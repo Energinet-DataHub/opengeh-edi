@@ -44,7 +44,7 @@ public class ProcessDelegationConfiguredEventProcessor : IIntegrationEventProces
         await _masterDataClient.CreateProcessDelegationAsync(
             new ProcessDelegationDto(
                 message.SequenceNumber,
-                MapToProcessType(message.Process.ToString()),
+                MapToProcessType(message.Process),
                 message.GridAreaCode,
                 message.StartsAt.ToInstant(),
                 message.StopsAt.ToInstant(),
@@ -53,14 +53,14 @@ public class ProcessDelegationConfiguredEventProcessor : IIntegrationEventProces
             cancellationToken).ConfigureAwait(false);
     }
 
-    private static ProcessType MapToProcessType(string delegatedProcess)
+    private static ProcessType MapToProcessType(DelegatedProcess delegatedProcess)
     {
         return delegatedProcess switch
         {
-            "ProcessRequestEnergyResults" => ProcessType.RequestedEnergyResults,
-            "ProcessReceiveEnergyResults" => ProcessType.RequestedEnergyResults,
-            "ProcessRequestWholesaleResults" => ProcessType.RequestedWholesaleResults,
-            "ProcessReceiveWholesaleResults" => ProcessType.CalculatedWholesaleResults,
+            DelegatedProcess.ProcessReceiveEnergyResults => ProcessType.ReceiveEnergyResults,
+            DelegatedProcess.ProcessRequestEnergyResults => ProcessType.RequestEnergyResults,
+            DelegatedProcess.ProcessRequestWholesaleResults => ProcessType.RequestWholesaleResults,
+            DelegatedProcess.ProcessReceiveWholesaleResults => ProcessType.ReceiveWholesaleResults,
             _ => throw new ArgumentOutOfRangeException(nameof(delegatedProcess), delegatedProcess, null),
         };
     }

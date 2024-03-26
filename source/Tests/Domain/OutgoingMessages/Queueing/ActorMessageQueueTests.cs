@@ -181,6 +181,6 @@ public class ActorMessageQueueTests
             ActorRole.MeteringPointAdministrator,
             string.Empty,
             Instant.FromUtc(2024, 1, 1, 0, 0),
-            processType ?? ProcessType.CalculatedEnergyResults);
+            processType ?? ProcessType.ReceiveEnergyResults);
     }
 }

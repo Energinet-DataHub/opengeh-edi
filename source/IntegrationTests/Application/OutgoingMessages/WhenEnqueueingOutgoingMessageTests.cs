@@ -98,7 +98,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.Equal(message.SenderRole.Code, result!.SenderRole),
             () => Assert.Equal(message.BusinessReason, result!.BusinessReason),
             () => Assert.Equal(message.Series.GridAreaCode, result!.GridAreaCode),
-            () => Assert.Equal(ProcessType.CalculatedEnergyResults.Name, result!.MessageCreatedFromProcess),
+            () => Assert.Equal(ProcessType.ReceiveEnergyResults.Name, result!.MessageCreatedFromProcess),
             () => Assert.Equal(expectedFileStorageReference, result!.FileStorageReference),
             () => Assert.Equal("OutgoingMessage", result!.Discriminator),
             () => Assert.Equal(message.RelatedToMessageId?.Value, result!.RelatedToMessageId),

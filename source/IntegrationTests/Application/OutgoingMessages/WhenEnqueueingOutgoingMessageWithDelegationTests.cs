@@ -269,7 +269,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             .WithReceiverRole(delegatedBy.ActorRole)
             .Build();
 
-        await AddDelegation(delegatedBy, delegatedTo, message.Series.GridAreaCode, processType: ProcessType.CalculatedWholesaleResults);
+        await AddDelegation(delegatedBy, delegatedTo, message.Series.GridAreaCode, processType: ProcessType.ReceiveWholesaleResults);
 
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
@@ -306,7 +306,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             ActorNumber.Create("8884567892341"),
             ActorRole.Delegated,
             "500",
-            ProcessType.CalculatedWholesaleResults,
+            ProcessType.ReceiveWholesaleResults,
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)));
         await AddDelegation(
@@ -315,7 +315,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             ActorNumber.Create("8884567892342"),
             ActorRole.Delegated,
             "600",
-            ProcessType.CalculatedWholesaleResults,
+            ProcessType.ReceiveWholesaleResults,
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(4)),
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(14)));
         await AddDelegation(
@@ -324,7 +324,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             ActorNumber.Create("8884567892343"),
             ActorRole.Delegated,
             "700",
-            ProcessType.CalculatedWholesaleResults,
+            ProcessType.ReceiveWholesaleResults,
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)),
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(7)));
     }
@@ -342,7 +342,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await masterDataClient.CreateProcessDelegationAsync(
             new ProcessDelegationDto(
                 sequenceNumber,
-                processType ?? ProcessType.CalculatedEnergyResults,
+                processType ?? ProcessType.ReceiveEnergyResults,
                 gridAreaCode,
                 startsAt ?? SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
                 stopsAt ?? SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)),

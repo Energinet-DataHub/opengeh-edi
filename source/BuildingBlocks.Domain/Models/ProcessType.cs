@@ -19,10 +19,10 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public class ProcessType : EnumerationType
 {
-    public static readonly ProcessType RequestedEnergyResults = new(nameof(RequestedEnergyResults));
-    public static readonly ProcessType CalculatedEnergyResults = new(nameof(CalculatedEnergyResults));
-    public static readonly ProcessType RequestedWholesaleResults = new(nameof(RequestedWholesaleResults));
-    public static readonly ProcessType CalculatedWholesaleResults = new(nameof(CalculatedWholesaleResults));
+    public static readonly ProcessType RequestEnergyResults = new(nameof(RequestEnergyResults));
+    public static readonly ProcessType ReceiveEnergyResults = new(nameof(ReceiveEnergyResults));
+    public static readonly ProcessType RequestWholesaleResults = new(nameof(RequestWholesaleResults));
+    public static readonly ProcessType ReceiveWholesaleResults = new(nameof(ReceiveWholesaleResults));
 
     private ProcessType(string name)
         : base(name)
