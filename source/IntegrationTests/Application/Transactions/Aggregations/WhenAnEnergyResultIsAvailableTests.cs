@@ -80,6 +80,7 @@ public class WhenAnEnergyResultIsAvailableTests : TestBase
             .HasReceiverRole(ActorRole.EnergySupplier.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
+            .HasProcessType(ProcessType.ReceiveEnergyResults)
             .HasRelationTo(null)
             .HasMessageRecordValue<EnergyResultMessageTimeSeries>(timeSeries => timeSeries.Period.Start, SampleData.StartOfPeriod)
             .HasMessageRecordValue<EnergyResultMessageTimeSeries>(timeSeries => timeSeries.Period.End, SampleData.EndOfPeriod)
@@ -111,6 +112,7 @@ public class WhenAnEnergyResultIsAvailableTests : TestBase
             .HasReceiverRole(ActorRole.MeteredDataResponsible.Code)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
+            .HasProcessType(ProcessType.ReceiveEnergyResults)
             .HasMessageRecordValue<EnergyResultMessageTimeSeries>(x => x.MeteringPointType, MeteringPointType.Consumption.Name)
             .HasMessageRecordValue<EnergyResultMessageTimeSeries>(property => property.SettlementType!, SettlementType.NonProfiled.Name);
     }
@@ -139,6 +141,7 @@ public class WhenAnEnergyResultIsAvailableTests : TestBase
             .HasReceiverRole(ActorRole.MeteredDataResponsible.Code)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
+            .HasProcessType(ProcessType.ReceiveEnergyResults)
             .HasMessageRecordValue<EnergyResultMessageTimeSeries>(x => x.GridAreaCode, SampleData.GridAreaCode)
             .HasMessageRecordValue<EnergyResultMessageTimeSeries>(x => x.Resolution, BuildingBlocks.Domain.Models.Resolution.QuarterHourly.Name)
             .HasMessageRecordValue<EnergyResultMessageTimeSeries>(x => x.MeasureUnitType, MeasurementUnit.Kwh.Name)
@@ -173,6 +176,7 @@ public class WhenAnEnergyResultIsAvailableTests : TestBase
             .HasReceiverRole(ActorRole.BalanceResponsibleParty.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
+            .HasProcessType(ProcessType.ReceiveEnergyResults)
             .HasMessageRecordValue<EnergyResultMessageTimeSeries>(
                 series => series.BalanceResponsibleNumber!,
                 SampleData.BalanceResponsibleNumber.Value)
@@ -207,6 +211,7 @@ public class WhenAnEnergyResultIsAvailableTests : TestBase
             .HasReceiverRole(ActorRole.BalanceResponsibleParty.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
+            .HasProcessType(ProcessType.ReceiveEnergyResults)
             .HasMessageRecordValue<EnergyResultMessageTimeSeries>(
                 series => series.BalanceResponsibleNumber!,
                 SampleData.BalanceResponsibleNumber.Value)
@@ -244,6 +249,7 @@ public class WhenAnEnergyResultIsAvailableTests : TestBase
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasBusinessReason(businessReason)
+            .HasProcessType(ProcessType.ReceiveEnergyResults)
             .HasMessageRecordValue<EnergyResultMessageTimeSeries>(x => x.MeteringPointType, MeteringPointType.Exchange.Name);
     }
 
@@ -274,6 +280,7 @@ public class WhenAnEnergyResultIsAvailableTests : TestBase
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasBusinessReason(businessReason)
+            .HasProcessType(ProcessType.ReceiveEnergyResults)
             .HasMessageRecordValue<EnergyResultMessageTimeSeries>(x => x.MeteringPointType, MeteringPointType.Consumption.Name);
     }
 
@@ -301,6 +308,7 @@ public class WhenAnEnergyResultIsAvailableTests : TestBase
             .HasReceiverRole(ActorRole.MeteredDataResponsible.Code)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
+            .HasProcessType(ProcessType.ReceiveEnergyResults)
             .HasBusinessReason(businessReason);
     }
 

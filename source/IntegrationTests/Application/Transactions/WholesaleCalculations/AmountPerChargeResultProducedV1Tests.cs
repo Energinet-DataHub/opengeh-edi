@@ -230,6 +230,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .HasReceiverRole(ActorRole.EnergySupplier.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
+            .HasProcessType(ProcessType.ReceiveWholesaleResults)
             .HasRelationTo(null)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.CalculationVersion, calculationVersion)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.GridAreaCode, gridAreaCode)

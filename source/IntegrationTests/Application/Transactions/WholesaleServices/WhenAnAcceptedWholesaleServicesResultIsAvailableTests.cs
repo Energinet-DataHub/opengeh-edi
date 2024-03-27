@@ -71,6 +71,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasRelationTo(process.InitiatedByMessageId)
             .HasBusinessReason(process.BusinessReason)
+            .HasProcessType(ProcessType.RequestWholesaleResults)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.Start.ToString(), process.StartOfPeriod)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.End.ToString(), process.EndOfPeriod)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.GridAreaCode, process.GridAreaCode)

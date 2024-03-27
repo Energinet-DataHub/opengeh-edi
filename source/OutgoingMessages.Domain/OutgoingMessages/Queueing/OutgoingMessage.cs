@@ -224,7 +224,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                     wholesaleServicesMessageDto.SenderRole,
                     serializer.Serialize(wholesaleServicesMessageDto.Series),
                     timestamp,
-                    ProcessType.RequestWholesaleResults,
+                    ProcessType.ReceiveWholesaleResults,
                     wholesaleServicesMessageDto.RelatedToMessageId,
                     wholesaleServicesMessageDto.Series.GridAreaCode),
                 new(
@@ -237,7 +237,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                     wholesaleServicesMessageDto.SenderRole,
                     serializer.Serialize(wholesaleServicesMessageDto.Series),
                     timestamp,
-                    ProcessType.RequestWholesaleResults,
+                    ProcessType.ReceiveWholesaleResults,
                     wholesaleServicesMessageDto.RelatedToMessageId,
                     wholesaleServicesMessageDto.Series.GridAreaCode),
             };
@@ -286,7 +286,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 acceptedWholesaleServicesMessage.SenderRole,
                 serializer.Serialize(acceptedWholesaleServicesMessage.Series),
                 timestamp,
-                ProcessType.ReceiveWholesaleResults,
+                ProcessType.RequestWholesaleResults,
                 acceptedWholesaleServicesMessage.RelatedToMessageId);
         }
 
