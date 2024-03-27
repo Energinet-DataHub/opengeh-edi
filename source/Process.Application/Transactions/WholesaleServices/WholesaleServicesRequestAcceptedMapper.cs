@@ -166,7 +166,7 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         {
             points.Add(new Point(
                 pointPosition,
-                Parse(point.Quantity) ?? throw new InvalidOperationException("Missing time serie point quantity"),
+                Parse(point.Quantity),
                 CalculatedQuantityQualityMapper.Map(point.QuantityQualities.ToList().AsReadOnly()),
                 Parse(point.Price),
                 Parse(point.Amount)));
