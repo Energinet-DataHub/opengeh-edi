@@ -1,0 +1,56 @@
+{
+  "RequestWholesaleSettlement_MarketDocument": {
+    "mRID": "{MessageId}",
+    "businessSector.type": {
+      "value": "23"
+    },
+    "createdDateTime": "2022-12-17T09:30:47Z",
+    "process.processType": {
+      "value": "D05"
+    },
+    "receiver_MarketParticipant.mRID": {
+      "codingScheme": "A10",
+      "value": "5790001330552"
+    },
+    "receiver_MarketParticipant.marketRole.type": {
+      "value": "DGL"
+    },
+    "sender_MarketParticipant.mRID": {
+      "codingScheme": "A10",
+      "value": "5790001330552"
+    },
+    "sender_MarketParticipant.marketRole.type": {
+      "value": "EZ"
+    },
+    "type": {
+      "value": "D21"
+    },
+    "Series": [
+      {
+        "mRID": "{TransactionId}",
+        "chargeTypeOwner_MarketParticipant.mRID": {
+          "codingScheme": "A10",
+          "value": "5790001330552"
+        },
+        "end_DateAndOrTime.dateTime": "2023-02-28T23:00:00Z",
+        "energySupplier_MarketParticipant.mRID": {
+          "codingScheme": "A10",
+          "value": "5790001687137"
+        },
+        "meteringGridArea_Domain.mRID": {
+          "codingScheme": "NDK",
+          "value": "804"
+        },
+        "start_DateAndOrTime.dateTime": "2023-03-31T22:00:00Z",
+        "ChargeType": [
+          {
+            "mRID": "40000",
+            "type": {
+              "value": "D03"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

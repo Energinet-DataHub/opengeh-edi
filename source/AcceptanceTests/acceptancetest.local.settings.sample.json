@@ -16,6 +16,8 @@
   "METERED_DATA_RESPONSIBLE_CLIENT_SECRET": "<client secret to generate token for metered data responsible>",
   "ENERGY_SUPPLIER_CLIENT_ID": "<client id to generate token for energy supplier>",
   "ENERGY_SUPPLIER_CLIENT_SECRET": "<client secret to generate token for energy supplier>",
+  "SYSTEM_OPERATOR_CLIENT_ID": "<client id to generate token for for system operator>",
+  "SYSTEM_OPERATOR_CLIENT_SECRET": "<client secret to generate token for for system operator>",
   
   "B2C_USERNAME": "<username for user in b2c tenant>",
   "B2C_PASSWORD": "<password for user in b2c tenant>",
