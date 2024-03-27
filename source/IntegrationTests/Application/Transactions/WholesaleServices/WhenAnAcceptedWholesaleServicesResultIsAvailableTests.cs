@@ -82,6 +82,40 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
     }
 
     [Fact]
+    public async Task Received_accepted_wholesale_monthly_sum_event_enqueues_message()
+    {
+        // Arrange
+        var process = WholesaleServicesProcessBuilder()
+            .SetState(WholesaleServicesProcess.State.Sent)
+            .Build();
+        Store(process);
+        var acceptedEvent = WholesaleServicesRequestAcceptedBuilder(process)
+            .BuildMonthlySum();
+
+        // Act
+        await HavingReceivedInboxEventAsync(nameof(WholesaleServicesRequestAccepted), acceptedEvent, process.ProcessId.Id);
+
+        // Assert
+        var outgoingMessage = await OutgoingMessageAsync(ActorRole.EnergySupplier, BusinessReason.WholesaleFixing);
+        outgoingMessage.Should().NotBeNull();
+        outgoingMessage
+            .HasReceiverId(process.RequestedByActorId.Value)
+            .HasDocumentReceiverId(process.RequestedByActorId.Value)
+            .HasReceiverRole(process.RequestedByActorRoleCode)
+            .HasDocumentReceiverRole(process.RequestedByActorRoleCode)
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
+            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
+            .HasRelationTo(process.InitiatedByMessageId)
+            .HasBusinessReason(process.BusinessReason)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.Start.ToString(), process.StartOfPeriod)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.End.ToString(), process.EndOfPeriod)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.GridAreaCode, process.GridAreaCode)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.ChargeOwner.Value, process.ChargeOwner)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.EnergySupplier.Value, process.EnergySupplierId)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.OriginalTransactionIdReference, process.BusinessTransactionId.Id);
+    }
+
+    [Fact]
     public async Task Received_same_accepted_wholesale_services_event_twice_enqueues_1_message()
     {
         // Arrange
