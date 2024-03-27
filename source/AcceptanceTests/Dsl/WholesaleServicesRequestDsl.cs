@@ -38,7 +38,7 @@ public sealed class WholesaleServicesRequestDsl
         return _edi.RequestWholesaleSettlementAsync(DocumentFormat.Json, validMessage: false);
     }
 
-    internal Task ConfirmAcceptedResultIsAvailableInJson()
+    internal Task ConfirmWholesaleServicesResultIsAvailableInJson()
     {
         return _edi.PeekWholesaleSettlementResponseAsync(DocumentFormat.Json, "NotifyWholesaleServices_MarketDocument");
     }

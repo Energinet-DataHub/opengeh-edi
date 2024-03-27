@@ -35,13 +35,13 @@ public sealed class WhenWholesaleServicesIsRequestedTests
     }
 
     [Fact]
-    public async Task Actor_can_peek_and_dequeue_accepted_message_after_wholesale_services_has_been_requested()
+    public async Task Actor_can_peek_and_dequeue_wholesale_services_after_wholesale_services_has_been_requested()
     {
         await _wholesaleServicesRequest.EmptyQueueForActor();
 
         await _wholesaleServicesRequest.RequestWholesaleSettlementInJson();
 
-        await _wholesaleServicesRequest.ConfirmAcceptedResultIsAvailableInJson();
+        await _wholesaleServicesRequest.ConfirmWholesaleServicesResultIsAvailableInJson();
     }
 
     [Fact]
