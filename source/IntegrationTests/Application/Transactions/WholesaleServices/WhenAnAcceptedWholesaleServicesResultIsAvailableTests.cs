@@ -63,10 +63,10 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         var outgoingMessage = await OutgoingMessageAsync(ActorRole.EnergySupplier, BusinessReason.WholesaleFixing);
         outgoingMessage.Should().NotBeNull();
         outgoingMessage
-            .HasReceiverId(process.EnergySupplierId!)
-            .HasDocumentReceiverId(process.EnergySupplierId!)
-            .HasReceiverRole(ActorRole.EnergySupplier.Code)
-            .HasDocumentReceiverRole(ActorRole.EnergySupplier.Code)
+            .HasReceiverId(process.RequestedByActorId.Value)
+            .HasDocumentReceiverId(process.RequestedByActorId.Value)
+            .HasReceiverRole(process.RequestedByActorRoleCode)
+            .HasDocumentReceiverRole(process.RequestedByActorRoleCode)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasRelationTo(process.InitiatedByMessageId)

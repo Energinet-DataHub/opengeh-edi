@@ -88,6 +88,16 @@
       <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureData.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <EmbeddedResource Include="Messages\json\RequestWholesaleSettlement.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="Messages\xml\RequestWholesaleSettlement.xml" />
+      <EmbeddedResource Include="Messages\json\RequestWholesaleSettlementWithWrongDateFormat.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Messages\xml\RequestWholesaleSettlementWithBadPeriod.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>
