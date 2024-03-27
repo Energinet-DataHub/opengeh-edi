@@ -146,13 +146,13 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         };
     }
 
-    private static MeteringPointType MapMeteringPointType(WholesaleServicesRequestSeries.Types.MeteringPointType meteringPointType)
+    private static MeteringPointType? MapMeteringPointType(WholesaleServicesRequestSeries.Types.MeteringPointType meteringPointType)
     {
         return meteringPointType switch
         {
             WholesaleServicesRequestSeries.Types.MeteringPointType.Production => MeteringPointType.Production,
             WholesaleServicesRequestSeries.Types.MeteringPointType.Consumption => MeteringPointType.Consumption,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.Unspecified => throw new InvalidOperationException("Could not map metering point type"),
+            WholesaleServicesRequestSeries.Types.MeteringPointType.Unspecified => null,
             _ => throw new InvalidOperationException("Unknown metering point type"),
         };
     }

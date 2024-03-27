@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServic
 [Serializable]
 public record AcceptedWholesaleServicesSerieDto(
     IReadOnlyCollection<Point> Points,
-    MeteringPointType MeteringPointType,
+    MeteringPointType? MeteringPointType,
     Resolution Resolution,
     ChargeType ChargeType,
     MeasurementUnit MeasurementUnit,
