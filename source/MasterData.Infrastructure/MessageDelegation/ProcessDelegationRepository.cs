@@ -66,7 +66,6 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
 
         var delegation = await delegationQuery
             .OrderByDescending(processDelegation => processDelegation.SequenceNumber)
-            .ThenByDescending(processDelegation => processDelegation.StartsAt)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
 
         if (delegation == null)

@@ -52,8 +52,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_delegated()
     {
         // Arrange
-        var delegatedBy = CreateActorNumberAndRole();
-        var delegatedTo = CreateActorNumberAndRole();
+        var delegatedBy = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"));
+        var delegatedTo = CreateActorNumberAndRole(ActorNumber.Create("1234567891235"));
         var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(delegatedBy.ActorNumber.Value)
             .WithReceiverRole(delegatedBy.ActorRole)
@@ -72,8 +72,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_delegated_with_multiple_delegations()
     {
         // Arrange
-        var delegatedBy = CreateActorNumberAndRole();
-        var delegatedTo = CreateActorNumberAndRole();
+        var delegatedBy = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"));
+        var delegatedTo = CreateActorNumberAndRole(ActorNumber.Create("1234567891235"));
         var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(delegatedBy.ActorNumber.Value)
             .WithReceiverRole(delegatedBy.ActorRole)
@@ -93,8 +93,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_delegated_as_grid_operator()
     {
         // Arrange
-        var delegatedBy = CreateActorNumberAndRole(actorRole: ActorRole.GridOperator);
-        var delegatedTo = CreateActorNumberAndRole(actorRole: ActorRole.GridOperator);
+        var delegatedBy = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"), actorRole: ActorRole.GridOperator);
+        var delegatedTo = CreateActorNumberAndRole(ActorNumber.Create("1234567891235"), actorRole: ActorRole.GridOperator);
         var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(delegatedBy.ActorNumber.Value)
             .WithReceiverRole(delegatedTo.ActorRole)
@@ -113,8 +113,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_original_receiver_when_delegation_has_expired()
     {
         // Arrange
-        var delegatedBy = CreateActorNumberAndRole();
-        var delegatedTo = CreateActorNumberAndRole();
+        var delegatedBy = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"));
+        var delegatedTo = CreateActorNumberAndRole(ActorNumber.Create("1234567891235"));
         var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(delegatedBy.ActorNumber.Value)
             .WithReceiverRole(delegatedBy.ActorRole)
@@ -139,19 +139,19 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_original_receiver_when_delegation_is_in_future()
     {
         // Arrange
-        var delegatedBy = CreateActorNumberAndRole();
-        var delegatedTo = CreateActorNumberAndRole();
+        var delegatedBy = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"));
+        var delegatedTo = CreateActorNumberAndRole(ActorNumber.Create("1234567891235"));
         var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(delegatedBy.ActorNumber.Value)
             .WithReceiverRole(delegatedBy.ActorRole)
             .Build();
 
-        var startsAtInThePast = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(10));
+        var startsAtInTheFuture = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5));
         await AddDelegation(
             delegatedBy,
             delegatedTo,
             message.Series.GridAreaCode,
-            startsAt: startsAtInThePast,
+            startsAt: startsAtInTheFuture,
             stopsAt: SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(10)));
 
         // Act
@@ -165,18 +165,20 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_original_receiver_when_delegation_has_stopped()
     {
         // Arrange
-        var delegatedBy = CreateActorNumberAndRole();
-        var delegatedTo = CreateActorNumberAndRole();
+        var delegatedBy = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"));
+        var delegatedTo = CreateActorNumberAndRole(ActorNumber.Create("1234567891235"), actorRole: ActorRole.Delegated);
         var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(delegatedBy.ActorNumber.Value)
             .WithReceiverRole(delegatedBy.ActorRole)
             .Build();
 
         var startsAt = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(10));
+        var now = SystemClock.Instance.GetCurrentInstant();
+        _dateTimeProvider.SetNow(now);
         await AddDelegation(delegatedBy, delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, sequenceNumber: 0);
 
         // Newer delegation to original receiver, which stops previous delegation
-        await AddDelegation(delegatedBy, delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: startsAt, sequenceNumber: 1);
+        await AddDelegation(delegatedBy, delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: now, sequenceNumber: 1);
 
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
@@ -189,8 +191,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_delegated_with_new_delegation_after_a_stopped_delegation()
     {
         // Arrange
-        var delegatedBy = CreateActorNumberAndRole();
-        var delegatedTo = CreateActorNumberAndRole();
+        var delegatedBy = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"));
+        var delegatedTo = CreateActorNumberAndRole(ActorNumber.Create("1234567891235"));
         var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(delegatedBy.ActorNumber.Value)
             .WithReceiverRole(delegatedBy.ActorRole)
@@ -218,8 +220,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_delegated_on_delegation_starts_date()
     {
         // Arrange
-        var delegatedBy = CreateActorNumberAndRole();
-        var delegatedTo = CreateActorNumberAndRole();
+        var delegatedBy = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"));
+        var delegatedTo = CreateActorNumberAndRole(ActorNumber.Create("1234567891235"));
         var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(delegatedBy.ActorNumber.Value)
             .WithReceiverRole(delegatedBy.ActorRole)
@@ -240,8 +242,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_original_receiver_on_delegation_stops_date()
     {
         // Arrange
-        var delegatedBy = CreateActorNumberAndRole();
-        var delegatedTo = CreateActorNumberAndRole();
+        var delegatedBy = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"));
+        var delegatedTo = CreateActorNumberAndRole(ActorNumber.Create("1234567891235"));
         var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(delegatedBy.ActorNumber.Value)
             .WithReceiverRole(delegatedBy.ActorRole)
@@ -262,8 +264,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_original_receiver_when_delegated_for_another_process_type()
     {
         // Arrange
-        var delegatedBy = CreateActorNumberAndRole();
-        var delegatedTo = CreateActorNumberAndRole();
+        var delegatedBy = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"));
+        var delegatedTo = CreateActorNumberAndRole(ActorNumber.Create("1234567891235"));
         var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(delegatedBy.ActorNumber.Value)
             .WithReceiverRole(delegatedBy.ActorRole)
@@ -284,9 +286,9 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         base.Dispose(disposing);
     }
 
-    private static ActorNumberAndRoleDto CreateActorNumberAndRole(ActorRole? actorRole = null)
+    private static ActorNumberAndRoleDto CreateActorNumberAndRole(ActorNumber actorNumber, ActorRole? actorRole = null)
     {
-        return new ActorNumberAndRoleDto(ActorNumber.Create("1234567891234"), actorRole ?? ActorRole.BalanceResponsibleParty);
+        return new ActorNumberAndRoleDto(actorNumber, actorRole ?? ActorRole.BalanceResponsibleParty);
     }
 
     private async Task AssertEnqueuedOutgoingMessage(OutgoingMessageId createdId, ActorNumberAndRoleDto receiverQueue, ActorNumberAndRoleDto receiverDocument)
