@@ -24,7 +24,7 @@ limitations under the License.
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.17.2" />
+        <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.17.4" />
         <PackageReference Include="Energinet.DataHub.Core.App.Common.Security" Version="8.2.0" />
         <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="10.0.0"/>
         <PackageReference Include="Energinet.DataHub.Core.Logging" Version="3.1.1" />
@@ -49,7 +49,8 @@ limitations under the License.
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
-        <PackageReference Include="Polly" Version="8.1.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.1" />
+        <PackageReference Include="Polly" Version="8.3.1" />
     </ItemGroup>
     <ItemGroup>
         <None Update="host.json">
