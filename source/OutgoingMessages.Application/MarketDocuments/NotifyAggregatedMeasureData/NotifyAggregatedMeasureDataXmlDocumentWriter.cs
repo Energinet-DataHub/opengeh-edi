@@ -62,6 +62,7 @@ public class NotifyAggregatedMeasureDataXmlDocumentWriter : DocumentWriter
                     MeteringPointType.FromName(timeSeries.MeteringPointType).Code)
                 .ConfigureAwait(false);
 
+#pragma warning disable CS0618 // Type or member is obsolete
             // TODO: This is keep for backward compatibility. Remove this in next pull request
             // only codes has length 3
             if (timeSeries.SettlementType is not null && timeSeries.SettlementType.Length == 3)
@@ -74,12 +75,15 @@ public class NotifyAggregatedMeasureDataXmlDocumentWriter : DocumentWriter
             }
             else
             {
+                var settlementMethodName = timeSeries.SettlementType ?? timeSeries.SettlementMethod;
+
                 await WriteElementIfHasValueAsync(
                         "marketEvaluationPoint.settlementMethod",
-                        timeSeries.SettlementType is null ? null : SettlementMethod.FromName(timeSeries.SettlementType).Code,
+                        settlementMethodName != null ? SettlementMethod.FromName(settlementMethodName).Code : null,
                         writer)
                     .ConfigureAwait(false);
             }
+#pragma warning restore CS0618 // Type or member is obsolete
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "meteringGridArea_Domain.mRID", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "NDK").ConfigureAwait(false);

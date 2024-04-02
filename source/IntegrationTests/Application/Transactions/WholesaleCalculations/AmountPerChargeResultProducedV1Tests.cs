@@ -245,7 +245,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.PriceMeasureUnit, MeasurementUnit.Kwh)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.Currency, Currency.DanishCrowns)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.ChargeType, ChargeType.Fee)
-            .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.SettlementType, SettlementMethod.Flex)
+            .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.SettlementMethod, SettlementMethod.Flex)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.MeteringPointType, MeteringPointType.Production)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.Resolution, Resolution.Hourly);
     }

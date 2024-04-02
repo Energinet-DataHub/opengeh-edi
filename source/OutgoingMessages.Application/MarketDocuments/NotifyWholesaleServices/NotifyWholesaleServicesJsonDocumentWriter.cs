@@ -100,12 +100,14 @@ public sealed class NotifyWholesaleServicesJsonDocumentWriter : IDocumentWriter
                             KeyValuePair.Create("value", series.MeteringPointType.Code));
                     }
 
-                    if (series.SettlementType is not null)
+#pragma warning disable CS0618 // Type or member is obsolete
+                    if (series.SettlementMethod is not null || series.SettlementType is not null)
                     {
                         writer.WriteObject(
                             "marketEvaluationPoint.settlementMethod",
-                            KeyValuePair.Create("value", series.SettlementType.Code));
+                            KeyValuePair.Create("value", series.SettlementType?.Code ?? series.SettlementMethod!.Code));
                     }
+#pragma warning restore CS0618 // Type or member is obsolete
 
                     writer.WriteProperty("chargeType.mRID", series.ChargeCode);
 
@@ -130,20 +132,11 @@ public sealed class NotifyWholesaleServicesJsonDocumentWriter : IDocumentWriter
 
                     writer.WriteProperty("product", ProductType.Tariff.Code);
 
-                    if (series.QuantityUnit != null)
-                    {
-                        // This is a bit of a hack, but it is the only way empty queues with old name
-                        writer.WriteObject(
-                            "quantity_Measure_Unit.name",
-                            KeyValuePair.Create("value", series.QuantityUnit.Code));
-                    }
-                    else
-                    {
-                        // this is the correct way to do it
-                        writer.WriteObject(
-                            "quantity_Measure_Unit.name",
-                            KeyValuePair.Create("value", series.QuantityMeasureUnit.Code));
-                    }
+#pragma warning disable CS0618 // Type or member is obsolete
+                    writer.WriteObject(
+                        "quantity_Measure_Unit.name",
+                        KeyValuePair.Create("value", series.QuantityUnit?.Code ?? series.QuantityMeasureUnit.Code));
+#pragma warning restore CS0618 // Type or member is obsolete
 
                     writer.WriteObject(
                         "price_Measure_Unit.name",

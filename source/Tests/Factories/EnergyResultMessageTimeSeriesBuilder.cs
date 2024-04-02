@@ -96,9 +96,9 @@ public class EnergyResultMessageTimeSeriesBuilder
         return this;
     }
 
-    public EnergyResultMessageTimeSeriesBuilder WithSettlementMethod(SettlementMethod? settlementType)
+    public EnergyResultMessageTimeSeriesBuilder WithSettlementMethod(SettlementMethod? settlementMethod)
     {
-        _settlementMethod = settlementType;
+        _settlementMethod = settlementMethod;
         return this;
     }
 
@@ -168,6 +168,7 @@ public class EnergyResultMessageTimeSeriesBuilder
             _transactionId,
             _gridAreaCode,
             _meteringPointType.Name,
+            null,
             _settlementMethod?.Name,
             _measurementUnit.Name,
             _resolution.Name,

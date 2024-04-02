@@ -55,7 +55,7 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
         actualTimeSeries.GridAreaDetails.GridAreaCode.Should().Be(firstSeries!.GridArea);
         actualTimeSeries.UnitType.Should().Be(MapUnitType(firstSeries));
         actualTimeSeries.MeteringPointType.Should().Be(MapMeteringPointType(firstSeries));
-        actualTimeSeries.SettlementType.Should().Be(MapSettlementMethod(firstSeries));
+        actualTimeSeries.SettlementMethod.Should().Be(MapSettlementMethod(firstSeries));
         actualTimeSeries.Points.Should()
             .BeEquivalentTo(
                 firstSeries.TimeSeriesPoints,

@@ -159,9 +159,9 @@ public class WholesaleServicesSeriesBuilder
         return this;
     }
 
-    public WholesaleServicesSeriesBuilder WithSettlementMethod(SettlementMethod? settlementType)
+    public WholesaleServicesSeriesBuilder WithSettlementMethod(SettlementMethod? settlementMethod)
     {
-        _settlementMethod = settlementType;
+        _settlementMethod = settlementMethod;
         return this;
     }
 
@@ -221,6 +221,7 @@ public class WholesaleServicesSeriesBuilder
             ChargeType: _chargeType,
             Resolution: _resolution,
             MeteringPointType: _meteringPointType,
+            null,
             _settlementMethod,
             _originalTransactionIdReference);
     }

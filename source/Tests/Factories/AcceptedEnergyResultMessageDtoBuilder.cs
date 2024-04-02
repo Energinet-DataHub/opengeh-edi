@@ -29,7 +29,7 @@ public static class AcceptedEnergyResultMessageDtoBuilder
     private static readonly ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
     private static readonly Guid _processId = Guid.NewGuid();
     private static readonly string _meteringPointType = MeteringPointType.Consumption.Code;
-    private static readonly string? _settlementType = SettlementMethod.Flex.Code;
+    private static readonly string? _settlementMethod = SettlementMethod.Flex.Code;
     private static readonly string _measureUnitType = MeasurementUnit.Kwh.Code;
     private static readonly string _resolution = Resolution.QuarterHourly.Code;
     private static readonly ActorNumber? _energySupplierNumber = ActorNumber.Create("1234567890123");
@@ -61,7 +61,7 @@ public static class AcceptedEnergyResultMessageDtoBuilder
             _processId,
             GridAreaCode,
             _meteringPointType,
-            _settlementType,
+            _settlementMethod,
             _measureUnitType,
             _resolution,
             _energySupplierNumber?.Value,

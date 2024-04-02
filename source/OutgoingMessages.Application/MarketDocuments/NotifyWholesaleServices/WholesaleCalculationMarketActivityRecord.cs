@@ -31,13 +31,22 @@ public record WholesaleCalculationMarketActivityRecord(
     Period Period,
     SettlementVersion? SettlementVersion,
     MeasurementUnit QuantityMeasureUnit,
+
+    // TODO: Should be removed at a later time, when all old outgoing messages are peeked
+    [property: Obsolete("Only kept for backwards compatibility, use QuantityMeasureUnit instead")]
     MeasurementUnit? QuantityUnit,
+
     MeasurementUnit PriceMeasureUnit,
     Currency Currency,
     ChargeType ChargeType,
     Resolution Resolution,
     MeteringPointType? MeteringPointType,
+
+    // TODO: Should be removed at a later time, when all old outgoing messages are peeked
+    [property: Obsolete("Only kept for backwards compatibility, use SettlementMethod instead")]
     SettlementMethod? SettlementType,
+
+    SettlementMethod? SettlementMethod,
     string? OriginalTransactionIdReference);
 
 public record Point(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);

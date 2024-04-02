@@ -66,7 +66,7 @@ public class AcceptedWholesaleServicesSeriesBuilder
             ChargeType: _chargeType,
             Resolution: _resolution,
             MeteringPointType: _meteringPointType,
-            SettlementType: _settlementMethod,
+            SettlementMethod: _settlementMethod,
             OriginalTransactionIdReference: _originalTransactionIdReference);
     }
 }

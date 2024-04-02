@@ -79,7 +79,7 @@ public record AcceptedWholesaleServicesSeries(
     ChargeType ChargeType,
     Resolution Resolution,
     MeteringPointType? MeteringPointType,
-    SettlementMethod? SettlementType,
+    SettlementMethod? SettlementMethod,
     string OriginalTransactionIdReference) : WholesaleServicesSeries(
     TransactionId,
     CalculationVersion,
@@ -98,5 +98,6 @@ public record AcceptedWholesaleServicesSeries(
     ChargeType,
     Resolution,
     MeteringPointType,
-    SettlementType,
+    null,
+    SettlementMethod,
     OriginalTransactionIdReference);

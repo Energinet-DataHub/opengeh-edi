@@ -114,7 +114,7 @@ public class WhenAnEnergyResultIsAvailableTests : TestBase
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasProcessType(ProcessType.ReceiveEnergyResults)
             .HasMessageRecordValue<EnergyResultMessageTimeSeries>(x => x.MeteringPointType, MeteringPointType.Consumption.Name)
-            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(property => property.SettlementType!, SettlementMethod.NonProfiled.Name);
+            .HasMessageRecordValue<EnergyResultMessageTimeSeries>(property => property.SettlementMethod!, SettlementMethod.NonProfiled.Name);
     }
 
     [Fact]
