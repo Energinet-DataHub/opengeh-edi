@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Asp.Versioning;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 
+[ApiVersion(1.0)]
 [ApiController]
 [Route("[controller]")]
 public class ArchivedMessageGetDocumentController : ControllerBase
