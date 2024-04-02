@@ -132,7 +132,7 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
                     // only codes has length 3
                     await WriteCodeWithCodeListReferenceAttributesAsync(
                             "SettlementMethod",
-                            EbixCode.Of(SettlementType.FromCode(timeSeries.SettlementType)),
+                            EbixCode.Of(SettlementMethod.FromCode(timeSeries.SettlementType)),
                             writer)
                         .ConfigureAwait(false);
                 }
@@ -140,7 +140,7 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
                 {
                     await WriteCodeWithCodeListReferenceAttributesAsync(
                             "SettlementMethod",
-                            EbixCode.Of(SettlementType.FromName(timeSeries.SettlementType)),
+                            EbixCode.Of(SettlementMethod.FromName(timeSeries.SettlementType)),
                             writer)
                         .ConfigureAwait(false);
                 }

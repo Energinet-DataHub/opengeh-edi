@@ -37,7 +37,7 @@ public record WholesaleCalculationMarketActivityRecord(
     ChargeType ChargeType,
     Resolution Resolution,
     MeteringPointType? MeteringPointType,
-    SettlementType? SettlementType,
+    SettlementMethod? SettlementType,
     string? OriginalTransactionIdReference);
 
 public record Point(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);

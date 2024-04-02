@@ -68,7 +68,7 @@ public class NotifyAggregatedMeasureDataXmlDocumentWriter : DocumentWriter
             {
                 await WriteElementIfHasValueAsync(
                         "marketEvaluationPoint.settlementMethod",
-                        SettlementType.FromCode(timeSeries.SettlementType).Code,
+                        SettlementMethod.FromCode(timeSeries.SettlementType).Code,
                         writer)
                     .ConfigureAwait(false);
             }
@@ -76,7 +76,7 @@ public class NotifyAggregatedMeasureDataXmlDocumentWriter : DocumentWriter
             {
                 await WriteElementIfHasValueAsync(
                         "marketEvaluationPoint.settlementMethod",
-                        timeSeries.SettlementType is null ? null : SettlementType.FromName(timeSeries.SettlementType).Code,
+                        timeSeries.SettlementType is null ? null : SettlementMethod.FromName(timeSeries.SettlementType).Code,
                         writer)
                     .ConfigureAwait(false);
             }

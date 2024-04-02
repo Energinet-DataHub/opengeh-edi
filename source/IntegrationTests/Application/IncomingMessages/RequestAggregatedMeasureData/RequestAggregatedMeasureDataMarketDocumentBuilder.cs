@@ -40,7 +40,7 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
     private string _serieId = Guid.NewGuid().ToString();
     private string _senderRole = ActorRole.EnergySupplier.Code;
     private string? _marketEvaluationPointType = MeteringPointType.Consumption.Code;
-    private string? _marketEvaluationSettlementMethod = SettlementType.Flex.Code;
+    private string? _marketEvaluationSettlementMethod = SettlementMethod.Flex.Code;
     private string? _energySupplierMarketParticipantId = SampleData.NewEnergySupplierNumber;
     private string? _balanceResponsiblePartyMarketParticipantId = "5799999933318";
 

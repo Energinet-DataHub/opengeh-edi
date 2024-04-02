@@ -55,7 +55,7 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
         actualTimeSeries.GridAreaDetails.GridAreaCode.Should().Be(firstSeries!.GridArea);
         actualTimeSeries.UnitType.Should().Be(MapUnitType(firstSeries));
         actualTimeSeries.MeteringPointType.Should().Be(MapMeteringPointType(firstSeries));
-        actualTimeSeries.SettlementType.Should().Be(MapSettlementType(firstSeries));
+        actualTimeSeries.SettlementType.Should().Be(MapSettlementMethod(firstSeries));
         actualTimeSeries.Points.Should()
             .BeEquivalentTo(
                 firstSeries.TimeSeriesPoints,
@@ -108,13 +108,13 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
         };
     }
 
-    private static SettlementType? MapSettlementType(Series aggregation)
+    private static SettlementMethod? MapSettlementMethod(Series aggregation)
     {
         return aggregation.TimeSeriesType switch
         {
             TimeSeriesType.Production => null,
-            TimeSeriesType.FlexConsumption => SettlementType.Flex,
-            TimeSeriesType.NonProfiledConsumption => SettlementType.NonProfiled,
+            TimeSeriesType.FlexConsumption => SettlementMethod.Flex,
+            TimeSeriesType.NonProfiledConsumption => SettlementMethod.NonProfiled,
             TimeSeriesType.NetExchangePerGa => null,
             TimeSeriesType.NetExchangePerNeighboringGa => null,
             TimeSeriesType.TotalConsumption => null,

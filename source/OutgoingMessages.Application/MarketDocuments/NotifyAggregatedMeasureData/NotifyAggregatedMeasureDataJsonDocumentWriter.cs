@@ -107,13 +107,13 @@ public class NotifyAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
                 {
                     writer.WriteObject(
                         "marketEvaluationPoint.settlementMethod",
-                        new KeyValuePair<string, string>("value", SettlementType.FromCode(series.SettlementType).Code));
+                        new KeyValuePair<string, string>("value", SettlementMethod.FromCode(series.SettlementType).Code));
                 }
                 else
                 {
                     writer.WriteObject(
                         "marketEvaluationPoint.settlementMethod",
-                        new KeyValuePair<string, string>("value", SettlementType.FromName(series.SettlementType).Code));
+                        new KeyValuePair<string, string>("value", SettlementMethod.FromName(series.SettlementType).Code));
                 }
             }
 

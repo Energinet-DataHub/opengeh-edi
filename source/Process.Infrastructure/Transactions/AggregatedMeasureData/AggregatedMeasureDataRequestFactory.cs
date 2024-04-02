@@ -67,7 +67,7 @@ public static class AggregatedMeasureDataRequestFactory
             request.MeteringPointType = MeteringPointType.TryGetNameFromCode(process.MeteringPointType, fallbackValue: process.MeteringPointType);
 
         if (process.SettlementMethod != null)
-            request.SettlementMethod = SettlementType.TryGetNameFromCode(process.SettlementMethod, fallbackValue: process.SettlementMethod);
+            request.SettlementMethod = SettlementMethod.TryGetNameFromCode(process.SettlementMethod, fallbackValue: process.SettlementMethod);
 
         if (process.EnergySupplierId != null)
             request.EnergySupplierId = process.EnergySupplierId;

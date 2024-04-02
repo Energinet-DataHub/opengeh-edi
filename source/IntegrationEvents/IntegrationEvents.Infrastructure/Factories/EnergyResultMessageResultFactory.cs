@@ -49,7 +49,7 @@ public class EnergyResultMessageResultFactory
             processId: Guid.NewGuid(),
             gridAreaCode: aggregationData.GridAreaCode,
             meteringPointType: MeteringPointTypeMapper.Map(integrationEvent.TimeSeriesType).Name,
-            settlementType: SettlementTypeMapper.Map(integrationEvent.TimeSeriesType)?.Name,
+            settlementType: SettlementMethodMapper.Map(integrationEvent.TimeSeriesType)?.Name,
             measureUnitType: MeasurementUnitMapper.Map(integrationEvent.QuantityUnit).Name,
             resolution: ResolutionMapper.Map(integrationEvent.Resolution).Name,
             energySupplierNumber: aggregationData.EnergySupplierNumber,

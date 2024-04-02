@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 public record AcceptedEnergyResultTimeSeries(
     IReadOnlyCollection<Point> Points,
     MeteringPointType MeteringPointType,
-    SettlementType? SettlementType,
+    SettlementMethod? SettlementType,
     MeasurementUnit UnitType,
     Resolution Resolution,
     GridAreaDetails GridAreaDetails,

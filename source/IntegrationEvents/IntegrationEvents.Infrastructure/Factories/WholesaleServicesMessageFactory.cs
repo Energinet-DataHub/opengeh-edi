@@ -126,7 +126,7 @@ public sealed class WholesaleServicesMessageFactory
             ChargeType: ChargeTypeMapper.Map(message.ChargeType),
             Resolution: ResolutionMapper.Map(message.Resolution),
             MeteringPointType: MeteringPointTypeMapper.Map(message.MeteringPointType),
-            SettlementType: SettlementTypeMapper.Map(message.SettlementMethod));
+            SettlementType: SettlementMethodMapper.Map(message.SettlementMethod));
 
         return wholesaleCalculationSeries;
     }

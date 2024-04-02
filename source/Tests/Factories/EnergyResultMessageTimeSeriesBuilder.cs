@@ -37,7 +37,7 @@ public class EnergyResultMessageTimeSeriesBuilder
     private Guid _transactionId = Guid.NewGuid();
     private string _gridAreaCode = "870";
     private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
-    private SettlementType? _settlementMethod = SettlementType.NonProfiled;
+    private SettlementMethod? _settlementMethod = SettlementMethod.NonProfiled;
     private MeasurementUnit _measurementUnit = MeasurementUnit.Kwh;
     private Resolution _resolution = Resolution.QuarterHourly;
     private string? _energySupplierNumber;
@@ -96,7 +96,7 @@ public class EnergyResultMessageTimeSeriesBuilder
         return this;
     }
 
-    public EnergyResultMessageTimeSeriesBuilder WithSettlementMethod(SettlementType? settlementType)
+    public EnergyResultMessageTimeSeriesBuilder WithSettlementMethod(SettlementMethod? settlementType)
     {
         _settlementMethod = settlementType;
         return this;
