@@ -28,10 +28,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 const string domainName = "EDI.B2CWebApi";
 
-builder.Logging
-    .ClearProviders()
-    .AddApplicationInsights();
-
 builder.Services
     .AddSwaggerForApplication()
     .AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>()
@@ -47,7 +43,8 @@ builder.Services
     .AddJwtTokenSecurity(builder.Configuration)
     .AddDateTime(builder.Configuration)
     .AddHttpClient()
-    .AddLiveHealthCheck();
+    .AddLiveHealthCheck()
+    .AddApplicationInsightsTelemetry();
 
 var blobStorageUrl = builder.Configuration["AZURE_STORAGE_ACCOUNT_URL"];
 
