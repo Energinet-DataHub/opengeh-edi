@@ -14,14 +14,15 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -276,13 +277,28 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         return new ActorNumberAndRoleDto(actorNumber, actorRole ?? ActorRole.BalanceResponsibleParty);
     }
 
-    private async Task AssertEnqueuedOutgoingMessage(OutgoingMessageId createdId, ActorNumberAndRoleDto receiverQueue, ActorNumberAndRoleDto receiverDocument)
+    private async Task AssertEnqueuedOutgoingMessage(
+        OutgoingMessageId createdId,
+        ActorNumberAndRoleDto receiverQueue,
+        ActorNumberAndRoleDto receiverDocument)
     {
         var enqueuedOutgoingMessage = await GetEnqueuedOutgoingMessageFromDatabase(createdId);
         enqueuedOutgoingMessage.ActorMessageQueueNumber.Should().Be(receiverQueue.ActorNumber.Value);
         enqueuedOutgoingMessage.ActorMessageQueueRole.Should().Be(receiverQueue.ActorRole.Code);
         enqueuedOutgoingMessage.DocumentReceiverNumber.Should().Be(receiverDocument.ActorNumber.Value);
         enqueuedOutgoingMessage.DocumentReceiverRole.Should().Be(receiverDocument.ActorRole.Code);
+
+        var result = await PeekMessageAsync(
+            MessageCategory.Aggregations,
+            actorNumber: receiverQueue.ActorNumber,
+            actorRole: receiverQueue.ActorRole);
+
+        AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
+            .IsDocumentType(DocumentType.NotifyAggregatedMeasureData)
+            .IsBusinessReason(BusinessReason.BalanceFixing)
+            .HasReceiverRole(receiverDocument.ActorRole)
+            .HasReceiver(receiverDocument.ActorNumber)
+            .HasSerieRecordCount(1);
     }
 
     private async Task<(string ActorMessageQueueNumber, string ActorMessageQueueRole, string DocumentReceiverNumber, string DocumentReceiverRole)> GetEnqueuedOutgoingMessageFromDatabase(OutgoingMessageId createdId)
