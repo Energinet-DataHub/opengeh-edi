@@ -180,7 +180,7 @@ public class AssertNotifyAggregatedMeasureDataEbixDocument : IAssertNotifyAggreg
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasSettlementMethod(SettlementType settlementMethod)
+    public IAssertNotifyAggregatedMeasureDataDocument HasSettlementMethod(SettlementMethod settlementMethod)
     {
         _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod", EbixCode.Of(settlementMethod));
         return this;

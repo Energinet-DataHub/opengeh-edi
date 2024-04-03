@@ -18,31 +18,31 @@ using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories.Mappers;
 
-public static class SettlementTypeMapper
+public static class SettlementMethodMapper
 {
-    public static SettlementType? Map(EnergyResultProducedV2.Types.TimeSeriesType timeSeriesType)
+    public static SettlementMethod? Map(EnergyResultProducedV2.Types.TimeSeriesType timeSeriesType)
     {
         return timeSeriesType switch
         {
-            // There exist no corresponding SettlementType for these TimeSeriesTypes
+            // There exist no corresponding SettlementMethod for these TimeSeriesTypes
             EnergyResultProducedV2.Types.TimeSeriesType.Production or
             EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerGa or
             EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerNeighboringGa or
             EnergyResultProducedV2.Types.TimeSeriesType.TotalConsumption => null,
 
-            EnergyResultProducedV2.Types.TimeSeriesType.FlexConsumption => SettlementType.Flex,
-            EnergyResultProducedV2.Types.TimeSeriesType.NonProfiledConsumption => SettlementType.NonProfiled,
+            EnergyResultProducedV2.Types.TimeSeriesType.FlexConsumption => SettlementMethod.Flex,
+            EnergyResultProducedV2.Types.TimeSeriesType.NonProfiledConsumption => SettlementMethod.NonProfiled,
             EnergyResultProducedV2.Types.TimeSeriesType.Unspecified => throw new InvalidOperationException("Could not map time series type"),
             _ => throw new ArgumentOutOfRangeException(nameof(timeSeriesType), timeSeriesType, "Unknown time series type from Wholesale"),
         };
     }
 
-    public static SettlementType? Map(AmountPerChargeResultProducedV1.Types.SettlementMethod settlementMethod)
+    public static SettlementMethod? Map(AmountPerChargeResultProducedV1.Types.SettlementMethod settlementMethod)
     {
         return settlementMethod switch
         {
-            AmountPerChargeResultProducedV1.Types.SettlementMethod.Flex => SettlementType.Flex,
-            AmountPerChargeResultProducedV1.Types.SettlementMethod.NonProfiled => SettlementType.NonProfiled,
+            AmountPerChargeResultProducedV1.Types.SettlementMethod.Flex => SettlementMethod.Flex,
+            AmountPerChargeResultProducedV1.Types.SettlementMethod.NonProfiled => SettlementMethod.NonProfiled,
             AmountPerChargeResultProducedV1.Types.SettlementMethod.Unspecified => null,
             _ => throw new ArgumentOutOfRangeException(nameof(settlementMethod), settlementMethod, "Unknown time series type from Wholesale"),
         };

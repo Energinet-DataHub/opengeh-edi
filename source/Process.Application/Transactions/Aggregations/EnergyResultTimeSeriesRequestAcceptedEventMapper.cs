@@ -55,7 +55,7 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
             acceptedEnergyResultTimeSeries.Add(new AcceptedEnergyResultTimeSeries(
                 MapPoints(aggregation.TimeSeriesPoints),
                 MapMeteringPointType(aggregation.TimeSeriesType),
-                MapSettlementType(aggregation.TimeSeriesType),
+                MapSettlementMethod(aggregation.TimeSeriesType),
                 MapUnitType(aggregation.QuantityUnit),
                 MapResolution(aggregation.Resolution),
                 await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false),
@@ -92,20 +92,20 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
         };
     }
 
-    private static SettlementType? MapSettlementType(TimeSeriesType timeSeriesType)
+    private static SettlementMethod? MapSettlementMethod(TimeSeriesType timeSeriesType)
     {
         return timeSeriesType switch
         {
             TimeSeriesType.Production => null,
-            TimeSeriesType.FlexConsumption => SettlementType.Flex,
-            TimeSeriesType.NonProfiledConsumption => SettlementType.NonProfiled,
+            TimeSeriesType.FlexConsumption => SettlementMethod.Flex,
+            TimeSeriesType.NonProfiledConsumption => SettlementMethod.NonProfiled,
             TimeSeriesType.NetExchangePerGa => null,
             TimeSeriesType.NetExchangePerNeighboringGa => null,
             TimeSeriesType.TotalConsumption => null,
             TimeSeriesType.Unspecified => throw new InvalidOperationException(
                 $"Unknown {typeof(TimeSeriesType)}. Value: {timeSeriesType}'"),
             _ => throw new InvalidOperationException(
-                $"Could not determine {typeof(SettlementType)} from 'timeSeriesType: {timeSeriesType}' of type: {typeof(TimeSeriesType)}"),
+                $"Could not determine {typeof(SettlementMethod)} from 'timeSeriesType: {timeSeriesType}' of type: {typeof(TimeSeriesType)}"),
         };
     }
 

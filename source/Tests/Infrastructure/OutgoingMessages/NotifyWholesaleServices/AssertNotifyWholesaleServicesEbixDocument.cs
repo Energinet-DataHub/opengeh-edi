@@ -272,7 +272,7 @@ internal sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyW
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementType settlementMethod)
+    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod settlementMethod)
     {
         _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod", settlementMethod.Code);
         return this;
