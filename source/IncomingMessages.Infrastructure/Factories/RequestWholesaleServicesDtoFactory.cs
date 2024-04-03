@@ -32,7 +32,7 @@ public static class RequestWholesaleServicesDtoFactory
                     serie.EndDateTime,
                     serie.GridArea,
                     serie.EnergySupplierId,
-                    serie.SettlementSeriesVersion,
+                    serie.SettlementVersion,
                     serie.Resolution,
                     serie.ChargeOwner,
                     serie.ChargeTypes

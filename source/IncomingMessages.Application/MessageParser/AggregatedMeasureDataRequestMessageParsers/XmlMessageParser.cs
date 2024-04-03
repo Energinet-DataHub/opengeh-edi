@@ -166,7 +166,7 @@ public class XmlMessageParser : IMessageParser
         string? meteringGridAreaDomainId = null;
         string? energySupplierMarketParticipantId = null;
         string? balanceResponsiblePartyMarketParticipantId = null;
-        string? settlementSeriesVersion = null;
+        string? settlementVersion = null;
         var ns = rootElement.DefaultNamespace;
 
         await reader.AdvanceToAsync(SeriesRecordElementName, ns).ConfigureAwait(false);
@@ -184,7 +184,7 @@ public class XmlMessageParser : IMessageParser
                     ref meteringGridAreaDomainId,
                     ref energySupplierMarketParticipantId,
                     ref balanceResponsiblePartyMarketParticipantId,
-                    ref settlementSeriesVersion);
+                    ref settlementVersion);
                 yield return record;
             }
 
@@ -225,7 +225,7 @@ public class XmlMessageParser : IMessageParser
             }
             else if (reader.Is("settlement_Series.version", ns))
             {
-                settlementSeriesVersion = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                settlementVersion = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
             else
             {
@@ -243,7 +243,7 @@ public class XmlMessageParser : IMessageParser
         ref string? meteringGridAreaDomainId,
         ref string? energySupplierMarketParticipantId,
         ref string? balanceResponsiblePartyMarketParticipantId,
-        ref string? settlementSeriesVersion)
+        ref string? settlementVersion)
     {
         var serie = new RequestAggregatedMeasureDataSerie(
             id,
@@ -254,7 +254,7 @@ public class XmlMessageParser : IMessageParser
             meteringGridAreaDomainId,
             energySupplierMarketParticipantId,
             balanceResponsiblePartyMarketParticipantId,
-            settlementSeriesVersion);
+            settlementVersion);
 
         id = string.Empty;
         marketEvaluationPointType = null;

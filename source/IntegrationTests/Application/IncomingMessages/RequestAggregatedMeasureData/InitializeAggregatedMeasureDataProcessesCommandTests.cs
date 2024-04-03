@@ -137,7 +137,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 
         aggregatedTimeSeriesRequest.RequestedByActorRole.Should().NotBeCimCode();
         aggregatedTimeSeriesRequest.BusinessReason.Should().NotBeCimCode();
-        aggregatedTimeSeriesRequest.SettlementSeriesVersion.Should().NotBeCimCode();
+        aggregatedTimeSeriesRequest.SettlementVersion.Should().NotBeCimCode();
         aggregatedTimeSeriesRequest.SettlementMethod.Should().NotBeCimCode();
         aggregatedTimeSeriesRequest.MeteringPointType.Should().NotBeCimCode();
     }
@@ -230,12 +230,12 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                         {
                             if (p.SettlementVersion is not null)
                             {
-                                p.SettlementVersion.Code.Should().Be(s.SettlementSeriesVersion);
+                                p.SettlementVersion.Code.Should().Be(s.SettlementVersion);
                             }
                             else
                             {
                                 p.SettlementVersion.Should().BeNull();
-                                p.SettlementVersion.Should().Be(s.SettlementSeriesVersion);
+                                p.SettlementVersion.Should().Be(s.SettlementVersion);
                             }
                         }
                     },

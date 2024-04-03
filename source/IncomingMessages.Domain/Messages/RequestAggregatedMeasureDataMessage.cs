@@ -35,4 +35,4 @@ public record RequestAggregatedMeasureDataSerie(
     string? MeteringGridAreaDomainId,
     string? EnergySupplierMarketParticipantId,
     string? BalanceResponsiblePartyMarketParticipantId,
-    string? SettlementSeriesVersion) : IIncomingMessageSerie;
+    string? SettlementVersion) : IIncomingMessageSerie;

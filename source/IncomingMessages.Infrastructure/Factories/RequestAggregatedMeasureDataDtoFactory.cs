@@ -35,7 +35,7 @@ public static class RequestAggregatedMeasureDataDtoFactory
                     serie.MeteringGridAreaDomainId,
                     serie.EnergySupplierMarketParticipantId,
                     serie.BalanceResponsiblePartyMarketParticipantId,
-                    serie.SettlementSeriesVersion)).ToList().AsReadOnly();
+                    serie.SettlementVersion)).ToList().AsReadOnly();
 
         return new RequestAggregatedMeasureDataDto(
                 requestAggregatedMeasureDataMessage.SenderNumber,

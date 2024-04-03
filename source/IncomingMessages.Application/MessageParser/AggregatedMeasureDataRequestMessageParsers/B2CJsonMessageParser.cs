@@ -59,7 +59,7 @@ public class B2CJsonMessageParser : IMessageParser
                     serie.MeteringGridAreaDomainId,
                     serie.EnergySupplierMarketParticipantId,
                     serie.BalanceResponsiblePartyMarketParticipantId,
-                    serie.SettlementSeriesVersion)).ToList().AsReadOnly();
+                    serie.SettlementVersion)).ToList().AsReadOnly();
 
         var requestAggregatedMeasureData = new RequestAggregatedMeasureDataMessage(
             requestAggregatedMeasureDataDto.SenderNumber,
