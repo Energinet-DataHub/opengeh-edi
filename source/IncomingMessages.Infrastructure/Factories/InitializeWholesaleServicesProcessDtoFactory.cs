@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.Process.Interfaces;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Factories;
 
-public static class RequestWholesaleServicesDtoFactory
+public static class InitializeWholesaleServicesProcessDtoFactory
 {
     public static InitializeWholesaleServicesProcessDto Create(RequestWholesaleServicesMessage wholesaleServicesMessage)
     {
@@ -26,7 +26,7 @@ public static class RequestWholesaleServicesDtoFactory
         var series = wholesaleServicesMessage.Serie
             .Cast<RequestWholesaleServicesSerie>()
             .Select(
-                serie => new InitializeWholesaleServicesSerie(
+                serie => new InitializeWholesaleServicesSeries(
                     serie.TransactionId,
                     serie.StartDateTime,
                     serie.EndDateTime,

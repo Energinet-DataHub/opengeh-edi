@@ -42,7 +42,7 @@ public class RequestAggregatedMeasureDataFactoryTests
             EnergySupplierId: "579000000003042",
             BalanceResponsibleId: "1234567890123");
 
-        var result = RequestAggregatedMeasureDataHttpFactory.Create(
+        var result = RequestAggregatedMeasureDataDtoFactory.Create(
             request,
             senderId,
             MarketRole.MeteredDataResponsible.Name,
@@ -55,15 +55,15 @@ public class RequestAggregatedMeasureDataFactoryTests
         Assert.Equal(MarketRole.MeteredDataResponsible.Code, result.SenderRoleCode);
         Assert.Equal("E74", result.MessageType);
 
-        Assert.All(result.Serie, serie =>
+        Assert.All(result.Serie, series =>
         {
-            Assert.Equal("E18", serie.MarketEvaluationPointType);
-            Assert.Null(serie.MarketEvaluationSettlementMethod);
-            Assert.Null(serie.SettlementSeriesVersion);
+            Assert.Equal("E18", series.MarketEvaluationPointType);
+            Assert.Null(series.MarketEvaluationSettlementMethod);
+            Assert.Null(series.SettlementSeriesVersion);
 
-            var startDate = InstantPattern.General.Parse(serie.StartDateAndOrTimeDateTime).GetValueOrThrow();
+            var startDate = InstantPattern.General.Parse(series.StartDateAndOrTimeDateTime).GetValueOrThrow();
             Assert.Equal(startDay, startDate.Day());
-            var endDate = InstantPattern.General.Parse(serie.EndDateAndOrTimeDateTime!).GetValueOrThrow();
+            var endDate = InstantPattern.General.Parse(series.EndDateAndOrTimeDateTime!).GetValueOrThrow();
             Assert.Equal(endDay, endDate.Day());
         });
     }
@@ -82,7 +82,7 @@ public class RequestAggregatedMeasureDataFactoryTests
             EnergySupplierId: "579000000003042",
             BalanceResponsibleId: "1234567890123");
 
-        var result = RequestAggregatedMeasureDataHttpFactory.Create(
+        var result = RequestAggregatedMeasureDataDtoFactory.Create(
             request,
             "9876543210987",
             MarketRole.MeteredDataResponsible.Name,

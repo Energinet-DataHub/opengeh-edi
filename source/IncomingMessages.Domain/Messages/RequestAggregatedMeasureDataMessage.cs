@@ -26,7 +26,7 @@ public record RequestAggregatedMeasureDataMessage(
     string? BusinessType,
     IReadOnlyCollection<IIncomingMessageSerie> Serie) : IIncomingMessage;
 
-public record RequestAggregatedMeasureDataSerie(
+public record RequestAggregatedMeasureDataMessageSeries(
     string TransactionId,
     string? MarketEvaluationPointType,
     string? MarketEvaluationSettlementMethod,

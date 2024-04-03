@@ -19,7 +19,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Factories;
 
-public static class RequestAggregatedMeasureDataHttpFactory
+public static class RequestAggregatedMeasureDataDtoFactory
 {
     private const string AggregatedMeasureDataMessageType = "E74";
     private const string Electricity = "23";
@@ -35,7 +35,7 @@ public static class RequestAggregatedMeasureDataHttpFactory
 
         var senderRoleCode = MapRoleNameToCode(senderRole);
 
-        var serie = new Serie(
+        var series = new RequestAggregatedMeasureDataSeries(
             Guid.NewGuid().ToString(),
             MapEvaluationPointType(request),
             MapSettlementMethod(request),
@@ -56,7 +56,7 @@ public static class RequestAggregatedMeasureDataHttpFactory
             Guid.NewGuid().ToString(),
             now.ToString(),
             Electricity,
-            new[] { serie });
+            new[] { series });
     }
 
     private static string? SetSettlementSeriesVersion(ProcessType processType)
