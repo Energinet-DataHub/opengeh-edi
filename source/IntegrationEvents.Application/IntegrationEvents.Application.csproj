@@ -20,7 +20,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
       <ProjectReference Include="..\IntegrationEvents.Infrastructure\IntegrationEvents.Infrastructure.csproj" />
     </ItemGroup>
 
