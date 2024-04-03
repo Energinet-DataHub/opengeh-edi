@@ -54,7 +54,9 @@ public class NotifyWholesaleServicesXmlDocumentWriter : DocumentWriter
             // These are there for later use, but are not used as of right now
             await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", wholesaleCalculationSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
             await WriteElementIfHasValueAsync("marketEvaluationPoint.type", wholesaleCalculationSeries.MeteringPointType?.Code, writer).ConfigureAwait(false);
-            await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", wholesaleCalculationSeries.SettlementType?.Code, writer).ConfigureAwait(false);
+#pragma warning disable CS0618 // Type or member is obsolete
+            await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", wholesaleCalculationSeries.SettlementType?.Code ?? wholesaleCalculationSeries.SettlementMethod?.Code, writer).ConfigureAwait(false);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "chargeType.mRID", null, wholesaleCalculationSeries.ChargeCode).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "chargeType.type", null, wholesaleCalculationSeries.ChargeType.Code).ConfigureAwait(false);
@@ -76,16 +78,9 @@ public class NotifyWholesaleServicesXmlDocumentWriter : DocumentWriter
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, ProductType.Tariff.Code).ConfigureAwait(false);
 
-            if (wholesaleCalculationSeries.QuantityUnit != null)
-            {
-                // This is a bit of a hack, but it is the only way empty queues with old name
-                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, wholesaleCalculationSeries.QuantityUnit.Code).ConfigureAwait(false);
-            }
-            else
-            {
-                // this is the correct way to do it
-                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, wholesaleCalculationSeries.QuantityMeasureUnit.Code).ConfigureAwait(false);
-            }
+#pragma warning disable CS0618 // Type or member is obsolete
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, wholesaleCalculationSeries.QuantityUnit?.Code ?? wholesaleCalculationSeries.QuantityMeasureUnit.Code).ConfigureAwait(false);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "price_Measure_Unit.name", null, wholesaleCalculationSeries.PriceMeasureUnit.Code).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "currency_Unit.name", null, wholesaleCalculationSeries.Currency.Code).ConfigureAwait(false);

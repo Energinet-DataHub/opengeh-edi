@@ -45,7 +45,7 @@ public class TestCreateOutgoingCommandHandler : IRequestHandler<TestCreateOutgoi
                 ProcessId.New().Id,
                 "1234",
                 MeteringPointType.Consumption.Name,
-                SettlementType.Flex.Name,
+                SettlementMethod.Flex.Name,
                 MeasurementUnit.Kwh.Name,
                 Resolution.QuarterHourly.Name,
                 "1234567891234",
