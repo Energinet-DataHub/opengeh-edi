@@ -45,6 +45,8 @@ using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjectio
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
@@ -57,7 +59,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using NodaTime;
 using Xunit;
+using SampleData = Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.SampleData;
 
 namespace Energinet.DataHub.EDI.IntegrationTests
 {
@@ -156,6 +160,12 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return id;
         }
 
+        protected Task<PeekResultDto> PeekMessageAsync(MessageCategory category, ActorNumber? actorNumber = null, ActorRole? actorRole = null)
+        {
+            var outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
+            return outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, actorRole ?? ActorRole.EnergySupplier, DocumentFormat.Xml), CancellationToken.None);
+        }
+
         protected Task<string?> GetArchivedMessageFileStorageReferenceFromDatabaseAsync(Guid messageId) => GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId.ToString());
 
         protected T GetService<T>()
@@ -163,6 +173,54 @@ namespace Energinet.DataHub.EDI.IntegrationTests
         {
             return ServiceProvider.GetRequiredService<T>();
         }
+
+        protected async Task AddMockDelegationsForActorAsync(ActorNumberAndRoleDto delegatedBy)
+        {
+        ArgumentNullException.ThrowIfNull(delegatedBy);
+        await AddDelegationAsync(
+            new ActorNumberAndRoleDto(delegatedBy.ActorNumber, delegatedBy.ActorRole),
+            new ActorNumberAndRoleDto(ActorNumber.Create("8884567892341"), ActorRole.Delegated),
+            "500",
+            ProcessType.ReceiveWholesaleResults,
+            SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
+            SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)));
+        await AddDelegationAsync(
+            new ActorNumberAndRoleDto(delegatedBy.ActorNumber, delegatedBy.ActorRole),
+            new ActorNumberAndRoleDto(ActorNumber.Create("8884567892342"), ActorRole.Delegated),
+            "600",
+            ProcessType.ReceiveWholesaleResults,
+            SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(4)),
+            SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(14)));
+        await AddDelegationAsync(
+            new ActorNumberAndRoleDto(delegatedBy.ActorNumber, delegatedBy.ActorRole),
+            new ActorNumberAndRoleDto(ActorNumber.Create("8884567892343"), ActorRole.Delegated),
+            "700",
+            ProcessType.ReceiveWholesaleResults,
+            SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)),
+            SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(7)));
+        }
+
+        protected async Task AddDelegationAsync(
+        ActorNumberAndRoleDto delegatedBy,
+        ActorNumberAndRoleDto delegatedTo,
+        string gridAreaCode,
+        ProcessType? processType = null,
+        Instant? startsAt = null,
+        Instant? stopsAt = null,
+        int sequenceNumber = 0)
+    {
+        var masterDataClient = GetService<IMasterDataClient>();
+        await masterDataClient.CreateProcessDelegationAsync(
+            new ProcessDelegationDto(
+                sequenceNumber,
+                processType ?? ProcessType.ReceiveEnergyResults,
+                gridAreaCode,
+                startsAt ?? SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
+                stopsAt ?? SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)),
+                delegatedBy,
+                delegatedTo),
+            CancellationToken.None);
+    }
 
         protected void ClearDbContextCaches()
         {

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
@@ -24,7 +23,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages
         public OutgoingMessageBundle(
             DocumentType documentType,
             Receiver receiver,
-            Guid processId,
+            Receiver documentReceiver,
             string businessReason,
             ActorNumber senderId,
             ActorRole senderRole,
@@ -34,21 +33,16 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages
         {
             DocumentType = documentType;
             Receiver = receiver;
-            ProcessId = processId;
+            DocumentReceiver = documentReceiver;
             BusinessReason = businessReason;
             SenderId = senderId;
             SenderRole = senderRole;
             AssignedBundleId = assignedBundleId;
             OutgoingMessages = outgoingMessages;
-            Id = Guid.NewGuid();
             RelatedToMessageId = relatedToMessageId;
         }
 
-        public Guid Id { get; }
-
         public DocumentType DocumentType { get; }
-
-        public Guid ProcessId { get; }
 
         public string BusinessReason { get; }
 
@@ -56,7 +50,15 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages
 
         public ActorRole SenderRole { get; }
 
+        /// <summary>
+        /// The actual receiver of the document.
+        /// </summary>
         public Receiver Receiver { get; }
+
+        /// <summary>
+        /// The receiver written within the document.
+        /// </summary>
+        public Receiver DocumentReceiver { get; }
 
         public BundleId AssignedBundleId { get; private set; }
 
