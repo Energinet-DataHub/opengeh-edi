@@ -225,7 +225,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
           BusinessReason.BalanceFixing,
           MessageId.New(),
           MeteringPointType.Consumption.Code,
-          SettlementType.Flex.Code,
+          SettlementMethod.Flex.Code,
           SampleData.StartOfPeriod,
           SampleData.EndOfPeriod,
           SampleData.GridAreaCode,

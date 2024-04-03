@@ -175,7 +175,7 @@ public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggrega
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasSettlementMethod(SettlementType settlementMethod)
+    public IAssertNotifyAggregatedMeasureDataDocument HasSettlementMethod(SettlementMethod settlementMethod)
     {
         ArgumentNullException.ThrowIfNull(settlementMethod);
         _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.settlementMethod", settlementMethod.Code);
