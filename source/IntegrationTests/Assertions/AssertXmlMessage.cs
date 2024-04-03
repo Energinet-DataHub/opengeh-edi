@@ -105,13 +105,20 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Assertions
 
         internal AssertXmlMessage IsBusinessReason(BusinessReason businessReason)
         {
-            Assert.Equal(businessReason.Code, GetMessageHeaderValue("process.processType"));
+            var messageHeaderValue = GetMessageHeaderValue("process.processType");
+            Assert.Equal(businessReason.Code, messageHeaderValue);
+            return this;
+        }
+
+        internal AssertXmlMessage HasReceiver(ActorNumber actorNumber)
+        {
+            Assert.Equal(actorNumber.Value, GetMessageHeaderValue("receiver_MarketParticipant.mRID"));
             return this;
         }
 
         internal AssertXmlMessage HasReceiverRole(ActorRole actorRole)
         {
-            Assert.Equal(actorRole.Name, GetMessageHeaderValue("receiver_MarketParticipant.marketRole.type"));
+            Assert.Equal(actorRole.Code, GetMessageHeaderValue("receiver_MarketParticipant.marketRole.type"));
             return this;
         }
 

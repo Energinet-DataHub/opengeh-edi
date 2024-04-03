@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
@@ -208,6 +209,29 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         // Assert
         peekResult.MessageId.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task Document_is_for_delegated_actor()
+    {
+        var expectedReceiver = ActorNumber.Create("1234567890123");
+        var delegatedBy = new ActorNumberAndRoleDto(ActorNumber.Create(SampleData.NewEnergySupplierNumber), ActorRole.EnergySupplier);
+        var delegatedTo = new ActorNumberAndRoleDto(expectedReceiver, ActorRole.EnergySupplier);
+        var message = _energyResultMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .WithReceiverRole(ActorRole.EnergySupplier)
+            .Build();
+        await AddDelegationAsync(delegatedBy, delegatedTo, message.Series.GridAreaCode);
+        await EnqueueMessage(message);
+
+        var result = await PeekMessage(MessageCategory.Aggregations, actorNumber: expectedReceiver);
+
+        AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
+            .IsDocumentType(DocumentType.NotifyAggregatedMeasureData)
+            .IsBusinessReason(BusinessReason.BalanceFixing)
+            .HasReceiverRole(ActorRole.EnergySupplier)
+            .HasReceiver(expectedReceiver)
+            .HasSerieRecordCount(1);
     }
 
     private async Task<bool> BundleIsRegistered()

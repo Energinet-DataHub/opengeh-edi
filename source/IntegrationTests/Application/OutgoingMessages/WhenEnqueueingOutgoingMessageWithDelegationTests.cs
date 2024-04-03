@@ -60,7 +60,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             .WithReceiverRole(_delegatedBy.ActorRole)
             .Build();
 
-        await AddDelegation(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
 
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
@@ -78,8 +78,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             .WithReceiverRole(_delegatedBy.ActorRole)
             .Build();
 
-        await AddMockDelegationsForActor(_delegatedBy);
-        await AddDelegation(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
+        await AddMockDelegationsForActorAsync(_delegatedBy);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
 
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
@@ -99,7 +99,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             .WithReceiverRole(_delegatedTo.ActorRole)
             .Build();
 
-        await AddDelegation(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
 
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
@@ -118,7 +118,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             .Build();
 
         var endsAtInThePast = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(1));
-        await AddDelegation(
+        await AddDelegationAsync(
             _delegatedBy,
             _delegatedTo,
             message.Series.GridAreaCode,
@@ -142,7 +142,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             .Build();
 
         var startsAtInTheFuture = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5));
-        await AddDelegation(
+        await AddDelegationAsync(
             _delegatedBy,
             _delegatedTo,
             message.Series.GridAreaCode,
@@ -168,10 +168,10 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         var startsAt = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(10));
         var now = SystemClock.Instance.GetCurrentInstant();
         _dateTimeProvider.SetNow(now);
-        await AddDelegation(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, sequenceNumber: 0);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, sequenceNumber: 0);
 
         // Newer delegation to original receiver, which stops previous delegation
-        await AddDelegation(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: now, sequenceNumber: 1);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: now, sequenceNumber: 1);
 
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
@@ -190,15 +190,15 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             .Build();
 
         var startsAtForStoppedDelegation = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(10));
-        await AddDelegation(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAtForStoppedDelegation, sequenceNumber: 0);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAtForStoppedDelegation, sequenceNumber: 0);
 
         // delegation, which stops previous delegation
-        await AddDelegation(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAtForStoppedDelegation, stopsAt: startsAtForStoppedDelegation, sequenceNumber: 1);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAtForStoppedDelegation, stopsAt: startsAtForStoppedDelegation, sequenceNumber: 1);
 
         // new delegation, which starts delegation to _delegatedTo
         var startsAt = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5));
         var stopsAt = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5));
-        await AddDelegation(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: stopsAt, sequenceNumber: 2);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: stopsAt, sequenceNumber: 2);
 
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
@@ -218,7 +218,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
 
         var startsAt = Instant.FromUtc(2024, 10, 1, 0, 0);
         _dateTimeProvider.SetNow(startsAt);
-        await AddDelegation(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: startsAt.Plus(Duration.FromDays(5)));
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: startsAt.Plus(Duration.FromDays(5)));
 
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
@@ -238,7 +238,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
 
         var stopsAt = Instant.FromUtc(2024, 10, 1, 0, 0);
         _dateTimeProvider.SetNow(stopsAt);
-        await AddDelegation(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: stopsAt.Minus(Duration.FromDays(5)), stopsAt: stopsAt);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: stopsAt.Minus(Duration.FromDays(5)), stopsAt: stopsAt);
 
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
@@ -256,7 +256,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             .WithReceiverRole(_delegatedBy.ActorRole)
             .Build();
 
-        await AddDelegation(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, processType: ProcessType.ReceiveWholesaleResults);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, processType: ProcessType.ReceiveWholesaleResults);
 
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
@@ -283,53 +283,6 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         enqueuedOutgoingMessage.ActorMessageQueueRole.Should().Be(receiverQueue.ActorRole.Code);
         enqueuedOutgoingMessage.DocumentReceiverNumber.Should().Be(receiverDocument.ActorNumber.Value);
         enqueuedOutgoingMessage.DocumentReceiverRole.Should().Be(receiverDocument.ActorRole.Code);
-    }
-
-    private async Task AddMockDelegationsForActor(ActorNumberAndRoleDto delegatedBy)
-    {
-        await AddDelegation(
-            new ActorNumberAndRoleDto(delegatedBy.ActorNumber, delegatedBy.ActorRole),
-            new ActorNumberAndRoleDto(ActorNumber.Create("8884567892341"), ActorRole.Delegated),
-            "500",
-            ProcessType.ReceiveWholesaleResults,
-            SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
-            SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)));
-        await AddDelegation(
-            new ActorNumberAndRoleDto(delegatedBy.ActorNumber, delegatedBy.ActorRole),
-            new ActorNumberAndRoleDto(ActorNumber.Create("8884567892342"), ActorRole.Delegated),
-            "600",
-            ProcessType.ReceiveWholesaleResults,
-            SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(4)),
-            SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(14)));
-        await AddDelegation(
-            new ActorNumberAndRoleDto(delegatedBy.ActorNumber, delegatedBy.ActorRole),
-            new ActorNumberAndRoleDto(ActorNumber.Create("8884567892343"), ActorRole.Delegated),
-            "700",
-            ProcessType.ReceiveWholesaleResults,
-            SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)),
-            SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(7)));
-    }
-
-    private async Task AddDelegation(
-        ActorNumberAndRoleDto delegatedBy,
-        ActorNumberAndRoleDto delegatedTo,
-        string gridAreaCode,
-        ProcessType? processType = null,
-        Instant? startsAt = null,
-        Instant? stopsAt = null,
-        int sequenceNumber = 0)
-    {
-        var masterDataClient = GetService<IMasterDataClient>();
-        await masterDataClient.CreateProcessDelegationAsync(
-            new ProcessDelegationDto(
-                sequenceNumber,
-                processType ?? ProcessType.ReceiveEnergyResults,
-                gridAreaCode,
-                startsAt ?? SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
-                stopsAt ?? SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)),
-                delegatedBy,
-                delegatedTo),
-            CancellationToken.None);
     }
 
     private async Task<(string ActorMessageQueueNumber, string ActorMessageQueueRole, string DocumentReceiverNumber, string DocumentReceiverRole)> GetEnqueuedOutgoingMessageFromDatabase(OutgoingMessageId createdId)
