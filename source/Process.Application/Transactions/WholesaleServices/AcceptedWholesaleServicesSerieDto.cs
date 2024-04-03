@@ -27,7 +27,7 @@ public record AcceptedWholesaleServicesSerieDto(
     ChargeType ChargeType,
     MeasurementUnit MeasurementUnit,
     SettlementVersion? SettlementVersion,
-    SettlementType? SettlementType,
+    SettlementMethod? SettlementMethod,
     Currency Currency,
     ActorNumber ChargeOwnerId,
     ActorNumber EnergySupplierId,

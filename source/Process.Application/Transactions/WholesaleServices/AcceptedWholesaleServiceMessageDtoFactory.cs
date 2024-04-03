@@ -62,7 +62,7 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
             acceptedWholesaleServices.ChargeType,
             acceptedWholesaleServices.Resolution,
             acceptedWholesaleServices.MeteringPointType,
-            acceptedWholesaleServices.SettlementType,
+            acceptedWholesaleServices.SettlementMethod,
             OriginalTransactionIdReference: process.BusinessTransactionId.Id);
 
         return acceptedWholesaleCalculationSeries;

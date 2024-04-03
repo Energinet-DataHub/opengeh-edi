@@ -99,23 +99,26 @@ public class NotifyAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
                     new KeyValuePair<string, string>("value", series.EnergySupplierNumber));
             }
 
-            if (series.SettlementType is not null)
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (series.SettlementType is not null || series.SettlementMethod is not null)
             {
                 // TODO: This is keep for backward compatibility. Remove this in next pull request
                 // only codes has length 3
-                if (series.SettlementType.Length == 3)
+                if (series.SettlementType is not null && series.SettlementType.Length == 3)
                 {
                     writer.WriteObject(
                         "marketEvaluationPoint.settlementMethod",
-                        new KeyValuePair<string, string>("value", SettlementType.FromCode(series.SettlementType).Code));
+                        new KeyValuePair<string, string>("value", SettlementMethod.FromCode(series.SettlementType).Code));
                 }
                 else
                 {
+                    var settlementMethodName = series.SettlementType ?? series.SettlementMethod;
                     writer.WriteObject(
                         "marketEvaluationPoint.settlementMethod",
-                        new KeyValuePair<string, string>("value", SettlementType.FromName(series.SettlementType).Code));
+                        new KeyValuePair<string, string>("value", SettlementMethod.FromName(settlementMethodName!).Code));
                 }
             }
+#pragma warning restore CS0618 // Type or member is obsolete
 
             if (series.OriginalTransactionIdReference is not null)
             {

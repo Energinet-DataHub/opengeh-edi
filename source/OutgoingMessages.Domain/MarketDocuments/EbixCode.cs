@@ -84,16 +84,16 @@ public static class EbixCode
         return actorRole.Code;
     }
 
-    public static string Of(SettlementType settlementType)
+    public static string Of(SettlementMethod settlementMethod)
     {
-        ArgumentNullException.ThrowIfNull(settlementType);
+        ArgumentNullException.ThrowIfNull(settlementMethod);
 
-        if (settlementType == SettlementType.Flex)
+        if (settlementMethod == SettlementMethod.Flex)
             return "D01";
-        if (settlementType == SettlementType.NonProfiled)
+        if (settlementMethod == SettlementMethod.NonProfiled)
             return "E02";
 
-        throw NoCodeFoundFor(settlementType.Name);
+        throw NoCodeFoundFor(settlementMethod.Name);
     }
 
     public static string Of(MeasurementUnit measurementUnit)

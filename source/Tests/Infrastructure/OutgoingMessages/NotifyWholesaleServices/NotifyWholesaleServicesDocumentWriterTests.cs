@@ -187,7 +187,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         var secondPoint = new WholesaleServicesPoint(2, 1, 200, 200, null);
 
         var messageBuilder = _wholesaleServicesSeriesBuilder
-            .WithSettlementMethod(SettlementType.Flex)
+            .WithSettlementMethod(SettlementMethod.Flex)
             .WithMeteringPointType(MeteringPointType.Consumption)
             .WithResolution(Resolution.Hourly)
             .WithPoints(new()
@@ -204,7 +204,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
 
         // Assert
         AssertDocument(document, DocumentFormat.FromName(documentFormat))
-            .HasSettlementMethod(SettlementType.Flex)
+            .HasSettlementMethod(SettlementMethod.Flex)
             .HasMeteringPointType(MeteringPointType.Consumption)
             .HasResolution(Resolution.Hourly)
             .PriceAmountIsPresentForPointIndex(0, firstPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))
@@ -257,7 +257,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         var secondPoint = new WholesaleServicesPoint(2, 1, 200, 200, null);
 
         var messageBuilder = _wholesaleServicesSeriesBuilder
-            .WithSettlementMethod(SettlementType.NonProfiled)
+            .WithSettlementMethod(SettlementMethod.NonProfiled)
             .WithMeteringPointType(MeteringPointType.Consumption)
             .WithResolution(Resolution.Hourly)
             .WithPoints(new()
@@ -274,7 +274,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
 
         // Assert
         AssertDocument(document, DocumentFormat.FromName(documentFormat))
-            .HasSettlementMethod(SettlementType.NonProfiled)
+            .HasSettlementMethod(SettlementMethod.NonProfiled)
             .HasMeteringPointType(MeteringPointType.Consumption)
             .HasResolution(Resolution.Hourly)
             .PriceAmountIsPresentForPointIndex(0, firstPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))

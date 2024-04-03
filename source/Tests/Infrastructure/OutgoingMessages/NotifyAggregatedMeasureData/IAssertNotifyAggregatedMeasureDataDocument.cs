@@ -148,7 +148,7 @@ public interface IAssertNotifyAggregatedMeasureDataDocument
     /// <summary>
     /// Asserts the settlement method
     /// </summary>
-    IAssertNotifyAggregatedMeasureDataDocument HasSettlementMethod(SettlementType settlementMethod);
+    IAssertNotifyAggregatedMeasureDataDocument HasSettlementMethod(SettlementMethod settlementMethod);
 
     /// <summary>
     ///     Asserts the quality is present with the given code

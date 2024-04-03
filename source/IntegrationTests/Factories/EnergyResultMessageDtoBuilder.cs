@@ -41,7 +41,7 @@ public class EnergyResultMessageDtoBuilder
             _processId,
             GridAreaCode,
             MeteringPointType.Consumption.Name,
-            SettlementType.NonProfiled.Name,
+            SettlementMethod.NonProfiled.Name,
             MeasurementUnit.Kwh.Name,
             Resolution.Hourly.Name,
             null,
