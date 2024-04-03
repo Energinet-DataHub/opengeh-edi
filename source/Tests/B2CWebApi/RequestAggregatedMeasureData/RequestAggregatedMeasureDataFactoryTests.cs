@@ -55,15 +55,15 @@ public class RequestAggregatedMeasureDataFactoryTests
         Assert.Equal(MarketRole.MeteredDataResponsible.Code, result.SenderRoleCode);
         Assert.Equal("E74", result.MessageType);
 
-        Assert.All(result.Serie, series =>
+        Assert.All(result.Serie, serie =>
         {
-            Assert.Equal("E18", series.MarketEvaluationPointType);
-            Assert.Null(series.MarketEvaluationSettlementMethod);
-            Assert.Null(series.SettlementSeriesVersion);
+            Assert.Equal("E18", serie.MarketEvaluationPointType);
+            Assert.Null(serie.MarketEvaluationSettlementMethod);
+            Assert.Null(serie.SettlementSeriesVersion);
 
-            var startDate = InstantPattern.General.Parse(series.StartDateAndOrTimeDateTime).GetValueOrThrow();
+            var startDate = InstantPattern.General.Parse(serie.StartDateAndOrTimeDateTime).GetValueOrThrow();
             Assert.Equal(startDay, startDate.Day());
-            var endDate = InstantPattern.General.Parse(series.EndDateAndOrTimeDateTime!).GetValueOrThrow();
+            var endDate = InstantPattern.General.Parse(serie.EndDateAndOrTimeDateTime!).GetValueOrThrow();
             Assert.Equal(endDay, endDate.Day());
         });
     }

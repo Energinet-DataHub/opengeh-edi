@@ -224,7 +224,7 @@ public class MessageParserTests
     private static MemoryStream CreateProtoMemoryStream()
     {
         var dateTimeZone = DateTimeZoneProviders.Tzdb["Europe/Copenhagen"];
-        var series = new RequestAggregatedMeasureDataSeries(
+        var serie = new RequestAggregatedMeasureDataSeries(
             "123353185",
             "E17",
             "D01",
@@ -245,7 +245,7 @@ public class MessageParserTests
             "123564789123564789123564789123564789",
             SystemClock.Instance.GetCurrentInstant().ToString(),
             BusinessType: "23",
-            new[] { series });
+            new[] { serie });
 
         var jsonString = new Serializer().Serialize(request);
         var encoding = Encoding.UTF8;

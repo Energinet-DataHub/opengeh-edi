@@ -35,7 +35,7 @@ public static class RequestAggregatedMeasureDataDtoFactory
 
         var senderRoleCode = MapRoleNameToCode(senderRole);
 
-        var series = new RequestAggregatedMeasureDataSeries(
+        var serie = new RequestAggregatedMeasureDataSeries(
             Guid.NewGuid().ToString(),
             MapEvaluationPointType(request),
             MapSettlementMethod(request),
@@ -56,7 +56,7 @@ public static class RequestAggregatedMeasureDataDtoFactory
             Guid.NewGuid().ToString(),
             now.ToString(),
             Electricity,
-            new[] { series });
+            new[] { serie });
     }
 
     private static string? SetSettlementSeriesVersion(ProcessType processType)

@@ -26,16 +26,16 @@ public static class InitializeAggregatedMeasureDataProcessDtoFactory
         var series = requestAggregatedMeasureDataMessage.Serie
             .Cast<RequestAggregatedMeasureDataMessageSeries>()
             .Select(
-                series => new InitializeAggregatedMeasureDataProcessSeries(
-                    series.TransactionId,
-                    series.MarketEvaluationPointType,
-                    series.MarketEvaluationSettlementMethod,
-                    series.StartDateTime,
-                    series.EndDateTime,
-                    series.MeteringGridAreaDomainId,
-                    series.EnergySupplierMarketParticipantId,
-                    series.BalanceResponsiblePartyMarketParticipantId,
-                    series.SettlementSeriesVersion)).ToList().AsReadOnly();
+                serie => new InitializeAggregatedMeasureDataProcessSeries(
+                    serie.TransactionId,
+                    serie.MarketEvaluationPointType,
+                    serie.MarketEvaluationSettlementMethod,
+                    serie.StartDateTime,
+                    serie.EndDateTime,
+                    serie.MeteringGridAreaDomainId,
+                    serie.EnergySupplierMarketParticipantId,
+                    serie.BalanceResponsiblePartyMarketParticipantId,
+                    serie.SettlementSeriesVersion)).ToList().AsReadOnly();
 
         return new InitializeAggregatedMeasureDataProcessDto(
                 requestAggregatedMeasureDataMessage.SenderNumber,
