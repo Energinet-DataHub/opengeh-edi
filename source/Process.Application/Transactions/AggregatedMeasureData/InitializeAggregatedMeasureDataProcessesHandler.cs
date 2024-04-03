@@ -49,7 +49,7 @@ public class InitializeAggregatedMeasureDataProcessesHandler : IRequestHandler<I
         RequestAggregatedMeasureDataDto dto)
     {
         var actorSenderNumber = ActorNumber.Create(dto.SenderNumber);
-        var businessReason = BusinessReason.FromCode(dto.BusinessReason);
+        var businessReason = BusinessReason.FromCodeOrUnknown(dto.BusinessReason);
         var messageId = MessageId.Create(dto.MessageId);
 
         foreach (var serie in dto.Series)

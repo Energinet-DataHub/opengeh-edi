@@ -91,6 +91,28 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
     }
 
     [Fact]
+    public async Task When_WholesaleServicesProcess_is_initialized_with_unknown_business_reason_service_bus_message_is_sent_to_wholesale()
+    {
+        // Arrange
+        var unknownBusinessReason = "A47";
+        var marketMessage = InitializeProcessDtoBuilder()
+            .SetBusinessReason(unknownBusinessReason)
+            .Build();
+
+        // Act
+        await InvokeCommandAsync(new InitializeWholesaleServicesProcessesCommand(marketMessage));
+        await ProcessInternalCommandsAsync();
+
+        // Assert
+        var process = GetProcess(marketMessage.SenderNumber);
+        var message = _senderSpy.Message;
+        message.Should().NotBeNull();
+        process!.BusinessReason.Code.Should().Be(unknownBusinessReason);
+        process.BusinessReason.Name.Should().Be("UNKNOWN");
+        await AssertProcessState(marketMessage!.MessageId, WholesaleServicesProcess.State.Sent);
+    }
+
+    [Fact]
     public async Task When_WholesaleServicesRequest_is_sent_to_wholesale_it_contains_no_CIM_codes()
     {
         // Arrange

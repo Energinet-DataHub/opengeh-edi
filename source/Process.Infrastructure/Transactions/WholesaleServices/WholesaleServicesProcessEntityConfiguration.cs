@@ -44,7 +44,7 @@ internal sealed class WholesaleServicesProcessEntityConfiguration : IEntityTypeC
         builder.Property(x => x.BusinessReason)
             .HasConversion(
                 value => value.Code,
-                dbValue => BusinessReason.FromCode(dbValue));
+                dbValue => BusinessReason.FromCodeOrUnknown(dbValue));
         builder.Property(x => x.RequestedByActorId)
             .HasConversion(
                 toDbValue => toDbValue.Value,

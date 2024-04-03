@@ -29,7 +29,6 @@ public class InitializeWholesaleServicesProcessDtoBuilder
     private readonly string _meteringGridAreaDomainId = "244";
     private readonly string _messageType = "E74";
     private readonly string _businessType = "23";
-    private readonly string _businessReason = BusinessReason.WholesaleFixing.Code;
     private readonly string _receiverId = DataHubDetails.DataHubActorNumber.Value;
     private readonly string _receiverRole = ActorRole.MeteredDataAdministrator.Code;
     private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
@@ -37,6 +36,7 @@ public class InitializeWholesaleServicesProcessDtoBuilder
     private readonly string? _chargeOwner = SampleData.ChargeOwner;
     private readonly string? _chargeTypeId = "EA-001";
     private readonly string? _chargeTypeType = "D03";
+    private string _businessReason = BusinessReason.WholesaleFixing.Code;
     private string _senderId = SampleData.NewEnergySupplierNumber;
     private string? _settlementVersion;
     private string _messageId = Guid.NewGuid().ToString();
@@ -77,6 +77,12 @@ public class InitializeWholesaleServicesProcessDtoBuilder
     public InitializeWholesaleServicesProcessDtoBuilder SetSenderId(string s)
     {
         _senderId = s;
+        return this;
+    }
+
+    public InitializeWholesaleServicesProcessDtoBuilder SetBusinessReason(string businessReason)
+    {
+        _businessReason = businessReason;
         return this;
     }
 
