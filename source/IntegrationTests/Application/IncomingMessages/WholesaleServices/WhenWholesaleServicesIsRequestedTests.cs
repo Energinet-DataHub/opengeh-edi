@@ -108,7 +108,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
     }
 
     [Fact]
-    public async Task When_WholesaleServicesProcess_is_initialized_with_unknown_business_reason_process_is_still_created_correctly()
+    public async Task When_WholesaleServicesProcess_is_initialized_with_unknown_business_reason_process_can_still_be_created()
     {
         // Arrange
         var unknownBusinessReason = "A47";
