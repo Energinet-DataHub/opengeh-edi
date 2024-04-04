@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public sealed class BusinessReason : DataHubType<BusinessReason>, IDataHubTypeWithUnknown
+public sealed class BusinessReason : DataHubTypeWithUnknown<BusinessReason>
 {
     public static readonly BusinessReason MoveIn = new(DataHubNames.BusinessReason.MoveIn, "E65");
     public static readonly BusinessReason BalanceFixing = new(DataHubNames.BusinessReason.BalanceFixing, "D04");
@@ -26,15 +26,5 @@ public sealed class BusinessReason : DataHubType<BusinessReason>, IDataHubTypeWi
     public static readonly BusinessReason Correction = new(DataHubNames.BusinessReason.Correction, "D32");
 
     private BusinessReason(string name, string code, bool isUnknown = false)
-     : base(name, code)
-    {
-        IsUnknown = isUnknown;
-    }
-
-    public bool IsUnknown { get; }
-
-    public static BusinessReason FromCodeOrUnknown(string code)
-    {
-        return TryFromCode(code) ?? new BusinessReason(DataHubNames.BusinessReason.Unknown, code, true);
-    }
+     : base(name, code, isUnknown) { }
 }
