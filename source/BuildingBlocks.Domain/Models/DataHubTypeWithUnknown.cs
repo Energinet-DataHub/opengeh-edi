@@ -35,11 +35,11 @@ public abstract class DataHubTypeWithUnknown<T> : DataHubType<T>
 
     public static T FromCodeOrUnknown(string code)
     {
-        return TryFromCode(code) ?? CreateUnknown("UNKNOWN", code);
+        return TryFromCode(code) ?? CreateUnknown(code);
     }
 
-    private static T CreateUnknown(string name, string code)
+    private static T CreateUnknown(string code)
     {
-        return (T)Activator.CreateInstance(typeof(T), BindingFlags.NonPublic | BindingFlags.Instance, null, new object[] { name, code, true }, null)!;
+        return (T)Activator.CreateInstance(typeof(T), BindingFlags.NonPublic | BindingFlags.Instance, null, new object[] { code, code, true }, null)!;
     }
 }

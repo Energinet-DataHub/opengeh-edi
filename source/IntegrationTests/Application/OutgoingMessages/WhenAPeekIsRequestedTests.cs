@@ -211,6 +211,27 @@ public class WhenAPeekIsRequestedTests : TestBase
         peekResult.MessageId.Should().NotBeNull();
     }
 
+    [Fact]
+    public async Task When_unknown_business_reason_then_exception_is_thrown()
+    {
+        var unknownCode = "A47";
+        var expectedExceptionMessage = $"{unknownCode} is not a valid BusinessReason name";
+
+        var message = _energyResultMessageDtoBuilder
+            .WithBusinessReason(BusinessReason.FromCodeOrUnknown(unknownCode))
+            .Build();
+
+        var act = async () =>
+        {
+            await EnqueueMessage(message);
+            var result = await PeekMessageAsync(MessageCategory.None);
+            return result;
+        };
+
+        (await act.Should().ThrowAsync<InvalidOperationException>($"because {unknownCode} is a unknown BusinessReason code"))
+            .WithMessage(expectedExceptionMessage);
+    }
+
     private async Task<bool> BundleIsRegistered()
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);

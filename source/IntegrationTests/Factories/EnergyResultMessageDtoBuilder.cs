@@ -26,8 +26,8 @@ public class EnergyResultMessageDtoBuilder
 {
     private const string GridAreaCode = "805";
     private static readonly Guid _processId = ProcessId.Create(Guid.NewGuid()).Id;
-    private static readonly BusinessReason _businessReason = BusinessReason.BalanceFixing;
     private static readonly IReadOnlyCollection<EnergyResultMessagePoint> _points = new List<EnergyResultMessagePoint>();
+    private static BusinessReason _businessReason = BusinessReason.BalanceFixing;
     private static ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private static ActorRole _receiverRole = ActorRole.MeteredDataAdministrator;
 
@@ -61,6 +61,12 @@ public class EnergyResultMessageDtoBuilder
     public EnergyResultMessageDtoBuilder WithReceiverRole(ActorRole actorRole)
     {
         _receiverRole = actorRole;
+        return this;
+    }
+
+    public EnergyResultMessageDtoBuilder WithBusinessReason(BusinessReason businessReason)
+    {
+        _businessReason = businessReason;
         return this;
     }
 }
