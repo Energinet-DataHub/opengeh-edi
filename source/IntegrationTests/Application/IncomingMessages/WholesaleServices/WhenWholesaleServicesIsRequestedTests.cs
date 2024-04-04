@@ -104,11 +104,15 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         await ProcessInternalCommandsAsync();
 
         // Assert
-        var process = GetProcess(marketMessage.SenderNumber);
         var message = _senderSpy.Message;
         message.Should().NotBeNull();
-        process!.BusinessReason.Code.Should().Be(unknownBusinessReason);
-        process.BusinessReason.Name.Should().Be("UNKNOWN");
+
+        var process = GetProcess(marketMessage.SenderNumber);
+        process.Should().NotBeNull();
+        process!.BusinessReason.IsUnknown.Should().BeTrue();
+        process.BusinessReason.Code.Should().Be(unknownBusinessReason);
+        process.BusinessReason.Name.Should().Be(unknownBusinessReason);
+
         await AssertProcessState(marketMessage!.MessageId, WholesaleServicesProcess.State.Sent);
     }
 
