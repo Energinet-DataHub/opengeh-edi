@@ -14,8 +14,10 @@
 
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using NodaTime;
+using MeteringPointType = Energinet.DataHub.EDI.B2CWebApi.Models.MeteringPointType;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Factories;
 
@@ -59,19 +61,19 @@ public static class RequestAggregatedMeasureDataHttpFactory
             new[] { serie });
     }
 
-    private static string? SetSettlementSeriesVersion(ProcessType processType)
+    private static string? SetSettlementSeriesVersion(CalculationType calculationType)
     {
-        if (processType == ProcessType.FirstCorrection)
+        if (calculationType == CalculationType.FirstCorrection)
         {
             return "D01";
         }
 
-        if (processType == ProcessType.SecondCorrection)
+        if (calculationType == CalculationType.SecondCorrection)
         {
             return "D02";
         }
 
-        if (processType == ProcessType.ThirdCorrection)
+        if (calculationType == CalculationType.ThirdCorrection)
         {
             return "D03";
         }
@@ -79,17 +81,17 @@ public static class RequestAggregatedMeasureDataHttpFactory
         return null;
     }
 
-    private static string MapToBusinessReasonCode(ProcessType requestProcessType)
+    private static string MapToBusinessReasonCode(CalculationType requestCalculationType)
     {
-        return requestProcessType switch
+        return requestCalculationType switch
         {
-            ProcessType.PreliminaryAggregation => "D03",
-            ProcessType.BalanceFixing => "D04",
-            ProcessType.WholesaleFixing => "D05",
-            ProcessType.FirstCorrection => "D32",
-            ProcessType.SecondCorrection => "D32",
-            ProcessType.ThirdCorrection => "D32",
-            _ => throw new ArgumentOutOfRangeException(nameof(requestProcessType), requestProcessType, "Unknown ProcessType"),
+            CalculationType.PreliminaryAggregation => BusinessReason.PreliminaryAggregation.Code,
+            CalculationType.BalanceFixing => BusinessReason.BalanceFixing.Code,
+            CalculationType.WholesaleFixing => BusinessReason.WholesaleFixing.Code,
+            CalculationType.FirstCorrection => BusinessReason.Correction.Code,
+            CalculationType.SecondCorrection => BusinessReason.Correction.Code,
+            CalculationType.ThirdCorrection => BusinessReason.Correction.Code,
+            _ => throw new ArgumentOutOfRangeException(nameof(requestCalculationType), requestCalculationType, "Unknown CalculationType"),
         };
     }
 
