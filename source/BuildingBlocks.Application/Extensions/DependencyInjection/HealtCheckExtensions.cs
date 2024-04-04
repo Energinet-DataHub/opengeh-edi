@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Azure.Identity;
-using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
-using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -22,16 +19,6 @@ namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
 public static class HealtCheckExtensions
 {
-    public static IServiceCollection AddLiveHealthCheck(this IServiceCollection services)
-    {
-        services
-            .AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>()
-            .AddHealthChecks()
-            .AddLiveCheck();
-
-        return services;
-    }
-
     /// <summary>
     /// Used for Service Bus queues where the app have peek (receiver) permissions
     /// </summary>
@@ -41,6 +28,10 @@ public static class HealtCheckExtensions
         ArgumentNullException.ThrowIfNull(queueNames);
         foreach (var name in queueNames)
         {
+            // services.TryAddHealthChecks().AddAzureServiceBusQueue(
+            //     name: name + "Exists",
+            //     connectionString: serviceBusConnectionString,
+            //     queueName: name);
             if (QueueHealthCheckIsAdded(services, name))
             {
                 return services;
@@ -60,13 +51,6 @@ public static class HealtCheckExtensions
     public static void AddBlobStorageHealthCheck(this IServiceCollection services, string name, string blobConnectionString)
     {
         services.AddHealthChecks().AddAzureBlobStorage(blobConnectionString, name: name);
-    }
-
-    public static IServiceCollection AddBlobStorageHealthCheck(this IServiceCollection services, string name, Uri storageAccountUri)
-    {
-        services.AddHealthChecks().AddAzureBlobStorage(storageAccountUri, new DefaultAzureCredential(), name: name);
-
-        return services;
     }
 
     private static bool QueueHealthCheckIsAdded(IServiceCollection services, string name)

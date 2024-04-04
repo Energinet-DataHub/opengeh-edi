@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using Azure.Identity;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Dapper;
 using Dapper.NodaTime;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -24,11 +27,25 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.Dependen
 
 public static class ArchivedMessageExtensions
 {
-    public static IServiceCollection AddArchivedMessagesModule(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddArchivedMessagesModule(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        Uri blobStorageUrl)
     {
         services.AddTransient<IArchivedMessageRepository, ArchivedMessageRepository>();
         services.AddTransient<IArchivedMessagesClient, ArchivedMessagesClient>();
         SqlMapper.AddTypeHandler(InstantHandler.Default);
+
+        // HealthChecks
+        services.TryAddHealthChecks(
+            "edi-documents-storage",
+            (key, builder) =>
+            {
+                builder.AddAzureBlobStorage(
+                    blobStorageUrl,
+                    new DefaultAzureCredential(),
+                    name: key);
+            });
 
         services.AddBuildingBlocks(configuration);
         return services;
