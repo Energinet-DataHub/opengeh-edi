@@ -24,4 +24,5 @@ public enum FeatureFlagName
     UseAmountPerChargeResultProduced,
     UseRequestWholesaleSettlementReceiver,
     UseMessageDelegation,
+    UseEnergyResultProduced,
 }

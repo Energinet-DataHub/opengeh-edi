@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -29,15 +30,18 @@ public sealed class EnergyResultProducedV2Processor : IIntegrationEventProcessor
     private readonly EnergyResultMessageResultFactory _energyResultMessageResultFactory;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ILogger<EnergyResultProducedV2Processor> _logger;
+    private readonly IFeatureFlagManager _featureFlagManager;
 
     public EnergyResultProducedV2Processor(
         EnergyResultMessageResultFactory energyResultMessageResultFactory,
         IOutgoingMessagesClient outgoingMessagesClient,
-        ILogger<EnergyResultProducedV2Processor> logger)
+        ILogger<EnergyResultProducedV2Processor> logger,
+        IFeatureFlagManager featureFlagManager)
     {
         _energyResultMessageResultFactory = energyResultMessageResultFactory;
         _outgoingMessagesClient = outgoingMessagesClient;
         _logger = logger;
+        _featureFlagManager = featureFlagManager;
     }
 
     public string EventTypeToHandle => EnergyResultProducedV2.EventName;
@@ -45,21 +49,23 @@ public sealed class EnergyResultProducedV2Processor : IIntegrationEventProcessor
     public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
-
-        var energyResultProducedV2 = (EnergyResultProducedV2)integrationEvent.Message;
-
-        if (!EnergyResultProducedProcessorExtensions.SupportedTimeSeriesTypes().Contains(energyResultProducedV2.TimeSeriesType))
+        if (await _featureFlagManager.UseEnergyResultProduced.ConfigureAwait(false))
         {
-            _logger.LogInformation(
-                "TimeSeriesType {TimeSeriesType} is not supported",
-                energyResultProducedV2.TimeSeriesType);
-            return;
+            var energyResultProducedV2 = (EnergyResultProducedV2)integrationEvent.Message;
+
+            if (!EnergyResultProducedProcessorExtensions.SupportedTimeSeriesTypes().Contains(energyResultProducedV2.TimeSeriesType))
+            {
+                _logger.LogInformation(
+                    "TimeSeriesType {TimeSeriesType} is not supported",
+                    energyResultProducedV2.TimeSeriesType);
+                return;
+            }
+
+            var message = await _energyResultMessageResultFactory
+                .CreateAsync(energyResultProducedV2, CancellationToken.None)
+                .ConfigureAwait(false);
+
+            await _outgoingMessagesClient.EnqueueAndCommitAsync(message, cancellationToken).ConfigureAwait(false);
         }
-
-        var message = await _energyResultMessageResultFactory
-            .CreateAsync(energyResultProducedV2, CancellationToken.None)
-            .ConfigureAwait(false);
-
-        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, cancellationToken).ConfigureAwait(false);
     }
 }
