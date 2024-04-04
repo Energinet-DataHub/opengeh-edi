@@ -35,6 +35,6 @@ public sealed class BusinessReason : DataHubType<BusinessReason>, IDataHubTypeWi
 
     public static BusinessReason FromCodeOrUnknown(string code)
     {
-        return TryFromCode(code) ?? new BusinessReason("UNKNOWN", code, true);
+        return TryFromCode(code) ?? new BusinessReason(DataHubNames.BusinessReason.Unknown, code, true);
     }
 }
