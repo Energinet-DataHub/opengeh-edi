@@ -59,6 +59,7 @@ public class DataHubTypeWithUnknownTests
         using var scope = new AssertionScope();
         var result = act.Should().NotThrow().Subject;
         result.Should().NotBeNull();
+        dataHubTypeWithUnknown.GetProperty("IsUnknown")!.GetValue(result).Should().Be(true);
         dataHubTypeWithUnknown.GetProperty("Name")!.GetValue(result).Should().Be(unknownCode);
         dataHubTypeWithUnknown.GetProperty("Code")!.GetValue(result).Should().Be(unknownCode);
     }
