@@ -31,4 +31,6 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
     public Task<bool> UseRequestWholesaleSettlementReceiver { get; } = Task.FromResult(true);
 
     public Task<bool> UseMessageDelegation { get; } = Task.FromResult(true);
+
+    public Task<bool> UseEnergyResultProduced { get; } = Task.FromResult(true);
 }
