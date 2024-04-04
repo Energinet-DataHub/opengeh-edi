@@ -46,7 +46,7 @@ public class InitializeAggregatedMeasureDataProcessesHandler : IRequestHandler<I
     }
 
     private void CreateAggregatedMeasureDataProcess(
-        RequestAggregatedMeasureDataDto dto)
+        InitializeAggregatedMeasureDataProcessDto dto)
     {
         var actorSenderNumber = ActorNumber.Create(dto.SenderNumber);
         var businessReason = BusinessReason.FromCodeOrUnknown(dto.BusinessReason);

@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
@@ -53,7 +54,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         var message = _energyResultMessageDtoBuilder.Build();
         await EnqueueMessage(message);
 
-        var result = await PeekMessage(MessageCategory.None);
+        var result = await PeekMessageAsync(MessageCategory.None);
 
         Assert.Null(result.Bundle);
         Assert.True(await BundleIsRegistered());
@@ -68,7 +69,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             .Build();
         await EnqueueMessage(message);
 
-        var result = await PeekMessage(MessageCategory.Aggregations);
+        var result = await PeekMessageAsync(MessageCategory.Aggregations);
 
         AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
             .IsDocumentType(DocumentType.NotifyAggregatedMeasureData)
@@ -85,10 +86,10 @@ public class WhenAPeekIsRequestedTests : TestBase
             .Build();
         await EnqueueMessage(message);
 
-        var firstPeekResult = await PeekMessage(MessageCategory.Aggregations);
+        var firstPeekResult = await PeekMessageAsync(MessageCategory.Aggregations);
 
         ClearDbContextCaches(); // Else the MarketDocument is cached in Entity Framework
-        var secondPeekResult = await PeekMessage(MessageCategory.Aggregations);
+        var secondPeekResult = await PeekMessageAsync(MessageCategory.Aggregations);
 
         Assert.NotNull(firstPeekResult.MessageId);
         Assert.NotNull(secondPeekResult.MessageId);
@@ -109,7 +110,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         await EnqueueMessage(message);
 
         // Act
-        var peekResult = await PeekMessage(MessageCategory.Aggregations);
+        var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);
 
         // Assert
         using var assertScope = new AssertionScope();
@@ -142,7 +143,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         await EnqueueMessage(message);
 
         // Act
-        var result = await PeekMessage(MessageCategory.Aggregations);
+        var result = await PeekMessageAsync(MessageCategory.Aggregations);
 
         // Assert
         result.Bundle.Should().NotBeNull();
@@ -161,7 +162,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             .Build();
         await EnqueueMessage(message);
 
-        var result = await PeekMessage(MessageCategory.Aggregations);
+        var result = await PeekMessageAsync(MessageCategory.Aggregations);
 
         result.MessageId.Should().NotBeNull();
 
@@ -178,7 +179,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             .Build();
         await EnqueueMessage(message);
 
-        var peekResult = await PeekMessage(MessageCategory.Aggregations);
+        var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);
 
         var marketDocumentFileStorageReference = await GetMarketDocumentFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value);
         var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value);
@@ -204,7 +205,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         await EnqueueMessage(message);
 
         // Act
-        var peekResult = await PeekMessage(MessageCategory.Aggregations, actorNumber: actorNumber, actorRole: ActorRole.MeteredDataResponsible);
+        var peekResult = await PeekMessageAsync(MessageCategory.Aggregations, actorNumber: actorNumber, actorRole: ActorRole.MeteredDataResponsible);
 
         // Assert
         peekResult.MessageId.Should().NotBeNull();
@@ -216,11 +217,6 @@ public class WhenAPeekIsRequestedTests : TestBase
         var numberOfBundles = await connection
             .ExecuteScalarAsync<int>("SELECT COUNT(*) FROM dbo.Bundles");
         return numberOfBundles == 1;
-    }
-
-    private Task<PeekResultDto> PeekMessage(MessageCategory category, ActorNumber? actorNumber = null, ActorRole? actorRole = null)
-    {
-        return _outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, actorRole ?? ActorRole.EnergySupplier, DocumentFormat.Xml), CancellationToken.None);
     }
 
     private async Task<bool> MarketDocumentExists(Guid marketDocumentBundleId)

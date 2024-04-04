@@ -98,10 +98,10 @@ public class InitializeWholesaleServicesProcessDtoBuilder
             _messageId,
             _createdAt,
             _businessType,
-            new List<InitializeWholesaleServicesSerie> { CreateSerie() }.AsReadOnly());
+            new List<InitializeWholesaleServicesSeries> { CreateSerie() }.AsReadOnly());
     }
 
-    private InitializeWholesaleServicesSerie CreateSerie() =>
+    private InitializeWholesaleServicesSeries CreateSerie() =>
         new(
             _serieId,
             _startDateAndOrTimeDateTime,

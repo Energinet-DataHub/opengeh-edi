@@ -23,7 +23,7 @@ public static class RequestAggregatedMeasureDataMessageFactory
 {
     public static RequestAggregatedMeasureDataMessage Create(
         MessageHeader header,
-        ReadOnlyCollection<RequestAggregatedMeasureDataSerie> series)
+        ReadOnlyCollection<RequestAggregatedMeasureDataMessageSeries> series)
     {
         ArgumentNullException.ThrowIfNull(header);
         ArgumentNullException.ThrowIfNull(series);
