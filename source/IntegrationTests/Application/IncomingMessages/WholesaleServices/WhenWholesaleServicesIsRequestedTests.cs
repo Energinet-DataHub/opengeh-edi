@@ -104,15 +104,28 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         await ProcessInternalCommandsAsync();
 
         // Assert
-        var message = _senderSpy.Message;
-        message.Should().NotBeNull();
+        _senderSpy.DidSend.Should().BeTrue();
+    }
 
+    [Fact]
+    public async Task When_WholesaleServicesProcess_is_initialized_with_unknown_business_reason_process_is_still_created_correctly()
+    {
+        // Arrange
+        var unknownBusinessReason = "A47";
+        var marketMessage = InitializeProcessDtoBuilder()
+            .SetBusinessReason(unknownBusinessReason)
+            .Build();
+
+        // Act
+        await InvokeCommandAsync(new InitializeWholesaleServicesProcessesCommand(marketMessage));
+        await ProcessInternalCommandsAsync();
+
+        // Assert
         var process = GetProcess(marketMessage.SenderNumber);
         process.Should().NotBeNull();
         process!.BusinessReason.IsUnknown.Should().BeTrue();
         process.BusinessReason.Code.Should().Be(unknownBusinessReason);
         process.BusinessReason.Name.Should().Be(unknownBusinessReason);
-
         await AssertProcessState(marketMessage!.MessageId, WholesaleServicesProcess.State.Sent);
     }
 

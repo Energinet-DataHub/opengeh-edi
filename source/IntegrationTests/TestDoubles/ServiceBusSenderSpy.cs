@@ -34,11 +34,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles
 
         public ServiceBusMessage? Message { get; set; }
 
+        public bool DidSend { get; set; }
+
         public Task SendAsync(ServiceBusMessage message, CancellationToken cancellationToken)
         {
             if (ShouldFail)
                 throw new ServiceBusException();
             Message = message;
+            DidSend = true;
             return Task.CompletedTask;
         }
 
