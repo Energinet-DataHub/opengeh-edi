@@ -38,5 +38,7 @@ public class MicrosoftFeatureFlagManager : IFeatureFlagManager
 
     public Task<bool> UseMessageDelegation => IsEnabledAsync(FeatureFlagName.UseMessageDelegation);
 
+    public Task<bool> UseEnergyResultProduced => IsEnabledAsync(FeatureFlagName.UseEnergyResultProduced);
+
     private Task<bool> IsEnabledAsync(FeatureFlagName featureFlagName) => _featureManager.IsEnabledAsync(featureFlagName.ToString());
 }

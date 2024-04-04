@@ -44,4 +44,9 @@ public interface IFeatureFlagManager
     /// Whether to allow message delegation for actors.
     /// </summary>
     Task<bool> UseMessageDelegation { get; }
+
+    /// <summary>
+    /// Whether to allow handling EnergyResultProduced events
+    /// </summary>
+    Task<bool> UseEnergyResultProduced { get; }
 }
