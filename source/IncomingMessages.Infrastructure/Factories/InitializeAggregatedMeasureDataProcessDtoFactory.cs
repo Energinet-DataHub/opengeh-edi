@@ -17,16 +17,16 @@ using Energinet.DataHub.EDI.Process.Interfaces;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Factories;
 
-public static class RequestAggregatedMeasureDataDtoFactory
+public static class InitializeAggregatedMeasureDataProcessDtoFactory
 {
-    public static RequestAggregatedMeasureDataDto Create(RequestAggregatedMeasureDataMessage requestAggregatedMeasureDataMessage)
+    public static InitializeAggregatedMeasureDataProcessDto Create(RequestAggregatedMeasureDataMessage requestAggregatedMeasureDataMessage)
     {
         ArgumentNullException.ThrowIfNull(requestAggregatedMeasureDataMessage);
 
         var series = requestAggregatedMeasureDataMessage.Serie
-            .Cast<RequestAggregatedMeasureDataSerie>()
+            .Cast<RequestAggregatedMeasureDataMessageSeries>()
             .Select(
-                serie => new Serie(
+                serie => new InitializeAggregatedMeasureDataProcessSeries(
                     serie.TransactionId,
                     serie.MarketEvaluationPointType,
                     serie.MarketEvaluationSettlementMethod,
@@ -37,7 +37,7 @@ public static class RequestAggregatedMeasureDataDtoFactory
                     serie.BalanceResponsiblePartyMarketParticipantId,
                     serie.SettlementSeriesVersion)).ToList().AsReadOnly();
 
-        return new RequestAggregatedMeasureDataDto(
+        return new InitializeAggregatedMeasureDataProcessDto(
                 requestAggregatedMeasureDataMessage.SenderNumber,
                 requestAggregatedMeasureDataMessage.SenderRoleCode,
                 requestAggregatedMeasureDataMessage.ReceiverNumber,

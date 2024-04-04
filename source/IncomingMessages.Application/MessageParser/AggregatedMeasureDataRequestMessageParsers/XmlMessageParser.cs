@@ -146,7 +146,7 @@ public class XmlMessageParser : IMessageParser
             .ExtractAsync(reader, root, HeaderElementName, SeriesRecordElementName)
             .ConfigureAwait(false);
 
-        var series = new List<RequestAggregatedMeasureDataSerie>();
+        var series = new List<RequestAggregatedMeasureDataMessageSeries>();
         await foreach (var serie in ParseSerieAsync(reader, root))
         {
             series.Add(serie);
@@ -156,7 +156,7 @@ public class XmlMessageParser : IMessageParser
             RequestAggregatedMeasureDataMessageFactory.Create(messageHeader, series.AsReadOnly()));
     }
 
-    private static async IAsyncEnumerable<RequestAggregatedMeasureDataSerie> ParseSerieAsync(XmlReader reader, RootElement rootElement)
+    private static async IAsyncEnumerable<RequestAggregatedMeasureDataMessageSeries> ParseSerieAsync(XmlReader reader, RootElement rootElement)
     {
         var id = string.Empty;
         var marketEvaluationPointType = string.Empty;
@@ -234,7 +234,7 @@ public class XmlMessageParser : IMessageParser
         }
     }
 
-    private static RequestAggregatedMeasureDataSerie CreateSerie(
+    private static RequestAggregatedMeasureDataMessageSeries CreateSerie(
         ref string id,
         ref string? marketEvaluationPointType,
         ref string? marketEvaluationSettlementMethod,
@@ -245,7 +245,7 @@ public class XmlMessageParser : IMessageParser
         ref string? balanceResponsiblePartyMarketParticipantId,
         ref string? settlementSeriesVersion)
     {
-        var serie = new RequestAggregatedMeasureDataSerie(
+        var serie = new RequestAggregatedMeasureDataMessageSeries(
             id,
             marketEvaluationPointType,
             marketEvaluationSettlementMethod,

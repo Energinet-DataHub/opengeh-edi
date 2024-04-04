@@ -42,7 +42,7 @@ public class RequestAggregatedMeasureDataFactoryTests
             EnergySupplierId: "579000000003042",
             BalanceResponsibleId: "1234567890123");
 
-        var result = RequestAggregatedMeasureDataHttpFactory.Create(
+        var result = RequestAggregatedMeasureDataDtoFactory.Create(
             request,
             senderId,
             MarketRole.MeteredDataResponsible.Name,
@@ -82,7 +82,7 @@ public class RequestAggregatedMeasureDataFactoryTests
             EnergySupplierId: "579000000003042",
             BalanceResponsibleId: "1234567890123");
 
-        var result = RequestAggregatedMeasureDataHttpFactory.Create(
+        var result = RequestAggregatedMeasureDataDtoFactory.Create(
             request,
             "9876543210987",
             MarketRole.MeteredDataResponsible.Name,

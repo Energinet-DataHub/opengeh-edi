@@ -48,31 +48,31 @@ public class IncomingMessagePublisher
         switch (incomingMessage)
         {
             case RequestAggregatedMeasureDataMessage requestAggregatedMeasureDataMessage:
-                await SendRequestAggregatedMeasureDateAsync(RequestAggregatedMeasureDataDtoFactory.Create(requestAggregatedMeasureDataMessage), cancellationToken).ConfigureAwait(false);
+                await SendInitializeAggregatedMeasureDataProcessAsync(InitializeAggregatedMeasureDataProcessDtoFactory.Create(requestAggregatedMeasureDataMessage), cancellationToken).ConfigureAwait(false);
                 break;
             case RequestWholesaleServicesMessage wholesaleSettlementMessage:
-                await SendRequestAggregatedMeasureDateAsync(RequestWholesaleServicesDtoFactory.Create(wholesaleSettlementMessage), cancellationToken).ConfigureAwait(false);
+                await SendInitializeWholesaleServicesProcessAsync(InitializeWholesaleServicesProcessDtoFactory.Create(wholesaleSettlementMessage), cancellationToken).ConfigureAwait(false);
                 break;
             default:
                 throw new InvalidOperationException($"Unknown message type {incomingMessage.GetType().Name}");
         }
     }
 
-    private async Task SendRequestAggregatedMeasureDateAsync(RequestAggregatedMeasureDataDto requestAggregatedMeasureDataDto, CancellationToken cancellationToken)
+    private async Task SendInitializeAggregatedMeasureDataProcessAsync(InitializeAggregatedMeasureDataProcessDto initializeAggregatedMeasureDataProcessDto, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(requestAggregatedMeasureDataDto);
+        ArgumentNullException.ThrowIfNull(initializeAggregatedMeasureDataProcessDto);
 
         var serviceBusMessage =
             new ServiceBusMessage(
-                new BinaryData(_serializer.Serialize(requestAggregatedMeasureDataDto)))
+                new BinaryData(_serializer.Serialize(initializeAggregatedMeasureDataProcessDto)))
             {
-                Subject = nameof(RequestAggregatedMeasureDataDto),
+                Subject = nameof(InitializeAggregatedMeasureDataProcessDto),
             };
 
         await _senderCreator.SendAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task SendRequestAggregatedMeasureDateAsync(InitializeWholesaleServicesProcessDto initializeWholesaleServicesProcessDto, CancellationToken cancellationToken)
+    private async Task SendInitializeWholesaleServicesProcessAsync(InitializeWholesaleServicesProcessDto initializeWholesaleServicesProcessDto, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(initializeWholesaleServicesProcessDto);
 

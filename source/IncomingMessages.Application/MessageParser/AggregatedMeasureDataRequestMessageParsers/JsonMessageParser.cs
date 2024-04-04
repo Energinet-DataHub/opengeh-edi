@@ -86,9 +86,9 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
         }
     }
 
-    private static RequestAggregatedMeasureDataSerie SeriesFrom(JsonElement element)
+    private static RequestAggregatedMeasureDataMessageSeries SeriesFrom(JsonElement element)
     {
-        return new RequestAggregatedMeasureDataSerie(
+        return new RequestAggregatedMeasureDataMessageSeries(
             element.GetProperty("mRID").ToString(),
             GetPropertyWithValue(element, "marketEvaluationPoint.type"),
             GetPropertyWithValue(element, "marketEvaluationPoint.settlementMethod"),
@@ -109,7 +109,7 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
         MessageHeader header,
         JsonElement seriesJson)
     {
-        var series = new List<RequestAggregatedMeasureDataSerie>();
+        var series = new List<RequestAggregatedMeasureDataMessageSeries>();
 
         foreach (var jsonElement in seriesJson.EnumerateArray())
         {

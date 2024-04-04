@@ -189,11 +189,11 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
     {
         private readonly
             IReadOnlyDictionary<string, Action<WholesaleServicesProcess, InitializeWholesaleServicesProcessDto,
-                InitializeWholesaleServicesSerie>>
+                InitializeWholesaleServicesSeries>>
             _assertionMap =
                 new
                     Dictionary<string, Action<WholesaleServicesProcess, InitializeWholesaleServicesProcessDto,
-                        InitializeWholesaleServicesSerie>>
+                        InitializeWholesaleServicesSeries>>
                     {
                         {
                             nameof(WholesaleServicesProcess.ProcessId),

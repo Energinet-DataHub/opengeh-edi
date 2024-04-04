@@ -21,7 +21,7 @@ using MeteringPointType = Energinet.DataHub.EDI.B2CWebApi.Models.MeteringPointTy
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Factories;
 
-public static class RequestAggregatedMeasureDataHttpFactory
+public static class RequestAggregatedMeasureDataDtoFactory
 {
     private const string AggregatedMeasureDataMessageType = "E74";
     private const string Electricity = "23";
@@ -37,7 +37,7 @@ public static class RequestAggregatedMeasureDataHttpFactory
 
         var senderRoleCode = MapRoleNameToCode(senderRole);
 
-        var serie = new Serie(
+        var serie = new RequestAggregatedMeasureDataSeries(
             Guid.NewGuid().ToString(),
             MapEvaluationPointType(request),
             MapSettlementMethod(request),
