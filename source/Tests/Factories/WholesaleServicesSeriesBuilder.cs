@@ -39,7 +39,7 @@ public class WholesaleServicesSeriesBuilder
     private int _calculationResultVersion = 1;
     private string _gridAreaCode = "870";
     private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
-    private SettlementType? _settlementMethod = SettlementType.NonProfiled;
+    private SettlementMethod? _settlementMethod = SettlementMethod.NonProfiled;
     private MeasurementUnit _measurementUnit = MeasurementUnit.Kwh;
     private MeasurementUnit _priceMeasureUnit = MeasurementUnit.Kwh;
     private Resolution _resolution = Resolution.Monthly;
@@ -159,9 +159,9 @@ public class WholesaleServicesSeriesBuilder
         return this;
     }
 
-    public WholesaleServicesSeriesBuilder WithSettlementMethod(SettlementType? settlementType)
+    public WholesaleServicesSeriesBuilder WithSettlementMethod(SettlementMethod? settlementMethod)
     {
-        _settlementMethod = settlementType;
+        _settlementMethod = settlementMethod;
         return this;
     }
 
@@ -221,6 +221,7 @@ public class WholesaleServicesSeriesBuilder
             ChargeType: _chargeType,
             Resolution: _resolution,
             MeteringPointType: _meteringPointType,
+            null,
             _settlementMethod,
             _originalTransactionIdReference);
     }

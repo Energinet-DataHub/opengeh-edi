@@ -5,11 +5,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
-      <ProjectReference Include="..\..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
-      <ProjectReference Include="..\..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
-      <ProjectReference Include="..\..\OutgoingMessages.Interfaces\OutgoingMessages.Interfaces.csproj" />
-      <ProjectReference Include="..\..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />
+      <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+      <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
+      
+      <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
+      <ProjectReference Include="..\OutgoingMessages.Interfaces\OutgoingMessages.Interfaces.csproj" />
+      
+      <ProjectReference Include="..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />
     </ItemGroup>
 
     <ItemGroup>
