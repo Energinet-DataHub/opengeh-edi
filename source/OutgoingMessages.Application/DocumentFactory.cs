@@ -50,7 +50,7 @@ public class DocumentFactory
                 bundle.BusinessReason,
                 bundle.SenderId.Value,
                 bundle.SenderRole.Code,
-                bundle.DocumentReceiver.Number.Value,
+                bundle.Receiver.Number.Value,
                 bundle.DocumentReceiver.ActorRole.Code,
                 bundle.AssignedBundleId.Id.ToString(),
                 timestamp),

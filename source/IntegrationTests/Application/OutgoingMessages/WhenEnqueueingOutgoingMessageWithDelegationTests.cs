@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -23,6 +24,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -277,6 +279,54 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         return new ActorNumberAndRoleDto(actorNumber, actorRole ?? ActorRole.BalanceResponsibleParty);
     }
 
+    private async Task AddMockDelegationsForActorAsync(ActorNumberAndRoleDto delegatedBy)
+    {
+        ArgumentNullException.ThrowIfNull(delegatedBy);
+        await AddDelegationAsync(
+            new ActorNumberAndRoleDto(delegatedBy.ActorNumber, delegatedBy.ActorRole),
+            new ActorNumberAndRoleDto(ActorNumber.Create("8884567892341"), ActorRole.Delegated),
+            "500",
+            ProcessType.ReceiveWholesaleResults,
+            SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
+            SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)));
+        await AddDelegationAsync(
+            new ActorNumberAndRoleDto(delegatedBy.ActorNumber, delegatedBy.ActorRole),
+            new ActorNumberAndRoleDto(ActorNumber.Create("8884567892342"), ActorRole.Delegated),
+            "600",
+            ProcessType.ReceiveWholesaleResults,
+            SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(4)),
+            SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(14)));
+        await AddDelegationAsync(
+            new ActorNumberAndRoleDto(delegatedBy.ActorNumber, delegatedBy.ActorRole),
+            new ActorNumberAndRoleDto(ActorNumber.Create("8884567892343"), ActorRole.Delegated),
+            "700",
+            ProcessType.ReceiveWholesaleResults,
+            SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)),
+            SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(7)));
+    }
+
+    private async Task AddDelegationAsync(
+        ActorNumberAndRoleDto delegatedBy,
+        ActorNumberAndRoleDto delegatedTo,
+        string gridAreaCode,
+        ProcessType? processType = null,
+        Instant? startsAt = null,
+        Instant? stopsAt = null,
+        int sequenceNumber = 0)
+    {
+        var masterDataClient = GetService<IMasterDataClient>();
+        await masterDataClient.CreateProcessDelegationAsync(
+            new ProcessDelegationDto(
+                sequenceNumber,
+                processType ?? ProcessType.ReceiveEnergyResults,
+                gridAreaCode,
+                startsAt ?? SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
+                stopsAt ?? SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)),
+                delegatedBy,
+                delegatedTo),
+            CancellationToken.None);
+    }
+
     private async Task AssertEnqueuedOutgoingMessage(
         OutgoingMessageId createdId,
         ActorNumberAndRoleDto receiverQueue,
@@ -297,7 +347,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             .IsDocumentType(DocumentType.NotifyAggregatedMeasureData)
             .IsBusinessReason(BusinessReason.BalanceFixing)
             .HasReceiverRole(receiverDocument.ActorRole)
-            .HasReceiver(receiverDocument.ActorNumber)
+            .HasReceiver(receiverQueue.ActorNumber)
             .HasSerieRecordCount(1);
     }
 
