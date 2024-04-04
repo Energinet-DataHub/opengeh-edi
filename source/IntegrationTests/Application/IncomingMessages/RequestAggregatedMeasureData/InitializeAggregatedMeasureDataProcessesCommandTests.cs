@@ -173,9 +173,9 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
     private sealed class ProcessAndRequestComparer : IEquivalencyStep
     {
         private readonly
-            IReadOnlyDictionary<string, Action<AggregatedMeasureDataProcess, RequestAggregatedMeasureDataDto, Serie>>
+            IReadOnlyDictionary<string, Action<AggregatedMeasureDataProcess, InitializeAggregatedMeasureDataProcessDto, InitializeAggregatedMeasureDataProcessSeries>>
             _assertionMap =
-                new Dictionary<string, Action<AggregatedMeasureDataProcess, RequestAggregatedMeasureDataDto, Serie>>
+                new Dictionary<string, Action<AggregatedMeasureDataProcess, InitializeAggregatedMeasureDataProcessDto, InitializeAggregatedMeasureDataProcessSeries>>
                 {
                     {
                         nameof(AggregatedMeasureDataProcess.ProcessId),
@@ -251,7 +251,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
             IEquivalencyValidator nestedValidator)
         {
             if (comparands is not
-                { Subject: AggregatedMeasureDataProcess p, Expectation: RequestAggregatedMeasureDataDto r })
+                { Subject: AggregatedMeasureDataProcess p, Expectation: InitializeAggregatedMeasureDataProcessDto r })
             {
                 return EquivalencyResult.ContinueWithNext;
             }

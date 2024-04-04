@@ -32,11 +32,10 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Interfaces;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
-using RequestAggregatedMeasureDataDto = Energinet.DataHub.EDI.Process.Interfaces.RequestAggregatedMeasureDataDto;
-using Serie = Energinet.DataHub.EDI.Process.Interfaces.Serie;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
@@ -554,15 +553,15 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         Assert.Contains(result.Errors, error => error is NotSupportedBusinessType);
     }
 
-    private RequestAggregatedMeasureDataDto CreateMarketMessageWithAuthentication(RequestAggregatedMeasureDataMessage message, string knownSenderId, string knownSenderRole)
+    private InitializeAggregatedMeasureDataProcessDto CreateMarketMessageWithAuthentication(RequestAggregatedMeasureDataMessage message, string knownSenderId, string knownSenderRole)
     {
         var authenticatedActor = GetService<AuthenticatedActor>();
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create(knownSenderId), restriction: Restriction.None,  ActorRole.FromCode(knownSenderRole)));
 
         var series = message.Serie
-            .Cast<RequestAggregatedMeasureDataSerie>()
+            .Cast<RequestAggregatedMeasureDataMessageSeries>()
             .Select(
-                serie => new Serie(
+                serie => new InitializeAggregatedMeasureDataProcessSeries(
                     serie.TransactionId,
                     serie.MarketEvaluationPointType,
                     serie.MarketEvaluationSettlementMethod,
@@ -572,7 +571,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
                     serie.EnergySupplierMarketParticipantId,
                     serie.BalanceResponsiblePartyMarketParticipantId,
                     serie.SettlementVersion)).ToList().AsReadOnly();
-        return new RequestAggregatedMeasureDataDto(
+        return new InitializeAggregatedMeasureDataProcessDto(
             message.SenderNumber,
             message.SenderRoleCode,
             message.ReceiverNumber,

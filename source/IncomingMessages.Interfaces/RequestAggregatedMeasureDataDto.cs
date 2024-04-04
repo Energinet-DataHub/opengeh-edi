@@ -29,9 +29,9 @@ public record RequestAggregatedMeasureDataDto(
     string MessageId,
     string CreatedAt,
     string? BusinessType,
-    IReadOnlyCollection<Serie> Serie);
+    IReadOnlyCollection<RequestAggregatedMeasureDataSeries> Serie);
 
-public record Serie(
+public record RequestAggregatedMeasureDataSeries(
     string Id,
     string? MarketEvaluationPointType,
     string? MarketEvaluationSettlementMethod,

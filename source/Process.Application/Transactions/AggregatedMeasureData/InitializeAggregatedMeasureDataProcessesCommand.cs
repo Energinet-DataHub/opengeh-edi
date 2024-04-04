@@ -20,10 +20,10 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasu
 
 public class InitializeAggregatedMeasureDataProcessesCommand : ICommand<Unit>
 {
-    public InitializeAggregatedMeasureDataProcessesCommand(RequestAggregatedMeasureDataDto dto)
+    public InitializeAggregatedMeasureDataProcessesCommand(InitializeAggregatedMeasureDataProcessDto dto)
     {
         Dto = dto;
     }
 
-    public RequestAggregatedMeasureDataDto Dto { get; }
+    public InitializeAggregatedMeasureDataProcessDto Dto { get; }
 }

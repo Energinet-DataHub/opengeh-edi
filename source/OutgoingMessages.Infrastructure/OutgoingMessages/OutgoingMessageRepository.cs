@@ -63,7 +63,7 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
         return new OutgoingMessageBundle(
             firstMessage.DocumentType,
             firstMessage.Receiver,
-            firstMessage.ProcessId,
+            firstMessage.DocumentReceiver,
             firstMessage.BusinessReason,
             firstMessage.SenderId,
             firstMessage.SenderRole,

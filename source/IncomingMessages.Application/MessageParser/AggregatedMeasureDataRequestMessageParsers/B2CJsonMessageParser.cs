@@ -50,7 +50,7 @@ public class B2CJsonMessageParser : IMessageParser
 
         var series = requestAggregatedMeasureDataDto.Serie
             .Select(
-                serie => new RequestAggregatedMeasureDataSerie(
+                serie => new RequestAggregatedMeasureDataMessageSeries(
                     serie.Id,
                     serie.MarketEvaluationPointType,
                     serie.MarketEvaluationSettlementMethod,
