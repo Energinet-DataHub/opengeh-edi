@@ -106,7 +106,7 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// Asserts the settlement method of the first series element
     /// </summary>
     /// <param name="expectedSettlementMethod"></param>
-    IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementType expectedSettlementMethod);
+    IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod expectedSettlementMethod);
 
     /// <summary>
     /// Asserts the amount sum of the points of the first series element

@@ -22,31 +22,31 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.BuildingBlocks.Models;
 
-public class SettlementTypeTests
+public class SettlementMethodTests
 {
-    public static IEnumerable<SettlementType> GetAllSettlementTypes()
+    public static IEnumerable<SettlementMethod> GetAllSettlementMethods()
     {
         var fields =
-            typeof(SettlementType).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+            typeof(SettlementMethod).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
-        return fields.Select(f => f.GetValue(null)).Cast<SettlementType>();
+        return fields.Select(f => f.GetValue(null)).Cast<SettlementMethod>();
     }
 
     [Fact]
-    public void Ensure_all_SettlementTypes()
+    public void Ensure_all_SettlementMethods()
     {
-        var settlementTypes = new List<(SettlementType ExpectedValue, string Name, string Code)>()
+        var settlementMethods = new List<(SettlementMethod ExpectedValue, string Name, string Code)>()
         {
-            (SettlementType.Flex, "Flex", "D01"), (SettlementType.NonProfiled, "NonProfiled", "E02"),
+            (SettlementMethod.Flex, "Flex", "D01"), (SettlementMethod.NonProfiled, "NonProfiled", "E02"),
         };
 
         using var scope = new AssertionScope();
-        foreach (var test in settlementTypes)
+        foreach (var test in settlementMethods)
         {
-            SettlementType.FromName(test.Name).Should().Be(test.ExpectedValue);
-            SettlementType.FromCode(test.Code).Should().Be(test.ExpectedValue);
+            SettlementMethod.FromName(test.Name).Should().Be(test.ExpectedValue);
+            SettlementMethod.FromCode(test.Code).Should().Be(test.ExpectedValue);
         }
 
-        settlementTypes.Select(c => c.ExpectedValue).Should().BeEquivalentTo(GetAllSettlementTypes());
+        settlementMethods.Select(c => c.ExpectedValue).Should().BeEquivalentTo(GetAllSettlementMethods());
     }
 }

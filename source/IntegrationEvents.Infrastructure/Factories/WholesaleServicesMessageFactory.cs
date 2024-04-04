@@ -96,6 +96,7 @@ public sealed class WholesaleServicesMessageFactory
             ChargeType: ChargeTypeMapper.Map(message.ChargeType),
             Resolution: Resolution.Monthly,
             null,
+            null,
             null);
         return wholesaleCalculationSeries;
     }
@@ -126,7 +127,8 @@ public sealed class WholesaleServicesMessageFactory
             ChargeType: ChargeTypeMapper.Map(message.ChargeType),
             Resolution: ResolutionMapper.Map(message.Resolution),
             MeteringPointType: MeteringPointTypeMapper.Map(message.MeteringPointType),
-            SettlementType: SettlementTypeMapper.Map(message.SettlementMethod));
+            null,
+            SettlementMethod: SettlementMethodMapper.Map(message.SettlementMethod));
 
         return wholesaleCalculationSeries;
     }

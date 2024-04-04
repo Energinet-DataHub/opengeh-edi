@@ -18,7 +18,7 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Application.Process.Transactions.Mappers;
 
-public class SettlementTypeMapperTests : BaseEnumMapperTests
+public class SettlementMethodMapperTests : BaseEnumMapperTests
 {
     private readonly EnergyResultProducedV2.Types.TimeSeriesType[] _invalidValues =
     {
@@ -32,7 +32,7 @@ public class SettlementTypeMapperTests : BaseEnumMapperTests
     [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.TimeSeriesType))]
     public void Ensure_handling_energy_result_produced(EnergyResultProducedV2.Types.TimeSeriesType value)
         => EnsureCanMapOrReturnsNull(
-            () => SettlementTypeMapper.Map(value),
+            () => SettlementMethodMapper.Map(value),
             value,
             unspecifiedValue: EnergyResultProducedV2.Types.TimeSeriesType.Unspecified,
             invalidValues: _invalidValues);
@@ -41,6 +41,6 @@ public class SettlementTypeMapperTests : BaseEnumMapperTests
     [MemberData(nameof(GetEnumValues), typeof(AmountPerChargeResultProducedV1.Types.SettlementMethod))]
     public void Ensure_handling_settlement_method_from_amount_per_charge_result_produced(AmountPerChargeResultProducedV1.Types.SettlementMethod value)
         => EnsureCanMapOrReturnsNull(
-            () => SettlementTypeMapper.Map(value),
+            () => SettlementMethodMapper.Map(value),
             value);
 }
