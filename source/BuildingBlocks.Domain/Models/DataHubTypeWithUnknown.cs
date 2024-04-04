@@ -33,11 +33,17 @@ public abstract class DataHubTypeWithUnknown<T> : DataHubType<T>
 
     public bool IsUnknown { get; }
 
+    /// <summary>
+    /// Create a DataHubType from a code or returns an UNKNOWN type if the code is not recognized
+    /// </summary>
     public static T FromCodeOrUnknown(string code)
     {
         return TryFromCode(code) ?? CreateUnknown(code);
     }
 
+    /// <summary>
+    /// Creates an instance of T. DataHubTypeWithUnknownTests verifies that all implementations can be created like this
+    /// </summary>
     private static T CreateUnknown(string code)
     {
         return (T)Activator.CreateInstance(typeof(T), BindingFlags.NonPublic | BindingFlags.Instance, null, new object[] { code, code, true }, null)!;

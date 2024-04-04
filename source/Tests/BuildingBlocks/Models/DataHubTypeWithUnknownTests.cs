@@ -44,7 +44,7 @@ public class DataHubTypeWithUnknownTests
 
     [Theory]
     [MemberData(nameof(GetAllDataHubTypeWithUnknown))]
-    public void Ensure_all_can_create_unknown(Type dataHubTypeWithUnknown)
+    public void Ensure_all_can_be_created_as_unknown(Type dataHubTypeWithUnknown)
     {
         ArgumentNullException.ThrowIfNull(dataHubTypeWithUnknown);
 
