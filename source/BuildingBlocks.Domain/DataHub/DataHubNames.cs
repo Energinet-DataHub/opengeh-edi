@@ -34,7 +34,6 @@ public static class DataHubNames
         public const string PreliminaryAggregation = "PreliminaryAggregation";
         public const string WholesaleFixing = "WholesaleFixing";
         public const string Correction = "Correction";
-        public const string Unknown = "UNKNOWN";
     }
 
     public static class ChargeType
