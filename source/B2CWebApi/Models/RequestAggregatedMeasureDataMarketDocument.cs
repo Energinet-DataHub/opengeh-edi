@@ -18,7 +18,7 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 /// Responsible for carrying the market message data from the incoming message before any data validation.
 /// </summary>
 public record RequestAggregatedMeasureDataMarketRequest(
-    ProcessType ProcessType,
+    CalculationType ProcessType, // TODO: Rename property to CalculationType when we implement RequestWholesaleSettlement in BFF
     MeteringPointType? MeteringPointType,
     string StartDate,
     string EndDate,
@@ -35,7 +35,7 @@ public enum MeteringPointType
     Exchange,
 }
 
-public enum ProcessType
+public enum CalculationType
 {
     PreliminaryAggregation,
     BalanceFixing,
