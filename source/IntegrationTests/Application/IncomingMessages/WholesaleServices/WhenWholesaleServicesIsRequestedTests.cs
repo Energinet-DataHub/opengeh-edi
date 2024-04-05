@@ -104,7 +104,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         await ProcessInternalCommandsAsync();
 
         // Assert
-        _senderSpy.DidSend.Should().BeTrue();
+        _senderSpy.MessageSent.Should().BeTrue();
     }
 
     [Fact]
@@ -165,7 +165,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
             .Build();
         await InvokeCommandAsync(new InitializeWholesaleServicesProcessesCommand(marketMessage));
         await ProcessInternalCommandsAsync();
-        _senderSpy.Message = null; // Reset the spy
+        _senderSpy.Reset();
         var process = GetProcess(marketMessage.SenderNumber);
 
         // Act
