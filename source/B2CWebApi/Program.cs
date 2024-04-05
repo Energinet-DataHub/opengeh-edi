@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Asp.Versioning;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.WebApp.Extensions.Builder;
@@ -35,27 +36,36 @@ builder.Logging
     .AddApplicationInsights();
 
 builder.Services
-        // Swagger
+    // Swagger
     .AddSwaggerForWebApp(Assembly.GetExecutingAssembly(), "EDI B2C Web API")
     .AddApiVersioningForWebApp(new ApiVersion(1, 0))
 
-        // Logging
+    // Logging
     .AddApplicationInsightsForWebApp(domainName)
+    .AddHttpLoggingScope(domainName)
     .AddApplicationInsightsTelemetry()
 
-    .AddControllers()
-    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+    // Health checks
+    .AddHealthChecksForWebApp()
 
-builder.Services
+    // System timer
+    .AddNodaTimeForApplication()
     .AddSystemTimer()
-    .AddHttpLoggingScope(domainName)
-    .AddSerializer()
+
+    // Modules
     .AddIncomingMessagesModule(builder.Configuration)
     .AddArchivedMessagesModule(builder.Configuration)
+
+    // Security
     .AddJwtTokenSecurity(builder.Configuration)
-    .AddDateTime(builder.Configuration)
+
+    // Serializer
+    .AddSerializer()
+
+    // Http
     .AddHttpClient()
-    .AddLiveHealthCheck();
+    .AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 var blobStorageUrl = builder.Configuration["AZURE_STORAGE_ACCOUNT_URL"];
 
