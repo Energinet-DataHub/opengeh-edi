@@ -46,7 +46,7 @@ public static class RequestAggregatedMeasureDataDtoFactory
             request.GridArea,
             request.EnergySupplierId,
             request.BalanceResponsibleId,
-            SetSettlementSeriesVersion(request.ProcessType));
+            SetSettlementVersion(request.ProcessType));
 
         return new RequestAggregatedMeasureDataDto(
             senderNumber,
@@ -61,7 +61,7 @@ public static class RequestAggregatedMeasureDataDtoFactory
             new[] { serie });
     }
 
-    private static string? SetSettlementSeriesVersion(CalculationType calculationType)
+    private static string? SetSettlementVersion(CalculationType calculationType)
     {
         if (calculationType == CalculationType.FirstCorrection)
         {

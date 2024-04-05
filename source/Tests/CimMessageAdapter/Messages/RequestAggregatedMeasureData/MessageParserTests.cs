@@ -119,7 +119,7 @@ public class MessageParserTests
             Assert.Equal("D01", serie.MarketEvaluationSettlementMethod);
             Assert.Equal("2022-07-22T22:00:00Z", serie.EndDateTime);
             Assert.Equal("2022-06-17T22:00:00Z", serie.StartDateTime);
-            Assert.Equal("D01", serie.SettlementSeriesVersion);
+            Assert.Equal("D01", serie.SettlementVersion);
         }
     }
 
@@ -152,7 +152,7 @@ public class MessageParserTests
             Assert.Equal("D01", serie.MarketEvaluationSettlementMethod);
             Assert.Equal("2022-07-22T22:00:00Z", serie.EndDateTime);
             Assert.Equal("2022-06-17T22:00:00Z", serie.StartDateTime);
-            Assert.Equal("D01", serie.SettlementSeriesVersion);
+            Assert.Equal("D01", serie.SettlementVersion);
         }
     }
 

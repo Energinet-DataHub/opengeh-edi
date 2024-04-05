@@ -35,7 +35,7 @@ public static class InitializeAggregatedMeasureDataProcessDtoFactory
                     serie.MeteringGridAreaDomainId,
                     serie.EnergySupplierMarketParticipantId,
                     serie.BalanceResponsiblePartyMarketParticipantId,
-                    serie.SettlementSeriesVersion)).ToList().AsReadOnly();
+                    serie.SettlementVersion)).ToList().AsReadOnly();
 
         return new InitializeAggregatedMeasureDataProcessDto(
                 requestAggregatedMeasureDataMessage.SenderNumber,

@@ -34,7 +34,7 @@ public record InitializeWholesaleServicesSeries(
     string? EndDateTime,
     string? GridAreaCode,
     string? EnergySupplierId,
-    string? SettlementSeriesVersion,
+    string? SettlementVersion,
     string? Resolution,
     string? ChargeOwner,
     IReadOnlyCollection<InitializeWholesaleServicesChargeType> ChargeTypes);
