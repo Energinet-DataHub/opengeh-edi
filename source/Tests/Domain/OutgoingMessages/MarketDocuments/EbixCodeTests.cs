@@ -49,7 +49,7 @@ public sealed class EbixCodeTests
         string? expectedResult)
     {
         // Arrange & Act
-        var result = EbixCode.Of(quantityQuality);
+        var result = EbixCode.EnergyResultOf(quantityQuality);
 
         // Assert
         result.Should().Be(expectedResult);
@@ -60,7 +60,7 @@ public sealed class EbixCodeTests
     public void Can_handle_all_edi_qualities(CalculatedQuantityQuality calculatedQuantityQuality)
     {
         // Act & Assert
-        EbixCode.Of(calculatedQuantityQuality);
+        EbixCode.EnergyResultOf(calculatedQuantityQuality);
     }
 
     [Fact]

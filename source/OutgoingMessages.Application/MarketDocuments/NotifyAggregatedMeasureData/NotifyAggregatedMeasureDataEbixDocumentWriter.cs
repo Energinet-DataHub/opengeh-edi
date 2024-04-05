@@ -170,12 +170,12 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "IntervalEnergyObservation", null).ConfigureAwait(false);
                 await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Position", null, point.Position.ToString(NumberFormatInfo.InvariantInfo)).ConfigureAwait(false);
                 if (point.Quantity is not null
-                    && EbixCode.Of(point.QuantityQuality) is not null)
+                    && EbixCode.EnergyResultOf(point.QuantityQuality) is not null)
                 {
                     await writer.WriteElementStringAsync(DocumentDetails.Prefix, "EnergyQuantity", null, point.Quantity.Value.ToString(NumberFormatInfo.InvariantInfo)).ConfigureAwait(false);
                     await WriteCodeWithCodeListReferenceAttributesAsync(
                             "QuantityQuality",
-                            EbixCode.Of(point.QuantityQuality)!,
+                            EbixCode.EnergyResultOf(point.QuantityQuality)!,
                             writer)
                         .ConfigureAwait(false);
                 }

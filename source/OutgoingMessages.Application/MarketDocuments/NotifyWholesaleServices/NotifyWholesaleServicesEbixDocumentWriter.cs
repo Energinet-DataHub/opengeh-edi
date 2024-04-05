@@ -190,9 +190,13 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                             }
 
                             // <QuantityQuality />
-                            if (point.QuantityQuality != null)
+                            if (point.QuantityQuality != null && EbixCode.WholesaleServicesOf(point.QuantityQuality.Value) is not null)
                             {
-                                await WriteCodeWithCodeListReferenceAttributesAsync("QuantityQuality", point.QuantityQuality.Value.ToString(), writer).ConfigureAwait(false);
+                                await WriteCodeWithCodeListReferenceAttributesAsync(
+                                        "QuantityQuality",
+                                        EbixCode.WholesaleServicesOf(point.QuantityQuality.Value)!,
+                                        writer)
+                                    .ConfigureAwait(false);
                             }
 
                             // <EnergySum />
