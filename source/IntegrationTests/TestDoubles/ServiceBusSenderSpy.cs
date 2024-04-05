@@ -32,13 +32,16 @@ namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles
 
         public string TopicName { get; }
 
-        public ServiceBusMessage? Message { get; set; }
+        public ServiceBusMessage? Message { get; private set; }
+
+        public bool MessageSent { get; private set; }
 
         public Task SendAsync(ServiceBusMessage message, CancellationToken cancellationToken)
         {
             if (ShouldFail)
                 throw new ServiceBusException();
             Message = message;
+            MessageSent = true;
             return Task.CompletedTask;
         }
 
@@ -48,6 +51,12 @@ namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles
                 throw new ServiceBusException();
 
             return Task.CompletedTask;
+        }
+
+        public void Reset()
+        {
+            Message = null;
+            MessageSent = false;
         }
 
 #pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
