@@ -61,7 +61,7 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
         builder.Property(x => x.SettlementVersion)
             .HasConversion(
                 value => value != null ? value.Code : null,
-                dbValue => !string.IsNullOrWhiteSpace(dbValue) ? SettlementVersion.FromCode(dbValue) : null);
+                dbValue => !string.IsNullOrWhiteSpace(dbValue) ? SettlementVersion.FromCodeOrUnused(dbValue) : null);
 
         builder.Property(x => x.InitiatedByMessageId)
             .HasConversion(
