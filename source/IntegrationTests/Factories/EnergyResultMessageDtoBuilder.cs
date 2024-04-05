@@ -28,6 +28,7 @@ public class EnergyResultMessageDtoBuilder
     private readonly Guid _processId = ProcessId.Create(Guid.NewGuid()).Id;
     private readonly IReadOnlyCollection<EnergyResultMessagePoint> _points = new List<EnergyResultMessagePoint>();
     private BusinessReason _businessReason = BusinessReason.BalanceFixing;
+    private SettlementVersion? _settlementVersion;
     private ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private ActorRole _receiverRole = ActorRole.MeteredDataAdministrator;
 
@@ -49,7 +50,8 @@ public class EnergyResultMessageDtoBuilder
             new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
             _points,
             _businessReason.Name,
-            1);
+            1,
+            _settlementVersion?.Name);
     }
 
     public EnergyResultMessageDtoBuilder WithReceiverNumber(string receiverNumber)
@@ -67,6 +69,12 @@ public class EnergyResultMessageDtoBuilder
     public EnergyResultMessageDtoBuilder WithBusinessReason(BusinessReason businessReason)
     {
         _businessReason = businessReason;
+        return this;
+    }
+
+    public EnergyResultMessageDtoBuilder WithSettlementVersion(SettlementVersion settlementVersion)
+    {
+        _settlementVersion = settlementVersion;
         return this;
     }
 }
