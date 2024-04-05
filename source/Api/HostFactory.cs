@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using BuildingBlocks.Application.Configuration.Logging;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
@@ -102,20 +103,9 @@ public static class HostFactory
                         .AddDataAccessUnitOfWorkModule(context.Configuration);
                 })
             .ConfigureLogging(
-                logging =>
+                (hostingContext, logging) =>
                 {
-                    logging.Services.Configure<LoggerFilterOptions>(
-                        options =>
-                        {
-                            var defaultRule = options.Rules.FirstOrDefault(
-                                rule =>
-                                    rule.ProviderName
-                                    == "Microsoft.Extensions.Logging.ApplicationInsights.ApplicationInsightsLoggerProvider");
-                            if (defaultRule is not null)
-                            {
-                                options.Rules.Remove(defaultRule);
-                            }
-                        });
+                    logging.AddLoggingConfigurationForIsolatedWorker(hostingContext);
                 })
             .Build();
     }

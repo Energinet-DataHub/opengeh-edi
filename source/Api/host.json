@@ -6,7 +6,12 @@
                 "isEnabled": true,
                 "excludedTypes": "Request;Exception"
             }
-        }
+        },
+      "logLevel": {
+        "default": "Information",
+        "Energinet.Datahub.Edi": "Information",
+        "Energinet.Datahub.Core": "Information"
+      }
     },
     "retry": {
       "maxRetryCount": 10,
