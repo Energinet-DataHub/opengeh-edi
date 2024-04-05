@@ -106,7 +106,7 @@ limitations under the License.
       <EmbeddedResource Include="Application\IncomingMessages\RequestWholesaleSettlement.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="Application\IncomingMessages\RequestWholesaleSettlementWithA47BusinessReason.json">
+      <EmbeddedResource Include="Application\IncomingMessages\RequestWholesaleSettlementWithUnusedBusinessReason.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="Infrastructure.CimMessageAdapter\Messages\xml\BadRequestAggregatedMeasureData.xml">
