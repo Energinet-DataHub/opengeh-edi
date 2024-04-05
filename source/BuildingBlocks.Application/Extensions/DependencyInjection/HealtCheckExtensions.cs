@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using Azure.Identity;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
@@ -29,17 +29,15 @@ public static class HealtCheckExtensions
         ArgumentNullException.ThrowIfNull(queueNames);
         foreach (var name in queueNames)
         {
-            if (QueueHealthCheckIsAdded(services, name))
-            {
-                return services;
-            }
-
-            services.AddHealthChecks()
-                .AddAzureServiceBusQueue(
-                    name: name + "Exists",
-                    connectionString: serviceBusConnectionString,
-                    queueName: name);
-            services.TryAddSingleton(new ServiceBusQueueHealthCheckIsAdded(name));
+            services.TryAddHealthChecks(
+                registrationKey: name,
+                (key, builder) =>
+                {
+                    builder.AddAzureServiceBusQueue(
+                        name: key,
+                        connectionString: serviceBusConnectionString,
+                        queueName: key);
+                });
         }
 
         return services;
@@ -57,15 +55,4 @@ public static class HealtCheckExtensions
 
         return services;
     }
-
-    private static bool QueueHealthCheckIsAdded(IServiceCollection services, string name)
-    {
-        return services.Any(
-            service =>
-                service.ServiceType == typeof(ServiceBusQueueHealthCheckIsAdded)
-                && service.ImplementationInstance is ServiceBusQueueHealthCheckIsAdded
-                && ((ServiceBusQueueHealthCheckIsAdded)service.ImplementationInstance).Name == name);
-    }
-
-    private sealed record ServiceBusQueueHealthCheckIsAdded(string Name);
 }
