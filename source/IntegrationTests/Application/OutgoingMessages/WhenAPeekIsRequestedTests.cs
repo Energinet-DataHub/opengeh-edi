@@ -262,7 +262,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         var act = async () =>
         {
             await EnqueueMessage(message);
-            var result = await PeekMessageAsync(MessageCategory.Aggregations, ActorNumber.Create(SampleData.NewEnergySupplierNumber), ActorRole.EnergySupplier, documentFormat: documentFormat);
+            var result = await PeekMessageAsync(MessageCategory.Aggregations, message.ReceiverNumber, message.ReceiverRole, documentFormat: documentFormat);
             return result;
         };
 
