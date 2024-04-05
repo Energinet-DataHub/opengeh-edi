@@ -32,7 +32,7 @@ public record RequestWholesaleServicesSerie(
     string? EndDateTime,
     string? GridArea,
     string? EnergySupplierId,
-    string? SettlementSeriesVersion,
+    string? SettlementVersion,
     string? Resolution,
     string? ChargeOwner,
     IReadOnlyCollection<RequestWholesaleServicesChargeType> ChargeTypes) : IIncomingMessageSerie;

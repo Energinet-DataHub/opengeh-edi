@@ -52,8 +52,8 @@ public class InitializeWholesaleServicesProcessesHandler : IRequestHandler<Initi
 
         foreach (var serie in initializeWholesaleServicesProcessDto.Serie)
         {
-            var settlementVersion = !string.IsNullOrWhiteSpace(serie.SettlementSeriesVersion)
-                ? Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementVersion.FromCode(serie.SettlementSeriesVersion)
+            var settlementVersion = !string.IsNullOrWhiteSpace(serie.SettlementVersion)
+                ? Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementVersion.FromCode(serie.SettlementVersion)
                 : null;
 
             var chargeTypes = serie.ChargeTypes

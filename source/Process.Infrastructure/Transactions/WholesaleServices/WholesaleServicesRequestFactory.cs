@@ -66,7 +66,7 @@ public static class WholesaleServicesRequestFactory
             request.GridAreaCode = process.GridAreaCode;
 
         if (process.SettlementVersion != null)
-            request.SettlementSeriesVersion = process.SettlementVersion.Name;
+            request.SettlementVersion = process.SettlementVersion.Name;
 
         foreach (var chargeType in process.ChargeTypes)
         {

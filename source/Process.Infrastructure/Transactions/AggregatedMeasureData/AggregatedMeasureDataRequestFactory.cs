@@ -79,7 +79,7 @@ public static class AggregatedMeasureDataRequestFactory
             request.BalanceResponsibleId = process.BalanceResponsibleId;
 
         if (process.SettlementVersion != null)
-            request.SettlementSeriesVersion = process.SettlementVersion.Name;
+            request.SettlementVersion = process.SettlementVersion.Name;
 
         if (process.MeteringGridAreaDomainId != null)
             request.GridAreaCode = process.MeteringGridAreaDomainId;
