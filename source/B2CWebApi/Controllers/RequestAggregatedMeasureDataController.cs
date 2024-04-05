@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Text;
-using Asp.Versioning;
 using Energinet.DataHub.Core.App.Common;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
@@ -27,7 +26,6 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 
-[ApiVersion(1.0)]
 [ApiController]
 [Route("[controller]")]
 public class RequestAggregatedMeasureDataController : ControllerBase
