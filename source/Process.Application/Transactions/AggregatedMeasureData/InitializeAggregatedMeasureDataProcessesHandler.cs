@@ -54,8 +54,8 @@ public class InitializeAggregatedMeasureDataProcessesHandler : IRequestHandler<I
 
         foreach (var serie in dto.Series)
         {
-            var settlementVersion = !string.IsNullOrWhiteSpace(serie.SettlementSeriesVersion)
-                ? SettlementVersion.FromCode(serie.SettlementSeriesVersion)
+            var settlementVersion = !string.IsNullOrWhiteSpace(serie.SettlementVersion)
+                ? SettlementVersion.FromCode(serie.SettlementVersion)
                 : null;
 
             _aggregatedMeasureDataProcessRepository.Add(

@@ -59,7 +59,7 @@ public class RequestAggregatedMeasureDataFactoryTests
         {
             Assert.Equal("E18", serie.MarketEvaluationPointType);
             Assert.Null(serie.MarketEvaluationSettlementMethod);
-            Assert.Null(serie.SettlementSeriesVersion);
+            Assert.Null(serie.SettlementVersion);
 
             var startDate = InstantPattern.General.Parse(serie.StartDateAndOrTimeDateTime).GetValueOrThrow();
             Assert.Equal(startDay, startDate.Day());
