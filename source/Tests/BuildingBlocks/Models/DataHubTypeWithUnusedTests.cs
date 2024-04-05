@@ -28,9 +28,9 @@ public class DataHubTypeWithUnusedTests
     /// <summary>
     /// Get all types that inherit from DataHubTypeWithUnused base classes (a list of <see cref="DataHubTypeWithUnused{T}"/>))
     /// </summary>
-    public static IEnumerable<object[]> GetAllDataHubTypeWithUnknown()
+    public static IEnumerable<object[]> GetAllDataHubTypeWithUnused()
     {
-        var dataHubTypeWithUnknownTypes = Assembly.GetAssembly(typeof(DataHubTypeWithUnused<>))!
+        var dataHubTypeWithUnusedTypes = Assembly.GetAssembly(typeof(DataHubTypeWithUnused<>))!
             .GetTypes()
             .Where(t => t.BaseType is { IsGenericType: true } && t.BaseType.GetGenericTypeDefinition() == typeof(DataHubTypeWithUnused<>))
             .Select(type => new object[]
@@ -39,28 +39,28 @@ public class DataHubTypeWithUnusedTests
             })
             .ToList();
 
-        return dataHubTypeWithUnknownTypes;
+        return dataHubTypeWithUnusedTypes;
     }
 
     [Theory]
-    [MemberData(nameof(GetAllDataHubTypeWithUnknown))]
-    public void Ensure_all_can_be_created_as_unknown(Type dataHubTypeWithUnknown)
+    [MemberData(nameof(GetAllDataHubTypeWithUnused))]
+    public void Ensure_all_can_be_created_as_unknown(Type dataHubTypeWithUnused)
     {
-        ArgumentNullException.ThrowIfNull(dataHubTypeWithUnknown);
+        ArgumentNullException.ThrowIfNull(dataHubTypeWithUnused);
 
         // Arrange
-        var unknownCode = "UNKNOWN-CODE";
-        var fromCodeOrUnknownMethod = dataHubTypeWithUnknown.GetMethod("FromCodeOrUnused", BindingFlags.Public | BindingFlags.Static);
+        var unusedCode = "UNUSED-CODE";
+        var fromCodeOrUnknownMethod = dataHubTypeWithUnused.GetMethod("FromCodeOrUnused", BindingFlags.Public | BindingFlags.Static);
 
         // Act
-        var act = () => fromCodeOrUnknownMethod!.Invoke(null, new object[] { unknownCode });
+        var act = () => fromCodeOrUnknownMethod!.Invoke(null, new object[] { unusedCode });
 
         // Assert
         using var scope = new AssertionScope();
         var result = act.Should().NotThrow().Subject;
         result.Should().NotBeNull();
-        dataHubTypeWithUnknown.GetProperty("IsUnused")!.GetValue(result).Should().Be(true);
-        dataHubTypeWithUnknown.GetProperty("Name")!.GetValue(result).Should().Be(unknownCode);
-        dataHubTypeWithUnknown.GetProperty("Code")!.GetValue(result).Should().Be(unknownCode);
+        dataHubTypeWithUnused.GetProperty("IsUnused")!.GetValue(result).Should().Be(true);
+        dataHubTypeWithUnused.GetProperty("Name")!.GetValue(result).Should().Be(unusedCode);
+        dataHubTypeWithUnused.GetProperty("Code")!.GetValue(result).Should().Be(unusedCode);
     }
 }
