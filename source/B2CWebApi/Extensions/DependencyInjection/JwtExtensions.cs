@@ -37,7 +37,7 @@ public static class JwtExtensions
                 "INTERNAL_OPEN_ID_URL must be set")
             .Validate(
                 o => !string.IsNullOrEmpty(o.BACKEND_BFF_APP_ID),
-                "BACKEND_BFF_APP_IDmust be set");
+                "BACKEND_BFF_APP_ID must be set");
 
         var options = configuration.Get<JwtOptions>()!;
         services.AddJwtBearerAuthentication(options.EXTERNAL_OPEN_ID_URL, options.INTERNAL_OPEN_ID_URL, options.BACKEND_BFF_APP_ID);
