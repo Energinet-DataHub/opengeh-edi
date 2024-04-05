@@ -48,9 +48,9 @@ jobs:
         with:
           filters: |
             dotnet:
-              - '.github/workflows/cd.yml'
-              - '.github/workflows/ci-dotnet.yml'
               - '.github/actions/dotnet-*/**'
+              - '.github/workflows/**'
+              - 'source/**'
             render_c4model_views:
               - 'docs/diagrams/c4-model/views.dsl'
               - 'docs/diagrams/c4-model/views.json'
