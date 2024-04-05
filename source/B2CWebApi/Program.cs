@@ -15,7 +15,6 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Asp.Versioning;
-using BuildingBlocks.Application.Configuration.Logging;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
@@ -26,7 +25,6 @@ using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyIn
 using Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
-using Microsoft.ApplicationInsights.Extensibility;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,10 +35,14 @@ builder.Logging
     .AddApplicationInsights();
 
 builder.Services
-    .AddSwaggerForWebApp(Assembly.GetExecutingAssembly())
+        // Swagger
+    .AddSwaggerForWebApp(Assembly.GetExecutingAssembly(), "EDI B2C Web API")
     .AddApiVersioningForWebApp(new ApiVersion(1, 0))
+
+        // Logging
     .AddApplicationInsightsForWebApp(domainName)
-    .AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>()
+    .AddApplicationInsightsTelemetry()
+
     .AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 

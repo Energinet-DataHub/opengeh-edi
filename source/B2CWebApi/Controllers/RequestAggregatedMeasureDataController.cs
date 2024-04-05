@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Text;
-using Energinet.DataHub.Core.App.Common;
+using Energinet.DataHub.Core.App.Common.Users;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
