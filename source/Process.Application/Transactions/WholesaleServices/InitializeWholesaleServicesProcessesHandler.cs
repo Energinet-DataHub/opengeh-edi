@@ -47,7 +47,7 @@ public class InitializeWholesaleServicesProcessesHandler : IRequestHandler<Initi
     private void CreateWholesaleServicesProcess(InitializeWholesaleServicesProcessDto initializeWholesaleServicesProcessDto)
     {
         var actorSenderNumber = ActorNumber.Create(initializeWholesaleServicesProcessDto.SenderNumber);
-        var businessReason = BusinessReason.FromCode(initializeWholesaleServicesProcessDto.BusinessReason);
+        var businessReason = BusinessReason.FromCodeOrUnused(initializeWholesaleServicesProcessDto.BusinessReason);
         var messageId = MessageId.Create(initializeWholesaleServicesProcessDto.MessageId);
 
         foreach (var serie in initializeWholesaleServicesProcessDto.Serie)

@@ -91,6 +91,45 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
     }
 
     [Fact]
+    public async Task When_WholesaleServicesProcess_is_initialized_with_unused_business_reason_service_bus_message_is_sent_to_wholesale()
+    {
+        // Arrange
+        const string unusedBusinessReason = "A47";
+        var marketMessage = InitializeProcessDtoBuilder()
+            .SetBusinessReason(unusedBusinessReason)
+            .Build();
+
+        // Act
+        await InvokeCommandAsync(new InitializeWholesaleServicesProcessesCommand(marketMessage));
+        await ProcessInternalCommandsAsync();
+
+        // Assert
+        _senderSpy.MessageSent.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task When_WholesaleServicesProcess_is_initialized_with_unused_business_reason_process_can_still_be_created()
+    {
+        // Arrange
+        const string unusedBusinessReason = "A47";
+        var marketMessage = InitializeProcessDtoBuilder()
+            .SetBusinessReason(unusedBusinessReason)
+            .Build();
+
+        // Act
+        await InvokeCommandAsync(new InitializeWholesaleServicesProcessesCommand(marketMessage));
+        await ProcessInternalCommandsAsync();
+
+        // Assert
+        var process = GetProcess(marketMessage.SenderNumber);
+        process.Should().NotBeNull();
+        process!.BusinessReason.IsUnused.Should().BeTrue();
+        process.BusinessReason.Code.Should().Be(unusedBusinessReason);
+        process.BusinessReason.Name.Should().Be(unusedBusinessReason);
+        await AssertProcessState(marketMessage!.MessageId, WholesaleServicesProcess.State.Sent);
+    }
+
+    [Fact]
     public async Task When_WholesaleServicesRequest_is_sent_to_wholesale_it_contains_no_CIM_codes()
     {
         // Arrange
@@ -126,7 +165,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
             .Build();
         await InvokeCommandAsync(new InitializeWholesaleServicesProcessesCommand(marketMessage));
         await ProcessInternalCommandsAsync();
-        _senderSpy.Message = null; // Reset the spy
+        _senderSpy.Reset();
         var process = GetProcess(marketMessage.SenderNumber);
 
         // Act
