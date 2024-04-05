@@ -212,13 +212,13 @@ public class WhenAPeekIsRequestedTests : TestBase
     }
 
     [Fact]
-    public async Task When_unknown_business_reason_then_exception_is_thrown()
+    public async Task When_unused_business_reason_then_exception_is_thrown()
     {
-        var unknownCode = "A47";
-        var expectedExceptionMessage = $"{unknownCode} is not a valid BusinessReason name";
+        var unusedCode = "A47";
+        var expectedExceptionMessage = $"{unusedCode} is not a valid BusinessReason name";
 
         var message = _energyResultMessageDtoBuilder
-            .WithBusinessReason(BusinessReason.FromCodeOrUnused(unknownCode))
+            .WithBusinessReason(BusinessReason.FromCodeOrUnused(unusedCode))
             .Build();
 
         var act = async () =>
@@ -228,7 +228,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             return result;
         };
 
-        (await act.Should().ThrowAsync<InvalidOperationException>($"because {unknownCode} is a unknown BusinessReason code"))
+        (await act.Should().ThrowAsync<InvalidOperationException>($"because {unusedCode} is a unused BusinessReason code"))
             .WithMessage(expectedExceptionMessage);
     }
 

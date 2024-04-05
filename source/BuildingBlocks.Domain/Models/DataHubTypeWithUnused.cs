@@ -19,7 +19,7 @@ using System.Reflection;
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 /// <summary>
-/// Used when a DataHubType can have an unknown value, typically used when a schema allows for values we no longer use
+/// Used when a DataHubType can have an unknown value, typically used when a schema allows for values we do not use
 /// </summary>
 [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "Used for converting our DataHubTypes")]
 public abstract class DataHubTypeWithUnused<T> : DataHubType<T>
@@ -34,7 +34,7 @@ public abstract class DataHubTypeWithUnused<T> : DataHubType<T>
     public bool IsUnused { get; }
 
     /// <summary>
-    /// Create a DataHubType from a code or returns an UNKNOWN type if the code is not recognized
+    /// Create a DataHubType from a code or returns as IsUnused=true if the code is not recognized
     /// </summary>
     public static T FromCodeOrUnused(string code)
     {

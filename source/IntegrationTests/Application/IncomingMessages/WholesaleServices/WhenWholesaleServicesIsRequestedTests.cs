@@ -91,12 +91,12 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
     }
 
     [Fact]
-    public async Task When_WholesaleServicesProcess_is_initialized_with_unknown_business_reason_service_bus_message_is_sent_to_wholesale()
+    public async Task When_WholesaleServicesProcess_is_initialized_with_unused_business_reason_service_bus_message_is_sent_to_wholesale()
     {
         // Arrange
-        var unknownBusinessReason = "A47";
+        const string unusedBusinessReason = "A47";
         var marketMessage = InitializeProcessDtoBuilder()
-            .SetBusinessReason(unknownBusinessReason)
+            .SetBusinessReason(unusedBusinessReason)
             .Build();
 
         // Act
@@ -108,12 +108,12 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
     }
 
     [Fact]
-    public async Task When_WholesaleServicesProcess_is_initialized_with_unknown_business_reason_process_can_still_be_created()
+    public async Task When_WholesaleServicesProcess_is_initialized_with_unused_business_reason_process_can_still_be_created()
     {
         // Arrange
-        var unknownBusinessReason = "A47";
+        const string unusedBusinessReason = "A47";
         var marketMessage = InitializeProcessDtoBuilder()
-            .SetBusinessReason(unknownBusinessReason)
+            .SetBusinessReason(unusedBusinessReason)
             .Build();
 
         // Act
@@ -124,8 +124,8 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         var process = GetProcess(marketMessage.SenderNumber);
         process.Should().NotBeNull();
         process!.BusinessReason.IsUnused.Should().BeTrue();
-        process.BusinessReason.Code.Should().Be(unknownBusinessReason);
-        process.BusinessReason.Name.Should().Be(unknownBusinessReason);
+        process.BusinessReason.Code.Should().Be(unusedBusinessReason);
+        process.BusinessReason.Name.Should().Be(unusedBusinessReason);
         await AssertProcessState(marketMessage!.MessageId, WholesaleServicesProcess.State.Sent);
     }
 
