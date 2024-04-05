@@ -44,16 +44,16 @@ public class DataHubTypeWithUnusedTests
 
     [Theory]
     [MemberData(nameof(GetAllDataHubTypeWithUnused))]
-    public void Ensure_all_can_be_created_as_unknown(Type dataHubTypeWithUnused)
+    public void Ensure_all_can_be_created_as_unused(Type dataHubTypeWithUnused)
     {
         ArgumentNullException.ThrowIfNull(dataHubTypeWithUnused);
 
         // Arrange
         var unusedCode = "UNUSED-CODE";
-        var fromCodeOrUnknownMethod = dataHubTypeWithUnused.GetMethod("FromCodeOrUnused", BindingFlags.Public | BindingFlags.Static);
+        var fromCodeOrUnusedMethod = dataHubTypeWithUnused.GetMethod("FromCodeOrUnused", BindingFlags.Public | BindingFlags.Static);
 
         // Act
-        var act = () => fromCodeOrUnknownMethod!.Invoke(null, new object[] { unusedCode });
+        var act = () => fromCodeOrUnusedMethod!.Invoke(null, new object[] { unusedCode });
 
         // Assert
         using var scope = new AssertionScope();
