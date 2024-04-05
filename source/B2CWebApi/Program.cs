@@ -15,8 +15,8 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Asp.Versioning;
+using BuildingBlocks.Application.Configuration.Logging;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.WebApp.Extensions.Builder;
@@ -26,45 +26,40 @@ using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyIn
 using Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
+using Microsoft.ApplicationInsights.Extensibility;
 
 var builder = WebApplication.CreateBuilder(args);
 
-const string domainName = "Edi";
-
-var blobStorageUrl = builder.Configuration["AZURE_STORAGE_ACCOUNT_URL"];
+const string domainName = "EDI";
 
 builder.Logging
     .ClearProviders()
     .AddApplicationInsights();
 
 builder.Services
-    // Swagger and Api versioning
-    .AddSwaggerForWebApp(Assembly.GetExecutingAssembly(), "EDI B2C Web API")
+    .AddSwaggerForWebApp(Assembly.GetExecutingAssembly())
     .AddApiVersioningForWebApp(new ApiVersion(1, 0))
-
-    // Logging
     .AddApplicationInsightsForWebApp(domainName)
-    .AddApplicationInsightsTelemetry()
-    .AddHttpLoggingScope(domainName)
-
-    // System timer
-    .AddNodaTimeForApplication()
-    .AddSystemTimer()
-
-    // Modules
-    .AddIncomingMessagesModule(builder.Configuration)
-    .AddArchivedMessagesModule(builder.Configuration, blobStorageUrl != null ? new Uri(blobStorageUrl) : null!)
-
-    // HealthChecks
-    .AddHealthChecksForWebApp()
-
+    .AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>()
     .AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services
+    .AddSystemTimer()
+    .AddHttpLoggingScope(domainName)
     .AddSerializer()
+    .AddIncomingMessagesModule(builder.Configuration)
+    .AddArchivedMessagesModule(builder.Configuration)
     .AddJwtTokenSecurity(builder.Configuration)
-    .AddHttpClient();
+    .AddDateTime(builder.Configuration)
+    .AddHttpClient()
+    .AddLiveHealthCheck();
+
+var blobStorageUrl = builder.Configuration["AZURE_STORAGE_ACCOUNT_URL"];
+
+builder.Services.AddBlobStorageHealthCheck(
+        "edi-documents-storage",
+        blobStorageUrl != null ? new Uri(blobStorageUrl) : null!);
 
 // ***********************************************************************************************
 // App building start here, aka Configure if one uses StartUp

@@ -19,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.Api.Common;
+using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Api.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
@@ -30,6 +31,7 @@ namespace Energinet.DataHub.EDI.Api.IncomingMessages;
 
 public class IncomingMessageReceiver
 {
+    private readonly ICorrelationContext _correlationContext;
     private readonly IFeatureFlagManager _featureFlagManager;
     private readonly IIncomingMessageClient _incomingMessageClient;
     private readonly ILogger<IncomingMessageReceiver> _logger;
@@ -37,10 +39,12 @@ public class IncomingMessageReceiver
     public IncomingMessageReceiver(
         ILogger<IncomingMessageReceiver> logger,
         IIncomingMessageClient incomingMessageClient,
+        ICorrelationContext correlationContext,
         IFeatureFlagManager featureFlagManager)
     {
         _logger = logger;
         _incomingMessageClient = incomingMessageClient;
+        _correlationContext = correlationContext;
         _featureFlagManager = featureFlagManager;
     }
 
@@ -94,13 +98,14 @@ public class IncomingMessageReceiver
         return CreateResponse(request, httpStatusCode, responseMessage);
     }
 
-    private static HttpResponseData CreateResponse(
+    private HttpResponseData CreateResponse(
         HttpRequestData request,
         HttpStatusCode statusCode,
         ResponseMessage responseMessage)
     {
         var response = request.CreateResponse(statusCode);
         response.WriteString(responseMessage.MessageBody, Encoding.UTF8);
+        response.Headers.Add("CorrelationId", _correlationContext.Id);
         return response;
     }
 }

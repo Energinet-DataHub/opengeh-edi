@@ -272,11 +272,12 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 .AddLogging()
                 .AddScoped<ISystemDateTimeProvider>(_ => new SystemDateTimeProviderStub());
 
-            _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
+            _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>();
+            _services.AddCorrelation(config)
             .AddIntegrationEventModule()
             .AddOutgoingMessagesModule(config)
             .AddProcessModule(config)
-            .AddArchivedMessagesModule(config, null!) // new Uri("http://dummy.url"))
+            .AddArchivedMessagesModule(config)
             .AddIncomingMessagesModule(config)
             .AddMasterDataModule(config)
             .AddDataAccessUnitOfWorkModule(config);

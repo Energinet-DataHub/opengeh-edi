@@ -14,10 +14,12 @@
 
 using System;
 using System.Linq;
+using BuildingBlocks.Application.Configuration.Logging;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
+using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Api.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
@@ -27,6 +29,7 @@ using Energinet.DataHub.EDI.IntegrationEvents.Application.Configuration;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -49,6 +52,7 @@ public static class HostFactory
                 worker =>
                 {
                     worker.UseMiddleware<UnHandledExceptionMiddleware>();
+                    worker.UseMiddleware<CorrelationIdMiddleware>();
                     worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
                 },
                 option =>
@@ -59,29 +63,31 @@ public static class HostFactory
                 (context, services) =>
                 {
                     services
-                        // Logging
                         .AddApplicationInsightsForIsolatedWorker(DomainName)
                         .ConfigureFunctionsApplicationInsights()
+                        .AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>()
                         .AddDataRetention()
-                        // Health checks
-                        .AddHealthChecksForIsolatedWorker()
+                        .AddCorrelation(context.Configuration)
+                        .AddLiveHealthCheck()
                         .TryAddExternalDomainServiceBusQueuesHealthCheck(
                             runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                             runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,
                             runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!)
                         .TryAddSqlServerHealthCheck(context.Configuration)
                         .AddB2BAuthentication(tokenValidationParameters!)
-
                         .AddSystemTimer()
                         .AddSerializer()
                         .AddLogging();
                     services.AddBlobStorageHealthCheck(
                         "edi-web-jobs-storage",
                         runtime.AzureWebJobsStorage!);
+                    services.AddBlobStorageHealthCheck(
+                        "edi-documents-storage",
+                        runtime.AZURE_STORAGE_ACCOUNT_URL!);
 
                     services
                         .AddIntegrationEventModule()
-                        .AddArchivedMessagesModule(context.Configuration, runtime.AZURE_STORAGE_ACCOUNT_URL!)
+                        .AddArchivedMessagesModule(context.Configuration)
                         .AddIncomingMessagesModule(context.Configuration)
                         .AddOutgoingMessagesModule(context.Configuration)
                         .AddProcessModule(context.Configuration)
