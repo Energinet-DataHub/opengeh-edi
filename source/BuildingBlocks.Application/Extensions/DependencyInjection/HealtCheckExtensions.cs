@@ -22,16 +22,6 @@ namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
 public static class HealtCheckExtensions
 {
-    public static IServiceCollection AddLiveHealthCheck(this IServiceCollection services)
-    {
-        services
-            .AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>()
-            .AddHealthChecks()
-            .AddLiveCheck();
-
-        return services;
-    }
-
     /// <summary>
     /// Used for Service Bus queues where the app have peek (receiver) permissions
     /// </summary>
@@ -57,9 +47,10 @@ public static class HealtCheckExtensions
         return services;
     }
 
-    public static void AddBlobStorageHealthCheck(this IServiceCollection services, string name, string blobConnectionString)
+    public static IServiceCollection AddBlobStorageHealthCheck(this IServiceCollection services, string name, string blobConnectionString)
     {
         services.AddHealthChecks().AddAzureBlobStorage(blobConnectionString, name: name);
+        return services;
     }
 
     public static IServiceCollection AddBlobStorageHealthCheck(this IServiceCollection services, string name, Uri storageAccountUri)

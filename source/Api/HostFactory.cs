@@ -61,28 +61,38 @@ public static class HostFactory
                 (context, services) =>
                 {
                     services
+                        // Logging
                         .AddApplicationInsightsForIsolatedWorker(DomainName)
                         .ConfigureFunctionsApplicationInsights()
-                        .AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>()
-                        .AddDataRetention()
-                        .AddLiveHealthCheck()
+                        .AddLogging()
+
+                        // Health checks
+                        .AddHealthChecksForIsolatedWorker()
+                        .AddBlobStorageHealthCheck(
+                        "edi-web-jobs-storage",
+                        runtime.AzureWebJobsStorage!)
+                        .AddBlobStorageHealthCheck(
+                            "edi-documents-storage",
+                            runtime.AZURE_STORAGE_ACCOUNT_URL!)
                         .TryAddExternalDomainServiceBusQueuesHealthCheck(
                             runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                             runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,
                             runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!)
                         .TryAddSqlServerHealthCheck(context.Configuration)
-                        .AddB2BAuthentication(tokenValidationParameters!)
-                        .AddSystemTimer()
-                        .AddSerializer()
-                        .AddLogging();
-                    services.AddBlobStorageHealthCheck(
-                        "edi-web-jobs-storage",
-                        runtime.AzureWebJobsStorage!);
-                    services.AddBlobStorageHealthCheck(
-                        "edi-documents-storage",
-                        runtime.AZURE_STORAGE_ACCOUNT_URL!);
 
-                    services
+                        // Data retention
+                        .AddDataRetention()
+
+                        // Security
+                        .AddB2BAuthentication(tokenValidationParameters!)
+
+                        // System timer
+                        .AddSystemTimer()
+
+                        // Serializer
+                        .AddSerializer()
+
+                        // Modules
                         .AddIntegrationEventModule()
                         .AddArchivedMessagesModule(context.Configuration)
                         .AddIncomingMessagesModule(context.Configuration)
