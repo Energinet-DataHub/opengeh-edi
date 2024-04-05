@@ -111,7 +111,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         wholesaleServicesRequest.RequestedByActorRole.Should().NotBeCimCode();
         wholesaleServicesRequest.BusinessReason.Should().NotBeCimCode();
         wholesaleServicesRequest.Resolution.Should().NotBeCimCode();
-        wholesaleServicesRequest.SettlementSeriesVersion.Should().NotBeCimCode();
+        wholesaleServicesRequest.SettlementVersion.Should().NotBeCimCode();
         foreach (var chargeType in wholesaleServicesRequest.ChargeTypes)
         {
             chargeType.ChargeType_.Should().NotBeCimCode();
@@ -246,7 +246,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
                             {
                                 if (p.SettlementVersion is not null)
                                 {
-                                    p.SettlementVersion.Code.Should().Be(s.SettlementSeriesVersion);
+                                    p.SettlementVersion.Code.Should().Be(s.SettlementVersion);
                                 }
                                 else
                                 {

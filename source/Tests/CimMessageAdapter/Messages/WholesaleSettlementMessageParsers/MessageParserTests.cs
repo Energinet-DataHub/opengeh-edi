@@ -97,7 +97,7 @@ public class MessageParserTests
             Assert.Equal("5799999933318", serie.EnergySupplierId);
             Assert.Equal("2022-08-31T22:00:00Z", serie.EndDateTime);
             Assert.Equal("244", serie.GridArea);
-            Assert.Equal("D01", serie.SettlementSeriesVersion);
+            Assert.Equal("D01", serie.SettlementVersion);
             Assert.Equal("2022-08-17T22:00:00Z", serie.StartDateTime);
             foreach (var chargeType in serie.ChargeTypes)
             {
