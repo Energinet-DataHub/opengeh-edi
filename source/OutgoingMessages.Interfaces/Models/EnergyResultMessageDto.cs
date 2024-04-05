@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 public class EnergyResultMessageDto : OutgoingMessageDto
 {
     private EnergyResultMessageDto(
-        ActorNumber receiverId,
+        ActorNumber receiverNumber,
         Guid processId,
         string businessReason,
         ActorRole receiverRole,
@@ -31,7 +31,7 @@ public class EnergyResultMessageDto : OutgoingMessageDto
         MessageId? relatedToMessageId = null)
         : base(
             DocumentType.NotifyAggregatedMeasureData,
-            receiverId,
+            receiverNumber,
             processId,
             businessReason,
             receiverRole,
@@ -50,7 +50,7 @@ public class EnergyResultMessageDto : OutgoingMessageDto
         Guid processId,
         string gridAreaCode,
         string meteringPointType,
-        string? settlementType,
+        string? settlementMethod,
         string measureUnitType,
         string resolution,
         string? energySupplierNumber,
@@ -65,7 +65,8 @@ public class EnergyResultMessageDto : OutgoingMessageDto
             processId,
             gridAreaCode,
             meteringPointType,
-            settlementType,
+            null,
+            settlementMethod,
             measureUnitType,
             resolution,
             energySupplierNumber,
@@ -88,7 +89,8 @@ public record EnergyResultMessageTimeSeries(
     Guid TransactionId,
     string GridAreaCode,
     string MeteringPointType,
-    string? SettlementType,
+    string? SettlementType, // TODO: To ensure backwards compatibility, will be remove in another PR.
+    string? SettlementMethod,
     string MeasureUnitType,
     string Resolution,
     string? EnergySupplierNumber,

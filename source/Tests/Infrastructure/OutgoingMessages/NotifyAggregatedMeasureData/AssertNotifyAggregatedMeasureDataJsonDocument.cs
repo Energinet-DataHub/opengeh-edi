@@ -229,7 +229,7 @@ internal sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNot
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasSettlementMethod(SettlementType settlementMethod)
+    public IAssertNotifyAggregatedMeasureDataDocument HasSettlementMethod(SettlementMethod settlementMethod)
     {
         Assert.Equal(settlementMethod.Code, FirstTimeSeriesElement()
             .GetProperty("marketEvaluationPoint.settlementMethod").GetProperty("value")

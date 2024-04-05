@@ -32,8 +32,8 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
         var message = CreateWholesaleResultSeries(process, acceptedWholesaleServices);
 
         return AcceptedWholesaleServicesMessageDto.Create(
-            message.EnergySupplier,
-            ActorRole.EnergySupplier,
+            process.RequestedByActorId,
+            ActorRole.FromCode(process.RequestedByActorRoleCode),
             message.ChargeOwner,
             process.ProcessId.Id,
             process.BusinessReason.Name,
@@ -62,7 +62,7 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
             acceptedWholesaleServices.ChargeType,
             acceptedWholesaleServices.Resolution,
             acceptedWholesaleServices.MeteringPointType,
-            acceptedWholesaleServices.SettlementType,
+            acceptedWholesaleServices.SettlementMethod,
             OriginalTransactionIdReference: process.BusinessTransactionId.Id);
 
         return acceptedWholesaleCalculationSeries;

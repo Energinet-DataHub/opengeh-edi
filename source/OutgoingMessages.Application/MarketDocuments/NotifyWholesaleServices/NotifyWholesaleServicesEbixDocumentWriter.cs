@@ -117,40 +117,28 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                     await writer.WriteStringAsync(ProductType.Tariff.Code).ConfigureAwait(false);
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-                    if (series.QuantityUnit != null)
-                    {
-                        // This is a bit of a hack, but it is the only way empty queues with old name
-
-                        // <UnitType />
-                        await WriteCodeWithCodeListReferenceAttributesAsync("UnitType", EbixCode.Of(series.QuantityUnit), writer).ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        // this is the correct way to do it
-
-                        // <UnitType />
-                        await WriteCodeWithCodeListReferenceAttributesAsync("UnitType", EbixCode.Of(series.QuantityMeasureUnit), writer).ConfigureAwait(false);
-                    }
+#pragma warning disable CS0618 // Type or member is obsolete
+                    // <UnitType />
+                    await WriteCodeWithCodeListReferenceAttributesAsync("UnitType", EbixCode.Of(series.QuantityUnit ?? series.QuantityMeasureUnit), writer).ConfigureAwait(false);
+#pragma warning restore CS0618 // Type or member is obsolete
 
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
                 } // End </IncludedProductCharacteristic>
 
-                if (series.MeteringPointType != null || series.SettlementType != null)
+#pragma warning disable CS0618 // Type or member is obsolete
+                if (series.MeteringPointType != null || series.SettlementType != null || series.SettlementMethod != null)
                 {
                     // Begin DetailMeasurementMeteringPointCharacteristic
                     await writer.WriteStartElementAsync(DocumentDetails.Prefix, "DetailMeasurementMeteringPointCharacteristic", null).ConfigureAwait(false);
                     if (series.MeteringPointType != null)
-                    {
                         await WriteCodeWithCodeListReferenceAttributesAsync("TypeOfMeteringPoint", series.MeteringPointType.Code, writer).ConfigureAwait(false);
-                    }
 
-                    if (series.SettlementType != null)
-                    {
-                        await WriteCodeWithCodeListReferenceAttributesAsync("SettlementMethod", series.SettlementType.Code, writer).ConfigureAwait(false);
-                    }
+                    if (series.SettlementType != null || series.SettlementMethod != null)
+                        await WriteCodeWithCodeListReferenceAttributesAsync("SettlementMethod", series.SettlementType?.Code ?? series.SettlementMethod!.Code, writer).ConfigureAwait(false);
 
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
                 }
+#pragma warning restore CS0618 // Type or member is obsolete
 
                 // End DetailMeasurementMeteringPointCharacteristic
 

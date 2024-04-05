@@ -65,6 +65,7 @@ public class IncomingMessageClient : IIncomingMessageClient
         CancellationToken cancellationToken,
         DocumentFormat responseFormat = null!)
     {
+        ArgumentNullException.ThrowIfNull(documentType);
         ArgumentNullException.ThrowIfNull(incomingMessageStream);
 
         var incomingMarketMessageParserResult =
@@ -85,6 +86,7 @@ public class IncomingMessageClient : IIncomingMessageClient
         await ArchiveIncomingMessageAsync(
                 incomingMessageStream,
                 incomingMarketMessageParserResult.IncomingMessage,
+                documentType,
                 cancellationToken)
             .ConfigureAwait(false);
 
@@ -128,12 +130,13 @@ public class IncomingMessageClient : IIncomingMessageClient
     private async Task ArchiveIncomingMessageAsync(
         IIncomingMessageStream incomingMessageStream,
         IIncomingMessage incomingMessage,
+        IncomingDocumentType incomingDocumentType,
         CancellationToken cancellationToken)
     {
         await _archivedMessagesClient.CreateAsync(
             new ArchivedMessage(
                 incomingMessage.MessageId,
-                IncomingDocumentType.RequestAggregatedMeasureData.Name,
+                incomingDocumentType.Name,
                 incomingMessage.SenderNumber,
                 incomingMessage.ReceiverNumber,
                 _systemDateTimeProvider.Now(),

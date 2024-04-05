@@ -90,15 +90,18 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.NotNull(result!.RecordId),
             () => Assert.Equal(message.ProcessId, result!.ProcessId),
             () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Name, result!.DocumentType),
-            () => Assert.Equal(message.ReceiverId.Value, result!.ReceiverId),
+            () => Assert.Equal(message.ReceiverNumber.Value, result!.ReceiverNumber),
             () => Assert.Equal(message.ReceiverRole.Code, result!.ReceiverRole),
+            () => Assert.Equal(message.ReceiverNumber.Value, result!.DocumentReceiverNumber),
+            () => Assert.Equal(message.ReceiverRole.Code, result!.DocumentReceiverRole),
             () => Assert.Equal(message.SenderId.Value, result!.SenderId),
             () => Assert.Equal(message.SenderRole.Code, result!.SenderRole),
             () => Assert.Equal(message.BusinessReason, result!.BusinessReason),
+            () => Assert.Equal(message.Series.GridAreaCode, result!.GridAreaCode),
+            () => Assert.Equal(ProcessType.ReceiveEnergyResults.Name, result!.MessageCreatedFromProcess),
             () => Assert.Equal(expectedFileStorageReference, result!.FileStorageReference),
             () => Assert.Equal("OutgoingMessage", result!.Discriminator),
             () => Assert.Equal(message.RelatedToMessageId?.Value, result!.RelatedToMessageId),
-            () => Assert.False(result!.IsPublished),
             () => Assert.NotNull(result!.AssignedBundleId),
         };
 
@@ -118,7 +121,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
 
         var result = await _outgoingMessagesClient.PeekAndCommitAsync(
             new PeekRequestDto(
-                message.ReceiverId,
+                message.ReceiverNumber,
                 MessageCategory.Aggregations,
                 message.ReceiverRole,
                 DocumentFormat.Xml),
@@ -136,7 +139,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var message2 = _energyResultMessageDtoBuilder.Build();
         await EnqueueAndCommitAsync(message2);
 
-        var result = await _outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(message.ReceiverId, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Ebix), CancellationToken.None);
+        var result = await _outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(message.ReceiverNumber, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Ebix), CancellationToken.None);
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = "SELECT top 1 id FROM [dbo].[Bundles] order by created";
         var id = await
@@ -152,7 +155,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var message = _energyResultMessageDtoBuilder.Build();
         await EnqueueAndCommitAsync(message);
         var peekRequestDto = new PeekRequestDto(
-            message.ReceiverId,
+            message.ReceiverNumber,
             MessageCategory.Aggregations,
             message.ReceiverRole,
             DocumentFormat.Xml);
@@ -160,7 +163,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var dequeueCommand = new DequeueRequestDto(
             peekResult.MessageId!.Value.ToString(),
             message.ReceiverRole,
-            message.ReceiverId);
+            message.ReceiverNumber);
 
         var result = await _outgoingMessagesClient.DequeueAndCommitAsync(dequeueCommand, CancellationToken.None);
 
@@ -175,7 +178,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var existingBundleId = Guid.NewGuid();
         var message = _energyResultMessageDtoBuilder
             .Build();
-        await CreateActorMessageQueueInDatabase(actorMessageQueueId, message.ReceiverId, message.ReceiverRole);
+        await CreateActorMessageQueueInDatabase(actorMessageQueueId, message.ReceiverNumber, message.ReceiverRole);
         await CreateBundleInDatabase(existingBundleId, actorMessageQueueId, message.DocumentType, message.BusinessReason);
 
         // Act
@@ -346,7 +349,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         // Assert
         var fromDb = await GetOutgoingMessageWithActorMessageQueueFromDatabase(createdId);
 
-        fromDb.ActorMessageQueueNumber.Should().Be(message.ReceiverId.Value);
+        fromDb.ActorMessageQueueNumber.Should().Be(message.ReceiverNumber.Value);
         fromDb.ActorMessageQueueRole.Should().Be(ActorRole.GridOperator.Code);
         fromDb.OutgoingMessageReceiverRole.Should().Be(ActorRole.MeteredDataResponsible.Code);
     }

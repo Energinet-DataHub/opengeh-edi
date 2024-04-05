@@ -22,12 +22,12 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServic
 [Serializable]
 public record AcceptedWholesaleServicesSerieDto(
     IReadOnlyCollection<Point> Points,
-    MeteringPointType MeteringPointType,
+    MeteringPointType? MeteringPointType,
     Resolution Resolution,
     ChargeType ChargeType,
     MeasurementUnit MeasurementUnit,
     SettlementVersion? SettlementVersion,
-    SettlementType? SettlementType,
+    SettlementMethod? SettlementMethod,
     Currency Currency,
     ActorNumber ChargeOwnerId,
     ActorNumber EnergySupplierId,
@@ -38,4 +38,4 @@ public record AcceptedWholesaleServicesSerieDto(
     long CalculationResultVersion);
 
 [Serializable]
-public record Point(int Position, decimal Quantity, CalculatedQuantityQuality QuantityQuality, decimal? Price, decimal? Amount);
+public record Point(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, decimal? Price, decimal? Amount);

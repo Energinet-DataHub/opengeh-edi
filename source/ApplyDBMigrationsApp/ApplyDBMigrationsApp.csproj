@@ -100,6 +100,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202306271334 Create AggregatedMeasureDataProcesses Table.sql" />
     <EmbeddedResource Include="Scripts\Model\202307061430 Create ActorMessageQueue Table.sql" />
     <EmbeddedResource Include="Scripts\Model\202307061435 Create Bundle Table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202403250652 Add gridarea column to OutgoingMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202403111207 Create ChargeTypes Table.sql" />
     <EmbeddedResource Include="Scripts\Model\202307061440 Create MarketDocument Table.sql" />
     <EmbeddedResource Include="Scripts\Model\202307061450 ReCreate MarketDocument Table.sql" />
@@ -160,6 +161,13 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202402181300 Add RelatedToMessageId column to ArchivedMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202403111204 Create WholesaleServicesProcesses Table.sql" />
     <EmbeddedResource Include="Scripts\Model\202403191331 Create MessageDelegation table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202403211123 Rename ReceiverId and ReceiverRole to DocumentReceiver in OutgoingMessage table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202403211236 Add ReceiverNumber and ReceiverRole columns to Outgoing Messages.sql" />
+    <EmbeddedResource Include="Scripts\Model\202403211302 Remove IsPublished from OutgoingMessage table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202403211328 Create ProcessDelegationConfigured table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202403211329 Drop MessageDelegationConfigured table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202403250624 Create lookup index on ProcessDelegation table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202403251343 Add processType column to OutgoingMessages.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <None Remove="Scripts\Model\202310231329 Alter Bundles1.sql" />

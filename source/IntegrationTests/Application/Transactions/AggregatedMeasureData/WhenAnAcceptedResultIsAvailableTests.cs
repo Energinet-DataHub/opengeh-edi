@@ -80,6 +80,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasReceiverRole(process.RequestedByActorRoleCode)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
+            .HasProcessType(ProcessType.RequestEnergyResults)
             .HasPointsInCorrectOrder<AcceptedEnergyResultMessageTimeSeries, decimal?>(timeSerie => timeSerie.Point.Select(x => x.Quantity).ToList(), acceptedEvent.Series.SelectMany(x => x.TimeSeriesPoints).OrderBy(x => x.Time).ToList())
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId)
@@ -224,7 +225,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
           BusinessReason.BalanceFixing,
           MessageId.New(),
           MeteringPointType.Consumption.Code,
-          SettlementType.Flex.Code,
+          SettlementMethod.Flex.Code,
           SampleData.StartOfPeriod,
           SampleData.EndOfPeriod,
           SampleData.GridAreaCode,

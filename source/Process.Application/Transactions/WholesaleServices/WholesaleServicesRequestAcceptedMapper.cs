@@ -56,7 +56,7 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
                 MapChargeType(aggregation.ChargeType),
                 MapMeasurementUnit(aggregation.QuantityUnit),
                 SettlementVersion: MapSettlementVersion(aggregation.CalculationType),
-                MapSettlementType(aggregation.SettlementMethod),
+                MapSettlementMethod(aggregation.SettlementMethod),
                 MapCurrency(aggregation.Currency),
                 ActorNumber.Create(aggregation.ChargeOwnerId),
                 ActorNumber.Create(aggregation.EnergySupplierId),
@@ -99,13 +99,13 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         };
     }
 
-    private static SettlementType? MapSettlementType(
+    private static SettlementMethod? MapSettlementMethod(
         WholesaleServicesRequestSeries.Types.SettlementMethod settlementMethod)
     {
         return settlementMethod switch
         {
-            WholesaleServicesRequestSeries.Types.SettlementMethod.Flex => SettlementType.Flex,
-            WholesaleServicesRequestSeries.Types.SettlementMethod.NonProfiled => SettlementType.NonProfiled,
+            WholesaleServicesRequestSeries.Types.SettlementMethod.Flex => SettlementMethod.Flex,
+            WholesaleServicesRequestSeries.Types.SettlementMethod.NonProfiled => SettlementMethod.NonProfiled,
             WholesaleServicesRequestSeries.Types.SettlementMethod.Unspecified => null,
             _ => throw new InvalidOperationException("Unknown settlement method"),
         };
@@ -146,13 +146,13 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         };
     }
 
-    private static MeteringPointType MapMeteringPointType(WholesaleServicesRequestSeries.Types.MeteringPointType meteringPointType)
+    private static MeteringPointType? MapMeteringPointType(WholesaleServicesRequestSeries.Types.MeteringPointType meteringPointType)
     {
         return meteringPointType switch
         {
             WholesaleServicesRequestSeries.Types.MeteringPointType.Production => MeteringPointType.Production,
             WholesaleServicesRequestSeries.Types.MeteringPointType.Consumption => MeteringPointType.Consumption,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.Unspecified => throw new InvalidOperationException("Could not map metering point type"),
+            WholesaleServicesRequestSeries.Types.MeteringPointType.Unspecified => null,
             _ => throw new InvalidOperationException("Unknown metering point type"),
         };
     }
@@ -166,7 +166,7 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         {
             points.Add(new Point(
                 pointPosition,
-                Parse(point.Quantity) ?? throw new InvalidOperationException("Missing time serie point quantity"),
+                Parse(point.Quantity),
                 CalculatedQuantityQualityMapper.Map(point.QuantityQualities.ToList().AsReadOnly()),
                 Parse(point.Price),
                 Parse(point.Amount)));

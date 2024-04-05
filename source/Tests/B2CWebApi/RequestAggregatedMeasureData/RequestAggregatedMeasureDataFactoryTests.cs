@@ -34,7 +34,7 @@ public class RequestAggregatedMeasureDataFactoryTests
         var startDay = 10;
         var endDay = 12;
         var request = new RequestAggregatedMeasureDataMarketRequest(
-            ProcessType: ProcessType.BalanceFixing,
+            ProcessType: CalculationType.BalanceFixing,
             MeteringPointType: MeteringPointType.Production,
             StartDate: $"2023-10-{startDay}T22:00:00.000Z",
             EndDate: $"2023-10-{endDay}T21:59:59.999Z",
@@ -42,7 +42,7 @@ public class RequestAggregatedMeasureDataFactoryTests
             EnergySupplierId: "579000000003042",
             BalanceResponsibleId: "1234567890123");
 
-        var result = RequestAggregatedMeasureDataHttpFactory.Create(
+        var result = RequestAggregatedMeasureDataDtoFactory.Create(
             request,
             senderId,
             MarketRole.MeteredDataResponsible.Name,
@@ -74,7 +74,7 @@ public class RequestAggregatedMeasureDataFactoryTests
         var endDay = 12;
         var endDataMilliseconds = 998;
         var request = new RequestAggregatedMeasureDataMarketRequest(
-            ProcessType: ProcessType.BalanceFixing,
+            ProcessType: CalculationType.BalanceFixing,
             MeteringPointType: MeteringPointType.Production,
             StartDate: $"2023-10-10T22:00:00.000Z",
             EndDate: $"2023-10-{endDay}T21:59:59.{endDataMilliseconds}Z",
@@ -82,7 +82,7 @@ public class RequestAggregatedMeasureDataFactoryTests
             EnergySupplierId: "579000000003042",
             BalanceResponsibleId: "1234567890123");
 
-        var result = RequestAggregatedMeasureDataHttpFactory.Create(
+        var result = RequestAggregatedMeasureDataDtoFactory.Create(
             request,
             "9876543210987",
             MarketRole.MeteredDataResponsible.Name,

@@ -19,7 +19,6 @@ using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
-using Energinet.DataHub.EDI.Api.Configuration.Middleware.Correlation;
 using Energinet.DataHub.EDI.Api.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
@@ -52,7 +51,6 @@ public static class HostFactory
                 worker =>
                 {
                     worker.UseMiddleware<UnHandledExceptionMiddleware>();
-                    worker.UseMiddleware<CorrelationIdMiddleware>();
                     worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
                 },
                 option =>
@@ -67,7 +65,6 @@ public static class HostFactory
                         .ConfigureFunctionsApplicationInsights()
                         .AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>()
                         .AddDataRetention()
-                        .AddCorrelation(context.Configuration)
                         .AddLiveHealthCheck()
                         .TryAddExternalDomainServiceBusQueuesHealthCheck(
                             runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,

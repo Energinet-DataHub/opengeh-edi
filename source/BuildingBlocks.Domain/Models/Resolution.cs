@@ -13,37 +13,22 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 [Serializable]
-public class Resolution : EnumerationType
+public class Resolution : DataHubType<Resolution>
 {
-    public static readonly Resolution QuarterHourly = new(nameof(QuarterHourly), "PT15M");
-    public static readonly Resolution Hourly = new(nameof(Hourly), "PT1H");
-    public static readonly Resolution Daily = new(nameof(Daily), "P1D");
-    public static readonly Resolution Monthly = new(nameof(Monthly), "P1M");
+    public static readonly Resolution QuarterHourly = new(DataHubNames.Resolution.QuarterHourly, "PT15M");
+    public static readonly Resolution Hourly = new(DataHubNames.Resolution.Hourly, "PT1H");
+    public static readonly Resolution Daily = new(DataHubNames.Resolution.Daily, "P1D");
+    public static readonly Resolution Monthly = new(DataHubNames.Resolution.Monthly, "P1M");
 
     [JsonConstructor]
     private Resolution(string name, string code)
-        : base(name)
+        : base(name, code)
     {
-        Code = code;
-    }
-
-    public string Code { get; }
-
-    public static Resolution FromName(string name)
-    {
-        return GetAll<Resolution>().FirstOrDefault(r => r.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(Resolution)} {nameof(name)}");
-    }
-
-    public static Resolution FromCode(string code)
-    {
-        return GetAll<Resolution>().FirstOrDefault(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{code} is not a valid {typeof(Resolution)} {nameof(code)}");
     }
 }

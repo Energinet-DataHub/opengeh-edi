@@ -71,6 +71,7 @@ public sealed class WhenARejectedWholesaleServicesIsAvailableTests : TestBase
             .HasRelationTo(process.InitiatedByMessageId)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
+            .HasProcessType(ProcessType.RequestWholesaleResults)
             .HasMessageRecordValue<RejectedWholesaleServicesMessageSeries>(
                 messageSeries => messageSeries.RejectReasons.First().ErrorCode,
                 rejectReason.ErrorCode)

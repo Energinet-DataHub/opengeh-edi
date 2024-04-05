@@ -124,15 +124,16 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "DetailMeasurementMeteringPointCharacteristic", null).ConfigureAwait(false);
             await WriteCodeWithCodeListReferenceAttributesAsync("TypeOfMeteringPoint", EbixCode.Of(MeteringPointType.FromName(timeSeries.MeteringPointType)), writer).ConfigureAwait(false);
 
-            if (timeSeries.SettlementType != null)
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (timeSeries.SettlementType != null || timeSeries.SettlementMethod != null)
             {
-                if (timeSeries.SettlementType.Length == 3)
+                if (timeSeries.SettlementType != null && timeSeries.SettlementType.Length == 3)
                 {
                     // TODO: This is keep for backward compatibility. Remove this in next pull request
                     // only codes has length 3
                     await WriteCodeWithCodeListReferenceAttributesAsync(
                             "SettlementMethod",
-                            EbixCode.Of(SettlementType.FromCode(timeSeries.SettlementType)),
+                            EbixCode.Of(SettlementMethod.FromCode(timeSeries.SettlementType)),
                             writer)
                         .ConfigureAwait(false);
                 }
@@ -140,11 +141,12 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
                 {
                     await WriteCodeWithCodeListReferenceAttributesAsync(
                             "SettlementMethod",
-                            EbixCode.Of(SettlementType.FromName(timeSeries.SettlementType)),
+                            EbixCode.Of(SettlementMethod.FromName(timeSeries.SettlementType ?? timeSeries.SettlementMethod!)),
                             writer)
                         .ConfigureAwait(false);
                 }
             }
+#pragma warning restore CS0618 // Type or member is obsolete
 
             await writer.WriteEndElementAsync().ConfigureAwait(false);
             // End DetailMeasurementMeteringPointCharacteristic

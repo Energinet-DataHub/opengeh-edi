@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
@@ -23,50 +22,43 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages
     {
         public OutgoingMessageBundle(
             DocumentType documentType,
-            ActorNumber receiverId,
-            Guid processId,
+            Receiver receiver,
+            Receiver documentReceiver,
             string businessReason,
-            ActorRole receiverRole,
             ActorNumber senderId,
             ActorRole senderRole,
-            bool isPublished,
             BundleId assignedBundleId,
             IReadOnlyCollection<OutgoingMessage> outgoingMessages,
             MessageId? relatedToMessageId = null)
         {
             DocumentType = documentType;
-            ReceiverId = receiverId;
-            ProcessId = processId;
+            Receiver = receiver;
+            DocumentReceiver = documentReceiver;
             BusinessReason = businessReason;
-            ReceiverRole = receiverRole;
             SenderId = senderId;
             SenderRole = senderRole;
-            IsPublished = isPublished;
             AssignedBundleId = assignedBundleId;
             OutgoingMessages = outgoingMessages;
-            Id = Guid.NewGuid();
             RelatedToMessageId = relatedToMessageId;
         }
 
-        public Guid Id { get; }
-
-        public bool IsPublished { get; private set; }
-
-        public ActorNumber ReceiverId { get; }
-
         public DocumentType DocumentType { get; }
 
-        public Guid ProcessId { get; }
-
         public string BusinessReason { get; }
-
-        public ActorRole ReceiverRole { get; }
 
         public ActorNumber SenderId { get; }
 
         public ActorRole SenderRole { get; }
 
-        public Receiver Receiver => Receiver.Create(ReceiverId, ReceiverRole);
+        /// <summary>
+        /// The actual receiver of the document.
+        /// </summary>
+        public Receiver Receiver { get; }
+
+        /// <summary>
+        /// The receiver written within the document.
+        /// </summary>
+        public Receiver DocumentReceiver { get; }
 
         public BundleId AssignedBundleId { get; private set; }
 

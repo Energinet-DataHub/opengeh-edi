@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 public class WholesaleServicesMessageDto : OutgoingMessageDto
 {
     protected WholesaleServicesMessageDto(
-        ActorNumber receiverId,
+        ActorNumber receiverNumber,
         Guid processId,
         string businessReason,
         ActorRole receiverRole,
@@ -31,7 +31,7 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
         MessageId? relatedToMessageId = null)
         : base(
             DocumentType.NotifyWholesaleServices,
-            receiverId,
+            receiverNumber,
             processId,
             businessReason,
             receiverRole,
@@ -59,7 +59,7 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
         ArgumentNullException.ThrowIfNull(businessReason);
 
         return new WholesaleServicesMessageDto(
-            receiverId: receiverNumber,
+            receiverNumber: receiverNumber,
             receiverRole: receiverRole,
             processId: processId,
             businessReason: businessReason,
@@ -86,7 +86,8 @@ public record WholesaleServicesSeries(
     ChargeType ChargeType,
     Resolution Resolution,
     MeteringPointType? MeteringPointType,
-    SettlementType? SettlementType,
+    SettlementMethod? SettlementType, // TODO: To ensure backwards compatibility, will be removed in another PR.
+    SettlementMethod? SettlementMethod,
     string? OriginalTransactionIdReference = null);
 
 public record WholesaleServicesPoint(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);

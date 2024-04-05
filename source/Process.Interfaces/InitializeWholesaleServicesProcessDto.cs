@@ -26,9 +26,9 @@ public record InitializeWholesaleServicesProcessDto(
     string MessageId,
     string CreatedAt,
     string? BusinessType,
-    IReadOnlyCollection<InitializeWholesaleServicesSerie> Serie);
+    IReadOnlyCollection<InitializeWholesaleServicesSeries> Serie);
 
-public record InitializeWholesaleServicesSerie(
+public record InitializeWholesaleServicesSeries(
     string Id,
     string StartDateTime,
     string? EndDateTime,

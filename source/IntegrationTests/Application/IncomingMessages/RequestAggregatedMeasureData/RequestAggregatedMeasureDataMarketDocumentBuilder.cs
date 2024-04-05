@@ -19,7 +19,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using NodaTime;
-using Serie = Energinet.DataHub.EDI.Process.Interfaces.Serie;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages.RequestAggregatedMeasureData;
 
@@ -40,7 +39,7 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
     private string _serieId = Guid.NewGuid().ToString();
     private string _senderRole = ActorRole.EnergySupplier.Code;
     private string? _marketEvaluationPointType = MeteringPointType.Consumption.Code;
-    private string? _marketEvaluationSettlementMethod = SettlementType.Flex.Code;
+    private string? _marketEvaluationSettlementMethod = SettlementMethod.Flex.Code;
     private string? _energySupplierMarketParticipantId = SampleData.NewEnergySupplierNumber;
     private string? _balanceResponsiblePartyMarketParticipantId = "5799999933318";
 
@@ -98,10 +97,10 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
         return this;
     }
 
-    internal RequestAggregatedMeasureDataDto Build()
+    internal InitializeAggregatedMeasureDataProcessDto Build()
     {
         var header = CreateHeader();
-        return new RequestAggregatedMeasureDataDto(
+        return new InitializeAggregatedMeasureDataProcessDto(
             header.SenderId,
             header.SenderRole,
             header.ReceiverId,
@@ -111,10 +110,10 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
             header.MessageId,
             header.CreatedAt,
             header.BusinessType,
-            new List<Serie> { CreateSerie() }.AsReadOnly());
+            new List<InitializeAggregatedMeasureDataProcessSeries> { CreateSerie() }.AsReadOnly());
     }
 
-    private Serie CreateSerie() =>
+    private InitializeAggregatedMeasureDataProcessSeries CreateSerie() =>
         new(
             _serieId,
             _marketEvaluationPointType,

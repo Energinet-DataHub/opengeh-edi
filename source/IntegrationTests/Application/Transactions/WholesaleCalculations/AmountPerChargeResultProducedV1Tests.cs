@@ -230,6 +230,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .HasReceiverRole(ActorRole.EnergySupplier.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
+            .HasProcessType(ProcessType.ReceiveWholesaleResults)
             .HasRelationTo(null)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.CalculationVersion, calculationVersion)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.GridAreaCode, gridAreaCode)
@@ -244,7 +245,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.PriceMeasureUnit, MeasurementUnit.Kwh)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.Currency, Currency.DanishCrowns)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.ChargeType, ChargeType.Fee)
-            .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.SettlementType, SettlementType.Flex)
+            .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.SettlementMethod, SettlementMethod.Flex)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.MeteringPointType, MeteringPointType.Production)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.Resolution, Resolution.Hourly);
     }

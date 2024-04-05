@@ -50,8 +50,8 @@ public class AssertOutgoingMessage
 
         using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var message = await connection.QuerySingleAsync(
-            $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.ProcessId, m.BusinessReason," +
-            $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference, m.RelatedToMessageId " +
+            $"SELECT m.Id, m.RecordId, m.DocumentType, m.DocumentReceiverNumber, m.DocumentReceiverRole, m.ReceiverNumber, m.ProcessId, m.BusinessReason," +
+            $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference, m.RelatedToMessageId, m.MessageCreatedFromProcess " +
             $" FROM [dbo].[OutgoingMessages] m" +
             $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Code}'");
 
@@ -71,23 +71,34 @@ public class AssertOutgoingMessage
         ArgumentNullException.ThrowIfNull(receiverRole);
         using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var message = await connection.QuerySingleOrDefaultAsync(
-            $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.ProcessId, m.BusinessReason," +
-            $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference " +
+            $"SELECT m.Id" +
             $" FROM [dbo].[OutgoingMessages] m" +
             $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Code}'");
 
         Assert.Null(message);
     }
 
-    public AssertOutgoingMessage HasReceiverId(string receiverId)
+    public AssertOutgoingMessage HasReceiverId(string receiverNumber)
     {
-        Assert.Equal(receiverId, _message.ReceiverId);
+        Assert.Equal(receiverNumber, _message.ReceiverNumber);
+        return this;
+    }
+
+    public AssertOutgoingMessage HasDocumentReceiverId(string receiverNumber)
+    {
+        Assert.Equal(receiverNumber, _message.DocumentReceiverNumber);
         return this;
     }
 
     public AssertOutgoingMessage HasReceiverRole(string receiverRole)
     {
         Assert.Equal(receiverRole, _message.ReceiverRole);
+        return this;
+    }
+
+    public AssertOutgoingMessage HasDocumentReceiverRole(string receiverRole)
+    {
+        Assert.Equal(receiverRole, _message.DocumentReceiverRole);
         return this;
     }
 
@@ -137,6 +148,12 @@ public class AssertOutgoingMessage
 
         var sut = _serializer.Deserialize<TMessageRecord>(_messageRecord);
         assertion(propertySelector(sut));
+        return this;
+    }
+
+    public AssertOutgoingMessage HasProcessType(ProcessType processType)
+    {
+        Assert.Equal(processType?.Name, _message.MessageCreatedFromProcess);
         return this;
     }
 

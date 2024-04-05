@@ -63,8 +63,46 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         var outgoingMessage = await OutgoingMessageAsync(ActorRole.EnergySupplier, BusinessReason.WholesaleFixing);
         outgoingMessage.Should().NotBeNull();
         outgoingMessage
-            .HasReceiverId(process.EnergySupplierId!)
-            .HasReceiverRole(ActorRole.EnergySupplier.Code)
+            .HasReceiverId(process.RequestedByActorId.Value)
+            .HasDocumentReceiverId(process.RequestedByActorId.Value)
+            .HasReceiverRole(process.RequestedByActorRoleCode)
+            .HasDocumentReceiverRole(process.RequestedByActorRoleCode)
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
+            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
+            .HasRelationTo(process.InitiatedByMessageId)
+            .HasBusinessReason(process.BusinessReason)
+            .HasProcessType(ProcessType.RequestWholesaleResults)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.Start.ToString(), process.StartOfPeriod)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.End.ToString(), process.EndOfPeriod)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.GridAreaCode, process.GridAreaCode)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.MeteringPointType, MeteringPointType.Production)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.ChargeOwner.Value, process.ChargeOwner)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.EnergySupplier.Value, process.EnergySupplierId)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.OriginalTransactionIdReference, process.BusinessTransactionId.Id);
+    }
+
+    [Fact]
+    public async Task Received_accepted_wholesale_monthly_sum_event_enqueues_message()
+    {
+        // Arrange
+        var process = WholesaleServicesProcessBuilder()
+            .SetState(WholesaleServicesProcess.State.Sent)
+            .Build();
+        Store(process);
+        var acceptedEvent = WholesaleServicesRequestAcceptedBuilder(process)
+            .BuildMonthlySum();
+
+        // Act
+        await HavingReceivedInboxEventAsync(nameof(WholesaleServicesRequestAccepted), acceptedEvent, process.ProcessId.Id);
+
+        // Assert
+        var outgoingMessage = await OutgoingMessageAsync(ActorRole.EnergySupplier, BusinessReason.WholesaleFixing);
+        outgoingMessage.Should().NotBeNull();
+        outgoingMessage
+            .HasReceiverId(process.RequestedByActorId.Value)
+            .HasDocumentReceiverId(process.RequestedByActorId.Value)
+            .HasReceiverRole(process.RequestedByActorRoleCode)
+            .HasDocumentReceiverRole(process.RequestedByActorRoleCode)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasRelationTo(process.InitiatedByMessageId)
@@ -72,7 +110,6 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.Start.ToString(), process.StartOfPeriod)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.End.ToString(), process.EndOfPeriod)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.GridAreaCode, process.GridAreaCode)
-            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.MeteringPointType, MeteringPointType.Production)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.ChargeOwner.Value, process.ChargeOwner)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.EnergySupplier.Value, process.EnergySupplierId)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.OriginalTransactionIdReference, process.BusinessTransactionId.Id);
@@ -170,7 +207,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
 
         var messages = await connection.QueryAsync(
-            $"SELECT m.Id, m.RecordId, m.DocumentType, m.ReceiverId, m.ProcessId, m.BusinessReason," +
+            $"SELECT m.Id, m.RecordId, m.DocumentType, m.DocumentReceiverNumber, m.DocumentReceiverRole, m.ReceiverNumber, m.ProcessId, m.BusinessReason," +
             $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference, m.RelatedToMessageId " +
             $" FROM [dbo].[OutgoingMessages] m" +
             $" WHERE m.DocumentType = '{DocumentType.NotifyWholesaleServices.Name}' AND m.BusinessReason = '{businessReason.Name}' AND m.ReceiverRole = '{receiverRole.Code}'");

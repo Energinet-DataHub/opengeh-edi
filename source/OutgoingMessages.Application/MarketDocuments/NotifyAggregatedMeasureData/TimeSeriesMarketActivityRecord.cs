@@ -23,7 +23,12 @@ public record TimeSeriesMarketActivityRecord(
     Guid TransactionId,
     string GridAreaCode,
     string MeteringPointType,
+
+    // TODO: Should be removed at a later time, when all old outgoing messages are peeked
+    [property: Obsolete("Only kept for backwards compatibility, use SettlementMethod instead")]
     string? SettlementType,
+
+    string? SettlementMethod,
     string MeasureUnitType,
     string Resolution,
     string? EnergySupplierNumber,

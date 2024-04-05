@@ -16,6 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.MasterData.Interfaces;
 
@@ -63,5 +64,20 @@ public interface IMasterDataClient
     /// </summary>
     Task DeleteActorCertificateAsync(
         ActorCertificateCredentialsRemovedDto actorCertificateCredentialsRemovedDto,
+        CancellationToken cancellationToken);
+
+    /// <summary>
+    ///    Create a new process delegation.
+    /// </summary>
+    Task CreateProcessDelegationAsync(ProcessDelegationDto processDelegationDto, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///    Get process delegation.
+    /// </summary>
+    Task<ProcessDelegationDto?> GetProcessDelegationAsync(
+        ActorNumber delegatedByActorNumber,
+        ActorRole delegatedByActorRole,
+        string? gridAreaCode,
+        ProcessType processType,
         CancellationToken cancellationToken);
 }

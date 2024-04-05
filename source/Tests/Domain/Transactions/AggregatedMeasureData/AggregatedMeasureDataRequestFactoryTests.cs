@@ -54,7 +54,7 @@ public sealed class AggregatedMeasureDataRequestFactoryTests
         serviceBusMessage.Should().NotBeNull();
 
         var request = AggregatedTimeSeriesRequest.Parser.ParseFrom(serviceBusMessage.Body);
-        request.MeteringPointType.Should().Be(MeteringPointType.Production.Code);
+        request.MeteringPointType.Should().Be(MeteringPointType.Production.Name);
     }
 
     [Fact]

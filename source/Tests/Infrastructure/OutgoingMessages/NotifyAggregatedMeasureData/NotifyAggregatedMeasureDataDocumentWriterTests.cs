@@ -64,7 +64,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
                     .WithEnergySupplierNumber(SampleData.EnergySupplierNumber)
                     .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod)
                     .WithPoint(new EnergyResultMessagePoint(1, 1m, CalculatedQuantityQuality.Calculated, "2022-12-12T23:00:00Z"))
-                    .WithSettlementMethod(SettlementType.NonProfiled),
+                    .WithSettlementMethod(SettlementMethod.NonProfiled),
                 DocumentFormat.FromName(documentFormat));
 
         await AssertDocument(document, DocumentFormat.FromName(documentFormat))
@@ -80,7 +80,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
             .HasPeriod(
                 new Period(SampleData.StartOfPeriod, SampleData.EndOfPeriod))
             .HasPoint(1, 1)
-            .HasSettlementMethod(SettlementType.NonProfiled)
+            .HasSettlementMethod(SettlementMethod.NonProfiled)
             .HasCalculationResultVersion(1)
             .DocumentIsValidAsync();
     }

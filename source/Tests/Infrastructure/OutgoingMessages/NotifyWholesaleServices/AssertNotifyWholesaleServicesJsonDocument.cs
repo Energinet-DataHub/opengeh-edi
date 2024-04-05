@@ -187,7 +187,7 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementType expectedSettlementMethod)
+    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod expectedSettlementMethod)
     {
         ArgumentNullException.ThrowIfNull(expectedSettlementMethod);
         FirstWholesaleSeriesElement()

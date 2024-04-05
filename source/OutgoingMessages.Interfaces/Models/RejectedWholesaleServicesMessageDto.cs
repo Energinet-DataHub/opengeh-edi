@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 public sealed class RejectedWholesaleServicesMessageDto : OutgoingMessageDto
 {
     public RejectedWholesaleServicesMessageDto(
-        ActorNumber receiverId,
+        ActorNumber receiverNumber,
         Guid processId,
         string businessReason,
         ActorRole receiverRole,
@@ -30,7 +30,7 @@ public sealed class RejectedWholesaleServicesMessageDto : OutgoingMessageDto
         RejectedWholesaleServicesMessageSeries series)
         : base(
             DocumentType.RejectRequestWholesaleSettlement,
-            receiverId,
+            receiverNumber,
             processId,
             businessReason,
             receiverRole,

@@ -39,54 +39,57 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             ActorRole senderRole,
             string serializedContent,
             Instant timestamp,
-            MessageId? relatedToMessageId = null)
+            ProcessType messageCreatedFromProcess,
+            MessageId? relatedToMessageId = null,
+            string? gridAreaCode = null)
         {
+            ArgumentNullException.ThrowIfNull(receiverId);
             Id = OutgoingMessageId.New();
             DocumentType = documentType;
-            ReceiverId = receiverId;
             ProcessId = processId;
             BusinessReason = businessReason;
-            ReceiverRole = receiverRole;
             SenderId = senderId;
             SenderRole = senderRole;
+            MessageCreatedFromProcess = messageCreatedFromProcess;
+            GridAreaCode = gridAreaCode;
             _serializedContent = serializedContent;
-            FileStorageReference = CreateFileStorageReference(ReceiverId, timestamp, Id);
             RelatedToMessageId = relatedToMessageId;
-            Receiver = Receiver.Create(ReceiverId, ReceiverRole);
+            DocumentReceiver = Receiver.Create(receiverId, receiverRole);
+            Receiver = Receiver.Create(receiverId, receiverRole);
+            FileStorageReference = CreateFileStorageReference(Receiver.Number, timestamp, Id);
         }
 
         /// <summary>
         /// Should only be used by Entity Framework
         /// </summary>
         // ReSharper disable once UnusedMember.Local -- Used by Entity Framework
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private OutgoingMessage(
             DocumentType documentType,
-            ActorNumber receiverId,
             Guid processId,
             string businessReason,
-            ActorRole receiverRole,
             ActorNumber senderId,
             ActorRole senderRole,
-            FileStorageReference fileStorageReference)
+            FileStorageReference fileStorageReference,
+            ProcessType messageCreatedFromProcess,
+            string? gridAreaCode)
         {
             Id = OutgoingMessageId.New();
             DocumentType = documentType;
-            ReceiverId = receiverId;
             ProcessId = processId;
             BusinessReason = businessReason;
-            ReceiverRole = receiverRole;
             SenderId = senderId;
             SenderRole = senderRole;
             FileStorageReference = fileStorageReference;
-            Receiver = Receiver.Create(ReceiverId, ReceiverRole);
+            MessageCreatedFromProcess = messageCreatedFromProcess;
+            GridAreaCode = gridAreaCode;
+            // DocumentReceiver, EF will set this after the constructor
+            // Receiver, EF will set this after the constructor
             // _serializedContent is set later in OutgoingMessageRepository, by getting the message from File Storage
         }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public OutgoingMessageId Id { get; }
-
-        public bool IsPublished { get; private set; }
-
-        public ActorNumber ReceiverId { get; }
 
         public DocumentType DocumentType { get; }
 
@@ -94,20 +97,27 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
         public string BusinessReason { get; }
 
-        public ActorRole ReceiverRole { get; }
-
         public ActorNumber SenderId { get; }
 
         public ActorRole SenderRole { get; }
 
+        public string? GridAreaCode { get; }
+
         /// <summary>
         /// Reference the actor queue that should receive the message.
         /// </summary>
-        public Receiver Receiver { get; }
+        public Receiver Receiver { get; private set; }
+
+        public Receiver DocumentReceiver { get; }
 
         public BundleId? AssignedBundleId { get; private set; }
 
         public FileStorageReference FileStorageReference { get; private set; }
+
+        /// <summary>
+        /// Describes the process type that the message was created from.
+        /// </summary>
+        public ProcessType MessageCreatedFromProcess { get; }
 
         /// <summary>
         /// If this attribute has a value, then it is used to store the message id of a request from an actor.
@@ -128,7 +138,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
             return new OutgoingMessage(
                 acceptedEnergyResultMessage.DocumentType,
-                acceptedEnergyResultMessage.ReceiverId,
+                acceptedEnergyResultMessage.ReceiverNumber,
                 acceptedEnergyResultMessage.ProcessId,
                 acceptedEnergyResultMessage.BusinessReason,
                 acceptedEnergyResultMessage.ReceiverRole,
@@ -136,6 +146,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 acceptedEnergyResultMessage.SenderRole,
                 serializer.Serialize(acceptedEnergyResultMessage.Series),
                 timestamp,
+                ProcessType.RequestEnergyResults,
                 acceptedEnergyResultMessage.RelatedToMessageId);
         }
 
@@ -152,7 +163,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
             return new OutgoingMessage(
                 rejectedEnergyResultMessage.DocumentType,
-                rejectedEnergyResultMessage.ReceiverId,
+                rejectedEnergyResultMessage.ReceiverNumber,
                 rejectedEnergyResultMessage.ProcessId,
                 rejectedEnergyResultMessage.BusinessReason,
                 rejectedEnergyResultMessage.ReceiverRole,
@@ -160,7 +171,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 rejectedEnergyResultMessage.SenderRole,
                 serializer.Serialize(rejectedEnergyResultMessage.Series),
                 timestamp,
-                rejectedEnergyResultMessage.RelatedToMessageId);
+                ProcessType.RequestEnergyResults,
+                relatedToMessageId: rejectedEnergyResultMessage.RelatedToMessageId);
         }
 
         /// <summary>
@@ -176,7 +188,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
             return new OutgoingMessage(
                 energyResultMessage.DocumentType,
-                energyResultMessage.ReceiverId,
+                energyResultMessage.ReceiverNumber,
                 energyResultMessage.ProcessId,
                 energyResultMessage.BusinessReason,
                 energyResultMessage.ReceiverRole,
@@ -184,7 +196,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 energyResultMessage.SenderRole,
                 serializer.Serialize(energyResultMessage.Series),
                 timestamp,
-                energyResultMessage.RelatedToMessageId);
+                ProcessType.ReceiveEnergyResults,
+                energyResultMessage.RelatedToMessageId,
+                energyResultMessage.Series.GridAreaCode);
         }
 
         /// <summary>
@@ -202,7 +216,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             {
                 new(
                     wholesaleServicesMessageDto.DocumentType,
-                    wholesaleServicesMessageDto.ReceiverId,
+                    wholesaleServicesMessageDto.ReceiverNumber,
                     wholesaleServicesMessageDto.ProcessId,
                     wholesaleServicesMessageDto.BusinessReason,
                     wholesaleServicesMessageDto.ReceiverRole,
@@ -210,7 +224,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                     wholesaleServicesMessageDto.SenderRole,
                     serializer.Serialize(wholesaleServicesMessageDto.Series),
                     timestamp,
-                    wholesaleServicesMessageDto.RelatedToMessageId),
+                    ProcessType.ReceiveWholesaleResults,
+                    wholesaleServicesMessageDto.RelatedToMessageId,
+                    wholesaleServicesMessageDto.Series.GridAreaCode),
                 new(
                     wholesaleServicesMessageDto.DocumentType,
                     wholesaleServicesMessageDto.ChargeOwnerId,
@@ -221,7 +237,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                     wholesaleServicesMessageDto.SenderRole,
                     serializer.Serialize(wholesaleServicesMessageDto.Series),
                     timestamp,
-                    wholesaleServicesMessageDto.RelatedToMessageId),
+                    ProcessType.ReceiveWholesaleResults,
+                    wholesaleServicesMessageDto.RelatedToMessageId,
+                    wholesaleServicesMessageDto.Series.GridAreaCode),
             };
         }
 
@@ -238,7 +256,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
             return new OutgoingMessage(
                 rejectedWholesaleServicesMessage.DocumentType,
-                rejectedWholesaleServicesMessage.ReceiverId,
+                rejectedWholesaleServicesMessage.ReceiverNumber,
                 rejectedWholesaleServicesMessage.ProcessId,
                 rejectedWholesaleServicesMessage.BusinessReason,
                 rejectedWholesaleServicesMessage.ReceiverRole,
@@ -246,6 +264,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 rejectedWholesaleServicesMessage.SenderRole,
                 serializer.Serialize(rejectedWholesaleServicesMessage.Series),
                 timestamp,
+                ProcessType.RequestWholesaleResults,
                 rejectedWholesaleServicesMessage.RelatedToMessageId);
         }
 
@@ -259,7 +278,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
             return new OutgoingMessage(
                 acceptedWholesaleServicesMessage.DocumentType,
-                acceptedWholesaleServicesMessage.ReceiverId,
+                acceptedWholesaleServicesMessage.ReceiverNumber,
                 acceptedWholesaleServicesMessage.ProcessId,
                 acceptedWholesaleServicesMessage.BusinessReason,
                 acceptedWholesaleServicesMessage.ReceiverRole,
@@ -267,6 +286,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 acceptedWholesaleServicesMessage.SenderRole,
                 serializer.Serialize(acceptedWholesaleServicesMessage.Series),
                 timestamp,
+                ProcessType.RequestWholesaleResults,
                 acceptedWholesaleServicesMessage.RelatedToMessageId);
         }
 
@@ -306,6 +326,14 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             }
 
             return Receiver.Create(Receiver.Number, actorMessageQueueReceiverRole);
+        }
+
+        /// <summary>
+        /// Override the current receiver of the message when the message is delegated to another actor.
+        /// </summary>
+        public void DelegateTo(Receiver delegatedToReceiver)
+        {
+            Receiver = delegatedToReceiver;
         }
 
         private static bool DocumentIsAggregatedMeasureData(DocumentType documentType)

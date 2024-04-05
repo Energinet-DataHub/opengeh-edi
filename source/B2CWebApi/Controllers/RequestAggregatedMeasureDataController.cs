@@ -59,7 +59,7 @@ public class RequestAggregatedMeasureDataController : ControllerBase
         var currentUser = _userContext.CurrentUser;
 
         var message =
-            RequestAggregatedMeasureDataHttpFactory.Create(
+            RequestAggregatedMeasureDataDtoFactory.Create(
                 request,
                 currentUser.ActorNumber,
                 currentUser.Role,

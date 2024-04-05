@@ -37,12 +37,12 @@ public class InitializeAggregatedMeasureDataHandler : IProcessInitializationHand
     public bool CanHandle(string processTypeToInitialize)
     {
         ArgumentNullException.ThrowIfNull(processTypeToInitialize);
-        return processTypeToInitialize.Equals(nameof(RequestAggregatedMeasureDataDto), StringComparison.Ordinal);
+        return processTypeToInitialize.Equals(nameof(InitializeAggregatedMeasureDataProcessDto), StringComparison.Ordinal);
     }
 
     public async Task ProcessAsync(byte[] processInitializationData)
     {
-        var marketMessage = _serializer.Deserialize<RequestAggregatedMeasureDataDto>(System.Text.Encoding.UTF8.GetString(processInitializationData));
+        var marketMessage = _serializer.Deserialize<InitializeAggregatedMeasureDataProcessDto>(System.Text.Encoding.UTF8.GetString(processInitializationData));
         await _mediator.Send(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage)).ConfigureAwait(false);
     }
 }

@@ -20,6 +20,7 @@ using System.Text.Json;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using FluentAssertions;
 using Nito.AsyncEx;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
@@ -58,12 +59,33 @@ internal sealed class EdiDriver : IDisposable
         return document;
     }
 
-    public async Task<Stream> PeekMessageAsync()
+    public async Task<Stream> RequestWholesaleSettlementAsync(DocumentFormat documentFormat, bool validMessage = true)
+    {
+        var b2bClient = await _httpClient;
+        using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/requestwholesalesettlement");
+        var contentType = DocumentFormat.Json == documentFormat ? "application/json" : "application/xml";
+        request.Content = new StringContent(GetRequestWholesaleSettlementContent(documentFormat, validMessage), Encoding.UTF8, contentType);
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+
+        var wholesaleSettlementResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
+        if (wholesaleSettlementResponse.StatusCode == HttpStatusCode.BadRequest)
+        {
+            var responseContent = await wholesaleSettlementResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+            throw new BadAggregatedMeasureDataRequestException($"responseContent: {responseContent}");
+        }
+
+        wholesaleSettlementResponse.EnsureSuccessStatusCode();
+
+        var document = await wholesaleSettlementResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
+        return document;
+    }
+
+    public async Task<Stream> PeekMessageAsync(DocumentFormat? documentFormat = null)
     {
         var stopWatch = Stopwatch.StartNew();
         while (stopWatch.ElapsedMilliseconds < 600000)
         {
-            var peekResponse = await PeekAsync()
+            var peekResponse = await PeekAsync(documentFormat)
                 .ConfigureAwait(false);
             if (peekResponse.StatusCode == HttpStatusCode.OK)
             {
@@ -108,6 +130,27 @@ internal sealed class EdiDriver : IDisposable
             .GetProperty("type")
             .GetProperty("value")
             .GetString());
+    }
+
+    public async Task PeekWholesaleSettlementResponseAsync(DocumentFormat documentFormat, string expectedDocumentType)
+    {
+        var documentStream = await PeekMessageAsync(documentFormat).ConfigureAwait(false);
+
+        if (documentFormat == DocumentFormat.Json)
+        {
+            var jsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(documentStream).ConfigureAwait(false);
+
+            var documentIsOfExpectedType = jsonElement.TryGetProperty(
+                expectedDocumentType,
+                out var marketDocument);
+
+            Assert.True(documentIsOfExpectedType, "\nAccepted message failed with wrong message type\n Document: " + jsonElement.ToString() + "\n");
+            return;
+        }
+
+        using var reader = new StreamReader(documentStream);
+        string text = await reader.ReadToEndAsync().ConfigureAwait(false);
+        text.Should().Contain(expectedDocumentType, "\nAccepted message failed with wrong message type\n Document: " + text + "\n");
     }
 
     public async Task PeekRejectedMessageAsync()
@@ -217,12 +260,35 @@ internal sealed class EdiDriver : IDisposable
         return jsonContent;
     }
 
-    private async Task<HttpResponseMessage> PeekAsync()
+    private static string GetRequestWholesaleSettlementContent(DocumentFormat documentFormat, bool validMessage)
+    {
+        if (DocumentFormat.Json == documentFormat)
+        {
+            var jsonContent = validMessage
+                ? File.ReadAllText("Messages/json/RequestWholesaleSettlement.json")
+                : File.ReadAllText("Messages/json/RequestWholesaleSettlementWithWrongDateFormat.json");
+
+            jsonContent = jsonContent.Replace("{MessageId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
+            jsonContent = jsonContent.Replace("{TransactionId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
+
+            return jsonContent;
+        }
+
+        var xmlContent = File.ReadAllText("Messages/xml/RequestWholesaleSettlementWithBadPeriod.xml");
+
+        xmlContent = xmlContent.Replace("{MessageId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
+        xmlContent = xmlContent.Replace("{TransactionId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
+
+        return xmlContent;
+    }
+
+    private async Task<HttpResponseMessage> PeekAsync(DocumentFormat? documentFormat = null)
     {
         var b2bClient = await _httpClient;
         using var request = new HttpRequestMessage(HttpMethod.Get, "v1.0/cim/aggregations");
-        request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
-        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        var contentType = documentFormat == null || DocumentFormat.Json == documentFormat ? "application/json" : "application/xml";
+        request.Content = new StringContent(string.Empty, Encoding.UTF8, contentType);
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
         var peekResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
         peekResponse.EnsureSuccessStatusCode();
         return peekResponse;
