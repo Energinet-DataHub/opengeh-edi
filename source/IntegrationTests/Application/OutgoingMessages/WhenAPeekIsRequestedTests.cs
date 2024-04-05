@@ -211,6 +211,27 @@ public class WhenAPeekIsRequestedTests : TestBase
         peekResult.MessageId.Should().NotBeNull();
     }
 
+    [Fact]
+    public async Task When_unused_business_reason_then_exception_is_thrown()
+    {
+        var unusedCode = "A47";
+        var expectedExceptionMessage = $"{unusedCode} is not a valid BusinessReason name";
+
+        var message = _energyResultMessageDtoBuilder
+            .WithBusinessReason(BusinessReason.FromCodeOrUnused(unusedCode))
+            .Build();
+
+        var act = async () =>
+        {
+            await EnqueueMessage(message);
+            var result = await PeekMessageAsync(MessageCategory.None);
+            return result;
+        };
+
+        (await act.Should().ThrowAsync<InvalidOperationException>($"because {unusedCode} is a unused BusinessReason code"))
+            .WithMessage(expectedExceptionMessage);
+    }
+
     private async Task<bool> BundleIsRegistered()
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
