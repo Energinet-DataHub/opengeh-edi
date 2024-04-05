@@ -87,6 +87,7 @@ public class AssertXmlDocument
     {
         ArgumentNullException.ThrowIfNull(_documentValidator);
         var validationResult = await _documentValidator.ValidateAsync(_stream, DocumentFormat.Xml, type, CancellationToken.None, version).ConfigureAwait(false);
+        validationResult.ValidationErrors.Should().BeEmpty();
         Assert.True(validationResult.IsValid);
         return this;
     }

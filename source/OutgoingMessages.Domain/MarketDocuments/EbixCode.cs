@@ -124,7 +124,7 @@ public static class EbixCode
         throw NoCodeFoundFor(resolution.Name);
     }
 
-    public static string? EnergyResultOf(CalculatedQuantityQuality calculatedQuantityQuality)
+    public static string? ForEnergyResultOf(CalculatedQuantityQuality calculatedQuantityQuality)
     {
         return calculatedQuantityQuality switch
         {
@@ -138,7 +138,7 @@ public static class EbixCode
         };
     }
 
-    public static string? WholesaleServicesOf(CalculatedQuantityQuality calculatedQuantityQuality)
+    public static string? ForWholesaleServicesOf(CalculatedQuantityQuality calculatedQuantityQuality)
     {
         return calculatedQuantityQuality switch
         {

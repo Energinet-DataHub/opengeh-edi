@@ -111,7 +111,7 @@ public class NotifyWholesaleServicesXmlDocumentWriter : DocumentWriter
                 // energySum_Quantity.quantity is nullable according to the schema, but as of right now. Things do not make sense if it is not present
                 await WriteElementAsync("energySum_Quantity.quantity", point.Amount?.ToString(NumberFormatInfo.InvariantInfo) ?? "0", writer).ConfigureAwait(false);
 
-                await WriteElementIfHasValueAsync("quality", point.QuantityQuality?.ToString(), writer).ConfigureAwait(false);
+                await WriteQualityIfSpecifiedAsync(writer, point).ConfigureAwait(false);
 
                 // tab removed
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
@@ -123,5 +123,16 @@ public class NotifyWholesaleServicesXmlDocumentWriter : DocumentWriter
             // closing off series tag
             await writer.WriteEndElementAsync().ConfigureAwait(false);
         }
+    }
+
+    private Task WriteQualityIfSpecifiedAsync(XmlWriter writer, Point point)
+    {
+        return point.QuantityQuality == null
+            ? Task.CompletedTask
+            : writer.WriteElementStringAsync(
+                DocumentDetails.Prefix,
+                "quality",
+                null,
+                CimCode.ForWholesaleServicesOf(point.QuantityQuality!.Value));
     }
 }

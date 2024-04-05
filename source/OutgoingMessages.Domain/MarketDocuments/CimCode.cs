@@ -25,7 +25,7 @@ public static class CimCode
     public const string QuantityQualityCodeCalculated = "A06";
     public const string QuantityQualityCodeNotAvailable = "A02";
 
-    public static string Of(CalculatedQuantityQuality calculatedQuantityQuality)
+    public static string ForEnergyResultOf(CalculatedQuantityQuality calculatedQuantityQuality)
     {
         return calculatedQuantityQuality switch
         {
@@ -33,6 +33,20 @@ public static class CimCode
             CalculatedQuantityQuality.Incomplete => QuantityQualityCodeIncomplete,
             CalculatedQuantityQuality.Estimated => QuantityQualityCodeEstimated,
             CalculatedQuantityQuality.Measured => QuantityQualityCodeMeasured,
+            CalculatedQuantityQuality.Calculated => QuantityQualityCodeCalculated,
+            CalculatedQuantityQuality.NotAvailable => QuantityQualityCodeNotAvailable,
+            _ => throw NoCodeFoundFor(calculatedQuantityQuality.ToString()),
+        };
+    }
+
+    public static string ForWholesaleServicesOf(CalculatedQuantityQuality calculatedQuantityQuality)
+    {
+        return calculatedQuantityQuality switch
+        {
+            CalculatedQuantityQuality.Missing => QuantityQualityCodeIncomplete,
+            CalculatedQuantityQuality.Incomplete => QuantityQualityCodeIncomplete,
+            CalculatedQuantityQuality.Estimated => QuantityQualityCodeCalculated,
+            CalculatedQuantityQuality.Measured => QuantityQualityCodeCalculated,
             CalculatedQuantityQuality.Calculated => QuantityQualityCodeCalculated,
             CalculatedQuantityQuality.NotAvailable => QuantityQualityCodeNotAvailable,
             _ => throw NoCodeFoundFor(calculatedQuantityQuality.ToString()),
