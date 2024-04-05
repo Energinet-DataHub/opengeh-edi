@@ -22,29 +22,29 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 /// Used when a DataHubType can have an unknown value, typically used when a schema allows for values we no longer use
 /// </summary>
 [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "Used for converting our DataHubTypes")]
-public abstract class DataHubTypeWithUnknown<T> : DataHubType<T>
+public abstract class DataHubTypeWithUnused<T> : DataHubType<T>
     where T : DataHubType<T>
 {
-    protected DataHubTypeWithUnknown(string name, string code, bool isUnknown)
+    protected DataHubTypeWithUnused(string name, string code, bool isUnused)
         : base(name, code)
     {
-        IsUnknown = isUnknown;
+        IsUnused = isUnused;
     }
 
-    public bool IsUnknown { get; }
+    public bool IsUnused { get; }
 
     /// <summary>
     /// Create a DataHubType from a code or returns an UNKNOWN type if the code is not recognized
     /// </summary>
-    public static T FromCodeOrUnknown(string code)
+    public static T FromCodeOrUnused(string code)
     {
-        return TryFromCode(code) ?? CreateUnknown(code);
+        return TryFromCode(code) ?? CreateUnused(code);
     }
 
     /// <summary>
     /// Creates an instance of T. DataHubTypeWithUnknownTests verifies that all implementations can be created like this
     /// </summary>
-    private static T CreateUnknown(string code)
+    private static T CreateUnused(string code)
     {
         return (T)Activator.CreateInstance(typeof(T), BindingFlags.NonPublic | BindingFlags.Instance, null, new object[] { code, code, true }, null)!;
     }

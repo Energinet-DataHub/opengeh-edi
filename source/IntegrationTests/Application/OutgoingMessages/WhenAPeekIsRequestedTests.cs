@@ -218,7 +218,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         var expectedExceptionMessage = $"{unknownCode} is not a valid BusinessReason name";
 
         var message = _energyResultMessageDtoBuilder
-            .WithBusinessReason(BusinessReason.FromCodeOrUnknown(unknownCode))
+            .WithBusinessReason(BusinessReason.FromCodeOrUnused(unknownCode))
             .Build();
 
         var act = async () =>

@@ -23,19 +23,19 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.BuildingBlocks.Models;
 
-public class DataHubTypeWithUnknownTests
+public class DataHubTypeWithUnusedTests
 {
     /// <summary>
-    /// Get all types that inherit from DataHubTypeWithUnknown base classes (a list of <see cref="DataHubTypeWithUnknown{T}"/>))
+    /// Get all types that inherit from DataHubTypeWithUnused base classes (a list of <see cref="DataHubTypeWithUnused{T}"/>))
     /// </summary>
     public static IEnumerable<object[]> GetAllDataHubTypeWithUnknown()
     {
-        var dataHubTypeWithUnknownTypes = Assembly.GetAssembly(typeof(DataHubTypeWithUnknown<>))!
+        var dataHubTypeWithUnknownTypes = Assembly.GetAssembly(typeof(DataHubTypeWithUnused<>))!
             .GetTypes()
-            .Where(t => t.BaseType is { IsGenericType: true } && t.BaseType.GetGenericTypeDefinition() == typeof(DataHubTypeWithUnknown<>))
+            .Where(t => t.BaseType is { IsGenericType: true } && t.BaseType.GetGenericTypeDefinition() == typeof(DataHubTypeWithUnused<>))
             .Select(type => new object[]
             {
-                type.BaseType!, // Get the DataHubTypeWithUnknown<T> base type instead of the implementation
+                type.BaseType!, // Get the DataHubTypeWithUnused<T> base type instead of the implementation
             })
             .ToList();
 
@@ -50,7 +50,7 @@ public class DataHubTypeWithUnknownTests
 
         // Arrange
         var unknownCode = "UNKNOWN-CODE";
-        var fromCodeOrUnknownMethod = dataHubTypeWithUnknown.GetMethod("FromCodeOrUnknown", BindingFlags.Public | BindingFlags.Static);
+        var fromCodeOrUnknownMethod = dataHubTypeWithUnknown.GetMethod("FromCodeOrUnused", BindingFlags.Public | BindingFlags.Static);
 
         // Act
         var act = () => fromCodeOrUnknownMethod!.Invoke(null, new object[] { unknownCode });
@@ -59,7 +59,7 @@ public class DataHubTypeWithUnknownTests
         using var scope = new AssertionScope();
         var result = act.Should().NotThrow().Subject;
         result.Should().NotBeNull();
-        dataHubTypeWithUnknown.GetProperty("IsUnknown")!.GetValue(result).Should().Be(true);
+        dataHubTypeWithUnknown.GetProperty("IsUnused")!.GetValue(result).Should().Be(true);
         dataHubTypeWithUnknown.GetProperty("Name")!.GetValue(result).Should().Be(unknownCode);
         dataHubTypeWithUnknown.GetProperty("Code")!.GetValue(result).Should().Be(unknownCode);
     }

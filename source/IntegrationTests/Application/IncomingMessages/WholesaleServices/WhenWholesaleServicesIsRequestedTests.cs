@@ -123,7 +123,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         // Assert
         var process = GetProcess(marketMessage.SenderNumber);
         process.Should().NotBeNull();
-        process!.BusinessReason.IsUnknown.Should().BeTrue();
+        process!.BusinessReason.IsUnused.Should().BeTrue();
         process.BusinessReason.Code.Should().Be(unknownBusinessReason);
         process.BusinessReason.Name.Should().Be(unknownBusinessReason);
         await AssertProcessState(marketMessage!.MessageId, WholesaleServicesProcess.State.Sent);
