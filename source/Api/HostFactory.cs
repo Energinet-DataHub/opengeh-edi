@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
-using BuildingBlocks.Application.Configuration.Logging;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
@@ -29,11 +27,9 @@ using Energinet.DataHub.EDI.IntegrationEvents.Application.Configuration;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Energinet.DataHub.EDI.Api;
@@ -70,8 +66,8 @@ public static class HostFactory
                         // Health checks
                         .AddHealthChecksForIsolatedWorker()
                         .AddBlobStorageHealthCheck(
-                        "edi-web-jobs-storage",
-                        runtime.AzureWebJobsStorage!)
+                            "edi-web-jobs-storage",
+                            runtime.AzureWebJobsStorage!)
                         .AddBlobStorageHealthCheck(
                             "edi-documents-storage",
                             runtime.AZURE_STORAGE_ACCOUNT_URL!)
