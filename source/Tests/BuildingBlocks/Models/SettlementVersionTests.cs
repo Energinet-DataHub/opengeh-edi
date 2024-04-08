@@ -40,13 +40,6 @@ public class SettlementVersionTests
             (SettlementVersion.FirstCorrection, "FirstCorrection", "D01"),
             (SettlementVersion.SecondCorrection, "SecondCorrection", "D02"),
             (SettlementVersion.ThirdCorrection, "ThirdCorrection", "D03"),
-            (SettlementVersion.FourthCorrection, "FourthCorrection", "D04"),
-            (SettlementVersion.FifthCorrection, "FifthCorrection", "D05"),
-            (SettlementVersion.SixthCorrection, "SixthCorrection", "D06"),
-            (SettlementVersion.SeventhCorrection, "SeventhCorrection", "D07"),
-            (SettlementVersion.EighthCorrection, "EighthCorrection", "D08"),
-            (SettlementVersion.NinthCorrection, "NinthCorrection", "D09"),
-            (SettlementVersion.TenthCorrection, "TenthCorrection", "D10"),
         };
 
         using var scope = new AssertionScope();

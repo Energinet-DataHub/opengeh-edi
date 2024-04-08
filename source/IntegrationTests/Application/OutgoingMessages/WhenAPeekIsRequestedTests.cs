@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -24,7 +26,6 @@ using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
-using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
@@ -46,6 +47,23 @@ public class WhenAPeekIsRequestedTests : TestBase
         _energyResultMessageDtoBuilder = new EnergyResultMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         _dateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
+    }
+
+    public static object[][] GetUnusedDataHubTypesWithDocumentFormat()
+    {
+        var documentFormats = EnumerationType.GetAll<DocumentFormat>();
+        var dataHubTypesWithUnused = Assembly.GetAssembly(typeof(DataHubTypeWithUnused<>))!
+            .GetTypes()
+            .Where(
+                t => t.BaseType is { IsGenericType: true }
+                     && t.BaseType.GetGenericTypeDefinition() == typeof(DataHubTypeWithUnused<>))
+            .ToArray();
+
+        var typesWithDocumentFormats = dataHubTypesWithUnused
+            .SelectMany(t => documentFormats.Select(df => new object[] { t, df }))
+            .ToArray();
+
+        return typesWithDocumentFormats;
     }
 
     [Fact]
@@ -211,25 +229,45 @@ public class WhenAPeekIsRequestedTests : TestBase
         peekResult.MessageId.Should().NotBeNull();
     }
 
-    [Fact]
-    public async Task When_unused_business_reason_then_exception_is_thrown()
+    [Theory]
+    [MemberData(nameof(GetUnusedDataHubTypesWithDocumentFormat))]
+    public async Task When_unused_datahub_value_then_exception_is_thrown(Type dataHubTypeWithUnused, DocumentFormat documentFormat)
     {
-        var unusedCode = "A47";
-        var expectedExceptionMessage = $"{unusedCode} is not a valid BusinessReason name";
+        ArgumentNullException.ThrowIfNull(dataHubTypeWithUnused);
+        ArgumentNullException.ThrowIfNull(documentFormat);
 
-        var message = _energyResultMessageDtoBuilder
-            .WithBusinessReason(BusinessReason.FromCodeOrUnused(unusedCode))
-            .Build();
+        string unusedCode;
+
+        var builder = _energyResultMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .WithReceiverRole(ActorRole.EnergySupplier);
+
+        if (dataHubTypeWithUnused == typeof(BusinessReason))
+        {
+            unusedCode = "A47";
+            builder.WithBusinessReason(BusinessReason.FromCodeOrUnused(unusedCode));
+        }
+        else if (dataHubTypeWithUnused == typeof(SettlementVersion))
+        {
+            unusedCode = "D10";
+            builder.WithSettlementVersion(SettlementVersion.FromCodeOrUnused(unusedCode));
+        }
+        else
+        {
+            throw new NotImplementedException($"Type {dataHubTypeWithUnused.Name} is not implemented yet");
+        }
+
+        var message = _energyResultMessageDtoBuilder.Build();
 
         var act = async () =>
         {
             await EnqueueMessage(message);
-            var result = await PeekMessageAsync(MessageCategory.None);
+            var result = await PeekMessageAsync(MessageCategory.Aggregations, message.ReceiverNumber, message.ReceiverRole, documentFormat: documentFormat);
             return result;
         };
 
-        (await act.Should().ThrowAsync<InvalidOperationException>($"because {unusedCode} is a unused BusinessReason code"))
-            .WithMessage(expectedExceptionMessage);
+        (await act.Should().ThrowAsync<InvalidOperationException>($"because {unusedCode} is a unused {dataHubTypeWithUnused.Name} code"))
+            .WithMessage($"{unusedCode} is not a valid {dataHubTypeWithUnused.Name}*");
     }
 
     private async Task<bool> BundleIsRegistered()
