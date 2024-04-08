@@ -35,6 +35,7 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
+#pragma warning disable CA1062
 public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
 {
     private readonly EnergyResultMessageDtoBuilder _energyResultMessageDtoBuilder;
@@ -349,6 +350,24 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             .HasReceiverRole(receiverDocument.ActorRole)
             .HasReceiver(receiverQueue.ActorNumber)
             .HasSerieRecordCount(1);
+    }
+
+    private async Task<(string ActorNumber, string ActorRole)> GetReceiverQueueAsync(OutgoingMessageId outgoingMessageId)
+    {
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+
+        var result = await connection.QuerySingleAsync(
+            @"SELECT tOutgoing.ReceiverNumber, tOutgoing.ReceiverRole, tOutgoing.DocumentReceiverNumber, tOutgoing.DocumentReceiverRole
+                    FROM [dbo].[OutgoingMessages] AS tOutgoing
+                    WHERE tOutgoing.Id = @Id",
+            new
+            {
+                Id = outgoingMessageId.Value.ToString(),
+            });
+
+        return (
+            ActorNumber: result.ReceiverNumber,
+            ActorRole: result.ReceiverRole);
     }
 
     private async Task<(string ActorMessageQueueNumber, string ActorMessageQueueRole, string DocumentReceiverNumber, string DocumentReceiverRole)> GetEnqueuedOutgoingMessageFromDatabase(OutgoingMessageId createdId)

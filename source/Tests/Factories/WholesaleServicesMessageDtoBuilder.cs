@@ -16,6 +16,7 @@ using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using OutgoingMessages.Application.Tests.Factories;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
 

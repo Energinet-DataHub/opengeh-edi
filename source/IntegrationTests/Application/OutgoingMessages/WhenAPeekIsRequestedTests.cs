@@ -13,15 +13,20 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Dapper;
+using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.PeekScenarios;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -35,6 +40,7 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
+[SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Test")]
 public class WhenAPeekIsRequestedTests : TestBase
 {
     private readonly EnergyResultMessageDtoBuilder _energyResultMessageDtoBuilder;
@@ -66,13 +72,63 @@ public class WhenAPeekIsRequestedTests : TestBase
         return typesWithDocumentFormats;
     }
 
+#pragma warning disable CA1024
+    public static IEnumerable<object[]> GetIntegrationEventScenarios()
+#pragma warning restore CA1024
+    {
+        //IIntegrationEventScenario
+        //IInboxEventScenario => svaret på en anmodning fra wholesale
+        //IIncomingMessageEventScenario => anmodning fra aktør
+            //Input: stream (RSMXX)
+            //Assert: ServiceBusMessage and ?Process?
+        return new[]
+        {
+            // new IIntegrationEventScenario[] { new EnergyResultProducedIntegrationEventScenario(DocumentFormat.Json) },
+            // new IIntegrationEventScenario[] { new EnergyResultProducedIntegrationEventScenario(DocumentFormat.Xml) },
+            // new IIntegrationEventScenario[] { new EnergyResultProducedIntegrationEventScenario(DocumentFormat.Ebix) },
+            // new IIntegrationEventScenario[] { new AmountPerChargeResultProducedIntegrationEventScenario(DocumentFormat.Json) },
+            // new IIntegrationEventScenario[] { new AmountPerChargeResultProducedIntegrationEvenScenario(DocumentFormat.Xml) },
+            // new IIntegrationEventScenario[] { new AmountPerChargeResultProducedIntegrationEventScenario(DocumentFormat.Ebix) },
+            // new IIntegrationEventScenario[] { new MonthAmountPerChargeResultProducedIntegrationEventScenario(DocumentFormat.Json) },
+            // new IIntegrationEventScenario[] { new MonthAmountPerChargeResultProducedIntegrationEvenScenario(DocumentFormat.Xml) },
+            // new IIntegrationEventScenario[] { new MonthAmountPerChargeResultProducedIntegrationEventScenario(DocumentFormat.Ebix) },
+            new IIntegrationEventScenario[] { new EnergyResultProducedIntegrationEventDelegationScenario(DocumentFormat.Json) },
+            new IIntegrationEventScenario[] { new EnergyResultProducedIntegrationEventDelegationScenario(DocumentFormat.Xml) },
+            new IIntegrationEventScenario[] { new EnergyResultProducedIntegrationEventDelegationScenario(DocumentFormat.Ebix) },
+            new IIntegrationEventScenario[] { new AmountPerChargeResultProducedIntegrationEventDelegationScenario(DocumentFormat.Json) },
+            new IIntegrationEventScenario[] { new AmountPerChargeResultProducedIntegrationEventDelegationScenario(DocumentFormat.Xml) },
+            new IIntegrationEventScenario[] { new AmountPerChargeResultProducedIntegrationEventDelegationScenario(DocumentFormat.Ebix) },
+            // new IIntegrationEventScenario[] { new MonthAmountPerChargeResultProducedIntegrationEventDelegationScenario(DocumentFormat.Json) },
+            // new IIntegrationEventScenario[] { new MonthAmountPerChargeResultProducedIntegrationEventDelegationScenario(DocumentFormat.Xml) },
+            // new IIntegrationEventScenario[] { new MonthAmountPerChargeResultProducedIntegrationEventDelegationScenario(DocumentFormat.Ebix) },
+        };
+    }
+
+    [Theory]
+    [MemberData(nameof(GetIntegrationEventScenarios))]
+    public async Task A_peek_request_received(IIntegrationEventScenario scenario)
+    {
+        // Arrange
+        var energyEvent = await scenario.BuildAsync(ServiceProvider);
+
+        // Act
+        var integrationEventHandler = GetService<IIntegrationEventHandler>();
+        await integrationEventHandler.HandleAsync(energyEvent);
+
+        // Assert
+        await scenario.AssertAsync(ServiceProvider);
+    }
+
     [Fact]
     public async Task When_no_messages_are_available_return_empty_result()
     {
         var message = _energyResultMessageDtoBuilder.Build();
         await EnqueueMessage(message);
 
-        var result = await PeekMessageAsync(MessageCategory.None);
+        var result = await PeekMessageAsync(
+            MessageCategory.Aggregations,
+            actorNumber: ActorNumber.Create(SampleData.NewEnergySupplierNumber),
+            actorRole: ActorRole.EnergySupplier);
 
         Assert.Null(result.Bundle);
         Assert.True(await BundleIsRegistered());
@@ -87,7 +143,10 @@ public class WhenAPeekIsRequestedTests : TestBase
             .Build();
         await EnqueueMessage(message);
 
-        var result = await PeekMessageAsync(MessageCategory.Aggregations);
+        var result = await PeekMessageAsync(
+            MessageCategory.Aggregations,
+            actorNumber: ActorNumber.Create(SampleData.NewEnergySupplierNumber),
+            actorRole: ActorRole.EnergySupplier);
 
         AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
             .IsDocumentType(DocumentType.NotifyAggregatedMeasureData)
@@ -104,10 +163,16 @@ public class WhenAPeekIsRequestedTests : TestBase
             .Build();
         await EnqueueMessage(message);
 
-        var firstPeekResult = await PeekMessageAsync(MessageCategory.Aggregations);
+        var firstPeekResult = await PeekMessageAsync(
+            MessageCategory.Aggregations,
+            actorNumber: ActorNumber.Create(SampleData.NewEnergySupplierNumber),
+            actorRole: ActorRole.EnergySupplier);
 
         ClearDbContextCaches(); // Else the MarketDocument is cached in Entity Framework
-        var secondPeekResult = await PeekMessageAsync(MessageCategory.Aggregations);
+        var secondPeekResult = await PeekMessageAsync(
+            MessageCategory.Aggregations,
+            actorNumber: ActorNumber.Create(SampleData.NewEnergySupplierNumber),
+            actorRole: ActorRole.EnergySupplier);
 
         Assert.NotNull(firstPeekResult.MessageId);
         Assert.NotNull(secondPeekResult.MessageId);
@@ -128,7 +193,10 @@ public class WhenAPeekIsRequestedTests : TestBase
         await EnqueueMessage(message);
 
         // Act
-        var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);
+        var peekResult = await PeekMessageAsync(
+            MessageCategory.Aggregations,
+            actorNumber: ActorNumber.Create(SampleData.NewEnergySupplierNumber),
+            actorRole: ActorRole.EnergySupplier);
 
         // Assert
         using var assertScope = new AssertionScope();
@@ -161,7 +229,10 @@ public class WhenAPeekIsRequestedTests : TestBase
         await EnqueueMessage(message);
 
         // Act
-        var result = await PeekMessageAsync(MessageCategory.Aggregations);
+        var result = await PeekMessageAsync(
+            MessageCategory.Aggregations,
+            actorNumber: ActorNumber.Create(SampleData.NewEnergySupplierNumber),
+            actorRole: ActorRole.EnergySupplier);
 
         // Assert
         result.Bundle.Should().NotBeNull();
@@ -180,7 +251,10 @@ public class WhenAPeekIsRequestedTests : TestBase
             .Build();
         await EnqueueMessage(message);
 
-        var result = await PeekMessageAsync(MessageCategory.Aggregations);
+        var result = await PeekMessageAsync(
+            MessageCategory.Aggregations,
+            actorNumber: ActorNumber.Create(SampleData.NewEnergySupplierNumber),
+            actorRole: ActorRole.EnergySupplier);
 
         result.MessageId.Should().NotBeNull();
 
@@ -197,7 +271,10 @@ public class WhenAPeekIsRequestedTests : TestBase
             .Build();
         await EnqueueMessage(message);
 
-        var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);
+        var peekResult = await PeekMessageAsync(
+            MessageCategory.Aggregations,
+            actorNumber: ActorNumber.Create(SampleData.NewEnergySupplierNumber),
+            actorRole: ActorRole.EnergySupplier);
 
         var marketDocumentFileStorageReference = await GetMarketDocumentFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value);
         var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value);
@@ -223,7 +300,10 @@ public class WhenAPeekIsRequestedTests : TestBase
         await EnqueueMessage(message);
 
         // Act
-        var peekResult = await PeekMessageAsync(MessageCategory.Aggregations, actorNumber: actorNumber, actorRole: ActorRole.MeteredDataResponsible);
+        var peekResult = await PeekMessageAsync(
+            MessageCategory.Aggregations,
+            actorNumber: actorNumber,
+            actorRole: ActorRole.MeteredDataResponsible);
 
         // Assert
         peekResult.MessageId.Should().NotBeNull();
@@ -268,6 +348,13 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         (await act.Should().ThrowAsync<InvalidOperationException>($"because {unusedCode} is a unused {dataHubTypeWithUnused.Name} code"))
             .WithMessage($"{unusedCode} is not a valid {dataHubTypeWithUnused.Name}*");
+    }
+
+    private Task HavingHandledIntegrationEventAsync(IntegrationEvent integrationEvent)
+    {
+        var integrationEventHandler = GetService<IIntegrationEventHandler>();
+
+        return integrationEventHandler.HandleAsync(integrationEvent);
     }
 
     private async Task<bool> BundleIsRegistered()

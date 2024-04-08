@@ -13,10 +13,14 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf.WellKnownTypes;
+using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
+using Duration = NodaTime.Duration;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
@@ -41,6 +45,19 @@ public class AmountPerChargeResultProducedV1EventBuilder
 
     internal AmountPerChargeResultProducedV1 Build()
     {
+        var points = new List<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint>();
+        var currentTime = _periodStartUtc.ToInstant();
+        while (currentTime < _periodEndUtc.ToInstant())
+        {
+            points.Add(new()
+            {
+                Time = currentTime.ToTimestamp(),
+                Quantity = new Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue { Units = 123, Nanos = 1200000 },
+                QuantityQualities = { AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated },
+            });
+            currentTime = currentTime.Plus(Duration.FromMinutes(15));
+        }
+
         var @event = new AmountPerChargeResultProducedV1
         {
             CalculationId = _calculationId.ToString(),
@@ -60,7 +77,7 @@ public class AmountPerChargeResultProducedV1EventBuilder
             CalculationResultVersion = _calculationVersion,
             Resolution = _resolution,
         };
-
+        @event.TimeSeriesPoints.AddRange(points);
         return @event;
     }
 

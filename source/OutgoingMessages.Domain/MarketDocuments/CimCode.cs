@@ -25,7 +25,7 @@ public static class CimCode
     public const string QuantityQualityCodeCalculated = "A06";
     public const string QuantityQualityCodeNotAvailable = "A02";
 
-    public static string ForEnergyResultOf(CalculatedQuantityQuality calculatedQuantityQuality)
+    public static string Of(CalculatedQuantityQuality calculatedQuantityQuality)
     {
         return calculatedQuantityQuality switch
         {
