@@ -66,6 +66,18 @@ public sealed class NotifyWholesaleServicesJsonDocumentWriter : IDocumentWriter
         return new MarketDocumentStream(stream);
     }
 
+    private static void WriteQualityIfSpecified(Utf8JsonWriter writer, Point point)
+    {
+        if (point.QuantityQuality != null)
+        {
+            writer.WriteObject(
+                "quality",
+                KeyValuePair.Create(
+                    "value",
+                    CimCode.ForWholesaleServicesOf(point.QuantityQuality!.Value)));
+        }
+    }
+
     private void WriteSeries(IReadOnlyCollection<string> marketActivityRecords, Utf8JsonWriter writer)
     {
         ArgumentNullException.ThrowIfNull(marketActivityRecords);
@@ -193,14 +205,7 @@ public sealed class NotifyWholesaleServicesJsonDocumentWriter : IDocumentWriter
                                                     point.Price.GetValueOrDefault()));
                                     }
 
-                                    if (point.QuantityQuality is not null)
-                                    {
-                                        writer.WriteObject(
-                                            "quality",
-                                            KeyValuePair.Create(
-                                                "value",
-                                                point.QuantityQuality.GetValueOrDefault().ToString()));
-                                    }
+                                    WriteQualityIfSpecified(writer, point);
                                 }
 
                                 writer.WriteEndObject();

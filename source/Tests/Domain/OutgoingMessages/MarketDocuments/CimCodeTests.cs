@@ -48,7 +48,7 @@ public sealed class CimCodeTests
         CalculatedQuantityQuality calculatedQuantityQuality,
         string expectedCimCode)
     {
-        var cimQuality = CimCode.Of(calculatedQuantityQuality);
+        var cimQuality = CimCode.ForEnergyResultOf(calculatedQuantityQuality);
 
         cimQuality.Should().Be(expectedCimCode);
     }
@@ -58,7 +58,7 @@ public sealed class CimCodeTests
     public void Can_handle_all_edi_qualities(CalculatedQuantityQuality calculatedQuantityQuality)
     {
         // Act
-        CimCode.Of(calculatedQuantityQuality);
+        CimCode.ForEnergyResultOf(calculatedQuantityQuality);
     }
 
     [Fact]
