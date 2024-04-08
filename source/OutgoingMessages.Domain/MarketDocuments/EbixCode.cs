@@ -124,7 +124,7 @@ public static class EbixCode
         throw NoCodeFoundFor(resolution.Name);
     }
 
-    public static string? Of(CalculatedQuantityQuality calculatedQuantityQuality)
+    public static string? ForEnergyResultOf(CalculatedQuantityQuality calculatedQuantityQuality)
     {
         return calculatedQuantityQuality switch
         {
@@ -132,6 +132,20 @@ public static class EbixCode
             CalculatedQuantityQuality.Incomplete => QuantityQualityCodeEstimated,
             CalculatedQuantityQuality.Measured => QuantityQualityCodeMeasured,
             CalculatedQuantityQuality.Calculated => QuantityQualityCodeMeasured,
+            CalculatedQuantityQuality.Missing => null,
+            CalculatedQuantityQuality.NotAvailable => null,
+            _ => throw NoCodeFoundFor(calculatedQuantityQuality.ToString()),
+        };
+    }
+
+    public static string? ForWholesaleServicesOf(CalculatedQuantityQuality calculatedQuantityQuality)
+    {
+        return calculatedQuantityQuality switch
+        {
+            CalculatedQuantityQuality.Estimated => QuantityQualityCodeCalculated,
+            CalculatedQuantityQuality.Incomplete => QuantityQualityCodeCalculated,
+            CalculatedQuantityQuality.Measured => QuantityQualityCodeCalculated,
+            CalculatedQuantityQuality.Calculated => QuantityQualityCodeCalculated,
             CalculatedQuantityQuality.Missing => null,
             CalculatedQuantityQuality.NotAvailable => null,
             _ => throw NoCodeFoundFor(calculatedQuantityQuality.ToString()),

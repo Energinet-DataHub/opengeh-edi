@@ -74,7 +74,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             .WithPriceMeasurementUnit(SampleData.PriceMeasureUnit)
             .WithResolution(SampleData.Resolution)
             .WithOriginalTransactionIdReference(transactionId)
-            .WithPoints(new Collection<WholesaleServicesPoint>() { new(1, 1, 1, SampleData.Quantity, null) });
+            .WithPoints(new Collection<WholesaleServicesPoint>() { new(1, 1, 1, SampleData.Quantity, CalculatedQuantityQuality.Calculated) });
 
         // Act
         var document = await WriteDocument(

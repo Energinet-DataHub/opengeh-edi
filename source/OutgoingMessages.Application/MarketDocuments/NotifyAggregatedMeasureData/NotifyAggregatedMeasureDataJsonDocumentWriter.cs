@@ -171,7 +171,7 @@ public class NotifyAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
                 {
                     writer.WriteObject(
                         "quality",
-                        new KeyValuePair<string, string>("value", CimCode.Of(point.QuantityQuality)));
+                        new KeyValuePair<string, string>("value", CimCode.ForEnergyResultOf(point.QuantityQuality)));
                 }
 
                 if (point.Quantity.HasValue)
