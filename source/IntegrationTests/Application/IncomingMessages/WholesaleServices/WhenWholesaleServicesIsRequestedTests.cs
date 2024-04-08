@@ -91,42 +91,37 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
     }
 
     [Fact]
-    public async Task When_WholesaleServicesProcess_is_initialized_with_unused_business_reason_service_bus_message_is_sent_to_wholesale()
+    public async Task When_WholesaleServicesProcess_is_initialized_with_a_unused_value_process_can_still_be_handled()
     {
         // Arrange
         const string unusedBusinessReason = "A47";
-        var marketMessage = InitializeProcessDtoBuilder()
+        const string unusedSettlementVersion = "D10";
+
+        var builder = InitializeProcessDtoBuilder()
             .SetBusinessReason(unusedBusinessReason)
-            .Build();
+            .SetSettlementVersion(unusedSettlementVersion);
+
+        var marketMessage = builder.Build();
 
         // Act
         await InvokeCommandAsync(new InitializeWholesaleServicesProcessesCommand(marketMessage));
         await ProcessInternalCommandsAsync();
 
         // Assert
+        using var assertionScope = new AssertionScope();
+
         _senderSpy.MessageSent.Should().BeTrue();
-    }
 
-    [Fact]
-    public async Task When_WholesaleServicesProcess_is_initialized_with_unused_business_reason_process_can_still_be_created()
-    {
-        // Arrange
-        const string unusedBusinessReason = "A47";
-        var marketMessage = InitializeProcessDtoBuilder()
-            .SetBusinessReason(unusedBusinessReason)
-            .Build();
-
-        // Act
-        await InvokeCommandAsync(new InitializeWholesaleServicesProcessesCommand(marketMessage));
-        await ProcessInternalCommandsAsync();
-
-        // Assert
         var process = GetProcess(marketMessage.SenderNumber);
         process.Should().NotBeNull();
+        await AssertProcessState(marketMessage.MessageId, WholesaleServicesProcess.State.Sent);
+
         process!.BusinessReason.IsUnused.Should().BeTrue();
         process.BusinessReason.Code.Should().Be(unusedBusinessReason);
         process.BusinessReason.Name.Should().Be(unusedBusinessReason);
-        await AssertProcessState(marketMessage!.MessageId, WholesaleServicesProcess.State.Sent);
+        process.SettlementVersion!.IsUnused.Should().BeTrue();
+        process.SettlementVersion.Code.Should().Be(unusedSettlementVersion);
+        process.SettlementVersion.Name.Should().Be(unusedSettlementVersion);
     }
 
     [Fact]
