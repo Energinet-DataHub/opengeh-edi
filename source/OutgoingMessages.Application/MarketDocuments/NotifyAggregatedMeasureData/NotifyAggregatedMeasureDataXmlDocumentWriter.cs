@@ -150,6 +150,6 @@ public class NotifyAggregatedMeasureDataXmlDocumentWriter : DocumentWriter
             DocumentDetails.Prefix,
             "quality",
             null,
-            CimCode.ForEnergyResultOf(point.QuantityQuality));
+            CimCode.Of(point.QuantityQuality));
     }
 }

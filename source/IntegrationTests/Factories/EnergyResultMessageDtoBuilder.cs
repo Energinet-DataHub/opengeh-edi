@@ -24,13 +24,13 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
 public class EnergyResultMessageDtoBuilder
 {
-    private const string GridAreaCode = "805";
     private readonly Guid _processId = ProcessId.Create(Guid.NewGuid()).Id;
     private readonly IReadOnlyCollection<EnergyResultMessagePoint> _points = new List<EnergyResultMessagePoint>();
     private BusinessReason _businessReason = BusinessReason.BalanceFixing;
     private SettlementVersion? _settlementVersion;
     private ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private ActorRole _receiverRole = ActorRole.MeteredDataAdministrator;
+    private string _gridAreaCode = "805";
 
 #pragma warning disable CA1822
     public EnergyResultMessageDto Build()
@@ -40,7 +40,7 @@ public class EnergyResultMessageDtoBuilder
             _receiverNumber,
             _receiverRole,
             _processId,
-            GridAreaCode,
+            _gridAreaCode,
             MeteringPointType.Consumption.Name,
             SettlementMethod.NonProfiled.Name,
             MeasurementUnit.Kwh.Name,
@@ -63,6 +63,12 @@ public class EnergyResultMessageDtoBuilder
     public EnergyResultMessageDtoBuilder WithReceiverRole(ActorRole actorRole)
     {
         _receiverRole = actorRole;
+        return this;
+    }
+
+    public EnergyResultMessageDtoBuilder WithGridAreaCode(string gridAreaCode)
+    {
+        _gridAreaCode = gridAreaCode;
         return this;
     }
 

@@ -26,6 +26,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
 internal sealed class EnergyResultProducedV2EventBuilder
 {
+    private readonly List<TimeSeriesPoint> _timeSeriesPoints = new();
     private CalculationType _calculationType = CalculationType.BalanceFixing;
     private Resolution _resolution = Resolution.Quarter;
     private QuantityUnit _measurementUnit = QuantityUnit.Kwh;
@@ -46,15 +47,16 @@ internal sealed class EnergyResultProducedV2EventBuilder
 
     internal EnergyResultProducedV2 Build()
     {
-        List<TimeSeriesPoint> timeSeriesPoints = new()
+        if (_timeSeriesPoints.Count == 0)
         {
-            new TimeSeriesPoint
-            {
-                Time = Timestamp.FromDateTime(DateTime.UtcNow),
-                Quantity = new DecimalValue { Nanos = 1, Units = 1 },
-                QuantityQualities = { _quantityQualities },
-            },
-        };
+            _timeSeriesPoints.Add(
+               new TimeSeriesPoint
+                    {
+                        Time = Timestamp.FromDateTime(DateTime.UtcNow),
+                        Quantity = new DecimalValue { Nanos = 1, Units = 1 },
+                        QuantityQualities = { _quantityQualities },
+                    });
+        }
 
         EnergyResultProducedV2 @event;
         if (_aggregationPerGridArea is not null)
@@ -70,7 +72,7 @@ internal sealed class EnergyResultProducedV2EventBuilder
                 PeriodEndUtc = _endOfPeriod,
                 TimeSeriesType = _timeSeriesType,
             };
-            @event.TimeSeriesPoints.Add(timeSeriesPoints);
+            @event.TimeSeriesPoints.Add(_timeSeriesPoints);
             return @event;
         }
 
@@ -87,7 +89,7 @@ internal sealed class EnergyResultProducedV2EventBuilder
                 PeriodEndUtc = _endOfPeriod,
                 TimeSeriesType = _timeSeriesType,
             };
-            @event.TimeSeriesPoints.Add(timeSeriesPoints);
+            @event.TimeSeriesPoints.Add(_timeSeriesPoints);
             return @event;
         }
 
@@ -104,7 +106,7 @@ internal sealed class EnergyResultProducedV2EventBuilder
                 PeriodEndUtc = _endOfPeriod,
                 TimeSeriesType = _timeSeriesType,
             };
-            @event.TimeSeriesPoints.Add(timeSeriesPoints);
+            @event.TimeSeriesPoints.Add(_timeSeriesPoints);
             return @event;
         }
 
@@ -121,7 +123,7 @@ internal sealed class EnergyResultProducedV2EventBuilder
                 PeriodEndUtc = _endOfPeriod,
                 TimeSeriesType = _timeSeriesType,
             };
-            @event.TimeSeriesPoints.Add(timeSeriesPoints);
+            @event.TimeSeriesPoints.Add(_timeSeriesPoints);
             return @event;
         }
 
@@ -135,7 +137,7 @@ internal sealed class EnergyResultProducedV2EventBuilder
             PeriodEndUtc = _endOfPeriod,
             TimeSeriesType = _timeSeriesType,
         };
-        @event.TimeSeriesPoints.Add(timeSeriesPoints);
+        @event.TimeSeriesPoints.Add(_timeSeriesPoints);
         return @event;
     }
 
@@ -154,6 +156,23 @@ internal sealed class EnergyResultProducedV2EventBuilder
     internal EnergyResultProducedV2EventBuilder WithMeasurementUnit(QuantityUnit measurementUnit)
     {
         _measurementUnit = measurementUnit;
+        return this;
+    }
+
+    internal EnergyResultProducedV2EventBuilder WithPointsForPeriod()
+    {
+        var currentTime = _startOfPeriod.ToInstant();
+        while (currentTime < _endOfPeriod.ToInstant())
+        {
+            _timeSeriesPoints.Add(new()
+            {
+                Time = Timestamp.FromDateTime(DateTime.UtcNow),
+                Quantity = new DecimalValue { Nanos = 1, Units = 1 },
+                QuantityQualities = { _quantityQualities },
+            });
+            currentTime = currentTime.Plus(Duration.FromMinutes(15));
+        }
+
         return this;
     }
 

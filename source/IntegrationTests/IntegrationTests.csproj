@@ -30,7 +30,7 @@ limitations under the License.
         </PackageReference>
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Core" Version="1.17.0" />
         <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
         <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
         <PackageReference Include="xunit" Version="2.6.2" />
         <PackageReference Include="xunit.categories" Version="2.0.8" />
@@ -72,6 +72,7 @@ limitations under the License.
       <ProjectReference Include="..\IntegrationEvents.Infrastructure\IntegrationEvents.Infrastructure.csproj" />
       <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj"/>
       <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
+      <ProjectReference Include="..\OutgoingMessages.Application.Tests\OutgoingMessages.Application.Tests.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Application\OutgoingMessages.Application.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Domain\OutgoingMessages.Domain.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
