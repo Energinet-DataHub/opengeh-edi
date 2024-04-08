@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Dapper;
 using Dapper.NodaTime;
+using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.Options;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -24,13 +26,36 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.Dependen
 
 public static class ArchivedMessageExtensions
 {
-    public static IServiceCollection AddArchivedMessagesModule(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddArchivedMessagesModule(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        bool isDevelopment = false)
     {
+        ArgumentNullException.ThrowIfNull(configuration);
+
         services.AddTransient<IArchivedMessageRepository, ArchivedMessageRepository>();
         services.AddTransient<IArchivedMessagesClient, ArchivedMessagesClient>();
         SqlMapper.AddTypeHandler(InstantHandler.Default);
 
+        // Dependencies
         services.AddBuildingBlocks(configuration);
+
+        if (isDevelopment == false)
+        {
+            //health checks
+            var uri = new Uri(
+                configuration["AZURE_STORAGE_ACCOUNT_URL"]
+                ?? throw new InvalidOperationException("AZURE_STORAGE_ACCOUNT_URL is missing"));
+            services.AddOptions<DocumentStorageOptions>()
+                .Configure(
+                    option =>
+                        option.StorageAccountUri = uri);
+            var options = configuration.Get<DocumentStorageOptions>()!;
+            services.AddBlobStorageHealthCheck(
+                options.StorageName,
+                options.StorageAccountUri!);
+        }
+
         return services;
     }
 }

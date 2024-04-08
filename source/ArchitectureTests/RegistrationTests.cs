@@ -20,7 +20,6 @@ using System.Reflection;
 using System.Text;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
@@ -48,6 +47,9 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             Environment.SetEnvironmentVariable("INCOMING_MESSAGES_QUEUE_NAME", "FakeQueueName1");
             Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", TestEnvironment.CreateConnectionString());
             Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", TestEnvironment.CreateDevelopmentStorageConnectionString());
+
+            // The following declaration slows down the test execution, since create a new Uri us a heavy operation
+            Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL", TestEnvironment.CreateFakeStorageUrl());
 
             _host = HostFactory.CreateHost(RuntimeEnvironment.Default, Program.TokenValidationParameters);
         }
@@ -239,7 +241,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
                     "Server=(LocalDB)\\\\MSSQLLocalDB;Database=B2BTransactions;User=User;Password=Password;TrustServerCertificate=true;Encrypt=True;Trusted_Connection=True;";
             }
 
-            public static string CreateFakeStorageUrl() => "http://dummy.url";
+            public static string CreateFakeStorageUrl() => "https://dummy.url";
 
             public static string CreateDevelopmentStorageConnectionString() => "UseDevelopmentStorage=true";
 

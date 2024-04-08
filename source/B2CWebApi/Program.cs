@@ -67,12 +67,6 @@ builder.Services
     .AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-var blobStorageUrl = builder.Configuration["AZURE_STORAGE_ACCOUNT_URL"];
-
-builder.Services.AddBlobStorageHealthCheck(
-        "edi-documents-storage",
-        blobStorageUrl != null ? new Uri(blobStorageUrl) : null!);
-
 // ***********************************************************************************************
 // App building start here, aka Configure if one uses StartUp
 // ***********************************************************************************************

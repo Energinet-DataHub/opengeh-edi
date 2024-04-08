@@ -22,6 +22,7 @@ using Azure.Storage.Blobs;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.EDI.Api.DataRetention;
 using Energinet.DataHub.EDI.Api.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
@@ -59,7 +60,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using NodaTime;
 using Xunit;
 using SampleData = Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.SampleData;
 
@@ -82,7 +82,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
             TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
             InboxEventNotificationHandler = new TestNotificationHandlerSpy();
-            BuildServices(integrationTestFixture.AzuriteManager.BlobStorageConnectionString);
+            BuildServices(integrationTestFixture.AzuriteManager);
             _processContext = GetService<ProcessContext>();
             _incomingMessagesContext = GetService<IncomingMessagesContext>();
             AuthenticatedActor = GetService<AuthenticatedActor>();
@@ -254,14 +254,17 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
         }
 
-        private void BuildServices(string fileStorageConnectionString)
+        private void BuildServices(
+            AzuriteManager azuriteManager)
         {
             Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
             Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", IntegrationTestFixture.DatabaseConnectionString);
             Environment.SetEnvironmentVariable("WHOLESALE_INBOX_MESSAGE_QUEUE_NAME", "Fake");
             Environment.SetEnvironmentVariable("INCOMING_MESSAGES_QUEUE_NAME", "Fake");
             Environment.SetEnvironmentVariable("SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE", "Fake");
-            Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", fileStorageConnectionString);
+            Environment.SetEnvironmentVariable(
+                "AZURE_STORAGE_ACCOUNT_CONNECTION_STRING",
+                azuriteManager.BlobStorageConnectionString);
 
             var config = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
@@ -284,9 +287,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
             .AddIntegrationEventModule()
-            .AddOutgoingMessagesModule(config)
+            .AddOutgoingMessagesModule(config, true)
             .AddProcessModule(config)
-            .AddArchivedMessagesModule(config)
+            .AddArchivedMessagesModule(config, true)
             .AddIncomingMessagesModule(config)
             .AddMasterDataModule(config)
             .AddDataAccessUnitOfWorkModule(config);

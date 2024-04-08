@@ -68,9 +68,6 @@ public static class HostFactory
                         .AddBlobStorageHealthCheck(
                             "edi-web-jobs-storage",
                             runtime.AzureWebJobsStorage!)
-                        .AddBlobStorageHealthCheck(
-                            "edi-documents-storage",
-                            runtime.AZURE_STORAGE_ACCOUNT_URL!)
                         .TryAddExternalDomainServiceBusQueuesHealthCheck(
                             runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                             runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,

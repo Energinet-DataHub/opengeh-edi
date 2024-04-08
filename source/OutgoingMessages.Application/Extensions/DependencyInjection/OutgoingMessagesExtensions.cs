@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
@@ -33,8 +35,12 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Dependen
 
 public static class OutgoingMessagesExtensions
 {
-    public static IServiceCollection AddOutgoingMessagesModule(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddOutgoingMessagesModule(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        bool isDevelopment = false)
     {
+        ArgumentNullException.ThrowIfNull(configuration);
         services.AddBuildingBlocks(configuration)
             .AddScopedSqlDbContext<ActorMessageQueueContext>(configuration);
 
@@ -70,6 +76,22 @@ public static class OutgoingMessagesExtensions
 
         //DataRetentionConfiguration
         services.AddTransient<IDataRetention, DequeuedBundlesRetention>();
+
+        if (isDevelopment == false)
+        {
+            //health checks
+            var uri = new Uri(
+                configuration["AZURE_STORAGE_ACCOUNT_URL"]
+                ?? throw new InvalidOperationException("AZURE_STORAGE_ACCOUNT_URL is missing"));
+            services.AddOptions<DocumentStorageOptions>()
+                .Configure(
+                    option =>
+                        option.StorageAccountUri = uri);
+            var options = configuration.Get<DocumentStorageOptions>()!;
+            services.AddBlobStorageHealthCheck(
+                options.StorageName,
+                options.StorageAccountUri!);
+        }
 
         return services;
     }
