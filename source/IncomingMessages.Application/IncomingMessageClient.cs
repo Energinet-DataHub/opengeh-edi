@@ -38,6 +38,7 @@ public class IncomingMessageClient : IIncomingMessageClient
     private readonly IArchivedMessagesClient _archivedMessagesClient;
     private readonly ILogger<IncomingMessageClient> _logger;
     private readonly IIncomingMessageReceiver _incomingMessageReceiver;
+    private readonly IncomingMessageDelegator _incomingMessageDelegator;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
     public IncomingMessageClient(
@@ -47,6 +48,7 @@ public class IncomingMessageClient : IIncomingMessageClient
         IArchivedMessagesClient archivedMessagesClient,
         ILogger<IncomingMessageClient> logger,
         IIncomingMessageReceiver incomingMessageReceiver,
+        IncomingMessageDelegator incomingMessageDelegator,
         ISystemDateTimeProvider systemDateTimeProvider)
     {
         _marketMessageParser = marketMessageParser;
@@ -55,6 +57,7 @@ public class IncomingMessageClient : IIncomingMessageClient
         _archivedMessagesClient = archivedMessagesClient;
         _logger = logger;
         _incomingMessageReceiver = incomingMessageReceiver;
+        _incomingMessageDelegator = incomingMessageDelegator;
         _systemDateTimeProvider = systemDateTimeProvider;
     }
 
@@ -90,13 +93,17 @@ public class IncomingMessageClient : IIncomingMessageClient
                 cancellationToken)
             .ConfigureAwait(false);
 
+        await _incomingMessageDelegator
+            .DelegateAsync(incomingMarketMessageParserResult.IncomingMessage, documentType, cancellationToken)
+            .ConfigureAwait(false);
+
         var validationResult =
             documentType == IncomingDocumentType.RequestWholesaleSettlement
                 ? Result.Succeeded() // TODO: Validate RequestWholesaleSettlement?
                 : await _requestAggregatedMeasureDataMessageValidator
                     .ValidateAsync(
                         incomingMarketMessageParserResult.IncomingMessage as RequestAggregatedMeasureDataMessage ??
-                        throw new InvalidOperationException(),
+                            throw new InvalidOperationException(),
                         cancellationToken)
             .ConfigureAwait(false);
 

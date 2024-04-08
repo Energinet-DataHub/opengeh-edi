@@ -35,6 +35,6 @@ public record RequestWholesaleServicesSerie(
     string? SettlementVersion,
     string? Resolution,
     string? ChargeOwner,
-    IReadOnlyCollection<RequestWholesaleServicesChargeType> ChargeTypes) : IIncomingMessageSerie;
+    IReadOnlyCollection<RequestWholesaleServicesChargeType> ChargeTypes) : BaseDelegatedSeries, IIncomingMessageSerie;
 
 public record RequestWholesaleServicesChargeType(string? Id, string? Type);

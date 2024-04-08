@@ -18,8 +18,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.MasterData.Infrastructure.MessageDelegation;
@@ -40,13 +42,46 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         _masterDataContext.ProcessDelegations.Add(processDelegation);
     }
 
-    public async Task<ProcessDelegation?> GetAsync(
+    public Task<ProcessDelegation?> GetProcessesDelegatedByAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
         string? gridAreaCode,
         ProcessType processType,
         CancellationToken cancellationToken)
     {
+        return GetDelegationAsync(
+            new ActorNumberAndRoleDto(delegatedByActorNumber, delegatedByActorRole),
+            null,
+            gridAreaCode,
+            processType,
+            cancellationToken);
+    }
+
+    public Task<ProcessDelegation?> GetProcessesDelegatedToAsync(
+        ActorNumber delegatedToActorNumber,
+        ActorRole delegatedToActorRole,
+        string? gridAreaCode,
+        ProcessType processType,
+        CancellationToken cancellationToken)
+    {
+        return GetDelegationAsync(
+            null,
+            new ActorNumberAndRoleDto(delegatedToActorNumber, delegatedToActorRole),
+            gridAreaCode,
+            processType,
+            cancellationToken);
+    }
+
+    public async Task<ProcessDelegation?> GetDelegationAsync(
+        ActorNumberAndRoleDto? delegatedBy,
+        ActorNumberAndRoleDto? delegatedTo,
+        string? gridAreaCode,
+        ProcessType processType,
+        CancellationToken cancellationToken)
+    {
+        if (delegatedBy == null && delegatedTo == null) throw new ArgumentException("At least one of the delegatedBy or delegatedTo must be set");
+        if (delegatedBy != null && delegatedTo != null) throw new ArgumentException("Only one of the delegatedBy or delegatedTo must be set");
+
         var now = _systemDateTimeProvider.Now();
 
         // The latest delegation can cover the period from the start date to the end date.
@@ -54,10 +89,22 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         // Therefore, we can not use the EndsAt to determine if the delegation is active in the query.
         var delegationQuery = _masterDataContext.ProcessDelegations
             .Where(
-                processDelegation => processDelegation.DelegatedByActorNumber == delegatedByActorNumber
-                                     && processDelegation.DelegatedByActorRole == delegatedByActorRole
-                                     && processDelegation.DelegatedProcess == processType
-                                     && processDelegation.StartsAt <= now);
+                processDelegation => processDelegation.DelegatedProcess == processType
+                                        && processDelegation.StartsAt <= now);
+
+        if (delegatedBy != null)
+        {
+            delegationQuery = delegationQuery.Where(d =>
+                    d.DelegatedByActorNumber == delegatedBy.ActorNumber
+                    && d.DelegatedByActorRole == delegatedBy.ActorRole);
+        }
+
+        if (delegatedTo != null)
+        {
+            delegationQuery = delegationQuery.Where(d =>
+                    d.DelegatedToActorNumber == delegatedTo.ActorNumber
+                    && d.DelegatedToActorRole == delegatedTo.ActorRole);
+        }
 
         if (gridAreaCode != null)
         {
@@ -65,7 +112,7 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         }
 
         var delegation = await delegationQuery
-            .OrderByDescending(processDelegation => processDelegation.SequenceNumber)
+            .OrderByDescending(processDelegation => processDelegation.SequenceNumber) // TODO: Shouldn't this order by start date?
             .FirstOrDefaultAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
 
         if (delegation == null)

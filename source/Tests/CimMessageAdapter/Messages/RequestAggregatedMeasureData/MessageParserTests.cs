@@ -115,7 +115,7 @@ public class MessageParserTests
             Assert.Equal("5799999933318", serie.BalanceResponsiblePartyMarketParticipantId);
             Assert.Equal("5790001330552", serie.EnergySupplierMarketParticipantId);
             Assert.Equal("E17", serie.MarketEvaluationPointType);
-            Assert.Equal("244", serie.MeteringGridAreaDomainId);
+            Assert.Equal("244", serie.GridArea);
             Assert.Equal("D01", serie.MarketEvaluationSettlementMethod);
             Assert.Equal("2022-07-22T22:00:00Z", serie.EndDateTime);
             Assert.Equal("2022-06-17T22:00:00Z", serie.StartDateTime);
@@ -148,7 +148,7 @@ public class MessageParserTests
             Assert.Equal("5799999933318", serie.BalanceResponsiblePartyMarketParticipantId);
             Assert.Equal("5790001330552", serie.EnergySupplierMarketParticipantId);
             Assert.Equal("E17", serie.MarketEvaluationPointType);
-            Assert.Equal("244", serie.MeteringGridAreaDomainId);
+            Assert.Equal("244", serie.GridArea);
             Assert.Equal("D01", serie.MarketEvaluationSettlementMethod);
             Assert.Equal("2022-07-22T22:00:00Z", serie.EndDateTime);
             Assert.Equal("2022-06-17T22:00:00Z", serie.StartDateTime);

@@ -64,7 +64,7 @@ public class OutgoingMessageDelegator
         ProcessType messageCreatedFromProcess,
         CancellationToken cancellationToken)
     {
-        var messageDelegation = await _masterDataClient.GetProcessDelegationAsync(
+        var messageDelegation = await _masterDataClient.GetProcessesDelegatedByAsync(
             delegatedByActorNumber,
             delegatedByActorRole,
             gridAreaCode,

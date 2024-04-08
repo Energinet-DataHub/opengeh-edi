@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
 /// <summary>
@@ -20,17 +22,47 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 public interface IIncomingMessageSerie
 {
     /// <summary>
-    /// Id of the incoming message serie
+    /// Id of the incoming message series
     /// </summary>
     public string TransactionId { get; }
 
     /// <summary>
-    /// Start Date and Time of the incoming message serie
+    /// Start Date and Time of the incoming message series
     /// </summary>
     public string StartDateTime { get; }
 
     /// <summary>
-    /// End Date and Time of the incoming message serie
+    /// End Date and Time of the incoming message series
     /// </summary>
     public string? EndDateTime { get; }
+
+    /// <summary>
+    /// Grid Area of the incoming message series
+    /// </summary>
+    public string? GridArea { get; }
+
+    /// <summary>
+    /// Whether the incoming message series is delegated
+    /// </summary>
+    public bool IsDelegated { get; }
+
+    /// <summary>
+    /// Who the incoming message series is delegated for (who originally was supposed to send the message)
+    /// </summary>
+    public ActorNumber? DelegatedForActorNumber { get; }
+
+    /// <summary>
+    /// Who the incoming message series is delegated for (who originally was supposed to send the message)
+    /// </summary>
+    public ActorRole? DelegatedForActorRole { get; }
+
+    /// <summary>
+    /// Who the incoming message series is delegated to (who sends the message, and the queue that should receive it)
+    /// </summary>
+    public ActorRole? DelegatedToActorRole { get; }
+
+    /// <summary>
+    /// Sets the incoming message series as delegated
+    /// </summary>
+    public void SetDelegated(ActorNumber delegatedForActorNumber, ActorRole delegatedForActorRole, ActorRole delegatedToActorRole);
 }

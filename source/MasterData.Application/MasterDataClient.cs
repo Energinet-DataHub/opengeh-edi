@@ -166,14 +166,41 @@ internal sealed class MasterDataClient : IMasterDataClient
         await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<ProcessDelegationDto?> GetProcessDelegationAsync(
+    public async Task<ProcessDelegationDto?> GetProcessesDelegatedByAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
         string? gridAreaCode,
         ProcessType processType,
         CancellationToken cancellationToken)
     {
-        var processDelegation = await _processDelegationRepository.GetAsync(
+        var processDelegation = await _processDelegationRepository.GetProcessesDelegatedByAsync(
+            delegatedByActorNumber,
+            delegatedByActorRole,
+            gridAreaCode,
+            processType,
+            cancellationToken).ConfigureAwait(false);
+
+        if (processDelegation is null)
+            return null;
+
+        return new ProcessDelegationDto(
+            processDelegation.SequenceNumber,
+            processDelegation.DelegatedProcess,
+            processDelegation.GridAreaCode,
+            processDelegation.StartsAt,
+            processDelegation.StopsAt,
+            new ActorNumberAndRoleDto(processDelegation.DelegatedByActorNumber, processDelegation.DelegatedByActorRole),
+            new ActorNumberAndRoleDto(processDelegation.DelegatedToActorNumber, processDelegation.DelegatedToActorRole));
+    }
+
+    public async Task<ProcessDelegationDto?> GetProcessesDelegatedToAsync(
+        ActorNumber delegatedByActorNumber,
+        ActorRole delegatedByActorRole,
+        string? gridAreaCode,
+        ProcessType processType,
+        CancellationToken cancellationToken)
+    {
+        var processDelegation = await _processDelegationRepository.GetProcessesDelegatedByAsync(
             delegatedByActorNumber,
             delegatedByActorRole,
             gridAreaCode,

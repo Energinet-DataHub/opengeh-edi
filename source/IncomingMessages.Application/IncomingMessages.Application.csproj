@@ -10,6 +10,7 @@
     <ProjectReference Include="..\DataAccess\DataAccess.csproj"/>
     <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
     <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj" />
+    <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
   </ItemGroup>
   <ItemDefinitionGroup>
     <ProjectReference>

@@ -32,7 +32,7 @@ public record RequestAggregatedMeasureDataMessageSeries(
     string? MarketEvaluationSettlementMethod,
     string StartDateTime,
     string? EndDateTime,
-    string? MeteringGridAreaDomainId,
+    string? GridArea,
     string? EnergySupplierMarketParticipantId,
     string? BalanceResponsiblePartyMarketParticipantId,
-    string? SettlementVersion) : IIncomingMessageSerie;
+    string? SettlementVersion) : BaseDelegatedSeries, IIncomingMessageSerie;
