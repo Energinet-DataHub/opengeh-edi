@@ -92,7 +92,7 @@ public class IncomingMessageClient : IIncomingMessageClient
 
         var validationResult =
             documentType == IncomingDocumentType.RequestWholesaleSettlement
-                ? Result.Succeeded()
+                ? Result.Succeeded() // TODO: Validate RequestWholesaleSettlement?
                 : await _requestAggregatedMeasureDataMessageValidator
                     .ValidateAsync(
                         incomingMarketMessageParserResult.IncomingMessage as RequestAggregatedMeasureDataMessage ??

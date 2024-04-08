@@ -30,7 +30,7 @@ public class MessageEnqueuer
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly ILogger<MessageEnqueuer> _logger;
-    private readonly MessageDelegator _messageDelegator;
+    private readonly OutgoingMessageDelegator _outgoingMessageDelegator;
     private readonly IFeatureFlagManager _featureFlagManager;
 
     public MessageEnqueuer(
@@ -38,14 +38,14 @@ public class MessageEnqueuer
         IOutgoingMessageRepository outgoingMessageRepository,
         ISystemDateTimeProvider systemDateTimeProvider,
         ILogger<MessageEnqueuer> logger,
-        MessageDelegator messageDelegator,
+        OutgoingMessageDelegator outgoingMessageDelegator,
         IFeatureFlagManager featureFlagManager)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _outgoingMessageRepository = outgoingMessageRepository;
         _systemDateTimeProvider = systemDateTimeProvider;
         _logger = logger;
-        _messageDelegator = messageDelegator;
+        _outgoingMessageDelegator = outgoingMessageDelegator;
         _featureFlagManager = featureFlagManager;
     }
 
@@ -57,7 +57,7 @@ public class MessageEnqueuer
 
         if (await _featureFlagManager.UseMessageDelegation.ConfigureAwait(false))
         {
-            messageToEnqueue = await _messageDelegator.DelegateAsync(messageToEnqueue, cancellationToken)
+            messageToEnqueue = await _outgoingMessageDelegator.DelegateAsync(messageToEnqueue, cancellationToken)
                 .ConfigureAwait(false);
         }
 
