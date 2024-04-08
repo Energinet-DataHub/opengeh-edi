@@ -50,8 +50,8 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         CancellationToken cancellationToken)
     {
         return GetDelegationAsync(
-            new ActorNumberAndRoleDto(delegatedByActorNumber, delegatedByActorRole),
-            null,
+            delegatedBy: new ActorNumberAndRoleDto(delegatedByActorNumber, delegatedByActorRole),
+            delegatedTo: null,
             gridAreaCode,
             processType,
             cancellationToken);
@@ -65,8 +65,8 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         CancellationToken cancellationToken)
     {
         return GetDelegationAsync(
-            null,
-            new ActorNumberAndRoleDto(delegatedToActorNumber, delegatedToActorRole),
+            delegatedBy: null,
+            delegatedTo: new ActorNumberAndRoleDto(delegatedToActorNumber, delegatedToActorRole),
             gridAreaCode,
             processType,
             cancellationToken);
