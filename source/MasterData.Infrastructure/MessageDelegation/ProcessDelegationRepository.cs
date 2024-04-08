@@ -72,7 +72,7 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
             cancellationToken);
     }
 
-    public async Task<ProcessDelegation?> GetDelegationAsync(
+    private async Task<ProcessDelegation?> GetDelegationAsync(
         ActorNumberAndRoleDto? delegatedBy,
         ActorNumberAndRoleDto? delegatedTo,
         string? gridAreaCode,
