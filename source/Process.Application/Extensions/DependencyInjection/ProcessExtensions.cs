@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using BuildingBlocks.Application.Extensions.DependencyInjection;
+using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.ProcessInitializationHandlers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
@@ -49,6 +51,21 @@ public static class ProcessExtensions
             .Validate(
                 o => !string.IsNullOrEmpty(o.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME),
                 "WHOLESALE_INBOX_MESSAGE_QUEUE_NAME must be set");
+
+        // Add options
+        services.AddOptions<ServiceBusOptions>()
+            .BindConfiguration(ServiceBusOptions.SectionName)
+            .ValidateDataAnnotations();
+
+        services
+            .AddOptions<EdiInboxOptions>()
+            .BindConfiguration(EdiInboxOptions.SectionName)
+            .ValidateDataAnnotations();
+
+        services
+            .AddOptions<WholesaleInboxOptions>()
+            .BindConfiguration(WholesaleInboxOptions.SectionName)
+            .ValidateDataAnnotations();
 
         services
             .AddScopedSqlDbContext<ProcessContext>(configuration)
@@ -104,8 +121,13 @@ public static class ProcessExtensions
             .AddTransient<IRequestHandler<RejectedWholesaleServices, Unit>,
                 RejectProcessWhenRejectedWholesaleServicesIsAvailable>()
             .AddTransient<INotificationHandler<WholesaleServicesRequestWasRejected>,
-                WhenARejectedWholesaleServicesRequestIsAvailable>();
+                WhenARejectedWholesaleServicesRequestIsAvailable>()
 
+            // health checks
+            .TryAddExternalDomainServiceBusQueuesHealthCheck(
+                configuration.Get<ServiceBusOptions>()!.ManageConnectionString,
+                configuration.Get<EdiInboxOptions>()!.QueueName,
+                configuration.Get<WholesaleInboxOptions>()!.QueueName);
         return services;
     }
 }

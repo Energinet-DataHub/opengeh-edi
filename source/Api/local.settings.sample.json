@@ -14,6 +14,7 @@
     "INTEGRATION_EVENT_TOPIC_NAME": "<Name of topic where integration events are received>",
     "INTEGRATION_EVENTS_SUBSCRIPTION_NAME" : "<Name of the service bus topic subscription for aggregation result notifications>",
     "AGGREGATION_RESULTS_API_URI": "<Uri of API where aggregation results can be retrieved>",
-    "AZURE_STORAGE_ACCOUNT_CONNECTION_STRING": "UseDevelopmentStorage=true"
+    "AZURE_STORAGE_ACCOUNT_CONNECTION_STRING": "UseDevelopmentStorage=true",
+    "AZURE_STORAGE_ACCOUNT_URL": "<Azure storage account url>"
   }
 }

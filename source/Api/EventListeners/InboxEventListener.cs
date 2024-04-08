@@ -38,8 +38,8 @@ public class InboxEventListener
     [Function(nameof(InboxEventListener))]
     public async Task RunAsync(
         [ServiceBusTrigger(
-            "%EDI_INBOX_MESSAGE_QUEUE_NAME%",
-            Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER")] byte[] message,
+            "%EdiInbox__QueueName%",
+            Connection = "ServiceBus__ListenConnectionString")] byte[] message,
         FunctionContext context,
         CancellationToken hostCancellationToken)
     {

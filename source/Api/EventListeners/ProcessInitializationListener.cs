@@ -37,8 +37,8 @@ public class ProcessInitializationListener
     [Function(nameof(ProcessInitializationListener))]
     public async Task RunAsync(
         [ServiceBusTrigger(
-            "%INCOMING_MESSAGES_QUEUE_NAME%",
-            Connection = "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER")]
+            "%IncomingMessages__QueueName%",
+            Connection = "ServiceBus__ListenConnectionString")]
         ServiceBusReceivedMessage message)
     {
         ArgumentNullException.ThrowIfNull(message);

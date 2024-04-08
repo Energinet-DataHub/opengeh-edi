@@ -67,7 +67,7 @@ public static class HostFactory
                         .AddHealthChecksForIsolatedWorker()
                         .AddBlobStorageHealthCheck(
                             "edi-web-jobs-storage",
-                            runtime.AzureWebJobsStorage!)
+                            context.Configuration["AzureWebJobsStorage"]!)
                         .TryAddExternalDomainServiceBusQueuesHealthCheck(
                             runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
                             runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,
