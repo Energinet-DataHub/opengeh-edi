@@ -52,7 +52,7 @@ jobs:
       structurizr_workspace_filename: views
       included_model_filename: model
     secrets:
-      github_token: ${{ secrets.GITHUB_TOKEN }}
+      token: ${{ secrets.GITHUB_TOKEN }}
 
   #
   # Branch policy status check
