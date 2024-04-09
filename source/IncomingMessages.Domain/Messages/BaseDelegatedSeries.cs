@@ -20,17 +20,17 @@ public abstract record BaseDelegatedSeries
 {
     public bool IsDelegated { get; private set; }
 
-    public ActorNumber? DelegatedForActorNumber { get; private set; }
-
-    public ActorRole? DelegatedForActorRole { get; private set; }
+    // public ActorNumber? DelegatedByActorNumber { get; private set; }
+    // public ActorRole? DelegatedByActorRole { get; private set; }
 
     public ActorRole? DelegatedToActorRole { get; private set; }
 
-    public void SetDelegated(ActorNumber delegatedByActorNumber, ActorRole delegatedByActorRole, ActorRole delegatedToActorRole)
+    public IReadOnlyCollection<string> DelegatedGridAreas { get; private set; } = Array.Empty<string>();
+
+    public void SetDelegated(ActorRole delegatedToActorRole, IReadOnlyCollection<string> delegatedGridAreas)
     {
         IsDelegated = true;
-        DelegatedForActorNumber = delegatedByActorNumber;
-        DelegatedForActorRole = delegatedByActorRole;
         DelegatedToActorRole = delegatedToActorRole;
+        DelegatedGridAreas = delegatedGridAreas;
     }
 }

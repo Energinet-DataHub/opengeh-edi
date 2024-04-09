@@ -25,7 +25,7 @@ public class WholesaleServicesProcessBuilder
     private readonly ProcessId _processId = ProcessId.New();
     private readonly string _startDateAndOrTimeDateTime = "2022-06-17T22:00:00Z";
     private readonly string _endDateAndOrTimeDateTime = "2022-07-22T22:00:00Z";
-    private readonly string _meteringGridAreaDomainId = "244";
+    private readonly string _gridArea = "244";
     private readonly BusinessReason _businessReason = BusinessReason.WholesaleFixing;
     private readonly string? _resolution = Resolution.Hourly.Code;
     private readonly string? _chargeOwner = ActorNumber.Create("5790000000002").Value;
@@ -76,12 +76,13 @@ public class WholesaleServicesProcessBuilder
             _businessReason,
             _startDateAndOrTimeDateTime,
             _endDateAndOrTimeDateTime,
-            _meteringGridAreaDomainId,
+            _gridArea,
             _energySupplierMarketParticipantId,
             _settlementVersion,
             _resolution,
             _chargeOwner,
-            chargeTypes.AsReadOnly());
+            chargeTypes.AsReadOnly(),
+            new List<string> { _gridArea });
 
         var prop = process.GetType().GetField(
             "_state", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);

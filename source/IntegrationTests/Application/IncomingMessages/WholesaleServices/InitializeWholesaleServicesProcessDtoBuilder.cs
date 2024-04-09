@@ -26,7 +26,7 @@ public class InitializeWholesaleServicesProcessDtoBuilder
 {
     private readonly string _startDateAndOrTimeDateTime = "2022-06-17T22:00:00Z";
     private readonly string _endDateAndOrTimeDateTime = "2022-07-22T22:00:00Z";
-    private readonly string _meteringGridAreaDomainId = "244";
+    private readonly string _gridArea = "244";
     private readonly string _messageType = "E74";
     private readonly string _businessType = "23";
     private readonly string _receiverId = DataHubDetails.DataHubActorNumber.Value;
@@ -106,12 +106,14 @@ public class InitializeWholesaleServicesProcessDtoBuilder
             _serieId,
             _startDateAndOrTimeDateTime,
             _endDateAndOrTimeDateTime,
-            _meteringGridAreaDomainId,
+            _gridArea,
             _energySupplierMarketParticipantId,
             _settlementVersion,
             _resolution,
             _chargeOwner,
-            new List<InitializeWholesaleServicesChargeType> { CreateChargeType() }.AsReadOnly());
+            new List<InitializeWholesaleServicesChargeType> { CreateChargeType() }.AsReadOnly(),
+            Array.Empty<string>(),
+            null);
 
     private InitializeWholesaleServicesChargeType CreateChargeType() =>
         new(_chargeTypeId, _chargeTypeType);

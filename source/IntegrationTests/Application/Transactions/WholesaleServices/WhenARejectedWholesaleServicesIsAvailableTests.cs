@@ -117,7 +117,8 @@ public sealed class WhenARejectedWholesaleServicesIsAvailableTests : TestBase
             null,
             null,
             null,
-            new ChargeType[] { new(ChargeTypeId.New(), "1", "ST1") });
+            new ChargeType[] { new(ChargeTypeId.New(), "1", "ST1") },
+            new[] { SampleData.GridAreaCode });
 
         process.SendToWholesale();
         _processContext.WholesaleServicesProcesses.Add(process);

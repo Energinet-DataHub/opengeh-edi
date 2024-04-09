@@ -62,7 +62,7 @@ public class WholesaleServicesRequestAcceptedBuilder
             Currency = WholesaleServicesRequestSeries.Types.Currency.Dkk,
             ChargeOwnerId = _process.ChargeOwner,
             EnergySupplierId = _process.EnergySupplierId,
-            GridArea = _process.GridAreaCode,
+            GridArea = _process.IncomingGridArea,
             ChargeCode = "EA-001",
             Period = new Period()
             {
@@ -108,7 +108,7 @@ public class WholesaleServicesRequestAcceptedBuilder
             Currency = WholesaleServicesRequestSeries.Types.Currency.Dkk,
             ChargeOwnerId = _process.ChargeOwner,
             EnergySupplierId = _process.EnergySupplierId,
-            GridArea = _process.GridAreaCode,
+            GridArea = _process.IncomingGridArea,
             ChargeCode = "EA-001",
             Period = new Period()
             {

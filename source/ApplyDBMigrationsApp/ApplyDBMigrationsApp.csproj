@@ -168,6 +168,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202403211329 Drop MessageDelegationConfigured table.sql" />
     <EmbeddedResource Include="Scripts\Model\202403250624 Create lookup index on ProcessDelegation table.sql" />
     <EmbeddedResource Include="Scripts\Model\202403251343 Add processType column to OutgoingMessages.sql" />
+    <EmbeddedResource Include="Scripts\Model\202404091217 Create WholesaleServicesProcessGridAreas table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202404091230 Rename GridAreaCode to IncomingGridArea for WholesaleServicesProcesses table.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <None Remove="Scripts\Model\202310231329 Alter Bundles1.sql" />

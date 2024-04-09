@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -64,6 +65,13 @@ public class InitializeWholesaleServicesProcessesHandler : IRequestHandler<Initi
                         chargeType.Type))
                 .ToList();
 
+            var gridAreas = new List<string>();
+
+            if (serie.DelegatedGridAreas.Count != 0)
+                gridAreas.AddRange(serie.DelegatedGridAreas);
+            else if (serie.IncomingGridAreaCode != null)
+                gridAreas.Add(serie.IncomingGridAreaCode);
+
             _wholesaleServicesProcessRepository.Add(
                 new WholesaleServicesProcess(
                     ProcessId.New(),
@@ -74,12 +82,13 @@ public class InitializeWholesaleServicesProcessesHandler : IRequestHandler<Initi
                     businessReason,
                     serie.StartDateTime,
                     serie.EndDateTime,
-                    serie.GridAreaCode,
+                    incomingGridArea: serie.IncomingGridAreaCode,
                     serie.EnergySupplierId,
                     settlementVersion,
                     serie.Resolution,
                     serie.ChargeOwner,
-                    chargeTypes));
+                    chargeTypes,
+                    gridAreas));
         }
     }
 }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.ObjectModel;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
@@ -46,15 +47,15 @@ public interface IIncomingMessageSerie
     /// </summary>
     public bool IsDelegated { get; }
 
-    /// <summary>
-    /// Who the incoming message series is delegated for (who originally was supposed to send the message)
-    /// </summary>
-    public ActorNumber? DelegatedForActorNumber { get; }
-
-    /// <summary>
-    /// Who the incoming message series is delegated for (who originally was supposed to send the message)
-    /// </summary>
-    public ActorRole? DelegatedForActorRole { get; }
+    // /// <summary>
+    // /// Who the incoming message series is delegated for (who originally was supposed to send the message)
+    // /// </summary>
+    // public ActorNumber? DelegatedByActorNumber { get; }
+    //
+    // /// <summary>
+    // /// Who the incoming message series is delegated for (who originally was supposed to send the message)
+    // /// </summary>
+    // public ActorRole? DelegatedByActorRole { get; }
 
     /// <summary>
     /// Who the incoming message series is delegated to (who sends the message, and the queue that should receive it)
@@ -62,7 +63,14 @@ public interface IIncomingMessageSerie
     public ActorRole? DelegatedToActorRole { get; }
 
     /// <summary>
+    /// What grid areas the incoming message is delegated in (if any).
+    ///     This is used if the GridArea is null and the message is delegated, then we need to know which grid areas
+    ///     the message is delegated in, to make sure Wholesale only retrieves data in the delegated grid areas
+    /// </summary>
+    public IReadOnlyCollection<string> DelegatedGridAreas { get; }
+
+    /// <summary>
     /// Sets the incoming message series as delegated
     /// </summary>
-    public void SetDelegated(ActorNumber delegatedForActorNumber, ActorRole delegatedForActorRole, ActorRole delegatedToActorRole);
+    public void SetDelegated(ActorRole delegatedToActorRole, IReadOnlyCollection<string> delegatedGridAreas);
 }

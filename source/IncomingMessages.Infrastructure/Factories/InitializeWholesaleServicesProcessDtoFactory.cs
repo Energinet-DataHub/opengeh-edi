@@ -38,7 +38,11 @@ public static class InitializeWholesaleServicesProcessDtoFactory
                     serie.ChargeTypes
                         .Select(
                             chargeType => new InitializeWholesaleServicesChargeType(chargeType.Id, chargeType.Type))
-                        .ToList().AsReadOnly()))
+                        .ToList().AsReadOnly(),
+                    serie.DelegatedGridAreas, // TODO: FIX THIS !!!
+                    // serie.DelegatedByActorNumber,
+                    // serie.DelegatedByActorRole,
+                    serie.DelegatedToActorRole))
             .ToList().AsReadOnly();
 
         return new InitializeWholesaleServicesProcessDto(

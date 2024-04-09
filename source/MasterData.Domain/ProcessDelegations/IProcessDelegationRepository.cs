@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -34,14 +35,14 @@ public interface IProcessDelegationRepository
     Task<ProcessDelegation?> GetProcessesDelegatedByAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
-        string? gridAreaCode,
+        string gridAreaCode,
         ProcessType processType,
         CancellationToken cancellationToken);
 
     /// <summary>
     /// Get the latest delegation to the given actor number, actor role, grid area code and process type.
     /// </summary>
-    Task<ProcessDelegation?> GetProcessesDelegatedToAsync(
+    Task<IReadOnlyCollection<ProcessDelegation>> GetProcessesDelegatedToAsync(
         ActorNumber delegatedToActorNumber,
         ActorRole delegatedToActorRole,
         string? gridAreaCode,

@@ -41,6 +41,8 @@ public class OutgoingMessageDelegator
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(messageToEnqueue);
+        if (string.IsNullOrEmpty(messageToEnqueue.GridAreaCode))
+            throw new ArgumentException($"Grid area code is required to delegate outgoing message with id {messageToEnqueue.Id.Value}");
 
         var delegatedTo = await GetDelegatedReceiverAsync(
             messageToEnqueue.DocumentReceiver.Number,
@@ -60,11 +62,11 @@ public class OutgoingMessageDelegator
     private async Task<Receiver?> GetDelegatedReceiverAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
-        string? gridAreaCode,
+        string gridAreaCode,
         ProcessType messageCreatedFromProcess,
         CancellationToken cancellationToken)
     {
-        var messageDelegation = await _masterDataClient.GetProcessesDelegatedByAsync(
+        var messageDelegation = await _masterDataClient.GetProcessDelegatedByAsync(
             delegatedByActorNumber,
             delegatedByActorRole,
             gridAreaCode,

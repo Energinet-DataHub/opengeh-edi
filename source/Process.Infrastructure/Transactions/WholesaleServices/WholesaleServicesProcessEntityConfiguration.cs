@@ -37,7 +37,7 @@ internal sealed class WholesaleServicesProcessEntityConfiguration : IEntityTypeC
                 fromDbValue => BusinessTransactionId.Create(fromDbValue));
         builder.Property(x => x.StartOfPeriod);
         builder.Property(x => x.EndOfPeriod);
-        builder.Property(x => x.GridAreaCode);
+        builder.Property(x => x.IncomingGridArea);
         builder.Property(x => x.ChargeOwner);
         builder.Property(x => x.Resolution);
         builder.Property(x => x.EnergySupplierId);
@@ -80,6 +80,18 @@ internal sealed class WholesaleServicesProcessEntityConfiguration : IEntityTypeC
                 navigationBuilder.Property<string?>(x => x.Id);
                 navigationBuilder.Property<string?>(x => x.Type);
                 navigationBuilder.WithOwner().HasForeignKey("WholesaleServicesProcessId");
+            });
+
+        builder.OwnsMany<WholesaleServicesProcessGridArea>(
+            "_gridAreas",
+            navigationBuilder =>
+            {
+                navigationBuilder.ToTable("WholesaleServicesProcessDelegatedGridAreas", "dbo");
+                navigationBuilder.WithOwner().HasForeignKey(x => x.WholesaleServicesProcessId);
+                navigationBuilder.HasKey(x => x.Id);
+                navigationBuilder.Property(x => x.WholesaleServicesProcessId)
+                    .HasConversion(processId => processId.Id, dbValue => ProcessId.Create(dbValue));
+                navigationBuilder.Property(x => x.GridArea);
             });
 
         builder.Ignore(x => x.DomainEvents);

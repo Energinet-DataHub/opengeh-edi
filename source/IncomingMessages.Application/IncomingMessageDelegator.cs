@@ -68,9 +68,10 @@ public class IncomingMessageDelegator
             return;
         }
 
+        // Delegation is setup for grid areas, so we need to set delegated for each series since they contain the grid area
         foreach (var series in message.Serie)
         {
-            var delegation = await _masterDataClient.GetProcessesDelegatedToAsync(
+            var delegations = await _masterDataClient.GetProcessesDelegatedToAsync(
                     senderNumber,
                     currentActorRole,
                     series.GridArea,
@@ -78,9 +79,12 @@ public class IncomingMessageDelegator
                     cancellationToken)
                 .ConfigureAwait(false);
 
-            if (delegation is not null)
+            if (delegations.Count != 0)
             {
-                series.SetDelegated(delegation.DelegatedBy.ActorNumber, delegation.DelegatedBy.ActorRole, senderRole);
+                var byActorNumber = delegations.First().DelegatedBy.ActorNumber;
+                var byActorRole = delegations.First().DelegatedBy.ActorRole;
+
+                series.SetDelegated(senderRole, delegations.Select(d => d.GridAreaCode).ToArray());
             }
         }
     }

@@ -13,12 +13,12 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
@@ -45,39 +45,53 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
     public Task<ProcessDelegation?> GetProcessesDelegatedByAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
-        string? gridAreaCode,
+        string gridAreaCode,
         ProcessType processType,
         CancellationToken cancellationToken)
     {
-        return GetDelegationAsync(
+        var query = GetBaseDelegationQuery(
             delegatedBy: new ActorNumberAndRoleDto(delegatedByActorNumber, delegatedByActorRole),
             delegatedTo: null,
-            gridAreaCode,
-            processType,
-            cancellationToken);
+            processType);
+
+        return query
+            .Where(pd => pd.GridAreaCode == gridAreaCode)
+            .OrderByDescending(pd => pd.SequenceNumber) // TODO: Shouldn't this order by start date?
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
     }
 
-    public Task<ProcessDelegation?> GetProcessesDelegatedToAsync(
+    public async Task<IReadOnlyCollection<ProcessDelegation>> GetProcessesDelegatedToAsync(
         ActorNumber delegatedToActorNumber,
         ActorRole delegatedToActorRole,
         string? gridAreaCode,
         ProcessType processType,
         CancellationToken cancellationToken)
     {
-        return GetDelegationAsync(
+        var query = GetBaseDelegationQuery(
             delegatedBy: null,
             delegatedTo: new ActorNumberAndRoleDto(delegatedToActorNumber, delegatedToActorRole),
-            gridAreaCode,
-            processType,
-            cancellationToken);
+            processType);
+
+        if (!string.IsNullOrEmpty(gridAreaCode))
+            query = query.Where(pd => pd.GridAreaCode == gridAreaCode);
+
+        // Get result grouped by each grid area code, so we can get the latest delegation for each grid area
+        var result = await query
+            .OrderByDescending(pd => pd.SequenceNumber)
+            .GroupBy(pd => pd.GridAreaCode)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        // Get the current delegation for each grid area
+        var latestForGridAreas = result.Select(group => group.First());
+
+        return latestForGridAreas.ToArray();
     }
 
-    private async Task<ProcessDelegation?> GetDelegationAsync(
+    private IQueryable<ProcessDelegation> GetBaseDelegationQuery(
         ActorNumberAndRoleDto? delegatedBy,
         ActorNumberAndRoleDto? delegatedTo,
-        string? gridAreaCode,
-        ProcessType processType,
-        CancellationToken cancellationToken)
+        ProcessType processType)
     {
         if (delegatedBy == null && delegatedTo == null) throw new ArgumentException("At least one of the delegatedBy or delegatedTo must be set");
         if (delegatedBy != null && delegatedTo != null) throw new ArgumentException("Only one of the delegatedBy or delegatedTo must be set");
@@ -88,40 +102,24 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         // If a delegation relationship has been cancelled the EndsAt is set to StartsAt.
         // Therefore, we can not use the EndsAt to determine if the delegation is active in the query.
         var delegationQuery = _masterDataContext.ProcessDelegations
-            .Where(
-                processDelegation => processDelegation.DelegatedProcess == processType
-                                        && processDelegation.StartsAt <= now);
+            .Where(pd => pd.DelegatedProcess == processType
+                                        && pd.StartsAt <= now
+                                        && pd.StopsAt > now);
 
         if (delegatedBy != null)
         {
-            delegationQuery = delegationQuery.Where(d =>
-                    d.DelegatedByActorNumber == delegatedBy.ActorNumber
-                    && d.DelegatedByActorRole == delegatedBy.ActorRole);
+            delegationQuery = delegationQuery.Where(pd =>
+                    pd.DelegatedByActorNumber == delegatedBy.ActorNumber
+                    && pd.DelegatedByActorRole == delegatedBy.ActorRole);
         }
 
         if (delegatedTo != null)
         {
-            delegationQuery = delegationQuery.Where(d =>
-                    d.DelegatedToActorNumber == delegatedTo.ActorNumber
-                    && d.DelegatedToActorRole == delegatedTo.ActorRole);
+            delegationQuery = delegationQuery.Where(pd =>
+                    pd.DelegatedToActorNumber == delegatedTo.ActorNumber
+                    && pd.DelegatedToActorRole == delegatedTo.ActorRole);
         }
 
-        if (gridAreaCode != null)
-        {
-            delegationQuery = delegationQuery.Where(processDelegation => processDelegation.GridAreaCode == gridAreaCode);
-        }
-
-        var delegation = await delegationQuery
-            .OrderByDescending(processDelegation => processDelegation.SequenceNumber) // TODO: Shouldn't this order by start date?
-            .FirstOrDefaultAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
-
-        if (delegation == null)
-            return null;
-
-        // If StopsAt is less than or equal to the current time, the delegation has ended.
-        if (delegation.StopsAt <= now)
-            return null;
-
-        return delegation;
+        return delegationQuery;
     }
 }

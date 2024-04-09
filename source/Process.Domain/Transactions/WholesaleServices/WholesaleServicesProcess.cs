@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ProcessEvents;
@@ -22,6 +23,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 
 public sealed class WholesaleServicesProcess : Entity
 {
+    private readonly IReadOnlyCollection<WholesaleServicesProcessGridArea> _gridAreas;
     private State _state = State.Initialized;
 
     public WholesaleServicesProcess(
@@ -33,13 +35,19 @@ public sealed class WholesaleServicesProcess : Entity
         BusinessReason businessReason,
         string startOfPeriod,
         string? endOfPeriod,
-        string? gridAreaCode,
+        string? incomingGridArea,
         string? energySupplierId,
         SettlementVersion? settlementVersion,
         string? resolution,
         string? chargeOwner,
-        IReadOnlyCollection<ChargeType> chargeTypes)
+        IReadOnlyCollection<ChargeType> chargeTypes,
+        IReadOnlyCollection<string> gridAreas)
     {
+        ArgumentNullException.ThrowIfNull(gridAreas);
+
+        if (incomingGridArea != null && gridAreas.Count == 0)
+            throw new ArgumentOutOfRangeException(nameof(gridAreas), gridAreas, "GridAreas must be provided when IncomingGridArea is not null");
+
         ProcessId = processId;
         RequestedByActorId = requestedByActorId;
         RequestedByActorRoleCode = requestedByActorRoleCode;
@@ -48,12 +56,13 @@ public sealed class WholesaleServicesProcess : Entity
         BusinessReason = businessReason;
         StartOfPeriod = startOfPeriod;
         EndOfPeriod = endOfPeriod;
-        GridAreaCode = gridAreaCode;
+        IncomingGridArea = incomingGridArea;
         EnergySupplierId = energySupplierId;
         SettlementVersion = settlementVersion;
         Resolution = resolution;
         ChargeOwner = chargeOwner;
         ChargeTypes = chargeTypes;
+        _gridAreas = gridAreas.Select(ga => new WholesaleServicesProcessGridArea(Guid.NewGuid(), ProcessId, ga)).ToArray();
         AddDomainEvent(new WholesaleServicesProcessIsInitialized(processId));
     }
 
@@ -96,7 +105,7 @@ public sealed class WholesaleServicesProcess : Entity
 
     public string? EndOfPeriod { get; }
 
-    public string? GridAreaCode { get; }
+    public string? IncomingGridArea { get; }
 
     public string? EnergySupplierId { get; }
 
@@ -107,6 +116,10 @@ public sealed class WholesaleServicesProcess : Entity
     public string? ChargeOwner { get; }
 
     public IReadOnlyCollection<ChargeType> ChargeTypes { get; }
+
+    public IReadOnlyCollection<string> GridAreas => _gridAreas.Select(g => g.GridArea).ToArray();
+
+    public bool IsDelegated => GridAreas.Count != 0;
 
     public void SendToWholesale()
     {

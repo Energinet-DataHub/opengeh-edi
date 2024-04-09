@@ -258,8 +258,8 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
                             (p, r, s) => p.EndOfPeriod.Should().Be(s.EndDateTime)
                         },
                         {
-                            nameof(WholesaleServicesProcess.GridAreaCode),
-                            (p, r, s) => p.GridAreaCode.Should().Be(s.GridAreaCode)
+                            nameof(WholesaleServicesProcess.IncomingGridArea),
+                            (p, r, s) => p.IncomingGridArea.Should().Be(s.IncomingGridAreaCode)
                         },
                         {
                             nameof(WholesaleServicesProcess.EnergySupplierId),

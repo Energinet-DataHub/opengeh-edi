@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -166,10 +168,10 @@ internal sealed class MasterDataClient : IMasterDataClient
         await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<ProcessDelegationDto?> GetProcessesDelegatedByAsync(
+    public async Task<ProcessDelegationDto?> GetProcessDelegatedByAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
-        string? gridAreaCode,
+        string gridAreaCode,
         ProcessType processType,
         CancellationToken cancellationToken)
     {
@@ -193,31 +195,32 @@ internal sealed class MasterDataClient : IMasterDataClient
             new ActorNumberAndRoleDto(processDelegation.DelegatedToActorNumber, processDelegation.DelegatedToActorRole));
     }
 
-    public async Task<ProcessDelegationDto?> GetProcessesDelegatedToAsync(
-        ActorNumber delegatedByActorNumber,
-        ActorRole delegatedByActorRole,
+    public async Task<IReadOnlyCollection<ProcessDelegationDto>> GetProcessesDelegatedToAsync(
+        ActorNumber delegatedToActorNumber,
+        ActorRole delegatedToActorRole,
         string? gridAreaCode,
         ProcessType processType,
         CancellationToken cancellationToken)
     {
-        var processDelegation = await _processDelegationRepository.GetProcessesDelegatedByAsync(
-            delegatedByActorNumber,
-            delegatedByActorRole,
+        var processDelegationList = await _processDelegationRepository.GetProcessesDelegatedToAsync(
+            delegatedToActorNumber,
+            delegatedToActorRole,
             gridAreaCode,
             processType,
             cancellationToken).ConfigureAwait(false);
 
-        if (processDelegation is null)
-            return null;
+        if (processDelegationList.Count == 0)
+            return Array.Empty<ProcessDelegationDto>();
 
-        return new ProcessDelegationDto(
-            processDelegation.SequenceNumber,
-            processDelegation.DelegatedProcess,
-            processDelegation.GridAreaCode,
-            processDelegation.StartsAt,
-            processDelegation.StopsAt,
-            new ActorNumberAndRoleDto(processDelegation.DelegatedByActorNumber, processDelegation.DelegatedByActorRole),
-            new ActorNumberAndRoleDto(processDelegation.DelegatedToActorNumber, processDelegation.DelegatedToActorRole));
+        return processDelegationList.Select(pd => new ProcessDelegationDto(
+                pd.SequenceNumber,
+                pd.DelegatedProcess,
+                pd.GridAreaCode,
+                pd.StartsAt,
+                pd.StopsAt,
+                new ActorNumberAndRoleDto(pd.DelegatedByActorNumber, pd.DelegatedByActorRole),
+                new ActorNumberAndRoleDto(pd.DelegatedToActorNumber, pd.DelegatedToActorRole)))
+            .ToArray();
     }
 
     private void CreateNewActorCertificate(ActorCertificateCredentialsAssignedDto request)

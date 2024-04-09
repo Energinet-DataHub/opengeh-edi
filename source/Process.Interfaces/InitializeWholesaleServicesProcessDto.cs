@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.Process.Interfaces;
 
@@ -32,11 +34,15 @@ public record InitializeWholesaleServicesSeries(
     string Id,
     string StartDateTime,
     string? EndDateTime,
-    string? GridAreaCode,
+    string? IncomingGridAreaCode,
     string? EnergySupplierId,
     string? SettlementVersion,
     string? Resolution,
     string? ChargeOwner,
-    IReadOnlyCollection<InitializeWholesaleServicesChargeType> ChargeTypes);
+    IReadOnlyCollection<InitializeWholesaleServicesChargeType> ChargeTypes,
+    IReadOnlyCollection<string> DelegatedGridAreas,
+    // ActorNumber? DelegatedByActorNumber,
+    // ActorRole? DelegatedByActorRole,
+    ActorRole? DelegatedToActorRole);
 
 public record InitializeWholesaleServicesChargeType(string? Id, string? Type);

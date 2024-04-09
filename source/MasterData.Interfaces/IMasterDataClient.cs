@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -73,17 +74,17 @@ public interface IMasterDataClient
     /// <summary>
     ///    Get process delegation.
     /// </summary>
-    Task<ProcessDelegationDto?> GetProcessesDelegatedByAsync(
+    Task<ProcessDelegationDto?> GetProcessDelegatedByAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
-        string? gridAreaCode,
+        string gridAreaCode,
         ProcessType processType,
         CancellationToken cancellationToken);
 
     /// <summary>
     ///    Get process delegation.
     /// </summary>
-    Task<ProcessDelegationDto?> GetProcessesDelegatedToAsync(
+    Task<IReadOnlyCollection<ProcessDelegationDto>> GetProcessesDelegatedToAsync(
         ActorNumber delegatedToActorNumber,
         ActorRole delegatedToActorRole,
         string? gridAreaCode,

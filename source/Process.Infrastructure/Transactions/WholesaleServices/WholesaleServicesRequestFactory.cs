@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
@@ -62,8 +63,10 @@ public static class WholesaleServicesRequestFactory
         if (process.ChargeOwner != null)
             request.ChargeOwnerId = process.ChargeOwner;
 
-        if (process.GridAreaCode != null)
-            request.GridAreaCode = process.GridAreaCode;
+        if (process.GridAreas.Count > 0)
+        {
+            request.GridAreaCodes.AddRange(process.GridAreas);
+        }
 
         if (process.SettlementVersion != null)
             request.SettlementVersion = process.SettlementVersion.Name;
