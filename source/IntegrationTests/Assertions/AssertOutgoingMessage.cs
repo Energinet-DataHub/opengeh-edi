@@ -51,7 +51,7 @@ public class AssertOutgoingMessage
         using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var message = await connection.QuerySingleAsync(
             $"SELECT m.Id, m.RecordId, m.DocumentType, m.DocumentReceiverNumber, m.DocumentReceiverRole, m.ReceiverNumber, m.ProcessId, m.BusinessReason," +
-            $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference, m.RelatedToMessageId, m.MessageCreatedFromProcess " +
+            $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference, m.RelatedToMessageId, m.MessageCreatedFromProcess, m.GridAreaCode " +
             $" FROM [dbo].[OutgoingMessages] m" +
             $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Code}'");
 
@@ -125,6 +125,12 @@ public class AssertOutgoingMessage
     public AssertOutgoingMessage HasRelationTo(MessageId? relatedToMessageId)
     {
         Assert.Equal(relatedToMessageId?.Value, _message.RelatedToMessageId);
+        return this;
+    }
+
+    public AssertOutgoingMessage HasGridAreaCode(string gridAreaCode)
+    {
+        Assert.Equal(gridAreaCode, _message.GridAreaCode);
         return this;
     }
 
