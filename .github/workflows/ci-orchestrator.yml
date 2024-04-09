@@ -47,12 +47,12 @@ jobs:
   render_c4model_views:
     needs: changes
     if: ${{ needs.changes.outputs.render_c4model_views == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/structurizr-render-diagrams.yml@Renetnielsen-patch-1
+    uses: Energinet-DataHub/.github/.github/workflows/structurizr-render-diagrams.yml@v13
     with:
       structurizr_workspace_filename: views
       included_model_filename: model
     secrets:
-      token: ${{ secrets.GITHUB_TOKEN }}
+      dh3serviceaccount_privatekey: ${{ secrets.dh3serviceaccount_privatekey }}
 
   #
   # Branch policy status check
