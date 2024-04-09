@@ -43,7 +43,7 @@ public class TestCreateOutgoingCommandHandler : IRequestHandler<TestCreateOutgoi
                 ActorNumber.Create("1234567891234"),
                 ActorRole.EnergySupplier,
                 ProcessId.New().Id,
-                "1234",
+                "123",
                 MeteringPointType.Consumption.Name,
                 SettlementMethod.Flex.Name,
                 MeasurementUnit.Kwh.Name,

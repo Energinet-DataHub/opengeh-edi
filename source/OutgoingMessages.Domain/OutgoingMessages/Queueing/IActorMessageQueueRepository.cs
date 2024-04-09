@@ -30,5 +30,5 @@ public interface IActorMessageQueueRepository
     /// <summary>
     /// Add a new actor queue.
     /// </summary>
-    Task AddAsync(ActorMessageQueue actorMessageQueue);
+    void Add(ActorMessageQueue actorMessageQueue);
 }

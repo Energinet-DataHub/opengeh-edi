@@ -48,8 +48,8 @@ public class ActorMessageQueueRepository : IActorMessageQueueRepository
         return actorMessageQueue;
     }
 
-    public async Task AddAsync(ActorMessageQueue actorMessageQueue)
+    public void Add(ActorMessageQueue actorMessageQueue)
     {
-        await _actorMessageQueueContext.ActorMessageQueues.AddAsync(actorMessageQueue).ConfigureAwait(false);
+        _actorMessageQueueContext.ActorMessageQueues.Add(actorMessageQueue);
     }
 }
