@@ -260,8 +260,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
         {
             Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
             Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", IntegrationTestFixture.DatabaseConnectionString);
-            Environment.SetEnvironmentVariable("INCOMING_MESSAGES_QUEUE_NAME", "Fake");
-            Environment.SetEnvironmentVariable("SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE", "Fake");
             Environment.SetEnvironmentVariable(
                 "AZURE_STORAGE_ACCOUNT_CONNECTION_STRING",
                 azuriteManager.BlobStorageConnectionString);

@@ -41,19 +41,18 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
 
         public RegistrationTests()
         {
-            Environment.SetEnvironmentVariable("SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND", TestEnvironment.CreateFakeServiceBusConnectionString());
-            Environment.SetEnvironmentVariable("SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE", TestEnvironment.CreateFakeServiceBusConnectionString());
             Environment.SetEnvironmentVariable("IncomingMessages__QueueName", "FakeQueueNameIncoming");
             Environment.SetEnvironmentVariable("WholesaleInbox__QueueName", "FakeQueueNameWholesale");
             Environment.SetEnvironmentVariable("EdiInbox__QueueName", "FakeQueueNameEdi");
-            Environment.SetEnvironmentVariable("INCOMING_MESSAGES_QUEUE_NAME", "FakeQueueName1");
             Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", TestEnvironment.CreateConnectionString());
             Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", TestEnvironment.CreateDevelopmentStorageConnectionString());
 
             // The following declaration slows down the test execution, since create a new Uri us a heavy operation
             Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL", TestEnvironment.CreateFakeStorageUrl());
 
+            Environment.SetEnvironmentVariable("ServiceBus__ListenConnectionString", TestEnvironment.CreateFakeServiceBusConnectionString());
             Environment.SetEnvironmentVariable("ServiceBus__ManageConnectionString", TestEnvironment.CreateFakeServiceBusConnectionString());
+            Environment.SetEnvironmentVariable("ServiceBus__SendConnectionString", TestEnvironment.CreateFakeServiceBusConnectionString());
 
             _host = HostFactory.CreateHost(RuntimeEnvironment.Default, Program.TokenValidationParameters);
         }
@@ -170,6 +169,10 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
                 .AddInMemoryCollection(
                     new Dictionary<string, string?>
                     {
+                        ["ServiceBus__ListenConnectionString"] = "Fake",
+                        ["ServiceBus__ManageConnectionString"] = "Fake",
+                        ["ServiceBus__SendConnectionString"] = "Fake",
+
                         ["UserAuthentication:MitIdExternalMetadataAddress"] = "NotEmpty",
                         ["UserAuthentication:ExternalMetadataAddress"] = "NotEmpty",
                         ["UserAuthentication:BackendBffAppId"] = "NotEmpty",
@@ -235,7 +238,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
 
         private sealed class TestEnvironment : RuntimeEnvironment
         {
-            public override string? SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND =>
+            public override string? ServiceBus__SendConnectionString =>
                 CreateFakeServiceBusConnectionString();
 
             public override string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>

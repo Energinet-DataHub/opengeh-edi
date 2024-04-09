@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;

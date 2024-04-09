@@ -24,12 +24,12 @@ namespace Energinet.DataHub.EDI.Api
 
         public virtual string? DB_CONNECTION_STRING => GetEnvironmentVariable(nameof(DB_CONNECTION_STRING));
 
-        public virtual string? SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND =>
-            GetEnvironmentVariable(nameof(SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND));
+        public virtual string? ServiceBus__SendConnectionString =>
+            GetEnvironmentVariable(nameof(ServiceBus__SendConnectionString));
 
         public virtual string? EdiInbox__QueueName => GetEnvironmentVariable(nameof(EdiInbox__QueueName));
 
-        public virtual string? INCOMING_MESSAGES_QUEUE_NAME => GetEnvironmentVariable(nameof(INCOMING_MESSAGES_QUEUE_NAME));
+        public virtual string? IncomingMessage_QueueName => GetEnvironmentVariable(nameof(IncomingMessage_QueueName));
 
         public virtual string? WholesaleInbox__QueueName => GetEnvironmentVariable(nameof(WholesaleInbox__QueueName));
 
@@ -42,8 +42,8 @@ namespace Energinet.DataHub.EDI.Api
         public virtual string? AZURE_FUNCTIONS_ENVIRONMENT =>
             GetEnvironmentVariable(nameof(AZURE_FUNCTIONS_ENVIRONMENT));
 
-        public string? SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE =>
-            GetEnvironmentVariable(nameof(SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE));
+        public string? ServiceBus__ManageConnectionString =>
+            GetEnvironmentVariable(nameof(ServiceBus__ManageConnectionString));
 
         public string? AzureWebJobsStorage =>
             GetEnvironmentVariable(nameof(AzureWebJobsStorage));

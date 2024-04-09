@@ -41,22 +41,14 @@ public static class IncomingMessagesExtensions
     public static IServiceCollection AddIncomingMessagesModule(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
-        services.AddOptions<ServiceBusClientOptions>()
-            .Bind(configuration)
-            .Validate(
-                o => !string.IsNullOrEmpty(o.INCOMING_MESSAGES_QUEUE_NAME),
-                "INCOMING_MESSAGES_QUEUE_NAME must be set")
-            .Validate(
-                o => !string.IsNullOrEmpty(o.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE),
-                "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE must be set");
 
         // Options
         services
             .AddOptions<IncomingMessagesQueueOptions>()
-            .BindConfiguration(IncomingMessagesQueueOptions.SectionName)
+            .Bind(configuration.GetSection(IncomingMessagesQueueOptions.SectionName))
             .ValidateDataAnnotations();
         services.AddOptions<ServiceBusOptions>()
-            .BindConfiguration(ServiceBusOptions.SectionName)
+            .Bind(configuration.GetSection(ServiceBusOptions.SectionName))
             .ValidateDataAnnotations();
 
         services

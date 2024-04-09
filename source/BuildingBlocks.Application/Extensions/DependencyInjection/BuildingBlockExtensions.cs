@@ -22,11 +22,13 @@ public static class BuildingBlockExtensions
 {
     public static IServiceCollection AddBuildingBlocks(this IServiceCollection services, IConfiguration configuration)
     {
+        ArgumentNullException.ThrowIfNull(configuration);
+
         services.AddServiceBus(configuration)
             .AddFileStorage(configuration)
             .AddFeatureFlags()
             .AddOptions<ServiceBusOptions>()
-            .BindConfiguration(ServiceBusOptions.SectionName)
+            .Bind(configuration.GetSection(ServiceBusOptions.SectionName))
             .ValidateDataAnnotations();
         return services;
     }
