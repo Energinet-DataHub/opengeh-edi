@@ -86,7 +86,7 @@ public class MessageEnqueuer
         {
             _logger.LogInformation("Creating new message queue for Actor: {ActorNumber}, MarketRole: {MarketRole}", receiver.Number.Value, receiver.ActorRole.Name);
             messageQueue = ActorMessageQueue.CreateFor(receiver);
-            await _actorMessageQueueRepository.AddAsync(messageQueue).ConfigureAwait(false);
+            _actorMessageQueueRepository.Add(messageQueue);
         }
 
         return messageQueue;

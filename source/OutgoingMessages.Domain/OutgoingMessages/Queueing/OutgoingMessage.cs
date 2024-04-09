@@ -40,8 +40,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             string serializedContent,
             Instant timestamp,
             ProcessType messageCreatedFromProcess,
-            MessageId? relatedToMessageId = null,
-            string? gridAreaCode = null)
+            MessageId? relatedToMessageId,
+            string? gridAreaCode)
         {
             ArgumentNullException.ThrowIfNull(receiverId);
             Id = OutgoingMessageId.New();
@@ -147,7 +147,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 serializer.Serialize(acceptedEnergyResultMessage.Series),
                 timestamp,
                 ProcessType.RequestEnergyResults,
-                acceptedEnergyResultMessage.RelatedToMessageId);
+                acceptedEnergyResultMessage.RelatedToMessageId,
+                acceptedEnergyResultMessage.Series.GridAreaCode);
         }
 
         /// <summary>
@@ -172,7 +173,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 serializer.Serialize(rejectedEnergyResultMessage.Series),
                 timestamp,
                 ProcessType.RequestEnergyResults,
-                relatedToMessageId: rejectedEnergyResultMessage.RelatedToMessageId);
+                relatedToMessageId: rejectedEnergyResultMessage.RelatedToMessageId,
+                null);
         }
 
         /// <summary>
@@ -265,7 +267,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 serializer.Serialize(rejectedWholesaleServicesMessage.Series),
                 timestamp,
                 ProcessType.RequestWholesaleResults,
-                rejectedWholesaleServicesMessage.RelatedToMessageId);
+                rejectedWholesaleServicesMessage.RelatedToMessageId,
+                null);
         }
 
         /// <summary>
@@ -287,7 +290,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 serializer.Serialize(acceptedWholesaleServicesMessage.Series),
                 timestamp,
                 ProcessType.RequestWholesaleResults,
-                acceptedWholesaleServicesMessage.RelatedToMessageId);
+                acceptedWholesaleServicesMessage.RelatedToMessageId,
+                acceptedWholesaleServicesMessage.Series.GridAreaCode);
         }
 
         public void AssignToBundle(BundleId bundleId)
