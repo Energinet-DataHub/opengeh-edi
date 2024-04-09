@@ -68,10 +68,6 @@ public static class HostFactory
                         .AddBlobStorageHealthCheck(
                             "edi-web-jobs-storage",
                             context.Configuration["AzureWebJobsStorage"]!)
-                        .TryAddExternalDomainServiceBusQueuesHealthCheck(
-                            runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
-                            runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,
-                            runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!)
                         .TryAddSqlServerHealthCheck(context.Configuration)
 
                         // Data retention

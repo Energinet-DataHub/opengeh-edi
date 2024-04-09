@@ -17,8 +17,6 @@ using System.Text.Json.Serialization;
 using Asp.Versioning;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
-using Energinet.DataHub.Core.App.WebApp.Authentication;
-using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.WebApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.WebApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Logging.LoggingMiddleware;
@@ -85,7 +83,7 @@ app
     .UseHttpsRedirection()
     .UseAuthentication()
     .UseAuthorization()
-    .UseUserMiddleware<FrontendUser>();
+    .UseUserMiddlewareForWebApp<FrontendUser>();
 
 app.MapControllers().RequireAuthorization();
 

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Diagnostics.CodeAnalysis;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
@@ -46,25 +48,21 @@ public static class ProcessExtensions
 {
     public static IServiceCollection AddProcessModule(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddOptions<ServiceBusClientOptions>()
-            .Bind(configuration)
-            .Validate(
-                o => !string.IsNullOrEmpty(o.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME),
-                "WHOLESALE_INBOX_MESSAGE_QUEUE_NAME must be set");
+        ArgumentNullException.ThrowIfNull(configuration);
 
-        // Add options
+        // Options
         services.AddOptions<ServiceBusOptions>()
-            .BindConfiguration(ServiceBusOptions.SectionName)
+            .Bind(configuration.GetSection(ServiceBusOptions.SectionName))
             .ValidateDataAnnotations();
 
         services
-            .AddOptions<EdiInboxOptions>()
-            .BindConfiguration(EdiInboxOptions.SectionName)
+            .AddOptionsWithValidateOnStart<EdiInboxOptions>()
+            .Bind(configuration.GetSection(EdiInboxOptions.SectionName))
             .ValidateDataAnnotations();
 
         services
             .AddOptions<WholesaleInboxOptions>()
-            .BindConfiguration(WholesaleInboxOptions.SectionName)
+            .Bind(configuration.GetSection(WholesaleInboxOptions.SectionName))
             .ValidateDataAnnotations();
 
         services
@@ -125,9 +123,9 @@ public static class ProcessExtensions
 
             // health checks
             .TryAddExternalDomainServiceBusQueuesHealthCheck(
-                configuration.Get<ServiceBusOptions>()!.ManageConnectionString,
-                configuration.Get<EdiInboxOptions>()!.QueueName,
-                configuration.Get<WholesaleInboxOptions>()!.QueueName);
+                configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>()!.ManageConnectionString!,
+                configuration.GetSection(EdiInboxOptions.SectionName).Get<EdiInboxOptions>()!.QueueName!,
+                configuration.GetSection(WholesaleInboxOptions.SectionName).Get<WholesaleInboxOptions>()!.QueueName!);
         return services;
     }
 }

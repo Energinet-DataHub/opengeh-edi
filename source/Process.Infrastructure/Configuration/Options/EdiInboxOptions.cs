@@ -22,7 +22,4 @@ public class EdiInboxOptions
 
     [Required]
     public string QueueName { get; set; } = string.Empty;
-
-    [Required]
-    public string ConnectionString { get; set; } = string.Empty;
 }

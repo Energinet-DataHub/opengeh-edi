@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
+using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators;
@@ -38,6 +40,7 @@ public static class IncomingMessagesExtensions
 {
     public static IServiceCollection AddIncomingMessagesModule(this IServiceCollection services, IConfiguration configuration)
     {
+        ArgumentNullException.ThrowIfNull(configuration);
         services.AddOptions<ServiceBusClientOptions>()
             .Bind(configuration)
             .Validate(
@@ -47,12 +50,20 @@ public static class IncomingMessagesExtensions
                 o => !string.IsNullOrEmpty(o.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE),
                 "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE must be set");
 
-        var serviceBusOptions = configuration.Get<ServiceBusClientOptions>()!;
+        // Options
+        services
+            .AddOptions<IncomingMessagesQueueOptions>()
+            .BindConfiguration(IncomingMessagesQueueOptions.SectionName)
+            .ValidateDataAnnotations();
+        services.AddOptions<ServiceBusOptions>()
+            .BindConfiguration(ServiceBusOptions.SectionName)
+            .ValidateDataAnnotations();
+
         services
             .AddServiceBus(configuration)
             .TryAddExternalDomainServiceBusQueuesHealthCheck(
-                serviceBusOptions.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
-                serviceBusOptions.INCOMING_MESSAGES_QUEUE_NAME!)
+                configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>()!.ManageConnectionString!,
+                configuration.GetSection(IncomingMessagesQueueOptions.SectionName).Get<IncomingMessagesQueueOptions>()!.QueueName!)
             .AddDapperConnectionToDatabase(configuration)
             .AddScopedSqlDbContext<IncomingMessagesContext>(configuration)
             .AddScoped<IIncomingMessageClient, IncomingMessageClient>()

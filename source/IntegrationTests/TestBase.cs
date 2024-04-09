@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -259,7 +260,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
         {
             Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
             Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", IntegrationTestFixture.DatabaseConnectionString);
-            Environment.SetEnvironmentVariable("WHOLESALE_INBOX_MESSAGE_QUEUE_NAME", "Fake");
             Environment.SetEnvironmentVariable("INCOMING_MESSAGES_QUEUE_NAME", "Fake");
             Environment.SetEnvironmentVariable("SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE", "Fake");
             Environment.SetEnvironmentVariable(
@@ -268,6 +268,18 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             var config = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
+                .AddInMemoryCollection(
+                    new Dictionary<string, string?>
+                    {
+                        ["ServiceBus:ManageConnectionString"] = "Fake",
+                        ["ServiceBus:ListenConnectionString"] = "Fake",
+                        ["ServiceBus:SendConnectionString"] = "Fake",
+                        ["IntegrationEvents:TopicName"] = "NotEmpty",
+                        ["IntegrationEvents:SubscriptionName"] = "NotEmpty",
+                        ["IncomingMessages:QueueName"] = "Fake",
+                        ["WholesaleInbox:QueueName"] = "Fake",
+                        ["EdiInbox:QueueName"] = "Fake",
+                    })
                 .Build();
 
             _services = new ServiceCollection();

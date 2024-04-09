@@ -25,11 +25,13 @@ using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Requests;
 using FluentAssertions;
 using FluentAssertions.Equivalency;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.Options;
 using Xunit;
 using Xunit.Categories;
 
@@ -72,7 +74,8 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
     [Fact]
     public async Task When_WholesaleServicesProcess_is_initialized_service_bus_message_is_sent_to_wholesale()
     {
-        // Arrange
+        var hej = GetService<IOptions<WholesaleInboxOptions>>();
+        var hej1 = GetService<IOptions<EdiInboxOptions>>();
         var exceptedServiceBusMessageSubject = nameof(WholesaleServicesRequest);
         var marketMessage = InitializeProcessDtoBuilder()
             .Build();
