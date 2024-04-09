@@ -15,8 +15,8 @@ ediDomain = group "EDI" {
         description "Backend server providing API for EDI operations"
         technology "Azure function, C#"
         tags "Microsoft Azure - Function Apps" "Mosaic"
-        
-        # Domain relationships        
+
+        # Domain relationships
         this -> ediDb "Used by EDI azure functions to store state"
         this -> dh3.sharedServiceBus "Subscribes to integration events"
         this -> ediStorageAccount "Stores state"
@@ -27,7 +27,7 @@ ediDomain = group "EDI" {
         }
     }
     ediApi = container "EDI API" {
-        description "API Gateway policies for EDI Web API"
+        description "APIM Gateway policies for EDI Web API"
         technology "Azure API Management Service"
         tags "Intermediate Technology" "Microsoft Azure - API Management Services" "Mosaic"
 
