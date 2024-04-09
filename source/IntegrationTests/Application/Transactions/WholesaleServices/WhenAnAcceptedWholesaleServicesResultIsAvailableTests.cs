@@ -166,6 +166,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .Build();
         var secondProcess = WholesaleServicesProcessBuilder()
             .SetState(WholesaleServicesProcess.State.Sent)
+            .SetBusinessTransactionId(Guid.NewGuid())
             .Build();
         Store(secondProcess);
         var secondAcceptedEvent = WholesaleServicesRequestAcceptedBuilder(firstProcess)
