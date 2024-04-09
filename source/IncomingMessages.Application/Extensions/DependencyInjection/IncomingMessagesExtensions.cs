@@ -45,10 +45,10 @@ public static class IncomingMessagesExtensions
         // Options
         services
             .AddOptions<IncomingMessagesQueueOptions>()
-            .Bind(configuration.GetSection(IncomingMessagesQueueOptions.SectionName))
+            .BindConfiguration(IncomingMessagesQueueOptions.SectionName)
             .ValidateDataAnnotations();
         services.AddOptions<ServiceBusOptions>()
-            .Bind(configuration.GetSection(ServiceBusOptions.SectionName))
+            .BindConfiguration(ServiceBusOptions.SectionName)
             .ValidateDataAnnotations();
 
         services

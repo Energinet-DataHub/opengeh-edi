@@ -28,7 +28,7 @@ public static class ServiceBusExtensions
         ArgumentNullException.ThrowIfNull(configuration);
 
         services.AddOptions<ServiceBusOptions>()
-            .Bind(configuration.GetSection(ServiceBusOptions.SectionName))
+            .BindConfiguration(ServiceBusOptions.SectionName)
             .ValidateDataAnnotations();
 
         services.AddSingleton<ServiceBusClient>(provider => new ServiceBusClient(

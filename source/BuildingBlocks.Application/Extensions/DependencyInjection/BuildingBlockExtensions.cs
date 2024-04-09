@@ -28,7 +28,7 @@ public static class BuildingBlockExtensions
             .AddFileStorage(configuration)
             .AddFeatureFlags()
             .AddOptions<ServiceBusOptions>()
-            .Bind(configuration.GetSection(ServiceBusOptions.SectionName))
+            .BindConfiguration(ServiceBusOptions.SectionName)
             .ValidateDataAnnotations();
         return services;
     }

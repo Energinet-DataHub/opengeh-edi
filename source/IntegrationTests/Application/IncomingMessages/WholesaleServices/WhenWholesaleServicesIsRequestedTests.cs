@@ -74,8 +74,6 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
     [Fact]
     public async Task When_WholesaleServicesProcess_is_initialized_service_bus_message_is_sent_to_wholesale()
     {
-        var hej = GetService<IOptions<WholesaleInboxOptions>>();
-        var hej1 = GetService<IOptions<EdiInboxOptions>>();
         var exceptedServiceBusMessageSubject = nameof(WholesaleServicesRequest);
         var marketMessage = InitializeProcessDtoBuilder()
             .Build();

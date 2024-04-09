@@ -21,6 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
+using BuildingBlocks.Application.Extensions.Options;
 using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
@@ -37,6 +38,7 @@ using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Configuration;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
@@ -53,6 +55,7 @@ using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Google.Protobuf;
@@ -269,18 +272,19 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 .AddInMemoryCollection(
                     new Dictionary<string, string?>
                     {
-                        ["ServiceBus:ManageConnectionString"] = "Fake",
-                        ["ServiceBus:ListenConnectionString"] = "Fake",
-                        ["ServiceBus:SendConnectionString"] = "Fake",
+                        [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ManageConnectionString)}"] = "Fake",
+                        [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ListenConnectionString)}"] = "Fake",
+                        [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.SendConnectionString)}"] = "Fake",
+                        [$"{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}"] = "Fake",
+                        [$"{WholesaleInboxOptions.SectionName}:{nameof(WholesaleInboxOptions.QueueName)}"] = "Fake",
+                        [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = "Fake",
                         ["IntegrationEvents:TopicName"] = "NotEmpty",
                         ["IntegrationEvents:SubscriptionName"] = "NotEmpty",
-                        ["IncomingMessages:QueueName"] = "Fake",
-                        ["WholesaleInbox:QueueName"] = "Fake",
-                        ["EdiInbox:QueueName"] = "Fake",
                     })
                 .Build();
 
             _services = new ServiceCollection();
+            _services.AddScoped<IConfiguration>(_ => config);
 
             _services.AddTransient<InboxEventsProcessor>()
                 .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>>(

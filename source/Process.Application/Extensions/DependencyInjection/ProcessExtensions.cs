@@ -51,17 +51,17 @@ public static class ProcessExtensions
 
         // Options
         services.AddOptions<ServiceBusOptions>()
-            .Bind(configuration.GetSection(ServiceBusOptions.SectionName))
+            .BindConfiguration(ServiceBusOptions.SectionName)
             .ValidateDataAnnotations();
 
         services
             .AddOptionsWithValidateOnStart<EdiInboxOptions>()
-            .Bind(configuration.GetSection(EdiInboxOptions.SectionName))
+            .BindConfiguration(EdiInboxOptions.SectionName)
             .ValidateDataAnnotations();
 
         services
             .AddOptions<WholesaleInboxOptions>()
-            .Bind(configuration.GetSection(WholesaleInboxOptions.SectionName))
+            .BindConfiguration(WholesaleInboxOptions.SectionName)
             .ValidateDataAnnotations();
 
         services
