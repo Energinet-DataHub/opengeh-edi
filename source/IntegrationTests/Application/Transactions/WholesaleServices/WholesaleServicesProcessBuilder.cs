@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
@@ -32,8 +33,8 @@ public class WholesaleServicesProcessBuilder
     private readonly string? _chargeTypeId = "EA-001";
     private readonly string? _chargeTypeType = "D03";
     private readonly string _senderRole = ActorRole.EnergySupplier.Code;
-    private readonly BusinessTransactionId _businessTransactionId = BusinessTransactionId.Create("1234");
     private readonly MessageId _messageId = MessageId.New();
+    private BusinessTransactionId _businessTransactionId = BusinessTransactionId.Create("1234");
     private SettlementVersion? _settlementVersion;
     private ActorNumber _senderNumber = ActorNumber.Create("5790000000000");
     private string? _energySupplierMarketParticipantId = ActorNumber.Create("5790000000001").Value;
@@ -60,6 +61,12 @@ public class WholesaleServicesProcessBuilder
     public WholesaleServicesProcessBuilder SetState(WholesaleServicesProcess.State state)
     {
         _state = state;
+        return this;
+    }
+
+    public WholesaleServicesProcessBuilder SetBusinessTransactionId(Guid transactionId)
+    {
+        _businessTransactionId = BusinessTransactionId.Create(transactionId.ToString());
         return this;
     }
 
