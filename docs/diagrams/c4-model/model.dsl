@@ -27,7 +27,7 @@ ediDomain = group "EDI" {
         }
     }
     ediApi = container "EDI API" {
-        description "APIM Gateway policies for EDI Web API"
+        description "APIMan Gateway policies for EDI Web API"
         technology "Azure API Management Service"
         tags "Intermediate Technology" "Microsoft Azure - API Management Services" "Mosaic"
 
