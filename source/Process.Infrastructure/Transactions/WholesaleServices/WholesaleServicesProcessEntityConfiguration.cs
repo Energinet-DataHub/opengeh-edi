@@ -86,7 +86,7 @@ internal sealed class WholesaleServicesProcessEntityConfiguration : IEntityTypeC
             "_gridAreas",
             navigationBuilder =>
             {
-                navigationBuilder.ToTable("WholesaleServicesProcessDelegatedGridAreas", "dbo");
+                navigationBuilder.ToTable("WholesaleServicesProcessGridAreas", "dbo");
                 navigationBuilder.WithOwner().HasForeignKey(x => x.WholesaleServicesProcessId);
                 navigationBuilder.HasKey(x => x.Id);
                 navigationBuilder.Property(x => x.WholesaleServicesProcessId)

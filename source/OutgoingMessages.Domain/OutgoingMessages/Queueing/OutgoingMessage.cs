@@ -147,7 +147,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 serializer.Serialize(acceptedEnergyResultMessage.Series),
                 timestamp,
                 ProcessType.RequestEnergyResults,
-                acceptedEnergyResultMessage.RelatedToMessageId);
+                acceptedEnergyResultMessage.RelatedToMessageId,
+                acceptedEnergyResultMessage.Series.GridAreaCode);
         }
 
         /// <summary>
@@ -287,7 +288,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                 serializer.Serialize(acceptedWholesaleServicesMessage.Series),
                 timestamp,
                 ProcessType.RequestWholesaleResults,
-                acceptedWholesaleServicesMessage.RelatedToMessageId);
+                acceptedWholesaleServicesMessage.RelatedToMessageId,
+                acceptedWholesaleServicesMessage.Series.GridAreaCode);
         }
 
         public void AssignToBundle(BundleId bundleId)

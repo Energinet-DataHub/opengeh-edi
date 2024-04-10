@@ -30,6 +30,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.WholesaleServices;
@@ -39,8 +40,8 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
 {
     private readonly ProcessContext _processContext;
 
-    public WhenAnAcceptedWholesaleServicesResultIsAvailableTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public WhenAnAcceptedWholesaleServicesResultIsAvailableTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _processContext = GetService<ProcessContext>();
     }

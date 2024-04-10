@@ -175,7 +175,7 @@ public class WhenGridAreaOwnershipAssignedTests : TestBase
     private async Task<IEnumerable<GridArea>> GetGridAreas()
     {
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
-        var sql = $"SELECT IncomingGridArea, GridAreaOwnerActorNumber FROM [dbo].[GridAreaOwner]";
+        var sql = $"SELECT GridAreaCode, GridAreaOwnerActorNumber FROM [dbo].[GridAreaOwner]";
         return await connection.QueryAsync<GridArea>(sql);
     }
 
