@@ -40,8 +40,8 @@ public class InboxEventListener
     [Function(nameof(InboxEventListener))]
     public async Task RunAsync(
         [ServiceBusTrigger(
-            $"{EdiInboxOptions.SectionName}__{nameof(EdiInboxOptions.QueueName)}",
-            Connection = $"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}")]
+            $"{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}",
+            Connection = $"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ListenConnectionString)}")]
         byte[] message,
         FunctionContext context,
         CancellationToken hostCancellationToken)
