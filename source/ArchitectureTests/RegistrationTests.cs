@@ -18,11 +18,15 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using BuildingBlocks.Application.Extensions.Options;
+using Energinet.DataHub.Core.App.WebApp.Extensions.Options;
 using Energinet.DataHub.EDI.Api;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
@@ -41,18 +45,18 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
 
         public RegistrationTests()
         {
-            Environment.SetEnvironmentVariable("IncomingMessages__QueueName", "FakeQueueNameIncoming");
-            Environment.SetEnvironmentVariable("WholesaleInbox__QueueName", "FakeQueueNameWholesale");
-            Environment.SetEnvironmentVariable("EdiInbox__QueueName", "FakeQueueNameEdi");
+            Environment.SetEnvironmentVariable($"{IncomingMessagesQueueOptions.SectionName}__{nameof(IncomingMessagesQueueOptions.QueueName)}", "FakeQueueNameIncoming");
+            Environment.SetEnvironmentVariable($"{WholesaleInboxOptions.SectionName}__{nameof(WholesaleInboxOptions.QueueName)}", "FakeQueueNameWholesale");
+            Environment.SetEnvironmentVariable($"{EdiInboxOptions.SectionName}__{nameof(EdiInboxOptions.QueueName)}", "FakeQueueNameEdi");
             Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", TestEnvironment.CreateConnectionString());
             Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", TestEnvironment.CreateDevelopmentStorageConnectionString());
 
             // The following declaration slows down the test execution, since create a new Uri us a heavy operation
             Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL", TestEnvironment.CreateFakeStorageUrl());
 
-            Environment.SetEnvironmentVariable("ServiceBus__ListenConnectionString", TestEnvironment.CreateFakeServiceBusConnectionString());
-            Environment.SetEnvironmentVariable("ServiceBus__ManageConnectionString", TestEnvironment.CreateFakeServiceBusConnectionString());
-            Environment.SetEnvironmentVariable("ServiceBus__SendConnectionString", TestEnvironment.CreateFakeServiceBusConnectionString());
+            Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
+            Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ManageConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
+            Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.SendConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
 
             _host = HostFactory.CreateHost(RuntimeEnvironment.Default, Program.TokenValidationParameters);
         }
@@ -169,14 +173,14 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
                 .AddInMemoryCollection(
                     new Dictionary<string, string?>
                     {
-                        ["ServiceBus__ListenConnectionString"] = "Fake",
-                        ["ServiceBus__ManageConnectionString"] = "Fake",
-                        ["ServiceBus__SendConnectionString"] = "Fake",
+                        [$"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}"] = "Fake",
+                        [$"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ManageConnectionString)}"] = "Fake",
+                        [$"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.SendConnectionString)}"] = "Fake",
 
-                        ["UserAuthentication:MitIdExternalMetadataAddress"] = "NotEmpty",
-                        ["UserAuthentication:ExternalMetadataAddress"] = "NotEmpty",
-                        ["UserAuthentication:BackendBffAppId"] = "NotEmpty",
-                        ["UserAuthentication:InternalMetadataAddress"] = "NotEmpty",
+                        [$"{UserAuthenticationOptions.SectionName}:{nameof(UserAuthenticationOptions.MitIdExternalMetadataAddress)}"] = "NotEmpty",
+                        [$"{UserAuthenticationOptions.SectionName}:{nameof(UserAuthenticationOptions.ExternalMetadataAddress)}"] = "NotEmpty",
+                        [$"{UserAuthenticationOptions.SectionName}:{nameof(UserAuthenticationOptions.BackendBffAppId)}"] = "NotEmpty",
+                        [$"{UserAuthenticationOptions.SectionName}:{nameof(UserAuthenticationOptions.InternalMetadataAddress)}"] = "NotEmpty",
                     })
                 .Build();
 

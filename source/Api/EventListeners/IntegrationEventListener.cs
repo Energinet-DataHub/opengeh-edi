@@ -14,8 +14,10 @@
 
 using System;
 using System.Threading.Tasks;
+using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
+using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.Options;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -35,9 +37,9 @@ public class IntegrationEventListener
     [Function(nameof(IntegrationEventListener))]
     public async Task RunAsync(
         [ServiceBusTrigger(
-            "IntegrationEvents__TopicName",
-            "IntegrationEvents__SubscriptionName",
-            Connection = "ServiceBus__ListenConnectionString")]
+            $"{IntegrationEventsOptions.SectionName}__{nameof(IntegrationEventsOptions.TopicName)}",
+            $"{IntegrationEventsOptions.SectionName}__{nameof(IntegrationEventsOptions.SectionName)}",
+            Connection = $"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}")]
         byte[] eventData,
         FunctionContext context)
     {

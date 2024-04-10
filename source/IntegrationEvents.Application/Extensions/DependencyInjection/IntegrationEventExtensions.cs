@@ -17,6 +17,7 @@ using System.Linq;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.Options;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
@@ -25,7 +26,7 @@ using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.IntegrationEvents.Application.Configuration;
+namespace Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
 
 public static class IntegrationEventExtensions
 {
@@ -62,6 +63,10 @@ public static class IntegrationEventExtensions
             .AddTransient<IIntegrationEventHandler, IntegrationEventHandler>();
 
         services.AddTransient<WholesaleServicesMessageFactory>();
+
+        services.AddOptions<IntegrationEventsOptions>()
+            .BindConfiguration(IntegrationEventsOptions.SectionName)
+            .ValidateDataAnnotations();
 
         return services;
     }
