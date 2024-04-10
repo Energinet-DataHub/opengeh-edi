@@ -15,6 +15,8 @@
 using System;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
+using BuildingBlocks.Application.Extensions.Options;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -37,8 +39,8 @@ public class ProcessInitializationListener
     [Function(nameof(ProcessInitializationListener))]
     public async Task RunAsync(
         [ServiceBusTrigger(
-            "%IncomingMessages__QueueName%",
-            Connection = "ServiceBus__ListenConnectionString")]
+            $"{IncomingMessagesQueueOptions.SectionName}__{nameof(IncomingMessagesQueueOptions.QueueName)}",
+            Connection = $"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}")]
         ServiceBusReceivedMessage message)
     {
         ArgumentNullException.ThrowIfNull(message);

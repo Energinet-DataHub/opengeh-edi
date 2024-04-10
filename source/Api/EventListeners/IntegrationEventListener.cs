@@ -35,8 +35,8 @@ public class IntegrationEventListener
     [Function(nameof(IntegrationEventListener))]
     public async Task RunAsync(
         [ServiceBusTrigger(
-            "%IntegrationEvents__TopicName%",
-            "%IntegrationEvents__SubscriptionName%",
+            "IntegrationEvents__TopicName",
+            "IntegrationEvents__SubscriptionName",
             Connection = "ServiceBus__ListenConnectionString")]
         byte[] eventData,
         FunctionContext context)

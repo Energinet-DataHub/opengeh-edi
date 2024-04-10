@@ -15,8 +15,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.EDI.Api.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 
@@ -38,8 +40,9 @@ public class InboxEventListener
     [Function(nameof(InboxEventListener))]
     public async Task RunAsync(
         [ServiceBusTrigger(
-            "%EdiInbox__QueueName%",
-            Connection = "ServiceBus__ListenConnectionString")] byte[] message,
+            $"{EdiInboxOptions.SectionName}__{nameof(EdiInboxOptions.QueueName)}",
+            Connection = $"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}")]
+        byte[] message,
         FunctionContext context,
         CancellationToken hostCancellationToken)
     {
