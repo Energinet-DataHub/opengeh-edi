@@ -47,13 +47,11 @@ public static class ArchivedMessageExtensions
                 configuration["AZURE_STORAGE_ACCOUNT_URL"]
                 ?? throw new InvalidOperationException("AZURE_STORAGE_ACCOUNT_URL is missing"));
             services.AddOptions<DocumentStorageOptions>()
-                .Configure(
-                    option =>
-                        option.StorageAccountUri = uri);
-            var options = configuration.Get<DocumentStorageOptions>()!;
+                .Configure(option => option.StorageAccountUri = uri);
+
             services.AddBlobStorageHealthCheck(
-                options.StorageName,
-                options.StorageAccountUri!);
+                DocumentStorageOptions.StorageName,
+                uri!);
         }
 
         return services;

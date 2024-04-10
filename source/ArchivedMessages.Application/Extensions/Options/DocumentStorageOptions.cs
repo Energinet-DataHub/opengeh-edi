@@ -18,7 +18,7 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.Options;
 
 public class DocumentStorageOptions
 {
-    public string StorageName { get; } = "edi-documents-storage";
+    public static string StorageName { get; } = "edi-documents-storage";
 
     public Uri? StorageAccountUri { get; set; }
 }
