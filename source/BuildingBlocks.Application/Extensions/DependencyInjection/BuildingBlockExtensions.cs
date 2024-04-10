@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using BuildingBlocks.Application.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,14 +21,10 @@ public static class BuildingBlockExtensions
 {
     public static IServiceCollection AddBuildingBlocks(this IServiceCollection services, IConfiguration configuration)
     {
-        ArgumentNullException.ThrowIfNull(configuration);
-
         services.AddServiceBus(configuration)
             .AddFileStorage(configuration)
-            .AddFeatureFlags()
-            .AddOptions<ServiceBusOptions>()
-            .BindConfiguration(ServiceBusOptions.SectionName)
-            .ValidateDataAnnotations();
+            .AddFeatureFlags();
+
         return services;
     }
 }
