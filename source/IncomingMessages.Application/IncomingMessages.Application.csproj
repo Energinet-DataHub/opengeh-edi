@@ -11,6 +11,10 @@
     <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
     <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="Dapper-NodaTime" Version="0.1.0" />
+  </ItemGroup>
   <ItemDefinitionGroup>
     <ProjectReference>
       <PrivateAssets>all</PrivateAssets>

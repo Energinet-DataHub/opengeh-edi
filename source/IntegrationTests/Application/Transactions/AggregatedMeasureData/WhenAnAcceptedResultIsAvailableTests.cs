@@ -81,6 +81,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasProcessType(ProcessType.RequestEnergyResults)
+            .HasRelationTo(process.InitiatedByMessageId)
+            .HasGridAreaCode(acceptedEvent.Series.First().GridArea)
             .HasPointsInCorrectOrder<AcceptedEnergyResultMessageTimeSeries, decimal?>(timeSerie => timeSerie.Point.Select(x => x.Quantity).ToList(), acceptedEvent.Series.SelectMany(x => x.TimeSeriesPoints).OrderBy(x => x.Time).ToList())
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId)

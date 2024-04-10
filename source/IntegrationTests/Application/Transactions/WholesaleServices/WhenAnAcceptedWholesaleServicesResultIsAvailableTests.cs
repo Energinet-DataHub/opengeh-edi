@@ -70,6 +70,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasRelationTo(process.InitiatedByMessageId)
+            .HasGridAreaCode(process.GridAreaCode!)
             .HasBusinessReason(process.BusinessReason)
             .HasProcessType(ProcessType.RequestWholesaleResults)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.Start.ToString(), process.StartOfPeriod)
@@ -106,6 +107,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasRelationTo(process.InitiatedByMessageId)
+            .HasGridAreaCode(process.GridAreaCode!)
             .HasBusinessReason(process.BusinessReason)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.Start.ToString(), process.StartOfPeriod)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.End.ToString(), process.EndOfPeriod)
@@ -166,6 +168,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .Build();
         var secondProcess = WholesaleServicesProcessBuilder()
             .SetState(WholesaleServicesProcess.State.Sent)
+            .SetBusinessTransactionId(Guid.NewGuid())
             .Build();
         Store(secondProcess);
         var secondAcceptedEvent = WholesaleServicesRequestAcceptedBuilder(firstProcess)
