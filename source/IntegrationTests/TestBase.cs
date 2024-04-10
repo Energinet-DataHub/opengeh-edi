@@ -60,11 +60,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Configuration;
-using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 using SampleData = Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.SampleData;
 
 namespace Energinet.DataHub.EDI.IntegrationTests
@@ -78,7 +75,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
         private ServiceCollection? _services;
         private bool _disposed;
 
-        protected TestBase(IntegrationTestFixture integrationTestFixture, ITestOutputHelper? testOutputHelper = null)
+        protected TestBase(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         {
             ArgumentNullException.ThrowIfNull(integrationTestFixture);
             IntegrationTestFixture.CleanupDatabase();

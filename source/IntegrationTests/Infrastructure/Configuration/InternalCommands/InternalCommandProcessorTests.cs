@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
@@ -34,8 +35,8 @@ public class InternalCommandProcessorTests : TestBase
     private readonly ICommandScheduler _scheduler;
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public InternalCommandProcessorTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public InternalCommandProcessorTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _processor = GetService<InternalCommandProcessor>();
         _scheduler = GetService<ICommandScheduler>();

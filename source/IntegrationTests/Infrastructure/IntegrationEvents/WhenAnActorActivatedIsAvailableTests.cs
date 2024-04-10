@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.IntegrationEvents;
 
@@ -31,8 +32,8 @@ public class WhenAnActorActivatedIsAvailableTests : TestBase
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public WhenAnActorActivatedIsAvailableTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public WhenAnActorActivatedIsAvailableTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _connectionFactory = GetService<IDatabaseConnectionFactory>();
     }

@@ -26,6 +26,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Retention;
 
@@ -33,8 +34,8 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 {
     private readonly IMasterDataClient _masterDataClient;
 
-    public RemoveOldGridAreaOwnersWhenADayHasPassedTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public RemoveOldGridAreaOwnersWhenADayHasPassedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _masterDataClient = GetService<IMasterDataClient>();
     }
