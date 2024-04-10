@@ -40,7 +40,7 @@ public class InboxEventListener
     [Function(nameof(InboxEventListener))]
     public async Task RunAsync(
         [ServiceBusTrigger(
-            $"{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}",
+            $"%{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}%",
             Connection = $"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ListenConnectionString)}")]
         byte[] message,
         FunctionContext context,

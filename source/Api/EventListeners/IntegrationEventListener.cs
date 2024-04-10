@@ -37,8 +37,8 @@ public class IntegrationEventListener
     [Function(nameof(IntegrationEventListener))]
     public async Task RunAsync(
         [ServiceBusTrigger(
-            $"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.TopicName)}",
-            $"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.SubscriptionName)}",
+            $"%{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.TopicName)}%",
+            $"%{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.SubscriptionName)}%",
             Connection = $"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ListenConnectionString)}")]
         byte[] eventData,
         FunctionContext context)

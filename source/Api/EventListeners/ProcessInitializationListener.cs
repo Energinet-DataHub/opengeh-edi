@@ -39,7 +39,7 @@ public class ProcessInitializationListener
     [Function(nameof(ProcessInitializationListener))]
     public async Task RunAsync(
         [ServiceBusTrigger(
-            $"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}",
+            $"%{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}%",
             Connection = $"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ListenConnectionString)}")]
         ServiceBusReceivedMessage message)
     {
