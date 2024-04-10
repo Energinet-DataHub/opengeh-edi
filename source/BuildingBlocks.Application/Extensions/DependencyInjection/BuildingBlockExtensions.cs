@@ -24,7 +24,6 @@ public static class BuildingBlockExtensions
         services.AddServiceBus(configuration)
             .AddFileStorage(configuration)
             .AddFeatureFlags();
-
         return services;
     }
 }
