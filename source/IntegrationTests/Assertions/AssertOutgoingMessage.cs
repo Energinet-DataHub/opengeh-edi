@@ -49,21 +49,17 @@ public class AssertOutgoingMessage
         ArgumentNullException.ThrowIfNull(fileStorageClient);
 
         using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
-        var outgoingMessage = await connection.QuerySingleOrDefaultAsync<Dictionary<string, object>>(
+        var outgoingMessage = await connection.QuerySingleOrDefaultAsync(
             $"SELECT m.Id, m.RecordId, m.DocumentType, m.DocumentReceiverNumber, m.DocumentReceiverRole, m.ReceiverNumber, m.ProcessId, m.BusinessReason," +
             $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference, m.RelatedToMessageId, m.MessageCreatedFromProcess " +
             $" FROM [dbo].[OutgoingMessages] m" +
             $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Code}'");
 
-        // var outgoingMessage = (object?)message;
-        // outgoingMessage.Should().NotBeNull("because an outgoing message should have been added to the database");
-        // Assert.NotNull(message);
-        outgoingMessage.Should().NotBeNull();
-        outgoingMessage!.TryGetValue("FileStorageReference", out var fileStorageReferenceObject);
-        fileStorageReferenceObject.Should().NotBeNull();
-        var fileStorageReference = fileStorageReferenceObject!.ToString()!;
+        ((object?)outgoingMessage).Should().NotBeNull("because an outgoing message should have been added to the database");
+        var outgoingMessageFileStorageReference = (string?)outgoingMessage!.FileStorageReference;
+        outgoingMessageFileStorageReference.Should().NotBeNull("because an outgoing message should always have a file storage reference");
 
-        var fileStorageFile = await fileStorageClient.DownloadAsync(new FileStorageReference(FileStorageCategory.OutgoingMessage(), fileStorageReference));
+        var fileStorageFile = await fileStorageClient.DownloadAsync(new FileStorageReference(FileStorageCategory.OutgoingMessage(), outgoingMessageFileStorageReference!));
 
         var messageRecord = await fileStorageFile.ReadAsStringAsync();
 
