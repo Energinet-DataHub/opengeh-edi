@@ -61,7 +61,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
-using SampleData = Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.SampleData;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
@@ -110,19 +109,21 @@ public class BehavioursTestBase : IDisposable
 
     protected async Task<PeekResultDto> PeekMessageAsync(
         MessageCategory category,
-        ActorNumber? actorNumber = null,
-        ActorRole? actorRole = null,
-        DocumentFormat? documentFormat = null)
+        ActorNumber actorNumber,
+        ActorRole actorRole,
+        DocumentFormat documentFormat)
     {
         using var serviceScope = _serviceProvider.CreateScope();
         var outgoingMessagesClient = serviceScope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+
         var result = await outgoingMessagesClient.PeekAndCommitAsync(
             new PeekRequestDto(
-                actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber),
+                actorNumber,
                 category,
-                actorRole ?? ActorRole.EnergySupplier,
-                documentFormat ?? DocumentFormat.Xml),
+                actorRole,
+                documentFormat),
             CancellationToken.None);
+
         return result;
     }
 
@@ -240,7 +241,8 @@ public class BehavioursTestBase : IDisposable
         (int Year, int Month, int Day) periodStart,
         (int Year, int Month, int Day) periodEnd,
         string gridArea,
-        string energySupplierActorNumber)
+        string energySupplierActorNumber,
+        string transactionId)
     {
         return GetService<IIncomingMessageClient>()
             .RegisterAndSendAsync(
@@ -258,7 +260,8 @@ public class BehavioursTestBase : IDisposable
                         .ToInstant()
                         .ToString(),
                     gridArea,
-                    energySupplierActorNumber),
+                    energySupplierActorNumber,
+                    transactionId),
                 DocumentFormat.Json,
                 IncomingDocumentType.RequestAggregatedMeasureData,
                 CancellationToken.None);
@@ -273,7 +276,8 @@ public class BehavioursTestBase : IDisposable
         (int Year, int Month, int Day) periodStart,
         (int Year, int Month, int Day) periodEnd,
         string gridArea,
-        string energySupplierActorNumber)
+        string energySupplierActorNumber,
+        string transactionId)
     {
         return GivenRequestAggregatedMeasureDataJsonAsync(
             senderActorNumber,
@@ -281,7 +285,8 @@ public class BehavioursTestBase : IDisposable
             periodStart,
             periodEnd,
             gridArea,
-            energySupplierActorNumber);
+            energySupplierActorNumber,
+            transactionId);
     }
 
     protected async Task GivenInitializeAggregatedMeasureDataProcessDtoIsHandledAsync(

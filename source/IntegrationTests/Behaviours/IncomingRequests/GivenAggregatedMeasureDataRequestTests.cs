@@ -54,7 +54,8 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
             (2024, 5, 1),
             (2024, 6, 1),
             "512",
-            "2111111111111");
+            "2111111111111",
+            "123564789123564789123564789123564787");
 
         responseMessage.IsErrorResponse.Should().BeFalse(responseMessage.MessageBody);
 
@@ -94,7 +95,8 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
             (2024, 5, 1),
             (2024, 6, 1),
             "512",
-            "2111111111111");
+            "2111111111111",
+            "123564789123564789123564789123564787");
 
         responseMessage.IsErrorResponse.Should().BeFalse(responseMessage.MessageBody);
 
@@ -115,6 +117,9 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
         peekedMessage.Bundle.Should().NotBeNull();
 
         new AssertNotifyAggregatedMeasureDataJsonDocument(peekedMessage.Bundle!)
-            .HasEnergySupplierNumber("2111111111111");
+            .HasEnergySupplierNumber("2111111111111")
+            .HasGridAreaCode("512")
+            .HasReceiverId("2111111111111")
+            .HasOriginalTransactionIdReference("123564789123564789123564789123564787");
     }
 }
