@@ -16,7 +16,6 @@ using System;
 using System.Linq;
 using System.Reflection;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore.Internal;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviors;
@@ -38,19 +37,17 @@ public static class MetaTests
         // Arrange
         var needsToBeOfForm_Given_xx_When_yy_Then_zz = @"^Given_[^_]+_When_[^_]+_Then_[^_]+$";
 
-        var allTestNames = Assembly.GetAssembly(typeof(MetaTests))
-            ?
+        var allTestNames = Assembly.GetAssembly(typeof(MetaTests))?
             .GetTypes()
             .Where(
                 type =>
                     type.IsClass
                     && type.Namespace != null
                     && !_excludedTestFolders.Any(f => type.Namespace.Contains(f, StringComparison.OrdinalIgnoreCase)))
-            .Select(type => type.GetMethods())
-            .SelectMany(methods => methods)
+            .SelectMany(type => type.GetMethods())
             .Where(IsXunitTest)
             .Select(m => m.Name)
-            .Where(name => !_genericMethodNames.Contains(name))
+            .Where(IsNotGenericMethod)
             .ToArray();
 
         // Assert
@@ -69,5 +66,10 @@ public static class MetaTests
     {
         return type.CustomAttributes.Any(t => t.AttributeType.Namespace == "Xunit")
             && type.CustomAttributes.All(t => t.AttributeType.Name != nameof(ExcludeFromNameConventionCheckAttribute));
+    }
+
+    private static bool IsNotGenericMethod(string name)
+    {
+        return !_genericMethodNames.Contains(name);
     }
 }
