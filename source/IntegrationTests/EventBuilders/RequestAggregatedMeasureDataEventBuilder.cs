@@ -28,7 +28,8 @@ internal static class RequestAggregatedMeasureDataEventBuilder
         string periodStart,
         string periodEnd,
         string? gridArea,
-        string energySupplierActorNumber = "5799999933318")
+        string energySupplierActorNumber,
+        string transactionId)
     {
         return new IncomingMessageStream(
             new MemoryStream(
@@ -39,7 +40,8 @@ internal static class RequestAggregatedMeasureDataEventBuilder
                         periodStart,
                         periodEnd,
                         gridArea,
-                        energySupplierActorNumber))));
+                        energySupplierActorNumber,
+                        transactionId))));
     }
 
     private static string GetJson(
@@ -48,7 +50,8 @@ internal static class RequestAggregatedMeasureDataEventBuilder
         string periodStart,
         string periodEnd,
         string? gridArea,
-        string energySupplierActorNumber = "5799999933318")
+        string energySupplierActorNumber,
+        string transactionId)
     {
         return $@"{{
 	""RequestAggregatedMeasureData_MarketDocument"": {{
@@ -79,7 +82,7 @@ internal static class RequestAggregatedMeasureDataEventBuilder
 		}},
 		""Series"": [
 			{{
-				""mRID"": ""123564789123564789123564789123564787"",
+				""mRID"": ""{transactionId}"",
 				""balanceResponsibleParty_MarketParticipant.mRID"": {{
 					""codingScheme"": ""A10"",
 					""value"": ""5799999933318""
