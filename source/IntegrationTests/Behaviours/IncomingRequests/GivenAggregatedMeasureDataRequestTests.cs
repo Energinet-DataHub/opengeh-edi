@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.Edi.Requests;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using FluentAssertions;
 using NodaTime;
 using Xunit;
@@ -75,5 +76,45 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
         aggregatedTimeSeriesRequest.RequestedByActorId.Should().Be("2111111111111");
         aggregatedTimeSeriesRequest.RequestedByActorRole.Should().Be("EnergySupplier");
         aggregatedTimeSeriesRequest.EnergySupplierId.Should().Be("2111111111111");
+    }
+
+    [Fact]
+    public async Task
+        Given_RequestAggregatedMeasureDataJsonIsReceivedAndDelegation_When_ActorPeeksJson_Then_CorrectJsonDocumentIsCreated()
+    {
+        // Arrange
+        var senderSpy = GivenServiceBusSenderSpy("Fake");
+        GivenNowIs(2024, 7, 1);
+        GivenAuthenticatedActorIs(ActorNumber.Create("2111111111111"), ActorRole.EnergySupplier);
+        await GivenGridAreaOwnershipAsync("512", ActorNumber.Create("3111111111111"));
+
+        var responseMessage = await GivenRequestAggregatedMeasureDataJsonAsync(
+            "2111111111111",
+            ActorRole.EnergySupplier.Code,
+            (2024, 5, 1),
+            (2024, 6, 1),
+            "512",
+            "2111111111111");
+
+        responseMessage.IsErrorResponse.Should().BeFalse(responseMessage.MessageBody);
+
+        senderSpy.Message.Should().NotBeNull();
+        await GivenInitializeAggregatedMeasureDataProcessDtoIsHandledAsync(senderSpy.Message!);
+        await GivenWholesaleAcceptedResponseToAggregatedMeasureDataRequestAsync(senderSpy.Message!);
+
+        // Act
+        ClearDbContextCaches();
+        var peekedMessage = await PeekMessageAsync(
+            MessageCategory.Aggregations,
+            ActorNumber.Create("2111111111111"),
+            ActorRole.EnergySupplier,
+            DocumentFormat.Json);
+
+        // Assert
+        peekedMessage.Should().NotBeNull();
+        peekedMessage.Bundle.Should().NotBeNull();
+
+        new AssertNotifyAggregatedMeasureDataJsonDocument(peekedMessage.Bundle!)
+            .HasEnergySupplierNumber("2111111111111");
     }
 }
