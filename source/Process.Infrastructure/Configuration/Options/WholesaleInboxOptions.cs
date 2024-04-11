@@ -16,10 +16,19 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 
+/// <summary>
+/// Options related to wholesale inbox queue.
+/// </summary>
 public class WholesaleInboxOptions
 {
+    /// <summary>
+    /// The name of the section in the configuration file where this option should find its information.
+    /// </summary>
     public const string SectionName = "WholesaleInbox";
 
+    /// <summary>
+    /// Queue name for the wholesale inbox.
+    /// </summary>
     [Required]
     public string QueueName { get; set; } = string.Empty;
 }

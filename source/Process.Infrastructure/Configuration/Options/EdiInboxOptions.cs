@@ -16,10 +16,19 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 
+/// <summary>
+/// Options related to Edi inbox queue.
+/// </summary>
 public class EdiInboxOptions
 {
+    /// <summary>
+    /// The name of the section in the configuration file where this option should find its information.
+    /// </summary>
     public const string SectionName = "EdiInbox";
 
+    /// <summary>
+    /// Queue name for the Edi inbox.
+    /// </summary>
     [Required]
     public string QueueName { get; set; } = string.Empty;
 }
