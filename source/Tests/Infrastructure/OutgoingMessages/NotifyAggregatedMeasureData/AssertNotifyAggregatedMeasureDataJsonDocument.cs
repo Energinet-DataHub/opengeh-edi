@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -28,7 +29,8 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 
-internal sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNotifyAggregatedMeasureDataDocument
+[SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Test class")]
+public sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNotifyAggregatedMeasureDataDocument
 {
     private readonly JsonSchemaProvider _schemas = new(new CimJsonSchemas());
     private readonly JsonDocument _document;
