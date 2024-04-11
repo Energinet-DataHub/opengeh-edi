@@ -73,8 +73,7 @@ public static class IntegrationEventExtensions
             .BindConfiguration(IntegrationEventsOptions.SectionName)
             .ValidateDataAnnotations();
 
-        // This module is using dapper, so we add health check manually
-        services.TryAddSqlServerHealthCheck(configuration);
+        services.AddDapperConnectionToDatabase(configuration);
 
         return services;
     }

@@ -34,7 +34,10 @@ public static class DatabaseExtensions
         SqlMapper.AddTypeHandler(InstantHandler.Default);
 
         services
-            .AddScoped<IDatabaseConnectionFactory, SqlDatabaseConnectionFactory>();
+            .AddScoped<IDatabaseConnectionFactory, SqlDatabaseConnectionFactory>()
+
+            // Health checks
+            .TryAddSqlServerHealthCheck(configuration);
 
         return services;
     }

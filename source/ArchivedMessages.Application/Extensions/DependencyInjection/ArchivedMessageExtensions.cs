@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
-using Dapper;
-using Dapper.NodaTime;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
@@ -30,18 +27,13 @@ public static class ArchivedMessageExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        ArgumentNullException.ThrowIfNull(configuration);
-
-        services.AddTransient<IArchivedMessageRepository, ArchivedMessageRepository>();
-        services.AddTransient<IArchivedMessagesClient, ArchivedMessagesClient>();
-        SqlMapper.AddTypeHandler(InstantHandler.Default);
+        services
+            .AddTransient<IArchivedMessageRepository, ArchivedMessageRepository>()
+            .AddTransient<IArchivedMessagesClient, ArchivedMessagesClient>()
+            .AddDapperConnectionToDatabase(configuration);
 
         // Dependencies
-        services.AddBuildingBlocks(configuration)
-
-            // Health checks
-            // This module is using dapper, so we add health check manually
-            .TryAddSqlServerHealthCheck(configuration);
+        services.AddBuildingBlocks(configuration);
 
         return services;
     }

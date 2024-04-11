@@ -22,6 +22,7 @@ limitations under the License.
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Dapper-NodaTime" Version="0.1.0"/>
         <PackageReference Include="FluentAssertions" Version="6.12.0" />
         <PackageReference Include="FluentAssertions.Analyzers" Version="0.28.0">
           <PrivateAssets>all</PrivateAssets>
