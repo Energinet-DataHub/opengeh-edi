@@ -33,7 +33,7 @@ internal static class RequestAggregatedMeasureDataEventBuilder
         return new IncomingMessageStream(
             new MemoryStream(
                 Encoding.UTF8.GetBytes(
-                    GetThatJson(
+                    GetJson(
                         senderActorNumber,
                         senderActorRole,
                         periodStart,
@@ -42,7 +42,7 @@ internal static class RequestAggregatedMeasureDataEventBuilder
                         energySupplierActorNumber))));
     }
 
-    private static string GetThatJson(
+    private static string GetJson(
         string senderActorNumber,
         string senderActorRole,
         string periodStart,
