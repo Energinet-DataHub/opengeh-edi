@@ -79,6 +79,7 @@ limitations under the License.
       <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
       <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
       <ProjectReference Include="..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />
+      <ProjectReference Include="..\Tests\Tests.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -132,5 +133,9 @@ limitations under the License.
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DocumentAsserters\"/>
+  </ItemGroup>
   
 </Project>

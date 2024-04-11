@@ -16,15 +16,11 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Azure.Messaging.ServiceBus;
-using Azure.Storage.Blobs;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.FeatureFlag;
-using Dapper;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.Api.DataRetention;
@@ -32,7 +28,6 @@ using Energinet.DataHub.EDI.Api.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
@@ -42,7 +37,6 @@ using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyIn
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Configuration;
-using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -58,10 +52,11 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
-using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.Edi.Requests;
+using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -70,10 +65,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using NodaTime;
 using Xunit;
-using SampleData = Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.SampleData;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
@@ -132,6 +125,7 @@ public class BehavioursTestBase : IDisposable
     private readonly SystemDateTimeProviderStub _systemDateTimeProviderStub;
     private readonly AuthenticatedActor _authenticatedActor;
     private readonly DateTimeZone _dateTimeZone;
+    private readonly ServiceProvider _serviceProvider;
     private ServiceCollection? _services;
     private bool _disposed;
 
@@ -143,7 +137,7 @@ public class BehavioursTestBase : IDisposable
         _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
         TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
         InboxEventNotificationHandler = new TestNotificationHandlerSpy();
-        BuildServices(integrationTestFixture.AzuriteManager.BlobStorageConnectionString);
+        _serviceProvider = BuildServices(integrationTestFixture.AzuriteManager.BlobStorageConnectionString);
         _processContext = GetService<ProcessContext>();
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         _authenticatedActor = GetService<AuthenticatedActor>();
@@ -153,10 +147,6 @@ public class BehavioursTestBase : IDisposable
 
         _dateTimeZone = DateTimeZoneProviders.Tzdb["Europe/Copenhagen"];
     }
-
-    protected FeatureFlagManagerStub FeatureFlagManagerStub { get; } = new();
-
-    protected ServiceProvider ServiceProvider { get; private set; } = null!;
 
     private TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
 
@@ -168,68 +158,25 @@ public class BehavioursTestBase : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    protected static async Task<string> GetFileContentFromFileStorageAsync(
-        string container,
-        string fileStorageReference)
+    protected async Task<PeekResultDto> PeekMessageAsync(
+        MessageCategory category,
+        ActorNumber actorNumber,
+        ActorRole actorRole,
+        DocumentFormat documentFormat)
     {
-        var azuriteBlobConnectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING");
-        var blobServiceClient = new BlobServiceClient(azuriteBlobConnectionString); // Uses new client to avoid some form of caching or similar
+        using var serviceScope = _serviceProvider.CreateScope();
+        var outgoingMessagesClient = serviceScope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
 
-        var containerClient = blobServiceClient.GetBlobContainerClient(container);
-        var blobClient = containerClient.GetBlobClient(fileStorageReference);
+        var result = await outgoingMessagesClient.PeekAndCommitAsync(
+            new PeekRequestDto(
+                actorNumber,
+                category,
+                actorRole,
+                documentFormat),
+            CancellationToken.None);
 
-        var blobContent = await blobClient.DownloadAsync();
-
-        if (!blobContent.HasValue) throw new InvalidOperationException($"Couldn't get file content from file storage (container: {container}, blob: {fileStorageReference})");
-
-        var fileStringContent = await GetStreamContentAsStringAsync(blobContent.Value.Content);
-        return fileStringContent;
+        return result;
     }
-
-    protected static async Task<string> GetStreamContentAsStringAsync(Stream stream)
-    {
-        ArgumentNullException.ThrowIfNull(stream);
-
-        if (stream.CanSeek && stream.Position != 0)
-            stream.Position = 0;
-
-        using var streamReader = new StreamReader(stream, Encoding.UTF8);
-        var stringContent = await streamReader.ReadToEndAsync();
-
-        return stringContent;
-    }
-
-    protected async Task<string?> GetArchivedMessageFileStorageReferenceFromDatabaseAsync(string messageId)
-    {
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var fileStorageReference = await connection.ExecuteScalarAsync<string>($"SELECT FileStorageReference FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'");
-
-        return fileStorageReference;
-    }
-
-    protected async Task<string?> GetMarketDocumentFileStorageReferenceFromDatabaseAsync(Guid bundleId)
-    {
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var fileStorageReference = await connection.ExecuteScalarAsync<string>($"SELECT FileStorageReference FROM [dbo].[MarketDocuments] WHERE BundleId = '{bundleId}'");
-
-        return fileStorageReference;
-    }
-
-    protected async Task<Guid> GetArchivedMessageIdFromDatabaseAsync(string messageId)
-    {
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var id = await connection.ExecuteScalarAsync<Guid>($"SELECT Id FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'");
-
-        return id;
-    }
-
-    protected Task<PeekResultDto> PeekMessageAsync(MessageCategory category, ActorNumber? actorNumber = null, ActorRole? actorRole = null, DocumentFormat? documentFormat = null)
-    {
-        var outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
-        return outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, actorRole ?? ActorRole.EnergySupplier, documentFormat ?? DocumentFormat.Xml), CancellationToken.None);
-    }
-
-    protected Task<string?> GetArchivedMessageFileStorageReferenceFromDatabaseAsync(Guid messageId) => GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId.ToString());
 
     protected void ClearDbContextCaches()
     {
@@ -237,7 +184,7 @@ public class BehavioursTestBase : IDisposable
 
         var dbContextServices = _services
             .Where(s => s.ServiceType.IsSubclassOf(typeof(DbContext)) || s.ServiceType == typeof(DbContext))
-            .Select(s => (DbContext)ServiceProvider.GetService(s.ServiceType)!);
+            .Select(s => (DbContext)_serviceProvider.GetService(s.ServiceType)!);
 
         foreach (var dbContext in dbContextServices)
             dbContext.ChangeTracker.Clear();
@@ -253,27 +200,25 @@ public class BehavioursTestBase : IDisposable
         _processContext.Dispose();
         _incomingMessagesContext.Dispose();
         _serviceBusSenderFactoryStub.Dispose();
-        ServiceProvider.Dispose();
+        _serviceProvider.Dispose();
         _disposed = true;
-    }
-
-    protected IServiceCollection GetServiceCollectionClone()
-    {
-        if (_services == null) throw new InvalidOperationException("ServiceCollection is not yet initialized");
-
-        var serviceCollectionClone = new ServiceCollection { _services };
-
-        return serviceCollectionClone;
-    }
-
-    protected Task<TResult> InvokeCommandAsync<TResult>(ICommand<TResult> command)
-    {
-        return GetService<IMediator>().Send(command);
     }
 
     protected Task CreateActorIfNotExistAsync(CreateActorDto createActorDto)
     {
         return GetService<IMasterDataClient>().CreateActorIfNotExistAsync(createActorDto, CancellationToken.None);
+    }
+
+    protected Task GivenGridAreaOwnershipAsync(string gridArea, ActorNumber actorNumber)
+    {
+        return GetService<IMasterDataClient>()
+            .UpdateGridAreaOwnershipAsync(
+                new GridAreaOwnershipAssignedDto(
+                    gridArea,
+                    _systemDateTimeProviderStub.Now().Minus(Duration.FromDays(100)),
+                    actorNumber,
+                    0),
+                CancellationToken.None);
     }
 
     protected async Task HavingReceivedInboxEventAsync(string eventType, IMessage eventPayload, Guid processId)
@@ -347,7 +292,8 @@ public class BehavioursTestBase : IDisposable
         (int Year, int Month, int Day) periodStart,
         (int Year, int Month, int Day) periodEnd,
         string gridArea,
-        string energySupplierActorNumber)
+        string energySupplierActorNumber,
+        string transactionId)
     {
         return GetService<IIncomingMessageClient>()
             .RegisterAndSendAsync(
@@ -365,7 +311,8 @@ public class BehavioursTestBase : IDisposable
                         .ToInstant()
                         .ToString(),
                     gridArea,
-                    energySupplierActorNumber),
+                    energySupplierActorNumber,
+                    transactionId),
                 DocumentFormat.Json,
                 IncomingDocumentType.RequestAggregatedMeasureData,
                 CancellationToken.None);
@@ -380,7 +327,8 @@ public class BehavioursTestBase : IDisposable
         (int Year, int Month, int Day) periodStart,
         (int Year, int Month, int Day) periodEnd,
         string gridArea,
-        string energySupplierActorNumber)
+        string energySupplierActorNumber,
+        string transactionId)
     {
         return GivenRequestAggregatedMeasureDataJsonAsync(
             senderActorNumber,
@@ -388,7 +336,8 @@ public class BehavioursTestBase : IDisposable
             periodStart,
             periodEnd,
             gridArea,
-            energySupplierActorNumber);
+            energySupplierActorNumber,
+            transactionId);
     }
 
     protected async Task GivenInitializeAggregatedMeasureDataProcessDtoIsHandledAsync(
@@ -411,6 +360,24 @@ public class BehavioursTestBase : IDisposable
         await GivenInitializeAggregatedMeasureDataProcessDtoIsHandledAsync(serviceBusMessage);
     }
 
+    protected async Task GivenWholesaleAcceptedResponseToAggregatedMeasureDataRequestAsync(
+        ServiceBusMessage serviceBusMessage)
+    {
+        serviceBusMessage.Subject.Should().Be(nameof(AggregatedTimeSeriesRequest));
+        serviceBusMessage.Body.Should().NotBeNull();
+
+        var aggregatedTimeSeriesRequest =
+            AggregatedTimeSeriesRequest.Parser.ParseFrom(serviceBusMessage.Body);
+
+        var aggregatedTimeSeriesRequestAccepted =
+            AggregatedTimeSeriesRequestAcceptedEventBuilder.BuildEventFrom(aggregatedTimeSeriesRequest);
+
+        await HavingReceivedInboxEventAsync(
+            nameof(AggregatedTimeSeriesRequestAccepted),
+            aggregatedTimeSeriesRequestAccepted,
+            Guid.Parse(serviceBusMessage.MessageId));
+    }
+
     protected ServiceBusSenderSpy GivenServiceBusSenderSpy(string topicName)
     {
         var serviceBusSenderSpy = new ServiceBusSenderSpy(topicName);
@@ -427,7 +394,7 @@ public class BehavioursTestBase : IDisposable
 
     protected async Task<PeekResultDto> WhenActorPeeksMessage(ActorNumber actorNumber, ActorRole actorRole, DocumentFormat documentFormat)
     {
-        await using var scope = ServiceProvider.CreateAsyncScope();
+        await using var scope = _serviceProvider.CreateAsyncScope();
         var outgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         var peekResult = await outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber, MessageCategory.Aggregations, actorRole, documentFormat), CancellationToken.None);
         return peekResult;
@@ -454,7 +421,7 @@ public class BehavioursTestBase : IDisposable
     private T GetService<T>()
         where T : notnull
     {
-        return ServiceProvider.GetRequiredService<T>();
+        return _serviceProvider.GetRequiredService<T>();
     }
 
     private Task ProcessReceivedInboxEventsAsync()
@@ -468,7 +435,7 @@ public class BehavioursTestBase : IDisposable
         return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
     }
 
-    private void BuildServices(string fileStorageConnectionString)
+    private ServiceProvider BuildServices(string fileStorageConnectionString)
     {
         Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", IntegrationTestFixture.DatabaseConnectionString);
@@ -508,8 +475,8 @@ public class BehavioursTestBase : IDisposable
         // Replace the services with stub implementations.
         // - Building blocks
         _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
-        _services.AddTransient<IFeatureFlagManager>(_ => FeatureFlagManagerStub);
+        _services.AddTransient<IFeatureFlagManager>(_ => new FeatureFlagManagerStub());
 
-        ServiceProvider = _services.BuildServiceProvider();
+        return _services.BuildServiceProvider();
     }
 }
