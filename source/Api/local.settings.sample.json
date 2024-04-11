@@ -10,7 +10,6 @@
     "AZURE_STORAGE_ACCOUNT_URL":                "<Azure storage account url>",
 
     "ServiceBus__ListenConnectionString": "<service bus connection string for shared service bus with listener permissions>",
-    "ServiceBus__ManageConnectionString": "<connection string for shared service bus with manage permissions>",
     "ServiceBus__SendConnectionString":   "<connection string for shared service bus with sender permissions>",
 
     "EdiInbox__QueueName":          "<Name of queue where incoming messages to EDI from other subsystems are placed>",

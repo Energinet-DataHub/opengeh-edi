@@ -122,7 +122,7 @@ public static class ProcessExtensions
 
             // health checks
             .TryAddExternalDomainServiceBusQueuesHealthCheck(
-                configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>()!.ManageConnectionString!,
+                configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>()!.ListenConnectionString!,
                 configuration.GetSection(EdiInboxOptions.SectionName).Get<EdiInboxOptions>()!.QueueName!,
                 configuration.GetSection(WholesaleInboxOptions.SectionName).Get<WholesaleInboxOptions>()!.QueueName!);
         return services;

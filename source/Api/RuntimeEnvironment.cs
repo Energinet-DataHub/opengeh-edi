@@ -42,9 +42,6 @@ namespace Energinet.DataHub.EDI.Api
         public virtual string? AZURE_FUNCTIONS_ENVIRONMENT =>
             GetEnvironmentVariable(nameof(AZURE_FUNCTIONS_ENVIRONMENT));
 
-        public string? ServiceBus__ManageConnectionString =>
-            GetEnvironmentVariable(nameof(ServiceBus__ManageConnectionString));
-
         public string? AzureWebJobsStorage =>
             GetEnvironmentVariable(nameof(AzureWebJobsStorage));
 

@@ -55,7 +55,6 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL", TestEnvironment.CreateFakeStorageUrl());
 
             Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
-            Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ManageConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
             Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.SendConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
 
             _host = HostFactory.CreateHost(RuntimeEnvironment.Default, Program.TokenValidationParameters);
@@ -174,7 +173,6 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
                     new Dictionary<string, string?>
                     {
                         [$"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}"] = "Fake",
-                        [$"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ManageConnectionString)}"] = "Fake",
                         [$"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.SendConnectionString)}"] = "Fake",
 
                         [$"{UserAuthenticationOptions.SectionName}:{nameof(UserAuthenticationOptions.MitIdExternalMetadataAddress)}"] = "NotEmpty",
