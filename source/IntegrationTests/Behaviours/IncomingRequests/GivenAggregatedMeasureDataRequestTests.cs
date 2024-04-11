@@ -32,7 +32,7 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
 
     [Fact]
     public async Task
-        Given_RequestAggregatedMeasureDataJsonAndDelegation_When_RequestIsReceived_Then_ServiceBusMessageToWholesaleIsAddedToServiceBus()
+        Given_Delegation_When_RequestAggregatedMeasureDataJsonIsReceived_Then_ServiceBusMessageToWholesaleIsAddedToServiceBus()
     {
         // Arrange
         var senderSpy = GivenServiceBusSenderSpy("Fake");
