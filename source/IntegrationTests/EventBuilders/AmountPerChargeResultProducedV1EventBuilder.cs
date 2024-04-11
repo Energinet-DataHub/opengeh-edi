@@ -18,7 +18,7 @@ using Google.Protobuf.WellKnownTypes;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
+namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
 public class AmountPerChargeResultProducedV1EventBuilder
 {

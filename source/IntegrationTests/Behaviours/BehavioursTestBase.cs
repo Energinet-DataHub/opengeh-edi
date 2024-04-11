@@ -19,11 +19,14 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Azure.Messaging.ServiceBus;
 using Azure.Storage.Blobs;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
+using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.Api.DataRetention;
 using Energinet.DataHub.EDI.Api.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
@@ -39,6 +42,8 @@ using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyIn
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Configuration;
+using Energinet.DataHub.EDI.IntegrationTests.Assertions;
+using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
@@ -57,7 +62,9 @@ using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Google.Protobuf;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -70,8 +77,53 @@ using SampleData = Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMe
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
+/// <summary>
+///     - IntegrationTests
+///         - IntegrationTests.EventBuilders
+///             - AggregatedMeasureDataEventBuilder
+///         - IntegrationTests.DocumentAsserters
+///             - AggregatedMeasureDataDocumentXMLAsserter
+///
+///         - IntegrationTests.Behaviours (BehaviourTestBase)
+///                    IntegrationEvent
+///                         (classes)
+///                         - GivenEnergyResultProducedV2
+///                             (methods)
+///                             - When_ActorPeeksDocument_Then_ActorCanPeekCorrectDocument
+///                             - When_ActorPeeksDocument_Then_DelegatedActorCanPeekCorrectDocument
+///                         - GivenMonthlyAmountPerChargeResultProducedV1
+///                             (methods)
+///                             - When_ActorPeeksDocument_Then_ActorCanPeekCorrectDocument
+///                             - When_ActorPeeksDocument_Then_DelegatedActorCanPeekCorrectDocument
+///                         - GivenAmountPerChargeResultProducedV1
+///                             (methods)
+///                             - When_ActorPeeksDocument_Then_ActorCanPeekCorrectDocument
+///                             - When_ChargeOwnerPeeksDocument_Then_ChargeOwnerCanPeekCorrectDocument
+///                             - When_ActorPeeksDocument_Then_DelegatedActorCanPeekCorrectDocument
+///                      IncomingRequests|IncomingMessages
+///
+///       (Existing)
+///       - IntegrationEvents.Application.Test
+///             - WhenAggregatedMeasureDataReceived
+///      -------------------------------------------------------
+///                 Unit tests
+///                     (folder)
+///                     NotifyWholesaleServices
+///                         (classes)
+///                         - NotifyWholesaleServiceDocumentWriterTests
+///                             (methods)
+///                             - Given_ChargeTypeIsFeeAndAmountFieldIsMissing_When_CreateDocument_Then_ThrowException
+///
+///             **** Rule of thumb ****
+///                 Given = // Arrange
+///                 When = // Act
+///                 Then  = // Assert
+///
+/// </summary>
 [Collection("IntegrationTest")]
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "This is a test class")]
+[SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Test class")]
+[SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Test class")]
 public class BehavioursTestBase : IDisposable
 {
     private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
@@ -365,6 +417,38 @@ public class BehavioursTestBase : IDisposable
         _serviceBusSenderFactoryStub.AddSenderSpy(serviceBusSenderSpy);
 
         return serviceBusSenderSpy;
+    }
+
+    protected async Task GivenIntegrationEventReceived(IEventMessage @event)
+    {
+        var integrationEvent = new IntegrationEvent(Guid.NewGuid(), @event.EventName, @event.EventMinorVersion, @event);
+        await GetService<IIntegrationEventHandler>().HandleAsync(integrationEvent);
+    }
+
+    protected async Task<PeekResultDto> WhenActorPeeksMessage(ActorNumber actorNumber, ActorRole actorRole, DocumentFormat documentFormat)
+    {
+        await using var scope = ServiceProvider.CreateAsyncScope();
+        var outgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        var peekResult = await outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber, MessageCategory.Aggregations, actorRole, documentFormat), CancellationToken.None);
+        return peekResult;
+    }
+
+    protected Task ThenDocumentIsCorrect(Stream? bundle, DocumentFormat documentFormat, Action<INotifyWholesaleServicesDocumentAsserter> assert)
+    {
+        using var assertionScope = new AssertionScope();
+        bundle.Should().NotBeNull();
+
+        var asserter = documentFormat.Name switch
+        {
+            nameof(DocumentFormat.Xml) => new StubNotifyWholesaleServicesDocumentAsserter(bundle),
+            nameof(DocumentFormat.Json) => new StubNotifyWholesaleServicesDocumentAsserter(bundle),
+            nameof(DocumentFormat.Ebix) => new StubNotifyWholesaleServicesDocumentAsserter(bundle),
+            _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, null),
+        };
+
+        assert(asserter);
+
+        return Task.CompletedTask;
     }
 
     private T GetService<T>()
