@@ -23,15 +23,16 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
-public class GivenAggregatedMeasureDataRequest : BehavioursTestBase
+public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
 {
-    public GivenAggregatedMeasureDataRequest(IntegrationTestFixture integrationTestFixture)
+    public GivenAggregatedMeasureDataRequestTests(IntegrationTestFixture integrationTestFixture)
         : base(integrationTestFixture)
     {
     }
 
     [Fact]
-    public async Task InsertBetterTestNameHereAsync()
+    public async Task
+        Given_RequestAggregatedMeasureDataJsonAndDelegation_When_RequestIsReceived_Then_ServiceBusMessageToWholesaleIsAddedToServiceBus()
     {
         // Arrange
         var senderSpy = GivenServiceBusSenderSpy("Fake");
