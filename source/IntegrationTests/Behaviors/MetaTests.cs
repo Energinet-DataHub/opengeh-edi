@@ -22,8 +22,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Behaviors;
 
 public static class MetaTests
 {
-    private static readonly string[] _genericMethodNames = { "GetType", "ToString", "Equals", "GetHashCode" };
-
     private static readonly string[] _excludedTestFolders =
     {
         "Energinet.DataHub.EDI.IntegrationTests.Api",
@@ -47,7 +45,6 @@ public static class MetaTests
             .SelectMany(type => type.GetMethods())
             .Where(IsXunitTest)
             .Select(m => m.Name)
-            .Where(IsNotGenericMethod)
             .ToArray();
 
         // Assert
@@ -66,10 +63,5 @@ public static class MetaTests
     {
         return type.CustomAttributes.Any(t => t.AttributeType.Namespace == "Xunit")
             && type.CustomAttributes.All(t => t.AttributeType.Name != nameof(ExcludeFromNameConventionCheckAttribute));
-    }
-
-    private static bool IsNotGenericMethod(string name)
-    {
-        return !_genericMethodNames.Contains(name);
     }
 }
