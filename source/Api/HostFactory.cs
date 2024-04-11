@@ -20,7 +20,6 @@ using Energinet.DataHub.EDI.Api.Configuration.Middleware;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.Api.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
@@ -38,9 +37,8 @@ public static class HostFactory
 {
     private const string DomainName = "EDI";
 
-    public static IHost CreateHost(RuntimeEnvironment runtime, TokenValidationParameters tokenValidationParameters)
+    public static IHost CreateHost(TokenValidationParameters tokenValidationParameters)
     {
-        ArgumentNullException.ThrowIfNull(runtime);
         ArgumentNullException.ThrowIfNull(tokenValidationParameters);
 
         return new HostBuilder()

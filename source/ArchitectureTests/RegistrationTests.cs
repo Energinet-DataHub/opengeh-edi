@@ -57,7 +57,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
             Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.SendConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
 
-            _host = HostFactory.CreateHost(RuntimeEnvironment.Default, Program.TokenValidationParameters);
+            _host = HostFactory.CreateHost(Program.TokenValidationParameters);
         }
 
         #region Member data providers
