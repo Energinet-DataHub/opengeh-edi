@@ -24,8 +24,11 @@ namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
 public static class FileStorageExtensions
 {
+    private const string FileStorageName = "edi-documents-storage";
+
     public static IServiceCollection AddFileStorage(this IServiceCollection services, IConfiguration configuration)
     {
+        ArgumentNullException.ThrowIfNull(configuration);
         services
             .AddOptions<BlobServiceClientConnectionOptions>()
             .Bind(configuration)
@@ -43,6 +46,15 @@ public static class FileStorageExtensions
             });
 
         services.AddTransient<IFileStorageClient, DataLakeFileStorageClient>();
+
+        var uri = configuration["AZURE_STORAGE_ACCOUNT_URL"];
+
+        if (uri != null)
+        {
+            services.TryAddBlobStorageHealthCheck(
+                FileStorageName,
+                uri!);
+        }
 
         return services;
     }

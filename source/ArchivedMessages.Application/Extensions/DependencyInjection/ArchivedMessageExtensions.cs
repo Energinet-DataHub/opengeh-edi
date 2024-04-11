@@ -16,7 +16,6 @@ using System;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Dapper;
 using Dapper.NodaTime;
-using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.Options;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
@@ -29,8 +28,7 @@ public static class ArchivedMessageExtensions
 {
     public static IServiceCollection AddArchivedMessagesModule(
         this IServiceCollection services,
-        IConfiguration configuration,
-        bool isDevelopment = false)
+        IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
@@ -42,20 +40,8 @@ public static class ArchivedMessageExtensions
         services.AddBuildingBlocks(configuration)
 
             // Health checks
+            // This module is using dapper, so we add health check manually
             .TryAddSqlServerHealthCheck(configuration);
-
-        if (isDevelopment == false)
-        {
-            var uri = new Uri(
-                configuration["AZURE_STORAGE_ACCOUNT_URL"]
-                ?? throw new InvalidOperationException("AZURE_STORAGE_ACCOUNT_URL is missing"));
-            services.AddOptions<DocumentStorageOptions>()
-                .Configure(option => option.StorageAccountUri = uri);
-
-            services.TryAddBlobStorageHealthCheck(
-                DocumentStorageOptions.StorageName,
-                uri!);
-        }
 
         return services;
     }

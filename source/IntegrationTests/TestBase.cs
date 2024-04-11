@@ -299,10 +299,10 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 .AddScoped<ISystemDateTimeProvider>(_ => new SystemDateTimeProviderStub());
 
             _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
-            .AddIntegrationEventModule()
-            .AddOutgoingMessagesModule(config, true)
+                .AddIntegrationEventModule(config)
+            .AddOutgoingMessagesModule(config)
             .AddProcessModule(config)
-            .AddArchivedMessagesModule(config, true)
+            .AddArchivedMessagesModule(config)
             .AddIncomingMessagesModule(config)
             .AddMasterDataModule(config)
             .AddDataAccessUnitOfWorkModule(config);

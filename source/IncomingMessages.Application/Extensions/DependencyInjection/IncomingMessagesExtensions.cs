@@ -53,9 +53,6 @@ public static class IncomingMessagesExtensions
 
         services
             .AddServiceBus(configuration)
-            .TryAddExternalDomainServiceBusQueuesHealthCheck(
-                configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>()!.ListenConnectionString!,
-                configuration.GetSection(IncomingMessagesQueueOptions.SectionName).Get<IncomingMessagesQueueOptions>()!.QueueName!)
             .AddDapperConnectionToDatabase(configuration)
             .AddScopedSqlDbContext<IncomingMessagesContext>(configuration)
             .AddScoped<IIncomingMessageClient, IncomingMessageClient>()
@@ -81,7 +78,12 @@ public static class IncomingMessagesExtensions
         //RegisterSchemaProviders
         services.AddSingleton<CimJsonSchemas>()
             .AddSingleton<CimXmlSchemaProvider>()
-            .AddSingleton<JsonSchemaProvider>();
+            .AddSingleton<JsonSchemaProvider>()
+
+            // Health checks
+            .TryAddExternalDomainServiceBusQueuesHealthCheck(
+                configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>()!.ListenConnectionString!,
+                configuration.GetSection(IncomingMessagesQueueOptions.SectionName).Get<IncomingMessagesQueueOptions>()!.QueueName!);
 
         return services;
     }

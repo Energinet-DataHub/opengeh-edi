@@ -68,7 +68,6 @@ public static class HostFactory
                         .TryAddBlobStorageHealthCheck(
                             "edi-web-jobs-storage",
                             context.Configuration["AzureWebJobsStorage"]!)
-                        .TryAddSqlServerHealthCheck(context.Configuration)
 
                         // Data retention
                         .AddDataRetention()
@@ -83,7 +82,7 @@ public static class HostFactory
                         .AddSerializer()
 
                         // Modules
-                        .AddIntegrationEventModule()
+                        .AddIntegrationEventModule(context.Configuration)
                         .AddArchivedMessagesModule(context.Configuration)
                         .AddIncomingMessagesModule(context.Configuration)
                         .AddOutgoingMessagesModule(context.Configuration)

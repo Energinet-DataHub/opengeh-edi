@@ -17,6 +17,7 @@ using System.Linq;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.Options;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
@@ -24,15 +25,19 @@ using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf.Reflection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
 
 public static class IntegrationEventExtensions
 {
-    public static IServiceCollection AddIntegrationEventModule(this IServiceCollection services)
+    public static IServiceCollection AddIntegrationEventModule(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
-        services.AddTransient<IIntegrationEventProcessor, ProcessDelegationConfiguredEventProcessor>()
+        services
+            .AddTransient<IIntegrationEventProcessor, ProcessDelegationConfiguredEventProcessor>()
             .AddTransient<IIntegrationEventProcessor, EnergyResultProducedV2Processor>()
             .AddTransient<IIntegrationEventProcessor, MonthlyAmountPerChargeResultProducedV1Processor>()
             .AddTransient<IIntegrationEventProcessor, AmountPerChargeResultProducedV1Processor>()
@@ -67,6 +72,9 @@ public static class IntegrationEventExtensions
         services.AddOptions<IntegrationEventsOptions>()
             .BindConfiguration(IntegrationEventsOptions.SectionName)
             .ValidateDataAnnotations();
+
+        // This module is using dapper, so we add health check manually
+        services.TryAddSqlServerHealthCheck(configuration);
 
         return services;
     }

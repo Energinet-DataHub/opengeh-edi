@@ -426,10 +426,10 @@ public class BehavioursTestBase : IDisposable
             .AddScoped<ISystemDateTimeProvider>(_ => _systemDateTimeProviderStub);
 
         _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
-            .AddIntegrationEventModule()
-            .AddOutgoingMessagesModule(config, true)
+            .AddIntegrationEventModule(config)
+            .AddOutgoingMessagesModule(config)
             .AddProcessModule(config)
-            .AddArchivedMessagesModule(config, true)
+            .AddArchivedMessagesModule(config)
             .AddIncomingMessagesModule(config)
             .AddMasterDataModule(config)
             .AddDataAccessUnitOfWorkModule(config);

@@ -16,7 +16,6 @@ using System;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
@@ -37,8 +36,7 @@ public static class OutgoingMessagesExtensions
 {
     public static IServiceCollection AddOutgoingMessagesModule(
         this IServiceCollection services,
-        IConfiguration configuration,
-        bool isDevelopment = false)
+        IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
         services.AddBuildingBlocks(configuration)
@@ -76,22 +74,6 @@ public static class OutgoingMessagesExtensions
 
         //DataRetentionConfiguration
         services.AddTransient<IDataRetention, DequeuedBundlesRetention>();
-
-        if (isDevelopment == false)
-        {
-            //health checks
-            var uri = new Uri(
-                configuration["AZURE_STORAGE_ACCOUNT_URL"]
-                ?? throw new InvalidOperationException("AZURE_STORAGE_ACCOUNT_URL is missing"));
-            services.AddOptions<DocumentStorageOptions>()
-                .Configure(
-                    option =>
-                        option.StorageAccountUri = uri);
-            var options = configuration.Get<DocumentStorageOptions>()!;
-            services.TryAddBlobStorageHealthCheck(
-                options.StorageName,
-                options.StorageAccountUri!);
-        }
 
         return services;
     }
