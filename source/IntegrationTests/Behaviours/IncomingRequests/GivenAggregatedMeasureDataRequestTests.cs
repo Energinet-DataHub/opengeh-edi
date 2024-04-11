@@ -81,7 +81,7 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
 
     [Fact]
     public async Task
-        Given_RequestAggregatedMeasureDataJsonIsReceivedAndDelegation_When_ActorPeeksJson_Then_CorrectJsonDocumentIsCreated()
+        Given_RequestAggregatedMeasureDataJsonIsReceived_When_ActorPeeksJson_Then_CorrectJsonDocumentIsCreated()
     {
         // Arrange
         var senderSpy = GivenServiceBusSenderSpy("Fake");
@@ -106,7 +106,7 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
 
         // Act
         ClearDbContextCaches();
-        var peekedMessage = await PeekMessageAsync(
+        var peekedMessage = await WhenPeekMessageAsync(
             MessageCategory.Aggregations,
             ActorNumber.Create("2111111111111"),
             ActorRole.EnergySupplier,
