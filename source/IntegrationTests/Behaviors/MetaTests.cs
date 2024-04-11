@@ -54,9 +54,17 @@ public static class MetaTests
 
     [Fact]
     [ExcludeFromNameConventionCheck]
-    public static void ThisDoesNotSatisfyTheNamingConvention()
+    public static void ThisDoesNotSatisfyTheNamingConventionFact()
     {
         return;
+    }
+
+    [Theory]
+    [InlineData("test")]
+    [ExcludeFromNameConventionCheck]
+    public static void ThisDoesNotSatisfyTheNamingConventionTheory(string test)
+    {
+        test.Should().Be("test");
     }
 
     private static bool IsXunitTest(MethodInfo type)
