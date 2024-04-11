@@ -12,11 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
+using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
+using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
+using Google.Protobuf.WellKnownTypes;
+using NodaTime;
+using NodaTime.Serialization.Protobuf;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents;
@@ -37,14 +44,28 @@ public class GivenAmountPerChargeResultProducedV1ReceivedTests : BehavioursTestB
 
     [Theory]
     [MemberData(nameof(AllDocumentFormats))]
-    public async Task When_EnergySupplierPeeksMessage_Then_ReceivesCorrectNotifyWholesaleServicesDocument(DocumentFormat documentFormat)
+    public async Task When_EnergySupplierActorPeeksMessage_Then_ReceivesCorrectNotifyWholesaleServicesDocument(DocumentFormat documentFormat)
     {
         // Arrange
-        var amountPerChargeEvent = new AmountPerChargeResultProducedV1EventBuilder()
-            .WithEnergySupplier("1111111111111")
-            .Build();
+        var amountPerChargeResultProducedEvent = GivenAmountPerChargeResultProducedV1Event(
+            @event => @event
+                .WithCalculationType(AmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
+                .WithStartOfPeriod(CreateDateInstant(2024, 1, 1).ToTimestamp())
+                .WithEndOfPeriod(CreateDateInstant(2024, 1, 31).ToTimestamp())
+                .WithGridAreaCode("100")
+                .WithEnergySupplier("1111111111111")
+                .WithChargeCode("222")
+                .WithChargeType(AmountPerChargeResultProducedV1.Types.ChargeType.Tariff)
+                .WithChargeOwner("333")
+                .WithResolution(AmountPerChargeResultProducedV1.Types.Resolution.Hour)
+                .WithQuantityUnit(AmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh)
+                .WithMeteringPointType(AmountPerChargeResultProducedV1.Types.MeteringPointType.Consumption)
+                .WithSettlementMethod(AmountPerChargeResultProducedV1.Types.SettlementMethod.Flex)
+                .WithIsTax(false)
+                .WithCurrency(AmountPerChargeResultProducedV1.Types.Currency.Dkk)
+                .WithCalculationVersion(1));
 
-        await GivenIntegrationEventReceived(amountPerChargeEvent);
+        await GivenIntegrationEventReceived(amountPerChargeResultProducedEvent);
 
         // Act
         var peekResult = await WhenActorPeeksMessage(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier, documentFormat);
@@ -53,8 +74,10 @@ public class GivenAmountPerChargeResultProducedV1ReceivedTests : BehavioursTestB
         await ThenDocumentIsCorrect(
             peekResult.Bundle,
             documentFormat,
-            (document) => document
-                .HasReceiver("1111111111111")
-                .HasEnergySupplier("1111111111111"));
+            document => document
+                .HasReceiverId(ActorNumber.Create("1111111111111"))
+                .HasReceiverRole(ActorRole.EnergySupplier, CodeListType.Ebix)
+                .HasEnergySupplierNumber(ActorNumber.Create("1111111111111"), "A10")
+                .HasPositionAndQuantity());
     }
 }

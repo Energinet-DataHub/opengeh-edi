@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -35,6 +36,9 @@ using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Configuration;
 using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
@@ -57,6 +61,9 @@ using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
+using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -264,6 +271,14 @@ public class BehavioursTestBase : IDisposable
         return _systemDateTimeProviderStub.Now();
     }
 
+    protected Instant CreateDateInstant(int year, int month, int day)
+    {
+        return new LocalDate(year, month, day)
+            .AtMidnight()
+            .InZoneStrictly(_dateTimeZone)
+            .ToInstant();
+    }
+
     protected async Task GivenDelegationAsync(
         ActorNumberAndRoleDto delegatedBy,
         ActorNumberAndRoleDto delegatedTo,
@@ -389,7 +404,9 @@ public class BehavioursTestBase : IDisposable
     protected async Task GivenIntegrationEventReceived(IEventMessage @event)
     {
         var integrationEvent = new IntegrationEvent(Guid.NewGuid(), @event.EventName, @event.EventMinorVersion, @event);
-        await GetService<IIntegrationEventHandler>().HandleAsync(integrationEvent);
+
+        using var serviceScope = _serviceProvider.CreateScope();
+        await serviceScope.ServiceProvider.GetRequiredService<IIntegrationEventHandler>().HandleAsync(integrationEvent);
     }
 
     protected async Task<PeekResultDto> WhenActorPeeksMessage(ActorNumber actorNumber, ActorRole actorRole, DocumentFormat documentFormat)
@@ -400,22 +417,44 @@ public class BehavioursTestBase : IDisposable
         return peekResult;
     }
 
-    protected Task ThenDocumentIsCorrect(Stream? bundle, DocumentFormat documentFormat, Action<INotifyWholesaleServicesDocumentAsserter> assert)
+    protected async Task ThenDocumentIsCorrect(Stream? bundle, DocumentFormat documentFormat, Action<IAssertNotifyWholesaleServicesDocument> assert)
     {
         using var assertionScope = new AssertionScope();
         bundle.Should().NotBeNull();
 
-        var asserter = documentFormat.Name switch
+        var xmlDocumentValidator = new DocumentValidator(new List<IValidator>
         {
-            nameof(DocumentFormat.Xml) => new StubNotifyWholesaleServicesDocumentAsserter(bundle),
-            nameof(DocumentFormat.Json) => new StubNotifyWholesaleServicesDocumentAsserter(bundle),
-            nameof(DocumentFormat.Ebix) => new StubNotifyWholesaleServicesDocumentAsserter(bundle),
+            new CimXmlValidator(new CimXmlSchemaProvider()),
+            new EbixValidator(new EbixSchemaProvider()),
+        });
+        IAssertNotifyWholesaleServicesDocument asserter = documentFormat.Name switch
+        {
+            nameof(DocumentFormat.Xml) => new AssertNotifyWholesaleServicesXmlDocument(
+                AssertXmlDocument.Document(
+                    bundle!,
+                    "cim_",
+                    xmlDocumentValidator)),
+            nameof(DocumentFormat.Json) => new AssertNotifyWholesaleServicesJsonDocument(bundle!),
+            nameof(DocumentFormat.Ebix) => new AssertNotifyWholesaleServicesEbixDocument(
+                AssertEbixDocument.Document(
+                    bundle!,
+                    "ns0",
+                    xmlDocumentValidator),
+                true),
             _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, null),
         };
 
+        await asserter.DocumentIsValidAsync();
         assert(asserter);
+    }
 
-        return Task.CompletedTask;
+    protected AmountPerChargeResultProducedV1 GivenAmountPerChargeResultProducedV1Event(Action<AmountPerChargeResultProducedV1EventBuilder> builder)
+    {
+        var eventBuilder = new AmountPerChargeResultProducedV1EventBuilder();
+
+        builder(eventBuilder);
+
+        return eventBuilder.Build();
     }
 
     private T GetService<T>()

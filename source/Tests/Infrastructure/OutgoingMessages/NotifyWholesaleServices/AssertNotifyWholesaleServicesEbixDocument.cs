@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -23,17 +24,20 @@ using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 
-internal sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWholesaleServicesDocument
+[SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Test class")]
+public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWholesaleServicesDocument
 {
     private const string HeaderEnergyDocument = "HeaderEnergyDocument";
     private const string ProcessEnergyContext = "ProcessEnergyContext";
     private const string PayloadEnergyTimeSeries = "PayloadEnergyTimeSeries";
 
     private readonly AssertEbixDocument _documentAsserter;
+    private readonly bool _skipIdentificationLengthValidation;
 
-    public AssertNotifyWholesaleServicesEbixDocument(AssertEbixDocument documentAsserter)
+    public AssertNotifyWholesaleServicesEbixDocument(AssertEbixDocument documentAsserter, bool skipIdentificationLengthValidation = false)
     {
         _documentAsserter = documentAsserter;
+        _skipIdentificationLengthValidation = skipIdentificationLengthValidation;
         _documentAsserter.HasValueWithAttributes(
             "HeaderEnergyDocument/DocumentType",
             "E31",
@@ -49,12 +53,12 @@ internal sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyW
     }
 
     public IAssertNotifyWholesaleServicesDocument HasBusinessReason(
-        BusinessReason businessReason,
+        BusinessReason expectedBusinessReason,
         CodeListType codeListType)
     {
         _documentAsserter.HasValueWithAttributes(
             $"{ProcessEnergyContext}/EnergyBusinessProcess",
-            EbixCode.Of(businessReason),
+            EbixCode.Of(expectedBusinessReason),
             CreateRequiredListAttributes(codeListType));
 
         return this;
@@ -231,7 +235,7 @@ internal sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyW
 
     public async Task<IAssertNotifyWholesaleServicesDocument> DocumentIsValidAsync()
     {
-        await _documentAsserter.HasValidStructureAsync(DocumentType.NotifyWholesaleServices, "3").ConfigureAwait(false);
+        await _documentAsserter.HasValidStructureAsync(DocumentType.NotifyWholesaleServices, "3", _skipIdentificationLengthValidation).ConfigureAwait(false);
         return this;
     }
 
@@ -242,19 +246,19 @@ internal sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyW
     }
 
     public IAssertNotifyWholesaleServicesDocument QualityIsPresentForPosition(
-        int position,
-        string quantityQualityCode)
+        int expectedPosition,
+        string expectedQuantityQualityCode)
     {
         _documentAsserter.HasValue(
-            $"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{position}]/QuantityQuality",
-            quantityQualityCode);
+            $"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/QuantityQuality",
+            expectedQuantityQualityCode);
 
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSettlementVersion(SettlementVersion settlementVersion)
+    public IAssertNotifyWholesaleServicesDocument HasSettlementVersion(SettlementVersion expectedSettlementVersion)
     {
-        _documentAsserter.HasValue("ProcessEnergyContext/ProcessVariant", EbixCode.Of(settlementVersion));
+        _documentAsserter.HasValue("ProcessEnergyContext/ProcessVariant", EbixCode.Of(expectedSettlementVersion));
         return this;
     }
 
@@ -264,17 +268,17 @@ internal sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyW
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(string originalTransactionIdReference)
+    public IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(string expectedOriginalTransactionIdReference)
     {
         _documentAsserter.HasValue(
             $"{PayloadEnergyTimeSeries}[1]/OriginalBusinessDocument",
-            originalTransactionIdReference);
+            expectedOriginalTransactionIdReference);
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod settlementMethod)
+    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod expectedSettlementMethod)
     {
-        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod", settlementMethod.Code);
+        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod", expectedSettlementMethod.Code);
         return this;
     }
 

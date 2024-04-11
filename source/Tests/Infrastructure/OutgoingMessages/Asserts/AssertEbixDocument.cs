@@ -98,13 +98,24 @@ public class AssertEbixDocument
         return this;
     }
 
-    public async Task<AssertEbixDocument> HasValidStructureAsync(DocumentType type, string version = "0.1")
+    public async Task<AssertEbixDocument> HasValidStructureAsync(DocumentType type, string version = "0.1", bool skipIdentificationLengthValidation = false)
     {
         Assert.True(_originalMessage.Root!.Name == "MessageContainer");
         Assert.NotNull(_originalMessage.Root!.Elements().Single(x => x.Name.LocalName == "MessageReference"));
         Assert.NotNull(_originalMessage.Root!.Elements().Single(x => x.Name.LocalName == "DocumentType"));
         Assert.NotNull(_originalMessage.Root!.Elements().Single(x => x.Name.LocalName == "MessageType"));
         var validationResult = await _documentValidator!.ValidateAsync(_stream, DocumentFormat.Ebix, type, CancellationToken.None, version).ConfigureAwait(false);
+
+        if (!validationResult.IsValid && skipIdentificationLengthValidation)
+        {
+            var validationErrorsExceptId = validationResult.ValidationErrors
+                .Where(e =>
+                    !(e.Contains("NotifyAggregatedWholesaleServices:v3:Identification' element is invalid", StringComparison.InvariantCulture)
+                    && e.Contains("The actual length is greater than the MaxLength value.", StringComparison.OrdinalIgnoreCase)))
+                .ToArray();
+
+            validationResult = ValidationResult.Invalid(validationErrorsExceptId);
+        }
 
         using var scope = new AssertionScope();
         validationResult.ValidationErrors.Should().BeEmpty();

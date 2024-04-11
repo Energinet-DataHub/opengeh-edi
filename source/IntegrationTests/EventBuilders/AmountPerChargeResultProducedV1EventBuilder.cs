@@ -13,17 +13,20 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
+using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common;
 using Google.Protobuf.WellKnownTypes;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
+using Duration = NodaTime.Duration;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
 public class AmountPerChargeResultProducedV1EventBuilder
 {
-    private readonly AmountPerChargeResultProducedV1.Types.MeteringPointType _meteringPointType = AmountPerChargeResultProducedV1.Types.MeteringPointType.Production;
-    private readonly AmountPerChargeResultProducedV1.Types.SettlementMethod _settlementMethod = AmountPerChargeResultProducedV1.Types.SettlementMethod.Flex;
+    private AmountPerChargeResultProducedV1.Types.MeteringPointType _meteringPointType = AmountPerChargeResultProducedV1.Types.MeteringPointType.Production;
+    private AmountPerChargeResultProducedV1.Types.SettlementMethod _settlementMethod = AmountPerChargeResultProducedV1.Types.SettlementMethod.Flex;
     private Guid _calculationId = Guid.NewGuid();
     private AmountPerChargeResultProducedV1.Types.CalculationType _calculationType = AmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing;
     private Timestamp _periodStartUtc = Instant.FromUtc(2023, 10, 1, 0, 0, 0).ToTimestamp();
@@ -41,6 +44,8 @@ public class AmountPerChargeResultProducedV1EventBuilder
 
     internal AmountPerChargeResultProducedV1 Build()
     {
+        var points = BuildTimeSeriesPoints();
+
         var @event = new AmountPerChargeResultProducedV1
         {
             CalculationId = _calculationId.ToString(),
@@ -60,6 +65,8 @@ public class AmountPerChargeResultProducedV1EventBuilder
             CalculationResultVersion = _calculationVersion,
             Resolution = _resolution,
         };
+
+        @event.TimeSeriesPoints.AddRange(points);
 
         return @event;
     }
@@ -146,5 +153,49 @@ public class AmountPerChargeResultProducedV1EventBuilder
     {
         _resolution = resolution;
         return this;
+    }
+
+    internal AmountPerChargeResultProducedV1EventBuilder WithMeteringPointType(AmountPerChargeResultProducedV1.Types.MeteringPointType meteringPointType)
+    {
+        _meteringPointType = meteringPointType;
+        return this;
+    }
+
+    internal AmountPerChargeResultProducedV1EventBuilder WithSettlementMethod(AmountPerChargeResultProducedV1.Types.SettlementMethod settlementMethod)
+    {
+        _settlementMethod = settlementMethod;
+        return this;
+    }
+
+    private List<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint> BuildTimeSeriesPoints()
+    {
+        var resolutionInHours = _resolution switch
+        {
+            AmountPerChargeResultProducedV1.Types.Resolution.Day => 24,
+            AmountPerChargeResultProducedV1.Types.Resolution.Hour => 1,
+            _ => throw new ArgumentOutOfRangeException(nameof(_resolution), _resolution, "Unhandled resolution type when building time series points"),
+        };
+
+        var timeSeriesPoints = new List<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint>();
+        var currentTime = _periodStartUtc;
+        while (currentTime < _periodEndUtc.ToInstant().Plus(Duration.FromDays(1)).ToTimestamp())
+        {
+            var point = new AmountPerChargeResultProducedV1.Types.TimeSeriesPoint
+            {
+                Amount = new DecimalValue { Units = 1, Nanos = 0 },
+                Price = new DecimalValue { Units = 2, Nanos = 0 },
+                Quantity = new DecimalValue { Units = 3, Nanos = 0 },
+                Time = currentTime,
+                QuantityQualities = { AmountPerChargeResultProducedV1.Types.QuantityQuality.Measured },
+            };
+            timeSeriesPoints.Add(point);
+
+            currentTime = currentTime
+                .ToInstant()
+                .Plus(Duration.FromHours(resolutionInHours))
+                .ToTimestamp();
+        }
+
+        return timeSeriesPoints;
     }
 }
