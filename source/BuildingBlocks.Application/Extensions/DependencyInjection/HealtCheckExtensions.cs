@@ -43,7 +43,7 @@ public static class HealtCheckExtensions
         return services;
     }
 
-    public static IServiceCollection AddBlobStorageHealthCheck(this IServiceCollection services, string name, string blobConnectionString)
+    public static IServiceCollection TryAddBlobStorageHealthCheck(this IServiceCollection services, string name, string blobConnectionString)
     {
         services.TryAddHealthChecks(
             name,
@@ -55,7 +55,7 @@ public static class HealtCheckExtensions
         return services;
     }
 
-    public static IServiceCollection AddBlobStorageHealthCheck(this IServiceCollection services, string name, Uri storageAccountUri)
+    public static IServiceCollection TryAddBlobStorageHealthCheck(this IServiceCollection services, string name, Uri storageAccountUri)
     {
         services.TryAddHealthChecks(
             name,

@@ -19,6 +19,7 @@ using Dapper.NodaTime;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.Options;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -38,18 +39,20 @@ public static class ArchivedMessageExtensions
         SqlMapper.AddTypeHandler(InstantHandler.Default);
 
         // Dependencies
-        services.AddBuildingBlocks(configuration);
+        services.AddBuildingBlocks(configuration)
+
+            // Health checks
+            .TryAddSqlServerHealthCheck(configuration);
 
         if (isDevelopment == false)
         {
-            //health checks
             var uri = new Uri(
                 configuration["AZURE_STORAGE_ACCOUNT_URL"]
                 ?? throw new InvalidOperationException("AZURE_STORAGE_ACCOUNT_URL is missing"));
             services.AddOptions<DocumentStorageOptions>()
                 .Configure(option => option.StorageAccountUri = uri);
 
-            services.AddBlobStorageHealthCheck(
+            services.TryAddBlobStorageHealthCheck(
                 DocumentStorageOptions.StorageName,
                 uri!);
         }

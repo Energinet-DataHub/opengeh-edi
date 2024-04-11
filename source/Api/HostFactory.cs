@@ -65,7 +65,7 @@ public static class HostFactory
 
                         // Health checks
                         .AddHealthChecksForIsolatedWorker()
-                        .AddBlobStorageHealthCheck(
+                        .TryAddBlobStorageHealthCheck(
                             "edi-web-jobs-storage",
                             context.Configuration["AzureWebJobsStorage"]!)
                         .TryAddSqlServerHealthCheck(context.Configuration)

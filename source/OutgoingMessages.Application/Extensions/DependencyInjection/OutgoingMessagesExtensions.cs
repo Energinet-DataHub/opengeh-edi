@@ -88,7 +88,7 @@ public static class OutgoingMessagesExtensions
                     option =>
                         option.StorageAccountUri = uri);
             var options = configuration.Get<DocumentStorageOptions>()!;
-            services.AddBlobStorageHealthCheck(
+            services.TryAddBlobStorageHealthCheck(
                 options.StorageName,
                 options.StorageAccountUri!);
         }
