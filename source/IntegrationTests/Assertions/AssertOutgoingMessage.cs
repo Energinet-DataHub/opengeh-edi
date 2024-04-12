@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
+using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Xunit;
@@ -178,6 +179,23 @@ public class AssertOutgoingMessage
                 .Be(decimal.Parse($"{expectedPointsInRightOrder[i].Quantity.Units}.{expectedPointsInRightOrder[i].Quantity.Nanos}", CultureInfo.InvariantCulture));
         }
 
+        return this;
+    }
+
+    public AssertOutgoingMessage HasProcessId(ProcessId? processId)
+    {
+        if (processId == null)
+            Assert.Null(_message.ProcessId);
+        else
+            Assert.Equal(processId.Id, _message.ProcessId);
+
+        return this;
+    }
+
+    public AssertOutgoingMessage HasEventId(string eventId)
+    {
+        ArgumentNullException.ThrowIfNull(eventId);
+        Assert.Equal(eventId, _message.EventId);
         return this;
     }
 }

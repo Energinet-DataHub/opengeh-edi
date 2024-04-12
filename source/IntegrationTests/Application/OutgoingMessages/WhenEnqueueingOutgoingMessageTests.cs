@@ -103,6 +103,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.Equal(expectedFileStorageReference, result!.FileStorageReference),
             () => Assert.Equal("OutgoingMessage", result!.Discriminator),
             () => Assert.Equal(message.RelatedToMessageId?.Value, result!.RelatedToMessageId),
+            () => Assert.Equal(message.EventId, result!.EventId),
             () => Assert.NotNull(result!.AssignedBundleId),
         };
 

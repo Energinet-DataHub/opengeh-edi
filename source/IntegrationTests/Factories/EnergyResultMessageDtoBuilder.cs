@@ -32,9 +32,7 @@ public class EnergyResultMessageDtoBuilder
     private ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private ActorRole _receiverRole = ActorRole.MeteredDataAdministrator;
 
-#pragma warning disable CA1822
     public EnergyResultMessageDto Build()
-#pragma warning restore CA1822
     {
         return EnergyResultMessageDto.Create(
             _eventId,

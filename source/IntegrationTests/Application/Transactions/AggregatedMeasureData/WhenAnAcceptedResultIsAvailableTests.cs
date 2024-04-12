@@ -62,6 +62,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     public async Task Aggregated_measure_data_response_is_accepted()
     {
         // Arrange
+        var expectedEventId = "expected-event-id";
         await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .StoreAsync(GetService<IMasterDataClient>());
@@ -70,12 +71,14 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         var acceptedEvent = GetAcceptedEvent(process);
 
         // Act
-        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id, expectedEventId);
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(ActorRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
 
         outgoingMessage
+            .HasProcessId(process.ProcessId)
+            .HasEventId(expectedEventId)
             .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(process.RequestedByActorRoleCode)

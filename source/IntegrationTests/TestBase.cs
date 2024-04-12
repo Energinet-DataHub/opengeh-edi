@@ -225,11 +225,11 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return GetService<IMasterDataClient>().CreateActorIfNotExistAsync(createActorDto, CancellationToken.None);
         }
 
-        protected async Task HavingReceivedInboxEventAsync(string eventType, IMessage eventPayload, Guid processId)
+        protected async Task HavingReceivedInboxEventAsync(string eventType, IMessage eventPayload, Guid processId, string? eventId = null)
         {
             await GetService<IInboxEventReceiver>().
                 ReceiveAsync(
-                    Guid.NewGuid().ToString(),
+                    eventId ?? Guid.NewGuid().ToString(),
                     eventType,
                     processId,
                     eventPayload.ToByteArray())
