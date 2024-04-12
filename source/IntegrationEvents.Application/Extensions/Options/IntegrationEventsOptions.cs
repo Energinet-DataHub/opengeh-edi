@@ -12,12 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Extensions.Options;
+using System.ComponentModel.DataAnnotations;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1707", Justification = "To match naming in other domains")]
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]
+namespace Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.Options;
 
-public class DateTimeOptions
+public class IntegrationEventsOptions
 {
-    public string TIME_ZONE { get; set; } = string.Empty;
+    public const string SectionName = "IntegrationEvents";
+
+    [Required]
+    public string TopicName { get; set; } = string.Empty;
+
+    [Required]
+    public string SubscriptionName { get; set; } = string.Empty;
 }

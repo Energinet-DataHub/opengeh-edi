@@ -12,13 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
+using System.ComponentModel.DataAnnotations;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1707", Justification = "To match naming in other domains")]
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]
-public class ServiceBusClientOptions
+namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
+
+/// <summary>
+/// Options related to wholesale inbox queue.
+/// </summary>
+public class WholesaleInboxOptions
 {
-    public string INCOMING_MESSAGES_QUEUE_NAME { get; set; } = string.Empty;
+    /// <summary>
+    /// The name of the section in the configuration file where this option should find its information.
+    /// </summary>
+    public const string SectionName = "WholesaleInbox";
 
-    public string SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE { get; set; } = string.Empty;
+    /// <summary>
+    /// Queue name for the wholesale inbox.
+    /// </summary>
+    [Required]
+    public string QueueName { get; set; } = string.Empty;
 }

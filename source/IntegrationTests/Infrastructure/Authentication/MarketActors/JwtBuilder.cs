@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 
@@ -24,7 +25,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
     public class JwtBuilder
     {
         private static readonly JwtSecurityTokenHandler _tokenHandler = new();
-        private static readonly byte[] _defaultSigningKey = Guid.NewGuid().ToByteArray();
+
+        // Creating a dummy signing key with 256 bits.
+        private static readonly byte[] _defaultSigningKey = Guid.NewGuid().ToByteArray().Concat(Guid.NewGuid().ToByteArray()).ToArray();
         private static readonly DateTime _unixEpoc = new DateTime(1970, 1, 1);
         private readonly SymmetricSecurityKey _signingKey;
         private readonly List<Claim> _claims;

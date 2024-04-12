@@ -12,20 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.ApplicationInsights.Channel;
-using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.ApplicationInsights.Extensibility;
+using System.ComponentModel.DataAnnotations;
 
-namespace BuildingBlocks.Application.Configuration.Logging;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 
-public class EnrichExceptionTelemetryInitializer : ITelemetryInitializer
+public class IncomingMessagesQueueOptions
 {
-    public void Initialize(ITelemetry telemetry)
-    {
-        if (telemetry is ExceptionTelemetry exceptionTelemetry)
-        {
-            // Add your custom properties
-            exceptionTelemetry.Properties["Domain"] = "Edi";
-        }
-    }
+    public const string SectionName = "IncomingMessages";
+
+    [Required]
+    public string QueueName { get; set; } = string.Empty;
 }

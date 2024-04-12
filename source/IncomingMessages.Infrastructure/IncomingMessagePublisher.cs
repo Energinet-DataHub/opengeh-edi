@@ -16,10 +16,10 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Factories;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Microsoft.Extensions.Options;
-using ServiceBusClientOptions = Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options.ServiceBusClientOptions;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 
@@ -30,14 +30,14 @@ public class IncomingMessagePublisher
 
     public IncomingMessagePublisher(
         IServiceBusSenderFactory serviceBusSenderFactory,
-        IOptions<ServiceBusClientOptions> options,
+        IOptions<IncomingMessagesQueueOptions> options,
         ISerializer serializer)
     {
         ArgumentNullException.ThrowIfNull(serviceBusSenderFactory);
         ArgumentNullException.ThrowIfNull(options);
         _serializer = serializer;
 
-        _senderCreator = serviceBusSenderFactory.GetSender(options.Value.INCOMING_MESSAGES_QUEUE_NAME);
+        _senderCreator = serviceBusSenderFactory.GetSender(options.Value.QueueName);
     }
 
     public async Task PublishAsync(

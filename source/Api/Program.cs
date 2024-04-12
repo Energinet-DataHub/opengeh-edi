@@ -24,7 +24,7 @@ TokenValidationParameters =
         ? TokenValidationParameters
         : await TokenConfiguration.GetTokenValidationParametersAsync(runtime).ConfigureAwait(false);
 
-using var host = HostFactory.CreateHost(runtime, TokenValidationParameters);
+using var host = HostFactory.CreateHost(TokenValidationParameters);
 
 await host.RunAsync().ConfigureAwait(false);
 

@@ -13,25 +13,13 @@
 // limitations under the License.
 
 using Azure.Identity;
-using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
-using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
 public static class HealtCheckExtensions
 {
-    public static IServiceCollection AddLiveHealthCheck(this IServiceCollection services)
-    {
-        services
-            .AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>()
-            .AddHealthChecks()
-            .AddLiveCheck();
-
-        return services;
-    }
-
     /// <summary>
     /// Used for Service Bus queues where the app have peek (receiver) permissions
     /// </summary>
@@ -41,42 +29,41 @@ public static class HealtCheckExtensions
         ArgumentNullException.ThrowIfNull(queueNames);
         foreach (var name in queueNames)
         {
-            if (QueueHealthCheckIsAdded(services, name))
-            {
-                return services;
-            }
-
-            services.AddHealthChecks()
-                .AddAzureServiceBusQueue(
-                    name: name + "Exists",
-                    connectionString: serviceBusConnectionString,
-                    queueName: name);
-            services.TryAddSingleton(new ServiceBusQueueHealthCheckIsAdded(name));
+            services.TryAddHealthChecks(
+                registrationKey: name,
+                (key, builder) =>
+                {
+                    builder.AddAzureServiceBusQueue(
+                        name: key,
+                        connectionString: serviceBusConnectionString,
+                        queueName: key);
+                });
         }
 
         return services;
     }
 
-    public static void AddBlobStorageHealthCheck(this IServiceCollection services, string name, string blobConnectionString)
+    public static IServiceCollection TryAddBlobStorageHealthCheck(this IServiceCollection services, string name, string blobConnectionString)
     {
-        services.AddHealthChecks().AddAzureBlobStorage(blobConnectionString, name: name);
-    }
-
-    public static IServiceCollection AddBlobStorageHealthCheck(this IServiceCollection services, string name, Uri storageAccountUri)
-    {
-        services.AddHealthChecks().AddAzureBlobStorage(storageAccountUri, new DefaultAzureCredential(), name: name);
+        services.TryAddHealthChecks(
+            name,
+            (key, builder) =>
+            {
+                builder.AddAzureBlobStorage(blobConnectionString, name: key);
+            });
 
         return services;
     }
 
-    private static bool QueueHealthCheckIsAdded(IServiceCollection services, string name)
+    public static IServiceCollection TryAddBlobStorageHealthCheck(this IServiceCollection services, string name, Uri storageAccountUri)
     {
-        return services.Any(
-            service =>
-                service.ServiceType == typeof(ServiceBusQueueHealthCheckIsAdded)
-                && service.ImplementationInstance is ServiceBusQueueHealthCheckIsAdded
-                && ((ServiceBusQueueHealthCheckIsAdded)service.ImplementationInstance).Name == name);
-    }
+        services.TryAddHealthChecks(
+            name,
+            (key, builder) =>
+            {
+                builder.AddAzureBlobStorage(storageAccountUri, new DefaultAzureCredential(), name: key);
+            });
 
-    private sealed record ServiceBusQueueHealthCheckIsAdded(string Name);
+        return services;
+    }
 }

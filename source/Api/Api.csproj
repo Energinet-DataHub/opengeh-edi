@@ -26,15 +26,15 @@ limitations under the License.
     <ItemGroup>
         <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.17.2" />
         <PackageReference Include="Energinet.DataHub.Core.App.Common.Security" Version="8.2.0" />
-        <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="8.1.0" />
+      <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="12.0.0" />
         <PackageReference Include="Energinet.DataHub.Core.Logging" Version="3.1.1" />
-        <PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="1.0.0" />
+        <PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="1.2.0" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Abstractions" Version="1.3.0" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.1.0" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.ServiceBus" Version="5.17.0" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.2.0" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.17.2" OutputItemType="Analyzer" />
-        <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.20.1" />
+        <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.21.0" />
 		<PackageReference Include="Energinet.DataHub.Core.Messaging" Version="3.3.1" />
 		        <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.6.40">
 		<PrivateAssets>all</PrivateAssets>
@@ -78,6 +78,7 @@ limitations under the License.
       <ProjectReference Include="..\OutgoingMessages.Application\OutgoingMessages.Application.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Interfaces\OutgoingMessages.Interfaces.csproj" />
       <ProjectReference Include="..\Process.Application\Process.Application.csproj" />
+      <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
       <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
     </ItemGroup>
   <ItemDefinitionGroup>
