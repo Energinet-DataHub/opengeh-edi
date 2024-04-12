@@ -6,14 +6,22 @@
     "B2C_TENANT_ID": "<Azure B2C tenant id>",
     "BACKEND_SERVICE_APP_ID": "<Backend service application id>",
     "DB_CONNECTION_STRING": "<SQL database connection string>",
-    "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_LISTENER": "<service bus connection string for shared service bus with listener permissions>",
-    "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE": "<connection string for shared service bus with manage permissions>",
-    "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND": "<connection string for shared service bus with sender permissions>",
-    "INCOMING_CHANGE_OF_SUPPLIER_MESSAGE_QUEUE_NAME": "<Name of queue where incoming move in transaction are placed>",
-    "INCOMING_MESSAGES_QUEUE_NAME": "<Name of queue where incoming messages to EDI are placed>",
-    "INTEGRATION_EVENT_TOPIC_NAME": "<Name of topic where integration events are received>",
-    "INTEGRATION_EVENTS_SUBSCRIPTION_NAME" : "<Name of the service bus topic subscription for aggregation result notifications>",
-    "AGGREGATION_RESULTS_API_URI": "<Uri of API where aggregation results can be retrieved>",
-    "AZURE_STORAGE_ACCOUNT_CONNECTION_STRING": "UseDevelopmentStorage=true"
+    "AZURE_STORAGE_ACCOUNT_CONNECTION_STRING":  "<Azure storage account connection string>",
+    "AZURE_STORAGE_ACCOUNT_URL":                "<Azure storage account url>",
+
+    "ServiceBus__ListenConnectionString": "<service bus connection string for shared service bus with listener permissions>",
+    "ServiceBus__SendConnectionString":   "<connection string for shared service bus with sender permissions>",
+
+    "EdiInbox__QueueName":          "<Name of queue where incoming messages to EDI from other subsystems are placed>",
+    "WholesaleInbox__QueueName":    "<Name of queue where EDI place messages to wholesale>",
+    "IncomingMessages__QueueName":  "<Name of queue where incoming messages to EDI from EDI are placed>",
+
+    "IntegrationEvents__TopicName":         "<Name of topic where integration events are received>",
+    "IntegrationEvents__SubscriptionName":  "<Name of the service bus topic subscription for aggregation result notifications>",
+
+    "FeatureManagement__UseMonthlyAmountPerChargeResultProduced": "<Boolean to enable or disable feature>",
+    "FeatureManagement__UseAmountPerChargeResultProduced":        "<Boolean to enable or disable feature>",
+    "FeatureManagement__UseRequestWholesaleSettlementReceiver":   "<Boolean to enable or disable feature>",
+    "FeatureManagement__UseMessageDelegation":                    "<Boolean to enable or disable feature>"
   }
 }

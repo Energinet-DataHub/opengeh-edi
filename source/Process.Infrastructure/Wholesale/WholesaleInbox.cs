@@ -19,10 +19,10 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Domain.Wholesale;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.WholesaleServices;
 using Microsoft.Extensions.Options;
-using ServiceBusClientOptions = Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options.ServiceBusClientOptions;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
 
@@ -32,12 +32,12 @@ public class WholesaleInbox : IWholesaleInbox
 
     public WholesaleInbox(
         IServiceBusSenderFactory serviceBusSenderFactory,
-        IOptions<ServiceBusClientOptions> options)
+        IOptions<WholesaleInboxOptions> options)
     {
         ArgumentNullException.ThrowIfNull(serviceBusSenderFactory);
         ArgumentNullException.ThrowIfNull(options);
 
-        _senderCreator = serviceBusSenderFactory.GetSender(options.Value.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME);
+        _senderCreator = serviceBusSenderFactory.GetSender(options.Value.QueueName);
     }
 
     public async Task SendProcessAsync(

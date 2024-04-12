@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 
@@ -26,11 +25,6 @@ public static class DataBaseHealthCheckExtensions
 
     public static IServiceCollection TryAddSqlServerHealthCheck(this IServiceCollection services,  IConfiguration configuration)
     {
-        if (SqlServerHealthCheckIsAdded(services))
-        {
-            return services;
-        }
-
         services
             .AddOptions<SqlDatabaseConnectionOptions>()
             .Bind(configuration)
@@ -38,22 +32,15 @@ public static class DataBaseHealthCheckExtensions
 
         var database = configuration.Get<SqlDatabaseConnectionOptions>()!;
 
-        services.AddHealthChecks()
-            .AddSqlServer(
-                name: DatabaseName,
-                connectionString: database.DB_CONNECTION_STRING);
-
-        services.TryAddSingleton<SqlHealthCheckIsAdded>();
+        services.TryAddHealthChecks(
+            registrationKey: DatabaseName,
+            (key, builder) =>
+            {
+                builder.AddSqlServer(
+                    name: key,
+                    connectionString: database.DB_CONNECTION_STRING);
+            });
 
         return services;
-    }
-
-    private static bool SqlServerHealthCheckIsAdded(IServiceCollection services)
-    {
-        return services.Any(service => service.ServiceType == typeof(SqlHealthCheckIsAdded));
-    }
-
-    private sealed class SqlHealthCheckIsAdded
-    {
     }
 }

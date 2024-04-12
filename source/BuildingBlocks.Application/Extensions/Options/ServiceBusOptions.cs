@@ -12,11 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
+using System.ComponentModel.DataAnnotations;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1707", Justification = "To match naming in other domains")]
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1056", Justification = "Nuget expects a string")]
-public class ServiceBusClientOptions
+namespace BuildingBlocks.Application.Extensions.Options;
+
+public class ServiceBusOptions
 {
-    public string WHOLESALE_INBOX_MESSAGE_QUEUE_NAME { get; set; } = string.Empty;
+    public const string SectionName = "ServiceBus";
+
+    [Required]
+    public string ListenConnectionString { get; set; } = string.Empty;
+
+    [Required]
+    public string SendConnectionString { get; set; } = string.Empty;
 }

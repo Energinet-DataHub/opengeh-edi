@@ -13,35 +13,32 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
-using BuildingBlocks.Application.Configuration.Logging;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware;
 using Energinet.DataHub.EDI.Api.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.Api.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.IntegrationEvents.Application.Configuration;
+using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Energinet.DataHub.EDI.Api;
 
 public static class HostFactory
 {
-    public static IHost CreateHost(RuntimeEnvironment runtime, TokenValidationParameters tokenValidationParameters)
+    private const string DomainName = "EDI";
+
+    public static IHost CreateHost(TokenValidationParameters tokenValidationParameters)
     {
-        ArgumentNullException.ThrowIfNull(runtime);
         ArgumentNullException.ThrowIfNull(tokenValidationParameters);
 
         return new HostBuilder()
@@ -59,29 +56,31 @@ public static class HostFactory
                 (context, services) =>
                 {
                     services
-                        .AddApplicationInsights()
+                        // Logging
+                        .AddApplicationInsightsForIsolatedWorker(DomainName)
                         .ConfigureFunctionsApplicationInsights()
-                        .AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>()
-                        .AddDataRetention()
-                        .AddLiveHealthCheck()
-                        .TryAddExternalDomainServiceBusQueuesHealthCheck(
-                            runtime.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
-                            runtime.EDI_INBOX_MESSAGE_QUEUE_NAME!,
-                            runtime.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME!)
-                        .TryAddSqlServerHealthCheck(context.Configuration)
-                        .AddB2BAuthentication(tokenValidationParameters!)
-                        .AddSystemTimer()
-                        .AddSerializer()
-                        .AddLogging();
-                    services.AddBlobStorageHealthCheck(
-                        "edi-web-jobs-storage",
-                        runtime.AzureWebJobsStorage!);
-                    services.AddBlobStorageHealthCheck(
-                        "edi-documents-storage",
-                        runtime.AZURE_STORAGE_ACCOUNT_URL!);
+                        .AddLogging()
 
-                    services
-                        .AddIntegrationEventModule()
+                        // Health checks
+                        .AddHealthChecksForIsolatedWorker()
+                        .TryAddBlobStorageHealthCheck(
+                            "edi-web-jobs-storage",
+                            context.Configuration["AzureWebJobsStorage"]!)
+
+                        // Data retention
+                        .AddDataRetention()
+
+                        // Security
+                        .AddB2BAuthentication(tokenValidationParameters!)
+
+                        // System timer
+                        .AddSystemTimer()
+
+                        // Serializer
+                        .AddSerializer()
+
+                        // Modules
+                        .AddIntegrationEventModule(context.Configuration)
                         .AddArchivedMessagesModule(context.Configuration)
                         .AddIncomingMessagesModule(context.Configuration)
                         .AddOutgoingMessagesModule(context.Configuration)
@@ -90,20 +89,9 @@ public static class HostFactory
                         .AddDataAccessUnitOfWorkModule(context.Configuration);
                 })
             .ConfigureLogging(
-                logging =>
+                (hostingContext, logging) =>
                 {
-                    logging.Services.Configure<LoggerFilterOptions>(
-                        options =>
-                        {
-                            var defaultRule = options.Rules.FirstOrDefault(
-                                rule =>
-                                    rule.ProviderName
-                                    == "Microsoft.Extensions.Logging.ApplicationInsights.ApplicationInsightsLoggerProvider");
-                            if (defaultRule is not null)
-                            {
-                                options.Rules.Remove(defaultRule);
-                            }
-                        });
+                    logging.AddLoggingConfigurationForIsolatedWorker(hostingContext);
                 })
             .Build();
     }
