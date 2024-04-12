@@ -42,7 +42,7 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
         _masterDataClient = masterDataClient;
     }
 
-    public async Task<INotification> MapFromAsync(byte[] payload, Guid referenceId, CancellationToken cancellationToken)
+    public async Task<INotification> MapFromAsync(byte[] payload, string eventId, Guid referenceId, CancellationToken cancellationToken)
     {
         var aggregations =
             AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(payload);
@@ -65,6 +65,7 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
         }
 
         return new AggregatedTimeSeriesRequestWasAccepted(
+            eventId,
             referenceId,
             acceptedEnergyResultTimeSeries);
     }

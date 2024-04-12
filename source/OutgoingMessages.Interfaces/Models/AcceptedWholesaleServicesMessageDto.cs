@@ -23,6 +23,7 @@ public class AcceptedWholesaleServicesMessageDto : WholesaleServicesMessageDto
     protected AcceptedWholesaleServicesMessageDto(
         ActorNumber receiverNumber,
         Guid processId,
+        string eventId,
         string businessReason,
         ActorRole receiverRole,
         ActorNumber chargeOwnerId,
@@ -31,6 +32,7 @@ public class AcceptedWholesaleServicesMessageDto : WholesaleServicesMessageDto
         : base(
         receiverNumber,
         processId,
+        eventId,
         businessReason,
         receiverRole,
         chargeOwnerId,
@@ -44,6 +46,7 @@ public class AcceptedWholesaleServicesMessageDto : WholesaleServicesMessageDto
         ActorRole receiverRole,
         ActorNumber chargeOwnerId,
         Guid processId,
+        string eventId,
         string businessReason,
         AcceptedWholesaleServicesSeries wholesaleSeries,
         MessageId relatedToMessageId)
@@ -55,6 +58,7 @@ public class AcceptedWholesaleServicesMessageDto : WholesaleServicesMessageDto
             receiverNumber: receiverNumber,
             receiverRole: receiverRole,
             processId: processId,
+            eventId: eventId,
             businessReason: businessReason,
             series: wholesaleSeries,
             chargeOwnerId: chargeOwnerId,

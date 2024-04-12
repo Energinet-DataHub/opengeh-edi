@@ -28,7 +28,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServic
 public sealed class WholesaleServicesRequestRejectedMapper : IInboxEventMapper
 {
 #pragma warning disable CA1822
-    public Task<INotification> MapFromAsync(byte[] payload, Guid referenceId, CancellationToken cancellationToken)
+    public Task<INotification> MapFromAsync(byte[] payload, string eventId, Guid referenceId, CancellationToken cancellationToken)
 #pragma warning restore CA1822
     {
         var inboxEvent =
@@ -36,6 +36,7 @@ public sealed class WholesaleServicesRequestRejectedMapper : IInboxEventMapper
 
         return Task.FromResult<INotification>(
             new WholesaleServicesRequestWasRejected(
+                eventId,
                 referenceId,
                 MapRejectReasons(inboxEvent.RejectReasons)));
     }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -173,6 +174,7 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
             process.RequestedByActorId,
             ActorRole.FromCode(process.RequestedByActorRoleCode),
             process.ProcessId.Id,
+            Guid.NewGuid().ToString(),
             gridarea,
             MeteringPointType.Production.Name,
             process.SettlementMethod,
@@ -195,7 +197,7 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
         {
             new("E86", "Invalid request"),
         };
-        return new RejectedAggregatedMeasureDataRequest(rejectReasons, BusinessReason.BalanceFixing);
+        return new RejectedAggregatedMeasureDataRequest(Guid.NewGuid().ToString(), rejectReasons, BusinessReason.BalanceFixing);
     }
 
     private static void AssertProcessState(AggregatedMeasureDataProcess process, AggregatedMeasureDataProcess.State state)

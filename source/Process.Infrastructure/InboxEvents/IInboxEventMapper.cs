@@ -28,10 +28,11 @@ public interface IInboxEventMapper
     /// Map payload to a notification
     /// </summary>
     /// <param name="payload"></param>
+    /// <param name="eventId"></param>
     /// <param name="referenceId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns><see cref="INotification"/></returns>
-    Task<INotification> MapFromAsync(byte[] payload, Guid referenceId, CancellationToken cancellationToken);
+    Task<INotification> MapFromAsync(byte[] payload, string eventId, Guid referenceId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Determines whether the specified event type can be handled by the mapper

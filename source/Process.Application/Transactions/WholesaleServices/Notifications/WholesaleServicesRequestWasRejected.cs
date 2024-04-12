@@ -19,5 +19,6 @@ using MediatR;
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications;
 
 public sealed record WholesaleServicesRequestWasRejected(
+    string EventId,
     Guid ReferenceId,
     IReadOnlyCollection<RejectReasonDto> RejectReasons) : INotification;

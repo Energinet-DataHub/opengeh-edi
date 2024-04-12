@@ -57,7 +57,7 @@ public sealed class EnergyResultProducedV2Processor : IIntegrationEventProcessor
         }
 
         var message = await _energyResultMessageResultFactory
-            .CreateAsync(energyResultProducedV2, CancellationToken.None)
+            .CreateAsync(integrationEvent.EventIdentification.ToString(), energyResultProducedV2, CancellationToken.None)
             .ConfigureAwait(false);
 
         await _outgoingMessagesClient.EnqueueAndCommitAsync(message, cancellationToken).ConfigureAwait(false);

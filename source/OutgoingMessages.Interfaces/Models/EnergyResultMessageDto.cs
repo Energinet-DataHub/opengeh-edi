@@ -24,7 +24,7 @@ public class EnergyResultMessageDto : OutgoingMessageDto
 {
     private EnergyResultMessageDto(
         ActorNumber receiverNumber,
-        Guid processId,
+        string eventId,
         string businessReason,
         ActorRole receiverRole,
         EnergyResultMessageTimeSeries series,
@@ -32,7 +32,8 @@ public class EnergyResultMessageDto : OutgoingMessageDto
         : base(
             DocumentType.NotifyAggregatedMeasureData,
             receiverNumber,
-            processId,
+            null,
+            eventId,
             businessReason,
             receiverRole,
             DataHubDetails.DataHubActorNumber,
@@ -45,9 +46,9 @@ public class EnergyResultMessageDto : OutgoingMessageDto
     public EnergyResultMessageTimeSeries Series { get; }
 
     public static EnergyResultMessageDto Create(
+        string eventId,
         ActorNumber receiverNumber,
         ActorRole receiverRole,
-        Guid processId,
         string gridAreaCode,
         string meteringPointType,
         string? settlementMethod,
@@ -62,7 +63,7 @@ public class EnergyResultMessageDto : OutgoingMessageDto
         string? settlementVersion = null)
     {
         var series = new EnergyResultMessageTimeSeries(
-            processId,
+            Guid.NewGuid(),
             gridAreaCode,
             meteringPointType,
             null,
@@ -78,7 +79,7 @@ public class EnergyResultMessageDto : OutgoingMessageDto
             settlementVersion);
         return new EnergyResultMessageDto(
             receiverNumber,
-            processId,
+            eventId,
             businessReasonName,
             receiverRole,
             series);

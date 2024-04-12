@@ -25,7 +25,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 public class EnergyResultMessageDtoBuilder
 {
     private const string GridAreaCode = "805";
-    private readonly Guid _processId = ProcessId.Create(Guid.NewGuid()).Id;
+    private readonly string _eventId = Guid.NewGuid().ToString();
     private readonly IReadOnlyCollection<EnergyResultMessagePoint> _points = new List<EnergyResultMessagePoint>();
     private BusinessReason _businessReason = BusinessReason.BalanceFixing;
     private SettlementVersion? _settlementVersion;
@@ -37,9 +37,9 @@ public class EnergyResultMessageDtoBuilder
 #pragma warning restore CA1822
     {
         return EnergyResultMessageDto.Create(
+            _eventId,
             _receiverNumber,
             _receiverRole,
-            _processId,
             GridAreaCode,
             MeteringPointType.Consumption.Name,
             SettlementMethod.NonProfiled.Name,

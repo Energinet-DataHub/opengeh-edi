@@ -22,11 +22,14 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServic
 public class AcceptedWholesaleServices : InternalCommand
 {
     [JsonConstructor]
-    public AcceptedWholesaleServices(Guid processId, IReadOnlyCollection<AcceptedWholesaleServicesSerieDto> acceptedWholesaleServicesSerie)
+    public AcceptedWholesaleServices(string eventId, Guid processId, IReadOnlyCollection<AcceptedWholesaleServicesSerieDto> acceptedWholesaleServicesSerie)
     {
+        EventId = eventId;
         ProcessId = processId;
         AcceptedWholesaleServicesSerie = acceptedWholesaleServicesSerie;
     }
+
+    public string EventId { get; }
 
     public Guid ProcessId { get; }
 

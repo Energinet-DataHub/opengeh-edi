@@ -51,7 +51,7 @@ public class MonthlyAmountPerChargeResultProducedV1Processor : IIntegrationEvent
         }
 
         var monthlyAmountPerChargeResultProducedV1 = (MonthlyAmountPerChargeResultProducedV1)integrationEvent.Message;
-        var message = await _wholesaleServicesMessageFactory.CreateMessageAsync(monthlyAmountPerChargeResultProducedV1)
+        var message = await _wholesaleServicesMessageFactory.CreateMessageAsync(integrationEvent.EventIdentification.ToString(), monthlyAmountPerChargeResultProducedV1)
             .ConfigureAwait(false);
 
         await _outgoingMessagesClient.EnqueueAndCommitAsync(message, cancellationToken).ConfigureAwait(false);

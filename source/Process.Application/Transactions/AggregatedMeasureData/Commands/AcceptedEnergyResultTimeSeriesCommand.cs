@@ -23,11 +23,14 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasu
 public class AcceptedEnergyResultTimeSeriesCommand : InternalCommand
 {
     [JsonConstructor]
-    public AcceptedEnergyResultTimeSeriesCommand(Guid processId, IReadOnlyCollection<AcceptedEnergyResultTimeSeries> aggregatedTimeSeries)
+    public AcceptedEnergyResultTimeSeriesCommand(string eventId, Guid processId, IReadOnlyCollection<AcceptedEnergyResultTimeSeries> aggregatedTimeSeries)
     {
+        EventId = eventId;
         ProcessId = processId;
         AggregatedTimeSeries = aggregatedTimeSeries;
     }
+
+    public string EventId { get; }
 
     public Guid ProcessId { get; }
 

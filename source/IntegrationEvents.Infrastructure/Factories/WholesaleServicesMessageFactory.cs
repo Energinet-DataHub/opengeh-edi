@@ -35,6 +35,7 @@ public sealed class WholesaleServicesMessageFactory
     }
 
     public async Task<WholesaleServicesMessageDto> CreateMessageAsync(
+        string eventId,
         MonthlyAmountPerChargeResultProducedV1 monthlyAmountPerChargeResultProducedV1)
     {
         ArgumentNullException.ThrowIfNull(monthlyAmountPerChargeResultProducedV1);
@@ -43,15 +44,16 @@ public sealed class WholesaleServicesMessageFactory
             .ConfigureAwait(false);
 
         return WholesaleServicesMessageDto.Create(
+            eventId,
             message.EnergySupplier,
             ActorRole.EnergySupplier,
             message.ChargeOwner,
-            Guid.NewGuid(),
             BusinessReasonMapper.Map(monthlyAmountPerChargeResultProducedV1.CalculationType).Name,
             message);
     }
 
     public async Task<WholesaleServicesMessageDto> CreateMessageAsync(
+        string eventId,
         AmountPerChargeResultProducedV1 amountPerChargeResultProducedV1)
     {
         ArgumentNullException.ThrowIfNull(amountPerChargeResultProducedV1);
@@ -59,10 +61,10 @@ public sealed class WholesaleServicesMessageFactory
         var message = await CreateWholesaleResultSeriesAsync(amountPerChargeResultProducedV1).ConfigureAwait(false);
 
         return WholesaleServicesMessageDto.Create(
+            eventId,
             receiverNumber: message.EnergySupplier,
             receiverRole: ActorRole.EnergySupplier,
             chargeOwnerId: message.ChargeOwner,
-            processId: Guid.NewGuid(),
             businessReason: BusinessReasonMapper.Map(amountPerChargeResultProducedV1.CalculationType).Name,
             wholesaleSeries: message);
     }

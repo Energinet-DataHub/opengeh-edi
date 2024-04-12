@@ -43,7 +43,7 @@ public class AcceptWholesaleServicesWhenAnAcceptedWholesaleServicesRequestIsAvai
         foreach (var acceptedWholesaleServices in request.AcceptedWholesaleServicesSerie)
         {
             var message = AcceptedWholesaleServiceMessageDtoFactory
-                .Create(process, acceptedWholesaleServices);
+                .Create(request.EventId, process, acceptedWholesaleServices);
             acceptedWholesaleServicesMessageDtos.Add(message);
         }
 

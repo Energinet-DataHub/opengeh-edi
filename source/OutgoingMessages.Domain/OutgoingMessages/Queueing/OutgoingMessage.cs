@@ -30,9 +30,10 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         private string? _serializedContent;
 
         public OutgoingMessage(
+            string eventId,
             DocumentType documentType,
             ActorNumber receiverId,
-            Guid processId,
+            Guid? processId,
             string businessReason,
             ActorRole receiverRole,
             ActorNumber senderId,
@@ -45,6 +46,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         {
             ArgumentNullException.ThrowIfNull(receiverId);
             Id = OutgoingMessageId.New();
+            EventId = eventId;
             DocumentType = documentType;
             ProcessId = processId;
             BusinessReason = businessReason;
@@ -66,7 +68,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private OutgoingMessage(
             DocumentType documentType,
-            Guid processId,
+            string eventId,
+            Guid? processId,
             string businessReason,
             ActorNumber senderId,
             ActorRole senderRole,
@@ -76,6 +79,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         {
             Id = OutgoingMessageId.New();
             DocumentType = documentType;
+            EventId = eventId;
             ProcessId = processId;
             BusinessReason = businessReason;
             SenderId = senderId;
@@ -93,7 +97,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
         public DocumentType DocumentType { get; }
 
-        public Guid ProcessId { get; }
+        public string EventId { get; }
+
+        public Guid? ProcessId { get; }
 
         public string BusinessReason { get; }
 
@@ -137,6 +143,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             ArgumentNullException.ThrowIfNull(acceptedEnergyResultMessage);
 
             return new OutgoingMessage(
+                acceptedEnergyResultMessage.EventId,
                 acceptedEnergyResultMessage.DocumentType,
                 acceptedEnergyResultMessage.ReceiverNumber,
                 acceptedEnergyResultMessage.ProcessId,
@@ -163,6 +170,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             ArgumentNullException.ThrowIfNull(rejectedEnergyResultMessage);
 
             return new OutgoingMessage(
+                rejectedEnergyResultMessage.EventId,
                 rejectedEnergyResultMessage.DocumentType,
                 rejectedEnergyResultMessage.ReceiverNumber,
                 rejectedEnergyResultMessage.ProcessId,
@@ -189,6 +197,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             ArgumentNullException.ThrowIfNull(energyResultMessage);
 
             return new OutgoingMessage(
+                energyResultMessage.EventId,
                 energyResultMessage.DocumentType,
                 energyResultMessage.ReceiverNumber,
                 energyResultMessage.ProcessId,
@@ -217,6 +226,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             return new List<OutgoingMessage>()
             {
                 new(
+                    wholesaleServicesMessageDto.EventId,
                     wholesaleServicesMessageDto.DocumentType,
                     wholesaleServicesMessageDto.ReceiverNumber,
                     wholesaleServicesMessageDto.ProcessId,
@@ -230,6 +240,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
                     wholesaleServicesMessageDto.RelatedToMessageId,
                     wholesaleServicesMessageDto.Series.GridAreaCode),
                 new(
+                    wholesaleServicesMessageDto.EventId,
                     wholesaleServicesMessageDto.DocumentType,
                     wholesaleServicesMessageDto.ChargeOwnerId,
                     wholesaleServicesMessageDto.ProcessId,
@@ -257,6 +268,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             ArgumentNullException.ThrowIfNull(rejectedWholesaleServicesMessage);
 
             return new OutgoingMessage(
+                rejectedWholesaleServicesMessage.EventId,
                 rejectedWholesaleServicesMessage.DocumentType,
                 rejectedWholesaleServicesMessage.ReceiverNumber,
                 rejectedWholesaleServicesMessage.ProcessId,
@@ -280,6 +292,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
             ArgumentNullException.ThrowIfNull(acceptedWholesaleServicesMessage);
 
             return new OutgoingMessage(
+                acceptedWholesaleServicesMessage.EventId,
                 acceptedWholesaleServicesMessage.DocumentType,
                 acceptedWholesaleServicesMessage.ReceiverNumber,
                 acceptedWholesaleServicesMessage.ProcessId,

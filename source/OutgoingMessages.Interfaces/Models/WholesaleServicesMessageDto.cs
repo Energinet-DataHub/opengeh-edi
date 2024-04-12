@@ -23,7 +23,8 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
 {
     protected WholesaleServicesMessageDto(
         ActorNumber receiverNumber,
-        Guid processId,
+        Guid? processId,
+        string eventId,
         string businessReason,
         ActorRole receiverRole,
         ActorNumber chargeOwnerId,
@@ -33,6 +34,7 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
             DocumentType.NotifyWholesaleServices,
             receiverNumber,
             processId,
+            eventId,
             businessReason,
             receiverRole,
             DataHubDetails.DataHubActorNumber,
@@ -48,20 +50,21 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
     public WholesaleServicesSeries Series { get; }
 
     public static WholesaleServicesMessageDto Create(
+        string eventId,
         ActorNumber receiverNumber,
         ActorRole receiverRole,
         ActorNumber chargeOwnerId,
-        Guid processId,
         string businessReason,
         WholesaleServicesSeries wholesaleSeries)
     {
-        ArgumentNullException.ThrowIfNull(processId);
+        ArgumentNullException.ThrowIfNull(eventId);
         ArgumentNullException.ThrowIfNull(businessReason);
 
         return new WholesaleServicesMessageDto(
             receiverNumber: receiverNumber,
             receiverRole: receiverRole,
-            processId: processId,
+            processId: null,
+            eventId: eventId,
             businessReason: businessReason,
             series: wholesaleSeries,
             chargeOwnerId: chargeOwnerId);

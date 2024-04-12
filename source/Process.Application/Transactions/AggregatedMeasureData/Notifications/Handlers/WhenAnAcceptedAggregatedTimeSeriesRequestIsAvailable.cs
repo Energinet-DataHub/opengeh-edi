@@ -34,6 +34,6 @@ public class WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable : INotificatio
     {
         ArgumentNullException.ThrowIfNull(notification);
         return _commandSchedulerFacade.EnqueueAsync(
-            new AcceptedEnergyResultTimeSeriesCommand(notification.ProcessId, notification.AggregatedTimeSeries));
+            new AcceptedEnergyResultTimeSeriesCommand(notification.EventId, notification.ProcessId, notification.AggregatedTimeSeries));
     }
 }

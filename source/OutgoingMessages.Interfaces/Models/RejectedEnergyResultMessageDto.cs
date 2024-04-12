@@ -24,6 +24,7 @@ public class RejectedEnergyResultMessageDto : OutgoingMessageDto
     public RejectedEnergyResultMessageDto(
         ActorNumber receiverNumber,
         Guid processId,
+        string eventId,
         string businessReason,
         ActorRole receiverRole,
         MessageId relatedToMessageId,
@@ -32,6 +33,7 @@ public class RejectedEnergyResultMessageDto : OutgoingMessageDto
             DocumentType.RejectRequestAggregatedMeasureData,
             receiverNumber,
             processId,
+            eventId,
             businessReason,
             receiverRole,
             DataHubDetails.DataHubActorNumber,

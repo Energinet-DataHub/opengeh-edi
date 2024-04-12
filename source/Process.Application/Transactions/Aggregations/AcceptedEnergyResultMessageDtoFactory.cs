@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
@@ -24,6 +25,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 public static class AcceptedEnergyResultMessageDtoFactory
 {
     public static AcceptedEnergyResultMessageDto Create(
+        string eventId,
         AggregatedMeasureDataProcess aggregatedMeasureDataProcess,
         AcceptedEnergyResultTimeSerie acceptedEnergyResultTimeSerie)
     {
@@ -34,6 +36,7 @@ public static class AcceptedEnergyResultMessageDtoFactory
             receiverNumber: aggregatedMeasureDataProcess.RequestedByActorId,
             receiverRole: ActorRole.FromCode(aggregatedMeasureDataProcess.RequestedByActorRoleCode),
             processId: aggregatedMeasureDataProcess.ProcessId.Id,
+            eventId: eventId,
             gridAreaCode: acceptedEnergyResultTimeSerie.GridAreaDetails.GridAreaCode,
             meteringPointType: acceptedEnergyResultTimeSerie.MeteringPointType,
             settlementMethod: aggregatedMeasureDataProcess.SettlementMethod,
@@ -51,6 +54,7 @@ public static class AcceptedEnergyResultMessageDtoFactory
     }
 
     public static AcceptedEnergyResultMessageDto Create(
+        string eventId,
         AggregatedMeasureDataProcess aggregatedMeasureDataProcess,
         AcceptedEnergyResultTimeSeries acceptedEnergyResultTimeSerie)
     {
@@ -61,6 +65,7 @@ public static class AcceptedEnergyResultMessageDtoFactory
             receiverNumber: aggregatedMeasureDataProcess.RequestedByActorId,
             receiverRole: ActorRole.FromCode(aggregatedMeasureDataProcess.RequestedByActorRoleCode),
             processId: aggregatedMeasureDataProcess.ProcessId.Id,
+            eventId: eventId,
             gridAreaCode: acceptedEnergyResultTimeSerie.GridAreaDetails.GridAreaCode,
             meteringPointType: acceptedEnergyResultTimeSerie.MeteringPointType.Name,
             settlementMethod: acceptedEnergyResultTimeSerie.SettlementMethod?.Name,

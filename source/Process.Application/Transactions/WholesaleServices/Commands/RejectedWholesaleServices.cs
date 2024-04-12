@@ -23,11 +23,14 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServic
 public sealed class RejectedWholesaleServices : InternalCommand
 {
     [JsonConstructor]
-    public RejectedWholesaleServices(Guid processId, IReadOnlyCollection<RejectReasonDto> rejectReasons)
+    public RejectedWholesaleServices(string eventId, Guid processId, IReadOnlyCollection<RejectReasonDto> rejectReasons)
     {
+        EventId = eventId;
         ProcessId = processId;
         RejectReasons = rejectReasons;
     }
+
+    public string EventId { get; }
 
     public Guid ProcessId { get; }
 

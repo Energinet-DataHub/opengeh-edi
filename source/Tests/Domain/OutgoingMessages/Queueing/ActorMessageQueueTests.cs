@@ -172,6 +172,7 @@ public class ActorMessageQueueTests
             ActorRole.EnergySupplier);
 
         return new OutgoingMessage(
+            Guid.NewGuid().ToString(),
             messageType ?? DocumentType.NotifyAggregatedMeasureData,
             receiver.Number,
             ProcessId.New().Id,

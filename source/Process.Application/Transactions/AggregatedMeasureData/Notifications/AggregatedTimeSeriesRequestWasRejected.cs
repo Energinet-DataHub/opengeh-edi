@@ -19,4 +19,4 @@ using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
 
-public record AggregatedTimeSeriesRequestWasRejected(Guid ReferenceId, IReadOnlyCollection<RejectReason> RejectReasons) : INotification;
+public record AggregatedTimeSeriesRequestWasRejected(string EventId, Guid ReferenceId, IReadOnlyCollection<RejectReason> RejectReasons) : INotification;

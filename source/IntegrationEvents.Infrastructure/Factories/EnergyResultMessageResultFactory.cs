@@ -35,6 +35,7 @@ public class EnergyResultMessageResultFactory
     }
 
     public async Task<EnergyResultMessageDto> CreateAsync(
+        string eventId,
         EnergyResultProducedV2 integrationEvent,
         CancellationToken cancellationToken)
     {
@@ -44,9 +45,9 @@ public class EnergyResultMessageResultFactory
             await GetAggregationLevelDataAsync(integrationEvent, cancellationToken).ConfigureAwait(false);
 
         return EnergyResultMessageDto.Create(
+            eventId,
             receiverNumber: aggregationData.ReceiverNumber,
             receiverRole: aggregationData.ReceiverRole,
-            processId: Guid.NewGuid(),
             gridAreaCode: aggregationData.GridAreaCode,
             meteringPointType: MeteringPointTypeMapper.Map(integrationEvent.TimeSeriesType).Name,
             settlementMethod: SettlementMethodMapper.Map(integrationEvent.TimeSeriesType)?.Name,
