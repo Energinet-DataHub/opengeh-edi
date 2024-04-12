@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.EDI.Api.Configuration;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Interfaces;
@@ -58,7 +59,7 @@ public class InboxEventListener
 
         var referenceId = GetReferenceId(context);
         await _inboxEventReceiver.ReceiveAsync(
-            (string)eventId,
+            EventId.From((string)eventId),
             (string)eventName,
             referenceId,
             message).ConfigureAwait(false);

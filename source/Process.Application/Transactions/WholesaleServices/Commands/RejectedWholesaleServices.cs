@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 
@@ -23,14 +24,14 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServic
 public sealed class RejectedWholesaleServices : InternalCommand
 {
     [JsonConstructor]
-    public RejectedWholesaleServices(string eventId, Guid processId, IReadOnlyCollection<RejectReasonDto> rejectReasons)
+    public RejectedWholesaleServices(EventId eventId, Guid processId, IReadOnlyCollection<RejectReasonDto> rejectReasons)
     {
         EventId = eventId;
         ProcessId = processId;
         RejectReasons = rejectReasons;
     }
 
-    public string EventId { get; }
+    public EventId EventId { get; }
 
     public Guid ProcessId { get; }
 

@@ -35,7 +35,7 @@ public class EnergyResultMessageResultFactory
     }
 
     public async Task<EnergyResultMessageDto> CreateAsync(
-        string eventId,
+        EventId eventId,
         EnergyResultProducedV2 integrationEvent,
         CancellationToken cancellationToken)
     {

@@ -24,7 +24,7 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
     protected WholesaleServicesMessageDto(
         ActorNumber receiverNumber,
         Guid? processId,
-        string eventId,
+        EventId eventId,
         string businessReason,
         ActorRole receiverRole,
         ActorNumber chargeOwnerId,
@@ -50,7 +50,7 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
     public WholesaleServicesSeries Series { get; }
 
     public static WholesaleServicesMessageDto Create(
-        string eventId,
+        EventId eventId,
         ActorNumber receiverNumber,
         ActorRole receiverRole,
         ActorNumber chargeOwnerId,

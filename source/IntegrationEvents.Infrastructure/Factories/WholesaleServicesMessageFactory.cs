@@ -35,7 +35,7 @@ public sealed class WholesaleServicesMessageFactory
     }
 
     public async Task<WholesaleServicesMessageDto> CreateMessageAsync(
-        string eventId,
+        EventId eventId,
         MonthlyAmountPerChargeResultProducedV1 monthlyAmountPerChargeResultProducedV1)
     {
         ArgumentNullException.ThrowIfNull(monthlyAmountPerChargeResultProducedV1);
@@ -53,7 +53,7 @@ public sealed class WholesaleServicesMessageFactory
     }
 
     public async Task<WholesaleServicesMessageDto> CreateMessageAsync(
-        string eventId,
+        EventId eventId,
         AmountPerChargeResultProducedV1 amountPerChargeResultProducedV1)
     {
         ArgumentNullException.ThrowIfNull(amountPerChargeResultProducedV1);

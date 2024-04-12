@@ -32,7 +32,7 @@ public static class RejectedEnergyResultMessageDtoBuilder
         new List<RejectedEnergyResultMessageRejectReason> { new(SampleData.SerieReasonCode, SampleData.SerieReasonMessage) },
         SampleData.OriginalTransactionId);
 
-    private static readonly string _eventId = Guid.NewGuid().ToString();
+    private static readonly EventId _eventId = EventId.From(Guid.NewGuid().ToString());
 
     public static RejectedEnergyResultMessageDto Build()
     {

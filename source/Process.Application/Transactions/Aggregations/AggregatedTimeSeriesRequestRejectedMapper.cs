@@ -17,6 +17,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.Edi.Responses;
@@ -28,7 +29,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 
 public class AggregatedTimeSeriesRequestRejectedMapper : IInboxEventMapper
 {
-    public Task<INotification> MapFromAsync(byte[] payload, string eventId, Guid referenceId, CancellationToken cancellationToken)
+    public Task<INotification> MapFromAsync(byte[] payload, EventId eventId, Guid referenceId, CancellationToken cancellationToken)
     {
         var inboxEvent =
             AggregatedTimeSeriesRequestRejected.Parser.ParseFrom(payload);

@@ -394,7 +394,7 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
 
         await _inboxEventReceiver
             .ReceiveAsync(
-                Guid.NewGuid().ToString(),
+                EventId.From(Guid.NewGuid()),
                 nameof(AggregatedTimeSeriesRequestAccepted),
                 process.ProcessId.Id,
                 requestAccepted.ToByteArray());

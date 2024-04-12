@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 
@@ -56,7 +57,7 @@ public class InboxEventsProcessor
             try
             {
                 var notification = await MapperFor(inboxEvent.EventType)
-                    .MapFromAsync(inboxEvent.EventPayload, inboxEvent.Id, inboxEvent.ReferenceId, cancellationToken).ConfigureAwait(false);
+                    .MapFromAsync(inboxEvent.EventPayload, EventId.From(inboxEvent.Id), inboxEvent.ReferenceId, cancellationToken).ConfigureAwait(false);
 
                 await _mediator.Publish(
                         notification,

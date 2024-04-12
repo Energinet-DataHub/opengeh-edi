@@ -24,7 +24,7 @@ public class WholesaleServicesMessageDtoBuilder
     private static readonly ActorNumber _receiverNumber = ActorNumber.Create("1234567890123");
     private static readonly ActorNumber _chargeOwner = DataHubDetails.DataHubActorNumber;
     private static readonly BusinessReason _businessReason = BusinessReason.BalanceFixing;
-    private static readonly string _eventId = Guid.NewGuid().ToString();
+    private static readonly EventId _eventId = EventId.From(Guid.NewGuid());
 
     private ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
 

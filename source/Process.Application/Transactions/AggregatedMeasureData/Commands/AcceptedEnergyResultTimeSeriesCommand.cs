@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 
@@ -23,14 +24,14 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasu
 public class AcceptedEnergyResultTimeSeriesCommand : InternalCommand
 {
     [JsonConstructor]
-    public AcceptedEnergyResultTimeSeriesCommand(string eventId, Guid processId, IReadOnlyCollection<AcceptedEnergyResultTimeSeries> aggregatedTimeSeries)
+    public AcceptedEnergyResultTimeSeriesCommand(EventId eventId, Guid processId, IReadOnlyCollection<AcceptedEnergyResultTimeSeries> aggregatedTimeSeries)
     {
         EventId = eventId;
         ProcessId = processId;
         AggregatedTimeSeries = aggregatedTimeSeries;
     }
 
-    public string EventId { get; }
+    public EventId EventId { get; }
 
     public Guid ProcessId { get; }
 

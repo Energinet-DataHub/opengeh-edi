@@ -30,7 +30,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
         private string? _serializedContent;
 
         public OutgoingMessage(
-            string eventId,
+            EventId eventId,
             DocumentType documentType,
             ActorNumber receiverId,
             Guid? processId,
@@ -68,7 +68,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         private OutgoingMessage(
             DocumentType documentType,
-            string eventId,
+            EventId eventId,
             Guid? processId,
             string businessReason,
             ActorNumber senderId,
@@ -97,7 +97,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queuein
 
         public DocumentType DocumentType { get; }
 
-        public string EventId { get; }
+        public EventId EventId { get; }
 
         public Guid? ProcessId { get; }
 

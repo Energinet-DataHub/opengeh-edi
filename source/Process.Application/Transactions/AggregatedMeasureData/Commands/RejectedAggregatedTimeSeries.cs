@@ -24,14 +24,14 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasu
 public class RejectedAggregatedTimeSeries : InternalCommand
 {
     [JsonConstructor]
-    public RejectedAggregatedTimeSeries(string eventId, Guid processId, IReadOnlyCollection<RejectReason> rejectReasons)
+    public RejectedAggregatedTimeSeries(EventId eventId, Guid processId, IReadOnlyCollection<RejectReason> rejectReasons)
     {
         EventId = eventId;
         ProcessId = processId;
         RejectReasons = rejectReasons;
     }
 
-    public string EventId { get; }
+    public EventId EventId { get; }
 
     public Guid ProcessId { get; }
 

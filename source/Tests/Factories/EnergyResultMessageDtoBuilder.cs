@@ -48,8 +48,7 @@ public class EnergyResultMessageDtoBuilder
 
     private static readonly string _businessReasonName = BusinessReason.BalanceFixing.Code;
     private static readonly string? _settlementVersion = SettlementVersion.FirstCorrection.Name;
-    private static readonly string _eventId = Guid.NewGuid().ToString();
-
+    private static readonly EventId _eventId = EventId.From(Guid.NewGuid());
     private ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
 
     public EnergyResultMessageDto Build()

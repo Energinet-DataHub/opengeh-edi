@@ -25,7 +25,7 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
     private AcceptedEnergyResultMessageDto(
         ActorNumber receiverNumber,
         Guid processId,
-        string eventId,
+        EventId eventId,
         string businessReason,
         ActorRole receiverRole,
         AcceptedEnergyResultMessageTimeSeries series,
@@ -50,7 +50,7 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
         ActorNumber receiverNumber,
         ActorRole receiverRole,
         Guid processId,
-        string eventId,
+        EventId eventId,
         string gridAreaCode,
         string meteringPointType,
         string? settlementMethod,

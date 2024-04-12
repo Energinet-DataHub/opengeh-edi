@@ -32,7 +32,7 @@ public static class RejectedWholesaleServicesMessageDtoBuilder
         new List<RejectedWholesaleServicesMessageRejectReason> { new(SampleData.SerieReasonCode, SampleData.SerieReasonMessage) },
         SampleData.OriginalTransactionId);
 
-    private static readonly string _eventId = Guid.NewGuid().ToString();
+    private static readonly EventId _eventId = EventId.From(Guid.NewGuid());
 
     public static RejectedWholesaleServicesMessageDto Build()
     {

@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServic
 public static class AcceptedWholesaleServiceMessageDtoFactory
 {
     public static AcceptedWholesaleServicesMessageDto Create(
-        string eventId,
+        EventId eventId,
         WholesaleServicesProcess process,
         AcceptedWholesaleServicesSerieDto acceptedWholesaleServices)
     {

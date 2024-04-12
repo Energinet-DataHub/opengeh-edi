@@ -174,7 +174,7 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
             process.RequestedByActorId,
             ActorRole.FromCode(process.RequestedByActorRoleCode),
             process.ProcessId.Id,
-            Guid.NewGuid().ToString(),
+            EventId.From(Guid.NewGuid()),
             gridarea,
             MeteringPointType.Production.Name,
             process.SettlementMethod,
@@ -197,7 +197,7 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
         {
             new("E86", "Invalid request"),
         };
-        return new RejectedAggregatedMeasureDataRequest(Guid.NewGuid().ToString(), rejectReasons, BusinessReason.BalanceFixing);
+        return new RejectedAggregatedMeasureDataRequest(EventId.From(Guid.NewGuid()), rejectReasons, BusinessReason.BalanceFixing);
     }
 
     private static void AssertProcessState(AggregatedMeasureDataProcess process, AggregatedMeasureDataProcess.State state)

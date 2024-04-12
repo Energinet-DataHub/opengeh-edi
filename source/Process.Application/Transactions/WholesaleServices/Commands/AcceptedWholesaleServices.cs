@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Commands;
@@ -22,14 +23,14 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServic
 public class AcceptedWholesaleServices : InternalCommand
 {
     [JsonConstructor]
-    public AcceptedWholesaleServices(string eventId, Guid processId, IReadOnlyCollection<AcceptedWholesaleServicesSerieDto> acceptedWholesaleServicesSerie)
+    public AcceptedWholesaleServices(EventId eventId, Guid processId, IReadOnlyCollection<AcceptedWholesaleServicesSerieDto> acceptedWholesaleServicesSerie)
     {
         EventId = eventId;
         ProcessId = processId;
         AcceptedWholesaleServicesSerie = acceptedWholesaleServicesSerie;
     }
 
-    public string EventId { get; }
+    public EventId EventId { get; }
 
     public Guid ProcessId { get; }
 

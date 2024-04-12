@@ -52,7 +52,7 @@ public static class AcceptedEnergyResultMessageDtoBuilder
     private static readonly string? _originalTransactionIdReference = Guid.NewGuid().ToString();
     private static readonly string? _settlementVersion = SettlementVersion.FirstCorrection.Code;
     private static readonly MessageId? _relatedToMessageId = MessageId.New();
-    private static readonly string _eventId = Guid.NewGuid().ToString();
+    private static readonly EventId _eventId = EventId.From(Guid.NewGuid());
 
     public static AcceptedEnergyResultMessageDto Build()
     {

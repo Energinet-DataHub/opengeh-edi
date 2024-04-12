@@ -25,7 +25,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 public class EnergyResultMessageDtoBuilder
 {
     private const string GridAreaCode = "805";
-    private readonly string _eventId = Guid.NewGuid().ToString();
+    private static readonly EventId _eventId = EventId.From(Guid.NewGuid());
     private readonly IReadOnlyCollection<EnergyResultMessagePoint> _points = new List<EnergyResultMessagePoint>();
     private BusinessReason _businessReason = BusinessReason.BalanceFixing;
     private SettlementVersion? _settlementVersion;

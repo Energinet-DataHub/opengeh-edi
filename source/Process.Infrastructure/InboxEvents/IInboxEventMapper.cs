@@ -15,6 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using MediatR;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
@@ -32,7 +33,7 @@ public interface IInboxEventMapper
     /// <param name="referenceId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns><see cref="INotification"/></returns>
-    Task<INotification> MapFromAsync(byte[] payload, string eventId, Guid referenceId, CancellationToken cancellationToken);
+    Task<INotification> MapFromAsync(byte[] payload, EventId eventId, Guid referenceId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Determines whether the specified event type can be handled by the mapper

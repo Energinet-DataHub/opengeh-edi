@@ -18,6 +18,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -97,7 +98,7 @@ public class WhenAnInboxEventIsReceivedTests : TestBase
 
     private Task EventIsReceived(string eventId)
     {
-        return _receiver.ReceiveAsync(eventId, _eventType, _referenceId, _eventPayload);
+        return _receiver.ReceiveAsync(EventId.From(eventId), _eventType, _referenceId, _eventPayload);
     }
 
     private async Task EventIsRegisteredWithInbox(string eventId, int expectedNumberOfRegisteredEvents = 1)

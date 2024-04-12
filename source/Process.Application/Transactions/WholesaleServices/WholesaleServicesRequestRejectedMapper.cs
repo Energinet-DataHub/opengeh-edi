@@ -17,6 +17,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.Edi.Responses;
@@ -28,7 +29,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServic
 public sealed class WholesaleServicesRequestRejectedMapper : IInboxEventMapper
 {
 #pragma warning disable CA1822
-    public Task<INotification> MapFromAsync(byte[] payload, string eventId, Guid referenceId, CancellationToken cancellationToken)
+    public Task<INotification> MapFromAsync(byte[] payload, EventId eventId, Guid referenceId, CancellationToken cancellationToken)
 #pragma warning restore CA1822
     {
         var inboxEvent =

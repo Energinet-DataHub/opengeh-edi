@@ -178,7 +178,7 @@ public class BehavioursTestBase : IDisposable
     {
         await GetService<IInboxEventReceiver>().
             ReceiveAsync(
-                Guid.NewGuid().ToString(),
+                EventId.From(Guid.NewGuid()),
                 eventType,
                 processId,
                 eventPayload.ToByteArray())

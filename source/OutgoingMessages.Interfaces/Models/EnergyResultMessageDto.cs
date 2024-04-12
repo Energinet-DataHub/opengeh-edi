@@ -24,7 +24,7 @@ public class EnergyResultMessageDto : OutgoingMessageDto
 {
     private EnergyResultMessageDto(
         ActorNumber receiverNumber,
-        string eventId,
+        EventId eventId,
         string businessReason,
         ActorRole receiverRole,
         EnergyResultMessageTimeSeries series,
@@ -46,7 +46,7 @@ public class EnergyResultMessageDto : OutgoingMessageDto
     public EnergyResultMessageTimeSeries Series { get; }
 
     public static EnergyResultMessageDto Create(
-        string eventId,
+        EventId eventId,
         ActorNumber receiverNumber,
         ActorRole receiverRole,
         string gridAreaCode,

@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Microsoft.Extensions.Logging;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 
@@ -66,7 +67,7 @@ public class AmountPerChargeResultProducedV1Processor : IIntegrationEventProcess
         }
 
         var message = await _wholesaleServicesMessageFactory
-            .CreateMessageAsync(integrationEvent.EventIdentification.ToString(), amountPerChargeResultProducedV1)
+            .CreateMessageAsync(EventId.From(integrationEvent.EventIdentification), amountPerChargeResultProducedV1)
             .ConfigureAwait(false);
 
         await _outgoingMessagesClient.EnqueueAndCommitAsync(message, cancellationToken).ConfigureAwait(false);

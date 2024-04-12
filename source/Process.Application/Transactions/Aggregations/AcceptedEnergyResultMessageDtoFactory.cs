@@ -25,7 +25,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 public static class AcceptedEnergyResultMessageDtoFactory
 {
     public static AcceptedEnergyResultMessageDto Create(
-        string eventId,
+        EventId eventId,
         AggregatedMeasureDataProcess aggregatedMeasureDataProcess,
         AcceptedEnergyResultTimeSerie acceptedEnergyResultTimeSerie)
     {
@@ -54,7 +54,7 @@ public static class AcceptedEnergyResultMessageDtoFactory
     }
 
     public static AcceptedEnergyResultMessageDto Create(
-        string eventId,
+        EventId eventId,
         AggregatedMeasureDataProcess aggregatedMeasureDataProcess,
         AcceptedEnergyResultTimeSeries acceptedEnergyResultTimeSerie)
     {

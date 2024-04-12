@@ -24,7 +24,7 @@ public class RejectedEnergyResultMessageDto : OutgoingMessageDto
     public RejectedEnergyResultMessageDto(
         ActorNumber receiverNumber,
         Guid processId,
-        string eventId,
+        EventId eventId,
         string businessReason,
         ActorRole receiverRole,
         MessageId relatedToMessageId,

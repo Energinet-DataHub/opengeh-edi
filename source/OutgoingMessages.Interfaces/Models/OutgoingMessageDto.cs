@@ -26,7 +26,7 @@ public abstract class OutgoingMessageDto
         DocumentType documentType,
         ActorNumber receiverNumber,
         Guid? processId,
-        string eventId,
+        EventId eventId,
         string businessReason,
         ActorRole receiverRole,
         ActorNumber senderId,
@@ -54,7 +54,7 @@ public abstract class OutgoingMessageDto
     /// Stores the id of the service bus message that created the OutgoingMessage
     ///     Useful for tracking and debugging purposes.
     /// </summary>
-    public string EventId { get; }
+    public EventId EventId { get; }
 
     public string BusinessReason { get; }
 

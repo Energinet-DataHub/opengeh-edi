@@ -23,7 +23,7 @@ public class AcceptedWholesaleServicesMessageDto : WholesaleServicesMessageDto
     protected AcceptedWholesaleServicesMessageDto(
         ActorNumber receiverNumber,
         Guid processId,
-        string eventId,
+        EventId eventId,
         string businessReason,
         ActorRole receiverRole,
         ActorNumber chargeOwnerId,
@@ -46,7 +46,7 @@ public class AcceptedWholesaleServicesMessageDto : WholesaleServicesMessageDto
         ActorRole receiverRole,
         ActorNumber chargeOwnerId,
         Guid processId,
-        string eventId,
+        EventId eventId,
         string businessReason,
         AcceptedWholesaleServicesSeries wholesaleSeries,
         MessageId relatedToMessageId)

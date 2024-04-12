@@ -51,7 +51,7 @@ public sealed class
     }
 
     private static RejectedWholesaleServicesMessageDto CreateRejectedWholesaleServicesResultMessage(
-        string eventId,
+        EventId eventId,
         WholesaleServicesProcess process,
         IReadOnlyCollection<RejectReasonDto> rejectReasons)
     {

@@ -201,7 +201,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     {
         await GetService<IInboxEventReceiver>()
             .ReceiveAsync(
-                Guid.NewGuid().ToString(),
+                EventId.From(Guid.NewGuid()),
                 nameof(AggregatedTimeSeriesRequestAccepted),
                 process.ProcessId.Id,
                 acceptedEvent.ToByteArray());
