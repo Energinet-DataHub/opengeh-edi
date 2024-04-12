@@ -51,7 +51,7 @@ public class AssertOutgoingMessage
 
         using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var outgoingMessage = await connection.QuerySingleOrDefaultAsync(
-            $"SELECT m.Id, m.RecordId, m.DocumentType, m.DocumentReceiverNumber, m.DocumentReceiverRole, m.ReceiverNumber, m.ProcessId, m.BusinessReason," +
+            $"SELECT m.Id, m.RecordId, m.DocumentType, m.DocumentReceiverNumber, m.DocumentReceiverRole, m.ReceiverNumber, m.ProcessId, m.EventId, m.BusinessReason," +
             $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference, m.RelatedToMessageId, m.MessageCreatedFromProcess, m.GridAreaCode " +
             $" FROM [dbo].[OutgoingMessages] m" +
             $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Code}'");
