@@ -53,7 +53,7 @@ public static class FileStorageExtensions
         {
             services.TryAddBlobStorageHealthCheck(
                 FileStorageName,
-                uri!);
+                new Uri(uri!));
         }
 
         return services;

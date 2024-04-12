@@ -55,6 +55,12 @@ builder.Services
     .AddArchivedMessagesModule(builder.Configuration)
 
     // Security
+    // Note that this requires you to have
+    // UserAuthentication__MitIdExternalMetadataAddress
+    // UserAuthentication__ExternalMetadataAddress
+    // UserAuthentication__InternalMetadataAddress
+    // UserAuthentication__BackendBffAppId
+    // Defined in app settings
     .AddJwtTokenSecurity(builder.Configuration)
 
     // Serializer
