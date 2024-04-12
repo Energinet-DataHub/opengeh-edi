@@ -25,13 +25,14 @@ using Google.Protobuf.WellKnownTypes;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents;
 
 public class GivenAmountPerChargeResultProducedV1ReceivedTests : BehavioursTestBase
 {
-    public GivenAmountPerChargeResultProducedV1ReceivedTests(IntegrationTestFixture fixture)
-        : base(fixture)
+    public GivenAmountPerChargeResultProducedV1ReceivedTests(IntegrationTestFixture fixture, ITestOutputHelper testOutputHelper)
+        : base(fixture, testOutputHelper)
     {
     }
 

@@ -260,7 +260,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
         }
 
-        private void BuildServices(string fileStorageConnectionString, ITestOutputHelper? testOutputHelper)
+        private void BuildServices(string fileStorageConnectionString, ITestOutputHelper testOutputHelper)
         {
             Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
             Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", IntegrationTestFixture.DatabaseConnectionString);
@@ -311,13 +311,10 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
             _services.AddTransient<IFeatureFlagManager>((x) => FeatureFlagManagerStub);
 
-            if (testOutputHelper != null)
-            {
-                // Add test logger
-                _services.AddSingleton<ITestOutputHelper>(sp => testOutputHelper);
-                _services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
-                _services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
-            }
+            // Add test logger
+            _services.AddSingleton<ITestOutputHelper>(sp => testOutputHelper);
+            _services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
+            _services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
 
             ServiceProvider = _services.BuildServiceProvider();
         }

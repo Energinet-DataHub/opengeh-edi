@@ -74,8 +74,11 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
@@ -138,7 +141,7 @@ public class BehavioursTestBase : IDisposable
     private ServiceCollection? _services;
     private bool _disposed;
 
-    protected BehavioursTestBase(IntegrationTestFixture integrationTestFixture)
+    protected BehavioursTestBase(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
     {
         ArgumentNullException.ThrowIfNull(integrationTestFixture);
         IntegrationTestFixture.CleanupDatabase();
@@ -146,7 +149,7 @@ public class BehavioursTestBase : IDisposable
         _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
         TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
         InboxEventNotificationHandler = new TestNotificationHandlerSpy();
-        _serviceProvider = BuildServices(integrationTestFixture.AzuriteManager.BlobStorageConnectionString);
+        _serviceProvider = BuildServices(integrationTestFixture.AzuriteManager.BlobStorageConnectionString, testOutputHelper);
         _processContext = GetService<ProcessContext>();
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         _authenticatedActor = GetService<AuthenticatedActor>();
@@ -473,7 +476,7 @@ public class BehavioursTestBase : IDisposable
         return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
     }
 
-    private ServiceProvider BuildServices(string fileStorageConnectionString)
+    private ServiceProvider BuildServices(string fileStorageConnectionString, ITestOutputHelper testOutputHelper)
     {
         Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", IntegrationTestFixture.DatabaseConnectionString);
@@ -523,6 +526,14 @@ public class BehavioursTestBase : IDisposable
         // - Building blocks
         _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
         _services.AddTransient<IFeatureFlagManager>(_ => new FeatureFlagManagerStub());
+
+        if (testOutputHelper != null)
+        {
+            // Add test logger
+            _services.AddSingleton<ITestOutputHelper>(sp => testOutputHelper);
+            _services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
+            _services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
+        }
 
         return _services.BuildServiceProvider();
     }
