@@ -1,0 +1,3 @@
+ALTER TABLE [dbo].[OutgoingMessages]
+    ALTER COLUMN [ProcessId] UNIQUEIDENTIFIER NULL;
+GO

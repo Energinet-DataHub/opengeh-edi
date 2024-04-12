@@ -47,6 +47,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages
 
             builder.Property(x => x.GridAreaCode);
 
+            builder.Property(x => x.EventId);
+
             builder.Property(x => x.SenderId)
                 .HasConversion(
                     toDbValue => toDbValue.Value,
