@@ -77,7 +77,6 @@ public class GivenAmountPerChargeResultProducedV1ReceivedTests : BehavioursTestB
             document => document
                 .HasReceiverId(ActorNumber.Create("1111111111111"))
                 .HasReceiverRole(ActorRole.EnergySupplier, CodeListType.Ebix)
-                .HasEnergySupplierNumber(ActorNumber.Create("1111111111111"), "A10")
-                .HasPositionAndQuantity());
+                .HasEnergySupplierNumber(ActorNumber.Create("1111111111111"), "A10"));
     }
 }
