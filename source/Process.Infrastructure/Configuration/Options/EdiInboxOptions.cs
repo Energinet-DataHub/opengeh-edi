@@ -12,11 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.Api.Extensions.Options;
+using System.ComponentModel.DataAnnotations;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1707", Justification = "To match naming in other domains")]
+namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 
-public class EnvironmentOptions
+/// <summary>
+/// Options related to Edi inbox queue.
+/// </summary>
+public class EdiInboxOptions
 {
-    public string AZURE_FUNCTIONS_ENVIRONMENT { get; set; } = string.Empty;
+    /// <summary>
+    /// The name of the section in the configuration file where this option should find its information.
+    /// </summary>
+    public const string SectionName = "EdiInbox";
+
+    /// <summary>
+    /// Queue name for the Edi inbox.
+    /// </summary>
+    [Required]
+    public string QueueName { get; set; } = string.Empty;
 }

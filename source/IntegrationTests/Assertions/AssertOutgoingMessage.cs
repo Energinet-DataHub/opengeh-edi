@@ -49,20 +49,21 @@ public class AssertOutgoingMessage
         ArgumentNullException.ThrowIfNull(fileStorageClient);
 
         using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
-        var message = await connection.QuerySingleAsync(
+        var outgoingMessage = await connection.QuerySingleOrDefaultAsync(
             $"SELECT m.Id, m.RecordId, m.DocumentType, m.DocumentReceiverNumber, m.DocumentReceiverRole, m.ReceiverNumber, m.ProcessId, m.BusinessReason," +
             $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference, m.RelatedToMessageId, m.MessageCreatedFromProcess, m.GridAreaCode " +
             $" FROM [dbo].[OutgoingMessages] m" +
             $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Code}'");
 
-        Assert.NotNull(message);
-        Assert.NotNull(message.FileStorageReference);
+        ((object?)outgoingMessage).Should().NotBeNull("because an outgoing message should have been added to the database");
+        var outgoingMessageFileStorageReference = (string?)outgoingMessage!.FileStorageReference;
+        outgoingMessageFileStorageReference.Should().NotBeNull("because an outgoing message should always have a file storage reference");
 
-        var fileStorageFile = await fileStorageClient.DownloadAsync(new FileStorageReference(FileStorageCategory.OutgoingMessage(), message.FileStorageReference));
+        var fileStorageFile = await fileStorageClient.DownloadAsync(new FileStorageReference(FileStorageCategory.OutgoingMessage(), outgoingMessageFileStorageReference!));
 
         var messageRecord = await fileStorageFile.ReadAsStringAsync();
 
-        return new AssertOutgoingMessage(message, messageRecord);
+        return new AssertOutgoingMessage(outgoingMessage, messageRecord);
     }
 
     public static async Task OutgoingMessageIsNullAsync(string messageType, string businessReason, ActorRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory)

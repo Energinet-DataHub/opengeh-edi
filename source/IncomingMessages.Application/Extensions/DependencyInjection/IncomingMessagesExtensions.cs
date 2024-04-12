@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
+using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators;
@@ -38,21 +40,19 @@ public static class IncomingMessagesExtensions
 {
     public static IServiceCollection AddIncomingMessagesModule(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddOptions<ServiceBusClientOptions>()
-            .Bind(configuration)
-            .Validate(
-                o => !string.IsNullOrEmpty(o.INCOMING_MESSAGES_QUEUE_NAME),
-                "INCOMING_MESSAGES_QUEUE_NAME must be set")
-            .Validate(
-                o => !string.IsNullOrEmpty(o.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE),
-                "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE must be set");
+        ArgumentNullException.ThrowIfNull(configuration);
 
-        var serviceBusOptions = configuration.Get<ServiceBusClientOptions>()!;
+        // Options
+        services
+            .AddOptions<IncomingMessagesQueueOptions>()
+            .BindConfiguration(IncomingMessagesQueueOptions.SectionName)
+            .ValidateDataAnnotations();
+        services.AddOptions<ServiceBusOptions>()
+            .BindConfiguration(ServiceBusOptions.SectionName)
+            .ValidateDataAnnotations();
+
         services
             .AddServiceBus(configuration)
-            .TryAddExternalDomainServiceBusQueuesHealthCheck(
-                serviceBusOptions.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE!,
-                serviceBusOptions.INCOMING_MESSAGES_QUEUE_NAME!)
             .AddDapperConnectionToDatabase(configuration)
             .AddScopedSqlDbContext<IncomingMessagesContext>(configuration)
             .AddScoped<IIncomingMessageClient, IncomingMessageClient>()
@@ -78,7 +78,12 @@ public static class IncomingMessagesExtensions
         //RegisterSchemaProviders
         services.AddSingleton<CimJsonSchemas>()
             .AddSingleton<CimXmlSchemaProvider>()
-            .AddSingleton<JsonSchemaProvider>();
+            .AddSingleton<JsonSchemaProvider>()
+
+            // Health checks
+            .TryAddExternalDomainServiceBusQueuesHealthCheck(
+                configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>()!.ListenConnectionString!,
+                configuration.GetSection(IncomingMessagesQueueOptions.SectionName).Get<IncomingMessagesQueueOptions>()!.QueueName!);
 
         return services;
     }

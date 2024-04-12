@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using Azure.Messaging.ServiceBus;
+using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using EdiServiceBusClientOptions = BuildingBlocks.Application.Configuration.Options.ServiceBusClientOptions;
 
 namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
@@ -25,13 +25,14 @@ public static class ServiceBusExtensions
 {
     public static IServiceCollection AddServiceBus(this IServiceCollection services, IConfiguration configuration)
     {
-        services
-            .AddOptions<EdiServiceBusClientOptions>()
-            .Bind(configuration)
-            .Validate(o => !string.IsNullOrEmpty(o.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND), "SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND must be set");
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        services.AddOptions<ServiceBusOptions>()
+            .BindConfiguration(ServiceBusOptions.SectionName)
+            .ValidateDataAnnotations();
 
         services.AddSingleton<ServiceBusClient>(provider => new ServiceBusClient(
-            provider.GetRequiredService<IOptions<EdiServiceBusClientOptions>>().Value.SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND,
+            provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.SendConnectionString,
             new ServiceBusClientOptions()
             {
                 TransportType = ServiceBusTransportType.AmqpWebSockets,

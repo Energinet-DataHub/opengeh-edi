@@ -32,6 +32,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NodaTime;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Api;
@@ -43,8 +44,8 @@ public class WhenMarketActorAuthenticatorMiddlewareIsCalledTests : TestBase
     private readonly FunctionExecutionDelegate _next;
     private readonly FunctionContextBuilder _functionContextBuilder;
 
-    public WhenMarketActorAuthenticatorMiddlewareIsCalledTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public WhenMarketActorAuthenticatorMiddlewareIsCalledTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         AuthenticatedActor.SetAuthenticatedActor(null);
         _nextSpy = new NextSpy();

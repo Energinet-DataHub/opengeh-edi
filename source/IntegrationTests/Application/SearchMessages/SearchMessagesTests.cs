@@ -28,6 +28,7 @@ using FluentAssertions;
 using NodaTime;
 using NodaTime.Text;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.SearchMessages;
 
@@ -36,8 +37,8 @@ public class SearchMessagesTests : TestBase
     private readonly IArchivedMessagesClient _archivedMessagesClient;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public SearchMessagesTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public SearchMessagesTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _archivedMessagesClient = GetService<IArchivedMessagesClient>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();

@@ -21,6 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
+using BuildingBlocks.Application.Extensions.Options;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
@@ -36,12 +37,12 @@ using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
-using Energinet.DataHub.EDI.IntegrationEvents.Application.Configuration;
-using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
+using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
@@ -57,6 +58,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Requests;
@@ -165,7 +167,7 @@ public class BehavioursTestBase : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    protected async Task<PeekResultDto> PeekMessageAsync(
+    protected async Task<PeekResultDto> WhenPeekMessageAsync(
         MessageCategory category,
         ActorNumber actorNumber,
         ActorRole actorRole,
@@ -366,9 +368,6 @@ public class BehavioursTestBase : IDisposable
         await ProcessInternalCommandsAsync();
     }
 
-    // TODO (MWO)
-    // In case we would like to consider the reception of a request as the "acting"
-    // step in our test, instead of a prerequisite.
     protected async Task WhenInitializeAggregatedMeasureDataProcessDtoIsHandledAsync(
         ServiceBusMessage serviceBusMessage)
     {
@@ -478,16 +477,25 @@ public class BehavioursTestBase : IDisposable
     {
         Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", IntegrationTestFixture.DatabaseConnectionString);
-        Environment.SetEnvironmentVariable("WHOLESALE_INBOX_MESSAGE_QUEUE_NAME", "Fake");
-        Environment.SetEnvironmentVariable("INCOMING_MESSAGES_QUEUE_NAME", "Fake");
-        Environment.SetEnvironmentVariable("SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE", "Fake");
         Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", fileStorageConnectionString);
 
         var config = new ConfigurationBuilder()
             .AddEnvironmentVariables()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ListenConnectionString)}"] = "Fake",
+                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.SendConnectionString)}"] = "Fake",
+                    [$"{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}"] = "Fake",
+                    [$"{WholesaleInboxOptions.SectionName}:{nameof(WholesaleInboxOptions.QueueName)}"] = "Fake",
+                    [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = "Fake",
+                    ["IntegrationEvents:TopicName"] = "NotEmpty",
+                    ["IntegrationEvents:SubscriptionName"] = "NotEmpty",
+                })
             .Build();
 
         _services = new ServiceCollection();
+        _services.AddScoped<IConfiguration>(_ => config);
 
         _services.AddTransient<InboxEventsProcessor>()
             .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>>(
@@ -503,7 +511,7 @@ public class BehavioursTestBase : IDisposable
             .AddScoped<ISystemDateTimeProvider>(_ => _systemDateTimeProviderStub);
 
         _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
-            .AddIntegrationEventModule()
+            .AddIntegrationEventModule(config)
             .AddOutgoingMessagesModule(config)
             .AddProcessModule(config)
             .AddArchivedMessagesModule(config)

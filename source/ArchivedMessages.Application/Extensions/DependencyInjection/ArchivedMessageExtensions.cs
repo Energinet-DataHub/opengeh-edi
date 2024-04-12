@@ -13,10 +13,9 @@
 // limitations under the License.
 
 using BuildingBlocks.Application.Extensions.DependencyInjection;
-using Dapper;
-using Dapper.NodaTime;
 using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,13 +23,18 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.Dependen
 
 public static class ArchivedMessageExtensions
 {
-    public static IServiceCollection AddArchivedMessagesModule(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddArchivedMessagesModule(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
-        services.AddTransient<IArchivedMessageRepository, ArchivedMessageRepository>();
-        services.AddTransient<IArchivedMessagesClient, ArchivedMessagesClient>();
-        SqlMapper.AddTypeHandler(InstantHandler.Default);
+        services
+            .AddTransient<IArchivedMessageRepository, ArchivedMessageRepository>()
+            .AddTransient<IArchivedMessagesClient, ArchivedMessagesClient>()
+            .AddDapperConnectionToDatabase(configuration);
 
+        // Dependencies
         services.AddBuildingBlocks(configuration);
+
         return services;
     }
 }

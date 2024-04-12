@@ -29,6 +29,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 using Enum = System.Enum;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.Aggregations;
@@ -48,8 +49,8 @@ public sealed class EnergyResultProducedV2ToAggregationResultTests : TestBase
     private readonly GridAreaBuilder _gridAreaBuilder = new();
     private readonly IFileStorageClient _fileStorageClient;
 
-    public EnergyResultProducedV2ToAggregationResultTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public EnergyResultProducedV2ToAggregationResultTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _masterDataClient = GetService<IMasterDataClient>();
         _integrationEventHandler = GetService<IIntegrationEventHandler>();

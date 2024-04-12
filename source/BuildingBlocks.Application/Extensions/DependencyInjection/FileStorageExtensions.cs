@@ -24,8 +24,11 @@ namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
 public static class FileStorageExtensions
 {
+    private const string FileStorageName = "edi-documents-storage";
+
     public static IServiceCollection AddFileStorage(this IServiceCollection services, IConfiguration configuration)
     {
+        ArgumentNullException.ThrowIfNull(configuration);
         services
             .AddOptions<BlobServiceClientConnectionOptions>()
             .Bind(configuration)
@@ -43,6 +46,19 @@ public static class FileStorageExtensions
             });
 
         services.AddTransient<IFileStorageClient, DataLakeFileStorageClient>();
+
+        var uri = configuration["AZURE_STORAGE_ACCOUNT_URL"];
+
+        // If this uri is null, then we are running our solution locally or running tests.
+        // For our tests we will have a call of "AddFileStorage" for every test method. Hence "new uri(xxx)" will be called for every test.
+        // Which will slow down the tests. Which we can remove by having this check.
+        var isIntegrationTest = uri == null;
+        if (!isIntegrationTest)
+        {
+            services.TryAddBlobStorageHealthCheck(
+                FileStorageName,
+                new Uri(uri!));
+        }
 
         return services;
     }

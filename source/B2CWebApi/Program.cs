@@ -12,48 +12,64 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Reflection;
 using System.Text.Json.Serialization;
-using BuildingBlocks.Application.Configuration.Logging;
+using Asp.Versioning;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.Core.App.WebApp.Authentication;
-using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.App.WebApp.Extensions.Builder;
+using Energinet.DataHub.Core.App.WebApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Logging.LoggingMiddleware;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
-using Microsoft.ApplicationInsights.Extensibility;
 
 var builder = WebApplication.CreateBuilder(args);
 
-const string domainName = "EDI.B2CWebApi";
+const string domainName = "EDI";
 
 builder.Logging
     .ClearProviders()
     .AddApplicationInsights();
 
 builder.Services
-    .AddSwaggerForApplication()
-    .AddSingleton<ITelemetryInitializer, EnrichExceptionTelemetryInitializer>()
-    .AddControllers()
-    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+    // Swagger
+    .AddSwaggerForWebApp(Assembly.GetExecutingAssembly(), "EDI B2C Web API")
+    .AddApiVersioningForWebApp(new ApiVersion(1, 0))
 
-builder.Services
-    .AddSystemTimer()
+    // Logging
+    .AddApplicationInsightsForWebApp(domainName)
     .AddHttpLoggingScope(domainName)
-    .AddSerializer()
+    .AddApplicationInsightsTelemetry()
+
+    // Health checks
+    .AddHealthChecksForWebApp()
+
+    // System timer
+    .AddNodaTimeForApplication()
+    .AddSystemTimer()
+
+    // Modules
     .AddIncomingMessagesModule(builder.Configuration)
     .AddArchivedMessagesModule(builder.Configuration)
+
+    // Security
+    // Note that this requires you to have
+    // UserAuthentication__MitIdExternalMetadataAddress
+    // UserAuthentication__ExternalMetadataAddress
+    // UserAuthentication__InternalMetadataAddress
+    // UserAuthentication__BackendBffAppId
+    // Defined in app settings
     .AddJwtTokenSecurity(builder.Configuration)
-    .AddDateTime(builder.Configuration)
+
+    // Serializer
+    .AddSerializer()
+
+    // Http
     .AddHttpClient()
-    .AddLiveHealthCheck();
-
-var blobStorageUrl = builder.Configuration["AZURE_STORAGE_ACCOUNT_URL"];
-
-builder.Services.AddBlobStorageHealthCheck(
-        "edi-documents-storage",
-        blobStorageUrl != null ? new Uri(blobStorageUrl) : null!);
+    .AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 // ***********************************************************************************************
 // App building start here, aka Configure if one uses StartUp
@@ -68,12 +84,12 @@ if (isDevelopment)
     app.UseDeveloperExceptionPage();
 
 app
-    .UseSwaggerUiForDevEnvironment()
+    .UseSwaggerForWebApp()
     .UseLoggingScope()
     .UseHttpsRedirection()
     .UseAuthentication()
     .UseAuthorization()
-    .UseUserMiddleware<FrontendUser>();
+    .UseUserMiddlewareForWebApp<FrontendUser>();
 
 app.MapControllers().RequireAuthorization();
 

@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors
@@ -33,8 +34,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
         private readonly IMarketActorAuthenticator _authenticator;
         private readonly AuthenticatedActor _authenticatedActor;
 
-        public MarketActorAuthenticatorTests(IntegrationTestFixture integrationTestFixture)
-            : base(integrationTestFixture)
+        public MarketActorAuthenticatorTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+            : base(integrationTestFixture, testOutputHelper)
         {
             _authenticator = GetService<IMarketActorAuthenticator>();
             _authenticatedActor = GetService<AuthenticatedActor>();

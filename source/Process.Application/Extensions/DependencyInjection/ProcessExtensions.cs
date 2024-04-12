@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using BuildingBlocks.Application.Extensions.DependencyInjection;
+using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.ProcessInitializationHandlers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
@@ -44,11 +47,22 @@ public static class ProcessExtensions
 {
     public static IServiceCollection AddProcessModule(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddOptions<ServiceBusClientOptions>()
-            .Bind(configuration)
-            .Validate(
-                o => !string.IsNullOrEmpty(o.WHOLESALE_INBOX_MESSAGE_QUEUE_NAME),
-                "WHOLESALE_INBOX_MESSAGE_QUEUE_NAME must be set");
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        // Options
+        services.AddOptions<ServiceBusOptions>()
+            .BindConfiguration(ServiceBusOptions.SectionName)
+            .ValidateDataAnnotations();
+
+        services
+            .AddOptionsWithValidateOnStart<EdiInboxOptions>()
+            .BindConfiguration(EdiInboxOptions.SectionName)
+            .ValidateDataAnnotations();
+
+        services
+            .AddOptions<WholesaleInboxOptions>()
+            .BindConfiguration(WholesaleInboxOptions.SectionName)
+            .ValidateDataAnnotations();
 
         services
             .AddScopedSqlDbContext<ProcessContext>(configuration)
@@ -104,8 +118,13 @@ public static class ProcessExtensions
             .AddTransient<IRequestHandler<RejectedWholesaleServices, Unit>,
                 RejectProcessWhenRejectedWholesaleServicesIsAvailable>()
             .AddTransient<INotificationHandler<WholesaleServicesRequestWasRejected>,
-                WhenARejectedWholesaleServicesRequestIsAvailable>();
+                WhenARejectedWholesaleServicesRequestIsAvailable>()
 
+            // health checks
+            .TryAddExternalDomainServiceBusQueuesHealthCheck(
+                configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>()!.ListenConnectionString!,
+                configuration.GetSection(EdiInboxOptions.SectionName).Get<EdiInboxOptions>()!.QueueName!,
+                configuration.GetSection(WholesaleInboxOptions.SectionName).Get<WholesaleInboxOptions>()!.QueueName!);
         return services;
     }
 }
