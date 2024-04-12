@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -22,12 +23,13 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 /// </summary>
 public record EventId
 {
+    [JsonConstructor]
     private EventId(string value)
     {
         Value = value;
     }
 
-    public string Value { get; init; }
+    public string Value { get; }
 
     public static EventId From(Guid eventIdentification) => new(eventIdentification.ToString());
 
