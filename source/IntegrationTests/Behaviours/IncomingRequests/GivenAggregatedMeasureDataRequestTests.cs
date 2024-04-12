@@ -81,7 +81,7 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
 
     [Fact]
     public async Task
-        Given_RequestAggregatedMeasureDataJsonIsReceived_When_ActorPeeksJson_Then_CorrectJsonDocumentIsCreated()
+        Given_AggregatedTimeSeriesRequestAcceptedIsReceived_When_ActorPeeks_Then_CorrectDocumentIsCreated()
     {
         // Arrange
         var senderSpy = GivenServiceBusSenderSpy("Fake");
