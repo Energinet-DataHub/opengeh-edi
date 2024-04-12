@@ -32,6 +32,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
 using NodaTime;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
@@ -45,8 +46,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     private ActorNumberAndRoleDto _delegatedBy = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"));
     private ActorNumberAndRoleDto _delegatedTo = CreateActorNumberAndRole(ActorNumber.Create("1234567891235"), actorRole: ActorRole.Delegated);
 
-    public WhenEnqueueingOutgoingMessageWithDelegationTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public WhenEnqueueingOutgoingMessageWithDelegationTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _energyResultMessageDtoBuilder = new EnergyResultMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();

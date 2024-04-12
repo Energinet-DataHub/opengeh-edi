@@ -29,6 +29,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.IntegrationEvents;
 
@@ -37,8 +38,8 @@ public class WhenGridAreaOwnershipAssignedTests : TestBase
     private readonly IDatabaseConnectionFactory _connectionFactory;
     private readonly GridAreaOwnershipAssignedEventBuilder _gridAreaOwnershipAssignedEventBuilder = new();
 
-    public WhenGridAreaOwnershipAssignedTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public WhenGridAreaOwnershipAssignedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _connectionFactory = GetService<IDatabaseConnectionFactory>();
     }
