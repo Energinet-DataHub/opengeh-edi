@@ -49,7 +49,11 @@ public static class FileStorageExtensions
 
         var uri = configuration["AZURE_STORAGE_ACCOUNT_URL"];
 
-        if (uri != null)
+        // If this uri is null, then we are running our solution locally or running tests.
+        // For our tests we will have a call of "AddFileStorage" for every test method. Hence "new uri(xxx)" will be called for every test.
+        // Which will slow down the tests. Which we can remove by having this check.
+        var isIntegrationTest = uri == null;
+        if (!isIntegrationTest)
         {
             services.TryAddBlobStorageHealthCheck(
                 FileStorageName,

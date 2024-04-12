@@ -25,6 +25,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
     public class JwtBuilder
     {
         private static readonly JwtSecurityTokenHandler _tokenHandler = new();
+
+        // Creating a dummy signing key with 256 bits.
         private static readonly byte[] _defaultSigningKey = Guid.NewGuid().ToByteArray().Concat(Guid.NewGuid().ToByteArray()).ToArray();
         private static readonly DateTime _unixEpoc = new DateTime(1970, 1, 1);
         private readonly SymmetricSecurityKey _signingKey;
