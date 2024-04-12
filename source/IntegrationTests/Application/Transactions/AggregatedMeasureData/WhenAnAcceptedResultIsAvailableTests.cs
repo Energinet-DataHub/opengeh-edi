@@ -34,6 +34,7 @@ using Google.Protobuf;
 using NodaTime.Serialization.Protobuf;
 using NodaTime.Text;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Categories;
 using DecimalValue = Energinet.DataHub.Edi.Responses.DecimalValue;
 using Period = Energinet.DataHub.Edi.Responses.Period;
@@ -51,8 +52,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     private readonly GridAreaBuilder _gridAreaBuilder = new();
     private readonly ProcessContext _processContext;
 
-    public WhenAnAcceptedResultIsAvailableTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public WhenAnAcceptedResultIsAvailableTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _processContext = GetService<ProcessContext>();
     }

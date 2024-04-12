@@ -35,6 +35,7 @@ using FluentAssertions.Execution;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 
@@ -46,8 +47,8 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     private readonly IncomingMessagesContext _incomingMessageContext;
     private readonly SystemDateTimeProviderStub _dateTimeProvider;
 
-    public WhenIncomingMessagesIsReceivedTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public WhenIncomingMessagesIsReceivedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();
         _senderSpy = new ServiceBusSenderSpy("Fake");

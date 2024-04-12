@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.DocumentFactory;
 
@@ -27,8 +28,8 @@ public class DocumentFactoryTests
 {
     private readonly IEnumerable<IDocumentWriter> _documentWriters;
 
-    public DocumentFactoryTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public DocumentFactoryTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _documentWriters = GetService<IEnumerable<IDocumentWriter>>();
     }

@@ -27,6 +27,7 @@ using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
@@ -40,8 +41,8 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
     private readonly AggregatedTimeSeriesRequestAccepted _aggregatedTimeSeriesRequestAcceptedResponse;
     private readonly GridAreaBuilder _gridAreaBuilder = new();
 
-    public WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _processor = GetService<InboxEventsProcessor>();
         _aggregatedTimeSeriesRequestAcceptedResponse = CreateResponseFromWholeSale();

@@ -28,6 +28,7 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.Edi.Responses;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Categories;
 using ChargeType = Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ChargeType;
 using RejectReason = Energinet.DataHub.Edi.Responses.RejectReason;
@@ -39,8 +40,8 @@ public sealed class WhenARejectedWholesaleServicesIsAvailableTests : TestBase
 {
     private readonly ProcessContext _processContext;
 
-    public WhenARejectedWholesaleServicesIsAvailableTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public WhenARejectedWholesaleServicesIsAvailableTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _processContext = GetService<ProcessContext>();
     }

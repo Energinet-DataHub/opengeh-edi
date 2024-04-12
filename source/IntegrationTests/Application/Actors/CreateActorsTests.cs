@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Actors;
 
@@ -32,8 +33,8 @@ public class CreateActorsTests : TestBase
     private readonly IMasterDataClient _masterDataClient;
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public CreateActorsTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public CreateActorsTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _masterDataClient = GetService<IMasterDataClient>();
         _connectionFactory = GetService<IDatabaseConnectionFactory>();

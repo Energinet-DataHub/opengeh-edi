@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Microsoft.Extensions.Logging;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Retention;
 
@@ -33,8 +34,8 @@ public class RemoveInternalCommandsWhenADayHasPassedTests : TestBase
     private readonly InternalCommandsRetention _sut;
 
     public RemoveInternalCommandsWhenADayHasPassedTests(
-        IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+        IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _processContext = GetService<ProcessContext>();
         _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
