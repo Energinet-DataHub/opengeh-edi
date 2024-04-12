@@ -27,6 +27,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using FluentAssertions;
 using NodaTime.Text;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Categories;
 using RejectReason = Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.RejectReason;
 
@@ -37,8 +38,8 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
 {
     private readonly ProcessContext _processContext;
 
-    public EnergyResultResponseFromWholesaleTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public EnergyResultResponseFromWholesaleTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _processContext = GetService<ProcessContext>();
     }

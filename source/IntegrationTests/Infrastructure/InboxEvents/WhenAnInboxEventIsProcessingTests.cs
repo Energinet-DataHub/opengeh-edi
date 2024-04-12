@@ -25,6 +25,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
@@ -36,8 +37,8 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
     private readonly InboxEventsProcessor _inboxProcessor;
     private readonly TestInboxEventMapper _testInboxEventMapper;
 
-    public WhenAnInboxEventIsProcessingTests(IntegrationTestFixture integrationTestFixture)
-     : base(integrationTestFixture)
+    public WhenAnInboxEventIsProcessingTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _testInboxEventMapper = new TestInboxEventMapper();
         _inboxProcessor = new InboxEventsProcessor(

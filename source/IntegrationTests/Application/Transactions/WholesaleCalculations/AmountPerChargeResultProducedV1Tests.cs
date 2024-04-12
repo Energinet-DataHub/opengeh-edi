@@ -34,6 +34,8 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using Xunit;
+using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.WholesaleCalculations;
 
@@ -46,8 +48,8 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
     private IIntegrationEventHandler _integrationEventHandler;
 
     public AmountPerChargeResultProducedV1Tests(
-        IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+        IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _integrationEventHandler = GetService<IIntegrationEventHandler>();
         _databaseConnectionFactory = GetService<IDatabaseConnectionFactory>();
@@ -122,13 +124,13 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
 
         var energySupplierMessage = await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
         var gridOperatorMessage = await AssertOutgoingMessageAsync(ActorRole.GridOperator);
-        var fetchSystemOperatorMessage = async () => await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
+        var assertSystemOperatorMessage = async () => await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
 
         energySupplierMessage.HasReceiverId(amountPerChargeEvent.EnergySupplierId);
         gridOperatorMessage.HasReceiverId(gridOperatorAndChargeOwner);
-        await fetchSystemOperatorMessage.Should()
-            .ThrowExactlyAsync<InvalidOperationException>()
-            .WithMessage("Sequence contains no elements");
+        await assertSystemOperatorMessage.Should()
+            .ThrowAsync<XunitException>()
+            .WithMessage("Expected object not to be <null>*");
     }
 
     [Fact]
@@ -151,13 +153,13 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
 
         var energySupplierMessage = await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
         var gridOperatorMessage = await AssertOutgoingMessageAsync(ActorRole.GridOperator);
-        var fetchSystemOperatorMessage = async () => await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
+        var assertSystemOperatorMessage = async () => await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
 
         energySupplierMessage.HasReceiverId(amountPerChargeEvent.EnergySupplierId);
         gridOperatorMessage.HasReceiverId(gridOperator);
-        await fetchSystemOperatorMessage.Should()
-            .ThrowExactlyAsync<InvalidOperationException>()
-            .WithMessage("Sequence contains no elements");
+        await assertSystemOperatorMessage.Should()
+            .ThrowAsync<XunitException>()
+            .WithMessage("Expected object not to be <null>*");
     }
 
     [Fact]

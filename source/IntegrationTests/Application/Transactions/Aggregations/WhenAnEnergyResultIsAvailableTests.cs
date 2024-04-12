@@ -30,6 +30,7 @@ using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Xunit;
+using Xunit.Abstractions;
 using static Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.EnergyResultProducedV2.Types;
 using Resolution = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.EnergyResultProducedV2.Types.Resolution;
 
@@ -40,8 +41,8 @@ public class WhenAnEnergyResultIsAvailableTests : TestBase
     private readonly EnergyResultProducedV2EventBuilder _eventBuilder = new();
     private readonly GridAreaBuilder _gridAreaBuilder = new();
 
-    public WhenAnEnergyResultIsAvailableTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public WhenAnEnergyResultIsAvailableTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
     }
 

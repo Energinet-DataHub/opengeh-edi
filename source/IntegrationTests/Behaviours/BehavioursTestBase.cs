@@ -111,7 +111,7 @@ public class BehavioursTestBase : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    protected async Task<PeekResultDto> PeekMessageAsync(
+    protected async Task<PeekResultDto> WhenPeekMessageAsync(
         MessageCategory category,
         ActorNumber actorNumber,
         ActorRole actorRole,
@@ -304,9 +304,6 @@ public class BehavioursTestBase : IDisposable
         await ProcessInternalCommandsAsync();
     }
 
-    // TODO (MWO)
-    // In case we would like to consider the reception of a request as the "acting"
-    // step in our test, instead of a prerequisite.
     protected async Task WhenInitializeAggregatedMeasureDataProcessDtoIsHandledAsync(
         ServiceBusMessage serviceBusMessage)
     {
