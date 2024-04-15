@@ -40,19 +40,19 @@ public class OutgoingMessageTests
     {
         new NotifyWholesaleServicesJsonDocumentWriter(new MessageRecordParser(new Serializer())),
         new NotifyWholesaleServicesEbixDocumentWriter(new MessageRecordParser(new Serializer())),
-        new NotifyWholesaleServicesXmlDocumentWriter(new MessageRecordParser(new Serializer())),
+        new NotifyWholesaleServicesXmlXmlDocumentWriter(new MessageRecordParser(new Serializer())),
 
         new NotifyAggregatedMeasureDataEbixDocumentWriter(new MessageRecordParser(new Serializer())),
-        new NotifyAggregatedMeasureDataXmlDocumentWriter(new MessageRecordParser(new Serializer())),
+        new NotifyAggregatedMeasureDataXmlXmlDocumentWriter(new MessageRecordParser(new Serializer())),
         new NotifyAggregatedMeasureDataJsonDocumentWriter(new MessageRecordParser(new Serializer())),
 
         new RejectRequestAggregatedMeasureDataJsonDocumentWriter(new MessageRecordParser(new Serializer())),
         new RejectRequestAggregatedMeasureDataEbixDocumentWriter(new MessageRecordParser(new Serializer())),
-        new RejectRequestAggregatedMeasureDataXmlDocumentWriter(new MessageRecordParser(new Serializer())),
+        new RejectRequestAggregatedMeasureDataXmlXmlDocumentWriter(new MessageRecordParser(new Serializer())),
 
         new RejectRequestWholesaleSettlementJsonDocumentWriter(new MessageRecordParser(new Serializer())),
         new RejectRequestWholesaleSettlementEbixDocumentWriter(new MessageRecordParser(new Serializer())),
-        new RejectRequestWholesaleSettlementXmlDocumentWriter(new MessageRecordParser(new Serializer())),
+        new RejectRequestWholesaleSettlementXmlXmlDocumentWriter(new MessageRecordParser(new Serializer())),
     };
 
     /// <summary>

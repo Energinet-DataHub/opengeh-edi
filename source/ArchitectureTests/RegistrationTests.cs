@@ -66,7 +66,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
         public static IEnumerable<object[]> GetDocumentWriterRequirements()
         {
             var constructorDependencies = ReflectionHelper.FindAllConstructorDependenciesForType();
-            return typeof(NotifyAggregatedMeasureDataXmlDocumentWriter).Assembly.GetTypes()
+            return typeof(NotifyAggregatedMeasureDataXmlXmlDocumentWriter).Assembly.GetTypes()
                 .Where(t => t.GetInterfaces().Contains(typeof(IDocumentWriter)) && !t.IsAbstract)
                 .Select(t => new object[] { new Requirement(t.Name, constructorDependencies(t), t) });
         }

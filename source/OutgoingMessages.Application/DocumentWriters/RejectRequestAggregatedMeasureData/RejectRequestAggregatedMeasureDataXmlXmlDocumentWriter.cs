@@ -17,14 +17,15 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Xml;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Formats;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Formats.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.RejectRequestAggregatedMeasureData;
 
-public class RejectRequestAggregatedMeasureDataXmlDocumentWriter : DocumentWriter
+public class RejectRequestAggregatedMeasureDataXmlXmlDocumentWriter : XmlDocumentWriter
 {
-    public RejectRequestAggregatedMeasureDataXmlDocumentWriter(IMessageRecordParser parser)
+    public RejectRequestAggregatedMeasureDataXmlXmlDocumentWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
                 "RejectRequestAggregatedMeasureData_MarketDocument",

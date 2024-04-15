@@ -15,7 +15,7 @@
 using System.Collections.Generic;
 using System.Text.Json;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Json;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Formats.Json;
 
 internal static class JsonWriterHelper
 {

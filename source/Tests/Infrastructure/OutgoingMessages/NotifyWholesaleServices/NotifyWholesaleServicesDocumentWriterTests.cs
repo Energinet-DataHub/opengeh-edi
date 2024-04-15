@@ -329,7 +329,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
 
         if (documentFormat == DocumentFormat.Xml)
         {
-            return new NotifyWholesaleServicesXmlDocumentWriter(_parser).WriteAsync(header, new[] { records });
+            return new NotifyWholesaleServicesXmlXmlDocumentWriter(_parser).WriteAsync(header, new[] { records });
         }
         else if (documentFormat == DocumentFormat.Ebix)
         {

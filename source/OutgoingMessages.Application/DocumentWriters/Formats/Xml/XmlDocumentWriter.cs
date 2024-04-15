@@ -22,15 +22,15 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Xml;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Formats.Xml;
 
-public abstract class DocumentWriter : IDocumentWriter
+public abstract class XmlDocumentWriter : IDocumentWriter
 {
     private readonly DocumentDetails _documentDetails;
     private readonly IMessageRecordParser _parser;
     private readonly string? _reasonCode;
 
-    protected DocumentWriter(DocumentDetails documentDetails, IMessageRecordParser parser, string? reasonCode = null)
+    protected XmlDocumentWriter(DocumentDetails documentDetails, IMessageRecordParser parser, string? reasonCode = null)
     {
         _documentDetails = documentDetails;
         _parser = parser;

@@ -17,14 +17,15 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Xml;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Formats;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Formats.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.RejectRequestWholesaleSettlement;
 
-public class RejectRequestWholesaleSettlementXmlDocumentWriter : DocumentWriter
+public class RejectRequestWholesaleSettlementXmlXmlDocumentWriter : XmlDocumentWriter
 {
-    public RejectRequestWholesaleSettlementXmlDocumentWriter(IMessageRecordParser parser)
+    public RejectRequestWholesaleSettlementXmlXmlDocumentWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
                 "RejectRequestWholesaleSettlement_MarketDocument",

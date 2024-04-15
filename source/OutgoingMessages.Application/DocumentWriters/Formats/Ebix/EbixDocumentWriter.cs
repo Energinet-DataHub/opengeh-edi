@@ -18,12 +18,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Ebix;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Formats.Ebix;
 
 public abstract class EbixDocumentWriter : IDocumentWriter
 {

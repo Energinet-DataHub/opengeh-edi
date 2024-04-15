@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Xml;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Formats.Xml;
 
 internal static class XmlHeaderWriter
 {
