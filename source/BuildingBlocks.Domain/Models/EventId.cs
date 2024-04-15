@@ -21,6 +21,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 /// An EventId symbolises a tracking id, typically received from a ServiceBusMessage's MessageId,
 ///     or in case of our IntegrationEvents, this is also the EventIdentifier
 /// </summary>
+[Serializable]
 public record EventId
 {
     [JsonConstructor]

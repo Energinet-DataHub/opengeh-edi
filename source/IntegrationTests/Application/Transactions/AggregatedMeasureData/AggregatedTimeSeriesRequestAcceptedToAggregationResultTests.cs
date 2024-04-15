@@ -392,9 +392,10 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
         var process = BuildProcess();
         var requestAccepted = CreateEventWithQuantityQuality(quantityQuality);
 
+        var eventId = EventId.From(Guid.NewGuid());
         await _inboxEventReceiver
             .ReceiveAsync(
-                EventId.From(Guid.NewGuid()),
+                eventId,
                 nameof(AggregatedTimeSeriesRequestAccepted),
                 process.ProcessId.Id,
                 requestAccepted.ToByteArray());
@@ -402,7 +403,8 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
         await HavingReceivedInboxEventAsync(
             nameof(AggregatedTimeSeriesRequestAccepted),
             requestAccepted,
-            process.ProcessId.Id);
+            process.ProcessId.Id,
+            eventId.Value);
 
         return await OutgoingMessageAsync();
     }
