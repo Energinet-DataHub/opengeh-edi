@@ -186,7 +186,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .WithCalculationType(AmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
             .Build();
 
-        FeatureFlagManagerStub.UseAmountPerChargeResultProduced = Task.FromResult(false);
+        FeatureFlagManagerStub.EnableAmountPerChargeResultProduced(false);
 
         await HandleIntegrationEventAsync(amountPerChargeEvent);
         await AssertOutgoingMessageIsNull(businessReason: BusinessReason.WholesaleFixing);

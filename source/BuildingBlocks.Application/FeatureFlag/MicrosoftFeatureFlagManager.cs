@@ -28,15 +28,15 @@ public class MicrosoftFeatureFlagManager : IFeatureFlagManager
         _featureManager = featureManager;
     }
 
-    public Task<bool> UseExampleFeatureFlag => IsEnabledAsync(FeatureFlagName.UseExampleFeatureFlag);
+    public Task<bool> UseExampleFeatureFlagAsync() => IsEnabledAsync(FeatureFlagName.UseExampleFeatureFlag);
 
-    public Task<bool> UseMonthlyAmountPerChargeResultProduced => IsEnabledAsync(FeatureFlagName.UseMonthlyAmountPerChargeResultProduced);
+    public Task<bool> UseMonthlyAmountPerChargeResultProducedAsync() => IsEnabledAsync(FeatureFlagName.UseMonthlyAmountPerChargeResultProduced);
 
-    public Task<bool> UseAmountPerChargeResultProduced => IsEnabledAsync(FeatureFlagName.UseAmountPerChargeResultProduced);
+    public Task<bool> UseAmountPerChargeResultProducedAsync() => IsEnabledAsync(FeatureFlagName.UseAmountPerChargeResultProduced);
 
-    public Task<bool> UseRequestWholesaleSettlementReceiver => IsEnabledAsync(FeatureFlagName.UseRequestWholesaleSettlementReceiver);
+    public Task<bool> UseRequestWholesaleSettlementReceiverAsync() => IsEnabledAsync(FeatureFlagName.UseRequestWholesaleSettlementReceiver);
 
-    public Task<bool> UseMessageDelegation => IsEnabledAsync(FeatureFlagName.UseMessageDelegation);
+    public Task<bool> UseMessageDelegationAsync() => IsEnabledAsync(FeatureFlagName.UseMessageDelegation);
 
     private Task<bool> IsEnabledAsync(FeatureFlagName featureFlagName) => _featureManager.IsEnabledAsync(featureFlagName.ToString());
 }
