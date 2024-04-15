@@ -16,7 +16,7 @@ using System;
 using System.Security.Cryptography.X509Certificates;
 using Energinet.DataHub.Core.App.FunctionApp;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Api.Mocks;
+namespace Energinet.DataHub.EDI.IntegrationTests.B2BApi.Mocks;
 
 /// <summary>
 /// Builds a mock of a function context, for use in tests where an Azure Function's FunctionContext is needed (an example is testing functions middleware).

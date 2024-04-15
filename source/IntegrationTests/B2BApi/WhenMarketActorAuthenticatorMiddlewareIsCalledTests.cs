@@ -24,7 +24,7 @@ using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.IntegrationTests.Api.Mocks;
+using Energinet.DataHub.EDI.IntegrationTests.B2BApi.Mocks;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using Microsoft.Azure.Functions.Worker.Middleware;
@@ -35,7 +35,7 @@ using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Api;
+namespace Energinet.DataHub.EDI.IntegrationTests.B2BApi;
 
 [IntegrationTest]
 public class WhenMarketActorAuthenticatorMiddlewareIsCalledTests : TestBase

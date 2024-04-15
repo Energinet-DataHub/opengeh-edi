@@ -13,22 +13,15 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
-using Microsoft.Azure.Functions.Worker;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Api.Mocks;
+namespace Energinet.DataHub.EDI.IntegrationTests.B2BApi.Mocks;
 
 /// <summary>
-/// A spy used for testing Azure Functions middleware, which registers if next() is called inside the middleware.
+/// Used to simulate the IFunctionBindingsFeature that is internal in Microsofts Azure Functions package.
+/// - Holds the InvocationResult which is typically (when using HTTP triggered functions) the returned HTTP response (an instance of HttpResponseData)
 /// </summary>
-[SuppressMessage("Style", "VSTHRD200", Justification = "Test class")]
-internal sealed class NextSpy
+[SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:Elements should be documented", Justification = "Test class")]
+internal interface IFunctionBindingsFeature
 {
-    public bool NextWasCalled { get; private set; }
-
-    public Task Next(FunctionContext ctx)
-    {
-        NextWasCalled = true;
-        return Task.CompletedTask;
-    }
+    object? InvocationResult { get; set; }
 }

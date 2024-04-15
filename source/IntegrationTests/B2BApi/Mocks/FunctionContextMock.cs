@@ -27,7 +27,7 @@ using Energinet.DataHub.EDI.B2BApi.Authentication.Certificate;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Api.Mocks;
+namespace Energinet.DataHub.EDI.IntegrationTests.B2BApi.Mocks;
 
 /// <summary>
 /// A mock of FunctionContext, for use in tests where the FunctionContext is needed (an example is testing functions middleware). Should be build using the FunctionContextBuilder class. Build to support testing the MarketActorAuthenticatorMiddleware, so it probably must be expanded to support other cases as well.
