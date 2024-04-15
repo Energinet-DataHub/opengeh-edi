@@ -67,6 +67,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Xunit;
 using Xunit.Abstractions;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using SampleData = Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.SampleData;
 
 namespace Energinet.DataHub.EDI.IntegrationTests
@@ -225,11 +226,11 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return GetService<IMasterDataClient>().CreateActorIfNotExistAsync(createActorDto, CancellationToken.None);
         }
 
-        protected async Task HavingReceivedInboxEventAsync(string eventType, IMessage eventPayload, Guid processId)
+        protected async Task HavingReceivedInboxEventAsync(string eventType, IMessage eventPayload, Guid processId, string? eventId = null)
         {
             await GetService<IInboxEventReceiver>().
                 ReceiveAsync(
-                    Guid.NewGuid().ToString(),
+                    EventId.From(eventId ?? Guid.NewGuid().ToString()),
                     eventType,
                     processId,
                     eventPayload.ToByteArray())

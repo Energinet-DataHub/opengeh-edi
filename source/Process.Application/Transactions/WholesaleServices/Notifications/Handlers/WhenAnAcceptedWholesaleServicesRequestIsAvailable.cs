@@ -33,6 +33,6 @@ public class WhenAnAcceptedWholesaleServicesRequestIsAvailable : INotificationHa
     public Task Handle(WholesaleServicesRequestWasAccepted notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
-        return _commandSchedulerFacade.EnqueueAsync(new AcceptedWholesaleServices(notification.ProcessId, notification.AcceptedWholesaleServicesSerie));
+        return _commandSchedulerFacade.EnqueueAsync(new AcceptedWholesaleServices(notification.EventId, notification.ProcessId, notification.AcceptedWholesaleServicesSerie));
     }
 }

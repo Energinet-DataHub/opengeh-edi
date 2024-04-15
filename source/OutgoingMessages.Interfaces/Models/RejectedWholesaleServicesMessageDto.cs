@@ -24,6 +24,7 @@ public sealed class RejectedWholesaleServicesMessageDto : OutgoingMessageDto
     public RejectedWholesaleServicesMessageDto(
         ActorNumber receiverNumber,
         Guid processId,
+        EventId eventId,
         string businessReason,
         ActorRole receiverRole,
         MessageId relatedToMessageId,
@@ -32,6 +33,7 @@ public sealed class RejectedWholesaleServicesMessageDto : OutgoingMessageDto
             DocumentType.RejectRequestWholesaleSettlement,
             receiverNumber,
             processId,
+            eventId,
             businessReason,
             receiverRole,
             DataHubDetails.DataHubActorNumber,

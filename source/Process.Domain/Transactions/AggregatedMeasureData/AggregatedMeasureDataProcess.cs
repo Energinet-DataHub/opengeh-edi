@@ -170,6 +170,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             return new RejectedEnergyResultMessageDto(
                 RequestedByActorId,
                 ProcessId.Id,
+                rejectedAggregatedMeasureDataRequest.EventId,
                 rejectedAggregatedMeasureDataRequest.BusinessReason.Name,
                 ActorRole.FromCode(RequestedByActorRoleCode),
                 InitiatedByMessageId,

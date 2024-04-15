@@ -13,18 +13,26 @@
 // limitations under the License.
 
 using System;
-using System.Threading.Tasks;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using System.Text.Json.Serialization;
 
-namespace Energinet.DataHub.EDI.Process.Interfaces;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 /// <summary>
-/// Responsible for receiving all types inbox events
+/// An EventId symbolises a tracking id, typically received from a ServiceBusMessage's MessageId,
+///     or in case of our IntegrationEvents, this is also the EventIdentifier
 /// </summary>
-public interface IInboxEventReceiver
+[Serializable]
+public record EventId
 {
-    /// <summary>
-    /// Receives an inbox event
-    /// </summary>
-    Task ReceiveAsync(EventId eventId, string eventType, Guid referenceId, byte[] eventPayload);
+    [JsonConstructor]
+    private EventId(string value)
+    {
+        Value = value;
+    }
+
+    public string Value { get; }
+
+    public static EventId From(Guid eventIdentification) => new(eventIdentification.ToString());
+
+    public static EventId From(string eventId) => new(eventId);
 }

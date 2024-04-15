@@ -5,6 +5,10 @@
     <RootNamespace>Energinet.DataHub.EDI.Process.Interfaces</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+  </ItemGroup>
+
   <ItemDefinitionGroup>
     <ProjectReference>
       <PrivateAssets>all</PrivateAssets>

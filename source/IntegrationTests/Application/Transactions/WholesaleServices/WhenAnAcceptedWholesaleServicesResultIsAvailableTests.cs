@@ -50,6 +50,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
     public async Task Received_accepted_wholesale_services_event_enqueues_message()
     {
         // Arrange
+        var eventId = Guid.NewGuid().ToString();
         var process = WholesaleServicesProcessBuilder()
             .SetState(WholesaleServicesProcess.State.Sent)
             .Build();
@@ -58,12 +59,14 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .Build();
 
         // Act
-        await HavingReceivedInboxEventAsync(nameof(WholesaleServicesRequestAccepted), acceptedEvent, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(WholesaleServicesRequestAccepted), acceptedEvent, process.ProcessId.Id, eventId);
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(ActorRole.EnergySupplier, BusinessReason.WholesaleFixing);
         outgoingMessage.Should().NotBeNull();
         outgoingMessage
+            .HasProcessId(process.ProcessId)
+            .HasEventId(eventId)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasDocumentReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(process.RequestedByActorRoleCode)
