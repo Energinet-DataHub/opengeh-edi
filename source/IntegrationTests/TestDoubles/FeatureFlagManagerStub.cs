@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
 
@@ -20,15 +21,23 @@ namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 /// <summary>
 /// A FeatureFlagManager used to set default values and which allows overriding feature flags during tests
 /// </summary>
+[SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Tests")]
 public class FeatureFlagManagerStub : IFeatureFlagManager
 {
-    public Task<bool> UseExampleFeatureFlag { get; set; } = Task.FromResult(true);
+    private bool _useAmountPerChargeResultProduced = true;
+    private bool _useMonthlyAmountPerChargeResultProducedAsync = true;
 
-    public Task<bool> UseMonthlyAmountPerChargeResultProduced { get; set; } = Task.FromResult(true);
+    public void EnableAmountPerChargeResultProduced(bool enable) => _useAmountPerChargeResultProduced = enable;
 
-    public Task<bool> UseAmountPerChargeResultProduced { get; set; } = Task.FromResult(true);
+    public void EnableMonthlyAmountPerChargeResultProduced(bool enable) => _useMonthlyAmountPerChargeResultProducedAsync = enable;
 
-    public Task<bool> UseRequestWholesaleSettlementReceiver { get; } = Task.FromResult(true);
+    public Task<bool> UseExampleFeatureFlagAsync() => Task.FromResult(true);
 
-    public Task<bool> UseMessageDelegation { get; } = Task.FromResult(true);
+    public Task<bool> UseMonthlyAmountPerChargeResultProducedAsync() => Task.FromResult(_useMonthlyAmountPerChargeResultProducedAsync);
+
+    public Task<bool> UseAmountPerChargeResultProducedAsync() => Task.FromResult(_useAmountPerChargeResultProduced);
+
+    public Task<bool> UseRequestWholesaleSettlementReceiverAsync() => Task.FromResult(true);
+
+    public Task<bool> UseMessageDelegationAsync() => Task.FromResult(true);
 }

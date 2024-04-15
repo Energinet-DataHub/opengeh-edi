@@ -51,7 +51,7 @@ public class AmountPerChargeResultProducedV1Processor : IIntegrationEventProcess
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        if (!await _featureManager.UseAmountPerChargeResultProduced.ConfigureAwait(false))
+        if (!await _featureManager.UseAmountPerChargeResultProducedAsync().ConfigureAwait(false))
         {
             return;
         }
