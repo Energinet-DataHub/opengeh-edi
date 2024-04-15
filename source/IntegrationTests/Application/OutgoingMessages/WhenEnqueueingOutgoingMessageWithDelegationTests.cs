@@ -61,7 +61,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     /// </summary>
     [Fact]
     public async Task
-        Given_OutgoingEnergyResultMessageToMeteredDataResponsible_When_DelegatedByIsGridOperator_Then_GridOperatorReceivesMessage()
+        Given_DelegatedByIsGridOperator_When_EnqueuingOutgoingEnergyResultMessageToMeteredDataResponsible_Then_GridOperatorReceivesMessage()
     {
         // Arrange
         var outgoingEnergyResultMessageReceiver = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"), actorRole: ActorRole.MeteredDataResponsible);
