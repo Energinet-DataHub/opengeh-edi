@@ -15,6 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Domain.ActorCertificates;
 using Energinet.DataHub.EDI.MasterData.Domain.Actors;
@@ -179,6 +180,17 @@ internal sealed class MasterDataClient : IMasterDataClient
             gridAreaCode,
             processType,
             cancellationToken).ConfigureAwait(false);
+
+        if (processDelegation is null
+            && WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack)
+        {
+            processDelegation = await _processDelegationRepository.GetAsync(
+                delegatedByActorNumber,
+                delegatedByActorRole.ForActorMessageQueue(),
+                gridAreaCode,
+                processType,
+                cancellationToken).ConfigureAwait(false);
+        }
 
         if (processDelegation is null)
             return null;

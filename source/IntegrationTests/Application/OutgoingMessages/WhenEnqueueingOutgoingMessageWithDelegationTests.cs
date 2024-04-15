@@ -56,6 +56,27 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     }
 
     [Fact]
+    public async Task
+        Given_GridOperatorIsDelegatedBy_When_OutgoingEnergyResultMessageToMeteredDataResponsible_Then_DelegatedToReceivesMessage()
+    {
+        // Arrange
+        var documentReceiver = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"), actorRole: ActorRole.MeteredDataResponsible);
+        var message = _energyResultMessageDtoBuilder
+            .WithReceiverNumber(documentReceiver.ActorNumber.Value)
+            .WithReceiverRole(documentReceiver.ActorRole)
+            .Build();
+
+        _delegatedBy = CreateActorNumberAndRole(documentReceiver.ActorNumber, actorRole: ActorRole.GridOperator);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
+
+        // Act
+        var createdId = await EnqueueAndCommitAsync(message);
+
+        // Assert
+        await AssertEnqueuedOutgoingMessage(createdId, _delegatedTo, documentReceiver);
+    }
+
+    [Fact]
     public async Task Enqueue_message_to_delegated()
     {
         // Arrange
