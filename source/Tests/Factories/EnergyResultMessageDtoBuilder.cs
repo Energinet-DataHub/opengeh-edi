@@ -26,7 +26,6 @@ public class EnergyResultMessageDtoBuilder
     private const long CalculationResultVersion = 1;
     private const string GridAreaCode = "804";
     private static readonly ActorNumber _receiverNumber = ActorNumber.Create("1234567890123");
-    private static readonly Guid _processId = Guid.NewGuid();
     private static readonly string _meteringPointType = MeteringPointType.Consumption.Name;
     private static readonly string? _settlementMethod = SettlementMethod.Flex.Name;
     private static readonly string _measureUnitType = MeasurementUnit.Kwh.Code;
@@ -49,15 +48,15 @@ public class EnergyResultMessageDtoBuilder
 
     private static readonly string _businessReasonName = BusinessReason.BalanceFixing.Code;
     private static readonly string? _settlementVersion = SettlementVersion.FirstCorrection.Name;
-
+    private static readonly EventId _eventId = EventId.From(Guid.NewGuid());
     private ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
 
     public EnergyResultMessageDto Build()
     {
         return EnergyResultMessageDto.Create(
+            _eventId,
             _receiverNumber,
             _receiverRole,
-            _processId,
             GridAreaCode,
             _meteringPointType,
             _settlementMethod,

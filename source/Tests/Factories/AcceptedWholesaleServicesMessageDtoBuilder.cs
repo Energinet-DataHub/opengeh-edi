@@ -26,6 +26,7 @@ public abstract class AcceptedWholesaleServicesMessageDtoBuilder
     private static readonly Guid _processId = Guid.NewGuid();
     private static readonly BusinessReason _businessReason = BusinessReason.BalanceFixing;
     private static readonly ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
+    private static readonly EventId _eventId = EventId.From(Guid.NewGuid());
 
     public static AcceptedWholesaleServicesMessageDto Build()
     {
@@ -36,6 +37,7 @@ public abstract class AcceptedWholesaleServicesMessageDtoBuilder
             _receiverRole,
             _chargeOwner,
             _processId,
+            _eventId,
             _businessReason.Name,
             series,
             MessageId.New());

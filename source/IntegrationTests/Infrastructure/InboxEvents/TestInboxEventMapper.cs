@@ -16,6 +16,7 @@ using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using MediatR;
 
@@ -23,8 +24,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
 public class TestInboxEventMapper : IInboxEventMapper
 {
-    #pragma warning disable // Method cannot be static since inherited from the interface
-    public Task<INotification> MapFromAsync(byte[] payload, Guid referenceId, CancellationToken cancellationToken)
+    public Task<INotification> MapFromAsync(byte[] payload, EventId eventId, Guid referenceId, CancellationToken cancellationToken)
     {
         return Task.FromResult(new TestNotification(Encoding.ASCII.GetString(payload)) as INotification);
     }

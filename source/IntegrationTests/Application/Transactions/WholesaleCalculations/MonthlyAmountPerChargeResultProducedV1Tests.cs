@@ -130,6 +130,7 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
         var isTax = false;
         var calculationVersion = 3;
         var amount = new DecimalValue { Units = 100, Nanos = 0 };
+        var eventId = Guid.NewGuid();
 
         // Arrange
         var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder
@@ -149,12 +150,14 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
             .Build();
 
         // Act
-        await HandleIntegrationEventAsync(monthlyPerChargeEvent);
+        await HandleIntegrationEventAsync(monthlyPerChargeEvent, eventId);
 
         // Assert
         var message = await AssertOutgoingMessageAsync(businessReason: BusinessReason.WholesaleFixing);
 
         message
+            .HasProcessId(null)
+            .HasEventId(eventId.ToString())
             .HasReceiverId(energySupplier)
             .HasReceiverRole(ActorRole.EnergySupplier.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
@@ -271,10 +274,10 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
             .WithMessage("Sequence contains no elements.");
     }
 
-    private async Task HandleIntegrationEventAsync(MonthlyAmountPerChargeResultProducedV1 @event)
+    private async Task HandleIntegrationEventAsync(MonthlyAmountPerChargeResultProducedV1 @event, Guid? eventId = null)
     {
         var integrationEvent = new IntegrationEvent(
-            Guid.NewGuid(),
+            eventId ?? Guid.NewGuid(),
             @event.GetType().Name,
             1,
             @event);

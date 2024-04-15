@@ -48,6 +48,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
     public async Task Aggregated_measure_data_response_is_rejected()
     {
         // Arrange
+        var expectedEventId = "expected-event-id";
         var process = BuildProcess();
         var rejectReason = new RejectReason()
         {
@@ -63,11 +64,13 @@ public class WhenARejectedResultIsAvailableTests : TestBase
         };
 
         // Act
-        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestRejected), rejectEvent, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestRejected), rejectEvent, process.ProcessId.Id, expectedEventId);
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(ActorRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
         outgoingMessage
+            .HasEventId(expectedEventId)
+            .HasProcessId(process.ProcessId)
             .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(process.RequestedByActorRoleCode)

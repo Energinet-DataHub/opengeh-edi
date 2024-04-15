@@ -45,7 +45,7 @@ public class AcceptProcessWhenAcceptedEnergyResultTimeSerieIsAvailable : IReques
         foreach (var aggregatedTimeSerie in request.AggregatedTimeSeries)
         {
             var message = AcceptedEnergyResultMessageDtoFactory
-                .Create(process, aggregatedTimeSerie);
+                .Create(request.EventId, process, aggregatedTimeSerie);
             energyResultMessageDtos.Add(message);
         }
 
