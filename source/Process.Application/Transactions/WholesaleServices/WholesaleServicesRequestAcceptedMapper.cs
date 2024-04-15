@@ -39,7 +39,7 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         return eventType.Equals(nameof(WholesaleServicesRequestAccepted), StringComparison.OrdinalIgnoreCase);
     }
 
-    public Task<INotification> MapFromAsync(byte[] payload, Guid referenceId, CancellationToken cancellationToken)
+    public Task<INotification> MapFromAsync(byte[] payload, EventId eventId, Guid referenceId, CancellationToken cancellationToken)
     {
         var wholesaleServicesRequestAccepted =
             WholesaleServicesRequestAccepted.Parser.ParseFrom(payload);
@@ -68,6 +68,7 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         }
 
         return Task.FromResult<INotification>(new WholesaleServicesRequestWasAccepted(
+            eventId,
             referenceId,
             acceptedWholesaleServicesSeries));
     }

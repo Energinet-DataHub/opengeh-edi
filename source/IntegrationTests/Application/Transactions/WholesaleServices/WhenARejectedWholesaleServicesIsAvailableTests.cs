@@ -50,6 +50,7 @@ public sealed class WhenARejectedWholesaleServicesIsAvailableTests : TestBase
     public async Task Wholesale_services_response_is_rejected()
     {
         // Arrange
+        var expectedEventId = Guid.NewGuid().ToString();
         var process = BuildProcess();
         var rejectReason = new RejectReason { ErrorCode = "ER0" };
         var rejectReason2 = new RejectReason { ErrorCode = "ER1" };
@@ -59,13 +60,16 @@ public sealed class WhenARejectedWholesaleServicesIsAvailableTests : TestBase
         await HavingReceivedInboxEventAsync(
             nameof(WholesaleServicesRequestRejected),
             rejectEvent,
-            process.ProcessId.Id);
+            process.ProcessId.Id,
+            expectedEventId);
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(
             ActorRole.EnergySupplier,
             BusinessReason.WholesaleFixing);
         outgoingMessage
+            .HasProcessId(process.ProcessId)
+            .HasEventId(expectedEventId)
             .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(process.RequestedByActorRoleCode)

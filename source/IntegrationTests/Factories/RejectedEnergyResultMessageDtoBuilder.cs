@@ -21,6 +21,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
 public class RejectedEnergyResultMessageDtoBuilder
 {
+    private static readonly EventId _eventId = EventId.From(Guid.NewGuid());
     private static readonly Guid _processId = Guid.NewGuid();
     private static readonly string _businessReason = BusinessReason.BalanceFixing.Name;
     private static readonly RejectedEnergyResultMessageSerie _series = new(
@@ -39,6 +40,7 @@ public class RejectedEnergyResultMessageDtoBuilder
         return new RejectedEnergyResultMessageDto(
             _receiverNumber,
             _processId,
+            _eventId,
             _businessReason,
             _receiverRole,
             _relatedToMessageId,
