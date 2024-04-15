@@ -112,7 +112,7 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
             .WithCalculationType(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
             .Build();
 
-        FeatureFlagManagerStub.UseMonthlyAmountPerChargeResultProduced = Task.FromResult(false);
+        FeatureFlagManagerStub.EnableMonthlyAmountPerChargeResultProduced(false);
 
         await HandleIntegrationEventAsync(monthlyPerChargeEvent);
         await AssertOutgoingMessageIsNull(businessReason: BusinessReason.WholesaleFixing);

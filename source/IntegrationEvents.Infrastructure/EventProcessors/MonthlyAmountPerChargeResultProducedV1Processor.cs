@@ -46,7 +46,7 @@ public class MonthlyAmountPerChargeResultProducedV1Processor : IIntegrationEvent
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        if (!await _featureManager.UseMonthlyAmountPerChargeResultProduced.ConfigureAwait(false))
+        if (!await _featureManager.UseMonthlyAmountPerChargeResultProducedAsync().ConfigureAwait(false))
         {
             return;
         }
