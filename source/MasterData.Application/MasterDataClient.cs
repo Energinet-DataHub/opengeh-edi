@@ -182,7 +182,8 @@ internal sealed class MasterDataClient : IMasterDataClient
             cancellationToken).ConfigureAwait(false);
 
         if (processDelegation is null
-            && WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack)
+            && WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack
+            && delegatedByActorRole.Equals(ActorRole.MeteredDataResponsible))
         {
             processDelegation = await _processDelegationRepository.GetAsync(
                 delegatedByActorNumber,
