@@ -23,7 +23,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.FunctionApp;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions;
-using Energinet.DataHub.EDI.Api.Authentication.Certificate;
+using Energinet.DataHub.EDI.B2BApi.Authentication.Certificate;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
