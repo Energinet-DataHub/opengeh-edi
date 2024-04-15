@@ -176,22 +176,10 @@ internal sealed class MasterDataClient : IMasterDataClient
     {
         var processDelegation = await _processDelegationRepository.GetAsync(
             delegatedByActorNumber,
-            delegatedByActorRole,
+            delegatedByActorRole.ForActorMessageDelegation(),
             gridAreaCode,
             processType,
             cancellationToken).ConfigureAwait(false);
-
-        if (processDelegation is null
-            && WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack
-            && delegatedByActorRole.Equals(ActorRole.MeteredDataResponsible))
-        {
-            processDelegation = await _processDelegationRepository.GetAsync(
-                delegatedByActorNumber,
-                delegatedByActorRole.ForActorMessageQueue(),
-                gridAreaCode,
-                processType,
-                cancellationToken).ConfigureAwait(false);
-        }
 
         if (processDelegation is null)
             return null;
