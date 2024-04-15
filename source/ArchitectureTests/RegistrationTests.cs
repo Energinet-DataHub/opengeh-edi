@@ -23,7 +23,8 @@ using Energinet.DataHub.Core.App.WebApp.Extensions.Options;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.NotifyWholesaleServices;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
@@ -90,7 +91,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
                 typeof(IDocumentWriter),
                 new[]
                 {
-                    typeof(OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices.NotifyWholesaleServicesEbixDocumentWriter).Assembly,
+                    typeof(NotifyWholesaleServicesEbixDocumentWriter).Assembly,
                 });
 
         public static IEnumerable<object[]> GetFunctionRequirements()

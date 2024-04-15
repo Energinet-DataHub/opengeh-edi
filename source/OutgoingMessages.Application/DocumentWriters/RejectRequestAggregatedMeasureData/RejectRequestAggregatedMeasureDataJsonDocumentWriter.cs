@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -24,15 +23,15 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestWholesaleSettlement;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.RejectRequestAggregatedMeasureData;
 
-public class RejectRequestWholesaleSettlementJsonDocumentWriter : IDocumentWriter
+public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
 {
-    private const string DocumentTypeName = "RejectRequestWholesaleSettlement_MarketDocument";
+    private const string DocumentTypeName = "RejectRequestAggregatedMeasureData_MarketDocument";
     private const string TypeCode = "ERR";
     private readonly IMessageRecordParser _parser;
 
-    public RejectRequestWholesaleSettlementJsonDocumentWriter(IMessageRecordParser parser)
+    public RejectRequestAggregatedMeasureDataJsonDocumentWriter(IMessageRecordParser parser)
     {
         _parser = parser;
     }
@@ -46,15 +45,13 @@ public class RejectRequestWholesaleSettlementJsonDocumentWriter : IDocumentWrite
 
     public bool HandlesType(DocumentType documentType)
     {
-        return documentType == DocumentType.RejectRequestWholesaleSettlement;
+        return documentType == DocumentType.RejectRequestAggregatedMeasureData;
     }
 
-    public async Task<MarketDocumentStream> WriteAsync(
-        OutgoingMessageHeader header,
-        IReadOnlyCollection<string> marketActivityRecords)
+    public async Task<MarketDocumentStream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
     {
         var stream = new MarketDocumentWriterMemoryStream();
-        var options = new JsonWriterOptions { Indented = true };
+        var options = new JsonWriterOptions() { Indented = true };
         using var writer = new Utf8JsonWriter(stream, options);
 
         JsonHeaderWriter.Write(header, DocumentTypeName, TypeCode, ReasonCode.FullyRejected.Code, writer);
@@ -105,13 +102,15 @@ public class RejectRequestWholesaleSettlementJsonDocumentWriter : IDocumentWrite
         writer.WriteEndObject();
     }
 
-    private ReadOnlyCollection<RejectedWholesaleServicesRecord> ParseFrom(IReadOnlyCollection<string> payloads)
+    private ReadOnlyCollection<RejectedTimeSerieMarketActivityRecord> ParseFrom(IReadOnlyCollection<string> payloads)
     {
         ArgumentNullException.ThrowIfNull(payloads);
+        var timeSeries = new List<RejectedTimeSerieMarketActivityRecord>();
+        foreach (var payload in payloads)
+        {
+            timeSeries.Add(_parser.From<RejectedTimeSerieMarketActivityRecord>(payload));
+        }
 
-        return payloads
-            .Select(payload => _parser.From<RejectedWholesaleServicesRecord>(payload))
-            .ToList()
-            .AsReadOnly();
+        return timeSeries.AsReadOnly();
     }
 }

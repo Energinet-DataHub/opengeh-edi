@@ -15,7 +15,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestWholesaleSettlement;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.RejectRequestWholesaleSettlement;
 
 // This is a copy of RejectedWholesaleServicesMessageSeries defined in the process module
 public record RejectedWholesaleServicesRecord(

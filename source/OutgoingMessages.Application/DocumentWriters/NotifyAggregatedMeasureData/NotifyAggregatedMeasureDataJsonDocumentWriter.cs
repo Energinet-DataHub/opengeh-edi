@@ -24,7 +24,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.NotifyAggregatedMeasureData;
 
 public class NotifyAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
 {

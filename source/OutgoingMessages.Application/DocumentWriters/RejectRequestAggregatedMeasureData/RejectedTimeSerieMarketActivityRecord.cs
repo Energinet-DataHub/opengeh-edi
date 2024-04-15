@@ -15,7 +15,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.RejectRequestAggregatedMeasureData;
 
 // This is a copy of RejectedTimeSerie defined in the process module
 public record RejectedTimeSerieMarketActivityRecord(

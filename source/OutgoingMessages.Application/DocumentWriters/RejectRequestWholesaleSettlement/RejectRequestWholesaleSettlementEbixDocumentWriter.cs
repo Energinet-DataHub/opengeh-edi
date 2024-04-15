@@ -22,18 +22,18 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Ebix;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.RejectRequestWholesaleSettlement;
 
-public class RejectRequestAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
+public class RejectRequestWholesaleSettlementEbixDocumentWriter : EbixDocumentWriter
 {
-    public RejectRequestAggregatedMeasureDataEbixDocumentWriter(IMessageRecordParser parser)
+    public RejectRequestWholesaleSettlementEbixDocumentWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
-            "DK_RejectRequestMeteredDataAggregated",
-            string.Empty,
-            "un:unece:260:data:EEM-DK_RejectRequestMeteredDataAggregated:v3",
-            "ns0",
-            "ERR"),
+                "DK_RejectAggregatedBillingInformation",
+                string.Empty,
+                "un:unece:260:data:EEM-DK_RejectAggregatedBillingInformation:v3",
+                "ns0",
+                "ERR"),
             parser)
     {
     }
@@ -41,35 +41,51 @@ public class RejectRequestAggregatedMeasureDataEbixDocumentWriter : EbixDocument
     public override bool HandlesType(DocumentType documentType)
     {
         ArgumentNullException.ThrowIfNull(documentType);
-        return DocumentType.RejectRequestAggregatedMeasureData == documentType;
+        return DocumentType.RejectRequestWholesaleSettlement == documentType;
     }
 
-    protected override async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer)
+    protected override async Task WriteMarketActivityRecordsAsync(
+        IReadOnlyCollection<string> marketActivityPayloads,
+        XmlWriter writer)
     {
         ArgumentNullException.ThrowIfNull(marketActivityPayloads);
         ArgumentNullException.ThrowIfNull(writer);
 
-        foreach (var rejectedTimeSerie in ParseFrom<RejectedTimeSerieMarketActivityRecord>(marketActivityPayloads))
+        foreach (var wholesaleServicesRecord in ParseFrom<RejectedWholesaleServicesRecord>(marketActivityPayloads))
         {
-            if (rejectedTimeSerie.RejectReasons.Count == 0)
+            if (wholesaleServicesRecord.RejectReasons.Count == 0)
+            {
                 throw new NotSupportedException("Unable to create reject message if no reason is supplied");
+            }
 
             // Begin PayloadResponseEvent
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "PayloadResponseEvent", null).ConfigureAwait(false);
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "PayloadChargeEvent", null)
+                .ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Identification", null, rejectedTimeSerie.TransactionId.ToString("N")).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(
+                    DocumentDetails.Prefix,
+                    "Identification",
+                    null,
+                    wholesaleServicesRecord.TransactionId.ToString("N"))
+                .ConfigureAwait(false);
+
+            await writer.WriteElementStringAsync(
+                    DocumentDetails.Prefix,
+                    "OriginalBusinessDocument",
+                    null,
+                    wholesaleServicesRecord.OriginalTransactionIdReference)
+                .ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "StatusType", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "6").ConfigureAwait(false);
             await writer.WriteStringAsync(EbixCode.Of(ReasonCode.FullyRejected)).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "ResponseReasonType", null).ConfigureAwait(false);
+            await writer.WriteStartElementAsync(DocumentDetails.Prefix, "ResponseReasonType", null)
+                .ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "260").ConfigureAwait(false);
-            await writer.WriteStringAsync(rejectedTimeSerie.RejectReasons.First().ErrorCode).ConfigureAwait(false);
+            await writer.WriteStringAsync(wholesaleServicesRecord.RejectReasons.First().ErrorCode).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
-
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "OriginalBusinessDocument", null, rejectedTimeSerie.OriginalTransactionIdReference).ConfigureAwait(false);
 
             // End PayloadResponseEvent
             await writer.WriteEndElementAsync().ConfigureAwait(false);

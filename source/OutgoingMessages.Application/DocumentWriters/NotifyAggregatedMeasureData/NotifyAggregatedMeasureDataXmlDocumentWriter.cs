@@ -21,7 +21,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.NotifyAggregatedMeasureData;
 
 public class NotifyAggregatedMeasureDataXmlDocumentWriter : DocumentWriter
 {

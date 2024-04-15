@@ -25,7 +25,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.NotifyWholesaleServices;
 
 public sealed class NotifyWholesaleServicesJsonDocumentWriter : IDocumentWriter
 {

@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.NotifyWholesaleServices;
 
 // This is a copy of WholesaleCalculationSeries defined in the process module
 public record WholesaleCalculationMarketActivityRecord(

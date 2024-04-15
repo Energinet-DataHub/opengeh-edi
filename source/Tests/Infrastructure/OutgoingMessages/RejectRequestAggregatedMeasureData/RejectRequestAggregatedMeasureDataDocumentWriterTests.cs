@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.RejectRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
