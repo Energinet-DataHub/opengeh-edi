@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;

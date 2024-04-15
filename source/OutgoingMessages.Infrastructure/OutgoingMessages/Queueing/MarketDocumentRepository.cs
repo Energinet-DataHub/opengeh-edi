@@ -14,7 +14,8 @@
 
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.Bundels;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 

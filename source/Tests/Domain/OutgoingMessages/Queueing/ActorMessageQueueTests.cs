@@ -14,7 +14,8 @@
 
 using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using NodaTime;
 using Xunit;

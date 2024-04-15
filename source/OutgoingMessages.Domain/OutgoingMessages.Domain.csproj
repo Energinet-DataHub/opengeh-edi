@@ -15,4 +15,8 @@
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.1.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Exceptions\" />
+  </ItemGroup>
+
 </Project>

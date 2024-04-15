@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages.Queueing;
 using Microsoft.EntityFrameworkCore;
