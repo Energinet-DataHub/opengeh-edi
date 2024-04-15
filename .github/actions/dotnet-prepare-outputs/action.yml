@@ -46,7 +46,7 @@ runs:
       shell: bash
       run: |
         dotnet publish \
-          'source/Api/Api.csproj' \
+          'source/B2BApi/B2BApi.csproj' \
           --no-build \
           --no-restore \
           --configuration Release \
