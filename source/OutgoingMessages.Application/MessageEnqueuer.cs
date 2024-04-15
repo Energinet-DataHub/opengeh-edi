@@ -55,7 +55,7 @@ public class MessageEnqueuer
     {
         ArgumentNullException.ThrowIfNull(messageToEnqueue);
 
-        if (await _featureFlagManager.UseMessageDelegation.ConfigureAwait(false))
+        if (await _featureFlagManager.UseMessageDelegationAsync().ConfigureAwait(false))
         {
             messageToEnqueue = await _messageDelegator.DelegateAsync(messageToEnqueue, cancellationToken)
                 .ConfigureAwait(false);

@@ -23,25 +23,25 @@ public interface IFeatureFlagManager
     /// <summary>
     /// A Feature Flag example
     /// </summary>
-    Task<bool> UseExampleFeatureFlag { get; }
+    Task<bool> UseExampleFeatureFlagAsync();
 
     /// <summary>
     /// Whether to allow handling MonthlyAmountPerChargeResultProduced events
     /// </summary>
-    Task<bool> UseMonthlyAmountPerChargeResultProduced { get; }
+    Task<bool> UseMonthlyAmountPerChargeResultProducedAsync();
 
     /// <summary>
     /// Whether to allow handling AmountPerChargeResultProduced events
     /// </summary>
-    Task<bool> UseAmountPerChargeResultProduced { get; }
+    Task<bool> UseAmountPerChargeResultProducedAsync();
 
     /// <summary>
     /// Whether to allow handling WholesaleSettlement Request
     /// </summary>
-    Task<bool> UseRequestWholesaleSettlementReceiver { get; }
+    Task<bool> UseRequestWholesaleSettlementReceiverAsync();
 
     /// <summary>
     /// Whether to allow message delegation for actors.
     /// </summary>
-    Task<bool> UseMessageDelegation { get; }
+    Task<bool> UseMessageDelegationAsync();
 }

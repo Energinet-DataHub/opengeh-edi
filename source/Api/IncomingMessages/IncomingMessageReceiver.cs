@@ -76,7 +76,7 @@ public class IncomingMessageReceiver
         if (incomingDocumentType == null) return request.CreateResponse(HttpStatusCode.NotFound);
 
         if (incomingDocumentType == IncomingDocumentType.RequestWholesaleSettlement
-            && !await _featureFlagManager.UseRequestWholesaleSettlementReceiver.ConfigureAwait(false))
+            && !await _featureFlagManager.UseRequestWholesaleSettlementReceiverAsync().ConfigureAwait(false))
         {
             return request.CreateResponse(HttpStatusCode.NotFound);
         }
