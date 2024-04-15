@@ -56,6 +56,20 @@ public class ActorRole : DataHubType<ActorRole>
     /// </summary>
     public ActorRole ForActorMessageQueue()
     {
+        return HackForMeteredDataResponsible();
+    }
+
+    /// <summary>
+    /// The ActorRole for a ActorMessageDelegation. This is implemented to support the "hack" where
+    ///     a MeteredDataResponsible uses the GridOperator
+    /// </summary>
+    public ActorRole ForActorMessageDelegation()
+    {
+        return HackForMeteredDataResponsible();
+    }
+
+    private ActorRole HackForMeteredDataResponsible()
+    {
         if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack && Equals(MeteredDataResponsible))
             return GridOperator;
 
