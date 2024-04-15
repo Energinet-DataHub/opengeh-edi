@@ -55,6 +55,31 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         _dateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
     }
 
+    /// <summary>
+    /// This is implemented to support the "hack" where
+    ///     MeteredDataResponsible is working as GridOperator.
+    /// </summary>
+    [Fact]
+    public async Task
+        Given_DelegatedByIsGridOperator_When_EnqueuingOutgoingEnergyResultMessageToMeteredDataResponsible_Then_GridOperatorReceivesMessage()
+    {
+        // Arrange
+        var outgoingEnergyResultMessageReceiver = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"), actorRole: ActorRole.MeteredDataResponsible);
+        var message = _energyResultMessageDtoBuilder
+            .WithReceiverNumber(outgoingEnergyResultMessageReceiver.ActorNumber.Value)
+            .WithReceiverRole(outgoingEnergyResultMessageReceiver.ActorRole)
+            .Build();
+
+        _delegatedBy = CreateActorNumberAndRole(outgoingEnergyResultMessageReceiver.ActorNumber, actorRole: ActorRole.GridOperator);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
+
+        // Act
+        var createdId = await EnqueueAndCommitAsync(message);
+
+        // Assert
+        await AssertEnqueuedOutgoingMessage(createdId, _delegatedTo, outgoingEnergyResultMessageReceiver);
+    }
+
     [Fact]
     public async Task Enqueue_message_to_delegated()
     {
