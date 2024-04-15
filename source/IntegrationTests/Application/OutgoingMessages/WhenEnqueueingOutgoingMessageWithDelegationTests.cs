@@ -57,23 +57,23 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
 
     [Fact]
     public async Task
-        Given_GridOperatorIsDelegatedBy_When_OutgoingEnergyResultMessageToMeteredDataResponsible_Then_DelegatedToReceivesMessage()
+        Given_OutgoingEnergyResultMessageToMeteredDataResponsible_When_DelegatedByIsGridOperator_Then_GridOperatorReceivesMessage()
     {
         // Arrange
-        var documentReceiver = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"), actorRole: ActorRole.MeteredDataResponsible);
+        var outgoingEnergyResultMessageReceiver = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"), actorRole: ActorRole.MeteredDataResponsible);
         var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(documentReceiver.ActorNumber.Value)
-            .WithReceiverRole(documentReceiver.ActorRole)
+            .WithReceiverNumber(outgoingEnergyResultMessageReceiver.ActorNumber.Value)
+            .WithReceiverRole(outgoingEnergyResultMessageReceiver.ActorRole)
             .Build();
 
-        _delegatedBy = CreateActorNumberAndRole(documentReceiver.ActorNumber, actorRole: ActorRole.GridOperator);
+        _delegatedBy = CreateActorNumberAndRole(outgoingEnergyResultMessageReceiver.ActorNumber, actorRole: ActorRole.GridOperator);
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
 
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
 
         // Assert
-        await AssertEnqueuedOutgoingMessage(createdId, _delegatedTo, documentReceiver);
+        await AssertEnqueuedOutgoingMessage(createdId, _delegatedTo, outgoingEnergyResultMessageReceiver);
     }
 
     [Fact]
