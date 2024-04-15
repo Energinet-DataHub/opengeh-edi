@@ -55,6 +55,10 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         _dateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
     }
 
+    /// <summary>
+    /// This is implemented to support the "hack" where
+    ///     MeteredDataResponsible is working as GridOperator.
+    /// </summary>
     [Fact]
     public async Task
         Given_OutgoingEnergyResultMessageToMeteredDataResponsible_When_DelegatedByIsGridOperator_Then_GridOperatorReceivesMessage()
