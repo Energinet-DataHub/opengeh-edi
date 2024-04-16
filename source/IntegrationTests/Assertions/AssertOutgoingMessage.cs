@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -128,10 +130,15 @@ public class AssertOutgoingMessage
         return this;
     }
 
+    public AssertOutgoingMessage HasGridAreaCodes(IReadOnlyCollection<string> gridAreaCodes)
+    {
+        Assert.Equal(gridAreaCodes, _message.GridAreaCodes);
+        return this;
+    }
+
     public AssertOutgoingMessage HasGridAreaCode(string gridAreaCode)
     {
-        Assert.Equal(gridAreaCode, _message.GridAreaCode);
-        return this;
+        return HasGridAreaCodes(new List<string> { gridAreaCode });
     }
 
     public AssertOutgoingMessage HasMessageRecordValue<TMessageRecord>(
