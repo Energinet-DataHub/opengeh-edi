@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "Api\Api.csproj", "{B14EBA74-CCAF-4677-8AE5-A0F6302ED54C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "B2BApi", "B2BApi\B2BApi.csproj", "{B14EBA74-CCAF-4677-8AE5-A0F6302ED54C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTests", "IntegrationTests\IntegrationTests.csproj", "{76FA7684-27E1-4022-9FB3-F72811E45C60}"
 EndProject
