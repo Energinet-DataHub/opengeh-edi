@@ -188,7 +188,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
     }
 
     [Fact]
-    public async Task Given_InboxEventWithTwoResults_When_ReceivingInboxEvent_Then_TheSeriesElementsHasDifferentIds()
+    public async Task Given_AcceptedInboxEventWithTwoSeries_When_ReceivingInboxEvent_Then_EachOutgoingMessageHasAUniqueTransactionId()
     {
         // Arrange
         var process = WholesaleServicesProcessBuilder()
