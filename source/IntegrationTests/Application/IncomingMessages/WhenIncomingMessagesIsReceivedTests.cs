@@ -33,7 +33,6 @@ using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.DependencyInjection;
-using NodaTime;
 using NodaTime.Extensions;
 using Xunit;
 using Xunit.Abstractions;
@@ -306,7 +305,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     [InlineData("Application\\IncomingMessages\\RequestWholesaleSettlement.json", "RequestWholesaleSettlement")]
     public async Task Incoming_message_is_archived_with_correct_data(string path, string incomingDocumentTypeName)
     {
-        // Assert
+        // Arrange
         var incomingDocumentType = IncomingDocumentType.FromName(incomingDocumentTypeName)!;
         int year = 2024,
             month = 01,
@@ -323,6 +322,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var messageIdFromFile = "123564789123564789123564789123564789";
         var businessReasonFromFile = "D05";
         var receiverActorNumberFromFile = "5790001330552";
+
         // Act
         await _incomingMessagesRequest.RegisterAndSendAsync(
             messageStream,
@@ -331,10 +331,6 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             CancellationToken.None);
 
         // Assert
-        // var archivedMessageId = await GetArchivedMessageIdFromDatabaseAsync(messageIdFromFile);
-        // var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageIdFromFile);
-        // await AssertArchivedMessageDocumentType(messageIdFromFile, incomingDocumentType);
-
         var archivedMessage = await GetArchivedMessageFromDatabaseAsync(messageIdFromFile);
         ((object?)archivedMessage).Should().NotBeNull("because an archived message should exists");
 
@@ -385,14 +381,6 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         stream.Position = 0;
 
         return new IncomingMessageStream(stream);
-    }
-
-    private async Task AssertArchivedMessageDocumentType(string messageId, IncomingDocumentType incomingDocumentType)
-    {
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var documentType = await connection.ExecuteScalarAsync<string>($"SELECT DocumentType FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'");
-
-        incomingDocumentType.Name.Should().Be(documentType);
     }
 
     private async Task<List<dynamic>> GetTransactionIdsAsync(ActorNumber senderNumber)
