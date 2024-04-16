@@ -79,6 +79,7 @@ using Microsoft.Extensions.Logging;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
