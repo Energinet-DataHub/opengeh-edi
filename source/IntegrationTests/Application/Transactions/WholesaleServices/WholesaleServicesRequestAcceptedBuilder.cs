@@ -31,7 +31,7 @@ public class WholesaleServicesRequestAcceptedBuilder
         _process = process;
     }
 
-    public WholesaleServicesRequestAccepted Build()
+    public WholesaleServicesRequestAccepted Build(bool withDuplicatedSeries = false)
     {
         List<WholesaleServicesRequestSeries.Types.Point> timeSeriesPoints = new();
         var currentTime = InstantPattern.General.Parse(_process.StartOfPeriod).Value;
@@ -75,6 +75,11 @@ public class WholesaleServicesRequestAcceptedBuilder
         wholesaleServicesRequestSeries.TimeSeriesPoints.AddRange(timeSeriesPoints.OrderBy(_ => Guid.NewGuid()));
         var wholesaleServicesRequestAccepted = new WholesaleServicesRequestAccepted();
         wholesaleServicesRequestAccepted.Series.Add(wholesaleServicesRequestSeries);
+        if (withDuplicatedSeries == true)
+        {
+            wholesaleServicesRequestAccepted.Series.Add(wholesaleServicesRequestSeries);
+        }
+
         return wholesaleServicesRequestAccepted;
     }
 

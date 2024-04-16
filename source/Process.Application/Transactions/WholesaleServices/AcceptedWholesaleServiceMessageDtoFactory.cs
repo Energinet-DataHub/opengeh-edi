@@ -48,7 +48,7 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
         AcceptedWholesaleServicesSerieDto acceptedWholesaleServices)
     {
         var acceptedWholesaleCalculationSeries = new AcceptedWholesaleServicesSeries(
-            TransactionId: process.ProcessId.Id,
+            TransactionId: Guid.NewGuid(),
             CalculationVersion: acceptedWholesaleServices.CalculationResultVersion,
             GridAreaCode: acceptedWholesaleServices.GridArea,
             ChargeCode: acceptedWholesaleServices.ChargeCode,

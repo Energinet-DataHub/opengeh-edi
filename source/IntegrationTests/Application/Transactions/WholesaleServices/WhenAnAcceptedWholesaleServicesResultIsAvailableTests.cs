@@ -187,6 +187,32 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         outgoingMessages.Count.Should().Be(2);
     }
 
+    [Fact]
+    public async Task Given_InboxEventWithTwoResults_When_ReceivingInboxEvent_Then_TheSeriesElementsHasDifferentIds()
+    {
+        // Arrange
+        var process = WholesaleServicesProcessBuilder()
+            .SetState(WholesaleServicesProcess.State.Sent)
+            .Build();
+        Store(process);
+        var acceptedEvent = WholesaleServicesRequestAcceptedBuilder(process)
+            .Build(withDuplicatedSeries: true);
+
+        // Act
+        await HavingReceivedInboxEventAsync(nameof(WholesaleServicesRequestAccepted), acceptedEvent, process.ProcessId.Id);
+
+        // Assert
+        var outgoingMessages = await AllOutgoingMessageAsync(ActorRole.EnergySupplier, BusinessReason.WholesaleFixing);
+        outgoingMessages.Count.Should().Be(2);
+        var firstMessage = outgoingMessages.First();
+        var secondMessage = outgoingMessages.Last();
+
+        var seriesIdOfFirstMessage = firstMessage.GetMessageValue<WholesaleServicesSeries, Guid>(series => series.TransactionId);
+        var seriesIdOfSecondMessage = secondMessage.GetMessageValue<WholesaleServicesSeries, Guid>(series => series.TransactionId);
+
+        seriesIdOfFirstMessage.Should().NotBe(seriesIdOfSecondMessage);
+    }
+
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
@@ -227,6 +253,18 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         BusinessReason businessReason)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
+            DocumentType.NotifyWholesaleServices.Name,
+            businessReason.Name,
+            roleOfReceiver,
+            GetService<IDatabaseConnectionFactory>(),
+            GetService<IFileStorageClient>());
+    }
+
+    private async Task<IList<AssertOutgoingMessage>> AllOutgoingMessageAsync(
+        ActorRole roleOfReceiver,
+        BusinessReason businessReason)
+    {
+        return await AssertOutgoingMessage.AllOutgoingMessagesAsync(
             DocumentType.NotifyWholesaleServices.Name,
             businessReason.Name,
             roleOfReceiver,
