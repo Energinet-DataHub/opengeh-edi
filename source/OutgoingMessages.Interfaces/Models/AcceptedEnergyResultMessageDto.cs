@@ -67,7 +67,7 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
         MessageId? relatedToMessageId = null)
     {
         var series = new AcceptedEnergyResultMessageTimeSeries(
-            processId,
+            Guid.NewGuid(),
             gridAreaCode,
             meteringPointType,
             null,
