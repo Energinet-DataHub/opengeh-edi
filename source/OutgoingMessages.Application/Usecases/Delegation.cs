@@ -20,16 +20,16 @@ using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.OutgoingMessages;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.Usecases;
 
 /// <summary>
 /// Responsible for delegating messages to the correct receiver if a delegation relationship exists.
 /// </summary>
-public class MessageDelegator
+public class Delegation
 {
     private readonly IMasterDataClient _masterDataClient;
 
-    public MessageDelegator(IMasterDataClient masterDataClient)
+    public Delegation(IMasterDataClient masterDataClient)
     {
         _masterDataClient = masterDataClient;
     }

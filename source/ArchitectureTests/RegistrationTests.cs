@@ -23,6 +23,7 @@ using Energinet.DataHub.Core.App.WebApp.Extensions.Options;
 using Energinet.DataHub.EDI.Api;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.Usecases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
@@ -74,7 +75,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
         public static IEnumerable<object[]> GetRequestHandlerRequirements()
             => ResolveTypes(
                 typeof(IRequestHandler<,>),
-                new[] { typeof(InitializeAggregatedMeasureDataProcessesHandler).Assembly, typeof(MessagePeeker).Assembly });
+                new[] { typeof(InitializeAggregatedMeasureDataProcessesHandler).Assembly, typeof(Peek).Assembly });
 
         public static IEnumerable<object[]> GetNotificationsHandlerRequirements()
             => ResolveTypes(

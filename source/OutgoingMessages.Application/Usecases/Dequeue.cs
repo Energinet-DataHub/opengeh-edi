@@ -21,16 +21,20 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.Bundels;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.Usecases;
 
-public class MessageDequeuer
+/// <summary>
+/// Dequeue is used by the actor to acknowledge a message was successfully received.
+/// The message is then removed from their queue. And next message is ready to be peeked.
+/// </summary>
+public class Dequeue
 {
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
-    private readonly ILogger<MessageDequeuer> _logger;
+    private readonly ILogger<Dequeue> _logger;
 
-    public MessageDequeuer(
+    public Dequeue(
         IActorMessageQueueRepository actorMessageQueueRepository,
-        ILogger<MessageDequeuer> logger)
+        ILogger<Dequeue> logger)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _logger = logger;

@@ -16,6 +16,7 @@ using System;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.Usecases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
@@ -61,18 +62,18 @@ public static class OutgoingMessagesExtensions
             .AddScoped<IMessageRecordParser, MessageRecordParser>();
 
         //MessageEnqueueingConfiguration
-        services.AddTransient<MessageEnqueuer>()
-            .AddTransient<MessageDelegator>()
+        services.AddTransient<Enqueue>()
+            .AddTransient<Delegation>()
             .AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>()
             .AddTransient<IOutgoingMessagesClient, OutgoingMessagesClient>();
 
         //PeekConfiguration
         services.AddScoped<IActorMessageQueueRepository, ActorMessageQueueRepository>()
             .AddScoped<IMarketDocumentRepository, MarketDocumentRepository>()
-            .AddTransient<MessagePeeker>();
+            .AddTransient<Peek>();
 
         //DequeConfiguration
-        services.AddTransient<MessageDequeuer>();
+        services.AddTransient<Dequeue>();
 
         //DataRetentionConfiguration
         services.AddTransient<IDataRetention, DequeuedBundlesRetention>();
