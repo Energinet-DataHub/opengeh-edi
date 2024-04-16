@@ -20,7 +20,8 @@ using System.Reflection;
 using System.Text;
 using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.Core.App.WebApp.Extensions.Options;
-using Energinet.DataHub.EDI.Api;
+using Energinet.DataHub.EDI.B2BApi;
+using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Usecases;
@@ -82,7 +83,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
                 typeof(INotificationHandler<>),
                 new[]
                 {
-                    typeof(Api.DataRetention.ExecuteDataRetentionsWhenADayHasPassed).Assembly,
+                    typeof(ExecuteDataRetentionsWhenADayHasPassed).Assembly,
                     typeof(Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers.EnqueueAcceptedEnergyResultMessageHandler).Assembly,
                     typeof(Process.Infrastructure.InboxEvents.ProcessInboxEventsOnTenSecondsHasPassed).Assembly,
                 });
