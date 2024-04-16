@@ -41,6 +41,11 @@ public class OutgoingMessageDelegator
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(messageToEnqueue);
+
+        // TODO: Delegate rejected messages based on who made the request
+        if (messageToEnqueue.DocumentType == DocumentType.RejectRequestAggregatedMeasureData || messageToEnqueue.DocumentType == DocumentType.RejectRequestWholesaleSettlement)
+            return messageToEnqueue;
+
         if (string.IsNullOrEmpty(messageToEnqueue.GridAreaCode))
             throw new ArgumentException($"Grid area code is required to delegate outgoing message with id {messageToEnqueue.Id.Value}");
 

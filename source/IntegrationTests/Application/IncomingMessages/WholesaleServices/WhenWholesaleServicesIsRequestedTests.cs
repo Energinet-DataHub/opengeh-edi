@@ -263,6 +263,10 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
                             (p, r, s) => p.IncomingGridArea.Should().Be(s.IncomingGridAreaCode)
                         },
                         {
+                            nameof(WholesaleServicesProcess.GridAreas),
+                            (p, r, s) => p.GridAreas.Should().Equal(s.DelegatedGridAreas.Count != 0 ? s.DelegatedGridAreas : s.IncomingGridAreaCode != null ? new[] { s.IncomingGridAreaCode! } : Array.Empty<string>())
+                        },
+                        {
                             nameof(WholesaleServicesProcess.EnergySupplierId),
                             (p, r, s) => p.EnergySupplierId.Should().Be(s.EnergySupplierId)
                         },

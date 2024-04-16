@@ -119,8 +119,6 @@ public sealed class WholesaleServicesProcess : Entity
 
     public IReadOnlyCollection<string> GridAreas => _gridAreas.Select(g => g.GridArea).ToArray();
 
-    public bool IsDelegated => GridAreas.Count != 0;
-
     public void SendToWholesale()
     {
         if (_state != State.Initialized)
