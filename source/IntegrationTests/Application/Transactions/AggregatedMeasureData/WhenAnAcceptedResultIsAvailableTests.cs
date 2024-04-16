@@ -59,7 +59,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     }
 
     [Fact]
-    public async Task Aggregated_measure_data_response_is_accepted()
+    public async Task Aggregated_measure_data_response_is_accepted() // TODO: Shouldn't we have a test with 2 series in the same accepted event, which creates 2 outgoing messages?
     {
         // Arrange
         var expectedEventId = "expected-event-id";
