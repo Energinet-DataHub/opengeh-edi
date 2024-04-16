@@ -35,6 +35,7 @@ using Google.Protobuf.WellKnownTypes;
 using NodaTime.Serialization.Protobuf;
 using NodaTime.Text;
 using Xunit;
+using Xunit.Abstractions;
 using Enum = System.Enum;
 using Period = Energinet.DataHub.Edi.Responses.Period;
 using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
@@ -55,8 +56,8 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
     private readonly IMasterDataClient _masterDataClient;
     private readonly IFileStorageClient _fileStorageClient;
 
-    public AggregatedTimeSeriesRequestAcceptedToAggregationResultTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public AggregatedTimeSeriesRequestAcceptedToAggregationResultTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _processContext = GetService<ProcessContext>();
         _inboxEventReceiver = GetService<IInboxEventReceiver>();
@@ -391,9 +392,10 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
         var process = BuildProcess();
         var requestAccepted = CreateEventWithQuantityQuality(quantityQuality);
 
+        var eventId = EventId.From(Guid.NewGuid());
         await _inboxEventReceiver
             .ReceiveAsync(
-                Guid.NewGuid().ToString(),
+                eventId,
                 nameof(AggregatedTimeSeriesRequestAccepted),
                 process.ProcessId.Id,
                 requestAccepted.ToByteArray());
@@ -401,7 +403,8 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
         await HavingReceivedInboxEventAsync(
             nameof(AggregatedTimeSeriesRequestAccepted),
             requestAccepted,
-            process.ProcessId.Id);
+            process.ProcessId.Id,
+            eventId.Value);
 
         return await OutgoingMessageAsync();
     }

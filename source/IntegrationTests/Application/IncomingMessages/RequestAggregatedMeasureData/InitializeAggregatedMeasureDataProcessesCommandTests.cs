@@ -30,6 +30,7 @@ using FluentAssertions;
 using FluentAssertions.Equivalency;
 using FluentAssertions.Execution;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages.RequestAggregatedMeasureData;
@@ -41,8 +42,8 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
     private readonly ServiceBusSenderSpy _senderSpy;
     private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
 
-    public InitializeAggregatedMeasureDataProcessesCommandTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public InitializeAggregatedMeasureDataProcessesCommandTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _processContext = GetService<ProcessContext>();
         _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();

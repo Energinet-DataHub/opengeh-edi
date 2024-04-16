@@ -1,0 +1,21 @@
+{
+    "version": "2.0",
+    "logging": {
+        "applicationInsights": {
+            "samplingSettings": {
+                "isEnabled": true,
+                "excludedTypes": "Request;Exception"
+            }
+        },
+      "logLevel": {
+        "default": "Information",
+        "Energinet.Datahub.Edi": "Information",
+        "Energinet.Datahub.Core": "Information"
+      }
+    },
+    "retry": {
+      "maxRetryCount": 10,
+      "strategy": "fixedDelay",
+      "delayInterval": "00:00:15"
+  }
+}

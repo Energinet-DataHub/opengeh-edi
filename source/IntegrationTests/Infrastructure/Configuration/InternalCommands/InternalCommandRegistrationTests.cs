@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 
@@ -28,8 +29,8 @@ public class InternalCommandRegistrationTests : TestBase
 {
     private readonly InternalCommandMapper _mapper;
 
-    public InternalCommandRegistrationTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public InternalCommandRegistrationTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _mapper = GetService<InternalCommandMapper>();
     }

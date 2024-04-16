@@ -34,6 +34,7 @@ using Google.Protobuf;
 using NodaTime.Serialization.Protobuf;
 using NodaTime.Text;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Categories;
 using DecimalValue = Energinet.DataHub.Edi.Responses.DecimalValue;
 using Period = Energinet.DataHub.Edi.Responses.Period;
@@ -51,8 +52,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     private readonly GridAreaBuilder _gridAreaBuilder = new();
     private readonly ProcessContext _processContext;
 
-    public WhenAnAcceptedResultIsAvailableTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public WhenAnAcceptedResultIsAvailableTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _processContext = GetService<ProcessContext>();
     }
@@ -61,6 +62,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     public async Task Aggregated_measure_data_response_is_accepted()
     {
         // Arrange
+        var expectedEventId = "expected-event-id";
         await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .StoreAsync(GetService<IMasterDataClient>());
@@ -69,18 +71,22 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         var acceptedEvent = GetAcceptedEvent(process);
 
         // Act
-        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id, expectedEventId);
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(ActorRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
 
         outgoingMessage
+            .HasProcessId(process.ProcessId)
+            .HasEventId(expectedEventId)
             .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(process.RequestedByActorRoleCode)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasProcessType(ProcessType.RequestEnergyResults)
+            .HasRelationTo(process.InitiatedByMessageId)
+            .HasGridAreaCode(acceptedEvent.Series.First().GridArea)
             .HasPointsInCorrectOrder<AcceptedEnergyResultMessageTimeSeries, decimal?>(timeSerie => timeSerie.Point.Select(x => x.Quantity).ToList(), acceptedEvent.Series.SelectMany(x => x.TimeSeriesPoints).OrderBy(x => x.Time).ToList())
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId)
@@ -195,7 +201,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     {
         await GetService<IInboxEventReceiver>()
             .ReceiveAsync(
-                Guid.NewGuid().ToString(),
+                EventId.From(Guid.NewGuid()),
                 nameof(AggregatedTimeSeriesRequestAccepted),
                 process.ProcessId.Id,
                 acceptedEvent.ToByteArray());

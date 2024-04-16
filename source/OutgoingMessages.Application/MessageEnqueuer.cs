@@ -55,7 +55,7 @@ public class MessageEnqueuer
     {
         ArgumentNullException.ThrowIfNull(messageToEnqueue);
 
-        if (await _featureFlagManager.UseMessageDelegation.ConfigureAwait(false))
+        if (await _featureFlagManager.UseMessageDelegationAsync().ConfigureAwait(false))
         {
             messageToEnqueue = await _outgoingMessageDelegator.DelegateAsync(messageToEnqueue, cancellationToken)
                 .ConfigureAwait(false);
@@ -86,7 +86,7 @@ public class MessageEnqueuer
         {
             _logger.LogInformation("Creating new message queue for Actor: {ActorNumber}, MarketRole: {MarketRole}", receiver.Number.Value, receiver.ActorRole.Name);
             messageQueue = ActorMessageQueue.CreateFor(receiver);
-            await _actorMessageQueueRepository.AddAsync(messageQueue).ConfigureAwait(false);
+            _actorMessageQueueRepository.Add(messageQueue);
         }
 
         return messageQueue;

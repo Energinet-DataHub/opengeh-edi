@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -27,6 +28,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using FluentAssertions;
 using NodaTime.Text;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Categories;
 using RejectReason = Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.RejectReason;
 
@@ -37,8 +39,8 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
 {
     private readonly ProcessContext _processContext;
 
-    public EnergyResultResponseFromWholesaleTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public EnergyResultResponseFromWholesaleTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _processContext = GetService<ProcessContext>();
     }
@@ -172,6 +174,7 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
             process.RequestedByActorId,
             ActorRole.FromCode(process.RequestedByActorRoleCode),
             process.ProcessId.Id,
+            EventId.From(Guid.NewGuid()),
             gridarea,
             MeteringPointType.Production.Name,
             process.SettlementMethod,
@@ -194,7 +197,7 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
         {
             new("E86", "Invalid request"),
         };
-        return new RejectedAggregatedMeasureDataRequest(rejectReasons, BusinessReason.BalanceFixing);
+        return new RejectedAggregatedMeasureDataRequest(EventId.From(Guid.NewGuid()), rejectReasons, BusinessReason.BalanceFixing);
     }
 
     private static void AssertProcessState(AggregatedMeasureDataProcess process, AggregatedMeasureDataProcess.State state)

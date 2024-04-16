@@ -32,6 +32,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
 using NodaTime;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
@@ -45,13 +46,38 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     private ActorNumberAndRoleDto _delegatedBy = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"));
     private ActorNumberAndRoleDto _delegatedTo = CreateActorNumberAndRole(ActorNumber.Create("1234567891235"), actorRole: ActorRole.Delegated);
 
-    public WhenEnqueueingOutgoingMessageWithDelegationTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public WhenEnqueueingOutgoingMessageWithDelegationTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _energyResultMessageDtoBuilder = new EnergyResultMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         _context = GetService<ActorMessageQueueContext>();
         _dateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
+    }
+
+    /// <summary>
+    /// This is implemented to support the "hack" where
+    ///     MeteredDataResponsible is working as GridOperator.
+    /// </summary>
+    [Fact]
+    public async Task
+        Given_DelegatedByIsGridOperator_When_EnqueuingOutgoingEnergyResultMessageToMeteredDataResponsible_Then_GridOperatorReceivesMessage()
+    {
+        // Arrange
+        var outgoingEnergyResultMessageReceiver = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"), actorRole: ActorRole.MeteredDataResponsible);
+        var message = _energyResultMessageDtoBuilder
+            .WithReceiverNumber(outgoingEnergyResultMessageReceiver.ActorNumber.Value)
+            .WithReceiverRole(outgoingEnergyResultMessageReceiver.ActorRole)
+            .Build();
+
+        _delegatedBy = CreateActorNumberAndRole(outgoingEnergyResultMessageReceiver.ActorNumber, actorRole: ActorRole.GridOperator);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
+
+        // Act
+        var createdId = await EnqueueAndCommitAsync(message);
+
+        // Assert
+        await AssertEnqueuedOutgoingMessage(createdId, _delegatedTo, outgoingEnergyResultMessageReceiver);
     }
 
     [Fact]

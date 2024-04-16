@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
+using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Xunit;
@@ -50,10 +51,8 @@ public class AssertOutgoingMessage
 
         using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var outgoingMessage = await connection.QuerySingleOrDefaultAsync(
-            $"SELECT m.Id, m.RecordId, m.DocumentType, m.DocumentReceiverNumber, m.DocumentReceiverRole, m.ReceiverNumber, m.ProcessId, m.BusinessReason," +
-            $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference, m.RelatedToMessageId, m.MessageCreatedFromProcess " +
-            $" FROM [dbo].[OutgoingMessages] m" +
-            $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Code}'");
+            $"SELECT * FROM [dbo].[OutgoingMessages]" +
+            $" WHERE DocumentType = '{messageType}' AND BusinessReason = '{businessReason}' AND ReceiverRole = '{receiverRole.Code}'");
 
         ((object?)outgoingMessage).Should().NotBeNull("because an outgoing message should have been added to the database");
         var outgoingMessageFileStorageReference = (string?)outgoingMessage!.FileStorageReference;
@@ -129,6 +128,12 @@ public class AssertOutgoingMessage
         return this;
     }
 
+    public AssertOutgoingMessage HasGridAreaCode(string gridAreaCode)
+    {
+        Assert.Equal(gridAreaCode, _message.GridAreaCode);
+        return this;
+    }
+
     public AssertOutgoingMessage HasMessageRecordValue<TMessageRecord>(
         Func<TMessageRecord, object?> propertySelector,
         object? expectedValue)
@@ -172,6 +177,23 @@ public class AssertOutgoingMessage
                 .Be(decimal.Parse($"{expectedPointsInRightOrder[i].Quantity.Units}.{expectedPointsInRightOrder[i].Quantity.Nanos}", CultureInfo.InvariantCulture));
         }
 
+        return this;
+    }
+
+    public AssertOutgoingMessage HasProcessId(ProcessId? processId)
+    {
+        if (processId == null)
+            Assert.Null(_message.ProcessId);
+        else
+            Assert.Equal(processId.Id, _message.ProcessId);
+
+        return this;
+    }
+
+    public AssertOutgoingMessage HasEventId(string eventId)
+    {
+        ArgumentNullException.ThrowIfNull(eventId);
+        Assert.Equal(eventId, _message.EventId);
         return this;
     }
 }

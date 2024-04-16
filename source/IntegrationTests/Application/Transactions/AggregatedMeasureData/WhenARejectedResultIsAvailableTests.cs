@@ -27,6 +27,7 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.Edi.Responses;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Categories;
 using RejectReason = Energinet.DataHub.Edi.Responses.RejectReason;
 
@@ -37,8 +38,8 @@ public class WhenARejectedResultIsAvailableTests : TestBase
 {
     private readonly ProcessContext _processContext;
 
-    public WhenARejectedResultIsAvailableTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public WhenARejectedResultIsAvailableTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _processContext = GetService<ProcessContext>();
     }
@@ -47,6 +48,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
     public async Task Aggregated_measure_data_response_is_rejected()
     {
         // Arrange
+        var expectedEventId = "expected-event-id";
         var process = BuildProcess();
         var rejectReason = new RejectReason()
         {
@@ -62,11 +64,13 @@ public class WhenARejectedResultIsAvailableTests : TestBase
         };
 
         // Act
-        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestRejected), rejectEvent, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestRejected), rejectEvent, process.ProcessId.Id, expectedEventId);
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(ActorRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
         outgoingMessage
+            .HasEventId(expectedEventId)
+            .HasProcessId(process.ProcessId)
             .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(process.RequestedByActorRoleCode)

@@ -30,13 +30,15 @@ public static class AggregatedMeasureDataRequestFactory
 
         var body = CreateAggregatedMeasureDataRequest(process);
 
-        var message = new ServiceBusMessage()
+        var message = new ServiceBusMessage
         {
             Body = new BinaryData(body.ToByteArray()),
             Subject = body.GetType().Name,
             MessageId = process.ProcessId.Id.ToString(),
         };
+
         message.ApplicationProperties.Add("ReferenceId", process.ProcessId.Id.ToString());
+
         return message;
     }
 

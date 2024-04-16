@@ -34,6 +34,8 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using Xunit;
+using Xunit.Abstractions;
+using Xunit.Sdk;
 using DecimalValue = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common.DecimalValue;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.WholesaleCalculations;
@@ -47,8 +49,8 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
     private IIntegrationEventHandler _integrationEventHandler;
 
     public MonthlyAmountPerChargeResultProducedV1Tests(
-        IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+        IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _integrationEventHandler = GetService<IIntegrationEventHandler>();
         _databaseConnectionFactory = GetService<IDatabaseConnectionFactory>();
@@ -110,7 +112,7 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
             .WithCalculationType(MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
             .Build();
 
-        FeatureFlagManagerStub.UseMonthlyAmountPerChargeResultProduced = Task.FromResult(false);
+        FeatureFlagManagerStub.EnableMonthlyAmountPerChargeResultProduced(false);
 
         await HandleIntegrationEventAsync(monthlyPerChargeEvent);
         await AssertOutgoingMessageIsNull(businessReason: BusinessReason.WholesaleFixing);
@@ -128,6 +130,7 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
         var isTax = false;
         var calculationVersion = 3;
         var amount = new DecimalValue { Units = 100, Nanos = 0 };
+        var eventId = Guid.NewGuid();
 
         // Arrange
         var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder
@@ -147,12 +150,14 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
             .Build();
 
         // Act
-        await HandleIntegrationEventAsync(monthlyPerChargeEvent);
+        await HandleIntegrationEventAsync(monthlyPerChargeEvent, eventId);
 
         // Assert
         var message = await AssertOutgoingMessageAsync(businessReason: BusinessReason.WholesaleFixing);
 
         message
+            .HasProcessId(null)
+            .HasEventId(eventId.ToString())
             .HasReceiverId(energySupplier)
             .HasReceiverRole(ActorRole.EnergySupplier.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
@@ -213,13 +218,14 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
 
         var energySupplierMessage = await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
         var gridOperatorMessage = await AssertOutgoingMessageAsync(ActorRole.GridOperator);
-        var fetchSystemOperatorMessage = async () => await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
 
         energySupplierMessage.HasReceiverId(amountPerChargeEvent.EnergySupplierId);
         gridOperatorMessage.HasReceiverId(gridOperatorAndChargeOwner);
-        await fetchSystemOperatorMessage.Should()
-            .ThrowExactlyAsync<InvalidOperationException>()
-            .WithMessage("Sequence contains no elements");
+
+        var assertSystemOperatorMessage = async () => await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
+        await assertSystemOperatorMessage.Should()
+            .ThrowAsync<XunitException>()
+            .WithMessage("Expected object not to be <null>*");
     }
 
     [Fact]
@@ -242,13 +248,13 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
 
         var energySupplierMessage = await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
         var gridOperatorMessage = await AssertOutgoingMessageAsync(ActorRole.GridOperator);
-        var fetchSystemOperatorMessage = async () => await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
+        var assertSystemOperatorMessage = async () => await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
 
         energySupplierMessage.HasReceiverId(amountPerChargeEvent.EnergySupplierId);
         gridOperatorMessage.HasReceiverId(gridOperator);
-        await fetchSystemOperatorMessage.Should()
-            .ThrowExactlyAsync<InvalidOperationException>()
-            .WithMessage("Sequence contains no elements");
+        await assertSystemOperatorMessage.Should()
+            .ThrowAsync<XunitException>()
+            .WithMessage("Expected object not to be <null>*");
     }
 
     [Fact]
@@ -268,10 +274,10 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
             .WithMessage("Sequence contains no elements.");
     }
 
-    private async Task HandleIntegrationEventAsync(MonthlyAmountPerChargeResultProducedV1 @event)
+    private async Task HandleIntegrationEventAsync(MonthlyAmountPerChargeResultProducedV1 @event, Guid? eventId = null)
     {
         var integrationEvent = new IntegrationEvent(
-            Guid.NewGuid(),
+            eventId ?? Guid.NewGuid(),
             @event.GetType().Name,
             1,
             @event);

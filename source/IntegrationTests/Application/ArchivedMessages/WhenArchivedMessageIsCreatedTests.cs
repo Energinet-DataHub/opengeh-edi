@@ -30,6 +30,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NodaTime;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.ArchivedMessages;
 
@@ -37,8 +38,8 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
 {
     private readonly IArchivedMessagesClient _archivedMessagesClient;
 
-    public WhenArchivedMessageIsCreatedTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public WhenArchivedMessageIsCreatedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _archivedMessagesClient = GetService<IArchivedMessagesClient>();
     }

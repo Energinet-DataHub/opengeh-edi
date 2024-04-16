@@ -31,6 +31,7 @@ using FluentAssertions;
 using FluentAssertions.Equivalency;
 using FluentAssertions.Execution;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages.WholesaleServices;
@@ -42,8 +43,8 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
     private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
     private readonly ServiceBusSenderSpy _senderSpy;
 
-    public WhenWholesaleServicesIsRequestedTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public WhenWholesaleServicesIsRequestedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _processContext = GetService<ProcessContext>();
         _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();

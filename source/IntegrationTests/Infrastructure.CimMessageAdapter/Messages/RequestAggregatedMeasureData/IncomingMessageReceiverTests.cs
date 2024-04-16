@@ -36,6 +36,7 @@ using Energinet.DataHub.EDI.Process.Interfaces;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.RequestAggregatedMeasureData;
 
@@ -45,8 +46,8 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
     private readonly ProcessContext _processContext;
     private readonly RequestAggregatedMeasureDataMessageValidator _requestAggregatedMeasureDataMessageValidator;
 
-    public IncomingMessageReceiverTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public IncomingMessageReceiverTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _marketMessageParser = GetService<MarketMessageParser>();
         _processContext = GetService<ProcessContext>();

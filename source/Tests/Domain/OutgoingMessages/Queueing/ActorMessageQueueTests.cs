@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using NodaTime;
 using Xunit;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.Tests.Domain.OutgoingMessages.Queueing;
 
@@ -172,6 +173,7 @@ public class ActorMessageQueueTests
             ActorRole.EnergySupplier);
 
         return new OutgoingMessage(
+            EventId.From(Guid.NewGuid()),
             messageType ?? DocumentType.NotifyAggregatedMeasureData,
             receiver.Number,
             ProcessId.New().Id,
@@ -181,6 +183,8 @@ public class ActorMessageQueueTests
             ActorRole.MeteringPointAdministrator,
             string.Empty,
             Instant.FromUtc(2024, 1, 1, 0, 0),
-            processType ?? ProcessType.ReceiveEnergyResults);
+            processType ?? ProcessType.ReceiveEnergyResults,
+            null,
+            null);
     }
 }

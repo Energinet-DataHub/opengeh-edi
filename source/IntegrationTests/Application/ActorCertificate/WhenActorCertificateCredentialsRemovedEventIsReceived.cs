@@ -28,6 +28,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using NodaTime;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.ActorCertificate;
@@ -37,8 +38,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.ActorCertificate;
 [IntegrationTest]
 public class WhenActorCertificateCredentialsRemovedEventIsReceived : TestBase
 {
-    public WhenActorCertificateCredentialsRemovedEventIsReceived(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public WhenActorCertificateCredentialsRemovedEventIsReceived(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
     }
 

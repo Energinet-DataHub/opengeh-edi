@@ -34,6 +34,8 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using Xunit;
+using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.WholesaleCalculations;
 
@@ -46,8 +48,8 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
     private IIntegrationEventHandler _integrationEventHandler;
 
     public AmountPerChargeResultProducedV1Tests(
-        IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+        IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _integrationEventHandler = GetService<IIntegrationEventHandler>();
         _databaseConnectionFactory = GetService<IDatabaseConnectionFactory>();
@@ -122,13 +124,13 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
 
         var energySupplierMessage = await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
         var gridOperatorMessage = await AssertOutgoingMessageAsync(ActorRole.GridOperator);
-        var fetchSystemOperatorMessage = async () => await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
+        var assertSystemOperatorMessage = async () => await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
 
         energySupplierMessage.HasReceiverId(amountPerChargeEvent.EnergySupplierId);
         gridOperatorMessage.HasReceiverId(gridOperatorAndChargeOwner);
-        await fetchSystemOperatorMessage.Should()
-            .ThrowExactlyAsync<InvalidOperationException>()
-            .WithMessage("Sequence contains no elements");
+        await assertSystemOperatorMessage.Should()
+            .ThrowAsync<XunitException>()
+            .WithMessage("Expected object not to be <null>*");
     }
 
     [Fact]
@@ -151,13 +153,13 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
 
         var energySupplierMessage = await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
         var gridOperatorMessage = await AssertOutgoingMessageAsync(ActorRole.GridOperator);
-        var fetchSystemOperatorMessage = async () => await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
+        var assertSystemOperatorMessage = async () => await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
 
         energySupplierMessage.HasReceiverId(amountPerChargeEvent.EnergySupplierId);
         gridOperatorMessage.HasReceiverId(gridOperator);
-        await fetchSystemOperatorMessage.Should()
-            .ThrowExactlyAsync<InvalidOperationException>()
-            .WithMessage("Sequence contains no elements");
+        await assertSystemOperatorMessage.Should()
+            .ThrowAsync<XunitException>()
+            .WithMessage("Expected object not to be <null>*");
     }
 
     [Fact]
@@ -184,7 +186,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .WithCalculationType(AmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
             .Build();
 
-        FeatureFlagManagerStub.UseAmountPerChargeResultProduced = Task.FromResult(false);
+        FeatureFlagManagerStub.EnableAmountPerChargeResultProduced(false);
 
         await HandleIntegrationEventAsync(amountPerChargeEvent);
         await AssertOutgoingMessageIsNull(businessReason: BusinessReason.WholesaleFixing);
@@ -201,6 +203,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
         var chargeOwner = "9876543216543";
         var isTax = false;
         var calculationVersion = 3;
+        var eventId = Guid.NewGuid();
 
         // Arrange
         var amountPerChargeEvent = _amountPerChargeEventBuilder
@@ -220,12 +223,14 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .Build();
 
         // Act
-        await HandleIntegrationEventAsync(amountPerChargeEvent);
+        await HandleIntegrationEventAsync(amountPerChargeEvent, eventId);
 
         // Assert
         var message = await AssertOutgoingMessageAsync(businessReason: BusinessReason.WholesaleFixing);
 
         message
+            .HasProcessId(null)
+            .HasEventId(eventId.ToString())
             .HasReceiverId(energySupplier)
             .HasReceiverRole(ActorRole.EnergySupplier.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
@@ -250,10 +255,10 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.Resolution, Resolution.Hourly);
     }
 
-    private async Task HandleIntegrationEventAsync(AmountPerChargeResultProducedV1 @event)
+    private async Task HandleIntegrationEventAsync(AmountPerChargeResultProducedV1 @event, Guid? eventId = null)
     {
         var integrationEvent = new IntegrationEvent(
-            Guid.NewGuid(),
+            eventId ?? Guid.NewGuid(),
             @event.GetType().Name,
             1,
             @event);

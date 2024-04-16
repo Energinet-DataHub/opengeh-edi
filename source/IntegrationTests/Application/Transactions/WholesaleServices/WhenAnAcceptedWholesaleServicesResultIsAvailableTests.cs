@@ -50,6 +50,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
     public async Task Received_accepted_wholesale_services_event_enqueues_message()
     {
         // Arrange
+        var eventId = Guid.NewGuid().ToString();
         var process = WholesaleServicesProcessBuilder()
             .SetState(WholesaleServicesProcess.State.Sent)
             .Build();
@@ -58,12 +59,14 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .Build();
 
         // Act
-        await HavingReceivedInboxEventAsync(nameof(WholesaleServicesRequestAccepted), acceptedEvent, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(WholesaleServicesRequestAccepted), acceptedEvent, process.ProcessId.Id, eventId);
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(ActorRole.EnergySupplier, BusinessReason.WholesaleFixing);
         outgoingMessage.Should().NotBeNull();
         outgoingMessage
+            .HasProcessId(process.ProcessId)
+            .HasEventId(eventId)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasDocumentReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(process.RequestedByActorRoleCode)
@@ -71,6 +74,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasRelationTo(process.InitiatedByMessageId)
+            .HasGridAreaCode(process.GridAreaCode!)
             .HasBusinessReason(process.BusinessReason)
             .HasProcessType(ProcessType.RequestWholesaleResults)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.Start.ToString(), process.StartOfPeriod)
@@ -107,6 +111,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasRelationTo(process.InitiatedByMessageId)
+            .HasGridAreaCode(process.GridAreaCode!)
             .HasBusinessReason(process.BusinessReason)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.Start.ToString(), process.StartOfPeriod)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.End.ToString(), process.EndOfPeriod)
@@ -167,6 +172,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .Build();
         var secondProcess = WholesaleServicesProcessBuilder()
             .SetState(WholesaleServicesProcess.State.Sent)
+            .SetBusinessTransactionId(Guid.NewGuid())
             .Build();
         Store(secondProcess);
         var secondAcceptedEvent = WholesaleServicesRequestAcceptedBuilder(firstProcess)

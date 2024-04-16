@@ -18,17 +18,22 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Energinet.DataHub.EDI.Api;
+using BuildingBlocks.Application.Extensions.Options;
+using Energinet.DataHub.Core.App.WebApp.Extensions.Options;
+using Energinet.DataHub.EDI.B2BApi;
+using Energinet.DataHub.EDI.B2BApi.DataRetention;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.DocumentWriters.Xml;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xunit;
@@ -41,14 +46,19 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
 
         public RegistrationTests()
         {
-            Environment.SetEnvironmentVariable("SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND", TestEnvironment.CreateFakeServiceBusConnectionString());
-            Environment.SetEnvironmentVariable("SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_MANAGE", TestEnvironment.CreateFakeServiceBusConnectionString());
-            Environment.SetEnvironmentVariable("WHOLESALE_INBOX_MESSAGE_QUEUE_NAME", "FakeQueueName");
-            Environment.SetEnvironmentVariable("INCOMING_MESSAGES_QUEUE_NAME", "FakeQueueName1");
+            Environment.SetEnvironmentVariable($"{IncomingMessagesQueueOptions.SectionName}__{nameof(IncomingMessagesQueueOptions.QueueName)}", "FakeQueueNameIncoming");
+            Environment.SetEnvironmentVariable($"{WholesaleInboxOptions.SectionName}__{nameof(WholesaleInboxOptions.QueueName)}", "FakeQueueNameWholesale");
+            Environment.SetEnvironmentVariable($"{EdiInboxOptions.SectionName}__{nameof(EdiInboxOptions.QueueName)}", "FakeQueueNameEdi");
             Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", TestEnvironment.CreateConnectionString());
             Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", TestEnvironment.CreateDevelopmentStorageConnectionString());
 
-            _host = HostFactory.CreateHost(RuntimeEnvironment.Default, Program.TokenValidationParameters);
+            // The following declaration slows down the test execution, since create a new Uri us a heavy operation
+            Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL", TestEnvironment.CreateFakeStorageUrl());
+
+            Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
+            Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.SendConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
+
+            _host = HostFactory.CreateHost(Program.TokenValidationParameters);
         }
 
         #region Member data providers
@@ -71,7 +81,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
                 typeof(INotificationHandler<>),
                 new[]
                 {
-                    typeof(Api.DataRetention.ExecuteDataRetentionsWhenADayHasPassed).Assembly,
+                    typeof(ExecuteDataRetentionsWhenADayHasPassed).Assembly,
                     typeof(Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers.EnqueueAcceptedEnergyResultMessageHandler).Assembly,
                     typeof(Process.Infrastructure.InboxEvents.ProcessInboxEventsOnTenSecondsHasPassed).Assembly,
                 });
@@ -159,12 +169,27 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
         [Fact(DisplayName = nameof(All_dependencies_can_be_resolved_in_b2c_app))]
         public void All_dependencies_can_be_resolved_in_b2c_app()
         {
+            var testConfiguration = new ConfigurationBuilder()
+                .AddInMemoryCollection(
+                    new Dictionary<string, string?>
+                    {
+                        [$"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}"] = "Fake",
+                        [$"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.SendConnectionString)}"] = "Fake",
+
+                        [$"{UserAuthenticationOptions.SectionName}:{nameof(UserAuthenticationOptions.MitIdExternalMetadataAddress)}"] = "NotEmpty",
+                        [$"{UserAuthenticationOptions.SectionName}:{nameof(UserAuthenticationOptions.ExternalMetadataAddress)}"] = "NotEmpty",
+                        [$"{UserAuthenticationOptions.SectionName}:{nameof(UserAuthenticationOptions.BackendBffAppId)}"] = "NotEmpty",
+                        [$"{UserAuthenticationOptions.SectionName}:{nameof(UserAuthenticationOptions.InternalMetadataAddress)}"] = "NotEmpty",
+                    })
+                .Build();
+
 #pragma warning disable CA2000
             using var application = new WebApplicationFactory<global::Energinet.DataHub.EDI.B2CWebApi.Program>()
 #pragma warning restore CA2000
                 .WithWebHostBuilder(
                     webBuilder =>
                     {
+                        webBuilder.UseConfiguration(testConfiguration);
                         webBuilder.UseDefaultServiceProvider(
                             (_, options) =>
                             {
@@ -172,6 +197,12 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
                                 options.ValidateScopes = true;
                                 // Validate the service provider during build
                                 options.ValidateOnBuild = true;
+                            })
+                            // Add controllers as services to enable validation of controller dependencies
+                            // See https://andrewlock.net/new-in-asp-net-core-3-service-provider-validation/#1-controller-constructor-dependencies-aren-t-checked
+                            .ConfigureServices(services =>
+                            {
+                                services.AddControllers().AddControllersAsServices();
                             });
                     })
                 .CreateClient(); // This will resolve the dependency injections, hence the test
@@ -210,7 +241,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
 
         private sealed class TestEnvironment : RuntimeEnvironment
         {
-            public override string? SERVICE_BUS_CONNECTION_STRING_FOR_DOMAIN_RELAY_SEND =>
+            public override string? ServiceBus__SendConnectionString =>
                 CreateFakeServiceBusConnectionString();
 
             public override string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
@@ -238,7 +269,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
                     "Server=(LocalDB)\\\\MSSQLLocalDB;Database=B2BTransactions;User=User;Password=Password;TrustServerCertificate=true;Encrypt=True;Trusted_Connection=True;";
             }
 
-            public static string CreateFakeStorageUrl() => "http://dummy.url";
+            public static string CreateFakeStorageUrl() => "https://dummy.url";
 
             public static string CreateDevelopmentStorageConnectionString() => "UseDevelopmentStorage=true";
 

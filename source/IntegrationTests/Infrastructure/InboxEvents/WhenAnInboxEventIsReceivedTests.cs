@@ -18,12 +18,14 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
@@ -36,8 +38,8 @@ public class WhenAnInboxEventIsReceivedTests : TestBase
     private readonly Guid _referenceId = Guid.NewGuid();
     private InboxEventReceiver _receiver;
 
-    public WhenAnInboxEventIsReceivedTests(IntegrationTestFixture integrationTestFixture)
-     : base(integrationTestFixture)
+    public WhenAnInboxEventIsReceivedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
         _receiver = new InboxEventReceiver(
             GetService<ProcessContext>(),
@@ -96,7 +98,7 @@ public class WhenAnInboxEventIsReceivedTests : TestBase
 
     private Task EventIsReceived(string eventId)
     {
-        return _receiver.ReceiveAsync(eventId, _eventType, _referenceId, _eventPayload);
+        return _receiver.ReceiveAsync(EventId.From(eventId), _eventType, _referenceId, _eventPayload);
     }
 
     private async Task EventIsRegisteredWithInbox(string eventId, int expectedNumberOfRegisteredEvents = 1)

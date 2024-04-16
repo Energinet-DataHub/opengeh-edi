@@ -177,7 +177,7 @@ internal sealed class MasterDataClient : IMasterDataClient
     {
         var processDelegation = await _processDelegationRepository.GetProcessesDelegatedByAsync(
             delegatedByActorNumber,
-            delegatedByActorRole,
+            delegatedByActorRole.ForActorMessageDelegation(),
             gridAreaCode,
             processType,
             cancellationToken).ConfigureAwait(false);
