@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
@@ -86,6 +87,7 @@ public class MessagePeeker
 
             var archivedMessageToCreate = new ArchivedMessage(
                 peekResult.BundleId.Id.ToString(),
+                outgoingMessageBundle.OutgoingMessages.Select(om => om.EventId).ToArray(),
                 outgoingMessageBundle.DocumentType.ToString(),
                 outgoingMessageBundle.SenderId.Value,
                 outgoingMessageBundle.Receiver.Number.Value,
