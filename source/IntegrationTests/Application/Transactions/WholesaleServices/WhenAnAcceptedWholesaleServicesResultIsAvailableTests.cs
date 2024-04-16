@@ -196,7 +196,8 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .Build();
         Store(process);
         var acceptedEvent = WholesaleServicesRequestAcceptedBuilder(process)
-            .Build(withDuplicatedSeries: true);
+            .Build();
+        acceptedEvent.Series.Add(acceptedEvent.Series.First());
 
         // Act
         await HavingReceivedInboxEventAsync(nameof(WholesaleServicesRequestAccepted), acceptedEvent, process.ProcessId.Id);

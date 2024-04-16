@@ -126,7 +126,6 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     public async Task Given_InboxEventWithTwoResults_When_ReceivingInboxEvent_Then_TheSeriesElementsHasDifferentIds()
     {
         // Arrange
-        // Arrange
         await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .StoreAsync(GetService<IMasterDataClient>());
