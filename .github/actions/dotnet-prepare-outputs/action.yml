@@ -50,7 +50,7 @@ runs:
           --no-build \
           --no-restore \
           --configuration Release \
-          --output '${{ inputs.output_path }}\functions\api'
+          --output '${{ inputs.output_path }}\functions\b2bapi'
 
     - name: Publish AcceptanceTest
       shell: bash
