@@ -33,7 +33,7 @@ using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.DependencyInjection;
-using NodaTime;
+using NodaTime.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -305,18 +305,24 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     [InlineData("Application\\IncomingMessages\\RequestWholesaleSettlement.json", "RequestWholesaleSettlement")]
     public async Task Incoming_message_is_archived_with_correct_data(string path, string incomingDocumentTypeName)
     {
-        // Assert
+        // Arrange
         var incomingDocumentType = IncomingDocumentType.FromName(incomingDocumentTypeName)!;
         int year = 2024,
             month = 01,
-            date = 05;
-        _dateTimeProvider.SetNow(Instant.FromUtc(year, month, date, 04, 23));
+            date = 05,
+            hour = 04,
+            minute = 23;
+        var expectedTimestamp = new DateTime(year, month, date, hour, minute, 0, DateTimeKind.Utc);
+        _dateTimeProvider.SetNow(expectedTimestamp.ToInstant());
 
-        var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
+        var authenticatedActor = GetService<AuthenticatedActor>();
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
         var messageStream = ReadJsonFile(path);
         var messageIdFromFile = "123564789123564789123564789123564789";
+        var businessReasonFromFile = "D05";
+        var receiverActorNumberFromFile = "5790001330552";
+
         // Act
         await _incomingMessagesRequest.RegisterAndSendAsync(
             messageStream,
@@ -325,10 +331,35 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             CancellationToken.None);
 
         // Assert
-        var archivedMessageId = await GetArchivedMessageIdFromDatabaseAsync(messageIdFromFile);
-        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageIdFromFile);
-        archivedMessageFileStorageReference.Should().Be($"{senderActorNumber.Value}/{year:0000}/{month:00}/{date:00}/{archivedMessageId:N}");
-        await AssertArchivedMessageDocumentType(messageIdFromFile, incomingDocumentType);
+        var archivedMessage = await GetArchivedMessageFromDatabaseAsync(messageIdFromFile);
+        ((object?)archivedMessage).Should().NotBeNull("because an archived message should exists");
+
+        var expectedFileStorageReference = $"{senderActorNumber.Value}/{year:0000}/{month:00}/{date:00}/{archivedMessage!.Id:N}";
+        var assertProperties = new Dictionary<string, Action<object?>>
+        {
+            { "BusinessReason", businessReason => businessReason.Should().Be(businessReasonFromFile) },
+            { "CreatedAt", createdAt => createdAt.Should().Be(expectedTimestamp) },
+            { "DocumentType", documentType => documentType.Should().Be(incomingDocumentType.Name) },
+            { "EventIds", eventIds => eventIds.Should().BeNull() },
+            { "FileStorageReference", fileStorageReference => fileStorageReference.Should().Be(expectedFileStorageReference) },
+            { "Id", id => id.Should().NotBeNull() },
+            { "MessageId", messageId => messageId.Should().Be(messageIdFromFile) },
+            { "ReceiverNumber", receiverNumber => receiverNumber.Should().Be(receiverActorNumberFromFile) },
+            { "RecordId", recordId => recordId.Should().NotBeNull() },
+            { "RelatedToMessageId", relatedToMessageId => relatedToMessageId.Should().BeNull() },
+            { "SenderNumber", senderNumber => senderNumber.Should().Be(senderActorNumber.Value) },
+        };
+
+        using var assertionScope = new AssertionScope();
+        var archivedMessageAsDictionary = (IDictionary<string, object>)archivedMessage!;
+
+        foreach (var assertProperty in assertProperties)
+            assertProperty.Value(archivedMessageAsDictionary[assertProperty.Key]);
+
+        assertProperties.Should().HaveSameCount(archivedMessageAsDictionary, "because all archived message properties should be asserted");
+
+        foreach (var dbPropertyName in archivedMessageAsDictionary.Keys)
+            assertProperties.Keys.Should().Contain(dbPropertyName);
     }
 
     protected override void Dispose(bool disposing)
@@ -350,14 +381,6 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         stream.Position = 0;
 
         return new IncomingMessageStream(stream);
-    }
-
-    private async Task AssertArchivedMessageDocumentType(string messageId, IncomingDocumentType incomingDocumentType)
-    {
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var documentType = await connection.ExecuteScalarAsync<string>($"SELECT DocumentType FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'");
-
-        incomingDocumentType.Name.Should().Be(documentType);
     }
 
     private async Task<List<dynamic>> GetTransactionIdsAsync(ActorNumber senderNumber)

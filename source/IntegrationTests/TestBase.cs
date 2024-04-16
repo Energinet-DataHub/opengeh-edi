@@ -25,9 +25,9 @@ using BuildingBlocks.Application.Extensions.Options;
 using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
-using Energinet.DataHub.EDI.Api.DataRetention;
-using Energinet.DataHub.EDI.Api.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.B2BApi.DataRetention;
+using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
@@ -67,6 +67,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Xunit;
 using Xunit.Abstractions;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using SampleData = Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.SampleData;
 
 namespace Energinet.DataHub.EDI.IntegrationTests
@@ -166,6 +167,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return id;
         }
 
+        protected async Task<dynamic?> GetArchivedMessageFromDatabaseAsync(string messageId)
+        {
+            using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+            var archivedMessage = await connection.QuerySingleOrDefaultAsync($"SELECT * FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'");
+
+            return archivedMessage;
+        }
+
         protected Task<PeekResultDto> PeekMessageAsync(MessageCategory category, ActorNumber? actorNumber = null, ActorRole? actorRole = null, DocumentFormat? documentFormat = null)
         {
             var outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
@@ -225,11 +234,11 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return GetService<IMasterDataClient>().CreateActorIfNotExistAsync(createActorDto, CancellationToken.None);
         }
 
-        protected async Task HavingReceivedInboxEventAsync(string eventType, IMessage eventPayload, Guid processId)
+        protected async Task HavingReceivedInboxEventAsync(string eventType, IMessage eventPayload, Guid processId, string? eventId = null)
         {
             await GetService<IInboxEventReceiver>().
                 ReceiveAsync(
-                    Guid.NewGuid().ToString(),
+                    EventId.From(eventId ?? Guid.NewGuid().ToString()),
                     eventType,
                     processId,
                     eventPayload.ToByteArray())

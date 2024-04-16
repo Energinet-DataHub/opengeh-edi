@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
@@ -22,6 +23,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
+using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Xunit;
@@ -50,7 +52,7 @@ public class AssertOutgoingMessage
 
         using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var outgoingMessage = await connection.QuerySingleOrDefaultAsync(
-            $"SELECT m.Id, m.RecordId, m.DocumentType, m.DocumentReceiverNumber, m.DocumentReceiverRole, m.ReceiverNumber, m.ProcessId, m.BusinessReason," +
+            $"SELECT m.Id, m.RecordId, m.DocumentType, m.DocumentReceiverNumber, m.DocumentReceiverRole, m.ReceiverNumber, m.ProcessId, m.EventId, m.BusinessReason," +
             $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference, m.RelatedToMessageId, m.MessageCreatedFromProcess, m.GridAreaCode " +
             $" FROM [dbo].[OutgoingMessages] m" +
             $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Code}'");
@@ -64,6 +66,38 @@ public class AssertOutgoingMessage
         var messageRecord = await fileStorageFile.ReadAsStringAsync();
 
         return new AssertOutgoingMessage(outgoingMessage, messageRecord);
+    }
+
+    public static async Task<IList<AssertOutgoingMessage>> AllOutgoingMessagesAsync(string messageType, string businessReason, ActorRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory, IFileStorageClient fileStorageClient)
+    {
+        ArgumentNullException.ThrowIfNull(receiverRole);
+        ArgumentNullException.ThrowIfNull(connectionFactoryFactory);
+        ArgumentNullException.ThrowIfNull(fileStorageClient);
+
+        using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+        var outgoingMessages = await connection.QueryAsync(
+            $"SELECT m.Id, m.RecordId, m.DocumentType, m.DocumentReceiverNumber, m.DocumentReceiverRole, m.ReceiverNumber, m.ProcessId, m.EventId, m.BusinessReason," +
+            $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference, m.RelatedToMessageId, m.MessageCreatedFromProcess, m.GridAreaCode " +
+            $" FROM [dbo].[OutgoingMessages] m" +
+            $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Code}'");
+
+        outgoingMessages = outgoingMessages.ToList();
+        outgoingMessages.Should().NotBeEmpty("because an outgoing message should have been added to the database");
+
+        var assertOutgoingMessages = new List<AssertOutgoingMessage>();
+        foreach (var outgoingMessage in outgoingMessages)
+        {
+            var outgoingMessageFileStorageReference = (string?)outgoingMessage!.FileStorageReference;
+            outgoingMessageFileStorageReference.Should().NotBeNull("because an outgoing message should always have a file storage reference");
+
+            var fileStorageFile = await fileStorageClient.DownloadAsync(new FileStorageReference(FileStorageCategory.OutgoingMessage(), outgoingMessageFileStorageReference!));
+
+            var messageRecord = await fileStorageFile.ReadAsStringAsync();
+
+            assertOutgoingMessages.Add(new AssertOutgoingMessage(outgoingMessage, messageRecord));
+        }
+
+        return assertOutgoingMessages;
     }
 
     public static async Task OutgoingMessageIsNullAsync(string messageType, string businessReason, ActorRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory)
@@ -179,5 +213,29 @@ public class AssertOutgoingMessage
         }
 
         return this;
+    }
+
+    public AssertOutgoingMessage HasProcessId(ProcessId? processId)
+    {
+        if (processId == null)
+            Assert.Null(_message.ProcessId);
+        else
+            Assert.Equal(processId.Id, _message.ProcessId);
+
+        return this;
+    }
+
+    public AssertOutgoingMessage HasEventId(string eventId)
+    {
+        ArgumentNullException.ThrowIfNull(eventId);
+        Assert.Equal(eventId, _message.EventId);
+        return this;
+    }
+
+    public TProperty GetMessageValue<TMessageRecord, TProperty>(Func<TMessageRecord, TProperty> propertySelector)
+    {
+        ArgumentNullException.ThrowIfNull(propertySelector);
+        var sut = _serializer.Deserialize<TMessageRecord>(_messageRecord);
+        return propertySelector(sut);
     }
 }

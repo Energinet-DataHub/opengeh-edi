@@ -45,12 +45,13 @@ public sealed class
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken)
             .ConfigureAwait(false);
 
-        process.IsRejected(CreateRejectedWholesaleServicesResultMessage(process, request.RejectReasons));
+        process.IsRejected(CreateRejectedWholesaleServicesResultMessage(request.EventId, process, request.RejectReasons));
 
         return Unit.Value;
     }
 
     private static RejectedWholesaleServicesMessageDto CreateRejectedWholesaleServicesResultMessage(
+        EventId eventId,
         WholesaleServicesProcess process,
         IReadOnlyCollection<RejectReasonDto> rejectReasons)
     {
@@ -67,6 +68,7 @@ public sealed class
         return new RejectedWholesaleServicesMessageDto(
             process.RequestedByActorId,
             process.ProcessId.Id,
+            eventId,
             process.BusinessReason.Name,
             ActorRole.FromCode(process.RequestedByActorRoleCode),
             process.InitiatedByMessageId,

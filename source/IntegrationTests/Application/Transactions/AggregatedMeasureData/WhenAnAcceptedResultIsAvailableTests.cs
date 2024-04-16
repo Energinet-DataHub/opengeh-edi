@@ -30,6 +30,7 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Responses;
+using FluentAssertions;
 using Google.Protobuf;
 using NodaTime.Serialization.Protobuf;
 using NodaTime.Text;
@@ -62,6 +63,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     public async Task Aggregated_measure_data_response_is_accepted()
     {
         // Arrange
+        var expectedEventId = "expected-event-id";
         await _gridAreaBuilder
             .WithGridAreaCode(SampleData.GridAreaCode)
             .StoreAsync(GetService<IMasterDataClient>());
@@ -70,12 +72,14 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         var acceptedEvent = GetAcceptedEvent(process);
 
         // Act
-        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id, expectedEventId);
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(ActorRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
 
         outgoingMessage
+            .HasProcessId(process.ProcessId)
+            .HasEventId(expectedEventId)
             .HasBusinessReason(process.BusinessReason)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(process.RequestedByActorRoleCode)
@@ -116,6 +120,33 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
+    }
+
+    [Fact]
+    public async Task Given_AcceptedInboxEventWithTwoSeries_When_ReceivingInboxEvent_Then_EachOutgoingMessageHasAUniqueTransactionId()
+    {
+        // Arrange
+        await _gridAreaBuilder
+            .WithGridAreaCode(SampleData.GridAreaCode)
+            .StoreAsync(GetService<IMasterDataClient>());
+
+        var process = BuildProcess();
+        var acceptedEvent = GetAcceptedEvent(process);
+        acceptedEvent.Series.Add(acceptedEvent.Series.First());
+
+        // Act
+        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
+
+        // Assert
+        var outgoingMessages = await AllOutgoingMessageAsync(ActorRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
+        outgoingMessages.Count.Should().Be(2);
+        var firstMessage = outgoingMessages.First();
+        var secondMessage = outgoingMessages.Last();
+
+        var seriesIdOfFirstMessage = firstMessage.GetMessageValue<AcceptedEnergyResultMessageTimeSeries, Guid>(series => series.TransactionId);
+        var seriesIdOfSecondMessage = secondMessage.GetMessageValue<AcceptedEnergyResultMessageTimeSeries, Guid>(series => series.TransactionId);
+
+        seriesIdOfFirstMessage.Should().NotBe(seriesIdOfSecondMessage);
     }
 
     [Fact]
@@ -198,7 +229,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     {
         await GetService<IInboxEventReceiver>()
             .ReceiveAsync(
-                Guid.NewGuid().ToString(),
+                EventId.From(Guid.NewGuid()),
                 nameof(AggregatedTimeSeriesRequestAccepted),
                 process.ProcessId.Id,
                 acceptedEvent.ToByteArray());
@@ -209,6 +240,18 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         BusinessReason businessReason)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
+            DocumentType.NotifyAggregatedMeasureData.Name,
+            businessReason.Name,
+            roleOfReceiver,
+            GetService<IDatabaseConnectionFactory>(),
+            GetService<IFileStorageClient>());
+    }
+
+    private async Task<IList<AssertOutgoingMessage>> AllOutgoingMessageAsync(
+        ActorRole roleOfReceiver,
+        BusinessReason businessReason)
+    {
+        return await AssertOutgoingMessage.AllOutgoingMessagesAsync(
             DocumentType.NotifyAggregatedMeasureData.Name,
             businessReason.Name,
             roleOfReceiver,

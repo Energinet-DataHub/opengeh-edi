@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.Process.Interfaces;
 
@@ -25,5 +26,5 @@ public interface IInboxEventReceiver
     /// <summary>
     /// Receives an inbox event
     /// </summary>
-    Task ReceiveAsync(string eventId, string eventType, Guid referenceId, byte[] eventPayload);
+    Task ReceiveAsync(EventId eventId, string eventType, Guid referenceId, byte[] eventPayload);
 }

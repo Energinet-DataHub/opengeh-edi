@@ -35,6 +35,6 @@ public sealed class
     {
         ArgumentNullException.ThrowIfNull(notification);
         return _commandSchedulerFacade.EnqueueAsync(
-            new RejectedWholesaleServices(notification.ReferenceId, notification.RejectReasons));
+            new RejectedWholesaleServices(notification.EventId, notification.ReferenceId, notification.RejectReasons));
     }
 }

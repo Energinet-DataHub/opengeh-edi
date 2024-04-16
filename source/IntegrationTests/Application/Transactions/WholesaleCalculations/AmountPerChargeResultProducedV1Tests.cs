@@ -187,7 +187,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .WithCalculationType(AmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
             .Build();
 
-        FeatureFlagManagerStub.UseAmountPerChargeResultProduced = Task.FromResult(false);
+        FeatureFlagManagerStub.EnableAmountPerChargeResultProduced(false);
 
         await HandleIntegrationEventAsync(amountPerChargeEvent);
         await AssertOutgoingMessageIsNull(businessReason: BusinessReason.WholesaleFixing);
@@ -204,6 +204,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
         var chargeOwner = "9876543216543";
         var isTax = false;
         var calculationVersion = 3;
+        var eventId = Guid.NewGuid();
 
         // Arrange
         var amountPerChargeEvent = _amountPerChargeEventBuilder
@@ -223,12 +224,14 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .Build();
 
         // Act
-        await HandleIntegrationEventAsync(amountPerChargeEvent);
+        await HandleIntegrationEventAsync(amountPerChargeEvent, eventId);
 
         // Assert
         var message = await AssertOutgoingMessageAsync(businessReason: BusinessReason.WholesaleFixing);
 
         message
+            .HasProcessId(null)
+            .HasEventId(eventId.ToString())
             .HasReceiverId(energySupplier)
             .HasReceiverRole(ActorRole.EnergySupplier.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
@@ -253,10 +256,10 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.Resolution, Resolution.Hourly);
     }
 
-    private async Task HandleIntegrationEventAsync(AmountPerChargeResultProducedV1 @event)
+    private async Task HandleIntegrationEventAsync(AmountPerChargeResultProducedV1 @event, Guid? eventId = null)
     {
         var integrationEvent = new IntegrationEvent(
-            Guid.NewGuid(),
+            eventId ?? Guid.NewGuid(),
             @event.GetType().Name,
             1,
             @event);

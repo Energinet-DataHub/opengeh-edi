@@ -50,6 +50,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
     public async Task Received_accepted_wholesale_services_event_enqueues_message()
     {
         // Arrange
+        var eventId = Guid.NewGuid().ToString();
         var process = WholesaleServicesProcessBuilder()
             .SetState(WholesaleServicesProcess.State.Sent)
             .Build();
@@ -58,12 +59,14 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .Build();
 
         // Act
-        await HavingReceivedInboxEventAsync(nameof(WholesaleServicesRequestAccepted), acceptedEvent, process.ProcessId.Id);
+        await HavingReceivedInboxEventAsync(nameof(WholesaleServicesRequestAccepted), acceptedEvent, process.ProcessId.Id, eventId);
 
         // Assert
         var outgoingMessage = await OutgoingMessageAsync(ActorRole.EnergySupplier, BusinessReason.WholesaleFixing);
         outgoingMessage.Should().NotBeNull();
         outgoingMessage
+            .HasProcessId(process.ProcessId)
+            .HasEventId(eventId)
             .HasReceiverId(process.RequestedByActorId.Value)
             .HasDocumentReceiverId(process.RequestedByActorId.Value)
             .HasReceiverRole(process.RequestedByActorRoleCode)
@@ -184,6 +187,33 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         outgoingMessages.Count.Should().Be(2);
     }
 
+    [Fact]
+    public async Task Given_AcceptedInboxEventWithTwoSeries_When_ReceivingInboxEvent_Then_EachOutgoingMessageHasAUniqueTransactionId()
+    {
+        // Arrange
+        var process = WholesaleServicesProcessBuilder()
+            .SetState(WholesaleServicesProcess.State.Sent)
+            .Build();
+        Store(process);
+        var acceptedEvent = WholesaleServicesRequestAcceptedBuilder(process)
+            .Build();
+        acceptedEvent.Series.Add(acceptedEvent.Series.First());
+
+        // Act
+        await HavingReceivedInboxEventAsync(nameof(WholesaleServicesRequestAccepted), acceptedEvent, process.ProcessId.Id);
+
+        // Assert
+        var outgoingMessages = await AllOutgoingMessageAsync(ActorRole.EnergySupplier, BusinessReason.WholesaleFixing);
+        outgoingMessages.Count.Should().Be(2);
+        var firstMessage = outgoingMessages.First();
+        var secondMessage = outgoingMessages.Last();
+
+        var seriesIdOfFirstMessage = firstMessage.GetMessageValue<WholesaleServicesSeries, Guid>(series => series.TransactionId);
+        var seriesIdOfSecondMessage = secondMessage.GetMessageValue<WholesaleServicesSeries, Guid>(series => series.TransactionId);
+
+        seriesIdOfFirstMessage.Should().NotBe(seriesIdOfSecondMessage);
+    }
+
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
@@ -224,6 +254,18 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         BusinessReason businessReason)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
+            DocumentType.NotifyWholesaleServices.Name,
+            businessReason.Name,
+            roleOfReceiver,
+            GetService<IDatabaseConnectionFactory>(),
+            GetService<IFileStorageClient>());
+    }
+
+    private async Task<IList<AssertOutgoingMessage>> AllOutgoingMessageAsync(
+        ActorRole roleOfReceiver,
+        BusinessReason businessReason)
+    {
+        return await AssertOutgoingMessage.AllOutgoingMessagesAsync(
             DocumentType.NotifyWholesaleServices.Name,
             businessReason.Name,
             roleOfReceiver,

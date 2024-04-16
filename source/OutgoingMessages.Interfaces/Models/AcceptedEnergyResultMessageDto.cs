@@ -25,6 +25,7 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
     private AcceptedEnergyResultMessageDto(
         ActorNumber receiverNumber,
         Guid processId,
+        EventId eventId,
         string businessReason,
         ActorRole receiverRole,
         AcceptedEnergyResultMessageTimeSeries series,
@@ -33,6 +34,7 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
             DocumentType.NotifyAggregatedMeasureData,
             receiverNumber,
             processId,
+            eventId,
             businessReason,
             receiverRole,
             DataHubDetails.DataHubActorNumber,
@@ -48,6 +50,7 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
         ActorNumber receiverNumber,
         ActorRole receiverRole,
         Guid processId,
+        EventId eventId,
         string gridAreaCode,
         string meteringPointType,
         string? settlementMethod,
@@ -64,7 +67,7 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
         MessageId? relatedToMessageId = null)
     {
         var series = new AcceptedEnergyResultMessageTimeSeries(
-            processId,
+            TransactionId: Guid.NewGuid(),
             gridAreaCode,
             meteringPointType,
             null,
@@ -81,6 +84,7 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
         return new AcceptedEnergyResultMessageDto(
             receiverNumber,
             processId,
+            eventId,
             businessReasonName,
             receiverRole,
             series,

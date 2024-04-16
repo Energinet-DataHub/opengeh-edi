@@ -23,6 +23,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServic
 public static class AcceptedWholesaleServiceMessageDtoFactory
 {
     public static AcceptedWholesaleServicesMessageDto Create(
+        EventId eventId,
         WholesaleServicesProcess process,
         AcceptedWholesaleServicesSerieDto acceptedWholesaleServices)
     {
@@ -36,6 +37,7 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
             ActorRole.FromCode(process.RequestedByActorRoleCode),
             message.ChargeOwner,
             process.ProcessId.Id,
+            eventId,
             process.BusinessReason.Name,
             message,
             process.InitiatedByMessageId);
@@ -46,7 +48,7 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
         AcceptedWholesaleServicesSerieDto acceptedWholesaleServices)
     {
         var acceptedWholesaleCalculationSeries = new AcceptedWholesaleServicesSeries(
-            TransactionId: process.ProcessId.Id,
+            TransactionId: Guid.NewGuid(),
             CalculationVersion: acceptedWholesaleServices.CalculationResultVersion,
             GridAreaCode: acceptedWholesaleServices.GridArea,
             ChargeCode: acceptedWholesaleServices.ChargeCode,

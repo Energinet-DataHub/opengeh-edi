@@ -33,6 +33,6 @@ public class WhenAnRejectedAggregatedTimeSeriesRequestIsAvailable : INotificatio
     public Task Handle(AggregatedTimeSeriesRequestWasRejected notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
-        return _commandSchedulerFacade.EnqueueAsync(new RejectedAggregatedTimeSeries(notification.ReferenceId, notification.RejectReasons));
+        return _commandSchedulerFacade.EnqueueAsync(new RejectedAggregatedTimeSeries(notification.EventId, notification.ReferenceId, notification.RejectReasons));
     }
 }

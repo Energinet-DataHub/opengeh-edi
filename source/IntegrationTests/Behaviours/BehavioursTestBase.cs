@@ -25,9 +25,9 @@ using BuildingBlocks.Application.Extensions.Options;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
-using Energinet.DataHub.EDI.Api.DataRetention;
-using Energinet.DataHub.EDI.Api.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.B2BApi.DataRetention;
+using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
@@ -237,7 +237,7 @@ public class BehavioursTestBase : IDisposable
     {
         await GetService<IInboxEventReceiver>().
             ReceiveAsync(
-                Guid.NewGuid().ToString(),
+                EventId.From(Guid.NewGuid()),
                 eventType,
                 processId,
                 eventPayload.ToByteArray())

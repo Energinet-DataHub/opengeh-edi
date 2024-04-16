@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Interfaces;
@@ -38,8 +39,10 @@ public class InboxEventReceiver : IInboxEventReceiver
         _mappers = mappers;
     }
 
-    public async Task ReceiveAsync(string eventId, string eventType, Guid referenceId, byte[] eventPayload)
+    public async Task ReceiveAsync(EventId eventId, string eventType, Guid referenceId, byte[] eventPayload)
     {
+        ArgumentNullException.ThrowIfNull(eventId);
+
         if (!EventIsKnown(eventType)) return;
 
         if (await EventIsAlreadyRegisteredAsync(eventId).ConfigureAwait(false) == false)
@@ -48,9 +51,9 @@ public class InboxEventReceiver : IInboxEventReceiver
         }
     }
 
-    private async Task<bool> EventIsAlreadyRegisteredAsync(string eventId)
+    private async Task<bool> EventIsAlreadyRegisteredAsync(EventId eventId)
     {
-        var inboxMessage = await _context.ReceivedInboxEvents.FindAsync(eventId).ConfigureAwait(false);
+        var inboxMessage = await _context.ReceivedInboxEvents.FindAsync(eventId.Value).ConfigureAwait(false);
         return inboxMessage is not null;
     }
 
@@ -59,9 +62,9 @@ public class InboxEventReceiver : IInboxEventReceiver
         return _mappers.Any(handler => handler.CanHandle(eventType));
     }
 
-    private async Task RegisterAsync(string eventId, string eventType, Guid referenceId, byte[] eventPayload)
+    private async Task RegisterAsync(EventId eventId, string eventType, Guid referenceId, byte[] eventPayload)
     {
-        _context.ReceivedInboxEvents.Add(new ReceivedInboxEvent(eventId, eventType, referenceId, eventPayload, _dateTimeProvider.Now()));
+        _context.ReceivedInboxEvents.Add(new ReceivedInboxEvent(eventId.Value, eventType, referenceId, eventPayload, _dateTimeProvider.Now()));
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 }

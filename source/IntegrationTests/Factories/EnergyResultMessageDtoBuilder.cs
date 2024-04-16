@@ -25,21 +25,19 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 public class EnergyResultMessageDtoBuilder
 {
     private const string GridAreaCode = "805";
-    private readonly Guid _processId = ProcessId.Create(Guid.NewGuid()).Id;
     private readonly IReadOnlyCollection<EnergyResultMessagePoint> _points = new List<EnergyResultMessagePoint>();
+    private EventId _eventId = EventId.From(Guid.NewGuid());
     private BusinessReason _businessReason = BusinessReason.BalanceFixing;
     private SettlementVersion? _settlementVersion;
     private ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private ActorRole _receiverRole = ActorRole.MeteredDataAdministrator;
 
-#pragma warning disable CA1822
     public EnergyResultMessageDto Build()
-#pragma warning restore CA1822
     {
         return EnergyResultMessageDto.Create(
+            _eventId,
             _receiverNumber,
             _receiverRole,
-            _processId,
             GridAreaCode,
             MeteringPointType.Consumption.Name,
             SettlementMethod.NonProfiled.Name,
@@ -75,6 +73,12 @@ public class EnergyResultMessageDtoBuilder
     public EnergyResultMessageDtoBuilder WithSettlementVersion(SettlementVersion settlementVersion)
     {
         _settlementVersion = settlementVersion;
+        return this;
+    }
+
+    public EnergyResultMessageDtoBuilder WithEventId(EventId eventId)
+    {
+        _eventId = eventId;
         return this;
     }
 }

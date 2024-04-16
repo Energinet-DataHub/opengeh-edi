@@ -13,6 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
@@ -22,8 +25,12 @@ public class ArchivedMessage
 {
     public static readonly FileStorageCategory FileStorageCategory = ArchivedFile.FileStorageCategory;
 
+    /// <summary>
+    /// Created an ArchivedMessage from a market document (typically from a outgoing message)
+    /// </summary>
     public ArchivedMessage(
         string? messageId,
+        IReadOnlyList<EventId> eventIds,
         string documentType,
         string senderNumber, // Doesn't use ActorNumber since we want to make sure to always create a ArchivedMessage
         string receiverNumber, // Doesn't use ActorNumber since we want to make sure to always create a ArchivedMessage
@@ -32,8 +39,11 @@ public class ArchivedMessage
         ArchivedMessageType archivedMessageType,
         IMarketDocumentStream marketDocumentStream,
         MessageId? relatedToMessageId = null)
-        : this(messageId, documentType, senderNumber, receiverNumber, createdAt, businessReason, archivedMessageType, new ArchivedMessageStream(marketDocumentStream), relatedToMessageId) { }
+        : this(messageId, eventIds, documentType, senderNumber, receiverNumber, createdAt, businessReason, archivedMessageType, new ArchivedMessageStream(marketDocumentStream), relatedToMessageId) { }
 
+    /// <summary>
+    /// Creates an ArchivedMessage for an incoming message
+    /// </summary>
     public ArchivedMessage(
         string? messageId,
         string documentType,
@@ -43,10 +53,11 @@ public class ArchivedMessage
         string? businessReason,
         ArchivedMessageType archivedMessageType,
         IIncomingMessageStream incomingMessageStream)
-        : this(messageId, documentType, senderNumber, receiverNumber, createdAt, businessReason, archivedMessageType, new ArchivedMessageStream(incomingMessageStream)) { }
+        : this(messageId, Array.Empty<EventId>(), documentType, senderNumber, receiverNumber, createdAt, businessReason, archivedMessageType, new ArchivedMessageStream(incomingMessageStream)) { }
 
     private ArchivedMessage(
         string? messageId,
+        IReadOnlyList<EventId> eventIds,
         string documentType,
         string senderNumber, // Doesn't use ActorNumber since we want to make sure to always create a ArchivedMessage
         string receiverNumber, // Doesn't use ActorNumber since we want to make sure to always create a ArchivedMessage
@@ -58,6 +69,7 @@ public class ArchivedMessage
     {
         Id = ArchivedMessageId.Create();
         MessageId = messageId;
+        EventIds = eventIds;
         DocumentType = documentType;
         SenderNumber = senderNumber;
         ReceiverNumber = receiverNumber;
@@ -73,6 +85,8 @@ public class ArchivedMessage
     public ArchivedMessageId Id { get; }
 
     public string? MessageId { get; }
+
+    public IReadOnlyList<EventId> EventIds { get; }
 
     public string DocumentType { get; }
 
