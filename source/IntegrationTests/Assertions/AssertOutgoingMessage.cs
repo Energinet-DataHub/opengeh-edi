@@ -130,15 +130,10 @@ public class AssertOutgoingMessage
         return this;
     }
 
-    public AssertOutgoingMessage HasGridAreaCodes(IReadOnlyCollection<string> gridAreaCodes)
-    {
-        Assert.Equal(gridAreaCodes, _message.GridAreaCodes);
-        return this;
-    }
-
     public AssertOutgoingMessage HasGridAreaCode(string gridAreaCode)
     {
-        return HasGridAreaCodes(new List<string> { gridAreaCode });
+        Assert.Equal(gridAreaCode, _message.GridAreaCode);
+        return this;
     }
 
     public AssertOutgoingMessage HasMessageRecordValue<TMessageRecord>(

@@ -197,9 +197,9 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         var startsAt = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(10));
         var now = SystemClock.Instance.GetCurrentInstant();
         _dateTimeProvider.SetNow(now);
-        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, sequenceNumber: 0);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: now.Plus(Duration.FromDays(30)), sequenceNumber: 0);
 
-        // Newer delegation to original receiver, which stops previous delegation
+        // Cancel a delegation by adding a newer (higher sequence number) delegation to same receiver, with startsAt == stopsAt
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: now, sequenceNumber: 1);
 
         // Act

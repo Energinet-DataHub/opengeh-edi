@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.MasterData.Infrastructure.MessageDelegation;
 
@@ -42,22 +43,34 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         _masterDataContext.ProcessDelegations.Add(processDelegation);
     }
 
-    public Task<ProcessDelegation?> GetProcessesDelegatedByAsync(
+    public async Task<ProcessDelegation?> GetProcessesDelegatedByAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
         string gridAreaCode,
         ProcessType processType,
         CancellationToken cancellationToken)
     {
+        var now = _systemDateTimeProvider.Now();
+
         var query = GetBaseDelegationQuery(
+            now,
             delegatedBy: new ActorNumberAndRoleDto(delegatedByActorNumber, delegatedByActorRole),
             delegatedTo: null,
             processType);
 
-        return query
+        var latestDelegation = await query
             .Where(pd => pd.GridAreaCode == gridAreaCode)
-            .OrderByDescending(pd => pd.SequenceNumber) // TODO: Shouldn't this order by start date?
-            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+            .OrderByDescending(pd => pd.SequenceNumber)
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        if (latestDelegation == null)
+            return null;
+
+        if (latestDelegation.StopsAt <= now)
+            return null;
+
+        return latestDelegation;
     }
 
     public async Task<IReadOnlyCollection<ProcessDelegation>> GetProcessesDelegatedToAsync(
@@ -67,7 +80,10 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         ProcessType processType,
         CancellationToken cancellationToken)
     {
+        var now = _systemDateTimeProvider.Now();
+
         var query = GetBaseDelegationQuery(
+            now,
             delegatedBy: null,
             delegatedTo: new ActorNumberAndRoleDto(delegatedToActorNumber, delegatedToActorRole),
             processType);
@@ -83,12 +99,15 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
             .ConfigureAwait(false);
 
         // Get the current delegation for each grid area
-        var latestForGridAreas = result.Select(group => group.First());
+        var latestForGridAreas = result
+            .Select(group => group.First())
+            .Where(d => d.StopsAt > now);
 
         return latestForGridAreas.ToArray();
     }
 
     private IQueryable<ProcessDelegation> GetBaseDelegationQuery(
+        Instant now,
         ActorNumberAndRoleDto? delegatedBy,
         ActorNumberAndRoleDto? delegatedTo,
         ProcessType processType)
@@ -96,15 +115,12 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         if (delegatedBy == null && delegatedTo == null) throw new ArgumentException("At least one of the delegatedBy or delegatedTo must be set");
         if (delegatedBy != null && delegatedTo != null) throw new ArgumentException("Only one of the delegatedBy or delegatedTo must be set");
 
-        var now = _systemDateTimeProvider.Now();
-
         // The latest delegation can cover the period from the start date to the end date.
         // If a delegation relationship has been cancelled the EndsAt is set to StartsAt.
         // Therefore, we can not use the EndsAt to determine if the delegation is active in the query.
         var delegationQuery = _masterDataContext.ProcessDelegations
             .Where(pd => pd.DelegatedProcess == processType
-                                        && pd.StartsAt <= now
-                                        && pd.StopsAt > now);
+                                        && pd.StartsAt <= now);
 
         if (delegatedBy != null)
         {
