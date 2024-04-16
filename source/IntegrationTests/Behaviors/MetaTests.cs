@@ -24,7 +24,7 @@ public static class MetaTests
 {
     private static readonly string[] _excludedTestFolders =
     {
-        "Energinet.DataHub.EDI.IntegrationTests.Api",
+        "Energinet.DataHub.EDI.IntegrationTests.B2BApi",
         "Energinet.DataHub.EDI.IntegrationTests.Application",
         "Energinet.DataHub.EDI.IntegrationTests.Infrastructure",
     };
