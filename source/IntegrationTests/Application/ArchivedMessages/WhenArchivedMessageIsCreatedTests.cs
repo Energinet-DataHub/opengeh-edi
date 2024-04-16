@@ -176,6 +176,7 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
 
         return new ArchivedMessage(
             string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
+            Array.Empty<EventId>(),
             DocumentType.NotifyAggregatedMeasureData.Name,
             senderNumber ?? "1234512345123",
             receiverNumber ?? "1234512345128",
