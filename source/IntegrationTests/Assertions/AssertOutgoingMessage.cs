@@ -84,7 +84,7 @@ public class AssertOutgoingMessage
         outgoingMessages = outgoingMessages.ToList();
         outgoingMessages.Should().NotBeEmpty("because an outgoing message should have been added to the database");
 
-        var returns = new List<AssertOutgoingMessage>();
+        var assertOutgoingMessages = new List<AssertOutgoingMessage>();
         foreach (var outgoingMessage in outgoingMessages)
         {
             var outgoingMessageFileStorageReference = (string?)outgoingMessage!.FileStorageReference;
@@ -94,10 +94,10 @@ public class AssertOutgoingMessage
 
             var messageRecord = await fileStorageFile.ReadAsStringAsync();
 
-            returns.Add(new AssertOutgoingMessage(outgoingMessage, messageRecord));
+            assertOutgoingMessages.Add(new AssertOutgoingMessage(outgoingMessage, messageRecord));
         }
 
-        return returns;
+        return assertOutgoingMessages;
     }
 
     public static async Task OutgoingMessageIsNullAsync(string messageType, string businessReason, ActorRole receiverRole, IDatabaseConnectionFactory connectionFactoryFactory)
