@@ -16,11 +16,11 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM.Json;
 
-internal static class JsonHeaderWriter
+internal static class CimJsonHeaderWriter
 {
     internal static void Write(OutgoingMessageHeader messageHeader, string documentType, string typeCode, string? reasonCode, Utf8JsonWriter writer)
     {

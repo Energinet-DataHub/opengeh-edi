@@ -12,16 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
+using System;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.OutgoingMessages
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
+
+public class ReceiverMismatchException : Exception
 {
-    public record OutgoingMessageHeader(
-        string BusinessReason,
-        string SenderId,
-        string SenderRole,
-        string ReceiverId,
-        string ReceiverRole,
-        string MessageId,
-        Instant TimeStamp);
+    public ReceiverMismatchException(string message)
+        : base(message)
+    {
+    }
+
+    public ReceiverMismatchException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+
+    public ReceiverMismatchException()
+    {
+    }
 }

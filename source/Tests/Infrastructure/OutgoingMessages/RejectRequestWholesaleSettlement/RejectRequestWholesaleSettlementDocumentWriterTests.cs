@@ -103,7 +103,7 @@ public sealed class RejectRequestWholesaleSettlementDocumentWriterTests : IClass
 
         if (documentFormat == DocumentFormat.Xml)
         {
-            return new RejectRequestWholesaleSettlementXmlXmlDocumentWriter(_parser).WriteAsync(
+            return new RejectRequestWholesaleSettlementCimXmlDocumentWriter(_parser).WriteAsync(
                 documentHeader,
                 new[] { records });
         }

@@ -13,10 +13,10 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.Bundels;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundels;
 
 public sealed class Bundle
 {

@@ -24,9 +24,9 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM.
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
 
-public class NotifyWholesaleServicesXmlXmlDocumentWriter : XmlDocumentWriter
+public class NotifyWholesaleServicesCimXmlDocumentWriter : CimXmlDocumentWriter
 {
-    public NotifyWholesaleServicesXmlXmlDocumentWriter(IMessageRecordParser parser)
+    public NotifyWholesaleServicesCimXmlDocumentWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
                 "NotifyWholesaleServices_MarketDocument",

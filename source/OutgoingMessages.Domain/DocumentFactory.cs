@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain;

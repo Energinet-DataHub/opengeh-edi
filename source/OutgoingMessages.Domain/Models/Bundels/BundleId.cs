@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.Bundels;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundels;
 
 public record BundleId
 {

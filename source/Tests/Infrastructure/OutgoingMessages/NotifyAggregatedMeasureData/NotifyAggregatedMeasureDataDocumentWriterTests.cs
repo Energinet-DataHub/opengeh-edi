@@ -285,7 +285,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
         }
         else if (documentFormat == DocumentFormat.Xml)
         {
-            return new NotifyAggregatedMeasureDataXmlXmlDocumentWriter(_parser).WriteAsync(
+            return new NotifyAggregatedMeasureDataCimXmlDocumentWriter(_parser).WriteAsync(
                 documentHeader,
                 new[] { records, });
         }

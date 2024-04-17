@@ -25,8 +25,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggreg
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestWholesaleSettlement;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.Tests.Factories;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -41,19 +40,19 @@ public class OutgoingMessageTests
     {
         new NotifyWholesaleServicesJsonDocumentWriter(new MessageRecordParser(new Serializer())),
         new NotifyWholesaleServicesEbixDocumentWriter(new MessageRecordParser(new Serializer())),
-        new NotifyWholesaleServicesXmlXmlDocumentWriter(new MessageRecordParser(new Serializer())),
+        new NotifyWholesaleServicesCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
 
         new NotifyAggregatedMeasureDataEbixDocumentWriter(new MessageRecordParser(new Serializer())),
-        new NotifyAggregatedMeasureDataXmlXmlDocumentWriter(new MessageRecordParser(new Serializer())),
+        new NotifyAggregatedMeasureDataCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
         new NotifyAggregatedMeasureDataJsonDocumentWriter(new MessageRecordParser(new Serializer())),
 
         new RejectRequestAggregatedMeasureDataJsonDocumentWriter(new MessageRecordParser(new Serializer())),
         new RejectRequestAggregatedMeasureDataEbixDocumentWriter(new MessageRecordParser(new Serializer())),
-        new RejectRequestAggregatedMeasureDataXmlXmlDocumentWriter(new MessageRecordParser(new Serializer())),
+        new RejectRequestAggregatedMeasureDataCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
 
         new RejectRequestWholesaleSettlementJsonDocumentWriter(new MessageRecordParser(new Serializer())),
         new RejectRequestWholesaleSettlementEbixDocumentWriter(new MessageRecordParser(new Serializer())),
-        new RejectRequestWholesaleSettlementXmlXmlDocumentWriter(new MessageRecordParser(new Serializer())),
+        new RejectRequestWholesaleSettlementCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
     };
 
     /// <summary>

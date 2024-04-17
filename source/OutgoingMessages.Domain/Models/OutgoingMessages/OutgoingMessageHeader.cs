@@ -12,23 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundels;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
-
-/// <summary>
-///  Repository for market documents
-/// </summary>
-public interface IMarketDocumentRepository
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
 {
-    /// <summary>
-    /// Get document by bundle id
-    /// </summary>
-    Task<MarketDocument?> GetAsync(BundleId bundleId);
-
-    /// <summary>
-    /// Add document to repository
-    /// </summary>
-    void Add(MarketDocument marketDocument);
+    public record OutgoingMessageHeader(
+        string BusinessReason,
+        string SenderId,
+        string SenderRole,
+        string ReceiverId,
+        string ReceiverRole,
+        string MessageId,
+        Instant TimeStamp);
 }

@@ -16,11 +16,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.Bundels;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundels;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 
 #pragma warning disable CA1711 // Identifiers should not have incorrect suffix
 public class ActorMessageQueue

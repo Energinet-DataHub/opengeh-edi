@@ -16,7 +16,7 @@ using System;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.Usecases;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
@@ -24,8 +24,8 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholes
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestWholesaleSettlement;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages.Queueing;
@@ -47,33 +47,33 @@ public static class OutgoingMessagesExtensions
 
         //AddMessageGenerationServices
         services.AddScoped<DocumentFactory>()
-            .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataXmlXmlDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataCimXmlDocumentWriter>()
             .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataEbixDocumentWriter>()
-            .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataXmlXmlDocumentWriter>()
+            .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataCimXmlDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataEbixDocumentWriter>()
-            .AddScoped<IDocumentWriter, NotifyWholesaleServicesXmlXmlDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyWholesaleServicesCimXmlDocumentWriter>()
             .AddScoped<IDocumentWriter, NotifyWholesaleServicesJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, NotifyWholesaleServicesEbixDocumentWriter>()
-            .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementXmlXmlDocumentWriter>()
+            .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementCimXmlDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementEbixDocumentWriter>()
             .AddScoped<IMessageRecordParser, MessageRecordParser>();
 
         //MessageEnqueueingConfiguration
-        services.AddTransient<Enqueue>()
-            .AddTransient<Delegation>()
+        services.AddTransient<EnqueueMessage>()
+            .AddTransient<DelegateMessage>()
             .AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>()
             .AddTransient<IOutgoingMessagesClient, OutgoingMessagesClient>();
 
         //PeekConfiguration
         services.AddScoped<IActorMessageQueueRepository, ActorMessageQueueRepository>()
             .AddScoped<IMarketDocumentRepository, MarketDocumentRepository>()
-            .AddTransient<Peek>();
+            .AddTransient<PeekMessage>();
 
         //DequeConfiguration
-        services.AddTransient<Dequeue>();
+        services.AddTransient<DequeueMessage>();
 
         //DataRetentionConfiguration
         services.AddTransient<IDataRetention, DequeuedBundlesRetention>();

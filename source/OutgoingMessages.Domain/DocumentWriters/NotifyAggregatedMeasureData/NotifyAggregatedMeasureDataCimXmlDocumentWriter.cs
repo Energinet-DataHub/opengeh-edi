@@ -24,9 +24,9 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM.
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
 
-public class NotifyAggregatedMeasureDataXmlXmlDocumentWriter : XmlDocumentWriter
+public class NotifyAggregatedMeasureDataCimXmlDocumentWriter : CimXmlDocumentWriter
 {
-    public NotifyAggregatedMeasureDataXmlXmlDocumentWriter(IMessageRecordParser parser)
+    public NotifyAggregatedMeasureDataCimXmlDocumentWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
             "NotifyAggregatedMeasureData_MarketDocument",

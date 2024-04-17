@@ -12,23 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.OutgoingMessages;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 
-public class OutgoingMessageException : Exception
+public class Receiver : ValueObject
 {
-    public OutgoingMessageException(string message)
-        : base(message)
+    private Receiver(ActorNumber actorNumber, ActorRole actorRole)
+    {
+        Number = actorNumber;
+        ActorRole = actorRole;
+    }
+
+    #pragma warning disable
+    private Receiver()
     {
     }
 
-    public OutgoingMessageException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
+    public ActorNumber Number { get; }
 
-    private OutgoingMessageException()
+    public ActorRole ActorRole { get; }
+
+    public static Receiver Create(ActorNumber actorNumber, ActorRole actorRole)
     {
+        return new Receiver(actorNumber, actorRole);
     }
 }

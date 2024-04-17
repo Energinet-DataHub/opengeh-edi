@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.Usecases;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
@@ -28,16 +28,16 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions;
 internal sealed class OutgoingMessageExceptionSimulator : OutgoingMessagesClient
 {
     public OutgoingMessageExceptionSimulator(
-        Peek peek,
-        Dequeue dequeue,
-        Enqueue enqueue,
+        PeekMessage peekMessage,
+        DequeueMessage dequeueMessage,
+        EnqueueMessage enqueueMessage,
         ActorMessageQueueContext actorMessageQueueContext,
         ISystemDateTimeProvider systemDateTimeProvider,
         ISerializer serializer)
         : base(
-            peek,
-            dequeue,
-            enqueue,
+            peekMessage,
+            dequeueMessage,
+            enqueueMessage,
             actorMessageQueueContext,
             systemDateTimeProvider,
             serializer)

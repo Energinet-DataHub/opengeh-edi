@@ -15,8 +15,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.Bundels;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundels;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 

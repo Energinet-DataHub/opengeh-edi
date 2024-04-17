@@ -12,20 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.Bundels;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 
-public class PeekResult
+/// <summary>
+/// The repository for the actor message queue.
+/// </summary>
+public interface IActorMessageQueueRepository
 {
-    public PeekResult(BundleId? bundleId, DocumentType? documentType)
-    {
-        BundleId = bundleId;
-        DocumentType = documentType;
-    }
+    /// <summary>
+    /// Get the the actor queue for the given actor number and message category.
+    /// </summary>
+    Task<ActorMessageQueue?> ActorMessageQueueForAsync(ActorNumber actorNumber, ActorRole actorRole);
 
-    public BundleId? BundleId { get; }
-
-    public DocumentType? DocumentType { get; }
+    /// <summary>
+    /// Add a new actor queue.
+    /// </summary>
+    void Add(ActorMessageQueue actorMessageQueue);
 }

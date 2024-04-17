@@ -18,11 +18,11 @@ using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.Bundels;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundels;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.OutgoingMessages
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
 {
     public class OutgoingMessage
     {

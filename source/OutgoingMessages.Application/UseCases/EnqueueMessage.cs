@@ -17,38 +17,38 @@ using System.Threading;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.Usecases;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 
 /// <summary>
 /// Enqueue is used by EDI to deliver a message to an appropriate actors queue.
 /// </summary>
-public class Enqueue
+public class EnqueueMessage
 {
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly ILogger<Enqueue> _logger;
-    private readonly Delegation _delegation;
+    private readonly ILogger<EnqueueMessage> _logger;
+    private readonly DelegateMessage _delegateMessage;
     private readonly IFeatureFlagManager _featureFlagManager;
 
-    public Enqueue(
+    public EnqueueMessage(
         IActorMessageQueueRepository actorMessageQueueRepository,
         IOutgoingMessageRepository outgoingMessageRepository,
         ISystemDateTimeProvider systemDateTimeProvider,
-        ILogger<Enqueue> logger,
-        Delegation delegation,
+        ILogger<EnqueueMessage> logger,
+        DelegateMessage delegateMessage,
         IFeatureFlagManager featureFlagManager)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _outgoingMessageRepository = outgoingMessageRepository;
         _systemDateTimeProvider = systemDateTimeProvider;
         _logger = logger;
-        _delegation = delegation;
+        _delegateMessage = delegateMessage;
         _featureFlagManager = featureFlagManager;
     }
 
@@ -60,7 +60,7 @@ public class Enqueue
 
         if (await _featureFlagManager.UseMessageDelegationAsync().ConfigureAwait(false))
         {
-            messageToEnqueue = await _delegation.DelegateAsync(messageToEnqueue, cancellationToken)
+            messageToEnqueue = await _delegateMessage.DelegateAsync(messageToEnqueue, cancellationToken)
                 .ConfigureAwait(false);
         }
 

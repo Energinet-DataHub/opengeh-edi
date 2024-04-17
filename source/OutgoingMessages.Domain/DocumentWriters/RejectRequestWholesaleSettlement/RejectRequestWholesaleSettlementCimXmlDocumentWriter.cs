@@ -20,16 +20,16 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM.Xml;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestWholesaleSettlement;
 
-public class RejectRequestAggregatedMeasureDataXmlXmlDocumentWriter : XmlDocumentWriter
+public class RejectRequestWholesaleSettlementCimXmlDocumentWriter : CimXmlDocumentWriter
 {
-    public RejectRequestAggregatedMeasureDataXmlXmlDocumentWriter(IMessageRecordParser parser)
+    public RejectRequestWholesaleSettlementCimXmlDocumentWriter(IMessageRecordParser parser)
         : base(
             new DocumentDetails(
-                "RejectRequestAggregatedMeasureData_MarketDocument",
-                "urn:ediel.org:measure:rejectrequestaggregatedmeasuredata:0:1 urn-ediel-org-measure-rejectrequestaggregatedmeasuredata-0-1.xsd",
-                "urn:ediel.org:measure:rejectrequestaggregatedmeasuredata:0:1",
+                "RejectRequestWholesaleSettlement_MarketDocument",
+                "urn:ediel.org:measure:rejectrequestwholesalesettlement:0:1 urn-ediel-org-measure-rejectrequestwholesalesettlement-0-1.xsd",
+                "urn:ediel.org:measure:rejectrequestwholesalesettlement:0:1",
                 "cim",
                 "ERR"),
             parser,
@@ -40,30 +40,39 @@ public class RejectRequestAggregatedMeasureDataXmlXmlDocumentWriter : XmlDocumen
     public override bool HandlesType(DocumentType documentType)
     {
         ArgumentNullException.ThrowIfNull(documentType);
-        return DocumentType.RejectRequestAggregatedMeasureData == documentType;
+        return DocumentType.RejectRequestWholesaleSettlement == documentType;
     }
 
-    protected override async Task WriteMarketActivityRecordsAsync(IReadOnlyCollection<string> marketActivityPayloads, XmlWriter writer)
+    protected override async Task WriteMarketActivityRecordsAsync(
+        IReadOnlyCollection<string> marketActivityPayloads,
+        XmlWriter writer)
     {
         ArgumentNullException.ThrowIfNull(marketActivityPayloads);
         ArgumentNullException.ThrowIfNull(writer);
 
-        foreach (var rejectedTimeSerie in ParseFrom<RejectedTimeSerieMarketActivityRecord>(marketActivityPayloads))
+        foreach (var wholesaleServicesRecord in ParseFrom<RejectedWholesaleServicesRecord>(marketActivityPayloads))
         {
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, rejectedTimeSerie.TransactionId.ToString())
-                 .ConfigureAwait(false);
             await writer.WriteElementStringAsync(
-                DocumentDetails.Prefix,
-                "originalTransactionIDReference_Series.mRID",
-                null,
-                rejectedTimeSerie.OriginalTransactionIdReference).ConfigureAwait(false);
+                    DocumentDetails.Prefix,
+                    "mRID",
+                    null,
+                    wholesaleServicesRecord.TransactionId.ToString())
+                .ConfigureAwait(false);
+            await writer.WriteElementStringAsync(
+                    DocumentDetails.Prefix,
+                    "originalTransactionIDReference_Series.mRID",
+                    null,
+                    wholesaleServicesRecord.OriginalTransactionIdReference)
+                .ConfigureAwait(false);
 
-            foreach (var reason in rejectedTimeSerie.RejectReasons)
+            foreach (var reason in wholesaleServicesRecord.RejectReasons)
             {
                 await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Reason", null).ConfigureAwait(false);
-                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "code", null, reason.ErrorCode).ConfigureAwait(false);
-                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "text", null, reason.ErrorMessage).ConfigureAwait(false);
+                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "code", null, reason.ErrorCode)
+                    .ConfigureAwait(false);
+                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "text", null, reason.ErrorMessage)
+                    .ConfigureAwait(false);
                 await writer.WriteEndElementAsync().ConfigureAwait(false);
             }
 

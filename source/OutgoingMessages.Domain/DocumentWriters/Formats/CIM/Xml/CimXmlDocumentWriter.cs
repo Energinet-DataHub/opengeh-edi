@@ -19,17 +19,17 @@ using System.Threading.Tasks;
 using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM.Xml;
 
-public abstract class XmlDocumentWriter : IDocumentWriter
+public abstract class CimXmlDocumentWriter : IDocumentWriter
 {
     private readonly DocumentDetails _documentDetails;
     private readonly IMessageRecordParser _parser;
     private readonly string? _reasonCode;
 
-    protected XmlDocumentWriter(DocumentDetails documentDetails, IMessageRecordParser parser, string? reasonCode = null)
+    protected CimXmlDocumentWriter(DocumentDetails documentDetails, IMessageRecordParser parser, string? reasonCode = null)
     {
         _documentDetails = documentDetails;
         _parser = parser;
@@ -110,6 +110,6 @@ public abstract class XmlDocumentWriter : IDocumentWriter
 
     private Task WriteHeaderAsync(OutgoingMessageHeader header, DocumentDetails documentDetails, XmlWriter writer)
     {
-        return XmlHeaderWriter.WriteAsync(writer, header, documentDetails, _reasonCode);
+        return CimXmlHeaderWriter.WriteAsync(writer, header, documentDetails, _reasonCode);
     }
 }

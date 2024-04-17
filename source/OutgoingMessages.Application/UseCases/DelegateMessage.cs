@@ -17,19 +17,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Application.Usecases;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 
 /// <summary>
 /// Responsible for delegating messages to the correct receiver if a delegation relationship exists.
 /// </summary>
-public class Delegation
+public class DelegateMessage
 {
     private readonly IMasterDataClient _masterDataClient;
 
-    public Delegation(IMasterDataClient masterDataClient)
+    public DelegateMessage(IMasterDataClient masterDataClient)
     {
         _masterDataClient = masterDataClient;
     }

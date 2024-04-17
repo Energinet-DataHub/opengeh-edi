@@ -17,7 +17,7 @@ using System.Text.Json;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM.Json;
 
-internal static class JsonWriterHelper
+internal static class CimJsonWriterHelper
 {
     internal static void WriteObject(this Utf8JsonWriter writer, string name, params KeyValuePair<string, string>[] values)
     {

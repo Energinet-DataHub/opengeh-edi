@@ -12,23 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundels;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 
-public class ReceiverMismatchException : Exception
+public class PeekResult
 {
-    public ReceiverMismatchException(string message)
-        : base(message)
+    public PeekResult(BundleId? bundleId, DocumentType? documentType)
     {
+        BundleId = bundleId;
+        DocumentType = documentType;
     }
 
-    public ReceiverMismatchException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
+    public BundleId? BundleId { get; }
 
-    public ReceiverMismatchException()
-    {
-    }
+    public DocumentType? DocumentType { get; }
 }

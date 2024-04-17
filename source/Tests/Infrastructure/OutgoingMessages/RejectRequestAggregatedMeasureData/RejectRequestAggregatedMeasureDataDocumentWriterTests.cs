@@ -77,7 +77,7 @@ public class RejectRequestAggregatedMeasureDataDocumentWriterTests : IClassFixtu
         }
         else if (documentFormat == DocumentFormat.Xml)
         {
-            return new RejectRequestAggregatedMeasureDataXmlXmlDocumentWriter(_parser).WriteAsync(
+            return new RejectRequestAggregatedMeasureDataCimXmlDocumentWriter(_parser).WriteAsync(
                 documentHeader,
                 new[] { records, });
         }

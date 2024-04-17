@@ -22,7 +22,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
@@ -330,7 +330,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
 
         if (documentFormat == DocumentFormat.Xml)
         {
-            return new NotifyWholesaleServicesXmlXmlDocumentWriter(_parser).WriteAsync(header, new[] { records });
+            return new NotifyWholesaleServicesCimXmlDocumentWriter(_parser).WriteAsync(header, new[] { records });
         }
         else if (documentFormat == DocumentFormat.Ebix)
         {

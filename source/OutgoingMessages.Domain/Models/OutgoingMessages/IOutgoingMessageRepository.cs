@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.Bundels;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundels;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Queueing.OutgoingMessages
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
 {
     /// <summary>
     /// Store for outgoing actor messages
