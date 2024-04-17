@@ -55,7 +55,7 @@ public class IncomingMessageDelegator
         // - AuthenticatedActor has the delegated TO actor role
         // - message.SenderRoleCode is the delegated BY actor role
         var requestedByActorNumber = ActorNumber.TryCreate(message.SenderNumber);
-        var requestedByActorRole = _authenticatedActor.CurrentActorIdentity.MarketRole != null // TODO: What is the role in ProcessDelegation? Is it DEL or is it the "target role"?
+        var requestedByActorRole = _authenticatedActor.CurrentActorIdentity.MarketRole != null
             ? ActorRole.TryFromCode(_authenticatedActor.CurrentActorIdentity.MarketRole.Code)
             : null;
 
@@ -86,6 +86,7 @@ public class IncomingMessageDelegator
 
             if (delegations.Count != 0)
             {
+                // TODO: How do we find delegatedByActorNumber if there is multiple delegations?
                 // var delegatedByActorNumber = GetDelegatedByActorNumber(series, requestedForActorRole);
                 var multipleDelegatedByActorNumbersExists = delegations.Count > 1
                                                             && delegations
@@ -95,7 +96,7 @@ public class IncomingMessageDelegator
                 if (multipleDelegatedByActorNumbersExists)
                     throw new NotImplementedException($"Multiple delegations with different delegated by actor numbers are not supported. Received delegated actor numbers: {string.Join(", ", delegations.Select(d => d.DelegatedBy.ActorNumber))}");
 
-                var delegatedByActorNumber = delegations.First().DelegatedBy.ActorNumber; // TODO: How do i get this if there is multiple delegations?
+                var delegatedByActorNumber = delegations.First().DelegatedBy.ActorNumber;
                 series.Delegate(delegatedByActorNumber, requestedByActorRole, delegations.Select(d => d.GridAreaCode).ToArray());
             }
         }
