@@ -166,6 +166,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return id;
         }
 
+        protected async Task<dynamic?> GetArchivedMessageFromDatabaseAsync(string messageId)
+        {
+            using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+            var archivedMessage = await connection.QuerySingleOrDefaultAsync($"SELECT * FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'");
+
+            return archivedMessage;
+        }
+
         protected Task<PeekResultDto> PeekMessageAsync(MessageCategory category, ActorNumber? actorNumber = null, ActorRole? actorRole = null, DocumentFormat? documentFormat = null)
         {
             var outgoingMessagesClient = GetService<IOutgoingMessagesClient>();

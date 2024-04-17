@@ -75,6 +75,7 @@ public class WholesaleServicesRequestAcceptedBuilder
         wholesaleServicesRequestSeries.TimeSeriesPoints.AddRange(timeSeriesPoints.OrderBy(_ => Guid.NewGuid()));
         var wholesaleServicesRequestAccepted = new WholesaleServicesRequestAccepted();
         wholesaleServicesRequestAccepted.Series.Add(wholesaleServicesRequestSeries);
+
         return wholesaleServicesRequestAccepted;
     }
 
