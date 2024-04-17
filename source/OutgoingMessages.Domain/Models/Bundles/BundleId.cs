@@ -12,8 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
+using System;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 
-public class MarketDocumentWriterMemoryStream : MemoryStream { }
+public record BundleId
+{
+    private BundleId(Guid id)
+    {
+        Id = id;
+    }
+
+    public Guid Id { get; }
+
+    public static BundleId New()
+    {
+        return new BundleId(Guid.NewGuid());
+    }
+
+    public static BundleId Create(Guid id)
+    {
+        return new BundleId(id);
+    }
+}

@@ -18,7 +18,8 @@ using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundels;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using NodaTime;
 

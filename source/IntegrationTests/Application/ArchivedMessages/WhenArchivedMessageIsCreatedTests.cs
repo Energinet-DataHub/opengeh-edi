@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using FluentAssertions;
 using FluentAssertions.Execution;

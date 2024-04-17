@@ -14,24 +14,21 @@
 
 using System;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundels;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 
-public record BundleId
+public class ReceiverMismatchException : Exception
 {
-    private BundleId(Guid id)
+    public ReceiverMismatchException(string message)
+        : base(message)
     {
-        Id = id;
     }
 
-    public Guid Id { get; }
-
-    public static BundleId New()
+    public ReceiverMismatchException(string message, Exception innerException)
+        : base(message, innerException)
     {
-        return new BundleId(Guid.NewGuid());
     }
 
-    public static BundleId Create(Guid id)
+    public ReceiverMismatchException()
     {
-        return new BundleId(id);
     }
 }

@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;

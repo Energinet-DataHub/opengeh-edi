@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters
 {
     /// <summary>
     /// Service for parsing a message record to- and from a string payload

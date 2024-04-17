@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters
 {
     public class MessageRecordParser : IMessageRecordParser
     {

@@ -12,23 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.IO;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 
-public class ReceiverMismatchException : Exception
-{
-    public ReceiverMismatchException(string message)
-        : base(message)
-    {
-    }
-
-    public ReceiverMismatchException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
-
-    public ReceiverMismatchException()
-    {
-    }
-}
+public class MarketDocumentWriterMemoryStream : MemoryStream { }

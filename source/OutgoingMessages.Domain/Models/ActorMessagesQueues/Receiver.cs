@@ -15,7 +15,7 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 
 public class Receiver : ValueObject
 {

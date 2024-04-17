@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 

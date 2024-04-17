@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Tests.Factories;

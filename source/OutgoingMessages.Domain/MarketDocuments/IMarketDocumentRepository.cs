@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundels;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 
