@@ -85,7 +85,7 @@ public class GivenAmountPerChargeResultProducedV1ReceivedTests : BehavioursTestB
 
         // Assert
         // -- Maybe this should force a list of properties, instead of using a builder? Then we are forced to always assert each property.
-        await ThenDocumentIsCorrect(
+        await ThenNotifyWholesaleServicesDocumentIsCorrect(
                 peekResult.Bundle,
                 documentFormat,
                 document => document

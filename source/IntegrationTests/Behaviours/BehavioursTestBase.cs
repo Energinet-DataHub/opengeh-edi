@@ -425,7 +425,7 @@ public class BehavioursTestBase : IDisposable
         return peekResult;
     }
 
-    protected async Task ThenDocumentIsCorrect(Stream? bundle, DocumentFormat documentFormat, Action<IAssertNotifyWholesaleServicesDocument> assert)
+    protected async Task ThenNotifyWholesaleServicesDocumentIsCorrect(Stream? bundle, DocumentFormat documentFormat, Action<IAssertNotifyWholesaleServicesDocument> assert)
     {
         using var assertionScope = new AssertionScope();
         bundle.Should().NotBeNull();
