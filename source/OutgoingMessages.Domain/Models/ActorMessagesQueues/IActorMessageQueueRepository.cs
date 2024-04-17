@@ -15,7 +15,7 @@
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 
 /// <summary>
 /// The repository for the actor message queue.
