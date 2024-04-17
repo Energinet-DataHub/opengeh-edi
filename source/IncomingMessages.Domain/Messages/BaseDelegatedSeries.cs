@@ -18,11 +18,6 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
 public abstract record BaseDelegatedSeries
 {
-    // public bool IsDelegated { get; private set; }
-
-    // public ActorNumber? DelegatedByActorNumber { get; private set; }
-    // public ActorRole? DelegatedByActorRole { get; private set; }
-
     public ActorNumber? DelegatedByActorNumber { get; private set; }
 
     public ActorRole? DelegatedToActorRole { get; private set; }
