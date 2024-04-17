@@ -32,7 +32,7 @@ public class WholesaleServicesProcessBuilder
     private readonly string? _chargeOwner = ActorNumber.Create("5790000000002").Value;
     private readonly string? _chargeTypeId = "EA-001";
     private readonly string? _chargeTypeType = "D03";
-    private readonly string _senderRole = ActorRole.EnergySupplier.Code;
+    private readonly ActorRole _senderRole = ActorRole.EnergySupplier;
     private readonly MessageId _messageId = MessageId.New();
     private BusinessTransactionId _businessTransactionId = BusinessTransactionId.Create("1234");
     private SettlementVersion? _settlementVersion;

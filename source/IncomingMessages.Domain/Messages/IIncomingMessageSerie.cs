@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
@@ -43,22 +44,13 @@ public interface IIncomingMessageSerie
     public string? GridArea { get; }
 
     /// <summary>
-    /// Whether the incoming message series is delegated
+    /// Who the incoming message series is delegated by (who originally was supposed to send the message)
     /// </summary>
-    public bool IsDelegated { get; }
-
-    // /// <summary>
-    // /// Who the incoming message series is delegated for (who originally was supposed to send the message)
-    // /// </summary>
-    // public ActorNumber? DelegatedByActorNumber { get; }
-    //
-    // /// <summary>
-    // /// Who the incoming message series is delegated for (who originally was supposed to send the message)
-    // /// </summary>
-    // public ActorRole? DelegatedByActorRole { get; }
+    public ActorNumber? DelegatedByActorNumber { get; }
 
     /// <summary>
-    /// Who the incoming message series is delegated to (who sends the message, and the queue that should receive it)
+    /// The role of the actor which the series is delegated to
+    ///     (the one who sends the message, and the queue that should receive it)
     /// </summary>
     public ActorRole? DelegatedToActorRole { get; }
 
@@ -72,5 +64,6 @@ public interface IIncomingMessageSerie
     /// <summary>
     /// Sets the incoming message series as delegated
     /// </summary>
-    public void SetDelegated(ActorRole delegatedToActorRole, IReadOnlyCollection<string> delegatedGridAreas);
+    [SuppressMessage("Naming", "CA1716:Identifiers should not match keywords", Justification = "The domain term is delegate, so we should use that")]
+    public void Delegate(ActorNumber delegatedByActorNumber, ActorRole delegatedToActorRole, IReadOnlyCollection<string> delegatedGridAreas);
 }

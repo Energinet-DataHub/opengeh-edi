@@ -66,11 +66,11 @@ public sealed class
             process.BusinessTransactionId.Id);
 
         return new RejectedWholesaleServicesMessageDto(
-            process.RequestedByActorId,
+            process.RequestedByActorNumber,
             process.ProcessId.Id,
             eventId,
             process.BusinessReason.Name,
-            ActorRole.FromCode(process.RequestedByActorRoleCode),
+            process.RequestedByActorRole,
             process.InitiatedByMessageId,
             rejectedWholesaleServices);
     }

@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -63,9 +64,9 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         await InvokeCommandAsync(new InitializeWholesaleServicesProcessesCommand(marketMessage));
 
         // Assert
-        var process = GetProcess(marketMessage.SenderNumber);
+        var process = GetProcess(marketMessage.RequestedByActorNumber);
         process.Should().NotBeNull();
-        process!.BusinessTransactionId.Id.Should().Be(marketMessage.Serie.First().Id);
+        process!.BusinessTransactionId.Id.Should().Be(marketMessage.Series.First().Id);
         process.Should().BeEquivalentTo(marketMessage, opt => opt.Using(new ProcessAndRequestComparer()));
         await AssertProcessState(marketMessage.MessageId, WholesaleServicesProcess.State.Initialized);
     }
@@ -83,7 +84,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         await ProcessInternalCommandsAsync();
 
         // Assert
-        var process = GetProcess(marketMessage.SenderNumber);
+        var process = GetProcess(marketMessage.RequestedByActorNumber);
         var message = _senderSpy.Message;
         message.Should().NotBeNull();
         message!.Subject.Should().Be(exceptedServiceBusMessageSubject);
@@ -113,7 +114,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
 
         _senderSpy.MessageSent.Should().BeTrue();
 
-        var process = GetProcess(marketMessage.SenderNumber);
+        var process = GetProcess(marketMessage.RequestedByActorNumber);
         process.Should().NotBeNull();
         await AssertProcessState(marketMessage.MessageId, WholesaleServicesProcess.State.Sent);
 
@@ -143,7 +144,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         message.Should().NotBeNull();
         var wholesaleServicesRequest = WholesaleServicesRequest.Parser.ParseFrom(message!.Body);
 
-        wholesaleServicesRequest.RequestedByActorRole.Should().NotBeCimCode();
+        wholesaleServicesRequest.RequestedForActorRole.Should().NotBeCimCode();
         wholesaleServicesRequest.BusinessReason.Should().NotBeCimCode();
         wholesaleServicesRequest.Resolution.Should().NotBeCimCode();
         wholesaleServicesRequest.SettlementVersion.Should().NotBeCimCode();
@@ -162,7 +163,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         await InvokeCommandAsync(new InitializeWholesaleServicesProcessesCommand(marketMessage));
         await ProcessInternalCommandsAsync();
         _senderSpy.Reset();
-        var process = GetProcess(marketMessage.SenderNumber);
+        var process = GetProcess(marketMessage.RequestedByActorNumber);
 
         // Act
         process!.SendToWholesale();
@@ -213,11 +214,11 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         actualState.Should().Be(state.ToString());
     }
 
-    private WholesaleServicesProcess? GetProcess(string senderNumber)
+    private WholesaleServicesProcess? GetProcess(ActorNumber senderNumber)
     {
         return _processContext.WholesaleServicesProcesses
             .ToList()
-            .FirstOrDefault(x => x.RequestedByActorId.Value == senderNumber);
+            .FirstOrDefault(x => x.RequestedByActorNumber.Value == senderNumber.Value);
     }
 
     private sealed class ProcessAndRequestComparer : IEquivalencyStep
@@ -239,12 +240,12 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
                             (p, r, s) => p.BusinessTransactionId.Id.Should().Be(s.Id)
                         },
                         {
-                            nameof(WholesaleServicesProcess.RequestedByActorId),
-                            (p, r, s) => p.RequestedByActorId.Value.Should().Be(r.SenderNumber)
+                            nameof(WholesaleServicesProcess.RequestedByActorNumber),
+                            (p, r, s) => p.RequestedByActorNumber.Should().Be(r.RequestedByActorNumber)
                         },
                         {
-                            nameof(WholesaleServicesProcess.RequestedByActorRoleCode),
-                            (p, r, s) => p.RequestedByActorRoleCode.Should().Be(r.SenderRoleCode)
+                            nameof(WholesaleServicesProcess.RequestedByActorRole),
+                            (p, r, s) => p.RequestedByActorRole.Should().Be(s.RequestedByActorRole)
                         },
                         {
                             nameof(WholesaleServicesProcess.BusinessReason),
@@ -259,12 +260,12 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
                             (p, r, s) => p.EndOfPeriod.Should().Be(s.EndDateTime)
                         },
                         {
-                            nameof(WholesaleServicesProcess.IncomingGridArea),
-                            (p, r, s) => p.IncomingGridArea.Should().Be(s.IncomingGridAreaCode)
+                            nameof(WholesaleServicesProcess.RequestedGridArea),
+                            (p, r, s) => p.RequestedGridArea.Should().Be(s.RequestedGridAreaCode)
                         },
                         {
                             nameof(WholesaleServicesProcess.GridAreas),
-                            (p, r, s) => p.GridAreas.Should().Equal(s.DelegatedGridAreas.Count != 0 ? s.DelegatedGridAreas : s.IncomingGridAreaCode != null ? new[] { s.IncomingGridAreaCode! } : Array.Empty<string>())
+                            (p, r, s) => p.GridAreas.Should().Equal(s.GridAreas)
                         },
                         {
                             nameof(WholesaleServicesProcess.EnergySupplierId),
@@ -318,7 +319,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
 
             var ignoredProperties = new[] { nameof(WholesaleServicesProcess.DomainEvents) };
 
-            r.Serie.Should().ContainSingle();
+            r.Series.Should().ContainSingle();
 
             using (new AssertionScope())
             {
@@ -327,7 +328,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
                              .Where(propertyInfo => !ignoredProperties.Contains(propertyInfo.Name)))
                 {
                     _assertionMap.Keys.Should().Contain(propertyInfo.Name);
-                    _assertionMap[propertyInfo.Name](p, r, r.Serie.First());
+                    _assertionMap[propertyInfo.Name](p, r, r.Series.First());
                 }
             }
 

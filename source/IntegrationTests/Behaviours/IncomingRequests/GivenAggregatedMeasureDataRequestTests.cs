@@ -36,7 +36,7 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
         Given_Delegation_When_RequestAggregatedMeasureDataJsonIsReceived_Then_ServiceBusMessageToWholesaleIsAddedToServiceBus()
     {
         // Arrange
-        var senderSpy = GivenServiceBusSenderSpy("Fake");
+        var senderSpy = CreateServiceBusSenderSpy("Fake");
         GivenNowIs(2024, 7, 1);
         GivenAuthenticatedActorIs(ActorNumber.Create("2111111111111"), ActorRole.EnergySupplier);
 
@@ -60,23 +60,22 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
         responseMessage.IsErrorResponse.Should().BeFalse(responseMessage.MessageBody);
 
         // Act
-        senderSpy.Message.Should().NotBeNull();
         await WhenInitializeAggregatedMeasureDataProcessDtoIsHandledAsync(senderSpy.Message!);
 
         // Assert
-        var message = senderSpy.Message;
-        message.Should().NotBeNull();
-        message!.Subject.Should().Be(nameof(AggregatedTimeSeriesRequest));
-        message.Body.Should().NotBeNull();
+        senderSpy.MessageSent.Should().BeTrue();
+        senderSpy.Message.Should().NotBeNull();
+        var serviceBusMessage = senderSpy.Message!;
+        serviceBusMessage.Subject.Should().Be(nameof(AggregatedTimeSeriesRequest));
+        serviceBusMessage.Body.Should().NotBeNull();
 
-        var aggregatedTimeSeriesRequest =
-            AggregatedTimeSeriesRequest.Parser.ParseFrom(message.Body);
+        var aggregatedTimeSeriesRequestMessage = AggregatedTimeSeriesRequest.Parser.ParseFrom(serviceBusMessage.Body);
 
-        aggregatedTimeSeriesRequest.Should().NotBeNull();
-        aggregatedTimeSeriesRequest.GridAreaCode.Should().Be("512");
-        aggregatedTimeSeriesRequest.RequestedByActorId.Should().Be("2111111111111");
-        aggregatedTimeSeriesRequest.RequestedByActorRole.Should().Be("EnergySupplier");
-        aggregatedTimeSeriesRequest.EnergySupplierId.Should().Be("2111111111111");
+        aggregatedTimeSeriesRequestMessage.Should().NotBeNull();
+        aggregatedTimeSeriesRequestMessage.GridAreaCode.Should().Be("512");
+        aggregatedTimeSeriesRequestMessage.RequestedByActorId.Should().Be("2111111111111");
+        aggregatedTimeSeriesRequestMessage.RequestedByActorRole.Should().Be("EnergySupplier");
+        aggregatedTimeSeriesRequestMessage.EnergySupplierId.Should().Be("2111111111111");
     }
 
     [Fact]
@@ -84,7 +83,7 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
         Given_AggregatedTimeSeriesRequestAcceptedIsReceived_When_ActorPeeks_Then_CorrectDocumentIsCreated()
     {
         // Arrange
-        var senderSpy = GivenServiceBusSenderSpy("Fake");
+        var senderSpy = CreateServiceBusSenderSpy("Fake");
         GivenNowIs(2024, 7, 1);
         GivenAuthenticatedActorIs(ActorNumber.Create("2111111111111"), ActorRole.EnergySupplier);
         await GivenGridAreaOwnershipAsync("512", ActorNumber.Create("3111111111111"));

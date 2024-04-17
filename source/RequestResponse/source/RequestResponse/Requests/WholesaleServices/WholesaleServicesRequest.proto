@@ -18,8 +18,8 @@ syntax = "proto3";
 option csharp_namespace = "Energinet.DataHub.Edi.Requests";
 
 message WholesaleServicesRequest {
-  string requested_by_actor_id = 1; // GLN or EIC for the requesting party. This is the party that receives the settlement request.
-  string requested_by_actor_role = 2; //The kind of market roles that can be played by parties for given domains within the electricity market. Eg. GridOperator, EnergySupplier etc.
+  string requested_for_actor_number = 1; // GLN or EIC for the requesting party. This is the party that receives the settlement request.
+  string requested_for_actor_role = 2; // The kind of market roles that can be played by parties for given domains within the electricity market. Eg. GridOperator, EnergySupplier etc.
   string business_reason = 3; // The requested business reason for the settlement request. eg. WholesaleFixing or Correction.
   optional string resolution = 6; // Used for determining if they are requesting monthly sums (Monthly) or amount pr. charge (Daily/Hourly).
   string period_start = 7; // The start of the requested period.

@@ -67,10 +67,10 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         outgoingMessage
             .HasProcessId(process.ProcessId)
             .HasEventId(eventId)
-            .HasReceiverId(process.RequestedByActorId.Value)
-            .HasDocumentReceiverId(process.RequestedByActorId.Value)
-            .HasReceiverRole(process.RequestedByActorRoleCode)
-            .HasDocumentReceiverRole(process.RequestedByActorRoleCode)
+            .HasReceiverId(process.RequestedByActorNumber.Value)
+            .HasDocumentReceiverId(process.RequestedByActorNumber.Value)
+            .HasReceiverRole(process.RequestedByActorRole.Code)
+            .HasDocumentReceiverRole(process.RequestedByActorRole.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasRelationTo(process.InitiatedByMessageId)
@@ -79,7 +79,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .HasProcessType(ProcessType.RequestWholesaleResults)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.Start.ToString(), process.StartOfPeriod)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.End.ToString(), process.EndOfPeriod)
-            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.GridAreaCode, process.IncomingGridArea)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.GridAreaCode, process.RequestedGridArea)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.MeteringPointType, MeteringPointType.Production)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.ChargeOwner.Value, process.ChargeOwner)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.EnergySupplier.Value, process.EnergySupplierId)
@@ -104,10 +104,10 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         var outgoingMessage = await OutgoingMessageAsync(ActorRole.EnergySupplier, BusinessReason.WholesaleFixing);
         outgoingMessage.Should().NotBeNull();
         outgoingMessage
-            .HasReceiverId(process.RequestedByActorId.Value)
-            .HasDocumentReceiverId(process.RequestedByActorId.Value)
-            .HasReceiverRole(process.RequestedByActorRoleCode)
-            .HasDocumentReceiverRole(process.RequestedByActorRoleCode)
+            .HasReceiverId(process.RequestedByActorNumber.Value)
+            .HasDocumentReceiverId(process.RequestedByActorNumber.Value)
+            .HasReceiverRole(process.RequestedByActorRole.Code)
+            .HasDocumentReceiverRole(process.RequestedByActorRole.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasRelationTo(process.InitiatedByMessageId)
@@ -115,7 +115,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .HasBusinessReason(process.BusinessReason)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.Start.ToString(), process.StartOfPeriod)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.End.ToString(), process.EndOfPeriod)
-            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.GridAreaCode, process.IncomingGridArea)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.GridAreaCode, process.RequestedGridArea)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.ChargeOwner.Value, process.ChargeOwner)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.EnergySupplier.Value, process.EnergySupplierId)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.OriginalTransactionIdReference, process.BusinessTransactionId.Id);

@@ -71,8 +71,8 @@ public sealed class WhenARejectedWholesaleServicesIsAvailableTests : TestBase
             .HasProcessId(process.ProcessId)
             .HasEventId(expectedEventId)
             .HasBusinessReason(process.BusinessReason)
-            .HasReceiverId(process.RequestedByActorId.Value)
-            .HasReceiverRole(process.RequestedByActorRoleCode)
+            .HasReceiverId(process.RequestedByActorNumber.Value)
+            .HasReceiverRole(process.RequestedByActorRole.Code)
             .HasRelationTo(process.InitiatedByMessageId)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
@@ -111,7 +111,7 @@ public sealed class WhenARejectedWholesaleServicesIsAvailableTests : TestBase
         var process = new WholesaleServicesProcess(
             ProcessId.New(),
             ActorNumber.Create("8200000007743"),
-            ActorRole.EnergySupplier.Code,
+            ActorRole.EnergySupplier,
             BusinessTransactionId.Create(Guid.NewGuid().ToString()),
             MessageId.New(),
             BusinessReason.WholesaleFixing,

@@ -45,19 +45,20 @@ public class InitializeWholesaleServicesProcessesHandler : IRequestHandler<Initi
         return Task.FromResult(Unit.Value);
     }
 
-    private void CreateWholesaleServicesProcess(InitializeWholesaleServicesProcessDto initializeWholesaleServicesProcessDto)
+    private void CreateWholesaleServicesProcess(InitializeWholesaleServicesProcessDto initializeProcessDto)
     {
-        var actorSenderNumber = ActorNumber.Create(initializeWholesaleServicesProcessDto.SenderNumber);
-        var businessReason = BusinessReason.FromCodeOrUnused(initializeWholesaleServicesProcessDto.BusinessReason);
-        var messageId = MessageId.Create(initializeWholesaleServicesProcessDto.MessageId);
+        var requestedByActorNumber = initializeProcessDto.RequestedByActorNumber;
+        var requestedForActorRole = initializeProcessDto.RequestedForActorRole;
+        var businessReason = BusinessReason.FromCodeOrUnused(initializeProcessDto.BusinessReason);
+        var messageId = MessageId.Create(initializeProcessDto.MessageId);
 
-        foreach (var serie in initializeWholesaleServicesProcessDto.Serie)
+        foreach (var series in initializeProcessDto.Series)
         {
-            var settlementVersion = !string.IsNullOrWhiteSpace(serie.SettlementVersion)
-                ? SettlementVersion.FromCodeOrUnused(serie.SettlementVersion)
+            var settlementVersion = !string.IsNullOrWhiteSpace(series.SettlementVersion)
+                ? SettlementVersion.FromCodeOrUnused(series.SettlementVersion)
                 : null;
 
-            var chargeTypes = serie.ChargeTypes
+            var chargeTypes = series.ChargeTypes
                 .Select(
                     chargeType => new Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ChargeType(
                         ChargeTypeId.New(),
@@ -65,30 +66,25 @@ public class InitializeWholesaleServicesProcessesHandler : IRequestHandler<Initi
                         chargeType.Type))
                 .ToList();
 
-            var gridAreas = new List<string>();
-
-            if (serie.DelegatedGridAreas.Count != 0)
-                gridAreas.AddRange(serie.DelegatedGridAreas);
-            else if (serie.IncomingGridAreaCode != null)
-                gridAreas.Add(serie.IncomingGridAreaCode);
-
             _wholesaleServicesProcessRepository.Add(
                 new WholesaleServicesProcess(
-                    ProcessId.New(),
-                    actorSenderNumber,
-                    initializeWholesaleServicesProcessDto.SenderRoleCode,
-                    BusinessTransactionId.Create(serie.Id),
-                    messageId,
-                    businessReason,
-                    serie.StartDateTime,
-                    serie.EndDateTime,
-                    incomingGridArea: serie.IncomingGridAreaCode,
-                    serie.EnergySupplierId,
-                    settlementVersion,
-                    serie.Resolution,
-                    serie.ChargeOwner,
-                    chargeTypes,
-                    gridAreas));
+                    processId: ProcessId.New(),
+                    requestedByActorNumber: requestedByActorNumber,
+                    requestedByActorRole: series.RequestedByActorRole,
+                    requestedForActorNumber: series.RequestedForActorNumber,
+                    requestedForActorRole: requestedForActorRole,
+                    businessTransactionId: BusinessTransactionId.Create(series.Id),
+                    initiatedByMessageId: messageId,
+                    businessReason: businessReason,
+                    startOfPeriod: series.StartDateTime,
+                    endOfPeriod: series.EndDateTime,
+                    requestedGridArea: series.RequestedGridAreaCode,
+                    energySupplierId: series.EnergySupplierId,
+                    settlementVersion: settlementVersion,
+                    resolution: series.Resolution,
+                    chargeOwner: series.ChargeOwner,
+                    chargeTypes: chargeTypes,
+                    gridAreas: series.GridAreas));
         }
     }
 }

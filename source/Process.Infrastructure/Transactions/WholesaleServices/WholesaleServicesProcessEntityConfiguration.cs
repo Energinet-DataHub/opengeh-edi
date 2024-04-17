@@ -37,7 +37,7 @@ internal sealed class WholesaleServicesProcessEntityConfiguration : IEntityTypeC
                 fromDbValue => BusinessTransactionId.Create(fromDbValue));
         builder.Property(x => x.StartOfPeriod);
         builder.Property(x => x.EndOfPeriod);
-        builder.Property(x => x.IncomingGridArea);
+        builder.Property(x => x.RequestedGridArea);
         builder.Property(x => x.ChargeOwner);
         builder.Property(x => x.Resolution);
         builder.Property(x => x.EnergySupplierId);
@@ -45,11 +45,24 @@ internal sealed class WholesaleServicesProcessEntityConfiguration : IEntityTypeC
             .HasConversion(
                 value => value.Code,
                 dbValue => BusinessReason.FromCodeOrUnused(dbValue));
-        builder.Property(x => x.RequestedByActorId)
+
+        builder.Property(x => x.RequestedByActorNumber)
             .HasConversion(
                 toDbValue => toDbValue.Value,
                 fromDbValue => ActorNumber.Create(fromDbValue));
-        builder.Property(x => x.RequestedByActorRoleCode);
+        builder.Property(x => x.RequestedByActorRole)
+            .HasConversion(
+                toDbValue => toDbValue.Code,
+                fromDbValue => ActorRole.FromCode(fromDbValue));
+
+        builder.Property(x => x.RequestedForActorNumber)
+            .HasConversion(
+                toDbValue => toDbValue.Value,
+                fromDbValue => ActorNumber.Create(fromDbValue));
+        builder.Property(x => x.RequestedForActorRole)
+            .HasConversion(
+                toDbValue => toDbValue.Code,
+                fromDbValue => ActorRole.FromCode(fromDbValue));
 
         builder.Property<WholesaleServicesProcess.State>("_state")
             .HasConversion(

@@ -27,21 +27,16 @@ public class InitializeWholesaleServicesProcessDtoBuilder
     private readonly string _startDateAndOrTimeDateTime = "2022-06-17T22:00:00Z";
     private readonly string _endDateAndOrTimeDateTime = "2022-07-22T22:00:00Z";
     private readonly string _gridArea = "244";
-    private readonly string _messageType = "E74";
-    private readonly string _businessType = "23";
-    private readonly string _receiverId = DataHubDetails.DataHubActorNumber.Value;
-    private readonly string _receiverRole = ActorRole.MeteredDataAdministrator.Code;
-    private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
     private readonly string? _resolution = Resolution.Hourly.Code;
     private readonly string? _chargeOwner = SampleData.ChargeOwner;
     private readonly string? _chargeTypeId = "EA-001";
     private readonly string? _chargeTypeType = "D03";
     private string _businessReason = BusinessReason.WholesaleFixing.Code;
-    private string _senderId = SampleData.NewEnergySupplierNumber;
+    private ActorNumber _senderId = ActorNumber.Create(SampleData.NewEnergySupplierNumber);
     private string? _settlementVersion;
     private string _messageId = Guid.NewGuid().ToString();
-    private string _serieId = Guid.NewGuid().ToString();
-    private string _senderRole = ActorRole.EnergySupplier.Code;
+    private string _seriesId = Guid.NewGuid().ToString();
+    private ActorRole _senderRole = ActorRole.EnergySupplier;
     private string? _energySupplierMarketParticipantId = SampleData.NewEnergySupplierNumber;
 
     public InitializeWholesaleServicesProcessDtoBuilder SetMessageId(string id)
@@ -52,7 +47,7 @@ public class InitializeWholesaleServicesProcessDtoBuilder
 
     public InitializeWholesaleServicesProcessDtoBuilder SetSenderRole(string senderRole)
     {
-        _senderRole = senderRole;
+        _senderRole = ActorRole.FromCode(senderRole);
         return this;
     }
 
@@ -70,13 +65,13 @@ public class InitializeWholesaleServicesProcessDtoBuilder
 
     public InitializeWholesaleServicesProcessDtoBuilder SetTransactionId(string transactionId)
     {
-        _serieId = transactionId;
+        _seriesId = transactionId;
         return this;
     }
 
     public InitializeWholesaleServicesProcessDtoBuilder SetSenderId(string s)
     {
-        _senderId = s;
+        _senderId = ActorNumber.Create(s);
         return this;
     }
 
@@ -91,19 +86,14 @@ public class InitializeWholesaleServicesProcessDtoBuilder
         return new InitializeWholesaleServicesProcessDto(
             _senderId,
             _senderRole,
-            _receiverId,
-            _receiverRole,
             _businessReason,
-            _messageType,
             _messageId,
-            _createdAt,
-            _businessType,
             new List<InitializeWholesaleServicesSeries> { CreateSerie() }.AsReadOnly());
     }
 
     private InitializeWholesaleServicesSeries CreateSerie() =>
         new(
-            _serieId,
+            _seriesId,
             _startDateAndOrTimeDateTime,
             _endDateAndOrTimeDateTime,
             _gridArea,
@@ -112,8 +102,9 @@ public class InitializeWholesaleServicesProcessDtoBuilder
             _resolution,
             _chargeOwner,
             new List<InitializeWholesaleServicesChargeType> { CreateChargeType() }.AsReadOnly(),
-            Array.Empty<string>(),
-            null);
+            new List<string> { _gridArea },
+            _senderId,
+            _senderRole);
 
     private InitializeWholesaleServicesChargeType CreateChargeType() =>
         new(_chargeTypeId, _chargeTypeType);

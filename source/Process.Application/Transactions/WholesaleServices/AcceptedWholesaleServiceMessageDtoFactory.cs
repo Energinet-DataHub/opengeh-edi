@@ -33,8 +33,8 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
         var message = CreateWholesaleResultSeries(process, acceptedWholesaleServices);
 
         return AcceptedWholesaleServicesMessageDto.Create(
-            process.RequestedByActorId,
-            ActorRole.FromCode(process.RequestedByActorRoleCode),
+            process.RequestedByActorNumber,
+            process.RequestedByActorRole,
             message.ChargeOwner,
             process.ProcessId.Id,
             eventId,

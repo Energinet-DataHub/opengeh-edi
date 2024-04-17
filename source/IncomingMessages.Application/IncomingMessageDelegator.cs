@@ -50,19 +50,24 @@ public class IncomingMessageDelegator
 
         var processType = MapToProcessType(documentType);
 
-        var senderNumber = ActorNumber.TryCreate(message.SenderNumber);
-        var currentActorRole = _authenticatedActor.CurrentActorIdentity.MarketRole != null // TODO: What is the role in ProcessDelegation? Is it DEL or is it the "target role"?
+        // Incoming message has current actor as sender, but uses the role of the original actor. This means:
+        // - message.SenderNumber is the delegated TO actor number
+        // - AuthenticatedActor has the delegated TO actor role
+        // - message.SenderRoleCode is the delegated BY actor role
+        var requestedByActorNumber = ActorNumber.TryCreate(message.SenderNumber);
+        var requestedByActorRole = _authenticatedActor.CurrentActorIdentity.MarketRole != null // TODO: What is the role in ProcessDelegation? Is it DEL or is it the "target role"?
             ? ActorRole.TryFromCode(_authenticatedActor.CurrentActorIdentity.MarketRole.Code)
             : null;
-        var senderRole = ActorRole.TryFromCode(message.SenderRoleCode);
 
-        if (senderNumber is null || currentActorRole is null || senderRole is null)
+        var requestedForActorRole = ActorRole.TryFromCode(message.SenderRoleCode);
+
+        if (requestedByActorNumber is null || requestedByActorRole is null || requestedForActorRole is null)
         {
             // Since actor number or actor role was invalid, there can't be setup any process delegation, so do nothing
             return;
         }
 
-        if (!_rolesWithAllowedDelegation.Contains(currentActorRole))
+        if (!_rolesWithAllowedDelegation.Contains(requestedByActorRole))
         {
             // Only grid operators and delegated actors can have delegations setup, so do nothing
             return;
@@ -72,8 +77,8 @@ public class IncomingMessageDelegator
         foreach (var series in message.Serie)
         {
             var delegations = await _masterDataClient.GetProcessesDelegatedToAsync(
-                    senderNumber,
-                    currentActorRole,
+                    requestedByActorNumber,
+                    requestedByActorRole,
                     series.GridArea,
                     processType,
                     cancellationToken)
@@ -81,13 +86,26 @@ public class IncomingMessageDelegator
 
             if (delegations.Count != 0)
             {
-                var byActorNumber = delegations.First().DelegatedBy.ActorNumber;
-                var byActorRole = delegations.First().DelegatedBy.ActorRole;
+                // var delegatedByActorNumber = GetDelegatedByActorNumber(series, requestedForActorRole);
+                var multipleDelegatedByActorNumbersExists = delegations.Count > 1
+                                                            && delegations
+                                                                .Select(d => d.DelegatedBy.ActorNumber)
+                                                                .Distinct()
+                                                                .Count() > 1;
+                if (multipleDelegatedByActorNumbersExists)
+                    throw new NotImplementedException($"Multiple delegations with different delegated by actor numbers are not supported. Received delegated actor numbers: {string.Join(", ", delegations.Select(d => d.DelegatedBy.ActorNumber))}");
 
-                series.SetDelegated(senderRole, delegations.Select(d => d.GridAreaCode).ToArray());
+                var delegatedByActorNumber = delegations.First().DelegatedBy.ActorNumber; // TODO: How do i get this if there is multiple delegations?
+                series.Delegate(delegatedByActorNumber, requestedByActorRole, delegations.Select(d => d.GridAreaCode).ToArray());
             }
         }
     }
+
+    // private ActorNumber GetDelegatedByActorNumber(IIncomingMessageSerie series, ActorRole requestedForActorRole)
+    // {
+    //     if (requestedForActorRole == ActorRole.EnergySupplier)
+    //         return series.
+    // }
 
     private ProcessType MapToProcessType(IncomingDocumentType incomingDocumentType)
     {

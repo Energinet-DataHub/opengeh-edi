@@ -58,9 +58,11 @@ using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Google.Protobuf;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
@@ -271,6 +273,58 @@ public class BehavioursTestBase : IDisposable
                 CancellationToken.None);
     }
 
+    protected async Task GivenRequestWholesaleServicesAsync(
+        DocumentFormat documentFormat,
+        string senderActorNumber,
+        string senderActorRole,
+        (int Year, int Month, int Day) periodStart,
+        (int Year, int Month, int Day) periodEnd,
+        string? gridArea,
+        string energySupplierActorNumber,
+        string transactionId)
+    {
+        var incomingMessageClient = GetService<IIncomingMessageClient>();
+
+        IncomingMessageStream incomingMessageStream;
+        if (documentFormat == DocumentFormat.Json)
+        {
+            incomingMessageStream = RequestWholesaleServicesRequestBuilder.GetJsonStream(
+                senderActorNumber,
+                senderActorRole,
+                new LocalDate(periodStart.Year, periodStart.Month, periodStart.Day)
+                    .AtMidnight()
+                    .InZoneStrictly(_dateTimeZone)
+                    .ToInstant()
+                    .ToString(),
+                new LocalDate(periodEnd.Year, periodEnd.Month, periodEnd.Day)
+                    .AtMidnight()
+                    .InZoneStrictly(_dateTimeZone)
+                    .ToInstant()
+                    .ToString(),
+                gridArea,
+                energySupplierActorNumber,
+                transactionId);
+        }
+        else
+        {
+            // TODO: Handle document format
+            throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, "Document format not supported");
+        }
+
+        var response = await
+            incomingMessageClient.RegisterAndSendAsync(
+                incomingMessageStream,
+                DocumentFormat.Json,
+                IncomingDocumentType.RequestWholesaleSettlement,
+                CancellationToken.None);
+
+        using (new AssertionScope())
+        {
+            response.IsErrorResponse.Should().BeFalse();
+            response.MessageBody.Should().BeEmpty();
+        }
+    }
+
     // TODO (MWO)
     // In case we would like to consider the reception of a request as the "acting"
     // step in our test, instead of a prerequisite.
@@ -328,12 +382,22 @@ public class BehavioursTestBase : IDisposable
             Guid.Parse(serviceBusMessage.MessageId));
     }
 
-    protected ServiceBusSenderSpy GivenServiceBusSenderSpy(string topicName)
+    protected ServiceBusSenderSpy CreateServiceBusSenderSpy(string topicName)
     {
         var serviceBusSenderSpy = new ServiceBusSenderSpy(topicName);
         _serviceBusSenderFactoryStub.AddSenderSpy(serviceBusSenderSpy);
 
         return serviceBusSenderSpy;
+    }
+
+    protected async Task WhenWholesaleServicesProcessIsInitializedAsync(ServiceBusMessage serviceBusMessage)
+    {
+        // We have to manually process the service bus message, as there isn't a real service bus
+        serviceBusMessage.Subject.Should().Be(nameof(InitializeWholesaleServicesProcessDto));
+        serviceBusMessage.Body.Should().NotBeNull();
+
+        await GetService<IProcessClient>().InitializeAsync(serviceBusMessage.Subject, serviceBusMessage.Body.ToArray());
+        await ProcessInternalCommandsAsync();
     }
 
     private T GetService<T>()

@@ -19,30 +19,24 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 namespace Energinet.DataHub.EDI.Process.Interfaces;
 
 public record InitializeWholesaleServicesProcessDto(
-    string SenderNumber,
-    string SenderRoleCode,
-    string ReceiverNumber,
-    string ReceiverRoleCode,
+    ActorNumber RequestedByActorNumber,
+    ActorRole RequestedForActorRole,
     string BusinessReason,
-    string MessageType,
     string MessageId,
-    string CreatedAt,
-    string? BusinessType,
-    IReadOnlyCollection<InitializeWholesaleServicesSeries> Serie);
+    IReadOnlyCollection<InitializeWholesaleServicesSeries> Series);
 
 public record InitializeWholesaleServicesSeries(
     string Id,
     string StartDateTime,
     string? EndDateTime,
-    string? IncomingGridAreaCode,
+    string? RequestedGridAreaCode,
     string? EnergySupplierId,
     string? SettlementVersion,
     string? Resolution,
     string? ChargeOwner,
     IReadOnlyCollection<InitializeWholesaleServicesChargeType> ChargeTypes,
-    IReadOnlyCollection<string> DelegatedGridAreas,
-    // ActorNumber? DelegatedByActorNumber,
-    // ActorRole? DelegatedByActorRole,
-    ActorRole? DelegatedToActorRole);
+    IReadOnlyCollection<string> GridAreas,
+    ActorNumber RequestedForActorNumber,
+    ActorRole RequestedByActorRole);
 
 public record InitializeWholesaleServicesChargeType(string? Id, string? Type);

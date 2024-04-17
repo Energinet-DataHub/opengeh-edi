@@ -28,14 +28,53 @@ public sealed class WholesaleServicesProcess : Entity
 
     public WholesaleServicesProcess(
         ProcessId processId,
-        ActorNumber requestedByActorId,
-        string requestedByActorRoleCode,
+        ActorNumber requestedByActorNumber,
+        ActorRole requestedByActorRole,
         BusinessTransactionId businessTransactionId,
         MessageId initiatedByMessageId,
         BusinessReason businessReason,
         string startOfPeriod,
         string? endOfPeriod,
-        string? incomingGridArea,
+        string? requestedGridArea,
+        string? energySupplierId,
+        SettlementVersion? settlementVersion,
+        string? resolution,
+        string? chargeOwner,
+        IReadOnlyCollection<ChargeType> chargeTypes,
+        IReadOnlyCollection<string> gridAreas)
+        : this(
+            processId,
+            requestedByActorNumber,
+            requestedByActorRole,
+            requestedByActorNumber,
+            requestedByActorRole,
+            businessTransactionId,
+            initiatedByMessageId,
+            businessReason,
+            startOfPeriod,
+            endOfPeriod,
+            requestedGridArea,
+            energySupplierId,
+            settlementVersion,
+            resolution,
+            chargeOwner,
+            chargeTypes,
+            gridAreas)
+    {
+    }
+
+    public WholesaleServicesProcess(
+        ProcessId processId,
+        ActorNumber requestedByActorNumber,
+        ActorRole requestedByActorRole,
+        ActorNumber requestedForActorNumber,
+        ActorRole requestedForActorRole,
+        BusinessTransactionId businessTransactionId,
+        MessageId initiatedByMessageId,
+        BusinessReason businessReason,
+        string startOfPeriod,
+        string? endOfPeriod,
+        string? requestedGridArea,
         string? energySupplierId,
         SettlementVersion? settlementVersion,
         string? resolution,
@@ -45,18 +84,20 @@ public sealed class WholesaleServicesProcess : Entity
     {
         ArgumentNullException.ThrowIfNull(gridAreas);
 
-        if (incomingGridArea != null && gridAreas.Count == 0)
+        if (requestedGridArea != null && gridAreas.Count == 0)
             throw new ArgumentOutOfRangeException(nameof(gridAreas), gridAreas, "GridAreas must be provided when IncomingGridArea is not null");
 
         ProcessId = processId;
-        RequestedByActorId = requestedByActorId;
-        RequestedByActorRoleCode = requestedByActorRoleCode;
+        RequestedByActorNumber = requestedByActorNumber;
+        RequestedByActorRole = requestedByActorRole;
+        RequestedForActorNumber = requestedForActorNumber;
+        RequestedForActorRole = requestedForActorRole;
         BusinessTransactionId = businessTransactionId;
         InitiatedByMessageId = initiatedByMessageId;
         BusinessReason = businessReason;
         StartOfPeriod = startOfPeriod;
         EndOfPeriod = endOfPeriod;
-        IncomingGridArea = incomingGridArea;
+        RequestedGridArea = requestedGridArea;
         EnergySupplierId = energySupplierId;
         SettlementVersion = settlementVersion;
         Resolution = resolution;
@@ -91,9 +132,13 @@ public sealed class WholesaleServicesProcess : Entity
 
     public ProcessId ProcessId { get; }
 
-    public ActorNumber RequestedByActorId { get; }
+    public ActorNumber RequestedByActorNumber { get; }
 
-    public string RequestedByActorRoleCode { get; }
+    public ActorRole RequestedByActorRole { get; }
+
+    public ActorNumber RequestedForActorNumber { get; }
+
+    public ActorRole RequestedForActorRole { get; }
 
     public BusinessTransactionId BusinessTransactionId { get; }
 
@@ -105,7 +150,7 @@ public sealed class WholesaleServicesProcess : Entity
 
     public string? EndOfPeriod { get; }
 
-    public string? IncomingGridArea { get; }
+    public string? RequestedGridArea { get; }
 
     public string? EnergySupplierId { get; }
 
