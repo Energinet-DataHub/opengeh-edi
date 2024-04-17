@@ -248,6 +248,14 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
                             (p, r, s) => p.RequestedByActorRole.Should().Be(s.RequestedByActorRole)
                         },
                         {
+                            nameof(WholesaleServicesProcess.RequestedForActorNumber),
+                            (p, r, s) => p.RequestedForActorNumber.Should().Be(s.RequestedForActorNumber)
+                        },
+                        {
+                            nameof(WholesaleServicesProcess.RequestedForActorRole),
+                            (p, r, s) => p.RequestedForActorRole.Should().Be(r.RequestedForActorRole)
+                        },
+                        {
                             nameof(WholesaleServicesProcess.BusinessReason),
                             (p, r, s) => p.BusinessReason.Code.Should().Be(r.BusinessReason)
                         },
