@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages.Queueing;
 
@@ -39,5 +40,10 @@ public class MarketDocumentEntityConfiguration : IEntityTypeConfiguration<Market
             .HasConversion(
                 fileStorageReference => fileStorageReference.Path,
                 dbValue => new FileStorageReference(MarketDocument.FileStorageCategory, dbValue));
+
+        builder.Property<string>("CreatedBy");
+        builder.Property<Instant>("CreatedAt");
+        builder.Property<string?>("ModifiedBy");
+        builder.Property<Instant?>("ModifiedAt");
     }
 }

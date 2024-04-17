@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.WholesaleServices;
 
@@ -83,5 +84,10 @@ internal sealed class WholesaleServicesProcessEntityConfiguration : IEntityTypeC
             });
 
         builder.Ignore(x => x.DomainEvents);
+
+        builder.Property<string>("CreatedBy");
+        builder.Property<Instant>("CreatedAt");
+        builder.Property<string?>("ModifiedBy");
+        builder.Property<Instant?>("ModifiedAt");
     }
 }

@@ -14,6 +14,7 @@
 
 using System;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
@@ -41,7 +42,8 @@ public static class OutgoingMessagesExtensions
         ArgumentNullException.ThrowIfNull(configuration);
         services.AddBuildingBlocks(configuration)
             .AddScopedSqlDbContext<ActorMessageQueueContext>(configuration);
-
+        services
+            .AddScoped<ExecutionContext>();
         //AddMessageGenerationServices
         services.AddScoped<DocumentFactory>()
             .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataXmlDocumentWriter>()

@@ -60,5 +60,10 @@ public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<Act
                     fromDbValue => fromDbValue != null ? MessageId.Create(fromDbValue) : null);
             navigationBuilder.WithOwner().HasForeignKey("ActorMessageQueueId");
         });
+
+        builder.Property<string>("CreatedBy");
+        builder.Property<Instant>("CreatedAt");
+        builder.Property<string?>("ModifiedBy");
+        builder.Property<Instant?>("ModifiedAt");
     }
 }
