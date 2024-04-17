@@ -425,6 +425,7 @@ public class SearchMessagesTests : TestBase
     {
         return new ArchivedMessage(
             messageId ?? "MessageId",
+            Array.Empty<EventId>(),
             documentType ?? DocumentType.NotifyAggregatedMeasureData.Name,
             senderNumber ?? "1234512345123",
             receiverNumber ?? "1234512345128",

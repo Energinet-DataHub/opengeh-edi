@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -31,6 +32,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
+using NodaTime.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -269,6 +271,66 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         (await act.Should().ThrowAsync<InvalidOperationException>($"because {unusedCode} is a unused {dataHubTypeWithUnused.Name} code"))
             .WithMessage($"{unusedCode} is not a valid {dataHubTypeWithUnused.Name}*");
+    }
+
+    [Fact]
+    public async Task Given_OutgoingMessage_When_MessageIsPeeked_Then_MessageIsArchivedWithCorrectData()
+    {
+        // Arrange / Given
+        var expectedEventId = EventId.From(Guid.NewGuid());
+        var receiverNumber = SampleData.NewEnergySupplierNumber;
+        var outgoingMessage = _energyResultMessageDtoBuilder
+            .WithReceiverNumber(receiverNumber)
+            .WithReceiverRole(ActorRole.EnergySupplier)
+            .WithEventId(expectedEventId)
+            .Build();
+
+        await EnqueueMessage(outgoingMessage);
+
+        var year = 2023;
+        var month = 1;
+        var day = 1;
+        var hour = 13;
+        var minute = 37;
+        var expectedTimestamp = new DateTime(year, month, day, hour, minute, 0, DateTimeKind.Utc);
+        _dateTimeProvider.SetNow(expectedTimestamp.ToInstant());
+
+        // Act / When
+        var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);
+
+        // Assert / Then
+        peekResult.Should().NotBeNull("because a peek result should be found");
+        peekResult.MessageId.Should().NotBeNull("because a peek result with a message id should be found");
+
+        var archivedMessage = await GetArchivedMessageFromDatabaseAsync(peekResult.MessageId!.Value.ToString());
+        ((object?)archivedMessage).Should().NotBeNull("because an archived message should exists");
+
+        var expectedFileStorageReference = $"{receiverNumber}/{year:0000}/{month:00}/{day:00}/{archivedMessage!.Id:N}";
+        var assertProperties = new Dictionary<string, Action<object?>>
+        {
+            { "BusinessReason", businessReason => businessReason.Should().Be(outgoingMessage.BusinessReason) },
+            { "CreatedAt", createdAt => createdAt.Should().Be(expectedTimestamp) },
+            { "DocumentType", documentType => documentType.Should().Be(outgoingMessage.DocumentType.Name) },
+            { "EventIds", eventIds => eventIds.Should().Be(expectedEventId.Value) },
+            { "FileStorageReference", fileStorageReference => fileStorageReference.Should().Be(expectedFileStorageReference) },
+            { "Id", id => id.Should().NotBeNull() },
+            { "MessageId", messageId => messageId.Should().Be(peekResult.MessageId.ToString()) },
+            { "ReceiverNumber", receiverNumber => receiverNumber.Should().Be(outgoingMessage.ReceiverNumber.Value) },
+            { "RecordId", recordId => recordId.Should().NotBeNull() },
+            { "RelatedToMessageId", relatedToMessageId => relatedToMessageId.Should().BeNull() },
+            { "SenderNumber", senderNumber => senderNumber.Should().Be(outgoingMessage.SenderId.Value) },
+        };
+
+        using var assertionScope = new AssertionScope();
+        var archivedMessageAsDictionary = (IDictionary<string, object>)archivedMessage!;
+
+        foreach (var assertProperty in assertProperties)
+            assertProperty.Value(archivedMessageAsDictionary[assertProperty.Key]);
+
+        assertProperties.Should().HaveSameCount(archivedMessageAsDictionary, "because all archived message properties should be asserted");
+
+        foreach (var dbPropertyName in archivedMessageAsDictionary.Keys)
+            assertProperties.Keys.Should().Contain(dbPropertyName);
     }
 
     private async Task<bool> BundleIsRegistered()
