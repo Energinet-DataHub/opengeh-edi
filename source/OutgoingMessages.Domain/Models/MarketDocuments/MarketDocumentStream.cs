@@ -15,7 +15,7 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 
 #pragma warning disable CA1711 // Is a "Stream" value object
 public record MarketDocumentStream : StreamValueObject, IMarketDocumentStream

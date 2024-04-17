@@ -15,7 +15,7 @@
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 
 /// <summary>
 ///  Repository for market documents
