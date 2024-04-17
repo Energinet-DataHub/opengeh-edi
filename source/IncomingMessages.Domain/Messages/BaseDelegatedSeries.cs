@@ -26,7 +26,6 @@ public abstract record BaseDelegatedSeries
 
     public void Delegate(ActorNumber delegatedByActorNumber, ActorRole delegatedToActorRole, IReadOnlyCollection<string> delegatedGridAreas)
     {
-        // IsDelegated = true;
         DelegatedByActorNumber = delegatedByActorNumber;
         DelegatedToActorRole = delegatedToActorRole;
         DelegatedGridAreas = delegatedGridAreas;
