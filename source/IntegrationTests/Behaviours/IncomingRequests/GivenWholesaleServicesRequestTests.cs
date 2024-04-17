@@ -37,7 +37,7 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
 
     [Fact]
     public async Task
-        Given_Delegation_When_WholesaleServicesProcessIsInitialized_Then_ServiceBusMessageToWholesaleIsAddedToServiceBus()
+        Given_DelegationInTwoGridAreas_When_WholesaleServicesProcessIsInitialized_Then_WholesaleServiceBusMessageIsCorrect()
     {
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy("Fake");
@@ -76,7 +76,7 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
         await WhenWholesaleServicesProcessIsInitializedAsync(senderSpy.Message!);
 
         // Assert
-        await ThenWholesaleServicesRequestMessageIsCorrect(
+        await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
             senderSpy,
             gridAreas: new[] { "512", "609" },
             requestedForActorNumber: "2111111111111",
@@ -84,7 +84,7 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
             energySupplierId: "2111111111111");
     }
 
-    private Task ThenWholesaleServicesRequestMessageIsCorrect(
+    private Task ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
         ServiceBusSenderSpy senderSpy,
         IReadOnlyCollection<string> gridAreas,
         string requestedForActorNumber,
