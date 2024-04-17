@@ -265,11 +265,16 @@ public class BehavioursTestBase : IDisposable
 
     protected void GivenNowIs(int year, int month, int day)
     {
-        _systemDateTimeProviderStub.SetNow(
+        GivenNowIs(
             new LocalDate(year, month, day)
                 .AtMidnight()
                 .InZoneStrictly(_dateTimeZone)
                 .ToInstant());
+    }
+
+    protected void GivenNowIs(Instant now)
+    {
+        _systemDateTimeProviderStub.SetNow(now);
     }
 
     protected Instant GetNow()

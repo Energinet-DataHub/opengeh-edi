@@ -78,6 +78,15 @@ public class AssertEbixDocument
         return HasValueWithAttributes(xpath, expectedValue);
     }
 
+    public AssertEbixDocument ElementExists(string xpath)
+    {
+        ArgumentNullException.ThrowIfNull(xpath);
+
+        Assert.NotNull(_document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager));
+
+        return this;
+    }
+
     public AssertEbixDocument HasValueWithAttributes(string xpath, string expectedValue, params AttributeNameAndValue[] attributes)
     {
         ArgumentNullException.ThrowIfNull(xpath);

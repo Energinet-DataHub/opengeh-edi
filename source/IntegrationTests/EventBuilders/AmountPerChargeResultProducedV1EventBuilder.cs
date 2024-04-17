@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common;
 using Google.Protobuf.WellKnownTypes;
@@ -25,6 +26,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
 public class AmountPerChargeResultProducedV1EventBuilder
 {
+    private readonly List<(long Sum, long Quantity, int Position, long Price, AmountPerChargeResultProducedV1.Types.QuantityQuality Quality)> _points = new();
     private AmountPerChargeResultProducedV1.Types.MeteringPointType _meteringPointType = AmountPerChargeResultProducedV1.Types.MeteringPointType.Production;
     private AmountPerChargeResultProducedV1.Types.SettlementMethod _settlementMethod = AmountPerChargeResultProducedV1.Types.SettlementMethod.Flex;
     private Guid _calculationId = Guid.NewGuid();
@@ -167,7 +169,44 @@ public class AmountPerChargeResultProducedV1EventBuilder
         return this;
     }
 
+    internal AmountPerChargeResultProducedV1EventBuilder WithPoint(int position, long price, long quantity, long sum, AmountPerChargeResultProducedV1.Types.QuantityQuality quality)
+    {
+        _points.Add((sum, quantity, position, price, quality));
+        return this;
+    }
+
     private List<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint> BuildTimeSeriesPoints()
+    {
+        var resolutionInHours = _resolution switch
+        {
+            AmountPerChargeResultProducedV1.Types.Resolution.Day => 24,
+            AmountPerChargeResultProducedV1.Types.Resolution.Hour => 1,
+            _ => throw new ArgumentOutOfRangeException(nameof(_resolution), _resolution, "Unhandled resolution type when building time series points"),
+        };
+
+        List<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint> timeSeriesPoints = new();
+        if (_points.Count > 0)
+        {
+            timeSeriesPoints = _points
+                .Select(p => new AmountPerChargeResultProducedV1.Types.TimeSeriesPoint
+                {
+                    Time = _periodStartUtc.ToInstant().Plus(Duration.FromHours(resolutionInHours * p.Position)).ToTimestamp(),
+                    Price = new DecimalValue { Units = p.Price, Nanos = 0 },
+                    Quantity = new DecimalValue { Units = p.Quantity, Nanos = 0 },
+                    Amount = new DecimalValue { Units = p.Sum, Nanos = 0 },
+                    QuantityQualities = { p.Quality },
+                })
+                .ToList();
+        }
+        else
+        {
+            timeSeriesPoints = GenereateTimeSeriesPoints();
+        }
+
+        return timeSeriesPoints;
+    }
+
+    private List<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint> GenereateTimeSeriesPoints()
     {
         var resolutionInHours = _resolution switch
         {
