@@ -25,19 +25,11 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 /// <summary>
 /// Responsible for delegating messages to the correct receiver if a delegation relationship exists.
 /// </summary>
-<<<<<<<< HEAD:source/OutgoingMessages.Application/OutgoingMessageDelegator.cs
-public class OutgoingMessageDelegator
-{
-    private readonly IMasterDataClient _masterDataClient;
-
-    public OutgoingMessageDelegator(IMasterDataClient masterDataClient)
-========
 public class DelegateMessage
 {
     private readonly IMasterDataClient _masterDataClient;
 
     public DelegateMessage(IMasterDataClient masterDataClient)
->>>>>>>> main:source/OutgoingMessages.Application/UseCases/DelegateMessage.cs
     {
         _masterDataClient = masterDataClient;
     }
