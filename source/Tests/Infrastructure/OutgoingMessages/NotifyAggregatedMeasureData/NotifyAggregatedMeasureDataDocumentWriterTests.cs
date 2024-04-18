@@ -19,9 +19,12 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.Ebix;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
@@ -283,13 +286,13 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
         }
         else if (documentFormat == DocumentFormat.Xml)
         {
-            return new NotifyAggregatedMeasureDataXmlDocumentWriter(_parser).WriteAsync(
+            return new NotifyAggregatedMeasureDataCimXmlDocumentWriter(_parser).WriteAsync(
                 documentHeader,
                 new[] { records, });
         }
         else
         {
-            return new NotifyAggregatedMeasureDataJsonDocumentWriter(_parser).WriteAsync(
+            return new NotifyAggregatedMeasureDataCimJsonDocumentWriter(_parser).WriteAsync(
                 documentHeader,
                 new[] { records, });
         }

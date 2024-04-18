@@ -17,8 +17,10 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
@@ -76,13 +78,13 @@ public class RejectRequestAggregatedMeasureDataDocumentWriterTests : IClassFixtu
         }
         else if (documentFormat == DocumentFormat.Xml)
         {
-            return new RejectRequestAggregatedMeasureDataXmlDocumentWriter(_parser).WriteAsync(
+            return new RejectRequestAggregatedMeasureDataCimXmlDocumentWriter(_parser).WriteAsync(
                 documentHeader,
                 new[] { records, });
         }
         else
         {
-            return new RejectRequestAggregatedMeasureDataJsonDocumentWriter(_parser).WriteAsync(
+            return new RejectRequestAggregatedMeasureDataCimJsonDocumentWriter(_parser).WriteAsync(
                 documentHeader,
                 new[] { records, });
         }
