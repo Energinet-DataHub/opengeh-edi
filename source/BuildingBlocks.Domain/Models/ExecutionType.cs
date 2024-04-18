@@ -22,6 +22,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 /// </summary>
 public class ExecutionType : EnumerationType
 {
+    public static readonly ExecutionType ADayHasPassed = new(nameof(ADayHasPassed));
     public static readonly ExecutionType TenSecondsHasPassed = new(nameof(TenSecondsHasPassed));
     public static readonly ExecutionType IntegrationEventListener = new(nameof(IntegrationEventListener));
     public static readonly ExecutionType ProcessInitializationListener = new(nameof(ProcessInitializationListener));
