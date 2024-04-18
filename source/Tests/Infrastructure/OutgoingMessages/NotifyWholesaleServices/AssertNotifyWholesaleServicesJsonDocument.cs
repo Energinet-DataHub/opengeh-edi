@@ -149,6 +149,7 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
     public IAssertNotifyWholesaleServicesDocument HasTransactionId(Guid expectedTransactionId)
     {
         FirstWholesaleSeriesElement().GetProperty("mRID").GetString().Should().Be(expectedTransactionId.ToString());
+
         return this;
     }
 
