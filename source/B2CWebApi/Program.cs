@@ -35,7 +35,7 @@ builder.Logging
     .AddApplicationInsights();
 
 builder.Services
-    .AddScoped<ExecutionContext>()
+    .AddScoped<Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext>()
     // Swagger
     .AddSwaggerForWebApp(Assembly.GetExecutingAssembly(), "EDI B2C Web API")
     .AddApiVersioningForWebApp(new ApiVersion(1, 0))
