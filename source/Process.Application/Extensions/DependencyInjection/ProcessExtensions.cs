@@ -30,6 +30,7 @@ using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.N
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications.Handlers;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ProcessEvents;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;

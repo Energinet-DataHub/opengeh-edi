@@ -270,7 +270,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
         }
 
-        private void BuildServices(string fileStorageConnectionString, ITestOutputHelper? testOutputHelper)
+        private void BuildServices(string fileStorageConnectionString, ITestOutputHelper testOutputHelper)
         {
             Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
             Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", IntegrationTestFixture.DatabaseConnectionString);
