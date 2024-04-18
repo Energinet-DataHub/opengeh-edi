@@ -61,7 +61,7 @@ public class PeekRequestListener
     {
         ArgumentNullException.ThrowIfNull(request);
         var response = HttpResponseData.CreateResponse(request);
-        if (!await _featureFlagManager.UsePeekMessagesAsync())
+        if (!await _featureFlagManager.UsePeekMessagesAsync().ConfigureAwait(false))
         {
             response.StatusCode = HttpStatusCode.NotFound;
             return response;

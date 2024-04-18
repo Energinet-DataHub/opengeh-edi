@@ -54,4 +54,9 @@ public interface IFeatureFlagManager
     /// Whether to allow actors to request messages.
     /// </summary>
     Task<bool> UseRequestMessagesAsync();
+
+    /// <summary>
+    /// Whether to allow handling EnergyResultProducedV2 events.
+    /// </summary>
+    Task<bool> UseEnergyResultProducedAsync();
 }

@@ -54,7 +54,7 @@ public class IncomingMessageReceiver
     {
         ArgumentNullException.ThrowIfNull(request);
         var response = HttpResponseData.CreateResponse(request);
-        if (!await _featureFlagManager.UseRequestMessagesAsync())
+        if (!await _featureFlagManager.UseRequestMessagesAsync().ConfigureAwait(false))
         {
             response.StatusCode = HttpStatusCode.NotFound;
             return response;

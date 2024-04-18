@@ -38,9 +38,11 @@ public class MicrosoftFeatureFlagManager : IFeatureFlagManager
 
     public Task<bool> UseMessageDelegationAsync() => IsEnabledAsync(FeatureFlagName.UseMessageDelegation);
 
-    public Task<bool> UsePeekMessagesAsync() => IsEnabledAsync(FeatureFlagName.UseMessageDelegation);
+    public Task<bool> UsePeekMessagesAsync() => IsEnabledAsync(FeatureFlagName.UsePeekMessages);
 
-    public Task<bool> UseRequestMessagesAsync() => IsEnabledAsync(FeatureFlagName.UseMessageDelegation);
+    public Task<bool> UseRequestMessagesAsync() => IsEnabledAsync(FeatureFlagName.UseRequestMessages);
+
+    public Task<bool> UseEnergyResultProducedAsync() => IsEnabledAsync(FeatureFlagName.UseEnergyResultProduced);
 
     private Task<bool> IsEnabledAsync(FeatureFlagName featureFlagName) => _featureManager.IsEnabledAsync(featureFlagName.ToString());
 }
