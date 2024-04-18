@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -31,6 +30,7 @@ using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using NodaTime.Text;
 using Xunit;
+using Xunit.Abstractions;
 using ChargeType = Energinet.DataHub.Edi.Requests.ChargeType;
 using Period = Energinet.DataHub.Edi.Responses.Period;
 
@@ -39,8 +39,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 [SuppressMessage("Performance", "CA1861:Avoid constant arrays as arguments", Justification = "Test class")]
 public class GivenWholesaleServicesRequestTests : BehavioursTestBase
 {
-    public GivenWholesaleServicesRequestTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public GivenWholesaleServicesRequestTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
     }
 
