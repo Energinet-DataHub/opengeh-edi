@@ -53,9 +53,9 @@ public class IncomingMessageReceiver
         CancellationToken hostCancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var response = HttpResponseData.CreateResponse(request);
         if (!await _featureFlagManager.UseRequestMessagesAsync().ConfigureAwait(false))
         {
+            var response = HttpResponseData.CreateResponse(request);
             response.StatusCode = HttpStatusCode.NotFound;
             return response;
         }
