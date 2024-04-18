@@ -40,4 +40,10 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
     public Task<bool> UseRequestWholesaleSettlementReceiverAsync() => Task.FromResult(true);
 
     public Task<bool> UseMessageDelegationAsync() => Task.FromResult(true);
+
+    public Task<bool> UsePeekMessagesAsync() => Task.FromResult(true);
+
+    public Task<bool> UseRequestMessagesAsync() => Task.FromResult(true);
+
+    public Task<bool> UseEnergyResultProducedAsync() => Task.FromResult(true);
 }
