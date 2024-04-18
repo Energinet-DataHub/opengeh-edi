@@ -328,13 +328,10 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 return executionContext;
             });
 
-            if (testOutputHelper != null)
-            {
-                // Add test logger
-                _services.AddSingleton<ITestOutputHelper>(sp => testOutputHelper);
-                _services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
-                _services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
-            }
+            // Add test logger
+            _services.AddSingleton<ITestOutputHelper>(sp => testOutputHelper);
+            _services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
+            _services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
 
             ServiceProvider = _services.BuildServiceProvider();
         }
