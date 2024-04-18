@@ -21,7 +21,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.OutgoingMessages
 {
     public class OutgoingMessageEntityConfiguration : IEntityTypeConfiguration<OutgoingMessage>
     {
