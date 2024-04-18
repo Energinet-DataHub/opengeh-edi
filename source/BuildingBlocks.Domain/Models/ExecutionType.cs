@@ -17,6 +17,9 @@ using System.Linq;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
+/// <summary>
+/// Represents different types of execution contexts in the system, primarily used for audit fields.
+/// </summary>
 public class ExecutionType : EnumerationType
 {
     public static readonly ExecutionType TenSecondsHasPassed = new(nameof(TenSecondsHasPassed));

@@ -22,6 +22,9 @@ namespace Energinet.DataHub.EDI.DataAccess.Extensions.DbContext;
 
 public static class DbContextExtensions
 {
+    /// <summary>
+    /// Updates the audit fields for the added or modified entities in the DbContext.
+    /// </summary>
     public static void UpdateAuditFields(
         this Microsoft.EntityFrameworkCore.DbContext dbContext,
         BuildingBlocks.Domain.ExecutionContext executionContext,

@@ -17,6 +17,9 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain;
 
+/// <summary>
+/// Manages the current execution context of the system, primarily used for setting and retrieving the execution type.
+/// </summary>
 public class ExecutionContext
 {
     private ExecutionType? _executionType;

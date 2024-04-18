@@ -24,8 +24,6 @@ public static class ExecutionContextBuilder
         {
             var executionContext = context.RequestServices.GetRequiredService<Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext>();
             executionContext.SetExecutionType(ExecutionType.B2CWebApi);
-
-            // Call the next delegate/middleware in the pipeline.
             await next(context).ConfigureAwait(false);
         });
         return app;

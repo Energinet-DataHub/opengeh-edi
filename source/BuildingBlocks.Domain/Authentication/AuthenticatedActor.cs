@@ -36,7 +36,7 @@ public class AuthenticatedActor
     }
 
     /// <summary>
-    /// Try get Current identity
+    /// Attempts to retrieve the current actor identity.
     /// </summary>
     public bool TryGetCurrentActorIdentity(out ActorIdentity? actorIdentity)
     {
