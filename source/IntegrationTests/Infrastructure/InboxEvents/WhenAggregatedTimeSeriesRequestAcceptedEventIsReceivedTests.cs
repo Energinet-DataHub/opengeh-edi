@@ -55,7 +55,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
             .WithGridAreaCode(GridAreaCode)
             .StoreAsync(GetService<IMasterDataClient>());
 
-        RegisterInboxEvent();
+        await RegisterInboxEvent();
 
         await _processor.ProcessEventsAsync(CancellationToken.None);
 
@@ -93,7 +93,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
         return timeSerie;
     }
 
-    private void RegisterInboxEvent()
+    private async Task RegisterInboxEvent()
     {
         var context = GetService<ProcessContext>();
         context.ReceivedInboxEvents.Add(new ReceivedInboxEvent(
@@ -102,7 +102,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
             _referenceId,
             _aggregatedTimeSeriesRequestAcceptedResponse.ToByteArray(),
             GetService<ISystemDateTimeProvider>().Now()));
-        context.SaveChanges();
+        await context.SaveChangesAsync();
     }
 
     private async Task EventIsMarkedAsProcessedAsync(string eventId)

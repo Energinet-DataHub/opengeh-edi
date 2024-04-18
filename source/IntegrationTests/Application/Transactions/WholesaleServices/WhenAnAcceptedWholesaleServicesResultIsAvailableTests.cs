@@ -54,7 +54,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         var process = WholesaleServicesProcessBuilder()
             .SetState(WholesaleServicesProcess.State.Sent)
             .Build();
-        Store(process);
+        await Store(process);
         var acceptedEvent = WholesaleServicesRequestAcceptedBuilder(process)
             .Build();
 
@@ -93,7 +93,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         var process = WholesaleServicesProcessBuilder()
             .SetState(WholesaleServicesProcess.State.Sent)
             .Build();
-        Store(process);
+        await Store(process);
         var acceptedEvent = WholesaleServicesRequestAcceptedBuilder(process)
             .BuildMonthlySum();
 
@@ -128,7 +128,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         var process = WholesaleServicesProcessBuilder()
             .SetState(WholesaleServicesProcess.State.Sent)
             .Build();
-        Store(process);
+        await Store(process);
         var acceptedEvent = WholesaleServicesRequestAcceptedBuilder(process)
             .Build();
 
@@ -148,7 +148,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         var process = WholesaleServicesProcessBuilder()
             .SetState(WholesaleServicesProcess.State.Rejected)
             .Build();
-        Store(process);
+        await Store(process);
         var acceptedEvent = WholesaleServicesRequestAcceptedBuilder(process)
             .Build();
 
@@ -167,14 +167,14 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         var firstProcess = WholesaleServicesProcessBuilder()
             .SetState(WholesaleServicesProcess.State.Sent)
             .Build();
-        Store(firstProcess);
+        await Store(firstProcess);
         var firstAcceptedEvent = WholesaleServicesRequestAcceptedBuilder(firstProcess)
             .Build();
         var secondProcess = WholesaleServicesProcessBuilder()
             .SetState(WholesaleServicesProcess.State.Sent)
             .SetBusinessTransactionId(Guid.NewGuid())
             .Build();
-        Store(secondProcess);
+        await Store(secondProcess);
         var secondAcceptedEvent = WholesaleServicesRequestAcceptedBuilder(firstProcess)
             .Build();
 
@@ -194,7 +194,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         var process = WholesaleServicesProcessBuilder()
             .SetState(WholesaleServicesProcess.State.Sent)
             .Build();
-        Store(process);
+        await Store(process);
         var acceptedEvent = WholesaleServicesRequestAcceptedBuilder(process)
             .Build();
         acceptedEvent.Series.Add(acceptedEvent.Series.First());
@@ -273,9 +273,9 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             GetService<IFileStorageClient>());
     }
 
-    private void Store(WholesaleServicesProcess process)
+    private async Task Store(WholesaleServicesProcess process)
     {
         _processContext.WholesaleServicesProcesses.Add(process);
-        _processContext.SaveChanges();
+        await _processContext.SaveChangesAsync();
     }
 }
