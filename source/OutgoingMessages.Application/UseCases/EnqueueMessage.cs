@@ -64,10 +64,12 @@ public class EnqueueMessage
                 .ConfigureAwait(false);
         }
 
-        var addToRepositoryTask = _outgoingMessageRepository.AddAsync(messageToEnqueue);
-        var addToActorMessageQueueTask = AddToActorMessageQueueAsync(messageToEnqueue);
+        await AddToActorMessageQueueAsync(messageToEnqueue).ConfigureAwait(false);
 
-        await Task.WhenAll(addToRepositoryTask, addToActorMessageQueueTask).ConfigureAwait(false);
+        // Add to outgoing message repository (and upload to file storage) after adding actor message queue,
+        // to minimize the cases where a message is uploaded to file storage but adding actor message queue fails
+        await _outgoingMessageRepository.AddAsync(messageToEnqueue).ConfigureAwait(false);
+
         _logger.LogInformation("Message enqueued: {Message} for Actor: {ActorNumber}", messageToEnqueue.Id, messageToEnqueue.Receiver.Number.Value);
 
         return messageToEnqueue.Id;
