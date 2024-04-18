@@ -98,6 +98,7 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
     [Fact]
     public async Task AndGiven_DelegationInTwoGridAreas_When_DelegatedActorPeeksMessage_Then_NotifyWholesaleServicesDocumentIsCorrect()
     {
+        // TODO: Handle asserting multiple messages (peek & dequeue needed?)
         // TODO: Same test, but just for rejected instead
         var documentFormat = DocumentFormat.Json; // TODO: Make input parameter
         /*
