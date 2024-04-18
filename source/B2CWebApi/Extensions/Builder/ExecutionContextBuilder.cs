@@ -22,7 +22,8 @@ public static class ExecutionContextBuilder
     {
         app.Use(async (context, next) =>
         {
-            var executionContext = context.RequestServices.GetRequiredService<Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext>();
+            var executionContext = context.RequestServices
+                .GetRequiredService<Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext>();
             executionContext.SetExecutionType(ExecutionType.B2CWebApi);
             await next(context).ConfigureAwait(false);
         });

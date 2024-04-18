@@ -38,9 +38,10 @@ public class ExecutionType : EnumerationType
     {
     }
 
-    public static ExecutionType FromName(string name)
+    public static bool TryFromName(string name, out ExecutionType? executionType)
     {
-        return GetAll<ExecutionType>().FirstOrDefault(f => f.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-               ?? throw new InvalidOperationException($"{name} is not a valid {typeof(ExecutionType)} {nameof(name)}");
+        executionType = GetAll<ExecutionType>()
+            .FirstOrDefault(f => f.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        return executionType != null;
     }
 }

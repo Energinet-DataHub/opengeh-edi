@@ -50,7 +50,7 @@ public static class DbContextExtensions
                 entry.Property("CreatedBy").CurrentValue =
                     authenticatedActor.TryGetCurrentActorIdentity(out var actorIdentity)
                         ? actorIdentity?.ActorNumber.Value
-                        : executionContext.CurrentExecutionType.Name;
+                        : executionContext.CurrentExecutionType?.Name ?? "Unknown";
                 entry.Property("CreatedAt").CurrentValue = systemDateTimeProvider.Now();
             }
 
@@ -61,7 +61,7 @@ public static class DbContextExtensions
                 entry.Property("ModifiedBy").CurrentValue =
                     authenticatedActor.TryGetCurrentActorIdentity(out var actorIdentity)
                         ? actorIdentity?.ActorNumber.Value
-                        : executionContext.CurrentExecutionType.Name;
+                        : executionContext.CurrentExecutionType?.Name ?? "Unknown";
                 entry.Property("ModifiedAt").CurrentValue = systemDateTimeProvider.Now();
             }
         }

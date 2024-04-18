@@ -24,8 +24,7 @@ public class ExecutionContext
 {
     private ExecutionType? _executionType;
 
-    public ExecutionType CurrentExecutionType => _executionType ??
-        throw new InvalidOperationException("Current execution type is not set");
+    public ExecutionType? CurrentExecutionType => _executionType;
 
     /// <summary>
     /// Set the current Execution Context name

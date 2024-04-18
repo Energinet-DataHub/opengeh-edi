@@ -41,8 +41,9 @@ public static class OutgoingMessagesExtensions
     {
         ArgumentNullException.ThrowIfNull(configuration);
         services.AddBuildingBlocks(configuration)
-            .AddScopedSqlDbContext<ActorMessageQueueContext>(configuration);
-        services.AddScoped<ExecutionContext>();
+            .AddScopedSqlDbContext<ActorMessageQueueContext>(configuration)
+            .AddScoped<ExecutionContext>();
+
         //AddMessageGenerationServices
         services.AddScoped<DocumentFactory>()
             .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataXmlDocumentWriter>()
