@@ -31,7 +31,6 @@ public class ExecutionType : EnumerationType
     public static readonly ExecutionType PeekRequestListener = new(nameof(PeekRequestListener));
     public static readonly ExecutionType DequeueRequestListener = new(nameof(DequeueRequestListener));
     public static readonly ExecutionType HealthCheck = new(nameof(HealthCheck));
-    public static readonly ExecutionType B2CWebApi = new(nameof(B2CWebApi));
     public static readonly ExecutionType Test = new(nameof(Test));
 
     public ExecutionType(string name)
