@@ -38,19 +38,19 @@ public class OutgoingMessageTests
 {
     private readonly IList<IDocumentWriter> _documentWriters = new List<IDocumentWriter>()
     {
-        new NotifyWholesaleServicesJsonDocumentWriter(new MessageRecordParser(new Serializer())),
+        new NotifyWholesaleServicesCimJsonDocumentWriter(new MessageRecordParser(new Serializer())),
         new NotifyWholesaleServicesEbixDocumentWriter(new MessageRecordParser(new Serializer())),
         new NotifyWholesaleServicesCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
 
         new NotifyAggregatedMeasureDataEbixDocumentWriter(new MessageRecordParser(new Serializer())),
         new NotifyAggregatedMeasureDataCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
-        new NotifyAggregatedMeasureDataJsonDocumentWriter(new MessageRecordParser(new Serializer())),
+        new NotifyAggregatedMeasureDataCimJsonDocumentWriter(new MessageRecordParser(new Serializer())),
 
-        new RejectRequestAggregatedMeasureDataJsonDocumentWriter(new MessageRecordParser(new Serializer())),
+        new RejectRequestAggregatedMeasureDataCimJsonDocumentWriter(new MessageRecordParser(new Serializer())),
         new RejectRequestAggregatedMeasureDataEbixDocumentWriter(new MessageRecordParser(new Serializer())),
         new RejectRequestAggregatedMeasureDataCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
 
-        new RejectRequestWholesaleSettlementJsonDocumentWriter(new MessageRecordParser(new Serializer())),
+        new RejectRequestWholesaleSettlementCimJsonDocumentWriter(new MessageRecordParser(new Serializer())),
         new RejectRequestWholesaleSettlementEbixDocumentWriter(new MessageRecordParser(new Serializer())),
         new RejectRequestWholesaleSettlementCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
     };
@@ -332,7 +332,7 @@ public class OutgoingMessageTests
 
     private static IEnumerable<Type> GetAllDocumentWriters()
     {
-        return typeof(NotifyWholesaleServicesJsonDocumentWriter).Assembly.GetTypes()
+        return typeof(NotifyWholesaleServicesCimJsonDocumentWriter).Assembly.GetTypes()
             .Where(t => t.GetInterfaces().Contains(typeof(IDocumentWriter)) && !t.IsAbstract);
     }
 }

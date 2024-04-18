@@ -24,13 +24,13 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestAggregatedMeasureData;
 
-public class RejectRequestAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
+public class RejectRequestAggregatedMeasureDataCimJsonDocumentWriter : IDocumentWriter
 {
     private const string DocumentTypeName = "RejectRequestAggregatedMeasureData_MarketDocument";
     private const string TypeCode = "ERR";
     private readonly IMessageRecordParser _parser;
 
-    public RejectRequestAggregatedMeasureDataJsonDocumentWriter(IMessageRecordParser parser)
+    public RejectRequestAggregatedMeasureDataCimJsonDocumentWriter(IMessageRecordParser parser)
     {
         _parser = parser;
     }

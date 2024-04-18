@@ -84,7 +84,7 @@ public class RejectRequestAggregatedMeasureDataDocumentWriterTests : IClassFixtu
         }
         else
         {
-            return new RejectRequestAggregatedMeasureDataJsonDocumentWriter(_parser).WriteAsync(
+            return new RejectRequestAggregatedMeasureDataCimJsonDocumentWriter(_parser).WriteAsync(
                 documentHeader,
                 new[] { records, });
         }

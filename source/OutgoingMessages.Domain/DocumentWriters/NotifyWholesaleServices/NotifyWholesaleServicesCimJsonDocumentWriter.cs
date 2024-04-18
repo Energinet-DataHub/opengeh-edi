@@ -27,13 +27,13 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
 
-public sealed class NotifyWholesaleServicesJsonDocumentWriter : IDocumentWriter
+public sealed class NotifyWholesaleServicesCimJsonDocumentWriter : IDocumentWriter
 {
     private const string DocumentTypeName = "NotifyWholesaleServices_MarketDocument";
     private const string TypeCode = "E31";
     private readonly IMessageRecordParser _parser;
 
-    public NotifyWholesaleServicesJsonDocumentWriter(IMessageRecordParser parser)
+    public NotifyWholesaleServicesCimJsonDocumentWriter(IMessageRecordParser parser)
     {
         _parser = parser;
     }

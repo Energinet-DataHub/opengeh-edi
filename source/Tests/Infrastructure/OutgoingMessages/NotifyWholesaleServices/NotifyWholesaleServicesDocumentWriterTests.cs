@@ -339,7 +339,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         }
         else if (documentFormat == DocumentFormat.Json)
         {
-            return new NotifyWholesaleServicesJsonDocumentWriter(_parser).WriteAsync(
+            return new NotifyWholesaleServicesCimJsonDocumentWriter(_parser).WriteAsync(
                 header,
                 new[] { records });
         }

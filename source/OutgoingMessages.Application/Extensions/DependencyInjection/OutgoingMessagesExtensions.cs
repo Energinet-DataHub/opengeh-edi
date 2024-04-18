@@ -49,16 +49,16 @@ public static class OutgoingMessagesExtensions
         //AddMessageGenerationServices
         services.AddScoped<DocumentFactory>()
             .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataCimXmlDocumentWriter>()
-            .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataJsonDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataCimJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataEbixDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataCimXmlDocumentWriter>()
-            .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataJsonDocumentWriter>()
+            .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataCimJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataEbixDocumentWriter>()
             .AddScoped<IDocumentWriter, NotifyWholesaleServicesCimXmlDocumentWriter>()
-            .AddScoped<IDocumentWriter, NotifyWholesaleServicesJsonDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyWholesaleServicesCimJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, NotifyWholesaleServicesEbixDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementCimXmlDocumentWriter>()
-            .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementJsonDocumentWriter>()
+            .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementCimJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementEbixDocumentWriter>()
             .AddScoped<IMessageRecordParser, MessageRecordParser>();
 

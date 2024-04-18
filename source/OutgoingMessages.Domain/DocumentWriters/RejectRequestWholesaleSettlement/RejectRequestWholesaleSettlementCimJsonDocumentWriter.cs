@@ -25,13 +25,13 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestWholesaleSettlement;
 
-public class RejectRequestWholesaleSettlementJsonDocumentWriter : IDocumentWriter
+public class RejectRequestWholesaleSettlementCimJsonDocumentWriter : IDocumentWriter
 {
     private const string DocumentTypeName = "RejectRequestWholesaleSettlement_MarketDocument";
     private const string TypeCode = "ERR";
     private readonly IMessageRecordParser _parser;
 
-    public RejectRequestWholesaleSettlementJsonDocumentWriter(IMessageRecordParser parser)
+    public RejectRequestWholesaleSettlementCimJsonDocumentWriter(IMessageRecordParser parser)
     {
         _parser = parser;
     }

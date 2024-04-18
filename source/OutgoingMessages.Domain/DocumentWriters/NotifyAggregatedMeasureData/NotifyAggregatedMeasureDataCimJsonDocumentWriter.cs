@@ -26,13 +26,13 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
 
-public class NotifyAggregatedMeasureDataJsonDocumentWriter : IDocumentWriter
+public class NotifyAggregatedMeasureDataCimJsonDocumentWriter : IDocumentWriter
 {
     private const string DocumentTypeName = "NotifyAggregatedMeasureData_MarketDocument";
     private const string TypeCode = "E31";
     private readonly IMessageRecordParser _parser;
 
-    public NotifyAggregatedMeasureDataJsonDocumentWriter(IMessageRecordParser parser)
+    public NotifyAggregatedMeasureDataCimJsonDocumentWriter(IMessageRecordParser parser)
     {
         _parser = parser;
     }

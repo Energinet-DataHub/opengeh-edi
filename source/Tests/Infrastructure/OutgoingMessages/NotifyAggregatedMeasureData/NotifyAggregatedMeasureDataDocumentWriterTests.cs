@@ -292,7 +292,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
         }
         else
         {
-            return new NotifyAggregatedMeasureDataJsonDocumentWriter(_parser).WriteAsync(
+            return new NotifyAggregatedMeasureDataCimJsonDocumentWriter(_parser).WriteAsync(
                 documentHeader,
                 new[] { records, });
         }

@@ -109,7 +109,7 @@ public sealed class RejectRequestWholesaleSettlementDocumentWriterTests : IClass
                 new[] { records });
         }
 
-        return new RejectRequestWholesaleSettlementJsonDocumentWriter(_parser).WriteAsync(
+        return new RejectRequestWholesaleSettlementCimJsonDocumentWriter(_parser).WriteAsync(
             documentHeader,
             new[] { records });
     }
