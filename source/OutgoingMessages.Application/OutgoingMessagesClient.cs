@@ -15,7 +15,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -24,24 +25,24 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 
 public class OutgoingMessagesClient : IOutgoingMessagesClient
 {
-    private readonly MessagePeeker _messagePeeker;
-    private readonly MessageDequeuer _messageDequeuer;
-    private readonly MessageEnqueuer _messageEnqueuer;
+    private readonly PeekMessage _peekMessage;
+    private readonly DequeueMessage _dequeueMessage;
+    private readonly EnqueueMessage _enqueueMessage;
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly ISerializer _serializer;
 
     public OutgoingMessagesClient(
-        MessagePeeker messagePeeker,
-        MessageDequeuer messageDequeuer,
-        MessageEnqueuer messageEnqueuer,
+        PeekMessage peekMessage,
+        DequeueMessage dequeueMessage,
+        EnqueueMessage enqueueMessage,
         ActorMessageQueueContext actorMessageQueueContext,
         ISystemDateTimeProvider systemDateTimeProvider,
         ISerializer serializer)
     {
-        _messagePeeker = messagePeeker;
-        _messageDequeuer = messageDequeuer;
-        _messageEnqueuer = messageEnqueuer;
+        _peekMessage = peekMessage;
+        _dequeueMessage = dequeueMessage;
+        _enqueueMessage = enqueueMessage;
         _actorMessageQueueContext = actorMessageQueueContext;
         _systemDateTimeProvider = systemDateTimeProvider;
         _serializer = serializer;
@@ -49,14 +50,14 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
 
     public async Task<DequeueRequestResultDto> DequeueAndCommitAsync(DequeueRequestDto request, CancellationToken cancellationToken)
     {
-        var dequeueRequestResult = await _messageDequeuer.DequeueAsync(request, cancellationToken).ConfigureAwait(false);
+        var dequeueRequestResult = await _dequeueMessage.DequeueAsync(request, cancellationToken).ConfigureAwait(false);
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return dequeueRequestResult;
     }
 
     public async Task<PeekResultDto> PeekAndCommitAsync(PeekRequestDto request, CancellationToken cancellationToken)
     {
-        var peekResult = await _messagePeeker.PeekAsync(request, cancellationToken).ConfigureAwait(false);
+        var peekResult = await _peekMessage.PeekAsync(request, cancellationToken).ConfigureAwait(false);
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return peekResult;
     }
@@ -69,7 +70,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             acceptedEnergyResultMessage,
             _serializer,
             _systemDateTimeProvider.Now());
-        var messageId = await _messageEnqueuer.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         return messageId;
     }
 
@@ -81,7 +82,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             rejectedEnergyResultMessage,
             _serializer,
             _systemDateTimeProvider.Now());
-        var messageId = await _messageEnqueuer.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         return messageId;
     }
 
@@ -94,7 +95,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             _serializer,
             _systemDateTimeProvider.Now());
 
-        var messageId = await _messageEnqueuer.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         return messageId;
     }
 
@@ -106,7 +107,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             energyResultMessage,
             _serializer,
             _systemDateTimeProvider.Now());
-        var messageId = await _messageEnqueuer.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return messageId;
     }
@@ -121,7 +122,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             _systemDateTimeProvider.Now());
         foreach (var message in messages)
         {
-            await _messageEnqueuer.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+            await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         }
 
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -135,7 +136,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             acceptedWholesaleServicesMessage,
             _serializer,
             _systemDateTimeProvider.Now());
-        var messageId = await _messageEnqueuer.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         return messageId;
     }
 }

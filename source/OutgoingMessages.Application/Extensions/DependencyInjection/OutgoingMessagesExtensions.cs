@@ -17,13 +17,17 @@ using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestAggregatedMeasureData;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestWholesaleSettlement;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestWholesaleSettlement;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages.Queueing;
@@ -46,33 +50,33 @@ public static class OutgoingMessagesExtensions
 
         //AddMessageGenerationServices
         services.AddScoped<DocumentFactory>()
-            .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataXmlDocumentWriter>()
-            .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataJsonDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataCimXmlDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataCimJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataEbixDocumentWriter>()
-            .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataXmlDocumentWriter>()
-            .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataJsonDocumentWriter>()
+            .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataCimXmlDocumentWriter>()
+            .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataCimJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestAggregatedMeasureDataEbixDocumentWriter>()
-            .AddScoped<IDocumentWriter, NotifyWholesaleServicesXmlDocumentWriter>()
-            .AddScoped<IDocumentWriter, NotifyWholesaleServicesJsonDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyWholesaleServicesCimXmlDocumentWriter>()
+            .AddScoped<IDocumentWriter, NotifyWholesaleServicesCimJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, NotifyWholesaleServicesEbixDocumentWriter>()
-            .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementXmlDocumentWriter>()
-            .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementJsonDocumentWriter>()
+            .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementCimXmlDocumentWriter>()
+            .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementCimJsonDocumentWriter>()
             .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementEbixDocumentWriter>()
             .AddScoped<IMessageRecordParser, MessageRecordParser>();
 
         //MessageEnqueueingConfiguration
-        services.AddTransient<MessageEnqueuer>()
-            .AddTransient<MessageDelegator>()
+        services.AddTransient<EnqueueMessage>()
+            .AddTransient<DelegateMessage>()
             .AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>()
             .AddTransient<IOutgoingMessagesClient, OutgoingMessagesClient>();
 
         //PeekConfiguration
         services.AddScoped<IActorMessageQueueRepository, ActorMessageQueueRepository>()
             .AddScoped<IMarketDocumentRepository, MarketDocumentRepository>()
-            .AddTransient<MessagePeeker>();
+            .AddTransient<PeekMessage>();
 
         //DequeConfiguration
-        services.AddTransient<MessageDequeuer>();
+        services.AddTransient<DequeueMessage>();
 
         //DataRetentionConfiguration
         services.AddTransient<IDataRetention, DequeuedBundlesRetention>();
