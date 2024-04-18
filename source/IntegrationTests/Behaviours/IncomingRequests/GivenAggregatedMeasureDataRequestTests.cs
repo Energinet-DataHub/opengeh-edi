@@ -21,13 +21,14 @@ using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregat
 using FluentAssertions;
 using NodaTime;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
 public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
 {
-    public GivenAggregatedMeasureDataRequestTests(IntegrationTestFixture integrationTestFixture)
-        : base(integrationTestFixture)
+    public GivenAggregatedMeasureDataRequestTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
     }
 

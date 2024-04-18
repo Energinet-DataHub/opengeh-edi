@@ -37,6 +37,11 @@ public interface IAssertNotifyWholesaleServicesDocument
     IAssertNotifyWholesaleServicesDocument HasMessageId(string expectedMessageId);
 
     /// <summary>
+    /// Asserts message id exists
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument MessageIdExists();
+
+    /// <summary>
     /// Asserts the process type in header
     /// </summary>
     /// <param name="expectedBusinessReason"></param>
@@ -84,6 +89,11 @@ public interface IAssertNotifyWholesaleServicesDocument
     IAssertNotifyWholesaleServicesDocument HasTransactionId(Guid expectedTransactionId);
 
     /// <summary>
+    /// Asserts transaction exists in the first series element
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument TransactionIdExists();
+
+    /// <summary>
     /// Asserts the version of the first series element
     /// </summary>
     /// <param name="expectedVersion"></param>
@@ -96,11 +106,21 @@ public interface IAssertNotifyWholesaleServicesDocument
     IAssertNotifyWholesaleServicesDocument HasSettlementVersion(SettlementVersion expectedSettlementVersion);
 
     /// <summary>
+    /// Asserts the settlement version is not present
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument SettlementVersionDoesNotExist();
+
+    /// <summary>
     /// Asserts the reference id of the first series element
     /// </summary>
     /// <param name="expectedOriginalTransactionIdReference"></param>
     IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(
         string expectedOriginalTransactionIdReference);
+
+    /// <summary>
+    /// Asserts that the first series element does not have a reference id
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument OriginalTransactionIdReferenceDoesNotExist();
 
     /// <summary>
     /// Asserts the settlement method of the first series element
@@ -109,11 +129,16 @@ public interface IAssertNotifyWholesaleServicesDocument
     IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod expectedSettlementMethod);
 
     /// <summary>
+    /// Asserts the settlement method is not present
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument SettlementMethodDoesNotExist();
+
+    /// <summary>
     /// Asserts the amount sum of the points of the first series element
     /// </summary>
-    /// <param name="pointIndex"></param>
+    /// <param name="position"></param>
     /// <param name="expectedPrice"></param>
-    IAssertNotifyWholesaleServicesDocument PriceAmountIsPresentForPointIndex(int pointIndex, string? expectedPrice);
+    IAssertNotifyWholesaleServicesDocument HasPriceForPosition(int position, string? expectedPrice);
 
     /// <summary>
     /// Asserts the metering point type of the first series element
@@ -158,10 +183,10 @@ public interface IAssertNotifyWholesaleServicesDocument
     IAssertNotifyWholesaleServicesDocument HasProductCode(string expectedProductCode);
 
     /// <summary>
-    /// Asserts the measure unit of the first series element
+    /// Asserts the quantity measure unit of the first series element
     /// </summary>
     /// <param name="expectedMeasurementUnit"></param>
-    IAssertNotifyWholesaleServicesDocument HasMeasurementUnit(MeasurementUnit expectedMeasurementUnit);
+    IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit expectedMeasurementUnit);
 
     /// <summary>
     /// Asserts the price measure unit of the first series element
@@ -191,25 +216,22 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// Asserts a point of the first series element
     /// </summary>
     /// <param name="expectedPosition"></param>
+    /// <param name="expectedSumQuantity"></param>
+    IAssertNotifyWholesaleServicesDocument HasSumQuantityForPosition(int expectedPosition, int expectedSumQuantity);
+
+    /// <summary>
+    /// Asserts a point of the first series element
+    /// </summary>
+    /// <param name="expectedPosition"></param>
     /// <param name="expectedQuantity"></param>
-    IAssertNotifyWholesaleServicesDocument HasPositionAndQuantity(int expectedPosition, int expectedQuantity);
+    IAssertNotifyWholesaleServicesDocument HasQuantityForPosition(int expectedPosition, int expectedQuantity);
 
     /// <summary>
     /// Asserts the quality is present with the given code
     /// </summary>
-    IAssertNotifyWholesaleServicesDocument QualityIsPresentForPosition(
+    IAssertNotifyWholesaleServicesDocument HasQualityForPosition(
         int expectedPosition,
-        string expectedQuantityQualityCode);
-
-    /// <summary>
-    /// Asserts the settlement method is not present
-    /// </summary>
-    IAssertNotifyWholesaleServicesDocument SettlementMethodIsNotPresent();
-
-    /// <summary>
-    /// Asserts the settlement version is not present
-    /// </summary>
-    IAssertNotifyWholesaleServicesDocument SettlementVersionIsNotPresent();
+        CalculatedQuantityQuality expectedQuantityQuality);
 
     #endregion
 }

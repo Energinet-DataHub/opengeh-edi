@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Commands;
 

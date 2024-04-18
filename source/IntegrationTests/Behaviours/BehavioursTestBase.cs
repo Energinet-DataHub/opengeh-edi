@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,6 +23,8 @@ using Azure.Messaging.ServiceBus;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.Extensions.Options;
 using BuildingBlocks.Application.FeatureFlag;
+using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
@@ -35,6 +38,9 @@ using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
@@ -57,6 +63,10 @@ using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
+using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
+using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Google.Protobuf;
@@ -65,13 +75,62 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using Xunit;
+using Xunit.Abstractions;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
+/// <summary>
+///     - IntegrationTests
+///         - IntegrationTests.EventBuilders
+///             - AggregatedMeasureDataEventBuilder
+///         - IntegrationTests.DocumentAsserters
+///             - AggregatedMeasureDataDocumentXMLAsserter
+///
+///         - IntegrationTests.Behaviours (BehaviourTestBase)
+///                    IntegrationEvent
+///                         (classes)
+///                         - GivenEnergyResultProducedV2
+///                             (methods)
+///                             - When_ActorPeeksDocument_Then_ActorCanPeekCorrectDocument
+///                             - When_ActorPeeksDocument_Then_DelegatedActorCanPeekCorrectDocument
+///                         - GivenMonthlyAmountPerChargeResultProducedV1
+///                             (methods)
+///                             - When_ActorPeeksDocument_Then_ActorCanPeekCorrectDocument
+///                             - When_ActorPeeksDocument_Then_DelegatedActorCanPeekCorrectDocument
+///                         - GivenAmountPerChargeResultProducedV1
+///                             (methods)
+///                             - When_ActorPeeksDocument_Then_ActorCanPeekCorrectDocument
+///                             - When_ChargeOwnerPeeksDocument_Then_ChargeOwnerCanPeekCorrectDocument
+///                             - When_ActorPeeksDocument_Then_DelegatedActorCanPeekCorrectDocument
+///                      IncomingRequests|IncomingMessages
+///
+///       (Existing)
+///       - IntegrationEvents.Application.Test
+///             - WhenAggregatedMeasureDataReceived
+///      -------------------------------------------------------
+///                 Unit tests
+///                     (folder)
+///                     NotifyWholesaleServices
+///                         (classes)
+///                         - NotifyWholesaleServiceDocumentWriterTests
+///                             (methods)
+///                             - Given_ChargeTypeIsFeeAndAmountFieldIsMissing_When_CreateDocument_Then_ThrowException
+///
+///             **** Rule of thumb ****
+///                 Given = // Arrange
+///                 When = // Act
+///                 Then  = // Assert
+///
+/// </summary>
 [Collection("IntegrationTest")]
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "This is a test class")]
+[SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Test class")]
+[SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Test class")]
 public class BehavioursTestBase : IDisposable
 {
     private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
@@ -84,7 +143,7 @@ public class BehavioursTestBase : IDisposable
     private ServiceCollection? _services;
     private bool _disposed;
 
-    protected BehavioursTestBase(IntegrationTestFixture integrationTestFixture)
+    protected BehavioursTestBase(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
     {
         ArgumentNullException.ThrowIfNull(integrationTestFixture);
         IntegrationTestFixture.CleanupDatabase();
@@ -92,7 +151,7 @@ public class BehavioursTestBase : IDisposable
         _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
         TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
         InboxEventNotificationHandler = new TestNotificationHandlerSpy();
-        _serviceProvider = BuildServices(integrationTestFixture.AzuriteManager.BlobStorageConnectionString);
+        _serviceProvider = BuildServices(integrationTestFixture.AzuriteManager.BlobStorageConnectionString, testOutputHelper);
         _processContext = GetService<ProcessContext>();
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         _authenticatedActor = GetService<AuthenticatedActor>();
@@ -207,16 +266,29 @@ public class BehavioursTestBase : IDisposable
 
     protected void GivenNowIs(int year, int month, int day)
     {
-        _systemDateTimeProviderStub.SetNow(
+        GivenNowIs(
             new LocalDate(year, month, day)
                 .AtMidnight()
                 .InZoneStrictly(_dateTimeZone)
                 .ToInstant());
     }
 
+    protected void GivenNowIs(Instant now)
+    {
+        _systemDateTimeProviderStub.SetNow(now);
+    }
+
     protected Instant GetNow()
     {
         return _systemDateTimeProviderStub.Now();
+    }
+
+    protected Instant CreateDateInstant(int year, int month, int day)
+    {
+        return new LocalDate(year, month, day)
+            .AtMidnight()
+            .InZoneStrictly(_dateTimeZone)
+            .ToInstant();
     }
 
     protected async Task GivenDelegationAsync(
@@ -405,6 +477,62 @@ public class BehavioursTestBase : IDisposable
         await ProcessInternalCommandsAsync();
     }
 
+    protected async Task GivenIntegrationEventReceived(IEventMessage @event)
+    {
+        var integrationEvent = new IntegrationEvent(Guid.NewGuid(), @event.EventName, @event.EventMinorVersion, @event);
+
+        using var serviceScope = _serviceProvider.CreateScope();
+        await serviceScope.ServiceProvider.GetRequiredService<IIntegrationEventHandler>().HandleAsync(integrationEvent);
+    }
+
+    protected async Task<PeekResultDto> WhenActorPeeksMessage(ActorNumber actorNumber, ActorRole actorRole, DocumentFormat documentFormat)
+    {
+        await using var scope = _serviceProvider.CreateAsyncScope();
+        var outgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        var peekResult = await outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber, MessageCategory.Aggregations, actorRole, documentFormat), CancellationToken.None);
+        return peekResult;
+    }
+
+    protected async Task ThenNotifyWholesaleServicesDocumentIsCorrect(Stream? bundle, DocumentFormat documentFormat, Action<IAssertNotifyWholesaleServicesDocument> assert)
+    {
+        using var assertionScope = new AssertionScope();
+        bundle.Should().NotBeNull();
+
+        var xmlDocumentValidator = new DocumentValidator(new List<IValidator>
+        {
+            new CimXmlValidator(new CimXmlSchemaProvider()),
+            new EbixValidator(new EbixSchemaProvider()),
+        });
+        IAssertNotifyWholesaleServicesDocument asserter = documentFormat.Name switch
+        {
+            nameof(DocumentFormat.Xml) => new AssertNotifyWholesaleServicesXmlDocument(
+                AssertXmlDocument.Document(
+                    bundle!,
+                    "cim_",
+                    xmlDocumentValidator)),
+            nameof(DocumentFormat.Json) => new AssertNotifyWholesaleServicesJsonDocument(bundle!),
+            nameof(DocumentFormat.Ebix) => new AssertNotifyWholesaleServicesEbixDocument(
+                AssertEbixDocument.Document(
+                    bundle!,
+                    "ns0",
+                    xmlDocumentValidator),
+                true),
+            _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, null),
+        };
+
+        await asserter.DocumentIsValidAsync();
+        assert(asserter);
+    }
+
+    protected AmountPerChargeResultProducedV1 GivenAmountPerChargeResultProducedV1Event(Action<AmountPerChargeResultProducedV1EventBuilder> builder)
+    {
+        var eventBuilder = new AmountPerChargeResultProducedV1EventBuilder();
+
+        builder(eventBuilder);
+
+        return eventBuilder.Build();
+    }
+
     private T GetService<T>()
         where T : notnull
     {
@@ -422,7 +550,7 @@ public class BehavioursTestBase : IDisposable
         return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
     }
 
-    private ServiceProvider BuildServices(string fileStorageConnectionString)
+    private ServiceProvider BuildServices(string fileStorageConnectionString, ITestOutputHelper testOutputHelper)
     {
         Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", IntegrationTestFixture.DatabaseConnectionString);
@@ -472,6 +600,14 @@ public class BehavioursTestBase : IDisposable
         // - Building blocks
         _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
         _services.AddTransient<IFeatureFlagManager>(_ => new FeatureFlagManagerStub());
+
+        if (testOutputHelper != null)
+        {
+            // Add test logger
+            _services.AddSingleton<ITestOutputHelper>(sp => testOutputHelper);
+            _services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
+            _services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
+        }
 
         return _services.BuildServiceProvider();
     }

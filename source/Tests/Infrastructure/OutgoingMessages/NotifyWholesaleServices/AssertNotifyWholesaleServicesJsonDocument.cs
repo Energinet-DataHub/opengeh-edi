@@ -22,6 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
 using FluentAssertions;
 using Json.Schema;
 
@@ -65,6 +66,12 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
     public IAssertNotifyWholesaleServicesDocument HasMessageId(string expectedMessageId)
     {
         _root.GetProperty("mRID").GetString().Should().Be(expectedMessageId);
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument MessageIdExists()
+    {
+        _root.TryGetProperty("mRID", out _).Should().BeTrue();
         return this;
     }
 
@@ -149,6 +156,13 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
     public IAssertNotifyWholesaleServicesDocument HasTransactionId(Guid expectedTransactionId)
     {
         FirstWholesaleSeriesElement().GetProperty("mRID").GetString().Should().Be(expectedTransactionId.ToString());
+
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument TransactionIdExists()
+    {
+        FirstWholesaleSeriesElement().TryGetProperty("mRID", out _).Should().BeTrue();
         return this;
     }
 
@@ -187,6 +201,12 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         return this;
     }
 
+    public IAssertNotifyWholesaleServicesDocument OriginalTransactionIdReferenceDoesNotExist()
+    {
+        FirstWholesaleSeriesElement().TryGetProperty("originalTransactionIDReference_Series.mRID", out _).Should().BeFalse();
+        return this;
+    }
+
     public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod expectedSettlementMethod)
     {
         ArgumentNullException.ThrowIfNull(expectedSettlementMethod);
@@ -200,13 +220,13 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument PriceAmountIsPresentForPointIndex(int pointIndex, string? expectedPrice)
+    public IAssertNotifyWholesaleServicesDocument HasPriceForPosition(int position, string? expectedPrice)
     {
         FirstWholesaleSeriesElement()
             .GetProperty("Period")
             .GetProperty("Point")
             .EnumerateArray()
-            .ToList()[pointIndex]
+            .ToList()[position - 1]
             .GetProperty("price.amount")
             .GetProperty("value")
             .GetDecimal()
@@ -322,7 +342,7 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasMeasurementUnit(MeasurementUnit expectedMeasurementUnit)
+    public IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit expectedMeasurementUnit)
     {
         ArgumentNullException.ThrowIfNull(expectedMeasurementUnit);
         FirstWholesaleSeriesElement()
@@ -399,7 +419,7 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasPositionAndQuantity(int expectedPosition, int expectedQuantity)
+    public IAssertNotifyWholesaleServicesDocument HasSumQuantityForPosition(int expectedPosition, int expectedSumQuantity)
     {
         var point = FirstWholesaleSeriesElement()
             .GetProperty("Period")
@@ -418,12 +438,36 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
             .GetProperty("energySum_Quantity.quantity")
             .GetDecimal()
             .Should()
+            .Be(expectedSumQuantity);
+
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasQuantityForPosition(int expectedPosition, int expectedQuantity)
+    {
+        var point = FirstWholesaleSeriesElement()
+            .GetProperty("Period")
+            .GetProperty("Point")
+            .EnumerateArray()
+            .ToList()[0];
+
+        point
+            .GetProperty("position")
+            .GetProperty("value")
+            .GetInt32()
+            .Should()
+            .Be(expectedPosition);
+
+        point
+            .GetProperty("energy_Quantity.quantity")
+            .GetDecimal()
+            .Should()
             .Be(expectedQuantity);
 
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument SettlementMethodIsNotPresent()
+    public IAssertNotifyWholesaleServicesDocument SettlementMethodDoesNotExist()
     {
         var act = () => FirstWholesaleSeriesElement()
             .GetProperty("marketEvaluationPoint.settlementMethod");
@@ -435,9 +479,9 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument QualityIsPresentForPosition(
+    public IAssertNotifyWholesaleServicesDocument HasQualityForPosition(
         int expectedPosition,
-        string expectedQuantityQualityCode)
+        CalculatedQuantityQuality expectedQuantityQuality)
     {
         FirstWholesaleSeriesElement()
             .GetProperty("Period")
@@ -445,14 +489,15 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
             .EnumerateArray()
             .ToList()[expectedPosition - 1]
             .GetProperty("quality")
+            .GetProperty("value")
             .GetString()
             .Should()
-            .Be(expectedQuantityQualityCode);
+            .Be(CimCode.ForWholesaleServicesOf(expectedQuantityQuality));
 
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument SettlementVersionIsNotPresent()
+    public IAssertNotifyWholesaleServicesDocument SettlementVersionDoesNotExist()
     {
         var act = () => FirstWholesaleSeriesElement()
             .GetProperty("settlement_Series.version");

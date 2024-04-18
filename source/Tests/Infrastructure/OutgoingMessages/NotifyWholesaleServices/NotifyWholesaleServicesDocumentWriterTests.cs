@@ -19,9 +19,11 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
@@ -101,13 +103,13 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             .HasEnergySupplierNumber(SampleData.EnergySupplier, "A10")
             .HasPeriod(new Period(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc))
             .HasCurrency(SampleData.Currency)
-            .HasMeasurementUnit(SampleData.MeasurementUnit)
+            .HasQuantityMeasurementUnit(SampleData.MeasurementUnit)
             .HasPriceMeasurementUnit(SampleData.PriceMeasureUnit)
             .HasResolution(SampleData.Resolution)
-            .HasPositionAndQuantity(1, SampleData.Quantity)
+            .HasSumQuantityForPosition(1, SampleData.Quantity)
             .HasProductCode(ProductType.Tariff.Code)
             .HasOriginalTransactionIdReference(transactionId)
-            .SettlementVersionIsNotPresent()
+            .SettlementVersionDoesNotExist()
             .DocumentIsValidAsync();
     }
 
@@ -130,7 +132,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         // Assert
         using var assertionScope = new AssertionScope();
         AssertDocument(document, DocumentFormat.FromName(documentFormat))
-            .HasPositionAndQuantity(1, 0);
+            .HasSumQuantityForPosition(1, 0);
     }
 
     [Theory]
@@ -173,7 +175,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
 
         // Assert
         AssertDocument(document, DocumentFormat.FromName(documentFormat))
-            .HasMeasurementUnit(MeasurementUnit.Pieces);
+            .HasQuantityMeasurementUnit(MeasurementUnit.Pieces);
     }
 
     [Theory]
@@ -207,8 +209,8 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             .HasSettlementMethod(SettlementMethod.Flex)
             .HasMeteringPointType(MeteringPointType.Consumption)
             .HasResolution(Resolution.Hourly)
-            .PriceAmountIsPresentForPointIndex(0, firstPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))
-            .PriceAmountIsPresentForPointIndex(1, secondPoint.Price?.ToString(NumberFormatInfo.InvariantInfo));
+            .HasPriceForPosition(1, firstPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))
+            .HasPriceForPosition(2, secondPoint.Price?.ToString(NumberFormatInfo.InvariantInfo));
     }
 
     [Theory]
@@ -239,11 +241,11 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
 
         // Assert
         AssertDocument(document, DocumentFormat.FromName(documentFormat))
-            .SettlementMethodIsNotPresent()
+            .SettlementMethodDoesNotExist()
             .HasMeteringPointType(MeteringPointType.Production)
             .HasResolution(Resolution.Hourly)
-            .PriceAmountIsPresentForPointIndex(0, firstPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))
-            .PriceAmountIsPresentForPointIndex(1, secondPoint.Price?.ToString(NumberFormatInfo.InvariantInfo));
+            .HasPriceForPosition(1, firstPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))
+            .HasPriceForPosition(2, secondPoint.Price?.ToString(NumberFormatInfo.InvariantInfo));
     }
 
     [Theory]
@@ -277,8 +279,8 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             .HasSettlementMethod(SettlementMethod.NonProfiled)
             .HasMeteringPointType(MeteringPointType.Consumption)
             .HasResolution(Resolution.Hourly)
-            .PriceAmountIsPresentForPointIndex(0, firstPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))
-            .PriceAmountIsPresentForPointIndex(1, secondPoint.Price?.ToString(NumberFormatInfo.InvariantInfo));
+            .HasPriceForPosition(1, firstPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))
+            .HasPriceForPosition(2, secondPoint.Price?.ToString(NumberFormatInfo.InvariantInfo));
     }
 
     [Theory]
@@ -329,7 +331,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
 
         if (documentFormat == DocumentFormat.Xml)
         {
-            return new NotifyWholesaleServicesXmlDocumentWriter(_parser).WriteAsync(header, new[] { records });
+            return new NotifyWholesaleServicesCimXmlDocumentWriter(_parser).WriteAsync(header, new[] { records });
         }
         else if (documentFormat == DocumentFormat.Ebix)
         {
@@ -337,7 +339,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         }
         else if (documentFormat == DocumentFormat.Json)
         {
-            return new NotifyWholesaleServicesJsonDocumentWriter(_parser).WriteAsync(
+            return new NotifyWholesaleServicesCimJsonDocumentWriter(_parser).WriteAsync(
                 header,
                 new[] { records });
         }
