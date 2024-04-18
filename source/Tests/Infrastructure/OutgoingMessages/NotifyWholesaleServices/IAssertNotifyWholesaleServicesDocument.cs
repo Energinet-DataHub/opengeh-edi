@@ -97,7 +97,7 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// Asserts the version of the first series element
     /// </summary>
     /// <param name="expectedVersion"></param>
-    IAssertNotifyWholesaleServicesDocument HasCalculationVersion(int expectedVersion);
+    IAssertNotifyWholesaleServicesDocument HasCalculationVersion(long expectedVersion);
 
     /// <summary>
     /// Asserts the settlement version of the first series element

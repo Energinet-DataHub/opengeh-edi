@@ -112,7 +112,7 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasCalculationVersion(int expectedVersion)
+    public IAssertNotifyWholesaleServicesDocument HasCalculationVersion(long expectedVersion)
     {
         _documentAsserter.HasValue($"Series[1]/version", expectedVersion.ToString(CultureInfo.InvariantCulture));
         return this;

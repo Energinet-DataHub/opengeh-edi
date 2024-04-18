@@ -129,7 +129,7 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasCalculationVersion(int expectedVersion)
+    public IAssertNotifyWholesaleServicesDocument HasCalculationVersion(long expectedVersion)
     {
         _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/Version", expectedVersion.ToString(CultureInfo.InvariantCulture));
         return this;

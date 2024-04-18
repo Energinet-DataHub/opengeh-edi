@@ -22,6 +22,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Used only in tests")]
 internal static class RequestWholesaleServicesRequestBuilder
 {
+    /// <summary>
+    /// Create a stream containing a RequestWholesaleSettlement message in JSON format (not monthly)
+    /// </summary>
     public static IncomingMessageStream GetJsonStream(
         string senderActorNumber,
         string senderActorRole,
@@ -29,7 +32,11 @@ internal static class RequestWholesaleServicesRequestBuilder
         string periodEnd,
         string? gridArea,
         string energySupplierActorNumber,
-        string transactionId)
+        string chargeOwnerActorNumber,
+        string chargeCode,
+        string chargeType,
+        string transactionId,
+        bool isMonthly)
     {
         return new IncomingMessageStream(
             new MemoryStream(
@@ -41,7 +48,11 @@ internal static class RequestWholesaleServicesRequestBuilder
                         periodEnd,
                         gridArea,
                         energySupplierActorNumber,
-                        transactionId))));
+                        chargeOwnerActorNumber,
+                        chargeCode,
+                        chargeType,
+                        transactionId,
+                        isMonthly))));
     }
 
     private static string GetJson(
@@ -51,7 +62,11 @@ internal static class RequestWholesaleServicesRequestBuilder
         string periodEnd,
         string? gridArea,
         string energySupplierActorNumber,
-        string transactionId)
+        string chargeOwnerActorNumber,
+        string chargeCode,
+        string chargeType,
+        string transactionId,
+        bool isMonthly)
     {
         return $@"{{
   ""RequestWholesaleSettlement_MarketDocument"": {{
@@ -83,9 +98,10 @@ internal static class RequestWholesaleServicesRequestBuilder
     ""Series"": [
       {{
         ""mRID"": ""{transactionId}"",
+        {GetResolutionSection(isMonthly)}
         ""chargeTypeOwner_MarketParticipant.mRID"": {{
           ""codingScheme"": ""A10"",
-          ""value"": ""5790001330552""
+          ""value"": ""{chargeOwnerActorNumber}""
         }},
         ""end_DateAndOrTime.dateTime"": ""{periodEnd}"",
         ""energySupplier_MarketParticipant.mRID"": {{
@@ -99,9 +115,9 @@ internal static class RequestWholesaleServicesRequestBuilder
         ""start_DateAndOrTime.dateTime"": ""{periodStart}"",
         ""ChargeType"": [
           {{
-            ""mRID"": ""40000"",
+            ""mRID"": ""{chargeCode}"",
             ""type"": {{
-              ""value"": ""D03""
+              ""value"": ""{chargeType}""
             }}
           }}
         ]
@@ -111,13 +127,12 @@ internal static class RequestWholesaleServicesRequestBuilder
 }}";
     }
 
-    private static string GetGridAreaSection(string? gridArea)
+    private static string GetResolutionSection(bool isMonthly)
     {
-        return gridArea is not null
-            ? $@"				""meteringGridArea_Domain.mRID"": {{
-				  ""codingScheme"": ""NDK"",
-				  ""value"": ""{gridArea}""
-				}},"
+        return isMonthly
+            ? """
+              "aggregationSeries_Period.resolution": "P1M",
+              """
             : string.Empty;
     }
 }

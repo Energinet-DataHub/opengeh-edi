@@ -41,7 +41,7 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
         GivenNowIs(2024, 7, 1);
         GivenAuthenticatedActorIs(ActorNumber.Create("2111111111111"), ActorRole.EnergySupplier);
 
-        await GivenDelegationAsync(
+        await GivenDelegation(
             new ActorNumberAndRoleDto(ActorNumber.Create("2111111111111"), ActorRole.EnergySupplier),
             new ActorNumberAndRoleDto(ActorNumber.Create("1111111111111"), ActorRole.Delegated),
             "512",

@@ -48,6 +48,8 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
         schema.Should().NotBeNull("Cannot validate document without a schema");
 
+        var documentAsString = _document.RootElement.GetRawText();
+
         var validationOptions = new EvaluationOptions { OutputFormat = OutputFormat.List };
         var validationResult = schema!.Evaluate(_document, validationOptions);
         var errors = validationResult.Details.Where(detail => detail.HasErrors)
@@ -56,7 +58,11 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
                 p => p.Errors!.Values.Select(
                     e => $"==> '{p.InstanceLocation}' does not adhere to '{p.EvaluationPath}' with error: {e}\n"));
 
-        validationResult.IsValid.Should().BeTrue(string.Join("\n", errors));
+        validationResult.IsValid.Should().BeTrue($"because document should be valid. Validation errors:{Environment.NewLine}{{0}}", string.Join("\n", errors));
+
+        var test = validationResult.Details
+            .Where(d => d.HasErrors)
+            .ToList();
 
         return this;
     }
@@ -166,7 +172,7 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasCalculationVersion(int expectedVersion)
+    public IAssertNotifyWholesaleServicesDocument HasCalculationVersion(long expectedVersion)
     {
         FirstWholesaleSeriesElement()
             .GetProperty("version")

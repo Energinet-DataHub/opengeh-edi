@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
@@ -33,6 +34,7 @@ using Xunit;
 using Xunit.Abstractions;
 using ChargeType = Energinet.DataHub.Edi.Requests.ChargeType;
 using Period = Energinet.DataHub.Edi.Responses.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
@@ -44,59 +46,59 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
     {
     }
 
+    // [Fact]
+    // public async Task AndGiven_DelegationInTwoGridAreas_When_WholesaleServicesProcessIsInitialized_Then_WholesaleServiceBusMessageIsCorrect()
+    // {
+    //     // Arrange
+    //     var senderSpy = CreateServiceBusSenderSpy("Fake");
+    //     GivenNowIs(2024, 7, 1);
+    //     var delegatedByActor = (ActorNumber: ActorNumber.Create("2111111111111"), ActorRole: ActorRole.EnergySupplier);
+    //     var delegatedToActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.Delegated);
+    //     GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
+    //
+    //     await GivenDelegation(
+    //         new ActorNumberAndRoleDto(delegatedByActor.ActorNumber, delegatedByActor.ActorRole),
+    //         new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
+    //         "512",
+    //         ProcessType.RequestWholesaleResults,
+    //         GetNow(),
+    //         GetNow().Plus(Duration.FromDays(32)));
+    //
+    //     await GivenDelegation(
+    //         new ActorNumberAndRoleDto(delegatedByActor.ActorNumber, delegatedByActor.ActorRole),
+    //         new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
+    //         "609",
+    //         ProcessType.RequestWholesaleResults,
+    //         GetNow(),
+    //         GetNow().Plus(Duration.FromDays(32)));
+    //
+    //     await GivenRequestWholesaleServices(
+    //         DocumentFormat.Json,
+    //         delegatedToActor.ActorNumber.Value,
+    //         delegatedByActor.ActorRole.Code,
+    //         (2024, 1, 1),
+    //         (2024, 2, 1),
+    //         null,
+    //         delegatedByActor.ActorNumber.Value,
+    //         "123564789123564789123564789123564787",
+    //         false);
+    //
+    //     // Act
+    //     await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
+    //
+    //     // Assert
+    //     await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
+    //         senderSpy,
+    //         gridAreas: new[] { "512", "609" },
+    //         requestedForActorNumber: "2111111111111",
+    //         requestedForActorRole: "EnergySupplier",
+    //         energySupplierId: "2111111111111");
+    // }
+
     [Fact]
-    public async Task
-        AndGiven_DelegationInTwoGridAreas_When_WholesaleServicesProcessIsInitialized_Then_WholesaleServiceBusMessageIsCorrect()
+    public async Task AndGiven_DelegationInTwoGridAreas_When_DelegatedActorPeeksMessage_Then_NotifyWholesaleServicesDocumentIsCorrect()
     {
-        // Arrange
-        var senderSpy = CreateServiceBusSenderSpy("Fake");
-        GivenNowIs(2024, 7, 1);
-        var delegatedByActor = (ActorNumber: ActorNumber.Create("2111111111111"), ActorRole: ActorRole.EnergySupplier);
-        var delegatedToActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.Delegated);
-        GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
-
-        await GivenDelegationAsync(
-            new ActorNumberAndRoleDto(delegatedByActor.ActorNumber, delegatedByActor.ActorRole),
-            new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
-            "512",
-            ProcessType.RequestWholesaleResults,
-            GetNow(),
-            GetNow().Plus(Duration.FromDays(32)));
-
-        await GivenDelegationAsync(
-            new ActorNumberAndRoleDto(delegatedByActor.ActorNumber, delegatedByActor.ActorRole),
-            new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
-            "609",
-            ProcessType.RequestWholesaleResults,
-            GetNow(),
-            GetNow().Plus(Duration.FromDays(32)));
-
-        await GivenRequestWholesaleServicesAsync(
-            DocumentFormat.Json,
-            delegatedToActor.ActorNumber.Value,
-            delegatedByActor.ActorRole.Code,
-            (2024, 1, 1),
-            (2024, 2, 1),
-            null,
-            delegatedByActor.ActorNumber.Value,
-            "123564789123564789123564789123564787");
-
-        // Act
-        await WhenWholesaleServicesProcessIsInitializedAsync(senderSpy.Message!);
-
-        // Assert
-        await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
-            senderSpy,
-            gridAreas: new[] { "512", "609" },
-            requestedForActorNumber: "2111111111111",
-            requestedForActorRole: "EnergySupplier",
-            energySupplierId: "2111111111111");
-    }
-
-    [Fact]
-    public async Task
-        AndGiven_DelegationInTwoGridAreas_When_DelegatedEnergySupplierPeeksMessage_Then_NotifyWholesaleServicesDocumentIsCorrect()
-    {
+        var documentFormat = DocumentFormat.Json; // TODO: Make input parameter
         /*
          * A request is a test with 2 parts:
          *  1. Send a request to the system (incoming message)
@@ -109,12 +111,13 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
 
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy("Fake");
-        GivenNowIs(2024, 7, 1);
         var delegatedByActor = (ActorNumber: ActorNumber.Create("2111111111111"), ActorRole: ActorRole.EnergySupplier);
         var delegatedToActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.Delegated);
+
+        GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
 
-        await GivenDelegationAsync(
+        await GivenDelegation(
             new ActorNumberAndRoleDto(delegatedByActor.ActorNumber, delegatedByActor.ActorRole),
             new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
             "512",
@@ -122,7 +125,7 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
             GetNow(),
             GetNow().Plus(Duration.FromDays(32)));
 
-        await GivenDelegationAsync(
+        await GivenDelegation(
             new ActorNumberAndRoleDto(delegatedByActor.ActorNumber, delegatedByActor.ActorRole),
             new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
             "609",
@@ -130,18 +133,22 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
             GetNow(),
             GetNow().Plus(Duration.FromDays(32)));
 
-        await GivenRequestWholesaleServicesAsync(
-            DocumentFormat.Json,
+        await GivenRequestWholesaleServices(
+            documentFormat,
             delegatedToActor.ActorNumber.Value,
             delegatedByActor.ActorRole.Code,
             (2024, 1, 1),
-            (2024, 2, 1),
+            (2024, 1, 31),
             null,
             delegatedByActor.ActorNumber.Value,
-            "123564789123564789123564789123564787");
+            "5799999933444",
+            "25361478",
+            BuildingBlocks.Domain.Models.ChargeType.Tariff.Code,
+            "123564789123564789123564789123564787",
+            false);
 
         // Act
-        await WhenWholesaleServicesProcessIsInitializedAsync(senderSpy.Message!);
+        await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
 
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
@@ -158,15 +165,57 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
          */
 
         // Arrange
-        var wholesaleServicesRequestAcceptedMessage = CreateWholesaleServicesRequestAcceptedMessage(message.WholesaleServicesRequest);
+        var wholesaleServicesRequestAcceptedMessage = GenerateWholesaleServicesRequestAcceptedMessage(message.WholesaleServicesRequest);
         await GivenWholesaleServicesRequestAcceptedIsReceived(message.ProcessId, wholesaleServicesRequestAcceptedMessage);
 
         // Act
+        var peekResult = await WhenActorPeeksMessage(
+            delegatedToActor.ActorNumber,
+            delegatedToActor.ActorRole,
+            documentFormat);
 
-        // Assert
+        await ThenNotifyWholesaleServicesDocumentIsCorrect(
+            peekResult.Bundle,
+            documentFormat,
+            document => document
+                // -- Assert header values --
+                .MessageIdExists()
+                // Assert businessSector.type? (23)
+                .HasTimestamp("2024-07-01T14:57:09Z") // 2024, 7, 1, 14, 57, 09
+                .HasBusinessReason(BusinessReason.WholesaleFixing, CodeListType.EbixDenmark)
+                .HasReceiverId(ActorNumber.Create("1111111111111"))
+                .HasReceiverRole(ActorRole.EnergySupplier, CodeListType.Ebix)
+                .HasSenderId(ActorNumber.Create("5790001330552"), "A10") // Sender is DataHub
+                .HasSenderRole(ActorRole.MeteredDataAdministrator)
+                // Assert type? (E31)
+                // -- Assert series values --
+                .TransactionIdExists()
+                .HasChargeTypeOwner(ActorNumber.Create("5799999933444"), "A10")
+                .HasChargeCode("25361478")
+                .HasChargeType(BuildingBlocks.Domain.Models.ChargeType.Tariff)
+                .HasCurrency(Currency.DanishCrowns)
+                .HasEnergySupplierNumber(ActorNumber.Create("2111111111111"), "A10")
+                .HasSettlementMethod(SettlementMethod.Flex)
+                .HasMeteringPointType(MeteringPointType.Consumption)
+                .HasGridAreaCode("609", "NDK")
+                .HasOriginalTransactionIdReference("123564789123564789123564789123564787")
+                .HasPriceMeasurementUnit(MeasurementUnit.Kwh)
+                .HasProductCode("5790001330590") // Example says "8716867000030", but document writes as "5790001330590"?
+                .HasQuantityMeasurementUnit(MeasurementUnit.Kwh)
+                .SettlementVersionDoesNotExist()
+                .HasCalculationVersion(GetNow().ToUnixTimeTicks())
+                .HasResolution(Resolution.Hourly)
+                .HasPeriod(
+                    new BuildingBlocks.Domain.Models.Period(
+                        CreateDateInstant(2024, 1, 1),
+                        CreateDateInstant(2024, 1, 31))));
+        // .HasSumQuantityForPosition(1, 30)
+        // .HasQuantityForPosition(1, 3)
+        // .HasPriceForPosition(1, "10")
+        // .HasQualityForPosition(1, CalculatedQuantityQuality.Calculated));
     }
 
-    private WholesaleServicesRequestAccepted CreateWholesaleServicesRequestAcceptedMessage(WholesaleServicesRequest request)
+    private WholesaleServicesRequestAccepted GenerateWholesaleServicesRequestAcceptedMessage(WholesaleServicesRequest request)
     {
         var gridAreas = request.GridAreaCodes.ToList();
         if (gridAreas.Count == 0)
@@ -174,7 +223,7 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
 
         var chargeTypes = request.ChargeTypes;
         if (chargeTypes.Count == 0)
-            chargeTypes.Add(new ChargeType { ChargeCode = "25361478", ChargeType_ = DataHubNames.ChargeType.Tariff });
+            chargeTypes.Add(new ChargeType { ChargeCode = "12345678", ChargeType_ = DataHubNames.ChargeType.Tariff });
 
         var series = gridAreas.SelectMany(
             ga => chargeTypes.Select(ct =>
@@ -230,7 +279,7 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
                     QuantityUnit = WholesaleServicesRequestSeries.Types.QuantityUnit.Kwh,
                     SettlementMethod = WholesaleServicesRequestSeries.Types.SettlementMethod.Flex,
                     EnergySupplierId = request.EnergySupplierId,
-                    MeteringPointType = WholesaleServicesRequestSeries.Types.MeteringPointType.Production,
+                    MeteringPointType = WholesaleServicesRequestSeries.Types.MeteringPointType.Consumption,
                     CalculationResultVersion = GetNow().ToUnixTimeTicks(),
                 };
 

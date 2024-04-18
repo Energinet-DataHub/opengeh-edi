@@ -130,7 +130,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 [Collection("IntegrationTest")]
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "This is a test class")]
 [SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Test class")]
-[SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Test class")]
 public class BehavioursTestBase : IDisposable
 {
     private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
@@ -291,7 +290,7 @@ public class BehavioursTestBase : IDisposable
             .ToInstant();
     }
 
-    protected async Task GivenDelegationAsync(
+    protected async Task GivenDelegation(
         ActorNumberAndRoleDto delegatedBy,
         ActorNumberAndRoleDto delegatedTo,
         string gridAreaCode,
@@ -345,7 +344,7 @@ public class BehavioursTestBase : IDisposable
                 CancellationToken.None);
     }
 
-    protected async Task GivenRequestWholesaleServicesAsync(
+    protected async Task GivenRequestWholesaleServices(
         DocumentFormat documentFormat,
         string senderActorNumber,
         string senderActorRole,
@@ -353,7 +352,11 @@ public class BehavioursTestBase : IDisposable
         (int Year, int Month, int Day) periodEnd,
         string? gridArea,
         string energySupplierActorNumber,
-        string transactionId)
+        string chargeOwnerActorNumber,
+        string chargeCode,
+        string chargeType,
+        string transactionId,
+        bool isMonthly)
     {
         var incomingMessageClient = GetService<IIncomingMessageClient>();
 
@@ -375,7 +378,11 @@ public class BehavioursTestBase : IDisposable
                     .ToString(),
                 gridArea,
                 energySupplierActorNumber,
-                transactionId);
+                chargeOwnerActorNumber,
+                chargeCode,
+                chargeType,
+                transactionId,
+                isMonthly);
         }
         else
         {
@@ -464,10 +471,10 @@ public class BehavioursTestBase : IDisposable
 
     protected Task GivenWholesaleServicesProcessIsInitializedAsync(ServiceBusMessage serviceBusMessage)
     {
-        return WhenWholesaleServicesProcessIsInitializedAsync(serviceBusMessage);
+        return WhenWholesaleServicesProcessIsInitialized(serviceBusMessage);
     }
 
-    protected async Task WhenWholesaleServicesProcessIsInitializedAsync(ServiceBusMessage serviceBusMessage)
+    protected async Task WhenWholesaleServicesProcessIsInitialized(ServiceBusMessage serviceBusMessage)
     {
         // We have to manually process the service bus message, as there isn't a real service bus
         serviceBusMessage.Subject.Should().Be(nameof(InitializeWholesaleServicesProcessDto));
@@ -493,10 +500,11 @@ public class BehavioursTestBase : IDisposable
         return peekResult;
     }
 
-    protected async Task ThenNotifyWholesaleServicesDocumentIsCorrect(Stream? bundle, DocumentFormat documentFormat, Action<IAssertNotifyWholesaleServicesDocument> assert)
+    protected async Task ThenNotifyWholesaleServicesDocumentIsCorrect(Stream? peekResultDocumentStream, DocumentFormat documentFormat, Action<IAssertNotifyWholesaleServicesDocument> assert)
     {
+        peekResultDocumentStream.Should().NotBeNull();
+
         using var assertionScope = new AssertionScope();
-        bundle.Should().NotBeNull();
 
         var xmlDocumentValidator = new DocumentValidator(new List<IValidator>
         {
@@ -507,21 +515,21 @@ public class BehavioursTestBase : IDisposable
         {
             nameof(DocumentFormat.Xml) => new AssertNotifyWholesaleServicesXmlDocument(
                 AssertXmlDocument.Document(
-                    bundle!,
+                    peekResultDocumentStream!,
                     "cim_",
                     xmlDocumentValidator)),
-            nameof(DocumentFormat.Json) => new AssertNotifyWholesaleServicesJsonDocument(bundle!),
+            nameof(DocumentFormat.Json) => new AssertNotifyWholesaleServicesJsonDocument(peekResultDocumentStream!),
             nameof(DocumentFormat.Ebix) => new AssertNotifyWholesaleServicesEbixDocument(
                 AssertEbixDocument.Document(
-                    bundle!,
+                    peekResultDocumentStream!,
                     "ns0",
                     xmlDocumentValidator),
                 true),
             _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, null),
         };
 
-        await asserter.DocumentIsValidAsync();
         assert(asserter);
+        await asserter.DocumentIsValidAsync();
     }
 
     protected AmountPerChargeResultProducedV1 GivenAmountPerChargeResultProducedV1Event(Action<AmountPerChargeResultProducedV1EventBuilder> builder)
