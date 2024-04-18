@@ -43,8 +43,9 @@ public class DelegateMessage
     {
         ArgumentNullException.ThrowIfNull(messageToEnqueue);
 
-        // TODO: Delegate rejected messages based on who made the request
-        if (messageToEnqueue.DocumentType == DocumentType.RejectRequestAggregatedMeasureData || messageToEnqueue.DocumentType == DocumentType.RejectRequestWholesaleSettlement)
+        // Do not delegate outgoing message if it is created from a request,
+        // because the receiver must be the same as the one who made the request
+        if (messageToEnqueue.MessageCreatedFromProcess == ProcessType.RequestWholesaleResults)
             return messageToEnqueue;
 
         if (string.IsNullOrEmpty(messageToEnqueue.GridAreaCode))

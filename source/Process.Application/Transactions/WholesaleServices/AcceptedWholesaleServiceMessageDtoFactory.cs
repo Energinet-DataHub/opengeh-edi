@@ -33,14 +33,16 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
         var message = CreateWholesaleResultSeries(process, acceptedWholesaleServices);
 
         return AcceptedWholesaleServicesMessageDto.Create(
-            process.RequestedByActorNumber,
-            process.RequestedByActorRole,
-            message.ChargeOwner,
-            process.ProcessId.Id,
-            eventId,
-            process.BusinessReason.Name,
-            message,
-            process.InitiatedByMessageId);
+            receiverNumber: process.RequestedByActorNumber,
+            receiverRole: process.RequestedByActorRole,
+            documentReceiverNumber: process.RequestedForActorNumber,
+            documentReceiverRole: process.RequestedForActorRole,
+            chargeOwnerId: message.ChargeOwner,
+            processId: process.ProcessId.Id,
+            eventId: eventId,
+            businessReason: process.BusinessReason.Name,
+            wholesaleSeries: message,
+            relatedToMessageId: process.InitiatedByMessageId);
     }
 
     private static AcceptedWholesaleServicesSeries CreateWholesaleResultSeries(

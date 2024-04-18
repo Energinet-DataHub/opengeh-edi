@@ -35,6 +35,8 @@ public abstract class AcceptedWholesaleServicesMessageDtoBuilder
         return AcceptedWholesaleServicesMessageDto.Create(
             _receiverNumber,
             _receiverRole,
+            _receiverNumber,
+            _receiverRole,
             _chargeOwner,
             _processId,
             _eventId,
