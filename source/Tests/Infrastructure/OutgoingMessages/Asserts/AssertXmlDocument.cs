@@ -64,6 +64,14 @@ public class AssertXmlDocument
         return this;
     }
 
+    public AssertXmlDocument ElementExists(string xpath)
+    {
+        ArgumentNullException.ThrowIfNull(xpath);
+        var pathSelectElement = _document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager);
+        Assert.NotNull(pathSelectElement);
+        return this;
+    }
+
     public AssertXmlDocument HasAttribute(string xpath, string attribute, string expectedValue)
     {
         ArgumentNullException.ThrowIfNull(xpath);

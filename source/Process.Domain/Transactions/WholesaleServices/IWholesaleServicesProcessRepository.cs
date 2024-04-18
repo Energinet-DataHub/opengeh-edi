@@ -14,9 +14,8 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 
 /// <summary>
 /// Storage for Process
