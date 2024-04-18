@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueu
 public interface IActorMessageQueueRepository
 {
     /// <summary>
-    /// Get the the actor queue for the given actor number and message category.
+    /// Get the actor queue for the given actor number and message category.
     /// </summary>
     Task<ActorMessageQueue?> ActorMessageQueueForAsync(ActorNumber actorNumber, ActorRole actorRole);
 
