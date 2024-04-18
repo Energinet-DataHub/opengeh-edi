@@ -16,6 +16,7 @@ using System;
 using System.Globalization;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
@@ -40,6 +41,12 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
     public IAssertNotifyWholesaleServicesDocument HasMessageId(string expectedMessageId)
     {
         _documentAsserter.HasValue("mRID", expectedMessageId);
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument MessageIdExists()
+    {
+        _documentAsserter.ElementExists("mRID");
         return this;
     }
 
@@ -98,6 +105,12 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         return this;
     }
 
+    public IAssertNotifyWholesaleServicesDocument TransactionIdExists()
+    {
+        _documentAsserter.ElementExists($"Series[1]/mRID");
+        return this;
+    }
+
     public IAssertNotifyWholesaleServicesDocument HasCalculationVersion(int expectedVersion)
     {
         _documentAsserter.HasValue($"Series[1]/version", expectedVersion.ToString(CultureInfo.InvariantCulture));
@@ -120,6 +133,12 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         return this;
     }
 
+    public IAssertNotifyWholesaleServicesDocument OriginalTransactionIdReferenceDoesNotExist()
+    {
+        _documentAsserter.IsNotPresent("Series[1]/originalTransactionIDReference_Series.mRID");
+        return this;
+    }
+
     public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod expectedSettlementMethod)
     {
         ArgumentNullException.ThrowIfNull(expectedSettlementMethod);
@@ -127,9 +146,9 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument PriceAmountIsPresentForPointIndex(int pointIndex, string? expectedPrice)
+    public IAssertNotifyWholesaleServicesDocument HasPriceForPosition(int position, string? expectedPrice)
     {
-        _documentAsserter.HasValue($"Series[1]/Period/Point[{pointIndex + 1}]/price.amount", expectedPrice ?? "0");
+        _documentAsserter.HasValue($"Series[1]/Period/Point[{position}]/price.amount", expectedPrice ?? "0");
         return this;
     }
 
@@ -191,7 +210,7 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasMeasurementUnit(MeasurementUnit expectedMeasurementUnit)
+    public IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit expectedMeasurementUnit)
     {
         ArgumentNullException.ThrowIfNull(expectedMeasurementUnit);
         _documentAsserter.HasValue("Series[1]/quantity_Measure_Unit.name", expectedMeasurementUnit.Code);
@@ -228,27 +247,35 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasPositionAndQuantity(int expectedPosition, int expectedQuantity)
+    public IAssertNotifyWholesaleServicesDocument HasSumQuantityForPosition(int expectedPosition, int expectedSumQuantity)
     {
         _documentAsserter
             .HasValue("Series[1]/Period/Point[1]/position", expectedPosition.ToString(CultureInfo.InvariantCulture))
-            .HasValue("Series[1]/Period/Point[1]/energySum_Quantity.quantity", expectedQuantity.ToString(CultureInfo.InvariantCulture));
+            .HasValue("Series[1]/Period/Point[1]/energySum_Quantity.quantity", expectedSumQuantity.ToString(CultureInfo.InvariantCulture));
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument SettlementMethodIsNotPresent()
+    public IAssertNotifyWholesaleServicesDocument HasQuantityForPosition(int expectedPosition, int expectedQuantity)
+    {
+        _documentAsserter
+            .HasValue("Series[1]/Period/Point[1]/position", expectedPosition.ToString(CultureInfo.InvariantCulture))
+            .HasValue("Series[1]/Period/Point[1]/energy_Quantity.quantity", expectedQuantity.ToString(CultureInfo.InvariantCulture));
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument SettlementMethodDoesNotExist()
     {
         _documentAsserter.IsNotPresent("Series[1]/marketEvaluationPoint.settlementMethod");
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument QualityIsPresentForPosition(int expectedPosition, string expectedQuantityQualityCode)
+    public IAssertNotifyWholesaleServicesDocument HasQualityForPosition(int expectedPosition, CalculatedQuantityQuality expectedQuantityQuality)
     {
-        _documentAsserter.HasValue($"Series[1]/Period/Point[{expectedPosition}]/quality", expectedQuantityQualityCode);
+        _documentAsserter.HasValue($"Series[1]/Period/Point[{expectedPosition}]/quality", CimCode.ForWholesaleServicesOf(expectedQuantityQuality));
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument SettlementVersionIsNotPresent()
+    public IAssertNotifyWholesaleServicesDocument SettlementVersionDoesNotExist()
     {
         _documentAsserter.IsNotPresent("Series[1]/settlement_Series.version");
         return this;
