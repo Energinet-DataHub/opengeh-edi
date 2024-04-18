@@ -68,7 +68,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .WithGridAreaCode(SampleData.GridAreaCode)
             .StoreAsync(GetService<IMasterDataClient>());
 
-        var process = BuildProcess();
+        var process = await BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);
 
         // Act
@@ -103,7 +103,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .WithGridAreaCode(SampleData.GridAreaCode)
             .StoreAsync(GetService<IMasterDataClient>());
 
-        var process = BuildProcess();
+        var process = await BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);
 
         // Act
@@ -130,7 +130,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .WithGridAreaCode(SampleData.GridAreaCode)
             .StoreAsync(GetService<IMasterDataClient>());
 
-        var process = BuildProcess();
+        var process = await BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);
         acceptedEvent.Series.Add(acceptedEvent.Series.First());
 
@@ -157,7 +157,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .WithGridAreaCode(SampleData.GridAreaCode)
             .StoreAsync(GetService<IMasterDataClient>());
 
-        var process = BuildProcess();
+        var process = await BuildProcess();
         var acceptedEvent = GetAcceptedEvent(process);
 
         // Act
@@ -259,7 +259,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             GetService<IFileStorageClient>());
     }
 
-    private AggregatedMeasureDataProcess BuildProcess(ActorRole? receiverRole = null)
+    private async Task<AggregatedMeasureDataProcess> BuildProcess(ActorRole? receiverRole = null)
     {
         receiverRole ??= SampleData.BalanceResponsibleParty;
 
@@ -281,7 +281,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         process.SendToWholesale();
         _processContext.AggregatedMeasureDataProcesses.Add(process);
-        _processContext.SaveChanges();
+        await _processContext.SaveChangesAsync();
         return process;
     }
 }

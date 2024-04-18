@@ -105,6 +105,10 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.Equal(message.RelatedToMessageId?.Value, result!.RelatedToMessageId),
             () => Assert.Equal(message.EventId.Value, result!.EventId),
             () => Assert.NotNull(result!.AssignedBundleId),
+            () => Assert.NotNull(result!.CreatedAt),
+            () => Assert.NotNull(result!.CreatedBy),
+            () => Assert.Null(result!.ModifiedAt),
+            () => Assert.Null(result!.ModifiedBy),
         };
 
         Assert.Multiple(propertyAssertions);
@@ -412,15 +416,18 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     private async Task CreateActorMessageQueueInDatabase(Guid id, ActorNumber actorNumber, ActorRole actorRole)
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        var systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
 
         await connection.ExecuteAsync(
-            @"INSERT INTO [dbo].[ActorMessageQueues] (Id, ActorNumber, ActorRole)
-                    VALUES (@Id, @ActorNumber, @ActorRole)",
+            @"INSERT INTO [dbo].[ActorMessageQueues] (Id, ActorNumber, ActorRole, CreatedBy, CreatedAt)
+                    VALUES (@Id, @ActorNumber, @ActorRole, @CreatedBy, @CreatedAt)",
             new
             {
                 Id = id,
                 ActorNumber = actorNumber.Value,
                 ActorRole = actorRole.Code,
+                CreatedBy = "Test",
+                CreatedAt = systemDateTimeProvider.Now(),
             });
     }
 

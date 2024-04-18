@@ -36,6 +36,15 @@ public class AuthenticatedActor
     }
 
     /// <summary>
+    /// Attempts to retrieve the current actor identity.
+    /// </summary>
+    public bool TryGetCurrentActorIdentity(out ActorIdentity? actorIdentity)
+    {
+        actorIdentity = _currentIdentity;
+        return actorIdentity != null;
+    }
+
+    /// <summary>
     /// Set the authenticated actor
     /// </summary>
     public void SetAuthenticatedActor(ActorIdentity? actorIdentity)

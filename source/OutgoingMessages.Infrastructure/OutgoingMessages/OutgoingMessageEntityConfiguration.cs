@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages
 {
@@ -113,6 +114,11 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages
                             fromDbValue => ActorRole.FromCode(fromDbValue))
                         .HasColumnName("ReceiverRole");
                 });
+
+            builder.Property<string>("CreatedBy");
+            builder.Property<Instant>("CreatedAt");
+            builder.Property<string?>("ModifiedBy");
+            builder.Property<Instant?>("ModifiedAt");
         }
     }
 }

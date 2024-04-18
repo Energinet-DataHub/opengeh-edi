@@ -49,7 +49,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
     {
         // Arrange
         var expectedEventId = "expected-event-id";
-        var process = BuildProcess();
+        var process = await BuildProcess();
         var rejectReason = new RejectReason()
         {
             ErrorCode = "ER0",
@@ -100,7 +100,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
             GetService<IFileStorageClient>());
     }
 
-    private AggregatedMeasureDataProcess BuildProcess()
+    private async Task<AggregatedMeasureDataProcess> BuildProcess()
     {
         var process = new AggregatedMeasureDataProcess(
           ProcessId.New(),
@@ -120,7 +120,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
 
         process.SendToWholesale();
         _processContext.AggregatedMeasureDataProcesses.Add(process);
-        _processContext.SaveChanges();
+        await _processContext.SaveChangesAsync();
         return process;
     }
 }

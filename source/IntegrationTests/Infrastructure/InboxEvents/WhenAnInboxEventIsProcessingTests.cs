@@ -47,13 +47,12 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
             GetService<ISystemDateTimeProvider>(),
             new[] { _testInboxEventMapper },
             GetService<ILogger<InboxEventsProcessor>>());
-
-        RegisterInboxEvent();
     }
 
     [Fact]
     public async Task Event_is_marked_as_processed_when_a_handler_has_handled_it_successfully()
     {
+        await RegisterInboxEvent();
         await ProcessInboxMessages();
 
         await EventIsMarkedAsProcessed(_eventId);
@@ -62,6 +61,7 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
     [Fact]
     public async Task Notification_for_events_is_published()
     {
+        await RegisterInboxEvent();
         TestNotificationHandlerSpy.AddNotification("Event1");
 
         await ProcessInboxMessages();
@@ -72,6 +72,7 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
     [Fact]
     public async Task Event_is_marked_as_failed_if_the_event_mapper_is_missing_for_the_eventType()
     {
+        await RegisterInboxEvent();
         var inboxProcessor = new InboxEventsProcessor(
             GetService<IDatabaseConnectionFactory>(),
             GetService<IMediator>(),
@@ -103,7 +104,7 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
         Assert.True(isFailed);
     }
 
-    private void RegisterInboxEvent()
+    private async Task RegisterInboxEvent()
     {
         var context = GetService<ProcessContext>();
         context.ReceivedInboxEvents.Add(new ReceivedInboxEvent(
@@ -112,6 +113,6 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
             _referenceId,
             Encoding.ASCII.GetBytes("Event1"),
             GetService<ISystemDateTimeProvider>().Now()));
-        context.SaveChanges();
+        await context.SaveChangesAsync();
     }
 }

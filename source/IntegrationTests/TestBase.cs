@@ -68,6 +68,7 @@ using Microsoft.Extensions.Logging;
 using Xunit;
 using Xunit.Abstractions;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
+using ExecutionContext = Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext;
 using SampleData = Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.SampleData;
 
 namespace Energinet.DataHub.EDI.IntegrationTests
@@ -319,6 +320,13 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             // - Building blocks
             _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
             _services.AddTransient<IFeatureFlagManager>((x) => FeatureFlagManagerStub);
+
+            _services.AddScoped<ExecutionContext>((x) =>
+            {
+                var executionContext = new ExecutionContext();
+                executionContext.SetExecutionType(ExecutionType.Test);
+                return executionContext;
+            });
 
             // Add test logger
             _services.AddSingleton<ITestOutputHelper>(sp => testOutputHelper);

@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
 
@@ -68,5 +69,10 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
                 toDbValue => toDbValue.Value,
                 fromDbValue => MessageId.Create(fromDbValue));
         builder.Ignore(x => x.DomainEvents);
+
+        builder.Property<string>("CreatedBy");
+        builder.Property<Instant>("CreatedAt");
+        builder.Property<string?>("ModifiedBy");
+        builder.Property<Instant?>("ModifiedAt");
     }
 }

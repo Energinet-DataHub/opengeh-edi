@@ -150,15 +150,14 @@ public class BehavioursTestBase : IDisposable
         _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
         TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
         InboxEventNotificationHandler = new TestNotificationHandlerSpy();
+        _systemDateTimeProviderStub = new SystemDateTimeProviderStub();
+        _dateTimeZone = DateTimeZoneProviders.Tzdb["Europe/Copenhagen"];
         _serviceProvider = BuildServices(integrationTestFixture.AzuriteManager.BlobStorageConnectionString, testOutputHelper);
         _processContext = GetService<ProcessContext>();
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         _authenticatedActor = GetService<AuthenticatedActor>();
         _authenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None));
-        _systemDateTimeProviderStub = new SystemDateTimeProviderStub();
-
-        _dateTimeZone = DateTimeZoneProviders.Tzdb["Europe/Copenhagen"];
     }
 
     private TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
@@ -527,6 +526,13 @@ public class BehavioursTestBase : IDisposable
             .AddIncomingMessagesModule(config)
             .AddMasterDataModule(config)
             .AddDataAccessUnitOfWorkModule(config);
+
+        _services.AddScoped<Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext>((x) =>
+        {
+            var executionContext = new Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext();
+            executionContext.SetExecutionType(ExecutionType.Test);
+            return executionContext;
+        });
 
         // Replace the services with stub implementations.
         // - Building blocks

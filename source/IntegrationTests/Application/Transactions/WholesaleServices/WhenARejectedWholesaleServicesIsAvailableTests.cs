@@ -51,7 +51,7 @@ public sealed class WhenARejectedWholesaleServicesIsAvailableTests : TestBase
     {
         // Arrange
         var expectedEventId = Guid.NewGuid().ToString();
-        var process = BuildProcess();
+        var process = await BuildProcess();
         var rejectReason = new RejectReason { ErrorCode = "ER0" };
         var rejectReason2 = new RejectReason { ErrorCode = "ER1" };
         var rejectEvent = new WholesaleServicesRequestRejected { RejectReasons = { rejectReason, rejectReason2 } };
@@ -106,7 +106,7 @@ public sealed class WhenARejectedWholesaleServicesIsAvailableTests : TestBase
             GetService<IFileStorageClient>());
     }
 
-    private WholesaleServicesProcess BuildProcess()
+    private async Task<WholesaleServicesProcess> BuildProcess()
     {
         var process = new WholesaleServicesProcess(
             ProcessId.New(),
@@ -126,7 +126,7 @@ public sealed class WhenARejectedWholesaleServicesIsAvailableTests : TestBase
 
         process.SendToWholesale();
         _processContext.WholesaleServicesProcesses.Add(process);
-        _processContext.SaveChanges();
+        await _processContext.SaveChangesAsync();
         return process;
     }
 }
