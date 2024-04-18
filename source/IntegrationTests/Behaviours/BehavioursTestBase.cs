@@ -390,6 +390,11 @@ public class BehavioursTestBase : IDisposable
         return serviceBusSenderSpy;
     }
 
+    protected Task GivenWholesaleServicesProcessIsInitializedAsync(ServiceBusMessage serviceBusMessage)
+    {
+        return WhenWholesaleServicesProcessIsInitializedAsync(serviceBusMessage);
+    }
+
     protected async Task WhenWholesaleServicesProcessIsInitializedAsync(ServiceBusMessage serviceBusMessage)
     {
         // We have to manually process the service bus message, as there isn't a real service bus
