@@ -23,8 +23,11 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
+using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Json.Schema;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 
@@ -48,8 +51,6 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
         schema.Should().NotBeNull("Cannot validate document without a schema");
 
-        var documentAsString = _document.RootElement.GetRawText();
-
         var validationOptions = new EvaluationOptions { OutputFormat = OutputFormat.List };
         var validationResult = schema!.Evaluate(_document, validationOptions);
         var errors = validationResult.Details.Where(detail => detail.HasErrors)
@@ -59,10 +60,6 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
                     e => $"==> '{p.InstanceLocation}' does not adhere to '{p.EvaluationPath}' with error: {e}\n"));
 
         validationResult.IsValid.Should().BeTrue($"because document should be valid. Validation errors:{Environment.NewLine}{{0}}", string.Join("\n", errors));
-
-        var test = validationResult.Details
-            .Where(d => d.HasErrors)
-            .ToList();
 
         return this;
     }
@@ -499,6 +496,77 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
             .GetString()
             .Should()
             .Be(CimCode.ForWholesaleServicesOf(expectedQuantityQuality));
+
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasAnyPoints()
+    {
+        FirstWholesaleSeriesElement()
+            .GetProperty("Period")
+            .TryGetProperty("Point", out _)
+            .Should().BeTrue();
+
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasPoints(IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points)
+    {
+        var pointsInDocument = FirstWholesaleSeriesElement()
+            .GetProperty("Period")
+            .GetProperty("Point")
+            .EnumerateArray()
+            .OrderBy(p => p.GetProperty("position")
+                                        .GetProperty("value")
+                                        .GetInt32())
+            .ToList();
+
+        pointsInDocument.Should().HaveSameCount(points);
+
+        var expectedPoints = points.OrderBy(p => p.Time).ToList();
+
+        for (var i = 0; i < pointsInDocument.Count; i++)
+        {
+            pointsInDocument[i]
+                .GetProperty("energySum_Quantity.quantity")
+                .GetDecimal()
+                .Should()
+                .Be(expectedPoints[i].Amount.ToDecimal());
+
+            pointsInDocument[i]
+                .GetProperty("energy_Quantity.quantity")
+                .GetDecimal()
+                .Should()
+                .Be(expectedPoints[i].Quantity.ToDecimal());
+
+            pointsInDocument[i]
+                .GetProperty("position")
+                .GetProperty("value")
+                .GetInt32()
+                .Should()
+                .Be(i + 1);
+
+            pointsInDocument[i]
+                .GetProperty("price.amount")
+                .GetProperty("value")
+                .GetDecimal()
+                .Should()
+                .Be(expectedPoints[i].Quantity.ToDecimal());
+
+            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+            {
+                QuantityQuality.Calculated => "A06",
+                _ => throw new NotImplementedException(
+                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
+            };
+
+            pointsInDocument[i]
+                .GetProperty("quality")
+                .GetProperty("value")
+                .GetString()
+                .Should()
+                .Be(expectedQuantityQuality);
+        }
 
         return this;
     }

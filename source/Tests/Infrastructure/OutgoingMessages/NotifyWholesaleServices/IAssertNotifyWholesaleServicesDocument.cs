@@ -13,8 +13,12 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.Edi.Responses;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 
@@ -233,5 +237,16 @@ public interface IAssertNotifyWholesaleServicesDocument
         int expectedPosition,
         CalculatedQuantityQuality expectedQuantityQuality);
 
+    /// <summary>
+    /// Asserts any points are present in the first series element
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument HasAnyPoints();
+
+    /// <summary>
+    /// Asserts the list of points exists exactly as given in the first series element
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument HasPoints(IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points);
+
     #endregion
+
 }

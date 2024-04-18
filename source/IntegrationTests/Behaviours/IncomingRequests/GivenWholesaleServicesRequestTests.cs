@@ -98,6 +98,7 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
     [Fact]
     public async Task AndGiven_DelegationInTwoGridAreas_When_DelegatedActorPeeksMessage_Then_NotifyWholesaleServicesDocumentIsCorrect()
     {
+        // TODO: Same test, but just for rejected instead
         var documentFormat = DocumentFormat.Json; // TODO: Make input parameter
         /*
          * A request is a test with 2 parts:
@@ -111,8 +112,8 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
 
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy("Fake");
-        var delegatedByActor = (ActorNumber: ActorNumber.Create("2111111111111"), ActorRole: ActorRole.EnergySupplier);
-        var delegatedToActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.Delegated);
+        var delegatedByActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.EnergySupplier);
+        var delegatedToActor = (ActorNumber: ActorNumber.Create("2222222222222"), ActorRole: ActorRole.Delegated);
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
@@ -139,7 +140,8 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
             delegatedByActor.ActorRole.Code,
             (2024, 1, 1),
             (2024, 1, 31),
-            null,
+            // null,
+            "609",
             delegatedByActor.ActorNumber.Value,
             "5799999933444",
             "25361478",
@@ -153,10 +155,11 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
             senderSpy,
-            gridAreas: new[] { "512", "609" },
-            requestedForActorNumber: "2111111111111",
+            // gridAreas: new[] { "512", "609" },
+            gridAreas: new[] { "609" },
+            requestedForActorNumber: "1111111111111",
             requestedForActorRole: "EnergySupplier",
-            energySupplierId: "2111111111111");
+            energySupplierId: "1111111111111");
 
         // TODO: Assert correct process is created
 
@@ -183,7 +186,7 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
                 // Assert businessSector.type? (23)
                 .HasTimestamp("2024-07-01T14:57:09Z") // 2024, 7, 1, 14, 57, 09
                 .HasBusinessReason(BusinessReason.WholesaleFixing, CodeListType.EbixDenmark)
-                .HasReceiverId(ActorNumber.Create("1111111111111"))
+                .HasReceiverId(ActorNumber.Create("2222222222222"))
                 .HasReceiverRole(ActorRole.EnergySupplier, CodeListType.Ebix)
                 .HasSenderId(ActorNumber.Create("5790001330552"), "A10") // Sender is DataHub
                 .HasSenderRole(ActorRole.MeteredDataAdministrator)
@@ -194,7 +197,7 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
                 .HasChargeCode("25361478")
                 .HasChargeType(BuildingBlocks.Domain.Models.ChargeType.Tariff)
                 .HasCurrency(Currency.DanishCrowns)
-                .HasEnergySupplierNumber(ActorNumber.Create("2111111111111"), "A10")
+                .HasEnergySupplierNumber(ActorNumber.Create("1111111111111"), "A10")
                 .HasSettlementMethod(SettlementMethod.Flex)
                 .HasMeteringPointType(MeteringPointType.Consumption)
                 .HasGridAreaCode("609", "NDK")
@@ -208,11 +211,8 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
                 .HasPeriod(
                     new BuildingBlocks.Domain.Models.Period(
                         CreateDateInstant(2024, 1, 1),
-                        CreateDateInstant(2024, 1, 31))));
-        // .HasSumQuantityForPosition(1, 30)
-        // .HasQuantityForPosition(1, 3)
-        // .HasPriceForPosition(1, "10")
-        // .HasQualityForPosition(1, CalculatedQuantityQuality.Calculated));
+                        CreateDateInstant(2024, 1, 31)))
+                .HasPoints(wholesaleServicesRequestAcceptedMessage.Series.First().TimeSeriesPoints));
     }
 
     private WholesaleServicesRequestAccepted GenerateWholesaleServicesRequestAcceptedMessage(WholesaleServicesRequest request)

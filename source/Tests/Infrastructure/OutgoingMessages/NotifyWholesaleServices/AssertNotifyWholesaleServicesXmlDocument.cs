@@ -13,11 +13,15 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
+using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 
@@ -274,6 +278,17 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
     {
         _documentAsserter.HasValue($"Series[1]/Period/Point[{expectedPosition}]/quality", CimCode.ForWholesaleServicesOf(expectedQuantityQuality));
         return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasAnyPoints()
+    {
+        _documentAsserter.ElementExists($"Series[1]/Period/Point[0]");
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasPoints(IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points)
+    {
+        throw new NotImplementedException();
     }
 
     public IAssertNotifyWholesaleServicesDocument SettlementVersionDoesNotExist()

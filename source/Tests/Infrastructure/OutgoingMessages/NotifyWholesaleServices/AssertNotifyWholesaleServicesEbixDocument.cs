@@ -19,7 +19,10 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.Ebix;
+using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 
@@ -239,16 +242,16 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
     public IAssertNotifyWholesaleServicesDocument HasSumQuantityForPosition(int expectedPosition, int expectedSumQuantity)
     {
         _documentAsserter
-            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[1]/Position", expectedPosition.ToString(CultureInfo.InvariantCulture))
-            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[1]/EnergySum", expectedSumQuantity.ToString(CultureInfo.InvariantCulture));
+            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/Position", expectedPosition.ToString(CultureInfo.InvariantCulture))
+            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/EnergySum", expectedSumQuantity.ToString(CultureInfo.InvariantCulture));
         return this;
     }
 
     public IAssertNotifyWholesaleServicesDocument HasQuantityForPosition(int expectedPosition, int expectedQuantity)
     {
         _documentAsserter
-            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[1]/Position", expectedPosition.ToString(CultureInfo.InvariantCulture))
-            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[1]/EnergyQuantity", expectedQuantity.ToString(CultureInfo.InvariantCulture));
+            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/Position", expectedPosition.ToString(CultureInfo.InvariantCulture))
+            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/EnergyQuantity", expectedQuantity.ToString(CultureInfo.InvariantCulture));
         return this;
     }
 
@@ -268,11 +271,27 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
         int expectedPosition,
         CalculatedQuantityQuality expectedQuantityQuality)
     {
-        _documentAsserter.HasValue(
-            $"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/QuantityQuality",
-            EbixCode.ForWholesaleServicesOf(expectedQuantityQuality)!);
+        _documentAsserter
+            .HasValue(
+                $"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/Position",
+                expectedPosition.ToString(CultureInfo.InvariantCulture))
+            .HasValue(
+                $"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/QuantityQuality",
+                EbixCode.ForWholesaleServicesOf(expectedQuantityQuality)!);
 
         return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasAnyPoints()
+    {
+        _documentAsserter.ElementExists($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[1]");
+
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasPoints(IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points)
+    {
+        throw new NotImplementedException();
     }
 
     public IAssertNotifyWholesaleServicesDocument HasSettlementVersion(SettlementVersion expectedSettlementVersion)
