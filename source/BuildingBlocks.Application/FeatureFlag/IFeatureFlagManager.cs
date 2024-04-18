@@ -44,4 +44,14 @@ public interface IFeatureFlagManager
     /// Whether to allow message delegation for actors.
     /// </summary>
     Task<bool> UseMessageDelegationAsync();
+
+    /// <summary>
+    /// Whether to allow actors to peek messages.
+    /// </summary>
+    Task<bool> UsePeekMessagesAsync();
+
+    /// <summary>
+    /// Whether to allow actors to request messages.
+    /// </summary>
+    Task<bool> UseRequestMessagesAsync();
 }
