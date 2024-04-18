@@ -24,8 +24,10 @@ using Energinet.DataHub.EDI.B2BApi;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.NotifyAggregatedMeasureData;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using FluentAssertions;
@@ -66,7 +68,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
         public static IEnumerable<object[]> GetDocumentWriterRequirements()
         {
             var constructorDependencies = ReflectionHelper.FindAllConstructorDependenciesForType();
-            return typeof(NotifyAggregatedMeasureDataXmlDocumentWriter).Assembly.GetTypes()
+            return typeof(NotifyAggregatedMeasureDataCimXmlDocumentWriter).Assembly.GetTypes()
                 .Where(t => t.GetInterfaces().Contains(typeof(IDocumentWriter)) && !t.IsAbstract)
                 .Select(t => new object[] { new Requirement(t.Name, constructorDependencies(t), t) });
         }
@@ -74,7 +76,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
         public static IEnumerable<object[]> GetRequestHandlerRequirements()
             => ResolveTypes(
                 typeof(IRequestHandler<,>),
-                new[] { typeof(InitializeAggregatedMeasureDataProcessesHandler).Assembly, typeof(MessagePeeker).Assembly });
+                new[] { typeof(InitializeAggregatedMeasureDataProcessesHandler).Assembly, typeof(PeekMessage).Assembly });
 
         public static IEnumerable<object[]> GetNotificationsHandlerRequirements()
             => ResolveTypes(
@@ -91,7 +93,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
                 typeof(IDocumentWriter),
                 new[]
                 {
-                    typeof(OutgoingMessages.Application.MarketDocuments.NotifyWholesaleServices.NotifyWholesaleServicesEbixDocumentWriter).Assembly,
+                    typeof(NotifyWholesaleServicesEbixDocumentWriter).Assembly,
                 });
 
         public static IEnumerable<object[]> GetFunctionRequirements()

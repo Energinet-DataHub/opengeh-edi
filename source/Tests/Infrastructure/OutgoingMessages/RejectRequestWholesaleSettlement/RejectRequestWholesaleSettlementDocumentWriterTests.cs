@@ -18,8 +18,10 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
-using Energinet.DataHub.EDI.OutgoingMessages.Application.MarketDocuments.RejectRequestWholesaleSettlement;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestWholesaleSettlement;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
@@ -102,12 +104,12 @@ public sealed class RejectRequestWholesaleSettlementDocumentWriterTests : IClass
 
         if (documentFormat == DocumentFormat.Xml)
         {
-            return new RejectRequestWholesaleSettlementXmlDocumentWriter(_parser).WriteAsync(
+            return new RejectRequestWholesaleSettlementCimXmlDocumentWriter(_parser).WriteAsync(
                 documentHeader,
                 new[] { records });
         }
 
-        return new RejectRequestWholesaleSettlementJsonDocumentWriter(_parser).WriteAsync(
+        return new RejectRequestWholesaleSettlementCimJsonDocumentWriter(_parser).WriteAsync(
             documentHeader,
             new[] { records });
     }
