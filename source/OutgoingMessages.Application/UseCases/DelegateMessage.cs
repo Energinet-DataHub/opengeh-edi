@@ -45,8 +45,11 @@ public class DelegateMessage
 
         // Do not delegate outgoing message if it is created from a request,
         // because the receiver must be the same as the one who made the request
-        if (messageToEnqueue.MessageCreatedFromProcess == ProcessType.RequestWholesaleResults)
+        if (messageToEnqueue.MessageCreatedFromProcess == ProcessType.RequestWholesaleResults ||
+            messageToEnqueue.MessageCreatedFromProcess == ProcessType.RequestEnergyResults)
+        {
             return messageToEnqueue;
+        }
 
         if (string.IsNullOrEmpty(messageToEnqueue.GridAreaCode))
             throw new ArgumentException($"Grid area code is required to delegate outgoing message with id {messageToEnqueue.Id.Value}");

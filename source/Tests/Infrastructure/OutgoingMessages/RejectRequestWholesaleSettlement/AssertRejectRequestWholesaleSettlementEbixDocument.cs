@@ -56,16 +56,31 @@ public class AssertRejectRequestWholesaleSettlementEbixDocument : IAssertRejectR
         return this;
     }
 
+    public IAssertRejectRequestWholesaleSettlementDocument MessageIdExists()
+    {
+        throw new NotImplementedException();
+    }
+
     public IAssertRejectRequestWholesaleSettlementDocument HasSenderId(string expectedSenderId)
     {
         _documentAsserter.HasValue("HeaderEnergyDocument/SenderEnergyParty/Identification", expectedSenderId);
         return this;
     }
 
+    public IAssertRejectRequestWholesaleSettlementDocument HasSenderRole(ActorRole role)
+    {
+        throw new NotImplementedException();
+    }
+
     public IAssertRejectRequestWholesaleSettlementDocument HasReceiverId(string expectedReceiverId)
     {
         _documentAsserter.HasValue("HeaderEnergyDocument/RecipientEnergyParty/Identification", expectedReceiverId);
         return this;
+    }
+
+    public IAssertRejectRequestWholesaleSettlementDocument HasReceiverRole(ActorRole role)
+    {
+        throw new NotImplementedException();
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasTimestamp(Instant expectedTimestamp)
@@ -78,6 +93,11 @@ public class AssertRejectRequestWholesaleSettlementEbixDocument : IAssertRejectR
     {
         _documentAsserter.HasValue("PayloadChargeEvent[1]/Identification", expectedTransactionId.ToString("N"));
         return this;
+    }
+
+    public IAssertRejectRequestWholesaleSettlementDocument TransactionIdExists()
+    {
+        throw new NotImplementedException();
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasOriginalTransactionId(

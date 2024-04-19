@@ -114,6 +114,30 @@ public static class WholesaleServicesResponseEventBuilder
         return requestAcceptedMessage;
     }
 
+    public static WholesaleServicesRequestRejected GenerateWholesaleServicesRequestRejected(WholesaleServicesRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        var rejectedMessage = new WholesaleServicesRequestRejected();
+
+        var start = InstantPattern.General.Parse(request.PeriodStart).Value;
+        var end = InstantPattern.General.Parse(request.PeriodEnd).Value;
+        if (end <= start)
+        {
+            rejectedMessage.RejectReasons.Add(new RejectReason
+            {
+                ErrorCode = "E17",
+                ErrorMessage = "Det er kun muligt at anmode om data på for en hel måned i forbindelse med en engrosfiksering eller korrektioner / It is only possible to request data for a full month in relation to wholesalefixing or corrections",
+            });
+        }
+        else
+        {
+            throw new NotImplementedException("Cannot generate rejected message for request");
+        }
+
+        return rejectedMessage;
+    }
+
     [SuppressMessage("Security", "CA5394:Do not use insecure randomness", Justification = "Random not used for security")]
     private static WholesaleServicesRequestSeries.Types.Point CreatePoint(Instant currentTime, int quantityFactor = 1)
     {

@@ -56,16 +56,31 @@ public class AssertRejectRequestWholesaleSettlementXmlDocument : IAssertRejectRe
         return this;
     }
 
+    public IAssertRejectRequestWholesaleSettlementDocument MessageIdExists()
+    {
+        throw new NotImplementedException();
+    }
+
     public IAssertRejectRequestWholesaleSettlementDocument HasSenderId(string expectedSenderId)
     {
         _documentAsserter.HasValue("sender_MarketParticipant.mRID", expectedSenderId);
         return this;
     }
 
+    public IAssertRejectRequestWholesaleSettlementDocument HasSenderRole(ActorRole role)
+    {
+        throw new NotImplementedException();
+    }
+
     public IAssertRejectRequestWholesaleSettlementDocument HasReceiverId(string expectedReceiverId)
     {
         _documentAsserter.HasValue("receiver_MarketParticipant.mRID", expectedReceiverId);
         return this;
+    }
+
+    public IAssertRejectRequestWholesaleSettlementDocument HasReceiverRole(ActorRole role)
+    {
+        throw new NotImplementedException();
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasTimestamp(Instant expectedTimestamp)
@@ -78,6 +93,11 @@ public class AssertRejectRequestWholesaleSettlementXmlDocument : IAssertRejectRe
     {
         _documentAsserter.HasValue("Series[1]/mRID", expectedTransactionId.ToString());
         return this;
+    }
+
+    public IAssertRejectRequestWholesaleSettlementDocument TransactionIdExists()
+    {
+        throw new NotImplementedException();
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasOriginalTransactionId(

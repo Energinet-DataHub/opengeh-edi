@@ -37,7 +37,7 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
         Given_Delegation_When_RequestAggregatedMeasureDataJsonIsReceived_Then_ServiceBusMessageToWholesaleIsAddedToServiceBus()
     {
         // Arrange
-        var senderSpy = CreateServiceBusSenderSpy("Fake");
+        var senderSpy = CreateServiceBusSenderSpy();
         GivenNowIs(2024, 7, 1);
         GivenAuthenticatedActorIs(ActorNumber.Create("2111111111111"), ActorRole.EnergySupplier);
 
@@ -84,7 +84,7 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
         Given_AggregatedTimeSeriesRequestAcceptedIsReceived_When_ActorPeeks_Then_CorrectDocumentIsCreated()
     {
         // Arrange
-        var senderSpy = CreateServiceBusSenderSpy("Fake");
+        var senderSpy = CreateServiceBusSenderSpy();
         GivenNowIs(2024, 7, 1);
         GivenAuthenticatedActorIs(ActorNumber.Create("2111111111111"), ActorRole.EnergySupplier);
         await GivenGridAreaOwnershipAsync("512", ActorNumber.Create("3111111111111"));

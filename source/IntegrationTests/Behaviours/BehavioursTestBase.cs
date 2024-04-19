@@ -65,6 +65,7 @@ using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestWholesaleSettlement;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
@@ -131,6 +132,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 [SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Test class")]
 public class BehavioursTestBase : IDisposable
 {
+    private const string MockServiceBusName = "mock-name";
     private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
     private readonly ProcessContext _processContext;
     private readonly IncomingMessagesContext _incomingMessagesContext;
@@ -156,7 +158,6 @@ public class BehavioursTestBase : IDisposable
         _authenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None));
         _systemDateTimeProviderStub = new SystemDateTimeProviderStub();
-
         _dateTimeZone = DateTimeZoneProviders.Tzdb["Europe/Copenhagen"];
     }
 
@@ -460,9 +461,9 @@ public class BehavioursTestBase : IDisposable
             Guid.Parse(serviceBusMessage.MessageId));
     }
 
-    protected ServiceBusSenderSpy CreateServiceBusSenderSpy(string topicName)
+    protected ServiceBusSenderSpy CreateServiceBusSenderSpy()
     {
-        var serviceBusSenderSpy = new ServiceBusSenderSpy(topicName);
+        var serviceBusSenderSpy = new ServiceBusSenderSpy(MockServiceBusName);
         _serviceBusSenderFactoryStub.AddSenderSpy(serviceBusSenderSpy);
 
         return serviceBusSenderSpy;
@@ -553,6 +554,38 @@ public class BehavioursTestBase : IDisposable
         await asserter.DocumentIsValidAsync();
     }
 
+    protected async Task ThenRejectRequestWholesaleSettlementDocumentIsCorrect(Stream? peekResultDocumentStream, DocumentFormat documentFormat, Action<IAssertRejectRequestWholesaleSettlementDocument> assert)
+    {
+        peekResultDocumentStream.Should().NotBeNull();
+        peekResultDocumentStream!.Position = 0;
+
+        using var assertionScope = new AssertionScope();
+
+        var xmlDocumentValidator = new DocumentValidator(new List<IValidator>
+        {
+            new CimXmlValidator(new CimXmlSchemaProvider()),
+            new EbixValidator(new EbixSchemaProvider()),
+        });
+        IAssertRejectRequestWholesaleSettlementDocument asserter = documentFormat.Name switch
+        {
+            nameof(DocumentFormat.Xml) => new AssertRejectRequestWholesaleSettlementXmlDocument(
+                AssertXmlDocument.Document(
+                    peekResultDocumentStream!,
+                    "cim_",
+                    xmlDocumentValidator)),
+            nameof(DocumentFormat.Json) => new AssertRejectRequestWholesaleSettlementJsonDocument(peekResultDocumentStream!),
+            nameof(DocumentFormat.Ebix) => new AssertRejectRequestWholesaleSettlementEbixDocument(
+                AssertEbixDocument.Document(
+                    peekResultDocumentStream!,
+                    "ns0",
+                    xmlDocumentValidator)),
+            _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, null),
+        };
+
+        assert(asserter);
+        await asserter.DocumentIsValidAsync();
+    }
+
     protected AmountPerChargeResultProducedV1 GivenAmountPerChargeResultProducedV1Event(Action<AmountPerChargeResultProducedV1EventBuilder> builder)
     {
         var eventBuilder = new AmountPerChargeResultProducedV1EventBuilder();
@@ -597,11 +630,11 @@ public class BehavioursTestBase : IDisposable
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ListenConnectionString)}"] = "Fake",
-                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.SendConnectionString)}"] = "Fake",
-                    [$"{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}"] = "Fake",
-                    [$"{WholesaleInboxOptions.SectionName}:{nameof(WholesaleInboxOptions.QueueName)}"] = "Fake",
-                    [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = "Fake",
+                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ListenConnectionString)}"] = MockServiceBusName,
+                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.SendConnectionString)}"] = MockServiceBusName,
+                    [$"{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}"] = MockServiceBusName,
+                    [$"{WholesaleInboxOptions.SectionName}:{nameof(WholesaleInboxOptions.QueueName)}"] = MockServiceBusName,
+                    [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = MockServiceBusName,
                     ["IntegrationEvents:TopicName"] = "NotEmpty",
                     ["IntegrationEvents:SubscriptionName"] = "NotEmpty",
                 })
