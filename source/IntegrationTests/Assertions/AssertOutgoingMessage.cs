@@ -60,6 +60,7 @@ public class AssertOutgoingMessage
         ((object?)outgoingMessage).Should().NotBeNull("because an outgoing message should have been added to the database");
         var outgoingMessageFileStorageReference = (string?)outgoingMessage!.FileStorageReference;
         outgoingMessageFileStorageReference.Should().NotBeNull("because an outgoing message should always have a file storage reference");
+        outgoingMessageFileStorageReference.Should().Contain(outgoingMessage.ReceiverNumber);
 
         var fileStorageFile = await fileStorageClient.DownloadAsync(new FileStorageReference(FileStorageCategory.OutgoingMessage(), outgoingMessageFileStorageReference!));
 
