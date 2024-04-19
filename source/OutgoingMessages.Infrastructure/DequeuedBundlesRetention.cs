@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Data.SqlClient;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages.Queueing;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 
 public class DequeuedBundlesRetention : IDataRetention
 {
