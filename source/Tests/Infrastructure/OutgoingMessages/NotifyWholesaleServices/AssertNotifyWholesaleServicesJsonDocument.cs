@@ -551,7 +551,7 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
                 .GetProperty("value")
                 .GetDecimal()
                 .Should()
-                .Be(expectedPoints[i].Quantity.ToDecimal());
+                .Be(expectedPoints[i].Price.ToDecimal());
 
             var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
             {

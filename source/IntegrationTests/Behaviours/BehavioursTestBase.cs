@@ -43,6 +43,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.C
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
@@ -507,37 +508,17 @@ public class BehavioursTestBase : IDisposable
         return peekResults;
     }
 
-    protected async Task ThenNotifyWholesaleServicesDocumentIsCorrect(Stream? peekResultDocumentStream, DocumentFormat documentFormat, Action<IAssertNotifyWholesaleServicesDocument> assert)
+    protected async Task ThenNotifyWholesaleServicesDocumentIsCorrect(Stream? peekResultDocumentStream, DocumentFormat documentFormat, NotifyWholesaleServicesDocumentAssertionInput assertionInput)
     {
         peekResultDocumentStream.Should().NotBeNull();
         peekResultDocumentStream!.Position = 0;
 
         using var assertionScope = new AssertionScope();
 
-        var xmlDocumentValidator = new DocumentValidator(new List<IValidator>
-        {
-            new CimXmlValidator(new CimXmlSchemaProvider()),
-            new EbixValidator(new EbixSchemaProvider()),
-        });
-        IAssertNotifyWholesaleServicesDocument asserter = documentFormat.Name switch
-        {
-            nameof(DocumentFormat.Xml) => new AssertNotifyWholesaleServicesXmlDocument(
-                AssertXmlDocument.Document(
-                    peekResultDocumentStream!,
-                    "cim_",
-                    xmlDocumentValidator)),
-            nameof(DocumentFormat.Json) => new AssertNotifyWholesaleServicesJsonDocument(peekResultDocumentStream!),
-            nameof(DocumentFormat.Ebix) => new AssertNotifyWholesaleServicesEbixDocument(
-                AssertEbixDocument.Document(
-                    peekResultDocumentStream!,
-                    "ns0",
-                    xmlDocumentValidator),
-                true),
-            _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, null),
-        };
-
-        assert(asserter);
-        await asserter.DocumentIsValidAsync();
+        await NotifyWholesaleServicesDocumentAsserter.AssertCorrectDocumentAsync(
+            documentFormat,
+            peekResultDocumentStream,
+            assertionInput);
     }
 
     protected async Task ThenRejectRequestWholesaleSettlementDocumentIsCorrect(Stream? peekResultDocumentStream, DocumentFormat documentFormat, Action<IAssertRejectRequestWholesaleSettlementDocument> assert)
@@ -669,13 +650,10 @@ public class BehavioursTestBase : IDisposable
         _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
         _services.AddTransient<IFeatureFlagManager>(_ => new FeatureFlagManagerStub());
 
-        if (testOutputHelper != null)
-        {
-            // Add test logger
-            _services.AddSingleton<ITestOutputHelper>(sp => testOutputHelper);
-            _services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
-            _services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
-        }
+        // Add test logger
+        _services.AddSingleton<ITestOutputHelper>(sp => testOutputHelper);
+        _services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
+        _services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
 
         return _services.BuildServiceProvider();
     }

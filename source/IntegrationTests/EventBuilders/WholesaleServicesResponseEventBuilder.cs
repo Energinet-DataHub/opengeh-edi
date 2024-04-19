@@ -154,7 +154,7 @@ public static class WholesaleServicesResponseEventBuilder
         {
             Time = currentTime.ToTimestamp(),
             Price = price,
-            Quantity = price,
+            Quantity = quantity,
             Amount = DecimalValue.FromDecimal(totalAmount),
             QuantityQualities = { QuantityQuality.Calculated },
         };

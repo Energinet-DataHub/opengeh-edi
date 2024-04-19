@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
@@ -33,10 +34,15 @@ using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesal
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Google.Protobuf;
+using Google.Protobuf.Collections;
+using Google.Protobuf.WellKnownTypes;
 using NodaTime;
 using NodaTime.Text;
 using Xunit;
 using Xunit.Abstractions;
+using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
+using Duration = NodaTime.Duration;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
@@ -91,7 +97,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             delegatedByActor.ActorNumber.Value,
             "5799999933444",
             "25361478",
-            BuildingBlocks.Domain.Models.ChargeType.Tariff.Code,
+            ChargeType.Tariff.Code,
             "123564789123564789123564789123564787",
             false);
 
@@ -137,39 +143,33 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         await ThenNotifyWholesaleServicesDocumentIsCorrect(
             peekResult.Bundle,
             documentFormat,
-            document => document
-                // -- Assert header values --
-                .MessageIdExists()
-                // Assert businessSector.type? (23)
-                .HasTimestamp("2024-07-01T14:57:09Z") // 2024, 7, 1, 14, 57, 09
-                .HasBusinessReason(BusinessReason.WholesaleFixing, CodeListType.EbixDenmark)
-                .HasReceiverId(ActorNumber.Create("2222222222222"))
-                .HasReceiverRole(ActorRole.EnergySupplier, CodeListType.Ebix)
-                .HasSenderId(ActorNumber.Create("5790001330552"), "A10") // Sender is DataHub
-                .HasSenderRole(ActorRole.MeteredDataAdministrator)
-                // Assert type? (E31)
-                // -- Assert series values --
-                .TransactionIdExists()
-                .HasChargeTypeOwner(ActorNumber.Create("5799999933444"), "A10")
-                .HasChargeCode("25361478")
-                .HasChargeType(BuildingBlocks.Domain.Models.ChargeType.Tariff)
-                .HasCurrency(Currency.DanishCrowns)
-                .HasEnergySupplierNumber(ActorNumber.Create("1111111111111"), "A10")
-                .HasSettlementMethod(SettlementMethod.Flex)
-                .HasMeteringPointType(MeteringPointType.Consumption)
-                .HasGridAreaCode("512", "NDK")
-                .HasOriginalTransactionIdReference("123564789123564789123564789123564787")
-                .HasPriceMeasurementUnit(MeasurementUnit.Kwh)
-                .HasProductCode("5790001330590") // Example says "8716867000030", but document writes as "5790001330590"?
-                .HasQuantityMeasurementUnit(MeasurementUnit.Kwh)
-                .SettlementVersionDoesNotExist()
-                .HasCalculationVersion(GetNow().ToUnixTimeTicks())
-                .HasResolution(Resolution.Hourly)
-                .HasPeriod(
-                    new BuildingBlocks.Domain.Models.Period(
-                        CreateDateInstant(2024, 1, 1),
-                        CreateDateInstant(2024, 1, 31)))
-                .HasPoints(wholesaleServicesRequestAcceptedMessage.Series.Single().TimeSeriesPoints));
+            new NotifyWholesaleServicesDocumentAssertionInput(
+                Timestamp: "2024-07-01T14:57:09Z",
+                BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
+                    BusinessReason.WholesaleFixing,
+                    null),
+                ReceiverId: "2222222222222",
+                ReceiverRole: ActorRole.EnergySupplier,
+                SenderId: "5790001330552", // Sender is always DataHub
+                SenderRole: ActorRole.MeteredDataAdministrator,
+                ChargeTypeOwner: "5799999933444",
+                ChargeCode: "25361478",
+                ChargeType: ChargeType.Tariff,
+                Currency: Currency.DanishCrowns,
+                EnergySupplierNumber: "1111111111111",
+                SettlementMethod: SettlementMethod.Flex,
+                MeteringPointType: MeteringPointType.Consumption,
+                GridArea: "512",
+                OriginalTransactionIdReference: "123564789123564789123564789123564787",
+                PriceMeasurementUnit: MeasurementUnit.Kwh,
+                ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
+                QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                CalculationVersion: GetNow().ToUnixTimeTicks(),
+                Resolution: Resolution.Hourly,
+                Period: new Period(
+                    CreateDateInstant(2024, 1, 1),
+                    CreateDateInstant(2024, 1, 31)),
+                Points: wholesaleServicesRequestAcceptedMessage.Series.Single().TimeSeriesPoints));
     }
 
     [Theory]
@@ -273,39 +273,67 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             await ThenNotifyWholesaleServicesDocumentIsCorrect(
                 peekResult.Bundle,
                 documentFormat,
-                document => document
-                    // -- Assert header values --
-                    .MessageIdExists()
-                    // Assert businessSector.type? (23)
-                    .HasTimestamp("2024-07-01T14:57:09Z")
-                    .HasBusinessReason(BusinessReason.WholesaleFixing, CodeListType.EbixDenmark)
-                    .HasReceiverId(ActorNumber.Create("2222222222222"))
-                    .HasReceiverRole(ActorRole.EnergySupplier, CodeListType.Ebix)
-                    .HasSenderId(ActorNumber.Create("5790001330552"), "A10") // Sender is DataHub
-                    .HasSenderRole(ActorRole.MeteredDataAdministrator)
-                    // Assert type? (E31)
-                    // -- Assert series values --
-                    .TransactionIdExists()
-                    .HasChargeTypeOwner(ActorNumber.Create("5799999933444"), "A10")
-                    .HasChargeCode("25361478")
-                    .HasChargeType(BuildingBlocks.Domain.Models.ChargeType.Tariff)
-                    .HasCurrency(Currency.DanishCrowns)
-                    .HasEnergySupplierNumber(ActorNumber.Create("1111111111111"), "A10")
-                    .HasSettlementMethod(SettlementMethod.Flex)
-                    .HasMeteringPointType(MeteringPointType.Consumption)
-                    .HasGridAreaCode(seriesRequest.GridArea, "NDK")
-                    .HasOriginalTransactionIdReference("123564789123564789123564789123564787")
-                    .HasPriceMeasurementUnit(MeasurementUnit.Kwh)
-                    .HasProductCode("5790001330590") // Example says "8716867000030", but document writes as "5790001330590"?
-                    .HasQuantityMeasurementUnit(MeasurementUnit.Kwh)
-                    .SettlementVersionDoesNotExist()
-                    .HasCalculationVersion(GetNow().ToUnixTimeTicks())
-                    .HasResolution(Resolution.Hourly)
-                    .HasPeriod(
-                        new BuildingBlocks.Domain.Models.Period(
-                            CreateDateInstant(2024, 1, 1),
-                            CreateDateInstant(2024, 1, 31)))
-                    .HasPoints(seriesRequest.TimeSeriesPoints));
+                new NotifyWholesaleServicesDocumentAssertionInput(
+                    Timestamp: "2024-07-01T14:57:09Z",
+                    BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
+                        BusinessReason.WholesaleFixing,
+                        null),
+                    ReceiverId: "2222222222222",
+                    ReceiverRole: ActorRole.EnergySupplier,
+                    SenderId: "5790001330552",  // Sender is always DataHub
+                    SenderRole: ActorRole.MeteredDataAdministrator,
+                    ChargeTypeOwner: "5799999933444",
+                    ChargeCode: "25361478",
+                    ChargeType: ChargeType.Tariff,
+                    Currency: Currency.DanishCrowns,
+                    EnergySupplierNumber: "1111111111111",
+                    SettlementMethod: SettlementMethod.Flex,
+                    MeteringPointType: MeteringPointType.Consumption,
+                    GridArea: seriesRequest.GridArea,
+                    OriginalTransactionIdReference: "123564789123564789123564789123564787",
+                    PriceMeasurementUnit: MeasurementUnit.Kwh,
+                    ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
+                    QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                    CalculationVersion: GetNow().ToUnixTimeTicks(),
+                    Resolution: Resolution.Hourly,
+                    Period: new Period(
+                        CreateDateInstant(2024, 1, 1),
+                        CreateDateInstant(2024, 1, 31)),
+                    Points: seriesRequest.TimeSeriesPoints));
+
+            // document => document
+            //         // -- Assert header values --
+            //         .MessageIdExists()
+            //         // Assert businessSector.type? (23)
+            //         .HasTimestamp("2024-07-01T14:57:09Z")
+            //         .HasBusinessReason(BusinessReason.WholesaleFixing, CodeListType.EbixDenmark)
+            //         .HasReceiverId(ActorNumber.Create("2222222222222"))
+            //         .HasReceiverRole(ActorRole.EnergySupplier, CodeListType.Ebix)
+            //         .HasSenderId(ActorNumber.Create("5790001330552"), "A10") // Sender is DataHub
+            //         .HasSenderRole(ActorRole.MeteredDataAdministrator)
+            //         // Assert type? (E31)
+            //         // -- Assert series values --
+            //         .TransactionIdExists()
+            //         .HasChargeTypeOwner(ActorNumber.Create("5799999933444"), "A10")
+            //         .HasChargeCode("25361478")
+            //         .HasChargeType(BuildingBlocks.Domain.Models.ChargeType.Tariff)
+            //         .HasCurrency(Currency.DanishCrowns)
+            //         .HasEnergySupplierNumber(ActorNumber.Create("1111111111111"), "A10")
+            //         .HasSettlementMethod(SettlementMethod.Flex)
+            //         .HasMeteringPointType(MeteringPointType.Consumption)
+            //         .HasGridAreaCode(seriesRequest.GridArea, "NDK")
+            //         .HasOriginalTransactionIdReference("123564789123564789123564789123564787")
+            //         .HasPriceMeasurementUnit(MeasurementUnit.Kwh)
+            //         .HasProductCode("5790001330590") // Example says "8716867000030", but document writes as "5790001330590"?
+            //         .HasQuantityMeasurementUnit(MeasurementUnit.Kwh)
+            //         .SettlementVersionDoesNotExist()
+            //         .HasCalculationVersion(GetNow().ToUnixTimeTicks())
+            //         .HasResolution(Resolution.Hourly)
+            //         .HasPeriod(
+            //             new BuildingBlocks.Domain.Models.Period(
+            //                 CreateDateInstant(2024, 1, 1),
+            //                 CreateDateInstant(2024, 1, 31)))
+            //         .HasPoints(seriesRequest.TimeSeriesPoints));
         }
     }
 
@@ -528,4 +556,6 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         return Task.FromResult((wholesaleServicesRequestMessage, processId));
     }
 }
+
 #pragma warning restore CS1570 // XML comment has badly formed XML
+
