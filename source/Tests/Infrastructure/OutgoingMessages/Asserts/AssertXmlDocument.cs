@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -50,6 +52,8 @@ public class AssertXmlDocument
     {
         _documentValidator = documentValidator;
     }
+
+    public XmlNamespaceManager XmlNamespaceManager => _xmlNamespaceManager;
 
     public static AssertXmlDocument Document(Stream document, string prefix, DocumentValidator validator)
     {
@@ -100,8 +104,17 @@ public class AssertXmlDocument
         return this;
     }
 
-    private string EnsureXPathHasPrefix(string xpath)
+    public IList<XElement>? GetElements(string xpath)
     {
+        ArgumentNullException.ThrowIfNull(xpath);
+        return _document.Root?.XPathSelectElements(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager)
+            .ToList();
+    }
+
+    public string EnsureXPathHasPrefix(string xpath)
+    {
+        ArgumentNullException.ThrowIfNull(xpath);
+
         var elementNames = xpath.Split("/");
         var xpathBuilder = new StringBuilder();
         xpathBuilder.Append('.');
