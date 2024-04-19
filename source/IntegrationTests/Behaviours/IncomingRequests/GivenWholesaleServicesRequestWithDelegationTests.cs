@@ -418,7 +418,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
                 .HasBusinessReason(BusinessReason.WholesaleFixing)
                 // Assert businessSector.type? (23)
                 .HasSenderId("5790001330552")
-                .HasSenderRole(ActorRole.MeteringPointAdministrator)
+                .HasSenderRole(ActorRole.MeteredDataAdministrator) // Example says "DDZ", but document writes as "DGL"?
                 .HasReceiverId("2222222222222")
                 .HasReceiverRole(ActorRole.EnergySupplier)
                 .HasTimestamp(InstantPattern.General.Parse("2024-07-01T14:57:09Z").Value)
