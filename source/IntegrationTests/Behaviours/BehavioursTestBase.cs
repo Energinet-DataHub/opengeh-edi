@@ -248,16 +248,6 @@ public class BehavioursTestBase : IDisposable
         await ProcessInternalCommandsAsync().ConfigureAwait(false);
     }
 
-    private async Task ProcessInternalCommandsAsync()
-    {
-        await ProcessBackgroundTasksAsync();
-
-        if (_processContext.QueuedInternalCommands.Any(command => command.ProcessedDate == null))
-        {
-            await ProcessInternalCommandsAsync();
-        }
-    }
-
     protected void GivenAuthenticatedActorIs(ActorNumber actorNumber, ActorRole actorRole)
     {
         _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, actorRole));
@@ -511,7 +501,7 @@ public class BehavioursTestBase : IDisposable
                 break;
 
             peekResults.Add(peekResult);
-            await WhenActorDequeueMessage(peekResult.MessageId.ToString()!, actorNumber, actorRole);
+            await WhenActorDequeuesMessage(peekResult.MessageId.ToString()!, actorNumber, actorRole);
         }
 
         return peekResults;
@@ -591,11 +581,21 @@ public class BehavioursTestBase : IDisposable
         return eventBuilder.Build();
     }
 
-    protected async Task WhenActorDequeueMessage(string messageId, ActorNumber actorNumber, ActorRole actorRole)
+    private async Task WhenActorDequeuesMessage(string messageId, ActorNumber actorNumber, ActorRole actorRole)
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
         var outgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
         await outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(messageId, actorRole, actorNumber), CancellationToken.None);
+    }
+
+    private async Task ProcessInternalCommandsAsync()
+    {
+        await ProcessBackgroundTasksAsync();
+
+        if (_processContext.QueuedInternalCommands.Any(command => command.ProcessedDate == null))
+        {
+            await ProcessInternalCommandsAsync();
+        }
     }
 
     private T GetService<T>()
