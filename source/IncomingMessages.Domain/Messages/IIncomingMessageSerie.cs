@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
 /// <summary>
-/// Represents a serie of an incoming message
+/// Represents a series of an incoming message
 /// </summary>
 public interface IIncomingMessageSerie
 {
