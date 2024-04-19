@@ -1,0 +1,46 @@
+{
+  "RequestAggregatedMeasureData_MarketDocument": {
+      "mRID": "{MessageId}",
+    "businessSector.type": {
+      "value": "23"
+    },
+    "createdDateTime": "2022-12-17T09:30:47Z",
+    "process.processType": {
+      "value": "D04"
+    },
+    "receiver_MarketParticipant.mRID": {
+      "codingScheme": "A10",
+      "value": "5790001330552"
+    },
+    "receiver_MarketParticipant.marketRole.type": {
+        "value": "DGL"
+    },
+    "sender_MarketParticipant.mRID": {
+      "codingScheme": "A10",
+      "value": "5790000392551"
+    },
+    "sender_MarketParticipant.marketRole.type": {
+      "value": "MDR"
+    },
+    "type": {
+      "value": "E74"
+    },
+    "Series": [
+      {
+        "mRID": "{TransactionId}",
+        "start_DateAndOrTime.dateTime": "2023-01-31T23:00:00Z",
+        "end_DateAndOrTime.dateTime": "2023-02-02T23:00:00Z",
+        "marketEvaluationPoint.settlementMethod": {
+          "value": "D01"
+        },
+        "marketEvaluationPoint.type": {
+          "value": "E17"
+        },
+        "meteringGridArea_Domain.mRID": {
+          "codingScheme": "NDK",
+          "value": "804"
+        }
+      }
+    ]
+  }
+}
