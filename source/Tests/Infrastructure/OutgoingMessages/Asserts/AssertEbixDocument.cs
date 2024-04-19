@@ -55,6 +55,8 @@ public class AssertEbixDocument
         _document.Save(stream);
         stream.Position = 0;
         _stream = stream;
+
+        var documentString = _document.ToString();
     }
 
     private AssertEbixDocument(Stream stream, string prefix, DocumentValidator documentValidator)
@@ -62,6 +64,8 @@ public class AssertEbixDocument
     {
         _documentValidator = documentValidator;
     }
+
+    public XmlNamespaceManager XmlNamespaceManager => _xmlNamespaceManager;
 
     public static AssertEbixDocument Document(Stream document, string prefix)
     {
@@ -132,8 +136,9 @@ public class AssertEbixDocument
         return this;
     }
 
-    private string EnsureXPathHasPrefix(string xpath)
+    public string EnsureXPathHasPrefix(string xpath)
     {
+        ArgumentNullException.ThrowIfNull(xpath);
         var elementNames = xpath.Split("/");
         var xpathBuilder = new StringBuilder();
         xpathBuilder.Append('.');
@@ -149,6 +154,12 @@ public class AssertEbixDocument
         }
 
         return xpathBuilder.ToString();
+    }
+
+    public IList<XElement>? GetElements(string xpath)
+    {
+        ArgumentNullException.ThrowIfNull(xpath);
+        return _document.Root?.XPathSelectElements(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager).ToList();
     }
 }
 
