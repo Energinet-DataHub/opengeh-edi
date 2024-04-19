@@ -115,8 +115,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.Out
                         .HasColumnName("ReceiverRole");
                 });
 
+            builder.Property(x => x.CreatedAt);
+
             builder.Property<string>("CreatedBy");
-            builder.Property<Instant>("CreatedAt");
             builder.Property<string?>("ModifiedBy");
             builder.Property<Instant?>("ModifiedAt");
         }
