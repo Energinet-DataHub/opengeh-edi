@@ -340,7 +340,7 @@ dotnet_diagnostic.CA2242.severity = warning
 dotnet_diagnostic.CA2254.severity = suggestion
 dotnet_diagnostic.CS1591.severity = none
 
-# Disable "Mark members as static" recommendation, since static should be avoided in favor of dependency injection
+# Disable "Mark members as static" recommendation, since static makes it easy to introduce dependency lifecycle errors
 # Rule link: https://learn.microsoft.com/da-dk/dotnet/fundamentals/code-analysis/quality-rules/ca1822
 dotnet_diagnostic.CA1822.severity = none 
 
