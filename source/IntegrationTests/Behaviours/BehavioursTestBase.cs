@@ -344,7 +344,7 @@ public class BehavioursTestBase : IDisposable
                 CancellationToken.None);
     }
 
-    protected async Task GivenRequestWholesaleServices(
+    protected async Task GivenReceivedWholesaleServicesRequest(
         DocumentFormat documentFormat,
         string senderActorNumber,
         string senderActorRole,

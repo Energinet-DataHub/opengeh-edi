@@ -80,13 +80,13 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             GetNow(),
             GetNow().Plus(Duration.FromDays(32)));
 
-        await GivenRequestWholesaleServices(
+        await GivenReceivedWholesaleServicesRequest(
             documentFormat,
             delegatedToActor.ActorNumber.Value,
             delegatedByActor.ActorRole.Code,
             (2024, 1, 1),
             (2024, 1, 31),
-            null,
+            "512",
             delegatedByActor.ActorNumber.Value,
             "5799999933444",
             "25361478",
@@ -210,7 +210,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             GetNow(),
             GetNow().Plus(Duration.FromDays(32)));
 
-        await GivenRequestWholesaleServices(
+        await GivenReceivedWholesaleServicesRequest(
             documentFormat,
             delegatedToActor.ActorNumber.Value,
             delegatedByActor.ActorRole.Code,
@@ -354,7 +354,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             GetNow().Plus(Duration.FromDays(32)));
 
         // Setup fake request (period end is before period start)
-        await GivenRequestWholesaleServices(
+        await GivenReceivedWholesaleServicesRequest(
             documentFormat,
             delegatedToActor.ActorNumber.Value,
             delegatedByActor.ActorRole.Code,
