@@ -116,6 +116,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages
                 });
 
             builder.Property(x => x.CreatedAt);
+
             builder.Property<string>("CreatedBy");
             builder.Property<string?>("ModifiedBy");
             builder.Property<Instant?>("ModifiedAt");
