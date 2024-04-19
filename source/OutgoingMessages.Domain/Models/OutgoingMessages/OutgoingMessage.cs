@@ -41,7 +41,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
             ActorNumber senderId,
             ActorRole senderRole,
             string serializedContent,
-            Instant timestamp,
+            Instant createdAt,
             ProcessType messageCreatedFromProcess,
             MessageId? relatedToMessageId,
             string? gridAreaCode)
@@ -60,7 +60,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
             RelatedToMessageId = relatedToMessageId;
             DocumentReceiver = Receiver.Create(receiverId, receiverRole);
             Receiver = Receiver.Create(receiverId, receiverRole);
-            FileStorageReference = CreateFileStorageReference(Receiver.Number, timestamp, Id);
+            CreatedAt = createdAt;
+            FileStorageReference = CreateFileStorageReference(Receiver.Number, createdAt, Id);
         }
 
         /// <summary>
@@ -77,6 +78,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
             ActorRole senderRole,
             FileStorageReference fileStorageReference,
             ProcessType messageCreatedFromProcess,
+            Instant createdAt,
             string? gridAreaCode)
         {
             Id = OutgoingMessageId.New();
@@ -89,6 +91,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
             FileStorageReference = fileStorageReference;
             MessageCreatedFromProcess = messageCreatedFromProcess;
             GridAreaCode = gridAreaCode;
+            CreatedAt = createdAt;
             // DocumentReceiver, EF will set this after the constructor
             // Receiver, EF will set this after the constructor
             // _serializedContent is set later in OutgoingMessageRepository, by getting the message from File Storage
@@ -119,6 +122,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
         public Receiver DocumentReceiver { get; }
 
         public BundleId? AssignedBundleId { get; private set; }
+
+        public Instant CreatedAt { get; private set; }
 
         public FileStorageReference FileStorageReference { get; private set; }
 
@@ -353,6 +358,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
         public void DelegateTo(Receiver delegatedToReceiver)
         {
             Receiver = delegatedToReceiver;
+            FileStorageReference = CreateFileStorageReference(Receiver.Number, CreatedAt, Id);
         }
 
         private static bool DocumentIsAggregatedMeasureData(DocumentType documentType)
