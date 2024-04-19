@@ -23,9 +23,18 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 
 public sealed class WholesaleServicesProcess : Entity
 {
+    /// <summary>
+    /// The process' grid areas are created when the process is created, and retrieved by Entity Framework from
+    /// the WholesaleServicesProcessGridAreas table.
+    /// </summary>
     private readonly IReadOnlyCollection<WholesaleServicesProcessGridArea> _gridAreas;
+
     private State _state = State.Initialized;
 
+    /// <summary>
+    /// Create a new process for wholesale services request, where who made the request and who the request is
+    /// requested for is the same actor.
+    /// </summary>
     public WholesaleServicesProcess(
         ProcessId processId,
         ActorNumber requestedByActorNumber,
@@ -63,6 +72,10 @@ public sealed class WholesaleServicesProcess : Entity
     {
     }
 
+    /// <summary>
+    /// Create a new process for wholesale services request, supplying both who the request is for and who requested it
+    /// (this is used in case of delegation)
+    /// </summary>
     public WholesaleServicesProcess(
         ProcessId processId,
         ActorNumber requestedByActorNumber,
@@ -83,9 +96,17 @@ public sealed class WholesaleServicesProcess : Entity
         IReadOnlyCollection<string> gridAreas)
     {
         ArgumentNullException.ThrowIfNull(gridAreas);
+        ArgumentNullException.ThrowIfNull(processId);
 
-        if (requestedGridArea != null && gridAreas.Count == 0)
-            throw new ArgumentOutOfRangeException(nameof(gridAreas), gridAreas, "GridAreas must be provided when IncomingGridArea is not null");
+        // if (requestedGridArea != null && gridAreas.Count == 0)
+        //     throw new ArgumentOutOfRangeException(nameof(gridAreas), gridAreas, "GridAreas must be provided when IncomingGridArea is not null");
+        if (requestedGridArea != null && gridAreas.Count != 1 && gridAreas.Single() != requestedGridArea)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(gridAreas),
+                gridAreas,
+                $"GridAreas must contain exactly the IncomingGridArea when IncomingGridArea is not null (id: {processId.Id}");
+        }
 
         ProcessId = processId;
         RequestedByActorNumber = requestedByActorNumber;
@@ -132,12 +153,26 @@ public sealed class WholesaleServicesProcess : Entity
 
     public ProcessId ProcessId { get; }
 
+    /// <summary>
+    /// The actor number of the actor that requested the wholesale services (the sender of the request)
+    /// </summary>
     public ActorNumber RequestedByActorNumber { get; }
 
+    /// <summary>
+    /// The actor role of the actor that requested the wholesale services (the sender of the request)
+    /// </summary>
     public ActorRole RequestedByActorRole { get; }
 
+    /// <summary>
+    /// The actor number of the actor that the wholesale services is requested for
+    /// This can differ from RequestedByActorNumber in case of delegation
+    /// </summary>
     public ActorNumber RequestedForActorNumber { get; }
 
+    /// <summary>
+    /// The actor role of the actor that the wholesale services is requested for
+    /// This can differ from RequestedByActorNumber in case of delegation
+    /// </summary>
     public ActorRole RequestedForActorRole { get; }
 
     public BusinessTransactionId BusinessTransactionId { get; }
@@ -150,6 +185,12 @@ public sealed class WholesaleServicesProcess : Entity
 
     public string? EndOfPeriod { get; }
 
+    /// <summary>
+    /// The requested grid area is the grid area that was written in the request document, if this is null
+    ///     then the request was for all appropriate grid areas.
+    /// This value isn't used but is saved in the database for tracking. Always use the GridAreas list instead, since
+    /// in case of delegation the request can be for multiple grid areas.
+    /// </summary>
     public string? RequestedGridArea { get; }
 
     public string? EnergySupplierId { get; }
@@ -162,6 +203,10 @@ public sealed class WholesaleServicesProcess : Entity
 
     public IReadOnlyCollection<ChargeType> ChargeTypes { get; }
 
+    /// <summary>
+    /// Which grid area's the request is for. If this list is empty, then the request is for all appropriate grid areas.
+    /// The process' grid areas are stored in the WholesaleServicesProcessGridAreas table.
+    /// </summary>
     public IReadOnlyCollection<string> GridAreas => _gridAreas.Select(g => g.GridArea).ToArray();
 
     public void SendToWholesale()

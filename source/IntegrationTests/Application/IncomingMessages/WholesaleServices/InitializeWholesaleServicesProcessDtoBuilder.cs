@@ -45,9 +45,9 @@ public class InitializeWholesaleServicesProcessDtoBuilder
         return this;
     }
 
-    public InitializeWholesaleServicesProcessDtoBuilder SetSenderRole(string senderRole)
+    public InitializeWholesaleServicesProcessDtoBuilder SetSenderRole(string senderRoleCode)
     {
-        _senderRole = ActorRole.FromCode(senderRole);
+        _senderRole = ActorRole.FromCode(senderRoleCode);
         return this;
     }
 
@@ -69,9 +69,9 @@ public class InitializeWholesaleServicesProcessDtoBuilder
         return this;
     }
 
-    public InitializeWholesaleServicesProcessDtoBuilder SetSenderId(string s)
+    public InitializeWholesaleServicesProcessDtoBuilder SetSenderId(string senderNumber)
     {
-        _senderId = ActorNumber.Create(s);
+        _senderId = ActorNumber.Create(senderNumber);
         return this;
     }
 
@@ -88,10 +88,10 @@ public class InitializeWholesaleServicesProcessDtoBuilder
             _senderRole,
             _businessReason,
             _messageId,
-            new List<InitializeWholesaleServicesSeries> { CreateSerie() }.AsReadOnly());
+            new List<InitializeWholesaleServicesSeries> { CreateSeries() }.AsReadOnly());
     }
 
-    private InitializeWholesaleServicesSeries CreateSerie() =>
+    private InitializeWholesaleServicesSeries CreateSeries() =>
         new(
             _seriesId,
             _startDateAndOrTimeDateTime,

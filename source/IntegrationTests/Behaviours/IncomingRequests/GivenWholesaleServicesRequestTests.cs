@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
@@ -98,7 +99,7 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
     [Fact]
     public async Task AndGiven_DelegationInTwoGridAreas_When_DelegatedActorPeeksMessage_Then_NotifyWholesaleServicesDocumentIsCorrect()
     {
-        // TODO: Handle asserting multiple messages (peek & dequeue needed?)
+        // TODO: Handle asserting multiple messages because of 2 grid areas (peek & dequeue needed?)
         // TODO: Same test, but just for rejected instead
         var documentFormat = DocumentFormat.Json; // TODO: Make input parameter
         /*
@@ -169,7 +170,13 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
          */
 
         // Arrange
-        var wholesaleServicesRequestAcceptedMessage = GenerateWholesaleServicesRequestAcceptedMessage(message.WholesaleServicesRequest);
+
+        // Generate a mock WholesaleRequestAccepted response from Wholesale, based on the WholesaleServicesRequest
+        // It is very important that the generated data is correct,
+        // since (almost) all assertion after this point is based on this data
+        var wholesaleServicesRequestAcceptedMessage = WholesaleServicesRequestAcceptedEventBuilder
+            .GenerateWholesaleServicesRequestAcceptedMessage(message.WholesaleServicesRequest, GetNow());
+
         await GivenWholesaleServicesRequestAcceptedIsReceived(message.ProcessId, wholesaleServicesRequestAcceptedMessage);
 
         // Act
@@ -178,6 +185,7 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
             delegatedToActor.ActorRole,
             documentFormat);
 
+        // Assert
         await ThenNotifyWholesaleServicesDocumentIsCorrect(
             peekResult.Bundle,
             documentFormat,
@@ -214,107 +222,6 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
                         CreateDateInstant(2024, 1, 1),
                         CreateDateInstant(2024, 1, 31)))
                 .HasPoints(wholesaleServicesRequestAcceptedMessage.Series.First().TimeSeriesPoints));
-    }
-
-    private WholesaleServicesRequestAccepted GenerateWholesaleServicesRequestAcceptedMessage(WholesaleServicesRequest request)
-    {
-        var gridAreas = request.GridAreaCodes.ToList();
-        if (gridAreas.Count == 0)
-            gridAreas.AddRange(new List<string> { "804", "917" });
-
-        var chargeTypes = request.ChargeTypes;
-        if (chargeTypes.Count == 0)
-            chargeTypes.Add(new ChargeType { ChargeCode = "12345678", ChargeType_ = DataHubNames.ChargeType.Tariff });
-
-        var series = gridAreas.SelectMany(
-            ga => chargeTypes.Select(ct =>
-            {
-                var resolution = request.Resolution == DataHubNames.Resolution.Monthly
-                    ? WholesaleServicesRequestSeries.Types.Resolution.Monthly
-                    : WholesaleServicesRequestSeries.Types.Resolution.Hour;
-
-                var points = new List<WholesaleServicesRequestSeries.Types.Point>();
-                var periodStart = InstantPattern.General.Parse(request.PeriodStart).Value;
-                var periodEnd = InstantPattern.General.Parse(request.PeriodEnd).Value;
-
-                if (resolution == WholesaleServicesRequestSeries.Types.Resolution.Monthly)
-                {
-                    points.Add(CreatePoint(periodEnd, quantityFactor: 30 * 24));
-                }
-                else
-                {
-                    var resolutionDuration = resolution switch
-                    {
-                        WholesaleServicesRequestSeries.Types.Resolution.Day => Duration.FromHours(24),
-                        WholesaleServicesRequestSeries.Types.Resolution.Hour => Duration.FromHours(1),
-                        _ => throw new NotImplementedException($"Unsupported resolution in request: {resolution.ToString()}"),
-                    };
-
-                    var currentTime = periodStart;
-                    while (currentTime < periodEnd)
-                    {
-                        points.Add(CreatePoint(currentTime));
-                        currentTime = currentTime.Plus(resolutionDuration);
-                    }
-                }
-
-                var series = new WholesaleServicesRequestSeries()
-                {
-                    Currency = WholesaleServicesRequestSeries.Types.Currency.Dkk,
-                    Period = new Period
-                    {
-                        StartOfPeriod = periodStart.ToTimestamp(),
-                        EndOfPeriod = periodEnd.ToTimestamp(),
-                    },
-                    Resolution = resolution,
-                    CalculationType = request.BusinessReason == DataHubNames.BusinessReason.WholesaleFixing
-                        ? WholesaleServicesRequestSeries.Types.CalculationType.WholesaleFixing
-                        : throw new NotImplementedException("Builder only supports WholesaleFixing, not corrections"),
-                    ChargeCode = ct.ChargeCode,
-                    ChargeType =
-                        Enum.TryParse<WholesaleServicesRequestSeries.Types.ChargeType>(ct.ChargeType_, out var result)
-                            ? result
-                            : throw new NotImplementedException("Unsupported chargetype in request"),
-                    ChargeOwnerId = request.HasChargeOwnerId ? request.ChargeOwnerId : "5799999933444",
-                    GridArea = ga,
-                    QuantityUnit = WholesaleServicesRequestSeries.Types.QuantityUnit.Kwh,
-                    SettlementMethod = WholesaleServicesRequestSeries.Types.SettlementMethod.Flex,
-                    EnergySupplierId = request.EnergySupplierId,
-                    MeteringPointType = WholesaleServicesRequestSeries.Types.MeteringPointType.Consumption,
-                    CalculationResultVersion = GetNow().ToUnixTimeTicks(),
-                };
-
-                series.TimeSeriesPoints.AddRange(points);
-
-                return series;
-            }));
-
-        var requestAcceptedMessage = new WholesaleServicesRequestAccepted();
-        requestAcceptedMessage.Series.AddRange(series);
-
-        return requestAcceptedMessage;
-    }
-
-    [SuppressMessage("Security", "CA5394:Do not use insecure randomness", Justification = "Random not used for security")]
-    private WholesaleServicesRequestSeries.Types.Point CreatePoint(Instant currentTime, int quantityFactor = 1)
-    {
-        // Create random price between 0.99 and 5.99
-        var price = new DecimalValue { Units = Random.Shared.Next(0, 4), Nanos = Random.Shared.Next(1, 99) };
-
-        // Create random quantity between 1.00 and 999.99 (multiplied a factor used by by monthly resolution)
-        var quantity = new DecimalValue { Units = Random.Shared.Next(1, 999) * quantityFactor, Nanos = Random.Shared.Next(0, 99) };
-
-        // Calculate the total amount (price * quantity)
-        var totalAmount = price.ToDecimal() * quantity.ToDecimal();
-
-        return new WholesaleServicesRequestSeries.Types.Point
-        {
-            Time = currentTime.ToTimestamp(),
-            Price = price,
-            Quantity = price,
-            Amount = DecimalValue.FromDecimal(totalAmount),
-            QuantityQualities = { QuantityQuality.Calculated },
-        };
     }
 
     private Task GivenWholesaleServicesRequestAcceptedIsReceived(Guid processId, WholesaleServicesRequestAccepted wholesaleServicesRequestAcceptedMessage)
