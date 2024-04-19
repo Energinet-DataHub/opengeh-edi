@@ -116,22 +116,6 @@ internal sealed class EdiDriver : IDisposable
         }
     }
 
-    public async Task PeekAcceptedAggregationMessageAsync()
-    {
-        var documentStream = await PeekMessageAsync().ConfigureAwait(false);
-        var jsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(documentStream).ConfigureAwait(false);
-
-        var documentIsOfExpectedType = jsonElement.TryGetProperty(
-            "NotifyAggregatedMeasureData_MarketDocument",
-            out var marketDocument);
-
-        Assert.True(documentIsOfExpectedType, "\nAccepted message failed with wrong message type\n Document: " + jsonElement.ToString() + "\n");
-        Assert.Equal("E31", marketDocument
-            .GetProperty("type")
-            .GetProperty("value")
-            .GetString());
-    }
-
     public async Task PeekWholesaleSettlementResponseAsync(DocumentFormat documentFormat, string expectedDocumentType)
     {
         var documentStream = await PeekMessageAsync(documentFormat).ConfigureAwait(false);
@@ -151,22 +135,6 @@ internal sealed class EdiDriver : IDisposable
         using var reader = new StreamReader(documentStream);
         string text = await reader.ReadToEndAsync().ConfigureAwait(false);
         text.Should().Contain(expectedDocumentType, "\nAccepted message failed with wrong message type\n Document: " + text + "\n");
-    }
-
-    public async Task PeekRejectedMessageAsync()
-    {
-        var documentStream = await PeekMessageAsync().ConfigureAwait(false);
-        var jsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(documentStream).ConfigureAwait(false);
-
-        var documentIsOfExpectedType = jsonElement.TryGetProperty(
-            "RejectRequestAggregatedMeasureData_MarketDocument",
-            out var marketDocument);
-
-        Assert.True(documentIsOfExpectedType, "\nRejected message failed with wrong message type\n");
-        Assert.Equal("ERR", marketDocument
-            .GetProperty("type")
-            .GetProperty("value")
-            .GetString());
     }
 
     public async Task RequestAggregatedMeasureDataWithoutTokenAsync()

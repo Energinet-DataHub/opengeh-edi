@@ -29,46 +29,6 @@ public sealed class AggregatedMeasureDataRequestDsl
         _edi = ediDriver;
     }
 
-    internal Task AggregatedMeasureDataFor()
-    {
-        return _edi.RequestAggregatedMeasureDataAsync();
-    }
-
-    internal Task ConfirmAcceptedResultIsAvailableFor()
-    {
-        return _edi.PeekAcceptedAggregationMessageAsync();
-    }
-
-    internal Task RejectedAggregatedMeasureDataFor()
-    {
-        return _edi.RequestAggregatedMeasureDataAsync(asyncError: true);
-    }
-
-    internal Task ConfirmRejectedResultIsAvailableFor()
-    {
-        return _edi.PeekRejectedMessageAsync();
-    }
-
-    internal Task EmptyQueueForActor()
-    {
-        return _edi.EmptyQueueAsync();
-    }
-
-    internal Task ConfirmRequestAggregatedMeasureDataWithoutTokenIsNotAllowed()
-    {
-        return _edi.RequestAggregatedMeasureDataWithoutTokenAsync();
-    }
-
-    internal Task ConfirmPeekWithoutTokenIsNotAllowed()
-    {
-        return _edi.PeekMessageWithoutTokenAsync();
-    }
-
-    internal Task ConfirmDequeueWithoutTokenIsNotAllowed()
-    {
-        return _edi.DequeueMessageWithoutTokenAsync("irrelevant-message-id");
-    }
-
     internal Task<string> AggregatedMeasureDataWithXmlPayload(XmlDocument payload)
     {
         return _edi.RequestAggregatedMeasureDataXmlAsync(payload);
