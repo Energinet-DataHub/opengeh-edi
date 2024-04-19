@@ -15,9 +15,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -29,12 +33,8 @@ using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesal
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
-using NodaTime.Serialization.Protobuf;
-using NodaTime.Text;
 using Xunit;
 using Xunit.Abstractions;
-using ChargeType = Energinet.DataHub.Edi.Requests.ChargeType;
-using Period = Energinet.DataHub.Edi.Responses.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
@@ -47,61 +47,11 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
     {
     }
 
-    // [Fact]
-    // public async Task AndGiven_DelegationInTwoGridAreas_When_WholesaleServicesProcessIsInitialized_Then_WholesaleServiceBusMessageIsCorrect()
-    // {
-    //     // Arrange
-    //     var senderSpy = CreateServiceBusSenderSpy("Fake");
-    //     GivenNowIs(2024, 7, 1);
-    //     var delegatedByActor = (ActorNumber: ActorNumber.Create("2111111111111"), ActorRole: ActorRole.EnergySupplier);
-    //     var delegatedToActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.Delegated);
-    //     GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
-    //
-    //     await GivenDelegation(
-    //         new ActorNumberAndRoleDto(delegatedByActor.ActorNumber, delegatedByActor.ActorRole),
-    //         new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
-    //         "512",
-    //         ProcessType.RequestWholesaleResults,
-    //         GetNow(),
-    //         GetNow().Plus(Duration.FromDays(32)));
-    //
-    //     await GivenDelegation(
-    //         new ActorNumberAndRoleDto(delegatedByActor.ActorNumber, delegatedByActor.ActorRole),
-    //         new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
-    //         "609",
-    //         ProcessType.RequestWholesaleResults,
-    //         GetNow(),
-    //         GetNow().Plus(Duration.FromDays(32)));
-    //
-    //     await GivenRequestWholesaleServices(
-    //         DocumentFormat.Json,
-    //         delegatedToActor.ActorNumber.Value,
-    //         delegatedByActor.ActorRole.Code,
-    //         (2024, 1, 1),
-    //         (2024, 2, 1),
-    //         null,
-    //         delegatedByActor.ActorNumber.Value,
-    //         "123564789123564789123564789123564787",
-    //         false);
-    //
-    //     // Act
-    //     await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
-    //
-    //     // Assert
-    //     await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
-    //         senderSpy,
-    //         gridAreas: new[] { "512", "609" },
-    //         requestedForActorNumber: "2111111111111",
-    //         requestedForActorRole: "EnergySupplier",
-    //         energySupplierId: "2111111111111");
-    // }
-
-    [Fact]
-    public async Task AndGiven_DelegationInTwoGridAreas_When_DelegatedActorPeeksMessage_Then_NotifyWholesaleServicesDocumentIsCorrect()
+    [Theory]
+    [MemberData(nameof(DocumentFormats.AllDocumentFormatsExcept), new object[] { new[] { "Xml", "Ebix" } }, MemberType = typeof(DocumentFormats))]
+    public async Task AndGiven_DelegationInTwoGridAreas_When_DelegatedActorPeeksMessage_Then_NotifyWholesaleServicesDocumentIsCorrect(DocumentFormat documentFormat)
     {
-        // TODO: Handle asserting multiple messages because of 2 grid areas (peek & dequeue needed?)
         // TODO: Same test, but just for rejected instead
-        var documentFormat = DocumentFormat.Json; // TODO: Make input parameter
         /*
          * A request is a test with 2 parts:
          *  1. Send a request to the system (incoming message)
@@ -142,8 +92,7 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
             delegatedByActor.ActorRole.Code,
             (2024, 1, 1),
             (2024, 1, 31),
-            // null,
-            "609",
+            null,
             delegatedByActor.ActorNumber.Value,
             "5799999933444",
             "25361478",
@@ -157,8 +106,7 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
             senderSpy,
-            // gridAreas: new[] { "512", "609" },
-            gridAreas: new[] { "609" },
+            gridAreas: new[] { "512", "609" },
             requestedForActorNumber: "1111111111111",
             requestedForActorRole: "EnergySupplier",
             energySupplierId: "1111111111111");
@@ -174,54 +122,109 @@ public class GivenWholesaleServicesRequestTests : BehavioursTestBase
         // Generate a mock WholesaleRequestAccepted response from Wholesale, based on the WholesaleServicesRequest
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
-        var wholesaleServicesRequestAcceptedMessage = WholesaleServicesRequestAcceptedEventBuilder
-            .GenerateWholesaleServicesRequestAcceptedMessage(message.WholesaleServicesRequest, GetNow());
+        var wholesaleServicesRequestAcceptedMessage = WholesaleServicesResponseEventBuilder
+            .GenerateWholesaleServicesRequestAccepted(message.WholesaleServicesRequest, GetNow());
 
         await GivenWholesaleServicesRequestAcceptedIsReceived(message.ProcessId, wholesaleServicesRequestAcceptedMessage);
 
         // Act
-        var peekResult = await WhenActorPeeksMessage(
+        var peekResults = await WhenActorPeeksAllMessages(
             delegatedToActor.ActorNumber,
             delegatedToActor.ActorRole,
             documentFormat);
 
         // Assert
-        await ThenNotifyWholesaleServicesDocumentIsCorrect(
-            peekResult.Bundle,
-            documentFormat,
-            document => document
-                // -- Assert header values --
-                .MessageIdExists()
-                // Assert businessSector.type? (23)
-                .HasTimestamp("2024-07-01T14:57:09Z") // 2024, 7, 1, 14, 57, 09
-                .HasBusinessReason(BusinessReason.WholesaleFixing, CodeListType.EbixDenmark)
-                .HasReceiverId(ActorNumber.Create("2222222222222"))
-                .HasReceiverRole(ActorRole.EnergySupplier, CodeListType.Ebix)
-                .HasSenderId(ActorNumber.Create("5790001330552"), "A10") // Sender is DataHub
-                .HasSenderRole(ActorRole.MeteredDataAdministrator)
-                // Assert type? (E31)
-                // -- Assert series values --
-                .TransactionIdExists()
-                .HasChargeTypeOwner(ActorNumber.Create("5799999933444"), "A10")
-                .HasChargeCode("25361478")
-                .HasChargeType(BuildingBlocks.Domain.Models.ChargeType.Tariff)
-                .HasCurrency(Currency.DanishCrowns)
-                .HasEnergySupplierNumber(ActorNumber.Create("1111111111111"), "A10")
-                .HasSettlementMethod(SettlementMethod.Flex)
-                .HasMeteringPointType(MeteringPointType.Consumption)
-                .HasGridAreaCode("609", "NDK")
-                .HasOriginalTransactionIdReference("123564789123564789123564789123564787")
-                .HasPriceMeasurementUnit(MeasurementUnit.Kwh)
-                .HasProductCode("5790001330590") // Example says "8716867000030", but document writes as "5790001330590"?
-                .HasQuantityMeasurementUnit(MeasurementUnit.Kwh)
-                .SettlementVersionDoesNotExist()
-                .HasCalculationVersion(GetNow().ToUnixTimeTicks())
-                .HasResolution(Resolution.Hourly)
-                .HasPeriod(
-                    new BuildingBlocks.Domain.Models.Period(
-                        CreateDateInstant(2024, 1, 1),
-                        CreateDateInstant(2024, 1, 31)))
-                .HasPoints(wholesaleServicesRequestAcceptedMessage.Series.First().TimeSeriesPoints));
+        peekResults.Should().HaveCount(2, "because there should be one message for each grid area");
+
+        foreach (var peekResult in peekResults)
+        {
+            peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
+            var peekResultGridArea = await GetGridAreaFromNotifyWholesaleServicesDocument(peekResult.Bundle!, documentFormat);
+
+            var seriesRequest = wholesaleServicesRequestAcceptedMessage.Series
+                .Should().ContainSingle(request => request.GridArea == peekResultGridArea)
+                .Subject;
+
+            await ThenNotifyWholesaleServicesDocumentIsCorrect(
+                peekResult.Bundle,
+                documentFormat,
+                document => document
+                    // -- Assert header values --
+                    .MessageIdExists()
+                    // Assert businessSector.type? (23)
+                    .HasTimestamp("2024-07-01T14:57:09Z") // 2024, 7, 1, 14, 57, 09
+                    .HasBusinessReason(BusinessReason.WholesaleFixing, CodeListType.EbixDenmark)
+                    .HasReceiverId(ActorNumber.Create("2222222222222"))
+                    .HasReceiverRole(ActorRole.EnergySupplier, CodeListType.Ebix)
+                    .HasSenderId(ActorNumber.Create("5790001330552"), "A10") // Sender is DataHub
+                    .HasSenderRole(ActorRole.MeteredDataAdministrator)
+                    // Assert type? (E31)
+                    // -- Assert series values --
+                    .TransactionIdExists()
+                    .HasChargeTypeOwner(ActorNumber.Create("5799999933444"), "A10")
+                    .HasChargeCode("25361478")
+                    .HasChargeType(BuildingBlocks.Domain.Models.ChargeType.Tariff)
+                    .HasCurrency(Currency.DanishCrowns)
+                    .HasEnergySupplierNumber(ActorNumber.Create("1111111111111"), "A10")
+                    .HasSettlementMethod(SettlementMethod.Flex)
+                    .HasMeteringPointType(MeteringPointType.Consumption)
+                    .HasGridAreaCode(seriesRequest.GridArea, "NDK")
+                    .HasOriginalTransactionIdReference("123564789123564789123564789123564787")
+                    .HasPriceMeasurementUnit(MeasurementUnit.Kwh)
+                    .HasProductCode("5790001330590") // Example says "8716867000030", but document writes as "5790001330590"?
+                    .HasQuantityMeasurementUnit(MeasurementUnit.Kwh)
+                    .SettlementVersionDoesNotExist()
+                    .HasCalculationVersion(GetNow().ToUnixTimeTicks())
+                    .HasResolution(Resolution.Hourly)
+                    .HasPeriod(
+                        new BuildingBlocks.Domain.Models.Period(
+                            CreateDateInstant(2024, 1, 1),
+                            CreateDateInstant(2024, 1, 31)))
+                    .HasPoints(seriesRequest.TimeSeriesPoints));
+        }
+    }
+
+    private async Task<string> GetGridAreaFromNotifyWholesaleServicesDocument(Stream documentStream, DocumentFormat documentFormat)
+    {
+        documentStream.Position = 0;
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            var xmlDocument = await XDocument.LoadAsync(documentStream, LoadOptions.None, CancellationToken.None);
+
+            var gridAreaEbixElement = xmlDocument.Root!
+                .XPathSelectElement("PayloadEnergyTimeSeries[1]/MeteringGridAreaUsedDomainLocation/Identification");
+
+            gridAreaEbixElement.Should().NotBeNull("because grid area should be present in the ebIX document");
+            return gridAreaEbixElement!.Value;
+        }
+
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            var cimXmlDocument = await XDocument.LoadAsync(documentStream, LoadOptions.None, CancellationToken.None);
+
+            var gridAreaCimXmlElement = cimXmlDocument.Root!
+                .XPathSelectElement("Series[1]/meteringGridArea_Domain.mRID");
+
+            gridAreaCimXmlElement.Should().NotBeNull("because grid area should be present in the CIM XML document");
+            return gridAreaCimXmlElement!.Value;
+        }
+
+        if (documentFormat == DocumentFormat.Json)
+        {
+            var cimJsonDocument = await JsonDocument.ParseAsync(documentStream);
+
+            var gridAreaCimJsonElement = cimJsonDocument.RootElement
+                .GetProperty("NotifyWholesaleServices_MarketDocument")
+                .GetProperty("Series").EnumerateArray().ToList()
+                .Single()
+                .GetProperty("meteringGridArea_Domain.mRID")
+                .GetProperty("value");
+
+            gridAreaCimJsonElement.Should().NotBeNull("because grid area should be present in the CIM JSON document");
+            return gridAreaCimJsonElement.GetString()!;
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, "Unsupported document format");
     }
 
     private Task GivenWholesaleServicesRequestAcceptedIsReceived(Guid processId, WholesaleServicesRequestAccepted wholesaleServicesRequestAcceptedMessage)

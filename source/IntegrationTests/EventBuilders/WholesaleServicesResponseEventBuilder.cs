@@ -26,13 +26,13 @@ using Period = Energinet.DataHub.Edi.Responses.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
-public static class WholesaleServicesRequestAcceptedEventBuilder
+public static class WholesaleServicesResponseEventBuilder
 {
     /// <summary>
     /// Generate a mock WholesaleRequestAccepted response from Wholesale, based on the WholesaleServicesRequest
     /// It is very important that the generated data is correct, since assertions is based on this data
     /// </summary>
-    public static WholesaleServicesRequestAccepted GenerateWholesaleServicesRequestAcceptedMessage(WholesaleServicesRequest request, Instant now)
+    public static WholesaleServicesRequestAccepted GenerateWholesaleServicesRequestAccepted(WholesaleServicesRequest request, Instant now)
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(now);

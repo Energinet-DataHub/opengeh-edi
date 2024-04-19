@@ -100,7 +100,7 @@ public sealed class WholesaleServicesProcess : Entity
 
         // if (requestedGridArea != null && gridAreas.Count == 0)
         //     throw new ArgumentOutOfRangeException(nameof(gridAreas), gridAreas, "GridAreas must be provided when IncomingGridArea is not null");
-        if (requestedGridArea != null && gridAreas.Count != 1 && gridAreas.Single() != requestedGridArea)
+        if (!string.IsNullOrEmpty(requestedGridArea) && gridAreas.Count != 1 && gridAreas.Single() != requestedGridArea)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(gridAreas),

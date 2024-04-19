@@ -72,7 +72,6 @@ using FluentAssertions.Execution;
 using Google.Protobuf;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -500,9 +499,31 @@ public class BehavioursTestBase : IDisposable
         return peekResult;
     }
 
+    protected async Task<List<PeekResultDto>> WhenActorPeeksAllMessages(ActorNumber actorNumber, ActorRole actorRole, DocumentFormat documentFormat)
+    {
+        var peekResults = new List<PeekResultDto>();
+
+        PeekResultDto? peekResult = null;
+
+        var timeoutAt = DateTime.UtcNow.AddMinutes(1);
+        while (DateTime.UtcNow < timeoutAt)
+        {
+            peekResult = await WhenActorPeeksMessage(actorNumber, actorRole, documentFormat);
+
+            if (peekResult.MessageId == null)
+                break;
+
+            peekResults.Add(peekResult);
+            await WhenActorDequeueMessage(peekResult.MessageId.ToString()!, actorNumber, actorRole);
+        }
+
+        return peekResults;
+    }
+
     protected async Task ThenNotifyWholesaleServicesDocumentIsCorrect(Stream? peekResultDocumentStream, DocumentFormat documentFormat, Action<IAssertNotifyWholesaleServicesDocument> assert)
     {
         peekResultDocumentStream.Should().NotBeNull();
+        peekResultDocumentStream!.Position = 0;
 
         using var assertionScope = new AssertionScope();
 
@@ -539,6 +560,13 @@ public class BehavioursTestBase : IDisposable
         builder(eventBuilder);
 
         return eventBuilder.Build();
+    }
+
+    protected async Task WhenActorDequeueMessage(string messageId, ActorNumber actorNumber, ActorRole actorRole)
+    {
+        await using var scope = _serviceProvider.CreateAsyncScope();
+        var outgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        await outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(messageId, actorRole, actorNumber), CancellationToken.None);
     }
 
     private T GetService<T>()

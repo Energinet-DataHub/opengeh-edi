@@ -37,13 +37,6 @@ public class GivenAmountPerChargeResultProducedV1ReceivedTests : BehavioursTestB
     {
     }
 
-    public static object[][] AllDocumentFormats()
-    {
-        return EnumerationType.GetAll<DocumentFormat>()
-            .Select(df => new object[] { df })
-            .ToArray();
-    }
-
 #pragma warning disable CS1570 // XML comment has badly formed XML
     /// <summary>
     /// Example based on: https://energinet.sharepoint.com/sites/DH3ART-team/_layouts/15/download.aspx?UniqueId=039914efcff74ec1a159eff3bb358f68&e=0RN8ma
@@ -51,7 +44,7 @@ public class GivenAmountPerChargeResultProducedV1ReceivedTests : BehavioursTestB
     /// <param name="documentFormat"></param>
 #pragma warning restore CS1570 // XML comment has badly formed XML
     [Theory]
-    [MemberData(nameof(AllDocumentFormats))]
+    [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
     public async Task When_EnergySupplierActorPeeksMessage_Then_ReceivesCorrectNotifyWholesaleServicesDocument(DocumentFormat documentFormat)
     {
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
