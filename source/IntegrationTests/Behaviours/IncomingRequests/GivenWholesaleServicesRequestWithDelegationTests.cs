@@ -41,6 +41,7 @@ using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
+#pragma warning disable CS1570 // XML comment has badly formed XML
 [SuppressMessage("Performance", "CA1861:Avoid constant arrays as arguments", Justification = "Test class")]
 public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBase
 {
@@ -308,12 +309,10 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         }
     }
 
-#pragma warning disable CS1570 // XML comment has badly formed XML
     /// <summary>
     /// Rejected document based on example:
     ///     https://energinet.sharepoint.com/sites/DH3ART-team/_layouts/15/download.aspx?UniqueId=60f1449eb8f44b179f233dda432b8f65&e=uVle0k
     /// </summary>
-#pragma warning restore CS1570 // XML comment has badly formed XML
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormatsExcept), new object[] { new[] { "Xml", "Ebix" } }, MemberType = typeof(DocumentFormats))]
     public async Task AndGiven_InvalidRequestWithDelegationInTwoGridAreas_When_DelegatedActorPeeksAllMessages_Then_OneRejectWholesaleSettlementDocumentsIsCreatedCorrectly(DocumentFormat documentFormat)
@@ -529,3 +528,4 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         return Task.FromResult((wholesaleServicesRequestMessage, processId));
     }
 }
+#pragma warning restore CS1570 // XML comment has badly formed XML

@@ -248,7 +248,7 @@ public class BehavioursTestBase : IDisposable
         await ProcessInternalCommandsAsync().ConfigureAwait(false);
     }
 
-    protected async Task ProcessInternalCommandsAsync()
+    private async Task ProcessInternalCommandsAsync()
     {
         await ProcessBackgroundTasksAsync();
 
@@ -469,18 +469,14 @@ public class BehavioursTestBase : IDisposable
         return serviceBusSenderSpy;
     }
 
-    protected Task GivenWholesaleServicesProcessIsInitializedAsync(ServiceBusMessage serviceBusMessage)
-    {
-        return WhenWholesaleServicesProcessIsInitialized(serviceBusMessage);
-    }
-
     protected async Task WhenWholesaleServicesProcessIsInitialized(ServiceBusMessage serviceBusMessage)
     {
+        using var scope = _serviceProvider.CreateScope();
         // We have to manually process the service bus message, as there isn't a real service bus
         serviceBusMessage.Subject.Should().Be(nameof(InitializeWholesaleServicesProcessDto));
         serviceBusMessage.Body.Should().NotBeNull();
 
-        await GetService<IProcessClient>().InitializeAsync(serviceBusMessage.Subject, serviceBusMessage.Body.ToArray());
+        await scope.ServiceProvider.GetRequiredService<IProcessClient>().InitializeAsync(serviceBusMessage.Subject, serviceBusMessage.Body.ToArray());
         await ProcessInternalCommandsAsync();
     }
 
@@ -613,10 +609,13 @@ public class BehavioursTestBase : IDisposable
         return ProcessBackgroundTasksAsync();
     }
 
-    private Task ProcessBackgroundTasksAsync()
+    private async Task ProcessBackgroundTasksAsync()
     {
-        var datetimeProvider = GetService<ISystemDateTimeProvider>();
-        return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
+        using var scope = _serviceProvider.CreateScope();
+        var datetimeProvider = scope.ServiceProvider.GetRequiredService<ISystemDateTimeProvider>();
+        await scope.ServiceProvider
+            .GetRequiredService<IMediator>()
+            .Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
     }
 
     private ServiceProvider BuildServices(string fileStorageConnectionString, ITestOutputHelper testOutputHelper)
