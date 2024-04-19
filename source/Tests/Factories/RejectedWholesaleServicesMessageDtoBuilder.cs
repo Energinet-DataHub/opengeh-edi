@@ -43,6 +43,8 @@ public static class RejectedWholesaleServicesMessageDtoBuilder
             _businessReason,
             _receiverRole,
             _relatedToMessageId,
-            _series);
+            _series,
+            _receiverNumber,
+            _receiverRole);
     }
 }

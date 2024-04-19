@@ -292,27 +292,27 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
         ///     This method create a single outgoing message, for the receiver, based on the rejected WholesaleServicesMessage.
         /// </summary>
         public static OutgoingMessage CreateMessage(
-            RejectedWholesaleServicesMessageDto rejectedWholesaleServicesMessage,
+            RejectedWholesaleServicesMessageDto message,
             ISerializer serializer,
             Instant timestamp)
         {
             ArgumentNullException.ThrowIfNull(serializer);
-            ArgumentNullException.ThrowIfNull(rejectedWholesaleServicesMessage);
+            ArgumentNullException.ThrowIfNull(message);
 
             return new OutgoingMessage(
-                rejectedWholesaleServicesMessage.EventId,
-                rejectedWholesaleServicesMessage.DocumentType,
-                rejectedWholesaleServicesMessage.ReceiverNumber,
-                rejectedWholesaleServicesMessage.ProcessId,
-                rejectedWholesaleServicesMessage.BusinessReason,
-                rejectedWholesaleServicesMessage.ReceiverRole,
-                rejectedWholesaleServicesMessage.SenderId,
-                rejectedWholesaleServicesMessage.SenderRole,
-                serializer.Serialize(rejectedWholesaleServicesMessage.Series),
-                timestamp,
-                ProcessType.RequestWholesaleResults,
-                rejectedWholesaleServicesMessage.RelatedToMessageId,
-                null);
+                eventId: message.EventId,
+                documentType: message.DocumentType,
+                receiver: Receiver.Create(message.ReceiverNumber, message.ReceiverRole),
+                documentReceiver: Receiver.Create(message.DocumentReceiverNumber, message.DocumentReceiverRole),
+                processId: message.ProcessId,
+                businessReason: message.BusinessReason,
+                senderId: message.SenderId,
+                senderRole: message.SenderRole,
+                serializedContent: serializer.Serialize(message.Series),
+                timestamp: timestamp,
+                messageCreatedFromProcess: ProcessType.RequestWholesaleResults,
+                relatedToMessageId: message.RelatedToMessageId,
+                gridAreaCode: null);
         }
 
         /// <summary>
@@ -327,19 +327,19 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
             ArgumentNullException.ThrowIfNull(message);
 
             return new OutgoingMessage(
-                message.EventId,
-                message.DocumentType,
+                eventId: message.EventId,
+                documentType: message.DocumentType,
                 receiver: Receiver.Create(message.ReceiverNumber, message.ReceiverRole),
                 documentReceiver: Receiver.Create(message.DocumentReceiverNumber, message.DocumentReceiverRole),
-                message.ProcessId,
-                message.BusinessReason,
-                message.SenderId,
-                message.SenderRole,
-                serializer.Serialize(message.Series),
-                timestamp,
-                ProcessType.RequestWholesaleResults,
-                message.RelatedToMessageId,
-                message.Series.GridAreaCode);
+                processId: message.ProcessId,
+                businessReason: message.BusinessReason,
+                senderId: message.SenderId,
+                senderRole: message.SenderRole,
+                serializedContent: serializer.Serialize(message.Series),
+                timestamp: timestamp,
+                messageCreatedFromProcess: ProcessType.RequestWholesaleResults,
+                relatedToMessageId: message.RelatedToMessageId,
+                gridAreaCode: message.Series.GridAreaCode);
         }
 
         public void AssignToBundle(BundleId bundleId)
