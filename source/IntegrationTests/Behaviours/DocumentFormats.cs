@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -21,16 +23,27 @@ public static class DocumentFormats
 {
     public static object[][] AllDocumentFormats()
     {
-        return EnumerationType.GetAll<DocumentFormat>()
-            .Select(df => new object[] { df })
-            .ToArray();
+        return AllDocumentFormatsExcept(Array.Empty<string>());
     }
 
     public static object[][] AllDocumentFormatsExcept(string[] except)
     {
-        return EnumerationType.GetAll<DocumentFormat>()
-            .Where(df => !except.Contains(df.Name))
+        return GetAllDocumentFormats(except)
             .Select(df => new object[] { df })
             .ToArray();
+    }
+
+    public static object[][] AllDocumentFormatsWithActorRolesExcept(string[] except, string[] actorRoles)
+    {
+        return GetAllDocumentFormats(except)
+            .SelectMany(df => actorRoles
+                .Select(ar => new object[] { df, ActorRole.FromCode(ar) }))
+            .ToArray();
+    }
+
+    private static IEnumerable<DocumentFormat> GetAllDocumentFormats(string[] except)
+    {
+        return EnumerationType.GetAll<DocumentFormat>()
+            .Where(df => !except.Contains(df.Name));
     }
 }

@@ -22,6 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
@@ -57,8 +58,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
     }
 
     [Theory]
-    [MemberData(nameof(DocumentFormats.AllDocumentFormatsExcept), new object[] { new[] { "Xml", "Ebix" }, new[] { "DDM", "DEL" } }, MemberType = typeof(DocumentFormats))]
-    public async Task AndGiven_DelegationInOneGridArea_When_DelegatedActorPeeksAllMessages_Then_OneNotifyWholesaleServicesDocumentIsCreatedCorrectly(DocumentFormat documentFormat)
+    [MemberData(nameof(DocumentFormats.AllDocumentFormatsWithActorRolesExcept), new[] { "Xml", "Ebix" }, new[] { ActorRole.EnergySupplierCode, ActorRole.DelegatedCode }, MemberType = typeof(DocumentFormats))]
+    public async Task AndGiven_DelegationInOneGridArea_When_ActorPeeksAllMessages_Then_OneNotifyWholesaleServicesDocumentIsCreatedCorrectly(DocumentFormat documentFormat, ActorRole delegatedToRole)
     {
         /*
          * A request is a test with 2 parts:
@@ -73,7 +74,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
         var delegatedByActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.EnergySupplier);
-        var delegatedToActor = (ActorNumber: ActorNumber.Create("2222222222222"), ActorRole: ActorRole.Delegated);
+        var delegatedToActor = (ActorNumber: ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
@@ -108,10 +109,10 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             senderSpy,
             gridAreas: new[] { "512" },
             requestedForActorNumber: "1111111111111",
-            requestedForActorRole: "EnergySupplier",
+            requestedForActorRole: DataHubNames.ActorRole.EnergySupplier,
             energySupplierId: "1111111111111");
 
-        // TODO: Assert correct process is created
+        // TODO: Assert correct process is created?
 
         /*
          *  --- PART 2: Receive data from Wholesale and create RSM document ---
@@ -172,8 +173,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
     }
 
     [Theory]
-    [MemberData(nameof(DocumentFormats.AllDocumentFormatsExcept), new object[] { new[] { "Xml", "Ebix" } }, MemberType = typeof(DocumentFormats))]
-    public async Task AndGiven_DelegationInTwoGridAreas_When_DelegatedActorPeeksAllMessages_Then_TwoNotifyWholesaleServicesDocumentsAreCreatedCorrectly(DocumentFormat documentFormat)
+    [MemberData(nameof(DocumentFormats.AllDocumentFormatsWithActorRolesExcept), new object[] { new[] { "Xml", "Ebix" }, new[] { ActorRole.EnergySupplierCode, ActorRole.DelegatedCode } }, MemberType = typeof(DocumentFormats))]
+    public async Task AndGiven_DelegationInTwoGridAreas_When_DelegatedActorPeeksAllMessages_Then_TwoNotifyWholesaleServicesDocumentsAreCreatedCorrectly(DocumentFormat documentFormat, ActorRole delegatedToRole)
     {
         /*
          * A request is a test with 2 parts:
@@ -188,7 +189,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
         var delegatedByActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.EnergySupplier);
-        var delegatedToActor = (ActorNumber: ActorNumber.Create("2222222222222"), ActorRole: ActorRole.Delegated);
+        var delegatedToActor = (ActorNumber: ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
@@ -219,7 +220,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             delegatedByActor.ActorNumber.Value,
             "5799999933444",
             "25361478",
-            BuildingBlocks.Domain.Models.ChargeType.Tariff.Code,
+            ChargeType.Tariff.Code,
             "123564789123564789123564789123564787",
             false);
 
@@ -231,7 +232,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             senderSpy,
             gridAreas: new[] { "512", "609" },
             requestedForActorNumber: "1111111111111",
-            requestedForActorRole: "EnergySupplier",
+            requestedForActorRole: DataHubNames.ActorRole.EnergySupplier,
             energySupplierId: "1111111111111");
 
         // TODO: Assert correct process is created
@@ -340,8 +341,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
     ///     https://energinet.sharepoint.com/sites/DH3ART-team/_layouts/15/download.aspx?UniqueId=60f1449eb8f44b179f233dda432b8f65&e=uVle0k
     /// </summary>
     [Theory]
-    [MemberData(nameof(DocumentFormats.AllDocumentFormatsExcept), new object[] { new[] { "Xml", "Ebix" } }, MemberType = typeof(DocumentFormats))]
-    public async Task AndGiven_InvalidRequestWithDelegationInTwoGridAreas_When_DelegatedActorPeeksAllMessages_Then_OneRejectWholesaleSettlementDocumentsIsCreatedCorrectly(DocumentFormat documentFormat)
+    [MemberData(nameof(DocumentFormats.AllDocumentFormatsWithActorRolesExcept), new object[] { new[] { "Xml", "Ebix" }, new[] { ActorRole.EnergySupplierCode, ActorRole.DelegatedCode } }, MemberType = typeof(DocumentFormats))]
+    public async Task AndGiven_InvalidRequestWithDelegationInTwoGridAreas_When_DelegatedActorPeeksAllMessages_Then_OneRejectWholesaleSettlementDocumentsIsCreatedCorrectly(DocumentFormat documentFormat, ActorRole delegatedToRole)
     {
         /*
          * A request is a test with 2 parts:
@@ -356,7 +357,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
         var delegatedByActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.EnergySupplier);
-        var delegatedToActor = (ActorNumber: ActorNumber.Create("2222222222222"), ActorRole: ActorRole.Delegated);
+        var delegatedToActor = (ActorNumber: ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
