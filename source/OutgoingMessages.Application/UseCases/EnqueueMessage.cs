@@ -16,7 +16,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -33,23 +35,23 @@ public class EnqueueMessage
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly ILogger<EnqueueMessage> _logger;
-    private readonly DelegateMessage _delegateMessage;
     private readonly IFeatureFlagManager _featureFlagManager;
+    private readonly IMasterDataClient _masterDataClient;
 
     public EnqueueMessage(
         IActorMessageQueueRepository actorMessageQueueRepository,
         IOutgoingMessageRepository outgoingMessageRepository,
         ISystemDateTimeProvider systemDateTimeProvider,
         ILogger<EnqueueMessage> logger,
-        DelegateMessage delegateMessage,
-        IFeatureFlagManager featureFlagManager)
+        IFeatureFlagManager featureFlagManager,
+        IMasterDataClient masterDataClient)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _outgoingMessageRepository = outgoingMessageRepository;
         _systemDateTimeProvider = systemDateTimeProvider;
         _logger = logger;
-        _delegateMessage = delegateMessage;
         _featureFlagManager = featureFlagManager;
+        _masterDataClient = masterDataClient;
     }
 
     public async Task<OutgoingMessageId> EnqueueAsync(
@@ -60,7 +62,7 @@ public class EnqueueMessage
 
         if (await _featureFlagManager.UseMessageDelegationAsync().ConfigureAwait(false))
         {
-            messageToEnqueue = await _delegateMessage.DelegateAsync(messageToEnqueue, cancellationToken)
+            messageToEnqueue = await DelegateAsync(messageToEnqueue, cancellationToken)
                 .ConfigureAwait(false);
         }
 
@@ -95,5 +97,49 @@ public class EnqueueMessage
         }
 
         return messageQueue;
+    }
+
+    /// <summary>
+    /// If a delegation relationship exists, the message is delegated to the correct receiver.
+    /// </summary>
+    private async Task<OutgoingMessage> DelegateAsync(
+        OutgoingMessage messageToEnqueue,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(messageToEnqueue);
+
+        var delegatedTo = await GetDelegatedReceiverAsync(
+            messageToEnqueue.DocumentReceiver.Number,
+            messageToEnqueue.DocumentReceiver.ActorRole,
+            messageToEnqueue.GridAreaCode,
+            messageToEnqueue.MessageCreatedFromProcess,
+            cancellationToken).ConfigureAwait(false);
+
+        if (delegatedTo is not null)
+        {
+            messageToEnqueue.DelegateTo(delegatedTo);
+        }
+
+        return messageToEnqueue;
+    }
+
+    private async Task<Receiver?> GetDelegatedReceiverAsync(
+        ActorNumber delegatedByActorNumber,
+        ActorRole delegatedByActorRole,
+        string? gridAreaCode,
+        ProcessType messageCreatedFromProcess,
+        CancellationToken cancellationToken)
+    {
+        var messageDelegation = await _masterDataClient.GetProcessDelegationAsync(
+                delegatedByActorNumber,
+                delegatedByActorRole,
+                gridAreaCode,
+                messageCreatedFromProcess,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        return messageDelegation is not null
+            ? Receiver.Create(messageDelegation.DelegatedTo.ActorNumber, messageDelegation.DelegatedTo.ActorRole)
+            : null;
     }
 }
