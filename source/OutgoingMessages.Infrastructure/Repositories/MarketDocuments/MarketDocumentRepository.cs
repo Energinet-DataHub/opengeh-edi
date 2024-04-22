@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages.Queueing;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.MarketDocuments;
 
 public class MarketDocumentRepository : IMarketDocumentRepository
 {
