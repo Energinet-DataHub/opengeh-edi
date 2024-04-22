@@ -42,7 +42,7 @@ internal sealed class NotifyWholesaleServicesDsl
         return _wholesale.PublishAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId);
     }
 
-    internal Task ConfirmResultIsAvailableFor()
+    internal Task<string> ConfirmResultIsAvailableFor()
     {
         return _edi.PeekMessageAsync();
     }

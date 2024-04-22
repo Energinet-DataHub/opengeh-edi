@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.SystemTests.Drivers;
 using Energinet.DataHub.EDI.SystemTests.Dsl;
 using Xunit;
 using Xunit.Categories;

@@ -15,7 +15,8 @@
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Responses.json;
-using Newtonsoft.Json.Linq;
+using Energinet.DataHub.EDI.AcceptanceTests.TestData;
+using FluentAssertions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
@@ -29,13 +30,14 @@ public class ArchivedMessageDsl
         _ediB2CDriver = ediB2CDriver;
     }
 
-    internal Task<string> ArchivedMessageGetDocumentAsync(Uri requestUri)
+    internal async Task<List<ArchivedMessageSearchResponse>> GetMessageIsArchived(string messageId)
     {
-        return _ediB2CDriver.ArchivedMessageGetDocumentAsync(requestUri);
-    }
-
-    internal Task<List<ArchivedMessageSearchResponse>> RequestArchivedMessageSearchAsync(Uri requestUri, JObject payload)
-    {
-        return _ediB2CDriver.RequestArchivedMessageSearchAsync(requestUri, payload);
+        return await _ediB2CDriver.RequestArchivedMessageSearchAsync(
+            ArchivedMessageData.GetSearchableDataObject(
+            messageId!,
+            null!,
+            null!,
+            null!,
+            null!)).ConfigureAwait(false);
     }
 }

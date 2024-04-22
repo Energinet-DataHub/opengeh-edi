@@ -80,7 +80,7 @@ internal sealed class EdiDriver : IDisposable
         return document;
     }
 
-    public async Task<Stream> PeekMessageAsync(DocumentFormat? documentFormat = null)
+    public async Task<string> PeekMessageAsync(DocumentFormat? documentFormat = null)
     {
         var stopWatch = Stopwatch.StartNew();
         while (stopWatch.ElapsedMilliseconds < 600000)
@@ -89,9 +89,9 @@ internal sealed class EdiDriver : IDisposable
                 .ConfigureAwait(false);
             if (peekResponse.StatusCode == HttpStatusCode.OK)
             {
-                var document = await peekResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                await DequeueAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
-                return document;
+                var messageId = GetMessageId(peekResponse);
+                await DequeueAsync(messageId).ConfigureAwait(false);
+                return messageId;
             }
 
             if (peekResponse.StatusCode != HttpStatusCode.NoContent)
@@ -114,27 +114,6 @@ internal sealed class EdiDriver : IDisposable
             await DequeueAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
             await EmptyQueueAsync().ConfigureAwait(false);
         }
-    }
-
-    public async Task PeekWholesaleSettlementResponseAsync(DocumentFormat documentFormat, string expectedDocumentType)
-    {
-        var documentStream = await PeekMessageAsync(documentFormat).ConfigureAwait(false);
-
-        if (documentFormat == DocumentFormat.Json)
-        {
-            var jsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(documentStream).ConfigureAwait(false);
-
-            var documentIsOfExpectedType = jsonElement.TryGetProperty(
-                expectedDocumentType,
-                out var marketDocument);
-
-            Assert.True(documentIsOfExpectedType, "\nAccepted message failed with wrong message type\n Document: " + jsonElement.ToString() + "\n");
-            return;
-        }
-
-        using var reader = new StreamReader(documentStream);
-        string text = await reader.ReadToEndAsync().ConfigureAwait(false);
-        text.Should().Contain(expectedDocumentType, "\nAccepted message failed with wrong message type\n Document: " + text + "\n");
     }
 
     public async Task RequestAggregatedMeasureDataWithoutTokenAsync()
