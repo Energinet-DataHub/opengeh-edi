@@ -314,7 +314,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
                 senderId: message.SenderId,
                 senderRole: message.SenderRole,
                 serializedContent: serializer.Serialize(message.Series),
-                timestamp: timestamp,
+                createdAt: timestamp,
                 messageCreatedFromProcess: ProcessType.RequestWholesaleResults,
                 relatedToMessageId: message.RelatedToMessageId,
                 gridAreaCode: null);
@@ -341,7 +341,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
                 senderId: message.SenderId,
                 senderRole: message.SenderRole,
                 serializedContent: serializer.Serialize(message.Series),
-                timestamp: timestamp,
+                createdAt: timestamp,
                 messageCreatedFromProcess: ProcessType.RequestWholesaleResults,
                 relatedToMessageId: message.RelatedToMessageId,
                 gridAreaCode: message.Series.GridAreaCode);
