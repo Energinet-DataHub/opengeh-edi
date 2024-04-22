@@ -57,10 +57,9 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
     }
 
     [Theory]
-    [MemberData(nameof(DocumentFormats.AllDocumentFormatsExcept), new object[] { new[] { "Xml", "Ebix" } }, MemberType = typeof(DocumentFormats))]
+    [MemberData(nameof(DocumentFormats.AllDocumentFormatsExcept), new object[] { new[] { "Xml", "Ebix" }, new[] { "DDM", "DEL" } }, MemberType = typeof(DocumentFormats))]
     public async Task AndGiven_DelegationInOneGridArea_When_DelegatedActorPeeksAllMessages_Then_OneNotifyWholesaleServicesDocumentIsCreatedCorrectly(DocumentFormat documentFormat)
     {
-        // TODO: Same test, but just for rejected instead
         /*
          * A request is a test with 2 parts:
          *  1. Send a request to the system (incoming message)
@@ -176,7 +175,6 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
     [MemberData(nameof(DocumentFormats.AllDocumentFormatsExcept), new object[] { new[] { "Xml", "Ebix" } }, MemberType = typeof(DocumentFormats))]
     public async Task AndGiven_DelegationInTwoGridAreas_When_DelegatedActorPeeksAllMessages_Then_TwoNotifyWholesaleServicesDocumentsAreCreatedCorrectly(DocumentFormat documentFormat)
     {
-        // TODO: Same test, but just for rejected instead
         /*
          * A request is a test with 2 parts:
          *  1. Send a request to the system (incoming message)
@@ -345,7 +343,6 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
     [MemberData(nameof(DocumentFormats.AllDocumentFormatsExcept), new object[] { new[] { "Xml", "Ebix" } }, MemberType = typeof(DocumentFormats))]
     public async Task AndGiven_InvalidRequestWithDelegationInTwoGridAreas_When_DelegatedActorPeeksAllMessages_Then_OneRejectWholesaleSettlementDocumentsIsCreatedCorrectly(DocumentFormat documentFormat)
     {
-        // TODO: Same test, but just for rejected instead
         /*
          * A request is a test with 2 parts:
          *  1. Send a request to the system (incoming message)

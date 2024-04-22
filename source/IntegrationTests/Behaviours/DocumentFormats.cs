@@ -26,10 +26,10 @@ public static class DocumentFormats
             .ToArray();
     }
 
-    public static object[][] AllDocumentFormatsExcept(string[]? except = null)
+    public static object[][] AllDocumentFormatsExcept(string[] except)
     {
         return EnumerationType.GetAll<DocumentFormat>()
-            .Where(df => except == null || !except.Contains(df.Name))
+            .Where(df => !except.Contains(df.Name))
             .Select(df => new object[] { df })
             .ToArray();
     }

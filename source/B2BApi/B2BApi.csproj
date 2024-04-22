@@ -24,7 +24,7 @@ limitations under the License.
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.17.2" />
+        <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.17.5" />
         <PackageReference Include="Energinet.DataHub.Core.App.Common.Security" Version="8.2.0" />
       <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="12.0.0" />
         <PackageReference Include="Energinet.DataHub.Core.Logging" Version="3.1.1" />
