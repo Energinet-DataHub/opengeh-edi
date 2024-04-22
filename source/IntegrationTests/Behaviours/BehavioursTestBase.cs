@@ -288,7 +288,7 @@ public class BehavioursTestBase : IDisposable
         string gridAreaCode,
         ProcessType processType,
         Instant startsAt,
-        Instant stopsAt,
+        Instant? stopsAt = null,
         int sequenceNumber = 0)
     {
         await GetService<IMasterDataClient>()
@@ -298,7 +298,7 @@ public class BehavioursTestBase : IDisposable
                     processType,
                     gridAreaCode,
                     startsAt,
-                    stopsAt,
+                    stopsAt ?? startsAt.Plus(Duration.FromDays(365)),
                     delegatedBy,
                     delegatedTo),
                 CancellationToken.None);

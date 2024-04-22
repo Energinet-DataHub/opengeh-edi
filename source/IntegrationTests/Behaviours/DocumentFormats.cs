@@ -23,21 +23,8 @@ public static class DocumentFormats
 {
     public static object[][] AllDocumentFormats()
     {
-        return AllDocumentFormatsExcept(Array.Empty<string>());
-    }
-
-    public static object[][] AllDocumentFormatsExcept(string[] except)
-    {
-        return GetAllDocumentFormats(except)
+        return GetAllDocumentFormats(Array.Empty<string>())
             .Select(df => new object[] { df })
-            .ToArray();
-    }
-
-    public static object[][] AllDocumentFormatsWithActorRolesExcept(string[] except, string[] actorRoles)
-    {
-        return GetAllDocumentFormats(except)
-            .SelectMany(df => actorRoles
-                .Select(ar => new object[] { df, ActorRole.FromCode(ar) }))
             .ToArray();
     }
 

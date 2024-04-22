@@ -29,6 +29,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 public static class WholesaleServicesResponseEventBuilder
 {
     public const string DefaultChargeOwnerId = "5799999933444";
+    public static readonly IReadOnlyCollection<string> DefaultGridAreas = new List<string> { "893", "917" };
 
     /// <summary>
     /// Generate a mock WholesaleRequestAccepted response from Wholesale, based on the WholesaleServicesRequest
@@ -41,7 +42,7 @@ public static class WholesaleServicesResponseEventBuilder
 
         var gridAreas = request.GridAreaCodes.ToList();
         if (gridAreas.Count == 0)
-            gridAreas.AddRange(new List<string> { "804", "917" });
+            gridAreas.AddRange(DefaultGridAreas);
 
         var chargeTypes = request.ChargeTypes;
         if (chargeTypes.Count == 0)
@@ -54,30 +55,10 @@ public static class WholesaleServicesResponseEventBuilder
                     ? WholesaleServicesRequestSeries.Types.Resolution.Monthly
                     : WholesaleServicesRequestSeries.Types.Resolution.Hour;
 
-                var points = new List<WholesaleServicesRequestSeries.Types.Point>();
                 var periodStart = InstantPattern.General.Parse(request.PeriodStart).Value;
                 var periodEnd = InstantPattern.General.Parse(request.PeriodEnd).Value;
 
-                if (resolution == WholesaleServicesRequestSeries.Types.Resolution.Monthly)
-                {
-                    points.Add(CreatePoint(periodEnd, quantityFactor: 30 * 24));
-                }
-                else
-                {
-                    var resolutionDuration = resolution switch
-                    {
-                        WholesaleServicesRequestSeries.Types.Resolution.Day => Duration.FromHours(24),
-                        WholesaleServicesRequestSeries.Types.Resolution.Hour => Duration.FromHours(1),
-                        _ => throw new NotImplementedException($"Unsupported resolution in request: {resolution.ToString()}"),
-                    };
-
-                    var currentTime = periodStart;
-                    while (currentTime < periodEnd)
-                    {
-                        points.Add(CreatePoint(currentTime));
-                        currentTime = currentTime.Plus(resolutionDuration);
-                    }
-                }
+                var points = CreatePoints(resolution, periodEnd, periodStart);
 
                 var series = new WholesaleServicesRequestSeries()
                 {
@@ -138,6 +119,34 @@ public static class WholesaleServicesResponseEventBuilder
         }
 
         return rejectedMessage;
+    }
+
+    private static List<WholesaleServicesRequestSeries.Types.Point> CreatePoints(WholesaleServicesRequestSeries.Types.Resolution resolution, Instant periodEnd, Instant periodStart)
+    {
+        var points = new List<WholesaleServicesRequestSeries.Types.Point>();
+
+        if (resolution == WholesaleServicesRequestSeries.Types.Resolution.Monthly)
+        {
+            points.Add(CreatePoint(periodEnd, quantityFactor: 30 * 24));
+        }
+        else
+        {
+            var resolutionDuration = resolution switch
+            {
+                WholesaleServicesRequestSeries.Types.Resolution.Day => Duration.FromHours(24),
+                WholesaleServicesRequestSeries.Types.Resolution.Hour => Duration.FromHours(1),
+                _ => throw new NotImplementedException($"Unsupported resolution in request: {resolution.ToString()}"),
+            };
+
+            var currentTime = periodStart;
+            while (currentTime < periodEnd)
+            {
+                points.Add(CreatePoint(currentTime));
+                currentTime = currentTime.Plus(resolutionDuration);
+            }
+        }
+
+        return points;
     }
 
     [SuppressMessage("Security", "CA5394:Do not use insecure randomness", Justification = "Random not used for security")]

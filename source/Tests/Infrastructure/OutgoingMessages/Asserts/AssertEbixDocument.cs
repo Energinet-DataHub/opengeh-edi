@@ -55,8 +55,6 @@ public class AssertEbixDocument
         _document.Save(stream);
         stream.Position = 0;
         _stream = stream;
-
-        var documentString = _document.ToString();
     }
 
     private AssertEbixDocument(Stream stream, string prefix, DocumentValidator documentValidator)

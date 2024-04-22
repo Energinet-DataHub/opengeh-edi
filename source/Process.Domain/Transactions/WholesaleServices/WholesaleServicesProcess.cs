@@ -105,7 +105,7 @@ public sealed class WholesaleServicesProcess : Entity
             throw new ArgumentOutOfRangeException(
                 nameof(gridAreas),
                 gridAreas,
-                $"GridAreas must contain exactly the IncomingGridArea when IncomingGridArea is not null (id: {processId.Id}");
+                $"GridAreas must contain exactly the IncomingGridArea when IncomingGridArea is not null (id: {processId.Id})");
         }
 
         ProcessId = processId;

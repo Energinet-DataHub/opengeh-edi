@@ -40,7 +40,6 @@ using NodaTime.Text;
 using Xunit;
 using Xunit.Abstractions;
 using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
-using Duration = NodaTime.Duration;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
@@ -105,8 +104,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
             "512",
             ProcessType.RequestWholesaleResults,
-            GetNow(),
-            GetNow().Plus(Duration.FromDays(32)));
+            GetNow());
 
         await GivenReceivedWholesaleServicesRequest(
             documentFormat: documentFormat,
@@ -239,16 +237,14 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
             "512",
             ProcessType.RequestWholesaleResults,
-            GetNow(),
-            GetNow().Plus(Duration.FromDays(32)));
+            GetNow());
 
         await GivenDelegation(
             new ActorNumberAndRoleDto(originalActor.ActorNumber, originalActor.ActorRole),
             new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
             "609",
             ProcessType.RequestWholesaleResults,
-            GetNow(),
-            GetNow().Plus(Duration.FromDays(32)));
+            GetNow());
 
         await GivenReceivedWholesaleServicesRequest(
             documentFormat: documentFormat,
@@ -391,16 +387,14 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
             "512",
             ProcessType.RequestWholesaleResults,
-            GetNow(),
-            GetNow().Plus(Duration.FromDays(32)));
+            GetNow());
 
         await GivenDelegation(
             new ActorNumberAndRoleDto(originalActor.ActorNumber, originalActor.ActorRole),
             new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
             "609",
             ProcessType.RequestWholesaleResults,
-            GetNow(),
-            GetNow().Plus(Duration.FromDays(32)));
+            GetNow());
 
         // Setup fake request (period end is before period start)
         await GivenReceivedWholesaleServicesRequest(
@@ -469,7 +463,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         using (new AssertionScope())
         {
             originalActorPeekResults.Should().BeEmpty("because original actor shouldn't receive result when delegated actor made the request");
-            peekResult = delegatedActorPeekResults.Should().ContainSingle("because there should only be one message for one grid area")
+            peekResult = delegatedActorPeekResults.Should().ContainSingle("because there should only be one rejected message regardless of grid areas")
                 .Subject;
 
             peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
@@ -529,8 +523,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
             "512",
             ProcessType.RequestWholesaleResults,
-            GetNow(),
-            GetNow().Plus(Duration.FromDays(32)));
+            GetNow());
 
         // Original actor requests own data
         await GivenReceivedWholesaleServicesRequest(
