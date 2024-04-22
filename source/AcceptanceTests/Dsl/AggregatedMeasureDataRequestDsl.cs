@@ -12,25 +12,71 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
+using FluentAssertions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
 public sealed class AggregatedMeasureDataRequestDsl
 {
-    private readonly EdiDriver _edi;
+    private readonly EdiDriver _ediDriver;
+    private readonly EdiProcessesDriver _ediProcessesDriver;
 
 #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
 
-    internal AggregatedMeasureDataRequestDsl(EdiDriver ediDriver)
+    internal AggregatedMeasureDataRequestDsl(EdiDriver ediDriver, EdiProcessesDriver ediProcessesDriver)
     {
-        _edi = ediDriver;
+        _ediDriver = ediDriver;
+        _ediProcessesDriver = ediProcessesDriver;
     }
 
     internal Task<string> AggregatedMeasureDataWithXmlPayload(XmlDocument payload)
     {
-        return _edi.RequestAggregatedMeasureDataXmlAsync(payload);
+        return _ediDriver.RequestAggregatedMeasureDataXmlAsync(payload);
+    }
+
+    internal async Task<Guid> RequestAsync(CancellationToken cancellationToken)
+    {
+        return await _ediDriver
+                .RequestAggregatedMeasureDataAsync(false, cancellationToken)
+                .ConfigureAwait(false);
+    }
+
+    internal async Task InvalidRequestMessageAsync(CancellationToken cancellationToken = default)
+    {
+        var act = async () =>
+        {
+            await _ediDriver
+                .RequestAggregatedMeasureDataAsync(true, cancellationToken)
+                .ConfigureAwait(false);
+        };
+
+        var httpRequestException = await Assert.ThrowsAsync<HttpRequestException>(act).ConfigureAwait(false);
+
+        Assert.Equal(HttpStatusCode.BadRequest, httpRequestException.StatusCode);
+    }
+
+    internal async Task ConfirmRequestIsInitiatedAsync(
+        Guid requestMessageId,
+        CancellationToken cancellationToken)
+    {
+        var processId = await _ediProcessesDriver
+            .GetAggregatedMeasureDataProcessIdAsync(requestMessageId, cancellationToken)
+            .ConfigureAwait(false);
+
+        processId.Should().NotBeNull();
+    }
+
+    internal async Task<Guid> InitializeAggregatedMeasureDataRequestAsync(
+        string gridAreaCode,
+        string actorNumber,
+        CancellationToken cancellationToken)
+    {
+        return await _ediProcessesDriver
+            .CreateAggregatedMeasureDataProcessAsync(gridAreaCode, actorNumber, cancellationToken)
+            .ConfigureAwait(false);
     }
 }

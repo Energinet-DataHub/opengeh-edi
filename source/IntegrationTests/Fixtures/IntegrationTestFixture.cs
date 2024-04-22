@@ -98,8 +98,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
             CreateSchema();
             CleanupDatabase();
 
-            AzuriteManager.StartAzurite();
-            CleanupFileStorage();
+            // AzuriteManager.StartAzurite();
+            // CleanupFileStorage();
 
             return Task.CompletedTask;
         }
@@ -167,7 +167,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
             if (disposing)
             {
                 CleanupDatabase();
-                CleanupFileStorage(true);
+                // CleanupFileStorage(true);
                 AzuriteManager.Dispose();
             }
 

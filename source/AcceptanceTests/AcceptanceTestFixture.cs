@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Net.Http.Headers;
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration; // DO NOT REMOVE THIS! use in debug mode
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Microsoft.Extensions.Configuration;
@@ -58,6 +59,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
         var serviceBusConnectionString = root.GetValue<string>("sb-domain-relay-manage-connection-string") ?? throw new InvalidOperationException("sb-domain-relay-manage-connection-string secret is not set in configuration");
         var topicName = root.GetValue<string>("sbt-shres-integrationevent-received-name") ?? throw new InvalidOperationException("sbt-shres-integrationevent-received-name secret is not set in configuration");
+        var ediInboxQueueName = root.GetValue<string>("sbq-edi-inbox-messagequeue-name") ?? throw new InvalidOperationException("sbq-edi-inbox-messagequeue-name secret is not set in configuration");
 
         var azureB2CTenantId = root.GetValue<string>("b2c-tenant-id") ?? "e9aa9b15-7200-441e-b255-927506b3494";
         var azureEntraBackendAppId = root.GetValue<string>("backend-b2b-app-id") ?? throw new InvalidOperationException("backend-b2b-app-id is not set in configuration");
@@ -85,12 +87,15 @@ public class AcceptanceTestFixture : IAsyncLifetime
         _b2cUsername = root.GetValue<string>("B2C_USERNAME") ?? throw new InvalidOperationException("B2C_USERNAME is not set in configuration");
         _b2cPassword = root.GetValue<string>("B2C_PASSWORD") ?? throw new InvalidOperationException("B2C_PASSWORD is not set in configuration");
         EventPublisher = new IntegrationEventPublisher(serviceBusConnectionString, topicName);
+        EdiInboxClient = new EdiInboxClient(ediInboxQueueName, serviceBusConnectionString);
         B2CAuthorizedHttpClient = new AsyncLazy<HttpClient>(CreateB2CAuthorizedHttpClientAsync);
     }
 
     internal Uri MarketParticipantUri { get; }
 
     internal IntegrationEventPublisher EventPublisher { get; }
+
+    internal EdiInboxClient EdiInboxClient { get; }
 
     internal string ConnectionString { get; }
 

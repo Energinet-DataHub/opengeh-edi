@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.MessageFactories;
+using Energinet.DataHub.EDI.AcceptanceTests.Factories;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf;
@@ -23,10 +25,14 @@ internal sealed class WholesaleDriver
 {
     public const string BalanceResponsiblePartyMarketRoleCode = "DDK";
     private readonly IntegrationEventPublisher _integrationEventPublisher;
+    private readonly EdiInboxClient _inboxEdiClient;
 
-    internal WholesaleDriver(IntegrationEventPublisher integrationEventPublisher)
+    internal WholesaleDriver(
+        IntegrationEventPublisher integrationEventPublisher,
+        EdiInboxClient inboxEdiClient)
     {
         _integrationEventPublisher = integrationEventPublisher;
+        _inboxEdiClient = inboxEdiClient;
     }
 
     internal Task PublishAggregationResultAsync(string gridAreaCode, ActorRole? marketRole = null, string? actorNumber = null)
@@ -75,5 +81,33 @@ internal sealed class WholesaleDriver
         return _integrationEventPublisher.PublishAsync(
             AmountPerChargeResultProducedV1.EventName,
             amountPerChargeResultProduced.ToByteArray());
+    }
+
+    internal async Task PublishWholesaleServicesRequestAcceptedResponseAsync(
+        Guid processId,
+        string gridAreaCode,
+        string energySupplierId,
+        string chargeOwnerId,
+        CancellationToken cancellationToken)
+    {
+        var message = WholesaleServiceRequestAcceptedMessageFactory.Create(
+            processId,
+            gridAreaCode,
+            energySupplierId,
+            chargeOwnerId);
+
+        await _inboxEdiClient.SendAsync(message, cancellationToken).ConfigureAwait(false);
+    }
+
+    internal async Task PublishAggregatedMeasureDataRequestAcceptedResponseAsync(
+        Guid processId,
+        string gridAreaCode,
+        CancellationToken cancellationToken)
+    {
+        var message = AggregatedMeasureDataRequestAcceptedMessageFactory.Create(
+            processId,
+            gridAreaCode);
+
+        await _inboxEdiClient.SendAsync(message, cancellationToken).ConfigureAwait(false);
     }
 }

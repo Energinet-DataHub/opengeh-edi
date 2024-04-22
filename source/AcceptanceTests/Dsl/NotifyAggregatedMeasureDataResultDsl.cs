@@ -39,13 +39,19 @@ internal sealed class NotifyAggregatedMeasureDataResultDsl
         return _edi.PeekMessageAsync();
     }
 
-    internal Task ConfirmResultIsAvailableForToken()
-    {
-        return _edi.PeekMessageAsync();
-    }
-
     internal async Task EmptyQueueForActor()
     {
         await _edi.EmptyQueueAsync().ConfigureAwait(false);
+    }
+
+    internal async Task PublishAggregatedMeasureDataRequestAcceptedResponseFor(
+        Guid processId,
+        string gridAreaCode,
+        CancellationToken cancellationToken)
+    {
+        await _wholesale.PublishAggregatedMeasureDataRequestAcceptedResponseAsync(
+            processId,
+            gridAreaCode,
+            cancellationToken).ConfigureAwait(false);
     }
 }

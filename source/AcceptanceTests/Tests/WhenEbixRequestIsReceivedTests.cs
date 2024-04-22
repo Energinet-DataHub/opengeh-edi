@@ -37,10 +37,10 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
         _fixture = fixture;
 
         _ebixMDR = new EbixRequestDsl(
-            new WholesaleDriver(fixture.EventPublisher),
+            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient),
             new EbixDriver(new Uri(fixture.ApiManagementUri, "/ebix"), fixture.EbixCertificatePasswordForMeterDataResponsible, ActorRole.MeteredDataAdministrator));
         _ebixEs = new EbixRequestDsl(
-            new WholesaleDriver(fixture.EventPublisher),
+            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient),
             new EbixDriver(new Uri(fixture.ApiManagementUri, "/ebix"), fixture.EbixCertificatePasswordForEnergySupplier, ActorRole.EnergySupplier));
         _actor = new ActorDsl(new MarketParticipantDriver(fixture.EventPublisher), new EdiActorDriver(fixture.ConnectionString));
     }

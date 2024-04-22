@@ -51,4 +51,19 @@ internal sealed class NotifyWholesaleServicesDsl
     {
         await _edi.EmptyQueueAsync().ConfigureAwait(false);
     }
+
+    internal async Task PublishWholesaleServicesRequestAcceptedResponseFor(
+        Guid processId,
+        string gridAreaCode,
+        string energySupplierId,
+        string chargeOwnerId,
+        CancellationToken cancellationToken)
+    {
+        await _wholesale.PublishWholesaleServicesRequestAcceptedResponseAsync(
+            processId,
+            gridAreaCode,
+            energySupplierId,
+            chargeOwnerId,
+            cancellationToken).ConfigureAwait(false);
+    }
 }

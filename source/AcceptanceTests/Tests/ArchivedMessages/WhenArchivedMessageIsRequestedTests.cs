@@ -41,7 +41,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 
         _notifyWholesaleServicesDsl = new NotifyWholesaleServicesDsl(
             new EdiDriver(fixture.B2BEnergySupplierAuthorizedHttpClient),
-            new WholesaleDriver(fixture.EventPublisher));
+            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
     }
 
     [Fact]
