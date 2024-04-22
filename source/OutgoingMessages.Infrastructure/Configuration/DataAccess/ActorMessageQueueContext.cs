@@ -18,12 +18,12 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DbContext;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.ActorMessageQueues;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.MarketDocuments;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.ActorMessagesQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.ActorMessageQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess
