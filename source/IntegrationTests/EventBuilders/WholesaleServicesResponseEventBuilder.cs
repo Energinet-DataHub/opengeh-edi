@@ -28,6 +28,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
 public static class WholesaleServicesResponseEventBuilder
 {
+    public const string DefaultChargeOwnerId = "5799999933444";
+
     /// <summary>
     /// Generate a mock WholesaleRequestAccepted response from Wholesale, based on the WholesaleServicesRequest
     /// It is very important that the generated data is correct, since assertions is based on this data
@@ -94,7 +96,7 @@ public static class WholesaleServicesResponseEventBuilder
                         Enum.TryParse<WholesaleServicesRequestSeries.Types.ChargeType>(ct.ChargeType_, out var result)
                             ? result
                             : throw new NotImplementedException("Unsupported chargetype in request"),
-                    ChargeOwnerId = request.HasChargeOwnerId ? request.ChargeOwnerId : "5799999933444",
+                    ChargeOwnerId = request.HasChargeOwnerId ? request.ChargeOwnerId : DefaultChargeOwnerId,
                     GridArea = ga,
                     QuantityUnit = WholesaleServicesRequestSeries.Types.QuantityUnit.Kwh,
                     SettlementMethod = WholesaleServicesRequestSeries.Types.SettlementMethod.Flex,

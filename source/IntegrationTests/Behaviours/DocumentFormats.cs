@@ -41,7 +41,7 @@ public static class DocumentFormats
             .ToArray();
     }
 
-    private static IEnumerable<DocumentFormat> GetAllDocumentFormats(string[] except)
+    public static IEnumerable<DocumentFormat> GetAllDocumentFormats(string[] except)
     {
         return EnumerationType.GetAll<DocumentFormat>()
             .Where(df => !except.Contains(df.Name));

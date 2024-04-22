@@ -15,7 +15,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
@@ -26,15 +28,15 @@ internal static class RequestWholesaleServicesRequestBuilder
     /// Create a stream containing a RequestWholesaleSettlement message in JSON format (not monthly)
     /// </summary>
     public static IncomingMessageStream GetJsonStream(
-        string senderActorNumber,
-        string senderActorRole,
-        string periodStart,
-        string periodEnd,
+        ActorNumber senderActorNumber,
+        ActorRole senderActorRole,
+        Instant periodStart,
+        Instant periodEnd,
         string? gridArea,
-        string energySupplierActorNumber,
-        string chargeOwnerActorNumber,
+        ActorNumber energySupplierActorNumber,
+        ActorNumber chargeOwnerActorNumber,
         string chargeCode,
-        string chargeType,
+        ChargeType chargeType,
         string transactionId,
         bool isMonthly)
     {
@@ -42,15 +44,15 @@ internal static class RequestWholesaleServicesRequestBuilder
             new MemoryStream(
                 Encoding.UTF8.GetBytes(
                     GetJson(
-                        senderActorNumber,
-                        senderActorRole,
-                        periodStart,
-                        periodEnd,
+                        senderActorNumber.Value,
+                        senderActorRole.Code,
+                        periodStart.ToString(),
+                        periodEnd.ToString(),
                         gridArea,
-                        energySupplierActorNumber,
-                        chargeOwnerActorNumber,
+                        energySupplierActorNumber.Value,
+                        chargeOwnerActorNumber.Value,
                         chargeCode,
-                        chargeType,
+                        chargeType.Code,
                         transactionId,
                         isMonthly))));
     }

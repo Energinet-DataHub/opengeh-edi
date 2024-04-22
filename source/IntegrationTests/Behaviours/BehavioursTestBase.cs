@@ -81,6 +81,7 @@ using Microsoft.Extensions.Logging;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
+using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
@@ -337,15 +338,15 @@ public class BehavioursTestBase : IDisposable
 
     protected async Task GivenReceivedWholesaleServicesRequest(
         DocumentFormat documentFormat,
-        string senderActorNumber,
-        string senderActorRole,
+        ActorNumber senderActorNumber,
+        ActorRole senderActorRole,
         (int Year, int Month, int Day) periodStart,
         (int Year, int Month, int Day) periodEnd,
         string? gridArea,
-        string energySupplierActorNumber,
-        string chargeOwnerActorNumber,
+        ActorNumber energySupplierActorNumber,
+        ActorNumber chargeOwnerActorNumber,
         string chargeCode,
-        string chargeType,
+        ChargeType chargeType,
         string transactionId,
         bool isMonthly)
     {
@@ -357,16 +358,8 @@ public class BehavioursTestBase : IDisposable
             incomingMessageStream = RequestWholesaleServicesRequestBuilder.GetJsonStream(
                 senderActorNumber,
                 senderActorRole,
-                new LocalDate(periodStart.Year, periodStart.Month, periodStart.Day)
-                    .AtMidnight()
-                    .InZoneStrictly(_dateTimeZone)
-                    .ToInstant()
-                    .ToString(),
-                new LocalDate(periodEnd.Year, periodEnd.Month, periodEnd.Day)
-                    .AtMidnight()
-                    .InZoneStrictly(_dateTimeZone)
-                    .ToInstant()
-                    .ToString(),
+                CreateDateInstant(periodStart.Year, periodStart.Month, periodStart.Day),
+                CreateDateInstant(periodEnd.Year, periodEnd.Month, periodEnd.Day),
                 gridArea,
                 energySupplierActorNumber,
                 chargeOwnerActorNumber,
@@ -491,12 +484,10 @@ public class BehavioursTestBase : IDisposable
     {
         var peekResults = new List<PeekResultDto>();
 
-        PeekResultDto? peekResult = null;
-
         var timeoutAt = DateTime.UtcNow.AddMinutes(1);
         while (DateTime.UtcNow < timeoutAt)
         {
-            peekResult = await WhenActorPeeksMessage(actorNumber, actorRole, documentFormat);
+            var peekResult = await WhenActorPeeksMessage(actorNumber, actorRole, documentFormat);
 
             if (peekResult.MessageId == null)
                 break;
