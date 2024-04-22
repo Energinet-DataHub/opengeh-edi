@@ -22,11 +22,8 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 [Serializable]
 public class ActorRole : DataHubType<ActorRole>
 {
-    public const string EnergySupplierCode = "DDQ";
-    public const string DelegatedCode = "DEL";
-
     public static readonly ActorRole MeteringPointAdministrator = new(DataHubNames.ActorRole.MeteringPointAdministrator, "DDZ");
-    public static readonly ActorRole EnergySupplier = new(DataHubNames.ActorRole.EnergySupplier, EnergySupplierCode);
+    public static readonly ActorRole EnergySupplier = new(DataHubNames.ActorRole.EnergySupplier, "DDQ");
 
     // A grid operator has two roles.
     // GridOperator (DDM) when creating a new metering point

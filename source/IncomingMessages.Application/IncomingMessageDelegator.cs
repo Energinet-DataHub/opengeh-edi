@@ -28,7 +28,7 @@ public class IncomingMessageDelegator
 {
     private static readonly HashSet<ActorRole> _rolesWithAllowedDelegation = new()
     {
-        ActorRole.EnergySupplier,
+        ActorRole.GridOperator,
         ActorRole.Delegated,
     };
 

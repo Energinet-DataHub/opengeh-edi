@@ -57,6 +57,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
 
     public static object[][] DocumentFormatsWithDelegatedFromAndToRoles()
     {
+        // TODO: Who can delegate RequestWholesaleServices?  I assume it's only the actors who can actually
+        // perform the request, eg. DDQ and DDM
         var delegatedFromRoles = new List<ActorRole>
         {
             ActorRole.EnergySupplier,
@@ -66,7 +68,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         var delegatedToRoles = new List<ActorRole>
         {
             ActorRole.Delegated,
-            ActorRole.EnergySupplier,
+            ActorRole.GridOperator,
         };
 
         return DocumentFormats
@@ -512,6 +514,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
     /// be able to request and receive his own data
     /// </summary>
     [Theory]
+    [MemberData(nameof(DocumentFormatsWithDelegatedFromAndToRoles))]
     [MemberData(nameof(DocumentFormatsWithDelegatedFromAndToRoles))]
     public async Task AndGiven_OriginalActorRequestsOwnData_When_OriginalActorPeeksAllMessages_Then_OriginalActorReceivesOneNotifyWholesaleServicesDocumentWithCorrectContent(DocumentFormat documentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
     {
