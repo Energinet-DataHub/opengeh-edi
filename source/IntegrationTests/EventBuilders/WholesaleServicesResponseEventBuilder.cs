@@ -28,21 +28,26 @@ namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
 public static class WholesaleServicesResponseEventBuilder
 {
-    public const string DefaultChargeOwnerId = "5799999933444";
-    public static readonly IReadOnlyCollection<string> DefaultGridAreas = new List<string> { "893", "917" };
+    // public const string DefaultChargeOwnerId = "5799999933444";
+    // public static readonly IReadOnlyCollection<string> DefaultGridAreas = new List<string> { "893", "917" };
 
     /// <summary>
     /// Generate a mock WholesaleRequestAccepted response from Wholesale, based on the WholesaleServicesRequest
     /// It is very important that the generated data is correct, since assertions is based on this data
     /// </summary>
-    public static WholesaleServicesRequestAccepted GenerateWholesaleServicesRequestAccepted(WholesaleServicesRequest request, Instant now)
+    public static WholesaleServicesRequestAccepted GenerateWholesaleServicesRequestAccepted(WholesaleServicesRequest request, Instant now, string? defaultChargeOwnerId = null, ICollection<string>? defaultGridAreas = null)
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(now);
 
+        if (!request.HasChargeOwnerId && defaultChargeOwnerId == null)
+            throw new ArgumentNullException(nameof(defaultChargeOwnerId), "defaultChargeOwnerId must be set when request has null ChargeOwnerId");
+        if (request.GridAreaCodes.Count == 0 && defaultGridAreas == null)
+            throw new ArgumentNullException(nameof(defaultGridAreas), "defaultGridAreas must be set when request has no GridAreaCodes");
+
         var gridAreas = request.GridAreaCodes.ToList();
         if (gridAreas.Count == 0)
-            gridAreas.AddRange(DefaultGridAreas);
+            gridAreas.AddRange(defaultGridAreas!);
 
         var chargeTypes = request.ChargeTypes;
         if (chargeTypes.Count == 0)
@@ -77,7 +82,7 @@ public static class WholesaleServicesResponseEventBuilder
                         Enum.TryParse<WholesaleServicesRequestSeries.Types.ChargeType>(ct.ChargeType_, out var result)
                             ? result
                             : throw new NotImplementedException("Unsupported chargetype in request"),
-                    ChargeOwnerId = request.HasChargeOwnerId ? request.ChargeOwnerId : DefaultChargeOwnerId,
+                    ChargeOwnerId = request.HasChargeOwnerId ? request.ChargeOwnerId : defaultChargeOwnerId!,
                     GridArea = ga,
                     QuantityUnit = WholesaleServicesRequestSeries.Types.QuantityUnit.Kwh,
                     SettlementMethod = WholesaleServicesRequestSeries.Types.SettlementMethod.Flex,

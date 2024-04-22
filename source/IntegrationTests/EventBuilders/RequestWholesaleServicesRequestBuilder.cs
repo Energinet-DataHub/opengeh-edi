@@ -110,10 +110,7 @@ internal static class RequestWholesaleServicesRequestBuilder
           ""codingScheme"": ""A10"",
           ""value"": ""{energySupplierActorNumber}""
         }},
-        ""meteringGridArea_Domain.mRID"": {{
-          ""codingScheme"": ""NDK"",
-          ""value"": ""{gridArea}""
-        }},
+        {GetGridAreaElement(gridArea)}
         ""start_DateAndOrTime.dateTime"": ""{periodStart}"",
         ""ChargeType"": [
           {{
@@ -135,6 +132,18 @@ internal static class RequestWholesaleServicesRequestBuilder
             ? """
               "aggregationSeries_Period.resolution": "P1M",
               """
+            : string.Empty;
+    }
+
+    private static string GetGridAreaElement(string? gridArea)
+    {
+        return gridArea != null
+            ? $$"""
+                "meteringGridArea_Domain.mRID": {
+                  "codingScheme": "NDK",
+                  "value": "{{gridArea}}"
+                },
+                """
             : string.Empty;
     }
 }

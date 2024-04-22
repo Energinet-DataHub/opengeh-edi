@@ -18,7 +18,7 @@ using System.Reflection;
 using FluentAssertions;
 using Xunit;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Behaviors;
+namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
 public static class MetaTests
 {
