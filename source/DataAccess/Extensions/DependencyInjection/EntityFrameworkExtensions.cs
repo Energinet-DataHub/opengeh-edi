@@ -25,7 +25,7 @@ public static class EntityFrameworkExtensions
     public static IServiceCollection AddScopedSqlDbContext<TDbContext>(
         this IServiceCollection services,
         IConfiguration configuration)
-        where TDbContext : DbContext
+        where TDbContext : Microsoft.EntityFrameworkCore.DbContext
     {
         services
             .AddOptions<SqlDatabaseConnectionOptions>()

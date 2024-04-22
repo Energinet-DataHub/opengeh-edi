@@ -41,7 +41,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
             ActorNumber senderId,
             ActorRole senderRole,
             string serializedContent,
-            Instant timestamp,
+            Instant createdAt,
             ProcessType messageCreatedFromProcess,
             MessageId? relatedToMessageId,
             string? gridAreaCode)
@@ -55,7 +55,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
                 senderId,
                 senderRole,
                 serializedContent,
-                timestamp,
+                createdAt,
                 messageCreatedFromProcess,
                 relatedToMessageId,
                 gridAreaCode)
@@ -72,7 +72,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
             ActorNumber senderId,
             ActorRole senderRole,
             string serializedContent,
-            Instant timestamp,
+            Instant createdAt,
             ProcessType messageCreatedFromProcess,
             MessageId? relatedToMessageId,
             string? gridAreaCode)
@@ -90,7 +90,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
             RelatedToMessageId = relatedToMessageId;
             DocumentReceiver = documentReceiver;
             Receiver = receiver;
-            FileStorageReference = CreateFileStorageReference(Receiver.Number, timestamp, Id);
+            CreatedAt = createdAt;
+            FileStorageReference = CreateFileStorageReference(Receiver.Number, createdAt, Id);
         }
 
         /// <summary>
@@ -107,6 +108,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
             ActorRole senderRole,
             FileStorageReference fileStorageReference,
             ProcessType messageCreatedFromProcess,
+            Instant createdAt,
             string? gridAreaCode)
         {
             Id = OutgoingMessageId.New();
@@ -119,6 +121,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
             FileStorageReference = fileStorageReference;
             MessageCreatedFromProcess = messageCreatedFromProcess;
             GridAreaCode = gridAreaCode;
+            CreatedAt = createdAt;
             // DocumentReceiver, EF will set this after the constructor
             // Receiver, EF will set this after the constructor
             // _serializedContent is set later in OutgoingMessageRepository, by getting the message from File Storage
@@ -149,6 +152,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
         public Receiver DocumentReceiver { get; }
 
         public BundleId? AssignedBundleId { get; private set; }
+
+        public Instant CreatedAt { get; private set; }
 
         public FileStorageReference FileStorageReference { get; private set; }
 
@@ -389,6 +394,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
                 throw new InvalidOperationException("Cannot delegate a message that has already been delegated to another actor");
 
             Receiver = delegatedToReceiver;
+            FileStorageReference = CreateFileStorageReference(Receiver.Number, CreatedAt, Id);
         }
 
         private static bool DocumentIsAggregatedMeasureData(DocumentType documentType)

@@ -15,6 +15,7 @@
 using System;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.Extensions.Options;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.ProcessInitializationHandlers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
@@ -67,7 +68,8 @@ public static class ProcessExtensions
 
         services
             .AddScopedSqlDbContext<ProcessContext>(configuration)
-            .AddMediatR();
+            .AddMediatR()
+            .AddScoped<ExecutionContext>();
 
         //ProcessingConfiguration
         services.AddScoped<DomainEventsAccessor>()

@@ -19,6 +19,7 @@ using System.Xml.Linq;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
@@ -77,7 +78,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         var createdId = await EnqueueAndCommitAsync(message);
 
         // Assert
-        await AssertEnqueuedOutgoingMessage(createdId, _delegatedTo, outgoingEnergyResultMessageReceiver);
+        await AssertEnqueuedOutgoingMessage(_delegatedTo, outgoingEnergyResultMessageReceiver);
     }
 
     [Fact]
@@ -95,7 +96,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         var createdId = await EnqueueAndCommitAsync(message);
 
         // Assert
-        await AssertEnqueuedOutgoingMessage(createdId, _delegatedTo, _delegatedBy);
+        await AssertEnqueuedOutgoingMessage(_delegatedTo, _delegatedBy);
     }
 
     [Fact]
@@ -114,7 +115,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         var createdId = await EnqueueAndCommitAsync(message);
 
         // Assert
-        await AssertEnqueuedOutgoingMessage(createdId, _delegatedTo, _delegatedBy);
+        await AssertEnqueuedOutgoingMessage(_delegatedTo, _delegatedBy);
     }
 
     [Fact]
@@ -134,7 +135,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         var createdId = await EnqueueAndCommitAsync(message);
 
         // Assert
-        await AssertEnqueuedOutgoingMessage(createdId, _delegatedTo, _delegatedBy);
+        await AssertEnqueuedOutgoingMessage(_delegatedTo, _delegatedBy);
     }
 
     [Fact]
@@ -158,7 +159,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         var createdId = await EnqueueAndCommitAsync(message);
 
         // Assert
-        await AssertEnqueuedOutgoingMessage(createdId, _delegatedBy, _delegatedBy);
+        await AssertEnqueuedOutgoingMessage(_delegatedBy, _delegatedBy);
     }
 
     [Fact]
@@ -182,7 +183,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         var createdId = await EnqueueAndCommitAsync(message);
 
         // Assert
-        await AssertEnqueuedOutgoingMessage(createdId, _delegatedBy, _delegatedBy);
+        await AssertEnqueuedOutgoingMessage(_delegatedBy, _delegatedBy);
     }
 
     [Fact]
@@ -206,7 +207,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         var createdId = await EnqueueAndCommitAsync(message);
 
         // Assert
-        await AssertEnqueuedOutgoingMessage(createdId, _delegatedBy, _delegatedBy);
+        await AssertEnqueuedOutgoingMessage(_delegatedBy, _delegatedBy);
     }
 
     [Fact]
@@ -233,7 +234,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         var createdId = await EnqueueAndCommitAsync(message);
 
         // Assert
-        await AssertEnqueuedOutgoingMessage(createdId, _delegatedTo, _delegatedBy);
+        await AssertEnqueuedOutgoingMessage(_delegatedTo, _delegatedBy);
     }
 
     [Fact]
@@ -253,7 +254,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         var createdId = await EnqueueAndCommitAsync(message);
 
         // Assert
-        await AssertEnqueuedOutgoingMessage(createdId, _delegatedTo, _delegatedBy);
+        await AssertEnqueuedOutgoingMessage(_delegatedTo, _delegatedBy);
     }
 
     [Fact]
@@ -273,7 +274,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         var createdId = await EnqueueAndCommitAsync(message);
 
         // Assert
-        await AssertEnqueuedOutgoingMessage(createdId, _delegatedBy, _delegatedBy);
+        await AssertEnqueuedOutgoingMessage(_delegatedBy, _delegatedBy);
     }
 
     [Fact]
@@ -291,7 +292,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         var createdId = await EnqueueAndCommitAsync(message);
 
         // Assert
-        await AssertEnqueuedOutgoingMessage(createdId, _delegatedBy, _delegatedBy);
+        await AssertEnqueuedOutgoingMessage(_delegatedBy, _delegatedBy);
     }
 
     protected override void Dispose(bool disposing)
@@ -354,15 +355,20 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     }
 
     private async Task AssertEnqueuedOutgoingMessage(
-        OutgoingMessageId createdId,
         ActorNumberAndRoleDto receiverQueue,
         ActorNumberAndRoleDto receiverDocument)
     {
-        var enqueuedOutgoingMessage = await GetEnqueuedOutgoingMessageFromDatabase(createdId);
-        enqueuedOutgoingMessage.ActorMessageQueueNumber.Should().Be(receiverQueue.ActorNumber.Value);
-        enqueuedOutgoingMessage.ActorMessageQueueRole.Should().Be(receiverQueue.ActorRole.Code);
-        enqueuedOutgoingMessage.DocumentReceiverNumber.Should().Be(receiverDocument.ActorNumber.Value);
-        enqueuedOutgoingMessage.DocumentReceiverRole.Should().Be(receiverDocument.ActorRole.Code);
+        var outgoingMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
+            DocumentType.NotifyAggregatedMeasureData.Name,
+            BusinessReason.BalanceFixing.Name,
+            receiverQueue.ActorRole,
+            GetService<IDatabaseConnectionFactory>(),
+            GetService<IFileStorageClient>());
+        outgoingMessage
+            .HasReceiverId(receiverQueue.ActorNumber.Value)
+            .HasReceiverRole(receiverQueue.ActorRole.Code)
+            .HasDocumentReceiverId(receiverDocument.ActorNumber.Value)
+            .HasDocumentReceiverRole(receiverDocument.ActorRole.Code);
 
         var result = await PeekMessageAsync(
             MessageCategory.Aggregations,
@@ -375,26 +381,6 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             .HasReceiverRole(receiverDocument.ActorRole)
             .HasReceiver(receiverQueue.ActorNumber)
             .HasSerieRecordCount(1);
-    }
-
-    private async Task<(string ActorMessageQueueNumber, string ActorMessageQueueRole, string DocumentReceiverNumber, string DocumentReceiverRole)> GetEnqueuedOutgoingMessageFromDatabase(OutgoingMessageId createdId)
-    {
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-
-        var result = await connection.QuerySingleAsync(
-            @"SELECT tOutgoing.ReceiverNumber, tOutgoing.ReceiverRole, tOutgoing.DocumentReceiverNumber, tOutgoing.DocumentReceiverRole
-                    FROM [dbo].[OutgoingMessages] AS tOutgoing
-                    WHERE tOutgoing.Id = @Id",
-            new
-                {
-                    Id = createdId.Value.ToString(),
-                });
-
-        return (
-            ActorMessageQueueNumber: result.ReceiverNumber,
-            ActorMessageQueueRole: result.ReceiverRole,
-            DocumentReceiverNumber: result.DocumentReceiverNumber,
-            DocumentReceiverRole: result.DocumentReceiverRole);
     }
 
     private async Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultMessageDto message)

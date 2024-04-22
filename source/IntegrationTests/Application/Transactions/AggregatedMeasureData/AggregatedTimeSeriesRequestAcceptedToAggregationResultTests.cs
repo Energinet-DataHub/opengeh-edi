@@ -389,7 +389,7 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
             .WithGridAreaCode(SampleData.GridAreaCode)
             .StoreAsync(_masterDataClient);
 
-        var process = BuildProcess();
+        var process = await BuildProcess();
         var requestAccepted = CreateEventWithQuantityQuality(quantityQuality);
 
         var eventId = EventId.From(Guid.NewGuid());
@@ -409,7 +409,7 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
         return await OutgoingMessageAsync();
     }
 
-    private AggregatedMeasureDataProcess BuildProcess()
+    private async Task<AggregatedMeasureDataProcess> BuildProcess()
     {
         var process = new AggregatedMeasureDataProcess(
             ProcessId.New(),
@@ -429,7 +429,7 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
 
         process.SendToWholesale();
         _processContext.AggregatedMeasureDataProcesses.Add(process);
-        _processContext.SaveChanges();
+        await _processContext.SaveChangesAsync();
         return process;
     }
 

@@ -179,6 +179,10 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202404171315 Add [WholesaleServicesProcesses].[RequestedForActorNumber] and [RequestedForActorRole] columns.sql" />
     <EmbeddedResource Include="Scripts\Model\202404171307 Rename IncomingGridArea to RequestedGridArea for WholesaleServicesProcesses table.sql" />
     <EmbeddedResource Include="Scripts\Model\202404171313 Rename RequestedByActorId to RequestedByActorNumber for WholesaleServicesProcesses table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202404171226 Add CreatedAt and CreatedBy and ModifiedAt and ModifiedBy columns to ActorMessageQueues.sql" />
+    <EmbeddedResource Include="Scripts\Model\202404171226 Add CreatedAt and CreatedBy and ModifiedAt and ModifiedBy columns to MarketDocuments.sql" />
+    <EmbeddedResource Include="Scripts\Model\202404171316 Add CreatedAt and CreatedBy and ModifiedAt and ModifiedBy columns to AggregatedMeasureDataProcesses.sql" />
+    <EmbeddedResource Include="Scripts\Model\202404171316 Add CreatedAt and CreatedBy and ModifiedAt and ModifiedBy columns to WholesaleServicesProcesses.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <None Remove="Scripts\Model\202310231329 Alter Bundles1.sql" />
@@ -207,6 +211,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202309211415 ArchivedMessage MessageId is longer.sql" />
     <EmbeddedResource Include="Scripts\Model\202309271021 Remove ResponseData from AggregatedMeasureDataProcesses.sql" />
     <EmbeddedResource Include="Scripts\Model\202310231618 Change SettlementVersion of AggregatedMeasuredDataProcess type to nvarchar.sql" />
+    <None Remove="Scripts\Model\202404170840 Add CreatedAt and CreatedBy and ModifiedAt and ModifiedBy columns to OutgoingMessages.sql" />
+    <EmbeddedResource Include="Scripts\Model\202404170840 Add CreatedAt and CreatedBy and ModifiedAt and ModifiedBy columns to OutgoingMessages.sql" />
   </ItemGroup>
 
   <ItemGroup>
