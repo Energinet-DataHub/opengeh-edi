@@ -79,7 +79,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
 
     [Theory]
     [MemberData(nameof(DocumentFormatsWithDelegatedFromAndToRoles))]
-    public async Task AndGiven_DelegationInOneGridArea_When_DelegatedActorPeeksAllMessages_Then_ReceivesOneNotifyWholesaleServicesDocumentIsCreatedCorrectly(DocumentFormat documentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
+    public async Task AndGiven_DelegationInOneGridArea_When_DelegatedActorPeeksAllMessages_Then_ReceivesOneNotifyWholesaleServicesDocumentWithCorrectContent(DocumentFormat documentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
     {
         /*
          *  --- PART 1: Receive request, create process and send message to Wholesale ---
@@ -212,7 +212,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
 
     [Theory]
     [MemberData(nameof(DocumentFormatsWithDelegatedFromAndToRoles))]
-    public async Task AndGiven_DelegationInTwoGridAreas_When_DelegatedActorPeeksAllMessages_Then_ReceivesTwoNotifyWholesaleServicesDocumentsAreCreatedCorrectly(DocumentFormat documentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
+    public async Task AndGiven_DelegationInTwoGridAreas_When_DelegatedActorPeeksAllMessages_Then_ReceivesTwoNotifyWholesaleServicesDocumentsWithCorrectContent(DocumentFormat documentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
     {
         /*
          *  --- PART 1: Receive request, create process and send message to Wholesale ---
@@ -362,7 +362,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
     /// </summary>
     [Theory]
     [MemberData(nameof(DocumentFormatsWithDelegatedFromAndToRoles))]
-    public async Task AndGiven_InvalidRequestWithDelegationInTwoGridAreas_When_DelegatedActorPeeksAllMessages_Then_ReceivesOneRejectWholesaleSettlementDocumentsIsCreatedCorrectly(DocumentFormat documentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
+    public async Task AndGiven_InvalidRequestWithDelegationInTwoGridAreas_When_DelegatedActorPeeksAllMessages_Then_ReceivesOneRejectWholesaleSettlementDocumentsWithCorrectContent(DocumentFormat documentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
     {
         /*
          *  --- PART 1: Receive request, create process and send message to Wholesale ---
@@ -469,27 +469,42 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
         }
 
+        var expectedReasonMessage = "Det er kun muligt at anmode om data på for en hel måned i forbindelse"
+                                    + " med en engrosfiksering eller korrektioner / It is only possible to request"
+                                    + " data for a full month in relation to wholesalefixing or corrections";
+
         await ThenRejectRequestWholesaleSettlementDocumentIsCorrect(
             peekResult.Bundle,
             documentFormat,
-            document => document
-                // -- Assert header values --
-                .MessageIdExists()
-                // Assert Type? ("ERR")
-                .HasBusinessReason(BusinessReason.WholesaleFixing)
-                // Assert businessSector.type? (23)
-                .HasSenderId("5790001330552")
-                .HasSenderRole(ActorRole.MeteredDataAdministrator) // Example says "DDZ", but document writes as "DGL"?
-                .HasReceiverId(delegatedToActor.ActorNumber.Value)
-                .HasReceiverRole(originalActor.ActorRole)
-                .HasTimestamp(InstantPattern.General.Parse("2024-07-01T14:57:09Z").Value)
-                .HasReasonCode(ReasonCode.FullyRejected.Code) // A02 = Rejected
-                .TransactionIdExists()
-                .HasOriginalTransactionId("123564789123564789123564789123564787")
-                .HasSerieReasonCode("E17") // E17 = Invalid period length
-                .HasSerieReasonMessage("Det er kun muligt at anmode om data på for en hel måned i forbindelse"
-                                       + " med en engrosfiksering eller korrektioner / It is only possible to request"
-                                       + " data for a full month in relation to wholesalefixing or corrections"));
+            new RejectRequestWholesaleSettlementDocumentAssertionInput(
+                InstantPattern.General.Parse("2024-07-01T14:57:09Z").Value,
+                BusinessReason.WholesaleFixing,
+                delegatedToActor.ActorNumber.Value,
+                originalActor.ActorRole,
+                "5790001330552",
+                ActorRole.MeteredDataAdministrator,
+                ReasonCode.FullyRejected.Code,
+                "123564789123564789123564789123564787",
+                "E17",
+                expectedReasonMessage));
+        // document => document
+        //     // -- Assert header values --
+        //     .MessageIdExists()
+        //     // Assert Type? ("ERR")
+        //     .HasBusinessReason(BusinessReason.WholesaleFixing)
+        //     // Assert businessSector.type? (23)
+        //     .HasSenderId("5790001330552")
+        //     .HasSenderRole(ActorRole.MeteredDataAdministrator) // Example says "DDZ", but document writes as "DGL"?
+        //     .HasReceiverId(delegatedToActor.ActorNumber.Value)
+        //     .HasReceiverRole(originalActor.ActorRole)
+        //     .HasTimestamp()
+        //     .HasReasonCode(ReasonCode.FullyRejected.Code) // A02 = Rejected
+        //     .TransactionIdExists()
+        //     .HasOriginalTransactionId("123564789123564789123564789123564787")
+        //     .HasSerieReasonCode("E17") // E17 = Invalid period length
+        //     .HasSerieReasonMessage("Det er kun muligt at anmode om data på for en hel måned i forbindelse"
+        //                            + " med en engrosfiksering eller korrektioner / It is only possible to request"
+        //                            + " data for a full month in relation to wholesalefixing or corrections"));
     }
 
     /// <summary>
@@ -498,7 +513,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
     /// </summary>
     [Theory]
     [MemberData(nameof(DocumentFormatsWithDelegatedFromAndToRoles))]
-    public async Task AndGiven_OriginalActorRequestsOwnData_When_OriginalActorPeeksAllMessages_Then_OriginalActorReceivesOneNotifyWholesaleServicesDocumentWhichIsCreatedCorrectly(DocumentFormat documentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
+    public async Task AndGiven_OriginalActorRequestsOwnData_When_OriginalActorPeeksAllMessages_Then_OriginalActorReceivesOneNotifyWholesaleServicesDocumentWithCorrectContent(DocumentFormat documentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
     {
         /*
          *  --- PART 1: Receive request, create process and send message to Wholesale ---

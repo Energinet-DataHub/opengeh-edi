@@ -20,6 +20,30 @@ using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution
 
 namespace Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 
-public record NotifyWholesaleServicesDocumentAssertionInput(string Timestamp, BusinessReasonWithSettlementVersion BusinessReasonWithSettlementVersion, string ReceiverId, ActorRole ReceiverRole, string SenderId, ActorRole SenderRole, string ChargeTypeOwner, string ChargeCode, ChargeType ChargeType, Currency Currency, string EnergySupplierNumber, SettlementMethod SettlementMethod, MeteringPointType MeteringPointType, string GridArea, string? OriginalTransactionIdReference, MeasurementUnit PriceMeasurementUnit, string ProductCode, MeasurementUnit QuantityMeasurementUnit, long CalculationVersion, Resolution Resolution, Period Period, IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> Points);
+public record NotifyWholesaleServicesDocumentAssertionInput(
+    string Timestamp,
+    BusinessReasonWithSettlementVersion BusinessReasonWithSettlementVersion,
+    string ReceiverId,
+    ActorRole ReceiverRole,
+    string SenderId,
+    ActorRole SenderRole,
+    string ChargeTypeOwner,
+    string ChargeCode,
+    ChargeType ChargeType,
+    Currency Currency,
+    string EnergySupplierNumber,
+    SettlementMethod SettlementMethod,
+    MeteringPointType MeteringPointType,
+    string GridArea,
+    string? OriginalTransactionIdReference,
+    MeasurementUnit PriceMeasurementUnit,
+    string ProductCode,
+    MeasurementUnit QuantityMeasurementUnit,
+    long CalculationVersion,
+    Resolution Resolution,
+    Period Period,
+    IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> Points);
 
-public record BusinessReasonWithSettlementVersion(BusinessReason BusinessReason, SettlementVersion? SettlementVersion);
+public record BusinessReasonWithSettlementVersion(
+    BusinessReason BusinessReason,
+    SettlementVersion? SettlementVersion);

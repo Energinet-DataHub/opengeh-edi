@@ -512,36 +512,17 @@ public class BehavioursTestBase : IDisposable
             assertionInput);
     }
 
-    protected async Task ThenRejectRequestWholesaleSettlementDocumentIsCorrect(Stream? peekResultDocumentStream, DocumentFormat documentFormat, Action<IAssertRejectRequestWholesaleSettlementDocument> assert)
+    protected async Task ThenRejectRequestWholesaleSettlementDocumentIsCorrect(Stream? peekResultDocumentStream, DocumentFormat documentFormat, RejectRequestWholesaleSettlementDocumentAssertionInput assertionInput)
     {
         peekResultDocumentStream.Should().NotBeNull();
         peekResultDocumentStream!.Position = 0;
 
         using var assertionScope = new AssertionScope();
 
-        var xmlDocumentValidator = new DocumentValidator(new List<IValidator>
-        {
-            new CimXmlValidator(new CimXmlSchemaProvider()),
-            new EbixValidator(new EbixSchemaProvider()),
-        });
-        IAssertRejectRequestWholesaleSettlementDocument asserter = documentFormat.Name switch
-        {
-            nameof(DocumentFormat.Xml) => new AssertRejectRequestWholesaleSettlementXmlDocument(
-                AssertXmlDocument.Document(
-                    peekResultDocumentStream!,
-                    "cim_",
-                    xmlDocumentValidator)),
-            nameof(DocumentFormat.Json) => new AssertRejectRequestWholesaleSettlementJsonDocument(peekResultDocumentStream!),
-            nameof(DocumentFormat.Ebix) => new AssertRejectRequestWholesaleSettlementEbixDocument(
-                AssertEbixDocument.Document(
-                    peekResultDocumentStream!,
-                    "ns0",
-                    xmlDocumentValidator)),
-            _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, null),
-        };
-
-        assert(asserter);
-        await asserter.DocumentIsValidAsync();
+        await RejectRequestWholesaleSettlementDocumentAsserter.AssertCorrectDocumentAsync(
+            documentFormat,
+            peekResultDocumentStream,
+            assertionInput);
     }
 
     protected AmountPerChargeResultProducedV1 GivenAmountPerChargeResultProducedV1Event(Action<AmountPerChargeResultProducedV1EventBuilder> builder)
