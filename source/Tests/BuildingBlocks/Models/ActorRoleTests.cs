@@ -26,8 +26,9 @@ public class ActorRoleTests
 {
     public static IEnumerable<ActorRole> GetAllActorRoles()
     {
-        var fields =
-            typeof(ActorRole).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+        var fields = typeof(ActorRole)
+            .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
+            .Where(f => !f.IsLiteral); // Filter out const fields
 
         return fields.Select(f => f.GetValue(null)).Cast<ActorRole>();
     }
