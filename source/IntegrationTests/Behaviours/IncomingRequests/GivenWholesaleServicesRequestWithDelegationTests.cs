@@ -71,8 +71,14 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             ActorRole.GridOperator,
         };
 
+        var exceptForDocumentFormats = new[]
+        {
+            DocumentFormat.Xml.Name, // TODO: The CIM XML feature isn't implemented yet
+            DocumentFormat.Ebix.Name, // ebIX is not supported for requests
+        };
+
         return DocumentFormats
-            .GetAllDocumentFormats(except: new[] { DocumentFormat.Xml.Name, DocumentFormat.Ebix.Name })
+            .GetAllDocumentFormats(exceptForDocumentFormats)
             .SelectMany(df => delegatedFromRoles
                 .SelectMany(from => delegatedToRoles
                     .Select(to => new object[] { df, from, to })))

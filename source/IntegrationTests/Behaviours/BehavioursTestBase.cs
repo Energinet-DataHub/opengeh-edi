@@ -38,9 +38,6 @@ using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
@@ -64,9 +61,6 @@ using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestWholesaleSettlement;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
@@ -352,32 +346,24 @@ public class BehavioursTestBase : IDisposable
     {
         var incomingMessageClient = GetService<IIncomingMessageClient>();
 
-        IncomingMessageStream incomingMessageStream;
-        if (documentFormat == DocumentFormat.Json)
-        {
-            incomingMessageStream = RequestWholesaleServicesRequestBuilder.GetJsonStream(
-                senderActorNumber,
-                senderActorRole,
-                CreateDateInstant(periodStart.Year, periodStart.Month, periodStart.Day),
-                CreateDateInstant(periodEnd.Year, periodEnd.Month, periodEnd.Day),
-                gridArea,
-                energySupplierActorNumber,
-                chargeOwnerActorNumber,
-                chargeCode,
-                chargeType,
-                transactionId,
-                isMonthly);
-        }
-        else
-        {
-            // TODO: Handle document format
-            throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, "Document format not supported");
-        }
+        var incomingMessageStream = RequestWholesaleServicesRequestBuilder.GetStream(
+            documentFormat,
+            senderActorNumber,
+            senderActorRole,
+            CreateDateInstant(periodStart.Year, periodStart.Month, periodStart.Day),
+            CreateDateInstant(periodEnd.Year, periodEnd.Month, periodEnd.Day),
+            gridArea,
+            energySupplierActorNumber,
+            chargeOwnerActorNumber,
+            chargeCode,
+            chargeType,
+            transactionId,
+            isMonthly);
 
         var response = await
             incomingMessageClient.RegisterAndSendAsync(
                 incomingMessageStream,
-                DocumentFormat.Json,
+                documentFormat,
                 IncomingDocumentType.RequestWholesaleSettlement,
                 CancellationToken.None);
 
