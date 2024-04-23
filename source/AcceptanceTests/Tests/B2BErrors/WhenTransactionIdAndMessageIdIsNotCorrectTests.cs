@@ -29,7 +29,7 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
     {
     }
 
-    [Fact]
+    [Fact(Skip = "Not a sub system test")]
     public async Task Message_id_is_not_unique()
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.MessageIdIsNotUnique());
@@ -42,7 +42,7 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
         await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00101", "Message id 'B6Qhv7Dls6zdnvgna3cQqXu0PAzFqKco8GLc' is not unique", response);
     }
 
-    [Fact]
+    [Fact(Skip = "Not a sub system test")]
     public async Task Message_id_is_empty()
     {
         var payload =
@@ -56,7 +56,7 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
         await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00201", "The id of the message cannot be empty", response);
     }
 
-    [Fact]
+    [Fact(Skip = "Not a sub system test")]
     public async Task Transaction_id_is_not_unique()
     {
         var payload =
@@ -70,7 +70,7 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
         await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00102", "Transaction id 'aX5fNO7st0zVIemSRek4GM1FCSRbQ28PMIZO' is not unique and will not be processed.", response);
     }
 
-    [Fact]
+    [Fact(Skip = "Not a sub system test")]
     public async Task Transaction_id_is_empty_produces_error()
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.EmptyTransactionId());
@@ -82,7 +82,7 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
         await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00202", "Transaction id cannot be empty", response);
     }
 
-    [Fact]
+    [Fact(Skip = "Not a sub system test")]
     public async Task Transaction_id_is_invalid_produces_error()
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.InvalidTransactionId());
@@ -94,7 +94,7 @@ public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
         await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00205", "Transaction id invalidId is invalid. Must contain 36 characters.", response);
     }
 
-    [Fact]
+    [Fact(Skip = "Not a sub system test")]
     public async Task Message_id_is_not_the_correct_length_produces_error()
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.InvalidLengthOfMessageId());

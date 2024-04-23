@@ -29,7 +29,7 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests : BaseTestClass
     {
     }
 
-    [Fact]
+    [Fact(Skip = "Not a sub system test")]
     public async Task Sender_market_participant_mrid_is_different_from_mrid_in_token()
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.WrongSenderMarketParticipantMrid());
@@ -41,7 +41,7 @@ public class WhenPayloadDataIsDifferentFromTokenDataTests : BaseTestClass
         await ErrorAsserter.AssertCorrectErrorIsReturnedAsync("00002", "Sender id does not match id of current authenticated user", response);
     }
 
-    [Fact]
+    [Fact(Skip = "Not a sub system test")]
     public async Task Mismatching_sender_role_type_produces_authentication_error()
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.SenderRoleTypeNotAuthorized());

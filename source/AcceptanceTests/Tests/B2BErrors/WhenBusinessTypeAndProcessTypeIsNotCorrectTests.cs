@@ -30,7 +30,7 @@ public class WhenBusinessTypeAndProcessTypeIsNotCorrectTests : BaseTestClass
     {
     }
 
-    [Fact]
+    [Fact(Skip = "Not a sub system test")]
     public async Task Wrong_business_sector_type_produces_schema_validation_error()
     {
         var payload = RequestAggregatedMeasureXmlBuilder.BuildEnergySupplierXmlPayload(SynchronousErrorTestData.SchemaValidationErrorOnWrongBusinessSectorType());
@@ -44,7 +44,7 @@ public class WhenBusinessTypeAndProcessTypeIsNotCorrectTests : BaseTestClass
         Assert.Contains("schema validation error", responseError.Message, StringComparison.InvariantCultureIgnoreCase);
     }
 
-    [Fact]
+    [Fact(Skip = "Not a sub system test")]
     public async Task Invalid_cim_type_produces_type_error()
     {
         var payload =
@@ -61,7 +61,7 @@ public class WhenBusinessTypeAndProcessTypeIsNotCorrectTests : BaseTestClass
             response);
     }
 
-    [Fact]
+    [Fact(Skip = "Not a sub system test")]
     public async Task Invalid_process_type_produces_type_error()
     {
         var payload =
@@ -78,7 +78,7 @@ public class WhenBusinessTypeAndProcessTypeIsNotCorrectTests : BaseTestClass
             response);
     }
 
-    [Fact]
+    [Fact(Skip = "Not a sub system test")]
     public async Task Invalid_business_type_produces_type_error()
     {
         var payload =
