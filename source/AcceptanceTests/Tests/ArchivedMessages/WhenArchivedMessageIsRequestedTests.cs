@@ -51,7 +51,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 
         await _notifyWholesaleServicesDsl.PublishMonthlyChargeResultFor(
             AcceptanceTestFixture.CimActorGridArea,
-            AcceptanceTestFixture.EdiSubsystemTestCimActorNumber,
+            AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
             AcceptanceTestFixture.ActorNumber);
 
         var messageId = await _notifyWholesaleServicesDsl.ConfirmResultIsAvailableFor();

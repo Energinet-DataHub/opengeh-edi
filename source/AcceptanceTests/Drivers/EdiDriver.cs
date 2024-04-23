@@ -36,7 +36,7 @@ internal sealed class EdiDriver : IDisposable
     {
     }
 
-    internal async Task<string> PeekMessageAsync(DocumentFormat? documentFormat = null)
+    internal async Task<HttpResponseMessage> PeekMessageAsync(DocumentFormat? documentFormat = null)
     {
         var stopWatch = Stopwatch.StartNew();
         while (stopWatch.ElapsedMilliseconds < 600000)
@@ -45,9 +45,8 @@ internal sealed class EdiDriver : IDisposable
                 .ConfigureAwait(false);
             if (peekResponse.StatusCode == HttpStatusCode.OK)
             {
-                var messageId = GetMessageId(peekResponse);
-                await DequeueAsync(messageId).ConfigureAwait(false);
-                return messageId;
+                await DequeueAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
+                return peekResponse;
             }
 
             if (peekResponse.StatusCode != HttpStatusCode.NoContent)
@@ -85,12 +84,13 @@ internal sealed class EdiDriver : IDisposable
         return responseString;
     }
 
-    internal async Task<Guid> RequestWholesaleSettlementAsync(CancellationToken cancellationToken)
+    internal async Task<Guid> RequestWholesaleSettlementAsync(bool withSyncError, CancellationToken cancellationToken)
     {
         var b2bClient = await _httpClient;
         using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/requestwholesalesettlement");
         var contentType = "application/json";
-        var requestContent = await GetRequestWholesaleSettlementContentAsync(cancellationToken).ConfigureAwait(false);
+        var requestContent = await GetRequestWholesaleSettlementContentAsync(withSyncError, cancellationToken)
+            .ConfigureAwait(false);
         request.Content = new StringContent(
             requestContent.Content,
             Encoding.UTF8,
@@ -98,6 +98,11 @@ internal sealed class EdiDriver : IDisposable
         request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
 
         var wholesaleSettlementResponse = await b2bClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        if (wholesaleSettlementResponse.StatusCode == HttpStatusCode.BadRequest)
+        {
+            var responseContent = await wholesaleSettlementResponse.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            throw new BadWholesaleSettlementRequestException($"responseContent: {responseContent}");
+        }
 
         wholesaleSettlementResponse.EnsureSuccessStatusCode();
         return requestContent.MessageId;
@@ -123,11 +128,18 @@ internal sealed class EdiDriver : IDisposable
     }
 
     private static async Task<(Guid MessageId, string Content)> GetRequestWholesaleSettlementContentAsync(
+        bool withSyncError,
         CancellationToken cancellationToken)
     {
         var messageId = Guid.NewGuid();
         var jsonContent = await File.ReadAllTextAsync("Messages/json/RequestWholesaleSettlement.json", cancellationToken)
             .ConfigureAwait(false);
+
+        if (withSyncError is true)
+        {
+            jsonContent = await File.ReadAllTextAsync("Messages/json/RequestWholesaleSettlementWithSyncError.json", cancellationToken)
+                .ConfigureAwait(false);
+        }
 
         jsonContent = jsonContent.Replace("{MessageId}", messageId.ToString(), StringComparison.InvariantCulture);
         jsonContent = jsonContent.Replace("{TransactionId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);

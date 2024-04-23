@@ -45,7 +45,7 @@ public sealed class WhenAmountPerChargeResultResultIsPublishedTests
 
         await _notifyWholesaleServicesDsl.PublishAmountPerChargeResultFor(
             AcceptanceTestFixture.CimActorGridArea,
-            AcceptanceTestFixture.EdiSubsystemTestCimActorNumber,
+            AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
             AcceptanceTestFixture.ActorNumber);
 
         await _notifyWholesaleServicesDsl.ConfirmResultIsAvailableFor();

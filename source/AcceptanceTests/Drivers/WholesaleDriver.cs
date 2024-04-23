@@ -86,15 +86,22 @@ internal sealed class WholesaleDriver
     internal async Task PublishWholesaleServicesRequestAcceptedResponseAsync(
         Guid processId,
         string gridAreaCode,
-        string energySupplierId,
-        string chargeOwnerId,
+        string energySupplierNumber,
+        string chargeOwnerNumber,
         CancellationToken cancellationToken)
     {
         var message = WholesaleServiceRequestAcceptedMessageFactory.Create(
             processId,
             gridAreaCode,
-            energySupplierId,
-            chargeOwnerId);
+            energySupplierNumber,
+            chargeOwnerNumber);
+
+        await _inboxEdiClient.SendAsync(message, cancellationToken).ConfigureAwait(false);
+    }
+
+    internal async Task PublishWholesaleServicesRequestRejectedResponseAsync(Guid processId, CancellationToken cancellationToken)
+    {
+        var message = WholesaleServiceRequestRejectedMessageFactory.Create(processId);
 
         await _inboxEdiClient.SendAsync(message, cancellationToken).ConfigureAwait(false);
     }
@@ -107,6 +114,13 @@ internal sealed class WholesaleDriver
         var message = AggregatedMeasureDataRequestAcceptedMessageFactory.Create(
             processId,
             gridAreaCode);
+
+        await _inboxEdiClient.SendAsync(message, cancellationToken).ConfigureAwait(false);
+    }
+
+    internal async Task PublishAggregatedMeasureDataRequestRejectedResponseAsync(Guid processId, CancellationToken cancellationToken)
+    {
+        var message = AggregatedMeasureDataRequestRejectedMessageFactory.Create(processId);
 
         await _inboxEdiClient.SendAsync(message, cancellationToken).ConfigureAwait(false);
     }

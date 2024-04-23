@@ -30,7 +30,9 @@ public class AcceptanceTestFixture : IAsyncLifetime
     internal const string ActorNumber = "5790000610976"; // Corresponds to the "Mosaic 03" actor in the UI.
     internal const string ActorRole = "metereddataresponsible";
 
-    internal const string EdiSubsystemTestCimActorNumber = "5790000392551"; // Corresponds to the "EDI - SUBSYSTEM TEST CIM" in the UI.
+    internal const string EdiSubsystemTestCimEnergySupplierNumber = "5790000392551"; // Corresponds to the "EDI - SUBSYSTEM TEST CIM" in the UI. Same as B2BEnergySupplierAuthorizedHttpClient
+    internal const string EdiSubsystemTestCimActorNumber = "5790001330551"; // Corresponds to the "EDI - SUBSYSTEM TEST CIM" in the UI.
+    internal const string EZTestCimActorNumber = "5790001330552"; // Corresponds to the "EDI - SUBSYSTEM TEST SYSTEM OPERATØR". Same as B2BSystemOperatorAuthorizedHttpClient
     internal const string ChargeOwnerId = "5790000391919"; // For now is a dummy value, but when we support multiple receivers, this will be the charge owners GLN.
 
     private readonly Uri _azureEntraB2CTenantUrl;

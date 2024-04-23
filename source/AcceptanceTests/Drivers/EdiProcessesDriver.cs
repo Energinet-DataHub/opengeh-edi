@@ -28,7 +28,7 @@ public class EdiProcessesDriver
 
     internal async Task<Guid> CreateWholesaleServiceProcessAsync(
         string gridAreaCode,
-        string energySupplierId,
+        string chargeOwnerNumber,
         CancellationToken cancellationToken)
     {
         using var connection = new SqlConnection(_connectionString);
@@ -38,11 +38,11 @@ public class EdiProcessesDriver
         command.CommandText = @"INSERT INTO [WholesaleServicesProcesses]
             (ProcessId, BusinessTransactionId, StartOfPeriod, EndOfPeriod, GridAreaCode, ChargeOwner, Resolution, EnergySupplierId, BusinessReason, RequestedByActorId, RequestedByActorRoleCode, State, SettlementVersion, InitiatedByMessageId, CreatedBy, CreatedAt, ModifiedBy, ModifiedAt)
             VALUES
-            (@ProcessId, @BusinessTransactionId, '2022-06-17T22:00:00Z', '2022-07-22T22:00:00Z', @GridAreaCode, 5790000000002, 'P1M', @EnergySupplierId, 'D05', @EnergySupplierId, 'DDQ', 'Sent', NULL, '318dcf73-4b3b-4b8a-ad47-64743dd77e66', 'Acceptance Tests', @CreatedAt, NULL, NULL);";
+            (@ProcessId, @BusinessTransactionId, '2022-06-17T22:00:00Z', '2022-07-22T22:00:00Z', @GridAreaCode, @ChargeOwnerNumber, 'P1M', 5790000000002, 'D05', @ChargeOwnerNumber, 'EZ', 'Sent', NULL, '318dcf73-4b3b-4b8a-ad47-64743dd77e66', 'Acceptance Tests', @CreatedAt, NULL, NULL);";
         command.Parameters.AddWithValue("@ProcessId", processId);
         command.Parameters.AddWithValue("@BusinessTransactionId", Guid.NewGuid());
         command.Parameters.AddWithValue("@GridAreaCode", gridAreaCode);
-        command.Parameters.AddWithValue("@EnergySupplierId", energySupplierId);
+        command.Parameters.AddWithValue("@ChargeOwnerNumber", chargeOwnerNumber);
         command.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow);
         command.Connection = connection;
 

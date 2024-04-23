@@ -15,6 +15,7 @@
 using System.Net;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
 using FluentAssertions;
 
@@ -45,7 +46,7 @@ public sealed class AggregatedMeasureDataRequestDsl
                 .ConfigureAwait(false);
     }
 
-    internal async Task InvalidRequestMessageAsync(CancellationToken cancellationToken = default)
+    internal async Task RequestWithInvalidMessageAsync(CancellationToken cancellationToken = default)
     {
         var act = async () =>
         {
@@ -54,9 +55,7 @@ public sealed class AggregatedMeasureDataRequestDsl
                 .ConfigureAwait(false);
         };
 
-        var httpRequestException = await Assert.ThrowsAsync<HttpRequestException>(act).ConfigureAwait(false);
-
-        Assert.Equal(HttpStatusCode.BadRequest, httpRequestException.StatusCode);
+        await Assert.ThrowsAsync<BadAggregatedMeasureDataRequestException>(act).ConfigureAwait(false);
     }
 
     internal async Task ConfirmRequestIsInitiatedAsync(

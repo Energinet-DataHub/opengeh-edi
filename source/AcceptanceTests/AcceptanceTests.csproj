@@ -101,6 +101,9 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <None Remove="Messages\xml\RequestWholesaleSettlement.xml" />
+      <EmbeddedResource Include="Messages\json\RequestWholesaleSettlementWithSyncError.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
       <EmbeddedResource Include="Messages\json\RequestWholesaleSettlementWithWrongDateFormat.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>

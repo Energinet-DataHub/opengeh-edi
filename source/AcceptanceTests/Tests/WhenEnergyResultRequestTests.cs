@@ -15,7 +15,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
@@ -58,48 +57,45 @@ public sealed class WhenEnergyResultRequestTests
     }
 
     [Fact]
-    public async Task Actor_request_invalid_aggregated_measure_data()
+    public async Task Actor_get_bad_request_when_aggregated_measure_data_request_is_invalid()
     {
         await _notifyAggregatedMeasureDataResultDsl.EmptyQueueForActor();
 
-        await _aggregatedMeasureDataRequestDsl.InvalidRequestMessageAsync(CancellationToken.None);
+        await _aggregatedMeasureDataRequestDsl.RequestWithInvalidMessageAsync(CancellationToken.None);
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_response_from_aggregated_measure_data_request()
     {
         await _notifyAggregatedMeasureDataResultDsl.EmptyQueueForActor();
-        var gridArea = "804";
+        var gridAreaCode = "804";
         var processId = await _aggregatedMeasureDataRequestDsl.InitializeAggregatedMeasureDataRequestAsync(
-            gridArea,
-            AcceptanceTestFixture.EdiSubsystemTestCimActorNumber,
+            gridAreaCode,
+            AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
             CancellationToken.None);
 
         await _notifyAggregatedMeasureDataResultDsl.PublishAggregatedMeasureDataRequestAcceptedResponseFor(
             processId,
-            gridArea,
+            gridAreaCode,
             CancellationToken.None);
 
         await _notifyAggregatedMeasureDataResultDsl.ConfirmResultIsAvailableFor();
     }
 
-    // [Fact]
-    // public async Task Actor_can_peek_and_dequeue_rejected_response_from_aggregated_measure_data_request()
-    // {
-    //     await _notifyWholesaleServicesDsl.EmptyQueueForActor();
-    //     var gridArea = "888";
-    //     var processId = await _wholesaleServicesRequestDsl.InitializeWholesaleServicesRequestAsync(
-    //         gridArea,
-    //         AcceptanceTestFixture.EdiSubsystemTestCimActorNumber,
-    //         CancellationToken.None);
-    //
-    //     await _notifyWholesaleServicesDsl.PublishRejectedWholesaleServicesRequestAcceptedResponseFor(
-    //         processId,
-    //         gridArea,
-    //         AcceptanceTestFixture.EdiSubsystemTestCimActorNumber,
-    //         AcceptanceTestFixture.ActorNumber,
-    //         CancellationToken.None);
-    //
-    //     await _notifyWholesaleServicesDsl.ConfirmResultIsAvailableFor();
-    // }
+    [Fact]
+    public async Task Actor_can_peek_and_dequeue_rejected_response_from_aggregated_measure_data_request()
+    {
+        await _notifyAggregatedMeasureDataResultDsl.EmptyQueueForActor();
+        var gridAreaCode = "804";
+        var processId = await _aggregatedMeasureDataRequestDsl.InitializeAggregatedMeasureDataRequestAsync(
+            gridAreaCode,
+            AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
+            CancellationToken.None);
+
+        await _notifyAggregatedMeasureDataResultDsl.PublishAggregatedMeasureDataRequestRejectedResponseFor(
+            processId,
+            CancellationToken.None);
+
+        await _notifyAggregatedMeasureDataResultDsl.ConfirmRejectResultIsAvailableFor();
+    }
 }

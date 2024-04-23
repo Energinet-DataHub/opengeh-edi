@@ -15,7 +15,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
@@ -26,16 +25,16 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
     Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 [IntegrationTest]
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
-public sealed class WhenWholesaleServicesResquestTests
+public sealed class WhenWholesaleSettlementRequestTests
 {
     private readonly NotifyWholesaleServicesDsl _notifyWholesaleServicesDsl;
     private readonly WholesaleServicesRequestDsl _wholesaleServicesRequestDsl;
 
-    public WhenWholesaleServicesResquestTests(AcceptanceTestFixture fixture)
+    public WhenWholesaleSettlementRequestTests(AcceptanceTestFixture fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
-        var ediDriver = new EdiDriver(fixture.B2BEnergySupplierAuthorizedHttpClient);
+        var ediDriver = new EdiDriver(fixture.B2BSystemOperatorAuthorizedHttpClient);
         var ediProcessesDriver = new EdiProcessesDriver(fixture.ConnectionString);
         _notifyWholesaleServicesDsl = new NotifyWholesaleServicesDsl(
             ediDriver,
@@ -45,7 +44,7 @@ public sealed class WhenWholesaleServicesResquestTests
     }
 
     [Fact]
-    public async Task Actor_can_request_wholesale_services()
+    public async Task Actor_can_request_wholesale_settlement()
     {
         await _notifyWholesaleServicesDsl.EmptyQueueForActor();
 
@@ -56,55 +55,48 @@ public sealed class WhenWholesaleServicesResquestTests
             CancellationToken.None);
     }
 
-    // [Fact]
-    // public async Task Actor_request_invalid_wholesale_services()
-    // {
-    //     await _notifyWholesaleServicesDsl.EmptyQueueForActor();
-    //
-    //     var messageId = await _wholesaleServicesRequestDsl.RequestAsync(CancellationToken.None);
-    //
-    //     await _wholesaleServicesRequestDsl.ConfirmRequestIsRejectedAsync(
-    //         messageId,
-    //         CancellationToken.None);
-    // }
-
     [Fact]
-    public async Task Actor_can_peek_and_dequeue_response_from_wholesale_services_request()
+    public async Task Actor_get_bad_request_when_wholesale_settlement_request_is_invalid()
     {
         await _notifyWholesaleServicesDsl.EmptyQueueForActor();
-        var gridArea = "888";
+
+        await _wholesaleServicesRequestDsl.RequestWithInvalidMessageAsync(CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task Actor_can_peek_and_dequeue_response_from_wholesale_settlement_request()
+    {
+        await _notifyWholesaleServicesDsl.EmptyQueueForActor();
+        var gridAreaCode = "888";
         var processId = await _wholesaleServicesRequestDsl.InitializeWholesaleServicesRequestAsync(
-            gridArea,
-            AcceptanceTestFixture.EdiSubsystemTestCimActorNumber,
+            gridAreaCode,
+            AcceptanceTestFixture.EZTestCimActorNumber,
             CancellationToken.None);
 
         await _notifyWholesaleServicesDsl.PublishWholesaleServicesRequestAcceptedResponseFor(
             processId,
-            gridArea,
-            AcceptanceTestFixture.EdiSubsystemTestCimActorNumber,
+            gridAreaCode,
             AcceptanceTestFixture.ActorNumber,
+            AcceptanceTestFixture.EZTestCimActorNumber,
             CancellationToken.None);
 
         await _notifyWholesaleServicesDsl.ConfirmResultIsAvailableFor();
     }
 
-    // [Fact]
-    // public async Task Actor_can_peek_and_dequeue_rejected_response_from_wholesale_services_request()
-    // {
-    //     await _notifyWholesaleServicesDsl.EmptyQueueForActor();
-    //     var gridArea = "888";
-    //     var processId = await _wholesaleServicesRequestDsl.InitializeWholesaleServicesRequestAsync(
-    //         gridArea,
-    //         AcceptanceTestFixture.EdiSubsystemTestCimActorNumber,
-    //         CancellationToken.None);
-    //
-    //     await _notifyWholesaleServicesDsl.PublishRejectedWholesaleServicesRequestAcceptedResponseFor(
-    //         processId,
-    //         gridArea,
-    //         AcceptanceTestFixture.EdiSubsystemTestCimActorNumber,
-    //         AcceptanceTestFixture.ActorNumber,
-    //         CancellationToken.None);
-    //
-    //     await _notifyWholesaleServicesDsl.ConfirmResultIsAvailableFor();
-    // }
+    [Fact]
+    public async Task Actor_can_peek_and_dequeue_rejected_response_from_wholesale_settlement_request()
+    {
+        await _notifyWholesaleServicesDsl.EmptyQueueForActor();
+        var gridAreaCode = "888";
+        var processId = await _wholesaleServicesRequestDsl.InitializeWholesaleServicesRequestAsync(
+            gridAreaCode,
+            AcceptanceTestFixture.EZTestCimActorNumber,
+            CancellationToken.None);
+
+        await _notifyWholesaleServicesDsl.PublishWholesaleServicesRequestRejectedResponseFor(
+            processId,
+            CancellationToken.None);
+
+        await _notifyWholesaleServicesDsl.ConfirmRejectResultIsAvailableFor();
+    }
 }

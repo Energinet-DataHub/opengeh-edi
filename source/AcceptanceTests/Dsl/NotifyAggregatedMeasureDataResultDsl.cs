@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using FluentAssertions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
@@ -34,9 +35,26 @@ internal sealed class NotifyAggregatedMeasureDataResultDsl
         return _wholesale.PublishAggregationResultAsync(gridAreaCode);
     }
 
-    internal Task ConfirmResultIsAvailableFor()
+    internal async Task ConfirmResultIsAvailableFor()
     {
-        return _edi.PeekMessageAsync();
+        var peekResponse = await _edi.PeekMessageAsync().ConfigureAwait(false);
+        var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
+        var contentString = await peekResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+        messageId.Should().NotBeNull();
+        contentString.Should().NotBeNull();
+        contentString.Should().Contain("NotifyAggregatedMeasureData_MarketDocument");
+    }
+
+    internal async Task ConfirmRejectResultIsAvailableFor()
+    {
+        var peekResponse = await _edi.PeekMessageAsync().ConfigureAwait(false);
+        var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
+        var contentString = await peekResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+        messageId.Should().NotBeNull();
+        contentString.Should().NotBeNull();
+        contentString.Should().Contain("RejectRequestAggregatedMeasureData_MarketDocument");
     }
 
     internal async Task EmptyQueueForActor()
@@ -53,5 +71,13 @@ internal sealed class NotifyAggregatedMeasureDataResultDsl
             processId,
             gridAreaCode,
             cancellationToken).ConfigureAwait(false);
+    }
+
+    internal async Task PublishAggregatedMeasureDataRequestRejectedResponseFor(
+        Guid processId,
+        CancellationToken cancellationToken)
+    {
+        await _wholesale.PublishAggregatedMeasureDataRequestRejectedResponseAsync(processId, cancellationToken)
+            .ConfigureAwait(false);
     }
 }

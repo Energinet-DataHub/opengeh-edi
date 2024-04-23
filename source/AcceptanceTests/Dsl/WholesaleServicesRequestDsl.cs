@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
 using FluentAssertions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
@@ -41,8 +42,20 @@ public sealed class WholesaleServicesRequestDsl
     internal async Task<Guid> RequestAsync(CancellationToken cancellationToken)
     {
         return await _ediDriver
-            .RequestWholesaleSettlementAsync(cancellationToken)
+            .RequestWholesaleSettlementAsync(withSyncError: false, cancellationToken)
             .ConfigureAwait(false);
+    }
+
+    internal async Task RequestWithInvalidMessageAsync(CancellationToken cancellationToken)
+    {
+        var act = async () =>
+        {
+            await _ediDriver
+                .RequestWholesaleSettlementAsync(withSyncError: true, cancellationToken)
+                .ConfigureAwait(false);
+        };
+
+        await Assert.ThrowsAsync<BadWholesaleSettlementRequestException>(act).ConfigureAwait(false);
     }
 
     internal async Task ConfirmRequestIsInitiatedAsync(
