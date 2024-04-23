@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
@@ -40,6 +41,7 @@ public class IncomingMessageClient : IIncomingMessageClient
     private readonly IIncomingMessageReceiver _incomingMessageReceiver;
     private readonly IncomingMessageDelegator _incomingMessageDelegator;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IFeatureFlagManager _featureFlagManager;
 
     public IncomingMessageClient(
         MarketMessageParser marketMessageParser,
@@ -49,7 +51,8 @@ public class IncomingMessageClient : IIncomingMessageClient
         ILogger<IncomingMessageClient> logger,
         IIncomingMessageReceiver incomingMessageReceiver,
         IncomingMessageDelegator incomingMessageDelegator,
-        ISystemDateTimeProvider systemDateTimeProvider)
+        ISystemDateTimeProvider systemDateTimeProvider,
+        IFeatureFlagManager featureFlagManager)
     {
         _marketMessageParser = marketMessageParser;
         _requestAggregatedMeasureDataMessageValidator = requestAggregatedMeasureDataMessageValidator;
@@ -59,6 +62,7 @@ public class IncomingMessageClient : IIncomingMessageClient
         _incomingMessageReceiver = incomingMessageReceiver;
         _incomingMessageDelegator = incomingMessageDelegator;
         _systemDateTimeProvider = systemDateTimeProvider;
+        _featureFlagManager = featureFlagManager;
     }
 
     public async Task<ResponseMessage> RegisterAndSendAsync(
@@ -93,9 +97,12 @@ public class IncomingMessageClient : IIncomingMessageClient
                 cancellationToken)
             .ConfigureAwait(false);
 
-        await _incomingMessageDelegator
-            .DelegateAsync(incomingMarketMessageParserResult.IncomingMessage, documentType, cancellationToken)
-            .ConfigureAwait(false);
+        if (await _featureFlagManager.UseMessageDelegationAsync().ConfigureAwait(false))
+        {
+            await _incomingMessageDelegator
+                .DelegateAsync(incomingMarketMessageParserResult.IncomingMessage, documentType, cancellationToken)
+                .ConfigureAwait(false);
+        }
 
         var validationResult =
             documentType == IncomingDocumentType.RequestWholesaleSettlement
