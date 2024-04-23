@@ -52,6 +52,7 @@ public static class IncomingMessagesExtensions
             .ValidateDataAnnotations();
 
         services
+            .AddFeatureFlags()
             .AddServiceBus(configuration)
             .AddDapperConnectionToDatabase(configuration)
             .AddScopedSqlDbContext<IncomingMessagesContext>(configuration)
