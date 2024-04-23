@@ -44,8 +44,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     private readonly ActorMessageQueueContext _context;
     private readonly SystemDateTimeProviderStub _dateTimeProvider;
 
-    private Actor _delegatedBy = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"));
-    private Actor _delegatedTo = CreateActorNumberAndRole(ActorNumber.Create("1234567891235"), actorRole: ActorRole.Delegated);
+    private Actor _delegatedBy = CreateActor(ActorNumber.Create("1234567891234"));
+    private Actor _delegatedTo = CreateActor(ActorNumber.Create("1234567891235"), actorRole: ActorRole.Delegated);
 
     public WhenEnqueueingOutgoingMessageWithDelegationTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
@@ -65,13 +65,13 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         Given_DelegatedByIsGridOperator_When_EnqueuingOutgoingEnergyResultMessageToMeteredDataResponsible_Then_GridOperatorReceivesMessage()
     {
         // Arrange
-        var outgoingEnergyResultMessageReceiver = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"), actorRole: ActorRole.MeteredDataResponsible);
+        var outgoingEnergyResultMessageReceiver = CreateActor(ActorNumber.Create("1234567891234"), actorRole: ActorRole.MeteredDataResponsible);
         var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(outgoingEnergyResultMessageReceiver.ActorNumber.Value)
             .WithReceiverRole(outgoingEnergyResultMessageReceiver.ActorRole)
             .Build();
 
-        _delegatedBy = CreateActorNumberAndRole(outgoingEnergyResultMessageReceiver.ActorNumber, actorRole: ActorRole.GridOperator);
+        _delegatedBy = CreateActor(outgoingEnergyResultMessageReceiver.ActorNumber, actorRole: ActorRole.GridOperator);
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
 
         // Act
@@ -122,8 +122,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_delegated_as_grid_operator()
     {
         // Arrange
-        _delegatedBy = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"), actorRole: ActorRole.GridOperator);
-        _delegatedTo = CreateActorNumberAndRole(ActorNumber.Create("1234567891235"), actorRole: ActorRole.GridOperator);
+        _delegatedBy = CreateActor(ActorNumber.Create("1234567891234"), actorRole: ActorRole.GridOperator);
+        _delegatedTo = CreateActor(ActorNumber.Create("1234567891235"), actorRole: ActorRole.GridOperator);
         var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(_delegatedBy.ActorNumber.Value)
             .WithReceiverRole(_delegatedTo.ActorRole)
@@ -301,7 +301,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         base.Dispose(disposing);
     }
 
-    private static Actor CreateActorNumberAndRole(ActorNumber actorNumber, ActorRole? actorRole = null)
+    private static Actor CreateActor(ActorNumber actorNumber, ActorRole? actorRole = null)
     {
         return new Actor(actorNumber, actorRole ?? ActorRole.BalanceResponsibleParty);
     }

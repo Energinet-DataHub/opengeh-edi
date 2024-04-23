@@ -57,7 +57,7 @@ public interface IMasterDataClient
     /// <summary>
     ///     Gets the <see cref="Actor" /> associated with the given certificate thumbprint, if any.
     /// </summary>
-    Task<Actor?> GetActorNumberAndRoleFromThumbprintAsync(CertificateThumbprintDto thumbprintDto);
+    Task<Actor?> GetActorFromThumbprintAsync(CertificateThumbprintDto thumbprintDto);
 
     /// <summary>
     ///     Delete the actor certificate for a given actor.

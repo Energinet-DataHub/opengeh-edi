@@ -122,7 +122,7 @@ internal sealed class MasterDataClient : IMasterDataClient
         await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<Actor?> GetActorNumberAndRoleFromThumbprintAsync(
+    public async Task<Actor?> GetActorFromThumbprintAsync(
         CertificateThumbprintDto thumbprint)
     {
         var actorCertificate =
