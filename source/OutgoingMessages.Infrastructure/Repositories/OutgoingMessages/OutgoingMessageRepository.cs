@@ -16,13 +16,12 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.OutgoingMessages;
 
 public class OutgoingMessageRepository : IOutgoingMessageRepository
 {

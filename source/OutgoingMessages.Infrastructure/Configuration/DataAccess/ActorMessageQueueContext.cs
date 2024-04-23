@@ -21,8 +21,9 @@ using Energinet.DataHub.EDI.DataAccess.Extensions.DbContext;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.OutgoingMessages.Queueing;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.ActorMessageQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.OutgoingMessages;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess
