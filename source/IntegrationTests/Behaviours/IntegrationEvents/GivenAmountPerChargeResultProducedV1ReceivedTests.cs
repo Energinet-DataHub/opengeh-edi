@@ -110,9 +110,9 @@ public class GivenAmountPerChargeResultProducedV1ReceivedTests : BehavioursTestB
                 {
                     new WholesaleServicesRequestSeries.Types.Point
                     {
-                        Price = new DecimalValue { Units = 10, Nanos = 0 },
-                        Quantity = new DecimalValue { Units = 3, Nanos = 0 },
-                        Amount = new DecimalValue { Units = 30, Nanos = 0 },
+                        Price = DecimalValue.FromDecimal(10),
+                        Quantity = DecimalValue.FromDecimal(3),
+                        Amount = DecimalValue.FromDecimal(30),
                         QuantityQualities = { QuantityQuality.Calculated },
                     },
                 }));
