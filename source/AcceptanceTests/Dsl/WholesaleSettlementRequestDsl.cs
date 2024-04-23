@@ -51,7 +51,7 @@ public sealed class WholesaleSettlementRequestDsl
             .ConfigureAwait(false);
     }
 
-    internal async Task RequestWithInvalidMessageAsync(CancellationToken cancellationToken)
+    internal async Task ConfirmInvalidRequestIsRejected(CancellationToken cancellationToken)
     {
         var act = async () =>
         {
@@ -63,7 +63,7 @@ public sealed class WholesaleSettlementRequestDsl
         await Assert.ThrowsAsync<BadWholesaleSettlementRequestException>(act).ConfigureAwait(false);
     }
 
-    internal async Task ConfirmRequestIsInitiatedAsync(
+    internal async Task ConfirmRequestIsInitializedAsync(
         Guid requestMessageId,
         CancellationToken cancellationToken)
     {

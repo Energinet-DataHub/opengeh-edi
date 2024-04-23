@@ -25,18 +25,18 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.ArchivedMessages;
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Testing")]
 public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 {
-    private readonly ArchivedMessageDsl _archivedMessageDsl;
-    private readonly NotifyWholesaleServicesDsl _notifyWholesaleServicesDsl;
+    private readonly ArchivedMessageDsl _archivedMessage;
+    private readonly NotifyWholesaleServicesDsl _notifyWholesaleServices;
 
     public WhenArchivedMessageIsRequestedTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
         : base(output, fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
-        _archivedMessageDsl = new ArchivedMessageDsl(
+        _archivedMessage = new ArchivedMessageDsl(
             new EdiB2CDriver(fixture.B2CAuthorizedHttpClient, fixture.ApiManagementUri));
 
-        _notifyWholesaleServicesDsl = new NotifyWholesaleServicesDsl(
+        _notifyWholesaleServices = new NotifyWholesaleServicesDsl(
             new EdiDriver(fixture.B2BEnergySupplierAuthorizedHttpClient),
             new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
     }
@@ -44,25 +44,15 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
     [Fact]
     public async Task B2C_actor_can_get_the_archived_message_after_peeking_the_message()
     {
-        await _notifyWholesaleServicesDsl.EmptyQueueForActor();
+        await _notifyWholesaleServices.EmptyQueueForActor();
 
-        await _notifyWholesaleServicesDsl.PublishMonthlyChargeResultFor(
+        await _notifyWholesaleServices.PublishMonthlyChargeResult(
             AcceptanceTestFixture.CimActorGridArea,
             AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
             AcceptanceTestFixture.ActorNumber);
 
-        var messageId = await _notifyWholesaleServicesDsl.ConfirmResultIsAvailableFor();
+        var messageId = await _notifyWholesaleServices.ConfirmResultIsAvailable();
 
-        var archivedMessages = await _archivedMessageDsl.GetMessageIsArchived(messageId);
-
-        archivedMessages.Should().NotBeNull();
-        var archivedMessage = archivedMessages.Single();
-        Assert.NotNull(archivedMessage.Id);
-        Assert.NotNull(archivedMessage.MessageId);
-        Assert.NotNull(archivedMessage.DocumentType);
-        Assert.NotNull(archivedMessage.SenderNumber);
-        Assert.NotNull(archivedMessage.ReceiverNumber);
-        Assert.IsType<DateTime>(archivedMessage.CreatedAt);
-        Assert.NotNull(archivedMessage.BusinessReason);
+        await _archivedMessage.ConfirmMessageIsArchived(messageId);
     }
 }

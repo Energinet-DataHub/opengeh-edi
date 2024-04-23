@@ -25,12 +25,12 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
     Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 [IntegrationTest]
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
-public sealed class WhenEnergyResultRequestTests
+public sealed class WhenEnergyResultRequestedTests
 {
-    private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureDataResultDsl;
-    private readonly AggregatedMeasureDataRequestDsl _aggregatedMeasureDataRequestDsl;
+    private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureDataResult;
+    private readonly AggregatedMeasureDataRequestDsl _aggregatedMeasureDataRequest;
 
-    public WhenEnergyResultRequestTests(AcceptanceTestFixture fixture)
+    public WhenEnergyResultRequestedTests(AcceptanceTestFixture fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
@@ -38,22 +38,22 @@ public sealed class WhenEnergyResultRequestTests
         var ediProcessesDriver = new EdiProcessesDriver(fixture.ConnectionString);
         var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
 
-        _notifyAggregatedMeasureDataResultDsl = new NotifyAggregatedMeasureDataResultDsl(
+        _notifyAggregatedMeasureDataResult = new NotifyAggregatedMeasureDataResultDsl(
             ediDriver,
             wholesaleDriver);
 
-        _aggregatedMeasureDataRequestDsl =
+        _aggregatedMeasureDataRequest =
             new AggregatedMeasureDataRequestDsl(ediDriver, ediProcessesDriver, wholesaleDriver);
     }
 
     [Fact]
     public async Task Actor_can_request_aggregated_measure_data()
     {
-        await _notifyAggregatedMeasureDataResultDsl.EmptyQueueForActor();
+        await _notifyAggregatedMeasureDataResult.EmptyQueueForActor();
 
-        var messageId = await _aggregatedMeasureDataRequestDsl.RequestAsync(cancellationToken: CancellationToken.None);
+        var messageId = await _aggregatedMeasureDataRequest.RequestAsync(cancellationToken: CancellationToken.None);
 
-        await _aggregatedMeasureDataRequestDsl.ConfirmRequestIsInitiatedAsync(
+        await _aggregatedMeasureDataRequest.ConfirmRequestIsInitializedAsync(
             messageId,
             CancellationToken.None);
     }
@@ -61,43 +61,43 @@ public sealed class WhenEnergyResultRequestTests
     [Fact]
     public async Task Actor_get_bad_request_when_aggregated_measure_data_request_is_invalid()
     {
-        await _notifyAggregatedMeasureDataResultDsl.EmptyQueueForActor();
+        await _notifyAggregatedMeasureDataResult.EmptyQueueForActor();
 
-        await _aggregatedMeasureDataRequestDsl.RequestWithInvalidMessageAsync(CancellationToken.None);
+        await _aggregatedMeasureDataRequest.ConfirmInvalidRequestIsRejected(CancellationToken.None);
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_response_from_aggregated_measure_data_request()
     {
-        await _notifyAggregatedMeasureDataResultDsl.EmptyQueueForActor();
+        await _notifyAggregatedMeasureDataResult.EmptyQueueForActor();
         var gridAreaCode = "804";
-        var processId = await _aggregatedMeasureDataRequestDsl.InitializeAggregatedMeasureDataRequestAsync(
+        var processId = await _aggregatedMeasureDataRequest.InitializeAggregatedMeasureDataRequestAsync(
             gridAreaCode,
             AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
             CancellationToken.None);
 
-        await _aggregatedMeasureDataRequestDsl.PublishAggregatedMeasureDataRequestAcceptedResponseAsync(
+        await _aggregatedMeasureDataRequest.PublishAggregatedMeasureDataRequestAcceptedResponseAsync(
             processId,
             gridAreaCode,
             CancellationToken.None);
 
-        await _notifyAggregatedMeasureDataResultDsl.ConfirmResultIsAvailableFor();
+        await _notifyAggregatedMeasureDataResult.ConfirmResultIsAvailableFor();
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_rejected_response_from_aggregated_measure_data_request()
     {
-        await _notifyAggregatedMeasureDataResultDsl.EmptyQueueForActor();
+        await _notifyAggregatedMeasureDataResult.EmptyQueueForActor();
         var gridAreaCode = "804";
-        var processId = await _aggregatedMeasureDataRequestDsl.InitializeAggregatedMeasureDataRequestAsync(
+        var processId = await _aggregatedMeasureDataRequest.InitializeAggregatedMeasureDataRequestAsync(
             gridAreaCode,
             AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
             CancellationToken.None);
 
-        await _aggregatedMeasureDataRequestDsl.PublishAggregatedMeasureDataRequestRejectedResponseAsync(
+        await _aggregatedMeasureDataRequest.PublishAggregatedMeasureDataRequestRejectedResponseAsync(
             processId,
             CancellationToken.None);
 
-        await _notifyAggregatedMeasureDataResultDsl.ConfirmRejectResultIsAvailableFor();
+        await _notifyAggregatedMeasureDataResult.ConfirmRejectResultIsAvailableFor();
     }
 }

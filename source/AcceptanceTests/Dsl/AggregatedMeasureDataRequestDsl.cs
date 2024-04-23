@@ -49,7 +49,7 @@ public sealed class AggregatedMeasureDataRequestDsl
                 .ConfigureAwait(false);
     }
 
-    internal async Task RequestWithInvalidMessageAsync(CancellationToken cancellationToken = default)
+    internal async Task ConfirmInvalidRequestIsRejected(CancellationToken cancellationToken = default)
     {
         var act = async () =>
         {
@@ -61,7 +61,7 @@ public sealed class AggregatedMeasureDataRequestDsl
         await Assert.ThrowsAsync<BadAggregatedMeasureDataRequestException>(act).ConfigureAwait(false);
     }
 
-    internal async Task ConfirmRequestIsInitiatedAsync(
+    internal async Task ConfirmRequestIsInitializedAsync(
         Guid requestMessageId,
         CancellationToken cancellationToken)
     {

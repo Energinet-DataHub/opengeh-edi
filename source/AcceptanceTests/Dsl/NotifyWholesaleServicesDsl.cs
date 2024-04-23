@@ -30,12 +30,12 @@ internal sealed class NotifyWholesaleServicesDsl
         _wholesaleDriver = wholesaleDriverDriver;
     }
 
-    internal Task PublishMonthlyChargeResultFor(string gridAreaCode, string energySupplierId, string chargeOwnerId)
+    internal Task PublishMonthlyChargeResult(string gridAreaCode, string energySupplierId, string chargeOwnerId)
     {
         return _wholesaleDriver.PublishMonthlyAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId);
     }
 
-    internal Task PublishAmountPerChargeResultFor(
+    internal Task PublishAmountPerChargeResult(
         string gridAreaCode,
         string energySupplierId,
         string chargeOwnerId)
@@ -43,7 +43,7 @@ internal sealed class NotifyWholesaleServicesDsl
         return _wholesaleDriver.PublishAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId);
     }
 
-    internal async Task<string> ConfirmResultIsAvailableFor()
+    internal async Task<string> ConfirmResultIsAvailable()
     {
         var peekResponse = await _edi.PeekMessageAsync().ConfigureAwait(false);
         var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
@@ -55,7 +55,7 @@ internal sealed class NotifyWholesaleServicesDsl
         return messageId!;
     }
 
-    internal async Task ConfirmRejectResultIsAvailableFor()
+    internal async Task ConfirmRejectResultIsAvailable()
     {
         var peekResponse = await _edi.PeekMessageAsync().ConfigureAwait(false);
         var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
