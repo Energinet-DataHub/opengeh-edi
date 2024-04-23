@@ -283,8 +283,8 @@ public class BehavioursTestBase : IDisposable
     }
 
     protected async Task GivenDelegation(
-        ActorNumberAndRoleDto delegatedBy,
-        ActorNumberAndRoleDto delegatedTo,
+        Actor delegatedBy,
+        Actor delegatedTo,
         string gridAreaCode,
         ProcessType processType,
         Instant startsAt,

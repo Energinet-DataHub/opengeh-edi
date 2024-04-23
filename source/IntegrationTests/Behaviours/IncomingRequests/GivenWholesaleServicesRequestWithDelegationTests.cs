@@ -28,7 +28,6 @@ using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
-using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
@@ -102,8 +101,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
 
         await GivenDelegation(
-            new ActorNumberAndRoleDto(originalActor.ActorNumber, originalActor.ActorRole),
-            new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
+            new(originalActor.ActorNumber, originalActor.ActorRole),
+            new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
             "512",
             ProcessType.RequestWholesaleResults,
             GetNow());
@@ -235,15 +234,15 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
 
         await GivenDelegation(
-            new ActorNumberAndRoleDto(originalActor.ActorNumber, originalActor.ActorRole),
-            new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
+            new(originalActor.ActorNumber, originalActor.ActorRole),
+            new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
             "512",
             ProcessType.RequestWholesaleResults,
             GetNow());
 
         await GivenDelegation(
-            new ActorNumberAndRoleDto(originalActor.ActorNumber, originalActor.ActorRole),
-            new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
+            new(originalActor.ActorNumber, originalActor.ActorRole),
+            new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
             "609",
             ProcessType.RequestWholesaleResults,
             GetNow());
@@ -385,15 +384,15 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
 
         await GivenDelegation(
-            new ActorNumberAndRoleDto(originalActor.ActorNumber, originalActor.ActorRole),
-            new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
+            new(originalActor.ActorNumber, originalActor.ActorRole),
+            new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
             "512",
             ProcessType.RequestWholesaleResults,
             GetNow());
 
         await GivenDelegation(
-            new ActorNumberAndRoleDto(originalActor.ActorNumber, originalActor.ActorRole),
-            new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
+            new(originalActor.ActorNumber, originalActor.ActorRole),
+            new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
             "609",
             ProcessType.RequestWholesaleResults,
             GetNow());
@@ -518,8 +517,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
 
         await GivenDelegation(
-            new ActorNumberAndRoleDto(originalActor.ActorNumber, originalActor.ActorRole),
-            new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
+            new(originalActor.ActorNumber, originalActor.ActorRole),
+            new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
             "512",
             ProcessType.RequestWholesaleResults,
             GetNow());
@@ -658,8 +657,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
 
         await GivenDelegation(
-            new ActorNumberAndRoleDto(originalActor.ActorNumber, originalActor.ActorRole),
-            new ActorNumberAndRoleDto(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
+            new(originalActor.ActorNumber, originalActor.ActorRole),
+            new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
             "512",
             ProcessType.RequestWholesaleResults,
             GetNow());

@@ -55,9 +55,9 @@ public interface IMasterDataClient
         CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets the <see cref="ActorNumberAndRoleDto" /> associated with the given certificate thumbprint, if any.
+    ///     Gets the <see cref="Actor" /> associated with the given certificate thumbprint, if any.
     /// </summary>
-    Task<ActorNumberAndRoleDto?> GetActorNumberAndRoleFromThumbprintAsync(CertificateThumbprintDto thumbprintDto);
+    Task<Actor?> GetActorNumberAndRoleFromThumbprintAsync(CertificateThumbprintDto thumbprintDto);
 
     /// <summary>
     ///     Delete the actor certificate for a given actor.
@@ -75,8 +75,7 @@ public interface IMasterDataClient
     ///    Get process delegation.
     /// </summary>
     Task<ProcessDelegationDto?> GetProcessDelegatedByAsync(
-        ActorNumber delegatedByActorNumber,
-        ActorRole delegatedByActorRole,
+        Actor delegatedBy,
         string gridAreaCode,
         ProcessType processType,
         CancellationToken cancellationToken);
@@ -85,8 +84,7 @@ public interface IMasterDataClient
     ///    Get process delegation.
     /// </summary>
     Task<IReadOnlyCollection<ProcessDelegationDto>> GetProcessesDelegatedToAsync(
-        ActorNumber delegatedToActorNumber,
-        ActorRole delegatedToActorRole,
+        Actor delegatedTo,
         string? gridAreaCode,
         ProcessType processType,
         CancellationToken cancellationToken);

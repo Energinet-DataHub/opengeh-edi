@@ -16,7 +16,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
-public abstract record BaseDelegatedSeries
+public abstract record BaseDelegatedSeries : IDelegatedIncomingMessageSeries
 {
     public ActorNumber? DelegatedByActorNumber { get; private set; }
 
@@ -24,7 +24,7 @@ public abstract record BaseDelegatedSeries
 
     public IReadOnlyCollection<string> DelegatedGridAreas { get; private set; } = Array.Empty<string>();
 
-    public void Delegate(ActorNumber delegatedByActorNumber, ActorRole delegatedToActorRole, IReadOnlyCollection<string> delegatedGridAreas)
+    public void DelegateSeries(ActorNumber delegatedByActorNumber, ActorRole delegatedToActorRole, IReadOnlyCollection<string> delegatedGridAreas)
     {
         DelegatedByActorNumber = delegatedByActorNumber;
         DelegatedToActorRole = delegatedToActorRole;

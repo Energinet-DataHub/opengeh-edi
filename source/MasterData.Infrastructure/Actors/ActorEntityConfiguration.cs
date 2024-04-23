@@ -14,9 +14,9 @@
 
 using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Actor = Energinet.DataHub.EDI.MasterData.Domain.Actors.Actor;
 
 namespace Energinet.DataHub.EDI.MasterData.Infrastructure.Actors;
 

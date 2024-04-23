@@ -116,39 +116,5 @@ public class GivenAmountPerChargeResultProducedV1ReceivedTests : BehavioursTestB
                         QuantityQualities = { QuantityQuality.Calculated },
                     },
                 }));
-            // ));
-            //     document => document
-            //         // -- Assert header values --
-            //         .MessageIdExists()
-            //         // Assert businessSector.type? (23)
-            //         .HasTimestamp()
-            //         .HasBusinessReason(BusinessReason.WholesaleFixing, CodeListType.EbixDenmark)
-            //         .HasReceiverId(ActorNumber.Create())
-            //         .HasReceiverRole(ActorRole.EnergySupplier, CodeListType.Ebix)
-            //         .HasSenderId(ActorNumber.Create("5790001330552"), "A10") // Sender is DataHub
-            //         .HasSenderRole(ActorRole.MeteredDataAdministrator)
-            //         // Assert type? (E31)
-            //         // -- Assert series values --
-            //         .TransactionIdExists()
-            //         .HasChargeTypeOwner(ActorNumber.Create("5799999933444"), "A10")
-            //         .HasChargeCode("25361478")
-            //         .HasChargeType(ChargeType.Tariff)
-            //         .HasCurrency(Currency.DanishCrowns)
-            //         .HasEnergySupplierNumber(ActorNumber.Create("5799999933318"), "A10")
-            //         .HasSettlementMethod(SettlementMethod.Flex)
-            //         .HasMeteringPointType(MeteringPointType.Consumption)
-            //         .HasGridAreaCode("244", "NDK")
-            //         .OriginalTransactionIdReferenceDoesNotExist()
-            //         .HasPriceMeasurementUnit(MeasurementUnit.Kwh)
-            //         .HasProductCode("5790001330590") // Example says "8716867000030", but document writes as "5790001330590"?
-            //         .HasQuantityMeasurementUnit(MeasurementUnit.Kwh)
-            //         .SettlementVersionDoesNotExist()
-            //         .HasCalculationVersion(1)
-            //         .HasResolution(Resolution.Hourly)
-            //         .HasPeriod(new Period(CreateDateInstant(2022, 09, 06), CreateDateInstant(2022, 09, 07)))
-            //         .HasSumQuantityForPosition(1, 30)
-            //         .HasQuantityForPosition(1, 3)
-            //         .HasPriceForPosition(1, "10")
-            //         .HasQualityForPosition(1, CalculatedQuantityQuality.Calculated));
     }
 }

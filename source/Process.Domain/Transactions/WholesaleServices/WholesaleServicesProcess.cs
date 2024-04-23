@@ -32,47 +32,6 @@ public sealed class WholesaleServicesProcess : Entity
     private State _state = State.Initialized;
 
     /// <summary>
-    /// Create a new process for wholesale services request, where who made the request and who the request is
-    /// requested for is the same actor.
-    /// </summary>
-    public WholesaleServicesProcess(
-        ProcessId processId,
-        ActorNumber requestedByActorNumber,
-        ActorRole requestedByActorRole,
-        BusinessTransactionId businessTransactionId,
-        MessageId initiatedByMessageId,
-        BusinessReason businessReason,
-        string startOfPeriod,
-        string? endOfPeriod,
-        string? requestedGridArea,
-        string? energySupplierId,
-        SettlementVersion? settlementVersion,
-        string? resolution,
-        string? chargeOwner,
-        IReadOnlyCollection<ChargeType> chargeTypes,
-        IReadOnlyCollection<string> gridAreas)
-        : this(
-            processId,
-            requestedByActorNumber,
-            requestedByActorRole,
-            requestedByActorNumber,
-            requestedByActorRole,
-            businessTransactionId,
-            initiatedByMessageId,
-            businessReason,
-            startOfPeriod,
-            endOfPeriod,
-            requestedGridArea,
-            energySupplierId,
-            settlementVersion,
-            resolution,
-            chargeOwner,
-            chargeTypes,
-            gridAreas)
-    {
-    }
-
-    /// <summary>
     /// Create a new process for wholesale services request, supplying both who the request is for and who requested it
     /// (this is used in case of delegation)
     /// </summary>
@@ -98,8 +57,6 @@ public sealed class WholesaleServicesProcess : Entity
         ArgumentNullException.ThrowIfNull(gridAreas);
         ArgumentNullException.ThrowIfNull(processId);
 
-        // if (requestedGridArea != null && gridAreas.Count == 0)
-        //     throw new ArgumentOutOfRangeException(nameof(gridAreas), gridAreas, "GridAreas must be provided when IncomingGridArea is not null");
         if (!string.IsNullOrEmpty(requestedGridArea) && gridAreas.Count != 1 && gridAreas.Single() != requestedGridArea)
         {
             throw new ArgumentOutOfRangeException(

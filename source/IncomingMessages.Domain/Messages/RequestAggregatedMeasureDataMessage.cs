@@ -24,7 +24,7 @@ public record RequestAggregatedMeasureDataMessage(
     string MessageId,
     string CreatedAt,
     string? BusinessType,
-    IReadOnlyCollection<IIncomingMessageSerie> Serie) : IIncomingMessage;
+    IReadOnlyCollection<IIncomingMessageSeries> Serie) : IIncomingMessage;
 
 public record RequestAggregatedMeasureDataMessageSeries(
     string TransactionId,
@@ -35,4 +35,4 @@ public record RequestAggregatedMeasureDataMessageSeries(
     string? GridArea,
     string? EnergySupplierMarketParticipantId,
     string? BalanceResponsiblePartyMarketParticipantId,
-    string? SettlementVersion) : BaseDelegatedSeries, IIncomingMessageSerie;
+    string? SettlementVersion) : BaseDelegatedSeries, IIncomingMessageSeries;

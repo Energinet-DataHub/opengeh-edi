@@ -77,8 +77,7 @@ public class IncomingMessageDelegator
         foreach (var series in message.Serie)
         {
             var delegations = await _masterDataClient.GetProcessesDelegatedToAsync(
-                    requestedByActorNumber,
-                    requestedByActorRole,
+                    new Actor(requestedByActorNumber, requestedByActorRole),
                     series.GridArea,
                     processType,
                     cancellationToken)
@@ -97,7 +96,7 @@ public class IncomingMessageDelegator
                     throw new NotImplementedException($"Multiple delegations with different delegated by actor numbers are not supported. Received delegated actor numbers: {string.Join(", ", delegations.Select(d => d.DelegatedBy.ActorNumber))}");
 
                 var delegatedByActorNumber = delegations.First().DelegatedBy.ActorNumber;
-                series.Delegate(delegatedByActorNumber, requestedByActorRole, delegations.Select(d => d.GridAreaCode).ToArray());
+                series.DelegateSeries(delegatedByActorNumber, requestedByActorRole, delegations.Select(d => d.GridAreaCode).ToArray());
             }
         }
     }

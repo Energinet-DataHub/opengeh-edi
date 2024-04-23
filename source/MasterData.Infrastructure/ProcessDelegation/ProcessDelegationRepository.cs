@@ -21,11 +21,10 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.MasterData.Infrastructure.MessageDelegation;
+namespace Energinet.DataHub.EDI.MasterData.Infrastructure.ProcessDelegation;
 
 public class ProcessDelegationRepository : IProcessDelegationRepository
 {
@@ -38,12 +37,12 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         _systemDateTimeProvider = systemDateTimeProvider;
     }
 
-    public void Create(ProcessDelegation processDelegation, CancellationToken cancellationToken)
+    public void Create(Domain.ProcessDelegations.ProcessDelegation processDelegation, CancellationToken cancellationToken)
     {
         _masterDataContext.ProcessDelegations.Add(processDelegation);
     }
 
-    public async Task<ProcessDelegation?> GetProcessesDelegatedByAsync(
+    public async Task<Domain.ProcessDelegations.ProcessDelegation?> GetProcessesDelegatedByAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
         string gridAreaCode,
@@ -54,7 +53,7 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
 
         var query = GetBaseDelegationQuery(
             now,
-            delegatedBy: new ActorNumberAndRoleDto(delegatedByActorNumber, delegatedByActorRole),
+            delegatedBy: new(delegatedByActorNumber, delegatedByActorRole),
             delegatedTo: null,
             processType);
 
@@ -73,7 +72,7 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         return latestDelegation;
     }
 
-    public async Task<IReadOnlyCollection<ProcessDelegation>> GetProcessesDelegatedToAsync(
+    public async Task<IReadOnlyCollection<Domain.ProcessDelegations.ProcessDelegation>> GetProcessesDelegatedToAsync(
         ActorNumber delegatedToActorNumber,
         ActorRole delegatedToActorRole,
         string? gridAreaCode,
@@ -85,7 +84,7 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         var query = GetBaseDelegationQuery(
             now,
             delegatedBy: null,
-            delegatedTo: new ActorNumberAndRoleDto(delegatedToActorNumber, delegatedToActorRole),
+            delegatedTo: new(delegatedToActorNumber, delegatedToActorRole),
             processType);
 
         if (!string.IsNullOrEmpty(gridAreaCode))
@@ -106,10 +105,10 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         return latestForGridAreas.ToArray();
     }
 
-    private IQueryable<ProcessDelegation> GetBaseDelegationQuery(
+    private IQueryable<Domain.ProcessDelegations.ProcessDelegation> GetBaseDelegationQuery(
         Instant now,
-        ActorNumberAndRoleDto? delegatedBy,
-        ActorNumberAndRoleDto? delegatedTo,
+        Actor? delegatedBy,
+        Actor? delegatedTo,
         ProcessType processType)
     {
         if (delegatedBy == null && delegatedTo == null) throw new ArgumentException("At least one of the delegatedBy or delegatedTo must be set");
@@ -118,9 +117,11 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         // The latest delegation can cover the period from the start date to the end date.
         // If a delegation relationship has been cancelled the EndsAt is set to StartsAt.
         // Therefore, we can not use the EndsAt to determine if the delegation is active in the query.
-        var delegationQuery = _masterDataContext.ProcessDelegations
-            .Where(pd => pd.DelegatedProcess == processType
-                                        && pd.StartsAt <= now);
+        var delegationQuery = Queryable
+            .Where<Domain.ProcessDelegations.ProcessDelegation>(
+                _masterDataContext.ProcessDelegations,
+                pd => pd.DelegatedProcess == processType
+                      && pd.StartsAt <= now);
 
         if (delegatedBy != null)
         {

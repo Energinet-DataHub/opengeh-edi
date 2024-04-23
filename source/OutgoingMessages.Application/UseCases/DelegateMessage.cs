@@ -77,8 +77,7 @@ public class DelegateMessage
         CancellationToken cancellationToken)
     {
         var messageDelegation = await _masterDataClient.GetProcessDelegatedByAsync(
-            delegatedByActorNumber,
-            delegatedByActorRole,
+            new(delegatedByActorNumber, delegatedByActorRole),
             gridAreaCode,
             messageCreatedFromProcess,
             cancellationToken)

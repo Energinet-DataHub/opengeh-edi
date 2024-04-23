@@ -26,6 +26,7 @@ using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Microsoft.Extensions.Logging;
+using Actor = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Actor;
 
 namespace Energinet.DataHub.EDI.MasterData.Application;
 
@@ -121,7 +122,7 @@ internal sealed class MasterDataClient : IMasterDataClient
         await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<ActorNumberAndRoleDto?> GetActorNumberAndRoleFromThumbprintAsync(
+    public async Task<Actor?> GetActorNumberAndRoleFromThumbprintAsync(
         CertificateThumbprintDto thumbprint)
     {
         var actorCertificate =
@@ -130,7 +131,7 @@ internal sealed class MasterDataClient : IMasterDataClient
                 .ConfigureAwait(false);
 
         return actorCertificate is not null
-            ? new ActorNumberAndRoleDto(actorCertificate.ActorNumber, actorCertificate.ActorRole)
+            ? new Actor(actorCertificate.ActorNumber, actorCertificate.ActorRole)
             : null;
     }
 
@@ -169,15 +170,14 @@ internal sealed class MasterDataClient : IMasterDataClient
     }
 
     public async Task<ProcessDelegationDto?> GetProcessDelegatedByAsync(
-        ActorNumber delegatedByActorNumber,
-        ActorRole delegatedByActorRole,
+        Actor delegatedByActor,
         string gridAreaCode,
         ProcessType processType,
         CancellationToken cancellationToken)
     {
         var processDelegation = await _processDelegationRepository.GetProcessesDelegatedByAsync(
-            delegatedByActorNumber,
-            delegatedByActorRole.ForActorMessageDelegation(),
+            delegatedByActor.ActorNumber,
+            delegatedByActor.ActorRole.ForActorMessageDelegation(),
             gridAreaCode,
             processType,
             cancellationToken).ConfigureAwait(false);
@@ -191,20 +191,19 @@ internal sealed class MasterDataClient : IMasterDataClient
             processDelegation.GridAreaCode,
             processDelegation.StartsAt,
             processDelegation.StopsAt,
-            new ActorNumberAndRoleDto(processDelegation.DelegatedByActorNumber, processDelegation.DelegatedByActorRole),
-            new ActorNumberAndRoleDto(processDelegation.DelegatedToActorNumber, processDelegation.DelegatedToActorRole));
+            new(processDelegation.DelegatedByActorNumber, processDelegation.DelegatedByActorRole),
+            new(processDelegation.DelegatedToActorNumber, processDelegation.DelegatedToActorRole));
     }
 
     public async Task<IReadOnlyCollection<ProcessDelegationDto>> GetProcessesDelegatedToAsync(
-        ActorNumber delegatedToActorNumber,
-        ActorRole delegatedToActorRole,
+        Actor delegatedToActor,
         string? gridAreaCode,
         ProcessType processType,
         CancellationToken cancellationToken)
     {
         var processDelegationList = await _processDelegationRepository.GetProcessesDelegatedToAsync(
-            delegatedToActorNumber,
-            delegatedToActorRole,
+            delegatedToActor.ActorNumber,
+            delegatedToActor.ActorRole,
             gridAreaCode,
             processType,
             cancellationToken).ConfigureAwait(false);
@@ -218,8 +217,8 @@ internal sealed class MasterDataClient : IMasterDataClient
                 pd.GridAreaCode,
                 pd.StartsAt,
                 pd.StopsAt,
-                new ActorNumberAndRoleDto(pd.DelegatedByActorNumber, pd.DelegatedByActorRole),
-                new ActorNumberAndRoleDto(pd.DelegatedToActorNumber, pd.DelegatedToActorRole)))
+                new(pd.DelegatedByActorNumber, pd.DelegatedByActorRole),
+                new(pd.DelegatedToActorNumber, pd.DelegatedToActorRole)))
             .ToArray();
     }
 

@@ -26,5 +26,5 @@ public record ProcessDelegationDto(
     string GridAreaCode,
     Instant StartsAt,
     Instant StopsAt,
-    ActorNumberAndRoleDto DelegatedBy,
-    ActorNumberAndRoleDto DelegatedTo);
+    Actor DelegatedBy,
+    Actor DelegatedTo);
