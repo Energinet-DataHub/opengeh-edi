@@ -21,12 +21,12 @@ internal sealed class DatahubDsl
 {
     private readonly EdiDriver _ediDriver;
 
-    public DatahubDsl(EdiDriver ediDriver)
+    internal DatahubDsl(EdiDriver ediDriver)
     {
         _ediDriver = ediDriver;
     }
 
-    public async Task EmptyQueueForAsync(Actor actor, CancellationToken cancellationToken)
+    internal async Task EmptyQueueForAsync(Actor actor, CancellationToken cancellationToken)
     {
         var peekResponse = await _ediDriver.PeekAsync(actor, cancellationToken).ConfigureAwait(false);
         while (peekResponse.Headers.TryGetValues("MessageId", out var messageIds))

@@ -17,11 +17,11 @@ using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
-public class EdiProcessesDriver
+internal sealed class EdiProcessesDriver
 {
     private readonly string _connectionString;
 
-    public EdiProcessesDriver(string connectionString)
+    internal EdiProcessesDriver(string connectionString)
     {
         _connectionString = connectionString;
     }

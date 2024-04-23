@@ -22,19 +22,19 @@ internal sealed class MarketParticipantDriver
 {
     private readonly IntegrationEventPublisher _integrationEventPublisher;
 
-    public MarketParticipantDriver(IntegrationEventPublisher integrationEventPublisher)
+    internal MarketParticipantDriver(IntegrationEventPublisher integrationEventPublisher)
     {
         _integrationEventPublisher = integrationEventPublisher;
     }
 
-    public async Task PublishActorActivatedAsync(string actorNumber, string b2CId)
+    internal async Task PublishActorActivatedAsync(string actorNumber, string b2CId)
     {
         await _integrationEventPublisher.PublishAsync(
             ActorActivated.EventName,
             ActorFactory.CreateActorActivated(actorNumber, b2CId).ToByteArray()).ConfigureAwait(false);
     }
 
-    public async Task PublishActorCertificateCredentialsRemovedAsync(string actorNumber, string actorRole, string thumbprint)
+    internal async Task PublishActorCertificateCredentialsRemovedAsync(string actorNumber, string actorRole, string thumbprint)
     {
         await _integrationEventPublisher.PublishAsync(
                 ActorCertificateCredentialsRemoved.EventName,
@@ -42,7 +42,7 @@ internal sealed class MarketParticipantDriver
             .ConfigureAwait(false);
     }
 
-    public async Task PublishActorCertificateCredentialsAssignedAsync(string actorNumber, string actorRole, string thumbprint)
+    internal async Task PublishActorCertificateCredentialsAssignedAsync(string actorNumber, string actorRole, string thumbprint)
     {
         await _integrationEventPublisher.PublishAsync(
                 ActorCertificateCredentialsAssigned.EventName,

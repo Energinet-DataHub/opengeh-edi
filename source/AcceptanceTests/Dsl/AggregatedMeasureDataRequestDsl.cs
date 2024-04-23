@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Net;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
-using Energinet.DataHub.EDI.AcceptanceTests.TestData;
 using FluentAssertions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;

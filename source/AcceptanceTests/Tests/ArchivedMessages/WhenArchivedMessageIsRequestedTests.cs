@@ -12,12 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
-using Energinet.DataHub.EDI.AcceptanceTests.Factories;
-using Energinet.DataHub.EDI.AcceptanceTests.TestData;
 using FluentAssertions;
 using Xunit.Abstractions;
 #pragma warning disable CS0162 // Unreachable code detected

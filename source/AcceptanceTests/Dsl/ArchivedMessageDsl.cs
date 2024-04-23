@@ -16,7 +16,6 @@ using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Responses.json;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
-using FluentAssertions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 

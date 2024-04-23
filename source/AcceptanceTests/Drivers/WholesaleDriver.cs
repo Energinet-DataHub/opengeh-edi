@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.MessageFactories;
-using Energinet.DataHub.EDI.AcceptanceTests.Factories;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf;
@@ -23,7 +21,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 internal sealed class WholesaleDriver
 {
-    public const string BalanceResponsiblePartyMarketRoleCode = "DDK";
+    private const string BalanceResponsiblePartyMarketRoleCode = "DDK";
     private readonly IntegrationEventPublisher _integrationEventPublisher;
     private readonly EdiInboxClient _inboxEdiClient;
 

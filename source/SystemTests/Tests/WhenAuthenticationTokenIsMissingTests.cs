@@ -24,14 +24,12 @@ namespace Energinet.DataHub.EDI.SystemTests.Tests;
 [Collection(SystemTestCollection.SystemTestCollectionName)]
 public sealed class WhenAuthenticationTokenIsMissingTests
 {
-    private readonly SystemTestFixture _fixture;
     private readonly AuthenticationTokenRequestDsl _authenticationTokenRequest;
 
     public WhenAuthenticationTokenIsMissingTests(SystemTestFixture fixture)
     {
-        _fixture = fixture;
         ArgumentNullException.ThrowIfNull(fixture);
-        _authenticationTokenRequest = new AuthenticationTokenRequestDsl(_fixture.EdiDriver);
+        _authenticationTokenRequest = new AuthenticationTokenRequestDsl(fixture.EdiDriver);
     }
 
     [Fact]

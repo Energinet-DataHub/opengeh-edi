@@ -18,12 +18,12 @@ using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.SystemTests.Drivers;
 
-public class MicrosoftIdentityDriver
+internal sealed class MicrosoftIdentityDriver
 {
     private readonly string _tenantId;
     private readonly string _backendAppId;
 
-    public MicrosoftIdentityDriver(string tenantId, string backendAppId)
+    internal MicrosoftIdentityDriver(string tenantId, string backendAppId)
     {
         ArgumentNullException.ThrowIfNull(tenantId);
         ArgumentNullException.ThrowIfNull(backendAppId);
@@ -31,7 +31,7 @@ public class MicrosoftIdentityDriver
         _backendAppId = backendAppId;
     }
 
-    public async Task<string> GetB2BTokenAsync(string clientId, string clientSecret, CancellationToken cancellationToken)
+    internal async Task<string> GetB2BTokenAsync(string clientId, string clientSecret, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(clientId);
         ArgumentNullException.ThrowIfNull(clientSecret);
@@ -58,4 +58,4 @@ public class MicrosoftIdentityDriver
     }
 }
 
-public sealed record AccessTokenResponse([property: JsonPropertyName("access_token")] string AccessToken);
+internal sealed record AccessTokenResponse([property: JsonPropertyName("access_token")] string AccessToken);

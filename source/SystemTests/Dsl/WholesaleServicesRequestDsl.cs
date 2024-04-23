@@ -18,30 +18,30 @@ using FluentAssertions;
 
 namespace Energinet.DataHub.EDI.SystemTests.Dsl;
 
-public class WholesaleServicesRequestDsl
+internal sealed class WholesaleServicesRequestDsl
 {
     private readonly EdiDriver _ediDriver;
 
-    public WholesaleServicesRequestDsl(EdiDriver ediDriver)
+    internal WholesaleServicesRequestDsl(EdiDriver ediDriver)
     {
         _ediDriver = ediDriver;
     }
 
-    public async Task RequestWholesaleSettlementForAsync(Actor actor, CancellationToken cancellationToken)
+    internal async Task RequestWholesaleSettlementForAsync(Actor actor, CancellationToken cancellationToken)
     {
         await _ediDriver
-            .RequestWholesaleSettlementAsync(actor, MessageType.RequestWholesaleSettlement, cancellationToken)
+            .SendRequestAsync(actor, MessageType.RequestWholesaleSettlement, cancellationToken)
             .ConfigureAwait(false);
     }
 
-    public async Task InvalidRequestWholesaleSettlementForAsync(Actor actor, CancellationToken cancellationToken)
+    internal async Task InvalidRequestWholesaleSettlementForAsync(Actor actor, CancellationToken cancellationToken)
     {
         await _ediDriver
-            .RequestWholesaleSettlementAsync(actor, MessageType.InvalidRequestWholesaleSettlement, cancellationToken)
+            .SendRequestAsync(actor, MessageType.InvalidRequestWholesaleSettlement, cancellationToken)
             .ConfigureAwait(false);
     }
 
-    public async Task<string> ConfirmWholesaleServicesResultIsAvailableForAsync(Actor actor, CancellationToken cancellationToken)
+    internal async Task<string> ConfirmWholesaleServicesResultIsAvailableForAsync(Actor actor, CancellationToken cancellationToken)
     {
         var peekResponse = await _ediDriver.PeekUntilResponseAsync(actor, cancellationToken).ConfigureAwait(false);
 
@@ -55,7 +55,7 @@ public class WholesaleServicesRequestDsl
         return messageId!;
     }
 
-    public async Task<string> ConfirmRejectWholesaleServicesResultIsAvailableForAsync(Actor actor, CancellationToken cancellationToken)
+    internal async Task<string> ConfirmRejectWholesaleServicesResultIsAvailableForAsync(Actor actor, CancellationToken cancellationToken)
     {
         var peekResponse = await _ediDriver.PeekUntilResponseAsync(actor, cancellationToken).ConfigureAwait(false);
 
@@ -69,7 +69,7 @@ public class WholesaleServicesRequestDsl
         return messageId!;
     }
 
-    public async Task DequeueForAsync(Actor actor, string messageId, CancellationToken cancellationToken)
+    internal async Task DequeueForAsync(Actor actor, string messageId, CancellationToken cancellationToken)
     {
         await _ediDriver.DequeueAsync(actor, messageId, cancellationToken).ConfigureAwait(false);
     }

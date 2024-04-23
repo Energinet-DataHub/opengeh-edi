@@ -22,19 +22,19 @@ using Nito.AsyncEx;
 
 namespace Energinet.DataHub.EDI.SystemTests.Drivers;
 
-public class EdiDriver
+public sealed class EdiDriver
 {
     private readonly AsyncLazy<HttpClient> _httpClient;
     private readonly MicrosoftIdentityDriver _microsoftIdentityDriver;
 
-    public EdiDriver(Uri apiManagementUri, string tenantId, string backendAppId)
+    internal EdiDriver(Uri apiManagementUri, string tenantId, string backendAppId)
     {
         ArgumentNullException.ThrowIfNull(apiManagementUri);
         _httpClient = new AsyncLazy<HttpClient>(() => GetHttpClientAsync(apiManagementUri));
         _microsoftIdentityDriver = new MicrosoftIdentityDriver(tenantId, backendAppId);
     }
 
-    public async Task<HttpResponseMessage> PeekAsync(Actor? actor, CancellationToken cancellationToken)
+    internal async Task<HttpResponseMessage> PeekAsync(Actor? actor, CancellationToken cancellationToken)
     {
         var httpClient = await _httpClient;
         await AddAuthTokenToRequestAsync(actor, httpClient, cancellationToken).ConfigureAwait(false);
@@ -47,7 +47,7 @@ public class EdiDriver
         return peekResponse;
     }
 
-    public async Task DequeueAsync(Actor? actor, string messageId, CancellationToken cancellationToken)
+    internal async Task DequeueAsync(Actor? actor, string messageId, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(messageId);
 
@@ -58,22 +58,11 @@ public class EdiDriver
         dequeueResponse.EnsureSuccessStatusCode();
     }
 
-    public async Task RequestAggregatedMeasureDataAsync(Actor? actor, MessageType messageType, CancellationToken cancellationToken)
+    internal async Task SendRequestAsync(Actor? actor, MessageType messageType, CancellationToken cancellationToken)
     {
         var httpClient = await _httpClient;
         await AddAuthTokenToRequestAsync(actor, httpClient, cancellationToken).ConfigureAwait(false);
-        using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/requestaggregatedmeasuredata");
-        request.Content = new StringContent(GetContent(messageType), Encoding.UTF8, "application/json");
-        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-        var response = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
-    }
-
-    public async Task RequestWholesaleSettlementAsync(Actor? actor, MessageType messageType, CancellationToken cancellationToken)
-    {
-        var httpClient = await _httpClient;
-        await AddAuthTokenToRequestAsync(actor, httpClient, cancellationToken).ConfigureAwait(false);
-        using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/requestwholesalesettlement");
+        using var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(messageType));
         request.Content = new StringContent(GetContent(messageType), Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         var response = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
@@ -83,7 +72,7 @@ public class EdiDriver
     /// <summary>
     ///  Calls Peek until a response is received or the timeout is reached.
     /// </summary>
-    public async Task<HttpResponseMessage> PeekUntilResponseAsync(
+    internal async Task<HttpResponseMessage> PeekUntilResponseAsync(
         Actor actor,
         CancellationToken cancellationToken,
         int timeoutInMs = 600000)
@@ -117,6 +106,18 @@ public class EdiDriver
         };
 
         return Task.FromResult(httpClient);
+    }
+
+    private static string GetRequestPath(MessageType messageType)
+    {
+        return messageType switch
+        {
+            MessageType.RequestAggregatedMeasureData or MessageType.InvalidRequestAggregatedMeasureData =>
+                "v1.0/cim/requestaggregatedmeasuredata",
+            MessageType.RequestWholesaleSettlement or MessageType.InvalidRequestWholesaleSettlement =>
+                "v1.0/cim/requestwholesalesettlement",
+            _ => throw new NotImplementedException(),
+        };
     }
 
     private static string GetContent(MessageType messageType)

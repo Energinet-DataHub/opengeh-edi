@@ -12,21 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics;
-using System.Net;
 using Energinet.DataHub.EDI.SystemTests.Drivers;
-using Energinet.DataHub.EDI.SystemTests.Exceptions;
 using Energinet.DataHub.EDI.SystemTests.Models;
 using FluentAssertions;
-using Xunit;
 
 namespace Energinet.DataHub.EDI.SystemTests.Dsl;
 
-public class AggregatedMeasureDataRequestDsl
+internal sealed class AggregatedMeasureDataRequestDsl
 {
     private readonly EdiDriver _ediDriver;
 
-    public AggregatedMeasureDataRequestDsl(EdiDriver ediDriver)
+    internal AggregatedMeasureDataRequestDsl(EdiDriver ediDriver)
     {
         _ediDriver = ediDriver;
     }
@@ -34,13 +30,13 @@ public class AggregatedMeasureDataRequestDsl
     internal async Task RequestAggregatedMeasureDataForAsync(Actor actor, CancellationToken cancellationToken)
     {
         await _ediDriver
-            .RequestAggregatedMeasureDataAsync(actor, MessageType.RequestAggregatedMeasureData, cancellationToken)
+            .SendRequestAsync(actor, MessageType.RequestAggregatedMeasureData, cancellationToken)
             .ConfigureAwait(false);
     }
 
     internal async Task InvalidRequestAggregatedMeasureDataForAsync(Actor actor, CancellationToken cancellationToken)
     {
-        await _ediDriver.RequestAggregatedMeasureDataAsync(
+        await _ediDriver.SendRequestAsync(
                 actor,
                 MessageType.InvalidRequestAggregatedMeasureData,
                 cancellationToken)

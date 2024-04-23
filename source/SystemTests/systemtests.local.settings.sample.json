@@ -1,0 +1,9 @@
+﻿{
+  "SHARED_KEYVAULT_NAME": "<SHARED_KEYVAULT_NAME>",
+
+  "METERED_DATA_RESPONSIBLE_CLIENT_ID": "<client id to generate token for metered data responsible>",
+  "METERED_DATA_RESPONSIBLE_CLIENT_SECRET": "<client secret to generate token for metered data responsible>",
+  
+  "SYSTEM_OPERATOR_CLIENT_ID": "<client id to generate token for for system operator>",
+  "SYSTEM_OPERATOR_CLIENT_SECRET": "<client secret to generate token for for system operator>"
+}

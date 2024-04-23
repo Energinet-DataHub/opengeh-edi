@@ -34,16 +34,16 @@ internal sealed class EdiInboxClient : IAsyncDisposable
         _sender = _client.CreateSender(queueName);
     }
 
-    public async Task SendAsync(ServiceBusMessage message, CancellationToken cancellationToken)
-    {
-        await _sender.SendMessageAsync(message, cancellationToken).ConfigureAwait(false);
-    }
-
     public async ValueTask DisposeAsync()
     {
         await DisposeCoreAsync().ConfigureAwait(false);
 
         GC.SuppressFinalize(this);
+    }
+
+    internal async Task SendAsync(ServiceBusMessage message, CancellationToken cancellationToken)
+    {
+        await _sender.SendMessageAsync(message, cancellationToken).ConfigureAwait(false);
     }
 
     private async ValueTask DisposeCoreAsync()

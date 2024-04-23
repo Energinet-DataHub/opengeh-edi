@@ -19,21 +19,25 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.SystemTests.Dsl;
 
-public class AuthenticationTokenRequestDsl
+internal sealed class AuthenticationTokenRequestDsl
 {
     private readonly EdiDriver _ediDriver;
 
-    public AuthenticationTokenRequestDsl(EdiDriver ediDriver)
+    internal AuthenticationTokenRequestDsl(EdiDriver ediDriver)
     {
         _ediDriver = ediDriver;
     }
 
-    internal async Task ConfirmRequestAggregatedMeasureDataWithoutTokenIsNotAllowedAsync(CancellationToken cancellationToken)
+    internal async Task ConfirmRequestAggregatedMeasureDataWithoutTokenIsNotAllowedAsync(
+        CancellationToken cancellationToken)
     {
         var act = async () =>
         {
             await _ediDriver
-                .RequestAggregatedMeasureDataAsync(actor: null, MessageType.RequestAggregatedMeasureData, cancellationToken)
+                .SendRequestAsync(
+                    actor: null,
+                    MessageType.RequestAggregatedMeasureData,
+                    cancellationToken)
                 .ConfigureAwait(false);
         };
 
@@ -58,7 +62,8 @@ public class AuthenticationTokenRequestDsl
     {
         var act = async () =>
         {
-            await _ediDriver.DequeueAsync(actor: null, "irrelevant-message-id", cancellationToken).ConfigureAwait(false);
+            await _ediDriver.DequeueAsync(actor: null, "irrelevant-message-id", cancellationToken)
+                .ConfigureAwait(false);
         };
 
         var httpRequestException = await Assert.ThrowsAsync<HttpRequestException>(act).ConfigureAwait(false);
