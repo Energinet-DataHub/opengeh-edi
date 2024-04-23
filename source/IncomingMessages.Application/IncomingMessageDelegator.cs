@@ -20,7 +20,9 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application;
 
@@ -34,11 +36,13 @@ public class IncomingMessageDelegator
 
     private readonly IMasterDataClient _masterDataClient;
     private readonly AuthenticatedActor _authenticatedActor;
+    private readonly ILogger<IncomingMessageDelegator> _logger;
 
-    public IncomingMessageDelegator(IMasterDataClient masterDataClient, AuthenticatedActor authenticatedActor)
+    public IncomingMessageDelegator(IMasterDataClient masterDataClient, AuthenticatedActor authenticatedActor, ILogger<IncomingMessageDelegator> logger)
     {
         _masterDataClient = masterDataClient;
         _authenticatedActor = authenticatedActor;
+        _logger = logger;
     }
 
     public async Task DelegateAsync(
@@ -51,17 +55,18 @@ public class IncomingMessageDelegator
         var processType = MapToProcessType(documentType);
 
         // Incoming message has current actor as sender, but uses the role of the original actor. This means:
-        // - message.SenderNumber is the delegated TO actor number
-        // - AuthenticatedActor has the delegated TO actor role
-        // - message.SenderRoleCode is the delegated BY actor role
+        // - message.SenderNumber is the delegated TO actor number (requested by actor number)
+        // - AuthenticatedActor has the delegated TO actor role (requested by actor role)
+        // - message.SenderRoleCode is the delegated BY actor role (original actor role)
+        // - the original actor number is found in the series based on the original actor role
         var requestedByActorNumber = ActorNumber.TryCreate(message.SenderNumber);
         var requestedByActorRole = _authenticatedActor.CurrentActorIdentity.MarketRole != null
             ? ActorRole.TryFromCode(_authenticatedActor.CurrentActorIdentity.MarketRole.Code)
             : null;
 
-        var requestedForActorRole = ActorRole.TryFromCode(message.SenderRoleCode);
+        var originalActorRole = ActorRole.TryFromCode(message.SenderRoleCode);
 
-        if (requestedByActorNumber is null || requestedByActorRole is null || requestedForActorRole is null)
+        if (requestedByActorNumber is null || requestedByActorRole is null || originalActorRole is null)
         {
             // Since actor number or actor role was invalid, there can't be setup any process delegation, so do nothing
             return;
@@ -85,27 +90,24 @@ public class IncomingMessageDelegator
 
             if (delegations.Count != 0)
             {
-                // TODO: How do we find delegatedByActorNumber if there is multiple delegations?
-                // var delegatedByActorNumber = GetDelegatedByActorNumber(series, requestedForActorRole);
-                var multipleDelegatedByActorNumbersExists = delegations.Count > 1
-                                                            && delegations
-                                                                .Select(d => d.DelegatedBy.ActorNumber)
-                                                                .Distinct()
-                                                                .Count() > 1;
-                if (multipleDelegatedByActorNumbersExists)
-                    throw new NotImplementedException($"Multiple delegations with different delegated by actor numbers are not supported. Received delegated actor numbers: {string.Join(", ", delegations.Select(d => d.DelegatedBy.ActorNumber))}");
+                var originalActorNumber = series.GetActorNumberForRole(originalActorRole);
 
-                var delegatedByActorNumber = delegations.First().DelegatedBy.ActorNumber;
-                series.DelegateSeries(delegatedByActorNumber, requestedByActorRole, delegations.Select(d => d.GridAreaCode).ToArray());
+                if (originalActorNumber == null)
+                {
+                    // Some part of the incoming message is invalid, since we cannot find the original
+                    // actor number, so do nothing
+                    _logger.LogWarning(
+                        "Cannot find original actor number for role {Role} in incoming message {DocumentType} (message id: {MessageId})",
+                        originalActorRole,
+                        documentType,
+                        message.MessageId);
+                    return;
+                }
+
+                series.DelegateSeries(originalActorNumber, requestedByActorRole, delegations.Select(d => d.GridAreaCode).ToArray());
             }
         }
     }
-
-    // private ActorNumber GetDelegatedByActorNumber(IIncomingMessageSerie series, ActorRole requestedForActorRole)
-    // {
-    //     if (requestedForActorRole == ActorRole.EnergySupplier)
-    //         return series.
-    // }
 
     private ProcessType MapToProcessType(IncomingDocumentType incomingDocumentType)
     {

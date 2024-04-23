@@ -18,16 +18,16 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
 public abstract record BaseDelegatedSeries : IDelegatedIncomingMessageSeries
 {
-    public ActorNumber? DelegatedByActorNumber { get; private set; }
+    public ActorNumber? OriginalActorNumber { get; private set; }
 
-    public ActorRole? DelegatedToActorRole { get; private set; }
+    public ActorRole? RequestedByActorRole { get; private set; }
 
     public IReadOnlyCollection<string> DelegatedGridAreas { get; private set; } = Array.Empty<string>();
 
-    public void DelegateSeries(ActorNumber delegatedByActorNumber, ActorRole delegatedToActorRole, IReadOnlyCollection<string> delegatedGridAreas)
+    public void DelegateSeries(ActorNumber originalActorNumber, ActorRole requestedByActorRole, IReadOnlyCollection<string> delegatedGridAreas)
     {
-        DelegatedByActorNumber = delegatedByActorNumber;
-        DelegatedToActorRole = delegatedToActorRole;
+        OriginalActorNumber = originalActorNumber;
+        RequestedByActorRole = requestedByActorRole;
         DelegatedGridAreas = delegatedGridAreas;
     }
 }

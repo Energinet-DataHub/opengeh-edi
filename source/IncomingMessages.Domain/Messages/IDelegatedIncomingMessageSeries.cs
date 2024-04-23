@@ -24,13 +24,13 @@ public interface IDelegatedIncomingMessageSeries
     /// <summary>
     /// Who the incoming message series is delegated by (who originally was supposed to send the message)
     /// </summary>
-    public ActorNumber? DelegatedByActorNumber { get; }
+    public ActorNumber? OriginalActorNumber { get; }
 
     /// <summary>
     /// The role of the actor which the series is delegated to
     ///     (the one who sends the message, and the queue that should receive it)
     /// </summary>
-    public ActorRole? DelegatedToActorRole { get; }
+    public ActorRole? RequestedByActorRole { get; }
 
     /// <summary>
     /// What grid areas the incoming message is delegated in (if any).
@@ -42,5 +42,5 @@ public interface IDelegatedIncomingMessageSeries
     /// <summary>
     /// Sets the incoming message series as delegated
     /// </summary>
-    public void DelegateSeries(ActorNumber delegatedByActorNumber, ActorRole delegatedToActorRole, IReadOnlyCollection<string> delegatedGridAreas);
+    public void DelegateSeries(ActorNumber originalActorNumber, ActorRole requestedByActorRole, IReadOnlyCollection<string> delegatedGridAreas);
 }

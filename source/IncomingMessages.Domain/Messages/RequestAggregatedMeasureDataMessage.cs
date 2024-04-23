@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
 public record RequestAggregatedMeasureDataMessage(
@@ -35,4 +37,10 @@ public record RequestAggregatedMeasureDataMessageSeries(
     string? GridArea,
     string? EnergySupplierMarketParticipantId,
     string? BalanceResponsiblePartyMarketParticipantId,
-    string? SettlementVersion) : BaseDelegatedSeries, IIncomingMessageSeries;
+    string? SettlementVersion) : BaseDelegatedSeries, IIncomingMessageSeries
+{
+    public ActorNumber? GetActorNumberForRole(ActorRole actorRole)
+    {
+        throw new NotImplementedException();
+    }
+}

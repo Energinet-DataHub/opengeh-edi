@@ -55,9 +55,9 @@ public static class InitializeWholesaleServicesProcessDtoFactory
                         GridAreas: gridAreas,
                         RequestedByActor: RequestedByActor.From(
                             senderActorNumber,
-                            series.DelegatedToActorRole ?? senderActorRole),
+                            series.RequestedByActorRole ?? senderActorRole),
                         OriginalActor: OriginalActor.From(
-                            series.DelegatedByActorNumber ?? senderActorNumber,
+                            series.OriginalActorNumber ?? senderActorNumber,
                             senderActorRole));
                 })
             .ToList().AsReadOnly();
