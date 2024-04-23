@@ -18,6 +18,7 @@ using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ProcessEvents;
+using Energinet.DataHub.EDI.Process.Interfaces;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 
@@ -37,10 +38,8 @@ public sealed class WholesaleServicesProcess : Entity
     /// </summary>
     public WholesaleServicesProcess(
         ProcessId processId,
-        ActorNumber requestedByActorNumber,
-        ActorRole requestedByActorRole,
-        ActorNumber requestedForActorNumber,
-        ActorRole requestedForActorRole,
+        RequestedByActor requestedByActor,
+        OriginalActor originalActor,
         BusinessTransactionId businessTransactionId,
         MessageId initiatedByMessageId,
         BusinessReason businessReason,
@@ -56,6 +55,8 @@ public sealed class WholesaleServicesProcess : Entity
     {
         ArgumentNullException.ThrowIfNull(gridAreas);
         ArgumentNullException.ThrowIfNull(processId);
+        ArgumentNullException.ThrowIfNull(requestedByActor);
+        ArgumentNullException.ThrowIfNull(originalActor);
 
         if (!string.IsNullOrEmpty(requestedGridArea) && gridAreas.Count != 1 && gridAreas.Single() != requestedGridArea)
         {
@@ -66,10 +67,8 @@ public sealed class WholesaleServicesProcess : Entity
         }
 
         ProcessId = processId;
-        RequestedByActorNumber = requestedByActorNumber;
-        RequestedByActorRole = requestedByActorRole;
-        RequestedForActorNumber = requestedForActorNumber;
-        RequestedForActorRole = requestedForActorRole;
+        RequestedByActor = requestedByActor;
+        OriginalActor = originalActor;
         BusinessTransactionId = businessTransactionId;
         InitiatedByMessageId = initiatedByMessageId;
         BusinessReason = businessReason;
@@ -111,26 +110,16 @@ public sealed class WholesaleServicesProcess : Entity
     public ProcessId ProcessId { get; }
 
     /// <summary>
-    /// The actor number of the actor that requested the wholesale services (the sender of the request)
+    /// The actor that requested the wholesale services (the sender of the request). This is typically the actor
+    /// that owns the request/process, except in case of delegation.
     /// </summary>
-    public ActorNumber RequestedByActorNumber { get; }
+    public RequestedByActor RequestedByActor { get; }
 
     /// <summary>
-    /// The actor role of the actor that requested the wholesale services (the sender of the request)
-    /// </summary>
-    public ActorRole RequestedByActorRole { get; }
-
-    /// <summary>
-    /// The actor number of the actor that the wholesale services is requested for
+    /// The original actor is the actor that the wholesale services is requested for (who owns the request/process)
     /// This can differ from RequestedByActorNumber in case of delegation
     /// </summary>
-    public ActorNumber RequestedForActorNumber { get; }
-
-    /// <summary>
-    /// The actor role of the actor that the wholesale services is requested for
-    /// This can differ from RequestedByActorNumber in case of delegation
-    /// </summary>
-    public ActorRole RequestedForActorRole { get; }
+    public OriginalActor OriginalActor { get; }
 
     public BusinessTransactionId BusinessTransactionId { get; }
 

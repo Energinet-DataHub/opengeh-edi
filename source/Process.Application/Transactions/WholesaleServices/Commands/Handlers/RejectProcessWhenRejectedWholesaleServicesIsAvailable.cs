@@ -65,14 +65,14 @@ public sealed class
             process.BusinessTransactionId.Id);
 
         return new RejectedWholesaleServicesMessageDto(
-            receiverNumber: process.RequestedByActorNumber,
+            receiverNumber: process.RequestedByActor.ActorNumber,
             processId: process.ProcessId.Id,
             eventId: eventId,
             businessReason: process.BusinessReason.Name,
-            receiverRole: process.RequestedByActorRole,
+            receiverRole: process.RequestedByActor.ActorRole,
             relatedToMessageId: process.InitiatedByMessageId,
             series: rejectedWholesaleServices,
-            documentReceiverNumber: process.RequestedForActorNumber,
-            documentReceiverRole: process.RequestedForActorRole);
+            documentReceiverNumber: process.OriginalActor.ActorNumber,
+            documentReceiverRole: process.OriginalActor.ActorRole);
     }
 }

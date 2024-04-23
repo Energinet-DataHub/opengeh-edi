@@ -67,10 +67,10 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         outgoingMessage
             .HasProcessId(process.ProcessId)
             .HasEventId(eventId)
-            .HasReceiverId(process.RequestedByActorNumber.Value)
-            .HasDocumentReceiverId(process.RequestedByActorNumber.Value)
-            .HasReceiverRole(process.RequestedByActorRole.Code)
-            .HasDocumentReceiverRole(process.RequestedByActorRole.Code)
+            .HasReceiverId(process.RequestedByActor.ActorNumber.Value)
+            .HasDocumentReceiverId(process.OriginalActor.ActorNumber.Value)
+            .HasReceiverRole(process.RequestedByActor.ActorRole.Code)
+            .HasDocumentReceiverRole(process.OriginalActor.ActorRole.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasRelationTo(process.InitiatedByMessageId)
@@ -104,10 +104,10 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         var outgoingMessage = await OutgoingMessageAsync(ActorRole.EnergySupplier, BusinessReason.WholesaleFixing);
         outgoingMessage.Should().NotBeNull();
         outgoingMessage
-            .HasReceiverId(process.RequestedByActorNumber.Value)
-            .HasDocumentReceiverId(process.RequestedByActorNumber.Value)
-            .HasReceiverRole(process.RequestedByActorRole.Code)
-            .HasDocumentReceiverRole(process.RequestedByActorRole.Code)
+            .HasReceiverId(process.RequestedByActor.ActorNumber.Value)
+            .HasDocumentReceiverId(process.OriginalActor.ActorNumber.Value)
+            .HasReceiverRole(process.RequestedByActor.ActorRole.Code)
+            .HasDocumentReceiverRole(process.OriginalActor.ActorRole.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasRelationTo(process.InitiatedByMessageId)

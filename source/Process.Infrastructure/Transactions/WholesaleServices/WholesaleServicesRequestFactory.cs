@@ -45,8 +45,8 @@ public static class WholesaleServicesRequestFactory
     {
         var request = new WholesaleServicesRequest()
         {
-            RequestedForActorNumber = process.RequestedForActorNumber.Value,
-            RequestedForActorRole = process.RequestedForActorRole.Name,
+            RequestedForActorNumber = process.OriginalActor.ActorNumber.Value,
+            RequestedForActorRole = process.OriginalActor.ActorRole.Name,
             BusinessReason = process.BusinessReason.Name,
             PeriodStart = process.StartOfPeriod,
         };

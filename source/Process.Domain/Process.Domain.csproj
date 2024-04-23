@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
     <ProjectReference Include="..\OutgoingMessages.Interfaces\OutgoingMessages.Interfaces.csproj" />
+    <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
   </ItemGroup>
 
   <ItemGroup>

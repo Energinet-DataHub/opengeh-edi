@@ -84,8 +84,6 @@ public class InitializeWholesaleServicesProcessDtoBuilder
     internal InitializeWholesaleServicesProcessDto Build()
     {
         return new InitializeWholesaleServicesProcessDto(
-            _senderId,
-            _senderRole,
             _businessReason,
             _messageId,
             new List<InitializeWholesaleServicesSeries> { CreateSeries() }.AsReadOnly());
@@ -103,8 +101,8 @@ public class InitializeWholesaleServicesProcessDtoBuilder
             _chargeOwner,
             new List<InitializeWholesaleServicesChargeType> { CreateChargeType() }.AsReadOnly(),
             new List<string> { _gridArea },
-            _senderId,
-            _senderRole);
+            RequestedByActor.From(_senderId, _senderRole),
+            OriginalActor.From(_senderId, _senderRole));
 
     private InitializeWholesaleServicesChargeType CreateChargeType() =>
         new(_chargeTypeId, _chargeTypeType);

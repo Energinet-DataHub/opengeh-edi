@@ -53,14 +53,16 @@ public static class InitializeWholesaleServicesProcessDtoFactory
                             .ToList()
                             .AsReadOnly(),
                         GridAreas: gridAreas,
-                        RequestedForActorNumber: series.DelegatedByActorNumber ?? senderActorNumber,
-                        RequestedByActorRole: series.DelegatedToActorRole ?? senderActorRole);
+                        RequestedByActor: RequestedByActor.From(
+                            senderActorNumber,
+                            series.DelegatedToActorRole ?? senderActorRole),
+                        OriginalActor: OriginalActor.From(
+                            series.DelegatedByActorNumber ?? senderActorNumber,
+                            senderActorRole));
                 })
             .ToList().AsReadOnly();
 
         return new InitializeWholesaleServicesProcessDto(
-                RequestedByActorNumber: senderActorNumber,
-                RequestedForActorRole: senderActorRole,
                 BusinessReason: wholesaleServicesMessage.BusinessReason,
                 MessageId: wholesaleServicesMessage.MessageId,
                 Series: series);

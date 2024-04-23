@@ -64,7 +64,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         await InvokeCommandAsync(new InitializeWholesaleServicesProcessesCommand(marketMessage));
 
         // Assert
-        var process = GetProcess(marketMessage.RequestedByActorNumber);
+        var process = GetProcess(marketMessage.Series.Single().RequestedByActor.ActorNumber);
         process.Should().NotBeNull();
         process!.BusinessTransactionId.Id.Should().Be(marketMessage.Series.First().Id);
         process.Should().BeEquivalentTo(marketMessage, opt => opt.Using(new ProcessAndRequestComparer()));
@@ -84,7 +84,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         await ProcessInternalCommandsAsync();
 
         // Assert
-        var process = GetProcess(marketMessage.RequestedByActorNumber);
+        var process = GetProcess(marketMessage.Series.Single().RequestedByActor.ActorNumber);
         var message = _senderSpy.Message;
         message.Should().NotBeNull();
         message!.Subject.Should().Be(exceptedServiceBusMessageSubject);
@@ -114,7 +114,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
 
         _senderSpy.MessageSent.Should().BeTrue();
 
-        var process = GetProcess(marketMessage.RequestedByActorNumber);
+        var process = GetProcess(marketMessage.Series.Single().RequestedByActor.ActorNumber);
         process.Should().NotBeNull();
         await AssertProcessState(marketMessage.MessageId, WholesaleServicesProcess.State.Sent);
 
@@ -163,7 +163,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         await InvokeCommandAsync(new InitializeWholesaleServicesProcessesCommand(marketMessage));
         await ProcessInternalCommandsAsync();
         _senderSpy.Reset();
-        var process = GetProcess(marketMessage.RequestedByActorNumber);
+        var process = GetProcess(marketMessage.Series.Single().RequestedByActor.ActorNumber);
 
         // Act
         process!.SendToWholesale();
@@ -218,7 +218,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
     {
         return _processContext.WholesaleServicesProcesses
             .ToList()
-            .FirstOrDefault(x => x.RequestedByActorNumber.Value == senderNumber.Value);
+            .FirstOrDefault(x => x.RequestedByActor.ActorNumber.Value == senderNumber.Value);
     }
 
     private sealed class ProcessAndRequestComparer : IEquivalencyStep
@@ -240,20 +240,12 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
                             (p, r, s) => p.BusinessTransactionId.Id.Should().Be(s.Id)
                         },
                         {
-                            nameof(WholesaleServicesProcess.RequestedByActorNumber),
-                            (p, r, s) => p.RequestedByActorNumber.Should().Be(r.RequestedByActorNumber)
+                            nameof(WholesaleServicesProcess.RequestedByActor),
+                            (p, r, s) => p.RequestedByActor.Should().Be(s.RequestedByActor)
                         },
                         {
-                            nameof(WholesaleServicesProcess.RequestedByActorRole),
-                            (p, r, s) => p.RequestedByActorRole.Should().Be(s.RequestedByActorRole)
-                        },
-                        {
-                            nameof(WholesaleServicesProcess.RequestedForActorNumber),
-                            (p, r, s) => p.RequestedForActorNumber.Should().Be(s.RequestedForActorNumber)
-                        },
-                        {
-                            nameof(WholesaleServicesProcess.RequestedForActorRole),
-                            (p, r, s) => p.RequestedForActorRole.Should().Be(r.RequestedForActorRole)
+                            nameof(WholesaleServicesProcess.OriginalActor),
+                            (p, r, s) => p.OriginalActor.Should().Be(s.OriginalActor)
                         },
                         {
                             nameof(WholesaleServicesProcess.BusinessReason),

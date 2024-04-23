@@ -19,8 +19,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 namespace Energinet.DataHub.EDI.Process.Interfaces;
 
 public record InitializeWholesaleServicesProcessDto(
-    ActorNumber RequestedByActorNumber,
-    ActorRole RequestedForActorRole,
+    // ActorNumber RequestedByActorNumber,
+    // ActorRole RequestedForActorRole,
     string BusinessReason,
     string MessageId,
     IReadOnlyCollection<InitializeWholesaleServicesSeries> Series);
@@ -36,7 +36,7 @@ public record InitializeWholesaleServicesSeries(
     string? ChargeOwner,
     IReadOnlyCollection<InitializeWholesaleServicesChargeType> ChargeTypes,
     IReadOnlyCollection<string> GridAreas,
-    ActorNumber RequestedForActorNumber,
-    ActorRole RequestedByActorRole);
+    RequestedByActor RequestedByActor,
+    OriginalActor OriginalActor);
 
 public record InitializeWholesaleServicesChargeType(string? Id, string? Type);

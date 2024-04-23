@@ -47,23 +47,39 @@ internal sealed class WholesaleServicesProcessEntityConfiguration : IEntityTypeC
                 value => value.Code,
                 dbValue => BusinessReason.FromCodeOrUnused(dbValue));
 
-        builder.Property(x => x.RequestedByActorNumber)
-            .HasConversion(
-                toDbValue => toDbValue.Value,
-                fromDbValue => ActorNumber.Create(fromDbValue));
-        builder.Property(x => x.RequestedByActorRole)
-            .HasConversion(
-                toDbValue => toDbValue.Code,
-                fromDbValue => ActorRole.FromCode(fromDbValue));
+        builder.OwnsOne(
+            x => x.RequestedByActor,
+            actor =>
+            {
+                actor.Property(a => a.ActorNumber)
+                    .HasColumnName("RequestedByActorNumber")
+                    .HasConversion(
+                        actorNumber => actorNumber.Value,
+                        dbValue => ActorNumber.Create(dbValue));
 
-        builder.Property(x => x.RequestedForActorNumber)
-            .HasConversion(
-                toDbValue => toDbValue.Value,
-                fromDbValue => ActorNumber.Create(fromDbValue));
-        builder.Property(x => x.RequestedForActorRole)
-            .HasConversion(
-                toDbValue => toDbValue.Code,
-                fromDbValue => ActorRole.FromCode(fromDbValue));
+                actor.Property(a => a.ActorRole)
+                    .HasColumnName("RequestedByActorRole")
+                    .HasConversion(
+                        actorRole => actorRole.Code,
+                        dbValue => ActorRole.FromCode(dbValue));
+            });
+
+        builder.OwnsOne(
+            x => x.OriginalActor,
+            actor =>
+            {
+                actor.Property(a => a.ActorNumber)
+                    .HasColumnName("OriginalActorNumber")
+                    .HasConversion(
+                        actorNumber => actorNumber.Value,
+                        dbValue => ActorNumber.Create(dbValue));
+
+                actor.Property(a => a.ActorRole)
+                    .HasColumnName("OriginalActorRole")
+                    .HasConversion(
+                        actorRole => actorRole.Code,
+                        dbValue => ActorRole.FromCode(dbValue));
+            });
 
         builder.Property<WholesaleServicesProcess.State>("_state")
             .HasConversion(

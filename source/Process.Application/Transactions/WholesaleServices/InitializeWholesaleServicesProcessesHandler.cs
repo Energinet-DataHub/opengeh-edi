@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Process.Domain;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Interfaces;
@@ -46,8 +47,6 @@ public class InitializeWholesaleServicesProcessesHandler : IRequestHandler<Initi
 
     private void CreateWholesaleServicesProcess(InitializeWholesaleServicesProcessDto initializeProcessDto)
     {
-        var requestedByActorNumber = initializeProcessDto.RequestedByActorNumber;
-        var requestedForActorRole = initializeProcessDto.RequestedForActorRole;
         var businessReason = BusinessReason.FromCodeOrUnused(initializeProcessDto.BusinessReason);
         var messageId = MessageId.Create(initializeProcessDto.MessageId);
 
@@ -68,10 +67,8 @@ public class InitializeWholesaleServicesProcessesHandler : IRequestHandler<Initi
             _wholesaleServicesProcessRepository.Add(
                 new WholesaleServicesProcess(
                     processId: ProcessId.New(),
-                    requestedByActorNumber: requestedByActorNumber,
-                    requestedByActorRole: series.RequestedByActorRole,
-                    requestedForActorNumber: series.RequestedForActorNumber,
-                    requestedForActorRole: requestedForActorRole,
+                    series.RequestedByActor,
+                    series.OriginalActor,
                     businessTransactionId: BusinessTransactionId.Create(series.Id),
                     initiatedByMessageId: messageId,
                     businessReason: businessReason,

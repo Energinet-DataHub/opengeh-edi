@@ -15,8 +15,10 @@
 using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Process.Domain;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
+using Energinet.DataHub.EDI.Process.Interfaces;
 using ChargeType = Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ChargeType;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.WholesaleServices;
@@ -74,10 +76,12 @@ public class WholesaleServicesProcessBuilder
     {
         var chargeTypes = BuildChargeTypes();
 
+        var requestedByActor = RequestedByActor.From(_senderNumber, _senderRole);
+
         var process = new WholesaleServicesProcess(
             _processId,
-            _senderNumber,
-            _senderRole,
+            requestedByActor,
+            OriginalActor.From(requestedByActor),
             _businessTransactionId,
             _messageId,
             _businessReason,
