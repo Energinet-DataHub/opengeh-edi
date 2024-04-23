@@ -36,12 +36,14 @@ public sealed class WhenEnergyResultRequestTests
 
         var ediDriver = new EdiDriver(fixture.B2BEnergySupplierAuthorizedHttpClient);
         var ediProcessesDriver = new EdiProcessesDriver(fixture.ConnectionString);
+        var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
 
         _notifyAggregatedMeasureDataResultDsl = new NotifyAggregatedMeasureDataResultDsl(
             ediDriver,
-            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
+            wholesaleDriver);
 
-        _aggregatedMeasureDataRequestDsl = new AggregatedMeasureDataRequestDsl(ediDriver, ediProcessesDriver);
+        _aggregatedMeasureDataRequestDsl =
+            new AggregatedMeasureDataRequestDsl(ediDriver, ediProcessesDriver, wholesaleDriver);
     }
 
     [Fact]
@@ -74,7 +76,7 @@ public sealed class WhenEnergyResultRequestTests
             AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
             CancellationToken.None);
 
-        await _notifyAggregatedMeasureDataResultDsl.PublishAggregatedMeasureDataRequestAcceptedResponseFor(
+        await _aggregatedMeasureDataRequestDsl.PublishAggregatedMeasureDataRequestAcceptedResponseAsync(
             processId,
             gridAreaCode,
             CancellationToken.None);
@@ -92,7 +94,7 @@ public sealed class WhenEnergyResultRequestTests
             AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
             CancellationToken.None);
 
-        await _notifyAggregatedMeasureDataResultDsl.PublishAggregatedMeasureDataRequestRejectedResponseFor(
+        await _aggregatedMeasureDataRequestDsl.PublishAggregatedMeasureDataRequestRejectedResponseAsync(
             processId,
             CancellationToken.None);
 

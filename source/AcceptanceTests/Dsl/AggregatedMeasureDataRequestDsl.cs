@@ -23,13 +23,18 @@ public sealed class AggregatedMeasureDataRequestDsl
 {
     private readonly EdiDriver _ediDriver;
     private readonly EdiProcessesDriver _ediProcessesDriver;
+    private readonly WholesaleDriver _wholesaleDriver;
 
 #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
 
-    internal AggregatedMeasureDataRequestDsl(EdiDriver ediDriver, EdiProcessesDriver ediProcessesDriver)
+    internal AggregatedMeasureDataRequestDsl(
+        EdiDriver ediDriver,
+        EdiProcessesDriver ediProcessesDriver,
+        WholesaleDriver wholesaleDriver)
     {
         _ediDriver = ediDriver;
         _ediProcessesDriver = ediProcessesDriver;
+        _wholesaleDriver = wholesaleDriver;
     }
 
     internal Task<string> AggregatedMeasureDataWithXmlPayload(XmlDocument payload)
@@ -74,6 +79,25 @@ public sealed class AggregatedMeasureDataRequestDsl
     {
         return await _ediProcessesDriver
             .CreateAggregatedMeasureDataProcessAsync(gridAreaCode, actorNumber, cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    internal async Task PublishAggregatedMeasureDataRequestAcceptedResponseAsync(
+        Guid processId,
+        string gridAreaCode,
+        CancellationToken cancellationToken)
+    {
+        await _wholesaleDriver.PublishAggregatedMeasureDataRequestAcceptedResponseAsync(
+            processId,
+            gridAreaCode,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    internal async Task PublishAggregatedMeasureDataRequestRejectedResponseAsync(
+        Guid processId,
+        CancellationToken cancellationToken)
+    {
+        await _wholesaleDriver.PublishAggregatedMeasureDataRequestRejectedResponseAsync(processId, cancellationToken)
             .ConfigureAwait(false);
     }
 }

@@ -19,20 +19,20 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
 internal sealed class NotifyAggregatedMeasureDataResultDsl
 {
-    private readonly WholesaleDriver _wholesale;
+    private readonly WholesaleDriver _wholesaleDriver;
     private readonly EdiDriver _edi;
 
     #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
 
-    internal NotifyAggregatedMeasureDataResultDsl(EdiDriver ediDriver, WholesaleDriver wholesaleDriver)
+    internal NotifyAggregatedMeasureDataResultDsl(EdiDriver ediDriver, WholesaleDriver wholesaleDriverDriver)
     {
         _edi = ediDriver;
-        _wholesale = wholesaleDriver;
+        _wholesaleDriver = wholesaleDriverDriver;
     }
 
     internal Task PublishResultFor(string gridAreaCode)
     {
-        return _wholesale.PublishAggregationResultAsync(gridAreaCode);
+        return _wholesaleDriver.PublishAggregationResultAsync(gridAreaCode);
     }
 
     internal async Task ConfirmResultIsAvailableFor()
@@ -60,24 +60,5 @@ internal sealed class NotifyAggregatedMeasureDataResultDsl
     internal async Task EmptyQueueForActor()
     {
         await _edi.EmptyQueueAsync().ConfigureAwait(false);
-    }
-
-    internal async Task PublishAggregatedMeasureDataRequestAcceptedResponseFor(
-        Guid processId,
-        string gridAreaCode,
-        CancellationToken cancellationToken)
-    {
-        await _wholesale.PublishAggregatedMeasureDataRequestAcceptedResponseAsync(
-            processId,
-            gridAreaCode,
-            cancellationToken).ConfigureAwait(false);
-    }
-
-    internal async Task PublishAggregatedMeasureDataRequestRejectedResponseFor(
-        Guid processId,
-        CancellationToken cancellationToken)
-    {
-        await _wholesale.PublishAggregatedMeasureDataRequestRejectedResponseAsync(processId, cancellationToken)
-            .ConfigureAwait(false);
     }
 }

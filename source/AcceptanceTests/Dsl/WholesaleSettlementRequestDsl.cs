@@ -18,18 +18,23 @@ using FluentAssertions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
-public sealed class WholesaleServicesRequestDsl
+public sealed class WholesaleSettlementRequestDsl
 {
     private readonly EdiProcessesDriver _ediProcessesDriver;
     private readonly EdiDriver _ediDriver;
+    private readonly WholesaleDriver _wholesaleDriver;
 
-    internal WholesaleServicesRequestDsl(EdiProcessesDriver ediProcessesDriver, EdiDriver ediDriver)
+    internal WholesaleSettlementRequestDsl(
+        EdiProcessesDriver ediProcessesDriver,
+        EdiDriver ediDriver,
+        WholesaleDriver wholesaleDriver)
     {
         _ediProcessesDriver = ediProcessesDriver;
         _ediDriver = ediDriver;
+        _wholesaleDriver = wholesaleDriver;
     }
 
-    internal async Task<Guid> InitializeWholesaleServicesRequestAsync(
+    internal async Task<Guid> InitializeWholesaleSettlementRequestAsync(
         string gridAreaCode,
         string actorNumber,
         CancellationToken cancellationToken)
@@ -67,5 +72,29 @@ public sealed class WholesaleServicesRequestDsl
             .ConfigureAwait(false);
 
         processId.Should().NotBeNull();
+    }
+
+    internal async Task PublishWholesaleServicesRequestAcceptedResponseAsync(
+        Guid processId,
+        string gridAreaCode,
+        string energySupplierNumber,
+        string chargeOwnerNumber,
+        CancellationToken cancellationToken)
+    {
+        await _wholesaleDriver.PublishWholesaleServicesRequestAcceptedResponseAsync(
+            processId,
+            gridAreaCode,
+            energySupplierNumber,
+            chargeOwnerNumber,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    internal async Task PublishWholesaleServicesRequestRejectedResponseAsync(
+        Guid processId,
+        CancellationToken cancellationToken)
+    {
+        await _wholesaleDriver.PublishWholesaleServicesRequestRejectedResponseAsync(
+            processId,
+            cancellationToken).ConfigureAwait(false);
     }
 }

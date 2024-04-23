@@ -85,7 +85,10 @@ internal sealed class EdiProcessesDriver
 
         var stopWatch = Stopwatch.StartNew();
 
-        command.CommandText = "SELECT ProcessId FROM [WholesaleServicesProcesses] WHERE InitiatedByMessageId = @InitiatedByMessageId";
+        // To avoid receiving a unexpected response on the process in a later test, we mark the process as stopped.
+        command.CommandText = @"
+            UPDATE [WholesaleServicesProcesses] SET State = 'Stopped' WHERE InitiatedByMessageId = @InitiatedByMessageId;
+            SELECT ProcessId FROM [WholesaleServicesProcesses] WHERE InitiatedByMessageId = @InitiatedByMessageId";
         command.Parameters.AddWithValue("@InitiatedByMessageId", initiatedByMessageId.ToString());
         command.Connection = connection;
 
@@ -110,7 +113,10 @@ internal sealed class EdiProcessesDriver
 
         var stopWatch = Stopwatch.StartNew();
 
-        command.CommandText = "SELECT ProcessId FROM [AggregatedMeasureDataProcesses] WHERE InitiatedByMessageId = @InitiatedByMessageId";
+        // To avoid receiving a unexpected response on the process in a later test, we mark the process as stopped.
+        command.CommandText = @"
+            UPDATE [AggregatedMeasureDataProcesses] SET State = 'Stopped' WHERE InitiatedByMessageId = @InitiatedByMessageId;
+            SELECT ProcessId FROM [AggregatedMeasureDataProcesses] WHERE InitiatedByMessageId = @InitiatedByMessageId";
         command.Parameters.AddWithValue("@InitiatedByMessageId", initiatedByMessageId.ToString());
         command.Connection = connection;
 

@@ -28,7 +28,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 public sealed class WhenWholesaleSettlementRequestTests
 {
     private readonly NotifyWholesaleServicesDsl _notifyWholesaleServicesDsl;
-    private readonly WholesaleServicesRequestDsl _wholesaleServicesRequestDsl;
+    private readonly WholesaleSettlementRequestDsl _wholesaleSettlementRequestDsl;
 
     public WhenWholesaleSettlementRequestTests(AcceptanceTestFixture fixture)
     {
@@ -36,11 +36,14 @@ public sealed class WhenWholesaleSettlementRequestTests
 
         var ediDriver = new EdiDriver(fixture.B2BSystemOperatorAuthorizedHttpClient);
         var ediProcessesDriver = new EdiProcessesDriver(fixture.ConnectionString);
+        var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
+
         _notifyWholesaleServicesDsl = new NotifyWholesaleServicesDsl(
             ediDriver,
-            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
+            wholesaleDriver);
 
-        _wholesaleServicesRequestDsl = new WholesaleServicesRequestDsl(ediProcessesDriver, ediDriver);
+        _wholesaleSettlementRequestDsl =
+            new WholesaleSettlementRequestDsl(ediProcessesDriver, ediDriver, wholesaleDriver);
     }
 
     [Fact]
@@ -48,9 +51,9 @@ public sealed class WhenWholesaleSettlementRequestTests
     {
         await _notifyWholesaleServicesDsl.EmptyQueueForActor();
 
-        var messageId = await _wholesaleServicesRequestDsl.RequestAsync(CancellationToken.None);
+        var messageId = await _wholesaleSettlementRequestDsl.RequestAsync(CancellationToken.None);
 
-        await _wholesaleServicesRequestDsl.ConfirmRequestIsInitiatedAsync(
+        await _wholesaleSettlementRequestDsl.ConfirmRequestIsInitiatedAsync(
             messageId,
             CancellationToken.None);
     }
@@ -60,7 +63,7 @@ public sealed class WhenWholesaleSettlementRequestTests
     {
         await _notifyWholesaleServicesDsl.EmptyQueueForActor();
 
-        await _wholesaleServicesRequestDsl.RequestWithInvalidMessageAsync(CancellationToken.None);
+        await _wholesaleSettlementRequestDsl.RequestWithInvalidMessageAsync(CancellationToken.None);
     }
 
     [Fact]
@@ -68,12 +71,12 @@ public sealed class WhenWholesaleSettlementRequestTests
     {
         await _notifyWholesaleServicesDsl.EmptyQueueForActor();
         var gridAreaCode = "888";
-        var processId = await _wholesaleServicesRequestDsl.InitializeWholesaleServicesRequestAsync(
+        var processId = await _wholesaleSettlementRequestDsl.InitializeWholesaleSettlementRequestAsync(
             gridAreaCode,
             AcceptanceTestFixture.EZTestCimActorNumber,
             CancellationToken.None);
 
-        await _notifyWholesaleServicesDsl.PublishWholesaleServicesRequestAcceptedResponseFor(
+        await _wholesaleSettlementRequestDsl.PublishWholesaleServicesRequestAcceptedResponseAsync(
             processId,
             gridAreaCode,
             AcceptanceTestFixture.ActorNumber,
@@ -88,12 +91,12 @@ public sealed class WhenWholesaleSettlementRequestTests
     {
         await _notifyWholesaleServicesDsl.EmptyQueueForActor();
         var gridAreaCode = "888";
-        var processId = await _wholesaleServicesRequestDsl.InitializeWholesaleServicesRequestAsync(
+        var processId = await _wholesaleSettlementRequestDsl.InitializeWholesaleSettlementRequestAsync(
             gridAreaCode,
             AcceptanceTestFixture.EZTestCimActorNumber,
             CancellationToken.None);
 
-        await _notifyWholesaleServicesDsl.PublishWholesaleServicesRequestRejectedResponseFor(
+        await _wholesaleSettlementRequestDsl.PublishWholesaleServicesRequestRejectedResponseAsync(
             processId,
             CancellationToken.None);
 

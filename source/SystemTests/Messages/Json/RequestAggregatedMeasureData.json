@@ -1,6 +1,6 @@
 {
   "RequestAggregatedMeasureData_MarketDocument": {
-      "mRID": "{MessageId}",
+    "mRID": "{MessageId}",
     "businessSector.type": {
       "value": "23"
     },

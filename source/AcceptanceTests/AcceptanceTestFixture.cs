@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Net.Http.Headers;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration; // DO NOT REMOVE THIS! use in debug mode
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Microsoft.Extensions.Configuration;
@@ -31,7 +30,6 @@ public class AcceptanceTestFixture : IAsyncLifetime
     internal const string ActorRole = "metereddataresponsible";
 
     internal const string EdiSubsystemTestCimEnergySupplierNumber = "5790000392551"; // Corresponds to the "EDI - SUBSYSTEM TEST CIM" in the UI. Same as B2BEnergySupplierAuthorizedHttpClient
-    internal const string EdiSubsystemTestCimActorNumber = "5790001330551"; // Corresponds to the "EDI - SUBSYSTEM TEST CIM" in the UI.
     internal const string EZTestCimActorNumber = "5790001330552"; // Corresponds to the "EDI - SUBSYSTEM TEST SYSTEM OPERATØR". Same as B2BSystemOperatorAuthorizedHttpClient
     internal const string ChargeOwnerId = "5790000391919"; // For now is a dummy value, but when we support multiple receivers, this will be the charge owners GLN.
 
@@ -44,7 +42,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
     public AcceptanceTestFixture()
     {
         var configurationBuilder = new ConfigurationBuilder()
-            .AddJsonFile("acceptancetest.dev001.settings.json", true)
+            .AddJsonFile("acceptancetest.dev002.settings.json", true)
             .AddEnvironmentVariables();
 
         var jsonConfiguration = configurationBuilder.Build();

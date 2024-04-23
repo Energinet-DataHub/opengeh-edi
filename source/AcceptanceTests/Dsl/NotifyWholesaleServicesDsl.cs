@@ -19,20 +19,20 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
 internal sealed class NotifyWholesaleServicesDsl
 {
-    private readonly WholesaleDriver _wholesale;
+    private readonly WholesaleDriver _wholesaleDriver;
     private readonly EdiDriver _edi;
 
     #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
 
-    internal NotifyWholesaleServicesDsl(EdiDriver ediDriver, WholesaleDriver wholesaleDriver)
+    internal NotifyWholesaleServicesDsl(EdiDriver ediDriver, WholesaleDriver wholesaleDriverDriver)
     {
         _edi = ediDriver;
-        _wholesale = wholesaleDriver;
+        _wholesaleDriver = wholesaleDriverDriver;
     }
 
     internal Task PublishMonthlyChargeResultFor(string gridAreaCode, string energySupplierId, string chargeOwnerId)
     {
-        return _wholesale.PublishMonthlyAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId);
+        return _wholesaleDriver.PublishMonthlyAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId);
     }
 
     internal Task PublishAmountPerChargeResultFor(
@@ -40,7 +40,7 @@ internal sealed class NotifyWholesaleServicesDsl
         string energySupplierId,
         string chargeOwnerId)
     {
-        return _wholesale.PublishAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId);
+        return _wholesaleDriver.PublishAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId);
     }
 
     internal async Task<string> ConfirmResultIsAvailableFor()
@@ -69,29 +69,5 @@ internal sealed class NotifyWholesaleServicesDsl
     internal async Task EmptyQueueForActor()
     {
         await _edi.EmptyQueueAsync().ConfigureAwait(false);
-    }
-
-    internal async Task PublishWholesaleServicesRequestAcceptedResponseFor(
-        Guid processId,
-        string gridAreaCode,
-        string energySupplierNumber,
-        string chargeOwnerNumber,
-        CancellationToken cancellationToken)
-    {
-        await _wholesale.PublishWholesaleServicesRequestAcceptedResponseAsync(
-            processId,
-            gridAreaCode,
-            energySupplierNumber,
-            chargeOwnerNumber,
-            cancellationToken).ConfigureAwait(false);
-    }
-
-    internal async Task PublishWholesaleServicesRequestRejectedResponseFor(
-        Guid processId,
-        CancellationToken cancellationToken)
-    {
-        await _wholesale.PublishWholesaleServicesRequestRejectedResponseAsync(
-            processId,
-            cancellationToken).ConfigureAwait(false);
     }
 }
