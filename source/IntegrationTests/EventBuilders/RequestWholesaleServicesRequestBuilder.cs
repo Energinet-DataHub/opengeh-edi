@@ -26,7 +26,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 internal static class RequestWholesaleServicesRequestBuilder
 {
     /// <summary>
-    /// Create a stream containing a RequestWholesaleSettlement message in JSON format (not monthly)
+    /// Create a stream containing a RequestWholesaleSettlement message in the specified format
     /// </summary>
     public static IncomingMessageStream GetStream(
         DocumentFormat format,
@@ -204,7 +204,7 @@ internal static class RequestWholesaleServicesRequestBuilder
 		{GetCimXmlGridAreaSection(gridArea)}
 		<cim:energySupplier_MarketParticipant.mRID codingScheme=""A10"">{energySupplierActorNumber}</cim:energySupplier_MarketParticipant.mRID>
 		<cim:chargeTypeOwner_MarketParticipant.mRID codingScheme=""A10"">{chargeOwnerActorNumber}</cim:chargeTypeOwner_MarketParticipant.mRID>
-		{GetCimXmlResolutionSection(isMonthly)} //
+		{GetCimXmlResolutionSection(isMonthly)}
 		<cim:ChargeType>
 			<cim:type>{chargeType}</cim:type>
 			<cim:mRID>{chargeCode}</cim:mRID>

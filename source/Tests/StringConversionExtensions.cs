@@ -15,7 +15,7 @@
 using System.Globalization;
 using FluentAssertions;
 
-namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
+namespace Energinet.DataHub.EDI.Tests;
 
 public static class StringConversionExtensions
 {

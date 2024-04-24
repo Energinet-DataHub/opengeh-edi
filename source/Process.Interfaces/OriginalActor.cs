@@ -19,7 +19,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 namespace Energinet.DataHub.EDI.Process.Interfaces;
 
 /// <summary>
-/// The original actor who the request is made for.
+/// The actor who a request/process is made on behalf of (the original actor is the actor who owns the data,
+/// not necessarily the actor who made the request, in case of delegation).
 /// </summary>
 [Serializable]
 public record OriginalActor
