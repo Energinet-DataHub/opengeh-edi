@@ -29,7 +29,8 @@ public class AcceptanceTestFixture : IAsyncLifetime
     internal const string ActorNumber = "5790000610976"; // Corresponds to the "Mosaic 03" actor in the UI.
     internal const string ActorRole = "metereddataresponsible";
 
-    internal const string EdiSubsystemTestCimActorNumber = "5790000392551"; // Corresponds to the "EDI - SUBSYSTEM TEST CIM" in the UI.
+    internal const string EdiSubsystemTestCimEnergySupplierNumber = "5790000392551"; // Corresponds to the "EDI - SUBSYSTEM TEST CIM" in the UI. Same as B2BEnergySupplierAuthorizedHttpClient
+    internal const string EZTestCimActorNumber = "5790001330552"; // Corresponds to the "EDI - SUBSYSTEM TEST SYSTEM OPERATØR". Same as B2BSystemOperatorAuthorizedHttpClient
     internal const string ChargeOwnerId = "5790000391919"; // For now is a dummy value, but when we support multiple receivers, this will be the charge owners GLN.
 
     private readonly Uri _azureEntraB2CTenantUrl;
@@ -58,6 +59,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
         var serviceBusConnectionString = root.GetValue<string>("sb-domain-relay-manage-connection-string") ?? throw new InvalidOperationException("sb-domain-relay-manage-connection-string secret is not set in configuration");
         var topicName = root.GetValue<string>("sbt-shres-integrationevent-received-name") ?? throw new InvalidOperationException("sbt-shres-integrationevent-received-name secret is not set in configuration");
+        var ediInboxQueueName = root.GetValue<string>("sbq-edi-inbox-messagequeue-name") ?? throw new InvalidOperationException("sbq-edi-inbox-messagequeue-name secret is not set in configuration");
 
         var azureB2CTenantId = root.GetValue<string>("b2c-tenant-id") ?? "e9aa9b15-7200-441e-b255-927506b3494";
         var azureEntraBackendAppId = root.GetValue<string>("backend-b2b-app-id") ?? throw new InvalidOperationException("backend-b2b-app-id is not set in configuration");
@@ -85,12 +87,15 @@ public class AcceptanceTestFixture : IAsyncLifetime
         _b2cUsername = root.GetValue<string>("B2C_USERNAME") ?? throw new InvalidOperationException("B2C_USERNAME is not set in configuration");
         _b2cPassword = root.GetValue<string>("B2C_PASSWORD") ?? throw new InvalidOperationException("B2C_PASSWORD is not set in configuration");
         EventPublisher = new IntegrationEventPublisher(serviceBusConnectionString, topicName);
+        EdiInboxClient = new EdiInboxClient(ediInboxQueueName, serviceBusConnectionString);
         B2CAuthorizedHttpClient = new AsyncLazy<HttpClient>(CreateB2CAuthorizedHttpClientAsync);
     }
 
     internal Uri MarketParticipantUri { get; }
 
     internal IntegrationEventPublisher EventPublisher { get; }
+
+    internal EdiInboxClient EdiInboxClient { get; }
 
     internal string ConnectionString { get; }
 
