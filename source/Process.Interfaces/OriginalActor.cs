@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 namespace Energinet.DataHub.EDI.Process.Interfaces;
 
 /// <summary>
-/// The original actor who owns the request/process data.
+/// The original actor who the request is made for.
 /// </summary>
 [Serializable]
 public record OriginalActor

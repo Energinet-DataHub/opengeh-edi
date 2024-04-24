@@ -28,9 +28,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
 public static class WholesaleServicesResponseEventBuilder
 {
-    // public const string DefaultChargeOwnerId = "5799999933444";
-    // public static readonly IReadOnlyCollection<string> DefaultGridAreas = new List<string> { "893", "917" };
-
     /// <summary>
     /// Generate a mock WholesaleRequestAccepted response from Wholesale, based on the WholesaleServicesRequest
     /// It is very important that the generated data is correct, since assertions is based on this data

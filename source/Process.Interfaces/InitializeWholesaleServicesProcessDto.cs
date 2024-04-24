@@ -19,8 +19,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 namespace Energinet.DataHub.EDI.Process.Interfaces;
 
 public record InitializeWholesaleServicesProcessDto(
-    // ActorNumber RequestedByActorNumber,
-    // ActorRole RequestedForActorRole,
     string BusinessReason,
     string MessageId,
     IReadOnlyCollection<InitializeWholesaleServicesSeries> Series);
