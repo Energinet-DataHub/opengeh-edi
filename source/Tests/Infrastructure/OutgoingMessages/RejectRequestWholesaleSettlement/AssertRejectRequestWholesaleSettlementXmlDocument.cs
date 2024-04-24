@@ -15,6 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using NodaTime;
 
@@ -58,7 +59,8 @@ public class AssertRejectRequestWholesaleSettlementXmlDocument : IAssertRejectRe
 
     public IAssertRejectRequestWholesaleSettlementDocument MessageIdExists()
     {
-        throw new NotImplementedException();
+        _documentAsserter.ElementExists("mRID");
+        return this;
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasSenderId(string expectedSenderId)
@@ -69,7 +71,9 @@ public class AssertRejectRequestWholesaleSettlementXmlDocument : IAssertRejectRe
 
     public IAssertRejectRequestWholesaleSettlementDocument HasSenderRole(ActorRole role)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(role);
+        _documentAsserter.HasValue("sender_MarketParticipant.marketRole.type", role.Code);
+        return this;
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasReceiverId(string expectedReceiverId)
@@ -80,7 +84,9 @@ public class AssertRejectRequestWholesaleSettlementXmlDocument : IAssertRejectRe
 
     public IAssertRejectRequestWholesaleSettlementDocument HasReceiverRole(ActorRole role)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(role);
+        _documentAsserter.HasValue("receiver_MarketParticipant.marketRole.type", role.Code);
+        return this;
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasTimestamp(Instant expectedTimestamp)
@@ -97,7 +103,8 @@ public class AssertRejectRequestWholesaleSettlementXmlDocument : IAssertRejectRe
 
     public IAssertRejectRequestWholesaleSettlementDocument TransactionIdExists()
     {
-        throw new NotImplementedException();
+        _documentAsserter.ElementExists("Series[1]/mRID");
+        return this;
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasOriginalTransactionId(

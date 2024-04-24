@@ -27,31 +27,39 @@ namespace Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 
 public static class NotifyWholesaleServicesDocumentAsserter
 {
+    private static readonly DocumentValidator _xmlDocumentValidator = new(new List<IValidator>
+    {
+        new CimXmlValidator(new CimXmlSchemaProvider()),
+        new EbixValidator(new EbixSchemaProvider()),
+    });
+
+    public static AssertEbixDocument CreateEbixAsserter(Stream document)
+    {
+        return AssertEbixDocument.Document(
+            document,
+            "ns0",
+            _xmlDocumentValidator);
+    }
+
+    public static AssertXmlDocument CreateCimXmlAsserter(Stream document)
+    {
+        return AssertXmlDocument.Document(
+            document,
+            "cim_",
+            _xmlDocumentValidator);
+    }
+
     public static async Task AssertCorrectDocumentAsync(DocumentFormat documentFormat, Stream document, NotifyWholesaleServicesDocumentAssertionInput assertionInput)
     {
         ArgumentNullException.ThrowIfNull(documentFormat);
         ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(assertionInput);
 
-        var xmlDocumentValidator = new DocumentValidator(new List<IValidator>
-        {
-            new CimXmlValidator(new CimXmlSchemaProvider()),
-            new EbixValidator(new EbixSchemaProvider()),
-        });
         IAssertNotifyWholesaleServicesDocument asserter = documentFormat.Name switch
         {
-            nameof(DocumentFormat.Xml) => new AssertNotifyWholesaleServicesXmlDocument(
-                AssertXmlDocument.Document(
-                    document,
-                    "cim_",
-                    xmlDocumentValidator)),
+            nameof(DocumentFormat.Xml) => new AssertNotifyWholesaleServicesXmlDocument(CreateCimXmlAsserter(document)),
             nameof(DocumentFormat.Json) => new AssertNotifyWholesaleServicesJsonDocument(document),
-            nameof(DocumentFormat.Ebix) => new AssertNotifyWholesaleServicesEbixDocument(
-                AssertEbixDocument.Document(
-                    document,
-                    "ns0",
-                    xmlDocumentValidator),
-                true),
+            nameof(DocumentFormat.Ebix) => new AssertNotifyWholesaleServicesEbixDocument(CreateEbixAsserter(document), true),
             _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, null),
         };
 

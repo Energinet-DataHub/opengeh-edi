@@ -53,13 +53,14 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
         var validationOptions = new EvaluationOptions { OutputFormat = OutputFormat.List };
         var validationResult = schema!.Evaluate(_document, validationOptions);
-        var errors = validationResult.Details.Where(detail => detail.HasErrors)
+        var validationErrors = validationResult.Details.Where(detail => !detail.IsValid && detail.HasErrors)
             .Select(x => (x.InstanceLocation, x.EvaluationPath, x.Errors))
             .SelectMany(
                 p => p.Errors!.Values.Select(
-                    e => $"==> '{p.InstanceLocation}' does not adhere to '{p.EvaluationPath}' with error: {e}\n"));
+                    e => $"==> '{p.InstanceLocation}' does not adhere to '{p.EvaluationPath}' with error: {e}\n"))
+            .ToList();
 
-        validationResult.IsValid.Should().BeTrue($"because document should be valid. Validation errors:{Environment.NewLine}{{0}}", string.Join("\n", errors));
+        validationResult.IsValid.Should().BeTrue($"because document should be valid. Validation errors:{Environment.NewLine}{{0}}", string.Join("\n", validationErrors));
 
         return this;
     }

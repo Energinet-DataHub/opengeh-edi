@@ -119,17 +119,34 @@ public class AssertEbixDocument
 
         if (!validationResult.IsValid && skipIdentificationLengthValidation)
         {
+            var ignoreMaxLengthErrorsFor = new List<string>()
+            {
+                "NotifyAggregatedWholesaleServices:v3:Identification",
+                "NotifyAggregatedWholesaleServices:v3:OriginalBusinessDocument",
+                "RejectAggregatedBillingInformation:v3:Identification",
+                "RejectAggregatedBillingInformation:v3:OriginalBusinessDocument",
+            };
+
             var validationErrorsExceptId = validationResult.ValidationErrors
-                .Where(e =>
-                    !(e.Contains("NotifyAggregatedWholesaleServices:v3:Identification' element is invalid", StringComparison.InvariantCulture)
-                    && e.Contains("The actual length is greater than the MaxLength value.", StringComparison.OrdinalIgnoreCase)))
+                .Where(errorMessage =>
+                {
+                    var isMaxLengthError = errorMessage.Contains(
+                        "The actual length is greater than the MaxLength value",
+                        StringComparison.OrdinalIgnoreCase);
+
+                    var isIgnoredElement = ignoreMaxLengthErrorsFor.Any(name =>
+                        errorMessage.Contains($"{name}' element is invalid", StringComparison.InvariantCulture));
+
+                    var ignoreError = isMaxLengthError && isIgnoredElement;
+                    return !ignoreError;
+                })
                 .ToArray();
 
             validationResult = ValidationResult.Invalid(validationErrorsExceptId);
         }
 
-        using var scope = new AssertionScope();
         validationResult.ValidationErrors.Should().BeEmpty();
+        validationResult.IsValid.Should().BeTrue();
 
         return this;
     }
@@ -158,6 +175,12 @@ public class AssertEbixDocument
     {
         ArgumentNullException.ThrowIfNull(xpath);
         return _document.Root?.XPathSelectElements(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager).ToList();
+    }
+
+    public XElement? GetElement(string xpath)
+    {
+        ArgumentNullException.ThrowIfNull(xpath);
+        return _document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager);
     }
 }
 

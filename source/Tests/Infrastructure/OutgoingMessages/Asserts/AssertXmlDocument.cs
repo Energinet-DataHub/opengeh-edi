@@ -111,6 +111,12 @@ public class AssertXmlDocument
             .ToList();
     }
 
+    public XElement? GetElement(string xpath)
+    {
+        ArgumentNullException.ThrowIfNull(xpath);
+        return _document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager);
+    }
+
     public string EnsureXPathHasPrefix(string xpath)
     {
         ArgumentNullException.ThrowIfNull(xpath);

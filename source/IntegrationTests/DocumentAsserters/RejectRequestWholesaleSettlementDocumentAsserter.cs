@@ -53,7 +53,8 @@ public static class RejectRequestWholesaleSettlementDocumentAsserter
                 AssertEbixDocument.Document(
                     document,
                     "ns0",
-                    xmlDocumentValidator)),
+                    xmlDocumentValidator),
+                true),
             _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, null),
         };
 

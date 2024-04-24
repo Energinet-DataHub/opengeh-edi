@@ -28,8 +28,11 @@ public static class DocumentFormats
             .ToArray();
     }
 
-    public static IEnumerable<DocumentFormat> GetAllDocumentFormats(string[] except)
+    public static IEnumerable<DocumentFormat> GetAllDocumentFormats(string[]? except = null)
     {
+        if (except == null)
+            except = Array.Empty<string>();
+
         return EnumerationType.GetAll<DocumentFormat>()
             .Where(df => !except.Contains(df.Name));
     }

@@ -54,9 +54,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
     {
     }
 
-    public static object[][] DocumentFormatsWithDelegatedFromAndToRoles()
+    public static object[][] DocumentFormatsWithDelegationCombinations()
     {
-        // TODO: What are the valid sender roles for RequestWholesaleServicesSeries? Are we missing any below?
         // Who can delegate RequestWholesaleServices? We assume it's only the actors who can actually
         // perform the RequestWholesaleServices, eg. DDQ and DDM
         var delegatedFromRoles = new List<ActorRole>
@@ -72,23 +71,30 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             ActorRole.GridOperator,
         };
 
-        var exceptForDocumentFormats = new[]
+        var exceptForIncomingDocumentFormats = new[]
         {
-            DocumentFormat.Xml.Name, // TODO: The CIM XML feature isn't implemented yet
+            DocumentFormat.Xml.Name, // TODO: The CIM XML request feature isn't implemented yet
             DocumentFormat.Ebix.Name, // ebIX is not supported for requests
         };
 
         return DocumentFormats
-            .GetAllDocumentFormats(exceptForDocumentFormats)
-            .SelectMany(df => delegatedFromRoles
-                .SelectMany(from => delegatedToRoles
-                    .Select(to => new object[] { df, from, to })))
+            .GetAllDocumentFormats(exceptForIncomingDocumentFormats)
+            .SelectMany(incomingDocumentFormat => delegatedFromRoles
+                .SelectMany(delegatedFromRole => delegatedToRoles
+                    .SelectMany(delegatedToRole => DocumentFormats.GetAllDocumentFormats()
+                        .Select(peekDocumentFormat => new object[]
+                        {
+                            incomingDocumentFormat,
+                            peekDocumentFormat,
+                            delegatedFromRole,
+                            delegatedToRole,
+                        }))))
             .ToArray();
     }
 
     [Theory]
-    [MemberData(nameof(DocumentFormatsWithDelegatedFromAndToRoles))]
-    public async Task AndGiven_DelegationInOneGridArea_When_DelegatedActorPeeksAllMessages_Then_ReceivesOneNotifyWholesaleServicesDocumentWithCorrectContent(DocumentFormat documentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
+    [MemberData(nameof(DocumentFormatsWithDelegationCombinations))]
+    public async Task AndGiven_DelegationInOneGridArea_When_DelegatedActorPeeksAllMessages_Then_ReceivesOneNotifyWholesaleServicesDocumentWithCorrectContent(DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
     {
         /*
          *  --- PART 1: Receive request, create process and send message to Wholesale ---
@@ -116,7 +122,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             GetNow());
 
         await GivenReceivedWholesaleServicesRequest(
-            documentFormat: documentFormat,
+            documentFormat: incomingDocumentFormat,
             senderActorNumber: delegatedToActor.ActorNumber,
             senderActorRole: originalActor.ActorRole,
             periodStart: (2024, 1, 1),
@@ -169,12 +175,12 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         var originalActorPeekResults = await WhenActorPeeksAllMessages(
             originalActor.ActorNumber,
             originalActor.ActorRole,
-            documentFormat);
+            peekDocumentFormat);
 
         var delegatedActorPeekResults = await WhenActorPeeksAllMessages(
             delegatedToActor.ActorNumber,
             delegatedToActor.ActorRole,
-            documentFormat);
+            peekDocumentFormat);
 
         // Assert
         PeekResultDto peekResult;
@@ -189,7 +195,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
 
         await ThenNotifyWholesaleServicesDocumentIsCorrect(
             peekResult.Bundle,
-            documentFormat,
+            peekDocumentFormat,
             new NotifyWholesaleServicesDocumentAssertionInput(
                 Timestamp: "2024-07-01T14:57:09Z",
                 BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
@@ -220,8 +226,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
     }
 
     [Theory]
-    [MemberData(nameof(DocumentFormatsWithDelegatedFromAndToRoles))]
-    public async Task AndGiven_DelegationInTwoGridAreas_When_DelegatedActorPeeksAllMessages_Then_ReceivesTwoNotifyWholesaleServicesDocumentsWithCorrectContent(DocumentFormat documentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
+    [MemberData(nameof(DocumentFormatsWithDelegationCombinations))]
+    public async Task AndGiven_DelegationInTwoGridAreas_When_DelegatedActorPeeksAllMessages_Then_ReceivesTwoNotifyWholesaleServicesDocumentsWithCorrectContent(DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
     {
         /*
          *  --- PART 1: Receive request, create process and send message to Wholesale ---
@@ -256,7 +262,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             GetNow());
 
         await GivenReceivedWholesaleServicesRequest(
-            documentFormat: documentFormat,
+            documentFormat: incomingDocumentFormat,
             senderActorNumber: delegatedToActor.ActorNumber,
             senderActorRole: originalActor.ActorRole,
             periodStart: (2024, 1, 1),
@@ -309,12 +315,12 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         var originalActorPeekResults = await WhenActorPeeksAllMessages(
             originalActor.ActorNumber,
             originalActor.ActorRole,
-            documentFormat);
+            peekDocumentFormat);
 
         var delegatedActorPeekResults = await WhenActorPeeksAllMessages(
             delegatedToActor.ActorNumber,
             delegatedToActor.ActorRole,
-            documentFormat);
+            peekDocumentFormat);
 
         // Assert
         using (new AssertionScope())
@@ -326,7 +332,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         foreach (var peekResult in delegatedActorPeekResults)
         {
             peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
-            var peekResultGridArea = await GetGridAreaFromNotifyWholesaleServicesDocument(peekResult.Bundle!, documentFormat);
+            var peekResultGridArea = await GetGridAreaFromNotifyWholesaleServicesDocument(peekResult.Bundle!, peekDocumentFormat);
 
             var seriesRequest = wholesaleServicesRequestAcceptedMessage.Series
                 .Should().ContainSingle(request => request.GridArea == peekResultGridArea)
@@ -334,7 +340,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
 
             await ThenNotifyWholesaleServicesDocumentIsCorrect(
                 peekResult.Bundle,
-                documentFormat,
+                peekDocumentFormat,
                 new NotifyWholesaleServicesDocumentAssertionInput(
                     Timestamp: "2024-07-01T14:57:09Z",
                     BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
@@ -370,8 +376,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
     ///     https://energinet.sharepoint.com/sites/DH3ART-team/_layouts/15/download.aspx?UniqueId=60f1449eb8f44b179f233dda432b8f65&e=uVle0k
     /// </summary>
     [Theory]
-    [MemberData(nameof(DocumentFormatsWithDelegatedFromAndToRoles))]
-    public async Task AndGiven_InvalidRequestWithDelegationInTwoGridAreas_When_DelegatedActorPeeksAllMessages_Then_ReceivesOneRejectWholesaleSettlementDocumentsWithCorrectContent(DocumentFormat documentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
+    [MemberData(nameof(DocumentFormatsWithDelegationCombinations))]
+    public async Task AndGiven_InvalidRequestWithDelegationInTwoGridAreas_When_DelegatedActorPeeksAllMessages_Then_ReceivesOneRejectWholesaleSettlementDocumentsWithCorrectContent(DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
     {
         /*
          *  --- PART 1: Receive request, create process and send message to Wholesale ---
@@ -407,7 +413,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
 
         // Setup fake request (period end is before period start)
         await GivenReceivedWholesaleServicesRequest(
-            documentFormat: documentFormat,
+            documentFormat: incomingDocumentFormat,
             senderActorNumber: delegatedToActor.ActorNumber,
             senderActorRole: originalActor.ActorRole,
             periodStart: (2024, 01, 01),
@@ -460,12 +466,12 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         var originalActorPeekResults = await WhenActorPeeksAllMessages(
             originalActor.ActorNumber,
             originalActor.ActorRole,
-            documentFormat);
+            peekDocumentFormat);
 
         var delegatedActorPeekResults = await WhenActorPeeksAllMessages(
             delegatedToActor.ActorNumber,
             delegatedToActor.ActorRole,
-            documentFormat);
+            peekDocumentFormat);
 
         // Assert
         PeekResultDto peekResult;
@@ -484,7 +490,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
 
         await ThenRejectRequestWholesaleSettlementDocumentIsCorrect(
             peekResult.Bundle,
-            documentFormat,
+            peekDocumentFormat,
             new RejectRequestWholesaleSettlementDocumentAssertionInput(
                 InstantPattern.General.Parse("2024-07-01T14:57:09Z").Value,
                 BusinessReason.WholesaleFixing,
@@ -503,8 +509,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
     /// be able to request and receive his own data
     /// </summary>
     [Theory]
-    [MemberData(nameof(DocumentFormatsWithDelegatedFromAndToRoles))]
-    public async Task AndGiven_OriginalActorRequestsOwnDataWithDataInTwoGridAreas_When_OriginalActorPeeksAllMessages_Then_OriginalActorReceivesTwoNotifyWholesaleServicesDocumentWithCorrectContent(DocumentFormat documentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
+    [MemberData(nameof(DocumentFormatsWithDelegationCombinations))]
+    public async Task AndGiven_OriginalActorRequestsOwnDataWithDataInTwoGridAreas_When_OriginalActorPeeksAllMessages_Then_OriginalActorReceivesTwoNotifyWholesaleServicesDocumentWithCorrectContent(DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
     {
         /*
          *  --- PART 1: Receive request, create process and send message to Wholesale ---
@@ -533,7 +539,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
 
         // Original actor requests own data
         await GivenReceivedWholesaleServicesRequest(
-            documentFormat: documentFormat,
+            documentFormat: incomingDocumentFormat,
             senderActorNumber: originalActor.ActorNumber,
             senderActorRole: originalActor.ActorRole,
             periodStart: (2024, 1, 1),
@@ -586,12 +592,12 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         var delegatedActorPeekResults = await WhenActorPeeksAllMessages(
             delegatedToActor.ActorNumber,
             delegatedToActor.ActorRole,
-            documentFormat);
+            peekDocumentFormat);
 
         var originalActorPeekResults = await WhenActorPeeksAllMessages(
             originalActor.ActorNumber,
             originalActor.ActorRole,
-            documentFormat);
+            peekDocumentFormat);
 
         // Assert
         using (new AssertionScope())
@@ -603,7 +609,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         foreach (var peekResult in originalActorPeekResults)
         {
             peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
-            var peekResultGridArea = await GetGridAreaFromNotifyWholesaleServicesDocument(peekResult.Bundle!, documentFormat);
+            var peekResultGridArea = await GetGridAreaFromNotifyWholesaleServicesDocument(peekResult.Bundle!, peekDocumentFormat);
 
             var seriesRequest = wholesaleServicesRequestAcceptedMessage.Series
                 .Should().ContainSingle(request => request.GridArea == peekResultGridArea)
@@ -611,7 +617,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
 
             await ThenNotifyWholesaleServicesDocumentIsCorrect(
                 peekResult.Bundle,
-                documentFormat,
+                peekDocumentFormat,
                 new NotifyWholesaleServicesDocumentAssertionInput(
                     Timestamp: "2024-07-01T14:57:09Z",
                     BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
@@ -643,8 +649,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
     }
 
     [Theory]
-    [MemberData(nameof(DocumentFormatsWithDelegatedFromAndToRoles))]
-    public async Task AndGiven_OriginalActorRequestsOwnDataWithGridArea_When_OriginalActorPeeksAllMessages_Then_OriginalActorReceivesOneNotifyWholesaleServicesDocumentWithCorrectContent(DocumentFormat documentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
+    [MemberData(nameof(DocumentFormatsWithDelegationCombinations))]
+    public async Task AndGiven_OriginalActorRequestsOwnDataWithGridArea_When_OriginalActorPeeksAllMessages_Then_OriginalActorReceivesOneNotifyWholesaleServicesDocumentWithCorrectContent(DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
     {
         /*
          *  --- PART 1: Receive request, create process and send message to Wholesale ---
@@ -673,7 +679,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
 
         // Original actor requests own data
         await GivenReceivedWholesaleServicesRequest(
-            documentFormat,
+            incomingDocumentFormat,
             originalActor.ActorNumber,
             originalActor.ActorRole,
             (2024, 1, 1),
@@ -726,12 +732,12 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         var delegatedActorPeekResults = await WhenActorPeeksAllMessages(
             delegatedToActor.ActorNumber,
             delegatedToActor.ActorRole,
-            documentFormat);
+            peekDocumentFormat);
 
         var originalActorPeekResults = await WhenActorPeeksAllMessages(
             originalActor.ActorNumber,
             originalActor.ActorRole,
-            documentFormat);
+            peekDocumentFormat);
 
         // Assert
         PeekResultDto peekResult;
@@ -746,7 +752,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
 
         await ThenNotifyWholesaleServicesDocumentIsCorrect(
             peekResult.Bundle,
-            documentFormat,
+            peekDocumentFormat,
             new NotifyWholesaleServicesDocumentAssertionInput(
                 Timestamp: "2024-07-01T14:57:09Z",
                 BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
@@ -781,23 +787,22 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         documentStream.Position = 0;
         if (documentFormat == DocumentFormat.Ebix)
         {
-            var xmlDocument = await XDocument.LoadAsync(documentStream, LoadOptions.None, CancellationToken.None);
+            var ebixAsserter = NotifyWholesaleServicesDocumentAsserter.CreateEbixAsserter(documentStream);
+            var gridAreaElement = ebixAsserter.GetElement("PayloadEnergyTimeSeries[1]/MeteringGridAreaUsedDomainLocation/Identification");
 
-            var gridAreaEbixElement = xmlDocument.Root!
-                .XPathSelectElement("PayloadEnergyTimeSeries[1]/MeteringGridAreaUsedDomainLocation/Identification");
-
-            gridAreaEbixElement.Should().NotBeNull("because grid area should be present in the ebIX document");
-            return gridAreaEbixElement!.Value;
+            gridAreaElement.Should().NotBeNull("because grid area should be present in the ebIX document");
+            gridAreaElement!.Value.Should().NotBeNull("because grid area value should not be null in the ebIX document");
+            return gridAreaElement.Value;
         }
 
         if (documentFormat == DocumentFormat.Xml)
         {
-            var cimXmlDocument = await XDocument.LoadAsync(documentStream, LoadOptions.None, CancellationToken.None);
+            var cimXmlAsserter = NotifyWholesaleServicesDocumentAsserter.CreateCimXmlAsserter(documentStream);
 
-            var gridAreaCimXmlElement = cimXmlDocument.Root!
-                .XPathSelectElement("Series[1]/meteringGridArea_Domain.mRID");
+            var gridAreaCimXmlElement = cimXmlAsserter.GetElement("Series[1]/meteringGridArea_Domain.mRID");
 
             gridAreaCimXmlElement.Should().NotBeNull("because grid area should be present in the CIM XML document");
+            gridAreaCimXmlElement!.Value.Should().NotBeNull("because grid area value should not be null in the CIM XML document");
             return gridAreaCimXmlElement!.Value;
         }
 
