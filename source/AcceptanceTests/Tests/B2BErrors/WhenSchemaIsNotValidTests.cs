@@ -29,7 +29,7 @@ public class WhenSchemaIsNotValidTests : BaseTestClass
     {
     }
 
-    [Fact]
+    [Fact(Skip = "Not a sub system test")]
     public async Task Invalid_xml_namespace_produces_schema_validation_error()
     {
         var payload =

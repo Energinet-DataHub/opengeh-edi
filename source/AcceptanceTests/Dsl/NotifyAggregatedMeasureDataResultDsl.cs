@@ -13,39 +13,48 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using FluentAssertions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
 internal sealed class NotifyAggregatedMeasureDataResultDsl
 {
-    private readonly WholesaleDriver _wholesale;
-    private readonly EdiDriver _edi;
+    private readonly WholesaleDriver _wholesaleDriver;
+    private readonly EdiDriver _ediDriver;
 
     #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
 
-    internal NotifyAggregatedMeasureDataResultDsl(EdiDriver ediDriver, WholesaleDriver wholesaleDriver)
+    internal NotifyAggregatedMeasureDataResultDsl(EdiDriver ediDriverDriver, WholesaleDriver wholesaleDriverDriver)
     {
-        _edi = ediDriver;
-        _wholesale = wholesaleDriver;
+        _ediDriver = ediDriverDriver;
+        _wholesaleDriver = wholesaleDriverDriver;
     }
 
-    internal Task PublishResultFor(string gridAreaCode)
+    internal async Task PublishResult(string gridAreaCode)
     {
-        return _wholesale.PublishAggregationResultAsync(gridAreaCode);
+        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+        await _wholesaleDriver.PublishAggregationResultAsync(gridAreaCode).ConfigureAwait(false);
     }
 
-    internal Task ConfirmResultIsAvailableFor()
+    internal async Task ConfirmResultIsAvailable()
     {
-        return _edi.PeekMessageAsync();
+        var peekResponse = await _ediDriver.PeekMessageAsync().ConfigureAwait(false);
+        var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
+        var contentString = await peekResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+        messageId.Should().NotBeNull();
+        contentString.Should().NotBeNull();
+        contentString.Should().Contain("NotifyAggregatedMeasureData_MarketDocument");
     }
 
-    internal Task ConfirmResultIsAvailableForToken()
+    internal async Task ConfirmRejectResultIsAvailable()
     {
-        return _edi.PeekMessageAsync();
-    }
+        var peekResponse = await _ediDriver.PeekMessageAsync().ConfigureAwait(false);
+        var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
+        var contentString = await peekResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-    internal async Task EmptyQueueForActor()
-    {
-        await _edi.EmptyQueueAsync().ConfigureAwait(false);
+        messageId.Should().NotBeNull();
+        contentString.Should().NotBeNull();
+        contentString.Should().Contain("RejectRequestAggregatedMeasureData_MarketDocument");
     }
 }

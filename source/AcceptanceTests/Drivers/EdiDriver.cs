@@ -16,11 +16,9 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Text.Json;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using FluentAssertions;
 using Nito.AsyncEx;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
@@ -38,49 +36,7 @@ internal sealed class EdiDriver : IDisposable
     {
     }
 
-    public async Task<Stream> RequestAggregatedMeasureDataAsync(bool asyncError = false, string? token = null)
-    {
-        var b2bClient = await _httpClient;
-        using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/requestaggregatedmeasuredata");
-        if (token is not null) request.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
-        request.Content = new StringContent(GetContent(asyncError), Encoding.UTF8, "application/json");
-        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-        var aggregatedMeasureDataResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
-        if (aggregatedMeasureDataResponse.StatusCode == HttpStatusCode.BadRequest)
-        {
-            var responseContent = await aggregatedMeasureDataResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new BadAggregatedMeasureDataRequestException($"responseContent: {responseContent}");
-        }
-
-        aggregatedMeasureDataResponse.EnsureSuccessStatusCode();
-
-        var document = await aggregatedMeasureDataResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
-        return document;
-    }
-
-    public async Task<Stream> RequestWholesaleSettlementAsync(DocumentFormat documentFormat, bool validMessage = true)
-    {
-        var b2bClient = await _httpClient;
-        using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/requestwholesalesettlement");
-        var contentType = DocumentFormat.Json == documentFormat ? "application/json" : "application/xml";
-        request.Content = new StringContent(GetRequestWholesaleSettlementContent(documentFormat, validMessage), Encoding.UTF8, contentType);
-        request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
-
-        var wholesaleSettlementResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
-        if (wholesaleSettlementResponse.StatusCode == HttpStatusCode.BadRequest)
-        {
-            var responseContent = await wholesaleSettlementResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-            throw new BadAggregatedMeasureDataRequestException($"responseContent: {responseContent}");
-        }
-
-        wholesaleSettlementResponse.EnsureSuccessStatusCode();
-
-        var document = await wholesaleSettlementResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
-        return document;
-    }
-
-    public async Task<Stream> PeekMessageAsync(DocumentFormat? documentFormat = null)
+    internal async Task<HttpResponseMessage> PeekMessageAsync(DocumentFormat? documentFormat = null)
     {
         var stopWatch = Stopwatch.StartNew();
         while (stopWatch.ElapsedMilliseconds < 600000)
@@ -89,9 +45,8 @@ internal sealed class EdiDriver : IDisposable
                 .ConfigureAwait(false);
             if (peekResponse.StatusCode == HttpStatusCode.OK)
             {
-                var document = await peekResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 await DequeueAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
-                return document;
+                return peekResponse;
             }
 
             if (peekResponse.StatusCode != HttpStatusCode.NoContent)
@@ -105,7 +60,7 @@ internal sealed class EdiDriver : IDisposable
         throw new TimeoutException("Unable to retrieve peek result within time limit");
     }
 
-    public async Task EmptyQueueAsync()
+    internal async Task EmptyQueueAsync()
     {
         var peekResponse = await PeekAsync()
                 .ConfigureAwait(false);
@@ -116,103 +71,7 @@ internal sealed class EdiDriver : IDisposable
         }
     }
 
-    public async Task PeekAcceptedAggregationMessageAsync()
-    {
-        var documentStream = await PeekMessageAsync().ConfigureAwait(false);
-        var jsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(documentStream).ConfigureAwait(false);
-
-        var documentIsOfExpectedType = jsonElement.TryGetProperty(
-            "NotifyAggregatedMeasureData_MarketDocument",
-            out var marketDocument);
-
-        Assert.True(documentIsOfExpectedType, "\nAccepted message failed with wrong message type\n Document: " + jsonElement.ToString() + "\n");
-        Assert.Equal("E31", marketDocument
-            .GetProperty("type")
-            .GetProperty("value")
-            .GetString());
-    }
-
-    public async Task PeekWholesaleSettlementResponseAsync(DocumentFormat documentFormat, string expectedDocumentType)
-    {
-        var documentStream = await PeekMessageAsync(documentFormat).ConfigureAwait(false);
-
-        if (documentFormat == DocumentFormat.Json)
-        {
-            var jsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(documentStream).ConfigureAwait(false);
-
-            var documentIsOfExpectedType = jsonElement.TryGetProperty(
-                expectedDocumentType,
-                out var marketDocument);
-
-            Assert.True(documentIsOfExpectedType, "\nAccepted message failed with wrong message type\n Document: " + jsonElement.ToString() + "\n");
-            return;
-        }
-
-        using var reader = new StreamReader(documentStream);
-        string text = await reader.ReadToEndAsync().ConfigureAwait(false);
-        text.Should().Contain(expectedDocumentType, "\nAccepted message failed with wrong message type\n Document: " + text + "\n");
-    }
-
-    public async Task PeekRejectedMessageAsync()
-    {
-        var documentStream = await PeekMessageAsync().ConfigureAwait(false);
-        var jsonElement = await JsonSerializer.DeserializeAsync<JsonElement>(documentStream).ConfigureAwait(false);
-
-        var documentIsOfExpectedType = jsonElement.TryGetProperty(
-            "RejectRequestAggregatedMeasureData_MarketDocument",
-            out var marketDocument);
-
-        Assert.True(documentIsOfExpectedType, "\nRejected message failed with wrong message type\n");
-        Assert.Equal("ERR", marketDocument
-            .GetProperty("type")
-            .GetProperty("value")
-            .GetString());
-    }
-
-    public async Task RequestAggregatedMeasureDataWithoutTokenAsync()
-    {
-        var act = () => RequestAggregatedMeasureDataAsync(false, string.Empty);
-
-        var httpRequestException = await Assert.ThrowsAsync<HttpRequestException>(act).ConfigureAwait(false);
-
-        Assert.Equal(HttpStatusCode.Unauthorized, httpRequestException.StatusCode);
-    }
-
-    public async Task PeekMessageWithoutTokenAsync()
-    {
-        var act = async () =>
-        {
-            var b2bClient = await _httpClient;
-            using var request = new HttpRequestMessage(HttpMethod.Get, "v1.0/cim/aggregations");
-            request.Headers.Authorization = new AuthenticationHeaderValue("bearer", null);
-            request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
-            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            var peekResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
-            peekResponse.EnsureSuccessStatusCode();
-        };
-
-        var httpRequestException = await Assert.ThrowsAsync<HttpRequestException>(act).ConfigureAwait(false);
-
-        Assert.Equal(HttpStatusCode.Unauthorized, httpRequestException.StatusCode);
-    }
-
-    public async Task DequeueMessageWithoutTokenAsync(string messageId)
-    {
-        var act = async () =>
-        {
-            var b2bClient = await _httpClient;
-            using var request = new HttpRequestMessage(HttpMethod.Delete, $"v1.0/cim/dequeue/{messageId}");
-            request.Headers.Authorization = new AuthenticationHeaderValue("bearer", null);
-            var dequeueResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
-            dequeueResponse.EnsureSuccessStatusCode();
-        };
-
-        var httpRequestException = await Assert.ThrowsAsync<HttpRequestException>(act).ConfigureAwait(false);
-
-        Assert.Equal(HttpStatusCode.Unauthorized, httpRequestException.StatusCode);
-    }
-
-    public async Task<string> RequestAggregatedMeasureDataXmlAsync(XmlDocument payload, string? token = null)
+    internal async Task<string> RequestAggregatedMeasureDataXmlAsync(XmlDocument payload, string? token = null)
     {
         var b2bClient = await _httpClient;
         using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/requestaggregatedmeasuredata");
@@ -225,61 +84,91 @@ internal sealed class EdiDriver : IDisposable
         return responseString;
     }
 
+    internal async Task<Guid> RequestWholesaleSettlementAsync(bool withSyncError, CancellationToken cancellationToken)
+    {
+        var b2bClient = await _httpClient;
+        using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/requestwholesalesettlement");
+        var contentType = "application/json";
+        var requestContent = await GetRequestWholesaleSettlementContentAsync(withSyncError, cancellationToken)
+            .ConfigureAwait(false);
+        request.Content = new StringContent(
+            requestContent.Content,
+            Encoding.UTF8,
+            contentType);
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+
+        var wholesaleSettlementResponse = await b2bClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        if (wholesaleSettlementResponse.StatusCode == HttpStatusCode.BadRequest)
+        {
+            var responseContent = await wholesaleSettlementResponse.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            throw new BadWholesaleSettlementRequestException($"responseContent: {responseContent}");
+        }
+
+        wholesaleSettlementResponse.EnsureSuccessStatusCode();
+        return requestContent.MessageId;
+    }
+
+    internal async Task<Guid> RequestAggregatedMeasureDataAsync(bool withSyncError, CancellationToken cancellationToken)
+    {
+        var b2bClient = await _httpClient;
+        using var request = new HttpRequestMessage(HttpMethod.Post, "v1.0/cim/requestaggregatedmeasuredata");
+        var requestContent = await GetAggregatedMeasureDataContentAsync(withSyncError, cancellationToken).ConfigureAwait(false);
+        request.Content = new StringContent(requestContent.Content, Encoding.UTF8, "application/json");
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+        var aggregatedMeasureDataResponse = await b2bClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        if (aggregatedMeasureDataResponse.StatusCode == HttpStatusCode.BadRequest)
+        {
+            var responseContent = await aggregatedMeasureDataResponse.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            throw new BadAggregatedMeasureDataRequestException($"responseContent: {responseContent}");
+        }
+
+        aggregatedMeasureDataResponse.EnsureSuccessStatusCode();
+        return requestContent.MessageId;
+    }
+
+    private static async Task<(Guid MessageId, string Content)> GetRequestWholesaleSettlementContentAsync(
+        bool withSyncError,
+        CancellationToken cancellationToken)
+    {
+        var messageId = Guid.NewGuid();
+        var jsonContent = await File.ReadAllTextAsync("Messages/json/RequestWholesaleSettlement.json", cancellationToken)
+            .ConfigureAwait(false);
+
+        if (withSyncError is true)
+        {
+            jsonContent = await File.ReadAllTextAsync("Messages/json/RequestWholesaleSettlementWithSyncError.json", cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        jsonContent = jsonContent.Replace("{MessageId}", messageId.ToString(), StringComparison.InvariantCulture);
+        jsonContent = jsonContent.Replace("{TransactionId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
+
+        return (messageId, jsonContent);
+    }
+
+    private static async Task<(Guid MessageId, string Content)> GetAggregatedMeasureDataContentAsync(bool withSyncError, CancellationToken cancellationToken)
+    {
+        var messageId = Guid.NewGuid();
+
+        var jsonContent = await File.ReadAllTextAsync("Messages/json/RequestAggregatedMeasureData.json", cancellationToken)
+            .ConfigureAwait(false);
+
+        if (withSyncError is true)
+        {
+            jsonContent = await File.ReadAllTextAsync("Messages/json/RequestAggregatedMeasureDataWithSyncError.json", cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        jsonContent = jsonContent.Replace("{MessageId}", messageId.ToString(), StringComparison.InvariantCulture);
+        jsonContent = jsonContent.Replace("{TransactionId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
+
+        return (messageId, jsonContent);
+    }
+
     private static string GetMessageId(HttpResponseMessage peekResponse)
     {
         return peekResponse.Headers.GetValues("MessageId").First();
-    }
-
-    private static string GetContent(bool forceAsyncError, ActorRole? marketRole = null)
-    {
-        string jsonRequestAcceptedFilePath;
-        string jsonRequestAsynchronousRejectedFilePath;
-
-        switch (marketRole?.Code)
-        {
-            case WholesaleDriver.BalanceResponsiblePartyMarketRoleCode:
-                jsonRequestAcceptedFilePath = "Messages/json/RequestAggregatedMeasureDataBalanceResponsible.json";
-                jsonRequestAsynchronousRejectedFilePath = "Messages/json/RequestAggregatedMeasureDataBalanceResponsibleWithBadPeriod.json";
-                break;
-
-            default:
-                jsonRequestAcceptedFilePath = "Messages/json/RequestAggregatedMeasureData.json";
-                jsonRequestAsynchronousRejectedFilePath = "Messages/json/RequestAggregatedMeasureDataWithBadPeriod.json";
-                break;
-        }
-
-        var jsonFilePath = forceAsyncError
-            ? jsonRequestAsynchronousRejectedFilePath
-            : jsonRequestAcceptedFilePath;
-
-        var jsonContent = File.ReadAllText(jsonFilePath);
-
-        jsonContent = jsonContent.Replace("{MessageId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
-        jsonContent = jsonContent.Replace("{TransactionId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
-
-        return jsonContent;
-    }
-
-    private static string GetRequestWholesaleSettlementContent(DocumentFormat documentFormat, bool validMessage)
-    {
-        if (DocumentFormat.Json == documentFormat)
-        {
-            var jsonContent = validMessage
-                ? File.ReadAllText("Messages/json/RequestWholesaleSettlement.json")
-                : File.ReadAllText("Messages/json/RequestWholesaleSettlementWithWrongDateFormat.json");
-
-            jsonContent = jsonContent.Replace("{MessageId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
-            jsonContent = jsonContent.Replace("{TransactionId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
-
-            return jsonContent;
-        }
-
-        var xmlContent = File.ReadAllText("Messages/xml/RequestWholesaleSettlementWithBadPeriod.xml");
-
-        xmlContent = xmlContent.Replace("{MessageId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
-        xmlContent = xmlContent.Replace("{TransactionId}", Guid.NewGuid().ToString(), StringComparison.InvariantCulture);
-
-        return xmlContent;
     }
 
     private async Task<HttpResponseMessage> PeekAsync(DocumentFormat? documentFormat = null)

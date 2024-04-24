@@ -27,6 +27,7 @@ internal sealed class EbixRequestDsl
     private readonly WholesaleDriver _wholesale;
     private readonly EbixDriver _ebix;
 
+#pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
     public EbixRequestDsl(WholesaleDriver wholesale, EbixDriver ebix)
     {
         _wholesale = wholesale;
@@ -40,17 +41,17 @@ internal sealed class EbixRequestDsl
         await _ebix.EmptyQueueAsync().ConfigureAwait(false);
     }
 
-    internal Task PublishAggregationResultFor(string gridArea)
+    internal Task PublishAggregationResult(string gridArea)
     {
         return _wholesale.PublishAggregationResultAsync(gridArea);
     }
 
-    internal Task PublishMonthlySumPrChargeFor(string gridArea, string energySupplierId, string chargeOwnerId)
+    internal Task PublishMonthlySumPrCharge(string gridArea, string energySupplierId, string chargeOwnerId)
     {
         return _wholesale.PublishMonthlyAmountPerChargeResultAsync(gridArea, energySupplierId, chargeOwnerId);
     }
 
-    internal async Task ConfirmEnergyResultIsAvailableForActor()
+    internal async Task ConfirmEnergyResultIsAvailable()
     {
         var response = await _ebix.PeekMessageAsync().ConfigureAwait(false);
 
@@ -61,7 +62,7 @@ internal sealed class EbixRequestDsl
             () => Assert.Equal("AggregatedMeteredDataTimeSeries", response?.MessageContainer?.DocumentType));
     }
 
-    internal async Task ConfirmWholesaleResultIsAvailableForActor()
+    internal async Task ConfirmWholesaleResultIsAvailable()
     {
         var response = await _ebix.PeekMessageAsync().ConfigureAwait(false);
 
@@ -120,7 +121,7 @@ internal sealed class EbixRequestDsl
              () => Assert.Contains("Certificate rejected", response.ReasonPhrase, StringComparison.InvariantCultureIgnoreCase));
     }
 
-    internal Task PublishAmountPerChargeResultFor(string gridArea, string energySupplierId, string chargeOwnerId)
+    internal Task PublishAmountPerChargeResult(string gridArea, string energySupplierId, string chargeOwnerId)
     {
         return _wholesale.PublishAmountPerChargeResultAsync(gridArea, energySupplierId, chargeOwnerId);
     }

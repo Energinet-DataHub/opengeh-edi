@@ -28,7 +28,9 @@ public class BaseTestClass
         BaseTestFixture = fixture;
         AggregationRequest = new AggregatedMeasureDataRequestDsl(
             new EdiDriver(
-                fixture.B2BEnergySupplierAuthorizedHttpClient));
+                fixture.B2BEnergySupplierAuthorizedHttpClient),
+            new EdiProcessesDriver(fixture.ConnectionString),
+            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
     }
 
     protected ITestOutputHelper Output { get; }

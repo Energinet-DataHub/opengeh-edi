@@ -21,12 +21,16 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 internal sealed class WholesaleDriver
 {
-    public const string BalanceResponsiblePartyMarketRoleCode = "DDK";
+    private const string BalanceResponsiblePartyMarketRoleCode = "DDK";
     private readonly IntegrationEventPublisher _integrationEventPublisher;
+    private readonly EdiInboxClient _inboxEdiClient;
 
-    internal WholesaleDriver(IntegrationEventPublisher integrationEventPublisher)
+    internal WholesaleDriver(
+        IntegrationEventPublisher integrationEventPublisher,
+        EdiInboxClient inboxEdiClient)
     {
         _integrationEventPublisher = integrationEventPublisher;
+        _inboxEdiClient = inboxEdiClient;
     }
 
     internal Task PublishAggregationResultAsync(string gridAreaCode, ActorRole? marketRole = null, string? actorNumber = null)
@@ -75,5 +79,47 @@ internal sealed class WholesaleDriver
         return _integrationEventPublisher.PublishAsync(
             AmountPerChargeResultProducedV1.EventName,
             amountPerChargeResultProduced.ToByteArray());
+    }
+
+    internal async Task PublishWholesaleServicesRequestAcceptedResponseAsync(
+        Guid processId,
+        string gridAreaCode,
+        string energySupplierNumber,
+        string chargeOwnerNumber,
+        CancellationToken cancellationToken)
+    {
+        var message = WholesaleServiceRequestAcceptedMessageFactory.Create(
+            processId,
+            gridAreaCode,
+            energySupplierNumber,
+            chargeOwnerNumber);
+
+        await _inboxEdiClient.SendAsync(message, cancellationToken).ConfigureAwait(false);
+    }
+
+    internal async Task PublishWholesaleServicesRequestRejectedResponseAsync(Guid processId, CancellationToken cancellationToken)
+    {
+        var message = WholesaleServiceRequestRejectedMessageFactory.Create(processId);
+
+        await _inboxEdiClient.SendAsync(message, cancellationToken).ConfigureAwait(false);
+    }
+
+    internal async Task PublishAggregatedMeasureDataRequestAcceptedResponseAsync(
+        Guid processId,
+        string gridAreaCode,
+        CancellationToken cancellationToken)
+    {
+        var message = AggregatedMeasureDataRequestAcceptedMessageFactory.Create(
+            processId,
+            gridAreaCode);
+
+        await _inboxEdiClient.SendAsync(message, cancellationToken).ConfigureAwait(false);
+    }
+
+    internal async Task PublishAggregatedMeasureDataRequestRejectedResponseAsync(Guid processId, CancellationToken cancellationToken)
+    {
+        var message = AggregatedMeasureDataRequestRejectedMessageFactory.Create(processId);
+
+        await _inboxEdiClient.SendAsync(message, cancellationToken).ConfigureAwait(false);
     }
 }
