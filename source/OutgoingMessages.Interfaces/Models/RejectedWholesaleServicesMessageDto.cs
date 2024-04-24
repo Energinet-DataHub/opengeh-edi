@@ -28,7 +28,9 @@ public sealed class RejectedWholesaleServicesMessageDto : OutgoingMessageDto
         string businessReason,
         ActorRole receiverRole,
         MessageId relatedToMessageId,
-        RejectedWholesaleServicesMessageSeries series)
+        RejectedWholesaleServicesMessageSeries series,
+        ActorNumber documentReceiverNumber,
+        ActorRole documentReceiverRole)
         : base(
             DocumentType.RejectRequestWholesaleSettlement,
             receiverNumber,
@@ -41,9 +43,15 @@ public sealed class RejectedWholesaleServicesMessageDto : OutgoingMessageDto
             relatedToMessageId)
     {
         Series = series;
+        DocumentReceiverNumber = documentReceiverNumber;
+        DocumentReceiverRole = documentReceiverRole;
     }
 
     public RejectedWholesaleServicesMessageSeries Series { get; }
+
+    public ActorNumber DocumentReceiverNumber { get; }
+
+    public ActorRole DocumentReceiverRole { get; }
 }
 
 public sealed record RejectedWholesaleServicesMessageSeries(

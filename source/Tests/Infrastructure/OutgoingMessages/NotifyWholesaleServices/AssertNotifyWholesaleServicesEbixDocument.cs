@@ -16,10 +16,16 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.XPath;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.Ebix;
+using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using FluentAssertions;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 
@@ -129,7 +135,7 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasCalculationVersion(int expectedVersion)
+    public IAssertNotifyWholesaleServicesDocument HasCalculationVersion(long expectedVersion)
     {
         _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/Version", expectedVersion.ToString(CultureInfo.InvariantCulture));
         return this;
@@ -239,16 +245,16 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
     public IAssertNotifyWholesaleServicesDocument HasSumQuantityForPosition(int expectedPosition, int expectedSumQuantity)
     {
         _documentAsserter
-            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[1]/Position", expectedPosition.ToString(CultureInfo.InvariantCulture))
-            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[1]/EnergySum", expectedSumQuantity.ToString(CultureInfo.InvariantCulture));
+            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/Position", expectedPosition.ToString(CultureInfo.InvariantCulture))
+            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/EnergySum", expectedSumQuantity.ToString(CultureInfo.InvariantCulture));
         return this;
     }
 
     public IAssertNotifyWholesaleServicesDocument HasQuantityForPosition(int expectedPosition, int expectedQuantity)
     {
         _documentAsserter
-            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[1]/Position", expectedPosition.ToString(CultureInfo.InvariantCulture))
-            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[1]/EnergyQuantity", expectedQuantity.ToString(CultureInfo.InvariantCulture));
+            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/Position", expectedPosition.ToString(CultureInfo.InvariantCulture))
+            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/EnergyQuantity", expectedQuantity.ToString(CultureInfo.InvariantCulture));
         return this;
     }
 
@@ -268,9 +274,76 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
         int expectedPosition,
         CalculatedQuantityQuality expectedQuantityQuality)
     {
-        _documentAsserter.HasValue(
-            $"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/QuantityQuality",
-            EbixCode.ForWholesaleServicesOf(expectedQuantityQuality)!);
+        _documentAsserter
+            .HasValue(
+                $"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/Position",
+                expectedPosition.ToString(CultureInfo.InvariantCulture))
+            .HasValue(
+                $"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/QuantityQuality",
+                EbixCode.ForWholesaleServicesOf(expectedQuantityQuality)!);
+
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasAnyPoints()
+    {
+        _documentAsserter.ElementExists($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[1]");
+
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasPoints(IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points)
+    {
+        var pointsInDocument = _documentAsserter
+            .GetElements($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation")!;
+
+        pointsInDocument.Should().HaveSameCount(points);
+
+        var expectedPoints = points.OrderBy(p => p.Time).ToList();
+
+        for (var i = 0; i < pointsInDocument.Count; i++)
+        {
+            pointsInDocument[i]
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("EnergySum"), _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .ToDecimal()
+                .Should()
+                .Be(expectedPoints[i].Amount.ToDecimal());
+
+            pointsInDocument[i]
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("EnergyQuantity"), _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .ToDecimal()
+                .Should()
+                .Be(expectedPoints[i].Quantity.ToDecimal());
+
+            pointsInDocument[i]
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("Position"), _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .ToInt()
+                .Should()
+                .Be(i + 1);
+
+            pointsInDocument[i]
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("EnergyPrice"), _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .ToDecimal()
+                .Should()
+                .Be(expectedPoints[i].Price.ToDecimal());
+
+            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+            {
+                QuantityQuality.Calculated => EbixCode.QuantityQualityCodeCalculated,
+                _ => throw new NotImplementedException(
+                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
+            };
+
+            pointsInDocument[i]
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("QuantityQuality"), _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .Should()
+                .Be(expectedQuantityQuality);
+        }
 
         return this;
     }

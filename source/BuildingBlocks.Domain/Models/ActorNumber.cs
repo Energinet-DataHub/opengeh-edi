@@ -32,9 +32,17 @@ public class ActorNumber : ValueObject
     public static ActorNumber Create(string actorNumber)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
+        return TryCreate(actorNumber) ?? throw InvalidActorNumberException.Create(actorNumber);
+    }
+
+    public static ActorNumber? TryCreate(string? actorNumber)
+    {
+        if (actorNumber == null)
+            return null;
+
         return IsGlnNumber(actorNumber) || IsEic(actorNumber)
             ? new ActorNumber(actorNumber)
-            : throw InvalidActorNumberException.Create(actorNumber);
+            : null;
     }
 
     public static bool IsEic(string actorNumber)

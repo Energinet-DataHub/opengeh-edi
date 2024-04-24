@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
-
-public sealed record ActorNumberAndRoleDto(ActorNumber ActorNumber, ActorRole ActorRole);
+public sealed record Actor(ActorNumber ActorNumber, ActorRole ActorRole);

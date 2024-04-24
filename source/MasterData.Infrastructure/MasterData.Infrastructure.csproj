@@ -7,6 +7,7 @@
     <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj"/>
     <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj"/>
     <ProjectReference Include="..\MasterData.Domain\MasterData.Domain.csproj" />
+    <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.35" />

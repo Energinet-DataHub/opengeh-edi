@@ -14,6 +14,7 @@
 
 using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -39,6 +40,7 @@ public class ActorRole : DataHubType<ActorRole>
     public static readonly ActorRole DanishEnergyAgency = new(DataHubNames.ActorRole.DanishEnergyAgency, "STS");
     public static readonly ActorRole Delegated = new(DataHubNames.ActorRole.Delegated, "DEL");
 
+    [JsonConstructor]
     private ActorRole(string name, string code)
         : base(name, code)
     {
