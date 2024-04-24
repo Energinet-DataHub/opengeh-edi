@@ -29,7 +29,7 @@ public class WhenReceiverDataIsNotCorrectTests : BaseTestClass
     {
     }
 
-    [Fact]
+    [Fact(Skip = "Not a sub system test")]
     public async Task Invalid_receiver_id_produces_correct_error()
     {
         var payload =

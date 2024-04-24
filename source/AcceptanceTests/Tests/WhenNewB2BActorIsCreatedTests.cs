@@ -45,9 +45,9 @@ public sealed class WhenNewB2BActorIsCreatedTests
         return; // skipped locally, b2c api is not public available
 #endif
         var b2CId = Guid.NewGuid().ToString();
-        await _actorDsl.PublishResultForAsync(actorNumber: "8880000610888", b2CId: b2CId);
+        await _actorDsl.PublishResult(actorNumber: "8880000610888", b2CId: b2CId);
 
-        var exists = await _actorDsl.ConfirmActorIsAvailableAsync(actorNumber: "8880000610888", b2CId: b2CId);
+        var exists = await _actorDsl.ConfirmActorIsAvailable(actorNumber: "8880000610888", b2CId: b2CId);
         Assert.True(exists);
     }
 }

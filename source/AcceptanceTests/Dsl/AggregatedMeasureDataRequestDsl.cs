@@ -14,63 +14,95 @@
 
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
-using Energinet.DataHub.EDI.AcceptanceTests.TestData;
+using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
+using FluentAssertions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
 public sealed class AggregatedMeasureDataRequestDsl
 {
-    private readonly EdiDriver _edi;
+    private readonly EdiDriver _ediDriver;
+    private readonly EdiProcessesDriver _ediProcessesDriver;
+    private readonly WholesaleDriver _wholesaleDriver;
 
 #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
 
-    internal AggregatedMeasureDataRequestDsl(EdiDriver ediDriver)
+    internal AggregatedMeasureDataRequestDsl(
+        EdiDriver ediDriver,
+        EdiProcessesDriver ediProcessesDriver,
+        WholesaleDriver wholesaleDriver)
     {
-        _edi = ediDriver;
-    }
-
-    internal Task AggregatedMeasureDataFor()
-    {
-        return _edi.RequestAggregatedMeasureDataAsync();
-    }
-
-    internal Task ConfirmAcceptedResultIsAvailableFor()
-    {
-        return _edi.PeekAcceptedAggregationMessageAsync();
-    }
-
-    internal Task RejectedAggregatedMeasureDataFor()
-    {
-        return _edi.RequestAggregatedMeasureDataAsync(asyncError: true);
-    }
-
-    internal Task ConfirmRejectedResultIsAvailableFor()
-    {
-        return _edi.PeekRejectedMessageAsync();
-    }
-
-    internal Task EmptyQueueForActor()
-    {
-        return _edi.EmptyQueueAsync();
-    }
-
-    internal Task ConfirmRequestAggregatedMeasureDataWithoutTokenIsNotAllowed()
-    {
-        return _edi.RequestAggregatedMeasureDataWithoutTokenAsync();
-    }
-
-    internal Task ConfirmPeekWithoutTokenIsNotAllowed()
-    {
-        return _edi.PeekMessageWithoutTokenAsync();
-    }
-
-    internal Task ConfirmDequeueWithoutTokenIsNotAllowed()
-    {
-        return _edi.DequeueMessageWithoutTokenAsync("irrelevant-message-id");
+        _ediDriver = ediDriver;
+        _ediProcessesDriver = ediProcessesDriver;
+        _wholesaleDriver = wholesaleDriver;
     }
 
     internal Task<string> AggregatedMeasureDataWithXmlPayload(XmlDocument payload)
     {
-        return _edi.RequestAggregatedMeasureDataXmlAsync(payload);
+        return _ediDriver.RequestAggregatedMeasureDataXmlAsync(payload);
+    }
+
+    internal async Task<Guid> Request(CancellationToken cancellationToken)
+    {
+        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+        return await _ediDriver
+                .RequestAggregatedMeasureDataAsync(false, cancellationToken)
+                .ConfigureAwait(false);
+    }
+
+    internal async Task ConfirmInvalidRequestIsRejected(CancellationToken cancellationToken = default)
+    {
+        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+        var act = async () =>
+        {
+            await _ediDriver
+                .RequestAggregatedMeasureDataAsync(true, cancellationToken)
+                .ConfigureAwait(false);
+        };
+
+        await Assert.ThrowsAsync<BadAggregatedMeasureDataRequestException>(act).ConfigureAwait(false);
+    }
+
+    internal async Task ConfirmRequestIsInitialized(
+        Guid requestMessageId,
+        CancellationToken cancellationToken)
+    {
+        var processId = await _ediProcessesDriver
+            .GetAggregatedMeasureDataProcessIdAsync(requestMessageId, cancellationToken)
+            .ConfigureAwait(false);
+
+        processId.Should().NotBeNull();
+    }
+
+    internal async Task PublishAggregatedMeasureDataRequestAcceptedResponse(
+        string gridAreaCode,
+        string actorNumber,
+        CancellationToken cancellationToken)
+    {
+        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+
+        var processId = await _ediProcessesDriver
+            .CreateAggregatedMeasureDataProcessAsync(gridAreaCode, actorNumber, cancellationToken)
+            .ConfigureAwait(false);
+
+        await _wholesaleDriver.PublishAggregatedMeasureDataRequestAcceptedResponseAsync(
+            processId,
+            gridAreaCode,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    internal async Task PublishAggregatedMeasureDataRequestRejectedResponse(
+        string gridAreaCode,
+        string actorNumber,
+        CancellationToken cancellationToken)
+    {
+        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+
+        var processId = await _ediProcessesDriver
+            .CreateAggregatedMeasureDataProcessAsync(gridAreaCode, actorNumber, cancellationToken)
+            .ConfigureAwait(false);
+
+        await _wholesaleDriver.PublishAggregatedMeasureDataRequestRejectedResponseAsync(processId, cancellationToken)
+            .ConfigureAwait(false);
     }
 }
