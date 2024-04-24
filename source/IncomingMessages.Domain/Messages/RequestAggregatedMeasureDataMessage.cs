@@ -41,6 +41,7 @@ public record RequestAggregatedMeasureDataMessageSeries(
 {
     public ActorNumber? GetActorNumberForRole(ActorRole actorRole)
     {
-        throw new NotImplementedException();
+        // TODO: Implement for aggregated measure data
+        return null;
     }
 }

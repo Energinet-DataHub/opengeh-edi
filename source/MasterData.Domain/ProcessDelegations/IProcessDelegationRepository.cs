@@ -31,6 +31,7 @@ public interface IProcessDelegationRepository
 
     /// <summary>
     /// Get the active delegation by the given actor number, actor role, grid area code and process type.
+    ///     Typically used when querying delegations for outgoing messages
     /// </summary>
     Task<ProcessDelegation?> GetProcessesDelegatedByAsync(
         ActorNumber delegatedByActorNumber,
@@ -41,6 +42,8 @@ public interface IProcessDelegationRepository
 
     /// <summary>
     /// Get the latest delegation to the given actor number, actor role, grid area code and process type.
+    /// If grid area is null, it retrieves all delegations to the given actor and process.
+    ///     Typically used when querying delegations for incoming messages
     /// </summary>
     Task<IReadOnlyCollection<ProcessDelegation>> GetProcessesDelegatedToAsync(
         ActorNumber delegatedToActorNumber,

@@ -63,6 +63,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         {
             ActorRole.EnergySupplier,
             ActorRole.GridOperator,
+            ActorRole.SystemOperator,
         };
 
         var delegatedToRoles = new List<ActorRole>

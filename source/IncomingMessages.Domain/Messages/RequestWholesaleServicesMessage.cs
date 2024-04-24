@@ -49,6 +49,7 @@ public record RequestWholesaleServicesSeries(
         {
             DataHubNames.ActorRole.EnergySupplier => ActorNumber.TryCreate(EnergySupplierId),
             DataHubNames.ActorRole.GridOperator => ActorNumber.TryCreate(ChargeOwner),
+            DataHubNames.ActorRole.SystemOperator => ActorNumber.TryCreate(ChargeOwner),
             _ => null,
         };
     }
