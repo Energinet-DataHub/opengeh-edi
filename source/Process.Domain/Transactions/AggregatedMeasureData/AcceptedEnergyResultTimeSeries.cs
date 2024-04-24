@@ -30,9 +30,3 @@ public record AcceptedEnergyResultTimeSeries(
     long CalculationResultVersion,
     Instant StartOfPeriod,
     Instant EndOfPeriod);
-
-[Serializable]
-public record Point(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);
-
-[Serializable]
-public record GridAreaDetails(string GridAreaCode, string OperatorNumber);

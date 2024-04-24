@@ -2,6 +2,7 @@
   <PropertyGroup>
     <AssemblyName>Energinet.DataHub.EDI.BuildingBlocks.Infrastructure</AssemblyName>
     <RootNamespace>Energinet.DataHub.EDI.BuildingBlocks.Infrastructure</RootNamespace>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Storage.Files.DataLake" Version="12.17.1" />
@@ -14,6 +15,10 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.1.2"/>
     <PackageReference Include="SimplerSoftware.EntityFrameworkCore.SqlServer.NodaTime" Version="8.0.0" />
+    <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.556">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />

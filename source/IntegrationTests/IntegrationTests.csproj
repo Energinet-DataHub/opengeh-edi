@@ -19,6 +19,7 @@ limitations under the License.
       <AssemblyName>Energinet.DataHub.EDI.IntegrationTests</AssemblyName>
       <RootNamespace>Energinet.DataHub.EDI.IntegrationTests</RootNamespace>
         <IsPackable>false</IsPackable>
+        <LangVersion>default</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -50,7 +51,7 @@ limitations under the License.
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.435">
+        <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.556">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

@@ -183,5 +183,3 @@ public class AssertEbixDocument
         return _document.Root?.XPathSelectElement(EnsureXPathHasPrefix(xpath), _xmlNamespaceManager);
     }
 }
-
-public record AttributeNameAndValue(string Name, string Value);

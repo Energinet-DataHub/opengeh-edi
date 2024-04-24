@@ -27,21 +27,3 @@ public record RequestAggregatedMeasureDataMessage(
     string CreatedAt,
     string? BusinessType,
     IReadOnlyCollection<IIncomingMessageSeries> Serie) : IIncomingMessage;
-
-public record RequestAggregatedMeasureDataMessageSeries(
-    string TransactionId,
-    string? MarketEvaluationPointType,
-    string? MarketEvaluationSettlementMethod,
-    string StartDateTime,
-    string? EndDateTime,
-    string? GridArea,
-    string? EnergySupplierMarketParticipantId,
-    string? BalanceResponsiblePartyMarketParticipantId,
-    string? SettlementVersion) : BaseDelegatedSeries, IIncomingMessageSeries
-{
-    public ActorNumber? GetActorNumberForRole(ActorRole actorRole)
-    {
-        // TODO: Implement for aggregated measure data
-        return null;
-    }
-}

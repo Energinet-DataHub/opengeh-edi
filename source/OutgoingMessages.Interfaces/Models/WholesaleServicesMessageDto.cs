@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -70,27 +69,3 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
             chargeOwnerId: chargeOwnerId);
     }
 }
-
-public record WholesaleServicesSeries(
-    Guid TransactionId,
-    long CalculationVersion,
-    string GridAreaCode,
-    string ChargeCode,
-    bool IsTax,
-    IReadOnlyCollection<WholesaleServicesPoint> Points,
-    ActorNumber EnergySupplier,
-    ActorNumber ChargeOwner,
-    Period Period,
-    SettlementVersion? SettlementVersion,
-    MeasurementUnit QuantityMeasureUnit,
-    MeasurementUnit? QuantityUnit, // To ensure backwards compatibility, will be remove in another PR.
-    MeasurementUnit PriceMeasureUnit,
-    Currency Currency,
-    ChargeType ChargeType,
-    Resolution Resolution,
-    MeteringPointType? MeteringPointType,
-    SettlementMethod? SettlementType, // TODO: To ensure backwards compatibility, will be removed in another PR.
-    SettlementMethod? SettlementMethod,
-    string? OriginalTransactionIdReference = null);
-
-public record WholesaleServicesPoint(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);

@@ -47,6 +47,7 @@ limitations under the License.
       <NoWarn>$(NoWarn);1591</NoWarn>
       <PublishRepositoryUrl>true</PublishRepositoryUrl>
       <PackageVersion>1.2.0</PackageVersion>
+      <LangVersion>default</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -63,7 +64,7 @@ limitations under the License.
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.435">
+      <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.556">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>

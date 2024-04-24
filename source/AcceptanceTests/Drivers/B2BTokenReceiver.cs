@@ -14,7 +14,6 @@
 
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
@@ -42,13 +41,12 @@ public class B2BTokenReceiver
         ArgumentNullException.ThrowIfNull(clientSecret);
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri($"https://login.microsoftonline.com/{_tenantId}/oauth2/v2.0/token", UriKind.Absolute));
 
-        request.Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
-        {
+        request.Content = new FormUrlEncodedContent([
             new("grant_type", "client_credentials"),
             new("client_id", clientId),
             new("client_secret", clientSecret),
             new("scope", $"{_backendAppId}/.default"),
-        });
+        ]);
 
         var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
@@ -61,5 +59,3 @@ public class B2BTokenReceiver
         return accessToken.AccessToken;
     }
 }
-
-public sealed record AccessTokenResponse([property: JsonPropertyName("access_token")] string AccessToken);

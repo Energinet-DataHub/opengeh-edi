@@ -100,7 +100,7 @@ public class InitializeWholesaleServicesProcessDtoBuilder
             _resolution,
             _chargeOwner,
             new List<InitializeWholesaleServicesChargeType> { CreateChargeType() }.AsReadOnly(),
-            new List<string> { _gridArea },
+            [_gridArea],
             RequestedByActor.From(_senderId, _senderRole),
             OriginalActor.From(_senderId, _senderRole));
 

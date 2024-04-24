@@ -25,22 +25,3 @@ public record RequestAggregatedMeasureDataMarketRequest(
     string? GridArea,
     string? EnergySupplierId,
     string? BalanceResponsibleId);
-
-public enum MeteringPointType
-{
-    Production,
-    FlexConsumption,
-    TotalConsumption,
-    NonProfiledConsumption,
-    Exchange,
-}
-
-public enum CalculationType
-{
-    PreliminaryAggregation,
-    BalanceFixing,
-    WholesaleFixing,
-    FirstCorrection,
-    SecondCorrection,
-    ThirdCorrection,
-}

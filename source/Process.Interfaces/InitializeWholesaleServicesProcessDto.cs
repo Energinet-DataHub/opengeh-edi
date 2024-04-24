@@ -22,19 +22,3 @@ public record InitializeWholesaleServicesProcessDto(
     string BusinessReason,
     string MessageId,
     IReadOnlyCollection<InitializeWholesaleServicesSeries> Series);
-
-public record InitializeWholesaleServicesSeries(
-    string Id,
-    string StartDateTime,
-    string? EndDateTime,
-    string? RequestedGridAreaCode,
-    string? EnergySupplierId,
-    string? SettlementVersion,
-    string? Resolution,
-    string? ChargeOwner,
-    IReadOnlyCollection<InitializeWholesaleServicesChargeType> ChargeTypes,
-    IReadOnlyCollection<string> GridAreas,
-    RequestedByActor RequestedByActor,
-    OriginalActor OriginalActor);
-
-public record InitializeWholesaleServicesChargeType(string? Id, string? Type);

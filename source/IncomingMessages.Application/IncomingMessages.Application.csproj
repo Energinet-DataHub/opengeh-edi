@@ -2,6 +2,7 @@
   <PropertyGroup>
     <AssemblyName>Energinet.DataHub.EDI.IncomingMessages.Application</AssemblyName>
     <RootNamespace>Energinet.DataHub.EDI.IncomingMessages.Application</RootNamespace>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ArchivedMessages.Interfaces\ArchivedMessages.Interfaces.csproj" />
@@ -15,6 +16,10 @@
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.35" />
     <PackageReference Include="Dapper-NodaTime" Version="0.1.0" />
+    <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.556">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemDefinitionGroup>
     <ProjectReference>

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -45,10 +44,3 @@ public class RejectedEnergyResultMessageDto : OutgoingMessageDto
 
     public RejectedEnergyResultMessageSerie Series { get; }
 }
-
-public record RejectedEnergyResultMessageSerie(
-    Guid TransactionId,
-    IReadOnlyCollection<RejectedEnergyResultMessageRejectReason> RejectReasons,
-    string OriginalTransactionIdReference);
-
-public record RejectedEnergyResultMessageRejectReason(string ErrorCode, string ErrorMessage);

@@ -25,5 +25,3 @@ public sealed record GetMessagesQuery(
     IReadOnlyCollection<string>? DocumentTypes = null,
     IReadOnlyCollection<string>? BusinessReasons = null,
     bool IncludeRelatedMessages = false);
-
-public record MessageCreationPeriod(Instant DateToSearchFrom, Instant DateToSearchTo);

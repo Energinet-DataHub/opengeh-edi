@@ -143,7 +143,7 @@ internal sealed class EbixDriver : IDisposable
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri("?soapAction=dequeueMessage", UriKind.Relative));
 
-        var emptyRequestBody = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>());
+        var emptyRequestBody = new FormUrlEncodedContent([]);
 
         request.Content = emptyRequestBody;
 
@@ -153,7 +153,7 @@ internal sealed class EbixDriver : IDisposable
     public async Task<HttpResponseMessage> PeekMessageWithoutCertificateAsync()
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri("?soapAction=peekMessage", UriKind.Relative));
-        request.Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>());
+        request.Content = new FormUrlEncodedContent([]);
 
         return await _unauthorizedHttpClient.SendAsync(request).ConfigureAwait(false);
     }
@@ -172,7 +172,7 @@ internal sealed class EbixDriver : IDisposable
     public async Task<HttpResponseMessage> DequeueMessageWithoutCertificateAsync()
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri("?soapAction=dequeueMessage", UriKind.Relative));
-        request.Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>());
+        request.Content = new FormUrlEncodedContent([]);
 
         return await _unauthorizedHttpClient.SendAsync(request).ConfigureAwait(false);
     }

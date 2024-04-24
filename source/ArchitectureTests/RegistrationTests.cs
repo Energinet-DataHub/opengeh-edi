@@ -238,7 +238,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             var allImplementations = ReflectionHelper.FindAllTypesThatImplementType();
 
             return allImplementations(targetType, allTypes(assemblies))
-                .Select(type => new object[] { new Requirement(type.Name, new List<Type> { targetType }, type) });
+                .Select(type => new object[] { new Requirement(type.Name, [targetType], type) });
         }
 
         private sealed class TestEnvironment : RuntimeEnvironment

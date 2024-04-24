@@ -3,6 +3,7 @@
   <PropertyGroup>
     <AssemblyName>Energinet.DataHub.EDI.Process.Domain</AssemblyName>
     <RootNamespace>Energinet.DataHub.EDI.Process.Domain</RootNamespace>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +15,10 @@
   <ItemGroup>
     <PackageReference Include="MediatR.Contracts" Version="2.0.1"/>
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.1.2" />
+    <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.556">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>
