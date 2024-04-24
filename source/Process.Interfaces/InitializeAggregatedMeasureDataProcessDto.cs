@@ -28,12 +28,12 @@ public record InitializeAggregatedMeasureDataProcessDto(
 
 public record InitializeAggregatedMeasureDataProcessSeries(
     string Id,
-    string? MarketEvaluationPointType,
-    string? MarketEvaluationSettlementMethod,
-    string StartDateAndOrTimeDateTime,
-    string? EndDateAndOrTimeDateTime,
+    string? MeteringPointType,
+    string? SettlementMethod,
+    string StartDateTime,
+    string? EndDateTime,
     string? RequestedGridAreaCode,
-    string? EnergySupplierMarketParticipantId,
-    string? BalanceResponsiblePartyMarketParticipantId,
+    string? EnergySupplierNumber,
+    string? BalanceResponsibleNumber,
     string? SettlementVersion,
     IReadOnlyCollection<string> GridAreas);

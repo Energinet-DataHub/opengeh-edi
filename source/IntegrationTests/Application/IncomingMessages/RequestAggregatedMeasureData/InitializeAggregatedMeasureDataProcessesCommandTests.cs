@@ -51,33 +51,46 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
     }
 
-    [Theory]
-    [InlineData("E17")]
-    [InlineData(null)]
-    public async Task Aggregated_measure_data_process_is_created_and_has_correct_data(string? marketEvaluationPointType)
+    public static IEnumerable<object?[]> InitializeProcessData()
     {
+        return new[]
+        {
+            new object?[] { "E17", null, Array.Empty<string>() },
+            new object?[] { null, null, new[] { "101", "542" } },
+            new object?[] { null, "101", new[] { "101" } },
+        };
+    }
+
+    [Theory]
+    [MemberData(nameof(InitializeProcessData))]
+    public async Task Aggregated_measure_data_process_is_created_and_has_correct_data(string? meteringPointType, string? requestedGridArea, string[] gridAreas)
+    {
+        ArgumentNullException.ThrowIfNull(gridAreas);
+
         // Arrange
-        var marketMessage = MessageBuilder()
-            .SetMarketEvaluationPointType(marketEvaluationPointType)
+        var initializeProcessDto = MessageBuilder()
+            .SetMeteringPointType(meteringPointType)
+            .SetRequestedGridArea(requestedGridArea)
+            .SetGridAreas(gridAreas)
             .Build();
 
         // Act
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(initializeProcessDto));
 
         // Assert
-        var process = GetProcess(marketMessage.SenderNumber);
+        var process = GetProcess(initializeProcessDto.SenderNumber);
         process.Should().NotBeNull();
-        marketMessage.Series.Should().NotBeEmpty();
-        process!.BusinessTransactionId.Id.Should().Be(marketMessage.Series.First().Id);
+        initializeProcessDto.Series.Should().NotBeEmpty();
+        process!.BusinessTransactionId.Id.Should().Be(initializeProcessDto.Series.First().Id);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);
-        process.Should().BeEquivalentTo(marketMessage, opt => opt.Using(new ProcessAndRequestComparer()));
+        process.Should().BeEquivalentTo(initializeProcessDto, opt => opt.Using(new ProcessAndRequestComparer()));
     }
 
     [Fact]
     public async Task Aggregated_measure_data_process_was_sent_to_wholesale()
     {
         // Arrange
-        var marketMessage =
+        var initializeProcessDto =
             MessageBuilder().
                 SetSenderRole(ActorRole.MeteredDataResponsible.Code).
                 SetEnergySupplierId(null).
@@ -85,18 +98,18 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                 Build();
 
         // Act
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(initializeProcessDto));
         await ProcessInternalCommandsAsync();
 
         // Assert
         var exceptedServiceBusMessageSubject = nameof(AggregatedTimeSeriesRequest);
         var message = _senderSpy.Message;
-        var process = GetProcess(marketMessage.SenderNumber);
+        var process = GetProcess(initializeProcessDto.SenderNumber);
         Assert.NotNull(message);
         Assert.NotNull(process);
         Assert.Equal(process.ProcessId.Id.ToString(), message!.MessageId);
         Assert.Equal(exceptedServiceBusMessageSubject, message!.Subject);
-        Assert.Equal(marketMessage.Series.First().Id, process!.BusinessTransactionId.Id);
+        Assert.Equal(initializeProcessDto.Series.First().Id, process!.BusinessTransactionId.Id);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Sent);
     }
 
@@ -104,13 +117,13 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
     public async Task Aggregated_measure_data_process_without_settlement_method_was_sent_to_wholesale()
     {
         // Arrange
-        var marketMessage =
+        var initializeProcessDto =
             MessageBuilder().
-                SetMarketEvaluationSettlementMethod(null).
+                SetSettlementMethod(null).
                 Build();
 
         // Act
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(initializeProcessDto));
         await ProcessInternalCommandsAsync();
 
         // Assert
@@ -122,11 +135,11 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
     public async Task When_AggregatedTimeSeriesRequest_is_sent_to_wholesale_it_contains_no_CIM_codes()
     {
         // Arrange
-        var marketMessage = MessageBuilder()
+        var initializeProcessDto = MessageBuilder()
             .Build();
 
         // Act
-        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
+        await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(initializeProcessDto));
         await ProcessInternalCommandsAsync();
 
         // Assert
@@ -200,19 +213,19 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                     },
                     {
                         nameof(AggregatedMeasureDataProcess.MeteringPointType),
-                        (p, r, s) => p.MeteringPointType.Should().Be(s.MarketEvaluationPointType)
+                        (p, r, s) => p.MeteringPointType.Should().Be(s.MeteringPointType)
                     },
                     {
                         nameof(AggregatedMeasureDataProcess.SettlementMethod),
-                        (p, r, s) => p.SettlementMethod.Should().Be(s.MarketEvaluationSettlementMethod)
+                        (p, r, s) => p.SettlementMethod.Should().Be(s.SettlementMethod)
                     },
                     {
                         nameof(AggregatedMeasureDataProcess.StartOfPeriod),
-                        (p, r, s) => p.StartOfPeriod.Should().Be(s.StartDateAndOrTimeDateTime)
+                        (p, r, s) => p.StartOfPeriod.Should().Be(s.StartDateTime)
                     },
                     {
                         nameof(AggregatedMeasureDataProcess.EndOfPeriod),
-                        (p, r, s) => p.EndOfPeriod.Should().Be(s.EndDateAndOrTimeDateTime)
+                        (p, r, s) => p.EndOfPeriod.Should().Be(s.EndDateTime)
                     },
                     {
                         nameof(AggregatedMeasureDataProcess.RequestedGridArea),
@@ -224,11 +237,11 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                     },
                     {
                         nameof(AggregatedMeasureDataProcess.EnergySupplierId),
-                        (p, r, s) => p.EnergySupplierId.Should().Be(s.EnergySupplierMarketParticipantId)
+                        (p, r, s) => p.EnergySupplierId.Should().Be(s.EnergySupplierNumber)
                     },
                     {
                         nameof(AggregatedMeasureDataProcess.BalanceResponsibleId),
-                        (p, r, s) => p.BalanceResponsibleId.Should().Be(s.BalanceResponsiblePartyMarketParticipantId)
+                        (p, r, s) => p.BalanceResponsibleId.Should().Be(s.BalanceResponsibleNumber)
                     },
                     {
                         nameof(AggregatedMeasureDataProcess.SettlementVersion), (p, r, s) =>

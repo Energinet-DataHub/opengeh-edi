@@ -59,10 +59,6 @@ public class InitializeAggregatedMeasureDataProcessesHandler : IRequestHandler<I
                 ? SettlementVersion.FromCodeOrUnused(series.SettlementVersion)
                 : null;
 
-            var gridAreas = series.RequestedGridAreaCode != null
-                ? new List<string> { series.RequestedGridAreaCode }
-                : new List<string>();
-
             _aggregatedMeasureDataProcessRepository.Add(
                 new AggregatedMeasureDataProcess(
                     ProcessId.New(),
@@ -71,15 +67,15 @@ public class InitializeAggregatedMeasureDataProcessesHandler : IRequestHandler<I
                     dto.SenderRoleCode,
                     businessReason,
                     messageId,
-                    series.MarketEvaluationPointType,
-                    series.MarketEvaluationSettlementMethod,
-                    series.StartDateAndOrTimeDateTime,
-                    series.EndDateAndOrTimeDateTime,
+                    series.MeteringPointType,
+                    series.SettlementMethod,
+                    series.StartDateTime,
+                    series.EndDateTime,
                     series.RequestedGridAreaCode,
-                    series.EnergySupplierMarketParticipantId,
-                    series.BalanceResponsiblePartyMarketParticipantId,
+                    series.EnergySupplierNumber,
+                    series.BalanceResponsibleNumber,
                     settlementVersion,
-                    gridAreas));
+                    series.GridAreas));
         }
     }
 }
