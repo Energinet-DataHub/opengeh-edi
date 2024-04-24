@@ -35,6 +35,7 @@ internal sealed class EdiProcessesDriver
 
         var processId = Guid.NewGuid();
 
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
         using (var createProcessCommand = new SqlCommand())
         {
             createProcessCommand.CommandText = @"INSERT INTO [WholesaleServicesProcesses]
@@ -48,7 +49,6 @@ internal sealed class EdiProcessesDriver
             createProcessCommand.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow);
 
             createProcessCommand.Connection = connection;
-            await createProcessCommand.Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
             await createProcessCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
         }
 
@@ -64,7 +64,6 @@ internal sealed class EdiProcessesDriver
             createProcessGridAreaCommand.Parameters.AddWithValue("@GridArea", requestedGridAreaCode);
 
             createProcessGridAreaCommand.Connection = connection;
-            await createProcessGridAreaCommand.Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
             await createProcessGridAreaCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
         }
 
@@ -79,6 +78,7 @@ internal sealed class EdiProcessesDriver
         using var connection = new SqlConnection(_connectionString);
         var processId = Guid.NewGuid();
 
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
         using (var createProcessCommand = new SqlCommand())
         {
             createProcessCommand.CommandText = @"INSERT INTO [AggregatedMeasureDataProcesses]
@@ -92,7 +92,6 @@ internal sealed class EdiProcessesDriver
             createProcessCommand.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow);
 
             createProcessCommand.Connection = connection;
-            await createProcessCommand.Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
             await createProcessCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
         }
 
