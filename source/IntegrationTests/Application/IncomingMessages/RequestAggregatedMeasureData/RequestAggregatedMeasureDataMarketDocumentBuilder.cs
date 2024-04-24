@@ -26,7 +26,7 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
 {
     private readonly string _startDateAndOrTimeDateTime = "2022-06-17T22:00:00Z";
     private readonly string _endDateAndOrTimeDateTime = "2022-07-22T22:00:00Z";
-    private readonly string _meteringGridAreaDomainId = "244";
+    private readonly string _gridArea = "244";
     private readonly string _messageType = "E74";
     private readonly string _businessType = "23";
     private readonly BusinessReason _businessReason = BusinessReason.PreliminaryAggregation;
@@ -103,27 +103,23 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
         return new InitializeAggregatedMeasureDataProcessDto(
             header.SenderId,
             header.SenderRole,
-            header.ReceiverId,
-            header.ReceiverRole,
             header.BusinessReason,
-            header.MessageType,
             header.MessageId,
-            header.CreatedAt,
-            header.BusinessType,
-            new List<InitializeAggregatedMeasureDataProcessSeries> { CreateSerie() }.AsReadOnly());
+            new List<InitializeAggregatedMeasureDataProcessSeries> { CreateSeries() }.AsReadOnly());
     }
 
-    private InitializeAggregatedMeasureDataProcessSeries CreateSerie() =>
+    private InitializeAggregatedMeasureDataProcessSeries CreateSeries() =>
         new(
             _serieId,
             _marketEvaluationPointType,
             _marketEvaluationSettlementMethod,
             _startDateAndOrTimeDateTime,
             _endDateAndOrTimeDateTime,
-            _meteringGridAreaDomainId,
+            _gridArea,
             _energySupplierMarketParticipantId,
             _balanceResponsiblePartyMarketParticipantId,
-            _settlementVersion);
+            _settlementVersion,
+            new List<string> { _gridArea });
 
     private MessageHeader CreateHeader()
     {

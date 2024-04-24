@@ -26,27 +26,32 @@ public static class InitializeAggregatedMeasureDataProcessDtoFactory
         var series = requestAggregatedMeasureDataMessage.Serie
             .Cast<RequestAggregatedMeasureDataMessageSeries>()
             .Select(
-                serie => new InitializeAggregatedMeasureDataProcessSeries(
-                    serie.TransactionId,
-                    serie.MarketEvaluationPointType,
-                    serie.MarketEvaluationSettlementMethod,
-                    serie.StartDateTime,
-                    serie.EndDateTime,
-                    serie.GridArea,
-                    serie.EnergySupplierMarketParticipantId,
-                    serie.BalanceResponsiblePartyMarketParticipantId,
-                    serie.SettlementVersion)).ToList().AsReadOnly();
+                series =>
+                {
+                    var gridAreas = series.DelegatedGridAreas.Count > 0
+                        ? series.DelegatedGridAreas
+                        : series.GridArea != null
+                            ? new List<string> { series.GridArea }
+                            : Array.Empty<string>();
+
+                    return new InitializeAggregatedMeasureDataProcessSeries(
+                        series.TransactionId,
+                        series.MarketEvaluationPointType,
+                        series.MarketEvaluationSettlementMethod,
+                        series.StartDateTime,
+                        series.EndDateTime,
+                        series.GridArea,
+                        series.EnergySupplierMarketParticipantId,
+                        series.BalanceResponsiblePartyMarketParticipantId,
+                        series.SettlementVersion,
+                        gridAreas);
+                }).ToList().AsReadOnly();
 
         return new InitializeAggregatedMeasureDataProcessDto(
                 requestAggregatedMeasureDataMessage.SenderNumber,
                 requestAggregatedMeasureDataMessage.SenderRoleCode,
-                requestAggregatedMeasureDataMessage.ReceiverNumber,
-                requestAggregatedMeasureDataMessage.ReceiverRoleCode,
                 requestAggregatedMeasureDataMessage.BusinessReason,
-                requestAggregatedMeasureDataMessage.MessageType,
                 requestAggregatedMeasureDataMessage.MessageId,
-                requestAggregatedMeasureDataMessage.CreatedAt,
-                requestAggregatedMeasureDataMessage.BusinessType,
                 series);
     }
 }

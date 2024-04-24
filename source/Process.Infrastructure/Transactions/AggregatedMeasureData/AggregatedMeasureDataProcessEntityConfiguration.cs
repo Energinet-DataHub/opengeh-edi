@@ -40,7 +40,7 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
         builder.Property(x => x.SettlementMethod);
         builder.Property(x => x.StartOfPeriod);
         builder.Property(x => x.EndOfPeriod);
-        builder.Property(x => x.MeteringGridAreaDomainId);
+        builder.Property(x => x.RequestedGridArea);
         builder.Property(x => x.EnergySupplierId);
         builder.Property(x => x.BalanceResponsibleId);
         builder.Property(x => x.BusinessReason)
@@ -68,6 +68,19 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
             .HasConversion(
                 toDbValue => toDbValue.Value,
                 fromDbValue => MessageId.Create(fromDbValue));
+
+        builder.OwnsMany<AggregatedMeasureDataProcessGridArea>(
+            "_gridAreas",
+            navigationBuilder =>
+            {
+                navigationBuilder.ToTable("AggregatedMeasureDataProcessGridAreas", "dbo");
+                navigationBuilder.WithOwner().HasForeignKey(x => x.AggregatedMeasureDataProcessId);
+                navigationBuilder.HasKey(x => x.Id);
+                navigationBuilder.Property(x => x.AggregatedMeasureDataProcessId)
+                    .HasConversion(processId => processId.Id, dbValue => ProcessId.Create(dbValue));
+                navigationBuilder.Property(x => x.GridArea);
+            });
+
         builder.Ignore(x => x.DomainEvents);
 
         builder.Property<string>("CreatedBy");

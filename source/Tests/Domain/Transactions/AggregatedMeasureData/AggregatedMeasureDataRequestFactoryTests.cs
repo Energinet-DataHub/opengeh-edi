@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
@@ -31,6 +32,7 @@ public sealed class AggregatedMeasureDataRequestFactoryTests
     [Fact]
     public void With_metering_point_type()
     {
+        var gridArea = "42";
         var process = new AggregatedMeasureDataProcess(
             ProcessId.New(),
             BusinessTransactionId.Create(Guid.NewGuid().ToString()),
@@ -42,10 +44,11 @@ public sealed class AggregatedMeasureDataRequestFactoryTests
             null,
             "123456",
             "123457",
-            "42",
+            gridArea,
             null,
             null,
-            null);
+            null,
+            new[] { gridArea });
 
         // Act
         var serviceBusMessage = AggregatedMeasureDataRequestFactory.CreateServiceBusMessage(process);
@@ -60,6 +63,7 @@ public sealed class AggregatedMeasureDataRequestFactoryTests
     [Fact]
     public void Without_metering_point_type()
     {
+        var gridArea = "42";
         var process = new AggregatedMeasureDataProcess(
             ProcessId.New(),
             BusinessTransactionId.Create(Guid.NewGuid().ToString()),
@@ -71,10 +75,11 @@ public sealed class AggregatedMeasureDataRequestFactoryTests
             null,
             "123456",
             "123457",
-            "42",
+            gridArea,
             null,
             null,
-            null);
+            null,
+            new[] { gridArea });
 
         // Act
         var serviceBusMessage = AggregatedMeasureDataRequestFactory.CreateServiceBusMessage(process);

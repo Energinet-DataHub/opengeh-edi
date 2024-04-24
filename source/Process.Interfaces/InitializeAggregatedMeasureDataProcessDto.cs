@@ -22,13 +22,8 @@ namespace Energinet.DataHub.EDI.Process.Interfaces;
 public record InitializeAggregatedMeasureDataProcessDto(
     string SenderNumber,
     string SenderRoleCode,
-    string ReceiverNumber,
-    string ReceiverRoleCode,
     string BusinessReason,
-    string MessageType,
     string MessageId,
-    string CreatedAt,
-    string? BusinessType,
     IReadOnlyCollection<InitializeAggregatedMeasureDataProcessSeries> Series);
 
 public record InitializeAggregatedMeasureDataProcessSeries(
@@ -37,7 +32,8 @@ public record InitializeAggregatedMeasureDataProcessSeries(
     string? MarketEvaluationSettlementMethod,
     string StartDateAndOrTimeDateTime,
     string? EndDateAndOrTimeDateTime,
-    string? MeteringGridAreaDomainId,
+    string? RequestedGridAreaCode,
     string? EnergySupplierMarketParticipantId,
     string? BalanceResponsiblePartyMarketParticipantId,
-    string? SettlementVersion);
+    string? SettlementVersion,
+    IReadOnlyCollection<string> GridAreas);

@@ -215,8 +215,12 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                         (p, r, s) => p.EndOfPeriod.Should().Be(s.EndDateAndOrTimeDateTime)
                     },
                     {
-                        nameof(AggregatedMeasureDataProcess.MeteringGridAreaDomainId),
-                        (p, r, s) => p.MeteringGridAreaDomainId.Should().Be(s.MeteringGridAreaDomainId)
+                        nameof(AggregatedMeasureDataProcess.RequestedGridArea),
+                        (p, r, s) => p.RequestedGridArea.Should().Be(s.RequestedGridAreaCode)
+                    },
+                    {
+                        nameof(AggregatedMeasureDataProcess.GridAreas),
+                        (p, r, s) => p.GridAreas.Should().Equal(s.GridAreas)
                     },
                     {
                         nameof(AggregatedMeasureDataProcess.EnergySupplierId),

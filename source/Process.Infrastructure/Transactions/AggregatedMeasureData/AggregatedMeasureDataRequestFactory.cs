@@ -74,8 +74,8 @@ public static class AggregatedMeasureDataRequestFactory
         if (process.EnergySupplierId != null)
             request.EnergySupplierId = process.EnergySupplierId;
 
-        if (process.MeteringGridAreaDomainId != null)
-            request.GridAreaCodes.Add(process.MeteringGridAreaDomainId);
+        if (process.RequestedGridArea != null)
+            request.GridAreaCodes.Add(process.RequestedGridArea);
 
         if (process.BalanceResponsibleId != null)
             request.BalanceResponsibleId = process.BalanceResponsibleId;
