@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.WellKnownTypes;
@@ -26,28 +27,29 @@ internal static class AggregatedTimeSeriesRequestAcceptedEventBuilder
     {
         var @event = new AggregatedTimeSeriesRequestAccepted();
 
-        var series = new Series
-        {
-            GridArea = aggregatedTimeSeriesRequest.GridAreaCode,
-            QuantityUnit = QuantityUnit.Kwh,
-            TimeSeriesType = TimeSeriesType.Production,
-            Resolution = Resolution.Pt1H,
-            CalculationResultVersion = 1024,
-            Period = new Period
+        var series = aggregatedTimeSeriesRequest.GridAreaCodes
+            .Select(gridArea => new Series
             {
-                StartOfPeriod = new Timestamp { Seconds = 512, Nanos = 256 },
-                EndOfPeriod = new Timestamp { Seconds = 1024, Nanos = 512 },
-            },
-            TimeSeriesPoints =
-            {
-                new TimeSeriesPoint
+                GridArea = gridArea,
+                QuantityUnit = QuantityUnit.Kwh,
+                TimeSeriesType = TimeSeriesType.Production,
+                Resolution = Resolution.Pt1H,
+                CalculationResultVersion = 1024,
+                Period = new Period
                 {
-                    Quantity = new DecimalValue { Units = 32, Nanos = 64 },
-                    Time = new Timestamp { Seconds = 128, Nanos = 256 },
-                    QuantityQualities = { QuantityQuality.Calculated, QuantityQuality.Measured },
+                    StartOfPeriod = new Timestamp { Seconds = 512, Nanos = 256 },
+                    EndOfPeriod = new Timestamp { Seconds = 1024, Nanos = 512 },
                 },
-            },
-        };
+                TimeSeriesPoints =
+                {
+                    new TimeSeriesPoint
+                    {
+                        Quantity = new DecimalValue { Units = 32, Nanos = 64 },
+                        Time = new Timestamp { Seconds = 128, Nanos = 256 },
+                        QuantityQualities = { QuantityQuality.Calculated, QuantityQuality.Measured },
+                    },
+                },
+            });
 
         @event.Series.Add(series);
 
