@@ -73,9 +73,9 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
         var aggregatedTimeSeriesRequestMessage = AggregatedTimeSeriesRequest.Parser.ParseFrom(serviceBusMessage.Body);
 
         aggregatedTimeSeriesRequestMessage.Should().NotBeNull();
-        aggregatedTimeSeriesRequestMessage.GridAreaCode.Should().Be("512");
-        aggregatedTimeSeriesRequestMessage.RequestedByActorId.Should().Be("2111111111111");
-        aggregatedTimeSeriesRequestMessage.RequestedByActorRole.Should().Be("EnergySupplier");
+        aggregatedTimeSeriesRequestMessage.GridAreaCodes.Should().Equal("512");
+        aggregatedTimeSeriesRequestMessage.RequestedForActorNumber.Should().Be("2111111111111");
+        aggregatedTimeSeriesRequestMessage.RequestedForActorRole.Should().Be("EnergySupplier");
         aggregatedTimeSeriesRequestMessage.EnergySupplierId.Should().Be("2111111111111");
     }
 
