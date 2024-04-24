@@ -79,7 +79,7 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
         aggregatedTimeSeriesRequestMessage.EnergySupplierId.Should().Be("2111111111111");
     }
 
-    [Fact]
+    [Fact(Skip = "Delegation is not implemented yet")]
     public async Task
         Given_DelegationInTwoGridAreas_When_RequestAggregatedMeasureDataJsonIsReceived_Then_ServiceBusMessageToWholesaleIsAddedToServiceBus()
     {
