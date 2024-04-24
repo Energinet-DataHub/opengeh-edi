@@ -52,7 +52,7 @@ internal sealed class EdiProcessesDriver
     }
 
     internal async Task<Guid> CreateAggregatedMeasureDataProcessAsync(
-        string gridAreaCode,
+        string requestedGridAreaCode,
         string actorNumber,
         CancellationToken cancellationToken)
     {
@@ -61,12 +61,12 @@ internal sealed class EdiProcessesDriver
         var processId = Guid.NewGuid();
 
         command.CommandText = @"INSERT INTO [AggregatedMeasureDataProcesses]
-            (ProcessId, BusinessTransactionId, MeteringPointType, SettlementMethod, StartOfPeriod, EndOfPeriod, MeteringGridAreaDomainId, EnergySupplierId, BalanceResponsibleId, RequestedByActorId, BusinessReason, RequestedByActorRoleCode, State, SettlementVersion, InitiatedByMessageId, CreatedBy, CreatedAt, ModifiedBy, ModifiedAt)
+            (ProcessId, BusinessTransactionId, MeteringPointType, SettlementMethod, StartOfPeriod, EndOfPeriod, RequestedGridArea, EnergySupplierId, BalanceResponsibleId, RequestedByActorId, BusinessReason, RequestedByActorRoleCode, State, SettlementVersion, InitiatedByMessageId, CreatedBy, CreatedAt, ModifiedBy, ModifiedAt)
             VALUES
-            (@ProcessId, @BusinessTransactionId, 'E17', 'D01', '2024-04-22T22:00:00Z', '2024-04-23T22:00:00Z', @GridAreaCode, @EnergySupplierId, null, @EnergySupplierId, 'D04', 'DDQ', 'Sent', NULL, '9e831318-f12c-48b0-9151-c9c6e73081dc', 'Acceptance Tests', @CreatedAt, NULL, NULL);";
+            (@ProcessId, @BusinessTransactionId, 'E17', 'D01', '2024-04-22T22:00:00Z', '2024-04-23T22:00:00Z', @RequestedGridArea, @EnergySupplierId, null, @EnergySupplierId, 'D04', 'DDQ', 'Sent', NULL, '9e831318-f12c-48b0-9151-c9c6e73081dc', 'Acceptance Tests', @CreatedAt, NULL, NULL);";
         command.Parameters.AddWithValue("@ProcessId", processId);
         command.Parameters.AddWithValue("@BusinessTransactionId", Guid.NewGuid());
-        command.Parameters.AddWithValue("@GridAreaCode", gridAreaCode);
+        command.Parameters.AddWithValue("@RequestedGridArea", requestedGridAreaCode);
         command.Parameters.AddWithValue("@EnergySupplierId", actorNumber);
         command.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow);
         command.Connection = connection;
