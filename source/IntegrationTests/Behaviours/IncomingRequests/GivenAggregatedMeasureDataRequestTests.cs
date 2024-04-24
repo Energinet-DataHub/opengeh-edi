@@ -105,13 +105,13 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
             GetNow().Plus(Duration.FromDays(256)));
 
         var responseMessage = await GivenRequestAggregatedMeasureDataJsonAsync(
-            "2111111111111",
-            ActorRole.EnergySupplier.Code,
-            (2024, 5, 1),
-            (2024, 6, 1),
-            null,
-            "2111111111111",
-            "123564789123564789123564789123564787");
+            senderActorNumber: "2111111111111",
+            senderActorRole: ActorRole.EnergySupplier.Code,
+            periodStart: (2024, 5, 1),
+            periodEnd: (2024, 6, 1),
+            gridArea: null,
+            energySupplierActorNumber: "2111111111111",
+            transactionId: "123564789123564789123564789123564787");
 
         responseMessage.IsErrorResponse.Should().BeFalse(responseMessage.MessageBody);
 

@@ -233,7 +233,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                     },
                     {
                         nameof(AggregatedMeasureDataProcess.GridAreas),
-                        (p, r, s) => p.GridAreas.Should().Equal(s.GridAreas)
+                        (p, r, s) => p.GridAreas.Should().BeEquivalentTo(s.GridAreas)
                     },
                     {
                         nameof(AggregatedMeasureDataProcess.EnergySupplierId),
