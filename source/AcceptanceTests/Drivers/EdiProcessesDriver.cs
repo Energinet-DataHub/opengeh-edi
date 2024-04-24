@@ -96,21 +96,22 @@ internal sealed class EdiProcessesDriver
             await createProcessCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        using (var createProcessGridAreaCommand = new SqlCommand())
-        {
-            var gridAreaId = Guid.NewGuid();
-            createProcessGridAreaCommand.CommandText = @"INSERT INTO [AggregatedMeasureDataProcessGridAreas]
-                (Id, AggregatedMeasureDataProcessId, GridArea)
-                VALUES
-                (@Id, @ProcessId, @GridArea);";
-            createProcessGridAreaCommand.Parameters.AddWithValue("@Id", gridAreaId);
-            createProcessGridAreaCommand.Parameters.AddWithValue("@ProcessId", processId);
-            createProcessGridAreaCommand.Parameters.AddWithValue("@GridArea", requestedGridAreaCode);
-
-            createProcessGridAreaCommand.Connection = connection;
-            await createProcessGridAreaCommand.Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-            await createProcessGridAreaCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
-        }
+        // TODO: Add after AggregatedMeasureDataProcessGridAreas is merged
+        // using (var createProcessGridAreaCommand = new SqlCommand())
+        // {
+        //     var gridAreaId = Guid.NewGuid();
+        //     createProcessGridAreaCommand.CommandText = @"INSERT INTO [AggregatedMeasureDataProcessGridAreas]
+        //         (Id, AggregatedMeasureDataProcessId, GridArea)
+        //         VALUES
+        //         (@Id, @ProcessId, @GridArea);";
+        //     createProcessGridAreaCommand.Parameters.AddWithValue("@Id", gridAreaId);
+        //     createProcessGridAreaCommand.Parameters.AddWithValue("@ProcessId", processId);
+        //     createProcessGridAreaCommand.Parameters.AddWithValue("@GridArea", requestedGridAreaCode);
+        //
+        //     createProcessGridAreaCommand.Connection = connection;
+        //     await createProcessGridAreaCommand.Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+        //     await createProcessGridAreaCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+        // }
 
         return processId;
     }
