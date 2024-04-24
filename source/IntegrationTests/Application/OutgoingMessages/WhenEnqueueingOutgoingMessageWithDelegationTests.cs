@@ -44,8 +44,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     private readonly ActorMessageQueueContext _context;
     private readonly SystemDateTimeProviderStub _dateTimeProvider;
 
-    private ActorNumberAndRoleDto _delegatedBy = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"));
-    private ActorNumberAndRoleDto _delegatedTo = CreateActorNumberAndRole(ActorNumber.Create("1234567891235"), actorRole: ActorRole.Delegated);
+    private Actor _delegatedBy = CreateActor(ActorNumber.Create("1234567891234"));
+    private Actor _delegatedTo = CreateActor(ActorNumber.Create("1234567891235"), actorRole: ActorRole.Delegated);
 
     public WhenEnqueueingOutgoingMessageWithDelegationTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
@@ -65,13 +65,13 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         Given_DelegatedByIsGridOperator_When_EnqueuingOutgoingEnergyResultMessageToMeteredDataResponsible_Then_GridOperatorReceivesMessage()
     {
         // Arrange
-        var outgoingEnergyResultMessageReceiver = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"), actorRole: ActorRole.MeteredDataResponsible);
+        var outgoingEnergyResultMessageReceiver = CreateActor(ActorNumber.Create("1234567891234"), actorRole: ActorRole.MeteredDataResponsible);
         var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(outgoingEnergyResultMessageReceiver.ActorNumber.Value)
             .WithReceiverRole(outgoingEnergyResultMessageReceiver.ActorRole)
             .Build();
 
-        _delegatedBy = CreateActorNumberAndRole(outgoingEnergyResultMessageReceiver.ActorNumber, actorRole: ActorRole.GridOperator);
+        _delegatedBy = CreateActor(outgoingEnergyResultMessageReceiver.ActorNumber, actorRole: ActorRole.GridOperator);
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
 
         // Act
@@ -122,8 +122,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_delegated_as_grid_operator()
     {
         // Arrange
-        _delegatedBy = CreateActorNumberAndRole(ActorNumber.Create("1234567891234"), actorRole: ActorRole.GridOperator);
-        _delegatedTo = CreateActorNumberAndRole(ActorNumber.Create("1234567891235"), actorRole: ActorRole.GridOperator);
+        _delegatedBy = CreateActor(ActorNumber.Create("1234567891234"), actorRole: ActorRole.GridOperator);
+        _delegatedTo = CreateActor(ActorNumber.Create("1234567891235"), actorRole: ActorRole.GridOperator);
         var message = _energyResultMessageDtoBuilder
             .WithReceiverNumber(_delegatedBy.ActorNumber.Value)
             .WithReceiverRole(_delegatedTo.ActorRole)
@@ -198,9 +198,9 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         var startsAt = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(10));
         var now = SystemClock.Instance.GetCurrentInstant();
         _dateTimeProvider.SetNow(now);
-        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, sequenceNumber: 0);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: now.Plus(Duration.FromDays(30)), sequenceNumber: 0);
 
-        // Newer delegation to original receiver, which stops previous delegation
+        // Cancel a delegation by adding a newer (higher sequence number) delegation to same receiver, with startsAt == stopsAt
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: now, sequenceNumber: 1);
 
         // Act
@@ -301,31 +301,31 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         base.Dispose(disposing);
     }
 
-    private static ActorNumberAndRoleDto CreateActorNumberAndRole(ActorNumber actorNumber, ActorRole? actorRole = null)
+    private static Actor CreateActor(ActorNumber actorNumber, ActorRole? actorRole = null)
     {
-        return new ActorNumberAndRoleDto(actorNumber, actorRole ?? ActorRole.BalanceResponsibleParty);
+        return new Actor(actorNumber, actorRole ?? ActorRole.BalanceResponsibleParty);
     }
 
-    private async Task AddMockDelegationsForActorAsync(ActorNumberAndRoleDto delegatedBy)
+    private async Task AddMockDelegationsForActorAsync(Actor delegatedBy)
     {
         ArgumentNullException.ThrowIfNull(delegatedBy);
         await AddDelegationAsync(
-            new ActorNumberAndRoleDto(delegatedBy.ActorNumber, delegatedBy.ActorRole),
-            new ActorNumberAndRoleDto(ActorNumber.Create("8884567892341"), ActorRole.Delegated),
+            new(delegatedBy.ActorNumber, delegatedBy.ActorRole),
+            new(ActorNumber.Create("8884567892341"), ActorRole.Delegated),
             "500",
             ProcessType.ReceiveWholesaleResults,
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)));
         await AddDelegationAsync(
-            new ActorNumberAndRoleDto(delegatedBy.ActorNumber, delegatedBy.ActorRole),
-            new ActorNumberAndRoleDto(ActorNumber.Create("8884567892342"), ActorRole.Delegated),
+            new(delegatedBy.ActorNumber, delegatedBy.ActorRole),
+            new(ActorNumber.Create("8884567892342"), ActorRole.Delegated),
             "600",
             ProcessType.ReceiveWholesaleResults,
             SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(4)),
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(14)));
         await AddDelegationAsync(
-            new ActorNumberAndRoleDto(delegatedBy.ActorNumber, delegatedBy.ActorRole),
-            new ActorNumberAndRoleDto(ActorNumber.Create("8884567892343"), ActorRole.Delegated),
+            new(delegatedBy.ActorNumber, delegatedBy.ActorRole),
+            new(ActorNumber.Create("8884567892343"), ActorRole.Delegated),
             "700",
             ProcessType.ReceiveWholesaleResults,
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)),
@@ -333,8 +333,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     }
 
     private async Task AddDelegationAsync(
-        ActorNumberAndRoleDto delegatedBy,
-        ActorNumberAndRoleDto delegatedTo,
+        Actor delegatedBy,
+        Actor delegatedTo,
         string gridAreaCode,
         ProcessType? processType = null,
         Instant? startsAt = null,
@@ -355,8 +355,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     }
 
     private async Task AssertEnqueuedOutgoingMessage(
-        ActorNumberAndRoleDto receiverQueue,
-        ActorNumberAndRoleDto receiverDocument)
+        Actor receiverQueue,
+        Actor receiverDocument)
     {
         var outgoingMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
             DocumentType.NotifyAggregatedMeasureData.Name,

@@ -45,8 +45,38 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
             ProcessType messageCreatedFromProcess,
             MessageId? relatedToMessageId,
             string? gridAreaCode)
+            : this(
+                eventId,
+                documentType,
+                Receiver.Create(receiverId, receiverRole),
+                Receiver.Create(receiverId, receiverRole),
+                processId,
+                businessReason,
+                senderId,
+                senderRole,
+                serializedContent,
+                createdAt,
+                messageCreatedFromProcess,
+                relatedToMessageId,
+                gridAreaCode)
         {
-            ArgumentNullException.ThrowIfNull(receiverId);
+        }
+
+        public OutgoingMessage(
+            EventId eventId,
+            DocumentType documentType,
+            Receiver receiver,
+            Receiver documentReceiver,
+            Guid? processId,
+            string businessReason,
+            ActorNumber senderId,
+            ActorRole senderRole,
+            string serializedContent,
+            Instant createdAt,
+            ProcessType messageCreatedFromProcess,
+            MessageId? relatedToMessageId,
+            string? gridAreaCode)
+        {
             Id = OutgoingMessageId.New();
             EventId = eventId;
             DocumentType = documentType;
@@ -58,8 +88,8 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
             GridAreaCode = gridAreaCode;
             _serializedContent = serializedContent;
             RelatedToMessageId = relatedToMessageId;
-            DocumentReceiver = Receiver.Create(receiverId, receiverRole);
-            Receiver = Receiver.Create(receiverId, receiverRole);
+            DocumentReceiver = documentReceiver;
+            Receiver = receiver;
             CreatedAt = createdAt;
             FileStorageReference = CreateFileStorageReference(Receiver.Number, createdAt, Id);
         }
@@ -267,51 +297,54 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
         ///     This method create a single outgoing message, for the receiver, based on the rejected WholesaleServicesMessage.
         /// </summary>
         public static OutgoingMessage CreateMessage(
-            RejectedWholesaleServicesMessageDto rejectedWholesaleServicesMessage,
+            RejectedWholesaleServicesMessageDto message,
             ISerializer serializer,
             Instant timestamp)
         {
             ArgumentNullException.ThrowIfNull(serializer);
-            ArgumentNullException.ThrowIfNull(rejectedWholesaleServicesMessage);
+            ArgumentNullException.ThrowIfNull(message);
 
             return new OutgoingMessage(
-                rejectedWholesaleServicesMessage.EventId,
-                rejectedWholesaleServicesMessage.DocumentType,
-                rejectedWholesaleServicesMessage.ReceiverNumber,
-                rejectedWholesaleServicesMessage.ProcessId,
-                rejectedWholesaleServicesMessage.BusinessReason,
-                rejectedWholesaleServicesMessage.ReceiverRole,
-                rejectedWholesaleServicesMessage.SenderId,
-                rejectedWholesaleServicesMessage.SenderRole,
-                serializer.Serialize(rejectedWholesaleServicesMessage.Series),
-                timestamp,
-                ProcessType.RequestWholesaleResults,
-                rejectedWholesaleServicesMessage.RelatedToMessageId,
-                null);
+                eventId: message.EventId,
+                documentType: message.DocumentType,
+                receiver: Receiver.Create(message.ReceiverNumber, message.ReceiverRole),
+                documentReceiver: Receiver.Create(message.DocumentReceiverNumber, message.DocumentReceiverRole),
+                processId: message.ProcessId,
+                businessReason: message.BusinessReason,
+                senderId: message.SenderId,
+                senderRole: message.SenderRole,
+                serializedContent: serializer.Serialize(message.Series),
+                createdAt: timestamp,
+                messageCreatedFromProcess: ProcessType.RequestWholesaleResults,
+                relatedToMessageId: message.RelatedToMessageId,
+                gridAreaCode: null);
         }
 
         /// <summary>
         ///     This method create a single outgoing message, for the receiver, based on the accepted WholesaleServicesMessage.
         /// </summary>
-        public static OutgoingMessage CreateMessage(AcceptedWholesaleServicesMessageDto acceptedWholesaleServicesMessage, ISerializer serializer, Instant timestamp)
+        public static OutgoingMessage CreateMessage(
+            AcceptedWholesaleServicesMessageDto message,
+            ISerializer serializer,
+            Instant timestamp)
         {
             ArgumentNullException.ThrowIfNull(serializer);
-            ArgumentNullException.ThrowIfNull(acceptedWholesaleServicesMessage);
+            ArgumentNullException.ThrowIfNull(message);
 
             return new OutgoingMessage(
-                acceptedWholesaleServicesMessage.EventId,
-                acceptedWholesaleServicesMessage.DocumentType,
-                acceptedWholesaleServicesMessage.ReceiverNumber,
-                acceptedWholesaleServicesMessage.ProcessId,
-                acceptedWholesaleServicesMessage.BusinessReason,
-                acceptedWholesaleServicesMessage.ReceiverRole,
-                acceptedWholesaleServicesMessage.SenderId,
-                acceptedWholesaleServicesMessage.SenderRole,
-                serializer.Serialize(acceptedWholesaleServicesMessage.Series),
-                timestamp,
-                ProcessType.RequestWholesaleResults,
-                acceptedWholesaleServicesMessage.RelatedToMessageId,
-                acceptedWholesaleServicesMessage.Series.GridAreaCode);
+                eventId: message.EventId,
+                documentType: message.DocumentType,
+                receiver: Receiver.Create(message.ReceiverNumber, message.ReceiverRole),
+                documentReceiver: Receiver.Create(message.DocumentReceiverNumber, message.DocumentReceiverRole),
+                processId: message.ProcessId,
+                businessReason: message.BusinessReason,
+                senderId: message.SenderId,
+                senderRole: message.SenderRole,
+                serializedContent: serializer.Serialize(message.Series),
+                createdAt: timestamp,
+                messageCreatedFromProcess: ProcessType.RequestWholesaleResults,
+                relatedToMessageId: message.RelatedToMessageId,
+                gridAreaCode: message.Series.GridAreaCode);
         }
 
         public void AssignToBundle(BundleId bundleId)
@@ -357,6 +390,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
         /// </summary>
         public void DelegateTo(Receiver delegatedToReceiver)
         {
+            if (Receiver != DocumentReceiver)
+                throw new InvalidOperationException("Cannot delegate a message that has already been delegated to another actor");
+
             Receiver = delegatedToReceiver;
             FileStorageReference = CreateFileStorageReference(Receiver.Number, CreatedAt, Id);
         }

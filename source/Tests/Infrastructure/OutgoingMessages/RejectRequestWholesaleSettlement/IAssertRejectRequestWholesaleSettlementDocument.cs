@@ -31,16 +31,31 @@ public interface IAssertRejectRequestWholesaleSettlementDocument
     IAssertRejectRequestWholesaleSettlementDocument HasMessageId(string expectedMessageId);
 
     /// <summary>
+    /// Assert MessageId exists
+    /// </summary>
+    IAssertRejectRequestWholesaleSettlementDocument MessageIdExists();
+
+    /// <summary>
     ///     Assert sender id
     /// </summary>
     /// <param name="expectedSenderId"></param>
     IAssertRejectRequestWholesaleSettlementDocument HasSenderId(string expectedSenderId);
 
     /// <summary>
+    ///    Asserts sender role
+    /// </summary>
+    IAssertRejectRequestWholesaleSettlementDocument HasSenderRole(ActorRole role);
+
+    /// <summary>
     ///     Asserts receiver id
     /// </summary>
     /// <param name="expectedReceiverId"></param>
     IAssertRejectRequestWholesaleSettlementDocument HasReceiverId(string expectedReceiverId);
+
+    /// <summary>
+    ///   Asserts receiver role
+    /// </summary>
+    IAssertRejectRequestWholesaleSettlementDocument HasReceiverRole(ActorRole role);
 
     /// <summary>
     ///     Asserts time stamp
@@ -70,6 +85,11 @@ public interface IAssertRejectRequestWholesaleSettlementDocument
     /// </summary>
     /// <param name="expectedTransactionId"></param>
     IAssertRejectRequestWholesaleSettlementDocument HasTransactionId(Guid expectedTransactionId);
+
+    /// <summary>
+    ///    Asserts transaction id exists
+    /// </summary>
+    IAssertRejectRequestWholesaleSettlementDocument TransactionIdExists();
 
     /// <summary>
     ///     Asserts serie reason code

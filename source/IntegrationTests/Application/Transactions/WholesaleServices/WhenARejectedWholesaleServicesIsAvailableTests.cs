@@ -23,9 +23,11 @@ using Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.Aggregated
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.Process.Domain;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Responses;
 using Xunit;
 using Xunit.Abstractions;
@@ -71,8 +73,8 @@ public sealed class WhenARejectedWholesaleServicesIsAvailableTests : TestBase
             .HasProcessId(process.ProcessId)
             .HasEventId(expectedEventId)
             .HasBusinessReason(process.BusinessReason)
-            .HasReceiverId(process.RequestedByActorId.Value)
-            .HasReceiverRole(process.RequestedByActorRoleCode)
+            .HasReceiverId(process.RequestedByActor.ActorNumber.Value)
+            .HasReceiverRole(process.RequestedByActor.ActorRole.Code)
             .HasRelationTo(process.InitiatedByMessageId)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
@@ -108,10 +110,12 @@ public sealed class WhenARejectedWholesaleServicesIsAvailableTests : TestBase
 
     private async Task<WholesaleServicesProcess> BuildProcess()
     {
+        var requestedByActor = RequestedByActor.From(ActorNumber.Create("8200000007743"), ActorRole.EnergySupplier);
+
         var process = new WholesaleServicesProcess(
             ProcessId.New(),
-            ActorNumber.Create("8200000007743"),
-            ActorRole.EnergySupplier.Code,
+            requestedByActor,
+            OriginalActor.From(requestedByActor),
             BusinessTransactionId.Create(Guid.NewGuid().ToString()),
             MessageId.New(),
             BusinessReason.WholesaleFixing,
@@ -122,7 +126,8 @@ public sealed class WhenARejectedWholesaleServicesIsAvailableTests : TestBase
             null,
             null,
             null,
-            new ChargeType[] { new(ChargeTypeId.New(), "1", "ST1") });
+            new ChargeType[] { new(ChargeTypeId.New(), "1", "ST1") },
+            new[] { SampleData.GridAreaCode });
 
         process.SendToWholesale();
         _processContext.WholesaleServicesProcesses.Add(process);

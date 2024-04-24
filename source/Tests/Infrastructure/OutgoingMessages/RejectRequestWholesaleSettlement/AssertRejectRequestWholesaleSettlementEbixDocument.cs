@@ -24,16 +24,18 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequ
 public class AssertRejectRequestWholesaleSettlementEbixDocument : IAssertRejectRequestWholesaleSettlementDocument
 {
     private readonly AssertEbixDocument _documentAsserter;
+    private readonly bool _skipIdentificationLengthValidation;
 
-    public AssertRejectRequestWholesaleSettlementEbixDocument(AssertEbixDocument documentAsserter)
+    public AssertRejectRequestWholesaleSettlementEbixDocument(AssertEbixDocument documentAsserter, bool skipIdentificationLengthValidation = false)
     {
         _documentAsserter = documentAsserter;
+        _skipIdentificationLengthValidation = skipIdentificationLengthValidation;
         _documentAsserter.HasValue("HeaderEnergyDocument/DocumentType", "ERR");
     }
 
     public async Task<IAssertRejectRequestWholesaleSettlementDocument> DocumentIsValidAsync()
     {
-        await _documentAsserter.HasValidStructureAsync(DocumentType.RejectRequestWholesaleSettlement, "3")
+        await _documentAsserter.HasValidStructureAsync(DocumentType.RejectRequestWholesaleSettlement, "3", _skipIdentificationLengthValidation)
             .ConfigureAwait(false);
         return this;
     }
@@ -56,15 +58,33 @@ public class AssertRejectRequestWholesaleSettlementEbixDocument : IAssertRejectR
         return this;
     }
 
+    public IAssertRejectRequestWholesaleSettlementDocument MessageIdExists()
+    {
+        _documentAsserter.ElementExists("HeaderEnergyDocument/Identification");
+        return this;
+    }
+
     public IAssertRejectRequestWholesaleSettlementDocument HasSenderId(string expectedSenderId)
     {
         _documentAsserter.HasValue("HeaderEnergyDocument/SenderEnergyParty/Identification", expectedSenderId);
         return this;
     }
 
+    public IAssertRejectRequestWholesaleSettlementDocument HasSenderRole(ActorRole role)
+    {
+        // Sender role for RejectRequestWholesaleSettlement doesn't exist in ebIX, so do nothing
+        return this;
+    }
+
     public IAssertRejectRequestWholesaleSettlementDocument HasReceiverId(string expectedReceiverId)
     {
         _documentAsserter.HasValue("HeaderEnergyDocument/RecipientEnergyParty/Identification", expectedReceiverId);
+        return this;
+    }
+
+    public IAssertRejectRequestWholesaleSettlementDocument HasReceiverRole(ActorRole role)
+    {
+        _documentAsserter.HasValue("ProcessEnergyContext/EnergyBusinessProcessRole", EbixCode.Of(role));
         return this;
     }
 
@@ -77,6 +97,12 @@ public class AssertRejectRequestWholesaleSettlementEbixDocument : IAssertRejectR
     public IAssertRejectRequestWholesaleSettlementDocument HasTransactionId(Guid expectedTransactionId)
     {
         _documentAsserter.HasValue("PayloadChargeEvent[1]/Identification", expectedTransactionId.ToString("N"));
+        return this;
+    }
+
+    public IAssertRejectRequestWholesaleSettlementDocument TransactionIdExists()
+    {
+        _documentAsserter.ElementExists("PayloadChargeEvent[1]/Identification");
         return this;
     }
 
