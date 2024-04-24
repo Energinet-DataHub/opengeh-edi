@@ -51,7 +51,7 @@ public sealed class WholesaleSettlementRequestDsl
             .ConfigureAwait(false);
     }
 
-    internal async Task ConfirmInvalidRequestIsRejected(CancellationToken cancellationToken)
+    internal async Task ConfirmInvalidRequestIsRejectedAsync(CancellationToken cancellationToken)
     {
         var act = async () =>
         {

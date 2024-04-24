@@ -63,7 +63,7 @@ public sealed class WhenWholesaleSettlementRequestedTests
     {
         await _notifyWholesaleServices.EmptyQueueForActor();
 
-        await _wholesaleSettlementRequest.ConfirmInvalidRequestIsRejected(CancellationToken.None);
+        await _wholesaleSettlementRequest.ConfirmInvalidRequestIsRejectedAsync(CancellationToken.None);
     }
 
     [Fact]
