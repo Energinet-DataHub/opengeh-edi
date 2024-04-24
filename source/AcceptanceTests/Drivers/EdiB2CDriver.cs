@@ -24,21 +24,23 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 public sealed class EdiB2CDriver : IDisposable
 {
     private readonly AsyncLazy<HttpClient> _httpClient;
+    private readonly Uri _apiManagementUri;
 
-    public EdiB2CDriver(AsyncLazy<HttpClient> b2CHttpClient)
+    public EdiB2CDriver(AsyncLazy<HttpClient> b2CHttpClient, Uri apiManagementUri)
     {
         _httpClient = b2CHttpClient;
+        _apiManagementUri = apiManagementUri;
     }
 
     public void Dispose()
     {
     }
 
-    public async Task<List<ArchivedMessageSearchResponse>> RequestArchivedMessageSearchAsync(Uri requestUri, JObject payload)
+    public async Task<List<ArchivedMessageSearchResponse>> RequestArchivedMessageSearchAsync(JObject payload)
     {
         var b2cClient = await _httpClient;
         ArgumentNullException.ThrowIfNull(payload);
-        using var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
+        using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(_apiManagementUri, "b2c/v1.0/ArchivedMessageSearch"));
         request.Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         var response = await b2cClient.SendAsync(request).ConfigureAwait(false);
@@ -47,17 +49,5 @@ public sealed class EdiB2CDriver : IDisposable
         var archivedMessageResponse = JsonConvert.DeserializeObject<List<ArchivedMessageSearchResponse>>(responseString) ?? throw new InvalidOperationException("Did not receive valid response");
 
         return archivedMessageResponse;
-    }
-
-    public async Task<string> ArchivedMessageGetDocumentAsync(Uri requestUri)
-    {
-        var b2cClient = await _httpClient;
-        using var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
-        request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/xml");
-        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/xml");
-        var response = await b2cClient.SendAsync(request).ConfigureAwait(false);
-        var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-        return responseString;
     }
 }
