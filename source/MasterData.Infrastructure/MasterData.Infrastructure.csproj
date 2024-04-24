@@ -2,6 +2,7 @@
   <PropertyGroup>
     <AssemblyName>Energinet.DataHub.EDI.MasterData.Infrastructure</AssemblyName>
     <RootNamespace>Energinet.DataHub.EDI.MasterData.Infrastructure</RootNamespace>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj"/>
@@ -11,5 +12,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.556">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 </Project>

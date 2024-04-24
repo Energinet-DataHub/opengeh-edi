@@ -30,14 +30,3 @@ public record RequestAggregatedMeasureDataDto(
     string CreatedAt,
     string? BusinessType,
     IReadOnlyCollection<RequestAggregatedMeasureDataSeries> Serie);
-
-public record RequestAggregatedMeasureDataSeries(
-    string Id,
-    string? MarketEvaluationPointType,
-    string? MarketEvaluationSettlementMethod,
-    string StartDateAndOrTimeDateTime,
-    string? EndDateAndOrTimeDateTime,
-    string? MeteringGridAreaDomainId,
-    string? EnergySupplierMarketParticipantId,
-    string? BalanceResponsiblePartyMarketParticipantId,
-    string? SettlementVersion);

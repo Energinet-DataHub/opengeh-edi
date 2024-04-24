@@ -12,21 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Responses.json;
+using System;
 
-public class ArchivedMessageSearchResponse
-{
-    public string? Id { get; set; }
+namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 
-    public string? MessageId { get; set; }
-
-    public string? DocumentType { get; set; }
-
-    public string? SenderNumber { get; set; }
-
-    public string? ReceiverNumber { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public string? BusinessReason { get; set; }
-}
+[Serializable]
+public record GridAreaDetails(string GridAreaCode, string OperatorNumber);

@@ -3,6 +3,7 @@
   <PropertyGroup>
     <AssemblyName>Energinet.DataHub.EDI.IncomingMessages.Domain</AssemblyName>
     <RootNamespace>Energinet.DataHub.EDI.IncomingMessages.Domain</RootNamespace>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -11,6 +12,12 @@
     </PropertyGroup>
     <ItemGroup>
       <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.556">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
     </ItemGroup>
 
 </Project>

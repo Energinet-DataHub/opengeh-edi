@@ -57,5 +57,3 @@ internal sealed class MicrosoftIdentityDriver
         return accessToken.AccessToken;
     }
 }
-
-internal sealed record AccessTokenResponse([property: JsonPropertyName("access_token")] string AccessToken);

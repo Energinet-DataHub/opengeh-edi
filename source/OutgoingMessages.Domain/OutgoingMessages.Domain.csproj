@@ -3,6 +3,7 @@
   <PropertyGroup>
     <AssemblyName>Energinet.DataHub.EDI.OutgoingMessages.Domain</AssemblyName>
     <RootNamespace>Energinet.DataHub.EDI.OutgoingMessages.Domain</RootNamespace>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +14,10 @@
 
   <ItemGroup>
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.1.2" />
+    <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.556">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

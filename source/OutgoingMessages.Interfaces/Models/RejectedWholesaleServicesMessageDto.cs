@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -53,10 +52,3 @@ public sealed class RejectedWholesaleServicesMessageDto : OutgoingMessageDto
 
     public ActorRole DocumentReceiverRole { get; }
 }
-
-public sealed record RejectedWholesaleServicesMessageSeries(
-    Guid TransactionId,
-    IReadOnlyCollection<RejectedWholesaleServicesMessageRejectReason> RejectReasons,
-    string OriginalTransactionIdReference);
-
-public sealed record RejectedWholesaleServicesMessageRejectReason(string ErrorCode, string ErrorMessage);

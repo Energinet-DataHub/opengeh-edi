@@ -30,14 +30,3 @@ public record InitializeAggregatedMeasureDataProcessDto(
     string CreatedAt,
     string? BusinessType,
     IReadOnlyCollection<InitializeAggregatedMeasureDataProcessSeries> Series);
-
-public record InitializeAggregatedMeasureDataProcessSeries(
-    string Id,
-    string? MarketEvaluationPointType,
-    string? MarketEvaluationSettlementMethod,
-    string StartDateAndOrTimeDateTime,
-    string? EndDateAndOrTimeDateTime,
-    string? MeteringGridAreaDomainId,
-    string? EnergySupplierMarketParticipantId,
-    string? BalanceResponsiblePartyMarketParticipantId,
-    string? SettlementVersion);

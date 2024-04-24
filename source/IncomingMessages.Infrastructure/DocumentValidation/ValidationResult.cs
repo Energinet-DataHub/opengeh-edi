@@ -27,7 +27,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidati
 
         public bool IsValid => ValidationErrors.Count == 0;
 
-        public IReadOnlyCollection<string> ValidationErrors { get; } = new List<string>();
+        public IReadOnlyCollection<string> ValidationErrors { get; } = [];
 
         public static ValidationResult Valid()
         {

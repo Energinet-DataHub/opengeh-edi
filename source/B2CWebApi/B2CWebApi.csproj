@@ -5,6 +5,7 @@
         <OutputType>Exe</OutputType>
         <AssemblyName>Energinet.DataHub.EDI.B2CWebApi</AssemblyName>
         <RootNamespace>Energinet.DataHub.EDI.B2CWebApi</RootNamespace>
+        <LangVersion>default</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,6 +15,10 @@
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
         <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+        <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.556">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>

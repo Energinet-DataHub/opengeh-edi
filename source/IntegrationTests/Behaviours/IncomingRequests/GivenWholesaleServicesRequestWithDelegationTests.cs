@@ -58,14 +58,14 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
     {
         // Who can delegate RequestWholesaleServices? We assume it's only the actors who can actually
         // perform the RequestWholesaleServices, eg. DDQ, DDM and EZ
-        var delegatedFromRoles = new List<ActorRole>
+        var delegatedFromRoles = new[]
         {
             ActorRole.EnergySupplier,
             ActorRole.GridOperator,
             ActorRole.SystemOperator,
         };
 
-        var delegatedToRoles = new List<ActorRole>
+        var delegatedToRoles = new[]
         {
             ActorRole.Delegated,
             ActorRole.GridOperator,

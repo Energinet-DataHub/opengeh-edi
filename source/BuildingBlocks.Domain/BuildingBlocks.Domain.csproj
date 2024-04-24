@@ -2,8 +2,13 @@
   <PropertyGroup>
     <AssemblyName>Energinet.DataHub.EDI.BuildingBlocks.Domain</AssemblyName>
     <RootNamespace>Energinet.DataHub.EDI.BuildingBlocks.Domain</RootNamespace>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NodaTime" Version="3.1.11"/>
+    <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.556">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 </Project>

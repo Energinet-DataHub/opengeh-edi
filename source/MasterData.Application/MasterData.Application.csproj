@@ -2,11 +2,18 @@
   <PropertyGroup>
     <AssemblyName>Energinet.DataHub.EDI.MasterData.Application</AssemblyName>
     <RootNamespace>Energinet.DataHub.EDI.MasterData.Application</RootNamespace>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataAccess\DataAccess.csproj"/>
     <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj"/>
     <ProjectReference Include="..\MasterData.Infrastructure\MasterData.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.556">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemDefinitionGroup>
     <ProjectReference>

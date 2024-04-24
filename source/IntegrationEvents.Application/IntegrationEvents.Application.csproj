@@ -2,6 +2,7 @@
     <PropertyGroup>
       <AssemblyName>Energinet.DataHub.EDI.IntegrationEvents.Application</AssemblyName>
       <RootNamespace>Energinet.DataHub.EDI.IntegrationEvents.Application</RootNamespace>
+      <LangVersion>default</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,6 +18,10 @@
       <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="3.3.1" />
       <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="9.1.0" />
       <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
+      <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.556">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
     </ItemGroup>
 
     <ItemGroup>

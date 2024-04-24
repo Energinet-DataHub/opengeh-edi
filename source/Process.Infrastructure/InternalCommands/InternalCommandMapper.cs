@@ -48,6 +48,4 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
                        $"No command metadata is registered for type {commandType.FullName}");
         }
     }
-
-    public record CommandMetadata(string CommandName, Type CommandType);
 }

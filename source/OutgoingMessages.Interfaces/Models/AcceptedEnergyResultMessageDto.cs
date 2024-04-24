@@ -91,21 +91,3 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
             relatedToMessageId);
     }
 }
-
-public record AcceptedEnergyResultMessageTimeSeries(
-    Guid TransactionId,
-    string GridAreaCode,
-    string MeteringPointType,
-    string? SettlementType, // TODO: To ensure backwards compatibility, will be remove in another PR.
-    string? SettlementMethod,
-    string MeasureUnitType,
-    string Resolution,
-    string? EnergySupplierNumber,
-    string? BalanceResponsibleNumber,
-    Period Period,
-    IReadOnlyCollection<AcceptedEnergyResultMessagePoint> Point,
-    long CalculationResultVersion,
-    string? OriginalTransactionIdReference = null,
-    string? SettlementVersion = null);
-
-public record AcceptedEnergyResultMessagePoint(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);

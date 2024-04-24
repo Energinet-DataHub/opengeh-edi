@@ -2,6 +2,7 @@
   <PropertyGroup>
     <AssemblyName>Energinet.DataHub.EDI.IncomingMessages.Infrastructure</AssemblyName>
     <RootNamespace>Energinet.DataHub.EDI.IncomingMessages.Infrastructure</RootNamespace>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
  
   <PropertyGroup>
@@ -21,6 +22,10 @@
   <ItemGroup>
     <PackageReference Include="JsonSchema.Net" Version="4.1.1"/>
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0"/>
+    <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.556">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

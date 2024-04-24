@@ -63,23 +63,3 @@ public record FileStorageReference
         return new FileStorageReference(category, reference);
     }
 }
-
-/// <summary>
-/// The file category ("archived", "outgoing" etc.). In Azure Blob Storage this references where which container the blob is stored inside.
-/// </summary>
-public record FileStorageCategory
-{
-    private const string ArchivedMessageCategory = "archived";
-    private const string OutgoingMessageCategory = "outgoing";
-
-    private FileStorageCategory(string value)
-    {
-        Value = value;
-    }
-
-    public string Value { get; }
-
-    public static FileStorageCategory ArchivedMessage() => new(ArchivedMessageCategory);
-
-    public static FileStorageCategory OutgoingMessage() => new(OutgoingMessageCategory);
-}

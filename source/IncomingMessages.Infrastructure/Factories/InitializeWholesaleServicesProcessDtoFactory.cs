@@ -35,8 +35,8 @@ public static class InitializeWholesaleServicesProcessDtoFactory
                     var gridAreas = series.DelegatedGridAreas.Count > 0
                         ? series.DelegatedGridAreas
                         : series.GridArea != null
-                            ? new List<string> { series.GridArea }
-                            : Array.Empty<string>();
+                            ? [series.GridArea]
+                            : [];
 
                     return new InitializeWholesaleServicesSeries(
                         Id: series.TransactionId,

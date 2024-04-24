@@ -29,11 +29,6 @@ public record Period(Instant Start, Instant End)
         return ParsePeriodDateFrom(End);
     }
 
-    private static string ParsePeriodDateFrom(Instant instant)
-    {
-        return instant.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture);
-    }
-
     public string StartToEbixString()
     {
         return ParsePeriodDateFromToEbix(Start);
@@ -42,6 +37,11 @@ public record Period(Instant Start, Instant End)
     public string EndToEbixString()
     {
         return ParsePeriodDateFromToEbix(End);
+    }
+
+    private static string ParsePeriodDateFrom(Instant instant)
+    {
+        return instant.ToString("yyyy-MM-ddTHH:mm'Z'", CultureInfo.InvariantCulture);
     }
 
     private static string ParsePeriodDateFromToEbix(Instant instant)

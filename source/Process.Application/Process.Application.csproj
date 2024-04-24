@@ -3,6 +3,7 @@
   <PropertyGroup>
     <AssemblyName>Energinet.DataHub.EDI.Process.Application</AssemblyName>
     <RootNamespace>Energinet.DataHub.EDI.Process.Application</RootNamespace>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +13,10 @@
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0"/>
     <PackageReference Include="NodaTime.Serialization.Protobuf" Version="2.0.1" />
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.1.2" />
+    <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.556">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

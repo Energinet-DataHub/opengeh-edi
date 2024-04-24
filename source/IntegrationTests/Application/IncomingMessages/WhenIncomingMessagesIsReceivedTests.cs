@@ -60,21 +60,37 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
     public static IEnumerable<object[]> ValidIncomingRequestMessages()
     {
-        return new List<object[]>
-        {
-            new object[] { DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData, ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json") },
-            new object[] { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ReadJsonFile("Application\\IncomingMessages\\RequestWholesaleSettlement.json") },
-            new object[] { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ReadJsonFile("Application\\IncomingMessages\\RequestWholesaleSettlementWithUnusedBusinessReason.json") },
-        };
+        return
+        [
+            [
+                DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData,
+                ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json"),
+            ],
+            [
+                DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement,
+                ReadJsonFile("Application\\IncomingMessages\\RequestWholesaleSettlement.json"),
+            ],
+            [
+                DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement,
+                ReadJsonFile(
+                    "Application\\IncomingMessages\\RequestWholesaleSettlementWithUnusedBusinessReason.json"),
+            ],
+        ];
     }
 
     public static IEnumerable<object[]> InvalidIncomingRequestMessages()
     {
-        return new List<object[]>
-        {
-            new object[] { DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData, ReadJsonFile("Application\\IncomingMessages\\FailSchemeValidationAggregatedMeasureData.json") },
-            new object[] { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ReadJsonFile("Application\\IncomingMessages\\FailSchemeValidationRequestWholesaleSettlement.json") },
-        };
+        return
+        [
+            [
+                DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData,
+                ReadJsonFile("Application\\IncomingMessages\\FailSchemeValidationAggregatedMeasureData.json"),
+            ],
+            [
+                DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement,
+                ReadJsonFile("Application\\IncomingMessages\\FailSchemeValidationRequestWholesaleSettlement.json"),
+            ],
+        ];
     }
 
     [Theory]

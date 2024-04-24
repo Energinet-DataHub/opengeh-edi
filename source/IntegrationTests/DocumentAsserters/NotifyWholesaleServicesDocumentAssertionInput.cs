@@ -43,7 +43,3 @@ public record NotifyWholesaleServicesDocumentAssertionInput(
     Resolution Resolution,
     Period Period,
     IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> Points);
-
-public record BusinessReasonWithSettlementVersion(
-    BusinessReason BusinessReason,
-    SettlementVersion? SettlementVersion);

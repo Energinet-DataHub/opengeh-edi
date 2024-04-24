@@ -48,5 +48,3 @@ public record WholesaleCalculationMarketActivityRecord(
 
     SettlementMethod? SettlementMethod,
     string? OriginalTransactionIdReference);
-
-public record Point(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);
