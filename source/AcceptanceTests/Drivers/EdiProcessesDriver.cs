@@ -27,7 +27,7 @@ internal sealed class EdiProcessesDriver
     }
 
     internal async Task<Guid> CreateWholesaleServiceProcessAsync(
-        string gridAreaCode,
+        string requestedGridAreaCode,
         string chargeOwnerNumber,
         CancellationToken cancellationToken)
     {
@@ -36,12 +36,12 @@ internal sealed class EdiProcessesDriver
         var processId = Guid.NewGuid();
 
         command.CommandText = @"INSERT INTO [WholesaleServicesProcesses]
-            (ProcessId, BusinessTransactionId, StartOfPeriod, EndOfPeriod, GridAreaCode, ChargeOwner, Resolution, EnergySupplierId, BusinessReason, RequestedByActorId, RequestedByActorRoleCode, State, SettlementVersion, InitiatedByMessageId, CreatedBy, CreatedAt, ModifiedBy, ModifiedAt)
+            (ProcessId, BusinessTransactionId, StartOfPeriod, EndOfPeriod, RequestedGridArea, ChargeOwner, Resolution, EnergySupplierId, BusinessReason, RequestedByActorNumber, RequestedByActorRole, OriginalActorNumber, OriginalActorRole, State, SettlementVersion, InitiatedByMessageId, CreatedBy, CreatedAt, ModifiedBy, ModifiedAt)
             VALUES
-            (@ProcessId, @BusinessTransactionId, '2022-06-17T22:00:00Z', '2022-07-22T22:00:00Z', @GridAreaCode, @ChargeOwnerNumber, 'P1M', 5790000000002, 'D05', @ChargeOwnerNumber, 'EZ', 'Sent', NULL, '318dcf73-4b3b-4b8a-ad47-64743dd77e66', 'Acceptance Tests', @CreatedAt, NULL, NULL);";
+            (@ProcessId, @BusinessTransactionId, '2022-06-17T22:00:00Z', '2022-07-22T22:00:00Z', @RequestedGridArea, @ChargeOwnerNumber, 'P1M', 5790000000002, 'D05', @ChargeOwnerNumber, 'EZ', @ChargeOwnerNumber, 'EZ', 'Sent', NULL, '318dcf73-4b3b-4b8a-ad47-64743dd77e66', 'Acceptance Tests', @CreatedAt, NULL, NULL);";
         command.Parameters.AddWithValue("@ProcessId", processId);
         command.Parameters.AddWithValue("@BusinessTransactionId", Guid.NewGuid());
-        command.Parameters.AddWithValue("@GridAreaCode", gridAreaCode);
+        command.Parameters.AddWithValue("@RequestedGridArea", requestedGridAreaCode);
         command.Parameters.AddWithValue("@ChargeOwnerNumber", chargeOwnerNumber);
         command.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow);
         command.Connection = connection;
