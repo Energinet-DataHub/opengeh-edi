@@ -85,9 +85,9 @@ internal sealed class EdiProcessesDriver
 
         var stopWatch = Stopwatch.StartNew();
 
-        // To avoid receiving a unexpected response on the process in a later test, we mark the process as stopped.
+        // To avoid receiving a unexpected response on the process in a later test, we mark the process as rejected.
         command.CommandText = @"
-            UPDATE [WholesaleServicesProcesses] SET State = 'Stopped' WHERE InitiatedByMessageId = @InitiatedByMessageId;
+            UPDATE [WholesaleServicesProcesses] SET State = 'Rejected' WHERE InitiatedByMessageId = @InitiatedByMessageId;
             SELECT ProcessId FROM [WholesaleServicesProcesses] WHERE InitiatedByMessageId = @InitiatedByMessageId";
         command.Parameters.AddWithValue("@InitiatedByMessageId", initiatedByMessageId.ToString());
         command.Connection = connection;
@@ -113,9 +113,9 @@ internal sealed class EdiProcessesDriver
 
         var stopWatch = Stopwatch.StartNew();
 
-        // To avoid receiving a unexpected response on the process in a later test, we mark the process as stopped.
+        // To avoid receiving a unexpected response on the process in a later test, we mark the process as rejected.
         command.CommandText = @"
-            UPDATE [AggregatedMeasureDataProcesses] SET State = 'Stopped' WHERE InitiatedByMessageId = @InitiatedByMessageId;
+            UPDATE [AggregatedMeasureDataProcesses] SET State = 'Rejected' WHERE InitiatedByMessageId = @InitiatedByMessageId;
             SELECT ProcessId FROM [AggregatedMeasureDataProcesses] WHERE InitiatedByMessageId = @InitiatedByMessageId";
         command.Parameters.AddWithValue("@InitiatedByMessageId", initiatedByMessageId.ToString());
         command.Connection = connection;
