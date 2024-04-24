@@ -29,6 +29,7 @@ jobs:
   integration_tests:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v13
     with:
+      job_name: Integration tests
       tests_dll_file_path: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
       download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
       dotnet_version: 8.0.200
@@ -38,6 +39,7 @@ jobs:
   architecture_tests:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v13
     with:
+      job_name: Architecture tests
       tests_dll_file_path: \source\ArchitectureTests\bin\Release\net8.0\Energinet.DataHub.EDI.ArchitectureTests.dll
       download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
       dotnet_version: 8.0.200
@@ -46,6 +48,7 @@ jobs:
   tests:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v13
     with:
+      job_name: Tests
       tests_dll_file_path: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.Tests.dll
       download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
       dotnet_version: 8.0.200
