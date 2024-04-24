@@ -41,9 +41,7 @@ public sealed class WhenMonthlyAmountPerChargeResultResultIsPublishedTests
     [Fact]
     public async Task Actor_can_peek_and_dequeue_monthly_charge_result()
     {
-        await _notifyWholesaleServices.EmptyQueueForActor();
-
-        await _notifyWholesaleServices.PublishMonthlyChargeResult(
+        await _notifyWholesaleServices.PublishMonthlyAmountPerChargeResult(
             AcceptanceTestFixture.CimActorGridArea,
             AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
             AcceptanceTestFixture.ActorNumber);

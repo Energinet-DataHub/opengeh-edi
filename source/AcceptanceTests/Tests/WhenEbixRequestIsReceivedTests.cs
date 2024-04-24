@@ -50,9 +50,9 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
     {
         await _ebixMDR.EmptyQueueForActor();
 
-        await _ebixMDR.PublishAggregationResultFor(AcceptanceTestFixture.EbixActorGridArea);
+        await _ebixMDR.PublishAggregationResult(AcceptanceTestFixture.EbixActorGridArea);
 
-        await _ebixMDR.ConfirmEnergyResultIsAvailableForActor();
+        await _ebixMDR.ConfirmEnergyResultIsAvailable();
     }
 
     [Fact]
@@ -60,12 +60,12 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
     {
         await _ebixEs.EmptyQueueForActor();
 
-        await _ebixEs.PublishMonthlySumPrChargeFor(
+        await _ebixEs.PublishMonthlySumPrCharge(
             AcceptanceTestFixture.EbixActorGridArea,
             AcceptanceTestFixture.ActorNumber,
             AcceptanceTestFixture.ChargeOwnerId);
 
-        await _ebixEs.ConfirmWholesaleResultIsAvailableForActor();
+        await _ebixEs.ConfirmWholesaleResultIsAvailable();
     }
 
     [Fact]
@@ -73,12 +73,12 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
     {
         await _ebixEs.EmptyQueueForActor();
 
-        await _ebixEs.PublishAmountPerChargeResultFor(
+        await _ebixEs.PublishAmountPerChargeResult(
             AcceptanceTestFixture.EbixActorGridArea,
             AcceptanceTestFixture.ActorNumber,
             AcceptanceTestFixture.ChargeOwnerId);
 
-        await _ebixEs.ConfirmWholesaleResultIsAvailableForActor();
+        await _ebixEs.ConfirmWholesaleResultIsAvailable();
     }
 
     [Fact]
@@ -108,20 +108,20 @@ public sealed class WhenEbixPeekRequestIsReceivedTests
     [Fact]
     public async Task Actor_cannot_peek_when_certificate_has_been_removed()
     {
-        await _actor.PublishActorCertificateCredentialsRemovedForAsync(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
+        await _actor.PublishActorCertificateCredentialsRemoved(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
 
         await _ebixMDR.ConfirmPeekWithRemovedCertificateIsNotAllowed();
 
-        await _actor.ActorCertificateCredentialsAssignedAsync(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
+        await _actor.ActorCertificateCredentialsAssigned(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
     }
 
     [Fact]
     public async Task Actor_cannot_dequeue_when_certificated_has_been_removed()
     {
-        await _actor.PublishActorCertificateCredentialsRemovedForAsync(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
+        await _actor.PublishActorCertificateCredentialsRemoved(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
 
         await _ebixMDR.ConfirmDequeueWithRemovedCertificateIsNotAllowed();
 
-        await _actor.ActorCertificateCredentialsAssignedAsync(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
+        await _actor.ActorCertificateCredentialsAssigned(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
     }
 }

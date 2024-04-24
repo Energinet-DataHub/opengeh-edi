@@ -20,11 +20,11 @@ using FluentAssertions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
-[SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Naming has to be sensible")]
 public class ArchivedMessageDsl
 {
     private readonly EdiB2CDriver _ediB2CDriver;
 
+#pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
     public ArchivedMessageDsl(EdiB2CDriver ediB2CDriver)
     {
         _ediB2CDriver = ediB2CDriver;

@@ -74,7 +74,7 @@ public static class AggregatedMeasureDataRequestAcceptedMessageFactory
                 Quantity = MapDecimalToDecimalValue(121043.602656m + currentTime.Seconds),
                 Time = currentTime,
             };
-            point.QuantityQualities.Add(QuantityQuality.Calculated);
+            point.QuantityQualities.Add(QuantityQuality.Estimated);
             result.Add(point);
             currentTime = new Timestamp { Seconds = currentTime.Seconds + 900, };
         }

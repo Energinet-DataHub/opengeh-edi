@@ -49,11 +49,9 @@ public sealed class WhenEnergyResultRequestedTests
     [Fact]
     public async Task Actor_can_request_aggregated_measure_data()
     {
-        await _notifyAggregatedMeasureDataResult.EmptyQueueForActor();
+        var messageId = await _aggregatedMeasureDataRequest.Request(cancellationToken: CancellationToken.None);
 
-        var messageId = await _aggregatedMeasureDataRequest.RequestAsync(cancellationToken: CancellationToken.None);
-
-        await _aggregatedMeasureDataRequest.ConfirmRequestIsInitializedAsync(
+        await _aggregatedMeasureDataRequest.ConfirmRequestIsInitialized(
             messageId,
             CancellationToken.None);
     }
@@ -61,43 +59,28 @@ public sealed class WhenEnergyResultRequestedTests
     [Fact]
     public async Task Actor_get_bad_request_when_aggregated_measure_data_request_is_invalid()
     {
-        await _notifyAggregatedMeasureDataResult.EmptyQueueForActor();
-
         await _aggregatedMeasureDataRequest.ConfirmInvalidRequestIsRejected(CancellationToken.None);
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_response_from_aggregated_measure_data_request()
     {
-        await _notifyAggregatedMeasureDataResult.EmptyQueueForActor();
-        var gridAreaCode = "804";
-        var processId = await _aggregatedMeasureDataRequest.InitializeAggregatedMeasureDataRequestAsync(
-            gridAreaCode,
+        await _aggregatedMeasureDataRequest.PublishAggregatedMeasureDataRequestAcceptedResponse(
+            "804",
             AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
             CancellationToken.None);
 
-        await _aggregatedMeasureDataRequest.PublishAggregatedMeasureDataRequestAcceptedResponseAsync(
-            processId,
-            gridAreaCode,
-            CancellationToken.None);
-
-        await _notifyAggregatedMeasureDataResult.ConfirmResultIsAvailableFor();
+        await _notifyAggregatedMeasureDataResult.ConfirmResultIsAvailable();
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_rejected_response_from_aggregated_measure_data_request()
     {
-        await _notifyAggregatedMeasureDataResult.EmptyQueueForActor();
-        var gridAreaCode = "804";
-        var processId = await _aggregatedMeasureDataRequest.InitializeAggregatedMeasureDataRequestAsync(
-            gridAreaCode,
+         await _aggregatedMeasureDataRequest.PublishAggregatedMeasureDataRequestRejectedResponse(
+            "804",
             AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
             CancellationToken.None);
 
-        await _aggregatedMeasureDataRequest.PublishAggregatedMeasureDataRequestRejectedResponseAsync(
-            processId,
-            CancellationToken.None);
-
-        await _notifyAggregatedMeasureDataResult.ConfirmRejectResultIsAvailableFor();
+         await _notifyAggregatedMeasureDataResult.ConfirmRejectResultIsAvailable();
     }
 }

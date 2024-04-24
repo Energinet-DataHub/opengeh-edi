@@ -49,36 +49,24 @@ public sealed class WhenWholesaleSettlementRequestedTests
     [Fact]
     public async Task Actor_can_request_wholesale_settlement()
     {
-        await _notifyWholesaleServices.EmptyQueueForActor();
+        var messageId = await _wholesaleSettlementRequest.Request(CancellationToken.None);
 
-        var messageId = await _wholesaleSettlementRequest.RequestAsync(CancellationToken.None);
-
-        await _wholesaleSettlementRequest.ConfirmRequestIsInitializedAsync(
+        await _wholesaleSettlementRequest.ConfirmRequestIsInitialized(
             messageId,
             CancellationToken.None);
     }
 
     [Fact]
-    public async Task Actor_get_bad_request_when_wholesale_settlement_request_is_invalid()
+    public async Task Actor_get_sync_rejected_response_when_wholesale_settlement_request_is_invalid()
     {
-        await _notifyWholesaleServices.EmptyQueueForActor();
-
-        await _wholesaleSettlementRequest.ConfirmInvalidRequestIsRejectedAsync(CancellationToken.None);
+        await _wholesaleSettlementRequest.ConfirmInvalidRequestIsRejected(CancellationToken.None);
     }
 
     [Fact]
     public async Task Actor_can_peek_and_dequeue_response_from_wholesale_settlement_request()
     {
-        await _notifyWholesaleServices.EmptyQueueForActor();
-        var gridAreaCode = "888";
-        var processId = await _wholesaleSettlementRequest.InitializeWholesaleSettlementRequestAsync(
-            gridAreaCode,
-            AcceptanceTestFixture.EZTestCimActorNumber,
-            CancellationToken.None);
-
-        await _wholesaleSettlementRequest.PublishWholesaleServicesRequestAcceptedResponseAsync(
-            processId,
-            gridAreaCode,
+        await _wholesaleSettlementRequest.PublishWholesaleServicesRequestAcceptedResponse(
+            "888",
             AcceptanceTestFixture.ActorNumber,
             AcceptanceTestFixture.EZTestCimActorNumber,
             CancellationToken.None);
@@ -89,15 +77,9 @@ public sealed class WhenWholesaleSettlementRequestedTests
     [Fact]
     public async Task Actor_can_peek_and_dequeue_rejected_response_from_wholesale_settlement_request()
     {
-        await _notifyWholesaleServices.EmptyQueueForActor();
-        var gridAreaCode = "888";
-        var processId = await _wholesaleSettlementRequest.InitializeWholesaleSettlementRequestAsync(
-            gridAreaCode,
+        await _wholesaleSettlementRequest.PublishWholesaleServicesRequestRejectedResponse(
+            "888",
             AcceptanceTestFixture.EZTestCimActorNumber,
-            CancellationToken.None);
-
-        await _wholesaleSettlementRequest.PublishWholesaleServicesRequestRejectedResponseAsync(
-            processId,
             CancellationToken.None);
 
         await _notifyWholesaleServices.ConfirmRejectResultIsAvailable();

@@ -44,9 +44,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
     [Fact]
     public async Task B2C_actor_can_get_the_archived_message_after_peeking_the_message()
     {
-        await _notifyWholesaleServices.EmptyQueueForActor();
-
-        await _notifyWholesaleServices.PublishMonthlyChargeResult(
+        await _notifyWholesaleServices.PublishMonthlyAmountPerChargeResult(
             AcceptanceTestFixture.CimActorGridArea,
             AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
             AcceptanceTestFixture.ActorNumber);

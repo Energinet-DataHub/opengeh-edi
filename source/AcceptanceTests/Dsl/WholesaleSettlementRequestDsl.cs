@@ -24,6 +24,7 @@ public sealed class WholesaleSettlementRequestDsl
     private readonly EdiDriver _ediDriver;
     private readonly WholesaleDriver _wholesaleDriver;
 
+#pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
     internal WholesaleSettlementRequestDsl(
         EdiProcessesDriver ediProcessesDriver,
         EdiDriver ediDriver,
@@ -34,25 +35,19 @@ public sealed class WholesaleSettlementRequestDsl
         _wholesaleDriver = wholesaleDriver;
     }
 
-    internal async Task<Guid> InitializeWholesaleSettlementRequestAsync(
-        string gridAreaCode,
-        string actorNumber,
-        CancellationToken cancellationToken)
+    internal async Task<Guid> Request(CancellationToken cancellationToken)
     {
-        return await _ediProcessesDriver
-            .CreateWholesaleServiceProcessAsync(gridAreaCode, actorNumber, cancellationToken)
-            .ConfigureAwait(false);
-    }
+        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
 
-    internal async Task<Guid> RequestAsync(CancellationToken cancellationToken)
-    {
         return await _ediDriver
             .RequestWholesaleSettlementAsync(withSyncError: false, cancellationToken)
             .ConfigureAwait(false);
     }
 
-    internal async Task ConfirmInvalidRequestIsRejectedAsync(CancellationToken cancellationToken)
+    internal async Task ConfirmInvalidRequestIsRejected(CancellationToken cancellationToken)
     {
+        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+
         var act = async () =>
         {
             await _ediDriver
@@ -63,7 +58,7 @@ public sealed class WholesaleSettlementRequestDsl
         await Assert.ThrowsAsync<BadWholesaleSettlementRequestException>(act).ConfigureAwait(false);
     }
 
-    internal async Task ConfirmRequestIsInitializedAsync(
+    internal async Task ConfirmRequestIsInitialized(
         Guid requestMessageId,
         CancellationToken cancellationToken)
     {
@@ -74,13 +69,18 @@ public sealed class WholesaleSettlementRequestDsl
         processId.Should().NotBeNull();
     }
 
-    internal async Task PublishWholesaleServicesRequestAcceptedResponseAsync(
-        Guid processId,
+    internal async Task PublishWholesaleServicesRequestAcceptedResponse(
         string gridAreaCode,
         string energySupplierNumber,
         string chargeOwnerNumber,
         CancellationToken cancellationToken)
     {
+        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+
+        var processId = await _ediProcessesDriver
+            .CreateWholesaleServiceProcessAsync(gridAreaCode, chargeOwnerNumber, cancellationToken)
+            .ConfigureAwait(false);
+
         await _wholesaleDriver.PublishWholesaleServicesRequestAcceptedResponseAsync(
             processId,
             gridAreaCode,
@@ -89,10 +89,17 @@ public sealed class WholesaleSettlementRequestDsl
             cancellationToken).ConfigureAwait(false);
     }
 
-    internal async Task PublishWholesaleServicesRequestRejectedResponseAsync(
-        Guid processId,
+    internal async Task PublishWholesaleServicesRequestRejectedResponse(
+        string gridAreaCode,
+        string actorNumber,
         CancellationToken cancellationToken)
     {
+        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+
+        var processId = await _ediProcessesDriver
+            .CreateWholesaleServiceProcessAsync(gridAreaCode, actorNumber, cancellationToken)
+            .ConfigureAwait(false);
+
         await _wholesaleDriver.PublishWholesaleServicesRequestRejectedResponseAsync(
             processId,
             cancellationToken).ConfigureAwait(false);

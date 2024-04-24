@@ -20,32 +20,34 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 internal sealed class NotifyWholesaleServicesDsl
 {
     private readonly WholesaleDriver _wholesaleDriver;
-    private readonly EdiDriver _edi;
+    private readonly EdiDriver _ediDriver;
 
     #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
 
-    internal NotifyWholesaleServicesDsl(EdiDriver ediDriver, WholesaleDriver wholesaleDriverDriver)
+    internal NotifyWholesaleServicesDsl(EdiDriver ediDriverDriver, WholesaleDriver wholesaleDriverDriver)
     {
-        _edi = ediDriver;
+        _ediDriver = ediDriverDriver;
         _wholesaleDriver = wholesaleDriverDriver;
     }
 
-    internal Task PublishMonthlyChargeResult(string gridAreaCode, string energySupplierId, string chargeOwnerId)
+    internal async Task PublishMonthlyAmountPerChargeResult(string gridAreaCode, string energySupplierId, string chargeOwnerId)
     {
-        return _wholesaleDriver.PublishMonthlyAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId);
+        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+        await _wholesaleDriver.PublishMonthlyAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId).ConfigureAwait(false);
     }
 
-    internal Task PublishAmountPerChargeResult(
+    internal async Task PublishAmountPerChargeResult(
         string gridAreaCode,
         string energySupplierId,
         string chargeOwnerId)
     {
-        return _wholesaleDriver.PublishAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId);
+        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+        await _wholesaleDriver.PublishAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId).ConfigureAwait(false);
     }
 
     internal async Task<string> ConfirmResultIsAvailable()
     {
-        var peekResponse = await _edi.PeekMessageAsync().ConfigureAwait(false);
+        var peekResponse = await _ediDriver.PeekMessageAsync().ConfigureAwait(false);
         var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
         var contentString = await peekResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
 
@@ -57,17 +59,12 @@ internal sealed class NotifyWholesaleServicesDsl
 
     internal async Task ConfirmRejectResultIsAvailable()
     {
-        var peekResponse = await _edi.PeekMessageAsync().ConfigureAwait(false);
+        var peekResponse = await _ediDriver.PeekMessageAsync().ConfigureAwait(false);
         var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
         var contentString = await peekResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         messageId.Should().NotBeNull();
         contentString.Should().NotBeNull();
         contentString.Should().Contain("RejectRequestWholesaleSettlement_MarketDocument");
-    }
-
-    internal async Task EmptyQueueForActor()
-    {
-        await _edi.EmptyQueueAsync().ConfigureAwait(false);
     }
 }
