@@ -36,4 +36,6 @@ public record InitializeAggregatedMeasureDataProcessSeries(
     string? EnergySupplierNumber,
     string? BalanceResponsibleNumber,
     string? SettlementVersion,
-    IReadOnlyCollection<string> GridAreas);
+    IReadOnlyCollection<string> GridAreas,
+    RequestedByActor RequestedByActor,
+    OriginalActor OriginalActor);

@@ -55,8 +55,6 @@ public sealed class WholesaleServicesProcess : Entity
     {
         ArgumentNullException.ThrowIfNull(gridAreas);
         ArgumentNullException.ThrowIfNull(processId);
-        ArgumentNullException.ThrowIfNull(requestedByActor);
-        ArgumentNullException.ThrowIfNull(originalActor);
 
         if (!GridAreasAreInSyncWithRequestedGridArea(requestedGridArea, gridAreas))
         {

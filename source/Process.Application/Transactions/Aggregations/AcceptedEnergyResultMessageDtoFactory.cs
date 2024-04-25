@@ -32,8 +32,8 @@ public static class AcceptedEnergyResultMessageDtoFactory
         ArgumentNullException.ThrowIfNull(acceptedEnergyResultTimeSeries);
 
         return AcceptedEnergyResultMessageDto.Create(
-            receiverNumber: aggregatedMeasureDataProcess.RequestedByActorId,
-            receiverRole: ActorRole.FromCode(aggregatedMeasureDataProcess.RequestedByActorRoleCode),
+            receiverNumber: aggregatedMeasureDataProcess.RequestedByActor.ActorNumber,
+            receiverRole: aggregatedMeasureDataProcess.RequestedByActor.ActorRole,
             processId: aggregatedMeasureDataProcess.ProcessId.Id,
             eventId: eventId,
             gridAreaCode: acceptedEnergyResultTimeSeries.GridAreaCode,

@@ -559,6 +559,10 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var authenticatedActor = GetService<AuthenticatedActor>();
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create(knownSenderId), restriction: Restriction.None,  ActorRole.FromCode(knownSenderRole)));
 
+        var requestedByActor = RequestedByActor.From(
+            ActorNumber.Create(message.SenderNumber),
+            ActorRole.FromCode(message.SenderRoleCode));
+
         var series = message.Series
             .Cast<RequestAggregatedMeasureDataMessageSeries>()
             .Select(
@@ -578,7 +582,9 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
                         series.EnergySupplierId,
                         series.BalanceResponsiblePartyId,
                         series.SettlementVersion,
-                        gridAreas);
+                        gridAreas,
+                        requestedByActor,
+                        OriginalActor.From(requestedByActor));
                 }).ToList().AsReadOnly();
 
         return new InitializeAggregatedMeasureDataProcessDto(

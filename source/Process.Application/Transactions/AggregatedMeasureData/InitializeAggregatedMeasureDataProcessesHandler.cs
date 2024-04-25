@@ -49,7 +49,6 @@ public class InitializeAggregatedMeasureDataProcessesHandler : IRequestHandler<I
     private void CreateAggregatedMeasureDataProcess(
         InitializeAggregatedMeasureDataProcessDto dto)
     {
-        var actorSenderNumber = ActorNumber.Create(dto.SenderNumber);
         var businessReason = BusinessReason.FromCodeOrUnused(dto.BusinessReason);
         var messageId = MessageId.Create(dto.MessageId);
 
@@ -62,9 +61,9 @@ public class InitializeAggregatedMeasureDataProcessesHandler : IRequestHandler<I
             _aggregatedMeasureDataProcessRepository.Add(
                 new AggregatedMeasureDataProcess(
                     ProcessId.New(),
+                    series.RequestedByActor,
+                    series.OriginalActor,
                     BusinessTransactionId.Create(series.Id),
-                    actorSenderNumber,
-                    dto.SenderRoleCode,
                     businessReason,
                     messageId,
                     series.MeteringPointType,
