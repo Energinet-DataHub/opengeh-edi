@@ -172,7 +172,7 @@ public class AssertNotifyAggregatedMeasureDataEbixDocument : IAssertNotifyAggreg
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasMeteringPointType(MeteringPointType assertionInputMeteringPointType)
+    public IAssertNotifyAggregatedMeasureDataDocument HasMeteringPointType(MeteringPointType meteringPointType)
     {
         throw new NotImplementedException();
     }
@@ -182,7 +182,7 @@ public class AssertNotifyAggregatedMeasureDataEbixDocument : IAssertNotifyAggreg
         throw new NotImplementedException();
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasResolution(Resolution assertionInputResolution)
+    public IAssertNotifyAggregatedMeasureDataDocument HasResolution(Resolution resolution)
     {
         throw new NotImplementedException();
     }

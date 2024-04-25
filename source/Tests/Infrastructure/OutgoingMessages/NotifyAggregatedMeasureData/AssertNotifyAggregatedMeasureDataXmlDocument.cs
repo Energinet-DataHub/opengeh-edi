@@ -163,7 +163,7 @@ public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggrega
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasMeteringPointType(MeteringPointType assertionInputMeteringPointType)
+    public IAssertNotifyAggregatedMeasureDataDocument HasMeteringPointType(MeteringPointType meteringPointType)
     {
         throw new NotImplementedException();
     }
@@ -173,7 +173,7 @@ public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggrega
         throw new NotImplementedException();
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasResolution(Resolution assertionInputResolution)
+    public IAssertNotifyAggregatedMeasureDataDocument HasResolution(Resolution resolution)
     {
         throw new NotImplementedException();
     }

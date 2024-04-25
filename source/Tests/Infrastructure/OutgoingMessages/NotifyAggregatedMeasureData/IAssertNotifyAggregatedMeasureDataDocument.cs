@@ -179,7 +179,7 @@ public interface IAssertNotifyAggregatedMeasureDataDocument
     /// <summary>
     /// Asserts the metering point type
     /// </summary>
-    IAssertNotifyAggregatedMeasureDataDocument HasMeteringPointType(MeteringPointType assertionInputMeteringPointType);
+    IAssertNotifyAggregatedMeasureDataDocument HasMeteringPointType(MeteringPointType meteringPointType);
 
     /// <summary>
     /// Asserts the quantity measurement unit
@@ -189,7 +189,7 @@ public interface IAssertNotifyAggregatedMeasureDataDocument
     /// <summary>
     /// Asserts the resolution
     /// </summary>
-    IAssertNotifyAggregatedMeasureDataDocument HasResolution(Resolution assertionInputResolution);
+    IAssertNotifyAggregatedMeasureDataDocument HasResolution(Resolution resolution);
 
     /// <summary>
     /// Asserts the points based on the Wholesale response

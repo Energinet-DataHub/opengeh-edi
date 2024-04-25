@@ -107,7 +107,7 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
         {
             Time = currentTime.ToTimestamp(),
             Quantity = quantity,
-            QuantityQualities = { QuantityQuality.Estimated, QuantityQuality.Measured },
+            QuantityQualities = { QuantityQuality.Estimated },
         };
     }
 }

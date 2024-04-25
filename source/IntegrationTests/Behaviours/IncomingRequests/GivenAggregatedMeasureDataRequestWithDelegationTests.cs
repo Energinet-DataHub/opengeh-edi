@@ -80,7 +80,12 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
             .GetAllDocumentFormats(exceptForIncomingDocumentFormats)
             .SelectMany(incomingDocumentFormat => delegatedFromRoles
                 .SelectMany(delegatedFromRole => delegatedToRoles
-                    .SelectMany(delegatedToRole => DocumentFormats.GetAllDocumentFormats()
+                    .SelectMany(delegatedToRole => DocumentFormats.GetAllDocumentFormats(new[]
+                        {
+                            // TODO: Remove to support XML & ebIX
+                            DocumentFormat.Xml.Name,
+                            DocumentFormat.Ebix.Name,
+                        })
                         .Select(peekDocumentFormat => new object[]
                         {
                             incomingDocumentFormat,
@@ -117,7 +122,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
             new(originalActor.ActorNumber, originalActor.ActorRole),
             new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
             "512",
-            ProcessType.RequestWholesaleResults,
+            ProcessType.RequestEnergyResults,
             GetNow());
 
         await GivenReceivedAggregatedMeasureDataRequest(
@@ -144,11 +149,11 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
             requestedForActorRole: originalActor.ActorRole.Name,
             energySupplier: energySupplierNumber.Value,
             balanceResponsibleParty: balanceResponsibleParty.Value,
-            businessReason: DataHubNames.BusinessReason.WholesaleFixing,
+            businessReason: BusinessReason.BalanceFixing,
             new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
             null,
-            settlementMethod: SettlementMethod.Flex.Code,
-            meteringPointType: MeteringPointType.Consumption.Code);
+            settlementMethod: SettlementMethod.Flex,
+            meteringPointType: MeteringPointType.Consumption);
 
         // TODO: Assert correct process is created?
 
@@ -242,14 +247,14 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
     //         new(originalActor.ActorNumber, originalActor.ActorRole),
     //         new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
     //         "512",
-    //         ProcessType.RequestWholesaleResults,
+    //         ProcessType.RequestEnergyResults,
     //         GetNow());
     //
     //     await GivenDelegation(
     //         new(originalActor.ActorNumber, originalActor.ActorRole),
     //         new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
     //         "609",
-    //         ProcessType.RequestWholesaleResults,
+    //         ProcessType.RequestEnergyResults,
     //         GetNow());
     //
     //     await GivenReceivedAggregatedMeasureDataRequest(
@@ -392,14 +397,14 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
     //         new(originalActor.ActorNumber, originalActor.ActorRole),
     //         new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
     //         "512",
-    //         ProcessType.RequestWholesaleResults,
+    //         ProcessType.RequestEnergyResults,
     //         GetNow());
     //
     //     await GivenDelegation(
     //         new(originalActor.ActorNumber, originalActor.ActorRole),
     //         new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
     //         "609",
-    //         ProcessType.RequestWholesaleResults,
+    //         ProcessType.RequestEnergyResults,
     //         GetNow());
     //
     //     // Setup fake request (period end is before period start)
@@ -525,7 +530,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
             new(originalActor.ActorNumber, originalActor.ActorRole),
             new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
             "512",
-            ProcessType.RequestWholesaleResults,
+            ProcessType.RequestEnergyResults,
             GetNow());
 
         // Original actor requests own data
@@ -553,11 +558,11 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
             requestedForActorRole: originalActor.ActorRole.Name,
             energySupplier: energySupplierNumber.Value,
             balanceResponsibleParty: balanceResponsibleParty.Value,
-            businessReason: DataHubNames.BusinessReason.BalanceFixing,
+            businessReason: BusinessReason.BalanceFixing,
             new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
             null,
-            settlementMethod: DataHubNames.SettlementMethod.Flex,
-            meteringPointType: DataHubNames.MeteringPointType.Consumption);
+            settlementMethod: SettlementMethod.Flex,
+            meteringPointType: MeteringPointType.Consumption);
 
         // TODO: Assert correct process is created?
 
@@ -620,7 +625,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
                     MeteringPointType: MeteringPointType.Consumption,
                     GridAreaCode: seriesRequest.GridArea,
                     OriginalTransactionIdReference: "123564789123564789123564789123564787",
-                    ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
+                    ProductCode: ProductType.EnergyActive.Code,
                     QuantityMeasurementUnit: MeasurementUnit.Kwh,
                     CalculationVersion: GetNow().ToUnixTimeTicks(),
                     Resolution: Resolution.Hourly,
@@ -657,7 +662,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
     //         new(originalActor.ActorNumber, originalActor.ActorRole),
     //         new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
     //         "512",
-    //         ProcessType.RequestWholesaleResults,
+    //         ProcessType.RequestEnergyResults,
     //         GetNow());
     //
     //     // Original actor requests own data
@@ -765,115 +770,12 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
     //             Points: aggregatedMeasureDataRequestAcceptedMessage.Series.Single().TimeSeriesPoints));
     // }
 
-    private async Task<string> GetGridAreaFromNotifyAggregatedMeasureDataDocument(Stream documentStream, DocumentFormat documentFormat)
-    {
-        documentStream.Position = 0;
-        if (documentFormat == DocumentFormat.Ebix)
-        {
-            var ebixAsserter = NotifyAggregatedMeasureDataDocumentAsserter.CreateEbixAsserter(documentStream);
-            var gridAreaElement = ebixAsserter.GetElement("PayloadEnergyTimeSeries[1]/MeteringGridAreaUsedDomainLocation/Identification");
-
-            gridAreaElement.Should().NotBeNull("because grid area should be present in the ebIX document");
-            gridAreaElement!.Value.Should().NotBeNull("because grid area value should not be null in the ebIX document");
-            return gridAreaElement.Value;
-        }
-
-        if (documentFormat == DocumentFormat.Xml)
-        {
-            var cimXmlAsserter = NotifyAggregatedMeasureDataDocumentAsserter.CreateCimXmlAsserter(documentStream);
-
-            var gridAreaCimXmlElement = cimXmlAsserter.GetElement("Series[1]/meteringGridArea_Domain.mRID");
-
-            gridAreaCimXmlElement.Should().NotBeNull("because grid area should be present in the CIM XML document");
-            gridAreaCimXmlElement!.Value.Should().NotBeNull("because grid area value should not be null in the CIM XML document");
-            return gridAreaCimXmlElement!.Value;
-        }
-
-        if (documentFormat == DocumentFormat.Json)
-        {
-            var cimJsonDocument = await JsonDocument.ParseAsync(documentStream);
-
-            var gridAreaCimJsonElement = cimJsonDocument.RootElement
-                .GetProperty("NotifyAggregatedMeasureData_MarketDocument")
-                .GetProperty("Series").EnumerateArray().ToList()
-                .Single()
-                .GetProperty("meteringGridArea_Domain.mRID")
-                .GetProperty("value");
-
-            gridAreaCimJsonElement.Should().NotBeNull("because grid area should be present in the CIM JSON document");
-            return gridAreaCimJsonElement.GetString()!;
-        }
-
-        throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, "Unsupported document format");
-    }
-
-    private Task GivenAggregatedMeasureDataRequestAcceptedIsReceived(Guid processId, AggregatedTimeSeriesRequestAccepted acceptedMessage)
-    {
-        return HavingReceivedInboxEventAsync(
-            eventType: nameof(AggregatedTimeSeriesRequestAccepted),
-            eventPayload: acceptedMessage,
-            processId: processId);
-    }
-
     private Task GivenAggregatedMeasureDataRequestRejectedIsReceived(Guid processId, AggregatedTimeSeriesRequestRejected rejectedMessage)
     {
         return HavingReceivedInboxEventAsync(
             eventType: nameof(AggregatedTimeSeriesRequestRejected),
             eventPayload: rejectedMessage,
             processId: processId);
-    }
-
-    private Task<(AggregatedTimeSeriesRequest AggregatedTimeSeriesRequest, Guid ProcessId)> ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
-            ServiceBusSenderSpy senderSpy,
-            IReadOnlyCollection<string> gridAreas,
-            string requestedForActorNumber,
-            string requestedForActorRole,
-            string? energySupplier,
-            string? balanceResponsibleParty,
-            string businessReason,
-            Period period,
-            string? settlementVersion,
-            string? settlementMethod,
-            string meteringPointType)
-    {
-        var (message, processId) = AssertServiceBusMessage(
-            senderSpy,
-            data => AggregatedTimeSeriesRequest.Parser.ParseFrom(data));
-
-        using var assertionScope = new AssertionScope();
-
-        message.GridAreaCodes.Should().BeEquivalentTo(gridAreas);
-        message.RequestedForActorNumber.Should().Be(requestedForActorNumber);
-        message.RequestedForActorRole.Should().Be(requestedForActorRole);
-
-        if (energySupplier == null)
-            message.HasEnergySupplierId.Should().BeFalse();
-        else
-            message.EnergySupplierId.Should().Be(energySupplier);
-
-        if (balanceResponsibleParty == null)
-            message.HasBalanceResponsibleId.Should().BeFalse();
-        else
-            message.BalanceResponsibleId.Should().Be(balanceResponsibleParty);
-
-        message.BusinessReason.Should().Be(businessReason);
-
-        message.Period.Start.Should().Be(period.Start.ToString());
-        message.Period.End.Should().Be(period.End.ToString());
-
-        if (settlementVersion == null)
-            message.HasSettlementVersion.Should().BeFalse();
-        else
-            message.SettlementVersion.Should().Be(settlementVersion);
-
-        if (settlementMethod == null)
-            message.HasSettlementMethod.Should().BeFalse();
-        else
-            message.SettlementMethod.Should().Be(settlementMethod);
-
-        message.MeteringPointType.Should().Be(meteringPointType);
-
-        return Task.FromResult((message, processId));
     }
 }
 

@@ -23,6 +23,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Json.Schema;
@@ -53,7 +54,8 @@ public sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNotif
 
     public IAssertNotifyAggregatedMeasureDataDocument MessageIdExists()
     {
-        throw new NotImplementedException();
+        _root.TryGetProperty("mRID", out _).Should().BeTrue();
+        return this;
     }
 
     public IAssertNotifyAggregatedMeasureDataDocument HasSenderId(string expectedSenderId)
@@ -82,7 +84,8 @@ public sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNotif
 
     public IAssertNotifyAggregatedMeasureDataDocument TransactionIdExists()
     {
-        throw new NotImplementedException();
+        FirstTimeSeriesElement().TryGetProperty("mRID", out _).Should().BeTrue();
+        return this;
     }
 
     public IAssertNotifyAggregatedMeasureDataDocument HasGridAreaCode(string expectedGridAreaCode)
@@ -218,24 +221,88 @@ public sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNotif
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasMeteringPointType(MeteringPointType assertionInputMeteringPointType)
+    public IAssertNotifyAggregatedMeasureDataDocument HasMeteringPointType(MeteringPointType meteringPointType)
     {
-        throw new NotImplementedException();
+        FirstTimeSeriesElement()
+            .GetProperty("marketEvaluationPoint.type")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(meteringPointType.Code);
+        return this;
     }
 
     public IAssertNotifyAggregatedMeasureDataDocument HasQuantityMeasurementUnit(MeasurementUnit quantityMeasurementUnit)
     {
-        throw new NotImplementedException();
+        FirstTimeSeriesElement()
+            .GetProperty("quantity_Measure_Unit.name")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(quantityMeasurementUnit.Code);
+        return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasResolution(Resolution assertionInputResolution)
+    public IAssertNotifyAggregatedMeasureDataDocument HasResolution(Resolution resolution)
     {
-        throw new NotImplementedException();
+        FirstTimeSeriesElement()
+            .GetProperty("Period")
+            .GetProperty("resolution")
+            .GetString()
+            .Should()
+            .Be(resolution.Code);
+
+        return this;
     }
 
     public IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<TimeSeriesPoint> points)
     {
-        throw new NotImplementedException();
+        var pointsInDocument = FirstTimeSeriesElement()
+            .GetProperty("Period")
+            .GetProperty("Point")
+            .EnumerateArray()
+            .OrderBy(p => p.GetProperty("position")
+                .GetProperty("value")
+                .GetInt32())
+            .ToList();
+
+        pointsInDocument.Should().HaveSameCount(points);
+
+        var expectedPoints = points.OrderBy(p => p.Time).ToList();
+
+        for (var i = 0; i < pointsInDocument.Count; i++)
+        {
+            pointsInDocument[i]
+                .GetProperty("position")
+                .GetProperty("value")
+                .GetInt32()
+                .Should()
+                .Be(i + 1);
+
+            pointsInDocument[i]
+                .GetProperty("quantity")
+                .GetDecimal()
+                .Should()
+                .Be(expectedPoints[i].Quantity.ToDecimal());
+
+            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+            {
+                QuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,
+                QuantityQuality.Estimated => CimCode.QuantityQualityCodeEstimated,
+                QuantityQuality.Measured => CimCode.QuantityQualityCodeMeasured,
+                _ => throw new NotImplementedException(
+                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
+            };
+
+            pointsInDocument[i]
+                .GetProperty("quality")
+                .GetProperty("value")
+                .GetString()
+                .Should()
+                .Be(expectedQuantityQuality);
+        }
+
+        return this;
     }
 
     public IAssertNotifyAggregatedMeasureDataDocument HasBusinessReason(BusinessReason businessReason)
@@ -266,7 +333,9 @@ public sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNotif
 
     public IAssertNotifyAggregatedMeasureDataDocument OriginalTransactionIdReferenceDoesNotExist()
     {
-        throw new NotImplementedException();
+        FirstTimeSeriesElement()
+            .TryGetProperty("originalTransactionIDReference_Series.mRID", out _).Should().BeTrue();
+        return this;
     }
 
     public IAssertNotifyAggregatedMeasureDataDocument HasSettlementMethod(SettlementMethod settlementMethod)

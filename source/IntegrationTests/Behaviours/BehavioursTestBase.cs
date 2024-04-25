@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
@@ -77,6 +78,7 @@ using Xunit;
 using Xunit.Abstractions;
 using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
@@ -583,6 +585,109 @@ public class BehavioursTestBase : IDisposable
         builder(eventBuilder);
 
         return eventBuilder.Build();
+    }
+
+    protected Task GivenAggregatedMeasureDataRequestAcceptedIsReceived(Guid processId, AggregatedTimeSeriesRequestAccepted acceptedMessage)
+    {
+        return HavingReceivedInboxEventAsync(
+            eventType: nameof(AggregatedTimeSeriesRequestAccepted),
+            eventPayload: acceptedMessage,
+            processId: processId);
+    }
+
+    protected async Task<string> GetGridAreaFromNotifyAggregatedMeasureDataDocument(Stream documentStream, DocumentFormat documentFormat)
+    {
+        documentStream.Position = 0;
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            var ebixAsserter = NotifyAggregatedMeasureDataDocumentAsserter.CreateEbixAsserter(documentStream);
+            var gridAreaElement = ebixAsserter.GetElement("PayloadEnergyTimeSeries[1]/MeteringGridAreaUsedDomainLocation/Identification");
+
+            gridAreaElement.Should().NotBeNull("because grid area should be present in the ebIX document");
+            gridAreaElement!.Value.Should().NotBeNull("because grid area value should not be null in the ebIX document");
+            return gridAreaElement.Value;
+        }
+
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            var cimXmlAsserter = NotifyAggregatedMeasureDataDocumentAsserter.CreateCimXmlAsserter(documentStream);
+
+            var gridAreaCimXmlElement = cimXmlAsserter.GetElement("Series[1]/meteringGridArea_Domain.mRID");
+
+            gridAreaCimXmlElement.Should().NotBeNull("because grid area should be present in the CIM XML document");
+            gridAreaCimXmlElement!.Value.Should().NotBeNull("because grid area value should not be null in the CIM XML document");
+            return gridAreaCimXmlElement!.Value;
+        }
+
+        if (documentFormat == DocumentFormat.Json)
+        {
+            var cimJsonDocument = await JsonDocument.ParseAsync(documentStream);
+
+            var gridAreaCimJsonElement = cimJsonDocument.RootElement
+                .GetProperty("NotifyAggregatedMeasureData_MarketDocument")
+                .GetProperty("Series").EnumerateArray().ToList()
+                .Single()
+                .GetProperty("meteringGridArea_Domain.mRID")
+                .GetProperty("value");
+
+            gridAreaCimJsonElement.Should().NotBeNull("because grid area should be present in the CIM JSON document");
+            return gridAreaCimJsonElement.GetString()!;
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, "Unsupported document format");
+    }
+
+    protected Task<(AggregatedTimeSeriesRequest AggregatedTimeSeriesRequest, Guid ProcessId)> ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
+            ServiceBusSenderSpy senderSpy,
+            IReadOnlyCollection<string> gridAreas,
+            string requestedForActorNumber,
+            string requestedForActorRole,
+            string? energySupplier,
+            string? balanceResponsibleParty,
+            BusinessReason businessReason,
+            Period period,
+            SettlementVersion? settlementVersion,
+            SettlementMethod? settlementMethod,
+            MeteringPointType meteringPointType)
+    {
+        var (message, processId) = AssertServiceBusMessage(
+            senderSpy,
+            data => AggregatedTimeSeriesRequest.Parser.ParseFrom(data));
+
+        using var assertionScope = new AssertionScope();
+
+        message.GridAreaCodes.Should().BeEquivalentTo(gridAreas);
+        message.RequestedForActorNumber.Should().Be(requestedForActorNumber);
+        message.RequestedForActorRole.Should().Be(requestedForActorRole);
+
+        if (energySupplier == null)
+            message.HasEnergySupplierId.Should().BeFalse();
+        else
+            message.EnergySupplierId.Should().Be(energySupplier);
+
+        if (balanceResponsibleParty == null)
+            message.HasBalanceResponsibleId.Should().BeFalse();
+        else
+            message.BalanceResponsibleId.Should().Be(balanceResponsibleParty);
+
+        message.BusinessReason.Should().Be(businessReason.Name);
+
+        message.Period.Start.Should().Be(period.Start.ToString());
+        message.Period.End.Should().Be(period.End.ToString());
+
+        if (settlementVersion == null)
+            message.HasSettlementVersion.Should().BeFalse();
+        else
+            message.SettlementVersion.Should().Be(settlementVersion.Name);
+
+        if (settlementMethod == null)
+            message.HasSettlementMethod.Should().BeFalse();
+        else
+            message.SettlementMethod.Should().Be(settlementMethod.Name);
+
+        message.MeteringPointType.Should().Be(meteringPointType.Name);
+
+        return Task.FromResult((message, processId));
     }
 
     private async Task InitializeProcess(ServiceBusMessage serviceBusMessage, string expectedSubject)
