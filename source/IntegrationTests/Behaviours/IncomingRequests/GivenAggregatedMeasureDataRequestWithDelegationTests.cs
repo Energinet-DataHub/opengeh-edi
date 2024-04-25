@@ -112,6 +112,8 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
             ? originalActor.ActorNumber
             : ActorNumber.Create("3333333333333");
         var balanceResponsibleParty = originalActor.ActorRole == ActorRole.BalanceResponsibleParty
+                                      || originalActor.ActorRole == ActorRole.GridOperator
+                                      || originalActor.ActorRole == ActorRole.MeteredDataResponsible
             ? originalActor.ActorNumber
             : ActorNumber.Create("4444444444444");
 

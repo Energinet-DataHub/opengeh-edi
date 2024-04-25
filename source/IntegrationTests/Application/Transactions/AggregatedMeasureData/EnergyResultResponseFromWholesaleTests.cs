@@ -173,6 +173,8 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
         return AcceptedEnergyResultMessageDto.Create(
             process.RequestedByActor.ActorNumber,
             process.RequestedByActor.ActorRole,
+            process.OriginalActor.ActorNumber,
+            process.OriginalActor.ActorRole,
             process.ProcessId.Id,
             EventId.From(Guid.NewGuid()),
             gridarea,
@@ -188,7 +190,9 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
             points.ToList().AsReadOnly(),
             process.BusinessReason.Name,
             1,
-            settlementVersion: process.SettlementVersion?.Name);
+            settlementVersion: process.SettlementVersion?.Name,
+            originalTransactionIdReference: process.BusinessTransactionId.Id,
+            relatedToMessageId: process.InitiatedByMessageId);
     }
 
     private static RejectedAggregatedMeasureDataRequest CreateRejectRequest()

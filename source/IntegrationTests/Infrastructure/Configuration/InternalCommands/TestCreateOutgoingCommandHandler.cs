@@ -42,6 +42,8 @@ public class TestCreateOutgoingCommandHandler : IRequestHandler<TestCreateOutgoi
             var message = AcceptedEnergyResultMessageDto.Create(
                 ActorNumber.Create("1234567891234"),
                 ActorRole.EnergySupplier,
+                ActorNumber.Create("1234567891234"),
+                ActorRole.EnergySupplier,
                 ProcessId.New().Id,
                 EventId.From(Guid.NewGuid()),
                 "123",
@@ -57,7 +59,10 @@ public class TestCreateOutgoingCommandHandler : IRequestHandler<TestCreateOutgoi
                     new(1, 1, CalculatedQuantityQuality.Incomplete, "2021-01-01T00:00:00Z"),
                 },
                 BusinessReason.BalanceFixing.Name,
-                1);
+                1,
+                Guid.NewGuid().ToString(),
+                null,
+                MessageId.New());
             await _mediator.Publish(new EnqueueAcceptedEnergyResultMessageEvent(message), cancellationToken).ConfigureAwait(false);
         }
 

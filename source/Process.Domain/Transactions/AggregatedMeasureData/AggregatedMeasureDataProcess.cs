@@ -215,13 +215,15 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
                 BusinessTransactionId.Id);
 
             return new RejectedEnergyResultMessageDto(
-                RequestedByActor.ActorNumber,
-                ProcessId.Id,
-                rejectedAggregatedMeasureDataRequest.EventId,
-                rejectedAggregatedMeasureDataRequest.BusinessReason.Name,
-                RequestedByActor.ActorRole,
-                InitiatedByMessageId,
-                rejectedTimeSerie);
+                receiverNumber: RequestedByActor.ActorNumber,
+                processId: ProcessId.Id,
+                eventId: rejectedAggregatedMeasureDataRequest.EventId,
+                businessReason: rejectedAggregatedMeasureDataRequest.BusinessReason.Name,
+                receiverRole: RequestedByActor.ActorRole,
+                relatedToMessageId: InitiatedByMessageId,
+                series: rejectedTimeSerie,
+                documentReceiverNumber: OriginalActor.ActorNumber,
+                documentReceiverRole: OriginalActor.ActorRole);
         }
     }
 }
