@@ -51,12 +51,12 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             ArgumentNullException.ThrowIfNull(gridAreas);
             ArgumentNullException.ThrowIfNull(processId);
 
-            if (!string.IsNullOrEmpty(requestedGridArea) && gridAreas.Count != 1 && gridAreas.Single() != requestedGridArea)
+            if (!GridAreasAreInSyncWithRequestedGridArea(requestedGridArea, gridAreas))
             {
                 throw new ArgumentOutOfRangeException(
                     nameof(gridAreas),
                     gridAreas,
-                    $"GridAreas must contain exactly the IncomingGridArea when IncomingGridArea is not null (id: {processId.Id})");
+                    $"Grid areas must contain exactly the requested grid area when the requested grid area is not null (id: {processId.Id})");
             }
 
             ProcessId = processId;
@@ -178,6 +178,19 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             AddDomainEvent(new EnqueueRejectedEnergyResultMessageEvent(CreateRejectedAggregationResultMessage(rejectAggregatedMeasureDataRequest)));
 
             _state = State.Rejected;
+        }
+
+        /// <summary>
+        /// If requested grid are has a value, then grid areas must contain exactly the requested grid area.
+        /// </summary>
+        private bool GridAreasAreInSyncWithRequestedGridArea(string? requestedGridArea, IReadOnlyCollection<string> gridAreas)
+        {
+            // If requested grid area is null, then grid areas can have any value
+            if (string.IsNullOrEmpty(requestedGridArea))
+                return true;
+
+            // If requested grid area is not null, then grid areas must contain exactly the requested grid area
+            return gridAreas.Count == 1 && gridAreas.Single() == requestedGridArea;
         }
 
         private RejectedEnergyResultMessageDto CreateRejectedAggregationResultMessage(

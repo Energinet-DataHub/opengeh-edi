@@ -55,9 +55,17 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
     {
         return new[]
         {
-            new object?[] { "E17", null, Array.Empty<string>() },
-            new object?[] { null, null, new[] { "101", "542" } },
+            // Return parameters: string? meteringPointType, string? requestedGridArea, string[] gridAreas
+
+            // Metering point type has value, and the request is for all grid areas
+            new object?[] { MeteringPointType.Consumption.Code, null, Array.Empty<string>() },
+
+            // Metering point type is null and the request is for grid area 101
             new object?[] { null, "101", new[] { "101" } },
+
+            // Metering point type is null and the request is for all grid areas,
+            // but because of delegation the actual grid areas requested are 101 and 542
+            new object?[] { null, null, new[] { "101", "542" } },
         };
     }
 
