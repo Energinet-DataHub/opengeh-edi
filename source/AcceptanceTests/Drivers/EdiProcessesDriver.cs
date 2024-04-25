@@ -82,7 +82,7 @@ internal sealed class EdiProcessesDriver
         using (var createProcessCommand = new SqlCommand())
         {
             createProcessCommand.CommandText = @"INSERT INTO [AggregatedMeasureDataProcesses]
-            (ProcessId, BusinessTransactionId, MeteringPointType, SettlementMethod, StartOfPeriod, EndOfPeriod, MeteringGridAreaDomainId, EnergySupplierId, BalanceResponsibleId, RequestedByActorId, BusinessReason, RequestedByActorRoleCode, State, SettlementVersion, InitiatedByMessageId, CreatedBy, CreatedAt, ModifiedBy, ModifiedAt)
+            (ProcessId, BusinessTransactionId, MeteringPointType, SettlementMethod, StartOfPeriod, EndOfPeriod, RequestedGridArea, EnergySupplierId, BalanceResponsibleId, RequestedByActorId, BusinessReason, RequestedByActorRoleCode, State, SettlementVersion, InitiatedByMessageId, CreatedBy, CreatedAt, ModifiedBy, ModifiedAt)
             VALUES
             (@ProcessId, @BusinessTransactionId, 'E17', 'D01', '2024-04-22T22:00:00Z', '2024-04-23T22:00:00Z', @RequestedGridArea, @EnergySupplierId, null, @EnergySupplierId, 'D04', 'DDQ', 'Sent', NULL, '9e831318-f12c-48b0-9151-c9c6e73081dc', 'Acceptance Tests', @CreatedAt, NULL, NULL);";
             createProcessCommand.Parameters.AddWithValue("@ProcessId", processId);
@@ -95,22 +95,20 @@ internal sealed class EdiProcessesDriver
             await createProcessCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        // TODO: Add after AggregatedMeasureDataProcessGridAreas is merged
-        // using (var createProcessGridAreaCommand = new SqlCommand())
-        // {
-        //     var gridAreaId = Guid.NewGuid();
-        //     createProcessGridAreaCommand.CommandText = @"INSERT INTO [AggregatedMeasureDataProcessGridAreas]
-        //         (Id, AggregatedMeasureDataProcessId, GridArea)
-        //         VALUES
-        //         (@Id, @ProcessId, @GridArea);";
-        //     createProcessGridAreaCommand.Parameters.AddWithValue("@Id", gridAreaId);
-        //     createProcessGridAreaCommand.Parameters.AddWithValue("@ProcessId", processId);
-        //     createProcessGridAreaCommand.Parameters.AddWithValue("@GridArea", requestedGridAreaCode);
-        //
-        //     createProcessGridAreaCommand.Connection = connection;
-        //     await createProcessGridAreaCommand.Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-        //     await createProcessGridAreaCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
-        // }
+        using (var createProcessGridAreaCommand = new SqlCommand())
+        {
+            var gridAreaId = Guid.NewGuid();
+            createProcessGridAreaCommand.CommandText = @"INSERT INTO [AggregatedMeasureDataProcessGridAreas]
+                (Id, AggregatedMeasureDataProcessId, GridArea)
+                VALUES
+                (@Id, @ProcessId, @GridArea);";
+            createProcessGridAreaCommand.Parameters.AddWithValue("@Id", gridAreaId);
+            createProcessGridAreaCommand.Parameters.AddWithValue("@ProcessId", processId);
+            createProcessGridAreaCommand.Parameters.AddWithValue("@GridArea", requestedGridAreaCode);
+
+            createProcessGridAreaCommand.Connection = connection;
+            await createProcessGridAreaCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+        }
 
         return processId;
     }
