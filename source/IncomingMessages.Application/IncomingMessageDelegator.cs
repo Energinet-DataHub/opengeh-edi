@@ -50,10 +50,6 @@ public class IncomingMessageDelegator
         IncomingDocumentType documentType,
         CancellationToken cancellationToken)
     {
-        // TODO: Remove after implementing delegation for RequestAggregatedMeasureData
-        if (documentType != IncomingDocumentType.RequestWholesaleSettlement)
-            return;
-
         ArgumentNullException.ThrowIfNull(message);
 
         var processType = MapToProcessType(documentType);

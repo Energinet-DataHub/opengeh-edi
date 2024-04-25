@@ -20,9 +20,9 @@ using Period = Energinet.DataHub.Edi.Responses.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
-internal static class AggregatedTimeSeriesRequestAcceptedEventBuilder
+internal static class AggregatedTimeSeriesResponseEventBuilder
 {
-    public static AggregatedTimeSeriesRequestAccepted BuildEventFrom(
+    public static AggregatedTimeSeriesRequestAccepted GenerateAcceptedFrom(
         AggregatedTimeSeriesRequest aggregatedTimeSeriesRequest)
     {
         var @event = new AggregatedTimeSeriesRequestAccepted();

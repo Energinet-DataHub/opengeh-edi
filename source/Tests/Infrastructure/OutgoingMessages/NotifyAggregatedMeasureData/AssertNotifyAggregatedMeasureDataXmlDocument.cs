@@ -13,10 +13,14 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 
@@ -34,6 +38,11 @@ public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggrega
     {
         _documentAsserter.HasValue("mRID", expectedMessageId);
         return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument MessageIdExists()
+    {
+        throw new NotImplementedException();
     }
 
     public IAssertNotifyAggregatedMeasureDataDocument HasSenderId(string expectedSenderId)
@@ -58,6 +67,11 @@ public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggrega
     {
         _documentAsserter.HasValue($"Series[1]/mRID", expectedTransactionId.ToString());
         return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument TransactionIdExists()
+    {
+        throw new NotImplementedException();
     }
 
     public IAssertNotifyAggregatedMeasureDataDocument HasGridAreaCode(string expectedGridAreaCode)
@@ -143,10 +157,30 @@ public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggrega
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasCalculationResultVersion(int version)
+    public IAssertNotifyAggregatedMeasureDataDocument HasCalculationResultVersion(long version)
     {
         _documentAsserter.HasValue($"Series[1]/version", version.ToString(NumberFormatInfo.InvariantInfo));
         return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument HasMeteringPointType(MeteringPointType assertionInputMeteringPointType)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument HasQuantityMeasurementUnit(MeasurementUnit quantityMeasurementUnit)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument HasResolution(Resolution assertionInputResolution)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<TimeSeriesPoint> points)
+    {
+        throw new NotImplementedException();
     }
 
     public IAssertNotifyAggregatedMeasureDataDocument HasBusinessReason(BusinessReason businessReason)
@@ -173,6 +207,11 @@ public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggrega
     {
         _documentAsserter.HasValue("Series[1]/originalTransactionIDReference_Series.mRID", originalTransactionIdReference);
         return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument OriginalTransactionIdReferenceDoesNotExist()
+    {
+        throw new NotImplementedException();
     }
 
     public IAssertNotifyAggregatedMeasureDataDocument HasSettlementMethod(SettlementMethod settlementMethod)

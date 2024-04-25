@@ -13,21 +13,27 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.Ebix;
+using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 
 public class AssertNotifyAggregatedMeasureDataEbixDocument : IAssertNotifyAggregatedMeasureDataDocument
 {
     private readonly AssertEbixDocument _documentAsserter;
+    private readonly bool _skipIdentificationLengthValidation;
 
-    public AssertNotifyAggregatedMeasureDataEbixDocument(AssertEbixDocument documentAsserter)
+    public AssertNotifyAggregatedMeasureDataEbixDocument(AssertEbixDocument documentAsserter, bool skipIdentificationLengthValidation = false)
     {
         _documentAsserter = documentAsserter;
+        _skipIdentificationLengthValidation = skipIdentificationLengthValidation;
         _documentAsserter.HasValue("HeaderEnergyDocument/DocumentType", "E31");
     }
 
@@ -35,6 +41,11 @@ public class AssertNotifyAggregatedMeasureDataEbixDocument : IAssertNotifyAggreg
     {
         _documentAsserter.HasValue("HeaderEnergyDocument/Identification", expectedMessageId);
         return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument MessageIdExists()
+    {
+        throw new NotImplementedException();
     }
 
     public IAssertNotifyAggregatedMeasureDataDocument HasSenderId(string expectedSenderId)
@@ -59,6 +70,11 @@ public class AssertNotifyAggregatedMeasureDataEbixDocument : IAssertNotifyAggreg
     {
         _documentAsserter.HasValue($"PayloadEnergyTimeSeries[1]/Identification", expectedTransactionId.ToString("N"));
         return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument TransactionIdExists()
+    {
+        throw new NotImplementedException();
     }
 
     public IAssertNotifyAggregatedMeasureDataDocument HasGridAreaCode(string expectedGridAreaCode)
@@ -104,7 +120,7 @@ public class AssertNotifyAggregatedMeasureDataEbixDocument : IAssertNotifyAggreg
 
     public async Task<IAssertNotifyAggregatedMeasureDataDocument> DocumentIsValidAsync()
     {
-        await _documentAsserter.HasValidStructureAsync(DocumentType.NotifyAggregatedMeasureData, "3").ConfigureAwait(false);
+        await _documentAsserter.HasValidStructureAsync(DocumentType.NotifyAggregatedMeasureData, "3", _skipIdentificationLengthValidation).ConfigureAwait(false);
         return this;
     }
 
@@ -150,10 +166,30 @@ public class AssertNotifyAggregatedMeasureDataEbixDocument : IAssertNotifyAggreg
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasCalculationResultVersion(int version)
+    public IAssertNotifyAggregatedMeasureDataDocument HasCalculationResultVersion(long version)
     {
         _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/Version", version.ToString(NumberFormatInfo.InvariantInfo));
         return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument HasMeteringPointType(MeteringPointType assertionInputMeteringPointType)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument HasQuantityMeasurementUnit(MeasurementUnit quantityMeasurementUnit)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument HasResolution(Resolution assertionInputResolution)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<TimeSeriesPoint> points)
+    {
+        throw new NotImplementedException();
     }
 
     public IAssertNotifyAggregatedMeasureDataDocument HasBusinessReason(BusinessReason businessReason)
@@ -178,6 +214,11 @@ public class AssertNotifyAggregatedMeasureDataEbixDocument : IAssertNotifyAggreg
     {
         _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/OriginalBusinessDocument", originalTransactionIdReference);
         return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument OriginalTransactionIdReferenceDoesNotExist()
+    {
+        throw new NotImplementedException();
     }
 
     public IAssertNotifyAggregatedMeasureDataDocument HasSettlementMethod(SettlementMethod settlementMethod)

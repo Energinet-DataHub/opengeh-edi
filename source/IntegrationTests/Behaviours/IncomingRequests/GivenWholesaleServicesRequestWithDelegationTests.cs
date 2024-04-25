@@ -856,71 +856,55 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             Period period,
             string? settlementVersion)
     {
-        using (new AssertionScope())
-        {
-            senderSpy.MessageSent.Should().BeTrue();
-            senderSpy.Message.Should().NotBeNull();
-        }
-
-        var serviceBusMessage = senderSpy.Message!;
-        Guid processId;
-        using (new AssertionScope())
-        {
-            serviceBusMessage.Subject.Should().Be(nameof(WholesaleServicesRequest));
-            serviceBusMessage.Body.Should().NotBeNull();
-            serviceBusMessage.ApplicationProperties.TryGetValue("ReferenceId", out var referenceId);
-            referenceId.Should().NotBeNull();
-            Guid.TryParse(referenceId!.ToString()!, out processId).Should().BeTrue();
-        }
-
-        var wholesaleServicesRequestMessage = WholesaleServicesRequest.Parser.ParseFrom(serviceBusMessage.Body);
-        wholesaleServicesRequestMessage.Should().NotBeNull();
+        var (message, processId) = AssertServiceBusMessage(
+            senderSpy,
+            (data) => WholesaleServicesRequest.Parser.ParseFrom(data));
 
         using var assertionScope = new AssertionScope();
 
-        wholesaleServicesRequestMessage.GridAreaCodes.Should().BeEquivalentTo(gridAreas);
-        wholesaleServicesRequestMessage.RequestedForActorNumber.Should().Be(requestedForActorNumber);
-        wholesaleServicesRequestMessage.RequestedForActorRole.Should().Be(requestedForActorRole);
+        message.GridAreaCodes.Should().BeEquivalentTo(gridAreas);
+        message.RequestedForActorNumber.Should().Be(requestedForActorNumber);
+        message.RequestedForActorRole.Should().Be(requestedForActorRole);
 
         if (energySupplierId == null)
-            wholesaleServicesRequestMessage.HasEnergySupplierId.Should().BeFalse();
+            message.HasEnergySupplierId.Should().BeFalse();
         else
-            wholesaleServicesRequestMessage.EnergySupplierId.Should().Be(energySupplierId);
+            message.EnergySupplierId.Should().Be(energySupplierId);
 
         if (chargeOwnerId == null)
-            wholesaleServicesRequestMessage.HasChargeOwnerId.Should().BeFalse();
+            message.HasChargeOwnerId.Should().BeFalse();
         else
-            wholesaleServicesRequestMessage.ChargeOwnerId.Should().Be(chargeOwnerId);
+            message.ChargeOwnerId.Should().Be(chargeOwnerId);
 
         if (resolution == null)
-            wholesaleServicesRequestMessage.HasResolution.Should().BeFalse();
+            message.HasResolution.Should().BeFalse();
         else
-            wholesaleServicesRequestMessage.Resolution.Should().Be(resolution);
+            message.Resolution.Should().Be(resolution);
 
-        wholesaleServicesRequestMessage.BusinessReason.Should().Be(businessReason);
+        message.BusinessReason.Should().Be(businessReason);
 
         if (chargeTypes == null)
         {
-            wholesaleServicesRequestMessage.ChargeTypes.Should().BeEmpty();
+            message.ChargeTypes.Should().BeEmpty();
         }
         else
         {
-            wholesaleServicesRequestMessage.ChargeTypes.Should().BeEquivalentTo(chargeTypes.Select(ct => new Energinet.DataHub.Edi.Requests.ChargeType
+            message.ChargeTypes.Should().BeEquivalentTo(chargeTypes.Select(ct => new Energinet.DataHub.Edi.Requests.ChargeType
             {
                 ChargeType_ = ct.ChargeType,
                 ChargeCode = ct.ChargeCode,
             }));
         }
 
-        wholesaleServicesRequestMessage.PeriodStart.Should().Be(period.Start.ToString());
-        wholesaleServicesRequestMessage.PeriodEnd.Should().Be(period.End.ToString());
+        message.PeriodStart.Should().Be(period.Start.ToString());
+        message.PeriodEnd.Should().Be(period.End.ToString());
 
         if (settlementVersion == null)
-            wholesaleServicesRequestMessage.HasSettlementVersion.Should().BeFalse();
+            message.HasSettlementVersion.Should().BeFalse();
         else
-            wholesaleServicesRequestMessage.SettlementVersion.Should().Be(settlementVersion);
+            message.SettlementVersion.Should().Be(settlementVersion);
 
-        return Task.FromResult((wholesaleServicesRequestMessage, processId));
+        return Task.FromResult((wholesaleServicesRequestMessage: message, processId));
     }
 }
 
