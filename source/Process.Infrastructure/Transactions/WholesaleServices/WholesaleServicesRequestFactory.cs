@@ -64,9 +64,7 @@ public static class WholesaleServicesRequestFactory
             request.ChargeOwnerId = process.ChargeOwner;
 
         if (process.GridAreas.Count > 0)
-        {
             request.GridAreaCodes.AddRange(process.GridAreas);
-        }
 
         if (process.SettlementVersion != null)
             request.SettlementVersion = process.SettlementVersion.Name;

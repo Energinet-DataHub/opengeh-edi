@@ -425,7 +425,8 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
             SampleData.GridAreaCode,
             null,
             SampleData.ReceiverNumber.Value,
-            null);
+            null,
+            new[] { SampleData.GridAreaCode });
 
         process.SendToWholesale();
         _processContext.AggregatedMeasureDataProcesses.Add(process);

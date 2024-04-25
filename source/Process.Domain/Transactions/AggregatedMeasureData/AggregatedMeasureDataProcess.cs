@@ -23,6 +23,12 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 {
     public sealed class AggregatedMeasureDataProcess : Entity
     {
+        /// <summary>
+        /// The process' grid areas are created when the process is created, and retrieved by Entity Framework from
+        /// the WholesaleServicesProcessGridAreas table.
+        /// </summary>
+        private readonly IReadOnlyCollection<AggregatedMeasureDataProcessGridArea> _gridAreas;
+
         private State _state = State.Initialized;
 
         public AggregatedMeasureDataProcess(
@@ -36,11 +42,23 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             string? settlementMethod,
             string startOfPeriod,
             string? endOfPeriod,
-            string? meteringGridAreaDomainId,
+            string? requestedGridArea,
             string? energySupplierId,
             string? balanceResponsibleId,
-            SettlementVersion? settlementVersion)
+            SettlementVersion? settlementVersion,
+            IReadOnlyCollection<string> gridAreas)
         {
+            ArgumentNullException.ThrowIfNull(gridAreas);
+            ArgumentNullException.ThrowIfNull(processId);
+
+            if (!GridAreasAreInSyncWithRequestedGridArea(requestedGridArea, gridAreas))
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(gridAreas),
+                    gridAreas,
+                    $"Grid areas must contain exactly the requested grid area when the requested grid area is not null (id: {processId.Id})");
+            }
+
             ProcessId = processId;
             BusinessTransactionId = businessTransactionId;
             BusinessReason = businessReason;
@@ -49,12 +67,13 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             SettlementMethod = settlementMethod;
             StartOfPeriod = startOfPeriod;
             EndOfPeriod = endOfPeriod;
-            MeteringGridAreaDomainId = meteringGridAreaDomainId;
+            RequestedGridArea = requestedGridArea;
             EnergySupplierId = energySupplierId;
             BalanceResponsibleId = balanceResponsibleId;
             SettlementVersion = settlementVersion;
             RequestedByActorId = requestedByActorId;
             RequestedByActorRoleCode = requestedByActorRoleCode;
+            _gridAreas = gridAreas.Select(ga => new AggregatedMeasureDataProcessGridArea(Guid.NewGuid(), ProcessId, ga)).ToArray();
             AddDomainEvent(new AggregatedMeasureProcessIsInitialized(processId));
         }
 
@@ -106,7 +125,13 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 
         public string? EndOfPeriod { get; }
 
-        public string? MeteringGridAreaDomainId { get; }
+        public string? RequestedGridArea { get; }
+
+        /// <summary>
+        /// Which grid area's the request is for. If this list is empty, then the request is for all appropriate grid areas.
+        /// The process' grid areas are stored in the AggregatedMeasureDataProcessGridAreas table.
+        /// </summary>
+        public IReadOnlyCollection<string> GridAreas => _gridAreas.Select(g => g.GridArea).ToArray();
 
         public string? EnergySupplierId { get; }
 
@@ -153,6 +178,19 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             AddDomainEvent(new EnqueueRejectedEnergyResultMessageEvent(CreateRejectedAggregationResultMessage(rejectAggregatedMeasureDataRequest)));
 
             _state = State.Rejected;
+        }
+
+        /// <summary>
+        /// If requested grid are has a value, then grid areas must contain exactly the requested grid area.
+        /// </summary>
+        private bool GridAreasAreInSyncWithRequestedGridArea(string? requestedGridArea, IReadOnlyCollection<string> gridAreas)
+        {
+            // If requested grid area is null, then grid areas can have any value
+            if (string.IsNullOrEmpty(requestedGridArea))
+                return true;
+
+            // If requested grid area is not null, then grid areas must contain exactly the requested grid area
+            return gridAreas.Count == 1 && gridAreas.Single() == requestedGridArea;
         }
 
         private RejectedEnergyResultMessageDto CreateRejectedAggregationResultMessage(

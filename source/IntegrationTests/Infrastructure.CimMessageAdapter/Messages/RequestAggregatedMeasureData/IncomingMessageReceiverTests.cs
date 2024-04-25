@@ -562,26 +562,30 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var series = message.Serie
             .Cast<RequestAggregatedMeasureDataMessageSeries>()
             .Select(
-                serie => new InitializeAggregatedMeasureDataProcessSeries(
-                    serie.TransactionId,
-                    serie.MarketEvaluationPointType,
-                    serie.MarketEvaluationSettlementMethod,
-                    serie.StartDateTime,
-                    serie.EndDateTime,
-                    serie.GridArea,
-                    serie.EnergySupplierMarketParticipantId,
-                    serie.BalanceResponsiblePartyMarketParticipantId,
-                    serie.SettlementVersion)).ToList().AsReadOnly();
+                series =>
+                {
+                    var gridAreas = series.GridArea != null
+                        ? new List<string> { series.GridArea }
+                        : new List<string>();
+
+                    return new InitializeAggregatedMeasureDataProcessSeries(
+                        series.TransactionId,
+                        series.MarketEvaluationPointType,
+                        series.MarketEvaluationSettlementMethod,
+                        series.StartDateTime,
+                        series.EndDateTime,
+                        series.GridArea,
+                        series.EnergySupplierMarketParticipantId,
+                        series.BalanceResponsiblePartyMarketParticipantId,
+                        series.SettlementVersion,
+                        gridAreas);
+                }).ToList().AsReadOnly();
+
         return new InitializeAggregatedMeasureDataProcessDto(
             message.SenderNumber,
             message.SenderRoleCode,
-            message.ReceiverNumber,
-            message.ReceiverRoleCode,
             message.BusinessReason,
-            message.MessageType,
             message.MessageId,
-            message.CreatedAt,
-            message.BusinessType,
             series);
     }
 

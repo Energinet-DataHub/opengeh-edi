@@ -116,7 +116,8 @@ public class WhenARejectedResultIsAvailableTests : TestBase
           SampleData.GridAreaCode,
           null,
           null,
-          null);
+          null,
+          new[] { SampleData.GridAreaCode });
 
         process.SendToWholesale();
         _processContext.AggregatedMeasureDataProcesses.Add(process);
