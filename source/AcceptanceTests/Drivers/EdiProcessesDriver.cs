@@ -107,7 +107,6 @@ internal sealed class EdiProcessesDriver
             createProcessGridAreaCommand.Parameters.AddWithValue("@GridArea", requestedGridAreaCode);
 
             createProcessGridAreaCommand.Connection = connection;
-            await createProcessGridAreaCommand.Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
             await createProcessGridAreaCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
         }
 
