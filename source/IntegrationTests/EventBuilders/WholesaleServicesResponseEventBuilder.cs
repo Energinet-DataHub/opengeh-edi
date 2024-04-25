@@ -60,7 +60,7 @@ public static class WholesaleServicesResponseEventBuilder
                 var periodStart = InstantPattern.General.Parse(request.PeriodStart).Value;
                 var periodEnd = InstantPattern.General.Parse(request.PeriodEnd).Value;
 
-                var points = CreatePoints(resolution, periodEnd, periodStart);
+                var points = CreatePoints(resolution, periodStart, periodEnd);
 
                 var series = new WholesaleServicesRequestSeries()
                 {
@@ -123,7 +123,7 @@ public static class WholesaleServicesResponseEventBuilder
         return rejectedMessage;
     }
 
-    private static List<WholesaleServicesRequestSeries.Types.Point> CreatePoints(WholesaleServicesRequestSeries.Types.Resolution resolution, Instant periodEnd, Instant periodStart)
+    private static List<WholesaleServicesRequestSeries.Types.Point> CreatePoints(WholesaleServicesRequestSeries.Types.Resolution resolution, Instant periodStart, Instant periodEnd)
     {
         var points = new List<WholesaleServicesRequestSeries.Types.Point>();
 

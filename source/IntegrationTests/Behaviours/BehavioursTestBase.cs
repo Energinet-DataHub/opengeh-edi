@@ -443,7 +443,7 @@ public class BehavioursTestBase : IDisposable
             AggregatedTimeSeriesRequest.Parser.ParseFrom(serviceBusMessage.Body);
 
         var aggregatedTimeSeriesRequestAccepted =
-            AggregatedTimeSeriesResponseEventBuilder.GenerateAcceptedFrom(aggregatedTimeSeriesRequest);
+            AggregatedTimeSeriesResponseEventBuilder.GenerateAcceptedFrom(aggregatedTimeSeriesRequest, GetNow());
 
         await HavingReceivedInboxEventAsync(
             nameof(AggregatedTimeSeriesRequestAccepted),
