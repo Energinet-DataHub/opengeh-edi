@@ -79,7 +79,7 @@ public class IncomingMessageDelegator
         }
 
         // Delegation is setup for grid areas, so we need to set delegated for each series since they contain the grid area
-        foreach (var series in message.Serie)
+        foreach (var series in message.Series)
         {
             var delegations = await _masterDataClient.GetProcessesDelegatedToAsync(
                     new Actor(requestedByActorNumber, requestedByActorRole),
