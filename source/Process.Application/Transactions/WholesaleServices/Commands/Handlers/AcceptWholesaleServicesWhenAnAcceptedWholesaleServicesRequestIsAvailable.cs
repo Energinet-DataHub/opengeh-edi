@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -39,13 +40,12 @@ public class AcceptWholesaleServicesWhenAnAcceptedWholesaleServicesRequestIsAvai
         var process = await _wholesaleServicesProcessRepository
             .GetAsync(ProcessId.Create(request.ProcessId), cancellationToken).ConfigureAwait(false);
 
-        var acceptedWholesaleServicesMessageDtos = new List<AcceptedWholesaleServicesMessageDto>();
-        foreach (var acceptedWholesaleServices in request.AcceptedWholesaleServicesSerie)
-        {
-            var message = AcceptedWholesaleServiceMessageDtoFactory
-                .Create(request.EventId, process, acceptedWholesaleServices);
-            acceptedWholesaleServicesMessageDtos.Add(message);
-        }
+        var acceptedWholesaleServicesMessageDtos = request.AcceptedWholesaleServicesSerie
+            .Select(series => AcceptedWholesaleServiceMessageDtoFactory.Create(
+                request.EventId,
+                process,
+                series))
+            .ToList();
 
         process.IsAccepted(acceptedWholesaleServicesMessageDtos);
 

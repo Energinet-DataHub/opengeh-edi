@@ -14,16 +14,15 @@
 
 using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.MasterData.Infrastructure.MessageDelegation;
+namespace Energinet.DataHub.EDI.MasterData.Infrastructure.ProcessDelegation;
 
-public class ProcessDelegationEntityConfiguration : IEntityTypeConfiguration<ProcessDelegation>
+public class ProcessDelegationEntityConfiguration : IEntityTypeConfiguration<Domain.ProcessDelegations.ProcessDelegation>
 {
-    public void Configure(EntityTypeBuilder<ProcessDelegation> builder)
+    public void Configure(EntityTypeBuilder<Domain.ProcessDelegations.ProcessDelegation> builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 

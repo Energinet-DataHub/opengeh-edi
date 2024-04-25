@@ -20,14 +20,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
+using FluentAssertions;
 using Json.Schema;
 using NodaTime;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestWholesaleSettlement;
 
-internal sealed class
-    AssertRejectRequestWholesaleSettlementJsonDocument : IAssertRejectRequestWholesaleSettlementDocument
+public sealed class AssertRejectRequestWholesaleSettlementJsonDocument : IAssertRejectRequestWholesaleSettlementDocument
 {
     private readonly JsonSchemaProvider _schemas = new(new CimJsonSchemas());
     private readonly JsonDocument _document;
@@ -41,43 +41,76 @@ internal sealed class
 
     public IAssertRejectRequestWholesaleSettlementDocument HasMessageId(string expectedMessageId)
     {
-        Assert.Equal(expectedMessageId, _root.GetProperty("mRID").ToString());
+        _root.GetProperty("mRID").GetString().Should().Be(expectedMessageId);
+        return this;
+    }
+
+    public IAssertRejectRequestWholesaleSettlementDocument MessageIdExists()
+    {
+        _root.TryGetProperty("mRID", out _).Should().BeTrue();
         return this;
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasSenderId(string expectedSenderId)
     {
-        Assert.Equal(
-            expectedSenderId,
-            _root.GetProperty("sender_MarketParticipant.mRID")
-                .GetProperty("value")
-                .ToString());
+        _root.GetProperty("sender_MarketParticipant.mRID")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(expectedSenderId);
+        return this;
+    }
+
+    public IAssertRejectRequestWholesaleSettlementDocument HasSenderRole(ActorRole role)
+    {
+        ArgumentNullException.ThrowIfNull(role);
+
+        _root.GetProperty("sender_MarketParticipant.marketRole.type")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(role.Code);
         return this;
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasReceiverId(string expectedReceiverId)
     {
-        Assert.Equal(
-            expectedReceiverId,
-            _root.GetProperty("receiver_MarketParticipant.mRID")
-                .GetProperty("value")
-                .ToString());
+        _root.GetProperty("receiver_MarketParticipant.mRID")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(expectedReceiverId);
+        return this;
+    }
+
+    public IAssertRejectRequestWholesaleSettlementDocument HasReceiverRole(ActorRole role)
+    {
+        ArgumentNullException.ThrowIfNull(role);
+
+        _root.GetProperty("receiver_MarketParticipant.marketRole.type")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(role.Code);
         return this;
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasTimestamp(Instant expectedTimestamp)
     {
-        Assert.Equal(expectedTimestamp.ToString(), _root.GetProperty("createdDateTime").ToString());
+        _root.GetProperty("createdDateTime")
+            .GetString()
+            .Should()
+            .Be(expectedTimestamp.ToString());
         return this;
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasReasonCode(string reasonCode)
     {
-        Assert.Equal(
-            reasonCode,
-            _root.GetProperty("reason.code")
-                .GetProperty("value")
-                .ToString());
+        _root.GetProperty("reason.code")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(reasonCode);
         return this;
     }
 
@@ -86,47 +119,82 @@ internal sealed class
         var schema = await _schemas
             .GetSchemaAsync<JsonSchema>("RejectRequestWholesaleSettlement", "0", CancellationToken.None)
             .ConfigureAwait(false);
+
+        schema.Should().NotBeNull("Cannot validate document without a schema");
+
         var validationOptions = new EvaluationOptions { OutputFormat = OutputFormat.List };
         var validationResult = schema!.Evaluate(_document, validationOptions);
         var errors = validationResult.Details.Where(detail => detail.HasErrors)
-            .Select(x => x.Errors)
-            .ToList()
-            .SelectMany(e => e!.Values)
-            .ToList();
-        Assert.True(validationResult.IsValid, string.Join("\n", errors));
+            .Select(x => (x.InstanceLocation, x.EvaluationPath, x.Errors))
+            .SelectMany(
+                p => p.Errors!.Values.Select(
+                    e => $"==> '{p.InstanceLocation}' does not adhere to '{p.EvaluationPath}' with error: {e}\n"));
+
+        validationResult.IsValid.Should().BeTrue($"because document should be valid. Validation errors:{Environment.NewLine}{{0}}", string.Join("\n", errors));
+
         return this;
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasBusinessReason(BusinessReason businessReason)
     {
-        Assert.Equal(businessReason.Code, _root.GetProperty("process.processType").GetProperty("value").ToString());
+        ArgumentNullException.ThrowIfNull(businessReason);
+
+        _root.GetProperty("process.processType")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(businessReason.Code);
         return this;
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasTransactionId(Guid expectedTransactionId)
     {
-        Assert.Equal(expectedTransactionId.ToString(), FirstSeriesElement().GetProperty("mRID").ToString());
+        FirstSeriesElement()
+            .GetProperty("mRID")
+            .GetString()
+            .Should()
+            .Be(expectedTransactionId.ToString());
+        return this;
+    }
+
+    public IAssertRejectRequestWholesaleSettlementDocument TransactionIdExists()
+    {
+        FirstSeriesElement()
+            .TryGetProperty("mRID", out _)
+            .Should()
+            .BeTrue();
         return this;
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasSerieReasonCode(string expectedSerieReasonCode)
     {
-        Assert.Equal(expectedSerieReasonCode, FirstReasonElement().GetProperty("code").GetProperty("value").ToString());
+        FirstReasonElement()
+            .GetProperty("code")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(expectedSerieReasonCode);
         return this;
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasSerieReasonMessage(string expectedSerieReasonMessage)
     {
-        Assert.Equal(expectedSerieReasonMessage, FirstReasonElement().GetProperty("text").ToString());
+        FirstReasonElement()
+            .GetProperty("text")
+            .GetString()
+            .Should()
+            .Be(expectedSerieReasonMessage);
         return this;
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasOriginalTransactionId(
         string expectedOriginalTransactionId)
     {
-        Assert.Equal(
-            expectedOriginalTransactionId,
-            FirstSeriesElement().GetProperty("originalTransactionIDReference_Series.mRID").ToString());
+        FirstSeriesElement()
+            .GetProperty("originalTransactionIDReference_Series.mRID")
+            .GetString()
+            .Should()
+            .Be(expectedOriginalTransactionId);
         return this;
     }
 

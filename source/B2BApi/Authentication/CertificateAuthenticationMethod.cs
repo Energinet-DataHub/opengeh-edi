@@ -53,15 +53,15 @@ public class CertificateAuthenticationMethod : IAuthenticationMethod
         if (certificate == null)
             return false;
 
-        var actorNumberAndRole = await _masterDataClient
-            .GetActorNumberAndRoleFromThumbprintAsync(new CertificateThumbprintDto(certificate.Thumbprint))
+        var actor = await _masterDataClient
+            .GetActorFromThumbprintAsync(new CertificateThumbprintDto(certificate.Thumbprint))
             .ConfigureAwait(false);
 
-        if (actorNumberAndRole == null)
+        if (actor == null)
         {
             return false;
         }
 
-        return _marketActorAuthenticator.Authenticate(actorNumberAndRole.ActorNumber, actorNumberAndRole.ActorRole);
+        return _marketActorAuthenticator.Authenticate(actor.ActorNumber, actor.ActorRole);
     }
 }

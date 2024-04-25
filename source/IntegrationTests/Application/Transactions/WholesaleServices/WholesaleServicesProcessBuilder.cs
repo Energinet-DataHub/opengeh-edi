@@ -15,8 +15,10 @@
 using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Process.Domain;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
+using Energinet.DataHub.EDI.Process.Interfaces;
 using ChargeType = Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ChargeType;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.WholesaleServices;
@@ -26,13 +28,13 @@ public class WholesaleServicesProcessBuilder
     private readonly ProcessId _processId = ProcessId.New();
     private readonly string _startDateAndOrTimeDateTime = "2022-06-17T22:00:00Z";
     private readonly string _endDateAndOrTimeDateTime = "2022-07-22T22:00:00Z";
-    private readonly string _meteringGridAreaDomainId = "244";
+    private readonly string _gridArea = "244";
     private readonly BusinessReason _businessReason = BusinessReason.WholesaleFixing;
     private readonly string? _resolution = Resolution.Hourly.Code;
     private readonly string? _chargeOwner = ActorNumber.Create("5790000000002").Value;
     private readonly string? _chargeTypeId = "EA-001";
     private readonly string? _chargeTypeType = "D03";
-    private readonly string _senderRole = ActorRole.EnergySupplier.Code;
+    private readonly ActorRole _senderRole = ActorRole.EnergySupplier;
     private readonly MessageId _messageId = MessageId.New();
     private BusinessTransactionId _businessTransactionId = BusinessTransactionId.Create("1234");
     private SettlementVersion? _settlementVersion;
@@ -74,21 +76,24 @@ public class WholesaleServicesProcessBuilder
     {
         var chargeTypes = BuildChargeTypes();
 
+        var requestedByActor = RequestedByActor.From(_senderNumber, _senderRole);
+
         var process = new WholesaleServicesProcess(
             _processId,
-            _senderNumber,
-            _senderRole,
+            requestedByActor,
+            OriginalActor.From(requestedByActor),
             _businessTransactionId,
             _messageId,
             _businessReason,
             _startDateAndOrTimeDateTime,
             _endDateAndOrTimeDateTime,
-            _meteringGridAreaDomainId,
+            _gridArea,
             _energySupplierMarketParticipantId,
             _settlementVersion,
             _resolution,
             _chargeOwner,
-            chargeTypes.AsReadOnly());
+            chargeTypes.AsReadOnly(),
+            new List<string> { _gridArea });
 
         var prop = process.GetType().GetField(
             "_state", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);

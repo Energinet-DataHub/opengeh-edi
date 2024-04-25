@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
+using Actor = Energinet.DataHub.EDI.MasterData.Domain.Actors.Actor;
 
 namespace Energinet.DataHub.EDI.MasterData.Infrastructure.Actors;
 

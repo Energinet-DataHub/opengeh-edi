@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -24,6 +26,7 @@ using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Microsoft.Extensions.Logging;
+using Actor = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Actor;
 
 namespace Energinet.DataHub.EDI.MasterData.Application;
 
@@ -119,7 +122,7 @@ internal sealed class MasterDataClient : IMasterDataClient
         await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<ActorNumberAndRoleDto?> GetActorNumberAndRoleFromThumbprintAsync(
+    public async Task<Actor?> GetActorFromThumbprintAsync(
         CertificateThumbprintDto thumbprint)
     {
         var actorCertificate =
@@ -128,7 +131,7 @@ internal sealed class MasterDataClient : IMasterDataClient
                 .ConfigureAwait(false);
 
         return actorCertificate is not null
-            ? new ActorNumberAndRoleDto(actorCertificate.ActorNumber, actorCertificate.ActorRole)
+            ? new Actor(actorCertificate.ActorNumber, actorCertificate.ActorRole)
             : null;
     }
 
@@ -166,16 +169,15 @@ internal sealed class MasterDataClient : IMasterDataClient
         await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<ProcessDelegationDto?> GetProcessDelegationAsync(
-        ActorNumber delegatedByActorNumber,
-        ActorRole delegatedByActorRole,
-        string? gridAreaCode,
+    public async Task<ProcessDelegationDto?> GetProcessDelegatedByAsync(
+        Actor delegatedByActor,
+        string gridAreaCode,
         ProcessType processType,
         CancellationToken cancellationToken)
     {
-        var processDelegation = await _processDelegationRepository.GetAsync(
-            delegatedByActorNumber,
-            delegatedByActorRole.ForActorMessageDelegation(),
+        var processDelegation = await _processDelegationRepository.GetProcessesDelegatedByAsync(
+            delegatedByActor.ActorNumber,
+            delegatedByActor.ActorRole.ForActorMessageDelegation(),
             gridAreaCode,
             processType,
             cancellationToken).ConfigureAwait(false);
@@ -189,8 +191,35 @@ internal sealed class MasterDataClient : IMasterDataClient
             processDelegation.GridAreaCode,
             processDelegation.StartsAt,
             processDelegation.StopsAt,
-            new ActorNumberAndRoleDto(processDelegation.DelegatedByActorNumber, processDelegation.DelegatedByActorRole),
-            new ActorNumberAndRoleDto(processDelegation.DelegatedToActorNumber, processDelegation.DelegatedToActorRole));
+            new(processDelegation.DelegatedByActorNumber, processDelegation.DelegatedByActorRole),
+            new(processDelegation.DelegatedToActorNumber, processDelegation.DelegatedToActorRole));
+    }
+
+    public async Task<IReadOnlyCollection<ProcessDelegationDto>> GetProcessesDelegatedToAsync(
+        Actor delegatedToActor,
+        string? gridAreaCode,
+        ProcessType processType,
+        CancellationToken cancellationToken)
+    {
+        var processDelegationList = await _processDelegationRepository.GetProcessesDelegatedToAsync(
+            delegatedToActor.ActorNumber,
+            delegatedToActor.ActorRole,
+            gridAreaCode,
+            processType,
+            cancellationToken).ConfigureAwait(false);
+
+        if (processDelegationList.Count == 0)
+            return Array.Empty<ProcessDelegationDto>();
+
+        return processDelegationList.Select(pd => new ProcessDelegationDto(
+                pd.SequenceNumber,
+                pd.DelegatedProcess,
+                pd.GridAreaCode,
+                pd.StartsAt,
+                pd.StopsAt,
+                new(pd.DelegatedByActorNumber, pd.DelegatedByActorRole),
+                new(pd.DelegatedToActorNumber, pd.DelegatedToActorRole)))
+            .ToArray();
     }
 
     private void CreateNewActorCertificate(ActorCertificateCredentialsAssignedDto request)

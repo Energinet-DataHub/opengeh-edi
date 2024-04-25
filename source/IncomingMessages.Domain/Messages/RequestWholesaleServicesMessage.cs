@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
 public record RequestWholesaleServicesMessage(
@@ -24,9 +27,9 @@ public record RequestWholesaleServicesMessage(
     string MessageId,
     string CreatedAt,
     string? BusinessType,
-    IReadOnlyCollection<IIncomingMessageSerie> Serie) : IIncomingMessage;
+    IReadOnlyCollection<IIncomingMessageSeries> Serie) : IIncomingMessage;
 
-public record RequestWholesaleServicesSerie(
+public record RequestWholesaleServicesSeries(
     string TransactionId,
     string StartDateTime,
     string? EndDateTime,
@@ -35,6 +38,21 @@ public record RequestWholesaleServicesSerie(
     string? SettlementVersion,
     string? Resolution,
     string? ChargeOwner,
-    IReadOnlyCollection<RequestWholesaleServicesChargeType> ChargeTypes) : IIncomingMessageSerie;
+    IReadOnlyCollection<RequestWholesaleServicesChargeType> ChargeTypes) : BaseDelegatedSeries, IIncomingMessageSeries
+{
+    public ActorNumber? GetActorNumberForRole(ActorRole actorRole)
+    {
+        ArgumentNullException.ThrowIfNull(actorRole);
+
+        // TODO: What are the valid sender roles for RequestWholesaleServicesSeries? Are we missing any below?
+        return actorRole.Name switch
+        {
+            DataHubNames.ActorRole.EnergySupplier => ActorNumber.TryCreate(EnergySupplierId),
+            DataHubNames.ActorRole.GridOperator => ActorNumber.TryCreate(ChargeOwner),
+            DataHubNames.ActorRole.SystemOperator => ActorNumber.TryCreate(ChargeOwner),
+            _ => null,
+        };
+    }
+}
 
 public record RequestWholesaleServicesChargeType(string? Id, string? Type);

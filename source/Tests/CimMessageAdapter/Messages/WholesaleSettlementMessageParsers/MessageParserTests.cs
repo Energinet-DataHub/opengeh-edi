@@ -88,7 +88,7 @@ public class MessageParserTests
         Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
         Assert.Equal("23", marketMessage.BusinessType);
 
-        foreach (var serie in marketMessage.Serie.Cast<RequestWholesaleServicesSerie>())
+        foreach (var serie in marketMessage.Serie.Cast<RequestWholesaleServicesSeries>())
         {
             Assert.NotNull(serie);
             Assert.Equal("25836143", serie.TransactionId);

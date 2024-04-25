@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -52,10 +54,8 @@ public class AssertOutgoingMessage
 
         using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
         var outgoingMessage = await connection.QuerySingleOrDefaultAsync(
-            $"SELECT m.Id, m.RecordId, m.DocumentType, m.DocumentReceiverNumber, m.DocumentReceiverRole, m.ReceiverNumber, m.ProcessId, m.EventId, m.BusinessReason," +
-            $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference, m.RelatedToMessageId, m.MessageCreatedFromProcess, m.GridAreaCode " +
-            $" FROM [dbo].[OutgoingMessages] m" +
-            $" WHERE m.DocumentType = '{messageType}' AND m.BusinessReason = '{businessReason}' AND m.ReceiverRole = '{receiverRole.Code}'");
+            $"SELECT * FROM [dbo].[OutgoingMessages]" +
+            $" WHERE DocumentType = '{messageType}' AND BusinessReason = '{businessReason}' AND ReceiverRole = '{receiverRole.Code}'");
 
         ((object?)outgoingMessage).Should().NotBeNull("because an outgoing message should have been added to the database");
         var outgoingMessageFileStorageReference = (string?)outgoingMessage!.FileStorageReference;

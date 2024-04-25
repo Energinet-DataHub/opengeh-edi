@@ -13,10 +13,12 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Process.Domain;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Interfaces;
@@ -43,19 +45,18 @@ public class InitializeWholesaleServicesProcessesHandler : IRequestHandler<Initi
         return Task.FromResult(Unit.Value);
     }
 
-    private void CreateWholesaleServicesProcess(InitializeWholesaleServicesProcessDto initializeWholesaleServicesProcessDto)
+    private void CreateWholesaleServicesProcess(InitializeWholesaleServicesProcessDto initializeProcessDto)
     {
-        var actorSenderNumber = ActorNumber.Create(initializeWholesaleServicesProcessDto.SenderNumber);
-        var businessReason = BusinessReason.FromCodeOrUnused(initializeWholesaleServicesProcessDto.BusinessReason);
-        var messageId = MessageId.Create(initializeWholesaleServicesProcessDto.MessageId);
+        var businessReason = BusinessReason.FromCodeOrUnused(initializeProcessDto.BusinessReason);
+        var messageId = MessageId.Create(initializeProcessDto.MessageId);
 
-        foreach (var serie in initializeWholesaleServicesProcessDto.Serie)
+        foreach (var series in initializeProcessDto.Series)
         {
-            var settlementVersion = !string.IsNullOrWhiteSpace(serie.SettlementVersion)
-                ? SettlementVersion.FromCodeOrUnused(serie.SettlementVersion)
+            var settlementVersion = !string.IsNullOrWhiteSpace(series.SettlementVersion)
+                ? SettlementVersion.FromCodeOrUnused(series.SettlementVersion)
                 : null;
 
-            var chargeTypes = serie.ChargeTypes
+            var chargeTypes = series.ChargeTypes
                 .Select(
                     chargeType => new Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ChargeType(
                         ChargeTypeId.New(),
@@ -65,20 +66,21 @@ public class InitializeWholesaleServicesProcessesHandler : IRequestHandler<Initi
 
             _wholesaleServicesProcessRepository.Add(
                 new WholesaleServicesProcess(
-                    ProcessId.New(),
-                    actorSenderNumber,
-                    initializeWholesaleServicesProcessDto.SenderRoleCode,
-                    BusinessTransactionId.Create(serie.Id),
-                    messageId,
-                    businessReason,
-                    serie.StartDateTime,
-                    serie.EndDateTime,
-                    serie.GridAreaCode,
-                    serie.EnergySupplierId,
-                    settlementVersion,
-                    serie.Resolution,
-                    serie.ChargeOwner,
-                    chargeTypes));
+                    processId: ProcessId.New(),
+                    series.RequestedByActor,
+                    series.OriginalActor,
+                    businessTransactionId: BusinessTransactionId.Create(series.Id),
+                    initiatedByMessageId: messageId,
+                    businessReason: businessReason,
+                    startOfPeriod: series.StartDateTime,
+                    endOfPeriod: series.EndDateTime,
+                    requestedGridArea: series.RequestedGridAreaCode,
+                    energySupplierId: series.EnergySupplierId,
+                    settlementVersion: settlementVersion,
+                    resolution: series.Resolution,
+                    chargeOwner: series.ChargeOwner,
+                    chargeTypes: chargeTypes,
+                    gridAreas: series.GridAreas));
         }
     }
 }

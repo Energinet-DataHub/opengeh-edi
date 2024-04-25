@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.Process.Interfaces;
 
@@ -23,34 +24,47 @@ public static class InitializeWholesaleServicesProcessDtoFactory
     {
         ArgumentNullException.ThrowIfNull(wholesaleServicesMessage);
 
+        var senderActorNumber = ActorNumber.Create(wholesaleServicesMessage.SenderNumber);
+        var senderActorRole = ActorRole.FromCode(wholesaleServicesMessage.SenderRoleCode);
+
         var series = wholesaleServicesMessage.Serie
-            .Cast<RequestWholesaleServicesSerie>()
+            .Cast<RequestWholesaleServicesSeries>()
             .Select(
-                serie => new InitializeWholesaleServicesSeries(
-                    serie.TransactionId,
-                    serie.StartDateTime,
-                    serie.EndDateTime,
-                    serie.GridArea,
-                    serie.EnergySupplierId,
-                    serie.SettlementVersion,
-                    serie.Resolution,
-                    serie.ChargeOwner,
-                    serie.ChargeTypes
-                        .Select(
-                            chargeType => new InitializeWholesaleServicesChargeType(chargeType.Id, chargeType.Type))
-                        .ToList().AsReadOnly()))
+                series =>
+                {
+                    var gridAreas = series.DelegatedGridAreas.Count > 0
+                        ? series.DelegatedGridAreas
+                        : series.GridArea != null
+                            ? new List<string> { series.GridArea }
+                            : Array.Empty<string>();
+
+                    return new InitializeWholesaleServicesSeries(
+                        Id: series.TransactionId,
+                        StartDateTime: series.StartDateTime,
+                        EndDateTime: series.EndDateTime,
+                        RequestedGridAreaCode: series.GridArea,
+                        EnergySupplierId: series.EnergySupplierId,
+                        SettlementVersion: series.SettlementVersion,
+                        Resolution: series.Resolution,
+                        ChargeOwner: series.ChargeOwner,
+                        ChargeTypes: series.ChargeTypes
+                            .Select(
+                                chargeType => new InitializeWholesaleServicesChargeType(chargeType.Id, chargeType.Type))
+                            .ToList()
+                            .AsReadOnly(),
+                        GridAreas: gridAreas,
+                        RequestedByActor: RequestedByActor.From(
+                            senderActorNumber,
+                            series.RequestedByActorRole ?? senderActorRole),
+                        OriginalActor: OriginalActor.From(
+                            series.OriginalActorNumber ?? senderActorNumber,
+                            senderActorRole));
+                })
             .ToList().AsReadOnly();
 
         return new InitializeWholesaleServicesProcessDto(
-                wholesaleServicesMessage.SenderNumber,
-                wholesaleServicesMessage.SenderRoleCode,
-                wholesaleServicesMessage.ReceiverNumber,
-                wholesaleServicesMessage.ReceiverRoleCode,
-                wholesaleServicesMessage.BusinessReason,
-                wholesaleServicesMessage.MessageType,
-                wholesaleServicesMessage.MessageId,
-                wholesaleServicesMessage.CreatedAt,
-                wholesaleServicesMessage.BusinessType,
-                series);
+                BusinessReason: wholesaleServicesMessage.BusinessReason,
+                MessageId: wholesaleServicesMessage.MessageId,
+                Series: series);
     }
 }

@@ -85,7 +85,7 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
         MessageHeader header,
         JsonElement seriesJson)
     {
-        var series = new List<RequestWholesaleServicesSerie>();
+        var series = new List<RequestWholesaleServicesSeries>();
 
         foreach (var jsonElement in seriesJson.EnumerateArray())
         {
@@ -105,7 +105,7 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
             series.AsReadOnly()));
     }
 
-    private static RequestWholesaleServicesSerie SeriesFrom(JsonElement element)
+    private static RequestWholesaleServicesSeries SeriesFrom(JsonElement element)
     {
         var chargeTypes = new List<RequestWholesaleServicesChargeType>();
         JsonElement? chargeTypeElements = element.TryGetProperty("ChargeType", out var chargeTypesElement)
@@ -121,7 +121,7 @@ public class JsonMessageParser : JsonParserBase, IMessageParser
             }
         }
 
-        return new RequestWholesaleServicesSerie(
+        return new RequestWholesaleServicesSeries(
             element.GetProperty("mRID").ToString(),
             element.GetProperty("start_DateAndOrTime.dateTime").ToString(),
             element.TryGetProperty("end_DateAndOrTime.dateTime", out var endDateProperty) ? endDateProperty.ToString() : null,

@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
@@ -38,7 +39,9 @@ public class IncomingMessageClient : IIncomingMessageClient
     private readonly IArchivedMessagesClient _archivedMessagesClient;
     private readonly ILogger<IncomingMessageClient> _logger;
     private readonly IIncomingMessageReceiver _incomingMessageReceiver;
+    private readonly IncomingMessageDelegator _incomingMessageDelegator;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IFeatureFlagManager _featureFlagManager;
 
     public IncomingMessageClient(
         MarketMessageParser marketMessageParser,
@@ -47,7 +50,9 @@ public class IncomingMessageClient : IIncomingMessageClient
         IArchivedMessagesClient archivedMessagesClient,
         ILogger<IncomingMessageClient> logger,
         IIncomingMessageReceiver incomingMessageReceiver,
-        ISystemDateTimeProvider systemDateTimeProvider)
+        IncomingMessageDelegator incomingMessageDelegator,
+        ISystemDateTimeProvider systemDateTimeProvider,
+        IFeatureFlagManager featureFlagManager)
     {
         _marketMessageParser = marketMessageParser;
         _requestAggregatedMeasureDataMessageValidator = requestAggregatedMeasureDataMessageValidator;
@@ -55,7 +60,9 @@ public class IncomingMessageClient : IIncomingMessageClient
         _archivedMessagesClient = archivedMessagesClient;
         _logger = logger;
         _incomingMessageReceiver = incomingMessageReceiver;
+        _incomingMessageDelegator = incomingMessageDelegator;
         _systemDateTimeProvider = systemDateTimeProvider;
+        _featureFlagManager = featureFlagManager;
     }
 
     public async Task<ResponseMessage> RegisterAndSendAsync(
@@ -90,13 +97,20 @@ public class IncomingMessageClient : IIncomingMessageClient
                 cancellationToken)
             .ConfigureAwait(false);
 
+        if (await _featureFlagManager.UseMessageDelegationAsync().ConfigureAwait(false))
+        {
+            await _incomingMessageDelegator
+                .DelegateAsync(incomingMarketMessageParserResult.IncomingMessage, documentType, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
         var validationResult =
             documentType == IncomingDocumentType.RequestWholesaleSettlement
-                ? Result.Succeeded()
+                ? Result.Succeeded() // TODO: Validate RequestWholesaleSettlement
                 : await _requestAggregatedMeasureDataMessageValidator
                     .ValidateAsync(
                         incomingMarketMessageParserResult.IncomingMessage as RequestAggregatedMeasureDataMessage ??
-                        throw new InvalidOperationException(),
+                            throw new InvalidOperationException(),
                         cancellationToken)
             .ConfigureAwait(false);
 

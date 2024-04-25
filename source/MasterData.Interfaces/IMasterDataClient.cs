@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.MasterData.Interfaces;
 
@@ -55,9 +55,9 @@ public interface IMasterDataClient
         CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets the <see cref="ActorNumberAndRoleDto" /> associated with the given certificate thumbprint, if any.
+    ///     Gets the <see cref="Actor" /> associated with the given certificate thumbprint, if any.
     /// </summary>
-    Task<ActorNumberAndRoleDto?> GetActorNumberAndRoleFromThumbprintAsync(CertificateThumbprintDto thumbprintDto);
+    Task<Actor?> GetActorFromThumbprintAsync(CertificateThumbprintDto thumbprintDto);
 
     /// <summary>
     ///     Delete the actor certificate for a given actor.
@@ -74,9 +74,17 @@ public interface IMasterDataClient
     /// <summary>
     ///    Get process delegation.
     /// </summary>
-    Task<ProcessDelegationDto?> GetProcessDelegationAsync(
-        ActorNumber delegatedByActorNumber,
-        ActorRole delegatedByActorRole,
+    Task<ProcessDelegationDto?> GetProcessDelegatedByAsync(
+        Actor delegatedBy,
+        string gridAreaCode,
+        ProcessType processType,
+        CancellationToken cancellationToken);
+
+    /// <summary>
+    ///    Get process delegation.
+    /// </summary>
+    Task<IReadOnlyCollection<ProcessDelegationDto>> GetProcessesDelegatedToAsync(
+        Actor delegatedTo,
         string? gridAreaCode,
         ProcessType processType,
         CancellationToken cancellationToken);

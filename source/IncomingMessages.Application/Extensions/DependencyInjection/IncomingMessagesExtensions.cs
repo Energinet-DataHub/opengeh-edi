@@ -52,10 +52,12 @@ public static class IncomingMessagesExtensions
             .ValidateDataAnnotations();
 
         services
+            .AddFeatureFlags()
             .AddServiceBus(configuration)
             .AddDapperConnectionToDatabase(configuration)
             .AddScopedSqlDbContext<IncomingMessagesContext>(configuration)
             .AddScoped<IIncomingMessageClient, IncomingMessageClient>()
+            .AddScoped<IncomingMessageDelegator>()
             .AddScoped<ITransactionIdRepository, TransactionIdRepository>()
             .AddScoped<IMessageIdRepository, MessageIdRepository>()
             .AddScoped<IMessageParser, AggregatedMeasureDataXmlMessageParser>()

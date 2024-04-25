@@ -32,7 +32,7 @@ public static class InitializeAggregatedMeasureDataProcessDtoFactory
                     serie.MarketEvaluationSettlementMethod,
                     serie.StartDateTime,
                     serie.EndDateTime,
-                    serie.MeteringGridAreaDomainId,
+                    serie.GridArea,
                     serie.EnergySupplierMarketParticipantId,
                     serie.BalanceResponsiblePartyMarketParticipantId,
                     serie.SettlementVersion)).ToList().AsReadOnly();
