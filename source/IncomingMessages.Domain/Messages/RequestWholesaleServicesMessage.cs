@@ -27,7 +27,7 @@ public record RequestWholesaleServicesMessage(
     string MessageId,
     string CreatedAt,
     string? BusinessType,
-    IReadOnlyCollection<IIncomingMessageSeries> Serie) : IIncomingMessage;
+    IReadOnlyCollection<IIncomingMessageSeries> Series) : IIncomingMessage;
 
 public record RequestWholesaleServicesSeries(
     string TransactionId,
@@ -44,7 +44,6 @@ public record RequestWholesaleServicesSeries(
     {
         ArgumentNullException.ThrowIfNull(actorRole);
 
-        // TODO: What are the valid sender roles for RequestWholesaleServicesSeries? Are we missing any below?
         return actorRole.Name switch
         {
             DataHubNames.ActorRole.EnergySupplier => ActorNumber.TryCreate(EnergySupplierId),

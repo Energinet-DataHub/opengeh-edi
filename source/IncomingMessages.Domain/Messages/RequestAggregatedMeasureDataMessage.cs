@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
@@ -26,22 +27,35 @@ public record RequestAggregatedMeasureDataMessage(
     string MessageId,
     string CreatedAt,
     string? BusinessType,
-    IReadOnlyCollection<IIncomingMessageSeries> Serie) : IIncomingMessage;
+    IReadOnlyCollection<IIncomingMessageSeries> Series) : IIncomingMessage;
 
 public record RequestAggregatedMeasureDataMessageSeries(
     string TransactionId,
-    string? MarketEvaluationPointType,
-    string? MarketEvaluationSettlementMethod,
+    string? MeteringPointType,
+    string? SettlementMethod,
     string StartDateTime,
     string? EndDateTime,
     string? GridArea,
-    string? EnergySupplierMarketParticipantId,
-    string? BalanceResponsiblePartyMarketParticipantId,
+    string? EnergySupplierId,
+    string? BalanceResponsiblePartyId,
     string? SettlementVersion) : BaseDelegatedSeries, IIncomingMessageSeries
 {
     public ActorNumber? GetActorNumberForRole(ActorRole actorRole)
     {
-        // TODO: Implement for aggregated measure data
-        return null;
+        ArgumentNullException.ThrowIfNull(actorRole);
+
+        // Roles who can make a request for aggregated measure data:
+        // ActorRole.EnergySupplier,
+        // ActorRole.MeteredDataResponsible,
+        // ActorRole.BalanceResponsibleParty,
+        // ActorRole.GridOperator, // Grid Operator can make requests because of DDM -> MDR hack
+        return actorRole.Name switch
+        {
+            DataHubNames.ActorRole.EnergySupplier => ActorNumber.TryCreate(EnergySupplierId),
+            DataHubNames.ActorRole.MeteredDataResponsible => ActorNumber.TryCreate(BalanceResponsiblePartyId), // How do i find the MDR actor number in the message?
+            DataHubNames.ActorRole.BalanceResponsibleParty => ActorNumber.TryCreate(BalanceResponsiblePartyId),
+            DataHubNames.ActorRole.GridOperator => ActorNumber.TryCreate(BalanceResponsiblePartyId), // How do i find the DDM (MDR) actor number in the message?
+            _ => null,
+        };
     }
 }

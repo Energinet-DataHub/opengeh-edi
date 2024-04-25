@@ -22,6 +22,11 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 public interface IDelegatedIncomingMessageSeries
 {
     /// <summary>
+    /// Whether the incoming message series is delegated
+    /// </summary>
+    public bool IsDelegated { get; }
+
+    /// <summary>
     /// Who the incoming message series is delegated by (who originally was supposed to send the message)
     /// </summary>
     public ActorNumber? OriginalActorNumber { get; }

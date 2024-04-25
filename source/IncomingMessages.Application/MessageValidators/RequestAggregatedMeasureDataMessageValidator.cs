@@ -166,7 +166,9 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators
 
         private async Task AuthorizeSenderAsync(RequestAggregatedMeasureDataMessage message)
         {
-            var result = await _senderAuthorizer.AuthorizeAsync(message.SenderNumber, message.SenderRoleCode).ConfigureAwait(false);
+            var allSeriesAreDelegated = message.Series.Count > 0 && message.Series.All(s => s.IsDelegated);
+
+            var result = await _senderAuthorizer.AuthorizeAsync(message.SenderNumber, message.SenderRoleCode, allSeriesAreDelegated).ConfigureAwait(false);
             _errors.AddRange(result.Errors);
         }
 

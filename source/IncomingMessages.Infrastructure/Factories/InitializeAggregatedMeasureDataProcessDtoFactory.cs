@@ -23,7 +23,7 @@ public static class InitializeAggregatedMeasureDataProcessDtoFactory
     {
         ArgumentNullException.ThrowIfNull(requestAggregatedMeasureDataMessage);
 
-        var series = requestAggregatedMeasureDataMessage.Serie
+        var series = requestAggregatedMeasureDataMessage.Series
             .Cast<RequestAggregatedMeasureDataMessageSeries>()
             .Select(
                 series =>
@@ -36,13 +36,13 @@ public static class InitializeAggregatedMeasureDataProcessDtoFactory
 
                     return new InitializeAggregatedMeasureDataProcessSeries(
                         series.TransactionId,
-                        series.MarketEvaluationPointType,
-                        series.MarketEvaluationSettlementMethod,
+                        series.MeteringPointType,
+                        series.SettlementMethod,
                         series.StartDateTime,
                         series.EndDateTime,
                         series.GridArea,
-                        series.EnergySupplierMarketParticipantId,
-                        series.BalanceResponsiblePartyMarketParticipantId,
+                        series.EnergySupplierId,
+                        series.BalanceResponsiblePartyId,
                         series.SettlementVersion,
                         gridAreas);
                 }).ToList().AsReadOnly();

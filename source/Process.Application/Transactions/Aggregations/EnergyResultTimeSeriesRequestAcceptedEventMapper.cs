@@ -42,7 +42,7 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
         _masterDataClient = masterDataClient;
     }
 
-    public async Task<INotification> MapFromAsync(byte[] payload, EventId eventId, Guid referenceId, CancellationToken cancellationToken)
+    public Task<INotification> MapFromAsync(byte[] payload, EventId eventId, Guid referenceId, CancellationToken cancellationToken)
     {
         var aggregations =
             AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(payload);
@@ -58,16 +58,17 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
                 MapSettlementMethod(aggregation.TimeSeriesType),
                 MapUnitType(aggregation.QuantityUnit),
                 MapResolution(aggregation.Resolution),
-                await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false),
+                // await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false), // TODO: What is this used for (operator number)? It seems unused
+                aggregation.GridArea,
                 aggregation.CalculationResultVersion,
                 aggregation.Period.StartOfPeriod.ToInstant(),
                 aggregation.Period.EndOfPeriod.ToInstant()));
         }
 
-        return new AggregatedTimeSeriesRequestWasAccepted(
+        return Task.FromResult<INotification>(new AggregatedTimeSeriesRequestWasAccepted(
             eventId,
             referenceId,
-            acceptedEnergyResultTimeSeries);
+            acceptedEnergyResultTimeSeries));
     }
 
     public bool CanHandle(string eventType)
@@ -168,6 +169,7 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
 
     private async Task<GridAreaDetails> MapGridAreaDetailsAsync(string gridAreaCode, CancellationToken cancellationToken)
     {
+        // TODO: What is this used for? It seems unused
         var gridOperatorNumber = await _masterDataClient
             .GetGridOwnerForGridAreaCodeAsync(gridAreaCode, cancellationToken)
             .ConfigureAwait(false);

@@ -36,7 +36,7 @@ public static class AcceptedEnergyResultMessageDtoFactory
             receiverRole: ActorRole.FromCode(aggregatedMeasureDataProcess.RequestedByActorRoleCode),
             processId: aggregatedMeasureDataProcess.ProcessId.Id,
             eventId: eventId,
-            gridAreaCode: acceptedEnergyResultTimeSeries.GridAreaDetails.GridAreaCode,
+            gridAreaCode: acceptedEnergyResultTimeSeries.GridAreaCode,
             meteringPointType: acceptedEnergyResultTimeSeries.MeteringPointType.Name,
             settlementMethod: acceptedEnergyResultTimeSeries.SettlementMethod?.Name,
             measureUnitType: acceptedEnergyResultTimeSeries.UnitType.Name,

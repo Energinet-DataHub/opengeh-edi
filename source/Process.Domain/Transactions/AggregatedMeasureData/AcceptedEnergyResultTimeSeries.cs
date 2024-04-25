@@ -26,7 +26,8 @@ public record AcceptedEnergyResultTimeSeries(
     SettlementMethod? SettlementMethod,
     MeasurementUnit UnitType,
     Resolution Resolution,
-    GridAreaDetails GridAreaDetails,
+    // GridAreaDetails GridAreaDetails, // TODO: What is this used for (operator number)? It seems unused
+    string GridAreaCode,
     long CalculationResultVersion,
     Instant StartOfPeriod,
     Instant EndOfPeriod);
