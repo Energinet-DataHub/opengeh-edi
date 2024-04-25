@@ -519,7 +519,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
             : ActorNumber.Create("4444444444444");
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
-        GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
+        GivenAuthenticatedActorIs(originalActor.ActorNumber, originalActor.ActorRole);
 
         await GivenDelegation(
             new(originalActor.ActorNumber, originalActor.ActorRole),
@@ -556,8 +556,8 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
             businessReason: DataHubNames.BusinessReason.BalanceFixing,
             new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
             null,
-            settlementMethod: SettlementMethod.Flex.Code,
-            meteringPointType: MeteringPointType.Consumption.Code);
+            settlementMethod: DataHubNames.SettlementMethod.Flex,
+            meteringPointType: DataHubNames.MeteringPointType.Consumption);
 
         // TODO: Assert correct process is created?
 
