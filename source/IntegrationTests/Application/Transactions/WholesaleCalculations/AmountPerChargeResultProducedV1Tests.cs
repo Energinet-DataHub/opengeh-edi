@@ -177,7 +177,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
 
         await act.Should()
             .ThrowExactlyAsync<InvalidOperationException>()
-            .WithMessage("Sequence contains no elements.");
+            .WithMessage("No owner found for grid area code: *");
     }
 
     [Fact]
