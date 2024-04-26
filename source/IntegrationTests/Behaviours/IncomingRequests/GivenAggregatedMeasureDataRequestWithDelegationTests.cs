@@ -15,22 +15,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Linq;
-using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using System.Xml.XPath;
-using Energinet.DataHub.EDI.B2CWebApi.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
-using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -72,7 +63,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
 
         var exceptForIncomingDocumentFormats = new[]
         {
-            DocumentFormat.Xml.Name, // TODO: Implement XML
+            // DocumentFormat.Xml.Name, // TODO: Implement XML
             DocumentFormat.Ebix.Name, // ebIX is not supported for requests
         };
 
@@ -80,12 +71,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
             .GetAllDocumentFormats(exceptForIncomingDocumentFormats)
             .SelectMany(incomingDocumentFormat => delegatedFromRoles
                 .SelectMany(delegatedFromRole => delegatedToRoles
-                    .SelectMany(delegatedToRole => DocumentFormats.GetAllDocumentFormats(new[]
-                        {
-                            // TODO: Remove to support XML & ebIX
-                            DocumentFormat.Xml.Name,
-                            DocumentFormat.Ebix.Name,
-                        })
+                    .SelectMany(delegatedToRole => DocumentFormats.GetAllDocumentFormats()
                         .Select(peekDocumentFormat => new object[]
                         {
                             incomingDocumentFormat,
