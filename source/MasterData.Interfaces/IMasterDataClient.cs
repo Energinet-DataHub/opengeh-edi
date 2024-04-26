@@ -48,6 +48,11 @@ public interface IMasterDataClient
     Task<ActorNumber> GetGridOwnerForGridAreaCodeAsync(string gridAreaCode, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Try to get the owner for a given grid area, returning null if none was found.
+    /// </summary>
+    Task<ActorNumber?> TryGetGridOwnerForGridAreaCodeAsync(string gridAreaCode, CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Create or update the actor certificate for a given actor.
     /// </summary>
     Task CreateOrUpdateActorCertificateAsync(

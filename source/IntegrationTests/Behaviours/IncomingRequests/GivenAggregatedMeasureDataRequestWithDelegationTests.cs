@@ -98,12 +98,15 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
             ? originalActor.ActorNumber
             : ActorNumber.Create("3333333333333");
         var balanceResponsibleParty = originalActor.ActorRole == ActorRole.BalanceResponsibleParty
-                                      || originalActor.ActorRole == ActorRole.GridOperator
-                                      || originalActor.ActorRole == ActorRole.MeteredDataResponsible
             ? originalActor.ActorNumber
             : ActorNumber.Create("4444444444444");
+        var gridAreaOwner = originalActor.ActorRole == ActorRole.GridOperator
+            || originalActor.ActorRole == ActorRole.MeteredDataResponsible
+            ? originalActor.ActorNumber
+            : ActorNumber.Create("5555555555555");
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
+        await GivenGridAreaOwnershipAsync("512", gridAreaOwner);
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
 
         await GivenDelegation(

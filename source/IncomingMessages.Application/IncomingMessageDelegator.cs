@@ -93,7 +93,9 @@ public class IncomingMessageDelegator
                 ActorNumber? gridAreaOwner = null;
                 if (series.GridArea != null)
                 {
-                    gridAreaOwner = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(
+                    // Try to get grid area owner for the grid area, returning null if none was found,
+                    // we cannot fail if we no owner was found, since validation hasn't been done yet
+                    gridAreaOwner = await _masterDataClient.TryGetGridOwnerForGridAreaCodeAsync(
                             series.GridArea,
                             cancellationToken)
                         .ConfigureAwait(false);
