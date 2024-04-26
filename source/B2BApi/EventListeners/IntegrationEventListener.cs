@@ -35,7 +35,7 @@ public class IntegrationEventListener
     }
 
     /// <summary>
-    /// Receives messages from the integration event queue and processes them.
+    /// Receives messages from the integration event topic and processes them.
     /// </summary>
     /// <remarks>
     /// Retries are currently handled by the Service Bus to avoid blocking a Azure Function Worker.
