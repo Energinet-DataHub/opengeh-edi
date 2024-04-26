@@ -81,6 +81,17 @@ public class IncomingMessageDelegator
         // Delegation is setup for grid areas, so we need to set delegated for each series since they contain the grid area
         foreach (var series in message.Series)
         {
+            if ((originalActorRole == ActorRole.GridOperator || originalActorRole == ActorRole.MeteredDataResponsible)
+                && series.GridArea == null)
+            {
+                // TODO: HVORDAN HÅNDTERER VI DENNE CASE FOR MDR/DDM?
+                // hvis man anmoder med gridarea == null så kan vi ikke finde ejeren af gridarea, siden der ikke er nogen
+                // vi kan godt bare skip delegering, men det vil gøre at validering efterfølgende fejler, da man ikke
+                // er logget ind som den aktør der står i beskeden. Dvs. man aldrig kan ramme Wholesale's async validering
+                // om at grid area skal være udfyldt som grid operator / MDR
+                continue;
+            }
+
             var delegations = await _masterDataClient.GetProcessesDelegatedToAsync(
                     new Actor(requestedByActorNumber, requestedByActorRole),
                     series.GridArea,
