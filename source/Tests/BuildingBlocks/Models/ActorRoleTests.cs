@@ -26,8 +26,7 @@ public class ActorRoleTests
 {
     public static IEnumerable<ActorRole> GetAllActorRoles()
     {
-        var fields =
-            typeof(ActorRole).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+        var fields = typeof(ActorRole).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
         return fields.Select(f => f.GetValue(null)).Cast<ActorRole>();
     }
@@ -46,7 +45,7 @@ public class ActorRoleTests
             (ActorRole.ImbalanceSettlementResponsible, "ImbalanceSettlementResponsible", "DDX"),
             (ActorRole.SystemOperator, "SystemOperator", "EZ"),
             (ActorRole.DanishEnergyAgency, "DanishEnergyAgency", "STS"),
-            (ActorRole.Delegated, "Delegated", "DEl"),
+            (ActorRole.Delegated, "Delegated", "DEL"),
         };
 
         using var scope = new AssertionScope();

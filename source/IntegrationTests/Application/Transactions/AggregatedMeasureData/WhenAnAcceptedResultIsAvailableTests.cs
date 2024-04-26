@@ -60,7 +60,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     }
 
     [Fact]
-    public async Task Aggregated_measure_data_response_is_accepted()
+    public async Task Aggregated_measure_data_response_is_accepted() // TODO: Shouldn't we have a test with 2 series in the same accepted event, which creates 2 outgoing messages?
     {
         // Arrange
         var expectedEventId = "expected-event-id";
@@ -87,7 +87,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasProcessType(ProcessType.RequestEnergyResults)
             .HasRelationTo(process.InitiatedByMessageId)
-            .HasGridAreaCode(acceptedEvent.Series.First().GridArea)
+            .HasGridAreaCode(acceptedEvent.Series.Single().GridArea)
             .HasPointsInCorrectOrder<AcceptedEnergyResultMessageTimeSeries, decimal?>(timeSerie => timeSerie.Point.Select(x => x.Quantity).ToList(), acceptedEvent.Series.SelectMany(x => x.TimeSeriesPoints).OrderBy(x => x.Time).ToList())
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId)
@@ -205,7 +205,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         var series = new Series
         {
-            GridArea = aggregatedMeasureDataProcess.MeteringGridAreaDomainId,
+            GridArea = aggregatedMeasureDataProcess.RequestedGridArea,
             QuantityUnit = QuantityUnit.Kwh,
             TimeSeriesType = TimeSeriesType.Production,
             Resolution = Resolution.Pt15M,
@@ -277,7 +277,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
           SampleData.GridAreaCode,
           receiverRole == ActorRole.EnergySupplier ? SampleData.ReceiverNumber.Value : null,
           receiverRole == ActorRole.BalanceResponsibleParty ? SampleData.ReceiverNumber.Value : null,
-          null);
+          null,
+          new[] { SampleData.GridAreaCode });
 
         process.SendToWholesale();
         _processContext.AggregatedMeasureDataProcesses.Add(process);

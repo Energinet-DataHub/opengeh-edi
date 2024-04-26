@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 
 public record RequestAggregatedMeasureDataMessage(
@@ -24,7 +26,7 @@ public record RequestAggregatedMeasureDataMessage(
     string MessageId,
     string CreatedAt,
     string? BusinessType,
-    IReadOnlyCollection<IIncomingMessageSerie> Serie) : IIncomingMessage;
+    IReadOnlyCollection<IIncomingMessageSeries> Serie) : IIncomingMessage;
 
 public record RequestAggregatedMeasureDataMessageSeries(
     string TransactionId,
@@ -32,7 +34,14 @@ public record RequestAggregatedMeasureDataMessageSeries(
     string? MarketEvaluationSettlementMethod,
     string StartDateTime,
     string? EndDateTime,
-    string? MeteringGridAreaDomainId,
+    string? GridArea,
     string? EnergySupplierMarketParticipantId,
     string? BalanceResponsiblePartyMarketParticipantId,
-    string? SettlementVersion) : IIncomingMessageSerie;
+    string? SettlementVersion) : BaseDelegatedSeries, IIncomingMessageSeries
+{
+    public ActorNumber? GetActorNumberForRole(ActorRole actorRole)
+    {
+        // TODO: Implement for aggregated measure data
+        return null;
+    }
+}

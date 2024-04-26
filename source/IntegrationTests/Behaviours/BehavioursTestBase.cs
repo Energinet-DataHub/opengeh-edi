@@ -38,11 +38,9 @@ using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
@@ -63,8 +61,6 @@ using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
@@ -79,6 +75,7 @@ using Microsoft.Extensions.Logging;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
+using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
@@ -129,9 +126,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 [Collection("IntegrationTest")]
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "This is a test class")]
 [SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Test class")]
-[SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Test class")]
 public class BehavioursTestBase : IDisposable
 {
+    private const string MockServiceBusName = "mock-name";
     private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
     private readonly ProcessContext _processContext;
     private readonly IncomingMessagesContext _incomingMessagesContext;
@@ -247,16 +244,6 @@ public class BehavioursTestBase : IDisposable
         await ProcessInternalCommandsAsync().ConfigureAwait(false);
     }
 
-    protected async Task ProcessInternalCommandsAsync()
-    {
-        await ProcessBackgroundTasksAsync();
-
-        if (_processContext.QueuedInternalCommands.Any(command => command.ProcessedDate == null))
-        {
-            await ProcessInternalCommandsAsync();
-        }
-    }
-
     protected void GivenAuthenticatedActorIs(ActorNumber actorNumber, ActorRole actorRole)
     {
         _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, actorRole));
@@ -289,13 +276,13 @@ public class BehavioursTestBase : IDisposable
             .ToInstant();
     }
 
-    protected async Task GivenDelegationAsync(
-        ActorNumberAndRoleDto delegatedBy,
-        ActorNumberAndRoleDto delegatedTo,
+    protected async Task GivenDelegation(
+        Actor delegatedBy,
+        Actor delegatedTo,
         string gridAreaCode,
         ProcessType processType,
         Instant startsAt,
-        Instant stopsAt,
+        Instant? stopsAt = null,
         int sequenceNumber = 0)
     {
         await GetService<IMasterDataClient>()
@@ -305,7 +292,7 @@ public class BehavioursTestBase : IDisposable
                     processType,
                     gridAreaCode,
                     startsAt,
-                    stopsAt,
+                    stopsAt ?? startsAt.Plus(Duration.FromDays(365)),
                     delegatedBy,
                     delegatedTo),
                 CancellationToken.None);
@@ -316,7 +303,7 @@ public class BehavioursTestBase : IDisposable
         string senderActorRole,
         (int Year, int Month, int Day) periodStart,
         (int Year, int Month, int Day) periodEnd,
-        string gridArea,
+        string? gridArea,
         string energySupplierActorNumber,
         string transactionId)
     {
@@ -341,6 +328,50 @@ public class BehavioursTestBase : IDisposable
                 DocumentFormat.Json,
                 IncomingDocumentType.RequestAggregatedMeasureData,
                 CancellationToken.None);
+    }
+
+    protected async Task GivenReceivedWholesaleServicesRequest(
+        DocumentFormat documentFormat,
+        ActorNumber senderActorNumber,
+        ActorRole senderActorRole,
+        (int Year, int Month, int Day) periodStart,
+        (int Year, int Month, int Day) periodEnd,
+        string? gridArea,
+        ActorNumber energySupplierActorNumber,
+        ActorNumber chargeOwnerActorNumber,
+        string chargeCode,
+        ChargeType chargeType,
+        string transactionId,
+        bool isMonthly)
+    {
+        var incomingMessageClient = GetService<IIncomingMessageClient>();
+
+        var incomingMessageStream = RequestWholesaleServicesRequestBuilder.GetStream(
+            documentFormat,
+            senderActorNumber,
+            senderActorRole,
+            CreateDateInstant(periodStart.Year, periodStart.Month, periodStart.Day),
+            CreateDateInstant(periodEnd.Year, periodEnd.Month, periodEnd.Day),
+            gridArea,
+            energySupplierActorNumber,
+            chargeOwnerActorNumber,
+            chargeCode,
+            chargeType,
+            transactionId,
+            isMonthly);
+
+        var response = await
+            incomingMessageClient.RegisterAndSendAsync(
+                incomingMessageStream,
+                documentFormat,
+                IncomingDocumentType.RequestWholesaleSettlement,
+                CancellationToken.None);
+
+        using (new AssertionScope())
+        {
+            response.IsErrorResponse.Should().BeFalse();
+            response.MessageBody.Should().BeEmpty();
+        }
     }
 
     // TODO (MWO)
@@ -400,12 +431,23 @@ public class BehavioursTestBase : IDisposable
             Guid.Parse(serviceBusMessage.MessageId));
     }
 
-    protected ServiceBusSenderSpy GivenServiceBusSenderSpy(string topicName)
+    protected ServiceBusSenderSpy CreateServiceBusSenderSpy()
     {
-        var serviceBusSenderSpy = new ServiceBusSenderSpy(topicName);
+        var serviceBusSenderSpy = new ServiceBusSenderSpy(MockServiceBusName);
         _serviceBusSenderFactoryStub.AddSenderSpy(serviceBusSenderSpy);
 
         return serviceBusSenderSpy;
+    }
+
+    protected async Task WhenWholesaleServicesProcessIsInitialized(ServiceBusMessage serviceBusMessage)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        // We have to manually process the service bus message, as there isn't a real service bus
+        serviceBusMessage.Subject.Should().Be(nameof(InitializeWholesaleServicesProcessDto));
+        serviceBusMessage.Body.Should().NotBeNull();
+
+        await scope.ServiceProvider.GetRequiredService<IProcessClient>().InitializeAsync(serviceBusMessage.Subject, serviceBusMessage.Body.ToArray());
+        await ProcessInternalCommandsAsync();
     }
 
     protected async Task GivenIntegrationEventReceived(IEventMessage @event)
@@ -424,35 +466,49 @@ public class BehavioursTestBase : IDisposable
         return peekResult;
     }
 
-    protected async Task ThenNotifyWholesaleServicesDocumentIsCorrect(Stream? bundle, DocumentFormat documentFormat, Action<IAssertNotifyWholesaleServicesDocument> assert)
+    protected async Task<List<PeekResultDto>> WhenActorPeeksAllMessages(ActorNumber actorNumber, ActorRole actorRole, DocumentFormat documentFormat)
     {
+        var peekResults = new List<PeekResultDto>();
+
+        var timeoutAt = DateTime.UtcNow.AddMinutes(1);
+        while (DateTime.UtcNow < timeoutAt)
+        {
+            var peekResult = await WhenActorPeeksMessage(actorNumber, actorRole, documentFormat);
+
+            if (peekResult.MessageId == null)
+                break;
+
+            peekResults.Add(peekResult);
+            await WhenActorDequeuesMessage(peekResult.MessageId.ToString()!, actorNumber, actorRole);
+        }
+
+        return peekResults;
+    }
+
+    protected async Task ThenNotifyWholesaleServicesDocumentIsCorrect(Stream? peekResultDocumentStream, DocumentFormat documentFormat, NotifyWholesaleServicesDocumentAssertionInput assertionInput)
+    {
+        peekResultDocumentStream.Should().NotBeNull();
+        peekResultDocumentStream!.Position = 0;
+
         using var assertionScope = new AssertionScope();
-        bundle.Should().NotBeNull();
 
-        var xmlDocumentValidator = new DocumentValidator(new List<IValidator>
-        {
-            new CimXmlValidator(new CimXmlSchemaProvider()),
-            new EbixValidator(new EbixSchemaProvider()),
-        });
-        IAssertNotifyWholesaleServicesDocument asserter = documentFormat.Name switch
-        {
-            nameof(DocumentFormat.Xml) => new AssertNotifyWholesaleServicesXmlDocument(
-                AssertXmlDocument.Document(
-                    bundle!,
-                    "cim_",
-                    xmlDocumentValidator)),
-            nameof(DocumentFormat.Json) => new AssertNotifyWholesaleServicesJsonDocument(bundle!),
-            nameof(DocumentFormat.Ebix) => new AssertNotifyWholesaleServicesEbixDocument(
-                AssertEbixDocument.Document(
-                    bundle!,
-                    "ns0",
-                    xmlDocumentValidator),
-                true),
-            _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, null),
-        };
+        await NotifyWholesaleServicesDocumentAsserter.AssertCorrectDocumentAsync(
+            documentFormat,
+            peekResultDocumentStream,
+            assertionInput);
+    }
 
-        await asserter.DocumentIsValidAsync();
-        assert(asserter);
+    protected async Task ThenRejectRequestWholesaleSettlementDocumentIsCorrect(Stream? peekResultDocumentStream, DocumentFormat documentFormat, RejectRequestWholesaleSettlementDocumentAssertionInput assertionInput)
+    {
+        peekResultDocumentStream.Should().NotBeNull();
+        peekResultDocumentStream!.Position = 0;
+
+        using var assertionScope = new AssertionScope();
+
+        await RejectRequestWholesaleSettlementDocumentAsserter.AssertCorrectDocumentAsync(
+            documentFormat,
+            peekResultDocumentStream,
+            assertionInput);
     }
 
     protected AmountPerChargeResultProducedV1 GivenAmountPerChargeResultProducedV1Event(Action<AmountPerChargeResultProducedV1EventBuilder> builder)
@@ -462,6 +518,23 @@ public class BehavioursTestBase : IDisposable
         builder(eventBuilder);
 
         return eventBuilder.Build();
+    }
+
+    private async Task WhenActorDequeuesMessage(string messageId, ActorNumber actorNumber, ActorRole actorRole)
+    {
+        await using var scope = _serviceProvider.CreateAsyncScope();
+        var outgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        await outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(messageId, actorRole, actorNumber), CancellationToken.None);
+    }
+
+    private async Task ProcessInternalCommandsAsync()
+    {
+        await ProcessBackgroundTasksAsync();
+
+        if (_processContext.QueuedInternalCommands.Any(command => command.ProcessedDate == null))
+        {
+            await ProcessInternalCommandsAsync();
+        }
     }
 
     private T GetService<T>()
@@ -475,10 +548,13 @@ public class BehavioursTestBase : IDisposable
         return ProcessBackgroundTasksAsync();
     }
 
-    private Task ProcessBackgroundTasksAsync()
+    private async Task ProcessBackgroundTasksAsync()
     {
-        var datetimeProvider = GetService<ISystemDateTimeProvider>();
-        return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
+        using var scope = _serviceProvider.CreateScope();
+        var datetimeProvider = scope.ServiceProvider.GetRequiredService<ISystemDateTimeProvider>();
+        await scope.ServiceProvider
+            .GetRequiredService<IMediator>()
+            .Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
     }
 
     private ServiceProvider BuildServices(string fileStorageConnectionString, ITestOutputHelper testOutputHelper)
@@ -492,11 +568,11 @@ public class BehavioursTestBase : IDisposable
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ListenConnectionString)}"] = "Fake",
-                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.SendConnectionString)}"] = "Fake",
-                    [$"{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}"] = "Fake",
-                    [$"{WholesaleInboxOptions.SectionName}:{nameof(WholesaleInboxOptions.QueueName)}"] = "Fake",
-                    [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = "Fake",
+                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ListenConnectionString)}"] = MockServiceBusName,
+                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.SendConnectionString)}"] = MockServiceBusName,
+                    [$"{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}"] = MockServiceBusName,
+                    [$"{WholesaleInboxOptions.SectionName}:{nameof(WholesaleInboxOptions.QueueName)}"] = MockServiceBusName,
+                    [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = MockServiceBusName,
                     ["IntegrationEvents:TopicName"] = "NotEmpty",
                     ["IntegrationEvents:SubscriptionName"] = "NotEmpty",
                 })
@@ -539,13 +615,10 @@ public class BehavioursTestBase : IDisposable
         _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
         _services.AddTransient<IFeatureFlagManager>(_ => new FeatureFlagManagerStub());
 
-        if (testOutputHelper != null)
-        {
-            // Add test logger
-            _services.AddSingleton<ITestOutputHelper>(sp => testOutputHelper);
-            _services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
-            _services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
-        }
+        // Add test logger
+        _services.AddSingleton<ITestOutputHelper>(sp => testOutputHelper);
+        _services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
+        _services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
 
         return _services.BuildServiceProvider();
     }

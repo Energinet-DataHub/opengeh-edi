@@ -43,6 +43,17 @@ public class DelegateMessage
     {
         ArgumentNullException.ThrowIfNull(messageToEnqueue);
 
+        // Do not delegate outgoing message if it is created from a request,
+        // because the receiver must be the same as the one who made the request
+        if (messageToEnqueue.MessageCreatedFromProcess == ProcessType.RequestWholesaleResults ||
+            messageToEnqueue.MessageCreatedFromProcess == ProcessType.RequestEnergyResults)
+        {
+            return messageToEnqueue;
+        }
+
+        if (string.IsNullOrEmpty(messageToEnqueue.GridAreaCode))
+            throw new ArgumentException($"Grid area code is required to delegate outgoing message with id {messageToEnqueue.Id.Value}");
+
         var delegatedTo = await GetDelegatedReceiverAsync(
             messageToEnqueue.DocumentReceiver.Number,
             messageToEnqueue.DocumentReceiver.ActorRole,
@@ -61,13 +72,12 @@ public class DelegateMessage
     private async Task<Receiver?> GetDelegatedReceiverAsync(
         ActorNumber delegatedByActorNumber,
         ActorRole delegatedByActorRole,
-        string? gridAreaCode,
+        string gridAreaCode,
         ProcessType messageCreatedFromProcess,
         CancellationToken cancellationToken)
     {
-        var messageDelegation = await _masterDataClient.GetProcessDelegationAsync(
-            delegatedByActorNumber,
-            delegatedByActorRole,
+        var messageDelegation = await _masterDataClient.GetProcessDelegatedByAsync(
+            new(delegatedByActorNumber, delegatedByActorRole),
             gridAreaCode,
             messageCreatedFromProcess,
             cancellationToken)

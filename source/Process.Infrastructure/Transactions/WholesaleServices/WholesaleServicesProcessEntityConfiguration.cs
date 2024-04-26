@@ -38,7 +38,7 @@ internal sealed class WholesaleServicesProcessEntityConfiguration : IEntityTypeC
                 fromDbValue => BusinessTransactionId.Create(fromDbValue));
         builder.Property(x => x.StartOfPeriod);
         builder.Property(x => x.EndOfPeriod);
-        builder.Property(x => x.GridAreaCode);
+        builder.Property(x => x.RequestedGridArea);
         builder.Property(x => x.ChargeOwner);
         builder.Property(x => x.Resolution);
         builder.Property(x => x.EnergySupplierId);
@@ -46,11 +46,40 @@ internal sealed class WholesaleServicesProcessEntityConfiguration : IEntityTypeC
             .HasConversion(
                 value => value.Code,
                 dbValue => BusinessReason.FromCodeOrUnused(dbValue));
-        builder.Property(x => x.RequestedByActorId)
-            .HasConversion(
-                toDbValue => toDbValue.Value,
-                fromDbValue => ActorNumber.Create(fromDbValue));
-        builder.Property(x => x.RequestedByActorRoleCode);
+
+        builder.OwnsOne(
+            x => x.RequestedByActor,
+            actor =>
+            {
+                actor.Property(a => a.ActorNumber)
+                    .HasColumnName("RequestedByActorNumber")
+                    .HasConversion(
+                        actorNumber => actorNumber.Value,
+                        dbValue => ActorNumber.Create(dbValue));
+
+                actor.Property(a => a.ActorRole)
+                    .HasColumnName("RequestedByActorRole")
+                    .HasConversion(
+                        actorRole => actorRole.Code,
+                        dbValue => ActorRole.FromCode(dbValue));
+            });
+
+        builder.OwnsOne(
+            x => x.OriginalActor,
+            actor =>
+            {
+                actor.Property(a => a.ActorNumber)
+                    .HasColumnName("OriginalActorNumber")
+                    .HasConversion(
+                        actorNumber => actorNumber.Value,
+                        dbValue => ActorNumber.Create(dbValue));
+
+                actor.Property(a => a.ActorRole)
+                    .HasColumnName("OriginalActorRole")
+                    .HasConversion(
+                        actorRole => actorRole.Code,
+                        dbValue => ActorRole.FromCode(dbValue));
+            });
 
         builder.Property<WholesaleServicesProcess.State>("_state")
             .HasConversion(
@@ -81,6 +110,18 @@ internal sealed class WholesaleServicesProcessEntityConfiguration : IEntityTypeC
                 navigationBuilder.Property<string?>(x => x.Id);
                 navigationBuilder.Property<string?>(x => x.Type);
                 navigationBuilder.WithOwner().HasForeignKey("WholesaleServicesProcessId");
+            });
+
+        builder.OwnsMany<WholesaleServicesProcessGridArea>(
+            "_gridAreas",
+            navigationBuilder =>
+            {
+                navigationBuilder.ToTable("WholesaleServicesProcessGridAreas", "dbo");
+                navigationBuilder.WithOwner().HasForeignKey(x => x.WholesaleServicesProcessId);
+                navigationBuilder.HasKey(x => x.Id);
+                navigationBuilder.Property(x => x.WholesaleServicesProcessId)
+                    .HasConversion(processId => processId.Id, dbValue => ProcessId.Create(dbValue));
+                navigationBuilder.Property(x => x.GridArea);
             });
 
         builder.Ignore(x => x.DomainEvents);

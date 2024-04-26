@@ -15,6 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using NodaTime;
 
@@ -56,15 +57,35 @@ public class AssertRejectRequestWholesaleSettlementXmlDocument : IAssertRejectRe
         return this;
     }
 
+    public IAssertRejectRequestWholesaleSettlementDocument MessageIdExists()
+    {
+        _documentAsserter.ElementExists("mRID");
+        return this;
+    }
+
     public IAssertRejectRequestWholesaleSettlementDocument HasSenderId(string expectedSenderId)
     {
         _documentAsserter.HasValue("sender_MarketParticipant.mRID", expectedSenderId);
         return this;
     }
 
+    public IAssertRejectRequestWholesaleSettlementDocument HasSenderRole(ActorRole role)
+    {
+        ArgumentNullException.ThrowIfNull(role);
+        _documentAsserter.HasValue("sender_MarketParticipant.marketRole.type", role.Code);
+        return this;
+    }
+
     public IAssertRejectRequestWholesaleSettlementDocument HasReceiverId(string expectedReceiverId)
     {
         _documentAsserter.HasValue("receiver_MarketParticipant.mRID", expectedReceiverId);
+        return this;
+    }
+
+    public IAssertRejectRequestWholesaleSettlementDocument HasReceiverRole(ActorRole role)
+    {
+        ArgumentNullException.ThrowIfNull(role);
+        _documentAsserter.HasValue("receiver_MarketParticipant.marketRole.type", role.Code);
         return this;
     }
 
@@ -77,6 +98,12 @@ public class AssertRejectRequestWholesaleSettlementXmlDocument : IAssertRejectRe
     public IAssertRejectRequestWholesaleSettlementDocument HasTransactionId(Guid expectedTransactionId)
     {
         _documentAsserter.HasValue("Series[1]/mRID", expectedTransactionId.ToString());
+        return this;
+    }
+
+    public IAssertRejectRequestWholesaleSettlementDocument TransactionIdExists()
+    {
+        _documentAsserter.ElementExists("Series[1]/mRID");
         return this;
     }
 

@@ -13,30 +13,28 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.Process.Interfaces;
 
 public record InitializeWholesaleServicesProcessDto(
-    string SenderNumber,
-    string SenderRoleCode,
-    string ReceiverNumber,
-    string ReceiverRoleCode,
     string BusinessReason,
-    string MessageType,
     string MessageId,
-    string CreatedAt,
-    string? BusinessType,
-    IReadOnlyCollection<InitializeWholesaleServicesSeries> Serie);
+    IReadOnlyCollection<InitializeWholesaleServicesSeries> Series);
 
 public record InitializeWholesaleServicesSeries(
     string Id,
     string StartDateTime,
     string? EndDateTime,
-    string? GridAreaCode,
+    string? RequestedGridAreaCode,
     string? EnergySupplierId,
     string? SettlementVersion,
     string? Resolution,
     string? ChargeOwner,
-    IReadOnlyCollection<InitializeWholesaleServicesChargeType> ChargeTypes);
+    IReadOnlyCollection<InitializeWholesaleServicesChargeType> ChargeTypes,
+    IReadOnlyCollection<string> GridAreas,
+    RequestedByActor RequestedByActor,
+    OriginalActor OriginalActor);
 
 public record InitializeWholesaleServicesChargeType(string? Id, string? Type);

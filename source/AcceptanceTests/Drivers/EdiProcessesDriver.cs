@@ -27,52 +27,89 @@ internal sealed class EdiProcessesDriver
     }
 
     internal async Task<Guid> CreateWholesaleServiceProcessAsync(
-        string gridAreaCode,
+        string requestedGridAreaCode,
         string chargeOwnerNumber,
         CancellationToken cancellationToken)
     {
         using var connection = new SqlConnection(_connectionString);
-        using var command = new SqlCommand();
+
         var processId = Guid.NewGuid();
 
-        command.CommandText = @"INSERT INTO [WholesaleServicesProcesses]
-            (ProcessId, BusinessTransactionId, StartOfPeriod, EndOfPeriod, GridAreaCode, ChargeOwner, Resolution, EnergySupplierId, BusinessReason, RequestedByActorId, RequestedByActorRoleCode, State, SettlementVersion, InitiatedByMessageId, CreatedBy, CreatedAt, ModifiedBy, ModifiedAt)
-            VALUES
-            (@ProcessId, @BusinessTransactionId, '2022-06-17T22:00:00Z', '2022-07-22T22:00:00Z', @GridAreaCode, @ChargeOwnerNumber, 'P1M', 5790000000002, 'D05', @ChargeOwnerNumber, 'EZ', 'Sent', NULL, '318dcf73-4b3b-4b8a-ad47-64743dd77e66', 'Acceptance Tests', @CreatedAt, NULL, NULL);";
-        command.Parameters.AddWithValue("@ProcessId", processId);
-        command.Parameters.AddWithValue("@BusinessTransactionId", Guid.NewGuid());
-        command.Parameters.AddWithValue("@GridAreaCode", gridAreaCode);
-        command.Parameters.AddWithValue("@ChargeOwnerNumber", chargeOwnerNumber);
-        command.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow);
-        command.Connection = connection;
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+        using (var createProcessCommand = new SqlCommand())
+        {
+            createProcessCommand.CommandText = @"INSERT INTO [WholesaleServicesProcesses]
+                (ProcessId, BusinessTransactionId, StartOfPeriod, EndOfPeriod, RequestedGridArea, ChargeOwner, Resolution, EnergySupplierId, BusinessReason, RequestedByActorNumber, RequestedByActorRole, OriginalActorNumber, OriginalActorRole, State, SettlementVersion, InitiatedByMessageId, CreatedBy, CreatedAt, ModifiedBy, ModifiedAt)
+                VALUES
+                (@ProcessId, @BusinessTransactionId, '2022-06-17T22:00:00Z', '2022-07-22T22:00:00Z', @RequestedGridArea, @ChargeOwnerNumber, 'P1M', 5790000000002, 'D05', @ChargeOwnerNumber, 'EZ', @ChargeOwnerNumber, 'EZ', 'Sent', NULL, '318dcf73-4b3b-4b8a-ad47-64743dd77e66', 'Acceptance Tests', @CreatedAt, NULL, NULL);";
+            createProcessCommand.Parameters.AddWithValue("@ProcessId", processId);
+            createProcessCommand.Parameters.AddWithValue("@BusinessTransactionId", Guid.NewGuid());
+            createProcessCommand.Parameters.AddWithValue("@RequestedGridArea", requestedGridAreaCode);
+            createProcessCommand.Parameters.AddWithValue("@ChargeOwnerNumber", chargeOwnerNumber);
+            createProcessCommand.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow);
 
-        await command.Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-        await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+            createProcessCommand.Connection = connection;
+            await createProcessCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        using (var createProcessGridAreaCommand = new SqlCommand())
+        {
+            var gridAreaId = Guid.NewGuid();
+            createProcessGridAreaCommand.CommandText = @"INSERT INTO [WholesaleServicesProcessGridAreas]
+                (Id, WholesaleServicesProcessId, GridArea)
+                VALUES
+                (@Id, @ProcessId, @GridArea);";
+            createProcessGridAreaCommand.Parameters.AddWithValue("@Id", gridAreaId);
+            createProcessGridAreaCommand.Parameters.AddWithValue("@ProcessId", processId);
+            createProcessGridAreaCommand.Parameters.AddWithValue("@GridArea", requestedGridAreaCode);
+
+            createProcessGridAreaCommand.Connection = connection;
+            await createProcessGridAreaCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+        }
+
         return processId;
     }
 
     internal async Task<Guid> CreateAggregatedMeasureDataProcessAsync(
-        string gridAreaCode,
+        string requestedGridAreaCode,
         string actorNumber,
         CancellationToken cancellationToken)
     {
         using var connection = new SqlConnection(_connectionString);
-        using var command = new SqlCommand();
         var processId = Guid.NewGuid();
 
-        command.CommandText = @"INSERT INTO [AggregatedMeasureDataProcesses]
-            (ProcessId, BusinessTransactionId, MeteringPointType, SettlementMethod, StartOfPeriod, EndOfPeriod, MeteringGridAreaDomainId, EnergySupplierId, BalanceResponsibleId, RequestedByActorId, BusinessReason, RequestedByActorRoleCode, State, SettlementVersion, InitiatedByMessageId, CreatedBy, CreatedAt, ModifiedBy, ModifiedAt)
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+        using (var createProcessCommand = new SqlCommand())
+        {
+            createProcessCommand.CommandText = @"INSERT INTO [AggregatedMeasureDataProcesses]
+            (ProcessId, BusinessTransactionId, MeteringPointType, SettlementMethod, StartOfPeriod, EndOfPeriod, RequestedGridArea, EnergySupplierId, BalanceResponsibleId, RequestedByActorId, BusinessReason, RequestedByActorRoleCode, State, SettlementVersion, InitiatedByMessageId, CreatedBy, CreatedAt, ModifiedBy, ModifiedAt)
             VALUES
-            (@ProcessId, @BusinessTransactionId, 'E17', 'D01', '2024-04-22T22:00:00Z', '2024-04-23T22:00:00Z', @GridAreaCode, @EnergySupplierId, null, @EnergySupplierId, 'D04', 'DDQ', 'Sent', NULL, '9e831318-f12c-48b0-9151-c9c6e73081dc', 'Acceptance Tests', @CreatedAt, NULL, NULL);";
-        command.Parameters.AddWithValue("@ProcessId", processId);
-        command.Parameters.AddWithValue("@BusinessTransactionId", Guid.NewGuid());
-        command.Parameters.AddWithValue("@GridAreaCode", gridAreaCode);
-        command.Parameters.AddWithValue("@EnergySupplierId", actorNumber);
-        command.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow);
-        command.Connection = connection;
+            (@ProcessId, @BusinessTransactionId, 'E17', 'D01', '2024-04-22T22:00:00Z', '2024-04-23T22:00:00Z', @RequestedGridArea, @EnergySupplierId, null, @EnergySupplierId, 'D04', 'DDQ', 'Sent', NULL, '9e831318-f12c-48b0-9151-c9c6e73081dc', 'Acceptance Tests', @CreatedAt, NULL, NULL);";
+            createProcessCommand.Parameters.AddWithValue("@ProcessId", processId);
+            createProcessCommand.Parameters.AddWithValue("@BusinessTransactionId", Guid.NewGuid());
+            createProcessCommand.Parameters.AddWithValue("@RequestedGridArea", requestedGridAreaCode);
+            createProcessCommand.Parameters.AddWithValue("@EnergySupplierId", actorNumber);
+            createProcessCommand.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow);
 
-        await command.Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-        await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+            createProcessCommand.Connection = connection;
+            await createProcessCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        using (var createProcessGridAreaCommand = new SqlCommand())
+        {
+            var gridAreaId = Guid.NewGuid();
+            createProcessGridAreaCommand.CommandText = @"INSERT INTO [AggregatedMeasureDataProcessGridAreas]
+                (Id, AggregatedMeasureDataProcessId, GridArea)
+                VALUES
+                (@Id, @ProcessId, @GridArea);";
+            createProcessGridAreaCommand.Parameters.AddWithValue("@Id", gridAreaId);
+            createProcessGridAreaCommand.Parameters.AddWithValue("@ProcessId", processId);
+            createProcessGridAreaCommand.Parameters.AddWithValue("@GridArea", requestedGridAreaCode);
+
+            createProcessGridAreaCommand.Connection = connection;
+            await createProcessGridAreaCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+        }
+
         return processId;
     }
 

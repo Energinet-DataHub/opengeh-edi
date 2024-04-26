@@ -67,6 +67,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
                 $"DELETE FROM [dbo].[MarketEvaluationPoints]" +
                 $"DELETE FROM [dbo].[Actor]" +
                 $"DELETE FROM [dbo].[ReceivedIntegrationEvents]" +
+                $"DELETE FROM [dbo].[AggregatedMeasureDataProcessGridAreas]" +
                 $"DELETE FROM [dbo].[AggregatedMeasureDataProcesses]" +
                 $"DELETE FROM [dbo].[ArchivedMessages]" +
                 $"DELETE FROM [dbo].[MarketDocuments]" +
@@ -79,6 +80,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
                 $"DELETE FROM [dbo].[GridAreaOwner]" +
                 $"DELETE FROM [dbo].[ActorCertificate]" +
                 $"DELETE FROM [dbo].[WholesaleServicesProcessChargeTypes]" +
+                $"DELETE FROM [dbo].[WholesaleServicesProcessGridAreas]" +
                 $"DELETE FROM [dbo].[WholesaleServicesProcesses]" +
                 $"DELETE FROM [dbo].[ProcessDelegation]";
 

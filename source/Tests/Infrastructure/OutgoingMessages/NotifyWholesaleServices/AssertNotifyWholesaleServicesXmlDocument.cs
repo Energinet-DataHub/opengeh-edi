@@ -13,11 +13,18 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.XPath;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
+using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using FluentAssertions;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 
@@ -112,7 +119,7 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasCalculationVersion(int expectedVersion)
+    public IAssertNotifyWholesaleServicesDocument HasCalculationVersion(long expectedVersion)
     {
         _documentAsserter.HasValue($"Series[1]/version", expectedVersion.ToString(CultureInfo.InvariantCulture));
         return this;
@@ -273,6 +280,68 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
     public IAssertNotifyWholesaleServicesDocument HasQualityForPosition(int expectedPosition, CalculatedQuantityQuality expectedQuantityQuality)
     {
         _documentAsserter.HasValue($"Series[1]/Period/Point[{expectedPosition}]/quality", CimCode.ForWholesaleServicesOf(expectedQuantityQuality));
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasAnyPoints()
+    {
+        _documentAsserter.ElementExists($"Series[1]/Period/Point[0]");
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasPoints(IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points)
+    {
+        var pointsInDocument = _documentAsserter
+            .GetElements("Series[1]/Period/Point")!;
+
+        pointsInDocument.Should().HaveSameCount(points);
+
+        var expectedPoints = points.OrderBy(p => p.Time).ToList();
+
+        for (var i = 0; i < pointsInDocument.Count; i++)
+        {
+            pointsInDocument[i]
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("energySum_Quantity.quantity"), _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .ToDecimal()
+                .Should()
+                .Be(expectedPoints[i].Amount.ToDecimal());
+
+            pointsInDocument[i]
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("energy_Quantity.quantity"), _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .ToDecimal()
+                .Should()
+                .Be(expectedPoints[i].Quantity.ToDecimal());
+
+            pointsInDocument[i]
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("position"), _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .ToInt()
+                .Should()
+                .Be(i + 1);
+
+            pointsInDocument[i]
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("price.amount"), _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .ToDecimal()
+                .Should()
+                .Be(expectedPoints[i].Price.ToDecimal());
+
+            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+            {
+                QuantityQuality.Calculated => "A06",
+                _ => throw new NotImplementedException(
+                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
+            };
+
+            pointsInDocument[i]
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("quality"), _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .Should()
+                .Be(expectedQuantityQuality);
+        }
+
         return this;
     }
 

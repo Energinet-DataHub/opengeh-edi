@@ -22,7 +22,7 @@ using Energinet.DataHub.EDI.MasterData.Infrastructure.ActorCertificate;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Actors;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.GridAreas;
-using Energinet.DataHub.EDI.MasterData.Infrastructure.MessageDelegation;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.ProcessDelegation;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 public class AcceptedWholesaleServicesMessageDto : WholesaleServicesMessageDto
 {
-    protected AcceptedWholesaleServicesMessageDto(
+    private AcceptedWholesaleServicesMessageDto(
         ActorNumber receiverNumber,
         Guid processId,
         EventId eventId,
@@ -28,7 +28,9 @@ public class AcceptedWholesaleServicesMessageDto : WholesaleServicesMessageDto
         ActorRole receiverRole,
         ActorNumber chargeOwnerId,
         AcceptedWholesaleServicesSeries series,
-        MessageId relatedToMessageId)
+        MessageId relatedToMessageId,
+        ActorNumber documentReceiverNumber,
+        ActorRole documentReceiverRole)
         : base(
         receiverNumber,
         processId,
@@ -39,11 +41,19 @@ public class AcceptedWholesaleServicesMessageDto : WholesaleServicesMessageDto
         series,
         relatedToMessageId)
     {
+        DocumentReceiverNumber = documentReceiverNumber;
+        DocumentReceiverRole = documentReceiverRole;
     }
+
+    public ActorNumber DocumentReceiverNumber { get; }
+
+    public ActorRole DocumentReceiverRole { get; }
 
     public static AcceptedWholesaleServicesMessageDto Create(
         ActorNumber receiverNumber,
         ActorRole receiverRole,
+        ActorNumber documentReceiverNumber,
+        ActorRole documentReceiverRole,
         ActorNumber chargeOwnerId,
         Guid processId,
         EventId eventId,
@@ -51,12 +61,11 @@ public class AcceptedWholesaleServicesMessageDto : WholesaleServicesMessageDto
         AcceptedWholesaleServicesSeries wholesaleSeries,
         MessageId relatedToMessageId)
     {
-        ArgumentNullException.ThrowIfNull(processId);
-        ArgumentNullException.ThrowIfNull(businessReason);
-
         return new AcceptedWholesaleServicesMessageDto(
             receiverNumber: receiverNumber,
             receiverRole: receiverRole,
+            documentReceiverNumber: documentReceiverNumber,
+            documentReceiverRole: documentReceiverRole,
             processId: processId,
             eventId: eventId,
             businessReason: businessReason,

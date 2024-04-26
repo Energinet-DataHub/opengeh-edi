@@ -344,6 +344,7 @@ dotnet_diagnostic.CS1591.severity = none
 # Rule link: https://learn.microsoft.com/da-dk/dotnet/fundamentals/code-analysis/quality-rules/ca1822
 dotnet_diagnostic.CA1822.severity = none 
 
+
 ###############################
 # StyleCop Analyzers          #
 ###############################

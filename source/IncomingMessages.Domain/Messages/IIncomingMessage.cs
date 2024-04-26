@@ -67,5 +67,5 @@ public interface IIncomingMessage
     /// <summary>
     /// Series of the incoming message
     /// </summary>
-    IReadOnlyCollection<IIncomingMessageSerie> Serie { get; }
+    IReadOnlyCollection<IIncomingMessageSeries> Serie { get; }
 }
