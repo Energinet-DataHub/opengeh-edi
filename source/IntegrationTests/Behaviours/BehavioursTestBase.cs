@@ -303,7 +303,7 @@ public class BehavioursTestBase : IDisposable
         string senderActorRole,
         (int Year, int Month, int Day) periodStart,
         (int Year, int Month, int Day) periodEnd,
-        string gridArea,
+        string? gridArea,
         string energySupplierActorNumber,
         string transactionId)
     {

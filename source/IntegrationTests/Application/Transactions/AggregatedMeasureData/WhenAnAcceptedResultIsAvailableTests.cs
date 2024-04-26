@@ -205,7 +205,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         var series = new Series
         {
-            GridArea = aggregatedMeasureDataProcess.MeteringGridAreaDomainId,
+            GridArea = aggregatedMeasureDataProcess.RequestedGridArea,
             QuantityUnit = QuantityUnit.Kwh,
             TimeSeriesType = TimeSeriesType.Production,
             Resolution = Resolution.Pt15M,
@@ -277,7 +277,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
           SampleData.GridAreaCode,
           receiverRole == ActorRole.EnergySupplier ? SampleData.ReceiverNumber.Value : null,
           receiverRole == ActorRole.BalanceResponsibleParty ? SampleData.ReceiverNumber.Value : null,
-          null);
+          null,
+          new[] { SampleData.GridAreaCode });
 
         process.SendToWholesale();
         _processContext.AggregatedMeasureDataProcesses.Add(process);

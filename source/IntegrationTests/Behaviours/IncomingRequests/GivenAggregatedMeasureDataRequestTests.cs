@@ -79,6 +79,61 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
         aggregatedTimeSeriesRequestMessage.EnergySupplierId.Should().Be("2111111111111");
     }
 
+    [Fact(Skip = "Delegation is not implemented yet")]
+    public async Task
+        Given_DelegationInTwoGridAreas_When_RequestAggregatedMeasureDataJsonIsReceived_Then_ServiceBusMessageToWholesaleIsAddedToServiceBus()
+    {
+        // Arrange
+        var senderSpy = CreateServiceBusSenderSpy();
+        GivenNowIs(2024, 7, 1);
+        GivenAuthenticatedActorIs(ActorNumber.Create("2111111111111"), ActorRole.EnergySupplier);
+
+        await GivenDelegation(
+            new(ActorNumber.Create("2111111111111"), ActorRole.EnergySupplier),
+            new(ActorNumber.Create("1111111111111"), ActorRole.Delegated),
+            "512",
+            ProcessType.RequestEnergyResults,
+            GetNow().Minus(Duration.FromDays(256)),
+            GetNow().Plus(Duration.FromDays(256)));
+
+        await GivenDelegation(
+            new(ActorNumber.Create("2111111111111"), ActorRole.EnergySupplier),
+            new(ActorNumber.Create("1111111111111"), ActorRole.Delegated),
+            "643",
+            ProcessType.RequestEnergyResults,
+            GetNow().Minus(Duration.FromDays(256)),
+            GetNow().Plus(Duration.FromDays(256)));
+
+        var responseMessage = await GivenRequestAggregatedMeasureDataJsonAsync(
+            senderActorNumber: "2111111111111",
+            senderActorRole: ActorRole.EnergySupplier.Code,
+            periodStart: (2024, 5, 1),
+            periodEnd: (2024, 6, 1),
+            gridArea: null,
+            energySupplierActorNumber: "2111111111111",
+            transactionId: "123564789123564789123564789123564787");
+
+        responseMessage.IsErrorResponse.Should().BeFalse(responseMessage.MessageBody);
+
+        // Act
+        await WhenInitializeAggregatedMeasureDataProcessDtoIsHandledAsync(senderSpy.Message!);
+
+        // Assert
+        senderSpy.MessageSent.Should().BeTrue();
+        senderSpy.Message.Should().NotBeNull();
+        var serviceBusMessage = senderSpy.Message!;
+        serviceBusMessage.Subject.Should().Be(nameof(AggregatedTimeSeriesRequest));
+        serviceBusMessage.Body.Should().NotBeNull();
+
+        var aggregatedTimeSeriesRequestMessage = AggregatedTimeSeriesRequest.Parser.ParseFrom(serviceBusMessage.Body);
+
+        aggregatedTimeSeriesRequestMessage.Should().NotBeNull();
+        aggregatedTimeSeriesRequestMessage.GridAreaCodes.Should().Equal("512", "643");
+        aggregatedTimeSeriesRequestMessage.RequestedForActorNumber.Should().Be("2111111111111");
+        aggregatedTimeSeriesRequestMessage.RequestedForActorRole.Should().Be("EnergySupplier");
+        aggregatedTimeSeriesRequestMessage.EnergySupplierId.Should().Be("2111111111111");
+    }
+
     [Fact]
     public async Task
         Given_AggregatedTimeSeriesRequestAcceptedIsReceived_When_ActorPeeks_Then_CorrectDocumentIsCreated()
