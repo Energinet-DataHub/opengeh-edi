@@ -47,5 +47,5 @@ public interface IIncomingMessageSeries : IDelegatedIncomingMessageSeries
     /// Get the actor number from the series based on the role. Eg. if the role is EnergySupplier,
     /// the EnergySupplierId should be returned. Returns null if the data for the role is not present.
     /// </summary>
-    public ActorNumber? GetActorNumberForRole(ActorRole actorRole);
+    public ActorNumber? GetActorNumberForRole(ActorRole actorRole, ActorNumber? gridAreaOwner);
 }

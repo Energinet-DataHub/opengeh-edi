@@ -40,7 +40,7 @@ public record RequestAggregatedMeasureDataMessageSeries(
     string? BalanceResponsiblePartyId,
     string? SettlementVersion) : BaseDelegatedSeries, IIncomingMessageSeries
 {
-    public ActorNumber? GetActorNumberForRole(ActorRole actorRole)
+    public ActorNumber? GetActorNumberForRole(ActorRole actorRole, ActorNumber? gridAreaOwner)
     {
         ArgumentNullException.ThrowIfNull(actorRole);
 
@@ -52,9 +52,9 @@ public record RequestAggregatedMeasureDataMessageSeries(
         return actorRole.Name switch
         {
             DataHubNames.ActorRole.EnergySupplier => ActorNumber.TryCreate(EnergySupplierId),
-            DataHubNames.ActorRole.MeteredDataResponsible => ActorNumber.TryCreate(BalanceResponsiblePartyId), // How do i find the MDR actor number in the message?
             DataHubNames.ActorRole.BalanceResponsibleParty => ActorNumber.TryCreate(BalanceResponsiblePartyId),
-            DataHubNames.ActorRole.GridOperator => ActorNumber.TryCreate(BalanceResponsiblePartyId), // How do i find the DDM (MDR) actor number in the message?
+            DataHubNames.ActorRole.MeteredDataResponsible => gridAreaOwner,
+            DataHubNames.ActorRole.GridOperator => gridAreaOwner,
             _ => null,
         };
     }

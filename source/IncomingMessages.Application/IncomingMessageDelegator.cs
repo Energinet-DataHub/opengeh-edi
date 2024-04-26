@@ -90,7 +90,16 @@ public class IncomingMessageDelegator
 
             if (delegations.Count != 0)
             {
-                var originalActorNumber = series.GetActorNumberForRole(originalActorRole);
+                ActorNumber? gridAreaOwner = null;
+                if (series.GridArea != null)
+                {
+                    gridAreaOwner = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(
+                            series.GridArea,
+                            cancellationToken)
+                        .ConfigureAwait(false);
+                }
+
+                var originalActorNumber = series.GetActorNumberForRole(originalActorRole, gridAreaOwner);
 
                 if (originalActorNumber == null)
                 {

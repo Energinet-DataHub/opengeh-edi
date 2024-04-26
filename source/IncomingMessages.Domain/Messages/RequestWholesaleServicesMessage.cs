@@ -40,13 +40,15 @@ public record RequestWholesaleServicesSeries(
     string? ChargeOwner,
     IReadOnlyCollection<RequestWholesaleServicesChargeType> ChargeTypes) : BaseDelegatedSeries, IIncomingMessageSeries
 {
-    public ActorNumber? GetActorNumberForRole(ActorRole actorRole)
+    public ActorNumber? GetActorNumberForRole(ActorRole actorRole, ActorNumber? gridAreaOwner)
     {
         ArgumentNullException.ThrowIfNull(actorRole);
 
         return actorRole.Name switch
         {
             DataHubNames.ActorRole.EnergySupplier => ActorNumber.TryCreate(EnergySupplierId),
+
+            // TODO: Should this be the grid area owner instead, or will they always be the same?
             DataHubNames.ActorRole.GridOperator => ActorNumber.TryCreate(ChargeOwner),
             DataHubNames.ActorRole.SystemOperator => ActorNumber.TryCreate(ChargeOwner),
             _ => null,
