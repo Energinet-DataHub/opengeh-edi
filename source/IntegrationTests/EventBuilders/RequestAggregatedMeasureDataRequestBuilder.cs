@@ -53,27 +53,84 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
                 balanceResponsibleParty,
                 transactionId);
         }
+        else if (format == DocumentFormat.Xml)
+        {
+            content = GetCimXml(
+                senderActorNumber,
+                senderActorRole,
+                meteringPointType,
+                settlementMethod,
+                periodStart,
+                periodEnd,
+                gridArea,
+                energySupplier,
+                balanceResponsibleParty,
+                transactionId);
+        }
         else
         {
             throw new ArgumentOutOfRangeException(nameof(format), format, "Unsupported document format");
         }
 
-        // else if (format == DocumentFormat.Xml)
-        // {
-        //     content = GetCimXml(
-        //         senderActorNumber,
-        //         senderActorRole,
-        //         meteringPointType,
-        //         settlementMethod,
-        //         periodStart,
-        //         periodEnd,
-        //         gridArea,
-        //         energySupplier,
-        //         balanceResponsibleParty,
-        //         transactionId);
-        // }
-
         return new IncomingMessageStream(new MemoryStream(Encoding.UTF8.GetBytes(content)));
+    }
+
+    private static string GetCimXml(
+        ActorNumber senderActorNumber,
+        ActorRole senderActorRole,
+        MeteringPointType meteringPointType,
+        SettlementMethod settlementMethod,
+        Instant periodStart,
+        Instant periodEnd,
+        string? gridArea,
+        ActorNumber? energySupplier,
+        ActorNumber? balanceResponsibleParty,
+        string transactionId)
+    {
+        return $@"<cim:RequestAggregatedMeasureData_MarketDocument xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:cim=""urn:ediel.org:measure:requestaggregatedmeasuredata:0:1"" xsi:schemaLocation=""urn:ediel.org:measure:requestaggregatedmeasuredata:0:1 urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd"">
+    <cim:mRID>123564789123564789123564789123564789</cim:mRID>
+    <cim:type>E74</cim:type>
+    <cim:process.processType>D04</cim:process.processType>
+    <cim:businessSector.type>23</cim:businessSector.type>
+    <cim:sender_MarketParticipant.mRID codingScheme=""A10"">{senderActorNumber.Value}</cim:sender_MarketParticipant.mRID>
+    <cim:sender_MarketParticipant.marketRole.type>{senderActorRole.Code}</cim:sender_MarketParticipant.marketRole.type>
+    <cim:receiver_MarketParticipant.mRID codingScheme=""A10"">5790001330552</cim:receiver_MarketParticipant.mRID>
+    <cim:receiver_MarketParticipant.marketRole.type>DGL</cim:receiver_MarketParticipant.marketRole.type>
+    <cim:createdDateTime>2022-12-17T09:30:47Z</cim:createdDateTime>
+    <cim:Series>
+        <cim:mRID>{transactionId}</cim:mRID>
+        <!-- <cim:settlement_Series.version>D01</cim:settlement_Series.version> -->
+        <cim:marketEvaluationPoint.type>{meteringPointType.Code}</cim:marketEvaluationPoint.type>
+        <cim:marketEvaluationPoint.settlementMethod>{settlementMethod.Code}</cim:marketEvaluationPoint.settlementMethod>
+        <cim:start_DateAndOrTime.dateTime>{periodStart.ToString()}</cim:start_DateAndOrTime.dateTime>
+        <cim:end_DateAndOrTime.dateTime>{periodEnd.ToString()}</cim:end_DateAndOrTime.dateTime>
+		{GetGridAreaCimXmlSection(gridArea)}
+        <cim:biddingZone_Domain.mRID codingScheme=""A01"">10YDK-1--------M</cim:biddingZone_Domain.mRID> <!-- anvendes ikke -->
+        {GetEnergySupplierCimXmlSection(energySupplier?.Value)}
+        {GetBalanceResponsibleCimXmlSection(balanceResponsibleParty?.Value)}
+    </cim:Series>
+</cim:RequestAggregatedMeasureData_MarketDocument>";
+    }
+
+    private static string GetEnergySupplierCimXmlSection(string? energySupplier)
+    {
+        return energySupplier != null
+            ? $"<cim:energySupplier_MarketParticipant.mRID codingScheme=\"A10\">{energySupplier}</cim:energySupplier_MarketParticipant.mRID>"
+            : string.Empty;
+    }
+
+    private static string GetBalanceResponsibleCimXmlSection(string? balanceResponsibleParty)
+    {
+        return balanceResponsibleParty != null
+            ? $"<cim:balanceResponsibleParty_MarketParticipant.mRID codingScheme=\"A10\">{balanceResponsibleParty}</cim:balanceResponsibleParty_MarketParticipant.mRID>"
+            : string.Empty;
+    }
+
+    private static string GetGridAreaCimXmlSection(string? gridArea)
+    {
+        return gridArea != null
+            ? $"<cim:meteringGridArea_Domain.mRID codingScheme=\"NDK\">{gridArea}</cim:meteringGridArea_Domain.mRID>"
+            : string.Empty;
     }
 
     private static string GetCimJson(
@@ -118,16 +175,16 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
 		""Series"": [
 			{{
 				""mRID"": ""{transactionId}"",
-                {GetBalanceResponsiblePartySection(balanceResponsiblePartyActorNumber?.Value)}
+                {GetBalanceResponsiblePartyCimJsonSection(balanceResponsiblePartyActorNumber?.Value)}
 				""end_DateAndOrTime.dateTime"": ""{periodEnd}"",
-                {GetEnergySupplierSection(energySupplierActorNumber?.Value)}
+                {GetEnergySupplierCimJsonSection(energySupplierActorNumber?.Value)}
 				""marketEvaluationPoint.settlementMethod"": {{
 					""value"": ""{settlementMethod.Code}""
 				}},
 				""marketEvaluationPoint.type"": {{
 					""value"": ""{meteringPointType.Code}""
 				}},
-				{GetGridAreaSection(gridArea)}
+				{GetGridAreaCimJsonSection(gridArea)}
 				""start_DateAndOrTime.dateTime"": ""{periodStart}""
 			}}
 	    ]
@@ -135,7 +192,7 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
 }}";
     }
 
-    private static string GetBalanceResponsiblePartySection(string? balanceResponsibleParty)
+    private static string GetBalanceResponsiblePartyCimJsonSection(string? balanceResponsibleParty)
     {
         return balanceResponsibleParty != null
             ? $@"   ""balanceResponsibleParty_MarketParticipant.mRID"": {{
@@ -145,7 +202,7 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
             : string.Empty;
     }
 
-    private static string GetGridAreaSection(string? gridArea)
+    private static string GetGridAreaCimJsonSection(string? gridArea)
     {
         return gridArea is not null
             ? $@"				""meteringGridArea_Domain.mRID"": {{
@@ -155,7 +212,7 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
             : string.Empty;
     }
 
-    private static string GetEnergySupplierSection(string? energySupplier)
+    private static string GetEnergySupplierCimJsonSection(string? energySupplier)
     {
         return energySupplier != null
             ? $@"   ""energySupplier_MarketParticipant.mRID"": {{
