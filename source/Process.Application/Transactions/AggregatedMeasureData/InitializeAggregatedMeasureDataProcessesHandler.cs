@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -52,28 +53,29 @@ public class InitializeAggregatedMeasureDataProcessesHandler : IRequestHandler<I
         var businessReason = BusinessReason.FromCodeOrUnused(dto.BusinessReason);
         var messageId = MessageId.Create(dto.MessageId);
 
-        foreach (var serie in dto.Series)
+        foreach (var series in dto.Series)
         {
-            var settlementVersion = !string.IsNullOrWhiteSpace(serie.SettlementVersion)
-                ? SettlementVersion.FromCodeOrUnused(serie.SettlementVersion)
+            var settlementVersion = !string.IsNullOrWhiteSpace(series.SettlementVersion)
+                ? SettlementVersion.FromCodeOrUnused(series.SettlementVersion)
                 : null;
 
             _aggregatedMeasureDataProcessRepository.Add(
                 new AggregatedMeasureDataProcess(
                     ProcessId.New(),
-                    BusinessTransactionId.Create(serie.Id),
+                    BusinessTransactionId.Create(series.Id),
                     actorSenderNumber,
                     dto.SenderRoleCode,
                     businessReason,
                     messageId,
-                    serie.MarketEvaluationPointType,
-                    serie.MarketEvaluationSettlementMethod,
-                    serie.StartDateAndOrTimeDateTime,
-                    serie.EndDateAndOrTimeDateTime,
-                    serie.MeteringGridAreaDomainId,
-                    serie.EnergySupplierMarketParticipantId,
-                    serie.BalanceResponsiblePartyMarketParticipantId,
-                    settlementVersion));
+                    series.MeteringPointType,
+                    series.SettlementMethod,
+                    series.StartDateTime,
+                    series.EndDateTime,
+                    series.RequestedGridAreaCode,
+                    series.EnergySupplierNumber,
+                    series.BalanceResponsibleNumber,
+                    settlementVersion,
+                    series.GridAreas));
         }
     }
 }

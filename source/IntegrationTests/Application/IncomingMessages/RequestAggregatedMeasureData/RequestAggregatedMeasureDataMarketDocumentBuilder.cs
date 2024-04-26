@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
@@ -24,22 +25,23 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages.Re
 
 public class RequestAggregatedMeasureDataMarketDocumentBuilder
 {
-    private readonly string _startDateAndOrTimeDateTime = "2022-06-17T22:00:00Z";
-    private readonly string _endDateAndOrTimeDateTime = "2022-07-22T22:00:00Z";
-    private readonly string _meteringGridAreaDomainId = "244";
+    private readonly string _startDateTime = "2022-06-17T22:00:00Z";
+    private readonly string _endDateTime = "2022-07-22T22:00:00Z";
     private readonly string _messageType = "E74";
     private readonly string _businessType = "23";
     private readonly BusinessReason _businessReason = BusinessReason.PreliminaryAggregation;
     private readonly ActorNumber _receiverId = DataHubDetails.DataHubActorNumber;
     private readonly ActorRole _receiverRole = ActorRole.MeteredDataAdministrator;
     private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
+    private string? _requestedGridArea = "244";
+    private List<string> _gridAreas = new() { "244" };
     private string _senderId = SampleData.NewEnergySupplierNumber;
     private string? _settlementVersion;
     private string _messageId = Guid.NewGuid().ToString();
-    private string _serieId = Guid.NewGuid().ToString();
+    private string _seriesId = Guid.NewGuid().ToString();
     private string _senderRole = ActorRole.EnergySupplier.Code;
-    private string? _marketEvaluationPointType = MeteringPointType.Consumption.Code;
-    private string? _marketEvaluationSettlementMethod = SettlementMethod.Flex.Code;
+    private string? _meteringPointType = MeteringPointType.Consumption.Code;
+    private string? _settlementMethod = SettlementMethod.Flex.Code;
     private string? _energySupplierMarketParticipantId = SampleData.NewEnergySupplierNumber;
     private string? _balanceResponsiblePartyMarketParticipantId = "5799999933318";
 
@@ -49,9 +51,9 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
         return this;
     }
 
-    public RequestAggregatedMeasureDataMarketDocumentBuilder SetMarketEvaluationPointType(string? marketEvaluationPointType)
+    public RequestAggregatedMeasureDataMarketDocumentBuilder SetMeteringPointType(string? meteringPointType)
     {
-        _marketEvaluationPointType = marketEvaluationPointType;
+        _meteringPointType = meteringPointType;
         return this;
     }
 
@@ -67,19 +69,19 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
         return this;
     }
 
-    public RequestAggregatedMeasureDataMarketDocumentBuilder SetMarketEvaluationSettlementMethod(string? marketEvaluationSettlementMethod = null)
+    public RequestAggregatedMeasureDataMarketDocumentBuilder SetSettlementMethod(string? settlementMethod)
     {
-        _marketEvaluationSettlementMethod = marketEvaluationSettlementMethod;
+        _settlementMethod = settlementMethod;
         return this;
     }
 
-    public RequestAggregatedMeasureDataMarketDocumentBuilder SetEnergySupplierId(string? energySupplierId = null)
+    public RequestAggregatedMeasureDataMarketDocumentBuilder SetEnergySupplierId(string? energySupplierId)
     {
         _energySupplierMarketParticipantId = energySupplierId;
         return this;
     }
 
-    public RequestAggregatedMeasureDataMarketDocumentBuilder SetBalanceResponsibleId(string? balanceResponsibleId = null)
+    public RequestAggregatedMeasureDataMarketDocumentBuilder SetBalanceResponsibleId(string? balanceResponsibleId)
     {
         _balanceResponsiblePartyMarketParticipantId = balanceResponsibleId;
         return this;
@@ -87,13 +89,25 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
 
     public RequestAggregatedMeasureDataMarketDocumentBuilder SetTransactionId(string transactionId)
     {
-        _serieId = transactionId;
+        _seriesId = transactionId;
         return this;
     }
 
-    public RequestAggregatedMeasureDataMarketDocumentBuilder SetSenderId(string s)
+    public RequestAggregatedMeasureDataMarketDocumentBuilder SetSenderId(string senderId)
     {
-        _senderId = s;
+        _senderId = senderId;
+        return this;
+    }
+
+    public RequestAggregatedMeasureDataMarketDocumentBuilder SetRequestedGridArea(string? requestedGridArea)
+    {
+        _requestedGridArea = requestedGridArea;
+        return this;
+    }
+
+    public RequestAggregatedMeasureDataMarketDocumentBuilder SetGridAreas(string[] gridAreas)
+    {
+        _gridAreas = gridAreas.ToList();
         return this;
     }
 
@@ -103,27 +117,23 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
         return new InitializeAggregatedMeasureDataProcessDto(
             header.SenderId,
             header.SenderRole,
-            header.ReceiverId,
-            header.ReceiverRole,
             header.BusinessReason,
-            header.MessageType,
             header.MessageId,
-            header.CreatedAt,
-            header.BusinessType,
-            new List<InitializeAggregatedMeasureDataProcessSeries> { CreateSerie() }.AsReadOnly());
+            new List<InitializeAggregatedMeasureDataProcessSeries> { CreateSeries() }.AsReadOnly());
     }
 
-    private InitializeAggregatedMeasureDataProcessSeries CreateSerie() =>
+    private InitializeAggregatedMeasureDataProcessSeries CreateSeries() =>
         new(
-            _serieId,
-            _marketEvaluationPointType,
-            _marketEvaluationSettlementMethod,
-            _startDateAndOrTimeDateTime,
-            _endDateAndOrTimeDateTime,
-            _meteringGridAreaDomainId,
+            _seriesId,
+            _meteringPointType,
+            _settlementMethod,
+            _startDateTime,
+            _endDateTime,
+            _requestedGridArea,
             _energySupplierMarketParticipantId,
             _balanceResponsiblePartyMarketParticipantId,
-            _settlementVersion);
+            _settlementVersion,
+            _gridAreas);
 
     private MessageHeader CreateHeader()
     {
