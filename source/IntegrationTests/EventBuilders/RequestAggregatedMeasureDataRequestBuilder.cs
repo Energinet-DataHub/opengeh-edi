@@ -13,8 +13,10 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
@@ -33,10 +35,9 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
         SettlementMethod settlementMethod,
         Instant periodStart,
         Instant periodEnd,
-        string? gridArea,
         ActorNumber? energySupplier,
         ActorNumber? balanceResponsibleParty,
-        string transactionId)
+        IReadOnlyCollection<(string? GridArea, string TransactionId)> series)
     {
         string content;
         if (format == DocumentFormat.Json)
@@ -48,10 +49,9 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
                 settlementMethod,
                 periodStart,
                 periodEnd,
-                gridArea,
                 energySupplier,
                 balanceResponsibleParty,
-                transactionId);
+                series);
         }
         else if (format == DocumentFormat.Xml)
         {
@@ -62,10 +62,9 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
                 settlementMethod,
                 periodStart,
                 periodEnd,
-                gridArea,
                 energySupplier,
                 balanceResponsibleParty,
-                transactionId);
+                series);
         }
         else
         {
@@ -82,10 +81,9 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
         SettlementMethod settlementMethod,
         Instant periodStart,
         Instant periodEnd,
-        string? gridArea,
         ActorNumber? energySupplier,
         ActorNumber? balanceResponsibleParty,
-        string transactionId)
+        IReadOnlyCollection<(string? GridArea, string TransactionId)> series)
     {
         return $@"<cim:RequestAggregatedMeasureData_MarketDocument xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:cim=""urn:ediel.org:measure:requestaggregatedmeasuredata:0:1"" xsi:schemaLocation=""urn:ediel.org:measure:requestaggregatedmeasuredata:0:1 urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd"">
     <cim:mRID>123564789123564789123564789123564789</cim:mRID>
@@ -97,18 +95,19 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
     <cim:receiver_MarketParticipant.mRID codingScheme=""A10"">5790001330552</cim:receiver_MarketParticipant.mRID>
     <cim:receiver_MarketParticipant.marketRole.type>DGL</cim:receiver_MarketParticipant.marketRole.type>
     <cim:createdDateTime>2022-12-17T09:30:47Z</cim:createdDateTime>
-    <cim:Series>
-        <cim:mRID>{transactionId}</cim:mRID>
-        <!-- <cim:settlement_Series.version>D01</cim:settlement_Series.version> -->
-        <cim:marketEvaluationPoint.type>{meteringPointType.Code}</cim:marketEvaluationPoint.type>
-        <cim:marketEvaluationPoint.settlementMethod>{settlementMethod.Code}</cim:marketEvaluationPoint.settlementMethod>
-        <cim:start_DateAndOrTime.dateTime>{periodStart.ToString()}</cim:start_DateAndOrTime.dateTime>
-        <cim:end_DateAndOrTime.dateTime>{periodEnd.ToString()}</cim:end_DateAndOrTime.dateTime>
-		{GetGridAreaCimXmlSection(gridArea)}
-        <cim:biddingZone_Domain.mRID codingScheme=""A01"">10YDK-1--------M</cim:biddingZone_Domain.mRID> <!-- anvendes ikke -->
-        {GetEnergySupplierCimXmlSection(energySupplier?.Value)}
-        {GetBalanceResponsibleCimXmlSection(balanceResponsibleParty?.Value)}
-    </cim:Series>
+    {string.Join("\n", series.Select(s => $@"
+        <cim:Series>
+            <cim:mRID>{s.TransactionId}</cim:mRID>
+            <!-- <cim:settlement_Series.version>D01</cim:settlement_Series.version> -->
+            <cim:marketEvaluationPoint.type>{meteringPointType.Code}</cim:marketEvaluationPoint.type>
+            <cim:marketEvaluationPoint.settlementMethod>{settlementMethod.Code}</cim:marketEvaluationPoint.settlementMethod>
+            <cim:start_DateAndOrTime.dateTime>{periodStart.ToString()}</cim:start_DateAndOrTime.dateTime>
+            <cim:end_DateAndOrTime.dateTime>{periodEnd.ToString()}</cim:end_DateAndOrTime.dateTime>
+		    {GetGridAreaCimXmlSection(s.GridArea)}
+            <cim:biddingZone_Domain.mRID codingScheme=""A01"">10YDK-1--------M</cim:biddingZone_Domain.mRID> <!-- anvendes ikke -->
+            {GetEnergySupplierCimXmlSection(energySupplier?.Value)}
+            {GetBalanceResponsibleCimXmlSection(balanceResponsibleParty?.Value)}
+        </cim:Series>"))}
 </cim:RequestAggregatedMeasureData_MarketDocument>";
     }
 
@@ -140,10 +139,9 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
         SettlementMethod settlementMethod,
         Instant periodStart,
         Instant periodEnd,
-        string? gridArea,
         ActorNumber? energySupplierActorNumber,
         ActorNumber? balanceResponsiblePartyActorNumber,
-        string transactionId)
+        IReadOnlyCollection<(string? GridArea, string TransactionId)> series)
     {
         return $@"{{
 	""RequestAggregatedMeasureData_MarketDocument"": {{
@@ -173,8 +171,9 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
 			""value"": ""E74""
 		}},
 		""Series"": [
-			{{
-				""mRID"": ""{transactionId}"",
+        {string.Join(",\n", series.Select(s => $@"
+            {{
+				""mRID"": ""{s.TransactionId}"",
                 {GetBalanceResponsiblePartyCimJsonSection(balanceResponsiblePartyActorNumber?.Value)}
 				""end_DateAndOrTime.dateTime"": ""{periodEnd}"",
                 {GetEnergySupplierCimJsonSection(energySupplierActorNumber?.Value)}
@@ -184,9 +183,9 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
 				""marketEvaluationPoint.type"": {{
 					""value"": ""{meteringPointType.Code}""
 				}},
-				{GetGridAreaCimJsonSection(gridArea)}
+				{GetGridAreaCimJsonSection(s.GridArea)}
 				""start_DateAndOrTime.dateTime"": ""{periodStart}""
-			}}
+			}}"))}
 	    ]
 	}}
 }}";

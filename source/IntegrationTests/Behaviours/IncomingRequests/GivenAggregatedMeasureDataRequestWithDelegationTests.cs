@@ -44,45 +44,54 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
     {
     }
 
-    public static object[][] DocumentFormatsWithDelegationCombinations()
+    public static object[][] DocumentFormatsWithAllRoleCombinations() => DocumentFormatsWithRoleCombinations(false);
+
+    public static object[][] DocumentFormatsWithRoleCombinationsForNullGridArea() => DocumentFormatsWithRoleCombinations(true);
+
+    public static object[][] DocumentFormatsWithRoleCombinations(bool nullGridArea)
     {
-        // The actor roles who can perform AggregatedMeasureDataRequest's
-        var delegatedFromRoles = new List<ActorRole>
+        var roleCombinations = new List<(ActorRole DelegatedFrom, ActorRole DelegatedTo)>
         {
-            ActorRole.EnergySupplier,
-            ActorRole.MeteredDataResponsible,
-            ActorRole.BalanceResponsibleParty,
-            ActorRole.GridOperator, // Grid Operator can make requests because of DDM -> MDR hack
+            // Energy supplier, metered data responsible and balance responsible can only delegate to delegated
+            (ActorRole.EnergySupplier, ActorRole.Delegated),
+            (ActorRole.BalanceResponsibleParty, ActorRole.Delegated),
         };
 
-        var delegatedToRoles = new List<ActorRole>
+        // Grid operator and MDR cannot make request with null grid area
+        if (!nullGridArea)
         {
-            ActorRole.Delegated,
-            ActorRole.GridOperator,
-        };
+            roleCombinations.Add((ActorRole.MeteredDataResponsible, ActorRole.Delegated));
+            roleCombinations.Add((ActorRole.GridOperator, ActorRole.Delegated));
 
-        var exceptForIncomingDocumentFormats = new[]
-        {
-            DocumentFormat.Ebix.Name, // ebIX is not supported for requests
-        };
+            // Grid operator can delegate to both delegated and grid operator
+            roleCombinations.Add((ActorRole.GridOperator, ActorRole.GridOperator));
+        }
 
-        return DocumentFormats
-            .GetAllDocumentFormats(exceptForIncomingDocumentFormats)
-            .SelectMany(incomingDocumentFormat => delegatedFromRoles
-                .SelectMany(delegatedFromRole => delegatedToRoles
-                    .SelectMany(delegatedToRole => DocumentFormats.GetAllDocumentFormats()
-                        .Select(peekDocumentFormat => new object[]
-                        {
-                            incomingDocumentFormat,
-                            peekDocumentFormat,
-                            delegatedFromRole,
-                            delegatedToRole,
-                        }))))
+        var requestDocumentFormats = DocumentFormats
+            .GetAllDocumentFormats(except: new[]
+            {
+                DocumentFormat.Ebix.Name, // ebIX is not supported for requests
+            })
+            .ToArray();
+
+        var peekDocumentFormats = DocumentFormats.GetAllDocumentFormats();
+
+        return roleCombinations.SelectMany(d => requestDocumentFormats
+                .SelectMany(
+                    incomingDocumentFormat => peekDocumentFormats
+                        .Select(
+                            peekDocumentFormat => new object[]
+                            {
+                                incomingDocumentFormat,
+                                peekDocumentFormat,
+                                d.DelegatedFrom,
+                                d.DelegatedTo,
+                            })))
             .ToArray();
     }
 
     [Theory]
-    [MemberData(nameof(DocumentFormatsWithDelegationCombinations))]
+    [MemberData(nameof(DocumentFormatsWithAllRoleCombinations))]
     public async Task AndGiven_DelegationInOneGridArea_When_DelegatedActorPeeksAllMessages_Then_ReceivesOneNotifyAggregatedMeasureDataWithCorrectContent(DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
     {
         /*
@@ -124,10 +133,12 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
             settlementMethod: SettlementMethod.Flex,
             periodStart: (2024, 1, 1),
             periodEnd: (2024, 1, 31),
-            gridArea: "512",
             energySupplier: energySupplierNumber,
             balanceResponsibleParty: balanceResponsibleParty,
-            transactionId: "123564789123564789123564789123564787");
+            series: new (string? GridArea, string TransactionId)[]
+            {
+                ("512", "123564789123564789123564789123564787"),
+            });
 
         // Act
         await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.Message!);
@@ -213,7 +224,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
     }
 
     [Theory]
-    [MemberData(nameof(DocumentFormatsWithDelegationCombinations))]
+    [MemberData(nameof(DocumentFormatsWithRoleCombinationsForNullGridArea))]
     public async Task AndGiven_DelegationInTwoGridAreas_When_DelegatedActorPeeksAllMessages_Then_ReceivesTwoNotifyAggregatedMeasureDataDocumentsWithCorrectContent(DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
     {
         /*
@@ -263,10 +274,12 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
             settlementMethod: SettlementMethod.Flex,
             periodStart: (2024, 1, 1),
             periodEnd: (2024, 1, 31),
-            gridArea: null,
             energySupplier: energySupplierNumber,
             balanceResponsibleParty: balanceResponsibleParty,
-            transactionId: "123564789123564789123564789123564787");
+            series: new (string? GridArea, string TransactionId)[]
+            {
+                (null, "123564789123564789123564789123564787"),
+            });
 
         // Act
         await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.Message!);
@@ -493,7 +506,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
     /// be able to request and receive his own data
     /// </summary>
     [Theory]
-    [MemberData(nameof(DocumentFormatsWithDelegationCombinations))]
+    [MemberData(nameof(DocumentFormatsWithRoleCombinationsForNullGridArea))]
     public async Task AndGiven_OriginalActorRequestsOwnDataWithDataInTwoGridAreas_When_OriginalActorPeeksAllMessages_Then_OriginalActorReceivesTwoNotifyAggregatedMeasureDataDocumentWithCorrectContent(DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
     {
         /*
@@ -530,10 +543,12 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
             settlementMethod: SettlementMethod.Flex,
             periodStart: (2024, 1, 1),
             periodEnd: (2024, 1, 31),
-            gridArea: null,
             energySupplier: energySupplierNumber,
             balanceResponsibleParty: balanceResponsibleParty,
-            transactionId: "123564789123564789123564789123564787");
+            series: new (string? GridArea, string TransactionId)[]
+            {
+                (null, "123564789123564789123564789123564787"),
+            });
 
         // Act
         await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.Message!);

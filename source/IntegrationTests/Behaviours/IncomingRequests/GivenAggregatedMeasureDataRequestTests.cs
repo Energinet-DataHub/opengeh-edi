@@ -93,17 +93,19 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
             GetNow().Plus(Duration.FromDays(256)));
 
         await GivenReceivedAggregatedMeasureDataRequest(
-            DocumentFormat.Json,
-            ActorNumber.Create("2111111111111"),
-            ActorRole.EnergySupplier,
-            MeteringPointType.Consumption,
-            SettlementMethod.Flex,
-            (2024, 5, 1),
-            (2024, 6, 1),
-            "512",
-            ActorNumber.Create("2111111111111"),
-            ActorNumber.Create("3111111111111"),
-            "123564789123564789123564789123564787");
+            documentFormat: DocumentFormat.Json,
+            senderActorNumber: ActorNumber.Create("2111111111111"),
+            senderActorRole: ActorRole.EnergySupplier,
+            meteringPointType: MeteringPointType.Consumption,
+            settlementMethod: SettlementMethod.Flex,
+            periodStart: (2024, 5, 1),
+            periodEnd: (2024, 6, 1),
+            energySupplier: ActorNumber.Create("2111111111111"),
+            balanceResponsibleParty: ActorNumber.Create("3111111111111"),
+            series: new (string? GridArea, string TransactionId)[]
+            {
+                ("512", "123564789123564789123564789123564787"),
+            });
 
         // Act
         await WhenInitializeAggregatedMeasureDataProcessDtoIsHandledAsync(senderSpy.Message!);
@@ -155,12 +157,14 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
             senderActorRole: ActorRole.EnergySupplier,
             periodStart: (2024, 5, 1),
             periodEnd: (2024, 6, 1),
-            gridArea: null,
             meteringPointType: MeteringPointType.Consumption,
             settlementMethod: SettlementMethod.Flex,
-            transactionId: "123564789123564789123564789123564787",
             energySupplier: ActorNumber.Create("2111111111111"),
-            balanceResponsibleParty: null);
+            balanceResponsibleParty: null,
+            series: new (string? GridArea, string TransactionId)[]
+            {
+                (null, "123564789123564789123564789123564787"),
+            });
 
         // Act
         await WhenInitializeAggregatedMeasureDataProcessDtoIsHandledAsync(senderSpy.Message!);
@@ -197,12 +201,14 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
             senderActorRole: ActorRole.EnergySupplier,
             periodStart: (2024, 5, 1),
             periodEnd: (2024, 6, 1),
-            gridArea: "512",
             meteringPointType: MeteringPointType.Consumption,
             settlementMethod: SettlementMethod.Flex,
-            transactionId: "123564789123564789123564789123564787",
             energySupplier: ActorNumber.Create("2111111111111"),
-            balanceResponsibleParty: null);
+            balanceResponsibleParty: null,
+            series: new (string? GridArea, string TransactionId)[]
+            {
+                ("512", "123564789123564789123564789123564787"),
+            });
 
         senderSpy.Message.Should().NotBeNull();
         await GivenInitializeAggregatedMeasureDataProcessDtoIsHandledAsync(senderSpy.Message!);
@@ -261,10 +267,12 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
             settlementMethod: SettlementMethod.Flex,
             periodStart: (2024, 1, 1),
             periodEnd: (2024, 1, 31),
-            gridArea: null,
             energySupplier: energySupplierNumber,
             balanceResponsibleParty: balanceResponsibleParty,
-            transactionId: "123564789123564789123564789123564787");
+            series: new (string? GridArea, string TransactionId)[]
+            {
+                (null, "123564789123564789123564789123564787"),
+            });
 
         // Act
         await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.Message!);

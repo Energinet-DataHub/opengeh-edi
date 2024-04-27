@@ -340,10 +340,9 @@ public class BehavioursTestBase : IDisposable
         SettlementMethod settlementMethod,
         (int Year, int Month, int Day) periodStart,
         (int Year, int Month, int Day) periodEnd,
-        string? gridArea,
         ActorNumber? energySupplier,
         ActorNumber? balanceResponsibleParty,
-        string transactionId)
+        IReadOnlyCollection<(string? GridArea, string TransactionId)> series)
     {
         var incomingMessageClient = GetService<IIncomingMessageClient>();
 
@@ -355,10 +354,9 @@ public class BehavioursTestBase : IDisposable
             settlementMethod,
             CreateDateInstant(periodStart.Year, periodStart.Month, periodStart.Day),
             CreateDateInstant(periodEnd.Year, periodEnd.Month, periodEnd.Day),
-            gridArea,
             energySupplier,
             balanceResponsibleParty,
-            transactionId);
+            series);
 
         var response = await
             incomingMessageClient.RegisterAndSendAsync(
@@ -380,13 +378,12 @@ public class BehavioursTestBase : IDisposable
         ActorRole senderActorRole,
         (int Year, int Month, int Day) periodStart,
         (int Year, int Month, int Day) periodEnd,
-        string? gridArea,
         ActorNumber energySupplierActorNumber,
         ActorNumber chargeOwnerActorNumber,
         string chargeCode,
         ChargeType chargeType,
-        string transactionId,
-        bool isMonthly)
+        bool isMonthly,
+        IReadOnlyCollection<(string? GridArea, string TransactionId)> series)
     {
         var incomingMessageClient = GetService<IIncomingMessageClient>();
 
@@ -396,13 +393,12 @@ public class BehavioursTestBase : IDisposable
             senderActorRole,
             CreateDateInstant(periodStart.Year, periodStart.Month, periodStart.Day),
             CreateDateInstant(periodEnd.Year, periodEnd.Month, periodEnd.Day),
-            gridArea,
             energySupplierActorNumber,
             chargeOwnerActorNumber,
             chargeCode,
             chargeType,
-            transactionId,
-            isMonthly);
+            isMonthly,
+            series);
 
         var response = await
             incomingMessageClient.RegisterAndSendAsync(
