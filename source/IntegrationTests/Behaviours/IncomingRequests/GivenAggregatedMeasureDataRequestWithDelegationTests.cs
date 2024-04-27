@@ -169,7 +169,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
 
         // Arrange
 
-        // Generate a mock WholesaleRequestAccepted response from Wholesale, based on the AggregatedMeasureDataRequest
+        // Generate a mock AggregatedTimeSeriesRequestAccepted response from Wholesale, based on the AggregatedMeasureDataRequest
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var aggregatedMeasureDataRequestAcceptedMessage = AggregatedTimeSeriesResponseEventBuilder
@@ -310,7 +310,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
 
         // Arrange
 
-        // Generate a mock WholesaleRequestAccepted response from Wholesale, based on the AggregatedMeasureDataRequest
+        // Generate a mock AggregatedTimeSeriesRequestAccepted response from Wholesale, based on the AggregatedMeasureDataRequest
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var rejectedMessage = AggregatedTimeSeriesResponseEventBuilder
@@ -341,8 +341,8 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
         }
 
         var expectedReasonMessage = "Det er kun muligt at anmode om data på for en hel måned i forbindelse"
-                                    + " med en engrosfiksering eller korrektioner / It is only possible to request"
-                                    + " data for a full month in relation to wholesalefixing or corrections";
+                                    + " med en balancefiksering eller korrektioner / It is only possible to request"
+                                    + " data for a full month in relation to balancefixing or corrections";
 
         await ThenRejectRequestAggregatedMeasureDataDocumentIsCorrect(
             peekResult.Bundle,
@@ -434,7 +434,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
 
         // Arrange
 
-        // Generate a mock WholesaleRequestAccepted response from Wholesale, based on the AggregatedMeasureDataRequest
+        // Generate a mock AggregatedTimeSeriesRequestAccepted response from Wholesale, based on the AggregatedMeasureDataRequest
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var aggregatedMeasureDataRequestAcceptedMessage = AggregatedTimeSeriesResponseEventBuilder
@@ -727,7 +727,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
 
         // Arrange
 
-        // Generate a mock WholesaleRequestAccepted response from Wholesale, based on the AggregatedMeasureDataRequest
+        // Generate a mock AggregatedTimeSeriesRequestAccepted response from Wholesale, based on the AggregatedMeasureDataRequest
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var rejectedMessage = AggregatedTimeSeriesResponseEventBuilder
@@ -758,8 +758,8 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
         }
 
         var expectedReasonMessage = "Det er kun muligt at anmode om data på for en hel måned i forbindelse"
-                                    + " med en engrosfiksering eller korrektioner / It is only possible to request"
-                                    + " data for a full month in relation to wholesalefixing or corrections";
+                                    + " med en balancefiksering eller korrektioner / It is only possible to request"
+                                    + " data for a full month in relation to balancefixing or corrections";
 
         await ThenRejectRequestAggregatedMeasureDataDocumentIsCorrect(
             peekResult.Bundle,
@@ -849,7 +849,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
 
         // Arrange
 
-        // Generate a mock WholesaleRequestAccepted response from Wholesale, based on the AggregatedMeasureDataRequest
+        // Generate a mock AggregatedTimeSeriesRequestAccepted response from Wholesale, based on the AggregatedMeasureDataRequest
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var aggregatedMeasureDataRequestAcceptedMessage = AggregatedTimeSeriesResponseEventBuilder

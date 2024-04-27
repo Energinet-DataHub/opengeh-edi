@@ -91,7 +91,7 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
             rejectedMessage.RejectReasons.Add(new RejectReason
             {
                 ErrorCode = "E17",
-                ErrorMessage = "Det er kun muligt at anmode om data på for en hel måned i forbindelse med en engrosfiksering eller korrektioner / It is only possible to request data for a full month in relation to wholesalefixing or corrections",
+                ErrorMessage = "Det er kun muligt at anmode om data på for en hel måned i forbindelse med en balancefiksering eller korrektioner / It is only possible to request data for a full month in relation to balancefixing or corrections",
             });
         }
         else

@@ -58,7 +58,6 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
                 MapSettlementMethod(aggregation.TimeSeriesType),
                 MapUnitType(aggregation.QuantityUnit),
                 MapResolution(aggregation.Resolution),
-                // await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false), // TODO: What is this used for (operator number)? It seems unused
                 aggregation.GridArea,
                 aggregation.CalculationResultVersion,
                 aggregation.Period.StartOfPeriod.ToInstant(),

@@ -451,7 +451,6 @@ public class BehavioursTestBase : IDisposable
         }
 
         var parsedMessage = parser(serviceBusMessage.Body);
-        // var aggregatedMeasureDataRequestMessage = AggregatedTimeSeriesRequest.Parser.ParseFrom(serviceBusMessage.Body);
         parsedMessage.Should().NotBeNull();
 
         return (parsedMessage, processId);
