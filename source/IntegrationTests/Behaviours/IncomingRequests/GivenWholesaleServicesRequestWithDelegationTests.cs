@@ -180,7 +180,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var wholesaleServicesRequestAcceptedMessage = WholesaleServicesResponseEventBuilder
-            .GenerateWholesaleServicesRequestAccepted(message.WholesaleServicesRequest, GetNow());
+            .GenerateAcceptedFrom(message.WholesaleServicesRequest, GetNow());
 
         await GivenWholesaleServicesRequestAcceptedIsReceived(message.ProcessId, wholesaleServicesRequestAcceptedMessage);
 
@@ -328,7 +328,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var wholesaleServicesRequestAcceptedMessage = WholesaleServicesResponseEventBuilder
-            .GenerateWholesaleServicesRequestAccepted(message.WholesaleServicesRequest, GetNow());
+            .GenerateAcceptedFrom(message.WholesaleServicesRequest, GetNow());
 
         await GivenWholesaleServicesRequestAcceptedIsReceived(message.ProcessId, wholesaleServicesRequestAcceptedMessage);
 
@@ -478,7 +478,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var wholesaleServicesRequestRejectedMessage = WholesaleServicesResponseEventBuilder
-            .GenerateWholesaleServicesRequestRejected(message.WholesaleServicesRequest);
+            .GenerateRejectedFrom(message.WholesaleServicesRequest);
 
         await GivenWholesaleServicesRequestRejectedIsReceived(message.ProcessId, wholesaleServicesRequestRejectedMessage);
 
@@ -618,7 +618,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var wholesaleServicesRequestRejectedMessage = WholesaleServicesResponseEventBuilder
-            .GenerateWholesaleServicesRequestRejected(message.WholesaleServicesRequest);
+            .GenerateRejectedFrom(message.WholesaleServicesRequest);
 
         await GivenWholesaleServicesRequestRejectedIsReceived(message.ProcessId, wholesaleServicesRequestRejectedMessage);
 
@@ -751,7 +751,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var wholesaleServicesRequestAcceptedMessage = WholesaleServicesResponseEventBuilder
-            .GenerateWholesaleServicesRequestAccepted(message.WholesaleServicesRequest, GetNow(), defaultGridAreas: new List<string> { "512", "973" });
+            .GenerateAcceptedFrom(message.WholesaleServicesRequest, GetNow(), defaultGridAreas: new List<string> { "512", "973" });
 
         await GivenWholesaleServicesRequestAcceptedIsReceived(message.ProcessId, wholesaleServicesRequestAcceptedMessage);
 
@@ -897,7 +897,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var wholesaleServicesRequestAcceptedMessage = WholesaleServicesResponseEventBuilder
-            .GenerateWholesaleServicesRequestAccepted(message.WholesaleServicesRequest, GetNow());
+            .GenerateAcceptedFrom(message.WholesaleServicesRequest, GetNow());
 
         await GivenWholesaleServicesRequestAcceptedIsReceived(message.ProcessId, wholesaleServicesRequestAcceptedMessage);
 

@@ -55,6 +55,12 @@ public class AssertRejectRequestAggregatedMeasureDataXmlDocument : IAssertReject
         return this;
     }
 
+    public IAssertRejectRequestAggregatedMeasureDataDocument MessageIdExists()
+    {
+        _documentAsserter.ElementExists("mRID");
+        return this;
+    }
+
     public IAssertRejectRequestAggregatedMeasureDataDocument HasSenderId(string expectedSenderId)
     {
         _documentAsserter.HasValue("sender_MarketParticipant.mRID", expectedSenderId);
@@ -76,6 +82,12 @@ public class AssertRejectRequestAggregatedMeasureDataXmlDocument : IAssertReject
     public IAssertRejectRequestAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId)
     {
         _documentAsserter.HasValue($"Series[1]/mRID", expectedTransactionId.ToString());
+        return this;
+    }
+
+    public IAssertRejectRequestAggregatedMeasureDataDocument TransactionIdExists()
+    {
+        _documentAsserter.ElementExists("Series[1]/mRID");
         return this;
     }
 

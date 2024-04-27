@@ -32,7 +32,7 @@ public static class WholesaleServicesResponseEventBuilder
     /// Generate a mock WholesaleRequestAccepted response from Wholesale, based on the WholesaleServicesRequest
     /// It is very important that the generated data is correct, since assertions is based on this data
     /// </summary>
-    public static WholesaleServicesRequestAccepted GenerateWholesaleServicesRequestAccepted(WholesaleServicesRequest request, Instant now, string? defaultChargeOwnerId = null, ICollection<string>? defaultGridAreas = null)
+    public static WholesaleServicesRequestAccepted GenerateAcceptedFrom(WholesaleServicesRequest request, Instant now, string? defaultChargeOwnerId = null, ICollection<string>? defaultGridAreas = null)
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(now);
@@ -99,7 +99,7 @@ public static class WholesaleServicesResponseEventBuilder
         return requestAcceptedMessage;
     }
 
-    public static WholesaleServicesRequestRejected GenerateWholesaleServicesRequestRejected(WholesaleServicesRequest request)
+    public static WholesaleServicesRequestRejected GenerateRejectedFrom(WholesaleServicesRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
 

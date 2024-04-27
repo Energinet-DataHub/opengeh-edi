@@ -127,6 +127,8 @@ public class AssertEbixDocument
                 "RejectAggregatedBillingInformation:v3:OriginalBusinessDocument",
                 "DK_AggregatedMeteredDataTimeSeries:v3:Identification",
                 "DK_AggregatedMeteredDataTimeSeries:v3:OriginalBusinessDocument",
+                "DK_RejectRequestMeteredDataAggregated:v3:Identification",
+                "DK_RejectRequestMeteredDataAggregated:v3:OriginalBusinessDocument",
             };
 
             var validationErrorsExceptId = validationResult.ValidationErrors

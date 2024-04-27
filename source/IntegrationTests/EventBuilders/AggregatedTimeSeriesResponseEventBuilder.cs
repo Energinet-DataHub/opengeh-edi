@@ -78,6 +78,30 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
         return @event;
     }
 
+    public static AggregatedTimeSeriesRequestRejected GenerateRejectedFrom(AggregatedTimeSeriesRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        var rejectedMessage = new AggregatedTimeSeriesRequestRejected();
+
+        var start = InstantPattern.General.Parse(request.Period.Start).Value;
+        var end = InstantPattern.General.Parse(request.Period.End).Value;
+        if (end <= start)
+        {
+            rejectedMessage.RejectReasons.Add(new RejectReason
+            {
+                ErrorCode = "E17",
+                ErrorMessage = "Det er kun muligt at anmode om data på for en hel måned i forbindelse med en engrosfiksering eller korrektioner / It is only possible to request data for a full month in relation to wholesalefixing or corrections",
+            });
+        }
+        else
+        {
+            throw new NotImplementedException("Cannot generate rejected message for request");
+        }
+
+        return rejectedMessage;
+    }
+
     private static List<TimeSeriesPoint> CreatePoints(Resolution resolution, Instant periodStart, Instant periodEnd)
     {
         var resolutionDuration = resolution switch

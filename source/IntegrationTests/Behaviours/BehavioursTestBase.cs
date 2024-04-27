@@ -574,6 +574,22 @@ public class BehavioursTestBase : IDisposable
             assertionInput);
     }
 
+    protected async Task ThenRejectRequestAggregatedMeasureDataDocumentIsCorrect(
+        Stream? peekResultDocumentStream,
+        DocumentFormat documentFormat,
+        RejectRequestAggregatedMeasureDataDocumentAssertionInput assertionInput)
+    {
+        peekResultDocumentStream.Should().NotBeNull();
+        peekResultDocumentStream!.Position = 0;
+
+        using var assertionScope = new AssertionScope();
+
+        await RejectRequestAggregatedMeasureDataDocumentAsserter.AssertCorrectDocumentAsync(
+            documentFormat,
+            peekResultDocumentStream,
+            assertionInput);
+    }
+
     protected AmountPerChargeResultProducedV1 GivenAmountPerChargeResultProducedV1Event(Action<AmountPerChargeResultProducedV1EventBuilder> builder)
     {
         var eventBuilder = new AmountPerChargeResultProducedV1EventBuilder();
