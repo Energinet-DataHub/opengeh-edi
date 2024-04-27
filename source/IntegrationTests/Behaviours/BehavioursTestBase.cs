@@ -215,11 +215,6 @@ public class BehavioursTestBase : IDisposable
         _disposed = true;
     }
 
-    protected Task CreateActorIfNotExistAsync(CreateActorDto createActorDto)
-    {
-        return GetService<IMasterDataClient>().CreateActorIfNotExistAsync(createActorDto, CancellationToken.None);
-    }
-
     protected Task GivenGridAreaOwnershipAsync(string gridArea, ActorNumber actorNumber)
     {
         return GetService<IMasterDataClient>()
@@ -299,38 +294,6 @@ public class BehavioursTestBase : IDisposable
                     delegatedTo),
                 CancellationToken.None);
     }
-
-    // protected Task<ResponseMessage> GivenRequestAggregatedMeasureDataJsonAsync(
-    //     string senderActorNumber,
-    //     string senderActorRole,
-    //     (int Year, int Month, int Day) periodStart,
-    //     (int Year, int Month, int Day) periodEnd,
-    //     string? gridArea,
-    //     string energySupplierActorNumber,
-    //     string transactionId)
-    // {
-    //     return GetService<IIncomingMessageClient>()
-    //         .RegisterAndSendAsync(
-    //             RequestAggregatedMeasureDataRequestBuilder.GetStream(
-    //                 senderActorNumber,
-    //                 senderActorRole,
-    //                 new LocalDate(periodStart.Year, periodStart.Month, periodStart.Day)
-    //                     .AtMidnight()
-    //                     .InZoneStrictly(_dateTimeZone)
-    //                     .ToInstant()
-    //                     .ToString(),
-    //                 new LocalDate(periodEnd.Year, periodEnd.Month, periodEnd.Day)
-    //                     .AtMidnight()
-    //                     .InZoneStrictly(_dateTimeZone)
-    //                     .ToInstant()
-    //                     .ToString(),
-    //                 gridArea,
-    //                 energySupplierActorNumber,
-    //                 transactionId),
-    //             DocumentFormat.Json,
-    //             IncomingDocumentType.RequestAggregatedMeasureData,
-    //             CancellationToken.None);
-    // }
 
     protected async Task GivenReceivedAggregatedMeasureDataRequest(
         DocumentFormat documentFormat,
