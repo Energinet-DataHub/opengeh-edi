@@ -84,11 +84,12 @@ public class IncomingMessageDelegator
             if ((originalActorRole == ActorRole.GridOperator || originalActorRole == ActorRole.MeteredDataResponsible)
                 && series.GridArea == null)
             {
-                // TODO: HVORDAN HÅNDTERER VI DENNE CASE FOR MDR/DDM?
-                // hvis man anmoder med gridarea == null så kan vi ikke finde ejeren af gridarea, siden der ikke er nogen
+                // TODO: Hvordan håndterer vi denne case for MDR/DDM?
+                // Hvis man anmoder med gridarea == null så kan vi ikke finde ejeren af gridarea, siden der ikke er nogen
                 // vi kan godt bare skip delegering, men det vil gøre at validering efterfølgende fejler, da man ikke
                 // er logget ind som den aktør der står i beskeden. Dvs. man aldrig kan ramme Wholesale's async validering
-                // om at grid area skal være udfyldt som grid operator / MDR
+                // om at grid area skal være udfyldt som grid operator / MDR. Måske det er okay at de blot får en sync
+                // valideringsfejl, fordi deres anmodning jo ikke er valid.
                 continue;
             }
 
