@@ -38,6 +38,14 @@ public class InboxEventListener
         _inboxEventReceiver = inboxEventReceiver;
     }
 
+    /// <summary>
+    /// Receives messages from the inbox queue and forwards them to the inbox event receiver.
+    /// </summary>
+    /// <remarks>
+    /// Retries are currently handled by the Service Bus to avoid blocking a Azure Function Worker.
+    /// If the method fails to process a message, the Service Bus will automatically retry delivery of the message
+    /// based on the retry policy configured for the Service Bus.
+    /// </remarks>
     [Function(nameof(InboxEventListener))]
     public async Task RunAsync(
         [ServiceBusTrigger(
