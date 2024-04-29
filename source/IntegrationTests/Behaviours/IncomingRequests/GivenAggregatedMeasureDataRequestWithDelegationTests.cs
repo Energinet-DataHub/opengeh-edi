@@ -119,7 +119,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         await GivenGridAreaOwnershipAsync("512", gridAreaOwner);
-        await GivenGridAreaOwnershipAsync("804", gridAreaOwner); // No delegation for 804, so shouldn't be used
+        await GivenGridAreaOwnershipAsync("804", gridAreaOwner); // No delegation/request for 804, so shouldn't be used
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
 
         await GivenDelegation(
