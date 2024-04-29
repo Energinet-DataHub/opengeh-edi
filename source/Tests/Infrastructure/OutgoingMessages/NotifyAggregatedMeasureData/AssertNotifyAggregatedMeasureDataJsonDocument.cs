@@ -334,7 +334,7 @@ public sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNotif
     public IAssertNotifyAggregatedMeasureDataDocument OriginalTransactionIdReferenceDoesNotExist()
     {
         FirstTimeSeriesElement()
-            .TryGetProperty("originalTransactionIDReference_Series.mRID", out _).Should().BeTrue();
+            .TryGetProperty("originalTransactionIDReference_Series.mRID", out _).Should().BeFalse();
         return this;
     }
 
