@@ -62,6 +62,16 @@ runs:
           --configuration Release \
           --output '${{ inputs.output_path }}\AcceptanceTests'
 
+    - name: Publish SystemTest
+      shell: bash
+      run: |
+        dotnet publish \
+          'source/SystemTests/SystemTests.csproj' \
+          --no-build \
+          --no-restore \
+          --configuration Release \
+          --output '${{ inputs.output_path }}\SystemTests'
+
     - name: Publish B2CWebApi
       shell: bash
       run: |
