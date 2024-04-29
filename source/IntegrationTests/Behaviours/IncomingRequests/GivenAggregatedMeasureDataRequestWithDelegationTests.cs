@@ -781,7 +781,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
     /// </summary>
     [Theory]
     [MemberData(nameof(DocumentFormatsWithRoleCombinationsForNullGridArea), MemberType = typeof(GivenAggregatedMeasureDataRequestWithDelegationTests))]
-    public async Task AndGiven_DelegationInTwoGridAreas_AndGiven_OriginalActorRequestsOwnDataWithDataInTwoGridAreas_When_OriginalActorPeeksAllMessages_Then_OriginalActorReceivesTwoNotifyAggregatedMeasureDataDocumentWithCorrectContent(DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
+    public async Task AndGiven_DelegationInOneGridArea_AndGiven_OriginalActorRequestsOwnDataWithDataInThreeGridAreas_When_OriginalActorPeeksAllMessages_Then_OriginalActorReceivesThreeNotifyAggregatedMeasureDataDocumentWithCorrectContent(DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
     {
         /*
          *  --- PART 1: Receive request, create process and send message to Wholesale ---
