@@ -31,6 +31,11 @@ public interface IAssertRejectRequestAggregatedMeasureDataDocument
     IAssertRejectRequestAggregatedMeasureDataDocument HasMessageId(string expectedMessageId);
 
     /// <summary>
+    /// Assert message id exists
+    /// </summary>
+    IAssertRejectRequestAggregatedMeasureDataDocument MessageIdExists();
+
+    /// <summary>
     /// Assert sender id
     /// </summary>
     /// <param name="expectedSenderId"></param>
@@ -70,6 +75,11 @@ public interface IAssertRejectRequestAggregatedMeasureDataDocument
     /// </summary>
     /// <param name="expectedTransactionId"></param>
     IAssertRejectRequestAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId);
+
+    /// <summary>
+    /// Asserts transaction id exists
+    /// </summary>
+    IAssertRejectRequestAggregatedMeasureDataDocument TransactionIdExists();
 
     /// <summary>
     /// Asserts serie reason code

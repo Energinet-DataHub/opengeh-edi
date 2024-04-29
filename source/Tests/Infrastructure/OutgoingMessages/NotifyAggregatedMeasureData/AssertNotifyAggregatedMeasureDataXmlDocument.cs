@@ -13,10 +13,18 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.XPath;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
+using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using FluentAssertions;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 
@@ -33,6 +41,12 @@ public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggrega
     public IAssertNotifyAggregatedMeasureDataDocument HasMessageId(string expectedMessageId)
     {
         _documentAsserter.HasValue("mRID", expectedMessageId);
+        return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument MessageIdExists()
+    {
+        _documentAsserter.ElementExists("mRID");
         return this;
     }
 
@@ -57,6 +71,12 @@ public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggrega
     public IAssertNotifyAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId)
     {
         _documentAsserter.HasValue($"Series[1]/mRID", expectedTransactionId.ToString());
+        return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument TransactionIdExists()
+    {
+        _documentAsserter.ElementExists("Series[1]/mRID");
         return this;
     }
 
@@ -143,9 +163,74 @@ public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggrega
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasCalculationResultVersion(int version)
+    public IAssertNotifyAggregatedMeasureDataDocument HasCalculationResultVersion(long version)
     {
         _documentAsserter.HasValue($"Series[1]/version", version.ToString(NumberFormatInfo.InvariantInfo));
+        return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument HasMeteringPointType(MeteringPointType meteringPointType)
+    {
+        ArgumentNullException.ThrowIfNull(meteringPointType);
+        _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.type", meteringPointType.Code);
+        return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument HasQuantityMeasurementUnit(MeasurementUnit quantityMeasurementUnit)
+    {
+        ArgumentNullException.ThrowIfNull(quantityMeasurementUnit);
+        _documentAsserter.HasValue("Series[1]/quantity_Measure_Unit.name", quantityMeasurementUnit.Code);
+        return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument HasResolution(Resolution resolution)
+    {
+        ArgumentNullException.ThrowIfNull(resolution);
+        _documentAsserter.HasValue("Series[1]/Period/resolution", resolution.Code);
+        return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<TimeSeriesPoint> points)
+    {
+        var pointsInDocument = _documentAsserter
+            .GetElements("Series[1]/Period/Point")!;
+
+        pointsInDocument.Should().HaveSameCount(points);
+
+        var expectedPoints = points.OrderBy(p => p.Time).ToList();
+
+        for (var i = 0; i < pointsInDocument.Count; i++)
+        {
+            pointsInDocument[i]
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("position"), _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .ToInt()
+                .Should()
+                .Be(i + 1);
+
+            pointsInDocument[i]
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("quantity"), _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .ToDecimal()
+                .Should()
+                .Be(expectedPoints[i].Quantity.ToDecimal());
+
+            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+            {
+                QuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,
+                QuantityQuality.Measured => CimCode.QuantityQualityCodeMeasured,
+                QuantityQuality.Estimated => CimCode.QuantityQualityCodeEstimated,
+                _ => throw new NotImplementedException(
+                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
+            };
+
+            pointsInDocument[i]
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("quality"), _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .Should()
+                .Be(expectedQuantityQuality);
+        }
+
         return this;
     }
 
@@ -172,6 +257,12 @@ public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggrega
     public IAssertNotifyAggregatedMeasureDataDocument HasOriginalTransactionIdReference(string originalTransactionIdReference)
     {
         _documentAsserter.HasValue("Series[1]/originalTransactionIDReference_Series.mRID", originalTransactionIdReference);
+        return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument OriginalTransactionIdReferenceDoesNotExist()
+    {
+        _documentAsserter.IsNotPresent("Series[1]/originalTransactionIDReference_Series.mRID");
         return this;
     }
 

@@ -32,11 +32,11 @@ public static class AcceptedEnergyResultMessageDtoFactory
         ArgumentNullException.ThrowIfNull(acceptedEnergyResultTimeSeries);
 
         return AcceptedEnergyResultMessageDto.Create(
-            receiverNumber: aggregatedMeasureDataProcess.RequestedByActorId,
-            receiverRole: ActorRole.FromCode(aggregatedMeasureDataProcess.RequestedByActorRoleCode),
+            receiverNumber: aggregatedMeasureDataProcess.RequestedByActor.ActorNumber,
+            receiverRole: aggregatedMeasureDataProcess.RequestedByActor.ActorRole,
             processId: aggregatedMeasureDataProcess.ProcessId.Id,
             eventId: eventId,
-            gridAreaCode: acceptedEnergyResultTimeSeries.GridAreaDetails.GridAreaCode,
+            gridAreaCode: acceptedEnergyResultTimeSeries.GridAreaCode,
             meteringPointType: acceptedEnergyResultTimeSeries.MeteringPointType.Name,
             settlementMethod: acceptedEnergyResultTimeSeries.SettlementMethod?.Name,
             measureUnitType: acceptedEnergyResultTimeSeries.UnitType.Name,
@@ -49,6 +49,8 @@ public static class AcceptedEnergyResultMessageDtoFactory
             calculationResultVersion: acceptedEnergyResultTimeSeries.CalculationResultVersion,
             settlementVersion: aggregatedMeasureDataProcess.SettlementVersion?.Name,
             relatedToMessageId: aggregatedMeasureDataProcess.InitiatedByMessageId,
-            originalTransactionIdReference: aggregatedMeasureDataProcess.BusinessTransactionId.Id);
+            originalTransactionIdReference: aggregatedMeasureDataProcess.BusinessTransactionId.Id,
+            documentReceiverNumber: aggregatedMeasureDataProcess.OriginalActor.ActorNumber,
+            documentReceiverRole: aggregatedMeasureDataProcess.OriginalActor.ActorRole);
     }
 }

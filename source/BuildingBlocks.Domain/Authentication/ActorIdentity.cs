@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
@@ -38,6 +39,11 @@ public class ActorIdentity
     public bool HasRole(ActorRole role)
     {
         return MarketRole != null && role != null && MarketRole.Name.Equals(role.Name, StringComparison.OrdinalIgnoreCase) && MarketRole.Code.Equals(role.Code, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public bool HasAnyOfRoles(params ActorRole[] roles)
+    {
+        return MarketRole != null && roles.Contains(MarketRole);
     }
 
     public bool HasRestriction(Restriction suspect)

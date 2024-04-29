@@ -23,7 +23,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages.RequestAggregatedMeasureData;
 
-public class RequestAggregatedMeasureDataMarketDocumentBuilder
+public class InitializeAggregatedMeasureDataProcessDtoBuilder
 {
     private readonly string _startDateTime = "2022-06-17T22:00:00Z";
     private readonly string _endDateTime = "2022-07-22T22:00:00Z";
@@ -35,77 +35,77 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
     private readonly string _createdAt = SystemClock.Instance.GetCurrentInstant().ToString();
     private string? _requestedGridArea = "244";
     private List<string> _gridAreas = new() { "244" };
-    private string _senderId = SampleData.NewEnergySupplierNumber;
+    private ActorNumber _senderId = ActorNumber.Create(SampleData.NewEnergySupplierNumber);
     private string? _settlementVersion;
     private string _messageId = Guid.NewGuid().ToString();
     private string _seriesId = Guid.NewGuid().ToString();
-    private string _senderRole = ActorRole.EnergySupplier.Code;
+    private ActorRole _senderRole = ActorRole.EnergySupplier;
     private string? _meteringPointType = MeteringPointType.Consumption.Code;
     private string? _settlementMethod = SettlementMethod.Flex.Code;
     private string? _energySupplierMarketParticipantId = SampleData.NewEnergySupplierNumber;
     private string? _balanceResponsiblePartyMarketParticipantId = "5799999933318";
 
-    public RequestAggregatedMeasureDataMarketDocumentBuilder SetMessageId(string id)
+    public InitializeAggregatedMeasureDataProcessDtoBuilder SetMessageId(string id)
     {
         _messageId = id;
         return this;
     }
 
-    public RequestAggregatedMeasureDataMarketDocumentBuilder SetMeteringPointType(string? meteringPointType)
+    public InitializeAggregatedMeasureDataProcessDtoBuilder SetMeteringPointType(string? meteringPointType)
     {
         _meteringPointType = meteringPointType;
         return this;
     }
 
-    public RequestAggregatedMeasureDataMarketDocumentBuilder SetSenderRole(string senderRole)
+    public InitializeAggregatedMeasureDataProcessDtoBuilder SetSenderRole(string senderRole)
     {
-        _senderRole = senderRole;
+        _senderRole = ActorRole.FromCode(senderRole);
         return this;
     }
 
-    public RequestAggregatedMeasureDataMarketDocumentBuilder SetSettlementVersion(string? settlementVersion)
+    public InitializeAggregatedMeasureDataProcessDtoBuilder SetSettlementVersion(string? settlementVersion)
     {
         _settlementVersion = settlementVersion;
         return this;
     }
 
-    public RequestAggregatedMeasureDataMarketDocumentBuilder SetSettlementMethod(string? settlementMethod)
+    public InitializeAggregatedMeasureDataProcessDtoBuilder SetSettlementMethod(string? settlementMethod)
     {
         _settlementMethod = settlementMethod;
         return this;
     }
 
-    public RequestAggregatedMeasureDataMarketDocumentBuilder SetEnergySupplierId(string? energySupplierId)
+    public InitializeAggregatedMeasureDataProcessDtoBuilder SetEnergySupplierId(string? energySupplierId)
     {
         _energySupplierMarketParticipantId = energySupplierId;
         return this;
     }
 
-    public RequestAggregatedMeasureDataMarketDocumentBuilder SetBalanceResponsibleId(string? balanceResponsibleId)
+    public InitializeAggregatedMeasureDataProcessDtoBuilder SetBalanceResponsibleId(string? balanceResponsibleId)
     {
         _balanceResponsiblePartyMarketParticipantId = balanceResponsibleId;
         return this;
     }
 
-    public RequestAggregatedMeasureDataMarketDocumentBuilder SetTransactionId(string transactionId)
+    public InitializeAggregatedMeasureDataProcessDtoBuilder SetTransactionId(string transactionId)
     {
         _seriesId = transactionId;
         return this;
     }
 
-    public RequestAggregatedMeasureDataMarketDocumentBuilder SetSenderId(string senderId)
+    public InitializeAggregatedMeasureDataProcessDtoBuilder SetSenderId(string senderId)
     {
-        _senderId = senderId;
+        _senderId = ActorNumber.Create(senderId);
         return this;
     }
 
-    public RequestAggregatedMeasureDataMarketDocumentBuilder SetRequestedGridArea(string? requestedGridArea)
+    public InitializeAggregatedMeasureDataProcessDtoBuilder SetRequestedGridArea(string? requestedGridArea)
     {
         _requestedGridArea = requestedGridArea;
         return this;
     }
 
-    public RequestAggregatedMeasureDataMarketDocumentBuilder SetGridAreas(string[] gridAreas)
+    public InitializeAggregatedMeasureDataProcessDtoBuilder SetGridAreas(string[] gridAreas)
     {
         _gridAreas = gridAreas.ToList();
         return this;
@@ -133,7 +133,9 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
             _energySupplierMarketParticipantId,
             _balanceResponsiblePartyMarketParticipantId,
             _settlementVersion,
-            _gridAreas);
+            _gridAreas,
+            RequestedByActor.From(_senderId, _senderRole),
+            OriginalActor.From(_senderId, _senderRole));
 
     private MessageHeader CreateHeader()
     {
@@ -141,8 +143,8 @@ public class RequestAggregatedMeasureDataMarketDocumentBuilder
             _messageId,
             _messageType,
             _businessReason.Code,
-            _senderId,
-            _senderRole,
+            _senderId.Value,
+            _senderRole.Code,
             _receiverId.Value,
             _receiverRole.Code,
             _createdAt,

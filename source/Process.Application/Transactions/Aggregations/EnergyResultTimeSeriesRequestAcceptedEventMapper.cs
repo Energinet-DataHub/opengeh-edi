@@ -42,7 +42,7 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
         _masterDataClient = masterDataClient;
     }
 
-    public async Task<INotification> MapFromAsync(byte[] payload, EventId eventId, Guid referenceId, CancellationToken cancellationToken)
+    public Task<INotification> MapFromAsync(byte[] payload, EventId eventId, Guid referenceId, CancellationToken cancellationToken)
     {
         var aggregations =
             AggregatedTimeSeriesRequestAccepted.Parser.ParseFrom(payload);
@@ -58,16 +58,16 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
                 MapSettlementMethod(aggregation.TimeSeriesType),
                 MapUnitType(aggregation.QuantityUnit),
                 MapResolution(aggregation.Resolution),
-                await MapGridAreaDetailsAsync(aggregation.GridArea, cancellationToken).ConfigureAwait(false),
+                aggregation.GridArea,
                 aggregation.CalculationResultVersion,
                 aggregation.Period.StartOfPeriod.ToInstant(),
                 aggregation.Period.EndOfPeriod.ToInstant()));
         }
 
-        return new AggregatedTimeSeriesRequestWasAccepted(
+        return Task.FromResult<INotification>(new AggregatedTimeSeriesRequestWasAccepted(
             eventId,
             referenceId,
-            acceptedEnergyResultTimeSeries);
+            acceptedEnergyResultTimeSeries));
     }
 
     public bool CanHandle(string eventType)
@@ -164,14 +164,5 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
 
         const decimal nanoFactor = 1_000_000_000;
         return input.Units + (input.Nanos / nanoFactor);
-    }
-
-    private async Task<GridAreaDetails> MapGridAreaDetailsAsync(string gridAreaCode, CancellationToken cancellationToken)
-    {
-        var gridOperatorNumber = await _masterDataClient
-            .GetGridOwnerForGridAreaCodeAsync(gridAreaCode, cancellationToken)
-            .ConfigureAwait(false);
-
-        return new GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
     }
 }
