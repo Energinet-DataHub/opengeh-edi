@@ -47,5 +47,10 @@ public interface IIncomingMessageSeries : IDelegatedIncomingMessageSeries
     /// Get the actor number from the series based on the role. Eg. if the role is EnergySupplier,
     /// the EnergySupplierId should be returned. Returns null if the data for the role is not present.
     /// </summary>
+    /// <param name="actorRole">The actor role for who to find the corresponding actor number in the document</param>
+    /// <param name="gridAreaOwner">
+    /// The grid area owner for the grid area in the series, used to find the actor number if the role is GridOperator.
+    /// Can be null if GridArea in the series is null, or if no owner is found.
+    /// </param>
     public ActorNumber? GetActorNumberForRole(ActorRole actorRole, ActorNumber? gridAreaOwner);
 }
