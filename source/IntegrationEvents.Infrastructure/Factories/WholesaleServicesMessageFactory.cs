@@ -52,6 +52,24 @@ public sealed class WholesaleServicesMessageFactory
             message);
     }
 
+    public Task<WholesaleServicesMessageDto> CreateMessageAsync(
+        EventId eventId,
+        TotalMonthlyAmountResultProducedV1 totalMonthlyAmountResultProducedV1)
+    {
+        ArgumentNullException.ThrowIfNull(totalMonthlyAmountResultProducedV1);
+        throw new NotImplementedException();
+        // var message = await CreateWholesaleResultSeriesAsync(totalMonthlyAmountResultProducedV1)
+        //     .ConfigureAwait(false);
+        //
+        // return WholesaleServicesMessageDto.Create(
+        //     eventId,
+        //     message.EnergySupplier,
+        //     ActorRole.EnergySupplier,
+        //     message.ChargeOwner,
+        //     BusinessReasonMapper.Map(totalMonthlyAmountResultProducedV1.CalculationType).Name,
+        //     message);
+    }
+
     public async Task<WholesaleServicesMessageDto> CreateMessageAsync(
         EventId eventId,
         AmountPerChargeResultProducedV1 amountPerChargeResultProducedV1)
