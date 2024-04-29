@@ -29,13 +29,13 @@ public class SenderAuthorizer : ISenderAuthorizer
         _actorAuthenticator = actorAuthenticator;
     }
 
-    public Task<Result> AuthorizeAsync(string senderNumber, string senderRoleCode)
+    public Task<Result> AuthorizeAsync(string senderNumber, string senderRoleCode, bool allSeriesAreDelegated)
     {
         ArgumentNullException.ThrowIfNull(senderNumber);
         ArgumentNullException.ThrowIfNull(senderRoleCode);
         EnsureSenderIdMatches(senderNumber);
-        EnsureSenderRoleCode(senderRoleCode);
-        EnsureCurrentUserHasRequiredRole(senderRoleCode);
+        EnsureSenderRoleCode(senderRoleCode, allSeriesAreDelegated);
+        EnsureCurrentUserHasRequiredRole(senderRoleCode, allSeriesAreDelegated);
 
         return Task.FromResult(
             _validationErrors.Count == 0 ? Result.Succeeded() : Result.Failure(_validationErrors.ToArray()));
@@ -47,9 +47,12 @@ public class SenderAuthorizer : ISenderAuthorizer
             !senderRoleCode.Equals(ActorRole.GridOperator.Code, StringComparison.OrdinalIgnoreCase);
     }
 
-    private void EnsureCurrentUserHasRequiredRole(string senderRole)
+    private void EnsureCurrentUserHasRequiredRole(string senderRole, bool allSeriesAreDelegated)
     {
         if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack && HackThatAllowDdmToActAsMdr(senderRole)) return;
+
+        if (AllSeriesAreDelegatedToSender(allSeriesAreDelegated))
+            return;
 
         if (!_actorAuthenticator.CurrentActorIdentity.HasRole(ActorRole.FromCode(senderRole)))
         {
@@ -57,8 +60,11 @@ public class SenderAuthorizer : ISenderAuthorizer
         }
     }
 
-    private void EnsureSenderRoleCode(string senderRoleCode)
+    private void EnsureSenderRoleCode(string senderRoleCode, bool allSeriesAreDelegated)
     {
+        if (AllSeriesAreDelegatedToSender(allSeriesAreDelegated))
+            return;
+
         if (!senderRoleCode.Equals(ActorRole.EnergySupplier.Code, StringComparison.OrdinalIgnoreCase)
             && !senderRoleCode.Equals(ActorRole.MeteredDataResponsible.Code, StringComparison.OrdinalIgnoreCase)
             && !senderRoleCode.Equals(ActorRole.BalanceResponsibleParty.Code, StringComparison.OrdinalIgnoreCase)
@@ -66,6 +72,11 @@ public class SenderAuthorizer : ISenderAuthorizer
         {
             _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
         }
+    }
+
+    private bool AllSeriesAreDelegatedToSender(bool allSeriesAreDelegated)
+    {
+        return allSeriesAreDelegated && _actorAuthenticator.CurrentActorIdentity.HasAnyOfRoles(ActorRole.Delegated, ActorRole.GridOperator);
     }
 
     private void EnsureSenderIdMatches(string senderNumber)

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -28,6 +29,11 @@ public interface IAssertNotifyAggregatedMeasureDataDocument
     /// </summary>
     /// <param name="expectedMessageId"></param>
     IAssertNotifyAggregatedMeasureDataDocument HasMessageId(string expectedMessageId);
+
+    /// <summary>
+    /// Assert message id exists
+    /// </summary>
+    IAssertNotifyAggregatedMeasureDataDocument MessageIdExists();
 
     /// <summary>
     /// Assert sender id
@@ -52,6 +58,11 @@ public interface IAssertNotifyAggregatedMeasureDataDocument
     /// </summary>
     /// <param name="expectedTransactionId"></param>
     IAssertNotifyAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId);
+
+    /// <summary>
+    /// Assert transaction id exists
+    /// </summary>
+    IAssertNotifyAggregatedMeasureDataDocument TransactionIdExists();
 
     /// <summary>
     /// Asserts grid area code
@@ -146,6 +157,11 @@ public interface IAssertNotifyAggregatedMeasureDataDocument
     IAssertNotifyAggregatedMeasureDataDocument HasOriginalTransactionIdReference(string originalTransactionIdReference);
 
     /// <summary>
+    /// Asserts the OriginalTransactionIdReference does not exist
+    /// </summary>
+    IAssertNotifyAggregatedMeasureDataDocument OriginalTransactionIdReferenceDoesNotExist();
+
+    /// <summary>
     /// Asserts the settlement method
     /// </summary>
     IAssertNotifyAggregatedMeasureDataDocument HasSettlementMethod(SettlementMethod settlementMethod);
@@ -158,5 +174,25 @@ public interface IAssertNotifyAggregatedMeasureDataDocument
     /// <summary>
     ///     Asserts the calculation result version is present with the given number
     /// </summary>
-    IAssertNotifyAggregatedMeasureDataDocument HasCalculationResultVersion(int version);
+    IAssertNotifyAggregatedMeasureDataDocument HasCalculationResultVersion(long version);
+
+    /// <summary>
+    /// Asserts the metering point type
+    /// </summary>
+    IAssertNotifyAggregatedMeasureDataDocument HasMeteringPointType(MeteringPointType meteringPointType);
+
+    /// <summary>
+    /// Asserts the quantity measurement unit
+    /// </summary>
+    IAssertNotifyAggregatedMeasureDataDocument HasQuantityMeasurementUnit(MeasurementUnit quantityMeasurementUnit);
+
+    /// <summary>
+    /// Asserts the resolution
+    /// </summary>
+    IAssertNotifyAggregatedMeasureDataDocument HasResolution(Resolution resolution);
+
+    /// <summary>
+    /// Asserts the points based on the Wholesale response
+    /// </summary>
+    IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<Edi.Responses.TimeSeriesPoint> points);
 }

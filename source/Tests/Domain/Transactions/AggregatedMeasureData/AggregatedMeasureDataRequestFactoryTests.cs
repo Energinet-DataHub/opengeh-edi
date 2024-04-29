@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureDa
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Requests;
 using FluentAssertions;
 using Xunit;
@@ -32,12 +33,16 @@ public sealed class AggregatedMeasureDataRequestFactoryTests
     [Fact]
     public void With_metering_point_type()
     {
+        var requestedByActor = RequestedByActor.From(
+            ActorNumber.Create("8200000007743"),
+            ActorRole.BalanceResponsibleParty);
+
         var gridArea = "42";
         var process = new AggregatedMeasureDataProcess(
             ProcessId.New(),
+            requestedByActor,
+            OriginalActor.From(requestedByActor),
             BusinessTransactionId.Create(Guid.NewGuid().ToString()),
-            ActorNumber.Create("8200000007743"),
-            MarketRole.BalanceResponsibleParty.Code,
             BusinessReason.BalanceFixing,
             MessageId.New(),
             MeteringPointType.Production.Code,
@@ -63,12 +68,16 @@ public sealed class AggregatedMeasureDataRequestFactoryTests
     [Fact]
     public void Without_metering_point_type()
     {
+        var requestedByActor = RequestedByActor.From(
+            ActorNumber.Create("8200000007743"),
+            ActorRole.BalanceResponsibleParty);
+
         var gridArea = "42";
         var process = new AggregatedMeasureDataProcess(
             ProcessId.New(),
+            requestedByActor,
+            OriginalActor.From(requestedByActor),
             BusinessTransactionId.Create(Guid.NewGuid().ToString()),
-            ActorNumber.Create("8200000007743"),
-            MarketRole.BalanceResponsibleParty.Code,
             BusinessReason.BalanceFixing,
             MessageId.New(),
             null,

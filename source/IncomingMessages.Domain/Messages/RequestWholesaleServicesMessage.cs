@@ -27,7 +27,7 @@ public record RequestWholesaleServicesMessage(
     string MessageId,
     string CreatedAt,
     string? BusinessType,
-    IReadOnlyCollection<IIncomingMessageSeries> Serie) : IIncomingMessage;
+    IReadOnlyCollection<IIncomingMessageSeries> Series) : IIncomingMessage;
 
 public record RequestWholesaleServicesSeries(
     string TransactionId,
@@ -40,15 +40,15 @@ public record RequestWholesaleServicesSeries(
     string? ChargeOwner,
     IReadOnlyCollection<RequestWholesaleServicesChargeType> ChargeTypes) : BaseDelegatedSeries, IIncomingMessageSeries
 {
-    public ActorNumber? GetActorNumberForRole(ActorRole actorRole)
+    public ActorNumber? GetActorNumberForRole(ActorRole actorRole, ActorNumber? gridAreaOwner)
     {
         ArgumentNullException.ThrowIfNull(actorRole);
 
-        // TODO: What are the valid sender roles for RequestWholesaleServicesSeries? Are we missing any below?
         return actorRole.Name switch
         {
             DataHubNames.ActorRole.EnergySupplier => ActorNumber.TryCreate(EnergySupplierId),
-            DataHubNames.ActorRole.GridOperator => ActorNumber.TryCreate(ChargeOwner),
+
+            DataHubNames.ActorRole.GridOperator => gridAreaOwner,
             DataHubNames.ActorRole.SystemOperator => ActorNumber.TryCreate(ChargeOwner),
             _ => null,
         };

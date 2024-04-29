@@ -54,46 +54,53 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
     {
     }
 
-    public static object[][] DocumentFormatsWithDelegationCombinations()
+    public static object[][] DocumentFormatsWithAllRoleCombinations() => DocumentFormatsWithRoleCombinations(false);
+
+    public static object[][] DocumentFormatsWithRoleCombinationsForNullGridArea() => DocumentFormatsWithRoleCombinations(true);
+
+    public static object[][] DocumentFormatsWithRoleCombinations(bool nullGridArea)
     {
-        // Who can delegate RequestWholesaleServices? We assume it's only the actors who can actually
-        // perform the RequestWholesaleServices, eg. DDQ, DDM and EZ
-        var delegatedFromRoles = new List<ActorRole>
+        var roleCombinations = new List<(ActorRole DelegatedFrom, ActorRole DelegatedTo)>
         {
-            ActorRole.EnergySupplier,
-            ActorRole.GridOperator,
-            ActorRole.SystemOperator,
+            // Energy supplier and system operator can only delegate to delegated, not to grid operator
+            (ActorRole.EnergySupplier, ActorRole.Delegated),
+            (ActorRole.SystemOperator, ActorRole.Delegated),
         };
 
-        var delegatedToRoles = new List<ActorRole>
+        // Grid operator cannot make requests with null grid area
+        if (!nullGridArea)
         {
-            ActorRole.Delegated,
-            ActorRole.GridOperator,
-        };
+            // Grid operator can delegate to both delegated and grid operator
+            roleCombinations.Add((ActorRole.GridOperator, ActorRole.Delegated));
+            roleCombinations.Add((ActorRole.GridOperator, ActorRole.GridOperator));
+        }
 
-        var exceptForIncomingDocumentFormats = new[]
-        {
-            DocumentFormat.Xml.Name, // TODO: The CIM XML request feature isn't implemented yet
-            DocumentFormat.Ebix.Name, // ebIX is not supported for requests
-        };
+        var requestDocumentFormats = DocumentFormats
+            .GetAllDocumentFormats(except: new[]
+            {
+                DocumentFormat.Xml.Name, // TODO: The CIM XML request feature isn't implemented yet
+                DocumentFormat.Ebix.Name, // ebIX is not supported for requests
+            })
+            .ToArray();
 
-        return DocumentFormats
-            .GetAllDocumentFormats(exceptForIncomingDocumentFormats)
-            .SelectMany(incomingDocumentFormat => delegatedFromRoles
-                .SelectMany(delegatedFromRole => delegatedToRoles
-                    .SelectMany(delegatedToRole => DocumentFormats.GetAllDocumentFormats()
-                        .Select(peekDocumentFormat => new object[]
+        var peekDocumentFormats = DocumentFormats.GetAllDocumentFormats();
+
+        return roleCombinations.SelectMany(d => requestDocumentFormats
+            .SelectMany(
+                incomingDocumentFormat => peekDocumentFormats
+                    .Select(
+                        peekDocumentFormat => new object[]
                         {
                             incomingDocumentFormat,
                             peekDocumentFormat,
-                            delegatedFromRole,
-                            delegatedToRole,
-                        }))))
+                            d.DelegatedFrom,
+                            d.DelegatedTo,
+                        })))
             .ToArray();
     }
 
     [Theory]
-    [MemberData(nameof(DocumentFormatsWithDelegationCombinations))]
+    [MemberData(nameof(DocumentFormatsWithAllRoleCombinations))]
     public async Task AndGiven_DelegationInOneGridArea_When_DelegatedActorPeeksAllMessages_Then_ReceivesOneNotifyWholesaleServicesDocumentWithCorrectContent(DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
     {
         /*
@@ -107,12 +114,16 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         var energySupplierNumber = originalActor.ActorRole == ActorRole.EnergySupplier
             ? originalActor.ActorNumber
             : ActorNumber.Create("3333333333333");
-        var chargeOwnerNumber = originalActor.ActorRole != ActorRole.EnergySupplier
+        var chargeOwnerNumber = originalActor.ActorRole == ActorRole.SystemOperator
             ? originalActor.ActorNumber
             : ActorNumber.Create("5799999933444");
+        var gridOperatorNumber = originalActor.ActorRole == ActorRole.GridOperator
+            ? originalActor.ActorNumber
+            : ActorNumber.Create("4444444444444");
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
+        await GivenGridAreaOwnershipAsync("512", gridOperatorNumber);
 
         await GivenDelegation(
             new(originalActor.ActorNumber, originalActor.ActorRole),
@@ -127,13 +138,15 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             senderActorRole: originalActor.ActorRole,
             periodStart: (2024, 1, 1),
             periodEnd: (2024, 1, 31),
-            gridArea: "512",
             energySupplierActorNumber: energySupplierNumber,
             chargeOwnerActorNumber: chargeOwnerNumber,
             chargeCode: "25361478",
             chargeType: ChargeType.Tariff,
-            transactionId: "123564789123564789123564789123564787",
-            isMonthly: false);
+            isMonthly: false,
+            series: new (string? GridArea, string TransactionId)[]
+            {
+                ("512", "123564789123564789123564789123564787"),
+            });
 
         // Act
         await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
@@ -167,7 +180,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var wholesaleServicesRequestAcceptedMessage = WholesaleServicesResponseEventBuilder
-            .GenerateWholesaleServicesRequestAccepted(message.WholesaleServicesRequest, GetNow());
+            .GenerateAcceptedFrom(message.WholesaleServicesRequest, GetNow());
 
         await GivenWholesaleServicesRequestAcceptedIsReceived(message.ProcessId, wholesaleServicesRequestAcceptedMessage);
 
@@ -226,7 +239,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
     }
 
     [Theory]
-    [MemberData(nameof(DocumentFormatsWithDelegationCombinations))]
+    [MemberData(nameof(DocumentFormatsWithRoleCombinationsForNullGridArea))] // Grid operator can't make request without grid area
     public async Task AndGiven_DelegationInTwoGridAreas_When_DelegatedActorPeeksAllMessages_Then_ReceivesTwoNotifyWholesaleServicesDocumentsWithCorrectContent(DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
     {
         /*
@@ -240,12 +253,18 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         var energySupplierNumber = originalActor.ActorRole == ActorRole.EnergySupplier
             ? originalActor.ActorNumber
             : ActorNumber.Create("3333333333333");
-        var chargeOwnerNumber = originalActor.ActorRole != ActorRole.EnergySupplier
+        var chargeOwnerNumber = originalActor.ActorRole == ActorRole.SystemOperator
             ? originalActor.ActorNumber
             : ActorNumber.Create("5799999933444");
+        var gridOperatorNumber = originalActor.ActorRole == ActorRole.GridOperator
+            ? originalActor.ActorNumber
+            : ActorNumber.Create("4444444444444");
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
+        await GivenGridAreaOwnershipAsync("512", gridOperatorNumber);
+        await GivenGridAreaOwnershipAsync("609", gridOperatorNumber);
+        await GivenGridAreaOwnershipAsync("704", gridOperatorNumber); // The delegated actor shouldn't receive data from this grid area
 
         await GivenDelegation(
             new(originalActor.ActorNumber, originalActor.ActorRole),
@@ -267,13 +286,15 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             senderActorRole: originalActor.ActorRole,
             periodStart: (2024, 1, 1),
             periodEnd: (2024, 1, 31),
-            gridArea: null,
             energySupplierActorNumber: energySupplierNumber,
             chargeOwnerActorNumber: chargeOwnerNumber,
             chargeCode: "25361478",
             chargeType: ChargeType.Tariff,
-            transactionId: "123564789123564789123564789123564787",
-            isMonthly: false);
+            isMonthly: false,
+            series: new (string? GridArea, string TransactionId)[]
+            {
+                (null, "123564789123564789123564789123564787"),
+            });
 
         // Act
         await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
@@ -307,7 +328,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var wholesaleServicesRequestAcceptedMessage = WholesaleServicesResponseEventBuilder
-            .GenerateWholesaleServicesRequestAccepted(message.WholesaleServicesRequest, GetNow());
+            .GenerateAcceptedFrom(message.WholesaleServicesRequest, GetNow());
 
         await GivenWholesaleServicesRequestAcceptedIsReceived(message.ProcessId, wholesaleServicesRequestAcceptedMessage);
 
@@ -329,10 +350,13 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             delegatedActorPeekResults.Should().HaveCount(2, "because there should be one message for each grid area");
         }
 
+        var resultGridAreas = new List<string>();
         foreach (var peekResult in delegatedActorPeekResults)
         {
             peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
             var peekResultGridArea = await GetGridAreaFromNotifyWholesaleServicesDocument(peekResult.Bundle!, peekDocumentFormat);
+
+            resultGridAreas.Add(peekResultGridArea);
 
             var seriesRequest = wholesaleServicesRequestAcceptedMessage.Series
                 .Should().ContainSingle(request => request.GridArea == peekResultGridArea)
@@ -369,6 +393,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
                         CreateDateInstant(2024, 1, 31)),
                     Points: seriesRequest.TimeSeriesPoints));
         }
+
+        resultGridAreas.Should().BeEquivalentTo("512", "609");
     }
 
     /// <summary>
@@ -376,7 +402,139 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
     ///     https://energinet.sharepoint.com/sites/DH3ART-team/_layouts/15/download.aspx?UniqueId=60f1449eb8f44b179f233dda432b8f65&e=uVle0k
     /// </summary>
     [Theory]
-    [MemberData(nameof(DocumentFormatsWithDelegationCombinations))]
+    [MemberData(nameof(DocumentFormatsWithAllRoleCombinations))]
+    public async Task AndGiven_InvalidRequestWithDelegationInOneGridAreas_When_DelegatedActorPeeksAllMessages_Then_ReceivesOneRejectWholesaleSettlementDocumentsWithCorrectContent(DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
+    {
+        /*
+         *  --- PART 1: Receive request, create process and send message to Wholesale ---
+         */
+
+        // Arrange
+        var senderSpy = CreateServiceBusSenderSpy();
+        var originalActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: delegatedFromRole);
+        var delegatedToActor = (ActorNumber: ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
+        var energySupplierNumber = originalActor.ActorRole == ActorRole.EnergySupplier
+            ? originalActor.ActorNumber
+            : ActorNumber.Create("3333333333333");
+        var chargeOwnerNumber = originalActor.ActorRole == ActorRole.SystemOperator
+            ? originalActor.ActorNumber
+            : ActorNumber.Create("5799999933444");
+        var gridOperatorNumber = originalActor.ActorRole == ActorRole.GridOperator
+            ? originalActor.ActorNumber
+            : ActorNumber.Create("4444444444444");
+
+        GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
+        GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
+        await GivenGridAreaOwnershipAsync("512", gridOperatorNumber);
+
+        await GivenDelegation(
+            new(originalActor.ActorNumber, originalActor.ActorRole),
+            new(delegatedToActor.ActorNumber, delegatedToActor.ActorRole),
+            "512",
+            ProcessType.RequestWholesaleResults,
+            GetNow());
+
+        // Setup fake request (period end is before period start)
+        await GivenReceivedWholesaleServicesRequest(
+            documentFormat: incomingDocumentFormat,
+            senderActorNumber: delegatedToActor.ActorNumber,
+            senderActorRole: originalActor.ActorRole,
+            periodStart: (2024, 01, 01),
+            periodEnd: (2023, 12, 31),
+            energySupplierActorNumber: energySupplierNumber,
+            chargeOwnerActorNumber: chargeOwnerNumber,
+            chargeCode: "25361478",
+            chargeType: ChargeType.Tariff,
+            isMonthly: false,
+            series: new (string? GridArea, string TransactionId)[]
+            {
+                ("512", "123564789123564789123564789123564787"),
+            });
+
+        // Act
+        await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
+
+        // Assert
+        var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
+            senderSpy,
+            gridAreas: new[] { "512" },
+            requestedForActorNumber: originalActor.ActorNumber.Value,
+            requestedForActorRole: originalActor.ActorRole.Name,
+            energySupplierId: energySupplierNumber.Value,
+            chargeOwnerId: chargeOwnerNumber.Value,
+            resolution: null,
+            businessReason: DataHubNames.BusinessReason.WholesaleFixing,
+            chargeTypes: new List<(string ChargeType, string ChargeCode)>
+            {
+                (DataHubNames.ChargeType.Tariff, "25361478"),
+            },
+            new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2023, 12, 31)),
+            null);
+
+        // TODO: Assert correct process is created?
+
+        /*
+         *  --- PART 2: Receive data from Wholesale and create RSM document ---
+         */
+
+        // Arrange
+
+        // Generate a mock WholesaleRequestAccepted response from Wholesale, based on the WholesaleServicesRequest
+        // It is very important that the generated data is correct,
+        // since (almost) all assertion after this point is based on this data
+        var wholesaleServicesRequestRejectedMessage = WholesaleServicesResponseEventBuilder
+            .GenerateRejectedFrom(message.WholesaleServicesRequest);
+
+        await GivenWholesaleServicesRequestRejectedIsReceived(message.ProcessId, wholesaleServicesRequestRejectedMessage);
+
+        // Act
+        var originalActorPeekResults = await WhenActorPeeksAllMessages(
+            originalActor.ActorNumber,
+            originalActor.ActorRole,
+            peekDocumentFormat);
+
+        var delegatedActorPeekResults = await WhenActorPeeksAllMessages(
+            delegatedToActor.ActorNumber,
+            delegatedToActor.ActorRole,
+            peekDocumentFormat);
+
+        // Assert
+        PeekResultDto peekResult;
+        using (new AssertionScope())
+        {
+            originalActorPeekResults.Should().BeEmpty("because original actor shouldn't receive result when delegated actor made the request");
+            peekResult = delegatedActorPeekResults.Should().ContainSingle("because there should only be one rejected message regardless of grid areas")
+                .Subject;
+
+            peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
+        }
+
+        var expectedReasonMessage = "Det er kun muligt at anmode om data på for en hel måned i forbindelse"
+                                    + " med en engrosfiksering eller korrektioner / It is only possible to request"
+                                    + " data for a full month in relation to wholesalefixing or corrections";
+
+        await ThenRejectRequestWholesaleSettlementDocumentIsCorrect(
+            peekResult.Bundle,
+            peekDocumentFormat,
+            new RejectRequestWholesaleSettlementDocumentAssertionInput(
+                InstantPattern.General.Parse("2024-07-01T14:57:09Z").Value,
+                BusinessReason.WholesaleFixing,
+                delegatedToActor.ActorNumber.Value,
+                originalActor.ActorRole,
+                "5790001330552",
+                ActorRole.MeteredDataAdministrator,
+                ReasonCode.FullyRejected.Code,
+                "123564789123564789123564789123564787",
+                "E17",
+                expectedReasonMessage));
+    }
+
+    /// <summary>
+    /// Rejected document based on example:
+    ///     https://energinet.sharepoint.com/sites/DH3ART-team/_layouts/15/download.aspx?UniqueId=60f1449eb8f44b179f233dda432b8f65&e=uVle0k
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(DocumentFormatsWithRoleCombinationsForNullGridArea))]
     public async Task AndGiven_InvalidRequestWithDelegationInTwoGridAreas_When_DelegatedActorPeeksAllMessages_Then_ReceivesOneRejectWholesaleSettlementDocumentsWithCorrectContent(DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
     {
         /*
@@ -390,12 +548,17 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         var energySupplierNumber = originalActor.ActorRole == ActorRole.EnergySupplier
             ? originalActor.ActorNumber
             : ActorNumber.Create("3333333333333");
-        var chargeOwnerNumber = originalActor.ActorRole != ActorRole.EnergySupplier
+        var chargeOwnerNumber = originalActor.ActorRole == ActorRole.SystemOperator
             ? originalActor.ActorNumber
             : ActorNumber.Create("5799999933444");
+        var gridOperatorNumber = originalActor.ActorRole == ActorRole.GridOperator
+            ? originalActor.ActorNumber
+            : ActorNumber.Create("4444444444444");
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
+        await GivenGridAreaOwnershipAsync("512", gridOperatorNumber);
+        await GivenGridAreaOwnershipAsync("609", gridOperatorNumber);
 
         await GivenDelegation(
             new(originalActor.ActorNumber, originalActor.ActorRole),
@@ -418,13 +581,15 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             senderActorRole: originalActor.ActorRole,
             periodStart: (2024, 01, 01),
             periodEnd: (2023, 12, 31),
-            gridArea: null,
             energySupplierActorNumber: energySupplierNumber,
             chargeOwnerActorNumber: chargeOwnerNumber,
             chargeCode: "25361478",
             chargeType: ChargeType.Tariff,
-            transactionId: "123564789123564789123564789123564787",
-            isMonthly: false);
+            isMonthly: false,
+            series: new (string? GridArea, string TransactionId)[]
+            {
+                (null, "123564789123564789123564789123564787"),
+            });
 
         // Act
         await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
@@ -458,7 +623,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var wholesaleServicesRequestRejectedMessage = WholesaleServicesResponseEventBuilder
-            .GenerateWholesaleServicesRequestRejected(message.WholesaleServicesRequest);
+            .GenerateRejectedFrom(message.WholesaleServicesRequest);
 
         await GivenWholesaleServicesRequestRejectedIsReceived(message.ProcessId, wholesaleServicesRequestRejectedMessage);
 
@@ -509,7 +674,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
     /// be able to request and receive his own data
     /// </summary>
     [Theory]
-    [MemberData(nameof(DocumentFormatsWithDelegationCombinations))]
+    [MemberData(nameof(DocumentFormatsWithRoleCombinationsForNullGridArea))] // Grid operator can't make request without grid area
     public async Task AndGiven_OriginalActorRequestsOwnDataWithDataInTwoGridAreas_When_OriginalActorPeeksAllMessages_Then_OriginalActorReceivesTwoNotifyWholesaleServicesDocumentWithCorrectContent(DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
     {
         /*
@@ -523,12 +688,17 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         var energySupplierNumber = originalActor.ActorRole == ActorRole.EnergySupplier
             ? originalActor.ActorNumber
             : ActorNumber.Create("3333333333333");
-        var chargeOwnerNumber = originalActor.ActorRole != ActorRole.EnergySupplier
+        var chargeOwnerNumber = originalActor.ActorRole == ActorRole.SystemOperator
             ? originalActor.ActorNumber
             : ActorNumber.Create("5799999933444");
+        var gridOperatorNumber = originalActor.ActorRole == ActorRole.GridOperator
+            ? originalActor.ActorNumber
+            : ActorNumber.Create("4444444444444");
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
+        await GivenGridAreaOwnershipAsync("512", gridOperatorNumber);
+        await GivenGridAreaOwnershipAsync("973", gridOperatorNumber);
 
         await GivenDelegation(
             new(originalActor.ActorNumber, originalActor.ActorRole),
@@ -544,13 +714,15 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             senderActorRole: originalActor.ActorRole,
             periodStart: (2024, 1, 1),
             periodEnd: (2024, 1, 31),
-            gridArea: null,
             energySupplierActorNumber: energySupplierNumber,
             chargeOwnerActorNumber: chargeOwnerNumber,
             chargeCode: "25361478",
             chargeType: ChargeType.Tariff,
-            transactionId: "123564789123564789123564789123564787",
-            isMonthly: false);
+            isMonthly: false,
+            series: new (string? GridArea, string TransactionId)[]
+            {
+                (null, "123564789123564789123564789123564787"),
+            });
 
         // Act
         await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
@@ -584,7 +756,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var wholesaleServicesRequestAcceptedMessage = WholesaleServicesResponseEventBuilder
-            .GenerateWholesaleServicesRequestAccepted(message.WholesaleServicesRequest, GetNow(), defaultGridAreas: new List<string> { "512", "973" });
+            .GenerateAcceptedFrom(message.WholesaleServicesRequest, GetNow(), defaultGridAreas: new List<string> { "512", "973" });
 
         await GivenWholesaleServicesRequestAcceptedIsReceived(message.ProcessId, wholesaleServicesRequestAcceptedMessage);
 
@@ -606,10 +778,13 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             originalActorPeekResults.Should().HaveCount(2, "because there should be one message for each grid area");
         }
 
+        var resultGridAreas = new List<string>();
         foreach (var peekResult in originalActorPeekResults)
         {
             peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
             var peekResultGridArea = await GetGridAreaFromNotifyWholesaleServicesDocument(peekResult.Bundle!, peekDocumentFormat);
+
+            resultGridAreas.Add(peekResultGridArea);
 
             var seriesRequest = wholesaleServicesRequestAcceptedMessage.Series
                 .Should().ContainSingle(request => request.GridArea == peekResultGridArea)
@@ -646,10 +821,12 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
                         CreateDateInstant(2024, 1, 31)),
                     Points: seriesRequest.TimeSeriesPoints));
         }
+
+        resultGridAreas.Should().BeEquivalentTo("512", "973");
     }
 
     [Theory]
-    [MemberData(nameof(DocumentFormatsWithDelegationCombinations))]
+    [MemberData(nameof(DocumentFormatsWithAllRoleCombinations))]
     public async Task AndGiven_OriginalActorRequestsOwnDataWithGridArea_When_OriginalActorPeeksAllMessages_Then_OriginalActorReceivesOneNotifyWholesaleServicesDocumentWithCorrectContent(DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat, ActorRole delegatedFromRole, ActorRole delegatedToRole)
     {
         /*
@@ -663,12 +840,16 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         var energySupplierNumber = originalActor.ActorRole == ActorRole.EnergySupplier
             ? originalActor.ActorNumber
             : ActorNumber.Create("3333333333333");
-        var chargeOwnerNumber = originalActor.ActorRole != ActorRole.EnergySupplier
+        var chargeOwnerNumber = originalActor.ActorRole == ActorRole.SystemOperator
             ? originalActor.ActorNumber
             : ActorNumber.Create("5799999933444");
+        var gridOperatorNumber = originalActor.ActorRole == ActorRole.GridOperator
+            ? originalActor.ActorNumber
+            : ActorNumber.Create("4444444444444");
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
+        await GivenGridAreaOwnershipAsync("512", gridOperatorNumber);
 
         await GivenDelegation(
             new(originalActor.ActorNumber, originalActor.ActorRole),
@@ -679,18 +860,20 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
 
         // Original actor requests own data
         await GivenReceivedWholesaleServicesRequest(
-            incomingDocumentFormat,
-            originalActor.ActorNumber,
-            originalActor.ActorRole,
-            (2024, 1, 1),
-            (2024, 1, 31),
-            "512",
-            energySupplierNumber,
-            chargeOwnerNumber,
-            "25361478",
-            ChargeType.Tariff,
-            "123564789123564789123564789123564787",
-            false);
+            documentFormat: incomingDocumentFormat,
+            senderActorNumber: originalActor.ActorNumber,
+            senderActorRole: originalActor.ActorRole,
+            periodStart: (2024, 1, 1),
+            periodEnd: (2024, 1, 31),
+            energySupplierActorNumber: energySupplierNumber,
+            chargeOwnerActorNumber: chargeOwnerNumber,
+            chargeCode: "25361478",
+            chargeType: ChargeType.Tariff,
+            isMonthly: false,
+            series: new (string? GridArea, string TransactionId)[]
+            {
+                ("512", "123564789123564789123564789123564787"),
+            });
 
         // Act
         await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
@@ -724,7 +907,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var wholesaleServicesRequestAcceptedMessage = WholesaleServicesResponseEventBuilder
-            .GenerateWholesaleServicesRequestAccepted(message.WholesaleServicesRequest, GetNow());
+            .GenerateAcceptedFrom(message.WholesaleServicesRequest, GetNow());
 
         await GivenWholesaleServicesRequestAcceptedIsReceived(message.ProcessId, wholesaleServicesRequestAcceptedMessage);
 
@@ -856,71 +1039,55 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             Period period,
             string? settlementVersion)
     {
-        using (new AssertionScope())
-        {
-            senderSpy.MessageSent.Should().BeTrue();
-            senderSpy.Message.Should().NotBeNull();
-        }
-
-        var serviceBusMessage = senderSpy.Message!;
-        Guid processId;
-        using (new AssertionScope())
-        {
-            serviceBusMessage.Subject.Should().Be(nameof(WholesaleServicesRequest));
-            serviceBusMessage.Body.Should().NotBeNull();
-            serviceBusMessage.ApplicationProperties.TryGetValue("ReferenceId", out var referenceId);
-            referenceId.Should().NotBeNull();
-            Guid.TryParse(referenceId!.ToString()!, out processId).Should().BeTrue();
-        }
-
-        var wholesaleServicesRequestMessage = WholesaleServicesRequest.Parser.ParseFrom(serviceBusMessage.Body);
-        wholesaleServicesRequestMessage.Should().NotBeNull();
+        var (message, processId) = AssertServiceBusMessage(
+            senderSpy,
+            (data) => WholesaleServicesRequest.Parser.ParseFrom(data));
 
         using var assertionScope = new AssertionScope();
 
-        wholesaleServicesRequestMessage.GridAreaCodes.Should().BeEquivalentTo(gridAreas);
-        wholesaleServicesRequestMessage.RequestedForActorNumber.Should().Be(requestedForActorNumber);
-        wholesaleServicesRequestMessage.RequestedForActorRole.Should().Be(requestedForActorRole);
+        message.GridAreaCodes.Should().BeEquivalentTo(gridAreas);
+        message.RequestedForActorNumber.Should().Be(requestedForActorNumber);
+        message.RequestedForActorRole.Should().Be(requestedForActorRole);
 
         if (energySupplierId == null)
-            wholesaleServicesRequestMessage.HasEnergySupplierId.Should().BeFalse();
+            message.HasEnergySupplierId.Should().BeFalse();
         else
-            wholesaleServicesRequestMessage.EnergySupplierId.Should().Be(energySupplierId);
+            message.EnergySupplierId.Should().Be(energySupplierId);
 
         if (chargeOwnerId == null)
-            wholesaleServicesRequestMessage.HasChargeOwnerId.Should().BeFalse();
+            message.HasChargeOwnerId.Should().BeFalse();
         else
-            wholesaleServicesRequestMessage.ChargeOwnerId.Should().Be(chargeOwnerId);
+            message.ChargeOwnerId.Should().Be(chargeOwnerId);
 
         if (resolution == null)
-            wholesaleServicesRequestMessage.HasResolution.Should().BeFalse();
+            message.HasResolution.Should().BeFalse();
         else
-            wholesaleServicesRequestMessage.Resolution.Should().Be(resolution);
+            message.Resolution.Should().Be(resolution);
 
-        wholesaleServicesRequestMessage.BusinessReason.Should().Be(businessReason);
+        message.BusinessReason.Should().Be(businessReason);
 
         if (chargeTypes == null)
         {
-            wholesaleServicesRequestMessage.ChargeTypes.Should().BeEmpty();
+            message.ChargeTypes.Should().BeEmpty();
         }
         else
         {
-            wholesaleServicesRequestMessage.ChargeTypes.Should().BeEquivalentTo(chargeTypes.Select(ct => new Energinet.DataHub.Edi.Requests.ChargeType
+            message.ChargeTypes.Should().BeEquivalentTo(chargeTypes.Select(ct => new Energinet.DataHub.Edi.Requests.ChargeType
             {
                 ChargeType_ = ct.ChargeType,
                 ChargeCode = ct.ChargeCode,
             }));
         }
 
-        wholesaleServicesRequestMessage.PeriodStart.Should().Be(period.Start.ToString());
-        wholesaleServicesRequestMessage.PeriodEnd.Should().Be(period.End.ToString());
+        message.PeriodStart.Should().Be(period.Start.ToString());
+        message.PeriodEnd.Should().Be(period.End.ToString());
 
         if (settlementVersion == null)
-            wholesaleServicesRequestMessage.HasSettlementVersion.Should().BeFalse();
+            message.HasSettlementVersion.Should().BeFalse();
         else
-            wholesaleServicesRequestMessage.SettlementVersion.Should().Be(settlementVersion);
+            message.SettlementVersion.Should().Be(settlementVersion);
 
-        return Task.FromResult((wholesaleServicesRequestMessage, processId));
+        return Task.FromResult((wholesaleServicesRequestMessage: message, processId));
     }
 }
 

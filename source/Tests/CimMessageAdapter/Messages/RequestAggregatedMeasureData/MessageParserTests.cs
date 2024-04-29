@@ -108,15 +108,15 @@ public class MessageParserTests
         //Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
         Assert.Equal("23", marketMessage.BusinessType);
 
-        foreach (var serie in marketMessage.Serie.Cast<RequestAggregatedMeasureDataMessageSeries>())
+        foreach (var serie in marketMessage.Series.Cast<RequestAggregatedMeasureDataMessageSeries>())
         {
             Assert.NotNull(serie);
             Assert.Equal("123353185", serie.TransactionId);
-            Assert.Equal("5799999933318", serie.BalanceResponsiblePartyMarketParticipantId);
-            Assert.Equal("5790001330552", serie.EnergySupplierMarketParticipantId);
-            Assert.Equal("E17", serie.MarketEvaluationPointType);
+            Assert.Equal("5799999933318", serie.BalanceResponsiblePartyId);
+            Assert.Equal("5790001330552", serie.EnergySupplierId);
+            Assert.Equal("E17", serie.MeteringPointType);
             Assert.Equal("244", serie.GridArea);
-            Assert.Equal("D01", serie.MarketEvaluationSettlementMethod);
+            Assert.Equal("D01", serie.SettlementMethod);
             Assert.Equal("2022-07-22T22:00:00Z", serie.EndDateTime);
             Assert.Equal("2022-06-17T22:00:00Z", serie.StartDateTime);
             Assert.Equal("D01", serie.SettlementVersion);
@@ -141,15 +141,15 @@ public class MessageParserTests
         //Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
         Assert.Equal("23", marketMessage.BusinessType);
 
-        foreach (var serie in marketMessage.Serie.Cast<RequestAggregatedMeasureDataMessageSeries>())
+        foreach (var serie in marketMessage.Series.Cast<RequestAggregatedMeasureDataMessageSeries>())
         {
             Assert.NotNull(serie);
             Assert.Equal("123353185", serie.TransactionId);
-            Assert.Equal("5799999933318", serie.BalanceResponsiblePartyMarketParticipantId);
-            Assert.Equal("5790001330552", serie.EnergySupplierMarketParticipantId);
-            Assert.Equal("E17", serie.MarketEvaluationPointType);
+            Assert.Equal("5799999933318", serie.BalanceResponsiblePartyId);
+            Assert.Equal("5790001330552", serie.EnergySupplierId);
+            Assert.Equal("E17", serie.MeteringPointType);
             Assert.Equal("244", serie.GridArea);
-            Assert.Equal("D01", serie.MarketEvaluationSettlementMethod);
+            Assert.Equal("D01", serie.SettlementMethod);
             Assert.Equal("2022-07-22T22:00:00Z", serie.EndDateTime);
             Assert.Equal("2022-06-17T22:00:00Z", serie.StartDateTime);
             Assert.Equal("D01", serie.SettlementVersion);

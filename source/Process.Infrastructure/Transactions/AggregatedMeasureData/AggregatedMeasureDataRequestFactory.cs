@@ -60,8 +60,8 @@ public static class AggregatedMeasureDataRequestFactory
         var request = new AggregatedTimeSeriesRequest()
         {
             Period = MapPeriod(process),
-            RequestedForActorNumber = process.RequestedByActorId.Value,
-            RequestedForActorRole = ActorRole.TryGetNameFromCode(process.RequestedByActorRoleCode, fallbackValue: process.RequestedByActorRoleCode),
+            RequestedForActorNumber = process.OriginalActor.ActorNumber.Value,
+            RequestedForActorRole = process.OriginalActor.ActorRole.Name,
             BusinessReason = process.BusinessReason.Name,
         };
 

@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
@@ -77,6 +78,7 @@ using Xunit;
 using Xunit.Abstractions;
 using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
@@ -213,11 +215,6 @@ public class BehavioursTestBase : IDisposable
         _disposed = true;
     }
 
-    protected Task CreateActorIfNotExistAsync(CreateActorDto createActorDto)
-    {
-        return GetService<IMasterDataClient>().CreateActorIfNotExistAsync(createActorDto, CancellationToken.None);
-    }
-
     protected Task GivenGridAreaOwnershipAsync(string gridArea, ActorNumber actorNumber)
     {
         return GetService<IMasterDataClient>()
@@ -298,36 +295,44 @@ public class BehavioursTestBase : IDisposable
                 CancellationToken.None);
     }
 
-    protected Task<ResponseMessage> GivenRequestAggregatedMeasureDataJsonAsync(
-        string senderActorNumber,
-        string senderActorRole,
+    protected async Task GivenReceivedAggregatedMeasureDataRequest(
+        DocumentFormat documentFormat,
+        ActorNumber senderActorNumber,
+        ActorRole senderActorRole,
+        MeteringPointType meteringPointType,
+        SettlementMethod settlementMethod,
         (int Year, int Month, int Day) periodStart,
         (int Year, int Month, int Day) periodEnd,
-        string? gridArea,
-        string energySupplierActorNumber,
-        string transactionId)
+        ActorNumber? energySupplier,
+        ActorNumber? balanceResponsibleParty,
+        IReadOnlyCollection<(string? GridArea, string TransactionId)> series)
     {
-        return GetService<IIncomingMessageClient>()
-            .RegisterAndSendAsync(
-                RequestAggregatedMeasureDataEventBuilder.GetJsonStream(
-                    senderActorNumber,
-                    senderActorRole,
-                    new LocalDate(periodStart.Year, periodStart.Month, periodStart.Day)
-                        .AtMidnight()
-                        .InZoneStrictly(_dateTimeZone)
-                        .ToInstant()
-                        .ToString(),
-                    new LocalDate(periodEnd.Year, periodEnd.Month, periodEnd.Day)
-                        .AtMidnight()
-                        .InZoneStrictly(_dateTimeZone)
-                        .ToInstant()
-                        .ToString(),
-                    gridArea,
-                    energySupplierActorNumber,
-                    transactionId),
-                DocumentFormat.Json,
+        var incomingMessageClient = GetService<IIncomingMessageClient>();
+
+        var incomingMessageStream = RequestAggregatedMeasureDataRequestBuilder.GetStream(
+            documentFormat,
+            senderActorNumber,
+            senderActorRole,
+            meteringPointType,
+            settlementMethod,
+            CreateDateInstant(periodStart.Year, periodStart.Month, periodStart.Day),
+            CreateDateInstant(periodEnd.Year, periodEnd.Month, periodEnd.Day),
+            energySupplier,
+            balanceResponsibleParty,
+            series);
+
+        var response = await
+            incomingMessageClient.RegisterAndSendAsync(
+                incomingMessageStream,
+                documentFormat,
                 IncomingDocumentType.RequestAggregatedMeasureData,
                 CancellationToken.None);
+
+        using (new AssertionScope())
+        {
+            response.IsErrorResponse.Should().BeFalse("because the response should not have an error. Actual response: {0}", response.MessageBody);
+            response.MessageBody.Should().BeEmpty();
+        }
     }
 
     protected async Task GivenReceivedWholesaleServicesRequest(
@@ -336,13 +341,12 @@ public class BehavioursTestBase : IDisposable
         ActorRole senderActorRole,
         (int Year, int Month, int Day) periodStart,
         (int Year, int Month, int Day) periodEnd,
-        string? gridArea,
         ActorNumber energySupplierActorNumber,
         ActorNumber chargeOwnerActorNumber,
         string chargeCode,
         ChargeType chargeType,
-        string transactionId,
-        bool isMonthly)
+        bool isMonthly,
+        IReadOnlyCollection<(string? GridArea, string TransactionId)> series)
     {
         var incomingMessageClient = GetService<IIncomingMessageClient>();
 
@@ -352,13 +356,12 @@ public class BehavioursTestBase : IDisposable
             senderActorRole,
             CreateDateInstant(periodStart.Year, periodStart.Month, periodStart.Day),
             CreateDateInstant(periodEnd.Year, periodEnd.Month, periodEnd.Day),
-            gridArea,
             energySupplierActorNumber,
             chargeOwnerActorNumber,
             chargeCode,
             chargeType,
-            transactionId,
-            isMonthly);
+            isMonthly,
+            series);
 
         var response = await
             incomingMessageClient.RegisterAndSendAsync(
@@ -372,28 +375,6 @@ public class BehavioursTestBase : IDisposable
             response.IsErrorResponse.Should().BeFalse();
             response.MessageBody.Should().BeEmpty();
         }
-    }
-
-    // TODO (MWO)
-    // In case we would like to consider the reception of a request as the "acting"
-    // step in our test, instead of a prerequisite.
-    protected Task<ResponseMessage> WhenRequestAggregatedMeasureDataJsonAsync(
-        string senderActorNumber,
-        string senderActorRole,
-        (int Year, int Month, int Day) periodStart,
-        (int Year, int Month, int Day) periodEnd,
-        string gridArea,
-        string energySupplierActorNumber,
-        string transactionId)
-    {
-        return GivenRequestAggregatedMeasureDataJsonAsync(
-            senderActorNumber,
-            senderActorRole,
-            periodStart,
-            periodEnd,
-            gridArea,
-            energySupplierActorNumber,
-            transactionId);
     }
 
     protected async Task GivenInitializeAggregatedMeasureDataProcessDtoIsHandledAsync(
@@ -423,7 +404,7 @@ public class BehavioursTestBase : IDisposable
             AggregatedTimeSeriesRequest.Parser.ParseFrom(serviceBusMessage.Body);
 
         var aggregatedTimeSeriesRequestAccepted =
-            AggregatedTimeSeriesRequestAcceptedEventBuilder.BuildEventFrom(aggregatedTimeSeriesRequest);
+            AggregatedTimeSeriesResponseEventBuilder.GenerateAcceptedFrom(aggregatedTimeSeriesRequest, GetNow());
 
         await HavingReceivedInboxEventAsync(
             nameof(AggregatedTimeSeriesRequestAccepted),
@@ -441,13 +422,38 @@ public class BehavioursTestBase : IDisposable
 
     protected async Task WhenWholesaleServicesProcessIsInitialized(ServiceBusMessage serviceBusMessage)
     {
-        using var scope = _serviceProvider.CreateScope();
-        // We have to manually process the service bus message, as there isn't a real service bus
-        serviceBusMessage.Subject.Should().Be(nameof(InitializeWholesaleServicesProcessDto));
-        serviceBusMessage.Body.Should().NotBeNull();
+        await InitializeProcess(serviceBusMessage, nameof(InitializeWholesaleServicesProcessDto));
+    }
 
-        await scope.ServiceProvider.GetRequiredService<IProcessClient>().InitializeAsync(serviceBusMessage.Subject, serviceBusMessage.Body.ToArray());
-        await ProcessInternalCommandsAsync();
+    protected async Task WhenAggregatedMeasureDataProcessIsInitialized(ServiceBusMessage serviceBusMessage)
+    {
+        await InitializeProcess(serviceBusMessage, nameof(InitializeAggregatedMeasureDataProcessDto));
+    }
+
+    protected (TServiceBusMessage Message, Guid ProcessId) AssertServiceBusMessage<TServiceBusMessage>(ServiceBusSenderSpy senderSpy, Func<BinaryData, TServiceBusMessage> parser)
+        where TServiceBusMessage : IMessage
+    {
+        using (new AssertionScope())
+        {
+            senderSpy.MessageSent.Should().BeTrue();
+            senderSpy.Message.Should().NotBeNull();
+        }
+
+        var serviceBusMessage = senderSpy.Message!;
+        Guid processId;
+        using (new AssertionScope())
+        {
+            serviceBusMessage.Subject.Should().Be(typeof(TServiceBusMessage).Name);
+            serviceBusMessage.Body.Should().NotBeNull();
+            serviceBusMessage.ApplicationProperties.TryGetValue("ReferenceId", out var referenceId);
+            referenceId.Should().NotBeNull();
+            Guid.TryParse(referenceId!.ToString()!, out processId).Should().BeTrue();
+        }
+
+        var parsedMessage = parser(serviceBusMessage.Body);
+        parsedMessage.Should().NotBeNull();
+
+        return (parsedMessage, processId);
     }
 
     protected async Task GivenIntegrationEventReceived(IEventMessage @event)
@@ -485,7 +491,10 @@ public class BehavioursTestBase : IDisposable
         return peekResults;
     }
 
-    protected async Task ThenNotifyWholesaleServicesDocumentIsCorrect(Stream? peekResultDocumentStream, DocumentFormat documentFormat, NotifyWholesaleServicesDocumentAssertionInput assertionInput)
+    protected async Task ThenNotifyWholesaleServicesDocumentIsCorrect(
+        Stream? peekResultDocumentStream,
+        DocumentFormat documentFormat,
+        NotifyWholesaleServicesDocumentAssertionInput assertionInput)
     {
         peekResultDocumentStream.Should().NotBeNull();
         peekResultDocumentStream!.Position = 0;
@@ -493,6 +502,22 @@ public class BehavioursTestBase : IDisposable
         using var assertionScope = new AssertionScope();
 
         await NotifyWholesaleServicesDocumentAsserter.AssertCorrectDocumentAsync(
+            documentFormat,
+            peekResultDocumentStream,
+            assertionInput);
+    }
+
+    protected async Task ThenNotifyAggregatedMeasureDataDocumentIsCorrect(
+        Stream? peekResultDocumentStream,
+        DocumentFormat documentFormat,
+        NotifyAggregatedMeasureDataDocumentAssertionInput assertionInput)
+    {
+        peekResultDocumentStream.Should().NotBeNull();
+        peekResultDocumentStream!.Position = 0;
+
+        using var assertionScope = new AssertionScope();
+
+        await NotifyAggregatedMeasureDataDocumentAsserter.AssertCorrectDocumentAsync(
             documentFormat,
             peekResultDocumentStream,
             assertionInput);
@@ -511,6 +536,22 @@ public class BehavioursTestBase : IDisposable
             assertionInput);
     }
 
+    protected async Task ThenRejectRequestAggregatedMeasureDataDocumentIsCorrect(
+        Stream? peekResultDocumentStream,
+        DocumentFormat documentFormat,
+        RejectRequestAggregatedMeasureDataDocumentAssertionInput assertionInput)
+    {
+        peekResultDocumentStream.Should().NotBeNull();
+        peekResultDocumentStream!.Position = 0;
+
+        using var assertionScope = new AssertionScope();
+
+        await RejectRequestAggregatedMeasureDataDocumentAsserter.AssertCorrectDocumentAsync(
+            documentFormat,
+            peekResultDocumentStream,
+            assertionInput);
+    }
+
     protected AmountPerChargeResultProducedV1 GivenAmountPerChargeResultProducedV1Event(Action<AmountPerChargeResultProducedV1EventBuilder> builder)
     {
         var eventBuilder = new AmountPerChargeResultProducedV1EventBuilder();
@@ -518,6 +559,120 @@ public class BehavioursTestBase : IDisposable
         builder(eventBuilder);
 
         return eventBuilder.Build();
+    }
+
+    protected Task GivenAggregatedMeasureDataRequestAcceptedIsReceived(Guid processId, AggregatedTimeSeriesRequestAccepted acceptedMessage)
+    {
+        return HavingReceivedInboxEventAsync(
+            eventType: nameof(AggregatedTimeSeriesRequestAccepted),
+            eventPayload: acceptedMessage,
+            processId: processId);
+    }
+
+    protected async Task<string> GetGridAreaFromNotifyAggregatedMeasureDataDocument(Stream documentStream, DocumentFormat documentFormat)
+    {
+        documentStream.Position = 0;
+        if (documentFormat == DocumentFormat.Ebix)
+        {
+            var ebixAsserter = NotifyAggregatedMeasureDataDocumentAsserter.CreateEbixAsserter(documentStream);
+            var gridAreaElement = ebixAsserter.GetElement("PayloadEnergyTimeSeries[1]/MeteringGridAreaUsedDomainLocation/Identification");
+
+            gridAreaElement.Should().NotBeNull("because grid area should be present in the ebIX document");
+            gridAreaElement!.Value.Should().NotBeNull("because grid area value should not be null in the ebIX document");
+            return gridAreaElement.Value;
+        }
+
+        if (documentFormat == DocumentFormat.Xml)
+        {
+            var cimXmlAsserter = NotifyAggregatedMeasureDataDocumentAsserter.CreateCimXmlAsserter(documentStream);
+
+            var gridAreaCimXmlElement = cimXmlAsserter.GetElement("Series[1]/meteringGridArea_Domain.mRID");
+
+            gridAreaCimXmlElement.Should().NotBeNull("because grid area should be present in the CIM XML document");
+            gridAreaCimXmlElement!.Value.Should().NotBeNull("because grid area value should not be null in the CIM XML document");
+            return gridAreaCimXmlElement!.Value;
+        }
+
+        if (documentFormat == DocumentFormat.Json)
+        {
+            var cimJsonDocument = await JsonDocument.ParseAsync(documentStream);
+
+            var gridAreaCimJsonElement = cimJsonDocument.RootElement
+                .GetProperty("NotifyAggregatedMeasureData_MarketDocument")
+                .GetProperty("Series").EnumerateArray().ToList()
+                .Single()
+                .GetProperty("meteringGridArea_Domain.mRID")
+                .GetProperty("value");
+
+            gridAreaCimJsonElement.Should().NotBeNull("because grid area should be present in the CIM JSON document");
+            return gridAreaCimJsonElement.GetString()!;
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, "Unsupported document format");
+    }
+
+    protected Task<(AggregatedTimeSeriesRequest AggregatedTimeSeriesRequest, Guid ProcessId)> ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
+            ServiceBusSenderSpy senderSpy,
+            IReadOnlyCollection<string> gridAreas,
+            string requestedForActorNumber,
+            string requestedForActorRole,
+            string? energySupplier,
+            string? balanceResponsibleParty,
+            BusinessReason businessReason,
+            Period period,
+            SettlementVersion? settlementVersion,
+            SettlementMethod? settlementMethod,
+            MeteringPointType meteringPointType)
+    {
+        var (message, processId) = AssertServiceBusMessage(
+            senderSpy,
+            data => AggregatedTimeSeriesRequest.Parser.ParseFrom(data));
+
+        using var assertionScope = new AssertionScope();
+
+        message.GridAreaCodes.Should().BeEquivalentTo(gridAreas);
+        message.RequestedForActorNumber.Should().Be(requestedForActorNumber);
+        message.RequestedForActorRole.Should().Be(requestedForActorRole);
+
+        if (energySupplier == null)
+            message.HasEnergySupplierId.Should().BeFalse();
+        else
+            message.EnergySupplierId.Should().Be(energySupplier);
+
+        if (balanceResponsibleParty == null)
+            message.HasBalanceResponsibleId.Should().BeFalse();
+        else
+            message.BalanceResponsibleId.Should().Be(balanceResponsibleParty);
+
+        message.BusinessReason.Should().Be(businessReason.Name);
+
+        message.Period.Start.Should().Be(period.Start.ToString());
+        message.Period.End.Should().Be(period.End.ToString());
+
+        if (settlementVersion == null)
+            message.HasSettlementVersion.Should().BeFalse();
+        else
+            message.SettlementVersion.Should().Be(settlementVersion.Name);
+
+        if (settlementMethod == null)
+            message.HasSettlementMethod.Should().BeFalse();
+        else
+            message.SettlementMethod.Should().Be(settlementMethod.Name);
+
+        message.MeteringPointType.Should().Be(meteringPointType.Name);
+
+        return Task.FromResult((message, processId));
+    }
+
+    private async Task InitializeProcess(ServiceBusMessage serviceBusMessage, string expectedSubject)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        // We have to manually process the service bus message, as there isn't a real service bus
+        serviceBusMessage.Subject.Should().Be(expectedSubject);
+        serviceBusMessage.Body.Should().NotBeNull();
+
+        await scope.ServiceProvider.GetRequiredService<IProcessClient>().InitializeAsync(serviceBusMessage.Subject, serviceBusMessage.Body.ToArray());
+        await ProcessInternalCommandsAsync();
     }
 
     private async Task WhenActorDequeuesMessage(string messageId, ActorNumber actorNumber, ActorRole actorRole)

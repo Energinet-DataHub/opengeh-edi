@@ -12,15 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using NodaTime;
 
-/// <summary>
-/// Authorization policy used for authorizing the sender of a market document
-/// </summary>
-public interface ISenderAuthorizer
-{
-    /// <summary>
-    /// Authorize sender
-    /// </summary>
-    Task<Result> AuthorizeAsync(string senderNumber, string senderRoleCode, bool allSeriesAreDelegated);
-}
+namespace Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
+
+public record RejectRequestAggregatedMeasureDataDocumentAssertionInput(
+    BusinessReason BusinessReason,
+    string SenderId,
+    string ReceiverId,
+    Instant Timestamp,
+    // ActorRole ReceiverRole,
+    // ActorRole SenderRole,
+    string ReasonCode,
+    string OriginalTransactionIdReference,
+    string SeriesReasonCode,
+    string SeriesReasonMessage);

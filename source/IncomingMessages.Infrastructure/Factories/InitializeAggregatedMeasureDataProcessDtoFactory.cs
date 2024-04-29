@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.Process.Interfaces;
 
@@ -19,11 +20,14 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Factories;
 
 public static class InitializeAggregatedMeasureDataProcessDtoFactory
 {
-    public static InitializeAggregatedMeasureDataProcessDto Create(RequestAggregatedMeasureDataMessage requestAggregatedMeasureDataMessage)
+    public static InitializeAggregatedMeasureDataProcessDto Create(RequestAggregatedMeasureDataMessage request)
     {
-        ArgumentNullException.ThrowIfNull(requestAggregatedMeasureDataMessage);
+        ArgumentNullException.ThrowIfNull(request);
 
-        var series = requestAggregatedMeasureDataMessage.Serie
+        var senderActorNumber = ActorNumber.Create(request.SenderNumber);
+        var senderActorRole = ActorRole.FromCode(request.SenderRoleCode);
+
+        var series = request.Series
             .Cast<RequestAggregatedMeasureDataMessageSeries>()
             .Select(
                 series =>
@@ -35,23 +39,29 @@ public static class InitializeAggregatedMeasureDataProcessDtoFactory
                             : Array.Empty<string>();
 
                     return new InitializeAggregatedMeasureDataProcessSeries(
-                        series.TransactionId,
-                        series.MarketEvaluationPointType,
-                        series.MarketEvaluationSettlementMethod,
-                        series.StartDateTime,
-                        series.EndDateTime,
-                        series.GridArea,
-                        series.EnergySupplierMarketParticipantId,
-                        series.BalanceResponsiblePartyMarketParticipantId,
-                        series.SettlementVersion,
-                        gridAreas);
+                        Id: series.TransactionId,
+                        MeteringPointType: series.MeteringPointType,
+                        SettlementMethod: series.SettlementMethod,
+                        StartDateTime: series.StartDateTime,
+                        EndDateTime: series.EndDateTime,
+                        RequestedGridAreaCode: series.GridArea,
+                        EnergySupplierNumber: series.EnergySupplierId,
+                        BalanceResponsibleNumber: series.BalanceResponsiblePartyId,
+                        SettlementVersion: series.SettlementVersion,
+                        GridAreas: gridAreas,
+                        RequestedByActor: RequestedByActor.From(
+                            senderActorNumber,
+                            series.RequestedByActorRole ?? senderActorRole),
+                        OriginalActor: OriginalActor.From(
+                            series.OriginalActorNumber ?? senderActorNumber,
+                            senderActorRole));
                 }).ToList().AsReadOnly();
 
         return new InitializeAggregatedMeasureDataProcessDto(
-                requestAggregatedMeasureDataMessage.SenderNumber,
-                requestAggregatedMeasureDataMessage.SenderRoleCode,
-                requestAggregatedMeasureDataMessage.BusinessReason,
-                requestAggregatedMeasureDataMessage.MessageId,
-                series);
+                SenderNumber: request.SenderNumber,
+                SenderRoleCode: request.SenderRoleCode,
+                BusinessReason: request.BusinessReason,
+                MessageId: request.MessageId,
+                Series: series);
     }
 }

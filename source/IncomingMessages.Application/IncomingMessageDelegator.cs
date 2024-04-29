@@ -50,10 +50,6 @@ public class IncomingMessageDelegator
         IncomingDocumentType documentType,
         CancellationToken cancellationToken)
     {
-        // TODO: Remove after implementing delegation for RequestAggregatedMeasureData
-        if (documentType != IncomingDocumentType.RequestWholesaleSettlement)
-            return;
-
         ArgumentNullException.ThrowIfNull(message);
 
         var processType = MapToProcessType(documentType);
@@ -83,8 +79,20 @@ public class IncomingMessageDelegator
         }
 
         // Delegation is setup for grid areas, so we need to set delegated for each series since they contain the grid area
-        foreach (var series in message.Serie)
+        foreach (var series in message.Series)
         {
+            if ((originalActorRole == ActorRole.GridOperator || originalActorRole == ActorRole.MeteredDataResponsible)
+                && series.GridArea == null)
+            {
+                // TODO: How do we handle this case for MDR/DDM?
+                // If you request with gridarea == null, then we can't find the grid area owner. This means delegation
+                // will be skipped, but this will cause the sync validation the actornumber in the message
+                // is not the same as the logged in actor. This means that Wholesale's async validation for grid area
+                // will never be reached, since the message is not valid. Maybe it's okay that they just get a sync
+                // validation error (unauthorized sender id), since their request is invalid.
+                continue;
+            }
+
             var delegations = await _masterDataClient.GetProcessesDelegatedToAsync(
                     new Actor(requestedByActorNumber, requestedByActorRole),
                     series.GridArea,
@@ -94,7 +102,18 @@ public class IncomingMessageDelegator
 
             if (delegations.Count != 0)
             {
-                var originalActorNumber = series.GetActorNumberForRole(originalActorRole);
+                ActorNumber? gridAreaOwner = null;
+                if (series.GridArea != null)
+                {
+                    // Try to get grid area owner for the grid area, returning null if none was found,
+                    // we cannot fail if no owner was found, since validation hasn't been done yet
+                    gridAreaOwner = await _masterDataClient.TryGetGridOwnerForGridAreaCodeAsync(
+                            series.GridArea,
+                            cancellationToken)
+                        .ConfigureAwait(false);
+                }
+
+                var originalActorNumber = series.GetActorNumberForRole(originalActorRole, gridAreaOwner);
 
                 if (originalActorNumber == null)
                 {
