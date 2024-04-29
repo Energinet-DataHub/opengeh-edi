@@ -48,7 +48,6 @@ public record RequestWholesaleServicesSeries(
         {
             DataHubNames.ActorRole.EnergySupplier => ActorNumber.TryCreate(EnergySupplierId),
 
-            // TODO: Should this be the grid area owner instead, or will they always be the same?
             DataHubNames.ActorRole.GridOperator => gridAreaOwner,
             DataHubNames.ActorRole.SystemOperator => ActorNumber.TryCreate(ChargeOwner),
             _ => null,
