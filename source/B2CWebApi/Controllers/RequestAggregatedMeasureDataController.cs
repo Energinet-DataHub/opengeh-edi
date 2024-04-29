@@ -51,7 +51,7 @@ public class RequestAggregatedMeasureDataController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "request-aggregated-measured-data:view")]
+    //[Authorize(Roles = "request-aggregated-measured-data:view")]
     public async Task<ActionResult> RequestAsync(RequestAggregatedMeasureDataMarketRequest request, CancellationToken cancellationToken)
     {
         var currentUser = _userContext.CurrentUser;

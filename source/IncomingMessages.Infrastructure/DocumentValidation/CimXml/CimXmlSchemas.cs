@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Reflection;
+
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml
 {
     public sealed class CimXmlSchemas : SchemaBase, ISchema
@@ -33,7 +35,8 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidati
         protected override Dictionary<KeyValuePair<string, string>, string> FillSchemaDictionary(string schemaPath)
         {
             var schemaDictionary = new Dictionary<KeyValuePair<string, string>, string>();
-            var schemas = Directory.GetFiles(schemaPath).ToList();
+            // var outPutDir = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? string.Empty;
+            var schemas = Directory.GetFiles(Path.Combine(string.Empty, _schemaPath)).ToList();
             foreach (var schema in schemas)
             {
                 var filename = Path.GetFileNameWithoutExtension(schema);

@@ -15,17 +15,17 @@
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
-using FluentAssertions;
 using Xunit.Abstractions;
+
 #pragma warning disable CS0162 // Unreachable code detected
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.ArchivedMessages;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2C;
 
 [Collection("Acceptance test collection")]
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Testing")]
 public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 {
-    private readonly ArchivedMessageDsl _archivedMessage;
+    private readonly FrontendDsl _frontend;
     private readonly NotifyWholesaleServicesDsl _notifyWholesaleServices;
 
     public WhenArchivedMessageIsRequestedTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
@@ -33,8 +33,8 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
-        _archivedMessage = new ArchivedMessageDsl(
-            new EdiB2CDriver(fixture.B2CAuthorizedHttpClient, fixture.ApiManagementUri));
+        _frontend = new FrontendDsl(
+            new EdiB2CDriver(fixture.B2CAuthorizedHttpClient, fixture.ApiManagementUri, fixture.EdiB2CUri));
 
         _notifyWholesaleServices = new NotifyWholesaleServicesDsl(
             new EdiDriver(fixture.B2BEnergySupplierAuthorizedHttpClient),
@@ -51,6 +51,6 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 
         var messageId = await _notifyWholesaleServices.ConfirmResultIsAvailable();
 
-        await _archivedMessage.ConfirmMessageIsArchived(messageId);
+        await _frontend.ConfirmMessageIsArchived(messageId);
     }
 }

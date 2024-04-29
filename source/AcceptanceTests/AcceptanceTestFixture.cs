@@ -42,7 +42,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
     public AcceptanceTestFixture()
     {
         var configurationBuilder = new ConfigurationBuilder()
-            .AddJsonFile("acceptancetest.dev002.settings.json", true)
+            .AddJsonFile("acceptancetest.dev001.settings.json", true)
             .AddEnvironmentVariables();
 
         var jsonConfiguration = configurationBuilder.Build();
@@ -60,6 +60,8 @@ public class AcceptanceTestFixture : IAsyncLifetime
         var serviceBusConnectionString = root.GetValue<string>("sb-domain-relay-manage-connection-string") ?? throw new InvalidOperationException("sb-domain-relay-manage-connection-string secret is not set in configuration");
         var topicName = root.GetValue<string>("sbt-shres-integrationevent-received-name") ?? throw new InvalidOperationException("sbt-shres-integrationevent-received-name secret is not set in configuration");
         var ediInboxQueueName = root.GetValue<string>("sbq-edi-inbox-messagequeue-name") ?? throw new InvalidOperationException("sbq-edi-inbox-messagequeue-name secret is not set in configuration");
+
+        EdiB2CUri = new Uri(root.GetValue<string>("app-edi-b2cwebapi-base-url") ?? throw new InvalidOperationException("app-edi-b2cwebapi-base-url secret is not set in configuration"));
 
         var azureB2CTenantId = root.GetValue<string>("b2c-tenant-id") ?? "e9aa9b15-7200-441e-b255-927506b3494";
         var azureEntraBackendAppId = root.GetValue<string>("backend-b2b-app-id") ?? throw new InvalidOperationException("backend-b2b-app-id is not set in configuration");
@@ -100,6 +102,8 @@ public class AcceptanceTestFixture : IAsyncLifetime
     internal string ConnectionString { get; }
 
     internal Uri ApiManagementUri { get; }
+
+    internal Uri EdiB2CUri { get; }
 
     internal string EbixCertificatePasswordForMeterDataResponsible { get; }
 

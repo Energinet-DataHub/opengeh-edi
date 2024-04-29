@@ -88,12 +88,13 @@ if (isDevelopment)
 app
     .UseSwaggerForWebApp()
     .UseLoggingScope()
-    .UseHttpsRedirection()
-    .UseAuthentication()
-    .UseAuthorization()
-    .UseUserMiddlewareForWebApp<FrontendUser>();
+    .UseHttpsRedirection();
+    // .UseAuthentication()
+    // .UseAuthorization()
+    //.UseUserMiddlewareForWebApp<FrontendUser>();
 
-app.MapControllers().RequireAuthorization();
+app.MapControllers();
+    // .RequireAuthorization();
 
 app.MapLiveHealthChecks();
 
