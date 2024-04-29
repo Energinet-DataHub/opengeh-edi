@@ -104,13 +104,13 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
         public ProcessId ProcessId { get; }
 
         /// <summary>
-        /// The actor that requested the wholesale services (the sender of the request). This is typically the actor
+        /// The actor that requested the aggregated measure data (the sender of the request). This is typically the actor
         /// that owns the request/process, except in case of delegation.
         /// </summary>
         public RequestedByActor RequestedByActor { get; }
 
         /// <summary>
-        /// The original actor is the actor that the wholesale services is requested for (who owns the request/process)
+        /// The original actor is the actor that the aggregated measure data is requested for (who owns the request/process)
         /// This can differ from RequestedByActorNumber in case of delegation
         /// </summary>
         public OriginalActor OriginalActor { get; }
