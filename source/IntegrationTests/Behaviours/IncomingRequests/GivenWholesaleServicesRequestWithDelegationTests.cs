@@ -350,10 +350,13 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             delegatedActorPeekResults.Should().HaveCount(2, "because there should be one message for each grid area");
         }
 
+        var resultGridAreas = new List<string>();
         foreach (var peekResult in delegatedActorPeekResults)
         {
             peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
             var peekResultGridArea = await GetGridAreaFromNotifyWholesaleServicesDocument(peekResult.Bundle!, peekDocumentFormat);
+
+            resultGridAreas.Add(peekResultGridArea);
 
             var seriesRequest = wholesaleServicesRequestAcceptedMessage.Series
                 .Should().ContainSingle(request => request.GridArea == peekResultGridArea)
@@ -390,6 +393,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
                         CreateDateInstant(2024, 1, 31)),
                     Points: seriesRequest.TimeSeriesPoints));
         }
+
+        resultGridAreas.Should().BeEquivalentTo("512", "609");
     }
 
     /// <summary>
@@ -773,10 +778,13 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             originalActorPeekResults.Should().HaveCount(2, "because there should be one message for each grid area");
         }
 
+        var resultGridAreas = new List<string>();
         foreach (var peekResult in originalActorPeekResults)
         {
             peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
             var peekResultGridArea = await GetGridAreaFromNotifyWholesaleServicesDocument(peekResult.Bundle!, peekDocumentFormat);
+
+            resultGridAreas.Add(peekResultGridArea);
 
             var seriesRequest = wholesaleServicesRequestAcceptedMessage.Series
                 .Should().ContainSingle(request => request.GridArea == peekResultGridArea)
@@ -813,6 +821,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
                         CreateDateInstant(2024, 1, 31)),
                     Points: seriesRequest.TimeSeriesPoints));
         }
+
+        resultGridAreas.Should().BeEquivalentTo("512", "973");
     }
 
     [Theory]

@@ -599,10 +599,13 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
             delegatedActorPeekResults.Should().HaveCount(2, "because there should be one message for each grid area");
         }
 
+        var resultGridAreas = new List<string>();
         foreach (var peekResult in delegatedActorPeekResults)
         {
             peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
             var peekResultGridArea = await GetGridAreaFromNotifyAggregatedMeasureDataDocument(peekResult.Bundle!, peekDocumentFormat);
+
+            resultGridAreas.Add(peekResultGridArea);
 
             var seriesRequest = aggregatedMeasureDataRequestAcceptedMessage.Series
                 .Should().ContainSingle(request => request.GridArea == peekResultGridArea)
@@ -635,6 +638,8 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
                         CreateDateInstant(2024, 1, 31)),
                     Points: seriesRequest.TimeSeriesPoints));
         }
+
+        resultGridAreas.Should().BeEquivalentTo("512", "609");
     }
 
     /// <summary>
@@ -853,7 +858,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var aggregatedMeasureDataRequestAcceptedMessage = AggregatedTimeSeriesResponseEventBuilder
-            .GenerateAcceptedFrom(message.AggregatedTimeSeriesRequest, GetNow(), new[] { "106", "509", "804" });
+            .GenerateAcceptedFrom(message.AggregatedTimeSeriesRequest, GetNow(), new[] { "106", "512", "804" });
 
         await GivenAggregatedMeasureDataRequestAcceptedIsReceived(message.ProcessId, aggregatedMeasureDataRequestAcceptedMessage);
 
@@ -875,10 +880,13 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
             originalActorPeekResults.Should().HaveCount(3, "because there should be one message for each grid area");
         }
 
+        var resultGridAreas = new List<string>();
         foreach (var peekResult in originalActorPeekResults)
         {
             peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
             var peekResultGridArea = await GetGridAreaFromNotifyAggregatedMeasureDataDocument(peekResult.Bundle!, peekDocumentFormat);
+
+            resultGridAreas.Add(peekResultGridArea);
 
             var seriesRequest = aggregatedMeasureDataRequestAcceptedMessage.Series
                 .Should().ContainSingle(request => request.GridArea == peekResultGridArea)
@@ -911,6 +919,8 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
                         CreateDateInstant(2024, 1, 31)),
                     Points: seriesRequest.TimeSeriesPoints));
         }
+
+        resultGridAreas.Should().BeEquivalentTo("106", "512", "804");
     }
 
     protected Task GivenAggregatedMeasureDataRequestRejectedIsReceived(Guid processId, AggregatedTimeSeriesRequestRejected rejectedMessage)
