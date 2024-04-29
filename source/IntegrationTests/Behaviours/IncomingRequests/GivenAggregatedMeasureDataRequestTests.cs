@@ -299,7 +299,7 @@ public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
 
         // Arrange
 
-        // Generate a mock WholesaleRequestAccepted response from Wholesale, based on the AggregatedMeasureDataRequest
+        // Generate a mock AggregatedTimeSeriesRequestAccepted response from Wholesale, based on the AggregatedMeasureDataRequest
         // It is very important that the generated data is correct,
         // since (almost) all assertion after this point is based on this data
         var generateDataInGridAreas = new List<string> { "106", "509" };
