@@ -165,14 +165,4 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
         const decimal nanoFactor = 1_000_000_000;
         return input.Units + (input.Nanos / nanoFactor);
     }
-
-    private async Task<GridAreaDetails> MapGridAreaDetailsAsync(string gridAreaCode, CancellationToken cancellationToken)
-    {
-        // TODO: What is this used for? It seems unused
-        var gridOperatorNumber = await _masterDataClient
-            .GetGridOwnerForGridAreaCodeAsync(gridAreaCode, cancellationToken)
-            .ConfigureAwait(false);
-
-        return new GridAreaDetails(gridAreaCode, gridOperatorNumber.Value);
-    }
 }
