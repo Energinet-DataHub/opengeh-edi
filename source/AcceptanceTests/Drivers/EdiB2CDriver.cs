@@ -25,11 +25,13 @@ public sealed class EdiB2CDriver : IDisposable
 {
     private readonly AsyncLazy<HttpClient> _httpClient;
     private readonly Uri _apiManagementUri;
+    private readonly Uri _b2cEdiUri;
 
-    public EdiB2CDriver(AsyncLazy<HttpClient> b2CHttpClient, Uri apiManagementUri)
+    public EdiB2CDriver(AsyncLazy<HttpClient> b2CHttpClient, Uri apiManagementUri, Uri ediB2CUri)
     {
         _httpClient = b2CHttpClient;
         _apiManagementUri = apiManagementUri;
+        _b2cEdiUri = ediB2CUri;
     }
 
     public void Dispose()
@@ -49,5 +51,30 @@ public sealed class EdiB2CDriver : IDisposable
         var archivedMessageResponse = JsonConvert.DeserializeObject<List<ArchivedMessageSearchResponse>>(responseString) ?? throw new InvalidOperationException("Did not receive valid response");
 
         return archivedMessageResponse;
+    }
+
+    public async Task RequestAggregatedMeasureDataAsync(string energySupplierNumber, CancellationToken cancellationToken)
+    {
+        var b2cClient = await _httpClient;
+        using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(_b2cEdiUri, "/RequestAggregatedMeasureData"));
+        var payload = GetAggregatedMeasureDataRequestBody(energySupplierNumber);
+        request.Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        var response = await b2cClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        var responseString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+    }
+
+    private static JObject GetAggregatedMeasureDataRequestBody(string energySupplierNumber)
+    {
+       return new JObject
+        {
+            ["StartDate"] = DateTime.UtcNow.AddDays(-10).ToString("s") + "Z",
+            ["EndDate"] = DateTime.UtcNow.ToString("s") + "Z",
+            ["ProcessType"] = "BalanceFixing",
+            ["MeteringPointType"] = "Production",
+            ["GridArea"] = "804",
+            ["EnergySupplierId"] = energySupplierNumber,
+        };
     }
 }

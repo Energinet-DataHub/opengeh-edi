@@ -20,12 +20,12 @@ using FluentAssertions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
-public class ArchivedMessageDsl
+public class FrontendDsl
 {
     private readonly EdiB2CDriver _ediB2CDriver;
 
 #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
-    public ArchivedMessageDsl(EdiB2CDriver ediB2CDriver)
+    public FrontendDsl(EdiB2CDriver ediB2CDriver)
     {
         _ediB2CDriver = ediB2CDriver;
     }
@@ -49,5 +49,11 @@ public class ArchivedMessageDsl
         Assert.NotNull(archivedMessage.ReceiverNumber);
         Assert.IsType<DateTime>(archivedMessage.CreatedAt);
         Assert.NotNull(archivedMessage.BusinessReason);
+    }
+
+    internal async Task RequestAggregatedMeasureData(string energySupplierNumber, CancellationToken cancellationToken)
+    {
+        await _ediB2CDriver.RequestAggregatedMeasureDataAsync(energySupplierNumber, cancellationToken)
+            .ConfigureAwait(false);
     }
 }
