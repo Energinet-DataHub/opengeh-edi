@@ -35,6 +35,8 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidati
         protected override Dictionary<KeyValuePair<string, string>, string> FillSchemaDictionary(string schemaPath)
         {
             var schemaDictionary = new Dictionary<KeyValuePair<string, string>, string>();
+
+            // Ensure that the output directory is correct for the schema files
             var outPutDir = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? string.Empty;
             var schemas = Directory.GetFiles(Path.Combine(outPutDir, _schemaPath)).ToList();
             foreach (var schema in schemas)

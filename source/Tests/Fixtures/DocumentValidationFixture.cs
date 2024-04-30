@@ -20,14 +20,9 @@ namespace Energinet.DataHub.EDI.Tests.Fixtures;
 
 public class DocumentValidationFixture
 {
-    public DocumentValidationFixture()
+    public DocumentValidator Validator { get; } = new(new[]
     {
-        Validator = new DocumentValidator(new[]
-        {
-            new CimXmlValidator(new CimXmlSchemaProvider()) as IValidator,
-            new EbixValidator(new EbixSchemaProvider()) as IValidator,
-        });
-    }
-
-    public DocumentValidator Validator { get; }
+        new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas())) as IValidator,
+        new EbixValidator(new EbixSchemaProvider()) as IValidator,
+    });
 }
