@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Reflection;
 using Json.Schema;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
@@ -39,10 +38,7 @@ public sealed class CimJsonSchemas : SchemaBase, ISchema
     {
         var schemaDictionary = new Dictionary<KeyValuePair<string, string>, string>();
 
-        // Ensure that the output directory is correct for the schema files
-        var outPutDir = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? string.Empty;
-        var schemas = Directory.GetFiles(Path.Combine(outPutDir, _schemaPath)).ToList();
-
+        var schemas = Directory.GetFiles(schemaPath).ToList();
         foreach (var schema in schemas)
         {
             var filename = Path.GetFileNameWithoutExtension(schema);

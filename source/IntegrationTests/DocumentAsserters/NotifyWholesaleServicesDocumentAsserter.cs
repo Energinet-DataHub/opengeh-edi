@@ -22,8 +22,6 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.C
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Ebix;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 
@@ -31,7 +29,7 @@ public static class NotifyWholesaleServicesDocumentAsserter
 {
     private static readonly DocumentValidator _xmlDocumentValidator = new(new List<IValidator>
     {
-        new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas(new Logger<CimXmlSchemas>(new NullLoggerFactory())))),
+        new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas())),
         new EbixValidator(new EbixSchemaProvider()),
     });
 

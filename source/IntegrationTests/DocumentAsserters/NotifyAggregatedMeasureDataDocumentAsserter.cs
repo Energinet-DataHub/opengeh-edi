@@ -32,7 +32,7 @@ public static class NotifyAggregatedMeasureDataDocumentAsserter
 {
     private static readonly DocumentValidator _xmlDocumentValidator = new(new List<IValidator>
     {
-        new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas(new Logger<CimXmlSchemas>(new NullLoggerFactory())))),
+        new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas())),
         new EbixValidator(new EbixSchemaProvider()),
     });
 

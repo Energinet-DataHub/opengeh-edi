@@ -38,10 +38,9 @@ public static class RejectRequestWholesaleSettlementDocumentAsserter
         ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(assertionInput);
 
-        using var nullLoggerFactory = new NullLoggerFactory();
         var xmlDocumentValidator = new DocumentValidator(new List<IValidator>
         {
-            new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas(new Logger<CimXmlSchemas>(nullLoggerFactory)))),
+            new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas())),
             new EbixValidator(new EbixSchemaProvider()),
         });
         IAssertRejectRequestWholesaleSettlementDocument asserter = documentFormat.Name switch

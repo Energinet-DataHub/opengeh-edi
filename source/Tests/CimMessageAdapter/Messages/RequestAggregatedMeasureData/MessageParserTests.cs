@@ -54,11 +54,10 @@ public class MessageParserTests
 
     public MessageParserTests()
     {
-        using var logfac = new NullLoggerFactory();
         _marketMessageParser = new MarketMessageParser(
             new IMessageParser[]
             {
-                new XmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas(new Logger<CimXmlSchemas>(logfac)))),
+                new XmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
                 new JsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
                 new B2CJsonMessageParser(new Serializer()),
             });
