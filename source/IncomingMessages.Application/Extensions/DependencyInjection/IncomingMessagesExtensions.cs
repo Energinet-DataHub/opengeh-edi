@@ -80,12 +80,12 @@ public static class IncomingMessagesExtensions
         //RegisterSchemaProviders
         services.AddSingleton<CimJsonSchemas>()
             .AddSingleton<CimXmlSchemaProvider>()
-            .AddSingleton<JsonSchemaProvider>();
+            .AddSingleton<JsonSchemaProvider>()
 
             // Health checks
-            // .TryAddExternalDomainServiceBusQueuesHealthCheck(
-            //     configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>()!.ListenConnectionString!,
-            //     configuration.GetSection(IncomingMessagesQueueOptions.SectionName).Get<IncomingMessagesQueueOptions>()!.QueueName!);
+            .TryAddExternalDomainServiceBusQueuesHealthCheck(
+                configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>()!.ListenConnectionString!,
+                configuration.GetSection(IncomingMessagesQueueOptions.SectionName).Get<IncomingMessagesQueueOptions>()!.QueueName!);
 
         return services;
     }
