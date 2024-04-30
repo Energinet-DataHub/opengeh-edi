@@ -63,7 +63,11 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
         var azureB2CTenantId = root.GetValue<string>("b2c-tenant-id") ?? "e9aa9b15-7200-441e-b255-927506b3494";
         var azureEntraBackendAppId = root.GetValue<string>("backend-b2b-app-id") ?? throw new InvalidOperationException("backend-b2b-app-id is not set in configuration");
+
         ApiManagementUri = new Uri(root.GetValue<string>("apim-gateway-url") ?? throw new InvalidOperationException("apim-gateway-url secret is not set in configuration"));
+        EbixUri = new Uri(
+            root.GetValue<string>("EBIX_APIM_URL")
+            ?? throw new InvalidOperationException("EBIX_APIM_URL is not set in configuration"));
 
         var meteredDataResponsibleId = root.GetValue<string>("METERED_DATA_RESPONSIBLE_CLIENT_ID") ?? throw new InvalidOperationException("METERED_DATA_RESPONSIBLE_CLIENT_ID is not set in configuration");
         var meteredDataResponsibleSecret = root.GetValue<string>("METERED_DATA_RESPONSIBLE_CLIENT_SECRET") ?? throw new InvalidOperationException("METERED_DATA_RESPONSIBLE_CLIENT_SECRET is not set in configuration");
@@ -100,6 +104,8 @@ public class AcceptanceTestFixture : IAsyncLifetime
     internal string ConnectionString { get; }
 
     internal Uri ApiManagementUri { get; }
+
+    internal Uri EbixUri { get; }
 
     internal string EbixCertificatePasswordForMeterDataResponsible { get; }
 
