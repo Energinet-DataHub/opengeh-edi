@@ -33,8 +33,8 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidati
         protected override Dictionary<KeyValuePair<string, string>, string> FillSchemaDictionary(string schemaPath)
         {
             var schemaDictionary = new Dictionary<KeyValuePair<string, string>, string>();
-
             var schemas = Directory.GetFiles(schemaPath).ToList();
+
             foreach (var schema in schemas)
             {
                 var filename = Path.GetFileNameWithoutExtension(schema);
