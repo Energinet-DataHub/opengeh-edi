@@ -326,6 +326,7 @@ public class BehavioursTestBase : IDisposable
                 incomingMessageStream,
                 documentFormat,
                 IncomingDocumentType.RequestAggregatedMeasureData,
+                documentFormat,
                 CancellationToken.None);
 
         using (new AssertionScope())
@@ -368,6 +369,7 @@ public class BehavioursTestBase : IDisposable
                 incomingMessageStream,
                 documentFormat,
                 IncomingDocumentType.RequestWholesaleSettlement,
+                documentFormat,
                 CancellationToken.None);
 
         using (new AssertionScope())

@@ -69,8 +69,8 @@ public class IncomingMessageClient : IIncomingMessageClient
         IIncomingMessageStream incomingMessageStream,
         DocumentFormat documentFormat,
         IncomingDocumentType documentType,
-        CancellationToken cancellationToken,
-        DocumentFormat responseFormat = null!)
+        DocumentFormat responseFormat,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(documentType);
         ArgumentNullException.ThrowIfNull(incomingMessageStream);
@@ -87,7 +87,7 @@ public class IncomingMessageClient : IIncomingMessageClient
                 "Failed to parse incoming message {DocumentType}. Errors: {Errors}",
                 documentType,
                 res.Errors);
-            return _responseFactory.From(res, responseFormat ?? documentFormat);
+            return _responseFactory.From(res, responseFormat);
         }
 
         await ArchiveIncomingMessageAsync(
@@ -120,7 +120,7 @@ public class IncomingMessageClient : IIncomingMessageClient
                 "Failed to validate incoming message: {MessageId}. Errors: {Errors}",
                 incomingMarketMessageParserResult.IncomingMessage?.MessageId,
                 incomingMarketMessageParserResult.Errors);
-            return _responseFactory.From(validationResult, responseFormat ?? documentFormat);
+            return _responseFactory.From(validationResult, responseFormat);
         }
 
         var result = await _incomingMessageReceiver
@@ -138,7 +138,7 @@ public class IncomingMessageClient : IIncomingMessageClient
             "Failed to save incoming message: {MessageId}. Errors: {Errors}",
             incomingMarketMessageParserResult.IncomingMessage!.MessageId,
             incomingMarketMessageParserResult.Errors);
-        return _responseFactory.From(result, responseFormat ?? documentFormat);
+        return _responseFactory.From(result, responseFormat);
     }
 
     private async Task ArchiveIncomingMessageAsync(

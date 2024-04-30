@@ -68,8 +68,8 @@ public class RequestAggregatedMeasureDataController : ControllerBase
                 GenerateStreamFromString(_serializer.Serialize(message)),
                 DocumentFormat.Json,
                 IncomingDocumentType.B2CRequestAggregatedMeasureData,
-                cancellationToken,
-                DocumentFormat.Json)
+                DocumentFormat.Json,
+                cancellationToken)
             .ConfigureAwait(false);
 
         if (responseMessage.IsErrorResponse)
