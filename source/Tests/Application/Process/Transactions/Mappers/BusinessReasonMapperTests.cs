@@ -43,4 +43,12 @@ public class BusinessReasonMapperTests : BaseEnumMapperTests
             () => BusinessReasonMapper.Map(value),
             value,
             unspecifiedValue: AmountPerChargeResultProducedV1.Types.CalculationType.Unspecified);
+
+    [Theory]
+    [MemberData(nameof(GetEnumValues), typeof(TotalMonthlyAmountResultProducedV1.Types.CalculationType))]
+    public void Ensure_handling_total_monthly_amount_result_produced(TotalMonthlyAmountResultProducedV1.Types.CalculationType value)
+        => EnsureCanMapOrThrows(
+            () => BusinessReasonMapper.Map(value),
+            value,
+            unspecifiedValue: TotalMonthlyAmountResultProducedV1.Types.CalculationType.Unspecified);
 }
