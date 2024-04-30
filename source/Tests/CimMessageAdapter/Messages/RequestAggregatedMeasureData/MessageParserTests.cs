@@ -32,6 +32,8 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.C
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NodaTime;
 using Xunit;
 using RequestAggregatedMeasureDataDto = Energinet.DataHub.EDI.IncomingMessages.Interfaces.RequestAggregatedMeasureDataDto;
@@ -52,10 +54,11 @@ public class MessageParserTests
 
     public MessageParserTests()
     {
+        using var logfac = new NullLoggerFactory();
         _marketMessageParser = new MarketMessageParser(
             new IMessageParser[]
             {
-                new XmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
+                new XmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas(new Logger<CimXmlSchemas>(logfac)))),
                 new JsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
                 new B2CJsonMessageParser(new Serializer()),
             });

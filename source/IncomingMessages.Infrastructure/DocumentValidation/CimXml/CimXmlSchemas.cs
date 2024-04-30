@@ -13,15 +13,18 @@
 // limitations under the License.
 
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml
 {
     public sealed class CimXmlSchemas : SchemaBase, ISchema
     {
         private static readonly string _schemaPath = $"DocumentValidation{Path.DirectorySeparatorChar}CimXml{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
+        private readonly ILogger<CimXmlSchemas> _logger;
 
-        public CimXmlSchemas()
+        public CimXmlSchemas(ILogger<CimXmlSchemas> logger)
         {
+            _logger = logger;
             InitializeSchemas(FillSchemaDictionary(_schemaPath));
         }
 
@@ -38,7 +41,9 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidati
 
             // Ensure that the output directory is correct for the schema files
             var outPutDir = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? string.Empty;
-            var schemas = Directory.GetFiles(Path.Combine(outPutDir, _schemaPath)).ToList();
+            var absoluteSchemaPath = Path.Combine(outPutDir, _schemaPath);
+            _logger.LogInformation($"Schema path: {absoluteSchemaPath}");
+            var schemas = Directory.GetFiles(absoluteSchemaPath).ToList();
             foreach (var schema in schemas)
             {
                 var filename = Path.GetFileNameWithoutExtension(schema);
