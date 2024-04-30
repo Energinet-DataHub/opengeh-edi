@@ -23,6 +23,8 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.E
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 
@@ -30,7 +32,7 @@ public static class NotifyAggregatedMeasureDataDocumentAsserter
 {
     private static readonly DocumentValidator _xmlDocumentValidator = new(new List<IValidator>
     {
-        new CimXmlValidator(new CimXmlSchemaProvider()),
+        new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas())),
         new EbixValidator(new EbixSchemaProvider()),
     });
 
