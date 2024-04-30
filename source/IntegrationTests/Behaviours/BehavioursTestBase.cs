@@ -295,7 +295,7 @@ public class BehavioursTestBase : IDisposable
                 CancellationToken.None);
     }
 
-    protected async Task GivenReceivedAggregatedMeasureDataRequest(
+    protected async Task<ResponseMessage> GivenReceivedAggregatedMeasureDataRequest(
         DocumentFormat documentFormat,
         ActorNumber senderActorNumber,
         ActorRole senderActorRole,
@@ -305,7 +305,8 @@ public class BehavioursTestBase : IDisposable
         (int Year, int Month, int Day) periodEnd,
         ActorNumber? energySupplier,
         ActorNumber? balanceResponsibleParty,
-        IReadOnlyCollection<(string? GridArea, string TransactionId)> series)
+        IReadOnlyCollection<(string? GridArea, string TransactionId)> series,
+        bool assertRequestWasSuccessful = true)
     {
         var incomingMessageClient = GetService<IIncomingMessageClient>();
 
@@ -329,11 +330,16 @@ public class BehavioursTestBase : IDisposable
                 documentFormat,
                 CancellationToken.None);
 
-        using (new AssertionScope())
+        if (assertRequestWasSuccessful)
         {
-            response.IsErrorResponse.Should().BeFalse("because the response should not have an error. Actual response: {0}", response.MessageBody);
-            response.MessageBody.Should().BeEmpty();
+            using (new AssertionScope())
+            {
+                response.IsErrorResponse.Should().BeFalse("because the response should not have an error. Actual response: {0}", response.MessageBody);
+                response.MessageBody.Should().BeEmpty();
+            }
         }
+
+        return response;
     }
 
     protected async Task GivenReceivedWholesaleServicesRequest(
