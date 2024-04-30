@@ -32,7 +32,7 @@ public static class WholesaleServicesResponseEventBuilder
     /// Generate a mock WholesaleRequestAccepted response from Wholesale, based on the WholesaleServicesRequest
     /// It is very important that the generated data is correct, since assertions is based on this data
     /// </summary>
-    public static WholesaleServicesRequestAccepted GenerateWholesaleServicesRequestAccepted(WholesaleServicesRequest request, Instant now, string? defaultChargeOwnerId = null, ICollection<string>? defaultGridAreas = null)
+    public static WholesaleServicesRequestAccepted GenerateAcceptedFrom(WholesaleServicesRequest request, Instant now, string? defaultChargeOwnerId = null, ICollection<string>? defaultGridAreas = null)
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(now);
@@ -60,7 +60,7 @@ public static class WholesaleServicesResponseEventBuilder
                 var periodStart = InstantPattern.General.Parse(request.PeriodStart).Value;
                 var periodEnd = InstantPattern.General.Parse(request.PeriodEnd).Value;
 
-                var points = CreatePoints(resolution, periodEnd, periodStart);
+                var points = CreatePoints(resolution, periodStart, periodEnd);
 
                 var series = new WholesaleServicesRequestSeries()
                 {
@@ -99,7 +99,7 @@ public static class WholesaleServicesResponseEventBuilder
         return requestAcceptedMessage;
     }
 
-    public static WholesaleServicesRequestRejected GenerateWholesaleServicesRequestRejected(WholesaleServicesRequest request)
+    public static WholesaleServicesRequestRejected GenerateRejectedFrom(WholesaleServicesRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -123,7 +123,7 @@ public static class WholesaleServicesResponseEventBuilder
         return rejectedMessage;
     }
 
-    private static List<WholesaleServicesRequestSeries.Types.Point> CreatePoints(WholesaleServicesRequestSeries.Types.Resolution resolution, Instant periodEnd, Instant periodStart)
+    private static List<WholesaleServicesRequestSeries.Types.Point> CreatePoints(WholesaleServicesRequestSeries.Types.Resolution resolution, Instant periodStart, Instant periodEnd)
     {
         var points = new List<WholesaleServicesRequestSeries.Types.Point>();
 

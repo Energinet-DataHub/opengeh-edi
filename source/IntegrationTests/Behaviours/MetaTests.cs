@@ -33,7 +33,7 @@ public static class MetaTests
     public static void Given_TestNames_When_CheckingConvention_Then_AllSatisfies()
     {
         // Arrange
-        var needsToBeOfForm_Given_xx_When_yy_Then_zz = @"^(((Given)|(AndGiven))_[^_]+_)?When_[^_]+_Then_[^_]+$";
+        var needsToBeOfForm_Given_xx_When_yy_Then_zz = @"^(((Given)|(AndGiven))_[^_]+_)*When_[^_]+_Then_[^_]+$";
 
         var allTestNames = Assembly.GetAssembly(typeof(MetaTests))?
             .GetTypes()

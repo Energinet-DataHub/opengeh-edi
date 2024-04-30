@@ -28,7 +28,9 @@ public class RejectedEnergyResultMessageDto : OutgoingMessageDto
         string businessReason,
         ActorRole receiverRole,
         MessageId relatedToMessageId,
-        RejectedEnergyResultMessageSerie series)
+        RejectedEnergyResultMessageSerie series,
+        ActorNumber documentReceiverNumber,
+        ActorRole documentReceiverRole)
         : base(
             DocumentType.RejectRequestAggregatedMeasureData,
             receiverNumber,
@@ -41,9 +43,15 @@ public class RejectedEnergyResultMessageDto : OutgoingMessageDto
             relatedToMessageId)
     {
         Series = series;
+        DocumentReceiverNumber = documentReceiverNumber;
+        DocumentReceiverRole = documentReceiverRole;
     }
 
     public RejectedEnergyResultMessageSerie Series { get; }
+
+    public ActorNumber DocumentReceiverNumber { get; }
+
+    public ActorRole DocumentReceiverRole { get; }
 }
 
 public record RejectedEnergyResultMessageSerie(

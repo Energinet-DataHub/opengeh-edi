@@ -23,9 +23,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
+using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Json.Schema;
 using Xunit;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 
@@ -45,6 +49,12 @@ public sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNotif
     public IAssertNotifyAggregatedMeasureDataDocument HasMessageId(string expectedMessageId)
     {
         Assert.Equal(expectedMessageId, _root.GetProperty("mRID").ToString());
+        return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument MessageIdExists()
+    {
+        _root.TryGetProperty("mRID", out _).Should().BeTrue();
         return this;
     }
 
@@ -69,6 +79,12 @@ public sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNotif
     public IAssertNotifyAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId)
     {
         Assert.Equal(expectedTransactionId, FirstTimeSeriesElement().GetProperty("mRID").GetGuid());
+        return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument TransactionIdExists()
+    {
+        FirstTimeSeriesElement().TryGetProperty("mRID", out _).Should().BeTrue();
         return this;
     }
 
@@ -199,9 +215,93 @@ public sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNotif
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasCalculationResultVersion(int version)
+    public IAssertNotifyAggregatedMeasureDataDocument HasCalculationResultVersion(long version)
     {
         Assert.Equal(version.ToString(NumberFormatInfo.InvariantInfo), FirstTimeSeriesElement().GetProperty("version").ToString());
+        return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument HasMeteringPointType(MeteringPointType meteringPointType)
+    {
+        FirstTimeSeriesElement()
+            .GetProperty("marketEvaluationPoint.type")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(meteringPointType.Code);
+        return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument HasQuantityMeasurementUnit(MeasurementUnit quantityMeasurementUnit)
+    {
+        FirstTimeSeriesElement()
+            .GetProperty("quantity_Measure_Unit.name")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(quantityMeasurementUnit.Code);
+        return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument HasResolution(Resolution resolution)
+    {
+        FirstTimeSeriesElement()
+            .GetProperty("Period")
+            .GetProperty("resolution")
+            .GetString()
+            .Should()
+            .Be(resolution.Code);
+
+        return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<TimeSeriesPoint> points)
+    {
+        var pointsInDocument = FirstTimeSeriesElement()
+            .GetProperty("Period")
+            .GetProperty("Point")
+            .EnumerateArray()
+            .OrderBy(p => p.GetProperty("position")
+                .GetProperty("value")
+                .GetInt32())
+            .ToList();
+
+        pointsInDocument.Should().HaveSameCount(points);
+
+        var expectedPoints = points.OrderBy(p => p.Time).ToList();
+
+        for (var i = 0; i < pointsInDocument.Count; i++)
+        {
+            pointsInDocument[i]
+                .GetProperty("position")
+                .GetProperty("value")
+                .GetInt32()
+                .Should()
+                .Be(i + 1);
+
+            pointsInDocument[i]
+                .GetProperty("quantity")
+                .GetDecimal()
+                .Should()
+                .Be(expectedPoints[i].Quantity.ToDecimal());
+
+            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+            {
+                QuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,
+                QuantityQuality.Estimated => CimCode.QuantityQualityCodeEstimated,
+                QuantityQuality.Measured => CimCode.QuantityQualityCodeMeasured,
+                _ => throw new NotImplementedException(
+                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
+            };
+
+            pointsInDocument[i]
+                .GetProperty("quality")
+                .GetProperty("value")
+                .GetString()
+                .Should()
+                .Be(expectedQuantityQuality);
+        }
+
         return this;
     }
 
@@ -228,6 +328,13 @@ public sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNotif
         Assert.Equal(originalTransactionIdReference, FirstTimeSeriesElement()
             .GetProperty("originalTransactionIDReference_Series.mRID")
             .ToString());
+        return this;
+    }
+
+    public IAssertNotifyAggregatedMeasureDataDocument OriginalTransactionIdReferenceDoesNotExist()
+    {
+        FirstTimeSeriesElement()
+            .TryGetProperty("originalTransactionIDReference_Series.mRID", out _).Should().BeFalse();
         return this;
     }
 

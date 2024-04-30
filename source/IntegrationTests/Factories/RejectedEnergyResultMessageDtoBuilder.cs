@@ -44,7 +44,9 @@ public class RejectedEnergyResultMessageDtoBuilder
             _businessReason,
             _receiverRole,
             _relatedToMessageId,
-            _series);
+            _series,
+            _receiverNumber,
+            _receiverRole);
     }
 
     public RejectedEnergyResultMessageDtoBuilder WithRelationTo(MessageId relatedToMessageId)

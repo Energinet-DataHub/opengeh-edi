@@ -57,23 +57,25 @@ public static class AcceptedEnergyResultMessageDtoBuilder
     public static AcceptedEnergyResultMessageDto Build()
     {
         return AcceptedEnergyResultMessageDto.Create(
-            _receiverNumber,
-            _receiverRole,
-            _processId,
-            _eventId,
-            GridAreaCode,
-            _meteringPointType,
-            _settlementMethod,
-            _measureUnitType,
-            _resolution,
-            _energySupplierNumber?.Value,
-            _balanceResponsibleNumber?.Value,
-            _period,
-            _points,
-            _businessReasonName,
-            CalculationResultVersion,
-            _originalTransactionIdReference,
-            _settlementVersion,
-            _relatedToMessageId);
+            receiverNumber: _receiverNumber,
+            receiverRole: _receiverRole,
+            documentReceiverNumber: _receiverNumber,
+            documentReceiverRole: _receiverRole,
+            processId: _processId,
+            eventId: _eventId,
+            gridAreaCode: GridAreaCode,
+            meteringPointType: _meteringPointType,
+            settlementMethod: _settlementMethod,
+            measureUnitType: _measureUnitType,
+            resolution: _resolution,
+            energySupplierNumber: _energySupplierNumber?.Value,
+            balanceResponsibleNumber: _balanceResponsibleNumber?.Value,
+            period: _period,
+            points: _points,
+            businessReasonName: _businessReasonName,
+            calculationResultVersion: CalculationResultVersion,
+            originalTransactionIdReference: _originalTransactionIdReference,
+            settlementVersion: _settlementVersion,
+            relatedToMessageId: _relatedToMessageId);
     }
 }

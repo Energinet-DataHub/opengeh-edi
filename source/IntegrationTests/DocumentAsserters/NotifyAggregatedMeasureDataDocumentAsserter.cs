@@ -21,11 +21,12 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Ebix;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 
-public static class NotifyWholesaleServicesDocumentAsserter
+public static class NotifyAggregatedMeasureDataDocumentAsserter
 {
     private static readonly DocumentValidator _xmlDocumentValidator = new(new List<IValidator>
     {
@@ -49,45 +50,41 @@ public static class NotifyWholesaleServicesDocumentAsserter
             _xmlDocumentValidator);
     }
 
-    public static async Task AssertCorrectDocumentAsync(DocumentFormat documentFormat, Stream document, NotifyWholesaleServicesDocumentAssertionInput assertionInput)
+    public static async Task AssertCorrectDocumentAsync(DocumentFormat documentFormat, Stream document, NotifyAggregatedMeasureDataDocumentAssertionInput assertionInput)
     {
         ArgumentNullException.ThrowIfNull(documentFormat);
         ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(assertionInput);
 
-        IAssertNotifyWholesaleServicesDocument asserter = documentFormat.Name switch
+        IAssertNotifyAggregatedMeasureDataDocument asserter = documentFormat.Name switch
         {
-            nameof(DocumentFormat.Xml) => new AssertNotifyWholesaleServicesXmlDocument(CreateCimXmlAsserter(document)),
-            nameof(DocumentFormat.Json) => new AssertNotifyWholesaleServicesJsonDocument(document),
-            nameof(DocumentFormat.Ebix) => new AssertNotifyWholesaleServicesEbixDocument(CreateEbixAsserter(document), true),
+            nameof(DocumentFormat.Xml) => new AssertNotifyAggregatedMeasureDataXmlDocument(CreateCimXmlAsserter(document)),
+            nameof(DocumentFormat.Json) => new AssertNotifyAggregatedMeasureDataJsonDocument(document),
+            nameof(DocumentFormat.Ebix) => new AssertNotifyAggregatedMeasureDataEbixDocument(CreateEbixAsserter(document), true),
             _ => throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, null),
         };
 
         asserter
             // -- Assert header values --
             .MessageIdExists()
-            // Assert businessSector.type? (23)
-            .HasBusinessReason(assertionInput.BusinessReasonWithSettlementVersion.BusinessReason, CodeListType.EbixDenmark)
-            .HasTimestamp(assertionInput.Timestamp)
-            .HasReceiverId(ActorNumber.Create(assertionInput.ReceiverId))
-            .HasReceiverRole(assertionInput.ReceiverRole, CodeListType.Ebix)
-            .HasSenderId(ActorNumber.Create(assertionInput.SenderId), "A10")
-            .HasSenderRole(assertionInput.SenderRole)
             // Assert type? (E31)
+            .HasBusinessReason(assertionInput.BusinessReasonWithSettlementVersion.BusinessReason)
+            // Assert businessSector.type? (23)
+            .HasSenderId(assertionInput.SenderId.Value)
+            // .HasSenderRole(assertionInput.SenderRole) ?
+            .HasReceiverId(assertionInput.ReceiverId.Value)
+            // .HasReceiverRole(assertionInput.ReceiverRole)
+            .HasTimestamp(assertionInput.Timestamp)
             // -- Assert series values --
             .TransactionIdExists()
-            .HasChargeTypeOwner(ActorNumber.Create(assertionInput.ChargeTypeOwner), "A10")
-            .HasChargeCode(assertionInput.ChargeCode)
-            .HasChargeType(assertionInput.ChargeType)
-            .HasCurrency(assertionInput.Currency)
-            .HasEnergySupplierNumber(ActorNumber.Create(assertionInput.EnergySupplierNumber), "A10")
-            .HasSettlementMethod(assertionInput.SettlementMethod)
+            .HasCalculationResultVersion(assertionInput.CalculationVersion)
             .HasMeteringPointType(assertionInput.MeteringPointType)
-            .HasGridAreaCode(assertionInput.GridArea, "NDK")
-            .HasPriceMeasurementUnit(assertionInput.PriceMeasurementUnit)
+            .HasGridAreaCode(assertionInput.GridAreaCode)
+            .HasEnergySupplierNumber(assertionInput.EnergySupplierNumber.Value)
+            .HasBalanceResponsibleNumber(assertionInput.BalanceResponsibleNumber.Value)
             .HasProductCode(assertionInput.ProductCode)
             .HasQuantityMeasurementUnit(assertionInput.QuantityMeasurementUnit)
-            .HasCalculationVersion(assertionInput.CalculationVersion)
+            .HasSettlementMethod(assertionInput.SettlementMethod)
             .HasResolution(assertionInput.Resolution)
             .HasPeriod(assertionInput.Period)
             .HasPoints(assertionInput.Points);
@@ -105,7 +102,7 @@ public static class NotifyWholesaleServicesDocumentAsserter
         }
         else
         {
-            asserter.SettlementVersionDoesNotExist();
+            asserter.SettlementVersionIsNotPresent();
         }
 
         await asserter

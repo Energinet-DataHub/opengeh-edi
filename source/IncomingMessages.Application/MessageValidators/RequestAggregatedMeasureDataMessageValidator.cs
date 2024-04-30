@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
@@ -76,7 +77,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators
                 checkBusinessTypeTask).ConfigureAwait(false);
 
             var transactionIdsToBeStored = new List<string>();
-            foreach (var serie in requestAggregatedMeasureDataMessage.Serie)
+            foreach (var serie in requestAggregatedMeasureDataMessage.Series)
             {
                 var transactionId = serie.TransactionId;
 
@@ -166,7 +167,9 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators
 
         private async Task AuthorizeSenderAsync(RequestAggregatedMeasureDataMessage message)
         {
-            var result = await _senderAuthorizer.AuthorizeAsync(message.SenderNumber, message.SenderRoleCode).ConfigureAwait(false);
+            var allSeriesAreDelegated = message.Series.Count > 0 && message.Series.All(s => s.IsDelegated);
+
+            var result = await _senderAuthorizer.AuthorizeAsync(message.SenderNumber, message.SenderRoleCode, allSeriesAreDelegated).ConfigureAwait(false);
             _errors.AddRange(result.Errors);
         }
 

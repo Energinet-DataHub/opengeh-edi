@@ -92,7 +92,16 @@ internal sealed class MasterDataClient : IMasterDataClient
         await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public Task<ActorNumber> GetGridOwnerForGridAreaCodeAsync(string gridAreaCode, CancellationToken cancellationToken)
+    public async Task<ActorNumber> GetGridOwnerForGridAreaCodeAsync(string gridAreaCode, CancellationToken cancellationToken)
+    {
+        var owner = await _gridAreaRepository
+            .GetGridOwnerForAsync(gridAreaCode, cancellationToken)
+            .ConfigureAwait(false);
+
+        return owner ?? throw new InvalidOperationException($"No owner found for grid area code: {gridAreaCode}");
+    }
+
+    public Task<ActorNumber?> TryGetGridOwnerForGridAreaCodeAsync(string gridAreaCode, CancellationToken cancellationToken)
     {
         return _gridAreaRepository.GetGridOwnerForAsync(gridAreaCode, cancellationToken);
     }

@@ -29,7 +29,9 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
         string businessReason,
         ActorRole receiverRole,
         AcceptedEnergyResultMessageTimeSeries series,
-        MessageId? relatedToMessageId = null)
+        MessageId? relatedToMessageId,
+        ActorNumber documentReceiverNumber,
+        ActorRole documentReceiverRole)
         : base(
             DocumentType.NotifyAggregatedMeasureData,
             receiverNumber,
@@ -42,13 +44,21 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
             relatedToMessageId)
     {
         Series = series;
+        DocumentReceiverNumber = documentReceiverNumber;
+        DocumentReceiverRole = documentReceiverRole;
     }
+
+    public ActorNumber DocumentReceiverNumber { get; }
+
+    public ActorRole DocumentReceiverRole { get; }
 
     public AcceptedEnergyResultMessageTimeSeries Series { get; }
 
     public static AcceptedEnergyResultMessageDto Create(
         ActorNumber receiverNumber,
         ActorRole receiverRole,
+        ActorNumber documentReceiverNumber,
+        ActorRole documentReceiverRole,
         Guid processId,
         EventId eventId,
         string gridAreaCode,
@@ -62,9 +72,9 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
         IReadOnlyCollection<AcceptedEnergyResultMessagePoint> points,
         string businessReasonName,
         long calculationResultVersion,
-        string? originalTransactionIdReference = null,
-        string? settlementVersion = null,
-        MessageId? relatedToMessageId = null)
+        string? originalTransactionIdReference,
+        string? settlementVersion,
+        MessageId? relatedToMessageId)
     {
         var series = new AcceptedEnergyResultMessageTimeSeries(
             TransactionId: Guid.NewGuid(),
@@ -88,7 +98,9 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
             businessReasonName,
             receiverRole,
             series,
-            relatedToMessageId);
+            relatedToMessageId,
+            documentReceiverNumber,
+            documentReceiverRole);
     }
 }
 

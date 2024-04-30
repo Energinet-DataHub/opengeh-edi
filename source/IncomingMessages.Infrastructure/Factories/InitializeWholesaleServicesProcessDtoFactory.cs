@@ -27,7 +27,7 @@ public static class InitializeWholesaleServicesProcessDtoFactory
         var senderActorNumber = ActorNumber.Create(wholesaleServicesMessage.SenderNumber);
         var senderActorRole = ActorRole.FromCode(wholesaleServicesMessage.SenderRoleCode);
 
-        var series = wholesaleServicesMessage.Serie
+        var series = wholesaleServicesMessage.Series
             .Cast<RequestWholesaleServicesSeries>()
             .Select(
                 series =>

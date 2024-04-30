@@ -155,9 +155,9 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
         _processContext.Dispose();
     }
 
-    private static RequestAggregatedMeasureDataMarketDocumentBuilder MessageBuilder()
+    private static InitializeAggregatedMeasureDataProcessDtoBuilder MessageBuilder()
     {
-        return new RequestAggregatedMeasureDataMarketDocumentBuilder();
+        return new InitializeAggregatedMeasureDataProcessDtoBuilder();
     }
 
     private static AcceptedEnergyResultMessageDto CreateAcceptedEnergyResultMessageDtoMessage(
@@ -171,8 +171,10 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
         };
 
         return AcceptedEnergyResultMessageDto.Create(
-            process.RequestedByActorId,
-            ActorRole.FromCode(process.RequestedByActorRoleCode),
+            process.RequestedByActor.ActorNumber,
+            process.RequestedByActor.ActorRole,
+            process.OriginalActor.ActorNumber,
+            process.OriginalActor.ActorRole,
             process.ProcessId.Id,
             EventId.From(Guid.NewGuid()),
             gridarea,
@@ -188,7 +190,9 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
             points.ToList().AsReadOnly(),
             process.BusinessReason.Name,
             1,
-            settlementVersion: process.SettlementVersion?.Name);
+            settlementVersion: process.SettlementVersion?.Name,
+            originalTransactionIdReference: process.BusinessTransactionId.Id,
+            relatedToMessageId: process.InitiatedByMessageId);
     }
 
     private static RejectedAggregatedMeasureDataRequest CreateRejectRequest()
@@ -210,6 +214,6 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
     {
         return _processContext.AggregatedMeasureDataProcesses
             .ToList()
-            .FirstOrDefault(x => x.RequestedByActorId.Value == senderNumber);
+            .FirstOrDefault(x => x.RequestedByActor.ActorNumber.Value == senderNumber);
     }
 }

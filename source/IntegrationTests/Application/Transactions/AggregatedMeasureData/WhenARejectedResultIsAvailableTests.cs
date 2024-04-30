@@ -25,6 +25,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Responses;
 using Xunit;
 using Xunit.Abstractions;
@@ -72,8 +73,8 @@ public class WhenARejectedResultIsAvailableTests : TestBase
             .HasEventId(expectedEventId)
             .HasProcessId(process.ProcessId)
             .HasBusinessReason(process.BusinessReason)
-            .HasReceiverId(process.RequestedByActorId.Value)
-            .HasReceiverRole(process.RequestedByActorRoleCode)
+            .HasReceiverId(process.RequestedByActor.ActorNumber.Value)
+            .HasReceiverRole(process.RequestedByActor.ActorRole.Code)
             .HasRelationTo(process.InitiatedByMessageId)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
@@ -102,11 +103,12 @@ public class WhenARejectedResultIsAvailableTests : TestBase
 
     private async Task<AggregatedMeasureDataProcess> BuildProcess()
     {
+        var requestedByActor = RequestedByActor.From(SampleData.ReceiverNumber, SampleData.BalanceResponsibleParty);
         var process = new AggregatedMeasureDataProcess(
           ProcessId.New(),
+          requestedByActor,
+          OriginalActor.From(requestedByActor),
           BusinessTransactionId.Create(Guid.NewGuid().ToString()),
-          SampleData.ReceiverNumber,
-          SampleData.BalanceResponsibleParty.Code,
           BusinessReason.BalanceFixing,
           MessageId.New(),
           null,

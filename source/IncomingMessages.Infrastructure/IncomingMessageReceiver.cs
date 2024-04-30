@@ -49,7 +49,7 @@ public class IncomingMessageReceiver : IIncomingMessageReceiver
         await AddMessageIdAndTransactionIdAsync(
                 incomingMessage.SenderNumber,
                 incomingMessage.MessageId,
-                incomingMessage.Serie.Select(x => x.TransactionId).ToList().AsReadOnly(),
+                incomingMessage.Series.Select(x => x.TransactionId).ToList().AsReadOnly(),
                 cancellationToken)
             .ConfigureAwait(false);
 
