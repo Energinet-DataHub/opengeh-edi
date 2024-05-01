@@ -18,11 +18,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.FunctionApp;
-using Energinet.DataHub.Core.App.FunctionApp.Extensions;
 using Energinet.DataHub.EDI.B2BApi.Authentication.Certificate;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -123,7 +123,13 @@ internal sealed class FunctionContextMock : FunctionContext
 
         public ValueTask<HttpRequestData?> GetHttpRequestDataAsync(FunctionContext context)
         {
-            var httpRequestData = context.Is(TriggerType.HttpTrigger) ? _httpRequestData : null;
+            var isHttpTrigger = context.FunctionDefinition.InputBindings.Any(
+                input => string.Equals(
+                    input.Value.Type,
+                    TriggerType.HttpTrigger.ToString(),
+                    StringComparison.OrdinalIgnoreCase));
+
+            var httpRequestData = isHttpTrigger ? _httpRequestData : null;
             return new ValueTask<HttpRequestData?>(httpRequestData);
         }
     }

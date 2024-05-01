@@ -22,9 +22,6 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.C
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Ebix;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 
