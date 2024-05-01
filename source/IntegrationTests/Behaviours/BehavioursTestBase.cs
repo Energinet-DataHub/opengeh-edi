@@ -311,16 +311,17 @@ public class BehavioursTestBase : IDisposable
         var incomingMessageClient = GetService<IIncomingMessageClient>();
 
         var incomingMessageStream = RequestAggregatedMeasureDataRequestBuilder.CreateIncomingMessage(
-            documentFormat,
-            senderActorNumber,
-            senderActorRole,
-            meteringPointType,
-            settlementMethod,
-            CreateDateInstant(periodStart.Year, periodStart.Month, periodStart.Day),
-            CreateDateInstant(periodEnd.Year, periodEnd.Month, periodEnd.Day),
-            energySupplier,
-            balanceResponsibleParty,
-            series);
+            format: documentFormat,
+            senderActorNumber: senderActorNumber,
+            senderActorRole: senderActorRole,
+            meteringPointType: meteringPointType,
+            settlementMethod: settlementMethod,
+            periodStart: CreateDateInstant(periodStart.Year, periodStart.Month, periodStart.Day),
+            periodEnd: CreateDateInstant(periodEnd.Year, periodEnd.Month, periodEnd.Day),
+            energySupplier: energySupplier,
+            balanceResponsibleParty: balanceResponsibleParty,
+            series: series,
+            ensureValidRequest: assertRequestWasSuccessful);
 
         var response = await
             incomingMessageClient.RegisterAndSendAsync(

@@ -37,13 +37,17 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
         Instant periodEnd,
         ActorNumber? energySupplier,
         ActorNumber? balanceResponsibleParty,
-        IReadOnlyCollection<(string? GridArea, string TransactionId)> series)
+        IReadOnlyCollection<(string? GridArea, string TransactionId)> series,
+        bool ensureValidRequest = true)
     {
-        EnsureValidRequest(
-            senderActorRole,
-            energySupplier,
-            balanceResponsibleParty,
-            series.Select(s => s.GridArea).ToArray());
+        if (ensureValidRequest)
+        {
+            EnsureValidRequest(
+                senderActorRole,
+                energySupplier,
+                balanceResponsibleParty,
+                series.Select(s => s.GridArea).ToArray());
+        }
 
         string content;
         if (format == DocumentFormat.Json)
@@ -273,6 +277,6 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
         var isValid = performValidation((energySupplier, balanceResponsibleParty, gridAreas));
 
         if (!isValid)
-            throw new ArgumentException($"Invalid data for the given sender role {senderActorRole.Name}. Energy supplier: {energySupplier?.Value}, balance responsible: {balanceResponsibleParty?.Value}, grid areas: {string.Join("::", gridAreas)}", nameof(senderActorRole));
+            throw new ArgumentException($"Invalid data for the given sender role {senderActorRole.Name}. Energy supplier: {energySupplier?.Value}, balance responsible: {balanceResponsibleParty?.Value}, grid areas: {string.Join("::", gridAreas)}");
     }
 }

@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.WellKnownTypes;
@@ -46,14 +47,9 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
                 var periodStart = InstantPattern.General.Parse(request.Period.Start).Value;
                 var periodEnd = InstantPattern.General.Parse(request.Period.End).Value;
 
-                var timeSeriesType = request.HasSettlementMethod
-                    ? request.SettlementMethod switch
-                        {
-                            BuildingBlocks.Domain.DataHub.DataHubNames.SettlementMethod.Flex => TimeSeriesType.FlexConsumption,
-                            BuildingBlocks.Domain.DataHub.DataHubNames.SettlementMethod.NonProfiled => TimeSeriesType.NonProfiledConsumption,
-                            _ => throw new NotImplementedException($"Unknown SettlementMethod: {request.SettlementMethod}"),
-                        }
-                    : TimeSeriesType.FlexConsumption;
+                var timeSeriesType = GetTimeSeriesType(
+                    request.HasSettlementMethod ? request.SettlementMethod : null,
+                    !string.IsNullOrEmpty(request.MeteringPointType) ? request.MeteringPointType : null);
                 var resolution = Resolution.Pt1H;
                 var points = CreatePoints(resolution, periodStart, periodEnd);
 
@@ -103,6 +99,18 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
         }
 
         return rejectedResponse;
+    }
+
+    private static TimeSeriesType GetTimeSeriesType(string? settlementMethod, string? meteringPointType)
+    {
+        return (settlementMethod, meteringPointType) switch
+        {
+            (DataHubNames.SettlementMethod.Flex, DataHubNames.MeteringPointType.Consumption) => TimeSeriesType.FlexConsumption,
+            (DataHubNames.SettlementMethod.NonProfiled, DataHubNames.MeteringPointType.Consumption) => TimeSeriesType.NonProfiledConsumption,
+            (null, DataHubNames.MeteringPointType.Production) => TimeSeriesType.Production,
+            (null, null) => TimeSeriesType.FlexConsumption, // Default if no settlement method or metering point type is set
+            _ => throw new NotImplementedException($"Not implemented combination of SettlementMethod and MeteringPointType ({settlementMethod} and {meteringPointType})"),
+        };
     }
 
     private static List<TimeSeriesPoint> CreatePoints(Resolution resolution, Instant periodStart, Instant periodEnd)
