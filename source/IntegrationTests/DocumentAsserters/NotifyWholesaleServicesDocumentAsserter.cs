@@ -29,7 +29,7 @@ public static class NotifyWholesaleServicesDocumentAsserter
 {
     private static readonly DocumentValidator _xmlDocumentValidator = new(new List<IValidator>
     {
-        new CimXmlValidator(new CimXmlSchemaProvider()),
+        new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas())),
         new EbixValidator(new EbixSchemaProvider()),
     });
 

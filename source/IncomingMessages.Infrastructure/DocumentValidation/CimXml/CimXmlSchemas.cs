@@ -34,6 +34,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidati
         {
             var schemaDictionary = new Dictionary<KeyValuePair<string, string>, string>();
             var schemas = Directory.GetFiles(schemaPath).ToList();
+
             foreach (var schema in schemas)
             {
                 var filename = Path.GetFileNameWithoutExtension(schema);

@@ -31,8 +31,13 @@ public class XmlMessageParser : IMessageParser
 {
     private const string SeriesRecordElementName = "Series";
     private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";
-    private readonly CimXmlSchemaProvider _schemaProvider = new();
+    private readonly CimXmlSchemaProvider _schemaProvider;
     private readonly List<ValidationError> _errors = new();
+
+    public XmlMessageParser(CimXmlSchemaProvider schemaProvider)
+    {
+        _schemaProvider = schemaProvider;
+    }
 
     public DocumentFormat HandledFormat => DocumentFormat.Xml;
 

@@ -22,9 +22,9 @@ public class CimXmlSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
 {
     private readonly ISchema _schema;
 
-    public CimXmlSchemaProvider()
+    public CimXmlSchemaProvider(CimXmlSchemas schemas)
     {
-        _schema = new CimXmlSchemas();
+        _schema = schemas;
     }
 
     public Task<XmlSchema?> GetAsync(DocumentType type, string version, CancellationToken cancellationToken)
