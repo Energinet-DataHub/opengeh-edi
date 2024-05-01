@@ -79,8 +79,6 @@ public static class NotifyAggregatedMeasureDataDocumentAsserter
             .HasCalculationResultVersion(assertionInput.CalculationVersion)
             .HasMeteringPointType(assertionInput.MeteringPointType)
             .HasGridAreaCode(assertionInput.GridAreaCode)
-            .HasEnergySupplierNumber(assertionInput.EnergySupplierNumber.Value)
-            .HasBalanceResponsibleNumber(assertionInput.BalanceResponsibleNumber.Value)
             .HasProductCode(assertionInput.ProductCode)
             .HasQuantityMeasurementUnit(assertionInput.QuantityMeasurementUnit)
             .HasSettlementMethod(assertionInput.SettlementMethod)
@@ -103,6 +101,12 @@ public static class NotifyAggregatedMeasureDataDocumentAsserter
         {
             asserter.SettlementVersionIsNotPresent();
         }
+
+        if (assertionInput.EnergySupplierNumber != null)
+            asserter.HasEnergySupplierNumber(assertionInput.EnergySupplierNumber.Value);
+
+        if (assertionInput.BalanceResponsibleNumber != null)
+            asserter.HasBalanceResponsibleNumber(assertionInput.BalanceResponsibleNumber.Value);
 
         await asserter
             .DocumentIsValidAsync();
