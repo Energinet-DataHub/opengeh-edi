@@ -18,10 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using System.Xml.XPath;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
@@ -963,6 +960,61 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
                     CreateDateInstant(2024, 1, 1),
                     CreateDateInstant(2024, 1, 31)),
                 Points: wholesaleServicesRequestAcceptedMessage.Series.Single().TimeSeriesPoints));
+    }
+
+    // TODO: Remove skip when Wholesale synchronous validation is implemented
+    // TODO: Add "Xml" tests when CIM XML is supported for Wholesale requests
+    [Theory(Skip = "Skipped until Wholesale synchronous validation is implemented")]
+    // [InlineData("Xml", DataHubNames.ActorRole.GridOperator, DataHubNames.ActorRole.Delegated)]
+    [InlineData("Json", DataHubNames.ActorRole.GridOperator, DataHubNames.ActorRole.Delegated)]
+    // [InlineData("Xml", DataHubNames.ActorRole.EnergySupplier, DataHubNames.ActorRole.Delegated)]
+    [InlineData("Json", DataHubNames.ActorRole.EnergySupplier, DataHubNames.ActorRole.Delegated)]
+    // [InlineData("Xml", DataHubNames.ActorRole.SystemOperator, DataHubNames.ActorRole.Delegated)]
+    [InlineData("Json", DataHubNames.ActorRole.SystemOperator, DataHubNames.ActorRole.Delegated)]
+    // [InlineData("Xml", DataHubNames.ActorRole.GridOperator, DataHubNames.ActorRole.GridOperator)]
+    [InlineData("Json", DataHubNames.ActorRole.GridOperator, DataHubNames.ActorRole.GridOperator)]
+    public async Task AndGiven_RequestDoesNotContainOriginalActorNumber_When_DelegatedActorPeeksAllMessages_Then_DelegationIsUnsuccessfulSoRequestIsRejectedWithCorrectInvalidRoleError(string incomingDocumentFormatName, string originalActorRoleName, string delegatedToRoleName)
+    {
+        var incomingDocumentFormat = DocumentFormat.FromName(incomingDocumentFormatName);
+        var originalActorRole = ActorRole.FromName(originalActorRoleName);
+        var delegatedToRole = ActorRole.FromName(delegatedToRoleName);
+
+        var senderSpy = CreateServiceBusSenderSpy();
+        var originalActor = new Actor(ActorNumber.Create("1111111111111"), ActorRole: originalActorRole);
+        var delegatedToActor = new Actor(ActorNumber: ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
+
+        if (originalActor.ActorRole == ActorRole.GridOperator)
+            await GivenGridAreaOwnershipAsync("804", originalActor.ActorNumber);
+
+        GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
+        await GivenDelegation(
+            originalActor,
+            delegatedToActor,
+            "804",
+            ProcessType.RequestEnergyResults,
+            GetNow());
+
+        var response = await GivenReceivedWholesaleServicesRequest(
+            documentFormat: incomingDocumentFormat,
+            senderActorNumber: delegatedToActor.ActorNumber,
+            senderActorRole: originalActor.ActorRole,
+            periodStart: (2024, 1, 1),
+            periodEnd: (2023, 12, 31),
+            energySupplierActorNumber: null,
+            chargeOwnerActorNumber: null,
+            chargeCode: null,
+            chargeType: null,
+            isMonthly: false,
+            series: new (string? GridArea, string TransactionId)[]
+            {
+                (null, "123564789123564789123564789123564787"),
+            },
+            assertRequestWasSuccessful: false);
+
+        using var scope = new AssertionScope();
+        response.IsErrorResponse.Should().BeTrue("because a synchronous error should have occurred");
+        response.MessageBody.Should().ContainAll("The authenticated user does not hold the required role");
+        senderSpy.MessageSent.Should().BeFalse();
     }
 
     private async Task<string> GetGridAreaFromNotifyWholesaleServicesDocument(Stream documentStream, DocumentFormat documentFormat)
