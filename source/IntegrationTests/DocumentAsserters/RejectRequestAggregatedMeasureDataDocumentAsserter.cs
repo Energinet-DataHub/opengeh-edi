@@ -23,6 +23,8 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.E
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestWholesaleSettlement;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 
@@ -39,7 +41,7 @@ public static class RejectRequestAggregatedMeasureDataDocumentAsserter
 
         var xmlDocumentValidator = new DocumentValidator(new List<IValidator>
         {
-            new CimXmlValidator(new CimXmlSchemaProvider()),
+            new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas())),
             new EbixValidator(new EbixSchemaProvider()),
         });
         IAssertRejectRequestAggregatedMeasureDataDocument asserter = documentFormat.Name switch

@@ -78,7 +78,9 @@ public static class IncomingMessagesExtensions
             .AddSingleton<ResponseFactory>();
 
         //RegisterSchemaProviders
-        services.AddSingleton<CimJsonSchemas>()
+        services
+            .AddSingleton<CimJsonSchemas>()
+            .AddSingleton<CimXmlSchemas>()
             .AddSingleton<CimXmlSchemaProvider>()
             .AddSingleton<JsonSchemaProvider>()
 
