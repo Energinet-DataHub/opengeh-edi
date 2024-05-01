@@ -90,9 +90,9 @@ public class IncomingMessageReceiver
         var responseMessage = await _incomingMessageClient
             .RegisterAndSendAsync(
                 new IncomingMessageStream(request.Body),
-                documentFormat: documentFormat,
+                incomingDocumentFormat: documentFormat,
                 incomingDocumentType,
-                responseFormat: documentFormat,
+                responseDocumentFormat: documentFormat,
                 cancellationToken)
             .ConfigureAwait(false);
 

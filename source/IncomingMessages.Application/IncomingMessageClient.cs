@@ -67,16 +67,16 @@ public class IncomingMessageClient : IIncomingMessageClient
 
     public async Task<ResponseMessage> RegisterAndSendAsync(
         IIncomingMessageStream incomingMessageStream,
-        DocumentFormat documentFormat,
+        DocumentFormat incomingDocumentFormat,
         IncomingDocumentType documentType,
-        DocumentFormat responseFormat,
+        DocumentFormat responseDocumentFormat,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(documentType);
         ArgumentNullException.ThrowIfNull(incomingMessageStream);
 
         var incomingMarketMessageParserResult =
-            await _marketMessageParser.ParseAsync(incomingMessageStream, documentFormat, documentType, cancellationToken)
+            await _marketMessageParser.ParseAsync(incomingMessageStream, incomingDocumentFormat, documentType, cancellationToken)
                 .ConfigureAwait(false);
 
         if (incomingMarketMessageParserResult.Errors.Count != 0
@@ -87,7 +87,7 @@ public class IncomingMessageClient : IIncomingMessageClient
                 "Failed to parse incoming message {DocumentType}. Errors: {Errors}",
                 documentType,
                 res.Errors);
-            return _responseFactory.From(res, responseFormat);
+            return _responseFactory.From(res, responseDocumentFormat);
         }
 
         await ArchiveIncomingMessageAsync(
@@ -120,7 +120,7 @@ public class IncomingMessageClient : IIncomingMessageClient
                 "Failed to validate incoming message: {MessageId}. Errors: {Errors}",
                 incomingMarketMessageParserResult.IncomingMessage?.MessageId,
                 incomingMarketMessageParserResult.Errors);
-            return _responseFactory.From(validationResult, responseFormat);
+            return _responseFactory.From(validationResult, responseDocumentFormat);
         }
 
         var result = await _incomingMessageReceiver
@@ -138,7 +138,7 @@ public class IncomingMessageClient : IIncomingMessageClient
             "Failed to save incoming message: {MessageId}. Errors: {Errors}",
             incomingMarketMessageParserResult.IncomingMessage!.MessageId,
             incomingMarketMessageParserResult.Errors);
-        return _responseFactory.From(result, responseFormat);
+        return _responseFactory.From(result, responseDocumentFormat);
     }
 
     private async Task ArchiveIncomingMessageAsync(

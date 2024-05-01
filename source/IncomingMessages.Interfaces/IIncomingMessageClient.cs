@@ -24,8 +24,8 @@ public interface IIncomingMessageClient
 {
     Task<ResponseMessage> RegisterAndSendAsync(
         IIncomingMessageStream incomingMessageStream,
-        DocumentFormat documentFormat,
+        DocumentFormat incomingDocumentFormat,
         IncomingDocumentType documentType,
-        DocumentFormat responseFormat,
+        DocumentFormat responseDocumentFormat,
         CancellationToken cancellationToken);
 }

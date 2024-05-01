@@ -36,10 +36,10 @@ internal static class RequestWholesaleServicesRequestBuilder
         ActorRole senderActorRole,
         Instant periodStart,
         Instant periodEnd,
-        ActorNumber energySupplierActorNumber,
-        ActorNumber chargeOwnerActorNumber,
-        string chargeCode,
-        ChargeType chargeType,
+        ActorNumber? energySupplierActorNumber,
+        ActorNumber? chargeOwnerActorNumber,
+        string? chargeCode,
+        ChargeType? chargeType,
         bool isMonthly,
         IReadOnlyCollection<(string? GridArea, string TransactionId)> series)
     {
@@ -51,10 +51,10 @@ internal static class RequestWholesaleServicesRequestBuilder
                 senderActorRole.Code,
                 periodStart.ToString(),
                 periodEnd.ToString(),
-                energySupplierActorNumber.Value,
-                chargeOwnerActorNumber.Value,
+                energySupplierActorNumber?.Value,
+                chargeOwnerActorNumber?.Value,
                 chargeCode,
-                chargeType.Code,
+                chargeType?.Code,
                 isMonthly,
                 series);
         }
@@ -65,10 +65,10 @@ internal static class RequestWholesaleServicesRequestBuilder
                 senderActorRole.Code,
                 periodStart.ToString(),
                 periodEnd.ToString(),
-                energySupplierActorNumber.Value,
-                chargeOwnerActorNumber.Value,
+                energySupplierActorNumber?.Value,
+                chargeOwnerActorNumber?.Value,
                 chargeCode,
-                chargeType.Code,
+                chargeType?.Code,
                 isMonthly,
                 series);
         }
@@ -85,10 +85,10 @@ internal static class RequestWholesaleServicesRequestBuilder
         string senderActorRole,
         string periodStart,
         string periodEnd,
-        string energySupplierActorNumber,
-        string chargeOwnerActorNumber,
-        string chargeCode,
-        string chargeType,
+        string? energySupplierActorNumber,
+        string? chargeOwnerActorNumber,
+        string? chargeCode,
+        string? chargeType,
         bool isMonthly,
         IReadOnlyCollection<(string? GridArea, string TransactionId)> series)
     {
@@ -124,29 +124,57 @@ internal static class RequestWholesaleServicesRequestBuilder
         {{
             ""mRID"": ""{s.TransactionId}"",
             {GetCimJsonResolutionSection(isMonthly)}
-            ""chargeTypeOwner_MarketParticipant.mRID"": {{
-              ""codingScheme"": ""A10"",
-              ""value"": ""{chargeOwnerActorNumber}""
-            }},
+            {GetCimJsonChargeOwnerSection(chargeOwnerActorNumber)}
             ""end_DateAndOrTime.dateTime"": ""{periodEnd}"",
-            ""energySupplier_MarketParticipant.mRID"": {{
-              ""codingScheme"": ""A10"",
-              ""value"": ""{energySupplierActorNumber}""
-            }},
+            {GetCimJsonEnergySupplierSection(energySupplierActorNumber)}
             {GetCimJsonGridAreaElement(s.GridArea)}
             ""start_DateAndOrTime.dateTime"": ""{periodStart}"",
-            ""ChargeType"": [
-              {{
-                ""mRID"": ""{chargeCode}"",
-                ""type"": {{
-                  ""value"": ""{chargeType}""
-                }}
-              }}
-            ]
+            ""ChargeType"": {GetCimJsonChargeTypeSection(new() { (chargeCode, chargeType) })}
         }}"))}
     ]
   }}
 }}";
+    }
+
+    private static string GetCimJsonChargeOwnerSection(string? chargeOwnerActorNumber)
+    {
+        return chargeOwnerActorNumber != null
+            ? $@"
+                ""chargeTypeOwner_MarketParticipant.mRID"": {{
+                    ""codingScheme"": ""A10"",
+                    ""value"": ""{chargeOwnerActorNumber}""
+                }},"
+            : string.Empty;
+    }
+
+    private static string GetCimJsonChargeTypeSection(List<(string? ChargeCode, string? ChargeType)> chargeTypes)
+    {
+        var array = "[";
+
+        array += string.Join(",\n", chargeTypes
+            .Where(c => c.ChargeCode != null || c.ChargeType != null)
+            .Select((c) => $@"
+                {{
+                    ""mRID"": ""{c.ChargeCode}"",
+                    ""type"": {{
+                        ""value"": ""{c.ChargeType}""
+                    }}
+                }}"));
+
+        array += "]";
+
+        return array;
+    }
+
+    private static string GetCimJsonEnergySupplierSection(string? energySupplierActorNumber)
+    {
+        return energySupplierActorNumber != null
+            ? $@"
+                ""energySupplier_MarketParticipant.mRID"": {{
+                    ""codingScheme"": ""A10"",
+                    ""value"": ""{energySupplierActorNumber}""
+                }},"
+            : string.Empty;
     }
 
     private static string GetCimJsonResolutionSection(bool isMonthly)
@@ -175,10 +203,10 @@ internal static class RequestWholesaleServicesRequestBuilder
         string senderActorRole,
         string periodStart,
         string periodEnd,
-        string energySupplierActorNumber,
-        string chargeOwnerActorNumber,
-        string chargeCode,
-        string chargeType,
+        string? energySupplierActorNumber,
+        string? chargeOwnerActorNumber,
+        string? chargeCode,
+        string? chargeType,
         bool isMonthly,
         IReadOnlyCollection<(string? GridArea, string TransactionId)> series)
     {
@@ -201,15 +229,38 @@ internal static class RequestWholesaleServicesRequestBuilder
 		    <cim:start_DateAndOrTime.dateTime>{periodStart}</cim:start_DateAndOrTime.dateTime>
 		    <cim:end_DateAndOrTime.dateTime>{periodEnd}</cim:end_DateAndOrTime.dateTime>
 		    {GetCimXmlGridAreaSection(s.GridArea)}
-		    <cim:energySupplier_MarketParticipant.mRID codingScheme=""A10"">{energySupplierActorNumber}</cim:energySupplier_MarketParticipant.mRID>
-		    <cim:chargeTypeOwner_MarketParticipant.mRID codingScheme=""A10"">{chargeOwnerActorNumber}</cim:chargeTypeOwner_MarketParticipant.mRID>
+            {GetCimXmlEnergySupplierSection(energySupplierActorNumber)}
+            {GetCimXmlChargeOwnerSection(chargeOwnerActorNumber)}
 		    {GetCimXmlResolutionSection(isMonthly)}
-		    <cim:ChargeType>
-			    <cim:type>{chargeType}</cim:type>
-			    <cim:mRID>{chargeCode}</cim:mRID>
-		    </cim:ChargeType>
+            {GetCimXmlChargeTypesSection(new() { (chargeType, chargeCode) })}
 	    </cim:Series>"))}
 </cim:RequestWholesaleSettlement_MarketDocument>";
+    }
+
+    private static string GetCimXmlChargeTypesSection(List<(string? ChargeType, string? ChargeCode)> chargeTypes)
+    {
+        return string.Join("\n", chargeTypes
+            .Where(c => c.ChargeCode != null || c.ChargeType != null)
+            .Select(c => @$"
+                <cim:ChargeType>
+			        <cim:type>{c.ChargeType}</cim:type>
+			        <cim:mRID>{c.ChargeCode}</cim:mRID>
+		        </cim:ChargeType>
+            "));
+    }
+
+    private static string GetCimXmlChargeOwnerSection(string? chargeOwnerActorNumber)
+    {
+        return chargeOwnerActorNumber != null
+            ? $"<cim:chargeTypeOwner_MarketParticipant.mRID codingScheme=\"A10\">{{chargeOwnerActorNumber}}</cim:chargeTypeOwner_MarketParticipant.mRID>"
+            : string.Empty;
+    }
+
+    private static string GetCimXmlEnergySupplierSection(string? energySupplierActorNumber)
+    {
+        return energySupplierActorNumber != null
+            ? $"<cim:energySupplier_MarketParticipant.mRID codingScheme=\"A10\">{energySupplierActorNumber}</cim:energySupplier_MarketParticipant.mRID>"
+            : string.Empty;
     }
 
     private static string GetCimXmlResolutionSection(bool isMonthly)
