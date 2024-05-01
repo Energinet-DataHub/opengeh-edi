@@ -32,8 +32,6 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.C
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using FluentAssertions.Execution;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using NodaTime;
 using Xunit;
 using RequestAggregatedMeasureDataDto = Energinet.DataHub.EDI.IncomingMessages.Interfaces.RequestAggregatedMeasureDataDto;
