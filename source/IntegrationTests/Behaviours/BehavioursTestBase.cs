@@ -299,8 +299,8 @@ public class BehavioursTestBase : IDisposable
         DocumentFormat documentFormat,
         ActorNumber senderActorNumber,
         ActorRole senderActorRole,
-        MeteringPointType meteringPointType,
-        SettlementMethod settlementMethod,
+        MeteringPointType? meteringPointType,
+        SettlementMethod? settlementMethod,
         (int Year, int Month, int Day) periodStart,
         (int Year, int Month, int Day) periodEnd,
         ActorNumber? energySupplier,
@@ -310,17 +310,18 @@ public class BehavioursTestBase : IDisposable
     {
         var incomingMessageClient = GetService<IIncomingMessageClient>();
 
-        var incomingMessageStream = RequestAggregatedMeasureDataRequestBuilder.GetStream(
-            documentFormat,
-            senderActorNumber,
-            senderActorRole,
-            meteringPointType,
-            settlementMethod,
-            CreateDateInstant(periodStart.Year, periodStart.Month, periodStart.Day),
-            CreateDateInstant(periodEnd.Year, periodEnd.Month, periodEnd.Day),
-            energySupplier,
-            balanceResponsibleParty,
-            series);
+        var incomingMessageStream = RequestAggregatedMeasureDataRequestBuilder.CreateIncomingMessage(
+            format: documentFormat,
+            senderActorNumber: senderActorNumber,
+            senderActorRole: senderActorRole,
+            meteringPointType: meteringPointType,
+            settlementMethod: settlementMethod,
+            periodStart: CreateDateInstant(periodStart.Year, periodStart.Month, periodStart.Day),
+            periodEnd: CreateDateInstant(periodEnd.Year, periodEnd.Month, periodEnd.Day),
+            energySupplier: energySupplier,
+            balanceResponsibleParty: balanceResponsibleParty,
+            series: series,
+            ensureValidRequest: assertRequestWasSuccessful);
 
         var response = await
             incomingMessageClient.RegisterAndSendAsync(
@@ -632,7 +633,7 @@ public class BehavioursTestBase : IDisposable
             Period period,
             SettlementVersion? settlementVersion,
             SettlementMethod? settlementMethod,
-            MeteringPointType meteringPointType)
+            MeteringPointType? meteringPointType)
     {
         var (message, processId) = AssertServiceBusMessage(
             senderSpy,
@@ -669,7 +670,10 @@ public class BehavioursTestBase : IDisposable
         else
             message.SettlementMethod.Should().Be(settlementMethod.Name);
 
-        message.MeteringPointType.Should().Be(meteringPointType.Name);
+        if (meteringPointType == null)
+            message.MeteringPointType.Should().BeEmpty(); // Contract is incorrect and doesn't have MeteringPointType as optional
+        else
+            message.MeteringPointType.Should().Be(meteringPointType.Name);
 
         return Task.FromResult((message, processId));
     }
