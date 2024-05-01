@@ -49,7 +49,6 @@ limitations under the License.
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
-        <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.1.2" />
     </ItemGroup>
     <ItemGroup>
         <None Update="host.json">
