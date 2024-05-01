@@ -295,7 +295,7 @@ public class BehavioursTestBase : IDisposable
                 CancellationToken.None);
     }
 
-    protected async Task GivenReceivedAggregatedMeasureDataRequest(
+    protected async Task<ResponseMessage> GivenReceivedAggregatedMeasureDataRequest(
         DocumentFormat documentFormat,
         ActorNumber senderActorNumber,
         ActorRole senderActorRole,
@@ -305,7 +305,8 @@ public class BehavioursTestBase : IDisposable
         (int Year, int Month, int Day) periodEnd,
         ActorNumber? energySupplier,
         ActorNumber? balanceResponsibleParty,
-        IReadOnlyCollection<(string? GridArea, string TransactionId)> series)
+        IReadOnlyCollection<(string? GridArea, string TransactionId)> series,
+        bool assertRequestWasSuccessful = true)
     {
         var incomingMessageClient = GetService<IIncomingMessageClient>();
 
@@ -326,27 +327,32 @@ public class BehavioursTestBase : IDisposable
                 incomingMessageStream,
                 documentFormat,
                 IncomingDocumentType.RequestAggregatedMeasureData,
+                documentFormat,
                 CancellationToken.None);
 
-        using (new AssertionScope())
+        if (assertRequestWasSuccessful)
         {
+            using var scope = new AssertionScope();
             response.IsErrorResponse.Should().BeFalse("because the response should not have an error. Actual response: {0}", response.MessageBody);
             response.MessageBody.Should().BeEmpty();
         }
+
+        return response;
     }
 
-    protected async Task GivenReceivedWholesaleServicesRequest(
+    protected async Task<ResponseMessage> GivenReceivedWholesaleServicesRequest(
         DocumentFormat documentFormat,
         ActorNumber senderActorNumber,
         ActorRole senderActorRole,
         (int Year, int Month, int Day) periodStart,
         (int Year, int Month, int Day) periodEnd,
-        ActorNumber energySupplierActorNumber,
-        ActorNumber chargeOwnerActorNumber,
-        string chargeCode,
-        ChargeType chargeType,
+        ActorNumber? energySupplierActorNumber,
+        ActorNumber? chargeOwnerActorNumber,
+        string? chargeCode,
+        ChargeType? chargeType,
         bool isMonthly,
-        IReadOnlyCollection<(string? GridArea, string TransactionId)> series)
+        IReadOnlyCollection<(string? GridArea, string TransactionId)> series,
+        bool assertRequestWasSuccessful = true)
     {
         var incomingMessageClient = GetService<IIncomingMessageClient>();
 
@@ -368,13 +374,17 @@ public class BehavioursTestBase : IDisposable
                 incomingMessageStream,
                 documentFormat,
                 IncomingDocumentType.RequestWholesaleSettlement,
+                documentFormat,
                 CancellationToken.None);
 
-        using (new AssertionScope())
+        if (assertRequestWasSuccessful)
         {
+            using var scope = new AssertionScope();
             response.IsErrorResponse.Should().BeFalse();
             response.MessageBody.Should().BeEmpty();
         }
+
+        return response;
     }
 
     protected async Task GivenInitializeAggregatedMeasureDataProcessDtoIsHandledAsync(

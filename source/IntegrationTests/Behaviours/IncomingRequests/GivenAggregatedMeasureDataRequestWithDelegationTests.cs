@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
@@ -923,7 +924,57 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTe
         resultGridAreas.Should().BeEquivalentTo("106", "512", "804");
     }
 
-    protected Task GivenAggregatedMeasureDataRequestRejectedIsReceived(Guid processId, AggregatedTimeSeriesRequestRejected rejectedMessage)
+    [Theory]
+    [InlineData("Xml", DataHubNames.ActorRole.GridOperator, DataHubNames.ActorRole.Delegated)]
+    [InlineData("Json", DataHubNames.ActorRole.GridOperator, DataHubNames.ActorRole.Delegated)]
+    [InlineData("Xml", DataHubNames.ActorRole.EnergySupplier, DataHubNames.ActorRole.Delegated)]
+    [InlineData("Json", DataHubNames.ActorRole.EnergySupplier, DataHubNames.ActorRole.Delegated)]
+    [InlineData("Xml", DataHubNames.ActorRole.BalanceResponsibleParty, DataHubNames.ActorRole.Delegated)]
+    [InlineData("Json", DataHubNames.ActorRole.BalanceResponsibleParty, DataHubNames.ActorRole.Delegated)]
+    public async Task AndGiven_RequestDoesNotContainOriginalActorNumber_When_DelegatedActorPeeksAllMessages_Then_DelegationIsUnsuccessfulSoRequestIsRejectedWithCorrectInvalidRoleError(string incomingDocumentFormatName, string originalActorRoleName, string delegatedToRoleName)
+    {
+        var incomingDocumentFormat = DocumentFormat.FromName(incomingDocumentFormatName);
+        var originalActorRole = ActorRole.FromName(originalActorRoleName);
+        var delegatedToRole = ActorRole.FromName(delegatedToRoleName);
+
+        var senderSpy = CreateServiceBusSenderSpy();
+        var originalActor = new Actor(ActorNumber.Create("1111111111111"), ActorRole: originalActorRole);
+        var delegatedToActor = new Actor(ActorNumber: ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
+
+        if (originalActor.ActorRole == ActorRole.GridOperator)
+            await GivenGridAreaOwnershipAsync("804", originalActor.ActorNumber);
+
+        GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
+        await GivenDelegation(
+            originalActor,
+            delegatedToActor,
+            "804",
+            ProcessType.RequestEnergyResults,
+            GetNow());
+
+        var response = await GivenReceivedAggregatedMeasureDataRequest(
+            incomingDocumentFormat,
+            delegatedToActor.ActorNumber,
+            originalActor.ActorRole,
+            MeteringPointType.Consumption,
+            SettlementMethod.Flex,
+            (2024, 1, 1),
+            (2023, 12, 31),
+            null,
+            null,
+            new (string? GridArea, string TransactionId)[]
+            {
+                (null, "123564789123564789123564789123564787"),
+            },
+            assertRequestWasSuccessful: false);
+
+        using var scope = new AssertionScope();
+        response.IsErrorResponse.Should().BeTrue("because a synchronous error should have occurred");
+        response.MessageBody.Should().ContainAll("The authenticated user does not hold the required role");
+        senderSpy.MessageSent.Should().BeFalse();
+    }
+
+    private Task GivenAggregatedMeasureDataRequestRejectedIsReceived(Guid processId, AggregatedTimeSeriesRequestRejected rejectedMessage)
     {
         return HavingReceivedInboxEventAsync(
             eventType: nameof(AggregatedTimeSeriesRequestRejected),

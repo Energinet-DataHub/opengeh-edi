@@ -22,5 +22,10 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 #pragma warning disable SA1600
 public interface IIncomingMessageClient
 {
-    Task<ResponseMessage> RegisterAndSendAsync(IIncomingMessageStream incomingMessageStream, DocumentFormat documentFormat, IncomingDocumentType documentType, CancellationToken cancellationToken, DocumentFormat responseFormat = null!);
+    Task<ResponseMessage> RegisterAndSendAsync(
+        IIncomingMessageStream incomingMessageStream,
+        DocumentFormat incomingDocumentFormat,
+        IncomingDocumentType documentType,
+        DocumentFormat responseDocumentFormat,
+        CancellationToken cancellationToken);
 }
