@@ -33,8 +33,6 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
     public static AggregatedTimeSeriesRequestAccepted GenerateAcceptedFrom(
         AggregatedTimeSeriesRequest request, Instant now, IReadOnlyCollection<string>? defaultGridAreas = null)
     {
-        var @event = new AggregatedTimeSeriesRequestAccepted();
-
         if (request.GridAreaCodes.Count == 0 && defaultGridAreas == null)
             throw new ArgumentNullException(nameof(defaultGridAreas), "defaultGridAreas must be set when request has no GridAreaCodes");
 
@@ -48,12 +46,14 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
                 var periodStart = InstantPattern.General.Parse(request.Period.Start).Value;
                 var periodEnd = InstantPattern.General.Parse(request.Period.End).Value;
 
-                var timeSeriesType = request.SettlementMethod switch
-                {
-                    BuildingBlocks.Domain.DataHub.DataHubNames.SettlementMethod.Flex => TimeSeriesType.FlexConsumption,
-                    BuildingBlocks.Domain.DataHub.DataHubNames.SettlementMethod.NonProfiled => TimeSeriesType.NonProfiledConsumption,
-                    _ => throw new NotImplementedException($"Unknown SettlementMethod: {request.SettlementMethod}"),
-                };
+                var timeSeriesType = request.HasSettlementMethod
+                    ? request.SettlementMethod switch
+                        {
+                            BuildingBlocks.Domain.DataHub.DataHubNames.SettlementMethod.Flex => TimeSeriesType.FlexConsumption,
+                            BuildingBlocks.Domain.DataHub.DataHubNames.SettlementMethod.NonProfiled => TimeSeriesType.NonProfiledConsumption,
+                            _ => throw new NotImplementedException($"Unknown SettlementMethod: {request.SettlementMethod}"),
+                        }
+                    : TimeSeriesType.FlexConsumption;
                 var resolution = Resolution.Pt1H;
                 var points = CreatePoints(resolution, periodStart, periodEnd);
 
@@ -73,22 +73,25 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
                 };
             });
 
-        @event.Series.Add(series);
+        var acceptedResponse = new AggregatedTimeSeriesRequestAccepted
+        {
+            Series = { series },
+        };
 
-        return @event;
+        return acceptedResponse;
     }
 
     public static AggregatedTimeSeriesRequestRejected GenerateRejectedFrom(AggregatedTimeSeriesRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var rejectedMessage = new AggregatedTimeSeriesRequestRejected();
+        var rejectedResponse = new AggregatedTimeSeriesRequestRejected();
 
         var start = InstantPattern.General.Parse(request.Period.Start).Value;
         var end = InstantPattern.General.Parse(request.Period.End).Value;
         if (end <= start)
         {
-            rejectedMessage.RejectReasons.Add(new RejectReason
+            rejectedResponse.RejectReasons.Add(new RejectReason
             {
                 ErrorCode = "E17",
                 ErrorMessage = "Det er kun muligt at anmode om data på for en hel måned i forbindelse med en balancefiksering eller korrektioner / It is only possible to request data for a full month in relation to balancefixing or corrections",
@@ -99,7 +102,7 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
             throw new NotImplementedException("Cannot generate rejected message for request");
         }
 
-        return rejectedMessage;
+        return rejectedResponse;
     }
 
     private static List<TimeSeriesPoint> CreatePoints(Resolution resolution, Instant periodStart, Instant periodEnd)
