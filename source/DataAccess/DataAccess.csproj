@@ -10,7 +10,7 @@
     <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="8.0.0"/>
     <PackageReference Include="Dapper" Version="2.1.35" />
     <PackageReference Include="Dapper-NodaTime" Version="0.1.0"/>
-    <PackageReference Include="Energinet.DataHub.Core.App.Common" Version="12.1.0"/>
+    <PackageReference Include="Energinet.DataHub.Core.App.Common" Version="12.2.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0"/>
   </ItemGroup>
 
