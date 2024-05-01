@@ -370,18 +370,6 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix {
         public marketMessagingB2BServiceV01PortTypeClient() {
         }
 
-        public marketMessagingB2BServiceV01PortTypeClient(string endpointConfigurationName) :
-                base(endpointConfigurationName) {
-        }
-
-        public marketMessagingB2BServiceV01PortTypeClient(string endpointConfigurationName, string remoteAddress) :
-                base(endpointConfigurationName, remoteAddress) {
-        }
-
-        public marketMessagingB2BServiceV01PortTypeClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) :
-                base(endpointConfigurationName, remoteAddress) {
-        }
-
         public marketMessagingB2BServiceV01PortTypeClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) :
                 base(binding, remoteAddress) {
         }
