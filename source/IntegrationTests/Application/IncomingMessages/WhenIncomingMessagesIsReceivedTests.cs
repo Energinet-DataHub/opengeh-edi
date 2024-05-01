@@ -19,6 +19,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoFixture;
 using Azure.Messaging.ServiceBus;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
@@ -91,6 +92,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
           incomingMessageStream,
           format,
           incomingDocumentType,
+          format,
           CancellationToken.None);
 
       // Assert
@@ -117,6 +119,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsMdr.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
+            DocumentFormat.Json,
             CancellationToken.None);
 
         // Assert
@@ -145,6 +148,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             incomingMessageStream,
             format,
             incomingDocumentType,
+            format,
             CancellationToken.None));
 
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
@@ -180,11 +184,13 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             incomingMessageStream,
             format,
             incomingDocumentType,
+            format,
             CancellationToken.None);
         var task02 = secondParser.RegisterAndSendAsync(
             incomingMessageStream,
             format,
             incomingDocumentType,
+            format,
             CancellationToken.None);
 
         // Act
@@ -225,11 +231,13 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             incomingMessageStream,
             format,
             incomingDocumentType,
+            format,
             CancellationToken.None);
         var task02 = secondParser.RegisterAndSendAsync(
             incomingMessageStream,
             format,
             incomingDocumentType,
+            format,
             CancellationToken.None);
 
         // Act
@@ -258,6 +266,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             incomingMessageStream,
             format,
             incomingDocumentType,
+            format,
             CancellationToken.None);
 
         // Assert
@@ -285,6 +294,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             messageStream,
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
+            DocumentFormat.Json,
             CancellationToken.None);
 
         // Assert
@@ -328,6 +338,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             messageStream,
             DocumentFormat.Json,
             incomingDocumentType,
+            DocumentFormat.Json,
             CancellationToken.None);
 
         // Assert
