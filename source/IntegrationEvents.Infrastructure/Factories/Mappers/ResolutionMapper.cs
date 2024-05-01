@@ -25,6 +25,7 @@ public static class ResolutionMapper
         return resolution switch
         {
             EnergyResultProducedV2.Types.Resolution.Quarter => Resolution.QuarterHourly,
+            // EnergyResultProducedV2.Types.Resolution.Hourly => Resolution.Hourly,
             EnergyResultProducedV2.Types.Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution type"),
             _ => throw new ArgumentOutOfRangeException(nameof(resolution), resolution, "Unknown resolution from Wholesale"),
         };
