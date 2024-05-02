@@ -34,7 +34,7 @@ using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Test class")]
-public class GivenAggregatedMeasureDataRequestTests : BehavioursTestBase
+public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehaviourTestBase
 {
     public GivenAggregatedMeasureDataRequestTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
