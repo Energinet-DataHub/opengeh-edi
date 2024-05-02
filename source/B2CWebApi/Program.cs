@@ -19,7 +19,6 @@ using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.WebApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.WebApp.Extensions.DependencyInjection;
-using Energinet.DataHub.Core.Logging.LoggingMiddleware;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
@@ -28,7 +27,7 @@ using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjectio
 
 var builder = WebApplication.CreateBuilder(args);
 
-const string domainName = "EDI";
+const string subsystemName = "EDI";
 
 builder.Logging
     .ClearProviders()
@@ -40,8 +39,7 @@ builder.Services
     .AddApiVersioningForWebApp(new ApiVersion(1, 0))
 
     // Logging
-    .AddApplicationInsightsForWebApp(domainName)
-    .AddHttpLoggingScope(domainName)
+    .AddApplicationInsightsForWebApp(subsystemName)
     .AddApplicationInsightsTelemetry()
 
     // Health checks
@@ -87,7 +85,6 @@ if (isDevelopment)
 
 app
     .UseSwaggerForWebApp()
-    .UseLoggingScope()
     .UseHttpsRedirection()
     .UseAuthentication()
     .UseAuthorization()
