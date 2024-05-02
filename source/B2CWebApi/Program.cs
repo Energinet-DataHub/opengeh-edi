@@ -19,7 +19,6 @@ using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.WebApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.WebApp.Extensions.DependencyInjection;
-using Energinet.DataHub.Core.Logging.LoggingMiddleware;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
@@ -41,8 +40,6 @@ builder.Services
 
     // Logging
     .AddApplicationInsightsForWebApp(domainName)
-    .AddHttpLoggingScope(domainName)
-    .AddApplicationInsightsTelemetry()
 
     // Health checks
     .AddHealthChecksForWebApp()
@@ -87,7 +84,6 @@ if (isDevelopment)
 
 app
     .UseSwaggerForWebApp()
-    .UseLoggingScope()
     .UseHttpsRedirection()
     .UseAuthentication()
     .UseAuthorization()
