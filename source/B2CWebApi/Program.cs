@@ -40,7 +40,6 @@ builder.Services
 
     // Logging
     .AddApplicationInsightsForWebApp(domainName)
-    .AddApplicationInsightsTelemetry()
 
     // Health checks
     .AddHealthChecksForWebApp()
