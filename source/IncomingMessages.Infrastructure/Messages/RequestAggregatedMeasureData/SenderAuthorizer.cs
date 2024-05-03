@@ -70,33 +70,33 @@ public class SenderAuthorizer : ISenderAuthorizer
 
         switch (message)
         {
-            case RequestAggregatedMeasureDataMessage ramdm
-                when !ramdm.SenderRoleCode.Equals(
-                         ActorRole.EnergySupplier.Code,
-                         StringComparison.OrdinalIgnoreCase)
-                     && !ramdm.SenderRoleCode.Equals(
-                         ActorRole.MeteredDataResponsible.Code,
-                         StringComparison.OrdinalIgnoreCase)
-                     && !ramdm.SenderRoleCode.Equals(
-                         ActorRole.BalanceResponsibleParty.Code,
-                         StringComparison.OrdinalIgnoreCase)
-                     && HackThatAllowDdmToDoRequestsAsMdr(ramdm.SenderRoleCode):
-                _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
+            case RequestAggregatedMeasureDataMessage ramdm:
+                switch (ramdm.SenderRoleCode)
+                {
+                    case var sc1 when sc1.Equals(ActorRole.EnergySupplier.Code, StringComparison.OrdinalIgnoreCase):
+                    case var sc2 when sc2.Equals(ActorRole.MeteredDataResponsible.Code, StringComparison.OrdinalIgnoreCase):
+                    case var sc3 when sc3.Equals(ActorRole.BalanceResponsibleParty.Code, StringComparison.OrdinalIgnoreCase):
+                    case var sc4 when !HackThatAllowDdmToDoRequestsAsMdr(sc4):
+                        break;
+                    default:
+                        _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
+                        break;
+                }
+
                 break;
-            case RequestAggregatedMeasureDataMessage: break;
-            case RequestWholesaleServicesMessage rwsm
-                when !rwsm.SenderRoleCode.Equals(
-                         ActorRole.EnergySupplier.Code,
-                         StringComparison.OrdinalIgnoreCase)
-                     && !rwsm.SenderRoleCode.Equals(
-                         ActorRole.GridOperator.Code,
-                         StringComparison.OrdinalIgnoreCase)
-                     && !rwsm.SenderRoleCode.Equals(
-                         ActorRole.SystemOperator.Code,
-                         StringComparison.OrdinalIgnoreCase):
-                _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
+            case RequestWholesaleServicesMessage rwsm:
+                switch (rwsm.SenderRoleCode)
+                {
+                    case var sc1 when sc1.Equals(ActorRole.EnergySupplier.Code, StringComparison.OrdinalIgnoreCase):
+                    case var sc2 when sc2.Equals(ActorRole.GridOperator.Code, StringComparison.OrdinalIgnoreCase):
+                    case var sc3 when sc3.Equals(ActorRole.SystemOperator.Code, StringComparison.OrdinalIgnoreCase):
+                        break;
+                    default:
+                        _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
+                        break;
+                }
+
                 break;
-            case RequestWholesaleServicesMessage: break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(message));
         }
