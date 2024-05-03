@@ -211,15 +211,21 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod expectedSettlementMethod)
+    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod? expectedSettlementMethod)
     {
-        ArgumentNullException.ThrowIfNull(expectedSettlementMethod);
-        FirstWholesaleSeriesElement()
+        if (expectedSettlementMethod is not null)
+        {
+            FirstWholesaleSeriesElement()
             .GetProperty("marketEvaluationPoint.settlementMethod")
             .GetProperty("value")
             .GetString()
             .Should()
             .Be(expectedSettlementMethod.Code);
+        }
+        else
+        {
+            SettlementMethodDoesNotExist();
+        }
 
         return this;
     }
@@ -240,60 +246,106 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType)
+    public IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType? expectedMeteringPointType)
     {
-        ArgumentNullException.ThrowIfNull(expectedMeteringPointType);
-        FirstWholesaleSeriesElement()
-            .GetProperty("marketEvaluationPoint.type")
-            .GetProperty("value")
-            .GetString()
-            .Should()
-            .Be(expectedMeteringPointType.Code);
+        if (expectedMeteringPointType is not null)
+        {
+            FirstWholesaleSeriesElement()
+                .GetProperty("marketEvaluationPoint.type")
+                .GetProperty("value")
+                .GetString()
+                .Should()
+                .Be(expectedMeteringPointType.Code);
+        }
+        else
+        {
+            var act = () => FirstWholesaleSeriesElement()
+                .GetProperty("marketEvaluationPoint.type");
+
+            act.Should()
+                .ThrowExactly<KeyNotFoundException>()
+                .WithMessage("The given key was not present in the dictionary.");
+        }
+
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasChargeCode(string expectedChargeTypeNumber)
+    public IAssertNotifyWholesaleServicesDocument HasChargeCode(string? expectedChargeTypeNumber)
     {
-        FirstWholesaleSeriesElement()
-            .GetProperty("chargeType.mRID")
-            .GetString()
-            .Should()
-            .Be(expectedChargeTypeNumber);
+        if (expectedChargeTypeNumber is not null)
+        {
+            FirstWholesaleSeriesElement()
+                .GetProperty("chargeType.mRID")
+                .GetString()
+                .Should()
+                .Be(expectedChargeTypeNumber);
+        }
+        else
+        {
+            var act = () => FirstWholesaleSeriesElement()
+                .GetProperty("chargeType.mRID");
+
+            act.Should()
+                .ThrowExactly<KeyNotFoundException>()
+                .WithMessage("The given key was not present in the dictionary.");
+        }
 
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasChargeType(ChargeType expectedChargeType)
+    public IAssertNotifyWholesaleServicesDocument HasChargeType(ChargeType? expectedChargeType)
     {
-        ArgumentNullException.ThrowIfNull(expectedChargeType);
-        FirstWholesaleSeriesElement()
-            .GetProperty("chargeType.type")
-            .GetProperty("value")
-            .GetString()
-            .Should()
-            .Be(expectedChargeType.Code);
+        if (expectedChargeType is not null)
+        {
+            FirstWholesaleSeriesElement()
+                .GetProperty("chargeType.type")
+                .GetProperty("value")
+                .GetString()
+                .Should()
+                .Be(expectedChargeType.Code);
+        }
+        else
+        {
+            var act = () => FirstWholesaleSeriesElement()
+                .GetProperty("chargeType.type");
+
+            act.Should()
+                .ThrowExactly<KeyNotFoundException>()
+                .WithMessage("The given key was not present in the dictionary.");
+        }
 
         return this;
     }
 
     public IAssertNotifyWholesaleServicesDocument HasChargeTypeOwner(
-        ActorNumber expectedChargeTypeOwner,
+        ActorNumber? expectedChargeTypeOwner,
         string codingScheme)
     {
-        ArgumentNullException.ThrowIfNull(expectedChargeTypeOwner);
-        FirstWholesaleSeriesElement()
-            .GetProperty("chargeType.chargeTypeOwner_MarketParticipant.mRID")
-            .GetProperty("value")
-            .GetString()
-            .Should()
-            .Be(expectedChargeTypeOwner.Value);
+        if (expectedChargeTypeOwner is not null)
+        {
+            FirstWholesaleSeriesElement()
+                .GetProperty("chargeType.chargeTypeOwner_MarketParticipant.mRID")
+                .GetProperty("value")
+                .GetString()
+                .Should()
+                .Be(expectedChargeTypeOwner.Value);
 
-        FirstWholesaleSeriesElement()
-            .GetProperty("chargeType.chargeTypeOwner_MarketParticipant.mRID")
-            .GetProperty("codingScheme")
-            .GetString()
-            .Should()
-            .Be(codingScheme);
+            FirstWholesaleSeriesElement()
+                .GetProperty("chargeType.chargeTypeOwner_MarketParticipant.mRID")
+                .GetProperty("codingScheme")
+                .GetString()
+                .Should()
+                .Be(codingScheme);
+        }
+        else
+        {
+            var act = () => FirstWholesaleSeriesElement()
+                .GetProperty("chargeType.chargeTypeOwner_MarketParticipant.mRID");
+
+            act.Should()
+                .ThrowExactly<KeyNotFoundException>()
+                .WithMessage("The given key was not present in the dictionary.");
+        }
 
         return this;
     }
@@ -346,15 +398,26 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit expectedMeasurementUnit)
+    public IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit? expectedMeasurementUnit)
     {
-        ArgumentNullException.ThrowIfNull(expectedMeasurementUnit);
-        FirstWholesaleSeriesElement()
-            .GetProperty("quantity_Measure_Unit.name")
-            .GetProperty("value")
-            .GetString()
-            .Should()
-            .Be(expectedMeasurementUnit.Code);
+        if (expectedMeasurementUnit is not null)
+        {
+            FirstWholesaleSeriesElement()
+                .GetProperty("quantity_Measure_Unit.name")
+                .GetProperty("value")
+                .GetString()
+                .Should()
+                .Be(expectedMeasurementUnit.Code);
+        }
+        else
+        {
+            var act = () => FirstWholesaleSeriesElement()
+                .GetProperty("quantity_Measure_Unit.name");
+
+            act.Should()
+                .ThrowExactly<KeyNotFoundException>()
+                .WithMessage("The given key was not present in the dictionary.");
+        }
 
         return this;
     }
@@ -410,15 +473,27 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasResolution(Resolution resolution)
+    public IAssertNotifyWholesaleServicesDocument HasResolution(Resolution? resolution)
     {
-        ArgumentNullException.ThrowIfNull(resolution);
-        FirstWholesaleSeriesElement()
-            .GetProperty("Period")
-            .GetProperty("resolution")
-            .GetString()
-            .Should()
-            .Be(resolution.Code);
+        if (resolution is not null)
+        {
+            FirstWholesaleSeriesElement()
+                .GetProperty("Period")
+                .GetProperty("resolution")
+                .GetString()
+                .Should()
+                .Be(resolution.Code);
+        }
+        else
+        {
+            var act = () => FirstWholesaleSeriesElement()
+                .GetProperty("Period")
+                .GetProperty("resolution");
+
+            act.Should()
+                .ThrowExactly<KeyNotFoundException>()
+                .WithMessage("The given key was not present in the dictionary.");
+        }
 
         return this;
     }

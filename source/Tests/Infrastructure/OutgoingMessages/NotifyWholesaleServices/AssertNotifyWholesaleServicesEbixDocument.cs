@@ -141,33 +141,67 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasChargeTypeOwner(ActorNumber expectedChargeTypeOwner, string codingScheme)
+    public IAssertNotifyWholesaleServicesDocument HasChargeTypeOwner(
+        ActorNumber? expectedChargeTypeOwner,
+        string codingScheme)
     {
-        _documentAsserter.HasValueWithAttributes(
+        if (expectedChargeTypeOwner is not null)
+        {
+            _documentAsserter.HasValueWithAttributes(
             $"{PayloadEnergyTimeSeries}[1]/ChargeTypeOwnerEnergyParty/Identification",
             expectedChargeTypeOwner.Value,
             CreateRequiredSchemeAttribute(expectedChargeTypeOwner));
+        }
+        else
+        {
+            _documentAsserter.IsNotPresent($"{PayloadEnergyTimeSeries}[1]/ChargeTypeOwnerEnergyParty/Identification");
+        }
+
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType)
+    public IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType? expectedMeteringPointType)
     {
-        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/TypeOfMeteringPoint", expectedMeteringPointType.Code);
+        if (expectedMeteringPointType is not null)
+        {
+            _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/TypeOfMeteringPoint", expectedMeteringPointType.Code);
+        }
+        else
+        {
+            _documentAsserter.IsNotPresent(
+                $"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/TypeOfMeteringPoint");
+        }
+
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasChargeCode(string expectedChargeTypeNumber)
+    public IAssertNotifyWholesaleServicesDocument HasChargeCode(string? expectedChargeTypeNumber)
     {
-        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/PartyChargeTypeID", expectedChargeTypeNumber);
+        if (expectedChargeTypeNumber is not null)
+        {
+            _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/PartyChargeTypeID", expectedChargeTypeNumber);
+        }
+        else
+        {
+            _documentAsserter.IsNotPresent($"{PayloadEnergyTimeSeries}[1]/PartyChargeTypeID");
+        }
+
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasChargeType(ChargeType expectedChargeType)
+    public IAssertNotifyWholesaleServicesDocument HasChargeType(ChargeType? expectedChargeType)
     {
-        _documentAsserter.HasValueWithAttributes(
-            $"{PayloadEnergyTimeSeries}[1]/ChargeType",
-            EbixCode.Of(expectedChargeType),
-            CreateRequiredListAttributes(CodeListType.EbixDenmark));
+        if (expectedChargeType is not null)
+        {
+            _documentAsserter.HasValueWithAttributes(
+                $"{PayloadEnergyTimeSeries}[1]/ChargeType",
+                EbixCode.Of(expectedChargeType),
+                CreateRequiredListAttributes(CodeListType.EbixDenmark));
+        }
+        else
+        {
+            _documentAsserter.IsNotPresent($"{PayloadEnergyTimeSeries}[1]/ChargeType");
+        }
 
         return this;
     }
@@ -204,12 +238,20 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit expectedMeasurementUnit)
+    public IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit? expectedMeasurementUnit)
     {
-        _documentAsserter.HasValueWithAttributes(
+        if (expectedMeasurementUnit is not null)
+        {
+            _documentAsserter.HasValueWithAttributes(
             $"{PayloadEnergyTimeSeries}[1]/IncludedProductCharacteristic/UnitType",
             EbixCode.Of(expectedMeasurementUnit),
             CreateRequiredListAttributes(CodeListType.Ebix));
+        }
+        else
+        {
+            _documentAsserter.IsNotPresent($"{PayloadEnergyTimeSeries}[1]/IncludedProductCharacteristic/UnitType");
+        }
+
         return this;
     }
 
@@ -236,9 +278,17 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasResolution(Resolution resolution)
+    public IAssertNotifyWholesaleServicesDocument HasResolution(Resolution? resolution)
     {
-        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/ObservationTimeSeriesPeriod/ResolutionDuration", EbixCode.Of(resolution));
+        if (resolution is not null)
+        {
+            _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/ObservationTimeSeriesPeriod/ResolutionDuration", EbixCode.Of(resolution));
+        }
+        else
+        {
+            _documentAsserter.IsNotPresent($"{PayloadEnergyTimeSeries}[1]/ObservationTimeSeriesPeriod/ResolutionDuration");
+        }
+
         return this;
     }
 
@@ -374,9 +424,17 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod expectedSettlementMethod)
+    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod? expectedSettlementMethod)
     {
-        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod", expectedSettlementMethod.Code);
+        if (expectedSettlementMethod is not null)
+        {
+            _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod", expectedSettlementMethod.Code);
+        }
+        else
+        {
+            _documentAsserter.IsNotPresent($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod");
+        }
+
         return this;
     }
 

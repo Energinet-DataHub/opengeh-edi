@@ -75,7 +75,7 @@ public static class NotifyWholesaleServicesDocumentAsserter
             // Assert type? (E31)
             // -- Assert series values --
             .TransactionIdExists()
-            .HasChargeTypeOwner(ActorNumber.Create(assertionInput.ChargeTypeOwner), "A10")
+            .HasChargeTypeOwner(assertionInput.ChargeTypeOwner is not null ? ActorNumber.Create(assertionInput.ChargeTypeOwner) : null, "A10")
             .HasChargeCode(assertionInput.ChargeCode)
             .HasChargeType(assertionInput.ChargeType)
             .HasCurrency(assertionInput.Currency)

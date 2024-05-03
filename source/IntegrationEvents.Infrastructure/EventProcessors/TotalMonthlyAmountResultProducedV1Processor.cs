@@ -52,8 +52,9 @@ public class TotalMonthlyAmountResultProducedV1Processor : IIntegrationEventProc
         }
 
         var totalMonthlyAmountResultProducedV1 = (TotalMonthlyAmountResultProducedV1)integrationEvent.Message;
-        var message = await _wholesaleServicesMessageFactory.CreateMessageAsync(EventId.From(integrationEvent.EventIdentification), totalMonthlyAmountResultProducedV1)
-            .ConfigureAwait(false);
+        var message = _wholesaleServicesMessageFactory.CreateMessage(
+            EventId.From(integrationEvent.EventIdentification),
+            totalMonthlyAmountResultProducedV1);
 
         await _outgoingMessagesClient.EnqueueAndCommitAsync(message, cancellationToken).ConfigureAwait(false);
     }

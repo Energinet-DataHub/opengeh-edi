@@ -130,7 +130,7 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// Asserts the settlement method of the first series element
     /// </summary>
     /// <param name="expectedSettlementMethod"></param>
-    IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod expectedSettlementMethod);
+    IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod? expectedSettlementMethod);
 
     /// <summary>
     /// Asserts the settlement method is not present
@@ -148,25 +148,25 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// Asserts the metering point type of the first series element
     /// </summary>
     /// <param name="expectedMeteringPointType"></param>
-    IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType);
+    IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType? expectedMeteringPointType);
 
     /// <summary>
     /// Asserts the charge type number of the first series element
     /// </summary>
     /// <param name="expectedChargeTypeNumber"></param>
-    IAssertNotifyWholesaleServicesDocument HasChargeCode(string expectedChargeTypeNumber);
+    IAssertNotifyWholesaleServicesDocument HasChargeCode(string? expectedChargeTypeNumber);
 
     /// <summary>
     /// Asserts the charge type of the first series element
     /// </summary>
     /// <param name="expectedChargeType"></param>
-    IAssertNotifyWholesaleServicesDocument HasChargeType(ChargeType expectedChargeType);
+    IAssertNotifyWholesaleServicesDocument HasChargeType(ChargeType? expectedChargeType);
 
     /// <summary>
     /// Asserts the charge type owner of the first series element
     /// </summary>
     IAssertNotifyWholesaleServicesDocument HasChargeTypeOwner(
-        ActorNumber expectedChargeTypeOwner,
+        ActorNumber? expectedChargeTypeOwner,
         string codingScheme);
 
     /// <summary>
@@ -190,7 +190,7 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// Asserts the quantity measure unit of the first series element
     /// </summary>
     /// <param name="expectedMeasurementUnit"></param>
-    IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit expectedMeasurementUnit);
+    IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit? expectedMeasurementUnit);
 
     /// <summary>
     /// Asserts the price measure unit of the first series element
@@ -214,7 +214,7 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// Asserts the resulution of the first series element
     /// </summary>
     /// <param name="resolution"></param>
-    IAssertNotifyWholesaleServicesDocument HasResolution(Resolution resolution);
+    IAssertNotifyWholesaleServicesDocument HasResolution(Resolution? resolution);
 
     /// <summary>
     /// Asserts a point of the first series element
