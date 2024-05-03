@@ -48,7 +48,7 @@ public class ProcessInitializationListener
     public async Task RunAsync(
         [ServiceBusTrigger(
             $"%{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}%",
-            Connection = $"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ListenConnectionString)}")]
+            Connection = $"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ManageConnectionString)}")]
         ServiceBusReceivedMessage message)
     {
         ArgumentNullException.ThrowIfNull(message);

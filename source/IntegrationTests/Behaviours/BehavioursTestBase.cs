@@ -306,27 +306,36 @@ public class BehavioursTestBase : IDisposable
     protected (TServiceBusMessage Message, Guid ProcessId) AssertServiceBusMessage<TServiceBusMessage>(ServiceBusSenderSpy senderSpy, Func<BinaryData, TServiceBusMessage> parser)
         where TServiceBusMessage : IMessage
     {
-        using (new AssertionScope())
-        {
-            senderSpy.MessageSent.Should().BeTrue();
-            senderSpy.Message.Should().NotBeNull();
-        }
+        var assertResult = AssertServiceBusMessages(senderSpy, 1, parser);
+        return assertResult.Single();
+    }
 
-        var serviceBusMessage = senderSpy.Message!;
-        Guid processId;
-        using (new AssertionScope())
+    protected IList<(TServiceBusMessage Message, Guid ProcessId)> AssertServiceBusMessages<TServiceBusMessage>(ServiceBusSenderSpy senderSpy, int expectedCount, Func<BinaryData, TServiceBusMessage> parser)
+        where TServiceBusMessage : IMessage
+    {
+        var sentMessages = senderSpy.MessagesSent
+            .Where(m => m.Subject == typeof(TServiceBusMessage).Name)
+            .ToList();
+
+        sentMessages.Should().HaveCount(expectedCount);
+
+        List<(TServiceBusMessage Message, Guid ProcessId)> messages = new();
+        using var scope = new AssertionScope();
+        foreach (var message in sentMessages)
         {
-            serviceBusMessage.Subject.Should().Be(typeof(TServiceBusMessage).Name);
-            serviceBusMessage.Body.Should().NotBeNull();
-            serviceBusMessage.ApplicationProperties.TryGetValue("ReferenceId", out var referenceId);
+            message.Subject.Should().Be(typeof(TServiceBusMessage).Name);
+            message.Body.Should().NotBeNull();
+            message.ApplicationProperties.TryGetValue("ReferenceId", out var referenceId);
             referenceId.Should().NotBeNull();
-            Guid.TryParse(referenceId!.ToString()!, out processId).Should().BeTrue();
+            Guid.TryParse(referenceId!.ToString()!, out var processId).Should().BeTrue();
+
+            var parsedMessage = parser(message.Body);
+            parsedMessage.Should().NotBeNull();
+
+            messages.Add((parsedMessage, processId));
         }
 
-        var parsedMessage = parser(serviceBusMessage.Body);
-        parsedMessage.Should().NotBeNull();
-
-        return (parsedMessage, processId);
+        return messages;
     }
 
     protected async Task GivenIntegrationEventReceived(IEventMessage @event)
@@ -432,6 +441,7 @@ public class BehavioursTestBase : IDisposable
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
+                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ManageConnectionString)}"] = MockServiceBusName,
                     [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ListenConnectionString)}"] = MockServiceBusName,
                     [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.SendConnectionString)}"] = MockServiceBusName,
                     [$"{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}"] = MockServiceBusName,

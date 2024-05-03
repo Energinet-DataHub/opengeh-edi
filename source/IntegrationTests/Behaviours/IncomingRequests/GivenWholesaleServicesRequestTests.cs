@@ -124,24 +124,22 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
             });
 
         // Act
-        await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
+        await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
             senderSpy,
-            gridAreas: new List<string> { "512" },
-            requestedForActorNumber: actor.ActorNumber.Value,
-            requestedForActorRole: actor.ActorRole.Name,
-            energySupplierId: energySupplierNumber.Value,
-            chargeOwnerId: chargeOwnerNumber.Value,
-            resolution: null,
-            businessReason: DataHubNames.BusinessReason.WholesaleFixing,
-            chargeTypes: new List<(string ChargeType, string ChargeCode)>
-            {
-                (DataHubNames.ChargeType.Tariff, "25361478"),
-            },
-            new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
-            null);
+            new WholesaleServicesMessageAssertionInput(
+                new List<string> { "512" },
+                actor.ActorNumber.Value,
+                actor.ActorRole.Name,
+                energySupplierNumber.Value,
+                chargeOwnerNumber.Value,
+                null,
+                DataHubNames.BusinessReason.WholesaleFixing,
+                new List<(string ChargeType, string ChargeCode)> { (DataHubNames.ChargeType.Tariff, "25361478"), },
+                new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
+                null));
 
         // TODO: Assert correct process is created?
 
@@ -252,24 +250,27 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
             });
 
         // Act
-        await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
+        await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
             senderSpy,
-            gridAreas: Array.Empty<string>(),
-            requestedForActorNumber: actor.ActorNumber.Value,
-            requestedForActorRole: actor.ActorRole.Name,
-            energySupplierId: energySupplierNumber.Value,
-            chargeOwnerId: chargeOwnerNumber.Value,
-            resolution: null,
-            businessReason: DataHubNames.BusinessReason.WholesaleFixing,
-            chargeTypes: new List<(string ChargeType, string ChargeCode)>
-            {
-                (DataHubNames.ChargeType.Tariff, "25361478"),
-            },
-            new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
-            null);
+            new WholesaleServicesMessageAssertionInput(
+                GridAreas: Array.Empty<string>(),
+                RequestedForActorNumber: actor.ActorNumber.Value,
+                RequestedForActorRole: actor.ActorRole.Name,
+                EnergySupplierId: energySupplierNumber.Value,
+                ChargeOwnerId: chargeOwnerNumber.Value,
+                Resolution: null,
+                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                ChargeTypes: new List<(string ChargeType, string ChargeCode)>
+                {
+                    (DataHubNames.ChargeType.Tariff, "25361478"),
+                },
+                Period: new Period(
+                    CreateDateInstant(2024, 1, 1),
+                    CreateDateInstant(2024, 1, 31)),
+                SettlementVersion: null));
 
         // TODO: Assert correct process is created?
 
@@ -388,21 +389,24 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
             });
 
         // Act
-        await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
+        await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
-            senderSpy: senderSpy,
-            gridAreas: gridAreaOrNull != null ? new[] { gridAreaOrNull } : new List<string>(),
-            requestedForActorNumber: actor.ActorNumber.Value,
-            requestedForActorRole: actor.ActorRole.Name,
-            energySupplierId: energySupplierOrNull?.Value,
-            chargeOwnerId: chargeOwnerOrNull?.Value,
-            resolution: null,
-            businessReason: DataHubNames.BusinessReason.WholesaleFixing,
-            chargeTypes: null,
-            period: new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
-            settlementVersion: null);
+            senderSpy,
+            new WholesaleServicesMessageAssertionInput(
+                GridAreas: gridAreaOrNull != null ? new[] { gridAreaOrNull } : new List<string>(),
+                RequestedForActorNumber: actor.ActorNumber.Value,
+                RequestedForActorRole: actor.ActorRole.Name,
+                EnergySupplierId: energySupplierOrNull?.Value,
+                ChargeOwnerId: chargeOwnerOrNull?.Value,
+                Resolution: null,
+                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                ChargeTypes: null,
+                Period: new Period(
+                    CreateDateInstant(2024, 1, 1),
+                    CreateDateInstant(2024, 1, 31)),
+                SettlementVersion: null));
 
         // TODO: Assert correct process is created?
 
@@ -471,5 +475,204 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                     CreateDateInstant(2024, 1, 1),
                     CreateDateInstant(2024, 1, 31)),
                 Points: acceptedResponse.Series.Single().TimeSeriesPoints));
+    }
+
+    [Theory]
+    [MemberData(nameof(DocumentFormatsWithAllActorRoleCombinations))]
+    public async Task AndGiven_RequestedThreeSeries_When_ActorPeeksAllMessages_Then_ReceivesThreeNotifyWholesaleServicesDocumentsWithCorrectContent(ActorRole actorRole, DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat)
+    {
+        /*
+         *  --- PART 1: Receive request, create process and send message to Wholesale ---
+         */
+
+        // Arrange
+        var senderSpy = CreateServiceBusSenderSpy();
+        var actor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: actorRole);
+        var energySupplierNumber = actor.ActorRole == ActorRole.EnergySupplier
+            ? actor.ActorNumber
+            : ActorNumber.Create("3333333333333");
+        var chargeOwnerNumber = actor.ActorRole == ActorRole.SystemOperator
+            ? actor.ActorNumber
+            : ActorNumber.Create("5799999933444");
+        var gridOperatorNumber = actor.ActorRole == ActorRole.GridOperator
+            ? actor.ActorNumber
+            : ActorNumber.Create("4444444444444");
+
+        GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
+        GivenAuthenticatedActorIs(actor.ActorNumber, actor.ActorRole);
+        await GivenGridAreaOwnershipAsync("143", gridOperatorNumber);
+        await GivenGridAreaOwnershipAsync("512", gridOperatorNumber);
+        await GivenGridAreaOwnershipAsync("877", gridOperatorNumber);
+
+        var gridAreasWithTransactionId = new (string? GridArea, string TransactionId)[]
+        {
+            ("143", "123564789123564789123564789123564786"),
+            ("512", "123564789123564789123564789123564787"),
+            ("877", "123564789123564789123564789123564788"),
+        };
+
+        await GivenReceivedWholesaleServicesRequest(
+            documentFormat: incomingDocumentFormat,
+            senderActorNumber: actor.ActorNumber,
+            senderActorRole: actor.ActorRole,
+            periodStart: (2024, 1, 1),
+            periodEnd: (2024, 1, 31),
+            energySupplier: energySupplierNumber,
+            chargeOwner: chargeOwnerNumber,
+            chargeCode: "25361478",
+            chargeType: ChargeType.Tariff,
+            isMonthly: false,
+            series: gridAreasWithTransactionId);
+
+        // Act
+        await WhenWholesaleServicesProcessesAreInitialized(senderSpy.MessagesSent.ToArray());
+
+        // Assert
+        var messages = await ThenWholesaleServicesRequestServiceBusMessagesAreCorrect(
+            senderSpy: senderSpy,
+            new List<WholesaleServicesMessageAssertionInput>
+            {
+                new(
+                    GridAreas: new List<string>() { "143" },
+                    RequestedForActorNumber: actor.ActorNumber.Value,
+                    RequestedForActorRole: actor.ActorRole.Name,
+                    EnergySupplierId: energySupplierNumber.Value,
+                    ChargeOwnerId: chargeOwnerNumber.Value,
+                    Resolution: null,
+                    BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                    ChargeTypes: new List<(string ChargeType, string ChargeCode)>
+                    {
+                        (DataHubNames.ChargeType.Tariff, "25361478"),
+                    },
+                    Period: new Period(
+                        CreateDateInstant(2024, 1, 1),
+                        CreateDateInstant(2024, 1, 31)),
+                    SettlementVersion: null),
+                new(
+                    GridAreas: new List<string>() { "512" },
+                    RequestedForActorNumber: actor.ActorNumber.Value,
+                    RequestedForActorRole: actor.ActorRole.Name,
+                    EnergySupplierId: energySupplierNumber.Value,
+                    ChargeOwnerId: chargeOwnerNumber.Value,
+                    Resolution: null,
+                    BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                    ChargeTypes: new List<(string ChargeType, string ChargeCode)>
+                    {
+                        (DataHubNames.ChargeType.Tariff, "25361478"),
+                    },
+                    Period: new Period(
+                        CreateDateInstant(2024, 1, 1),
+                        CreateDateInstant(2024, 1, 31)),
+                    SettlementVersion: null),
+                new(
+                    GridAreas: new List<string>() { "877" },
+                    RequestedForActorNumber: actor.ActorNumber.Value,
+                    RequestedForActorRole: actor.ActorRole.Name,
+                    EnergySupplierId: energySupplierNumber.Value,
+                    ChargeOwnerId: chargeOwnerNumber.Value,
+                    Resolution: null,
+                    BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                    ChargeTypes: new List<(string ChargeType, string ChargeCode)>
+                    {
+                        (DataHubNames.ChargeType.Tariff, "25361478"),
+                    },
+                    Period: new Period(
+                        CreateDateInstant(2024, 1, 1),
+                        CreateDateInstant(2024, 1, 31)),
+                    SettlementVersion: null),
+            });
+
+        // TODO: Assert correct process is created?
+
+        /*
+         *  --- PART 2: Receive data from Wholesale and create RSM document ---
+         */
+
+        // Arrange
+
+        // Generate a mock WholesaleServicesRequestAccepted response from Wholesale, based on the WholesaleServicesRequest
+        // It is very important that the generated data is correct,
+        // since (almost) all assertion after this point is based on this data
+        var acceptedResponses = messages
+            .Select(message =>
+                (
+                    ProcessId: message.ProcessId,
+                    AcceptedResponse: WholesaleServicesResponseEventBuilder
+                        .GenerateAcceptedFrom(message.WholesaleServicesRequest, GetNow())))
+            .ToList();
+
+        foreach (var response in acceptedResponses)
+        {
+            await GivenWholesaleServicesRequestAcceptedIsReceived(response.ProcessId, response.AcceptedResponse);
+        }
+
+        // Act
+        var peekResults = await WhenActorPeeksAllMessages(
+            actor.ActorNumber,
+            actor.ActorRole,
+            peekDocumentFormat);
+
+        // Assert
+        using (new AssertionScope())
+        {
+            peekResults
+                .Should()
+                .HaveCount(3, "because there should be three messages when requesting three series");
+        }
+
+        var gridAreas = new List<string>();
+        foreach (var peekResult in peekResults)
+        {
+            peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
+
+            var expectedGridArea = await GetGridAreaFromNotifyWholesaleServicesDocument(peekResult.Bundle!, peekDocumentFormat);
+            gridAreas.Add(expectedGridArea);
+
+            var acceptedResponse = acceptedResponses
+                .Should()
+                .ContainSingle(r => r.AcceptedResponse.Series.Single().GridArea == expectedGridArea)
+                .Subject;
+
+            var seriesRequest = acceptedResponse.AcceptedResponse.Series
+                .Should().ContainSingle(request => request.GridArea == expectedGridArea)
+                .Subject;
+
+            var expectedTransactionId = gridAreasWithTransactionId
+                .Single(ga => ga.GridArea == expectedGridArea)
+                .TransactionId;
+
+            await ThenNotifyWholesaleServicesDocumentIsCorrect(
+                peekResult.Bundle,
+                peekDocumentFormat,
+                new NotifyWholesaleServicesDocumentAssertionInput(
+                    Timestamp: "2024-07-01T14:57:09Z",
+                    BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
+                        BusinessReason.WholesaleFixing,
+                        null),
+                    ReceiverId: actor.ActorNumber.Value,
+                    ReceiverRole: actor.ActorRole,
+                    SenderId: "5790001330552",  // Sender is always DataHub
+                    SenderRole: ActorRole.MeteredDataAdministrator,
+                    ChargeTypeOwner: chargeOwnerNumber.Value,
+                    ChargeCode: "25361478",
+                    ChargeType: ChargeType.Tariff,
+                    Currency: Currency.DanishCrowns,
+                    EnergySupplierNumber: energySupplierNumber.Value,
+                    SettlementMethod: SettlementMethod.Flex,
+                    MeteringPointType: MeteringPointType.Consumption,
+                    GridArea: seriesRequest.GridArea,
+                    OriginalTransactionIdReference: expectedTransactionId,
+                    PriceMeasurementUnit: MeasurementUnit.Kwh,
+                    ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
+                    QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                    CalculationVersion: GetNow().ToUnixTimeTicks(),
+                    Resolution: Resolution.Hourly,
+                    Period: new Period(
+                        CreateDateInstant(2024, 1, 1),
+                        CreateDateInstant(2024, 1, 31)),
+                    Points: seriesRequest.TimeSeriesPoints));
+        }
+
+        gridAreas.Should().BeEquivalentTo("143", "512", "877");
     }
 }

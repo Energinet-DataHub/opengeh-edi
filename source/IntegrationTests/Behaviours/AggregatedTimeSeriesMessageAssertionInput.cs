@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace BuildingBlocks.Application.Extensions.Options;
+namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
-public class ServiceBusOptions
-{
-    public const string SectionName = "ServiceBus";
-
-    [Required]
-    public string ManageConnectionString { get; set; } = string.Empty;
-
-    [Required]
-    public string ListenConnectionString { get; set; } = string.Empty;
-
-    [Required]
-    public string SendConnectionString { get; set; } = string.Empty;
-}
+public record AggregatedTimeSeriesMessageAssertionInput(
+    IReadOnlyCollection<string> GridAreas,
+    string RequestedForActorNumber,
+    string RequestedForActorRole,
+    string? EnergySupplier,
+    string? BalanceResponsibleParty,
+    BusinessReason BusinessReason,
+    Period Period,
+    SettlementVersion? SettlementVersion,
+    SettlementMethod? SettlementMethod,
+    MeteringPointType? MeteringPointType);
