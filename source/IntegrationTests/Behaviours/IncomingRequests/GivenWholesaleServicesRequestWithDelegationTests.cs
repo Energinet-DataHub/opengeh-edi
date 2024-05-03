@@ -151,19 +151,22 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
             senderSpy,
-            gridAreas: new[] { "512" },
-            requestedForActorNumber: originalActor.ActorNumber.Value,
-            requestedForActorRole: originalActor.ActorRole.Name,
-            energySupplierId: energySupplierNumber.Value,
-            chargeOwnerId: chargeOwnerNumber.Value,
-            resolution: null,
-            businessReason: DataHubNames.BusinessReason.WholesaleFixing,
-            chargeTypes: new List<(string ChargeType, string ChargeCode)>
-            {
-                (DataHubNames.ChargeType.Tariff, "25361478"),
-            },
-            new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
-            null);
+            new WholesaleServicesMessageAssertionInput(
+                GridAreas: new[] { "512" },
+                RequestedForActorNumber: originalActor.ActorNumber.Value,
+                RequestedForActorRole: originalActor.ActorRole.Name,
+                EnergySupplierId: energySupplierNumber.Value,
+                ChargeOwnerId: chargeOwnerNumber.Value,
+                Resolution: null,
+                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                ChargeTypes: new List<(string ChargeType, string ChargeCode)>
+                {
+                    (DataHubNames.ChargeType.Tariff, "25361478"),
+                },
+                Period: new Period(
+                    CreateDateInstant(2024, 1, 1),
+                    CreateDateInstant(2024, 1, 31)),
+                SettlementVersion: null));
 
         // TODO: Assert correct process is created?
 
@@ -299,19 +302,22 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
             senderSpy,
-            gridAreas: new[] { "512", "609" },
-            requestedForActorNumber: originalActor.ActorNumber.Value,
-            requestedForActorRole: originalActor.ActorRole.Name,
-            energySupplierId: energySupplierNumber.Value,
-            chargeOwnerId: chargeOwnerNumber.Value,
-            resolution: null,
-            businessReason: DataHubNames.BusinessReason.WholesaleFixing,
-            chargeTypes: new List<(string ChargeType, string ChargeCode)>
-            {
-                (DataHubNames.ChargeType.Tariff, "25361478"),
-            },
-            new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
-            null);
+            new WholesaleServicesMessageAssertionInput(
+                GridAreas: new[] { "512", "609" },
+                RequestedForActorNumber: originalActor.ActorNumber.Value,
+                RequestedForActorRole: originalActor.ActorRole.Name,
+                EnergySupplierId: energySupplierNumber.Value,
+                ChargeOwnerId: chargeOwnerNumber.Value,
+                Resolution: null,
+                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                ChargeTypes: new List<(string ChargeType, string ChargeCode)>
+                {
+                    (DataHubNames.ChargeType.Tariff, "25361478"),
+                },
+                Period: new Period(
+                    CreateDateInstant(2024, 1, 1),
+                    CreateDateInstant(2024, 1, 31)),
+                SettlementVersion: null));
 
         // TODO: Assert correct process is created
 
@@ -454,19 +460,22 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
             senderSpy,
-            gridAreas: new[] { "512" },
-            requestedForActorNumber: originalActor.ActorNumber.Value,
-            requestedForActorRole: originalActor.ActorRole.Name,
-            energySupplierId: energySupplierNumber.Value,
-            chargeOwnerId: chargeOwnerNumber.Value,
-            resolution: null,
-            businessReason: DataHubNames.BusinessReason.WholesaleFixing,
-            chargeTypes: new List<(string ChargeType, string ChargeCode)>
-            {
-                (DataHubNames.ChargeType.Tariff, "25361478"),
-            },
-            new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2023, 12, 31)),
-            null);
+            new WholesaleServicesMessageAssertionInput(
+                GridAreas: new[] { "512" },
+                RequestedForActorNumber: originalActor.ActorNumber.Value,
+                RequestedForActorRole: originalActor.ActorRole.Name,
+                EnergySupplierId: energySupplierNumber.Value,
+                ChargeOwnerId: chargeOwnerNumber.Value,
+                Resolution: null,
+                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                ChargeTypes: new List<(string ChargeType, string ChargeCode)>
+                {
+                    (DataHubNames.ChargeType.Tariff, "25361478"),
+                },
+                Period: new Period(
+                    CreateDateInstant(2024, 1, 1),
+                    CreateDateInstant(2023, 12, 31)),
+                SettlementVersion: null));
 
         // TODO: Assert correct process is created?
 
@@ -594,19 +603,22 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
             senderSpy,
-            gridAreas: new[] { "512", "609" },
-            requestedForActorNumber: originalActor.ActorNumber.Value,
-            requestedForActorRole: originalActor.ActorRole.Name,
-            energySupplierId: energySupplierNumber.Value,
-            chargeOwnerId: chargeOwnerNumber.Value,
-            resolution: null,
-            businessReason: DataHubNames.BusinessReason.WholesaleFixing,
-            chargeTypes: new List<(string ChargeType, string ChargeCode)>
-            {
-                (DataHubNames.ChargeType.Tariff, "25361478"),
-            },
-            new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2023, 12, 31)),
-            null);
+            new WholesaleServicesMessageAssertionInput(
+                GridAreas: new[] { "512", "609" },
+                RequestedForActorNumber: originalActor.ActorNumber.Value,
+                RequestedForActorRole: originalActor.ActorRole.Name,
+                EnergySupplierId: energySupplierNumber.Value,
+                ChargeOwnerId: chargeOwnerNumber.Value,
+                Resolution: null,
+                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                ChargeTypes: new List<(string ChargeType, string ChargeCode)>
+                {
+                    (DataHubNames.ChargeType.Tariff, "25361478"),
+                },
+                Period: new Period(
+                    CreateDateInstant(2024, 1, 1),
+                    CreateDateInstant(2023, 12, 31)),
+                SettlementVersion: null));
 
         // TODO: Assert correct process is created?
 
@@ -727,19 +739,22 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
             senderSpy,
-            gridAreas: Array.Empty<string>(),
-            requestedForActorNumber: originalActor.ActorNumber.Value,
-            requestedForActorRole: originalActor.ActorRole.Name,
-            energySupplierId: energySupplierNumber.Value,
-            chargeOwnerId: chargeOwnerNumber.Value,
-            resolution: null,
-            businessReason: DataHubNames.BusinessReason.WholesaleFixing,
-            chargeTypes: new List<(string ChargeType, string ChargeCode)>
-            {
-                (DataHubNames.ChargeType.Tariff, "25361478"),
-            },
-            new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
-            null);
+            new WholesaleServicesMessageAssertionInput(
+                GridAreas: Array.Empty<string>(),
+                RequestedForActorNumber: originalActor.ActorNumber.Value,
+                RequestedForActorRole: originalActor.ActorRole.Name,
+                EnergySupplierId: energySupplierNumber.Value,
+                ChargeOwnerId: chargeOwnerNumber.Value,
+                Resolution: null,
+                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                ChargeTypes: new List<(string ChargeType, string ChargeCode)>
+                {
+                    (DataHubNames.ChargeType.Tariff, "25361478"),
+                },
+                Period: new Period(
+                    CreateDateInstant(2024, 1, 1),
+                    CreateDateInstant(2024, 1, 31)),
+                SettlementVersion: null));
 
         // TODO: Assert correct process is created?
 
@@ -878,19 +893,22 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
             senderSpy,
-            gridAreas: new[] { "512" },
-            requestedForActorNumber: originalActor.ActorNumber.Value,
-            requestedForActorRole: originalActor.ActorRole.Name,
-            energySupplierId: energySupplierNumber.Value,
-            chargeOwnerId: chargeOwnerNumber.Value,
-            resolution: null,
-            businessReason: DataHubNames.BusinessReason.WholesaleFixing,
-            chargeTypes: new List<(string ChargeType, string ChargeCode)>
-            {
-                (DataHubNames.ChargeType.Tariff, "25361478"),
-            },
-            new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
-            null);
+            new WholesaleServicesMessageAssertionInput(
+                GridAreas: new[] { "512" },
+                RequestedForActorNumber: originalActor.ActorNumber.Value,
+                RequestedForActorRole: originalActor.ActorRole.Name,
+                EnergySupplierId: energySupplierNumber.Value,
+                ChargeOwnerId: chargeOwnerNumber.Value,
+                Resolution: null,
+                BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
+                ChargeTypes: new List<(string ChargeType, string ChargeCode)>
+                {
+                    (DataHubNames.ChargeType.Tariff, "25361478"),
+                },
+                Period: new Period(
+                    CreateDateInstant(2024, 1, 1),
+                    CreateDateInstant(2024, 1, 31)),
+                SettlementVersion: null));
 
         // TODO: Assert correct process is created?
 
