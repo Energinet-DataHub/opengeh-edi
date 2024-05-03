@@ -124,7 +124,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
             });
 
         // Act
-        await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
+        await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
@@ -250,7 +250,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
             });
 
         // Act
-        await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
+        await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
@@ -389,7 +389,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
             });
 
         // Act
-        await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
+        await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(

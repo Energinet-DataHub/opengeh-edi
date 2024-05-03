@@ -121,7 +121,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
             });
 
         // Act
-        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.Message!);
+        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
@@ -237,7 +237,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
             });
 
         // Act
-        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.Message!);
+        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
@@ -366,7 +366,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
             });
 
         // Act
-        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.Message!);
+        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(

@@ -85,7 +85,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
 
         // Assert
         var process = GetProcess(marketMessage.Series.Single().RequestedByActor.ActorNumber);
-        var message = _senderSpy.Message;
+        var message = _senderSpy.LatestMessage;
         message.Should().NotBeNull();
         message!.Subject.Should().Be(exceptedServiceBusMessageSubject);
         process.Should().BeEquivalentTo(marketMessage, opt => opt.Using(new ProcessAndRequestComparer()));
@@ -138,7 +138,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         await ProcessInternalCommandsAsync();
 
         // Assert
-        var message = _senderSpy.Message;
+        var message = _senderSpy.LatestMessage;
 
         using var scope = new AssertionScope();
         message.Should().NotBeNull();
@@ -169,7 +169,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         process!.SendToWholesale();
 
         // Assert
-        _senderSpy.Message.Should().BeNull();
+        _senderSpy.LatestMessage.Should().BeNull();
         await AssertProcessState(marketMessage!.MessageId, WholesaleServicesProcess.State.Sent);
     }
 
@@ -186,7 +186,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         await ProcessInternalCommandsAsync();
 
         // Assert
-        _senderSpy.Message.Should().BeNull();
+        _senderSpy.LatestMessage.Should().BeNull();
         await AssertProcessState(marketMessage!.MessageId, WholesaleServicesProcess.State.Initialized);
     }
 

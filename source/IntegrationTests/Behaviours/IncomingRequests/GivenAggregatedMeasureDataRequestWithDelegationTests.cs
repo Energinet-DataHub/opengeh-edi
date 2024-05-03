@@ -146,7 +146,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
             });
 
         // Act
-        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.Message!);
+        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
@@ -288,7 +288,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
             });
 
         // Act
-        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.Message!);
+        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
@@ -413,7 +413,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
             });
 
         // Act
-        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.Message!);
+        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
@@ -555,7 +555,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
             });
 
         // Act
-        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.Message!);
+        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
@@ -713,7 +713,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
             });
 
         // Act
-        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.Message!);
+        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
@@ -836,7 +836,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
             });
 
         // Act
-        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.Message!);
+        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(

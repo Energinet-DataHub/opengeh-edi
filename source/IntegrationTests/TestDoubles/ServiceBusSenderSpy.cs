@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
@@ -34,7 +35,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles
 
         public string TopicName { get; }
 
-        public ServiceBusMessage? Message { get; private set; }
+        public ServiceBusMessage? LatestMessage => MessagesSent.LastOrDefault();
 
         public ICollection<ServiceBusMessage> MessagesSent { get; private set; }
 
@@ -46,7 +47,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles
                 throw new ServiceBusException();
 
             MessagesSent.Add(message);
-            Message = message;
             MessageSent = true;
 
             return Task.CompletedTask;
@@ -62,7 +62,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles
 
         public void Reset()
         {
-            Message = null;
             MessageSent = false;
             MessagesSent.Clear();
         }

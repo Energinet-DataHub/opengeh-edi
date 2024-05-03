@@ -146,7 +146,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
             });
 
         // Act
-        await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
+        await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
@@ -297,7 +297,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
             });
 
         // Act
-        await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
+        await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
@@ -455,7 +455,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
             });
 
         // Act
-        await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
+        await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
@@ -598,7 +598,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
             });
 
         // Act
-        await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
+        await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
@@ -734,7 +734,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
             });
 
         // Act
-        await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
+        await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
@@ -888,7 +888,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
             });
 
         // Act
-        await WhenWholesaleServicesProcessIsInitialized(senderSpy.Message!);
+        await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
