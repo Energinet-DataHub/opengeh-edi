@@ -33,7 +33,6 @@ using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit.Abstractions;
-using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
@@ -174,60 +173,38 @@ public abstract class AggregatedMeasureDataBehaviourTestBase : BehavioursTestBas
             assertionInput);
     }
 
-    protected Task<(AggregatedTimeSeriesRequest AggregatedTimeSeriesRequest, Guid ProcessId)> ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
+    protected async Task<(AggregatedTimeSeriesRequest AggregatedTimeSeriesRequest, Guid ProcessId)> ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
             ServiceBusSenderSpy senderSpy,
-            IReadOnlyCollection<string> gridAreas,
-            string requestedForActorNumber,
-            string requestedForActorRole,
-            string? energySupplier,
-            string? balanceResponsibleParty,
-            BusinessReason businessReason,
-            Period period,
-            SettlementVersion? settlementVersion,
-            SettlementMethod? settlementMethod,
-            MeteringPointType? meteringPointType)
+            AggregatedTimeSeriesMessageAssertionInput assertionInput)
     {
-        var (message, processId) = AssertServiceBusMessage(
+        var assertionResult = await ThenAggregatedTimeSeriesRequestServiceBusMessagesAreCorrect(
             senderSpy,
-            data => AggregatedTimeSeriesRequest.Parser.ParseFrom(data));
+            new List<AggregatedTimeSeriesMessageAssertionInput> { assertionInput });
+
+        return assertionResult.Single();
+    }
+
+    protected Task<IList<(AggregatedTimeSeriesRequest AggregatedTimeSeriesRequest, Guid ProcessId)>> ThenAggregatedTimeSeriesRequestServiceBusMessagesAreCorrect(
+            ServiceBusSenderSpy senderSpy,
+            IList<AggregatedTimeSeriesMessageAssertionInput> assertionInputs)
+    {
+        var messages = AssertServiceBusMessages(
+            senderSpy: senderSpy,
+            expectedCount: assertionInputs.Count,
+            parser: data => AggregatedTimeSeriesRequest.Parser.ParseFrom(data));
 
         using var assertionScope = new AssertionScope();
 
-        message.GridAreaCodes.Should().BeEquivalentTo(gridAreas);
-        message.RequestedForActorNumber.Should().Be(requestedForActorNumber);
-        message.RequestedForActorRole.Should().Be(requestedForActorRole);
+        var assertionMethods = assertionInputs
+            .OrderBy(i => string.Join(",", i.GridAreas))
+            .Select(GetAggregatedTimeSeriesRequestAssertion);
 
-        if (energySupplier == null)
-            message.HasEnergySupplierId.Should().BeFalse();
-        else
-            message.EnergySupplierId.Should().Be(energySupplier);
+        messages.Select(m => m.Message)
+            .OrderBy(m => string.Join(",", m.GridAreaCodes))
+            .Should()
+            .SatisfyRespectively(assertionMethods);
 
-        if (balanceResponsibleParty == null)
-            message.HasBalanceResponsibleId.Should().BeFalse();
-        else
-            message.BalanceResponsibleId.Should().Be(balanceResponsibleParty);
-
-        message.BusinessReason.Should().Be(businessReason.Name);
-
-        message.Period.Start.Should().Be(period.Start.ToString());
-        message.Period.End.Should().Be(period.End.ToString());
-
-        if (settlementVersion == null)
-            message.HasSettlementVersion.Should().BeFalse();
-        else
-            message.SettlementVersion.Should().Be(settlementVersion.Name);
-
-        if (settlementMethod == null)
-            message.HasSettlementMethod.Should().BeFalse();
-        else
-            message.SettlementMethod.Should().Be(settlementMethod.Name);
-
-        if (meteringPointType == null)
-            message.MeteringPointType.Should().BeEmpty(); // Contract is incorrect and doesn't have MeteringPointType as optional
-        else
-            message.MeteringPointType.Should().Be(meteringPointType.Name);
-
-        return Task.FromResult((message, processId));
+        return Task.FromResult(messages);
     }
 
     protected async Task WhenAggregatedMeasureDataProcessIsInitialized(ServiceBusMessage serviceBusMessage)
@@ -235,38 +212,53 @@ public abstract class AggregatedMeasureDataBehaviourTestBase : BehavioursTestBas
         await InitializeProcess(serviceBusMessage, nameof(InitializeAggregatedMeasureDataProcessDto));
     }
 
-    protected async Task GivenInitializeAggregatedMeasureDataProcessDtoIsHandledAsync(
-        ServiceBusMessage serviceBusMessage)
+    protected async Task WhenAggregatedMeasureDataProcessesAreInitialized(IReadOnlyCollection<ServiceBusMessage> serviceBusMessages)
     {
-        // We have to manually process the service bus message, as there isn't a real service bus
-        serviceBusMessage.Subject.Should().Be(nameof(InitializeAggregatedMeasureDataProcessDto));
-        serviceBusMessage.Body.Should().NotBeNull();
-
-        await GetService<IProcessClient>().InitializeAsync(serviceBusMessage.Subject, serviceBusMessage.Body.ToArray());
-        await ProcessInternalCommandsAsync();
+        foreach (var serviceBusMessage in serviceBusMessages)
+        {
+            await InitializeProcess(serviceBusMessage, nameof(InitializeAggregatedMeasureDataProcessDto));
+        }
     }
 
-    protected async Task WhenInitializeAggregatedMeasureDataProcessDtoIsHandledAsync(
-        ServiceBusMessage serviceBusMessage)
+    private Action<AggregatedTimeSeriesRequest> GetAggregatedTimeSeriesRequestAssertion(AggregatedTimeSeriesMessageAssertionInput assertionInput)
     {
-        await GivenInitializeAggregatedMeasureDataProcessDtoIsHandledAsync(serviceBusMessage);
-    }
+        void Assertion(AggregatedTimeSeriesRequest message)
+        {
+            message.GridAreaCodes.Should().BeEquivalentTo(assertionInput.GridAreas);
+            message.RequestedForActorNumber.Should().Be(assertionInput.RequestedForActorNumber);
+            message.RequestedForActorRole.Should().Be(assertionInput.RequestedForActorRole);
 
-    protected async Task GivenWholesaleAcceptedResponseToAggregatedMeasureDataRequestAsync(
-        ServiceBusMessage serviceBusMessage)
-    {
-        serviceBusMessage.Subject.Should().Be(nameof(AggregatedTimeSeriesRequest));
-        serviceBusMessage.Body.Should().NotBeNull();
+            if (assertionInput.EnergySupplier == null)
+                message.HasEnergySupplierId.Should().BeFalse();
+            else
+                message.EnergySupplierId.Should().Be(assertionInput.EnergySupplier);
 
-        var aggregatedTimeSeriesRequest =
-            AggregatedTimeSeriesRequest.Parser.ParseFrom(serviceBusMessage.Body);
+            if (assertionInput.BalanceResponsibleParty == null)
+                message.HasBalanceResponsibleId.Should().BeFalse();
+            else
+                message.BalanceResponsibleId.Should().Be(assertionInput.BalanceResponsibleParty);
 
-        var aggregatedTimeSeriesRequestAccepted =
-            AggregatedTimeSeriesResponseEventBuilder.GenerateAcceptedFrom(aggregatedTimeSeriesRequest, GetNow());
+            message.BusinessReason.Should().Be(assertionInput.BusinessReason.Name);
 
-        await HavingReceivedInboxEventAsync(
-            nameof(AggregatedTimeSeriesRequestAccepted),
-            aggregatedTimeSeriesRequestAccepted,
-            Guid.Parse(serviceBusMessage.MessageId));
+            message.Period.Start.Should().Be(assertionInput.Period.Start.ToString());
+            message.Period.End.Should().Be(assertionInput.Period.End.ToString());
+
+            if (assertionInput.SettlementVersion == null)
+                message.HasSettlementVersion.Should().BeFalse();
+            else
+                message.SettlementVersion.Should().Be(assertionInput.SettlementVersion.Name);
+
+            if (assertionInput.SettlementMethod == null)
+                message.HasSettlementMethod.Should().BeFalse();
+            else
+                message.SettlementMethod.Should().Be(assertionInput.SettlementMethod.Name);
+
+            if (assertionInput.MeteringPointType == null)
+                message.MeteringPointType.Should().BeEmpty(); // Contract is incorrect and doesn't have MeteringPointType as optional
+            else
+                message.MeteringPointType.Should().Be(assertionInput.MeteringPointType.Name);
+        }
+
+        return Assertion;
     }
 }
