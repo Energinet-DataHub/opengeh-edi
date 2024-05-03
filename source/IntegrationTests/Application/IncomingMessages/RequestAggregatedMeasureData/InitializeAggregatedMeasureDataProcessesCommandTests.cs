@@ -111,7 +111,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 
         // Assert
         var exceptedServiceBusMessageSubject = nameof(AggregatedTimeSeriesRequest);
-        var message = _senderSpy.Message;
+        var message = _senderSpy.LatestMessage;
         var process = GetProcess(initializeProcessDto.SenderNumber);
         Assert.NotNull(message);
         Assert.NotNull(process);
@@ -135,7 +135,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         await ProcessInternalCommandsAsync();
 
         // Assert
-        var message = _senderSpy.Message;
+        var message = _senderSpy.LatestMessage;
         Assert.NotNull(message);
     }
 
@@ -151,7 +151,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         await ProcessInternalCommandsAsync();
 
         // Assert
-        var message = _senderSpy.Message;
+        var message = _senderSpy.LatestMessage;
 
         using var scope = new AssertionScope();
         message.Should().NotBeNull();

@@ -146,21 +146,22 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
             });
 
         // Act
-        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.Message!);
+        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
             senderSpy,
-            gridAreas: new[] { "512" },
-            requestedForActorNumber: originalActor.ActorNumber.Value,
-            requestedForActorRole: originalActor.ActorRole.Name,
-            energySupplier: energySupplierNumber.Value,
-            balanceResponsibleParty: balanceResponsibleParty.Value,
-            businessReason: BusinessReason.BalanceFixing,
-            new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
-            null,
-            settlementMethod: SettlementMethod.Flex,
-            meteringPointType: MeteringPointType.Consumption);
+            new AggregatedTimeSeriesMessageAssertionInput(
+                GridAreas: new List<string>() { "512" },
+                RequestedForActorNumber: originalActor.ActorNumber.Value,
+                RequestedForActorRole: originalActor.ActorRole.Name,
+                EnergySupplier: energySupplierNumber.Value,
+                BalanceResponsibleParty: balanceResponsibleParty.Value,
+                BusinessReason: BusinessReason.BalanceFixing,
+                Period: new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
+                SettlementVersion: null,
+                SettlementMethod: SettlementMethod.Flex,
+                MeteringPointType: MeteringPointType.Consumption));
 
         // TODO: Assert correct process is created?
 
@@ -287,21 +288,22 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
             });
 
         // Act
-        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.Message!);
+        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
             senderSpy,
-            gridAreas: new[] { "512" },
-            requestedForActorNumber: originalActor.ActorNumber.Value,
-            requestedForActorRole: originalActor.ActorRole.Name,
-            energySupplier: energySupplierNumber.Value,
-            balanceResponsibleParty: balanceResponsibleParty.Value,
-            businessReason: BusinessReason.BalanceFixing,
-            new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2023, 12, 31)),
-            null,
-            settlementMethod: SettlementMethod.Flex,
-            meteringPointType: MeteringPointType.Consumption);
+            new AggregatedTimeSeriesMessageAssertionInput(
+                GridAreas: new List<string>() { "512" },
+                RequestedForActorNumber: originalActor.ActorNumber.Value,
+                RequestedForActorRole: originalActor.ActorRole.Name,
+                EnergySupplier: energySupplierNumber.Value,
+                BalanceResponsibleParty: balanceResponsibleParty.Value,
+                BusinessReason: BusinessReason.BalanceFixing,
+                Period: new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2023, 12, 31)),
+                SettlementVersion: null,
+                SettlementMethod: SettlementMethod.Flex,
+                MeteringPointType: MeteringPointType.Consumption));
 
         // TODO: Assert correct process is created?
 
@@ -411,21 +413,22 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
             });
 
         // Act
-        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.Message!);
+        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
             senderSpy,
-            gridAreas: new[] { "512" },
-            requestedForActorNumber: originalActor.ActorNumber.Value,
-            requestedForActorRole: originalActor.ActorRole.Name,
-            energySupplier: energySupplierNumber.Value,
-            balanceResponsibleParty: balanceResponsibleParty.Value,
-            businessReason: BusinessReason.BalanceFixing,
-            new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
-            null,
-            settlementMethod: SettlementMethod.Flex,
-            meteringPointType: MeteringPointType.Consumption);
+            new AggregatedTimeSeriesMessageAssertionInput(
+                GridAreas: new List<string>() { "512" },
+                RequestedForActorNumber: originalActor.ActorNumber.Value,
+                RequestedForActorRole: originalActor.ActorRole.Name,
+                EnergySupplier: energySupplierNumber.Value,
+                BalanceResponsibleParty: balanceResponsibleParty.Value,
+                BusinessReason: BusinessReason.BalanceFixing,
+                Period: new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
+                SettlementVersion: null,
+                SettlementMethod: SettlementMethod.Flex,
+                MeteringPointType: MeteringPointType.Consumption));
 
         // TODO: Assert correct process is created?
 
@@ -552,21 +555,22 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
             });
 
         // Act
-        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.Message!);
+        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
             senderSpy,
-            gridAreas: new[] { "512", "609" },
-            requestedForActorNumber: originalActor.ActorNumber.Value,
-            requestedForActorRole: originalActor.ActorRole.Name,
-            energySupplier: energySupplierNumber.Value,
-            balanceResponsibleParty: balanceResponsibleParty.Value,
-            businessReason: BusinessReason.BalanceFixing,
-            new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
-            null,
-            settlementMethod: SettlementMethod.Flex,
-            meteringPointType: MeteringPointType.Consumption);
+            new AggregatedTimeSeriesMessageAssertionInput(
+                GridAreas: new List<string>() { "512", "609" },
+                RequestedForActorNumber: originalActor.ActorNumber.Value,
+                RequestedForActorRole: originalActor.ActorRole.Name,
+                EnergySupplier: energySupplierNumber.Value,
+                BalanceResponsibleParty: balanceResponsibleParty.Value,
+                BusinessReason: BusinessReason.BalanceFixing,
+                Period: new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
+                SettlementVersion: null,
+                SettlementMethod: SettlementMethod.Flex,
+                MeteringPointType: MeteringPointType.Consumption));
 
         // TODO: Assert correct process is created
 
@@ -709,21 +713,22 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
             });
 
         // Act
-        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.Message!);
+        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
             senderSpy,
-            gridAreas: new[] { "512", "609" },
-            requestedForActorNumber: originalActor.ActorNumber.Value,
-            requestedForActorRole: originalActor.ActorRole.Name,
-            energySupplier: energySupplierNumber.Value,
-            balanceResponsibleParty: balanceResponsibleParty.Value,
-            businessReason: BusinessReason.BalanceFixing,
-            new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2023, 12, 31)),
-            null,
-            settlementMethod: SettlementMethod.Flex,
-            meteringPointType: MeteringPointType.Consumption);
+            new AggregatedTimeSeriesMessageAssertionInput(
+                GridAreas: new List<string>() { "512", "609" },
+                RequestedForActorNumber: originalActor.ActorNumber.Value,
+                RequestedForActorRole: originalActor.ActorRole.Name,
+                EnergySupplier: energySupplierNumber.Value,
+                BalanceResponsibleParty: balanceResponsibleParty.Value,
+                BusinessReason: BusinessReason.BalanceFixing,
+                Period: new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2023, 12, 31)),
+                SettlementVersion: null,
+                SettlementMethod: SettlementMethod.Flex,
+                MeteringPointType: MeteringPointType.Consumption));
 
         // TODO: Assert correct process is created?
 
@@ -831,21 +836,22 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
             });
 
         // Act
-        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.Message!);
+        await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.LatestMessage!);
 
         // Assert
         var message = await ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
             senderSpy,
-            gridAreas: new List<string>(),
-            requestedForActorNumber: originalActor.ActorNumber.Value,
-            requestedForActorRole: originalActor.ActorRole.Name,
-            energySupplier: energySupplierNumber.Value,
-            balanceResponsibleParty: balanceResponsibleParty.Value,
-            businessReason: BusinessReason.BalanceFixing,
-            new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
-            null,
-            settlementMethod: SettlementMethod.Flex,
-            meteringPointType: MeteringPointType.Consumption);
+            new AggregatedTimeSeriesMessageAssertionInput(
+                GridAreas: new List<string>(),
+                RequestedForActorNumber: originalActor.ActorNumber.Value,
+                RequestedForActorRole: originalActor.ActorRole.Name,
+                EnergySupplier: energySupplierNumber.Value,
+                BalanceResponsibleParty: balanceResponsibleParty.Value,
+                BusinessReason: BusinessReason.BalanceFixing,
+                Period: new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
+                SettlementVersion: null,
+                SettlementMethod: SettlementMethod.Flex,
+                MeteringPointType: MeteringPointType.Consumption));
 
         // TODO: Assert correct process is created?
 

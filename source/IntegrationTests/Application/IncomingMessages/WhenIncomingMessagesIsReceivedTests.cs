@@ -97,7 +97,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
       // Assert
       var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
       var messageIds = await GetMessageIdsAsync(senderActorNumber);
-      var message = _senderSpy.Message;
+      var message = _senderSpy.LatestMessage;
 
       Assert.Multiple(
           () => Assert.NotNull(message),
@@ -124,7 +124,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         // Assert
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
-        var message = _senderSpy.Message;
+        var message = _senderSpy.LatestMessage;
 
         using var assertionScope = new AssertionScope();
         message.Should().NotBeNull();
@@ -152,7 +152,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
-        var message = _senderSpy.Message;
+        var message = _senderSpy.LatestMessage;
 
         Assert.Multiple(
             () => Assert.Null(message),
@@ -198,7 +198,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         // Assert
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
-        var message = _senderSpy.Message;
+        var message = _senderSpy.LatestMessage;
 
         Assert.Multiple(
             () => Assert.NotNull(results),
@@ -271,7 +271,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         // Assert
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
-        var message = _senderSpy.Message;
+        var message = _senderSpy.LatestMessage;
 
         Assert.Multiple(
             () => Assert.Null(message),
