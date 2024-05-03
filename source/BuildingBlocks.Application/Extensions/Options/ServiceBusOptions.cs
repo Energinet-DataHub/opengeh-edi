@@ -21,6 +21,9 @@ public class ServiceBusOptions
     public const string SectionName = "ServiceBus";
 
     [Required]
+    public string ManageConnectionString { get; set; } = string.Empty;
+
+    [Required]
     public string ListenConnectionString { get; set; } = string.Empty;
 
     [Required]
