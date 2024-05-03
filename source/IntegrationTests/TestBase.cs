@@ -280,6 +280,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 .AddInMemoryCollection(
                     new Dictionary<string, string?>
                     {
+                        [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ManageConnectionString)}"] = "Fake",
                         [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ListenConnectionString)}"] = "Fake",
                         [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.SendConnectionString)}"] = "Fake",
                         [$"{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}"] = "Fake",
