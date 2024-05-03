@@ -32,13 +32,15 @@ public static class WholesaleServicesResponseEventBuilder
     /// Generate a mock WholesaleRequestAccepted response from Wholesale, based on the WholesaleServicesRequest
     /// It is very important that the generated data is correct, since assertions is based on this data
     /// </summary>
-    public static WholesaleServicesRequestAccepted GenerateAcceptedFrom(WholesaleServicesRequest request, Instant now, string? defaultChargeOwnerId = null, ICollection<string>? defaultGridAreas = null)
+    public static WholesaleServicesRequestAccepted GenerateAcceptedFrom(WholesaleServicesRequest request, Instant now, string? defaultChargeOwnerId = null, string? defaultEnergySupplierId = null, ICollection<string>? defaultGridAreas = null)
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(now);
 
         if (!request.HasChargeOwnerId && defaultChargeOwnerId == null)
             throw new ArgumentNullException(nameof(defaultChargeOwnerId), "defaultChargeOwnerId must be set when request has null ChargeOwnerId");
+        if (!request.HasEnergySupplierId && defaultEnergySupplierId == null)
+            throw new ArgumentNullException(nameof(defaultEnergySupplierId), "defaultEnergySupplierId must be set when request has null EnergySupplierId");
         if (request.GridAreaCodes.Count == 0 && defaultGridAreas == null)
             throw new ArgumentNullException(nameof(defaultGridAreas), "defaultGridAreas must be set when request has no GridAreaCodes");
 
@@ -83,7 +85,7 @@ public static class WholesaleServicesResponseEventBuilder
                     GridArea = ga,
                     QuantityUnit = WholesaleServicesRequestSeries.Types.QuantityUnit.Kwh,
                     SettlementMethod = WholesaleServicesRequestSeries.Types.SettlementMethod.Flex,
-                    EnergySupplierId = request.EnergySupplierId,
+                    EnergySupplierId = request.HasEnergySupplierId ? request.EnergySupplierId : defaultEnergySupplierId!,
                     MeteringPointType = WholesaleServicesRequestSeries.Types.MeteringPointType.Consumption,
                     CalculationResultVersion = now.ToUnixTimeTicks(),
                 };
