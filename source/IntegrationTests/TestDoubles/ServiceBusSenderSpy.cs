@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,6 +27,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles
         public ServiceBusSenderSpy(string topicName)
         {
             TopicName = topicName;
+            MessagesSent = new List<ServiceBusMessage>();
         }
 
         public bool ShouldFail { get; set; }
@@ -34,14 +36,19 @@ namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles
 
         public ServiceBusMessage? Message { get; private set; }
 
+        public ICollection<ServiceBusMessage> MessagesSent { get; private set; }
+
         public bool MessageSent { get; private set; }
 
         public Task SendAsync(ServiceBusMessage message, CancellationToken cancellationToken)
         {
             if (ShouldFail)
                 throw new ServiceBusException();
+
+            MessagesSent.Add(message);
             Message = message;
             MessageSent = true;
+
             return Task.CompletedTask;
         }
 
@@ -57,6 +64,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles
         {
             Message = null;
             MessageSent = false;
+            MessagesSent.Clear();
         }
 
 #pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
