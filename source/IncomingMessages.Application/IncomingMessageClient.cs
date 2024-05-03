@@ -34,7 +34,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application;
 public class IncomingMessageClient : IIncomingMessageClient
 {
     private readonly MarketMessageParser _marketMessageParser;
-    private readonly RequestAggregatedMeasureDataMessageValidator _requestAggregatedMeasureDataMessageValidator;
+    private readonly IncomingMessageValidator _incomingMessageValidator;
     private readonly ResponseFactory _responseFactory;
     private readonly IArchivedMessagesClient _archivedMessagesClient;
     private readonly ILogger<IncomingMessageClient> _logger;
@@ -45,7 +45,7 @@ public class IncomingMessageClient : IIncomingMessageClient
 
     public IncomingMessageClient(
         MarketMessageParser marketMessageParser,
-        RequestAggregatedMeasureDataMessageValidator requestAggregatedMeasureDataMessageValidator,
+        IncomingMessageValidator incomingMessageValidator,
         ResponseFactory responseFactory,
         IArchivedMessagesClient archivedMessagesClient,
         ILogger<IncomingMessageClient> logger,
@@ -55,7 +55,7 @@ public class IncomingMessageClient : IIncomingMessageClient
         IFeatureFlagManager featureFlagManager)
     {
         _marketMessageParser = marketMessageParser;
-        _requestAggregatedMeasureDataMessageValidator = requestAggregatedMeasureDataMessageValidator;
+        _incomingMessageValidator = incomingMessageValidator;
         _responseFactory = responseFactory;
         _archivedMessagesClient = archivedMessagesClient;
         _logger = logger;
@@ -104,14 +104,8 @@ public class IncomingMessageClient : IIncomingMessageClient
                 .ConfigureAwait(false);
         }
 
-        var validationResult =
-            documentType == IncomingDocumentType.RequestWholesaleSettlement
-                ? Result.Succeeded() // TODO: Validate RequestWholesaleSettlement
-                : await _requestAggregatedMeasureDataMessageValidator
-                    .ValidateAsync(
-                        incomingMarketMessageParserResult.IncomingMessage as RequestAggregatedMeasureDataMessage ??
-                            throw new InvalidOperationException(),
-                        cancellationToken)
+        var validationResult = await _incomingMessageValidator
+            .ValidateAsync(incomingMarketMessageParserResult.IncomingMessage, cancellationToken)
             .ConfigureAwait(false);
 
         if (!validationResult.Success)

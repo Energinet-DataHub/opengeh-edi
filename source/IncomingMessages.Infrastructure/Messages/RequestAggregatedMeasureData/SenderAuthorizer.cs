@@ -15,6 +15,7 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
@@ -29,13 +30,15 @@ public class SenderAuthorizer : ISenderAuthorizer
         _actorAuthenticator = actorAuthenticator;
     }
 
-    public Task<Result> AuthorizeAsync(string senderNumber, string senderRoleCode, bool allSeriesAreDelegated)
+    public Task<Result> AuthorizeAsync(IIncomingMessage message, bool allSeriesAreDelegated)
     {
-        ArgumentNullException.ThrowIfNull(senderNumber);
-        ArgumentNullException.ThrowIfNull(senderRoleCode);
-        EnsureSenderIdMatches(senderNumber);
-        EnsureSenderRoleCode(senderRoleCode, allSeriesAreDelegated);
-        EnsureCurrentUserHasRequiredRole(senderRoleCode, allSeriesAreDelegated);
+        ArgumentNullException.ThrowIfNull(message);
+        ArgumentNullException.ThrowIfNull(message.SenderNumber);
+        ArgumentNullException.ThrowIfNull(message.SenderRoleCode);
+
+        EnsureSenderIdMatches(message.SenderNumber);
+        EnsureSenderRoleCode(message, allSeriesAreDelegated);
+        EnsureCurrentUserHasRequiredRole(message.SenderRoleCode, allSeriesAreDelegated);
 
         return Task.FromResult(
             _validationErrors.Count == 0 ? Result.Succeeded() : Result.Failure(_validationErrors.ToArray()));
@@ -60,17 +63,42 @@ public class SenderAuthorizer : ISenderAuthorizer
         }
     }
 
-    private void EnsureSenderRoleCode(string senderRoleCode, bool allSeriesAreDelegated)
+    private void EnsureSenderRoleCode(IIncomingMessage message, bool allSeriesAreDelegated)
     {
         if (AllSeriesAreDelegatedToSender(allSeriesAreDelegated))
             return;
 
-        if (!senderRoleCode.Equals(ActorRole.EnergySupplier.Code, StringComparison.OrdinalIgnoreCase)
-            && !senderRoleCode.Equals(ActorRole.MeteredDataResponsible.Code, StringComparison.OrdinalIgnoreCase)
-            && !senderRoleCode.Equals(ActorRole.BalanceResponsibleParty.Code, StringComparison.OrdinalIgnoreCase)
-            && HackThatAllowDdmToDoRequestsAsMdr(senderRoleCode))
+        switch (message)
         {
-            _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
+            case RequestAggregatedMeasureDataMessage ramdm
+                when !ramdm.SenderRoleCode.Equals(
+                         ActorRole.EnergySupplier.Code,
+                         StringComparison.OrdinalIgnoreCase)
+                     && !ramdm.SenderRoleCode.Equals(
+                         ActorRole.MeteredDataResponsible.Code,
+                         StringComparison.OrdinalIgnoreCase)
+                     && !ramdm.SenderRoleCode.Equals(
+                         ActorRole.BalanceResponsibleParty.Code,
+                         StringComparison.OrdinalIgnoreCase)
+                     && HackThatAllowDdmToDoRequestsAsMdr(ramdm.SenderRoleCode):
+                _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
+                break;
+            case RequestAggregatedMeasureDataMessage: break;
+            case RequestWholesaleServicesMessage rwsm
+                when !rwsm.SenderRoleCode.Equals(
+                         ActorRole.EnergySupplier.Code,
+                         StringComparison.OrdinalIgnoreCase)
+                     && !rwsm.SenderRoleCode.Equals(
+                         ActorRole.GridOperator.Code,
+                         StringComparison.OrdinalIgnoreCase)
+                     && !rwsm.SenderRoleCode.Equals(
+                         ActorRole.SystemOperator.Code,
+                         StringComparison.OrdinalIgnoreCase):
+                _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
+                break;
+            case RequestWholesaleServicesMessage: break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(message));
         }
     }
 
