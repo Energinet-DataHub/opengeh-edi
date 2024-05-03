@@ -42,7 +42,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Test class")]
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Test class")]
 [SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1201:Elements should appear in the correct order", Justification = "Test class")]
-public class GivenAggregatedMeasureDataRequestWithDelegationTests : BehavioursTestBase
+public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMeasureDataBehaviourTestBase
 {
     public GivenAggregatedMeasureDataRequestWithDelegationTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)

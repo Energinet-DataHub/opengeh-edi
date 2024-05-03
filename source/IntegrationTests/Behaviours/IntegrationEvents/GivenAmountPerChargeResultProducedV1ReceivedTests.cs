@@ -33,7 +33,7 @@ using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents;
 
-public class GivenAmountPerChargeResultProducedV1ReceivedTests : BehavioursTestBase
+public class GivenAmountPerChargeResultProducedV1ReceivedTests : WholesaleServicesBehaviourTestBase
 {
     public GivenAmountPerChargeResultProducedV1ReceivedTests(IntegrationTestFixture fixture, ITestOutputHelper testOutputHelper)
         : base(fixture, testOutputHelper)

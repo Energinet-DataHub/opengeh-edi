@@ -104,9 +104,13 @@ public static class NotifyAggregatedMeasureDataDocumentAsserter
 
         if (assertionInput.EnergySupplierNumber != null)
             asserter.HasEnergySupplierNumber(assertionInput.EnergySupplierNumber.Value);
+        else
+            asserter.EnergySupplierNumberIsNotPresent();
 
         if (assertionInput.BalanceResponsibleNumber != null)
             asserter.HasBalanceResponsibleNumber(assertionInput.BalanceResponsibleNumber.Value);
+        else
+            asserter.BalanceResponsibleNumberIsNotPresent();
 
         await asserter
             .DocumentIsValidAsync();

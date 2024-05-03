@@ -44,10 +44,10 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 #pragma warning disable CS1570 // XML comment has badly formed XML
 [SuppressMessage("Performance", "CA1861:Avoid constant arrays as arguments", Justification = "Test class")]
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Test class")]
-public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBase
+public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleServicesBehaviourTestBase
 {
-    public GivenWholesaleServicesRequestWithDelegationTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
-        : base(integrationTestFixture, testOutputHelper)
+    public GivenWholesaleServicesRequestWithDelegationTests(IntegrationTestFixture fixture, ITestOutputHelper testOutputHelper)
+        : base(fixture, testOutputHelper)
     {
     }
 
@@ -135,8 +135,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             senderActorRole: originalActor.ActorRole,
             periodStart: (2024, 1, 1),
             periodEnd: (2024, 1, 31),
-            energySupplierActorNumber: energySupplierNumber,
-            chargeOwnerActorNumber: chargeOwnerNumber,
+            energySupplier: energySupplierNumber,
+            chargeOwner: chargeOwnerNumber,
             chargeCode: "25361478",
             chargeType: ChargeType.Tariff,
             isMonthly: false,
@@ -283,8 +283,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             senderActorRole: originalActor.ActorRole,
             periodStart: (2024, 1, 1),
             periodEnd: (2024, 1, 31),
-            energySupplierActorNumber: energySupplierNumber,
-            chargeOwnerActorNumber: chargeOwnerNumber,
+            energySupplier: energySupplierNumber,
+            chargeOwner: chargeOwnerNumber,
             chargeCode: "25361478",
             chargeType: ChargeType.Tariff,
             isMonthly: false,
@@ -438,8 +438,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             senderActorRole: originalActor.ActorRole,
             periodStart: (2024, 01, 01),
             periodEnd: (2023, 12, 31),
-            energySupplierActorNumber: energySupplierNumber,
-            chargeOwnerActorNumber: chargeOwnerNumber,
+            energySupplier: energySupplierNumber,
+            chargeOwner: chargeOwnerNumber,
             chargeCode: "25361478",
             chargeType: ChargeType.Tariff,
             isMonthly: false,
@@ -578,8 +578,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             senderActorRole: originalActor.ActorRole,
             periodStart: (2024, 01, 01),
             periodEnd: (2023, 12, 31),
-            energySupplierActorNumber: energySupplierNumber,
-            chargeOwnerActorNumber: chargeOwnerNumber,
+            energySupplier: energySupplierNumber,
+            chargeOwner: chargeOwnerNumber,
             chargeCode: "25361478",
             chargeType: ChargeType.Tariff,
             isMonthly: false,
@@ -711,8 +711,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             senderActorRole: originalActor.ActorRole,
             periodStart: (2024, 1, 1),
             periodEnd: (2024, 1, 31),
-            energySupplierActorNumber: energySupplierNumber,
-            chargeOwnerActorNumber: chargeOwnerNumber,
+            energySupplier: energySupplierNumber,
+            chargeOwner: chargeOwnerNumber,
             chargeCode: "25361478",
             chargeType: ChargeType.Tariff,
             isMonthly: false,
@@ -862,8 +862,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             senderActorRole: originalActor.ActorRole,
             periodStart: (2024, 1, 1),
             periodEnd: (2024, 1, 31),
-            energySupplierActorNumber: energySupplierNumber,
-            chargeOwnerActorNumber: chargeOwnerNumber,
+            energySupplier: energySupplierNumber,
+            chargeOwner: chargeOwnerNumber,
             chargeCode: "25361478",
             chargeType: ChargeType.Tariff,
             isMonthly: false,
@@ -1000,8 +1000,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
             senderActorRole: originalActor.ActorRole,
             periodStart: (2024, 1, 1),
             periodEnd: (2023, 12, 31),
-            energySupplierActorNumber: null,
-            chargeOwnerActorNumber: null,
+            energySupplier: null,
+            chargeOwner: null,
             chargeCode: null,
             chargeType: null,
             isMonthly: false,
@@ -1015,131 +1015,6 @@ public class GivenWholesaleServicesRequestWithDelegationTests : BehavioursTestBa
         response.IsErrorResponse.Should().BeTrue("because a synchronous error should have occurred");
         response.MessageBody.Should().ContainAll("The authenticated user does not hold the required role");
         senderSpy.MessageSent.Should().BeFalse();
-    }
-
-    private async Task<string> GetGridAreaFromNotifyWholesaleServicesDocument(Stream documentStream, DocumentFormat documentFormat)
-    {
-        documentStream.Position = 0;
-        if (documentFormat == DocumentFormat.Ebix)
-        {
-            var ebixAsserter = NotifyWholesaleServicesDocumentAsserter.CreateEbixAsserter(documentStream);
-            var gridAreaElement = ebixAsserter.GetElement("PayloadEnergyTimeSeries[1]/MeteringGridAreaUsedDomainLocation/Identification");
-
-            gridAreaElement.Should().NotBeNull("because grid area should be present in the ebIX document");
-            gridAreaElement!.Value.Should().NotBeNull("because grid area value should not be null in the ebIX document");
-            return gridAreaElement.Value;
-        }
-
-        if (documentFormat == DocumentFormat.Xml)
-        {
-            var cimXmlAsserter = NotifyWholesaleServicesDocumentAsserter.CreateCimXmlAsserter(documentStream);
-
-            var gridAreaCimXmlElement = cimXmlAsserter.GetElement("Series[1]/meteringGridArea_Domain.mRID");
-
-            gridAreaCimXmlElement.Should().NotBeNull("because grid area should be present in the CIM XML document");
-            gridAreaCimXmlElement!.Value.Should().NotBeNull("because grid area value should not be null in the CIM XML document");
-            return gridAreaCimXmlElement!.Value;
-        }
-
-        if (documentFormat == DocumentFormat.Json)
-        {
-            var cimJsonDocument = await JsonDocument.ParseAsync(documentStream);
-
-            var gridAreaCimJsonElement = cimJsonDocument.RootElement
-                .GetProperty("NotifyWholesaleServices_MarketDocument")
-                .GetProperty("Series").EnumerateArray().ToList()
-                .Single()
-                .GetProperty("meteringGridArea_Domain.mRID")
-                .GetProperty("value");
-
-            gridAreaCimJsonElement.Should().NotBeNull("because grid area should be present in the CIM JSON document");
-            return gridAreaCimJsonElement.GetString()!;
-        }
-
-        throw new ArgumentOutOfRangeException(nameof(documentFormat), documentFormat, "Unsupported document format");
-    }
-
-    private Task GivenWholesaleServicesRequestAcceptedIsReceived(Guid processId, WholesaleServicesRequestAccepted acceptedMessage)
-    {
-        return GivenWholesaleServicesRequestResponseIsReceived(processId, acceptedMessage);
-    }
-
-    private Task GivenWholesaleServicesRequestRejectedIsReceived(Guid processId, WholesaleServicesRequestRejected rejectedMessage)
-    {
-        return GivenWholesaleServicesRequestResponseIsReceived(processId, rejectedMessage);
-    }
-
-    private Task GivenWholesaleServicesRequestResponseIsReceived<TType>(Guid processId, TType wholesaleServicesRequestResponseMessage)
-        where TType : IMessage
-    {
-        return HavingReceivedInboxEventAsync(
-            eventType: typeof(TType).Name,
-            eventPayload: wholesaleServicesRequestResponseMessage,
-            processId: processId);
-    }
-
-    private Task<(WholesaleServicesRequest WholesaleServicesRequest, Guid ProcessId)> ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
-            ServiceBusSenderSpy senderSpy,
-            IReadOnlyCollection<string> gridAreas,
-            string requestedForActorNumber,
-            string requestedForActorRole,
-            string? energySupplierId,
-            string? chargeOwnerId,
-            string? resolution,
-            string businessReason,
-            List<(string ChargeType, string ChargeCode)>? chargeTypes,
-            Period period,
-            string? settlementVersion)
-    {
-        var (message, processId) = AssertServiceBusMessage(
-            senderSpy,
-            (data) => WholesaleServicesRequest.Parser.ParseFrom(data));
-
-        using var assertionScope = new AssertionScope();
-
-        message.GridAreaCodes.Should().BeEquivalentTo(gridAreas);
-        message.RequestedForActorNumber.Should().Be(requestedForActorNumber);
-        message.RequestedForActorRole.Should().Be(requestedForActorRole);
-
-        if (energySupplierId == null)
-            message.HasEnergySupplierId.Should().BeFalse();
-        else
-            message.EnergySupplierId.Should().Be(energySupplierId);
-
-        if (chargeOwnerId == null)
-            message.HasChargeOwnerId.Should().BeFalse();
-        else
-            message.ChargeOwnerId.Should().Be(chargeOwnerId);
-
-        if (resolution == null)
-            message.HasResolution.Should().BeFalse();
-        else
-            message.Resolution.Should().Be(resolution);
-
-        message.BusinessReason.Should().Be(businessReason);
-
-        if (chargeTypes == null)
-        {
-            message.ChargeTypes.Should().BeEmpty();
-        }
-        else
-        {
-            message.ChargeTypes.Should().BeEquivalentTo(chargeTypes.Select(ct => new Energinet.DataHub.Edi.Requests.ChargeType
-            {
-                ChargeType_ = ct.ChargeType,
-                ChargeCode = ct.ChargeCode,
-            }));
-        }
-
-        message.PeriodStart.Should().Be(period.Start.ToString());
-        message.PeriodEnd.Should().Be(period.End.ToString());
-
-        if (settlementVersion == null)
-            message.HasSettlementVersion.Should().BeFalse();
-        else
-            message.SettlementVersion.Should().Be(settlementVersion);
-
-        return Task.FromResult((wholesaleServicesRequestMessage: message, processId));
     }
 }
 
