@@ -13,8 +13,11 @@
 // limitations under the License.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
@@ -45,6 +48,16 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
         _wholesaleServicesSeriesBuilder = new WholesaleServicesSeriesBuilder();
+    }
+
+    public static IEnumerable<object[]> AllDocumentFormatsWithMeteringPointTypes()
+    {
+        var documentFormats = EnumerationType.GetAll<DocumentFormat>();
+        var meteringPointTypes = EnumerationType.GetAll<MeteringPointType>();
+
+        return documentFormats
+            .SelectMany(df => meteringPointTypes
+                    .Select(mpt => new object[] { df, mpt }));
     }
 
     [Theory]
@@ -323,6 +336,25 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         // Assert
         AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .HasResolution(Resolution.Daily);
+    }
+
+    [Theory]
+    [MemberData(nameof(AllDocumentFormatsWithMeteringPointTypes))]
+    public async Task Can_create_notifyWholesaleServices_document_with_all_metering_point_types(DocumentFormat documentFormat, MeteringPointType meteringPointType)
+    {
+        // Arrange
+        var messageBuilder = _wholesaleServicesSeriesBuilder
+            .WithMeteringPointType(meteringPointType);
+
+        // Act
+        var document = await WriteDocument(
+            messageBuilder.BuildHeader(),
+            messageBuilder.BuildWholesaleCalculation(),
+            documentFormat);
+
+        // Assert
+        AssertDocument(document, documentFormat)
+            .HasMeteringPointType(meteringPointType);
     }
 
     private Task<MarketDocumentStream> WriteDocument(OutgoingMessageHeader header, WholesaleServicesSeries wholesaleServicesSeries, DocumentFormat documentFormat)
