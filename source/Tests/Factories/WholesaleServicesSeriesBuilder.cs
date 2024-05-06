@@ -28,7 +28,7 @@ namespace Energinet.DataHub.EDI.Tests.Factories;
 
 public class WholesaleServicesSeriesBuilder
 {
-    private string _messageId = Guid.NewGuid().ToString();
+    private string _messageId = Guid.NewGuid().ToString("N");
     private Instant _timeStamp = SystemClock.Instance.GetCurrentInstant();
     private BusinessReason _businessReason = BusinessReason.BalanceFixing;
     private ActorNumber _receiverActorNumber = ActorNumber.Create("1234567890123");

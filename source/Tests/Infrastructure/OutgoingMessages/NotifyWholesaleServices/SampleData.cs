@@ -22,7 +22,7 @@ internal static class SampleData
 {
     #region header attributes
 
-    public static string MessageId => "11111111-1111-1111-1111-111111111111".Substring(0, 16); // Max 16 characters in ebIX
+    public static string MessageId => Guid.Parse("11111111-1111-1111-1111-111111111111").ToString("N"); // Max 16 characters in ebIX
 
     public static ActorNumber SenderId => ActorNumber.Create("5790000000000");
 
