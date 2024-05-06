@@ -29,15 +29,15 @@ public class MessageTypeValidator : IMessageTypeValidator
         return await Task.FromResult(
                 message switch
                 {
-                    RequestAggregatedMeasureDataMessage requestAggregatedMeasureDataMessage =>
-                        _aggregatedMeasureDataWhiteList.Contains(requestAggregatedMeasureDataMessage.MessageType)
+                    RequestAggregatedMeasureDataMessage ramdm =>
+                        _aggregatedMeasureDataWhiteList.Contains(ramdm.MessageType)
                             ? Result.Succeeded()
                             : Result.Failure(
-                                new NotSupportedMessageType(requestAggregatedMeasureDataMessage.MessageType)),
-                    RequestWholesaleServicesMessage requestWholesaleServicesMessage =>
-                        _wholesaleServicesWhiteList.Contains(requestWholesaleServicesMessage.MessageType)
+                                new NotSupportedMessageType(ramdm.MessageType)),
+                    RequestWholesaleServicesMessage rqsm =>
+                        _wholesaleServicesWhiteList.Contains(rqsm.MessageType)
                             ? Result.Succeeded()
-                            : Result.Failure(new NotSupportedMessageType(requestWholesaleServicesMessage.MessageType)),
+                            : Result.Failure(new NotSupportedMessageType(rqsm.MessageType)),
                     _ => throw new InvalidOperationException($"The baw's on the slates! {message.GetType().Name}"),
                 })
             .ConfigureAwait(false);

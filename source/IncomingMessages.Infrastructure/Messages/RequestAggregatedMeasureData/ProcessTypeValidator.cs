@@ -23,7 +23,7 @@ public class ProcessTypeValidator : IProcessTypeValidator
         new[] { "D03", "D04", "D05", "D32" };
 
     private static readonly IReadOnlyCollection<string> _wholesaleServicesWhitelist =
-        new[] { "D03", "D04", "D05", "D32" };
+        new[] { "D05", "D32" };
 
     public async Task<Result> ValidateAsync(IIncomingMessage message, CancellationToken cancellationToken)
     {

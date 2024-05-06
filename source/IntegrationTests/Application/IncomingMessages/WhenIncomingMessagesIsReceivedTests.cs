@@ -64,7 +64,6 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         {
             new object[] { DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData, ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json") },
             new object[] { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ReadJsonFile("Application\\IncomingMessages\\RequestWholesaleSettlement.json") },
-            //new object[] { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ReadJsonFile("Application\\IncomingMessages\\RequestWholesaleSettlementWithUnusedBusinessReason.json") },
         };
     }
 
@@ -84,7 +83,6 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
       // Assert
       var authenticatedActor = GetService<AuthenticatedActor>();
       var senderActorNumber = ActorNumber.Create("5799999933318");
-      // Balance virker ikke for WholesaleServices
       authenticatedActor.SetAuthenticatedActor(
           new ActorIdentity(
               senderActorNumber,
