@@ -58,13 +58,21 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         _incomingMessageValidator = GetService<IncomingMessageValidator>();
     }
 
-    public static IEnumerable<object[]> AllowedActorRoles =>
+    public static IEnumerable<object[]> AllowedActorRolesForAggregatedMeasureData =>
         new List<object[]>
         {
             new object[] { ActorRole.EnergySupplier.Code },
             new object[] { ActorRole.MeteredDataResponsible.Code },
             new object[] { ActorRole.BalanceResponsibleParty.Code },
             new object[] { ActorRole.GridOperator.Code },
+        };
+
+    public static IEnumerable<object[]> AllowedActorRolesForWholesaleServices =>
+        new List<object[]>
+        {
+            new object[] { ActorRole.EnergySupplier.Code },
+            new object[] { ActorRole.GridOperator.Code },
+            new object[] { ActorRole.SystemOperator.Code },
         };
 
     public async Task InitializeAsync()
@@ -378,8 +386,8 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
     }
 
     [Theory]
-    [MemberData(nameof(AllowedActorRoles))]
-    public async Task Sender_role_type_must_be_the_role_of(string role)
+    [MemberData(nameof(AllowedActorRolesForAggregatedMeasureData))]
+    public async Task Sender_role_type_for_aggregated_measure_data_must_be_the_role_of(string role)
     {
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
@@ -392,6 +400,24 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             CancellationToken.None);
 
         Assert.DoesNotContain(result.Errors, error => error is SenderRoleTypeIsNotAuthorized);
+    }
+
+    [Theory]
+    [MemberData(nameof(AllowedActorRolesForWholesaleServices))]
+    public async Task Sender_role_type_for_wholesale_services_must_be_the_role_of(string role)
+    {
+        await using var message = BusinessMessageBuilder
+            .RequestWholesaleServices()
+            .WithSenderRole(role)
+            .Message();
+
+        var (incomingMessage, _) = await ParseWholesaleServicesMessageAsync(message);
+
+        var result = await _incomingMessageValidator.ValidateAsync(
+            incomingMessage!,
+            CancellationToken.None);
+
+        result.Errors.Should().NotContain(e => e is SenderRoleTypeIsNotAuthorized);
     }
 
     [Fact]
@@ -645,6 +671,16 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
         return (IncomingMessage: (RequestAggregatedMeasureDataMessage?)messageParser.IncomingMessage, ParserResult: messageParser);
+    }
+
+    private async Task<(RequestWholesaleServicesMessage? IncomingMessage, IncomingMarketMessageParserResult ParserResult)> ParseWholesaleServicesMessageAsync(Stream message)
+    {
+        var messageParser = await _marketMessageParser.ParseAsync(
+            new IncomingMessageStream(message),
+            DocumentFormat.Xml,
+            IncomingDocumentType.RequestWholesaleSettlement,
+            CancellationToken.None);
+        return (IncomingMessage: (RequestWholesaleServicesMessage?)messageParser.IncomingMessage, ParserResult: messageParser);
     }
 
     private async Task StoreMessageIdForActorAsync(string messageId, string senderActorNumber)
