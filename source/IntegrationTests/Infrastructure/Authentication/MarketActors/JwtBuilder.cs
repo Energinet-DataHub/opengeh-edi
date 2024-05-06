@@ -192,7 +192,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
         /// <param name="role">role to add</param>
         /// <returns>This builder instance</returns>
         public JwtBuilder WithRole(string role)
-            => RegisterClaim(new("roles", role));
+            => RegisterClaim(new(ClaimTypes.Role, role));
 
         /// <summary>
         /// Build the token from the configuration
