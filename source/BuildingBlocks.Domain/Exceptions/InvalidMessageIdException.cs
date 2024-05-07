@@ -34,6 +34,6 @@ public class InvalidMessageIdException : Exception
 
     public static InvalidMessageIdException Create(string? messageId)
     {
-        return new InvalidMessageIdException($"{messageId} is not a valid message id, Message ids must be 36 characters long");
+        return new InvalidMessageIdException($"{messageId} is not a valid message id, Message ids must be at most 36 characters long");
     }
 }
