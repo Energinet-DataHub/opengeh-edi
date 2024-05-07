@@ -13,18 +13,22 @@
 // limitations under the License.
 
 using Azure.Messaging.ServiceBus;
+using Dapper;
+using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 internal sealed class IntegrationEventPublisher : IAsyncDisposable
 {
+    private readonly string _dbConnectionString;
     private readonly ServiceBusClient _client;
     private readonly ServiceBusSender _sender;
 
-    internal IntegrationEventPublisher(string connectionString, string topicName)
+    internal IntegrationEventPublisher(string serviceBusConnectionString, string topicName, string dbConnectionString)
     {
+        _dbConnectionString = dbConnectionString;
         _client = new ServiceBusClient(
-            connectionString,
+            serviceBusConnectionString,
             new ServiceBusClientOptions()
             {
                 TransportType = ServiceBusTransportType.AmqpWebSockets, // Firewall is not open for AMQP and Therefore, needs to go over WebSockets.
@@ -39,9 +43,40 @@ internal sealed class IntegrationEventPublisher : IAsyncDisposable
         GC.SuppressFinalize(this);
     }
 
-    internal Task PublishAsync(string eventName, byte[] eventPayload)
+    internal async Task PublishAsync(string eventName, byte[] eventPayload, bool waitForHandled)
     {
-        return _sender.SendMessageAsync(CreateIntegrationEventMessage(eventName, eventPayload));
+        var integrationEvent = CreateIntegrationEventMessage(eventName, eventPayload);
+        await _sender
+            .SendMessageAsync(integrationEvent)
+            .ConfigureAwait(false);
+
+        if (waitForHandled)
+        {
+            var timeout = TimeSpan.FromSeconds(30);
+            var timeoutAt = DateTime.UtcNow.Add(timeout);
+
+            await Task.Delay(TimeSpan.FromMilliseconds(500)).ConfigureAwait(false);
+
+            using var connection = new SqlConnection(_dbConnectionString);
+            await connection.OpenAsync().ConfigureAwait(false);
+
+            while (DateTime.UtcNow < timeoutAt)
+            {
+                var receivedIntegrationEvent = await connection.QuerySingleOrDefaultAsync(
+                        "SELECT * FROM [ReceivedIntegrationEvents] WHERE Id = @EventId AND EventType = @EventType",
+                        new
+                        {
+                            EventId = integrationEvent.MessageId,
+                            EventType = eventName,
+                        })
+                    .ConfigureAwait(false);
+
+                if (receivedIntegrationEvent != null)
+                    break;
+
+                await Task.Delay(TimeSpan.FromMilliseconds(500)).ConfigureAwait(false);
+            }
+        }
     }
 
     private static ServiceBusMessage CreateIntegrationEventMessage(string eventName, byte[] eventPayload)
