@@ -15,22 +15,23 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors
 {
     public class JwtBuilder
     {
-        private static readonly JwtSecurityTokenHandler _tokenHandler = new();
+        private static readonly JsonWebTokenHandler _tokenHandler = new();
 
         // Creating a dummy signing key with 256 bits.
         private static readonly byte[] _defaultSigningKey = Guid.NewGuid().ToByteArray().Concat(Guid.NewGuid().ToByteArray()).ToArray();
         private static readonly DateTime _unixEpoc = new DateTime(1970, 1, 1);
         private readonly SymmetricSecurityKey _signingKey;
-        private readonly List<Claim> _claims;
+        private readonly Dictionary<string, object> _claims;
         private DateTime? _expires;
         private string? _audience;
         private DateTime? _notBefore;
@@ -39,33 +40,11 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
         public JwtBuilder(byte[] signingKey)
         {
             _signingKey = new SymmetricSecurityKey(signingKey);
-            _claims = new List<Claim>(16);
+            _claims = new Dictionary<string, object>();
         }
 
         public JwtBuilder()
             : this(_defaultSigningKey) { }
-
-        /// <summary>
-        /// The signing key used to sign the JWT token
-        /// </summary>
-        public SymmetricSecurityKey SigningKey => _signingKey;
-
-        public static JwtSecurityToken Parse(string token, SymmetricSecurityKey signingKey)
-        {
-#pragma warning disable CA5404 // Do not disable token validation checks
-            _ = _tokenHandler.ValidateToken(
-                token,
-                new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = signingKey,
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                },
-                out SecurityToken jwtSecurityToken);
-#pragma warning restore CA5404 // Do not disable token validation checks
-            return (JwtSecurityToken)jwtSecurityToken;
-        }
 
         /// <summary>
         /// Set the expiry date for the token
@@ -125,7 +104,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
                 Expires(expiresAt)
                 .WithClaim(
                     type: JwtRegisteredClaimNames.Iat,
-                    value: issuedAt.Subtract(JwtBuilder._unixEpoc).TotalSeconds.ToString(DateTimeFormatInfo.InvariantInfo),
+                    value: issuedAt.Subtract(_unixEpoc).TotalSeconds.ToString(DateTimeFormatInfo.InvariantInfo),
                     valueType: ClaimValueTypes.Integer64);
         }
 
@@ -179,20 +158,12 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
             => RegisterClaim(new(type, value, valueType));
 
         /// <summary>
-        /// Add a claim to the token
-        /// </summary>
-        /// <param name="claim">claim to add</param>
-        /// <returns>This builder instance</returns>
-        public JwtBuilder WithClaim(Claim claim)
-            => RegisterClaim(claim);
-
-        /// <summary>
         /// Add a claim of type 'role' to the token
         /// </summary>
         /// <param name="role">role to add</param>
         /// <returns>This builder instance</returns>
         public JwtBuilder WithRole(string role)
-            => RegisterClaim(new(ClaimTypes.Role, role));
+            => RegisterClaim(new("roles", role));
 
         /// <summary>
         /// Build the token from the configuration
@@ -200,19 +171,21 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
         /// <returns>string with the token</returns>
         public string CreateToken(string securityAlgorithm = SecurityAlgorithms.HmacSha256Signature)
         {
-            var token = new JwtSecurityToken(
-                issuer: _issuer,
-                audience: _audience,
-                notBefore: _notBefore,
-                expires: _expires,
-                signingCredentials: new SigningCredentials(_signingKey, securityAlgorithm),
-                claims: _claims);
-            return _tokenHandler.WriteToken(token);
+            var token = new SecurityTokenDescriptor()
+            {
+                Issuer = _issuer,
+                Audience = _audience,
+                Claims = _claims,
+                NotBefore = _notBefore,
+                Expires = _expires,
+                SigningCredentials = new SigningCredentials(_signingKey, securityAlgorithm),
+            };
+            return _tokenHandler.CreateToken(token);
         }
 
         private JwtBuilder RegisterClaim(Claim claim)
         {
-            _claims.Add(claim);
+            _claims.Add(claim.Type, claim.Value);
             return this;
         }
     }
