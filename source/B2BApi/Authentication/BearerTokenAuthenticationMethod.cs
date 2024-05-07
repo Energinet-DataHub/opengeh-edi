@@ -43,15 +43,15 @@ public class BearerTokenAuthenticationMethod : IAuthenticationMethod
         return contentType != "application/ebix";
     }
 
-    public Task<bool> AuthenticateAsync(HttpRequestData httpRequestData, CancellationToken cancellationToken)
+    public async Task<bool> AuthenticateAsync(HttpRequestData httpRequestData, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(httpRequestData);
 
-        var result = _jwtTokenParser.ParseFrom(httpRequestData.Headers);
+        var result = await _jwtTokenParser.ParseFromAsync(httpRequestData.Headers).ConfigureAwait(false);
         if (result.Success == false)
         {
             LogParseResult(result);
-            return Task.FromResult(false);
+            return await Task.FromResult(false).ConfigureAwait(false);
         }
 
         if (result.ClaimsPrincipal == null)
@@ -59,7 +59,7 @@ public class BearerTokenAuthenticationMethod : IAuthenticationMethod
             throw new ArgumentException("Claims principal was null after successful parsing of JWT token");
         }
 
-        return _marketActorAuthenticator.AuthenticateAsync(result.ClaimsPrincipal, cancellationToken);
+        return await _marketActorAuthenticator.AuthenticateAsync(result.ClaimsPrincipal, cancellationToken).ConfigureAwait(false);
     }
 
     private void LogParseResult(Result result)

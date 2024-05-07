@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IdentityModel.Tokens.Jwt;
 using Energinet.DataHub.EDI.B2BApi;
 using Energinet.DataHub.EDI.B2BApi.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
 var runtime = RuntimeEnvironment.Default;
@@ -39,7 +39,7 @@ namespace Energinet.DataHub.EDI.B2BApi
                 ValidateAudience = false,
                 ValidateIssuer = false,
                 ValidateLifetime = false,
-                SignatureValidator = (token, parameters) => new JwtSecurityToken(token),
+                SignatureValidator = (token, parameters) => new JsonWebToken(token),
             };
 #pragma warning restore CA5404 // Do not disable token validation checks
     }
