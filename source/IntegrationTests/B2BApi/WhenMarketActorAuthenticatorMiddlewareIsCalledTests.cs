@@ -200,7 +200,7 @@ public class WhenMarketActorAuthenticatorMiddlewareIsCalledTests : TestBase
             .CreateToken();
 
         var functionContext = _functionContextBuilder
-            .TriggeredByHttp(null, token)
+            .TriggeredByHttp(withContentType: null, withToken: token)
             .Build();
 
         var sut = CreateMarketActorAuthenticatorMiddleware();

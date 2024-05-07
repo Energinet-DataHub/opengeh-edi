@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
@@ -163,7 +164,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
         /// <param name="role">role to add</param>
         /// <returns>This builder instance</returns>
         public JwtBuilder WithRole(string role)
-            => RegisterClaim(new(ClaimTypes.Role, role));
+            => RegisterClaim(new(ClaimsMap.Roles, role));
 
         /// <summary>
         /// Build the token from the configuration
