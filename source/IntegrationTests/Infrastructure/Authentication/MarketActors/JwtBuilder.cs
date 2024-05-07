@@ -20,7 +20,6 @@ using System.Security.Claims;
 using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors
 {
