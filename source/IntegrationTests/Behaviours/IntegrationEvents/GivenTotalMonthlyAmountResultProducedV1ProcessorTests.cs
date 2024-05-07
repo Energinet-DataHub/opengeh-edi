@@ -67,7 +67,7 @@ public class GivenTotalMonthlyAmountResultProducedV1ProcessorTests : BehavioursT
             ReceiverRole: ActorRole.EnergySupplier,
             SenderId: "5790001330552",
             SenderRole: ActorRole.MeteredDataAdministrator,
-            ChargeTypeOwner: null,
+            ChargeTypeOwner: null, //ChargeOwner is not writting in the document for total sum
             ChargeCode: null,
             ChargeType: null,
             Currency: Currency.DanishCrowns,
@@ -100,7 +100,7 @@ public class GivenTotalMonthlyAmountResultProducedV1ProcessorTests : BehavioursT
             ReceiverRole: ActorRole.GridOperator,
             SenderId: "5790001330552",
             SenderRole: ActorRole.MeteredDataAdministrator,
-            ChargeTypeOwner: null,
+            ChargeTypeOwner: null, //ChargeOwner is not writting in the document for total sum
             ChargeCode: null,
             ChargeType: null,
             Currency: Currency.DanishCrowns,

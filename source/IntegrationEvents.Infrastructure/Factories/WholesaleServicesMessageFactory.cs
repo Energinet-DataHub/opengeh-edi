@@ -59,22 +59,6 @@ public sealed class WholesaleServicesMessageFactory
             message);
     }
 
-    public WholesaleServicesMessageDto CreateMessage(
-        EventId eventId,
-        TotalMonthlyAmountResultProducedV1 totalMonthlyAmountResultProducedV1)
-    {
-        ArgumentNullException.ThrowIfNull(totalMonthlyAmountResultProducedV1);
-        var message = CreateWholesaleResultSeries(totalMonthlyAmountResultProducedV1);
-
-        return WholesaleServicesMessageDto.Create(
-            eventId,
-            message.EnergySupplier,
-            ActorRole.EnergySupplier,
-            ActorNumber.Create(totalMonthlyAmountResultProducedV1.ChargeOwnerId),
-            BusinessReasonMapper.Map(totalMonthlyAmountResultProducedV1.CalculationType).Name,
-            message);
-    }
-
     public async Task<WholesaleServicesMessageDto> CreateMessageAsync(
         EventId eventId,
         AmountPerChargeResultProducedV1 amountPerChargeResultProducedV1)
@@ -155,35 +139,6 @@ public sealed class WholesaleServicesMessageFactory
             MeteringPointType: MeteringPointTypeMapper.Map(message.MeteringPointType),
             null,
             SettlementMethod: SettlementMethodMapper.Map(message.SettlementMethod));
-    }
-
-    private WholesaleServicesSeries CreateWholesaleResultSeries(TotalMonthlyAmountResultProducedV1 message)
-    {
-        ArgumentNullException.ThrowIfNull(message);
-
-        return new WholesaleServicesSeries(
-            TransactionId: Guid.NewGuid(),
-            CalculationVersion: 1, // TODO: Awaiting an updated contract
-            GridAreaCode: message.GridAreaCode,
-            ChargeCode: null,
-            IsTax: false,
-            Points: new[]
-            {
-                new WholesaleServicesPoint(1, null, null, message.Amount != null ? DecimalParser.Parse(message.Amount) : null, null),
-            },
-            EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
-            null, // ChargeOwner is not allowed in RSM-019 for TotalMonthlyAmountResultProducedV1
-            Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
-            SettlementVersion: SettlementVersionMapper.Map(message.CalculationType),
-            QuantityMeasureUnit: null,
-            QuantityUnit: null,
-            PriceMeasureUnit: MeasurementUnit.Kwh,
-            Currency: CurrencyMapper.Map(message.Currency),
-            ChargeType: null,
-            Resolution: Resolution.Monthly,
-            MeteringPointType: null,
-            SettlementType: null,
-            SettlementMethod: null);
     }
 
     private async Task<ActorNumber> GetChargeOwnerAsync(string gridAreaCode, string chargeOwnerId, bool isTax)

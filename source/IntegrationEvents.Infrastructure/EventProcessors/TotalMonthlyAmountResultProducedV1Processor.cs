@@ -52,7 +52,7 @@ public class TotalMonthlyAmountResultProducedV1Processor : IIntegrationEventProc
         }
 
         var totalMonthlyAmountResultProducedV1 = (TotalMonthlyAmountResultProducedV1)integrationEvent.Message;
-        var message = _wholesaleServicesMessageFactory.CreateMessage(
+        var message = WholesaleServicesTotalSumMessageFactory.CreateMessage(
             EventId.From(integrationEvent.EventIdentification),
             totalMonthlyAmountResultProducedV1);
 

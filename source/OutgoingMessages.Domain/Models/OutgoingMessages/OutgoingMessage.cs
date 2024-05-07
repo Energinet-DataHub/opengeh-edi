@@ -279,10 +279,10 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
                 new(
                     wholesaleServicesMessageDto.EventId,
                     wholesaleServicesMessageDto.DocumentType,
-                    wholesaleServicesMessageDto.ChargeOwnerId,
+                    wholesaleServicesMessageDto.ChargeOwnerId!,
                     wholesaleServicesMessageDto.ProcessId,
                     wholesaleServicesMessageDto.BusinessReason,
-                    GetChargeOwnerRole(wholesaleServicesMessageDto.ChargeOwnerId),
+                    GetChargeOwnerRole(wholesaleServicesMessageDto.ChargeOwnerId!),
                     wholesaleServicesMessageDto.SenderId,
                     wholesaleServicesMessageDto.SenderRole,
                     serializer.Serialize(wholesaleServicesMessageDto.Series),
@@ -345,6 +345,33 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
                 messageCreatedFromProcess: ProcessType.RequestWholesaleResults,
                 relatedToMessageId: message.RelatedToMessageId,
                 gridAreaCode: message.Series.GridAreaCode);
+        }
+
+        /// <summary>
+        ///     This method create a single outgoing message, for the receiver, based on the WholesaleServicesTotalSumMessage.
+        /// </summary>
+        public static OutgoingMessage CreateMessage(
+            WholesaleServicesTotalSumMessageDto wholesaleServicesTotalSumMessage,
+            ISerializer serializer,
+            Instant timestamp)
+        {
+            ArgumentNullException.ThrowIfNull(serializer);
+            ArgumentNullException.ThrowIfNull(wholesaleServicesTotalSumMessage);
+
+            return new(
+                wholesaleServicesTotalSumMessage.EventId,
+                wholesaleServicesTotalSumMessage.DocumentType,
+                wholesaleServicesTotalSumMessage.ReceiverNumber,
+                wholesaleServicesTotalSumMessage.ProcessId,
+                wholesaleServicesTotalSumMessage.BusinessReason,
+                wholesaleServicesTotalSumMessage.ReceiverRole,
+                wholesaleServicesTotalSumMessage.SenderId,
+                wholesaleServicesTotalSumMessage.SenderRole,
+                serializer.Serialize(wholesaleServicesTotalSumMessage.Series),
+                timestamp,
+                ProcessType.ReceiveWholesaleResults,
+                wholesaleServicesTotalSumMessage.RelatedToMessageId,
+                wholesaleServicesTotalSumMessage.Series.GridAreaCode);
         }
 
         public void AssignToBundle(BundleId bundleId)
