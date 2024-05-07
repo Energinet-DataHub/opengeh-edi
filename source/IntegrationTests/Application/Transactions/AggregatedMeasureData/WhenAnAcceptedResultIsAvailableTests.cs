@@ -92,7 +92,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId)
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1)
-            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.OriginalTransactionIdReference, process.BusinessTransactionId.Id);
+            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.OriginalTransactionIdReference, process.BusinessTransactionId.Value);
     }
 
     [Fact]
@@ -269,7 +269,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
           ProcessId.New(),
           requestedByActor,
           OriginalActor.From(requestedByActor),
-          BusinessTransactionId.Create(Guid.NewGuid().ToString()),
+          TransactionId.New(),
           BusinessReason.BalanceFixing,
           MessageId.New(),
           MeteringPointType.Consumption.Code,

@@ -63,7 +63,7 @@ public class InitializeAggregatedMeasureDataProcessesHandler : IRequestHandler<I
                     ProcessId.New(),
                     series.RequestedByActor,
                     series.OriginalActor,
-                    BusinessTransactionId.Create(series.Id),
+                    series.Id,
                     businessReason,
                     messageId,
                     series.MeteringPointType,

@@ -69,7 +69,7 @@ public class InitializeWholesaleServicesProcessesHandler : IRequestHandler<Initi
                     processId: ProcessId.New(),
                     series.RequestedByActor,
                     series.OriginalActor,
-                    businessTransactionId: BusinessTransactionId.Create(series.Id),
+                    businessTransactionId: TransactionId.From(series.Id),
                     initiatedByMessageId: messageId,
                     businessReason: businessReason,
                     startOfPeriod: series.StartDateTime,

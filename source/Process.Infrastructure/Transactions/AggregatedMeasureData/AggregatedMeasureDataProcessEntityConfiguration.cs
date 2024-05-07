@@ -34,8 +34,8 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
                 fromDbValue => ProcessId.Create(fromDbValue));
         builder.Property(x => x.BusinessTransactionId)
             .HasConversion(
-                toDbValue => toDbValue.Id,
-                fromDbValue => BusinessTransactionId.Create(fromDbValue));
+                toDbValue => toDbValue.Value,
+                fromDbValue => TransactionId.From(fromDbValue));
         builder.Property(x => x.MeteringPointType);
         builder.Property(x => x.SettlementMethod);
         builder.Property(x => x.StartOfPeriod);

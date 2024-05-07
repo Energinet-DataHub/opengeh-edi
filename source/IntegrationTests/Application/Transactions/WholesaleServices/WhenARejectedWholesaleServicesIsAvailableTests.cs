@@ -87,7 +87,7 @@ public sealed class WhenARejectedWholesaleServicesIsAvailableTests : TestBase
                 rejectReason2.ErrorCode)
             .HasMessageRecordValue<RejectedWholesaleServicesMessageSeries>(
                 messageSeries => messageSeries.OriginalTransactionIdReference,
-                process.BusinessTransactionId.Id);
+                process.BusinessTransactionId.Value);
     }
 
     protected override void Dispose(bool disposing)
@@ -116,7 +116,7 @@ public sealed class WhenARejectedWholesaleServicesIsAvailableTests : TestBase
             ProcessId.New(),
             requestedByActor,
             OriginalActor.From(requestedByActor),
-            BusinessTransactionId.Create(Guid.NewGuid().ToString()),
+            TransactionId.New(),
             MessageId.New(),
             BusinessReason.WholesaleFixing,
             SampleData.StartOfPeriod,

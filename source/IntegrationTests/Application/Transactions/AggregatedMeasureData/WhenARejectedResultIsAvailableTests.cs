@@ -80,7 +80,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<RejectedEnergyResultMessageSerie>(timeSerie => timeSerie.RejectReasons.First().ErrorCode, rejectReason.ErrorCode)
             .HasMessageRecordValue<RejectedEnergyResultMessageSerie>(timeSerie => timeSerie.RejectReasons.Last().ErrorCode, rejectReason2.ErrorCode)
-            .HasMessageRecordValue<RejectedEnergyResultMessageSerie>(timeSerie => timeSerie.OriginalTransactionIdReference, process.BusinessTransactionId.Id);
+            .HasMessageRecordValue<RejectedEnergyResultMessageSerie>(timeSerie => timeSerie.OriginalTransactionIdReference, process.BusinessTransactionId.Value);
     }
 
     protected override void Dispose(bool disposing)
@@ -108,7 +108,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
           ProcessId.New(),
           requestedByActor,
           OriginalActor.From(requestedByActor),
-          BusinessTransactionId.Create(Guid.NewGuid().ToString()),
+          TransactionId.New(),
           BusinessReason.BalanceFixing,
           MessageId.New(),
           null,

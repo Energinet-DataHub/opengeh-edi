@@ -67,7 +67,7 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
             acceptedWholesaleServices.Resolution,
             acceptedWholesaleServices.MeteringPointType,
             acceptedWholesaleServices.SettlementMethod,
-            OriginalTransactionIdReference: process.BusinessTransactionId.Id);
+            OriginalTransactionIdReference: process.BusinessTransactionId.Value);
 
         return acceptedWholesaleCalculationSeries;
     }

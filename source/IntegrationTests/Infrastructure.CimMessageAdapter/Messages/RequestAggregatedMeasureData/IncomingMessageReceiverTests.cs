@@ -667,7 +667,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
                         : new List<string>();
 
                     return new InitializeAggregatedMeasureDataProcessSeries(
-                        series.TransactionId,
+                        TransactionId.From(series.TransactionId),
                         series.MeteringPointType,
                         series.SettlementMethod,
                         series.StartDateTime,

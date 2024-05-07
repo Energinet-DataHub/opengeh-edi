@@ -83,7 +83,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.MeteringPointType, MeteringPointType.Production)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.ChargeOwner.Value, process.ChargeOwner)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.EnergySupplier.Value, process.EnergySupplierId)
-            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.OriginalTransactionIdReference, process.BusinessTransactionId.Id);
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.OriginalTransactionIdReference, process.BusinessTransactionId.Value);
     }
 
     [Fact]
@@ -118,7 +118,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.GridAreaCode, process.RequestedGridArea)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.ChargeOwner.Value, process.ChargeOwner)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.EnergySupplier.Value, process.EnergySupplierId)
-            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.OriginalTransactionIdReference, process.BusinessTransactionId.Id);
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.OriginalTransactionIdReference, process.BusinessTransactionId.Value);
     }
 
     [Fact]

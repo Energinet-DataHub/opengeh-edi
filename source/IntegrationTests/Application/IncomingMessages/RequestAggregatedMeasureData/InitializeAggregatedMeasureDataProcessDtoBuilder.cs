@@ -124,7 +124,7 @@ public class InitializeAggregatedMeasureDataProcessDtoBuilder
 
     private InitializeAggregatedMeasureDataProcessSeries CreateSeries() =>
         new(
-            _seriesId,
+            TransactionId.From(_seriesId),
             _meteringPointType,
             _settlementMethod,
             _startDateTime,

@@ -62,7 +62,7 @@ public sealed class
                             reason.ErrorCode,
                             reason.ErrorMessage))
                 .ToList(),
-            process.BusinessTransactionId.Id);
+            process.BusinessTransactionId.Value);
 
         return new RejectedWholesaleServicesMessageDto(
             receiverNumber: process.RequestedByActor.ActorNumber,
