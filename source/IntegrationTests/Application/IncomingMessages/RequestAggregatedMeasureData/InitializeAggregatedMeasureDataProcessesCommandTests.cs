@@ -111,7 +111,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 
         // Assert
         var exceptedServiceBusMessageSubject = nameof(AggregatedTimeSeriesRequest);
-        var message = _senderSpy.Message;
+        var message = _senderSpy.LatestMessage;
         var process = GetProcess(initializeProcessDto.SenderNumber);
         Assert.NotNull(message);
         Assert.NotNull(process);
@@ -135,7 +135,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         await ProcessInternalCommandsAsync();
 
         // Assert
-        var message = _senderSpy.Message;
+        var message = _senderSpy.LatestMessage;
         Assert.NotNull(message);
     }
 
@@ -151,7 +151,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         await ProcessInternalCommandsAsync();
 
         // Assert
-        var message = _senderSpy.Message;
+        var message = _senderSpy.LatestMessage;
 
         using var scope = new AssertionScope();
         message.Should().NotBeNull();
@@ -172,9 +172,9 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         _serviceBusClientSenderFactory.Dispose();
     }
 
-    private static RequestAggregatedMeasureDataMarketDocumentBuilder MessageBuilder()
+    private static InitializeAggregatedMeasureDataProcessDtoBuilder MessageBuilder()
     {
-        return new RequestAggregatedMeasureDataMarketDocumentBuilder();
+        return new InitializeAggregatedMeasureDataProcessDtoBuilder();
     }
 
     private static void AssertProcessState(AggregatedMeasureDataProcess process, AggregatedMeasureDataProcess.State state)
@@ -189,7 +189,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 
         return _processContext.AggregatedMeasureDataProcesses
             .ToList()
-            .FirstOrDefault(x => x.RequestedByActorId.Value == senderNumber);
+            .FirstOrDefault(x => x.RequestedByActor.ActorNumber.Value == senderNumber);
     }
 
     private sealed class ProcessAndRequestComparer : IEquivalencyStep
@@ -208,12 +208,12 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                         (p, r, s) => p.BusinessTransactionId.Id.Should().Be(s.Id)
                     },
                     {
-                        nameof(AggregatedMeasureDataProcess.RequestedByActorId),
-                        (p, r, s) => p.RequestedByActorId.Value.Should().Be(r.SenderNumber)
+                        nameof(AggregatedMeasureDataProcess.RequestedByActor),
+                        (p, r, s) => p.RequestedByActor.Should().Be(s.RequestedByActor)
                     },
                     {
-                        nameof(AggregatedMeasureDataProcess.RequestedByActorRoleCode),
-                        (p, r, s) => p.RequestedByActorRoleCode.Should().Be(r.SenderRoleCode)
+                        nameof(AggregatedMeasureDataProcess.OriginalActor),
+                        (p, r, s) => p.OriginalActor.Should().Be(s.OriginalActor)
                     },
                     {
                         nameof(AggregatedMeasureDataProcess.BusinessReason),

@@ -24,16 +24,18 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequ
 public class AssertRejectRequestAggregatedMeasureDataEbixDocument : IAssertRejectRequestAggregatedMeasureDataDocument
 {
     private readonly AssertEbixDocument _documentAsserter;
+    private readonly bool _skipMaxLengthValidation;
 
-    public AssertRejectRequestAggregatedMeasureDataEbixDocument(AssertEbixDocument documentAsserter)
+    public AssertRejectRequestAggregatedMeasureDataEbixDocument(AssertEbixDocument documentAsserter, bool skipMaxLengthValidation = false)
     {
         _documentAsserter = documentAsserter;
+        _skipMaxLengthValidation = skipMaxLengthValidation;
         _documentAsserter.HasValue("HeaderEnergyDocument/DocumentType", "ERR");
     }
 
     public async Task<IAssertRejectRequestAggregatedMeasureDataDocument> DocumentIsValidAsync()
     {
-        await _documentAsserter.HasValidStructureAsync(DocumentType.RejectRequestAggregatedMeasureData, "3").ConfigureAwait(false);
+        await _documentAsserter.HasValidStructureAsync(DocumentType.RejectRequestAggregatedMeasureData, "3", _skipMaxLengthValidation).ConfigureAwait(false);
         return this;
     }
 
@@ -52,6 +54,12 @@ public class AssertRejectRequestAggregatedMeasureDataEbixDocument : IAssertRejec
     public IAssertRejectRequestAggregatedMeasureDataDocument HasMessageId(string expectedMessageId)
     {
         _documentAsserter.HasValue("HeaderEnergyDocument/Identification", expectedMessageId);
+        return this;
+    }
+
+    public IAssertRejectRequestAggregatedMeasureDataDocument MessageIdExists()
+    {
+        _documentAsserter.ElementExists("HeaderEnergyDocument/Identification");
         return this;
     }
 
@@ -76,6 +84,12 @@ public class AssertRejectRequestAggregatedMeasureDataEbixDocument : IAssertRejec
     public IAssertRejectRequestAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId)
     {
         _documentAsserter.HasValue($"PayloadResponseEvent[1]/Identification", expectedTransactionId.ToString("N"));
+        return this;
+    }
+
+    public IAssertRejectRequestAggregatedMeasureDataDocument TransactionIdExists()
+    {
+        _documentAsserter.ElementExists("PayloadResponseEvent[1]/Identification");
         return this;
     }
 

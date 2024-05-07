@@ -81,8 +81,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasProcessId(process.ProcessId)
             .HasEventId(expectedEventId)
             .HasBusinessReason(process.BusinessReason)
-            .HasReceiverId(process.RequestedByActorId.Value)
-            .HasReceiverRole(process.RequestedByActorRoleCode)
+            .HasReceiverId(process.RequestedByActor.ActorNumber.Value)
+            .HasReceiverRole(process.RequestedByActor.ActorRole.Code)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasProcessType(ProcessType.RequestEnergyResults)
@@ -115,8 +115,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         outgoingMessage
             .HasBusinessReason(process.BusinessReason)
-            .HasReceiverId(process.RequestedByActorId.Value)
-            .HasReceiverRole(process.RequestedByActorRoleCode)
+            .HasReceiverId(process.RequestedByActor.ActorNumber.Value)
+            .HasReceiverRole(process.RequestedByActor.ActorRole.Code)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
@@ -169,8 +169,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
 
         outgoingMessage
             .HasBusinessReason(process.BusinessReason)
-            .HasReceiverId(process.RequestedByActorId.Value)
-            .HasReceiverRole(process.RequestedByActorRoleCode)
+            .HasReceiverId(process.RequestedByActor.ActorNumber.Value)
+            .HasReceiverRole(process.RequestedByActor.ActorRole.Code)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
@@ -263,11 +263,13 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     {
         receiverRole ??= SampleData.BalanceResponsibleParty;
 
+        var requestedByActor = RequestedByActor.From(SampleData.ReceiverNumber, receiverRole);
+
         var process = new AggregatedMeasureDataProcess(
           ProcessId.New(),
+          requestedByActor,
+          OriginalActor.From(requestedByActor),
           BusinessTransactionId.Create(Guid.NewGuid().ToString()),
-          SampleData.ReceiverNumber,
-          receiverRole.Code,
           BusinessReason.BalanceFixing,
           MessageId.New(),
           MeteringPointType.Consumption.Code,

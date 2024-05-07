@@ -47,11 +47,40 @@ internal sealed class AggregatedMeasureDataProcessEntityConfiguration : IEntityT
             .HasConversion(
                 value => value.Code,
                 dbValue => BusinessReason.FromCodeOrUnused(dbValue));
-        builder.Property(x => x.RequestedByActorId)
-            .HasConversion(
-                toDbValue => toDbValue.Value,
-                fromDbValue => ActorNumber.Create(fromDbValue));
-        builder.Property(x => x.RequestedByActorRoleCode);
+
+        builder.OwnsOne(
+            x => x.RequestedByActor,
+            actor =>
+            {
+                actor.Property(a => a.ActorNumber)
+                    .HasColumnName("RequestedByActorNumber")
+                    .HasConversion(
+                        actorNumber => actorNumber.Value,
+                        dbValue => ActorNumber.Create(dbValue));
+
+                actor.Property(a => a.ActorRole)
+                    .HasColumnName("RequestedByActorRole")
+                    .HasConversion(
+                        actorRole => actorRole.Code,
+                        dbValue => ActorRole.FromCode(dbValue));
+            });
+
+        builder.OwnsOne(
+            x => x.OriginalActor,
+            actor =>
+            {
+                actor.Property(a => a.ActorNumber)
+                    .HasColumnName("OriginalActorNumber")
+                    .HasConversion(
+                        actorNumber => actorNumber.Value,
+                        dbValue => ActorNumber.Create(dbValue));
+
+                actor.Property(a => a.ActorRole)
+                    .HasColumnName("OriginalActorRole")
+                    .HasConversion(
+                        actorRole => actorRole.Code,
+                        dbValue => ActorRole.FromCode(dbValue));
+            });
 
         builder.Property<AggregatedMeasureDataProcess.State>("_state")
             .HasConversion(

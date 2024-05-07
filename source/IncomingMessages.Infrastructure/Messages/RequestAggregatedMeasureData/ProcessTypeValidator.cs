@@ -12,17 +12,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 
 public class ProcessTypeValidator : IProcessTypeValidator
 {
-    private static readonly IReadOnlyCollection<string> _whiteList = new[] { "D03", "D04", "D05", "D32" };
+    private static readonly IReadOnlyCollection<string> _aggregatedMeasureDataWhitelist =
+        new[]
+        {
+            BusinessReason.PreliminaryAggregation.Code,
+            BusinessReason.BalanceFixing.Code,
+            BusinessReason.WholesaleFixing.Code,
+            BusinessReason.Correction.Code,
+        };
 
-    public async Task<Result> ValidateAsync(string processType, CancellationToken cancellationToken)
+    private static readonly IReadOnlyCollection<string> _wholesaleServicesWhitelist =
+        new[]
+        {
+            BusinessReason.WholesaleFixing.Code,
+            BusinessReason.Correction.Code,
+        };
+
+    public async Task<Result> ValidateAsync(IIncomingMessage message, CancellationToken cancellationToken)
     {
-        return await Task.FromResult(_whiteList.Contains(processType) ?
-             Result.Succeeded() : Result.Failure(new NotSupportedProcessType(processType))).ConfigureAwait(false);
+        return await Task.FromResult(
+                message switch
+                {
+                    RequestAggregatedMeasureDataMessage ramdm =>
+                        _aggregatedMeasureDataWhitelist.Contains(ramdm.BusinessReason)
+                            ? Result.Succeeded()
+                            : Result.Failure(new NotSupportedProcessType(ramdm.BusinessReason)),
+                    RequestWholesaleServicesMessage rwsm =>
+                        _wholesaleServicesWhitelist.Contains(rwsm.BusinessReason)
+                            ? Result.Succeeded()
+                            : Result.Failure(new NotSupportedProcessType(rwsm.BusinessReason)),
+                    _ => throw new InvalidOperationException($"The baw's on the slates! {message.GetType().Name}"),
+                })
+            .ConfigureAwait(false);
     }
 }

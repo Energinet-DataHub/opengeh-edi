@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
@@ -77,6 +78,7 @@ using Xunit;
 using Xunit.Abstractions;
 using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
@@ -213,11 +215,6 @@ public class BehavioursTestBase : IDisposable
         _disposed = true;
     }
 
-    protected Task CreateActorIfNotExistAsync(CreateActorDto createActorDto)
-    {
-        return GetService<IMasterDataClient>().CreateActorIfNotExistAsync(createActorDto, CancellationToken.None);
-    }
-
     protected Task GivenGridAreaOwnershipAsync(string gridArea, ActorNumber actorNumber)
     {
         return GetService<IMasterDataClient>()
@@ -298,139 +295,6 @@ public class BehavioursTestBase : IDisposable
                 CancellationToken.None);
     }
 
-    protected Task<ResponseMessage> GivenRequestAggregatedMeasureDataJsonAsync(
-        string senderActorNumber,
-        string senderActorRole,
-        (int Year, int Month, int Day) periodStart,
-        (int Year, int Month, int Day) periodEnd,
-        string? gridArea,
-        string energySupplierActorNumber,
-        string transactionId)
-    {
-        return GetService<IIncomingMessageClient>()
-            .RegisterAndSendAsync(
-                RequestAggregatedMeasureDataEventBuilder.GetJsonStream(
-                    senderActorNumber,
-                    senderActorRole,
-                    new LocalDate(periodStart.Year, periodStart.Month, periodStart.Day)
-                        .AtMidnight()
-                        .InZoneStrictly(_dateTimeZone)
-                        .ToInstant()
-                        .ToString(),
-                    new LocalDate(periodEnd.Year, periodEnd.Month, periodEnd.Day)
-                        .AtMidnight()
-                        .InZoneStrictly(_dateTimeZone)
-                        .ToInstant()
-                        .ToString(),
-                    gridArea,
-                    energySupplierActorNumber,
-                    transactionId),
-                DocumentFormat.Json,
-                IncomingDocumentType.RequestAggregatedMeasureData,
-                CancellationToken.None);
-    }
-
-    protected async Task GivenReceivedWholesaleServicesRequest(
-        DocumentFormat documentFormat,
-        ActorNumber senderActorNumber,
-        ActorRole senderActorRole,
-        (int Year, int Month, int Day) periodStart,
-        (int Year, int Month, int Day) periodEnd,
-        string? gridArea,
-        ActorNumber energySupplierActorNumber,
-        ActorNumber chargeOwnerActorNumber,
-        string chargeCode,
-        ChargeType chargeType,
-        string transactionId,
-        bool isMonthly)
-    {
-        var incomingMessageClient = GetService<IIncomingMessageClient>();
-
-        var incomingMessageStream = RequestWholesaleServicesRequestBuilder.GetStream(
-            documentFormat,
-            senderActorNumber,
-            senderActorRole,
-            CreateDateInstant(periodStart.Year, periodStart.Month, periodStart.Day),
-            CreateDateInstant(periodEnd.Year, periodEnd.Month, periodEnd.Day),
-            gridArea,
-            energySupplierActorNumber,
-            chargeOwnerActorNumber,
-            chargeCode,
-            chargeType,
-            transactionId,
-            isMonthly);
-
-        var response = await
-            incomingMessageClient.RegisterAndSendAsync(
-                incomingMessageStream,
-                documentFormat,
-                IncomingDocumentType.RequestWholesaleSettlement,
-                CancellationToken.None);
-
-        using (new AssertionScope())
-        {
-            response.IsErrorResponse.Should().BeFalse();
-            response.MessageBody.Should().BeEmpty();
-        }
-    }
-
-    // TODO (MWO)
-    // In case we would like to consider the reception of a request as the "acting"
-    // step in our test, instead of a prerequisite.
-    protected Task<ResponseMessage> WhenRequestAggregatedMeasureDataJsonAsync(
-        string senderActorNumber,
-        string senderActorRole,
-        (int Year, int Month, int Day) periodStart,
-        (int Year, int Month, int Day) periodEnd,
-        string gridArea,
-        string energySupplierActorNumber,
-        string transactionId)
-    {
-        return GivenRequestAggregatedMeasureDataJsonAsync(
-            senderActorNumber,
-            senderActorRole,
-            periodStart,
-            periodEnd,
-            gridArea,
-            energySupplierActorNumber,
-            transactionId);
-    }
-
-    protected async Task GivenInitializeAggregatedMeasureDataProcessDtoIsHandledAsync(
-        ServiceBusMessage serviceBusMessage)
-    {
-        // We have to manually process the service bus message, as there isn't a real service bus
-        serviceBusMessage.Subject.Should().Be(nameof(InitializeAggregatedMeasureDataProcessDto));
-        serviceBusMessage.Body.Should().NotBeNull();
-
-        await GetService<IProcessClient>().InitializeAsync(serviceBusMessage.Subject, serviceBusMessage.Body.ToArray());
-        await ProcessInternalCommandsAsync();
-    }
-
-    protected async Task WhenInitializeAggregatedMeasureDataProcessDtoIsHandledAsync(
-        ServiceBusMessage serviceBusMessage)
-    {
-        await GivenInitializeAggregatedMeasureDataProcessDtoIsHandledAsync(serviceBusMessage);
-    }
-
-    protected async Task GivenWholesaleAcceptedResponseToAggregatedMeasureDataRequestAsync(
-        ServiceBusMessage serviceBusMessage)
-    {
-        serviceBusMessage.Subject.Should().Be(nameof(AggregatedTimeSeriesRequest));
-        serviceBusMessage.Body.Should().NotBeNull();
-
-        var aggregatedTimeSeriesRequest =
-            AggregatedTimeSeriesRequest.Parser.ParseFrom(serviceBusMessage.Body);
-
-        var aggregatedTimeSeriesRequestAccepted =
-            AggregatedTimeSeriesRequestAcceptedEventBuilder.BuildEventFrom(aggregatedTimeSeriesRequest);
-
-        await HavingReceivedInboxEventAsync(
-            nameof(AggregatedTimeSeriesRequestAccepted),
-            aggregatedTimeSeriesRequestAccepted,
-            Guid.Parse(serviceBusMessage.MessageId));
-    }
-
     protected ServiceBusSenderSpy CreateServiceBusSenderSpy()
     {
         var serviceBusSenderSpy = new ServiceBusSenderSpy(MockServiceBusName);
@@ -439,15 +303,39 @@ public class BehavioursTestBase : IDisposable
         return serviceBusSenderSpy;
     }
 
-    protected async Task WhenWholesaleServicesProcessIsInitialized(ServiceBusMessage serviceBusMessage)
+    protected (TServiceBusMessage Message, Guid ProcessId) AssertServiceBusMessage<TServiceBusMessage>(ServiceBusSenderSpy senderSpy, Func<BinaryData, TServiceBusMessage> parser)
+        where TServiceBusMessage : IMessage
     {
-        using var scope = _serviceProvider.CreateScope();
-        // We have to manually process the service bus message, as there isn't a real service bus
-        serviceBusMessage.Subject.Should().Be(nameof(InitializeWholesaleServicesProcessDto));
-        serviceBusMessage.Body.Should().NotBeNull();
+        var assertResult = AssertServiceBusMessages(senderSpy, 1, parser);
+        return assertResult.Single();
+    }
 
-        await scope.ServiceProvider.GetRequiredService<IProcessClient>().InitializeAsync(serviceBusMessage.Subject, serviceBusMessage.Body.ToArray());
-        await ProcessInternalCommandsAsync();
+    protected IList<(TServiceBusMessage Message, Guid ProcessId)> AssertServiceBusMessages<TServiceBusMessage>(ServiceBusSenderSpy senderSpy, int expectedCount, Func<BinaryData, TServiceBusMessage> parser)
+        where TServiceBusMessage : IMessage
+    {
+        var sentMessages = senderSpy.MessagesSent
+            .Where(m => m.Subject == typeof(TServiceBusMessage).Name)
+            .ToList();
+
+        sentMessages.Should().HaveCount(expectedCount);
+
+        List<(TServiceBusMessage Message, Guid ProcessId)> messages = new();
+        using var scope = new AssertionScope();
+        foreach (var message in sentMessages)
+        {
+            message.Subject.Should().Be(typeof(TServiceBusMessage).Name);
+            message.Body.Should().NotBeNull();
+            message.ApplicationProperties.TryGetValue("ReferenceId", out var referenceId);
+            referenceId.Should().NotBeNull();
+            Guid.TryParse(referenceId!.ToString()!, out var processId).Should().BeTrue();
+
+            var parsedMessage = parser(message.Body);
+            parsedMessage.Should().NotBeNull();
+
+            messages.Add((parsedMessage, processId));
+        }
+
+        return messages;
     }
 
     protected async Task GivenIntegrationEventReceived(IEventMessage @event)
@@ -485,32 +373,6 @@ public class BehavioursTestBase : IDisposable
         return peekResults;
     }
 
-    protected async Task ThenNotifyWholesaleServicesDocumentIsCorrect(Stream? peekResultDocumentStream, DocumentFormat documentFormat, NotifyWholesaleServicesDocumentAssertionInput assertionInput)
-    {
-        peekResultDocumentStream.Should().NotBeNull();
-        peekResultDocumentStream!.Position = 0;
-
-        using var assertionScope = new AssertionScope();
-
-        await NotifyWholesaleServicesDocumentAsserter.AssertCorrectDocumentAsync(
-            documentFormat,
-            peekResultDocumentStream,
-            assertionInput);
-    }
-
-    protected async Task ThenRejectRequestWholesaleSettlementDocumentIsCorrect(Stream? peekResultDocumentStream, DocumentFormat documentFormat, RejectRequestWholesaleSettlementDocumentAssertionInput assertionInput)
-    {
-        peekResultDocumentStream.Should().NotBeNull();
-        peekResultDocumentStream!.Position = 0;
-
-        using var assertionScope = new AssertionScope();
-
-        await RejectRequestWholesaleSettlementDocumentAsserter.AssertCorrectDocumentAsync(
-            documentFormat,
-            peekResultDocumentStream,
-            assertionInput);
-    }
-
     protected AmountPerChargeResultProducedV1 GivenAmountPerChargeResultProducedV1Event(Action<AmountPerChargeResultProducedV1EventBuilder> builder)
     {
         var eventBuilder = new AmountPerChargeResultProducedV1EventBuilder();
@@ -520,14 +382,24 @@ public class BehavioursTestBase : IDisposable
         return eventBuilder.Build();
     }
 
-    private async Task WhenActorDequeuesMessage(string messageId, ActorNumber actorNumber, ActorRole actorRole)
+    protected T GetService<T>()
+        where T : notnull
     {
-        await using var scope = _serviceProvider.CreateAsyncScope();
-        var outgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-        await outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(messageId, actorRole, actorNumber), CancellationToken.None);
+        return _serviceProvider.GetRequiredService<T>();
     }
 
-    private async Task ProcessInternalCommandsAsync()
+    protected async Task InitializeProcess(ServiceBusMessage serviceBusMessage, string expectedSubject)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        // We have to manually process the service bus message, as there isn't a real service bus
+        serviceBusMessage.Subject.Should().Be(expectedSubject);
+        serviceBusMessage.Body.Should().NotBeNull();
+
+        await scope.ServiceProvider.GetRequiredService<IProcessClient>().InitializeAsync(serviceBusMessage.Subject, serviceBusMessage.Body.ToArray());
+        await ProcessInternalCommandsAsync();
+    }
+
+    protected async Task ProcessInternalCommandsAsync()
     {
         await ProcessBackgroundTasksAsync();
 
@@ -537,10 +409,11 @@ public class BehavioursTestBase : IDisposable
         }
     }
 
-    private T GetService<T>()
-        where T : notnull
+    private async Task WhenActorDequeuesMessage(string messageId, ActorNumber actorNumber, ActorRole actorRole)
     {
-        return _serviceProvider.GetRequiredService<T>();
+        await using var scope = _serviceProvider.CreateAsyncScope();
+        var outgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        await outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(messageId, actorRole, actorNumber), CancellationToken.None);
     }
 
     private Task ProcessReceivedInboxEventsAsync()
@@ -568,6 +441,7 @@ public class BehavioursTestBase : IDisposable
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
+                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ManageConnectionString)}"] = MockServiceBusName,
                     [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ListenConnectionString)}"] = MockServiceBusName,
                     [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.SendConnectionString)}"] = MockServiceBusName,
                     [$"{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}"] = MockServiceBusName,

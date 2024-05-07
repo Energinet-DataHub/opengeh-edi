@@ -18,6 +18,7 @@ using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
+using Energinet.DataHub.EDI.Process.Interfaces;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData
 {
@@ -33,9 +34,9 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
 
         public AggregatedMeasureDataProcess(
             ProcessId processId,
+            RequestedByActor requestedByActor,
+            OriginalActor originalActor,
             BusinessTransactionId businessTransactionId,
-            ActorNumber requestedByActorId,
-            string requestedByActorRoleCode,
             BusinessReason businessReason,
             MessageId initiatedByMessageId,
             string? meteringPointType,
@@ -60,6 +61,8 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             }
 
             ProcessId = processId;
+            RequestedByActor = requestedByActor;
+            OriginalActor = originalActor;
             BusinessTransactionId = businessTransactionId;
             BusinessReason = businessReason;
             InitiatedByMessageId = initiatedByMessageId;
@@ -71,8 +74,6 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             EnergySupplierId = energySupplierId;
             BalanceResponsibleId = balanceResponsibleId;
             SettlementVersion = settlementVersion;
-            RequestedByActorId = requestedByActorId;
-            RequestedByActorRoleCode = requestedByActorRoleCode;
             _gridAreas = gridAreas.Select(ga => new AggregatedMeasureDataProcessGridArea(Guid.NewGuid(), ProcessId, ga)).ToArray();
             AddDomainEvent(new AggregatedMeasureProcessIsInitialized(processId));
         }
@@ -101,6 +102,18 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
         }
 
         public ProcessId ProcessId { get; }
+
+        /// <summary>
+        /// The actor that requested the aggregated measure data (the sender of the request). This is typically the actor
+        /// that owns the request/process, except in case of delegation.
+        /// </summary>
+        public RequestedByActor RequestedByActor { get; }
+
+        /// <summary>
+        /// The original actor is the actor that the aggregated measure data is requested for (who owns the request/process)
+        /// This can differ from RequestedByActorNumber in case of delegation
+        /// </summary>
+        public OriginalActor OriginalActor { get; }
 
         public BusinessTransactionId BusinessTransactionId { get; }
 
@@ -138,10 +151,6 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
         public string? BalanceResponsibleId { get; }
 
         public SettlementVersion? SettlementVersion { get; }
-
-        public ActorNumber RequestedByActorId { get; set; }
-
-        public string RequestedByActorRoleCode { get; }
 
         public void SendToWholesale()
         {
@@ -206,13 +215,15 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
                 BusinessTransactionId.Id);
 
             return new RejectedEnergyResultMessageDto(
-                RequestedByActorId,
-                ProcessId.Id,
-                rejectedAggregatedMeasureDataRequest.EventId,
-                rejectedAggregatedMeasureDataRequest.BusinessReason.Name,
-                ActorRole.FromCode(RequestedByActorRoleCode),
-                InitiatedByMessageId,
-                rejectedTimeSerie);
+                receiverNumber: RequestedByActor.ActorNumber,
+                processId: ProcessId.Id,
+                eventId: rejectedAggregatedMeasureDataRequest.EventId,
+                businessReason: rejectedAggregatedMeasureDataRequest.BusinessReason.Name,
+                receiverRole: RequestedByActor.ActorRole,
+                relatedToMessageId: InitiatedByMessageId,
+                series: rejectedTimeSerie,
+                documentReceiverNumber: OriginalActor.ActorNumber,
+                documentReceiverRole: OriginalActor.ActorRole);
         }
     }
 }

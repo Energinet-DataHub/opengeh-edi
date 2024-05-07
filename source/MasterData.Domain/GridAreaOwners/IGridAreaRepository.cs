@@ -37,5 +37,5 @@ public interface IGridAreaRepository
     /// <summary>
     /// Responsible for getting the grid operator for a given grid area.
     /// </summary>
-    Task<ActorNumber> GetGridOwnerForAsync(string gridAreaCode, CancellationToken cancellationToken);
+    Task<ActorNumber?> GetGridOwnerForAsync(string gridAreaCode, CancellationToken cancellationToken);
 }

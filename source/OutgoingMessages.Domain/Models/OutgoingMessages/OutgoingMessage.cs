@@ -172,54 +172,54 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
         /// This method create a single outgoing message, for the receiver, based on the accepted energyResultMessage.
         /// </summary>
         public static OutgoingMessage CreateMessage(
-            AcceptedEnergyResultMessageDto acceptedEnergyResultMessage,
+            AcceptedEnergyResultMessageDto acceptedMessage,
             ISerializer serializer,
             Instant timestamp)
         {
             ArgumentNullException.ThrowIfNull(serializer);
-            ArgumentNullException.ThrowIfNull(acceptedEnergyResultMessage);
+            ArgumentNullException.ThrowIfNull(acceptedMessage);
 
             return new OutgoingMessage(
-                acceptedEnergyResultMessage.EventId,
-                acceptedEnergyResultMessage.DocumentType,
-                acceptedEnergyResultMessage.ReceiverNumber,
-                acceptedEnergyResultMessage.ProcessId,
-                acceptedEnergyResultMessage.BusinessReason,
-                acceptedEnergyResultMessage.ReceiverRole,
-                acceptedEnergyResultMessage.SenderId,
-                acceptedEnergyResultMessage.SenderRole,
-                serializer.Serialize(acceptedEnergyResultMessage.Series),
-                timestamp,
-                ProcessType.RequestEnergyResults,
-                acceptedEnergyResultMessage.RelatedToMessageId,
-                acceptedEnergyResultMessage.Series.GridAreaCode);
+                eventId: acceptedMessage.EventId,
+                documentType: acceptedMessage.DocumentType,
+                receiver: Receiver.Create(acceptedMessage.ReceiverNumber, acceptedMessage.ReceiverRole),
+                documentReceiver: Receiver.Create(acceptedMessage.DocumentReceiverNumber, acceptedMessage.DocumentReceiverRole),
+                processId: acceptedMessage.ProcessId,
+                businessReason: acceptedMessage.BusinessReason,
+                senderId: acceptedMessage.SenderId,
+                senderRole: acceptedMessage.SenderRole,
+                serializedContent: serializer.Serialize(acceptedMessage.Series),
+                createdAt: timestamp,
+                messageCreatedFromProcess: ProcessType.RequestEnergyResults,
+                relatedToMessageId: acceptedMessage.RelatedToMessageId,
+                gridAreaCode: acceptedMessage.Series.GridAreaCode);
         }
 
         /// <summary>
         /// This method create a single outgoing message, for the receiver, based on the rejected energyResultMessage.
         /// </summary>
         public static OutgoingMessage CreateMessage(
-            RejectedEnergyResultMessageDto rejectedEnergyResultMessage,
+            RejectedEnergyResultMessageDto rejectedMessage,
             ISerializer serializer,
             Instant timestamp)
         {
             ArgumentNullException.ThrowIfNull(serializer);
-            ArgumentNullException.ThrowIfNull(rejectedEnergyResultMessage);
+            ArgumentNullException.ThrowIfNull(rejectedMessage);
 
             return new OutgoingMessage(
-                rejectedEnergyResultMessage.EventId,
-                rejectedEnergyResultMessage.DocumentType,
-                rejectedEnergyResultMessage.ReceiverNumber,
-                rejectedEnergyResultMessage.ProcessId,
-                rejectedEnergyResultMessage.BusinessReason,
-                rejectedEnergyResultMessage.ReceiverRole,
-                rejectedEnergyResultMessage.SenderId,
-                rejectedEnergyResultMessage.SenderRole,
-                serializer.Serialize(rejectedEnergyResultMessage.Series),
-                timestamp,
-                ProcessType.RequestEnergyResults,
-                relatedToMessageId: rejectedEnergyResultMessage.RelatedToMessageId,
-                null);
+                eventId: rejectedMessage.EventId,
+                documentType: rejectedMessage.DocumentType,
+                receiver: Receiver.Create(rejectedMessage.ReceiverNumber, rejectedMessage.ReceiverRole),
+                documentReceiver: Receiver.Create(rejectedMessage.DocumentReceiverNumber, rejectedMessage.DocumentReceiverRole),
+                processId: rejectedMessage.ProcessId,
+                businessReason: rejectedMessage.BusinessReason,
+                senderId: rejectedMessage.SenderId,
+                senderRole: rejectedMessage.SenderRole,
+                serializedContent: serializer.Serialize(rejectedMessage.Series),
+                createdAt: timestamp,
+                messageCreatedFromProcess: ProcessType.RequestEnergyResults,
+                relatedToMessageId: rejectedMessage.RelatedToMessageId,
+                gridAreaCode: null);
         }
 
         /// <summary>

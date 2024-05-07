@@ -29,7 +29,7 @@ public static class NotifyWholesaleServicesDocumentAsserter
 {
     private static readonly DocumentValidator _xmlDocumentValidator = new(new List<IValidator>
     {
-        new CimXmlValidator(new CimXmlSchemaProvider()),
+        new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas())),
         new EbixValidator(new EbixSchemaProvider()),
     });
 
@@ -67,6 +67,7 @@ public static class NotifyWholesaleServicesDocumentAsserter
             // -- Assert header values --
             .MessageIdExists()
             // Assert businessSector.type? (23)
+            .HasBusinessReason(assertionInput.BusinessReasonWithSettlementVersion.BusinessReason, CodeListType.EbixDenmark)
             .HasTimestamp(assertionInput.Timestamp)
             .HasReceiverId(ActorNumber.Create(assertionInput.ReceiverId))
             .HasReceiverRole(assertionInput.ReceiverRole, CodeListType.Ebix)

@@ -38,7 +38,7 @@ public static class RejectRequestWholesaleSettlementDocumentAsserter
 
         var xmlDocumentValidator = new DocumentValidator(new List<IValidator>
         {
-            new CimXmlValidator(new CimXmlSchemaProvider()),
+            new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas())),
             new EbixValidator(new EbixSchemaProvider()),
         });
         IAssertRejectRequestWholesaleSettlementDocument asserter = documentFormat.Name switch

@@ -13,11 +13,12 @@
 // limitations under the License.
 
 using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.B2BApi.Authentication.Errors;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Xunit;
 using Xunit.Categories;
@@ -33,17 +34,17 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
             ValidateAudience = false,
             ValidateLifetime = false,
             ValidateIssuer = false,
-            SignatureValidator = (token, parameters) => new JwtSecurityToken(token),
+            SignatureValidator = (token, parameters) => new JsonWebToken(token),
         };
 #pragma warning restore CA5404 // Do not disable token validation checks
 
         [Fact]
-        public void Returns_failure_when_token_validation_fails()
+        public async Task Returns_failure_when_token_validation_fails()
         {
             var token = CreateToken();
             using var httpRequest = CreateRequestWithAuthorizationHeader("bearer " + token);
 
-            var result = Parse(httpRequest, new TokenValidationParameters()
+            var result = await Parse(httpRequest, new TokenValidationParameters()
             {
                 ValidateLifetime = true,
             });
@@ -55,22 +56,22 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
         }
 
         [Fact]
-        public void Returns_claims_principal()
+        public async Task Returns_claims_principal()
         {
             using var httpRequest = CreateRequestWithAuthorizationHeader("bearer " + CreateToken());
 
-            var result = Parse(httpRequest);
+            var result = await Parse(httpRequest);
 
             Assert.True(result.Success);
             Assert.NotNull(result.ClaimsPrincipal);
         }
 
         [Fact]
-        public void Returns_failure_when_no_authorization_header_is_set()
+        public async Task Returns_failure_when_no_authorization_header_is_set()
         {
             using var httpRequest = CreateRequest();
 
-            var result = Parse(httpRequest);
+            var result = await Parse(httpRequest);
 
             Assert.False(result.Success);
             Assert.IsType<NoAuthenticationHeaderSet>(result.Error);
@@ -78,11 +79,11 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
         }
 
         [Fact]
-        public void Returns_failure_when_authorization_header_is_empty()
+        public async Task Returns_failure_when_authorization_header_is_empty()
         {
             using var httpRequest = CreateRequestWithAuthorizationHeader("bearer ");
 
-            var result = Parse(httpRequest);
+            var result = await Parse(httpRequest);
 
             Assert.False(result.Success);
             Assert.IsType<AuthenticationHeaderIsNotBearerToken>(result.Error);
@@ -90,21 +91,21 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.M
         }
 
         [Fact]
-        public void Authorization_header_must_start_with_bearer()
+        public async Task Authorization_header_must_start_with_bearer()
         {
             using var httpRequest = CreateRequestWithAuthorizationHeader("Nobearer " + CreateToken());
 
-            var result = Parse(httpRequest);
+            var result = await Parse(httpRequest);
 
             Assert.False(result.Success);
             Assert.IsType<AuthenticationHeaderIsNotBearerToken>(result.Error);
             Assert.Null(result.ClaimsPrincipal);
         }
 
-        private static Result Parse(HttpRequestMessage httpRequest, TokenValidationParameters? validationParameters = null)
+        private static Task<Result> Parse(HttpRequestMessage httpRequest, TokenValidationParameters? validationParameters = null)
         {
             var principalParser = new JwtTokenParser(validationParameters ?? DisableAllTokenValidations);
-            return principalParser.ParseFrom(httpRequest.Headers);
+            return principalParser.ParseFromAsync(httpRequest.Headers);
         }
 
         private static HttpRequestMessage CreateRequest()

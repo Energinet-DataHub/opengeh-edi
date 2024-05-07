@@ -20,13 +20,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
+using FluentAssertions;
 using Json.Schema;
 using NodaTime;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 
-internal sealed class AssertRejectRequestAggregatedMeasureDataJsonDocument : IAssertRejectRequestAggregatedMeasureDataDocument
+public sealed class AssertRejectRequestAggregatedMeasureDataJsonDocument : IAssertRejectRequestAggregatedMeasureDataDocument
 {
     private readonly JsonSchemaProvider _schemas = new(new CimJsonSchemas());
     private readonly JsonDocument _document;
@@ -41,6 +42,12 @@ internal sealed class AssertRejectRequestAggregatedMeasureDataJsonDocument : IAs
     public IAssertRejectRequestAggregatedMeasureDataDocument HasMessageId(string expectedMessageId)
     {
         Assert.Equal(expectedMessageId, _root.GetProperty("mRID").ToString());
+        return this;
+    }
+
+    public IAssertRejectRequestAggregatedMeasureDataDocument MessageIdExists()
+    {
+        _root.TryGetProperty("mRID", out _).Should().BeTrue();
         return this;
     }
 
@@ -87,6 +94,7 @@ internal sealed class AssertRejectRequestAggregatedMeasureDataJsonDocument : IAs
 
     public IAssertRejectRequestAggregatedMeasureDataDocument HasBusinessReason(BusinessReason businessReason)
     {
+        ArgumentNullException.ThrowIfNull(businessReason);
         Assert.Equal(businessReason.Code, _root.GetProperty("process.processType").GetProperty("value").ToString());
         return this;
     }
@@ -94,6 +102,12 @@ internal sealed class AssertRejectRequestAggregatedMeasureDataJsonDocument : IAs
     public IAssertRejectRequestAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId)
     {
         Assert.Equal(expectedTransactionId.ToString(), FirstSeriesElement().GetProperty("mRID").ToString());
+        return this;
+    }
+
+    public IAssertRejectRequestAggregatedMeasureDataDocument TransactionIdExists()
+    {
+        FirstSeriesElement().TryGetProperty("mRID", out _).Should().BeTrue();
         return this;
     }
 

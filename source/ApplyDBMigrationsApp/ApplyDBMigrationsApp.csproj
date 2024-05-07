@@ -188,6 +188,9 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202404241647 Add WholesaleServicesProcessGridAreas foreign key.sql" />
     <EmbeddedResource Include="Scripts\Model\202404241647 Create AggregatedMeasureDataProcessGridAreas table.sql" />
     <EmbeddedResource Include="Scripts\Model\202404241708 Rename MeteringGridAreaDomainId to RequestedGridArea for AggregatedMeasureDataProcesses table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202404252357 Rename RequestedBy columns for AggregatedMeasureDataProcesses table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202404252358 Add [AggregatedMeasureDataProcesses].[OriginalActorNumber] and [OriginalActorRole] columns.sql" />
+    <EmbeddedResource Include="Scripts\Model\202405031407 Update AggregatedMeasureDataProcesses columns.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <None Remove="Scripts\Model\202310231329 Alter Bundles1.sql" />

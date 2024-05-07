@@ -57,6 +57,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
             // The following declaration slows down the test execution, since create a new Uri us a heavy operation
             Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL", TestEnvironment.CreateFakeStorageUrl());
 
+            Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ManageConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
             Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
             Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.SendConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
 
@@ -175,6 +176,7 @@ namespace Energinet.DataHub.EDI.ArchitectureTests
                 .AddInMemoryCollection(
                     new Dictionary<string, string?>
                     {
+                        [$"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ManageConnectionString)}"] = "Fake",
                         [$"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}"] = "Fake",
                         [$"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.SendConnectionString)}"] = "Fake",
 

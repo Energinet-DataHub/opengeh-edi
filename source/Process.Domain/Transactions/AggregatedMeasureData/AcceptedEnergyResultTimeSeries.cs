@@ -26,7 +26,7 @@ public record AcceptedEnergyResultTimeSeries(
     SettlementMethod? SettlementMethod,
     MeasurementUnit UnitType,
     Resolution Resolution,
-    GridAreaDetails GridAreaDetails,
+    string GridAreaCode,
     long CalculationResultVersion,
     Instant StartOfPeriod,
     Instant EndOfPeriod);

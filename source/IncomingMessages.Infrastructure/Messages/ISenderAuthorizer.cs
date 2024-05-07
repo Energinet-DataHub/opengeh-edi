@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
+
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
 
 /// <summary>
@@ -22,5 +24,5 @@ public interface ISenderAuthorizer
     /// <summary>
     /// Authorize sender
     /// </summary>
-    Task<Result> AuthorizeAsync(string senderNumber, string senderRoleCode);
+    Task<Result> AuthorizeAsync(IIncomingMessage message, bool allSeriesAreDelegated);
 }

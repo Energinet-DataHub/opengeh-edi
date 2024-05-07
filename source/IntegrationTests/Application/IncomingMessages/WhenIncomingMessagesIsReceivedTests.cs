@@ -64,7 +64,6 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         {
             new object[] { DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData, ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json") },
             new object[] { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ReadJsonFile("Application\\IncomingMessages\\RequestWholesaleSettlement.json") },
-            new object[] { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ReadJsonFile("Application\\IncomingMessages\\RequestWholesaleSettlementWithUnusedBusinessReason.json") },
         };
     }
 
@@ -74,6 +73,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         {
             new object[] { DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData, ReadJsonFile("Application\\IncomingMessages\\FailSchemeValidationAggregatedMeasureData.json") },
             new object[] { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ReadJsonFile("Application\\IncomingMessages\\FailSchemeValidationRequestWholesaleSettlement.json") },
+            new object[] { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ReadJsonFile("Application\\IncomingMessages\\RequestWholesaleSettlementWithUnusedBusinessReason.json") },
         };
     }
 
@@ -84,19 +84,26 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
       // Assert
       var authenticatedActor = GetService<AuthenticatedActor>();
       var senderActorNumber = ActorNumber.Create("5799999933318");
-      authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
+      authenticatedActor.SetAuthenticatedActor(
+          new ActorIdentity(
+              senderActorNumber,
+              Restriction.Owned,
+              incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData ? ActorRole.BalanceResponsibleParty : ActorRole.EnergySupplier));
 
       // Act
-      await _incomingMessagesRequest.RegisterAndSendAsync(
+      var registerAndSendAsync = await _incomingMessagesRequest.RegisterAndSendAsync(
           incomingMessageStream,
           format,
           incomingDocumentType,
+          format,
           CancellationToken.None);
 
       // Assert
+      registerAndSendAsync.IsErrorResponse.Should().BeFalse(registerAndSendAsync.MessageBody);
+
       var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
       var messageIds = await GetMessageIdsAsync(senderActorNumber);
-      var message = _senderSpy.Message;
+      var message = _senderSpy.LatestMessage;
 
       Assert.Multiple(
           () => Assert.NotNull(message),
@@ -117,12 +124,13 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsMdr.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
+            DocumentFormat.Json,
             CancellationToken.None);
 
         // Assert
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
-        var message = _senderSpy.Message;
+        var message = _senderSpy.LatestMessage;
 
         using var assertionScope = new AssertionScope();
         message.Should().NotBeNull();
@@ -137,7 +145,12 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         // Assert
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
+        authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(
+                senderActorNumber,
+                Restriction.Owned,
+                incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData ? ActorRole.BalanceResponsibleParty : ActorRole.EnergySupplier));
+
         _senderSpy.ShouldFail = true;
 
         // Act & Assert
@@ -145,11 +158,12 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             incomingMessageStream,
             format,
             incomingDocumentType,
+            format,
             CancellationToken.None));
 
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
-        var message = _senderSpy.Message;
+        var message = _senderSpy.LatestMessage;
 
         Assert.Multiple(
             () => Assert.Null(message),
@@ -166,7 +180,11 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         // Arrange
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
+        authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(
+                senderActorNumber,
+                Restriction.Owned,
+                incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData ? ActorRole.BalanceResponsibleParty : ActorRole.EnergySupplier));
 
         // new scope to simulate a race condition.
         var sessionProvider = GetService<IServiceProvider>();
@@ -180,11 +198,13 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             incomingMessageStream,
             format,
             incomingDocumentType,
+            format,
             CancellationToken.None);
         var task02 = secondParser.RegisterAndSendAsync(
             incomingMessageStream,
             format,
             incomingDocumentType,
+            format,
             CancellationToken.None);
 
         // Act
@@ -193,7 +213,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         // Assert
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
-        var message = _senderSpy.Message;
+        var message = _senderSpy.LatestMessage;
 
         Assert.Multiple(
             () => Assert.NotNull(results),
@@ -211,7 +231,11 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var exceptedDuplicateMessageIdDetectedErrorCode = "00101";
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
+        authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(
+                senderActorNumber,
+                Restriction.Owned,
+                incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData ? ActorRole.BalanceResponsibleParty : ActorRole.EnergySupplier));
 
         // new scope to simulate a race condition.
         var sessionProvider = GetService<IServiceProvider>();
@@ -225,11 +249,13 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             incomingMessageStream,
             format,
             incomingDocumentType,
+            format,
             CancellationToken.None);
         var task02 = secondParser.RegisterAndSendAsync(
             incomingMessageStream,
             format,
             incomingDocumentType,
+            format,
             CancellationToken.None);
 
         // Act
@@ -258,12 +284,13 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             incomingMessageStream,
             format,
             incomingDocumentType,
+            format,
             CancellationToken.None);
 
         // Assert
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
-        var message = _senderSpy.Message;
+        var message = _senderSpy.LatestMessage;
 
         Assert.Multiple(
             () => Assert.Null(message),
@@ -285,6 +312,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             messageStream,
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
+            DocumentFormat.Json,
             CancellationToken.None);
 
         // Assert
@@ -328,6 +356,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             messageStream,
             DocumentFormat.Json,
             incomingDocumentType,
+            DocumentFormat.Json,
             CancellationToken.None);
 
         // Assert

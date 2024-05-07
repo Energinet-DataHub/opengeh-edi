@@ -52,7 +52,7 @@ public class TestAggregatedTimeSeriesRequestAcceptedHandlerSpy : INotificationHa
 
         var actualTimeSeries = actualNotification.AggregatedTimeSeries.First();
         actualTimeSeries.Should().NotBeNull();
-        actualTimeSeries.GridAreaDetails.GridAreaCode.Should().Be(firstSeries!.GridArea);
+        actualTimeSeries.GridAreaCode.Should().Be(firstSeries!.GridArea);
         actualTimeSeries.UnitType.Should().Be(MapUnitType(firstSeries));
         actualTimeSeries.MeteringPointType.Should().Be(MapMeteringPointType(firstSeries));
         actualTimeSeries.SettlementMethod.Should().Be(MapSettlementMethod(firstSeries));

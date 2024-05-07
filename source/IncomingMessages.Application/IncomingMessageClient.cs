@@ -34,7 +34,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application;
 public class IncomingMessageClient : IIncomingMessageClient
 {
     private readonly MarketMessageParser _marketMessageParser;
-    private readonly RequestAggregatedMeasureDataMessageValidator _requestAggregatedMeasureDataMessageValidator;
+    private readonly IncomingMessageValidator _incomingMessageValidator;
     private readonly ResponseFactory _responseFactory;
     private readonly IArchivedMessagesClient _archivedMessagesClient;
     private readonly ILogger<IncomingMessageClient> _logger;
@@ -45,7 +45,7 @@ public class IncomingMessageClient : IIncomingMessageClient
 
     public IncomingMessageClient(
         MarketMessageParser marketMessageParser,
-        RequestAggregatedMeasureDataMessageValidator requestAggregatedMeasureDataMessageValidator,
+        IncomingMessageValidator incomingMessageValidator,
         ResponseFactory responseFactory,
         IArchivedMessagesClient archivedMessagesClient,
         ILogger<IncomingMessageClient> logger,
@@ -55,7 +55,7 @@ public class IncomingMessageClient : IIncomingMessageClient
         IFeatureFlagManager featureFlagManager)
     {
         _marketMessageParser = marketMessageParser;
-        _requestAggregatedMeasureDataMessageValidator = requestAggregatedMeasureDataMessageValidator;
+        _incomingMessageValidator = incomingMessageValidator;
         _responseFactory = responseFactory;
         _archivedMessagesClient = archivedMessagesClient;
         _logger = logger;
@@ -67,16 +67,16 @@ public class IncomingMessageClient : IIncomingMessageClient
 
     public async Task<ResponseMessage> RegisterAndSendAsync(
         IIncomingMessageStream incomingMessageStream,
-        DocumentFormat documentFormat,
+        DocumentFormat incomingDocumentFormat,
         IncomingDocumentType documentType,
-        CancellationToken cancellationToken,
-        DocumentFormat responseFormat = null!)
+        DocumentFormat responseDocumentFormat,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(documentType);
         ArgumentNullException.ThrowIfNull(incomingMessageStream);
 
         var incomingMarketMessageParserResult =
-            await _marketMessageParser.ParseAsync(incomingMessageStream, documentFormat, documentType, cancellationToken)
+            await _marketMessageParser.ParseAsync(incomingMessageStream, incomingDocumentFormat, documentType, cancellationToken)
                 .ConfigureAwait(false);
 
         if (incomingMarketMessageParserResult.Errors.Count != 0
@@ -87,7 +87,7 @@ public class IncomingMessageClient : IIncomingMessageClient
                 "Failed to parse incoming message {DocumentType}. Errors: {Errors}",
                 documentType,
                 res.Errors);
-            return _responseFactory.From(res, responseFormat ?? documentFormat);
+            return _responseFactory.From(res, responseDocumentFormat);
         }
 
         await ArchiveIncomingMessageAsync(
@@ -104,14 +104,8 @@ public class IncomingMessageClient : IIncomingMessageClient
                 .ConfigureAwait(false);
         }
 
-        var validationResult =
-            documentType == IncomingDocumentType.RequestWholesaleSettlement
-                ? Result.Succeeded() // TODO: Validate RequestWholesaleSettlement
-                : await _requestAggregatedMeasureDataMessageValidator
-                    .ValidateAsync(
-                        incomingMarketMessageParserResult.IncomingMessage as RequestAggregatedMeasureDataMessage ??
-                            throw new InvalidOperationException(),
-                        cancellationToken)
+        var validationResult = await _incomingMessageValidator
+            .ValidateAsync(incomingMarketMessageParserResult.IncomingMessage, cancellationToken)
             .ConfigureAwait(false);
 
         if (!validationResult.Success)
@@ -120,7 +114,7 @@ public class IncomingMessageClient : IIncomingMessageClient
                 "Failed to validate incoming message: {MessageId}. Errors: {Errors}",
                 incomingMarketMessageParserResult.IncomingMessage?.MessageId,
                 incomingMarketMessageParserResult.Errors);
-            return _responseFactory.From(validationResult, responseFormat ?? documentFormat);
+            return _responseFactory.From(validationResult, responseDocumentFormat);
         }
 
         var result = await _incomingMessageReceiver
@@ -138,7 +132,7 @@ public class IncomingMessageClient : IIncomingMessageClient
             "Failed to save incoming message: {MessageId}. Errors: {Errors}",
             incomingMarketMessageParserResult.IncomingMessage!.MessageId,
             incomingMarketMessageParserResult.Errors);
-        return _responseFactory.From(result, responseFormat ?? documentFormat);
+        return _responseFactory.From(result, responseDocumentFormat);
     }
 
     private async Task ArchiveIncomingMessageAsync(
