@@ -34,7 +34,7 @@ public class MessageTypeValidator : IMessageTypeValidator
                             ? Result.Succeeded()
                             : Result.Failure(
                                 new NotSupportedMessageType(ramdm.MessageType)),
-                    RequestWholesaleServicesMessage rqsm =>
+                    RequestWholesaleServicesMessage rwsm =>
                         _wholesaleServicesWhiteList.Contains(rqsm.MessageType)
                             ? Result.Succeeded()
                             : Result.Failure(new NotSupportedMessageType(rqsm.MessageType)),
