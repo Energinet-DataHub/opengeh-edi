@@ -495,24 +495,49 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
     }
 
     [Fact]
-    public async Task Message_id_must_be_in_correct_length()
+    public async Task Message_id_can_be_shorter_than_max_length()
     {
-        var knownReceiverId = "5790001330552";
-        var knownReceiverRole = "DDZ";
-        var toShortMessageId = "36";
+        const string knownReceiverId = "5790001330552";
+        const string knownReceiverRole = "DDZ";
+        const string shortMessageId = "36";
+
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
-            .WithMessageId(toShortMessageId)
+            .WithMessageId(shortMessageId)
             .WithReceiverRole(knownReceiverRole)
             .WithReceiverId(knownReceiverId)
             .Message();
 
-        var messageParser = await ParseMessageAsync(message);
+        var (incomingMessage, _) = await ParseMessageAsync(message);
+
         var result = await _incomingMessageValidator.ValidateAsync(
-            messageParser.IncomingMessage!,
+            incomingMessage!,
             CancellationToken.None);
 
-        Assert.Contains(result.Errors, error => error is InvalidMessageIdSize);
+        result.Errors.Should().NotContainItemsAssignableTo<InvalidMessageIdSize>();
+    }
+
+    [Fact]
+    public async Task Message_id_cannot_be_longer_than_max_length()
+    {
+        const string knownReceiverId = "5790001330552";
+        const string knownReceiverRole = "DDZ";
+        var longMessageId = Guid.NewGuid().ToString() + Guid.NewGuid();
+
+        await using var message = BusinessMessageBuilder
+            .RequestAggregatedMeasureData()
+            .WithMessageId(longMessageId)
+            .WithReceiverRole(knownReceiverRole)
+            .WithReceiverId(knownReceiverId)
+            .Message();
+
+        var (incomingMessage, _) = await ParseMessageAsync(message);
+
+        var result = await _incomingMessageValidator.ValidateAsync(
+            incomingMessage!,
+            CancellationToken.None);
+
+        result.Errors.Should().ContainItemsAssignableTo<InvalidMessageIdSize>();
     }
 
     [Fact]
@@ -542,19 +567,20 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
     }
 
     [Fact]
-    public async Task Transaction_id_must_not_be_less_than_36_characters()
+    public async Task Transaction_id_can_be_less_than_36_characters()
     {
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
             .WithSeriesTransactionId("12356478912356478912356478912356478")
             .Message();
 
-        var messageParser = await ParseMessageAsync(message);
+        var (incomingMessage, _) = await ParseMessageAsync(message);
+
         var result = await _incomingMessageValidator.ValidateAsync(
-            messageParser.IncomingMessage!,
+            incomingMessage!,
             CancellationToken.None);
 
-        Assert.Contains(result.Errors, error => error is InvalidTransactionIdSize);
+        result.Errors.Should().NotContainItemsAssignableTo<InvalidTransactionIdSize>();
     }
 
     [Fact]

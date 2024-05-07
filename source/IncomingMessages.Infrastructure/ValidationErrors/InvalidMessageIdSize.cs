@@ -17,7 +17,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors
 public class InvalidMessageIdSize : ValidationError
 {
     public InvalidMessageIdSize(string messageId)
-        : base($"Message id {messageId} is invalid. Must contain 36 characters.", "00305", "MessageId")
+        : base($"Message id {messageId} is invalid. Must contain at most 36 characters.", "00305", "MessageId")
     {
     }
 }
