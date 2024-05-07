@@ -13,7 +13,7 @@
 			"value": "5790001330552"
 		},
 		"receiver_MarketParticipant.marketRole.type": {
-			"value": "DDZ"
+      "value": "DGL"
 		},
 		"sender_MarketParticipant.mRID": {
 			"codingScheme": "A10",
@@ -27,7 +27,7 @@
 		},
 		"Series": [
       {
-        "mRID": "25836143",
+        "mRID": "123564789123564789123564789123564787",
         "aggregationSeries_Period.resolution": "PT1M",
         "chargeTypeOwner_MarketParticipant.mRID": {
           "codingScheme": "A10",

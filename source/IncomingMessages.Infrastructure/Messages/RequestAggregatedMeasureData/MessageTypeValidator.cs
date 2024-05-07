@@ -12,17 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
 
 public class MessageTypeValidator : IMessageTypeValidator
 {
-    private static readonly IReadOnlyCollection<string> _whiteList = new[] { "E74" };
+    private static readonly IReadOnlyCollection<string> _aggregatedMeasureDataWhiteList = new[] { "E74" };
+    private static readonly IReadOnlyCollection<string> _wholesaleServicesWhiteList = new[] { "D21" };
 
-    public async Task<Result> ValidateAsync(string messageType, CancellationToken cancellationToken)
+    public async Task<Result> ValidateAsync(IIncomingMessage message, CancellationToken cancellationToken)
     {
-        return await Task.FromResult(_whiteList.Contains(messageType) ?
-             Result.Succeeded() : Result.Failure(new NotSupportedMessageType(messageType))).ConfigureAwait(false);
+        ArgumentNullException.ThrowIfNull(message);
+
+        return await Task.FromResult(
+                message switch
+                {
+                    RequestAggregatedMeasureDataMessage ramdm =>
+                        _aggregatedMeasureDataWhiteList.Contains(ramdm.MessageType)
+                            ? Result.Succeeded()
+                            : Result.Failure(
+                                new NotSupportedMessageType(ramdm.MessageType)),
+                    RequestWholesaleServicesMessage rwsm =>
+                        _wholesaleServicesWhiteList.Contains(rwsm.MessageType)
+                            ? Result.Succeeded()
+                            : Result.Failure(new NotSupportedMessageType(rwsm.MessageType)),
+                    _ => throw new InvalidOperationException($"The baw's on the slates! {message.GetType().Name}"),
+                })
+            .ConfigureAwait(false);
     }
 }

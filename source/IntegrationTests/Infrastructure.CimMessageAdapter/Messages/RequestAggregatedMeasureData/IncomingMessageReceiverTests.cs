@@ -44,7 +44,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
 {
     private readonly MarketMessageParser _marketMessageParser;
     private readonly ProcessContext _processContext;
-    private readonly RequestAggregatedMeasureDataMessageValidator _requestAggregatedMeasureDataMessageValidator;
+    private readonly IncomingMessageValidator _incomingMessageValidator;
 
     public IncomingMessageReceiverTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
@@ -55,16 +55,24 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var authenticatedActor = GetService<AuthenticatedActor>();
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234567890123"), restriction: Restriction.None,  ActorRole.FromCode("DDQ")));
 
-        _requestAggregatedMeasureDataMessageValidator = GetService<RequestAggregatedMeasureDataMessageValidator>();
+        _incomingMessageValidator = GetService<IncomingMessageValidator>();
     }
 
-    public static IEnumerable<object[]> AllowedActorRoles =>
+    public static IEnumerable<object[]> AllowedActorRolesForAggregatedMeasureData =>
         new List<object[]>
         {
             new object[] { ActorRole.EnergySupplier.Code },
             new object[] { ActorRole.MeteredDataResponsible.Code },
             new object[] { ActorRole.BalanceResponsibleParty.Code },
             new object[] { ActorRole.GridOperator.Code },
+        };
+
+    public static IEnumerable<object[]> AllowedActorRolesForWholesaleServices =>
+        new List<object[]>
+        {
+            new object[] { ActorRole.EnergySupplier.Code },
+            new object[] { ActorRole.GridOperator.Code },
+            new object[] { ActorRole.SystemOperator.Code },
         };
 
     public async Task InitializeAsync()
@@ -100,7 +108,9 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
+        var result = await _incomingMessageValidator.ValidateAsync(
+            messageParser.IncomingMessage!,
+            CancellationToken.None);
 
         Assert.Contains(result.Errors, error => error is InvalidReceiverId);
     }
@@ -115,7 +125,9 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
+        var result = await _incomingMessageValidator.ValidateAsync(
+            messageParser.IncomingMessage!,
+            CancellationToken.None);
 
         Assert.DoesNotContain(result.Errors, error => error is InvalidReceiverId);
     }
@@ -129,7 +141,9 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
+        var result = await _incomingMessageValidator.ValidateAsync(
+            messageParser.IncomingMessage!,
+            CancellationToken.None);
 
         Assert.DoesNotContain(result.Errors, error => error is InvalidReceiverRole);
     }
@@ -163,7 +177,9 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
+        var result = await _incomingMessageValidator.ValidateAsync(
+            messageParser.IncomingMessage!,
+            CancellationToken.None);
 
         Assert.DoesNotContain(result.Errors, error => error is AuthenticatedUserDoesNotMatchSenderId);
     }
@@ -178,7 +194,9 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
+        var result = await _incomingMessageValidator.ValidateAsync(
+            messageParser.IncomingMessage!,
+            CancellationToken.None);
 
         Assert.Contains(result.Errors, error => error is AuthenticatedUserDoesNotMatchSenderId);
     }
@@ -192,7 +210,9 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
+        var result = await _incomingMessageValidator.ValidateAsync(
+            messageParser.IncomingMessage!,
+            CancellationToken.None);
 
         Assert.Contains(result.Errors, error => error is AuthenticatedUserDoesNotHoldRequiredRoleType);
     }
@@ -216,7 +236,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
 
         // Act
         var messageParser = await ParseMessageAsync(message);
-        var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(
+        var result = await _incomingMessageValidator.ValidateAsync(
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
@@ -242,7 +262,9 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
+        var result = await _incomingMessageValidator.ValidateAsync(
+            messageParser.IncomingMessage!,
+            CancellationToken.None);
 
         Assert.Contains(result.Errors, error => error is DuplicateTransactionIdDetected);
     }
@@ -259,7 +281,9 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var resultFromFirstMessage = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
+        var resultFromFirstMessage = await _incomingMessageValidator.ValidateAsync(
+            messageParser.IncomingMessage!,
+            CancellationToken.None);
 
         // Request from a second sender.
         await using var message02 = BusinessMessageBuilder
@@ -270,7 +294,9 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser2 = await ParseMessageAsync(message02);
-        var resultFromSecondMessage = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser2.IncomingMessage!, CancellationToken.None);
+        var resultFromSecondMessage = await _incomingMessageValidator.ValidateAsync(
+            messageParser2.IncomingMessage!,
+            CancellationToken.None);
 
         Assert.DoesNotContain(resultFromFirstMessage.Errors, error => error is DuplicateTransactionIdDetected);
         Assert.DoesNotContain(resultFromSecondMessage.Errors, error => error is DuplicateTransactionIdDetected);
@@ -289,7 +315,9 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
+        var result = await _incomingMessageValidator.ValidateAsync(
+            messageParser.IncomingMessage!,
+            CancellationToken.None);
 
         Assert.Contains(result.Errors, error => error is EmptyTransactionId);
     }
@@ -303,7 +331,9 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
+        var result = await _incomingMessageValidator.ValidateAsync(
+            messageParser.IncomingMessage!,
+            CancellationToken.None);
 
         Assert.Contains(result.Errors, error => error is EmptyMessageId);
     }
@@ -320,10 +350,14 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser01 = await ParseMessageAsync(message01);
-        var result01 = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser01.IncomingMessage!, CancellationToken.None);
+        var result01 = await _incomingMessageValidator.ValidateAsync(
+            messageParser01.IncomingMessage!,
+            CancellationToken.None);
 
         var messageParser02 = await ParseMessageAsync(message02);
-        var result02 = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser02.IncomingMessage!, CancellationToken.None);
+        var result02 = await _incomingMessageValidator.ValidateAsync(
+            messageParser02.IncomingMessage!,
+            CancellationToken.None);
 
         Assert.DoesNotContain(result01.Errors, error => error is DuplicateMessageIdDetected);
         Assert.DoesNotContain(result02.Errors, error => error is DuplicateMessageIdDetected);
@@ -343,15 +377,17 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         await StoreMessageIdForActorAsync(existingMessageId, senderActorNumber);
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
+        var result = await _incomingMessageValidator.ValidateAsync(
+            messageParser.IncomingMessage!,
+            CancellationToken.None);
 
         Assert.False(result.Success);
         Assert.Contains(result.Errors, error => error is DuplicateMessageIdDetected);
     }
 
     [Theory]
-    [MemberData(nameof(AllowedActorRoles))]
-    public async Task Sender_role_type_must_be_the_role_of(string role)
+    [MemberData(nameof(AllowedActorRolesForAggregatedMeasureData))]
+    public async Task Sender_role_type_for_aggregated_measure_data_must_be_the_role_of(string role)
     {
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
@@ -359,9 +395,29 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
+        var result = await _incomingMessageValidator.ValidateAsync(
+            messageParser.IncomingMessage!,
+            CancellationToken.None);
 
         Assert.DoesNotContain(result.Errors, error => error is SenderRoleTypeIsNotAuthorized);
+    }
+
+    [Theory(Skip = "Depends on CIM XML parser for wholesale services requests")]
+    [MemberData(nameof(AllowedActorRolesForWholesaleServices))]
+    public async Task Sender_role_type_for_wholesale_services_must_be_the_role_of(string role)
+    {
+        await using var message = BusinessMessageBuilder
+            .RequestWholesaleServices()
+            .WithSenderRole(role)
+            .Message();
+
+        var (incomingMessage, _) = await ParseWholesaleServicesMessageAsync(message);
+
+        var result = await _incomingMessageValidator.ValidateAsync(
+            incomingMessage!,
+            CancellationToken.None);
+
+        result.Errors.Should().NotContain(e => e is SenderRoleTypeIsNotAuthorized);
     }
 
     [Fact]
@@ -452,7 +508,9 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
+        var result = await _incomingMessageValidator.ValidateAsync(
+            messageParser.IncomingMessage!,
+            CancellationToken.None);
 
         Assert.Contains(result.Errors, error => error is InvalidMessageIdSize);
     }
@@ -492,7 +550,9 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
+        var result = await _incomingMessageValidator.ValidateAsync(
+            messageParser.IncomingMessage!,
+            CancellationToken.None);
 
         Assert.Contains(result.Errors, error => error is InvalidTransactionIdSize);
     }
@@ -506,7 +566,9 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
+        var result = await _incomingMessageValidator.ValidateAsync(
+            messageParser.IncomingMessage!,
+            CancellationToken.None);
 
         Assert.DoesNotContain(result.Errors, error => error is InvalidTransactionIdSize);
     }
@@ -520,7 +582,9 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
+        var result = await _incomingMessageValidator.ValidateAsync(
+            messageParser.IncomingMessage!,
+            CancellationToken.None);
 
         Assert.Contains(result.Errors, error => error is InvalidTransactionIdSize);
     }
@@ -534,7 +598,9 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
+        var result = await _incomingMessageValidator.ValidateAsync(
+            messageParser.IncomingMessage!,
+            CancellationToken.None);
 
         Assert.NotNull(result);
         Assert.True(result.Success);
@@ -549,7 +615,9 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _requestAggregatedMeasureDataMessageValidator.ValidateAsync(messageParser.IncomingMessage!, CancellationToken.None);
+        var result = await _incomingMessageValidator.ValidateAsync(
+            messageParser.IncomingMessage!,
+            CancellationToken.None);
 
         Assert.Contains(result.Errors, error => error is NotSupportedBusinessType);
     }
@@ -603,6 +671,16 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
         return (IncomingMessage: (RequestAggregatedMeasureDataMessage?)messageParser.IncomingMessage, ParserResult: messageParser);
+    }
+
+    private async Task<(RequestWholesaleServicesMessage? IncomingMessage, IncomingMarketMessageParserResult ParserResult)> ParseWholesaleServicesMessageAsync(Stream message)
+    {
+        var messageParser = await _marketMessageParser.ParseAsync(
+            new IncomingMessageStream(message),
+            DocumentFormat.Xml,
+            IncomingDocumentType.RequestWholesaleSettlement,
+            CancellationToken.None);
+        return (IncomingMessage: (RequestWholesaleServicesMessage?)messageParser.IncomingMessage, ParserResult: messageParser);
     }
 
     private async Task StoreMessageIdForActorAsync(string messageId, string senderActorNumber)

@@ -125,6 +125,9 @@ limitations under the License.
       <EmbeddedResource Include="Infrastructure.CimMessageAdapter\Messages\xml\RequestChangeOfSupplier.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
+      <EmbeddedResource Include="Infrastructure.CimMessageAdapter\Messages\xml\RequestWholesaleSettlement.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
       <None Remove="CimMessageAdapter\Messages\xml\RequestAggregatedMeasureData.xml" />
       <EmbeddedResource Include="Infrastructure.CimMessageAdapter\Messages\xml\RequestAggregatedMeasureData.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
