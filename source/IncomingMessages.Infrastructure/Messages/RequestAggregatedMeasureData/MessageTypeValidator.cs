@@ -35,9 +35,9 @@ public class MessageTypeValidator : IMessageTypeValidator
                             : Result.Failure(
                                 new NotSupportedMessageType(ramdm.MessageType)),
                     RequestWholesaleServicesMessage rwsm =>
-                        _wholesaleServicesWhiteList.Contains(rqsm.MessageType)
+                        _wholesaleServicesWhiteList.Contains(rwsm.MessageType)
                             ? Result.Succeeded()
-                            : Result.Failure(new NotSupportedMessageType(rqsm.MessageType)),
+                            : Result.Failure(new NotSupportedMessageType(rwsm.MessageType)),
                     _ => throw new InvalidOperationException($"The baw's on the slates! {message.GetType().Name}"),
                 })
             .ConfigureAwait(false);

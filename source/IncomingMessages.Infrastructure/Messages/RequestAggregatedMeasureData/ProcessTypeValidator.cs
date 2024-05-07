@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
@@ -20,10 +21,20 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.Request
 public class ProcessTypeValidator : IProcessTypeValidator
 {
     private static readonly IReadOnlyCollection<string> _aggregatedMeasureDataWhitelist =
-        new[] { "D03", "D04", "D05", "D32" };
+        new[]
+        {
+            BusinessReason.PreliminaryAggregation.Code,
+            BusinessReason.BalanceFixing.Code,
+            BusinessReason.WholesaleFixing.Code,
+            BusinessReason.Correction.Code,
+        };
 
     private static readonly IReadOnlyCollection<string> _wholesaleServicesWhitelist =
-        new[] { "D05", "D32" };
+        new[]
+        {
+            BusinessReason.WholesaleFixing.Code,
+            BusinessReason.Correction.Code,
+        };
 
     public async Task<Result> ValidateAsync(IIncomingMessage message, CancellationToken cancellationToken)
     {
@@ -31,9 +42,9 @@ public class ProcessTypeValidator : IProcessTypeValidator
                 message switch
                 {
                     RequestAggregatedMeasureDataMessage ramdm =>
-                        _aggregatedMeasureDataWhitelist.Contains(ragdm.BusinessReason)
+                        _aggregatedMeasureDataWhitelist.Contains(ramdm.BusinessReason)
                             ? Result.Succeeded()
-                            : Result.Failure(new NotSupportedProcessType(ragdm.BusinessReason)),
+                            : Result.Failure(new NotSupportedProcessType(ramdm.BusinessReason)),
                     RequestWholesaleServicesMessage rwsm =>
                         _wholesaleServicesWhitelist.Contains(rwsm.BusinessReason)
                             ? Result.Succeeded()
