@@ -933,6 +933,10 @@
     <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_DK_RejectAggregatedBillingInformation-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <None Remove="DocumentValidation\CimXml\Schemas\urn-ediel-org-measure-requestwholesalesettlement-0-1.xsd" />
+    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-measure-requestwholesalesettlement-0-1.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

@@ -21,18 +21,17 @@ using System.Xml;
 using System.Xml.Schema;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.Xml;
-using Energinet.DataHub.EDI.IncomingMessages.Application.Factories;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.BaseParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers;
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.WholesaleSettlementMessageParsers;
 
 public class XmlMessageParser : XmlBaseParser, IMessageParser
 {
-    private const string SeriesRecordElementName = "Series";
-    private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";
+    private const string SeriesElementName = "Series";
+    private const string HeaderElementName = "RequestWholesaleSettlement_MarketDocument";
     private readonly CimXmlSchemaProvider _schemaProvider;
 
     public XmlMessageParser(CimXmlSchemaProvider schemaProvider)
@@ -42,12 +41,10 @@ public class XmlMessageParser : XmlBaseParser, IMessageParser
 
     public DocumentFormat HandledFormat => DocumentFormat.Xml;
 
-    public IncomingDocumentType DocumentType => IncomingDocumentType.RequestAggregatedMeasureData;
+    public IncomingDocumentType DocumentType => IncomingDocumentType.RequestWholesaleSettlement;
 
     public async Task<IncomingMarketMessageParserResult> ParseAsync(IIncomingMessageStream incomingMessageStream, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(incomingMessageStream);
-
         string version;
         string businessProcessType;
         try
@@ -84,11 +81,11 @@ public class XmlMessageParser : XmlBaseParser, IMessageParser
 
         try
         {
-            var parsedXmlData = await ParseXmlDataAsync(reader, cancellationToken).ConfigureAwait(false);
+            var parsedXmlData = await ParseXmlDataAsync(reader).ConfigureAwait(false);
 
             if (Errors.Count != 0)
             {
-               return new IncomingMarketMessageParserResult(Errors.ToArray());
+                return new IncomingMarketMessageParserResult(Errors.ToArray());
             }
 
             return parsedXmlData;
@@ -103,70 +100,81 @@ public class XmlMessageParser : XmlBaseParser, IMessageParser
         }
     }
 
-    private static async Task<IncomingMarketMessageParserResult> ParseXmlDataAsync(
-        XmlReader reader, CancellationToken cancellationToken)
+    private async Task<IncomingMarketMessageParserResult> ParseXmlDataAsync(
+        XmlReader reader)
     {
         var root = await reader.ReadRootElementAsync().ConfigureAwait(false);
-        var messageHeader = await MessageHeaderExtractor
-            .ExtractAsync(reader, root, HeaderElementName, SeriesRecordElementName)
+        var header = await MessageHeaderExtractor
+            .ExtractAsync(reader, root, HeaderElementName, SeriesElementName)
             .ConfigureAwait(false);
 
-        var series = new List<RequestAggregatedMeasureDataMessageSeries>();
+        var series = new List<RequestWholesaleServicesSeries>();
         await foreach (var serie in ParseSerieAsync(reader, root))
         {
             series.Add(serie);
         }
 
-        return new IncomingMarketMessageParserResult(
-            RequestAggregatedMeasureDataMessageFactory.Create(messageHeader, series.AsReadOnly()));
+        return new IncomingMarketMessageParserResult(new RequestWholesaleServicesMessage(
+            header.SenderId,
+            header.SenderRole,
+            header.ReceiverId,
+            header.ReceiverRole,
+            header.BusinessReason,
+            header.MessageType,
+            header.MessageId,
+            header.CreatedAt,
+            header.BusinessType,
+            series.AsReadOnly()));
     }
 
-    private static async IAsyncEnumerable<RequestAggregatedMeasureDataMessageSeries> ParseSerieAsync(XmlReader reader, RootElement rootElement)
+    private async IAsyncEnumerable<RequestWholesaleServicesSeries> ParseSerieAsync(
+        XmlReader reader,
+        RootElement rootElement)
     {
         var id = string.Empty;
-        var marketEvaluationPointType = string.Empty;
-        string? marketEvaluationSettlementMethod = null;
         var startDateAndOrTimeDateTime = string.Empty;
-        var endDateAndOrTimeDateTime = string.Empty;
+        string? endDateAndOrTimeDateTime = null;
         string? meteringGridAreaDomainId = null;
         string? energySupplierMarketParticipantId = null;
-        string? balanceResponsiblePartyMarketParticipantId = null;
+        string? chargeTypeOwnerMarketParticipantId = null;
         string? settlementVersion = null;
+        string? resolution = null;
+        string? chargeType = null;
+        string? chargeId = null;
         var ns = rootElement.DefaultNamespace;
 
-        await reader.AdvanceToAsync(SeriesRecordElementName, ns).ConfigureAwait(false);
+        await reader.AdvanceToAsync(SeriesElementName, ns).ConfigureAwait(false);
 
         while (!reader.EOF)
         {
-            if (reader.Is(SeriesRecordElementName, ns, XmlNodeType.EndElement))
+            if (reader.Is(SeriesElementName, ns, XmlNodeType.EndElement))
             {
-                var record = CreateSerie(
-                    ref id,
-                    ref marketEvaluationPointType,
-                    ref marketEvaluationSettlementMethod,
-                    ref startDateAndOrTimeDateTime,
-                    ref endDateAndOrTimeDateTime,
-                    ref meteringGridAreaDomainId,
-                    ref energySupplierMarketParticipantId,
-                    ref balanceResponsiblePartyMarketParticipantId,
-                    ref settlementVersion);
-                yield return record;
+                var chargeTypes = new List<RequestWholesaleServicesChargeType>();
+                if (chargeType is not null && chargeId is not null)
+                {
+                    var chargeTypeOwner = new RequestWholesaleServicesChargeType(chargeId, chargeType);
+                    chargeTypes.Add(chargeTypeOwner);
+                }
+
+                var serie = new RequestWholesaleServicesSeries(
+                    id,
+                    startDateAndOrTimeDateTime,
+                    endDateAndOrTimeDateTime,
+                    meteringGridAreaDomainId,
+                    energySupplierMarketParticipantId,
+                    settlementVersion,
+                    resolution,
+                    chargeTypeOwnerMarketParticipantId,
+                    chargeTypes);
+                yield return serie;
             }
 
             if (reader.NodeType == XmlNodeType.Element && reader.SchemaInfo?.Validity == XmlSchemaValidity.Invalid)
                 await reader.ReadToEndAsync().ConfigureAwait(false);
 
-            if (reader.Is("mRID", ns))
+            if (reader.Depth == 2 && reader.Is("mRID", ns))
             {
                 id = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("marketEvaluationPoint.type", ns))
-            {
-                marketEvaluationPointType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
-            }
-            else if (reader.Is("marketEvaluationPoint.settlementMethod", ns))
-            {
-                marketEvaluationSettlementMethod = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
             else if (reader.Is("start_DateAndOrTime.dateTime", ns))
             {
@@ -184,52 +192,30 @@ public class XmlMessageParser : XmlBaseParser, IMessageParser
             {
                 energySupplierMarketParticipantId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
-            else if (reader.Is("balanceResponsibleParty_MarketParticipant.mRID", ns))
+            else if (reader.Is("chargeTypeOwner_MarketParticipant.mRID", ns))
             {
-                balanceResponsiblePartyMarketParticipantId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                chargeTypeOwnerMarketParticipantId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
             else if (reader.Is("settlement_Series.version", ns))
             {
                 settlementVersion = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Is("aggregationSeries_Period.resolution", ns))
+            {
+                resolution = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Depth == 3 && reader.Is("type", ns))
+            {
+                chargeType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+            else if (reader.Depth == 3 && reader.Is("mRID", ns))
+            {
+                chargeId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
             else
             {
                 await reader.ReadAsync().ConfigureAwait(false);
             }
         }
-    }
-
-    private static RequestAggregatedMeasureDataMessageSeries CreateSerie(
-        ref string id,
-        ref string? marketEvaluationPointType,
-        ref string? marketEvaluationSettlementMethod,
-        ref string startDateAndOrTimeDateTime,
-        ref string? endDateAndOrTimeDateTime,
-        ref string? meteringGridAreaDomainId,
-        ref string? energySupplierMarketParticipantId,
-        ref string? balanceResponsiblePartyMarketParticipantId,
-        ref string? settlementVersion)
-    {
-        var serie = new RequestAggregatedMeasureDataMessageSeries(
-            id,
-            marketEvaluationPointType,
-            marketEvaluationSettlementMethod,
-            startDateAndOrTimeDateTime,
-            endDateAndOrTimeDateTime,
-            meteringGridAreaDomainId,
-            energySupplierMarketParticipantId,
-            balanceResponsiblePartyMarketParticipantId,
-            settlementVersion);
-
-        id = string.Empty;
-        marketEvaluationPointType = null;
-        marketEvaluationSettlementMethod = null;
-        startDateAndOrTimeDateTime = string.Empty;
-        endDateAndOrTimeDateTime = null;
-        meteringGridAreaDomainId = null;
-        energySupplierMarketParticipantId = null;
-        balanceResponsiblePartyMarketParticipantId = null;
-
-        return serie;
     }
 }
