@@ -30,7 +30,7 @@ public class ProcessTypeValidator : IProcessTypeValidator
         return await Task.FromResult(
                 message switch
                 {
-                    RequestAggregatedMeasureDataMessage ragdm =>
+                    RequestAggregatedMeasureDataMessage ramdm =>
                         _aggregatedMeasureDataWhitelist.Contains(ragdm.BusinessReason)
                             ? Result.Succeeded()
                             : Result.Failure(new NotSupportedProcessType(ragdm.BusinessReason)),
