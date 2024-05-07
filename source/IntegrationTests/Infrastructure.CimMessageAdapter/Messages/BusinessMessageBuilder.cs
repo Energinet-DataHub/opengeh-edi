@@ -35,6 +35,11 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
             return new BusinessMessageBuilder(pathToXmlFile, "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1");
         }
 
+        public static BusinessMessageBuilder RequestWholesaleServices(string pathToXmlFile = "Infrastructure.CimMessageAdapter//Messages//Xml//RequestWholesaleSettlement.xml")
+        {
+            return new BusinessMessageBuilder(pathToXmlFile, "urn:ediel.org:measure:requestwholesalesettlement:0:1");
+        }
+
         public BusinessMessageBuilder WithSenderRole(string roleType)
         {
             SetRootChildElementValue("sender_MarketParticipant.marketRole.type", roleType);
