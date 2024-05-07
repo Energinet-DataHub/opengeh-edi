@@ -45,7 +45,7 @@ namespace Energinet.DataHub.EDI.B2BApi.Authentication
         {
             ArgumentNullException.ThrowIfNull(claimsPrincipal);
             _logger.LogDebug("claimsPrincipal: {ClaimsPrincipal}", string.Join(",", claimsPrincipal.Claims));
-            var rolesFromClaims = GetClaimValuesFrom(claimsPrincipal, ClaimsMap.Roles);
+            var rolesFromClaims = GetClaimValuesFrom(claimsPrincipal, ClaimTypes.Role);
             var role = ParseRole(rolesFromClaims);
 
             var userIdFromAzp = GetClaimValueFrom(claimsPrincipal, ClaimsMap.UserId);
