@@ -13,10 +13,12 @@
 // limitations under the License.
 
 using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.B2BApi.Authentication.Errors;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Energinet.DataHub.EDI.B2BApi.Authentication
@@ -30,21 +32,21 @@ namespace Energinet.DataHub.EDI.B2BApi.Authentication
             _validationParameters = validationParameters ?? throw new ArgumentNullException(nameof(validationParameters));
         }
 
-        public Result ParseFrom(HttpHeaders requestHeaders)
+        public Task<Result> ParseFromAsync(HttpHeaders requestHeaders)
         {
             ArgumentNullException.ThrowIfNull(requestHeaders);
             if (requestHeaders.TryGetValues("authorization", out var authorizationHeaderValues) == false)
             {
-                return Result.Failed(new NoAuthenticationHeaderSet());
+                return Task.FromResult(Result.Failed(new NoAuthenticationHeaderSet()));
             }
 
             var authorizationHeaderValue = authorizationHeaderValues.FirstOrDefault();
             if (authorizationHeaderValue is null || IsBearer(authorizationHeaderValue) == false)
             {
-                return Result.Failed(new AuthenticationHeaderIsNotBearerToken());
+                return Task.FromResult(Result.Failed(new AuthenticationHeaderIsNotBearerToken()));
             }
 
-            return ExtractPrincipalFrom(ParseBearerToken(authorizationHeaderValue));
+            return ExtractPrincipalFromAsync(ParseBearerToken(authorizationHeaderValue));
         }
 
         private static string ParseBearerToken(string authorizationHeaderValue)
@@ -59,12 +61,18 @@ namespace Energinet.DataHub.EDI.B2BApi.Authentication
             return authorizationHeaderValue.StartsWith("bearer", StringComparison.OrdinalIgnoreCase) && authorizationHeaderValue.Length > 7;
         }
 
-        private Result ExtractPrincipalFrom(string token)
+        private async Task<Result> ExtractPrincipalFromAsync(string token)
         {
             try
             {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var principal = tokenHandler.ValidateToken(token, _validationParameters, out _);
+                var tokenHandler = new JsonWebTokenHandler();
+                var tokenValidation = await tokenHandler.ValidateTokenAsync(token, _validationParameters).ConfigureAwait(false);
+                if (tokenValidation.IsValid == false)
+                {
+                    return Result.Failed(new TokenValidationFailed("Token validation failed"), token);
+                }
+
+                var principal = new ClaimsPrincipal(tokenValidation.ClaimsIdentity);
                 return Result.Succeeded(principal);
             }
             catch (ArgumentException e)

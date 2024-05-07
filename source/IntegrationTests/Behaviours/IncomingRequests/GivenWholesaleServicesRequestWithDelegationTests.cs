@@ -705,7 +705,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
             : ActorNumber.Create("4444444444444");
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
-        GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
+        GivenAuthenticatedActorIs(originalActor.ActorNumber, originalActor.ActorRole);
         await GivenGridAreaOwnershipAsync("512", gridOperatorNumber);
         await GivenGridAreaOwnershipAsync("973", gridOperatorNumber);
 
@@ -860,7 +860,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
             : ActorNumber.Create("4444444444444");
 
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
-        GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);
+        GivenAuthenticatedActorIs(originalActor.ActorNumber, originalActor.ActorRole);
         await GivenGridAreaOwnershipAsync("512", gridOperatorNumber);
 
         await GivenDelegation(

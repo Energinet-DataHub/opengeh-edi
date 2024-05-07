@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
+
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
 
 /// <summary>
@@ -22,7 +24,7 @@ public interface IMessageTypeValidator
     /// <summary>
     /// Validates Message Type
     /// </summary>
-    /// <param name="messageType"></param>
+    /// <param name="message"></param>
     /// <param name="cancellationToken"></param>
-    public Task<Result> ValidateAsync(string messageType, CancellationToken cancellationToken);
+    public Task<Result> ValidateAsync(IIncomingMessage message, CancellationToken cancellationToken);
 }

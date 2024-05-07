@@ -34,6 +34,8 @@ public static class ClaimsMap
 
     public static string UserId => "azp";
 
+    public static string Roles => "roles";
+
     public static ActorRole? RoleFrom(string roleClaimValue)
     {
         _rolesMap.TryGetValue(roleClaimValue, out var marketRole);
@@ -42,6 +44,6 @@ public static class ClaimsMap
 
     public static Claim RoleFrom(ActorRole actorRole)
     {
-        return new Claim(ClaimTypes.Role, _rolesMap.First(x => x.Value.Equals(actorRole)).Key);
+        return new Claim(Roles, _rolesMap.First(x => x.Value.Equals(actorRole)).Key);
     }
 }
