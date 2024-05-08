@@ -118,7 +118,7 @@ public class WhenIncomingMessagesIsReceivedWithDelegationTests : TestBase
     }
 
     [Fact]
-    public async Task Receive_message_from_deleged_when_delegation_has_stopped()
+    public async Task Receive_message_from_delegated_when_delegation_has_stopped()
     {
         // Arrange
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
