@@ -189,12 +189,9 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             DocumentFormat.FromName(documentFormat));
 
         // Assert
-        // TODO: H87 (MeasurementUnit.Pieces) is not a valid code in CIM formats
-        // await AssertDocument(document, DocumentFormat.FromName(documentFormat))
-        //     .HasQuantityMeasurementUnit(MeasurementUnit.Pieces)
-        //     .DocumentIsValidAsync();
-        AssertDocument(document, DocumentFormat.FromName(documentFormat))
-            .HasQuantityMeasurementUnit(MeasurementUnit.Pieces);
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
+            .HasQuantityMeasurementUnit(MeasurementUnit.Pieces)
+            .DocumentIsValidAsync();
     }
 
     [Theory]
