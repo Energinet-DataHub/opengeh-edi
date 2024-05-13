@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
@@ -21,6 +23,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories.Mappers;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
@@ -28,6 +31,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.Tests.Application.Process.Transactions.Mappers;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -55,6 +59,15 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
         _integrationEventHandler = GetService<IIntegrationEventHandler>();
         _databaseConnectionFactory = GetService<IDatabaseConnectionFactory>();
         _fileStorageClient = GetService<IFileStorageClient>();
+    }
+
+    public static IEnumerable<object[]> AllMeteringPointTypes()
+    {
+        var allValues = Enum.GetValues<AmountPerChargeResultProducedV1.Types.MeteringPointType>();
+
+        return allValues
+            .Except(new[] { AmountPerChargeResultProducedV1.Types.MeteringPointType.Unspecified })
+            .Select(mpt => new object[] { mpt });
     }
 
     [Fact]
@@ -254,6 +267,26 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.SettlementMethod, SettlementMethod.Flex)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.MeteringPointType, MeteringPointType.Production)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.Resolution, Resolution.Hourly);
+    }
+
+    [Theory]
+    [MemberData(nameof(AllMeteringPointTypes))]
+    public async Task Can_create_outgoing_message_for_all_metering_point_types(AmountPerChargeResultProducedV1.Types.MeteringPointType meteringPointType)
+    {
+        // Arrange
+        var integrationEvent = _amountPerChargeEventBuilder
+            .WithMeteringPointType(meteringPointType)
+            .Build();
+
+        // Act
+        await HandleIntegrationEventAsync(integrationEvent);
+        var assertOutgoingMessage = await AssertOutgoingMessageAsync();
+
+        // Assert
+        var expectedMeteringPointType = MeteringPointTypeMapper.Map(meteringPointType);
+
+        assertOutgoingMessage
+            .HasMessageRecordValue<WholesaleServicesSeries>((series) => series.MeteringPointType, expectedMeteringPointType);
     }
 
     private async Task HandleIntegrationEventAsync(AmountPerChargeResultProducedV1 @event, Guid? eventId = null)
