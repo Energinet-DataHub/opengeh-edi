@@ -19,11 +19,13 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.WholesaleSettlementMessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using FluentAssertions.Execution;
@@ -48,8 +50,21 @@ public class MessageParserTests
         _marketMessageParser = new MarketMessageParser(
             new IMessageParser[]
             {
+                new XmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
                 new JsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
             });
+    }
+
+    public static IEnumerable<object[]> CreateMessagesWithTwoChargeTypes()
+    {
+        return new List<object[]>
+        {
+            new object[]
+            {
+                DocumentFormat.Json, CreateBaseJsonMessages("RequestWholesaleSettlement2ChargeTypes.json"),
+            },
+            new object[] { DocumentFormat.Xml, CreateBaseXmlMessage("RequestWholesaleSettlement2ChargeTypes.xml") },
+        };
     }
 
     public static IEnumerable<object[]> CreateMessagesWithSingleAndMultipleTransactions()
@@ -58,6 +73,7 @@ public class MessageParserTests
         {
             new object[] { DocumentFormat.Json, CreateBaseJsonMessages("RequestWholesaleSettlement.json") },
             new object[] { DocumentFormat.Json, CreateBaseJsonMessages("RequestWholesaleSettlement.json", 1) },
+            new object[] { DocumentFormat.Xml, CreateBaseXmlMessage("RequestWholesaleSettlement.xml") },
         };
     }
 
@@ -109,6 +125,34 @@ public class MessageParserTests
     }
 
     [Theory]
+    [MemberData(nameof(CreateMessagesWithTwoChargeTypes))]
+    public async Task Given_MessageWithMultipleChargeTypes_When_Parsing_Then_SuccesfullyParses(
+        DocumentFormat format,
+        Stream message)
+    {
+        var result = await _marketMessageParser.ParseAsync(
+            new IncomingMessageStream(message),
+            format,
+            IncomingDocumentType.RequestWholesaleSettlement,
+            CancellationToken.None);
+        using var assertionScope = new AssertionScope();
+        Assert.True(result.Success);
+        var marketMessage = (RequestWholesaleServicesMessage)result!.IncomingMessage!;
+        Assert.NotNull(marketMessage);
+
+        var series = marketMessage.Series.Cast<RequestWholesaleServicesSeries>().ToList();
+
+        var firstChargeType = series.First().ChargeTypes.First();
+        var secondChargeType = series.First().ChargeTypes.Last();
+
+        Assert.Equal("EA-001", firstChargeType.Id);
+        Assert.Equal("D03", firstChargeType.Type);
+
+        Assert.Equal("EA-002", secondChargeType.Id);
+        Assert.Equal("D02", secondChargeType.Type);
+    }
+
+    [Theory]
     [MemberData(nameof(CreateBadMessages))]
     public async Task Messages_with_errors(DocumentFormat format, Stream message, string expectedError)
     {
@@ -118,6 +162,17 @@ public class MessageParserTests
         Assert.True(result.Success == false);
         Assert.True(expectedError != null);
         Assert.Contains(result.Errors, error => error.GetType().Name == expectedError);
+    }
+
+    private static MemoryStream CreateBaseXmlMessage(string fileName)
+    {
+        var xmlDocument = XDocument.Load(
+            $"{PathToMessages}xml{SubPath}{fileName}");
+
+        var stream = new MemoryStream();
+        xmlDocument.Save(stream);
+
+        return stream;
     }
 
     private static MemoryStream CreateBaseJsonMessages(string fileName, int addSeriesUntilMbSize = 0)

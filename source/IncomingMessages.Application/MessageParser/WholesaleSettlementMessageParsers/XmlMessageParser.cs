@@ -109,7 +109,7 @@ public class XmlMessageParser : XmlBaseParser, IMessageParser
             .ConfigureAwait(false);
 
         var series = new List<RequestWholesaleServicesSeries>();
-        await foreach (var serie in ParseSerieAsync(reader, root))
+        await foreach (var serie in ParseSeriesAsync(reader, root))
         {
             series.Add(serie);
         }
@@ -127,16 +127,16 @@ public class XmlMessageParser : XmlBaseParser, IMessageParser
             series.AsReadOnly()));
     }
 
-    private async IAsyncEnumerable<RequestWholesaleServicesSeries> ParseSerieAsync(
+    private async IAsyncEnumerable<RequestWholesaleServicesSeries> ParseSeriesAsync(
         XmlReader reader,
         RootElement rootElement)
     {
         var id = string.Empty;
         var startDateAndOrTimeDateTime = string.Empty;
         string? endDateAndOrTimeDateTime = null;
-        string? meteringGridAreaDomainId = null;
-        string? energySupplierMarketParticipantId = null;
-        string? chargeTypeOwnerMarketParticipantId = null;
+        string? gridArea = null;
+        string? energySupplierId = null;
+        string? chargeTypeOwnerId = null;
         string? settlementVersion = null;
         string? resolution = null;
         string? chargeType = null;
@@ -156,17 +156,17 @@ public class XmlMessageParser : XmlBaseParser, IMessageParser
                     chargeTypes.Add(chargeTypeOwner);
                 }
 
-                var serie = new RequestWholesaleServicesSeries(
+                var series = new RequestWholesaleServicesSeries(
                     id,
                     startDateAndOrTimeDateTime,
                     endDateAndOrTimeDateTime,
-                    meteringGridAreaDomainId,
-                    energySupplierMarketParticipantId,
+                    gridArea,
+                    energySupplierId,
                     settlementVersion,
                     resolution,
-                    chargeTypeOwnerMarketParticipantId,
+                    chargeTypeOwnerId,
                     chargeTypes);
-                yield return serie;
+                yield return series;
             }
 
             if (reader.NodeType == XmlNodeType.Element && reader.SchemaInfo?.Validity == XmlSchemaValidity.Invalid)
@@ -186,15 +186,15 @@ public class XmlMessageParser : XmlBaseParser, IMessageParser
             }
             else if (reader.Is("meteringGridArea_Domain.mRID", ns))
             {
-                meteringGridAreaDomainId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                gridArea = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
             else if (reader.Is("energySupplier_MarketParticipant.mRID", ns))
             {
-                energySupplierMarketParticipantId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                energySupplierId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
             else if (reader.Is("chargeTypeOwner_MarketParticipant.mRID", ns))
             {
-                chargeTypeOwnerMarketParticipantId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                chargeTypeOwnerId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
             else if (reader.Is("settlement_Series.version", ns))
             {
@@ -204,6 +204,8 @@ public class XmlMessageParser : XmlBaseParser, IMessageParser
             {
                 resolution = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
+
+            // This should not work
             else if (reader.Depth == 3 && reader.Is("type", ns))
             {
                 chargeType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
