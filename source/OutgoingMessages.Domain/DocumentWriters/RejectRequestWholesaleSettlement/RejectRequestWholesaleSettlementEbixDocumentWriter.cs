@@ -65,14 +65,14 @@ public class RejectRequestWholesaleSettlementEbixDocumentWriter : EbixDocumentWr
                     DocumentDetails.Prefix,
                     "Identification",
                     null,
-                    wholesaleServicesRecord.TransactionId.ToString("N"))
+                    TransactionIdToEbixString(wholesaleServicesRecord.TransactionId))
                 .ConfigureAwait(false);
 
             await writer.WriteElementStringAsync(
                     DocumentDetails.Prefix,
                     "OriginalBusinessDocument",
                     null,
-                    wholesaleServicesRecord.OriginalTransactionIdReference)
+                    TransactionIdToEbixString(wholesaleServicesRecord.OriginalTransactionIdReference))
                 .ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "StatusType", null).ConfigureAwait(false);

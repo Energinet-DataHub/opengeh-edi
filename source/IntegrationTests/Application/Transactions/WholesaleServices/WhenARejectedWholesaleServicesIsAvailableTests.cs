@@ -23,7 +23,6 @@ using Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.Aggregated
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
-using Energinet.DataHub.EDI.Process.Domain;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
@@ -87,7 +86,7 @@ public sealed class WhenARejectedWholesaleServicesIsAvailableTests : TestBase
                 rejectReason2.ErrorCode)
             .HasMessageRecordValue<RejectedWholesaleServicesMessageSeries>(
                 messageSeries => messageSeries.OriginalTransactionIdReference,
-                process.BusinessTransactionId.Value);
+                process.BusinessTransactionId);
     }
 
     protected override void Dispose(bool disposing)

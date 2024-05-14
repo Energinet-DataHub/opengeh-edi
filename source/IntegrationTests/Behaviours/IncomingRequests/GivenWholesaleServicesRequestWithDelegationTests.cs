@@ -15,22 +15,16 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
-using Energinet.DataHub.Edi.Requests;
-using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using Google.Protobuf;
 using NodaTime;
 using NodaTime.Text;
 using Xunit;
@@ -140,9 +134,9 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
             chargeCode: "25361478",
             chargeType: ChargeType.Tariff,
             isMonthly: false,
-            series: new (string? GridArea, string TransactionId)[]
+            new (string? GridArea, TransactionId TransactionId)[]
             {
-                ("512", "123564789123564789123564789123564787"),
+                ("512", TransactionId.From("123564789123564789123564789123564787")),
             });
 
         // Act
@@ -226,7 +220,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
                 SettlementMethod: SettlementMethod.Flex,
                 MeteringPointType: MeteringPointType.Consumption,
                 GridArea: "512",
-                OriginalTransactionIdReference: "123564789123564789123564789123564787",
+                TransactionId.From("123564789123564789123564789123564787"),
                 PriceMeasurementUnit: MeasurementUnit.Kwh,
                 ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
                 QuantityMeasurementUnit: MeasurementUnit.Kwh,
@@ -291,9 +285,9 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
             chargeCode: "25361478",
             chargeType: ChargeType.Tariff,
             isMonthly: false,
-            series: new (string? GridArea, string TransactionId)[]
+            new (string? GridArea, TransactionId TransactionId)[]
             {
-                (null, "123564789123564789123564789123564787"),
+                (null, TransactionId.From("123564789123564789123564789123564787")),
             });
 
         // Act
@@ -385,7 +379,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
                     SettlementMethod: SettlementMethod.Flex,
                     MeteringPointType: MeteringPointType.Consumption,
                     GridArea: seriesRequest.GridArea,
-                    OriginalTransactionIdReference: "123564789123564789123564789123564787",
+                    TransactionId.From("123564789123564789123564789123564787"),
                     PriceMeasurementUnit: MeasurementUnit.Kwh,
                     ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
                     QuantityMeasurementUnit: MeasurementUnit.Kwh,
@@ -449,9 +443,9 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
             chargeCode: "25361478",
             chargeType: ChargeType.Tariff,
             isMonthly: false,
-            series: new (string? GridArea, string TransactionId)[]
+            new (string? GridArea, TransactionId TransactionId)[]
             {
-                ("512", "123564789123564789123564789123564787"),
+                ("512", TransactionId.From("123564789123564789123564789123564787")),
             });
 
         // Act
@@ -592,9 +586,9 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
             chargeCode: "25361478",
             chargeType: ChargeType.Tariff,
             isMonthly: false,
-            series: new (string? GridArea, string TransactionId)[]
+            new (string? GridArea, TransactionId TransactionId)[]
             {
-                (null, "123564789123564789123564789123564787"),
+                (null, TransactionId.From("123564789123564789123564789123564787")),
             });
 
         // Act
@@ -728,9 +722,9 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
             chargeCode: "25361478",
             chargeType: ChargeType.Tariff,
             isMonthly: false,
-            series: new (string? GridArea, string TransactionId)[]
+            new (string? GridArea, TransactionId TransactionId)[]
             {
-                (null, "123564789123564789123564789123564787"),
+                (null, TransactionId.From("123564789123564789123564789123564787")),
             });
 
         // Act
@@ -822,7 +816,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
                     SettlementMethod: SettlementMethod.Flex,
                     MeteringPointType: MeteringPointType.Consumption,
                     GridArea: seriesRequest.GridArea,
-                    OriginalTransactionIdReference: "123564789123564789123564789123564787",
+                    TransactionId.From("123564789123564789123564789123564787"),
                     PriceMeasurementUnit: MeasurementUnit.Kwh,
                     ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
                     QuantityMeasurementUnit: MeasurementUnit.Kwh,
@@ -882,9 +876,9 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
             chargeCode: "25361478",
             chargeType: ChargeType.Tariff,
             isMonthly: false,
-            series: new (string? GridArea, string TransactionId)[]
+            new (string? GridArea, TransactionId TransactionId)[]
             {
-                ("512", "123564789123564789123564789123564787"),
+                ("512", TransactionId.From("123564789123564789123564789123564787")),
             });
 
         // Act
@@ -968,7 +962,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
                 SettlementMethod: SettlementMethod.Flex,
                 MeteringPointType: MeteringPointType.Consumption,
                 GridArea: "512",
-                OriginalTransactionIdReference: "123564789123564789123564789123564787",
+                TransactionId.From("123564789123564789123564789123564787"),
                 PriceMeasurementUnit: MeasurementUnit.Kwh,
                 ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
                 QuantityMeasurementUnit: MeasurementUnit.Kwh,
@@ -1023,9 +1017,9 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
             chargeCode: null,
             chargeType: null,
             isMonthly: false,
-            series: new (string? GridArea, string TransactionId)[]
+            new (string? GridArea, TransactionId TransactionId)[]
             {
-                (null, "123564789123564789123564789123564787"),
+                (null, TransactionId.From("123564789123564789123564789123564787")),
             },
             assertRequestWasSuccessful: false);
 

@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.Edi.Responses;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 
@@ -57,7 +59,7 @@ public interface IAssertNotifyAggregatedMeasureDataDocument
     /// Asserts transaction id
     /// </summary>
     /// <param name="expectedTransactionId"></param>
-    IAssertNotifyAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId);
+    IAssertNotifyAggregatedMeasureDataDocument HasTransactionId(TransactionId expectedTransactionId);
 
     /// <summary>
     /// Assert transaction id exists
@@ -154,7 +156,8 @@ public interface IAssertNotifyAggregatedMeasureDataDocument
     /// Asserts the OriginalTransactionIdReference
     /// </summary>
     /// <param name="originalTransactionIdReference"></param>
-    IAssertNotifyAggregatedMeasureDataDocument HasOriginalTransactionIdReference(string originalTransactionIdReference);
+    IAssertNotifyAggregatedMeasureDataDocument HasOriginalTransactionIdReference(
+        TransactionId originalTransactionIdReference);
 
     /// <summary>
     /// Asserts the OriginalTransactionIdReference does not exist
@@ -194,5 +197,5 @@ public interface IAssertNotifyAggregatedMeasureDataDocument
     /// <summary>
     /// Asserts the points based on the Wholesale response
     /// </summary>
-    IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<Edi.Responses.TimeSeriesPoint> points);
+    IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<TimeSeriesPoint> points);
 }

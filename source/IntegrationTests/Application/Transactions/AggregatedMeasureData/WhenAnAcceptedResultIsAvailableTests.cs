@@ -32,6 +32,7 @@ using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Google.Protobuf;
+using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using NodaTime.Text;
 using Xunit;
@@ -92,7 +93,9 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId)
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1)
-            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.OriginalTransactionIdReference, process.BusinessTransactionId.Value);
+            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(
+                timeSerie => timeSerie.OriginalTransactionIdReference,
+                process.BusinessTransactionId);
     }
 
     [Fact]
@@ -143,8 +146,12 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         var firstMessage = outgoingMessages.First();
         var secondMessage = outgoingMessages.Last();
 
-        var seriesIdOfFirstMessage = firstMessage.GetMessageValue<AcceptedEnergyResultMessageTimeSeries, Guid>(series => series.TransactionId);
-        var seriesIdOfSecondMessage = secondMessage.GetMessageValue<AcceptedEnergyResultMessageTimeSeries, Guid>(series => series.TransactionId);
+        var seriesIdOfFirstMessage =
+            firstMessage.GetMessageValue<AcceptedEnergyResultMessageTimeSeries, TransactionId>(
+                series => series.TransactionId);
+        var seriesIdOfSecondMessage =
+            secondMessage.GetMessageValue<AcceptedEnergyResultMessageTimeSeries, TransactionId>(
+                series => series.TransactionId);
 
         seriesIdOfFirstMessage.Should().NotBe(seriesIdOfSecondMessage);
     }
@@ -200,7 +207,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
                 Time = currentTime.ToTimestamp(),
                 QuantityQualities = { QuantityQuality.Calculated },
             }));
-            currentTime = currentTime.Plus(NodaTime.Duration.FromMinutes(15));
+            currentTime = currentTime.Plus(Duration.FromMinutes(15));
         }
 
         var series = new Series

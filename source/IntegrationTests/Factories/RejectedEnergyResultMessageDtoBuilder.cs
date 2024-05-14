@@ -25,9 +25,9 @@ public class RejectedEnergyResultMessageDtoBuilder
     private static readonly Guid _processId = Guid.NewGuid();
     private static readonly string _businessReason = BusinessReason.BalanceFixing.Name;
     private static readonly RejectedEnergyResultMessageSerie _series = new(
-        Guid.Parse("4E85A732-85FD-4D92-8FF3-72C052802716"),
+        TransactionId.From("4E85A732-85FD-4D92-8FF3-72C052802716"),
         new List<RejectedEnergyResultMessageRejectReason> { new("E18", "Det virker ikke!") },
-        "4E85A73285FD4D928FF372C052802717");
+        TransactionId.From("4E85A732-85FD-4D92-8FF3-72C052802717"));
 
     private static MessageId _relatedToMessageId = MessageId.Create(Guid.NewGuid().ToString());
     private static ActorRole _receiverRole = ActorRole.MeteredDataResponsible;

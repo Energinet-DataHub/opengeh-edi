@@ -41,7 +41,7 @@ internal static class RequestWholesaleServicesRequestBuilder
         string? chargeCode,
         ChargeType? chargeType,
         bool isMonthly,
-        IReadOnlyCollection<(string? GridArea, string TransactionId)> series)
+        IReadOnlyCollection<(string? GridArea, TransactionId TransactionId)> series)
     {
         string content;
         if (format == DocumentFormat.Json)
@@ -90,7 +90,7 @@ internal static class RequestWholesaleServicesRequestBuilder
         string? chargeCode,
         string? chargeType,
         bool isMonthly,
-        IReadOnlyCollection<(string? GridArea, string TransactionId)> series)
+        IReadOnlyCollection<(string? GridArea, TransactionId TransactionId)> series)
     {
         return $@"{{
   ""RequestWholesaleSettlement_MarketDocument"": {{
@@ -122,7 +122,7 @@ internal static class RequestWholesaleServicesRequestBuilder
     ""Series"": [
         {string.Join(",\n", series.Select(s => $@"
         {{
-            ""mRID"": ""{s.TransactionId}"",
+            ""mRID"": ""{s.TransactionId.Value}"",
             {GetCimJsonResolutionSection(isMonthly)}
             {GetCimJsonChargeOwnerSection(chargeOwnerActorNumber)}
             ""end_DateAndOrTime.dateTime"": ""{periodEnd}"",
@@ -208,7 +208,7 @@ internal static class RequestWholesaleServicesRequestBuilder
         string? chargeCode,
         string? chargeType,
         bool isMonthly,
-        IReadOnlyCollection<(string? GridArea, string TransactionId)> series)
+        IReadOnlyCollection<(string? GridArea, TransactionId TransactionId)> series)
     {
         return $@"
 <?xml version=""1.0"" encoding=""UTF-8""?>
@@ -225,7 +225,7 @@ internal static class RequestWholesaleServicesRequestBuilder
 	<cim:createdDateTime>2022-12-17T09:30:47Z</cim:createdDateTime>
     {string.Join("\n", series.Select(s => $@"
         <cim:Series>
-		    <cim:mRID>{s.TransactionId}</cim:mRID>
+		    <cim:mRID>{s.TransactionId.Value}</cim:mRID>
 		    <cim:start_DateAndOrTime.dateTime>{periodStart}</cim:start_DateAndOrTime.dateTime>
 		    <cim:end_DateAndOrTime.dateTime>{periodEnd}</cim:end_DateAndOrTime.dateTime>
 		    {GetCimXmlGridAreaSection(s.GridArea)}

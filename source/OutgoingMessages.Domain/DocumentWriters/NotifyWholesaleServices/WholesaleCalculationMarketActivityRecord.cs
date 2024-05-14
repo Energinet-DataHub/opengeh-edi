@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWh
 
 // This is a copy of WholesaleCalculationSeries defined in the process module
 public record WholesaleCalculationMarketActivityRecord(
-    Guid TransactionId,
+    TransactionId TransactionId,
     long CalculationVersion,
     string GridAreaCode,
     string ChargeCode,
@@ -47,6 +47,6 @@ public record WholesaleCalculationMarketActivityRecord(
     SettlementMethod? SettlementType,
 
     SettlementMethod? SettlementMethod,
-    string? OriginalTransactionIdReference);
+    TransactionId? OriginalTransactionIdReference);
 
 public record Point(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);

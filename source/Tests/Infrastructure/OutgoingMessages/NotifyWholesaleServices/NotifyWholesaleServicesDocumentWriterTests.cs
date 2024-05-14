@@ -18,8 +18,6 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
-using Energinet.DataHub.EDI.OutgoingMessages.Application;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
@@ -53,9 +51,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
     [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_notifyWholesaleServices_document(string documentFormat)
     {
-        var transactionId = documentFormat == nameof(DocumentFormat.Ebix)
-            ? SampleData.TransactionId.ToString().Substring(0, 35)
-            : SampleData.TransactionId.ToString();
+        var transactionId = SampleData.TransactionId;
         // Arrange
         var messageBuilder = _wholesaleServicesSeriesBuilder
             .WithMessageId(SampleData.MessageId)

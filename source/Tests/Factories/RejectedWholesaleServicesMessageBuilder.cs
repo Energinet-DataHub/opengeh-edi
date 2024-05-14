@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestWholesaleSettlement;
@@ -32,8 +30,10 @@ public class RejectedWholesaleServicesMessageBuilder
     private readonly string _messageId = SampleData.MessageId;
     private readonly BusinessReason _businessReason = SampleData.BusinessReason;
     private readonly Instant _creationDate = SampleData.CreationDate;
-    private readonly Guid _transactionId = SampleData.TransactionId;
-    private readonly string _originalTransactionIdReference = SampleData.OriginalTransactionId;
+    private readonly TransactionId _transactionId = TransactionId.From(SampleData.TransactionId.ToString());
+
+    private readonly TransactionId _originalTransactionIdReference =
+        TransactionId.From(SampleData.OriginalTransactionId);
 
     private readonly IReadOnlyCollection<RejectedWholesaleServicesMessageRejectReason> _rejectReasons =
         new List<RejectedWholesaleServicesMessageRejectReason>

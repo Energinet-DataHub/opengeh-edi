@@ -16,15 +16,11 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
-using Energinet.DataHub.EDI.Process.Domain.Transactions;
-using Energinet.DataHub.Edi.Requests;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
@@ -86,7 +82,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
 
     [Theory]
     [MemberData(nameof(DocumentFormatsWithAllActorRoleCombinations))]
-    public async Task AndGiven_DataInOneGridArea_When_ActorPeeksAllMessages_Then_ReceivesOneNotifyAggregatedMeasureDataDocumentWithCorrectContent(ActorRole actorRole, DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat)
+    public async Task AndGiven_DataInOneGridArea_When_ActorPeeksAllMessages_Then_ReceivesOneNotifyAggregatedMeasureDataDocumentWithCorrectContent(BuildingBlocks.Domain.Models.ActorRole actorRole, DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat)
     {
         /*
          *  --- PART 1: Receive request, create process and send message to Wholesale ---
@@ -115,9 +111,9 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
             periodEnd: (2024, 1, 31),
             energySupplier: energySupplierNumber,
             balanceResponsibleParty: balanceResponsibleParty,
-            series: new (string? GridArea, string TransactionId)[]
+            new (string? GridArea, TransactionId TransactionId)[]
             {
-                ("512", "123564789123564789123564789123564787"),
+                ("512", TransactionId.From("123564789123564789123564789123564787")),
             });
 
         // Act
@@ -189,7 +185,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
                 SettlementMethod: SettlementMethod.Flex,
                 MeteringPointType: MeteringPointType.Consumption,
                 GridAreaCode: "512",
-                OriginalTransactionIdReference: "123564789123564789123564789123564787",
+                OriginalTransactionIdReference: TransactionId.From("123564789123564789123564789123564787"),
                 ProductCode: ProductType.EnergyActive.Code,
                 QuantityMeasurementUnit: MeasurementUnit.Kwh,
                 CalculationVersion: GetNow().ToUnixTimeTicks(),
@@ -231,9 +227,9 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
             periodEnd: (2024, 1, 31),
             energySupplier: energySupplierNumber,
             balanceResponsibleParty: balanceResponsibleParty,
-            series: new (string? GridArea, string TransactionId)[]
+            new (string? GridArea, TransactionId TransactionId)[]
             {
-                (null, "123564789123564789123564789123564787"),
+                (null, TransactionId.From("123564789123564789123564789123564787")),
             });
 
         // Act
@@ -312,7 +308,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
                     SettlementMethod: SettlementMethod.Flex,
                     MeteringPointType: MeteringPointType.Consumption,
                     GridAreaCode: seriesRequest.GridArea,
-                    OriginalTransactionIdReference: "123564789123564789123564789123564787",
+                    OriginalTransactionIdReference: TransactionId.From("123564789123564789123564789123564787"),
                     ProductCode: ProductType.EnergyActive.Code,
                     QuantityMeasurementUnit: MeasurementUnit.Kwh,
                     CalculationVersion: GetNow().ToUnixTimeTicks(),
@@ -360,9 +356,9 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
             periodEnd: (2024, 1, 31),
             energySupplier: energySupplierOrNull,
             balanceResponsibleParty: balanceResponsibleOrNull,
-            series: new (string? GridArea, string TransactionId)[]
+            new (string? GridArea, TransactionId TransactionId)[]
             {
-                (gridAreaOrNull, "123564789123564789123564789123564787"),
+                (gridAreaOrNull, TransactionId.From("123564789123564789123564789123564787")),
             });
 
         // Act
@@ -435,7 +431,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
                 SettlementMethod: SettlementMethod.Flex,
                 MeteringPointType: MeteringPointType.Consumption,
                 GridAreaCode: "512",
-                OriginalTransactionIdReference: "123564789123564789123564789123564787",
+                OriginalTransactionIdReference: TransactionId.From("123564789123564789123564789123564787"),
                 ProductCode: ProductType.EnergyActive.Code,
                 QuantityMeasurementUnit: MeasurementUnit.Kwh,
                 CalculationVersion: GetNow().ToUnixTimeTicks(),
@@ -467,11 +463,11 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(currentActor.ActorNumber, currentActor.ActorRole);
 
-        var gridAreasWithTransactionId = new (string? GridArea, string TransactionId)[]
+        var gridAreasWithTransactionId = new (string? GridArea, TransactionId TransactionId)[]
         {
-            ("143", "123564789123564789123564789123564786"),
-            ("512", "123564789123564789123564789123564787"),
-            ("877", "123564789123564789123564789123564788"),
+            ("143", TransactionId.From("123564789123564789123564789123564786")),
+            ("512", TransactionId.From("123564789123564789123564789123564787")),
+            ("877", TransactionId.From("123564789123564789123564789123564788")),
         };
 
         await GivenReceivedAggregatedMeasureDataRequest(

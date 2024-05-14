@@ -35,7 +35,6 @@ using FluentAssertions.Execution;
 using Google.Protobuf;
 using Xunit.Abstractions;
 using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
-using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
@@ -190,7 +189,7 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
         string? chargeCode,
         ChargeType? chargeType,
         bool isMonthly,
-        IReadOnlyCollection<(string? GridArea, string TransactionId)> series,
+        IReadOnlyCollection<(string? GridArea, TransactionId TransactionId)> series,
         bool assertRequestWasSuccessful = true)
     {
         var incomingMessageClient = GetService<IIncomingMessageClient>();
@@ -261,7 +260,7 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
                 message.ChargeTypes.Should()
                     .BeEquivalentTo(
                         input.ChargeTypes.Select(
-                            ct => new Energinet.DataHub.Edi.Requests.ChargeType
+                            ct => new Edi.Requests.ChargeType
                             {
                                 ChargeType_ = ct.ChargeType, ChargeCode = ct.ChargeCode,
                             }));

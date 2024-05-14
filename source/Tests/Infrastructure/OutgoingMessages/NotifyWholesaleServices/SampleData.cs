@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
@@ -34,7 +33,7 @@ internal static class SampleData
 
     #region series attributes
 
-    public static Guid TransactionId => Guid.Parse("11111111-1111-1111-1111-111111111111");
+    public static TransactionId TransactionId => TransactionId.From("11111111111111111111111111111111");
 
     public static int Version => 1;
 

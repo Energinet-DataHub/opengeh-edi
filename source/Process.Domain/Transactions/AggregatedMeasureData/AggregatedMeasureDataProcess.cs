@@ -206,13 +206,13 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             RejectedAggregatedMeasureDataRequest rejectedAggregatedMeasureDataRequest)
         {
             var rejectedTimeSerie = new RejectedEnergyResultMessageSerie(
-                ProcessId.Id,
+                TransactionId.New(),
                 rejectedAggregatedMeasureDataRequest.RejectReasons.Select(reason =>
                         new RejectedEnergyResultMessageRejectReason(
                             reason.ErrorCode,
                             reason.ErrorMessage))
                     .ToList(),
-                BusinessTransactionId.Value);
+                BusinessTransactionId);
 
             return new RejectedEnergyResultMessageDto(
                 receiverNumber: RequestedByActor.ActorNumber,

@@ -191,7 +191,7 @@ public class EnergyResultResponseFromWholesaleTests : TestBase
             process.BusinessReason.Name,
             1,
             settlementVersion: process.SettlementVersion?.Name,
-            originalTransactionIdReference: process.BusinessTransactionId.Value,
+            originalTransactionIdReference: process.BusinessTransactionId,
             relatedToMessageId: process.InitiatedByMessageId);
     }
 

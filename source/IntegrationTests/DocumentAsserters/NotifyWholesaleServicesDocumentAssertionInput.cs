@@ -35,7 +35,7 @@ public record NotifyWholesaleServicesDocumentAssertionInput(
     SettlementMethod SettlementMethod,
     MeteringPointType MeteringPointType,
     string GridArea,
-    string? OriginalTransactionIdReference,
+    TransactionId? OriginalTransactionIdReference,
     MeasurementUnit PriceMeasurementUnit,
     string ProductCode,
     MeasurementUnit QuantityMeasurementUnit,

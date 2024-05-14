@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using NodaTime;
@@ -35,7 +34,7 @@ public class EnergyResultMessageTimeSeriesBuilder
     private ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
     private string _senderNumber = "1234567890321";
     private ActorRole _senderRole = ActorRole.MeteredDataAdministrator;
-    private Guid _transactionId = Guid.NewGuid();
+    private TransactionId _transactionId = TransactionId.New();
     private string _gridAreaCode = "870";
     private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
     private SettlementMethod? _settlementMethod = SettlementMethod.NonProfiled;
@@ -79,7 +78,7 @@ public class EnergyResultMessageTimeSeriesBuilder
         return this;
     }
 
-    public EnergyResultMessageTimeSeriesBuilder WithTransactionId(Guid transactionId)
+    public EnergyResultMessageTimeSeriesBuilder WithTransactionId(TransactionId transactionId)
     {
         _transactionId = transactionId;
         return this;
@@ -166,7 +165,7 @@ public class EnergyResultMessageTimeSeriesBuilder
     public EnergyResultMessageTimeSeries BuildTimeSeries()
     {
         return new EnergyResultMessageTimeSeries(
-            _transactionId,
+            TransactionId.From(_transactionId.Value),
             _gridAreaCode,
             _meteringPointType.Name,
             null,

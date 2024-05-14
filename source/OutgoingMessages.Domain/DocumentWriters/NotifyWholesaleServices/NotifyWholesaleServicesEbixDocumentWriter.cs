@@ -72,7 +72,12 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "PayloadEnergyTimeSeries", null).ConfigureAwait(false);
             {
                 // <Identification />
-                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Identification", null, series.TransactionId.ToString("N")).ConfigureAwait(false);
+                await writer.WriteElementStringAsync(
+                        DocumentDetails.Prefix,
+                        "Identification",
+                        null,
+                        TransactionIdToEbixString(series.TransactionId))
+                    .ConfigureAwait(false);
 
                 // <Function />
                 await WriteCodeWithCodeListReferenceAttributesAsync("Function", "9", writer).ConfigureAwait(false);
@@ -220,7 +225,7 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                 // <OriginalBusinessDocument />
                 await WriteElementIfHasValueAsync(
                         "OriginalBusinessDocument",
-                        series.OriginalTransactionIdReference,
+                        series.OriginalTransactionIdReference is not null ? TransactionIdToEbixString(series.OriginalTransactionIdReference) : null,
                         writer)
                     .ConfigureAwait(false);
 

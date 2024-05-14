@@ -55,8 +55,8 @@ public sealed class RejectedWholesaleServicesMessageDto : OutgoingMessageDto
 }
 
 public sealed record RejectedWholesaleServicesMessageSeries(
-    Guid TransactionId,
+    TransactionId TransactionId,
     IReadOnlyCollection<RejectedWholesaleServicesMessageRejectReason> RejectReasons,
-    string OriginalTransactionIdReference);
+    TransactionId OriginalTransactionIdReference);
 
 public sealed record RejectedWholesaleServicesMessageRejectReason(string ErrorCode, string ErrorMessage);

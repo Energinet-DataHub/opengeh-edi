@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -90,7 +89,7 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// Asserts transaction id of the first series element
     /// </summary>
     /// <param name="expectedTransactionId"></param>
-    IAssertNotifyWholesaleServicesDocument HasTransactionId(Guid expectedTransactionId);
+    IAssertNotifyWholesaleServicesDocument HasTransactionId(TransactionId expectedTransactionId);
 
     /// <summary>
     /// Asserts transaction exists in the first series element
@@ -119,7 +118,7 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// </summary>
     /// <param name="expectedOriginalTransactionIdReference"></param>
     IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(
-        string expectedOriginalTransactionIdReference);
+        TransactionId expectedOriginalTransactionIdReference);
 
     /// <summary>
     /// Asserts that the first series element does not have a reference id

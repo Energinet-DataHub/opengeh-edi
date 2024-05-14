@@ -47,13 +47,13 @@ public class NotifyWholesaleServicesCimXmlDocumentWriter : CimXmlDocumentWriter
         foreach (var wholesaleCalculationSeries in ParseFrom<WholesaleCalculationMarketActivityRecord>(marketActivityPayloads))
         {
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, wholesaleCalculationSeries.TransactionId.ToString()).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, wholesaleCalculationSeries.TransactionId.Value).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "version", null, wholesaleCalculationSeries.CalculationVersion.ToString(NumberFormatInfo.InvariantInfo)).ConfigureAwait(false);
 
             await WriteElementIfHasValueAsync("settlement_Series.version", wholesaleCalculationSeries.SettlementVersion?.Code, writer).ConfigureAwait(false);
 
             // These are there for later use, but are not used as of right now
-            await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", wholesaleCalculationSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
+            await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", wholesaleCalculationSeries.OriginalTransactionIdReference?.Value, writer).ConfigureAwait(false);
             await WriteElementIfHasValueAsync("marketEvaluationPoint.type", wholesaleCalculationSeries.MeteringPointType?.Code, writer).ConfigureAwait(false);
 #pragma warning disable CS0618 // Type or member is obsolete
             await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", wholesaleCalculationSeries.SettlementType?.Code ?? wholesaleCalculationSeries.SettlementMethod?.Code, writer).ConfigureAwait(false);
