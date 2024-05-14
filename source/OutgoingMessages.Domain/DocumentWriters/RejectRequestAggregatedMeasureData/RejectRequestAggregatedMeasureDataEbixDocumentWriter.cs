@@ -60,7 +60,7 @@ public class RejectRequestAggregatedMeasureDataEbixDocumentWriter : EbixDocument
                     DocumentDetails.Prefix,
                     "Identification",
                     null,
-                    TransactionIdToEbixString(rejectedTimeSerie.TransactionId))
+                    rejectedTimeSerie.TransactionId.Value)
                 .ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "StatusType", null).ConfigureAwait(false);
@@ -77,7 +77,7 @@ public class RejectRequestAggregatedMeasureDataEbixDocumentWriter : EbixDocument
                     DocumentDetails.Prefix,
                     "OriginalBusinessDocument",
                     null,
-                    TransactionIdToEbixString(rejectedTimeSerie.OriginalTransactionIdReference))
+                    rejectedTimeSerie.OriginalTransactionIdReference.Value)
                 .ConfigureAwait(false);
 
             // End PayloadResponseEvent

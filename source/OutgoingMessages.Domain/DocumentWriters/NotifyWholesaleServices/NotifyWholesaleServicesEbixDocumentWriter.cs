@@ -76,7 +76,7 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                         DocumentDetails.Prefix,
                         "Identification",
                         null,
-                        TransactionIdToEbixString(series.TransactionId))
+                        series.TransactionId.Value)
                     .ConfigureAwait(false);
 
                 // <Function />
@@ -225,7 +225,7 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                 // <OriginalBusinessDocument />
                 await WriteElementIfHasValueAsync(
                         "OriginalBusinessDocument",
-                        series.OriginalTransactionIdReference is not null ? TransactionIdToEbixString(series.OriginalTransactionIdReference) : null,
+                        series.OriginalTransactionIdReference?.Value,
                         writer)
                     .ConfigureAwait(false);
 

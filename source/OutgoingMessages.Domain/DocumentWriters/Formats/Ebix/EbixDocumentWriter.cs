@@ -175,17 +175,6 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         return Task.CompletedTask;
     }
 
-    protected string TransactionIdToEbixString(TransactionId transactionId)
-    {
-        ArgumentNullException.ThrowIfNull(transactionId);
-        // If the transactionId is a guid (with or without dashes), we will remove the dashes.
-        // The parsing has the unfortunate side effect of lowercasing, so if the id is guid-compatible,
-        // it will be converted to lowercase regardless of dashes.
-        return Guid.TryParse(transactionId.Value, out var asGuid)
-            ? asGuid.ToString().Replace("-", string.Empty, StringComparison.InvariantCultureIgnoreCase)
-            : transactionId.Value;
-    }
-
     private static async Task WriteEndAsync(XmlWriter writer)
     {
         await writer.WriteEndElementAsync().ConfigureAwait(false);

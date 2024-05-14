@@ -95,9 +95,10 @@ public class AssertRejectRequestWholesaleSettlementXmlDocument : IAssertRejectRe
         return this;
     }
 
-    public IAssertRejectRequestWholesaleSettlementDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertRejectRequestWholesaleSettlementDocument HasTransactionId(TransactionId expectedTransactionId)
     {
-        _documentAsserter.HasValue("Series[1]/mRID", expectedTransactionId.ToString());
+        ArgumentNullException.ThrowIfNull(expectedTransactionId);
+        _documentAsserter.HasValue("Series[1]/mRID", expectedTransactionId.Value);
         return this;
     }
 
@@ -108,11 +109,12 @@ public class AssertRejectRequestWholesaleSettlementXmlDocument : IAssertRejectRe
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasOriginalTransactionId(
-        string expectedOriginalTransactionId)
+        TransactionId expectedOriginalTransactionId)
     {
+        ArgumentNullException.ThrowIfNull(expectedOriginalTransactionId);
         _documentAsserter.HasValue(
             "Series[1]/originalTransactionIDReference_Series.mRID",
-            expectedOriginalTransactionId);
+            expectedOriginalTransactionId.Value);
         return this;
     }
 

@@ -76,7 +76,7 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
                     DocumentDetails.Prefix,
                     "Identification",
                     null,
-                    TransactionIdToEbixString(timeSeries.TransactionId))
+                    timeSeries.TransactionId.Value)
                 .ConfigureAwait(false);
 
             await WriteCodeWithCodeListReferenceAttributesAsync("Function", "9", writer).ConfigureAwait(false);
@@ -194,7 +194,7 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
 
             await WriteElementIfHasValueAsync(
                     "OriginalBusinessDocument",
-                    timeSeries.OriginalTransactionIdReference is not null ? TransactionIdToEbixString(timeSeries.OriginalTransactionIdReference) : null,
+                    timeSeries.OriginalTransactionIdReference?.Value,
                     writer)
                 .ConfigureAwait(false);
 

@@ -524,7 +524,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
                 "5790001330552",
                 ActorRole.MeteredDataAdministrator,
                 ReasonCode.FullyRejected.Code,
-                "123564789123564789123564789123564787",
+                TransactionId.From("123564789123564789123564789123564787"),
                 "E17",
                 expectedReasonMessage));
     }
@@ -667,7 +667,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
                 "5790001330552",
                 ActorRole.MeteredDataAdministrator,
                 ReasonCode.FullyRejected.Code,
-                "123564789123564789123564789123564787",
+                TransactionId.From("123564789123564789123564789123564787"),
                 "E17",
                 expectedReasonMessage));
     }

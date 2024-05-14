@@ -30,10 +30,9 @@ public class RejectedWholesaleServicesMessageBuilder
     private readonly string _messageId = SampleData.MessageId;
     private readonly BusinessReason _businessReason = SampleData.BusinessReason;
     private readonly Instant _creationDate = SampleData.CreationDate;
-    private readonly TransactionId _transactionId = TransactionId.From(SampleData.TransactionId.ToString());
+    private readonly TransactionId _transactionId = SampleData.TransactionId;
 
-    private readonly TransactionId _originalTransactionIdReference =
-        TransactionId.From(SampleData.OriginalTransactionId);
+    private readonly TransactionId _originalTransactionIdReference = SampleData.OriginalTransactionId;
 
     private readonly IReadOnlyCollection<RejectedWholesaleServicesMessageRejectReason> _rejectReasons =
         new List<RejectedWholesaleServicesMessageRejectReason>
