@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Globalization;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Exceptions;
 
@@ -22,6 +24,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 ///     Represents a transaction id which used in communication between EDI and actors.
 /// </summary>
 [Serializable]
+[JsonConverter(typeof(TransactionIdJsonConverter))]
 public class TransactionId : ValueObject
 {
     [JsonConstructor]
@@ -46,5 +49,27 @@ public class TransactionId : ValueObject
     {
         return new TransactionId(
             Guid.NewGuid().ToString().Replace("-", string.Empty, StringComparison.InvariantCultureIgnoreCase));
+    }
+}
+
+public class TransactionIdJsonConverter : JsonConverter<TransactionId>
+{
+    public override TransactionId Read(
+        ref Utf8JsonReader reader,
+        Type typeToConvert,
+        JsonSerializerOptions options)
+    {
+        return TransactionId.From(reader.GetString()!);
+    }
+
+    public override void Write(
+        Utf8JsonWriter writer,
+        TransactionId value,
+        JsonSerializerOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(writer);
+        ArgumentNullException.ThrowIfNull(value);
+
+        writer.WriteRawValue($"\"{value.Value}\"");
     }
 }
