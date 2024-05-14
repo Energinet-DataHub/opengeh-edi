@@ -15,7 +15,7 @@
 
 syntax = "proto3";
 
-option csharp_namespace = "Energinet.DataHub.EnergySupplying.RequestResponse.Requests";
+option csharp_namespace = "Energinet.DataHub.EnergySupplying.RequestResponse.IntegrationEvents";
 
 message MessagesEnqueued {
   string instance_id = 1; // The ID of the workflow responsible for the calculation.
