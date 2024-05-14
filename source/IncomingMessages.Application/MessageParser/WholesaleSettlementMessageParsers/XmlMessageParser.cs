@@ -45,10 +45,10 @@ public class XmlMessageParser : XmlBaseParser
             .ExtractAsync(reader, root, HeaderElementName, SeriesElementName)
             .ConfigureAwait(false);
 
-        var series = new List<RequestWholesaleServicesSeries>();
-        await foreach (var serie in ParseSeriesAsync(reader, root))
+        var listOfSeries = new List<RequestWholesaleServicesSeries>();
+        await foreach (var series in ParseSeriesAsync(reader, root))
         {
-            series.Add(serie);
+            listOfSeries.Add(series);
         }
 
         return new IncomingMarketMessageParserResult(new RequestWholesaleServicesMessage(
@@ -61,7 +61,7 @@ public class XmlMessageParser : XmlBaseParser
             header.MessageId,
             header.CreatedAt,
             header.BusinessType,
-            series.AsReadOnly()));
+            listOfSeries.AsReadOnly()));
     }
 
     private async IAsyncEnumerable<RequestWholesaleServicesSeries> ParseSeriesAsync(
