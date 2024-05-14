@@ -558,7 +558,10 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
             var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
             {
-                QuantityQuality.Calculated => "A06",
+                // For WholesaleServices then calculated, estimated and measured is written as calculated
+                QuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,
+                QuantityQuality.Estimated => CimCode.QuantityQualityCodeCalculated,
+                QuantityQuality.Measured => CimCode.QuantityQualityCodeCalculated,
                 _ => throw new NotImplementedException(
                     $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
             };

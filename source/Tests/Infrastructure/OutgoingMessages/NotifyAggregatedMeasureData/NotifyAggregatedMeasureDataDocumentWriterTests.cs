@@ -99,8 +99,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
 
         var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.FromName(documentFormat));
 
-        AssertDocument(document, DocumentFormat.FromName(documentFormat))
-            .QuantityIsNotPresentForPosition(1);
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
+            .QuantityIsNotPresentForPosition(1)
+            .DocumentIsValidAsync();
     }
 
     [Theory]
@@ -114,8 +115,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
 
         var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.FromName(documentFormat));
 
-        AssertDocument(document, DocumentFormat.FromName(documentFormat))
-            .QualityIsNotPresentForPosition(1);
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
+            .QualityIsNotPresentForPosition(1)
+            .DocumentIsValidAsync();
     }
 
     [Theory]
@@ -127,7 +129,7 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
             .Cast<CalculatedQuantityQuality>()
             .Order()
             .Where(x => x != CalculatedQuantityQuality.Measured)
-            .Select((quality, index) => new EnergyResultMessagePoint(index, 1, quality, "2022-12-12T23:00:00Z"))
+            .Select((quality, index) => new EnergyResultMessagePoint(index + 1, 1, quality, "2022-12-12T23:00:00Z"))
             .ToList();
 
         points.ForEach(point => _energyResultMessageTimeSeries.WithPoint(point));
@@ -136,12 +138,13 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
 
         // Assert
         points.Should().HaveCount(5);
-        AssertDocument(document, DocumentFormat.FromName(documentFormat))
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .QualityIsPresentForPosition(1, CimCode.QuantityQualityCodeIncomplete)
             .QualityIsPresentForPosition(2, CimCode.QuantityQualityCodeIncomplete)
             .QualityIsPresentForPosition(3, CimCode.QuantityQualityCodeEstimated)
             .QualityIsPresentForPosition(4, CimCode.QuantityQualityCodeCalculated)
-            .QualityIsPresentForPosition(5, CimCode.QuantityQualityCodeNotAvailable);
+            .QualityIsPresentForPosition(5, CimCode.QuantityQualityCodeNotAvailable)
+            .DocumentIsValidAsync();
     }
 
     [Theory]
@@ -158,9 +161,10 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
         var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.FromName(documentFormat));
 
         // Assert
-        AssertDocument(document, DocumentFormat.FromName(documentFormat))
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .QualityIsNotPresentForPosition(1)
-            .QualityIsNotPresentForPosition(2);
+            .QualityIsNotPresentForPosition(2)
+            .DocumentIsValidAsync();
     }
 
     [Theory]
@@ -181,11 +185,12 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
 
         // Assert
         points.Should().HaveCount(4);
-        AssertDocument(document, DocumentFormat.FromName(documentFormat))
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .QualityIsPresentForPosition(1, EbixCode.QuantityQualityCodeEstimated)
             .QualityIsPresentForPosition(2, EbixCode.QuantityQualityCodeEstimated)
             .QualityIsPresentForPosition(3, EbixCode.QuantityQualityCodeMeasured)
-            .QualityIsPresentForPosition(4, EbixCode.QuantityQualityCodeMeasured);
+            .QualityIsPresentForPosition(4, EbixCode.QuantityQualityCodeMeasured)
+            .DocumentIsValidAsync();
     }
 
     [Theory]
@@ -200,8 +205,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
 
         var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.FromName(documentFormat));
 
-        AssertDocument(document, DocumentFormat.FromName(documentFormat))
-            .SettlementMethodIsNotPresent();
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
+            .SettlementMethodIsNotPresent()
+            .DocumentIsValidAsync();
     }
 
     [Theory]
@@ -215,8 +221,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
 
         var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.FromName(documentFormat));
 
-        AssertDocument(document, DocumentFormat.FromName(documentFormat))
-            .EnergySupplierNumberIsNotPresent();
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
+            .EnergySupplierNumberIsNotPresent()
+            .DocumentIsValidAsync();
     }
 
     [Theory]
@@ -230,8 +237,9 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
 
         var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.FromName(documentFormat));
 
-        AssertDocument(document, DocumentFormat.FromName(documentFormat))
-            .BalanceResponsibleNumberIsNotPresent();
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
+            .BalanceResponsibleNumberIsNotPresent()
+            .DocumentIsValidAsync();
     }
 
     [Theory]
@@ -247,9 +255,10 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
 
         var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.FromName(documentFormat));
 
-        AssertDocument(document, DocumentFormat.FromName(documentFormat))
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .HasBusinessReason(BusinessReason.FromName(processType))
-            .SettlementVersionIsNotPresent();
+            .SettlementVersionIsNotPresent()
+            .DocumentIsValidAsync();
     }
 
     [Theory]

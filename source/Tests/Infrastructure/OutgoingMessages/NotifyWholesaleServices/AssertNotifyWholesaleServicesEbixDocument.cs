@@ -334,7 +334,10 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
 
             var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
             {
+                // For WholesaleServices then calculated, estimated and measured is written as calculated
                 QuantityQuality.Calculated => EbixCode.QuantityQualityCodeCalculated,
+                QuantityQuality.Estimated => EbixCode.QuantityQualityCodeCalculated,
+                QuantityQuality.Measured => EbixCode.QuantityQualityCodeCalculated,
                 _ => throw new NotImplementedException(
                     $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
             };

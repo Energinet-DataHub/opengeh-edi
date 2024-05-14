@@ -27,7 +27,7 @@ public class EnergyResultMessageTimeSeriesBuilder
 {
     private readonly List<EnergyResultMessagePoint> _points = new();
     private readonly long _calculationResultVersion = 1;
-    private string _messageId = Guid.NewGuid().ToString();
+    private string _messageId = Guid.NewGuid().ToString("N");
     private Instant _timeStamp = SystemClock.Instance.GetCurrentInstant();
     private BusinessReason _businessReason = BusinessReason.BalanceFixing;
     private string _receiverNumber = "1234567890123";
@@ -164,6 +164,19 @@ public class EnergyResultMessageTimeSeriesBuilder
 
     public EnergyResultMessageTimeSeries BuildTimeSeries()
     {
+        var points = _points;
+        if (_points.Count == 0)
+        {
+            points = new List<EnergyResultMessagePoint>
+            {
+                new(
+                    1,
+                    10,
+                    CalculatedQuantityQuality.Measured,
+                    _period.StartToString()),
+            };
+        }
+
         return new EnergyResultMessageTimeSeries(
             TransactionId.From(_transactionId.Value),
             _gridAreaCode,
@@ -175,7 +188,7 @@ public class EnergyResultMessageTimeSeriesBuilder
             _energySupplierNumber,
             _balanceResponsibleNumber,
             _period,
-            _points,
+            points,
             _calculationResultVersion,
             null,
             _settlementVersion?.Name);

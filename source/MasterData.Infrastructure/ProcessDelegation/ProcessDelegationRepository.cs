@@ -92,17 +92,19 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
 
         // Get result grouped by each grid area code, so we can get the latest delegation for each grid area
         var result = await query
-            .OrderByDescending(pd => pd.SequenceNumber)
             .GroupBy(pd => pd.GridAreaCode)
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
         // Get the current delegation for each grid area
         var latestForGridAreas = result
-            .Select(group => group.First())
-            .Where(d => d.StopsAt > now);
+            .Select(group => group
+                .OrderByDescending(pd => pd.SequenceNumber)
+                .First())
+            .Where(d => d.StopsAt > now)
+            .ToList();
 
-        return latestForGridAreas.ToArray();
+        return latestForGridAreas;
     }
 
     private IQueryable<Domain.ProcessDelegations.ProcessDelegation> GetBaseDelegationQuery(
