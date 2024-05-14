@@ -63,7 +63,6 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
         var incomingDocumentFormats = DocumentFormats
             .GetAllDocumentFormats(except: new[]
             {
-                DocumentFormat.Xml.Name, // TODO: Remove after implementing RequestWholesaleServices for XML
                 DocumentFormat.Ebix.Name, // ebIX is not supported for requests
             })
             .ToArray();
