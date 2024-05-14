@@ -21,9 +21,24 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 [Serializable]
 public class MeteringPointType : DataHubType<MeteringPointType>
 {
+    // Metering point types
     public static readonly MeteringPointType Consumption = new(DataHubNames.MeteringPointType.Consumption, "E17");
     public static readonly MeteringPointType Production = new(DataHubNames.MeteringPointType.Production, "E18");
     public static readonly MeteringPointType Exchange = new(DataHubNames.MeteringPointType.Exchange, "E20");
+
+    // Child metering point types
+    public static readonly MeteringPointType VeProduction = new("VeProduction", "D01");
+    public static readonly MeteringPointType NetProduction = new("NetProduction", "D05");
+    public static readonly MeteringPointType SupplyToGrid = new("SupplyToGrid", "D06");
+    public static readonly MeteringPointType ConsumptionFromGrid = new("ConsumptionFromGrid", "D07");
+    public static readonly MeteringPointType WholesaleServicesInformation = new("WholesaleServicesInformation", "D08");
+    public static readonly MeteringPointType OwnProduction = new("OwnProduction", "D09");
+    public static readonly MeteringPointType NetFromGrid = new("NetFromGrid", "D10");
+    public static readonly MeteringPointType NetToGrid = new("NetToGrid", "D11");
+    public static readonly MeteringPointType TotalConsumption = new("TotalConsumption", "D12");
+    public static readonly MeteringPointType ElectricalHeating = new("ElectricalHeating", "D14");
+    public static readonly MeteringPointType NetConsumption = new("NetConsumption", "D15");
+    public static readonly MeteringPointType EffectSettlement = new("EffectSettlement", "D19");
 
     [JsonConstructor]
     private MeteringPointType(string name, string code)

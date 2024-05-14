@@ -13,8 +13,11 @@
 // limitations under the License.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
@@ -45,6 +48,16 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         _documentValidation = documentValidation;
         _parser = new MessageRecordParser(new Serializer());
         _wholesaleServicesSeriesBuilder = new WholesaleServicesSeriesBuilder();
+    }
+
+    public static IEnumerable<object[]> AllDocumentFormatsWithMeteringPointTypes()
+    {
+        var documentFormats = EnumerationType.GetAll<DocumentFormat>();
+        var meteringPointTypes = EnumerationType.GetAll<MeteringPointType>();
+
+        return documentFormats
+            .SelectMany(df => meteringPointTypes
+                    .Select(mpt => new object[] { df, mpt }));
     }
 
     [Theory]
@@ -131,8 +144,9 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
 
         // Assert
         using var assertionScope = new AssertionScope();
-        AssertDocument(document, DocumentFormat.FromName(documentFormat))
-            .HasSumQuantityForPosition(1, 0);
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
+            .HasSumQuantityForPosition(1, 0)
+            .DocumentIsValidAsync();
     }
 
     [Theory]
@@ -153,8 +167,9 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
 
         // Assert
         using var assertionScope = new AssertionScope();
-        AssertDocument(document, DocumentFormat.FromName(documentFormat))
-            .HasSettlementVersion(SettlementVersion.FirstCorrection);
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
+            .HasSettlementVersion(SettlementVersion.FirstCorrection)
+            .DocumentIsValidAsync();
     }
 
     [Theory]
@@ -174,8 +189,9 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             DocumentFormat.FromName(documentFormat));
 
         // Assert
-        AssertDocument(document, DocumentFormat.FromName(documentFormat))
-            .HasQuantityMeasurementUnit(MeasurementUnit.Pieces);
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
+            .HasQuantityMeasurementUnit(MeasurementUnit.Pieces)
+            .DocumentIsValidAsync();
     }
 
     [Theory]
@@ -205,12 +221,13 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             DocumentFormat.FromName(documentFormat));
 
         // Assert
-        AssertDocument(document, DocumentFormat.FromName(documentFormat))
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .HasSettlementMethod(SettlementMethod.Flex)
             .HasMeteringPointType(MeteringPointType.Consumption)
             .HasResolution(Resolution.Hourly)
             .HasPriceForPosition(1, firstPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))
-            .HasPriceForPosition(2, secondPoint.Price?.ToString(NumberFormatInfo.InvariantInfo));
+            .HasPriceForPosition(2, secondPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))
+            .DocumentIsValidAsync();
     }
 
     [Theory]
@@ -240,12 +257,13 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             DocumentFormat.FromName(documentFormat));
 
         // Assert
-        AssertDocument(document, DocumentFormat.FromName(documentFormat))
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .SettlementMethodDoesNotExist()
             .HasMeteringPointType(MeteringPointType.Production)
             .HasResolution(Resolution.Hourly)
             .HasPriceForPosition(1, firstPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))
-            .HasPriceForPosition(2, secondPoint.Price?.ToString(NumberFormatInfo.InvariantInfo));
+            .HasPriceForPosition(2, secondPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))
+            .DocumentIsValidAsync();
     }
 
     [Theory]
@@ -275,12 +293,13 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             DocumentFormat.FromName(documentFormat));
 
         // Assert
-        AssertDocument(document, DocumentFormat.FromName(documentFormat))
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .HasSettlementMethod(SettlementMethod.NonProfiled)
             .HasMeteringPointType(MeteringPointType.Consumption)
             .HasResolution(Resolution.Hourly)
             .HasPriceForPosition(1, firstPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))
-            .HasPriceForPosition(2, secondPoint.Price?.ToString(NumberFormatInfo.InvariantInfo));
+            .HasPriceForPosition(2, secondPoint.Price?.ToString(NumberFormatInfo.InvariantInfo))
+            .DocumentIsValidAsync();
     }
 
     [Theory]
@@ -300,8 +319,9 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             DocumentFormat.FromName(documentFormat));
 
         // Assert
-        AssertDocument(document, DocumentFormat.FromName(documentFormat))
-            .HasResolution(Resolution.Hourly);
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
+            .HasResolution(Resolution.Hourly)
+            .DocumentIsValidAsync();
     }
 
     [Theory]
@@ -321,8 +341,29 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             DocumentFormat.FromName(documentFormat));
 
         // Assert
-        AssertDocument(document, DocumentFormat.FromName(documentFormat))
-            .HasResolution(Resolution.Daily);
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
+            .HasResolution(Resolution.Daily)
+            .DocumentIsValidAsync();
+    }
+
+    [Theory]
+    [MemberData(nameof(AllDocumentFormatsWithMeteringPointTypes))]
+    public async Task Can_create_notifyWholesaleServices_document_with_all_metering_point_types(DocumentFormat documentFormat, MeteringPointType meteringPointType)
+    {
+        // Arrange
+        var messageBuilder = _wholesaleServicesSeriesBuilder
+            .WithMeteringPointType(meteringPointType);
+
+        // Act
+        var document = await WriteDocument(
+            messageBuilder.BuildHeader(),
+            messageBuilder.BuildWholesaleCalculation(),
+            documentFormat);
+
+        // Assert
+        await AssertDocument(document, documentFormat)
+            .HasMeteringPointType(meteringPointType)
+            .DocumentIsValidAsync();
     }
 
     private Task<MarketDocumentStream> WriteDocument(OutgoingMessageHeader header, WholesaleServicesSeries wholesaleServicesSeries, DocumentFormat documentFormat)
@@ -333,11 +374,13 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         {
             return new NotifyWholesaleServicesCimXmlDocumentWriter(_parser).WriteAsync(header, new[] { records });
         }
-        else if (documentFormat == DocumentFormat.Ebix)
+
+        if (documentFormat == DocumentFormat.Ebix)
         {
             return new NotifyWholesaleServicesEbixDocumentWriter(_parser).WriteAsync(header, new[] { records });
         }
-        else if (documentFormat == DocumentFormat.Json)
+
+        if (documentFormat == DocumentFormat.Json)
         {
             return new NotifyWholesaleServicesCimJsonDocumentWriter(_parser).WriteAsync(
                 header,

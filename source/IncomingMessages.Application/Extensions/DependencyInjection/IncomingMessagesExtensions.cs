@@ -33,6 +33,7 @@ using AggregatedMeasureDataB2CJsonMessageParser = Energinet.DataHub.EDI.Incoming
 using AggregatedMeasureDataJsonMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers.JsonMessageParser;
 using AggregatedMeasureDataXmlMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers.XmlMessageParser;
 using WholesaleSettlementJsonMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.WholesaleSettlementMessageParsers.JsonMessageParser;
+using WholesaleSettlementXmlMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.WholesaleSettlementMessageParsers.XmlMessageParser;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 
@@ -64,6 +65,7 @@ public static class IncomingMessagesExtensions
             .AddScoped<IMessageParser, AggregatedMeasureDataJsonMessageParser>()
             .AddScoped<IMessageParser, AggregatedMeasureDataB2CJsonMessageParser>()
             .AddScoped<IMessageParser, WholesaleSettlementJsonMessageParser>()
+            .AddScoped<IMessageParser, WholesaleSettlementXmlMessageParser>()
             .AddScoped<MarketMessageParser>()
             .AddScoped<ISenderAuthorizer, SenderAuthorizer>()
             .AddScoped<IncomingMessagePublisher>()
