@@ -19,5 +19,5 @@ option csharp_namespace = "Energinet.DataHub.EnergySupplying.RequestResponse.Int
 
 message MessagesEnqueued {
   string instance_id = 1; // The ID of the workflow responsible for the calculation.
-  string calculation_id = 2; // The message were enqueued for this calculation.
+  string calculation_id = 2; // The messages were enqueued for this calculation.
 }
