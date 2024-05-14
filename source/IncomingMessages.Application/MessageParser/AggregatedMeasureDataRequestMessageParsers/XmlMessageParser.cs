@@ -74,7 +74,7 @@ public class XmlMessageParser : XmlBaseParser
         {
             if (reader.Is(SeriesRecordElementName, ns, XmlNodeType.EndElement))
             {
-                var serie = new RequestAggregatedMeasureDataMessageSeries(
+                var series = new RequestAggregatedMeasureDataMessageSeries(
                     id,
                     marketEvaluationPointType,
                     marketEvaluationSettlementMethod,
@@ -94,7 +94,7 @@ public class XmlMessageParser : XmlBaseParser
                 energySupplierMarketParticipantId = null;
                 balanceResponsiblePartyMarketParticipantId = null;
 
-                yield return serie;
+                yield return series;
             }
 
             if (reader.NodeType == XmlNodeType.Element && reader.SchemaInfo?.Validity == XmlSchemaValidity.Invalid)
