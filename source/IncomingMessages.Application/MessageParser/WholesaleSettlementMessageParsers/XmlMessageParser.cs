@@ -159,7 +159,10 @@ public class XmlMessageParser : XmlBaseParser, IMessageParser
                     settlementVersion,
                     resolution,
                     chargeTypeOwnerId,
-                    chargeTypes);
+                    // clones the list
+                    chargeTypes.Select(a => a).ToList());
+
+                chargeTypes.Clear();
                 yield return series;
             }
 

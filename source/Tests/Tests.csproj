@@ -92,6 +92,9 @@ limitations under the License.
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\WholesaleSettlement\RequestWholesaleSettlement2ChargeTypes.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\WholesaleSettlement\RequestWholesaleSettlementTwoSeries.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
       <None Include="CimMessageAdapter\Messages\json\AggregatedMeasure\InvalidJsonAggregatedMeasureData.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>

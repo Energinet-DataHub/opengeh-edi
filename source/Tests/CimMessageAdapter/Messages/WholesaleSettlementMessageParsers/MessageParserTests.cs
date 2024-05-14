@@ -74,6 +74,7 @@ public class MessageParserTests
             new object[] { DocumentFormat.Json, CreateBaseJsonMessages("RequestWholesaleSettlement.json") },
             new object[] { DocumentFormat.Json, CreateBaseJsonMessages("RequestWholesaleSettlement.json", 1) },
             new object[] { DocumentFormat.Xml, CreateBaseXmlMessage("RequestWholesaleSettlement.xml") },
+            new object[] { DocumentFormat.Xml, CreateBaseXmlMessage("RequestWholesaleSettlementTwoSeries.xml") },
         };
     }
 
@@ -115,12 +116,9 @@ public class MessageParserTests
             Assert.Equal("244", serie.GridArea);
             Assert.Equal("D01", serie.SettlementVersion);
             Assert.Equal("2022-08-17T22:00:00Z", serie.StartDateTime);
-            foreach (var chargeType in serie.ChargeTypes)
-            {
-                Assert.True(chargeType != null);
-                Assert.Equal("EA-001", chargeType.Id);
-                Assert.Equal("D03", chargeType.Type);
-            }
+            Assert.Single(serie.ChargeTypes);
+            Assert.Equal("EA-001", serie.ChargeTypes.First().Id);
+            Assert.Equal("D03", serie.ChargeTypes.First().Type);
         }
     }
 
