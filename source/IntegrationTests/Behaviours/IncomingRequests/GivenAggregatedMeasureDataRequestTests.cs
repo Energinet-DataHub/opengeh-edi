@@ -82,7 +82,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
 
     [Theory]
     [MemberData(nameof(DocumentFormatsWithAllActorRoleCombinations))]
-    public async Task AndGiven_DataInOneGridArea_When_ActorPeeksAllMessages_Then_ReceivesOneNotifyAggregatedMeasureDataDocumentWithCorrectContent(BuildingBlocks.Domain.Models.ActorRole actorRole, DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat)
+    public async Task AndGiven_DataInOneGridArea_When_ActorPeeksAllMessages_Then_ReceivesOneNotifyAggregatedMeasureDataDocumentWithCorrectContent(ActorRole actorRole, DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat)
     {
         /*
          *  --- PART 1: Receive request, create process and send message to Wholesale ---
@@ -123,7 +123,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
         var message = await ThenAggregatedTimeSeriesRequestServiceBusMessageIsCorrect(
             senderSpy: senderSpy,
             new AggregatedTimeSeriesMessageAssertionInput(
-                GridAreas: new List<string>() { "512" },
+                GridAreas: new List<string> { "512" },
                 RequestedForActorNumber: currentActor.ActorNumber.Value,
                 RequestedForActorRole: currentActor.ActorRole.Name,
                 EnergySupplier: energySupplierNumber.Value,
@@ -491,7 +491,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
             new List<AggregatedTimeSeriesMessageAssertionInput>
             {
                 new(
-                    GridAreas: new List<string>() { "143" },
+                    GridAreas: new List<string> { "143" },
                     RequestedForActorNumber: currentActor.ActorNumber.Value,
                     RequestedForActorRole: currentActor.ActorRole.Name,
                     EnergySupplier: energySupplierNumber.Value,
@@ -502,7 +502,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
                     SettlementMethod: SettlementMethod.Flex,
                     MeteringPointType: MeteringPointType.Consumption),
                 new(
-                    GridAreas: new List<string>() { "512" },
+                    GridAreas: new List<string> { "512" },
                     RequestedForActorNumber: currentActor.ActorNumber.Value,
                     RequestedForActorRole: currentActor.ActorRole.Name,
                     EnergySupplier: energySupplierNumber.Value,
@@ -513,7 +513,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
                     SettlementMethod: SettlementMethod.Flex,
                     MeteringPointType: MeteringPointType.Consumption),
                 new(
-                    GridAreas: new List<string>() { "877" },
+                    GridAreas: new List<string> { "877" },
                     RequestedForActorNumber: currentActor.ActorNumber.Value,
                     RequestedForActorRole: currentActor.ActorRole.Name,
                     EnergySupplier: energySupplierNumber.Value,
