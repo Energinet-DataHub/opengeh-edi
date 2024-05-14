@@ -13,12 +13,12 @@
 	<cim:Series>
 		<cim:mRID>{TransactionId}</cim:mRID>
 		<cim:settlement_Series.version>D01</cim:settlement_Series.version>
-		<cim:start_DateAndOrTime.dateTime>2022-08-1T22:00:00Z</cim:start_DateAndOrTime.dateTime>
-		<cim:end_DateAndOrTime.dateTime>2022-08-31T22:00:00Z</cim:end_DateAndOrTime.dateTime>
+		<cim:start_DateAndOrTime.dateTime>2022-08-01T22:00:00Z</cim:start_DateAndOrTime.dateTime>
+		<cim:end_DateAndOrTime.dateTime>2022-08-30T22:00:00Z</cim:end_DateAndOrTime.dateTime>
 		<cim:meteringGridArea_Domain.mRID codingScheme="NDK">244</cim:meteringGridArea_Domain.mRID>
 		<cim:energySupplier_MarketParticipant.mRID codingScheme="A10">5799999933318</cim:energySupplier_MarketParticipant.mRID>
 		<cim:chargeTypeOwner_MarketParticipant.mRID codingScheme="A10">570001110111</cim:chargeTypeOwner_MarketParticipant.mRID> 
-		<cim:aggregationSeries_Period.resolution>PT1M</cim:aggregationSeries_Period.resolution> <!-- kun i forbindelse med BRS-030 -->
+		<cim:aggregationSeries_Period.resolution>P1M</cim:aggregationSeries_Period.resolution> <!-- kun i forbindelse med BRS-030 -->
 		<cim:ChargeType>
 			<cim:type>D03</cim:type>
 			<cim:mRID>EA-001</cim:mRID>

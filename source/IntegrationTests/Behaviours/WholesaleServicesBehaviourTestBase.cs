@@ -35,7 +35,6 @@ using FluentAssertions.Execution;
 using Google.Protobuf;
 using Xunit.Abstractions;
 using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
-using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 
