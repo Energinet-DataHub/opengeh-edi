@@ -75,7 +75,6 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
         var requestDocumentFormats = DocumentFormats
             .GetAllDocumentFormats(except: new[]
             {
-                DocumentFormat.Xml.Name, // TODO: The CIM XML request feature isn't implemented yet
                 DocumentFormat.Ebix.Name, // ebIX is not supported for requests
             })
             .ToArray();
@@ -980,17 +979,13 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
                 Points: wholesaleServicesRequestAcceptedMessage.Series.Single().TimeSeriesPoints));
     }
 
-    // TODO: Remove skip when Wholesale synchronous validation is implemented
-    // TODO: Add "Xml" tests when CIM XML is supported for Wholesale requests
-    [Theory(Skip = "Skipped until Wholesale synchronous validation is implemented")]
-    // [InlineData("Xml", DataHubNames.ActorRole.GridOperator, DataHubNames.ActorRole.Delegated)]
+    [Theory]
+    [InlineData("Xml", DataHubNames.ActorRole.GridOperator, DataHubNames.ActorRole.Delegated)]
     [InlineData("Json", DataHubNames.ActorRole.GridOperator, DataHubNames.ActorRole.Delegated)]
-    // [InlineData("Xml", DataHubNames.ActorRole.EnergySupplier, DataHubNames.ActorRole.Delegated)]
+    [InlineData("Xml", DataHubNames.ActorRole.EnergySupplier, DataHubNames.ActorRole.Delegated)]
     [InlineData("Json", DataHubNames.ActorRole.EnergySupplier, DataHubNames.ActorRole.Delegated)]
-    // [InlineData("Xml", DataHubNames.ActorRole.SystemOperator, DataHubNames.ActorRole.Delegated)]
+    [InlineData("Xml", DataHubNames.ActorRole.SystemOperator, DataHubNames.ActorRole.Delegated)]
     [InlineData("Json", DataHubNames.ActorRole.SystemOperator, DataHubNames.ActorRole.Delegated)]
-    // [InlineData("Xml", DataHubNames.ActorRole.GridOperator, DataHubNames.ActorRole.GridOperator)]
-    [InlineData("Json", DataHubNames.ActorRole.GridOperator, DataHubNames.ActorRole.GridOperator)]
     public async Task AndGiven_RequestDoesNotContainOriginalActorNumber_When_DelegatedActorPeeksAllMessages_Then_DelegationIsUnsuccessfulSoRequestIsRejectedWithCorrectInvalidRoleError(string incomingDocumentFormatName, string originalActorRoleName, string delegatedToRoleName)
     {
         var incomingDocumentFormat = DocumentFormat.FromName(incomingDocumentFormatName);
