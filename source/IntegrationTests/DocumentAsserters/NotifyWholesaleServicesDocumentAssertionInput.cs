@@ -40,7 +40,7 @@ public record NotifyWholesaleServicesDocumentAssertionInput(
     string ProductCode,
     MeasurementUnit QuantityMeasurementUnit,
     long CalculationVersion,
-    Resolution? Resolution,
+    Resolution Resolution,
     Period Period,
     IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> Points);
 

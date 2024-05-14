@@ -48,18 +48,19 @@ public class GivenTotalMonthlyAmountResultProducedV1ProcessorTests : WholesaleSe
         // Arrange
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
 
+        var chargeOwnerId = "5790002241111";
         var totalMonthlyAmountResultProducedEvent = GivenTotalMonthlyAmountResultProducedV1Event(
             TotalMonthlyAmountResultProducedV1.Types.CalculationType.WholesaleFixing,
-            CreateDateInstant(2023, 12, 31),
-            CreateDateInstant(2024, 01, 31),
-            "740",
-            "5790002243172",
-            "5790002241111");
+            periodStart: CreateDateInstant(2023, 12, 31),
+            periodEnd: CreateDateInstant(2024, 01, 31),
+            gridAreaCode: "740",
+            energySupplierId: "5790002243172",
+            chargeOwnerId: chargeOwnerId);
 
         await GivenIntegrationEventReceived(totalMonthlyAmountResultProducedEvent);
 
         // Act
-        var peekResultForChargeOwner = await WhenActorPeeksMessage(ActorNumber.Create("5790002241111"), ActorRole.GridOperator, documentFormat);
+        var peekResultAsChargeOwner = await WhenActorPeeksMessage(ActorNumber.Create(chargeOwnerId), ActorRole.GridOperator, documentFormat);
 
         // Assert
         var expectedDocumentToChargeOwner = new NotifyWholesaleServicesDocumentAssertionInput(
@@ -96,7 +97,7 @@ public class GivenTotalMonthlyAmountResultProducedV1ProcessorTests : WholesaleSe
             });
 
         await ThenNotifyWholesaleServicesDocumentIsCorrect(
-            peekResultForChargeOwner.Bundle,
+            peekResultAsChargeOwner.Bundle,
             documentFormat,
             expectedDocumentToChargeOwner);
     }
@@ -109,18 +110,19 @@ public class GivenTotalMonthlyAmountResultProducedV1ProcessorTests : WholesaleSe
         // Arrange
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
 
+        var energySupplierId = "5790002243172";
         var totalMonthlyAmountResultProducedEvent = GivenTotalMonthlyAmountResultProducedV1Event(
             TotalMonthlyAmountResultProducedV1.Types.CalculationType.WholesaleFixing,
-            CreateDateInstant(2023, 12, 31),
-            CreateDateInstant(2024, 01, 31),
-            "740",
-            "5790002243172",
-            null);
+            periodStart: CreateDateInstant(2023, 12, 31),
+            periodEnd: CreateDateInstant(2024, 01, 31),
+            gridAreaCode: "740",
+            energySupplierId: energySupplierId,
+            chargeOwnerId: null);
 
         await GivenIntegrationEventReceived(totalMonthlyAmountResultProducedEvent);
 
         // Act
-        var peekResultForEnergySupplier = await WhenActorPeeksMessage(ActorNumber.Create("5790002243172"), ActorRole.EnergySupplier, documentFormat);
+        var peekResultForEnergySupplier = await WhenActorPeeksMessage(ActorNumber.Create(energySupplierId), ActorRole.EnergySupplier, documentFormat);
 
         // Assert
         var expectedDocumentToEnergySupplier = new NotifyWholesaleServicesDocumentAssertionInput(
