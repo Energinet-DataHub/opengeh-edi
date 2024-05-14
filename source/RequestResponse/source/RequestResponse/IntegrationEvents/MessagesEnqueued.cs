@@ -15,8 +15,8 @@
 // ReSharper disable once CheckNamespace -- Protobuf is in with another namespace
 namespace Energinet.DataHub.EnergySupplying.RequestResponse.IntegrationEvents;
 
-public partial class MessagesEnqueued
+public partial class MessagesEnqueuedV1
 {
-    public const string EventName = "MessagesEnqueued";
+    public const string EventName = "MessagesEnqueuedV1";
     public const int CurrentMinorVersion = 1;
 }
