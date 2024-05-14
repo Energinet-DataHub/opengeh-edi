@@ -126,7 +126,7 @@ public class MessageParserTests
 
     [Theory]
     [MemberData(nameof(CreateMessagesWithTwoChargeTypes))]
-    public async Task Given_MessageWithMultipleChargeTypes_When_Parsing_Then_SuccesfullyParses(
+    public async Task Given_MessageWithtwoChargeTypes_When_Parsing_Then_SuccessfullyParses(
         DocumentFormat format,
         Stream message)
     {

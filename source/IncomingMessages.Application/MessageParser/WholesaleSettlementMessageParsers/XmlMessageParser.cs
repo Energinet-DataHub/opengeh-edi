@@ -141,6 +141,7 @@ public class XmlMessageParser : XmlBaseParser, IMessageParser
         string? resolution = null;
         string? chargeType = null;
         string? chargeId = null;
+        List<RequestWholesaleServicesChargeType> chargeTypes = new();
         var ns = rootElement.DefaultNamespace;
 
         await reader.AdvanceToAsync(SeriesElementName, ns).ConfigureAwait(false);
@@ -149,13 +150,6 @@ public class XmlMessageParser : XmlBaseParser, IMessageParser
         {
             if (reader.Is(SeriesElementName, ns, XmlNodeType.EndElement))
             {
-                var chargeTypes = new List<RequestWholesaleServicesChargeType>();
-                if (chargeType is not null && chargeId is not null)
-                {
-                    var chargeTypeOwner = new RequestWholesaleServicesChargeType(chargeId, chargeType);
-                    chargeTypes.Add(chargeTypeOwner);
-                }
-
                 var series = new RequestWholesaleServicesSeries(
                     id,
                     startDateAndOrTimeDateTime,
@@ -204,8 +198,6 @@ public class XmlMessageParser : XmlBaseParser, IMessageParser
             {
                 resolution = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
             }
-
-            // This should not work
             else if (reader.Depth == 3 && reader.Is("type", ns))
             {
                 chargeType = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
@@ -213,6 +205,21 @@ public class XmlMessageParser : XmlBaseParser, IMessageParser
             else if (reader.Depth == 3 && reader.Is("mRID", ns))
             {
                 chargeId = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+            }
+
+            // We're at the end of a charge type element
+            else if (reader.Is("ChargeType", ns, XmlNodeType.EndElement))
+            {
+                // chargeId and chargeType are read, since these lives inside the ChargeType element
+                var chargeTypeOwner = new RequestWholesaleServicesChargeType(chargeId, chargeType);
+                chargeTypes.Add(chargeTypeOwner);
+
+                // Reset the current values, since we're done with this chargeType element
+                chargeType = null;
+                chargeId = null;
+
+                // Move to next element
+                await reader.ReadAsync().ConfigureAwait(false);
             }
             else
             {
