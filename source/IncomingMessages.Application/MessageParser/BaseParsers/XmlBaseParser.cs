@@ -14,16 +14,88 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.BaseParsers;
 
-public abstract class XmlBaseParser
+public abstract class XmlBaseParser : IMessageParser
 {
-    protected Collection<ValidationError> Errors { get; } = new();
+    private readonly CimXmlSchemaProvider _schemaProvider;
+
+    protected XmlBaseParser(CimXmlSchemaProvider schemaProvider)
+    {
+        _schemaProvider = schemaProvider;
+    }
+
+    public DocumentFormat HandledFormat => DocumentFormat.Xml;
+
+    public abstract IncomingDocumentType DocumentType { get; }
+
+    private Collection<ValidationError> Errors { get; } = new();
+
+    public async Task<IncomingMarketMessageParserResult> ParseAsync(IIncomingMessageStream incomingMessageStream, CancellationToken cancellationToken)
+    {
+        string version;
+        string businessProcessType;
+        try
+        {
+            version = GetVersion(incomingMessageStream);
+            businessProcessType = GetBusinessReason(incomingMessageStream);
+        }
+        catch (XmlException exception)
+        {
+            return InvalidXmlFailure(exception);
+        }
+        catch (ObjectDisposedException generalException)
+        {
+            return InvalidXmlFailure(generalException);
+        }
+        catch (IndexOutOfRangeException indexOutOfRangeException)
+        {
+            return InvalidXmlFailure(indexOutOfRangeException);
+        }
+
+        var xmlSchema = await _schemaProvider.GetSchemaAsync<XmlSchema>(businessProcessType, version, cancellationToken)
+            .ConfigureAwait(true);
+        if (xmlSchema is null)
+        {
+            return new IncomingMarketMessageParserResult(
+                new InvalidBusinessReasonOrVersion(businessProcessType, version));
+        }
+
+        using var reader = XmlReader.Create(incomingMessageStream.Stream, CreateXmlReaderSettings(xmlSchema));
+        if (Errors.Count > 0)
+        {
+            return new IncomingMarketMessageParserResult(Errors.ToArray());
+        }
+
+        try
+        {
+            var parsedXmlData = await ParseXmlDataAsync(reader).ConfigureAwait(false);
+
+            if (Errors.Count != 0)
+            {
+                return new IncomingMarketMessageParserResult(Errors.ToArray());
+            }
+
+            return parsedXmlData;
+        }
+        catch (XmlException exception)
+        {
+            return InvalidXmlFailure(exception);
+        }
+        catch (ObjectDisposedException generalException)
+        {
+            return InvalidXmlFailure(generalException);
+        }
+    }
 
     protected static string GetVersion(IIncomingMessageStream message)
     {
@@ -62,6 +134,9 @@ public abstract class XmlBaseParser
         settings.ValidationEventHandler += OnValidationError;
         return settings;
     }
+
+    protected abstract Task<IncomingMarketMessageParserResult> ParseXmlDataAsync(
+        XmlReader reader);
 
     private static string[] SplitNamespace(IIncomingMessageStream message)
     {

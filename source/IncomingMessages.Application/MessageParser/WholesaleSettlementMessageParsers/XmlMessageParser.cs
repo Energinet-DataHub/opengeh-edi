@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
@@ -24,83 +22,22 @@ using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.Xml;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.BaseParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.WholesaleSettlementMessageParsers;
 
-public class XmlMessageParser : XmlBaseParser, IMessageParser
+public class XmlMessageParser : XmlBaseParser
 {
     private const string SeriesElementName = "Series";
     private const string HeaderElementName = "RequestWholesaleSettlement_MarketDocument";
-    private readonly CimXmlSchemaProvider _schemaProvider;
 
     public XmlMessageParser(CimXmlSchemaProvider schemaProvider)
+        : base(schemaProvider)
     {
-        _schemaProvider = schemaProvider;
     }
 
-    public DocumentFormat HandledFormat => DocumentFormat.Xml;
+    public override IncomingDocumentType DocumentType => IncomingDocumentType.RequestWholesaleSettlement;
 
-    public IncomingDocumentType DocumentType => IncomingDocumentType.RequestWholesaleSettlement;
-
-    public async Task<IncomingMarketMessageParserResult> ParseAsync(IIncomingMessageStream incomingMessageStream, CancellationToken cancellationToken)
-    {
-        string version;
-        string businessProcessType;
-        try
-        {
-            version = GetVersion(incomingMessageStream);
-            businessProcessType = GetBusinessReason(incomingMessageStream);
-        }
-        catch (XmlException exception)
-        {
-            return InvalidXmlFailure(exception);
-        }
-        catch (ObjectDisposedException generalException)
-        {
-            return InvalidXmlFailure(generalException);
-        }
-        catch (IndexOutOfRangeException indexOutOfRangeException)
-        {
-            return InvalidXmlFailure(indexOutOfRangeException);
-        }
-
-        var xmlSchema = await _schemaProvider.GetSchemaAsync<XmlSchema>(businessProcessType, version, cancellationToken)
-            .ConfigureAwait(true);
-        if (xmlSchema is null)
-        {
-            return new IncomingMarketMessageParserResult(
-                new InvalidBusinessReasonOrVersion(businessProcessType, version));
-        }
-
-        using var reader = XmlReader.Create(incomingMessageStream.Stream, CreateXmlReaderSettings(xmlSchema));
-        if (Errors.Count > 0)
-        {
-            return new IncomingMarketMessageParserResult(Errors.ToArray());
-        }
-
-        try
-        {
-            var parsedXmlData = await ParseXmlDataAsync(reader).ConfigureAwait(false);
-
-            if (Errors.Count != 0)
-            {
-                return new IncomingMarketMessageParserResult(Errors.ToArray());
-            }
-
-            return parsedXmlData;
-        }
-        catch (XmlException exception)
-        {
-            return InvalidXmlFailure(exception);
-        }
-        catch (ObjectDisposedException generalException)
-        {
-            return InvalidXmlFailure(generalException);
-        }
-    }
-
-    private async Task<IncomingMarketMessageParserResult> ParseXmlDataAsync(
+    protected override async Task<IncomingMarketMessageParserResult> ParseXmlDataAsync(
         XmlReader reader)
     {
         var root = await reader.ReadRootElementAsync().ConfigureAwait(false);
@@ -162,6 +99,16 @@ public class XmlMessageParser : XmlBaseParser, IMessageParser
                     // clones the list
                     chargeTypes.Select(a => a).ToList());
 
+                id = string.Empty;
+                startDateAndOrTimeDateTime = string.Empty;
+                endDateAndOrTimeDateTime = null;
+                gridArea = null;
+                energySupplierId = null;
+                chargeTypeOwnerId = null;
+                settlementVersion = null;
+                resolution = null;
+                chargeType = null;
+                chargeId = null;
                 chargeTypes.Clear();
                 yield return series;
             }
