@@ -66,7 +66,7 @@ public static class WholesaleServicesTotalSumMessageFactory
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
             SettlementVersion: SettlementVersionMapper.Map(message.CalculationType),
-            PriceMeasureUnit: MeasurementUnit.Kwh,
+            QuantityMeasureUnit: MeasurementUnit.Kwh,
             Currency: CurrencyMapper.Map(message.Currency),
             Resolution: Resolution.Monthly,
             Amount: DecimalParser.Parse(message.Amount));

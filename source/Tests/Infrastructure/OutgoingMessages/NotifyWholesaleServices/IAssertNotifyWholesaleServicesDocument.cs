@@ -190,13 +190,13 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// Asserts the quantity measure unit of the first series element
     /// </summary>
     /// <param name="expectedMeasurementUnit"></param>
-    IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit? expectedMeasurementUnit);
+    IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit expectedMeasurementUnit);
 
     /// <summary>
     /// Asserts the price measure unit of the first series element
     /// </summary>
     /// <param name="expectedPriceMeasurementUnit"></param>
-    IAssertNotifyWholesaleServicesDocument HasPriceMeasurementUnit(MeasurementUnit expectedPriceMeasurementUnit);
+    IAssertNotifyWholesaleServicesDocument HasPriceMeasurementUnit(MeasurementUnit? expectedPriceMeasurementUnit);
 
     /// <summary>
     /// Asserts the currency of the first series element

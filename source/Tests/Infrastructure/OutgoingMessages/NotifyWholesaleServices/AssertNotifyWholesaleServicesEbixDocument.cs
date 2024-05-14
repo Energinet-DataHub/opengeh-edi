@@ -238,24 +238,17 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit? expectedMeasurementUnit)
+    public IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit expectedMeasurementUnit)
     {
-        if (expectedMeasurementUnit is not null)
-        {
-            _documentAsserter.HasValueWithAttributes(
-            $"{PayloadEnergyTimeSeries}[1]/IncludedProductCharacteristic/UnitType",
-            EbixCode.Of(expectedMeasurementUnit),
-            CreateRequiredListAttributes(CodeListType.Ebix));
-        }
-        else
-        {
-            _documentAsserter.IsNotPresent($"{PayloadEnergyTimeSeries}[1]/IncludedProductCharacteristic/UnitType");
-        }
+        _documentAsserter.HasValueWithAttributes(
+        $"{PayloadEnergyTimeSeries}[1]/IncludedProductCharacteristic/UnitType",
+        EbixCode.Of(expectedMeasurementUnit),
+        CreateRequiredListAttributes(CodeListType.Ebix));
 
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasPriceMeasurementUnit(MeasurementUnit expectedPriceMeasurementUnit)
+    public IAssertNotifyWholesaleServicesDocument HasPriceMeasurementUnit(MeasurementUnit? expectedPriceMeasurementUnit)
     {
         // Is not used in ebIX document
         return this;
@@ -360,12 +353,19 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
                 .Should()
                 .Be(expectedPoints[i].Amount.ToDecimal());
 
-            pointsInDocument[i]
+            if (expectedPoints[i].Quantity is not null)
+            {
+                pointsInDocument[i]
                 .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("EnergyQuantity"), _documentAsserter.XmlNamespaceManager)!
                 .Value
                 .ToDecimal()
                 .Should()
                 .Be(expectedPoints[i].Quantity.ToDecimal());
+            }
+            else
+            {
+                _documentAsserter.IsNotPresent($"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[{i}]/EnergyQuantity");
+            }
 
             pointsInDocument[i]
                 .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("Position"), _documentAsserter.XmlNamespaceManager)!
@@ -374,25 +374,41 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
                 .Should()
                 .Be(i + 1);
 
-            pointsInDocument[i]
-                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("EnergyPrice"), _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .ToDecimal()
-                .Should()
-                .Be(expectedPoints[i].Price.ToDecimal());
-
-            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+            if (expectedPoints[i].Price is not null)
             {
-                QuantityQuality.Calculated => EbixCode.QuantityQualityCodeCalculated,
-                _ => throw new NotImplementedException(
-                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
-            };
+                pointsInDocument[i]
+                    .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("EnergyPrice"), _documentAsserter.XmlNamespaceManager)!
+                    .Value
+                    .ToDecimal()
+                    .Should()
+                    .Be(expectedPoints[i].Price.ToDecimal());
+            }
+            else
+            {
+                _documentAsserter.IsNotPresent(
+                    $"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[{i}]/EnergyPrice");
+            }
 
-            pointsInDocument[i]
-                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("QuantityQuality"), _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .Should()
-                .Be(expectedQuantityQuality);
+            if (expectedPoints[i].QuantityQualities.Count > 0)
+            {
+                var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+                {
+                    QuantityQuality.Calculated => EbixCode.QuantityQualityCodeCalculated,
+                    _ => throw new NotImplementedException(
+                        $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
+                };
+
+                pointsInDocument[i]
+                    .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("QuantityQuality"), _documentAsserter.XmlNamespaceManager)!
+                    .Value
+                    .Should()
+                    .Be(expectedQuantityQuality);
+            }
+            else
+            {
+                _documentAsserter.IsNotPresent(
+                    $"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[{i}]/QuantityQuality");
+            }
         }
 
         return this;

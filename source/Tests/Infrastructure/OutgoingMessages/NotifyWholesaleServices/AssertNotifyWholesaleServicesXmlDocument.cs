@@ -262,24 +262,24 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit? expectedMeasurementUnit)
+    public IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit expectedMeasurementUnit)
     {
-        if (expectedMeasurementUnit is not null)
-        {
-            _documentAsserter.HasValue("Series[1]/quantity_Measure_Unit.name", expectedMeasurementUnit.Code);
-        }
-        else
-        {
-            _documentAsserter.IsNotPresent("Series[1]/quantity_Measure_Unit.name");
-        }
-
+        ArgumentNullException.ThrowIfNull(expectedMeasurementUnit);
+        _documentAsserter.HasValue("Series[1]/quantity_Measure_Unit.name", expectedMeasurementUnit.Code);
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasPriceMeasurementUnit(MeasurementUnit expectedPriceMeasurementUnit)
+    public IAssertNotifyWholesaleServicesDocument HasPriceMeasurementUnit(MeasurementUnit? expectedPriceMeasurementUnit)
     {
-        ArgumentNullException.ThrowIfNull(expectedPriceMeasurementUnit);
-        _documentAsserter.HasValue("Series[1]/price_Measure_Unit.name", expectedPriceMeasurementUnit.Code);
+        if (expectedPriceMeasurementUnit is not null)
+        {
+            _documentAsserter.HasValue("Series[1]/price_Measure_Unit.name", expectedPriceMeasurementUnit.Code);
+        }
+        else
+        {
+            _documentAsserter.IsNotPresent("Series[1]/price_Measure_Unit.name");
+        }
+
         return this;
     }
 
@@ -378,7 +378,9 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
                 .Should()
                 .Be(expectedPoints[i].Amount.ToDecimal());
 
-            pointsInDocument[i]
+            if (expectedPoints[i].Quantity is not null)
+            {
+                pointsInDocument[i]
                 .XPathSelectElement(
                     _documentAsserter.EnsureXPathHasPrefix("energy_Quantity.quantity"),
                     _documentAsserter.XmlNamespaceManager)!
@@ -386,6 +388,11 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
                 .ToDecimal()
                 .Should()
                 .Be(expectedPoints[i].Quantity.ToDecimal());
+            }
+            else
+            {
+                _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{i}]/energy_Quantity.quantity");
+            }
 
             pointsInDocument[i]
                 .XPathSelectElement(
@@ -396,29 +403,42 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
                 .Should()
                 .Be(i + 1);
 
-            pointsInDocument[i]
-                .XPathSelectElement(
-                    _documentAsserter.EnsureXPathHasPrefix("price.amount"),
-                    _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .ToDecimal()
-                .Should()
-                .Be(expectedPoints[i].Price.ToDecimal());
-
-            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+            if (expectedPoints[i].Price is not null)
             {
-                QuantityQuality.Calculated => "A06",
-                _ => throw new NotImplementedException(
-                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
-            };
+                pointsInDocument[i]
+                    .XPathSelectElement(
+                        _documentAsserter.EnsureXPathHasPrefix("price.amount"),
+                        _documentAsserter.XmlNamespaceManager)!
+                    .Value
+                    .ToDecimal()
+                    .Should()
+                    .Be(expectedPoints[i].Price.ToDecimal());
+            }
+            else
+            {
+                _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{i}]/price.amount");
+            }
 
-            pointsInDocument[i]
-                .XPathSelectElement(
-                    _documentAsserter.EnsureXPathHasPrefix("quality"),
-                    _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .Should()
-                .Be(expectedQuantityQuality);
+            if (expectedPoints[i].QuantityQualities.Count > 0)
+            {
+                var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+                {
+                    QuantityQuality.Calculated => "A06",
+                    _ => throw new NotImplementedException(
+                        $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
+                };
+                pointsInDocument[i]
+                    .XPathSelectElement(
+                        _documentAsserter.EnsureXPathHasPrefix("quality"),
+                        _documentAsserter.XmlNamespaceManager)!
+                    .Value
+                    .Should()
+                    .Be(expectedQuantityQuality);
+            }
+            else
+            {
+                _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{i}]/quality");
+            }
         }
 
         return this;

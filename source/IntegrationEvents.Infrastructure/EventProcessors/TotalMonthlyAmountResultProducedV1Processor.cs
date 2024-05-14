@@ -28,19 +28,16 @@ public class TotalMonthlyAmountResultProducedV1Processor : IIntegrationEventProc
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly IFeatureFlagManager _featureManager;
-    private readonly WholesaleServicesMessageFactory _wholesaleServicesMessageFactory;
 
     public TotalMonthlyAmountResultProducedV1Processor(
         IOutgoingMessagesClient outgoingMessagesClient,
-        IFeatureFlagManager featureManager,
-        WholesaleServicesMessageFactory wholesaleServicesMessageFactory)
+        IFeatureFlagManager featureManager)
     {
         _outgoingMessagesClient = outgoingMessagesClient;
         _featureManager = featureManager;
-        _wholesaleServicesMessageFactory = wholesaleServicesMessageFactory;
     }
 
-    public string EventTypeToHandle => MonthlyAmountPerChargeResultProducedV1.EventName;
+    public string EventTypeToHandle => TotalMonthlyAmountResultProducedV1.EventName;
 
     public async Task ProcessAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {

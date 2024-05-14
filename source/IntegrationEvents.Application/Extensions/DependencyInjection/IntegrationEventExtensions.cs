@@ -58,6 +58,7 @@ public static class IntegrationEventExtensions
             ActorCertificateCredentialsRemoved.Descriptor,
             ActorCertificateCredentialsAssigned.Descriptor,
             MonthlyAmountPerChargeResultProducedV1.Descriptor,
+            TotalMonthlyAmountResultProducedV1.Descriptor,
             AmountPerChargeResultProducedV1.Descriptor,
             ProcessDelegationConfigured.Descriptor,
         };

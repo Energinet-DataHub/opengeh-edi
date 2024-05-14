@@ -398,7 +398,7 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit? expectedMeasurementUnit)
+    public IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit expectedMeasurementUnit)
     {
         if (expectedMeasurementUnit is not null)
         {
@@ -423,15 +423,26 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
     }
 
     public IAssertNotifyWholesaleServicesDocument HasPriceMeasurementUnit(
-        MeasurementUnit expectedPriceMeasurementUnit)
+        MeasurementUnit? expectedPriceMeasurementUnit)
     {
-        ArgumentNullException.ThrowIfNull(expectedPriceMeasurementUnit);
-        FirstWholesaleSeriesElement()
+        if (expectedPriceMeasurementUnit is not null)
+        {
+            FirstWholesaleSeriesElement()
             .GetProperty("price_Measure_Unit.name")
             .GetProperty("value")
             .GetString()
             .Should()
             .Be(expectedPriceMeasurementUnit.Code);
+        }
+        else
+        {
+            var act = () => FirstWholesaleSeriesElement()
+                .GetProperty("price_Measure_Unit.name");
+
+            act.Should()
+                .ThrowExactly<KeyNotFoundException>()
+                .WithMessage("The given key was not present in the dictionary.");
+        }
 
         return this;
     }
@@ -609,11 +620,23 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
                 .Should()
                 .Be(expectedPoints[i].Amount.ToDecimal());
 
-            pointsInDocument[i]
-                .GetProperty("energy_Quantity.quantity")
-                .GetDecimal()
-                .Should()
-                .Be(expectedPoints[i].Quantity.ToDecimal());
+            if (expectedPoints[i].Quantity is not null)
+            {
+                pointsInDocument[i]
+                    .GetProperty("energy_Quantity.quantity")
+                    .GetDecimal()
+                    .Should()
+                    .Be(expectedPoints[i].Quantity.ToDecimal());
+            }
+            else
+            {
+                var act = () => pointsInDocument[i]
+                    .GetProperty("energy_Quantity.quantity");
+
+                act.Should()
+                    .ThrowExactly<KeyNotFoundException>()
+                    .WithMessage("The given key was not present in the dictionary.");
+            }
 
             pointsInDocument[i]
                 .GetProperty("position")
@@ -622,26 +645,50 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
                 .Should()
                 .Be(i + 1);
 
-            pointsInDocument[i]
-                .GetProperty("price.amount")
-                .GetProperty("value")
-                .GetDecimal()
-                .Should()
-                .Be(expectedPoints[i].Price.ToDecimal());
-
-            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+            if (expectedPoints[i].Price is not null)
             {
-                QuantityQuality.Calculated => "A06",
-                _ => throw new NotImplementedException(
-                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
-            };
+                pointsInDocument[i]
+                    .GetProperty("price.amount")
+                    .GetProperty("value")
+                    .GetDecimal()
+                    .Should()
+                    .Be(expectedPoints[i].Price.ToDecimal());
+            }
+            else
+            {
+                var act = () => pointsInDocument[i]
+                    .GetProperty("price.amount");
 
-            pointsInDocument[i]
-                .GetProperty("quality")
-                .GetProperty("value")
-                .GetString()
-                .Should()
-                .Be(expectedQuantityQuality);
+                act.Should()
+                    .ThrowExactly<KeyNotFoundException>()
+                    .WithMessage("The given key was not present in the dictionary.");
+            }
+
+            if (expectedPoints[i].QuantityQualities.Count > 0)
+            {
+                var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+                {
+                    QuantityQuality.Calculated => "A06",
+                    _ => throw new NotImplementedException(
+                        $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
+                };
+
+                pointsInDocument[i]
+                    .GetProperty("quality")
+                    .GetProperty("value")
+                    .GetString()
+                    .Should()
+                    .Be(expectedQuantityQuality);
+            }
+            else
+            {
+                var act = () => pointsInDocument[i]
+                    .GetProperty("quality");
+
+                act.Should()
+                    .ThrowExactly<KeyNotFoundException>()
+                    .WithMessage("The given key was not present in the dictionary.");
+            }
         }
 
         return this;
