@@ -40,6 +40,20 @@ public class MeteringPointTypeTests
             (MeteringPointType.Consumption, "Consumption", "E17"),
             (MeteringPointType.Exchange, "Exchange", "E20"),
             (MeteringPointType.Production, "Production", "E18"),
+
+            // Child metering point types
+            (MeteringPointType.VeProduction, "VeProduction", "D01"),
+            (MeteringPointType.NetProduction, "NetProduction", "D05"),
+            (MeteringPointType.SupplyToGrid, "SupplyToGrid", "D06"),
+            (MeteringPointType.ConsumptionFromGrid, "ConsumptionFromGrid", "D07"),
+            (MeteringPointType.WholesaleServicesInformation, "WholesaleServicesInformation", "D08"),
+            (MeteringPointType.OwnProduction, "OwnProduction", "D09"),
+            (MeteringPointType.NetFromGrid, "NetFromGrid", "D10"),
+            (MeteringPointType.NetToGrid, "NetToGrid", "D11"),
+            (MeteringPointType.TotalConsumption, "TotalConsumption", "D12"),
+            (MeteringPointType.ElectricalHeating, "ElectricalHeating", "D14"),
+            (MeteringPointType.NetConsumption, "NetConsumption", "D15"),
+            (MeteringPointType.EffectSettlement, "EffectSettlement", "D19"),
         };
 
         using var scope = new AssertionScope();
