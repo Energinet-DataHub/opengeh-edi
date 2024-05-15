@@ -61,7 +61,7 @@ public static class WholesaleServicesTotalSumMessageFactory
 
         return new WholesaleServicesTotalSumSeries(
             TransactionId: Guid.NewGuid(),
-            CalculationVersion: 1, // TODO: Awaiting an updated contract
+            CalculationVersion: message.CalculationResultVersion,
             GridAreaCode: message.GridAreaCode,
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
