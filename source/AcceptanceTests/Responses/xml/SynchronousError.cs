@@ -16,57 +16,57 @@ using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Responses.xml;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Responses.Xml;
 
-    [XmlRoot(ElementName = "Error")]
-    public class ErrorResponse
+[SuppressMessage("Security", "CA5369:Use XmlReader for \'XmlSerializer.Deserialize()\'", Justification = "Not available through API")]
+public static class SynchronousError
+{
+    public static ErrorResponse? BuildB2BErrorResponse(string responseData)
     {
-        [XmlElement(ElementName = "Code")]
-        public string Code { get; set; }
+        var serializer = new XmlSerializer(typeof(ErrorResponse));
+        ErrorResponse error;
 
-        [XmlElement(ElementName = "Message")]
-        public string Message { get; set; }
-
-        [XmlElement(ElementName = "Target")]
-        public string Target { get; set; }
-
-        [XmlElement(ElementName = "Details")]
-        public Details Details { get; set; }
-    }
-
-    [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "Deserializer needs to write")]
-    [SuppressMessage("Design", "CA1002:Do not expose generic lists", Justification = "Deserializer needs to be able to set it")]
-    public class Details
-    {
-        [XmlElement(ElementName = "Error")]
-        public List<InnerError> InnerErrors { get; set; }
-    }
-
-    public class InnerError
-    {
-        [XmlElement(ElementName = "Code")]
-        public string Code { get; set; }
-
-        [XmlElement(ElementName = "Message")]
-        public string Message { get; set; }
-
-        [XmlElement(ElementName = "Target")]
-        public string Target { get; set; }
-    }
-
-    [SuppressMessage("Security", "CA5369:Use XmlReader for \'XmlSerializer.Deserialize()\'", Justification = "Not available through API")]
-    public static class SynchronousError
-    {
-        public static ErrorResponse? BuildB2BErrorResponse(string responseData)
+        using (var reader = new StringReader(responseData))
         {
-            var serializer = new XmlSerializer(typeof(ErrorResponse));
-            ErrorResponse error;
-
-            using (var reader = new StringReader(responseData))
-            {
-                error = (ErrorResponse)serializer.Deserialize(reader)!;
-            }
-
-            return error;
+            error = (ErrorResponse)serializer.Deserialize(reader)!;
         }
+
+        return error;
     }
+}
+
+[XmlRoot(ElementName = "Error")]
+public class ErrorResponse
+{
+    [XmlElement(ElementName = "Code")]
+    public string Code { get; set; }
+
+    [XmlElement(ElementName = "Message")]
+    public string Message { get; set; }
+
+    [XmlElement(ElementName = "Target")]
+    public string Target { get; set; }
+
+    [XmlElement(ElementName = "Details")]
+    public Details Details { get; set; }
+}
+
+[SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "Deserializer needs to write")]
+[SuppressMessage("Design", "CA1002:Do not expose generic lists", Justification = "Deserializer needs to be able to set it")]
+public class Details
+{
+    [XmlElement(ElementName = "Error")]
+    public List<InnerError> InnerErrors { get; set; }
+}
+
+public class InnerError
+{
+    [XmlElement(ElementName = "Code")]
+    public string Code { get; set; }
+
+    [XmlElement(ElementName = "Message")]
+    public string Message { get; set; }
+
+    [XmlElement(ElementName = "Target")]
+    public string Target { get; set; }
+}
