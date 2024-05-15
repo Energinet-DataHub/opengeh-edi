@@ -32,9 +32,9 @@ public class InvalidTransactionIdException : Exception
     {
     }
 
-    public static InvalidTransactionIdException Create(string? messageId)
+    public static InvalidTransactionIdException Create(string? transactionId)
     {
         return new InvalidTransactionIdException(
-            $"{messageId} is not a valid transaction id; transaction ids must be at most 36 characters long");
+            $"{transactionId} is not a valid transaction id; transaction ids must be at most 36 characters long");
     }
 }
