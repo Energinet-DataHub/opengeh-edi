@@ -54,8 +54,9 @@ internal sealed class IntegrationEventPublisher : IAsyncDisposable
         {
             var timeout = TimeSpan.FromSeconds(30);
             var timeoutAt = DateTime.UtcNow.Add(timeout);
+            var retryDelay = TimeSpan.FromMilliseconds(500);
 
-            await Task.Delay(TimeSpan.FromMilliseconds(500)).ConfigureAwait(false);
+            await Task.Delay(retryDelay).ConfigureAwait(false);
 
             using var connection = new SqlConnection(_dbConnectionString);
             await connection.OpenAsync().ConfigureAwait(false);
@@ -74,7 +75,7 @@ internal sealed class IntegrationEventPublisher : IAsyncDisposable
                 if (receivedIntegrationEvent != null)
                     break;
 
-                await Task.Delay(TimeSpan.FromMilliseconds(500)).ConfigureAwait(false);
+                await Task.Delay(retryDelay).ConfigureAwait(false);
             }
         }
     }
