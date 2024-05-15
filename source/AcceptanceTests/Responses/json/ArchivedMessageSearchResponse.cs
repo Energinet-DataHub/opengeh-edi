@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Responses.json;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Responses.Json;
 
 public class ArchivedMessageSearchResponse
 {
