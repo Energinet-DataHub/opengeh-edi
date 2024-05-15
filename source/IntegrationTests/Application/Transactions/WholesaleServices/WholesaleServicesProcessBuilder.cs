@@ -66,9 +66,9 @@ public class WholesaleServicesProcessBuilder
         return this;
     }
 
-    public WholesaleServicesProcessBuilder SetBusinessTransactionId(Guid transactionId)
+    public WholesaleServicesProcessBuilder SetBusinessTransactionId(TransactionId transactionId)
     {
-        _businessTransactionId = TransactionId.From(transactionId.ToString());
+        _businessTransactionId = transactionId;
         return this;
     }
 
