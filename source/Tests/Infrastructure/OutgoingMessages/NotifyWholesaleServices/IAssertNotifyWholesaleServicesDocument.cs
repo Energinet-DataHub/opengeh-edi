@@ -130,7 +130,7 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// Asserts the settlement method of the first series element
     /// </summary>
     /// <param name="expectedSettlementMethod"></param>
-    IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod expectedSettlementMethod);
+    IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod? expectedSettlementMethod);
 
     /// <summary>
     /// Asserts the settlement method is not present
@@ -148,7 +148,7 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// Asserts the metering point type of the first series element
     /// </summary>
     /// <param name="expectedMeteringPointType"></param>
-    IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType);
+    IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType? expectedMeteringPointType);
 
     /// <summary>
     /// Asserts the charge type number of the first series element

@@ -150,9 +150,18 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType)
+    public IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType? expectedMeteringPointType)
     {
-        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/TypeOfMeteringPoint", expectedMeteringPointType.Code);
+        if (expectedMeteringPointType is not null)
+        {
+            _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/TypeOfMeteringPoint", expectedMeteringPointType.Code);
+        }
+        else
+        {
+            _documentAsserter.IsNotPresent(
+                $"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/TypeOfMeteringPoint");
+        }
+
         return this;
     }
 
@@ -310,12 +319,19 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
                 .Should()
                 .Be(expectedPoints[i].Amount.ToDecimal());
 
-            pointsInDocument[i]
+            if (expectedPoints[i].Quantity is not null)
+            {
+                pointsInDocument[i]
                 .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("EnergyQuantity"), _documentAsserter.XmlNamespaceManager)!
                 .Value
                 .ToDecimal()
                 .Should()
                 .Be(expectedPoints[i].Quantity.ToDecimal());
+            }
+            else
+            {
+                _documentAsserter.IsNotPresent($"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[{i}]/EnergyQuantity");
+            }
 
             pointsInDocument[i]
                 .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("Position"), _documentAsserter.XmlNamespaceManager)!
@@ -324,28 +340,44 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
                 .Should()
                 .Be(i + 1);
 
-            pointsInDocument[i]
-                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("EnergyPrice"), _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .ToDecimal()
-                .Should()
-                .Be(expectedPoints[i].Price.ToDecimal());
-
-            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+            if (expectedPoints[i].Price is not null)
             {
-                // For WholesaleServices then calculated, estimated and measured is written as calculated
+                pointsInDocument[i]
+                    .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("EnergyPrice"), _documentAsserter.XmlNamespaceManager)!
+                    .Value
+                    .ToDecimal()
+                    .Should()
+                    .Be(expectedPoints[i].Price.ToDecimal());
+            }
+            else
+            {
+                _documentAsserter.IsNotPresent(
+                    $"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[{i}]/EnergyPrice");
+            }
+
+            if (expectedPoints[i].QuantityQualities.Count > 0)
+            {
+                var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+                {
+                    // For WholesaleServices then calculated, estimated and measured is written as calculated
                 QuantityQuality.Calculated => EbixCode.QuantityQualityCodeCalculated,
                 QuantityQuality.Estimated => EbixCode.QuantityQualityCodeCalculated,
-                QuantityQuality.Measured => EbixCode.QuantityQualityCodeCalculated,
-                _ => throw new NotImplementedException(
-                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
-            };
+                QuantityQuality.Measured =>EbixCode.QuantityQualityCodeCalculated,
+                    _ => throw new NotImplementedException(
+                        $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
+                };
 
-            pointsInDocument[i]
-                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("QuantityQuality"), _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .Should()
-                .Be(expectedQuantityQuality);
+                pointsInDocument[i]
+                    .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("QuantityQuality"), _documentAsserter.XmlNamespaceManager)!
+                    .Value
+                    .Should()
+                    .Be(expectedQuantityQuality);
+            }
+            else
+            {
+                _documentAsserter.IsNotPresent(
+                    $"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[{i}]/QuantityQuality");
+            }
         }
 
         return this;
@@ -377,9 +409,17 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod expectedSettlementMethod)
+    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod? expectedSettlementMethod)
     {
-        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod", expectedSettlementMethod.Code);
+        if (expectedSettlementMethod is not null)
+        {
+            _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod", expectedSettlementMethod.Code);
+        }
+        else
+        {
+            _documentAsserter.IsNotPresent($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod");
+        }
+
         return this;
     }
 

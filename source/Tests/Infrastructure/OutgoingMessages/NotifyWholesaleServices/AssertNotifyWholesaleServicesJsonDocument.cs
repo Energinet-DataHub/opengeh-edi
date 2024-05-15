@@ -211,15 +211,21 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod expectedSettlementMethod)
+    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod? expectedSettlementMethod)
     {
-        ArgumentNullException.ThrowIfNull(expectedSettlementMethod);
-        FirstWholesaleSeriesElement()
-            .GetProperty("marketEvaluationPoint.settlementMethod")
-            .GetProperty("value")
-            .GetString()
-            .Should()
-            .Be(expectedSettlementMethod.Code);
+        if (expectedSettlementMethod is not null)
+        {
+            FirstWholesaleSeriesElement()
+                .GetProperty("marketEvaluationPoint.settlementMethod")
+                .GetProperty("value")
+                .GetString()
+                .Should()
+                .Be(expectedSettlementMethod.Code);
+        }
+        else
+        {
+            SettlementMethodDoesNotExist();
+        }
 
         return this;
     }
@@ -240,15 +246,27 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType)
+    public IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType? expectedMeteringPointType)
     {
-        ArgumentNullException.ThrowIfNull(expectedMeteringPointType);
-        FirstWholesaleSeriesElement()
-            .GetProperty("marketEvaluationPoint.type")
-            .GetProperty("value")
-            .GetString()
-            .Should()
-            .Be(expectedMeteringPointType.Code);
+        if (expectedMeteringPointType is not null)
+        {
+            FirstWholesaleSeriesElement()
+                .GetProperty("marketEvaluationPoint.type")
+                .GetProperty("value")
+                .GetString()
+                .Should()
+                .Be(expectedMeteringPointType.Code);
+        }
+        else
+        {
+            var act = () => FirstWholesaleSeriesElement()
+                .GetProperty("marketEvaluationPoint.type");
+
+            act.Should()
+                .ThrowExactly<KeyNotFoundException>()
+                .WithMessage("The given key was not present in the dictionary.");
+        }
+
         return this;
     }
 
@@ -534,11 +552,23 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
                 .Should()
                 .Be(expectedPoints[i].Amount.ToDecimal());
 
-            pointsInDocument[i]
-                .GetProperty("energy_Quantity.quantity")
-                .GetDecimal()
-                .Should()
-                .Be(expectedPoints[i].Quantity.ToDecimal());
+            if (expectedPoints[i].Quantity is not null)
+            {
+                pointsInDocument[i]
+                    .GetProperty("energy_Quantity.quantity")
+                    .GetDecimal()
+                    .Should()
+                    .Be(expectedPoints[i].Quantity.ToDecimal());
+            }
+            else
+            {
+                var act = () => pointsInDocument[i]
+                    .GetProperty("energy_Quantity.quantity");
+
+                act.Should()
+                    .ThrowExactly<KeyNotFoundException>()
+                    .WithMessage("The given key was not present in the dictionary.");
+            }
 
             pointsInDocument[i]
                 .GetProperty("position")
@@ -547,29 +577,53 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
                 .Should()
                 .Be(i + 1);
 
-            pointsInDocument[i]
-                .GetProperty("price.amount")
-                .GetProperty("value")
-                .GetDecimal()
-                .Should()
-                .Be(expectedPoints[i].Price.ToDecimal());
-
-            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+            if (expectedPoints[i].Price is not null)
             {
-                // For WholesaleServices then calculated, estimated and measured is written as calculated
+                pointsInDocument[i]
+                    .GetProperty("price.amount")
+                    .GetProperty("value")
+                    .GetDecimal()
+                    .Should()
+                    .Be(expectedPoints[i].Price.ToDecimal());
+            }
+            else
+            {
+                var act = () => pointsInDocument[i]
+                    .GetProperty("price.amount");
+
+                act.Should()
+                    .ThrowExactly<KeyNotFoundException>()
+                    .WithMessage("The given key was not present in the dictionary.");
+            }
+
+            if (expectedPoints[i].QuantityQualities.Count > 0)
+            {
+                var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+                {
+                    // For WholesaleServices then calculated, estimated and measured is written as calculated
                 QuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,
                 QuantityQuality.Estimated => CimCode.QuantityQualityCodeCalculated,
                 QuantityQuality.Measured => CimCode.QuantityQualityCodeCalculated,
-                _ => throw new NotImplementedException(
-                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
-            };
+                    _ => throw new NotImplementedException(
+                        $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
+                };
 
-            pointsInDocument[i]
-                .GetProperty("quality")
-                .GetProperty("value")
-                .GetString()
-                .Should()
-                .Be(expectedQuantityQuality);
+                pointsInDocument[i]
+                    .GetProperty("quality")
+                    .GetProperty("value")
+                    .GetString()
+                    .Should()
+                    .Be(expectedQuantityQuality);
+            }
+            else
+            {
+                var act = () => pointsInDocument[i]
+                    .GetProperty("quality");
+
+                act.Should()
+                    .ThrowExactly<KeyNotFoundException>()
+                    .WithMessage("The given key was not present in the dictionary.");
+            }
         }
 
         return this;

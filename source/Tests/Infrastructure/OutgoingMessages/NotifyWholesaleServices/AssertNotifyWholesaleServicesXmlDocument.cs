@@ -147,10 +147,19 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod expectedSettlementMethod)
+    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod? expectedSettlementMethod)
     {
-        ArgumentNullException.ThrowIfNull(expectedSettlementMethod);
-        _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.settlementMethod", expectedSettlementMethod.Code);
+        if (expectedSettlementMethod is not null)
+        {
+            _documentAsserter.HasValue(
+                "Series[1]/marketEvaluationPoint.settlementMethod",
+                expectedSettlementMethod.Code);
+        }
+        else
+        {
+            _documentAsserter.IsNotPresent("Series[1]/marketEvaluationPoint.settlementMethod");
+        }
+
         return this;
     }
 
@@ -160,10 +169,17 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType)
+    public IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType? expectedMeteringPointType)
     {
-        ArgumentNullException.ThrowIfNull(expectedMeteringPointType);
-        _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.type", expectedMeteringPointType.Code);
+        if (expectedMeteringPointType is not null)
+        {
+            _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.type", expectedMeteringPointType.Code);
+        }
+        else
+        {
+            _documentAsserter.IsNotPresent("Series[1]/marketEvaluationPoint.type");
+        }
+
         return this;
     }
 
@@ -301,48 +317,78 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         for (var i = 0; i < pointsInDocument.Count; i++)
         {
             pointsInDocument[i]
-                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("energySum_Quantity.quantity"), _documentAsserter.XmlNamespaceManager)!
+                .XPathSelectElement(
+                    _documentAsserter.EnsureXPathHasPrefix("energySum_Quantity.quantity"),
+                    _documentAsserter.XmlNamespaceManager)!
                 .Value
                 .ToDecimal()
                 .Should()
                 .Be(expectedPoints[i].Amount.ToDecimal());
 
-            pointsInDocument[i]
-                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("energy_Quantity.quantity"), _documentAsserter.XmlNamespaceManager)!
+            if (expectedPoints[i].Quantity is not null)
+            {
+                pointsInDocument[i]
+                .XPathSelectElement(
+                    _documentAsserter.EnsureXPathHasPrefix("energy_Quantity.quantity"),
+                    _documentAsserter.XmlNamespaceManager)!
                 .Value
                 .ToDecimal()
                 .Should()
                 .Be(expectedPoints[i].Quantity.ToDecimal());
+            }
+            else
+            {
+                _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{i}]/energy_Quantity.quantity");
+            }
 
             pointsInDocument[i]
-                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("position"), _documentAsserter.XmlNamespaceManager)!
+                .XPathSelectElement(
+                    _documentAsserter.EnsureXPathHasPrefix("position"),
+                    _documentAsserter.XmlNamespaceManager)!
                 .Value
                 .ToInt()
                 .Should()
                 .Be(i + 1);
 
-            pointsInDocument[i]
-                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("price.amount"), _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .ToDecimal()
-                .Should()
-                .Be(expectedPoints[i].Price.ToDecimal());
-
-            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+            if (expectedPoints[i].Price is not null)
             {
-                // For WholesaleServices then calculated, estimated and measured is written as calculated
+                pointsInDocument[i]
+                    .XPathSelectElement(
+                        _documentAsserter.EnsureXPathHasPrefix("price.amount"),
+                        _documentAsserter.XmlNamespaceManager)!
+                    .Value
+                    .ToDecimal()
+                    .Should()
+                    .Be(expectedPoints[i].Price.ToDecimal());
+            }
+            else
+            {
+                _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{i}]/price.amount");
+            }
+
+            if (expectedPoints[i].QuantityQualities.Count > 0)
+            {
+                var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+                {
+                    // For WholesaleServices then calculated, estimated and measured is written as calculated
                 QuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,
                 QuantityQuality.Estimated => CimCode.QuantityQualityCodeCalculated,
                 QuantityQuality.Measured => CimCode.QuantityQualityCodeCalculated,
-                _ => throw new NotImplementedException(
-                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
-            };
-
-            pointsInDocument[i]
-                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("quality"), _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .Should()
-                .Be(expectedQuantityQuality);
+                    _ => throw new NotImplementedException(
+                        $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
+                };
+                pointsInDocument[i]
+                    .XPathSelectElement(
+                        _documentAsserter.EnsureXPathHasPrefix("quality"),
+                        _documentAsserter.XmlNamespaceManager)!
+                    .Value
+                    .Should()
+                    .Be(expectedQuantityQuality);
+            }
+            else
+            {
+                _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{i}]/quality");
+            }
         }
 
         return this;

@@ -409,7 +409,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
 
         private static ActorRole GetChargeOwnerRole(ActorNumber chargeOwnerId)
         {
-            return chargeOwnerId == DataHubDetails.DataHubActorNumber
+            return chargeOwnerId == DataHubDetails.SystemOperatorActorNumber
                 ? ActorRole.SystemOperator
                 : ActorRole.GridOperator;
         }
