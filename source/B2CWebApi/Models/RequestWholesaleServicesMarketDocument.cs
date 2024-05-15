@@ -14,23 +14,15 @@
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
-public enum MeteringPointType
-{
-    Production,
-    FlexConsumption,
-    TotalConsumption,
-    NonProfiledConsumption,
-    Exchange,
-}
-
 /// <summary>
-/// Responsible for carrying the market message data from the incoming message before any data validation.
+///     Responsible for carrying the market message data from the incoming message before any data validation.
 /// </summary>
-public record RequestAggregatedMeasureDataMarketRequest(
-    CalculationType ProcessType, // TODO: Rename property to CalculationType when we implement RequestWholesaleSettlement in BFF
-    MeteringPointType? MeteringPointType,
+public record RequestWholesaleSettlementMarketRequest(
+    CalculationType CalculationType, // TODO: Rename property to CalculationType when we implement RequestWholesaleSettlement in BFF
     string StartDate,
     string EndDate,
     string? GridArea,
     string? EnergySupplierId,
-    string? BalanceResponsibleId);
+    string? Resolution,
+    string? ChargeOwner,
+    IReadOnlyCollection<(string? Id, string? Type)> ChargeTypes);
