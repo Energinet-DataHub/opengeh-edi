@@ -39,7 +39,7 @@ public static class RequestAggregatedMeasureDataDtoFactory
         var senderRoleCode = MapRoleNameToCode(senderRole);
 
         var series = new RequestAggregatedMeasureDataSeries(
-            Guid.NewGuid().ToString().Replace("-", string.Empty, StringComparison.InvariantCultureIgnoreCase),
+            TransactionId.New().Value,
             MapEvaluationPointType(request),
             MapSettlementMethod(request),
             InstantFormatFactory.SetInstantToMidnight(request.StartDate, dateTimeZone).ToString(),
