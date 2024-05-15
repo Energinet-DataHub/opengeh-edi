@@ -584,7 +584,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
     }
 
     [Fact]
-    public async Task Transaction_id_must_be_36_characters()
+    public async Task Transaction_id_can_be_36_characters()
     {
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
@@ -596,7 +596,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
-        Assert.DoesNotContain(result.Errors, error => error is InvalidTransactionIdSize);
+        result.Errors.Should().NotContainItemsAssignableTo<InvalidTransactionIdSize>();
     }
 
     [Fact]
@@ -612,7 +612,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
-        Assert.Contains(result.Errors, error => error is InvalidTransactionIdSize);
+        result.Errors.Should().ContainItemsAssignableTo<InvalidTransactionIdSize>();
     }
 
     [Fact]
