@@ -46,7 +46,8 @@ internal sealed class WholesaleDriver
 
         return _integrationEventPublisher.PublishAsync(
             EnergyResultProducedV2.EventName,
-            aggregation.ToByteArray());
+            aggregation.ToByteArray(),
+            waitForHandled: true);
     }
 
     internal Task PublishMonthlyAmountPerChargeResultAsync(
@@ -62,7 +63,8 @@ internal sealed class WholesaleDriver
 
         return _integrationEventPublisher.PublishAsync(
             MonthlyAmountPerChargeResultProducedV1.EventName,
-            monthlyAmountPerChargeResultProduced.ToByteArray());
+            monthlyAmountPerChargeResultProduced.ToByteArray(),
+            waitForHandled: true);
     }
 
     internal Task PublishAmountPerChargeResultAsync(
@@ -78,7 +80,8 @@ internal sealed class WholesaleDriver
 
         return _integrationEventPublisher.PublishAsync(
             AmountPerChargeResultProducedV1.EventName,
-            amountPerChargeResultProduced.ToByteArray());
+            amountPerChargeResultProduced.ToByteArray(),
+            waitForHandled: true);
     }
 
     internal async Task PublishWholesaleServicesRequestAcceptedResponseAsync(
