@@ -1,7 +1,7 @@
 <Project>
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <LangVersion>11.0</LangVersion>
+        <LangVersion>12.0</LangVersion>
         <AnalysisMode>AllEnabledByDefault</AnalysisMode>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <Nullable>enable</Nullable>

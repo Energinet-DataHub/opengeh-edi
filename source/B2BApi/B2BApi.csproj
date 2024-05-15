@@ -15,7 +15,6 @@ limitations under the License.
 -->
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <LangVersion>preview</LangVersion>
         <AzureFunctionsVersion>v4</AzureFunctionsVersion>
         <OutputType>Exe</OutputType>
         <_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
