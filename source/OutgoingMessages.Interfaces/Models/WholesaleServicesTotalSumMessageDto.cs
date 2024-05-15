@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -20,33 +21,39 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 /// <summary>
 /// Represents the total sum of wholesale services for either Energy Supplier or Charge owner.
 /// </summary>
-public class WholesaleServicesTotalSumMessageDto : WholesaleServicesMessageDto
+public class WholesaleServicesTotalSumMessageDto : OutgoingMessageDto
 {
     protected WholesaleServicesTotalSumMessageDto(
         Guid? processId,
         EventId eventId,
-        string businessReason,
+        BusinessReason businessReason,
         ActorNumber receiverNumber,
         ActorRole receiverRole,
-        WholesaleServicesSeries series,
+        WholesaleServicesTotalSumSeries series,
         MessageId? relatedToMessageId = null)
         : base(
+            DocumentType.NotifyWholesaleServices,
             receiverNumber,
             processId,
             eventId,
-            businessReason,
+#pragma warning disable CA1062
+            businessReason.Name,
+#pragma warning restore CA1062
             receiverRole,
-            null,
-            series,
+            DataHubDetails.DataHubActorNumber,
+            ActorRole.MeteredDataAdministrator,
             relatedToMessageId)
     {
+        Series = series;
     }
+
+    public WholesaleServicesTotalSumSeries Series { get; }
 
     public static WholesaleServicesTotalSumMessageDto Create(
         EventId eventId,
         ActorNumber receiverNumber,
         ActorRole receiverRole,
-        string businessReason,
+        BusinessReason businessReason,
         WholesaleServicesTotalSumSeries wholesaleSeries)
     {
         ArgumentNullException.ThrowIfNull(eventId);

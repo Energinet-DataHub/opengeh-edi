@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
@@ -29,9 +30,9 @@ using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents;
 
-public class GivenTotalMonthlyAmountResultProducedV1ProcessorTests : WholesaleServicesBehaviourTestBase
+public class GivenTotalMonthlyAmountResultProducedV1ReceivedTests : WholesaleServicesBehaviourTestBase
 {
-    public GivenTotalMonthlyAmountResultProducedV1ProcessorTests(
+    public GivenTotalMonthlyAmountResultProducedV1ReceivedTests(
         IntegrationTestFixture integrationTestFixture,
         ITestOutputHelper testOutputHelper)
         : base(
@@ -55,14 +56,19 @@ public class GivenTotalMonthlyAmountResultProducedV1ProcessorTests : WholesaleSe
             periodEnd: CreateDateInstant(2024, 01, 31),
             gridAreaCode: "740",
             energySupplierId: "5790002243172",
-            chargeOwnerId: chargeOwnerId);
+            chargeOwnerId: chargeOwnerId,
+            new DecimalValue()
+            {
+                Nanos = 8888, Units = 8888,
+            });
 
         await GivenIntegrationEventReceived(totalMonthlyAmountResultProducedEvent);
 
         // Act
-        var peekResultAsChargeOwner = await WhenActorPeeksMessage(ActorNumber.Create(chargeOwnerId), ActorRole.GridOperator, documentFormat);
+        var peekResultsAsChargeOwner = await WhenActorPeeksAllMessages(ActorNumber.Create(chargeOwnerId), ActorRole.GridOperator, documentFormat);
 
         // Assert
+        var peekResultAsChargeOwner = peekResultsAsChargeOwner.Single();
         var expectedDocumentToChargeOwner = new NotifyWholesaleServicesDocumentAssertionInput(
             Timestamp: "2022-09-07T13:37:05Z",
             BusinessReasonWithSettlementVersion: new(BusinessReason.WholesaleFixing, null),
@@ -117,14 +123,19 @@ public class GivenTotalMonthlyAmountResultProducedV1ProcessorTests : WholesaleSe
             periodEnd: CreateDateInstant(2024, 01, 31),
             gridAreaCode: "740",
             energySupplierId: energySupplierId,
-            chargeOwnerId: null);
+            chargeOwnerId: null,
+            new DecimalValue()
+            {
+                Nanos = 8888, Units = 8888,
+            });
 
         await GivenIntegrationEventReceived(totalMonthlyAmountResultProducedEvent);
 
         // Act
-        var peekResultForEnergySupplier = await WhenActorPeeksMessage(ActorNumber.Create(energySupplierId), ActorRole.EnergySupplier, documentFormat);
+        var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(ActorNumber.Create(energySupplierId), ActorRole.EnergySupplier, documentFormat);
 
         // Assert
+        var peekResultForEnergySupplier = peekResultsForEnergySupplier.Single();
         var expectedDocumentToEnergySupplier = new NotifyWholesaleServicesDocumentAssertionInput(
             Timestamp: "2022-09-07T13:37:05Z",
             BusinessReasonWithSettlementVersion: new(BusinessReason.WholesaleFixing, null),
@@ -170,7 +181,8 @@ public class GivenTotalMonthlyAmountResultProducedV1ProcessorTests : WholesaleSe
         Instant periodEnd,
         string gridAreaCode,
         string energySupplierId,
-        string? chargeOwnerId)
+        string? chargeOwnerId,
+        DecimalValue amount)
     {
         var totalMonthlyAmountResultProducedV1Event = new TotalMonthlyAmountResultProducedV1()
         {
@@ -181,10 +193,7 @@ public class GivenTotalMonthlyAmountResultProducedV1ProcessorTests : WholesaleSe
             GridAreaCode = gridAreaCode,
             EnergySupplierId = energySupplierId,
             Currency = TotalMonthlyAmountResultProducedV1.Types.Currency.Dkk,
-            Amount = new DecimalValue()
-            {
-                Nanos = 8888, Units = 8888,
-            },
+            Amount = amount,
             CalculationResultVersion = 1,
         };
 

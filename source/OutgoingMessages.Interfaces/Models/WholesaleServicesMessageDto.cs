@@ -27,7 +27,7 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
         EventId eventId,
         string businessReason,
         ActorRole receiverRole,
-        ActorNumber? chargeOwnerId,
+        ActorNumber chargeOwnerId,
         WholesaleServicesSeries series,
         MessageId? relatedToMessageId = null)
         : base(
@@ -45,7 +45,7 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
         Series = series;
     }
 
-    public ActorNumber? ChargeOwnerId { get; }
+    public ActorNumber ChargeOwnerId { get; }
 
     public WholesaleServicesSeries Series { get; }
 

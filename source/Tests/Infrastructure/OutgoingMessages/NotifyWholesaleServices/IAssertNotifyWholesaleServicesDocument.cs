@@ -130,7 +130,7 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// Asserts the settlement method of the first series element
     /// </summary>
     /// <param name="expectedSettlementMethod"></param>
-    IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod? expectedSettlementMethod);
+    IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod expectedSettlementMethod);
 
     /// <summary>
     /// Asserts the settlement method is not present
@@ -148,26 +148,46 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// Asserts the metering point type of the first series element
     /// </summary>
     /// <param name="expectedMeteringPointType"></param>
-    IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType? expectedMeteringPointType);
+    IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType);
+
+    /// <summary>
+    /// Asserts the metering point type of the first series element is not present
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument MeteringPointTypeDoesNotExist();
 
     /// <summary>
     /// Asserts the charge type number of the first series element
     /// </summary>
     /// <param name="expectedChargeTypeNumber"></param>
-    IAssertNotifyWholesaleServicesDocument HasChargeCode(string? expectedChargeTypeNumber);
+    IAssertNotifyWholesaleServicesDocument HasChargeCode(string expectedChargeTypeNumber);
+
+    /// <summary>
+    /// Asserts the charge type number of the first series element is not present
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument ChargeCodeDoesNotExist();
 
     /// <summary>
     /// Asserts the charge type of the first series element
     /// </summary>
     /// <param name="expectedChargeType"></param>
-    IAssertNotifyWholesaleServicesDocument HasChargeType(ChargeType? expectedChargeType);
+    IAssertNotifyWholesaleServicesDocument HasChargeType(ChargeType expectedChargeType);
+
+    /// <summary>
+    /// Asserts the charge type of the first series element is not present
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument ChargeTypeDoesNotExist();
 
     /// <summary>
     /// Asserts the charge type owner of the first series element
     /// </summary>
     IAssertNotifyWholesaleServicesDocument HasChargeTypeOwner(
-        ActorNumber? expectedChargeTypeOwner,
+        ActorNumber expectedChargeTypeOwner,
         string codingScheme);
+
+    /// <summary>
+    /// Asserts the charge type owner of the first series element is not present
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument ChargeTypeOwnerDoesNotExist();
 
     /// <summary>
     /// Asserts grid area code of the first series element
@@ -193,10 +213,15 @@ public interface IAssertNotifyWholesaleServicesDocument
     IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit expectedMeasurementUnit);
 
     /// <summary>
+    /// Asserts the price measure unit of the first series element is not present
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument PriceMeasurementUnitDoesNotExist();
+
+    /// <summary>
     /// Asserts the price measure unit of the first series element
     /// </summary>
     /// <param name="expectedPriceMeasurementUnit"></param>
-    IAssertNotifyWholesaleServicesDocument HasPriceMeasurementUnit(MeasurementUnit? expectedPriceMeasurementUnit);
+    IAssertNotifyWholesaleServicesDocument HasPriceMeasurementUnit(MeasurementUnit expectedPriceMeasurementUnit);
 
     /// <summary>
     /// Asserts the currency of the first series element
@@ -214,7 +239,12 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// Asserts the resulution of the first series element
     /// </summary>
     /// <param name="resolution"></param>
-    IAssertNotifyWholesaleServicesDocument HasResolution(Resolution? resolution);
+    IAssertNotifyWholesaleServicesDocument HasResolution(Resolution resolution);
+
+    /// <summary>
+    /// Asserts the resulution of the first series element is not present
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument ResolutionDoesNotExist();
 
     /// <summary>
     /// Asserts a point of the first series element
@@ -249,4 +279,8 @@ public interface IAssertNotifyWholesaleServicesDocument
 
     #endregion
 
+    /// <summary>
+    /// Asserts the list of points only contains a single point with the given amount
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmount(DecimalValue expectedAmount);
 }

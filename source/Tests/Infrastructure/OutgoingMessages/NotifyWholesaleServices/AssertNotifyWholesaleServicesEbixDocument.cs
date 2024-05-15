@@ -39,7 +39,9 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
     private readonly AssertEbixDocument _documentAsserter;
     private readonly bool _skipIdentificationLengthValidation;
 
-    public AssertNotifyWholesaleServicesEbixDocument(AssertEbixDocument documentAsserter, bool skipIdentificationLengthValidation = false)
+    public AssertNotifyWholesaleServicesEbixDocument(
+        AssertEbixDocument documentAsserter,
+        bool skipIdentificationLengthValidation = false)
     {
         _documentAsserter = documentAsserter;
         _skipIdentificationLengthValidation = skipIdentificationLengthValidation;
@@ -103,7 +105,9 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasReceiverRole(ActorRole expectedReceiverRole, CodeListType codeListType)
+    public IAssertNotifyWholesaleServicesDocument HasReceiverRole(
+        ActorRole expectedReceiverRole,
+        CodeListType codeListType)
     {
         _documentAsserter.HasValueWithAttributes(
             $"{ProcessEnergyContext}/EnergyBusinessProcessRole",
@@ -137,72 +141,70 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
 
     public IAssertNotifyWholesaleServicesDocument HasCalculationVersion(long expectedVersion)
     {
-        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/Version", expectedVersion.ToString(CultureInfo.InvariantCulture));
+        _documentAsserter.HasValue(
+            $"{PayloadEnergyTimeSeries}[1]/Version",
+            expectedVersion.ToString(CultureInfo.InvariantCulture));
         return this;
     }
 
     public IAssertNotifyWholesaleServicesDocument HasChargeTypeOwner(
-        ActorNumber? expectedChargeTypeOwner,
+        ActorNumber expectedChargeTypeOwner,
         string codingScheme)
     {
-        if (expectedChargeTypeOwner is not null)
-        {
-            _documentAsserter.HasValueWithAttributes(
+        ArgumentNullException.ThrowIfNull(expectedChargeTypeOwner);
+        _documentAsserter.HasValueWithAttributes(
             $"{PayloadEnergyTimeSeries}[1]/ChargeTypeOwnerEnergyParty/Identification",
             expectedChargeTypeOwner.Value,
             CreateRequiredSchemeAttribute(expectedChargeTypeOwner));
-        }
-        else
-        {
-            _documentAsserter.IsNotPresent($"{PayloadEnergyTimeSeries}[1]/ChargeTypeOwnerEnergyParty/Identification");
-        }
-
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType? expectedMeteringPointType)
+    public IAssertNotifyWholesaleServicesDocument ChargeTypeOwnerDoesNotExist()
     {
-        if (expectedMeteringPointType is not null)
-        {
-            _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/TypeOfMeteringPoint", expectedMeteringPointType.Code);
-        }
-        else
-        {
-            _documentAsserter.IsNotPresent(
-                $"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/TypeOfMeteringPoint");
-        }
-
+        _documentAsserter.IsNotPresent($"{PayloadEnergyTimeSeries}[1]/ChargeTypeOwnerEnergyParty/Identification");
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasChargeCode(string? expectedChargeTypeNumber)
+    public IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType)
     {
-        if (expectedChargeTypeNumber is not null)
-        {
-            _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/PartyChargeTypeID", expectedChargeTypeNumber);
-        }
-        else
-        {
-            _documentAsserter.IsNotPresent($"{PayloadEnergyTimeSeries}[1]/PartyChargeTypeID");
-        }
-
+        _documentAsserter.HasValue(
+            $"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/TypeOfMeteringPoint",
+            expectedMeteringPointType.Code);
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasChargeType(ChargeType? expectedChargeType)
+    public IAssertNotifyWholesaleServicesDocument MeteringPointTypeDoesNotExist()
     {
-        if (expectedChargeType is not null)
-        {
-            _documentAsserter.HasValueWithAttributes(
-                $"{PayloadEnergyTimeSeries}[1]/ChargeType",
-                EbixCode.Of(expectedChargeType),
-                CreateRequiredListAttributes(CodeListType.EbixDenmark));
-        }
-        else
-        {
-            _documentAsserter.IsNotPresent($"{PayloadEnergyTimeSeries}[1]/ChargeType");
-        }
+        _documentAsserter.IsNotPresent(
+            $"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/TypeOfMeteringPoint");
+        return this;
+    }
 
+    public IAssertNotifyWholesaleServicesDocument HasChargeCode(string expectedChargeTypeNumber)
+    {
+        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/PartyChargeTypeID", expectedChargeTypeNumber);
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument ChargeCodeDoesNotExist()
+    {
+        _documentAsserter.IsNotPresent($"{PayloadEnergyTimeSeries}[1]/PartyChargeTypeID");
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasChargeType(ChargeType expectedChargeType)
+    {
+        ArgumentNullException.ThrowIfNull(expectedChargeType);
+        _documentAsserter.HasValueWithAttributes(
+            $"{PayloadEnergyTimeSeries}[1]/ChargeType",
+            EbixCode.Of(expectedChargeType),
+            CreateRequiredListAttributes(CodeListType.EbixDenmark));
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument ChargeTypeDoesNotExist()
+    {
+        _documentAsserter.IsNotPresent($"{PayloadEnergyTimeSeries}[1]/ChargeType");
         return this;
     }
 
@@ -241,14 +243,20 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
     public IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit expectedMeasurementUnit)
     {
         _documentAsserter.HasValueWithAttributes(
-        $"{PayloadEnergyTimeSeries}[1]/IncludedProductCharacteristic/UnitType",
-        EbixCode.Of(expectedMeasurementUnit),
-        CreateRequiredListAttributes(CodeListType.Ebix));
+            $"{PayloadEnergyTimeSeries}[1]/IncludedProductCharacteristic/UnitType",
+            EbixCode.Of(expectedMeasurementUnit),
+            CreateRequiredListAttributes(CodeListType.Ebix));
 
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasPriceMeasurementUnit(MeasurementUnit? expectedPriceMeasurementUnit)
+    public IAssertNotifyWholesaleServicesDocument PriceMeasurementUnitDoesNotExist()
+    {
+        // Is not used in ebIX document
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasPriceMeasurementUnit(MeasurementUnit expectedPriceMeasurementUnit)
     {
         // Is not used in ebIX document
         return this;
@@ -266,50 +274,71 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
     public IAssertNotifyWholesaleServicesDocument HasPeriod(Period expectedPeriod)
     {
         _documentAsserter
-            .HasValue($"{PayloadEnergyTimeSeries}[1]/ObservationTimeSeriesPeriod/Start", expectedPeriod.StartToEbixString())
-            .HasValue($"{PayloadEnergyTimeSeries}[1]/ObservationTimeSeriesPeriod/End", expectedPeriod.EndToEbixString());
+            .HasValue(
+                $"{PayloadEnergyTimeSeries}[1]/ObservationTimeSeriesPeriod/Start",
+                expectedPeriod.StartToEbixString())
+            .HasValue(
+                $"{PayloadEnergyTimeSeries}[1]/ObservationTimeSeriesPeriod/End",
+                expectedPeriod.EndToEbixString());
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasResolution(Resolution? resolution)
+    public IAssertNotifyWholesaleServicesDocument HasResolution(Resolution resolution)
     {
-        if (resolution is not null)
-        {
-            _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/ObservationTimeSeriesPeriod/ResolutionDuration", EbixCode.Of(resolution));
-        }
-        else
-        {
-            _documentAsserter.IsNotPresent($"{PayloadEnergyTimeSeries}[1]/ObservationTimeSeriesPeriod/ResolutionDuration");
-        }
-
+        ArgumentNullException.ThrowIfNull(resolution);
+        _documentAsserter.HasValue(
+            $"{PayloadEnergyTimeSeries}[1]/ObservationTimeSeriesPeriod/ResolutionDuration",
+            EbixCode.Of(resolution));
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSumQuantityForPosition(int expectedPosition, int expectedSumQuantity)
+    public IAssertNotifyWholesaleServicesDocument ResolutionDoesNotExist()
+    {
+        _documentAsserter.IsNotPresent(
+            $"{PayloadEnergyTimeSeries}[1]/ObservationTimeSeriesPeriod/ResolutionDuration");
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasSumQuantityForPosition(
+        int expectedPosition,
+        int expectedSumQuantity)
     {
         _documentAsserter
-            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/Position", expectedPosition.ToString(CultureInfo.InvariantCulture))
-            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/EnergySum", expectedSumQuantity.ToString(CultureInfo.InvariantCulture));
+            .HasValue(
+                $"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/Position",
+                expectedPosition.ToString(CultureInfo.InvariantCulture))
+            .HasValue(
+                $"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/EnergySum",
+                expectedSumQuantity.ToString(CultureInfo.InvariantCulture));
         return this;
     }
 
     public IAssertNotifyWholesaleServicesDocument HasQuantityForPosition(int expectedPosition, int expectedQuantity)
     {
         _documentAsserter
-            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/Position", expectedPosition.ToString(CultureInfo.InvariantCulture))
-            .HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/EnergyQuantity", expectedQuantity.ToString(CultureInfo.InvariantCulture));
+            .HasValue(
+                $"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/Position",
+                expectedPosition.ToString(CultureInfo.InvariantCulture))
+            .HasValue(
+                $"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{expectedPosition}]/EnergyQuantity",
+                expectedQuantity.ToString(CultureInfo.InvariantCulture));
         return this;
     }
 
     public async Task<IAssertNotifyWholesaleServicesDocument> DocumentIsValidAsync()
     {
-        await _documentAsserter.HasValidStructureAsync(DocumentType.NotifyWholesaleServices, "3", _skipIdentificationLengthValidation).ConfigureAwait(false);
+        await _documentAsserter.HasValidStructureAsync(
+                DocumentType.NotifyWholesaleServices,
+                "3",
+                _skipIdentificationLengthValidation)
+            .ConfigureAwait(false);
         return this;
     }
 
     public IAssertNotifyWholesaleServicesDocument SettlementMethodDoesNotExist()
     {
-        _documentAsserter.IsNotPresent("PayloadEnergyTimeSeries[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod");
+        _documentAsserter.IsNotPresent(
+            "PayloadEnergyTimeSeries[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod");
         return this;
     }
 
@@ -335,7 +364,8 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasPoints(IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points)
+    public IAssertNotifyWholesaleServicesDocument HasPoints(
+        IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points)
     {
         var pointsInDocument = _documentAsserter
             .GetElements($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation")!;
@@ -353,19 +383,12 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
                 .Should()
                 .Be(expectedPoints[i].Amount.ToDecimal());
 
-            if (expectedPoints[i].Quantity is not null)
-            {
-                pointsInDocument[i]
+            pointsInDocument[i]
                 .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("EnergyQuantity"), _documentAsserter.XmlNamespaceManager)!
                 .Value
                 .ToDecimal()
                 .Should()
                 .Be(expectedPoints[i].Quantity.ToDecimal());
-            }
-            else
-            {
-                _documentAsserter.IsNotPresent($"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[{i}]/EnergyQuantity");
-            }
 
             pointsInDocument[i]
                 .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("Position"), _documentAsserter.XmlNamespaceManager)!
@@ -374,45 +397,63 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
                 .Should()
                 .Be(i + 1);
 
-            if (expectedPoints[i].Price is not null)
-            {
-                pointsInDocument[i]
-                    .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("EnergyPrice"), _documentAsserter.XmlNamespaceManager)!
-                    .Value
-                    .ToDecimal()
-                    .Should()
-                    .Be(expectedPoints[i].Price.ToDecimal());
-            }
-            else
-            {
-                _documentAsserter.IsNotPresent(
-                    $"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[{i}]/EnergyPrice");
-            }
+            pointsInDocument[i]
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("EnergyPrice"), _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .ToDecimal()
+                .Should()
+                .Be(expectedPoints[i].Price.ToDecimal());
 
-            if (expectedPoints[i].QuantityQualities.Count > 0)
+            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
             {
-                var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
-                {
-                    // For WholesaleServices then calculated, estimated and measured is written as calculated
+                // For WholesaleServices then calculated, estimated and measured is written as calculated
                 QuantityQuality.Calculated => EbixCode.QuantityQualityCodeCalculated,
                 QuantityQuality.Estimated => EbixCode.QuantityQualityCodeCalculated,
-                QuantityQuality.Measured =>EbixCode.QuantityQualityCodeCalculated,
-                    _ => throw new NotImplementedException(
-                        $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
-                };
+                QuantityQuality.Measured => EbixCode.QuantityQualityCodeCalculated,
+                _ => throw new NotImplementedException(
+                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
+            };
 
-                pointsInDocument[i]
-                    .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("QuantityQuality"), _documentAsserter.XmlNamespaceManager)!
-                    .Value
-                    .Should()
-                    .Be(expectedQuantityQuality);
-            }
-            else
-            {
-                _documentAsserter.IsNotPresent(
-                    $"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[{i}]/QuantityQuality");
-            }
+            pointsInDocument[i]
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("QuantityQuality"), _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .Should()
+                .Be(expectedQuantityQuality);
         }
+
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmount(DecimalValue expectedAmount)
+    {
+        var pointsInDocument = _documentAsserter
+            .GetElements($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation")!;
+
+        var pointInDocument = pointsInDocument.Single();
+
+        pointInDocument
+            .XPathSelectElement(
+                _documentAsserter.EnsureXPathHasPrefix("EnergySum"),
+                _documentAsserter.XmlNamespaceManager)!
+            .Value
+            .ToDecimal()
+            .Should()
+            .Be(expectedAmount.ToDecimal());
+
+        pointInDocument
+            .XPathSelectElement(
+                _documentAsserter.EnsureXPathHasPrefix("Position"),
+                _documentAsserter.XmlNamespaceManager)!
+            .Value
+            .ToInt()
+            .Should()
+            .Be(1);
+
+        _documentAsserter.IsNotPresent($"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[1]/EnergyQuantity");
+
+        _documentAsserter.IsNotPresent("PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[1]/EnergyPrice");
+
+        _documentAsserter.IsNotPresent($"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[1]/QuantityQuality");
 
         return this;
     }
@@ -429,7 +470,8 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(string expectedOriginalTransactionIdReference)
+    public IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(
+        string expectedOriginalTransactionIdReference)
     {
         _documentAsserter.HasValue(
             $"{PayloadEnergyTimeSeries}[1]/OriginalBusinessDocument",
@@ -443,23 +485,19 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod? expectedSettlementMethod)
+    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod expectedSettlementMethod)
     {
-        if (expectedSettlementMethod is not null)
-        {
-            _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod", expectedSettlementMethod.Code);
-        }
-        else
-        {
-            _documentAsserter.IsNotPresent($"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod");
-        }
-
+        _documentAsserter.HasValue(
+            $"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod",
+            expectedSettlementMethod.Code);
         return this;
     }
 
     public IAssertNotifyWholesaleServicesDocument HasPriceForPosition(int position, string? expectedPrice)
     {
-        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{position}]/EnergyPrice", expectedPrice ?? "0");
+        _documentAsserter.HasValue(
+            $"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation[{position}]/EnergyPrice",
+            expectedPrice ?? "0");
         return this;
     }
 
@@ -469,10 +507,7 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
     {
         var (codeList, countryCode) = GetCodeListConstant(codeListType);
 
-        var requiredAttributes = new List<AttributeNameAndValue>
-        {
-            new("listAgencyIdentifier", codeList),
-        };
+        var requiredAttributes = new List<AttributeNameAndValue> { new("listAgencyIdentifier", codeList), };
 
         if (!string.IsNullOrEmpty(countryCode))
             requiredAttributes.Add(new("listIdentifier", countryCode));
@@ -491,7 +526,8 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
 
     private static AttributeNameAndValue CreateRequiredSchemeAttribute(ActorNumber actorNumber)
     {
-        var codeOwner = GetActorNumberOwner(ActorNumber.IsGlnNumber(actorNumber.Value) ? ActorNumberType.Gln : ActorNumberType.Eic);
+        var codeOwner = GetActorNumberOwner(
+            ActorNumber.IsGlnNumber(actorNumber.Value) ? ActorNumberType.Gln : ActorNumberType.Eic);
         var requiredAttribute = new AttributeNameAndValue("schemeAgencyIdentifier", codeOwner);
 
         return requiredAttribute;

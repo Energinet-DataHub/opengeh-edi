@@ -279,10 +279,10 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
                 new(
                     wholesaleServicesMessageDto.EventId,
                     wholesaleServicesMessageDto.DocumentType,
-                    wholesaleServicesMessageDto.ChargeOwnerId!,
+                    wholesaleServicesMessageDto.ChargeOwnerId,
                     wholesaleServicesMessageDto.ProcessId,
                     wholesaleServicesMessageDto.BusinessReason,
-                    GetChargeOwnerRole(wholesaleServicesMessageDto.ChargeOwnerId!),
+                    GetChargeOwnerRole(wholesaleServicesMessageDto.ChargeOwnerId),
                     wholesaleServicesMessageDto.SenderId,
                     wholesaleServicesMessageDto.SenderRole,
                     serializer.Serialize(wholesaleServicesMessageDto.Series),

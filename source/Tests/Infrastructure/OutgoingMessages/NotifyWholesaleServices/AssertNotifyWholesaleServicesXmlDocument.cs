@@ -150,19 +150,12 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod? expectedSettlementMethod)
+    public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod expectedSettlementMethod)
     {
-        if (expectedSettlementMethod is not null)
-        {
-            _documentAsserter.HasValue(
+        ArgumentNullException.ThrowIfNull(expectedSettlementMethod);
+        _documentAsserter.HasValue(
                 "Series[1]/marketEvaluationPoint.settlementMethod",
                 expectedSettlementMethod.Code);
-        }
-        else
-        {
-            _documentAsserter.IsNotPresent("Series[1]/marketEvaluationPoint.settlementMethod");
-        }
-
         return this;
     }
 
@@ -172,67 +165,62 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType? expectedMeteringPointType)
+    public IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType)
     {
-        if (expectedMeteringPointType is not null)
-        {
-            _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.type", expectedMeteringPointType.Code);
-        }
-        else
-        {
-            _documentAsserter.IsNotPresent("Series[1]/marketEvaluationPoint.type");
-        }
-
+        ArgumentNullException.ThrowIfNull(expectedMeteringPointType);
+        _documentAsserter.HasValue("Series[1]/marketEvaluationPoint.type", expectedMeteringPointType.Code);
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasChargeCode(string? expectedChargeTypeNumber)
+    public IAssertNotifyWholesaleServicesDocument MeteringPointTypeDoesNotExist()
     {
-        if (expectedChargeTypeNumber is not null)
-        {
-            _documentAsserter.HasValue("Series[1]/chargeType.mRID", expectedChargeTypeNumber);
-        }
-        else
-        {
-            _documentAsserter.IsNotPresent("Series[1]/chargeType.mRID");
-        }
-
+        _documentAsserter.IsNotPresent("Series[1]/marketEvaluationPoint.type");
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasChargeType(ChargeType? expectedChargeType)
+    public IAssertNotifyWholesaleServicesDocument HasChargeCode(string expectedChargeTypeNumber)
     {
-        if (expectedChargeType is not null)
-        {
-            _documentAsserter.HasValue("Series[1]/chargeType.type", expectedChargeType.Code);
-        }
-        else
-        {
-            _documentAsserter.IsNotPresent("Series[1]/chargeType.type");
-        }
+        _documentAsserter.HasValue("Series[1]/chargeType.mRID", expectedChargeTypeNumber);
+        return this;
+    }
 
+    public IAssertNotifyWholesaleServicesDocument ChargeCodeDoesNotExist()
+    {
+        _documentAsserter.IsNotPresent("Series[1]/chargeType.mRID");
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasChargeType(ChargeType expectedChargeType)
+    {
+        ArgumentNullException.ThrowIfNull(expectedChargeType);
+        _documentAsserter.HasValue("Series[1]/chargeType.type", expectedChargeType.Code);
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument ChargeTypeDoesNotExist()
+    {
+        _documentAsserter.IsNotPresent("Series[1]/chargeType.type");
         return this;
     }
 
     public IAssertNotifyWholesaleServicesDocument HasChargeTypeOwner(
-        ActorNumber? expectedChargeTypeOwner,
+        ActorNumber expectedChargeTypeOwner,
         string codingScheme)
     {
-        if (expectedChargeTypeOwner is not null)
-        {
-            _documentAsserter.HasValue(
-                "Series[1]/chargeType.chargeTypeOwner_MarketParticipant.mRID",
-                expectedChargeTypeOwner.Value);
-            _documentAsserter.HasAttribute(
-                "Series[1]/chargeType.chargeTypeOwner_MarketParticipant.mRID",
-                "codingScheme",
-                codingScheme);
-        }
-        else
-        {
-            _documentAsserter.IsNotPresent("Series[1]/chargeType.chargeTypeOwner_MarketParticipant.mRID");
-        }
+        ArgumentNullException.ThrowIfNull(expectedChargeTypeOwner);
+        _documentAsserter.HasValue(
+            "Series[1]/chargeType.chargeTypeOwner_MarketParticipant.mRID",
+            expectedChargeTypeOwner.Value);
+        _documentAsserter.HasAttribute(
+            "Series[1]/chargeType.chargeTypeOwner_MarketParticipant.mRID",
+            "codingScheme",
+            codingScheme);
+        return this;
+    }
 
+    public IAssertNotifyWholesaleServicesDocument ChargeTypeOwnerDoesNotExist()
+    {
+        _documentAsserter.IsNotPresent("Series[1]/chargeType.chargeTypeOwner_MarketParticipant.mRID");
         return this;
     }
 
@@ -269,17 +257,16 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasPriceMeasurementUnit(MeasurementUnit? expectedPriceMeasurementUnit)
+    public IAssertNotifyWholesaleServicesDocument HasPriceMeasurementUnit(MeasurementUnit expectedPriceMeasurementUnit)
     {
-        if (expectedPriceMeasurementUnit is not null)
-        {
-            _documentAsserter.HasValue("Series[1]/price_Measure_Unit.name", expectedPriceMeasurementUnit.Code);
-        }
-        else
-        {
-            _documentAsserter.IsNotPresent("Series[1]/price_Measure_Unit.name");
-        }
+        ArgumentNullException.ThrowIfNull(expectedPriceMeasurementUnit);
+        _documentAsserter.HasValue("Series[1]/price_Measure_Unit.name", expectedPriceMeasurementUnit.Code);
+        return this;
+    }
 
+    public IAssertNotifyWholesaleServicesDocument PriceMeasurementUnitDoesNotExist()
+    {
+        _documentAsserter.IsNotPresent("Series[1]/price_Measure_Unit.name");
         return this;
     }
 
@@ -299,17 +286,16 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasResolution(Resolution? resolution)
+    public IAssertNotifyWholesaleServicesDocument HasResolution(Resolution resolution)
     {
-        if (resolution is not null)
-        {
-            _documentAsserter.HasValue("Series[1]/Period/resolution", resolution.Code);
-        }
-        else
-        {
-            _documentAsserter.IsNotPresent("Series[1]/Period/resolution");
-        }
+        ArgumentNullException.ThrowIfNull(resolution);
+        _documentAsserter.HasValue("Series[1]/Period/resolution", resolution.Code);
+        return this;
+    }
 
+    public IAssertNotifyWholesaleServicesDocument ResolutionDoesNotExist()
+    {
+        _documentAsserter.IsNotPresent("Series[1]/Period/resolution");
         return this;
     }
 
@@ -370,79 +356,83 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         for (var i = 0; i < pointsInDocument.Count; i++)
         {
             pointsInDocument[i]
-                .XPathSelectElement(
-                    _documentAsserter.EnsureXPathHasPrefix("energySum_Quantity.quantity"),
-                    _documentAsserter.XmlNamespaceManager)!
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("energySum_Quantity.quantity"), _documentAsserter.XmlNamespaceManager)!
                 .Value
                 .ToDecimal()
                 .Should()
                 .Be(expectedPoints[i].Amount.ToDecimal());
 
-            if (expectedPoints[i].Quantity is not null)
-            {
-                pointsInDocument[i]
-                .XPathSelectElement(
-                    _documentAsserter.EnsureXPathHasPrefix("energy_Quantity.quantity"),
-                    _documentAsserter.XmlNamespaceManager)!
+            pointsInDocument[i]
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("energy_Quantity.quantity"), _documentAsserter.XmlNamespaceManager)!
                 .Value
                 .ToDecimal()
                 .Should()
                 .Be(expectedPoints[i].Quantity.ToDecimal());
-            }
-            else
-            {
-                _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{i}]/energy_Quantity.quantity");
-            }
 
             pointsInDocument[i]
-                .XPathSelectElement(
-                    _documentAsserter.EnsureXPathHasPrefix("position"),
-                    _documentAsserter.XmlNamespaceManager)!
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("position"), _documentAsserter.XmlNamespaceManager)!
                 .Value
                 .ToInt()
                 .Should()
                 .Be(i + 1);
 
-            if (expectedPoints[i].Price is not null)
-            {
-                pointsInDocument[i]
-                    .XPathSelectElement(
-                        _documentAsserter.EnsureXPathHasPrefix("price.amount"),
-                        _documentAsserter.XmlNamespaceManager)!
-                    .Value
-                    .ToDecimal()
-                    .Should()
-                    .Be(expectedPoints[i].Price.ToDecimal());
-            }
-            else
-            {
-                _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{i}]/price.amount");
-            }
+            pointsInDocument[i]
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("price.amount"), _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .ToDecimal()
+                .Should()
+                .Be(expectedPoints[i].Price.ToDecimal());
 
-            if (expectedPoints[i].QuantityQualities.Count > 0)
+            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
             {
-                var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
-                {
-                    // For WholesaleServices then calculated, estimated and measured is written as calculated
+                // For WholesaleServices then calculated, estimated and measured is written as calculated
                 QuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,
                 QuantityQuality.Estimated => CimCode.QuantityQualityCodeCalculated,
                 QuantityQuality.Measured => CimCode.QuantityQualityCodeCalculated,
-                    _ => throw new NotImplementedException(
-                        $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
-                };
-                pointsInDocument[i]
-                    .XPathSelectElement(
-                        _documentAsserter.EnsureXPathHasPrefix("quality"),
-                        _documentAsserter.XmlNamespaceManager)!
-                    .Value
-                    .Should()
-                    .Be(expectedQuantityQuality);
-            }
-            else
-            {
-                _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{i}]/quality");
-            }
+                _ => throw new NotImplementedException(
+                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
+            };
+
+            pointsInDocument[i]
+                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("quality"), _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .Should()
+                .Be(expectedQuantityQuality);
         }
+
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmount(DecimalValue expectedAmount)
+    {
+        ArgumentNullException.ThrowIfNull(expectedAmount);
+        var pointsInDocument = _documentAsserter
+            .GetElements("Series[1]/Period/Point")!;
+
+        var pointInDocument = pointsInDocument.Single();
+
+        pointInDocument
+            .XPathSelectElement(
+                _documentAsserter.EnsureXPathHasPrefix("energySum_Quantity.quantity"),
+                _documentAsserter.XmlNamespaceManager)!
+            .Value
+            .ToDecimal()
+            .Should()
+            .Be(expectedAmount.ToDecimal());
+
+        pointInDocument.XPathSelectElement(
+                _documentAsserter.EnsureXPathHasPrefix("position"),
+                _documentAsserter.XmlNamespaceManager)!
+            .Value
+            .ToInt()
+            .Should()
+            .Be(1);
+
+        _documentAsserter.IsNotPresent("Series[1]/Period/Point[1]/energy_Quantity.quantity");
+
+        _documentAsserter.IsNotPresent("Series[1]/Period/Point[1]/price.amount");
+
+        _documentAsserter.IsNotPresent("Series[1]/Period/Point[1]/quality");
 
         return this;
     }

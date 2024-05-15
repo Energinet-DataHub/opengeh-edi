@@ -36,7 +36,7 @@ public static class WholesaleServicesTotalSumMessageFactory
             eventId,
             receiver.ActorNumber,
             receiver.ActorRole,
-            BusinessReasonMapper.Map(totalMonthlyAmountResultProducedV1.CalculationType).Name,
+            BusinessReasonMapper.Map(totalMonthlyAmountResultProducedV1.CalculationType),
             message);
     }
 
@@ -60,7 +60,7 @@ public static class WholesaleServicesTotalSumMessageFactory
         ArgumentNullException.ThrowIfNull(message);
 
         return new WholesaleServicesTotalSumSeries(
-            TransactionId: Guid.NewGuid(),
+            TransactionId: Guid.NewGuid(), // TODO: Use TransactionId value object
             CalculationVersion: message.CalculationResultVersion,
             GridAreaCode: message.GridAreaCode,
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
