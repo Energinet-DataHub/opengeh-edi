@@ -44,5 +44,7 @@ public class MicrosoftFeatureFlagManager : IFeatureFlagManager
 
     public Task<bool> UseEnergyResultProducedAsync() => IsEnabledAsync(FeatureFlagName.UseEnergyResultProduced);
 
+    public Task<bool> UseCalculationResultsCompletedEventAsync() => IsEnabledAsync(FeatureFlagName.UseCalculationResultsCompletedEvent);
+
     private Task<bool> IsEnabledAsync(FeatureFlagName featureFlagName) => _featureManager.IsEnabledAsync(featureFlagName.ToString());
 }

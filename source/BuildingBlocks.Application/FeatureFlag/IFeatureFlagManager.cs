@@ -59,4 +59,10 @@ public interface IFeatureFlagManager
     /// Whether to allow handling EnergyResultProducedV2 events.
     /// </summary>
     Task<bool> UseEnergyResultProducedAsync();
+
+    /// <summary>
+    /// When true we use the 'EnqueueMessagesOrchestration' to prepare messages;
+    /// otherwise we prepare messages based on the old implementation.
+    /// </summary>
+    Task<bool> UseCalculationResultsCompletedEventAsync();
 }
