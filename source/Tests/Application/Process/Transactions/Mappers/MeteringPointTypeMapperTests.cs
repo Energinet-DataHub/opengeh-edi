@@ -12,39 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Linq;
-using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Exceptions;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories.Mappers;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
-using FluentAssertions;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Application.Process.Transactions.Mappers;
 
 public class MeteringPointTypeMapperTests : BaseEnumMapperTests
 {
-    private static readonly AmountPerChargeResultProducedV1.Types.MeteringPointType[] _invalidValues =
-    {
-        AmountPerChargeResultProducedV1.Types.MeteringPointType.VeProduction,
-        AmountPerChargeResultProducedV1.Types.MeteringPointType.NetProduction,
-        AmountPerChargeResultProducedV1.Types.MeteringPointType.SupplyToGrid,
-        AmountPerChargeResultProducedV1.Types.MeteringPointType.ConsumptionFromGrid,
-        AmountPerChargeResultProducedV1.Types.MeteringPointType.WholesaleServicesInformation,
-        AmountPerChargeResultProducedV1.Types.MeteringPointType.OwnProduction,
-        AmountPerChargeResultProducedV1.Types.MeteringPointType.NetFromGrid,
-        AmountPerChargeResultProducedV1.Types.MeteringPointType.NetToGrid,
-        AmountPerChargeResultProducedV1.Types.MeteringPointType.TotalConsumption,
-        AmountPerChargeResultProducedV1.Types.MeteringPointType.ElectricalHeating,
-        AmountPerChargeResultProducedV1.Types.MeteringPointType.NetConsumption,
-        AmountPerChargeResultProducedV1.Types.MeteringPointType.EffectSettlement,
-    };
-
-    public static IEnumerable<object[]> GetInvalidAmountPerChargeResultProducedV1MeteringPointTypes()
-    {
-        return _invalidValues.Select(document => new object[] { document }).ToList();
-    }
-
     [Theory]
     [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.TimeSeriesType))]
     public void Ensure_handling_energy_result_produced(EnergyResultProducedV2.Types.TimeSeriesType value)
@@ -60,15 +35,5 @@ public class MeteringPointTypeMapperTests : BaseEnumMapperTests
         => EnsureCanMapOrThrows(
             () => MeteringPointTypeMapper.Map(value),
             value,
-            unspecifiedValue: AmountPerChargeResultProducedV1.Types.MeteringPointType.Unspecified,
-            invalidValues: _invalidValues);
-
-    [Theory]
-    [MemberData(nameof(GetInvalidAmountPerChargeResultProducedV1MeteringPointTypes))]
-    public void Ensure_throws_domain_exception(AmountPerChargeResultProducedV1.Types.MeteringPointType value)
-    {
-        var act = () => MeteringPointTypeMapper.Map(value);
-
-        act.Should().ThrowExactly<NotSupportedMeteringPointTypeException>();
-    }
+            unspecifiedValue: AmountPerChargeResultProducedV1.Types.MeteringPointType.Unspecified);
 }

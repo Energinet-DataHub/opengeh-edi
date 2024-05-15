@@ -402,7 +402,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         Assert.DoesNotContain(result.Errors, error => error is SenderRoleTypeIsNotAuthorized);
     }
 
-    [Theory(Skip = "Depends on CIM XML parser for wholesale services requests")]
+    [Theory]
     [MemberData(nameof(AllowedActorRolesForWholesaleServices))]
     public async Task Sender_role_type_for_wholesale_services_must_be_the_role_of(string role)
     {
