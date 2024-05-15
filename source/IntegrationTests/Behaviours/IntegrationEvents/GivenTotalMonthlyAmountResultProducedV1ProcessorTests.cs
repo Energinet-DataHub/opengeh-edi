@@ -29,7 +29,7 @@ using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents;
 
-public class GivenTotalMonthlyAmountResultProducedV1ProcessorTests : WholesaleServicesBehaviourTestBase
+public class GivenTotalMonthlyAmountResultProducedV1ReceivedTests : WholesaleServicesBehaviourTestBase
 {
     public GivenTotalMonthlyAmountResultProducedV1ProcessorTests(
         IntegrationTestFixture integrationTestFixture,
