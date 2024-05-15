@@ -14,7 +14,7 @@
 
 using System.Net.Http.Headers;
 using System.Text;
-using Energinet.DataHub.EDI.AcceptanceTests.Responses.json;
+using Energinet.DataHub.EDI.AcceptanceTests.Responses.Json;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Nito.AsyncEx;
