@@ -259,6 +259,7 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
             .GetString()
             .Should()
             .Be(expectedMeteringPointType.Code);
+
         return this;
     }
 
