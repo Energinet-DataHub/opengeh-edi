@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
+using FluentAssertions;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using Xunit;
@@ -44,7 +45,7 @@ public class GivenMonthlyAmountPerChargeResultProducedV1ReceivedTests : Wholesal
 #pragma warning restore CS1570 // XML comment has badly formed XML
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
-    public async Task When_EnergySupplierActorPeeksMessage_Then_ReceivesCorrectNotifyWholesaleServicesDocument(DocumentFormat documentFormat)
+    public async Task When_ChargeIsNotTaxAndEnergySupplierAndChargeOwnerActorPeeksMessage_Then_ReceivesCorrectNotifyWholesaleServicesDocuments(DocumentFormat documentFormat)
     {
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
 
@@ -62,50 +63,65 @@ public class GivenMonthlyAmountPerChargeResultProducedV1ReceivedTests : Wholesal
         await GivenIntegrationEventReceived(monthlyAmountPerChargeResultProducedEvent);
 
         // Act
-        var peekResult = await WhenActorPeeksMessage(ActorNumber.Create("5799999933318"), ActorRole.EnergySupplier, documentFormat);
+        var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(ActorNumber.Create("5799999933318"), ActorRole.EnergySupplier, documentFormat);
+        var peekResultsForChargeOwner = await WhenActorPeeksAllMessages(ActorNumber.Create("5799999933444"), ActorRole.GridOperator, documentFormat);
 
         // Assert
-        // -- Maybe this should force a list of properties, instead of using a builder? Then we are forced to always assert each property.
-        await ThenNotifyWholesaleServicesDocumentIsCorrect(
-            peekResult.Bundle,
-            documentFormat,
-            new NotifyWholesaleServicesDocumentAssertionInput(
-                Timestamp: "2022-09-07T13:37:05Z",
-                BusinessReasonWithSettlementVersion: new(BusinessReason.WholesaleFixing, null),
-                ReceiverId: "5799999933318",
-                ReceiverRole: ActorRole.EnergySupplier,
-                SenderId: "5790001330552",
-                SenderRole: ActorRole.MeteredDataAdministrator,
-                ChargeTypeOwner: "5799999933444",
-                ChargeCode: "25361478",
-                ChargeType: ChargeType.Tariff,
-                Currency: Currency.DanishCrowns,
-                EnergySupplierNumber: "5799999933318",
-                SettlementMethod: null,
-                MeteringPointType: null,
-                GridArea: "244",
-                OriginalTransactionIdReference: null,
-                PriceMeasurementUnit: MeasurementUnit.Kwh,
-                ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
-                QuantityMeasurementUnit: MeasurementUnit.Kwh,
-                CalculationVersion: 1,
-                Resolution: Resolution.Monthly,
-                Period: new Period(CreateDateInstant(2022, 09, 06), CreateDateInstant(2022, 09, 07)),
-                Points: new[]
+        var peekResultForEnergySupplier = peekResultsForEnergySupplier.Should().ContainSingle().Subject;
+        var peekResultForChargeOwner = peekResultsForChargeOwner.Should().ContainSingle().Subject;
+
+        var assertionInputForEnergySupplier = new NotifyWholesaleServicesDocumentAssertionInput(
+            Timestamp: "2022-09-07T13:37:05Z",
+            BusinessReasonWithSettlementVersion: new(BusinessReason.WholesaleFixing, null),
+            ReceiverId: "5799999933318",
+            ReceiverRole: ActorRole.EnergySupplier,
+            SenderId: "5790001330552",
+            SenderRole: ActorRole.MeteredDataAdministrator,
+            ChargeTypeOwner: "5799999933444",
+            ChargeCode: "25361478",
+            ChargeType: ChargeType.Tariff,
+            Currency: Currency.DanishCrowns,
+            EnergySupplierNumber: "5799999933318",
+            SettlementMethod: null,
+            MeteringPointType: null,
+            GridArea: "244",
+            OriginalTransactionIdReference: null,
+            PriceMeasurementUnit: MeasurementUnit.Kwh,
+            ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
+            QuantityMeasurementUnit: MeasurementUnit.Kwh,
+            CalculationVersion: 1,
+            Resolution: Resolution.Monthly,
+            Period: new Period(CreateDateInstant(2022, 09, 06), CreateDateInstant(2022, 09, 07)),
+            Points: new[]
+            {
+                new WholesaleServicesRequestSeries.Types.Point
                 {
-                    new WholesaleServicesRequestSeries.Types.Point
-                    {
-                        Price = null,
-                        Quantity = null,
-                        Amount = DecimalValue.FromDecimal(30),
-                        QuantityQualities = { },
-                    },
-                }));
+                    Price = null,
+                    Quantity = null,
+                    Amount = DecimalValue.FromDecimal(30),
+                    QuantityQualities = { },
+                },
+            });
+
+        var assertionInputForChargeOwner = assertionInputForEnergySupplier with
+        {
+            ReceiverId = "5799999933444",
+            ReceiverRole = ActorRole.GridOperator,
+        };
+
+        await ThenNotifyWholesaleServicesDocumentIsCorrect(
+            peekResultForEnergySupplier.Bundle,
+            documentFormat,
+            assertionInputForEnergySupplier);
+        await ThenNotifyWholesaleServicesDocumentIsCorrect(
+            peekResultForChargeOwner.Bundle,
+            documentFormat,
+            assertionInputForChargeOwner);
     }
 
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
-    public async Task When_ChargeIsTax_Then_GridOwnerReceivesCorrectNotifyWholesaleServicesDocument(
+    public async Task When_ChargeIsTaxAndEnergySupplierAndGridOwnerActorPeeksMessage_Then_ReceivesCorrectNotifyWholesaleServicesDocument(
         DocumentFormat documentFormat)
     {
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
@@ -127,121 +143,73 @@ public class GivenMonthlyAmountPerChargeResultProducedV1ReceivedTests : Wholesal
         await GivenIntegrationEventReceived(monthlyAmountPerChargeResultProducedEvent);
 
         // Act
-        var peekResult = await WhenActorPeeksMessage(ActorNumber.Create(gridOwnerActorNumber.Value), ActorRole.GridOperator, documentFormat);
+        var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(ActorNumber.Create("5799999933318"), ActorRole.EnergySupplier, documentFormat);
+        var peekResultsForGridOperator = await WhenActorPeeksAllMessages(ActorNumber.Create(gridOwnerActorNumber.Value), ActorRole.GridOperator, documentFormat);
+        var peekResultsForChargeOwner = await WhenActorPeeksAllMessages(ActorNumber.Create("5799999933444"), ActorRole.GridOperator, documentFormat);
 
         // Assert
-        // -- Maybe this should force a list of properties, instead of using a builder? Then we are forced to always assert each property.
-        await ThenNotifyWholesaleServicesDocumentIsCorrect(
-            peekResult.Bundle,
-            documentFormat,
-            new NotifyWholesaleServicesDocumentAssertionInput(
-                Timestamp: "2022-09-07T13:37:05Z",
-                BusinessReasonWithSettlementVersion: new(BusinessReason.WholesaleFixing, null),
-                ReceiverId: gridOwnerActorNumber.Value,
-                ReceiverRole: ActorRole.GridOperator,
-                SenderId: "5790001330552",
-                SenderRole: ActorRole.MeteredDataAdministrator,
-                ChargeTypeOwner: "5799999933444",
-                ChargeCode: "25361478",
-                ChargeType: ChargeType.Tariff,
-                Currency: Currency.DanishCrowns,
-                EnergySupplierNumber: "5799999933318",
-                SettlementMethod: null,
-                MeteringPointType: null,
-                GridArea: "244",
-                OriginalTransactionIdReference: null,
-                PriceMeasurementUnit: MeasurementUnit.Kwh,
-                ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
-                QuantityMeasurementUnit: MeasurementUnit.Kwh,
-                CalculationVersion: 1,
-                Resolution: Resolution.Monthly,
-                Period: new Period(CreateDateInstant(2022, 09, 06), CreateDateInstant(2022, 09, 07)),
-                Points: new[]
+        var peekResultForEnergySupplier = peekResultsForEnergySupplier.Should().ContainSingle().Subject;
+        var peekResultForGridOperator = peekResultsForGridOperator.Should().ContainSingle().Subject;
+        peekResultsForChargeOwner.Should().BeEmpty();
+
+        var assertionInputForEnergySupplier = new NotifyWholesaleServicesDocumentAssertionInput(
+            Timestamp: "2022-09-07T13:37:05Z",
+            BusinessReasonWithSettlementVersion: new(BusinessReason.WholesaleFixing, null),
+            ReceiverId: "5799999933318",
+            ReceiverRole: ActorRole.EnergySupplier,
+            SenderId: "5790001330552",
+            SenderRole: ActorRole.MeteredDataAdministrator,
+            ChargeTypeOwner: "5799999933444",
+            ChargeCode: "25361478",
+            ChargeType: ChargeType.Tariff,
+            Currency: Currency.DanishCrowns,
+            EnergySupplierNumber: "5799999933318",
+            SettlementMethod: null,
+            MeteringPointType: null,
+            GridArea: "244",
+            OriginalTransactionIdReference: null,
+            PriceMeasurementUnit: MeasurementUnit.Kwh,
+            ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
+            QuantityMeasurementUnit: MeasurementUnit.Kwh,
+            CalculationVersion: 1,
+            Resolution: Resolution.Monthly,
+            Period: new Period(CreateDateInstant(2022, 09, 06), CreateDateInstant(2022, 09, 07)),
+            Points: new[]
+            {
+                new WholesaleServicesRequestSeries.Types.Point
                 {
-                    new WholesaleServicesRequestSeries.Types.Point
-                    {
-                        Price = null,
-                        Quantity = null,
-                        Amount = DecimalValue.FromDecimal(30),
-                        QuantityQualities = { },
-                    },
-                }));
+                    Price = null,
+                    Quantity = null,
+                    Amount = DecimalValue.FromDecimal(30),
+                    QuantityQualities = { },
+                },
+            });
+
+        var assertionInputForGridOperator = assertionInputForEnergySupplier with
+        {
+            ReceiverId = gridOwnerActorNumber.Value,
+            ReceiverRole = ActorRole.GridOperator,
+        };
+
+        await ThenNotifyWholesaleServicesDocumentIsCorrect(
+            peekResultForEnergySupplier.Bundle,
+            documentFormat,
+            assertionInputForEnergySupplier);
+        await ThenNotifyWholesaleServicesDocumentIsCorrect(
+            peekResultForGridOperator.Bundle,
+            documentFormat,
+            assertionInputForGridOperator);
     }
 
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
-    public async Task When_ChargeIsNotTax_Then_ChargeOwnerReceivesCorrectNotifyWholesaleServicesDocument(
+    public async Task When_ChargeIsNotTaxAndChargeOwnerIsSystemOperatorAndEnergySupplierAndSystemOperatorActorPeeksMessage_Then_ReceivesCorrectNotifyWholesaleServicesDocuments(
         DocumentFormat documentFormat)
     {
-        GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
-
-        // Arrange
-        var chargeOwner = "5799999933444";
-        var monthlyAmountPerChargeResultProducedEvent = GivenMonthlyAmountPerChargeResultProducedV1Event(
-            periodStart: CreateDateInstant(2022, 09, 06),
-            periodEnd: CreateDateInstant(2022, 09, 07),
-            gridAreaCode: "244",
-            energySupplierId: "5799999933318",
-            chargeOwnerId: chargeOwner,
-            chargeCode: "25361478",
-            chargeType: MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Tariff,
-            isTax: false);
-
-        await GivenIntegrationEventReceived(monthlyAmountPerChargeResultProducedEvent);
-
-        // Act
-        var peekResult = await WhenActorPeeksMessage(ActorNumber.Create(chargeOwner), ActorRole.GridOperator, documentFormat);
-
-        // Assert
-        // -- Maybe this should force a list of properties, instead of using a builder? Then we are forced to always assert each property.
-        await ThenNotifyWholesaleServicesDocumentIsCorrect(
-            peekResult.Bundle,
-            documentFormat,
-            new NotifyWholesaleServicesDocumentAssertionInput(
-                Timestamp: "2022-09-07T13:37:05Z",
-                BusinessReasonWithSettlementVersion: new(BusinessReason.WholesaleFixing, null),
-                ReceiverId: chargeOwner,
-                ReceiverRole: ActorRole.GridOperator,
-                SenderId: "5790001330552",
-                SenderRole: ActorRole.MeteredDataAdministrator,
-                ChargeTypeOwner: chargeOwner,
-                ChargeCode: "25361478",
-                ChargeType: ChargeType.Tariff,
-                Currency: Currency.DanishCrowns,
-                EnergySupplierNumber: "5799999933318",
-                SettlementMethod: null,
-                MeteringPointType: null,
-                GridArea: "244",
-                OriginalTransactionIdReference: null,
-                PriceMeasurementUnit: MeasurementUnit.Kwh,
-                ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
-                QuantityMeasurementUnit: MeasurementUnit.Kwh,
-                CalculationVersion: 1,
-                Resolution: Resolution.Monthly,
-                Period: new Period(CreateDateInstant(2022, 09, 06), CreateDateInstant(2022, 09, 07)),
-                Points: new[]
-                {
-                    new WholesaleServicesRequestSeries.Types.Point
-                    {
-                        Price = null,
-                        Quantity = null,
-                        Amount = DecimalValue.FromDecimal(30),
-                        QuantityQualities = { },
-                    },
-                }));
-    }
-
-    [Theory]
-    [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
-    public async Task When_ChargeIsNotTaxAndChargeOwnerIsSystemOperator_Then_SystemOperatorReceivesCorrectNotifyWholesaleServicesDocument(
-        DocumentFormat documentFormat)
-    {
-        // receiver role = EZ
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
 
         // Arrange
         var chargeOwner = DataHubDetails.SystemOperatorActorNumber;
-        // -- Maybe this should force a list of properties, instead of using a builder? Then we are forced to always provide each property.
         var monthlyAmountPerChargeResultProducedEvent = GivenMonthlyAmountPerChargeResultProducedV1Event(
             periodStart: CreateDateInstant(2022, 09, 06),
             periodEnd: CreateDateInstant(2022, 09, 07),
@@ -255,45 +223,144 @@ public class GivenMonthlyAmountPerChargeResultProducedV1ReceivedTests : Wholesal
         await GivenIntegrationEventReceived(monthlyAmountPerChargeResultProducedEvent);
 
         // Act
-        var peekResult = await WhenActorPeeksMessage(ActorNumber.Create(chargeOwner.Value), ActorRole.SystemOperator, documentFormat);
+        var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(ActorNumber.Create("5799999933318"), ActorRole.EnergySupplier, documentFormat);
+        var peekResultsForChargeOwner = await WhenActorPeeksAllMessages(ActorNumber.Create(chargeOwner.Value), ActorRole.SystemOperator, documentFormat);
 
         // Assert
-        // -- Maybe this should force a list of properties, instead of using a builder? Then we are forced to always assert each property.
-        await ThenNotifyWholesaleServicesDocumentIsCorrect(
-            peekResult.Bundle,
-            documentFormat,
-            new NotifyWholesaleServicesDocumentAssertionInput(
-                Timestamp: "2022-09-07T13:37:05Z",
-                BusinessReasonWithSettlementVersion: new(BusinessReason.WholesaleFixing, null),
-                ReceiverId: chargeOwner.Value,
-                ReceiverRole: ActorRole.SystemOperator,
-                SenderId: "5790001330552",
-                SenderRole: ActorRole.MeteredDataAdministrator,
-                ChargeTypeOwner: chargeOwner.Value,
-                ChargeCode: "25361478",
-                ChargeType: ChargeType.Tariff,
-                Currency: Currency.DanishCrowns,
-                EnergySupplierNumber: "5799999933318",
-                SettlementMethod: null,
-                MeteringPointType: null,
-                GridArea: "244",
-                OriginalTransactionIdReference: null,
-                PriceMeasurementUnit: MeasurementUnit.Kwh,
-                ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
-                QuantityMeasurementUnit: MeasurementUnit.Kwh,
-                CalculationVersion: 1,
-                Resolution: Resolution.Monthly,
-                Period: new Period(CreateDateInstant(2022, 09, 06), CreateDateInstant(2022, 09, 07)),
-                Points: new[]
+        var peekResultForEnergySupplier = peekResultsForEnergySupplier.Should().ContainSingle().Subject;
+        var peekResultForChargeOwner = peekResultsForChargeOwner.Should().ContainSingle().Subject;
+
+        var assertionInputForEnergySupplier = new NotifyWholesaleServicesDocumentAssertionInput(
+            Timestamp: "2022-09-07T13:37:05Z",
+            BusinessReasonWithSettlementVersion: new(BusinessReason.WholesaleFixing, null),
+            ReceiverId: "5799999933318",
+            ReceiverRole: ActorRole.EnergySupplier,
+            SenderId: "5790001330552",
+            SenderRole: ActorRole.MeteredDataAdministrator,
+            ChargeTypeOwner: chargeOwner.Value,
+            ChargeCode: "25361478",
+            ChargeType: ChargeType.Tariff,
+            Currency: Currency.DanishCrowns,
+            EnergySupplierNumber: "5799999933318",
+            SettlementMethod: null,
+            MeteringPointType: null,
+            GridArea: "244",
+            OriginalTransactionIdReference: null,
+            PriceMeasurementUnit: MeasurementUnit.Kwh,
+            ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
+            QuantityMeasurementUnit: MeasurementUnit.Kwh,
+            CalculationVersion: 1,
+            Resolution: Resolution.Monthly,
+            Period: new Period(CreateDateInstant(2022, 09, 06), CreateDateInstant(2022, 09, 07)),
+            Points: new[]
+            {
+                new WholesaleServicesRequestSeries.Types.Point
                 {
-                    new WholesaleServicesRequestSeries.Types.Point
-                    {
-                        Price = null,
-                        Quantity = null,
-                        Amount = DecimalValue.FromDecimal(30),
-                        QuantityQualities = { },
-                    },
-                }));
+                    Price = null,
+                    Quantity = null,
+                    Amount = DecimalValue.FromDecimal(30),
+                    QuantityQualities = { },
+                },
+            });
+
+        var assertionInputForChargeOwner = assertionInputForEnergySupplier with
+        {
+            ReceiverId = chargeOwner.Value,
+            ReceiverRole = ActorRole.SystemOperator,
+        };
+
+        await ThenNotifyWholesaleServicesDocumentIsCorrect(
+            peekResultForEnergySupplier.Bundle,
+            documentFormat,
+            assertionInputForEnergySupplier);
+        await ThenNotifyWholesaleServicesDocumentIsCorrect(
+            peekResultForChargeOwner.Bundle,
+            documentFormat,
+            assertionInputForChargeOwner);
+    }
+
+    [Theory]
+    [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
+    public async Task When_ChargeIsTaxAndChargeOwnerIsSystemOperatorAndEnergySupplierAndGridOwnerActorPeeksMessage_Then_ReceivesCorrectNotifyWholesaleServicesDocuments(
+        DocumentFormat documentFormat)
+    {
+        // receiver role = EZ
+        GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
+
+        // Arrange
+        var gridOwnerActorNumber = ActorNumber.Create("5799999933555");
+        await GivenGridAreaOwnershipAsync("244", gridOwnerActorNumber);
+        var chargeOwner = DataHubDetails.SystemOperatorActorNumber;
+        // -- Maybe this should force a list of properties, instead of using a builder? Then we are forced to always provide each property.
+        var monthlyAmountPerChargeResultProducedEvent = GivenMonthlyAmountPerChargeResultProducedV1Event(
+            periodStart: CreateDateInstant(2022, 09, 06),
+            periodEnd: CreateDateInstant(2022, 09, 07),
+            gridAreaCode: "244",
+            energySupplierId: "5799999933318",
+            chargeOwnerId: chargeOwner.Value,
+            chargeCode: "25361478",
+            chargeType: MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Tariff,
+            isTax: true);
+
+        await GivenIntegrationEventReceived(monthlyAmountPerChargeResultProducedEvent);
+
+        // Act
+        var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(ActorNumber.Create("5799999933318"), ActorRole.EnergySupplier, documentFormat);
+        var peekResultsForGridOperator = await WhenActorPeeksAllMessages(ActorNumber.Create(gridOwnerActorNumber.Value), ActorRole.GridOperator, documentFormat);
+        var peekResultsForChargeOwner = await WhenActorPeeksAllMessages(ActorNumber.Create(chargeOwner.Value), ActorRole.SystemOperator, documentFormat);
+
+        // Assert
+        var peekResultForEnergySupplier = peekResultsForEnergySupplier.Should().ContainSingle().Subject;
+        var peekResultForGridOperator = peekResultsForGridOperator.Should().ContainSingle().Subject;
+        peekResultsForChargeOwner.Should().BeEmpty();
+
+        var assertionInputForEnergySupplier = new NotifyWholesaleServicesDocumentAssertionInput(
+            Timestamp: "2022-09-07T13:37:05Z",
+            BusinessReasonWithSettlementVersion: new(BusinessReason.WholesaleFixing, null),
+            ReceiverId: "5799999933318",
+            ReceiverRole: ActorRole.EnergySupplier,
+            SenderId: "5790001330552",
+            SenderRole: ActorRole.MeteredDataAdministrator,
+            ChargeTypeOwner: chargeOwner.Value,
+            ChargeCode: "25361478",
+            ChargeType: ChargeType.Tariff,
+            Currency: Currency.DanishCrowns,
+            EnergySupplierNumber: "5799999933318",
+            SettlementMethod: null,
+            MeteringPointType: null,
+            GridArea: "244",
+            OriginalTransactionIdReference: null,
+            PriceMeasurementUnit: MeasurementUnit.Kwh,
+            ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
+            QuantityMeasurementUnit: MeasurementUnit.Kwh,
+            CalculationVersion: 1,
+            Resolution: Resolution.Monthly,
+            Period: new Period(CreateDateInstant(2022, 09, 06), CreateDateInstant(2022, 09, 07)),
+            Points: new[]
+            {
+                new WholesaleServicesRequestSeries.Types.Point
+                {
+                    Price = null,
+                    Quantity = null,
+                    Amount = DecimalValue.FromDecimal(30),
+                    QuantityQualities = { },
+                },
+            });
+
+        var assertionInputForGridOperator = assertionInputForEnergySupplier with
+        {
+            ReceiverId = gridOwnerActorNumber.Value,
+            ReceiverRole = ActorRole.GridOperator,
+        };
+
+        await ThenNotifyWholesaleServicesDocumentIsCorrect(
+            peekResultForEnergySupplier.Bundle,
+            documentFormat,
+            assertionInputForEnergySupplier);
+        await ThenNotifyWholesaleServicesDocumentIsCorrect(
+            peekResultForGridOperator.Bundle,
+            documentFormat,
+            assertionInputForGridOperator);
     }
 
     private MonthlyAmountPerChargeResultProducedV1 GivenMonthlyAmountPerChargeResultProducedV1Event(
