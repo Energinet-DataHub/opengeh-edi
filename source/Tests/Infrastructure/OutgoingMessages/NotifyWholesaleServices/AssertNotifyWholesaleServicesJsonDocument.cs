@@ -262,12 +262,10 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
     public IAssertNotifyWholesaleServicesDocument MeteringPointTypeDoesNotExist()
     {
-        var act = () => FirstWholesaleSeriesElement()
-            .GetProperty("marketEvaluationPoint.type");
-
-        act.Should()
-            .ThrowExactly<KeyNotFoundException>()
-            .WithMessage("The given key was not present in the dictionary.");
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("marketEvaluationPoint.type", out _)
+            .Should()
+            .BeFalse();
         return this;
     }
 
@@ -283,12 +281,10 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
     public IAssertNotifyWholesaleServicesDocument ChargeCodeDoesNotExist()
     {
-        var act = () => FirstWholesaleSeriesElement()
-            .GetProperty("chargeType.mRID");
-
-        act.Should()
-            .ThrowExactly<KeyNotFoundException>()
-            .WithMessage("The given key was not present in the dictionary.");
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("chargeType.mRID", out _)
+            .Should()
+            .BeFalse();
         return this;
     }
 
@@ -306,12 +302,10 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
     public IAssertNotifyWholesaleServicesDocument ChargeTypeDoesNotExist()
     {
-        var act = () => FirstWholesaleSeriesElement()
-            .GetProperty("chargeType.type");
-
-        act.Should()
-            .ThrowExactly<KeyNotFoundException>()
-            .WithMessage("The given key was not present in the dictionary.");
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("chargeType.type", out _)
+            .Should()
+            .BeFalse();
         return this;
     }
 
@@ -338,12 +332,10 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
     public IAssertNotifyWholesaleServicesDocument ChargeTypeOwnerDoesNotExist()
     {
-        var act = () => FirstWholesaleSeriesElement()
-            .GetProperty("chargeType.chargeTypeOwner_MarketParticipant.mRID");
-
-        act.Should()
-            .ThrowExactly<KeyNotFoundException>()
-            .WithMessage("The given key was not present in the dictionary.");
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("chargeType.chargeTypeOwner_MarketParticipant.mRID", out _)
+            .Should()
+            .BeFalse();
         return this;
     }
 
@@ -397,25 +389,13 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
     public IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit expectedMeasurementUnit)
     {
-        if (expectedMeasurementUnit is not null)
-        {
-            FirstWholesaleSeriesElement()
-                .GetProperty("quantity_Measure_Unit.name")
-                .GetProperty("value")
-                .GetString()
-                .Should()
-                .Be(expectedMeasurementUnit.Code);
-        }
-        else
-        {
-            var act = () => FirstWholesaleSeriesElement()
-                .GetProperty("quantity_Measure_Unit.name");
-
-            act.Should()
-                .ThrowExactly<KeyNotFoundException>()
-                .WithMessage("The given key was not present in the dictionary.");
-        }
-
+        ArgumentNullException.ThrowIfNull(expectedMeasurementUnit);
+        FirstWholesaleSeriesElement()
+            .GetProperty("quantity_Measure_Unit.name")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(expectedMeasurementUnit.Code);
         return this;
     }
 
@@ -434,12 +414,10 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
     public IAssertNotifyWholesaleServicesDocument PriceMeasurementUnitDoesNotExist()
     {
-        var act = () => FirstWholesaleSeriesElement()
-            .GetProperty("price_Measure_Unit.name");
-
-        act.Should()
-            .ThrowExactly<KeyNotFoundException>()
-            .WithMessage("The given key was not present in the dictionary.");
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("price_Measure_Unit.name", out _)
+            .Should()
+            .BeFalse();
         return this;
     }
 
@@ -494,13 +472,11 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
     public IAssertNotifyWholesaleServicesDocument ResolutionDoesNotExist()
     {
-        var act = () => FirstWholesaleSeriesElement()
+        FirstWholesaleSeriesElement()
             .GetProperty("Period")
-            .GetProperty("resolution");
-
-        act.Should()
-            .ThrowExactly<KeyNotFoundException>()
-            .WithMessage("The given key was not present in the dictionary.");
+            .TryGetProperty("resolution", out _)
+            .Should()
+            .BeFalse();
         return this;
     }
 
@@ -556,13 +532,10 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
     public IAssertNotifyWholesaleServicesDocument SettlementMethodDoesNotExist()
     {
-        var act = () => FirstWholesaleSeriesElement()
-            .GetProperty("marketEvaluationPoint.settlementMethod");
-
-        act.Should()
-            .ThrowExactly<KeyNotFoundException>()
-            .WithMessage("The given key was not present in the dictionary.");
-
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("marketEvaluationPoint.settlementMethod", out _)
+            .Should()
+            .BeFalse();
         return this;
     }
 
@@ -688,33 +661,30 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
             .Should()
             .Be(1);
 
-        var quantityAct = () => pointInDocument.GetProperty("energy_Quantity.quantity");
-        quantityAct.Should()
-            .ThrowExactly<KeyNotFoundException>()
-            .WithMessage("The given key was not present in the dictionary.");
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("energy_Quantity.quantity", out _)
+            .Should()
+            .BeFalse();
 
-        var priceAmountAct = () => pointInDocument.GetProperty("price.amount");
-        priceAmountAct.Should()
-            .ThrowExactly<KeyNotFoundException>()
-            .WithMessage("The given key was not present in the dictionary.");
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("price.amount", out _)
+            .Should()
+            .BeFalse();
 
-        var qualityAct = () => pointInDocument.GetProperty("quality");
-        qualityAct.Should()
-            .ThrowExactly<KeyNotFoundException>()
-            .WithMessage("The given key was not present in the dictionary.");
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("quality", out _)
+            .Should()
+            .BeFalse();
 
         return this;
     }
 
     public IAssertNotifyWholesaleServicesDocument SettlementVersionDoesNotExist()
     {
-        var act = () => FirstWholesaleSeriesElement()
-            .GetProperty("settlement_Series.version");
-
-        act.Should()
-            .ThrowExactly<KeyNotFoundException>()
-            .WithMessage("The given key was not present in the dictionary.");
-
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("settlement_Series.version", out _)
+            .Should()
+            .BeFalse();
         return this;
     }
 

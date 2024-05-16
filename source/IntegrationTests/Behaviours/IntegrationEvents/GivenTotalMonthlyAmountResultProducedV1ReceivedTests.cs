@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
+using FluentAssertions;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using Xunit;
@@ -68,7 +69,7 @@ public class GivenTotalMonthlyAmountResultProducedV1ReceivedTests : WholesaleSer
         var peekResultsAsChargeOwner = await WhenActorPeeksAllMessages(ActorNumber.Create(chargeOwnerId), ActorRole.GridOperator, documentFormat);
 
         // Assert
-        var peekResultAsChargeOwner = peekResultsAsChargeOwner.Single();
+        var peekResultAsChargeOwner = peekResultsAsChargeOwner.Should().ContainSingle().Subject;
         var expectedDocumentToChargeOwner = new NotifyWholesaleServicesDocumentAssertionInput(
             Timestamp: "2022-09-07T13:37:05Z",
             BusinessReasonWithSettlementVersion: new(BusinessReason.WholesaleFixing, null),
@@ -135,7 +136,7 @@ public class GivenTotalMonthlyAmountResultProducedV1ReceivedTests : WholesaleSer
         var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(ActorNumber.Create(energySupplierId), ActorRole.EnergySupplier, documentFormat);
 
         // Assert
-        var peekResultForEnergySupplier = peekResultsForEnergySupplier.Single();
+        var peekResultForEnergySupplier = peekResultsForEnergySupplier.Should().ContainSingle().Subject;
         var expectedDocumentToEnergySupplier = new NotifyWholesaleServicesDocumentAssertionInput(
             Timestamp: "2022-09-07T13:37:05Z",
             BusinessReasonWithSettlementVersion: new(BusinessReason.WholesaleFixing, null),
