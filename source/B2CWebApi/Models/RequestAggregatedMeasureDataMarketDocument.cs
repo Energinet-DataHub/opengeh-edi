@@ -27,7 +27,7 @@ public enum MeteringPointType
 /// Responsible for carrying the market message data from the incoming message before any data validation.
 /// </summary>
 public record RequestAggregatedMeasureDataMarketRequest(
-    CalculationType ProcessType, // TODO: Rename property to CalculationType when we implement RequestWholesaleSettlement in BFF
+    CalculationType CalculationType,
     MeteringPointType? MeteringPointType,
     string StartDate,
     string EndDate,

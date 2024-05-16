@@ -17,7 +17,7 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 /// <summary>
 ///     Responsible for carrying the market message data from the incoming message before any data validation.
 /// </summary>
-public record RequestWholesaleSettlementMarketRequest(
+public sealed record RequestWholesaleSettlementMarketRequest(
     CalculationType CalculationType, // TODO: Rename property to CalculationType when we implement RequestWholesaleSettlement in BFF
     string StartDate,
     string EndDate,
@@ -25,4 +25,6 @@ public record RequestWholesaleSettlementMarketRequest(
     string? EnergySupplierId,
     string? Resolution,
     string? ChargeOwner,
-    IReadOnlyCollection<(string? Id, string? Type)> ChargeTypes);
+    IReadOnlyCollection<RequestWholesaleSettlementChargeType> ChargeTypes);
+
+public sealed record RequestWholesaleSettlementChargeType(string? Id, string? Type);

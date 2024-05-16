@@ -40,4 +40,6 @@ public record RequestWholesaleSettlementSeries(
     string? SettlementVersion,
     string? Resolution,
     string? ChargeOwner,
-    IReadOnlyCollection<(string? Id, string? Type)> ChargeTypes);
+    IReadOnlyCollection<RequestWholesaleSettlementChargeType> ChargeTypes);
+
+public sealed record RequestWholesaleSettlementChargeType(string? Id, string? Type);

@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using NodaTime;
+using RequestWholesaleSettlementChargeType = Energinet.DataHub.EDI.IncomingMessages.Interfaces.RequestWholesaleSettlementChargeType;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Factories;
 
@@ -46,7 +47,7 @@ public static class RequestWholesaleSettlementDtoFactory
             SetSettlementVersion(request.CalculationType),
             request.Resolution,
             request.ChargeOwner,
-            request.ChargeTypes);
+            request.ChargeTypes.Select(ct => new RequestWholesaleSettlementChargeType(ct.Id, ct.Type)).ToList());
 
         return new RequestWholesaleSettlementDto(
             senderNumber,
