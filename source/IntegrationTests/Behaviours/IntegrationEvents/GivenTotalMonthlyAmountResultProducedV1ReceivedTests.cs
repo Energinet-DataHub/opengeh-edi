@@ -15,6 +15,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -75,7 +76,7 @@ public class GivenTotalMonthlyAmountResultProducedV1ReceivedTests : WholesaleSer
             BusinessReasonWithSettlementVersion: new(BusinessReason.WholesaleFixing, null),
             ReceiverId: "5790002241111",
             ReceiverRole: ActorRole.GridOperator,
-            SenderId: "5790001330552",
+            SenderId: DataHubDetails.DataHubActorNumber.Value,
             SenderRole: ActorRole.MeteredDataAdministrator,
             ChargeTypeOwner: null, //ChargeOwner is not writting in the document for total sum
             ChargeCode: null,
@@ -142,7 +143,7 @@ public class GivenTotalMonthlyAmountResultProducedV1ReceivedTests : WholesaleSer
             BusinessReasonWithSettlementVersion: new(BusinessReason.WholesaleFixing, null),
             ReceiverId: "5790002243172",
             ReceiverRole: ActorRole.EnergySupplier,
-            SenderId: "5790001330552",
+            SenderId: DataHubDetails.DataHubActorNumber.Value,
             SenderRole: ActorRole.MeteredDataAdministrator,
             ChargeTypeOwner: null, //ChargeOwner is not allowed in the document for total sum
             ChargeCode: null,
