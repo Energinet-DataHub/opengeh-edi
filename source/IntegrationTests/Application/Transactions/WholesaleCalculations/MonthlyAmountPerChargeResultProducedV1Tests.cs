@@ -101,7 +101,7 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
             .WithChargeOwner(DataHubDetails.SystemOperatorActorNumber.Value)
             .Build();
         await HandleIntegrationEventAsync(monthlyPerChargeEvent);
-        await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
+        await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
         await AssertOutgoingMessageAsync(ActorRole.SystemOperator);
     }
 
