@@ -95,10 +95,10 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
     }
 
     [Fact]
-    public async Task MonthlyAmountPerChargeResultProducedV1Processor_creates_outgoing_message_to_energy_supplier_and_energinet_as_charge_owner()
+    public async Task MonthlyAmountPerChargeResultProducedV1Processor_creates_outgoing_message_to_energy_supplier_and_system_operator_as_charge_owner()
     {
         var monthlyPerChargeEvent = _monthlyPerChargeEventBuilder
-            .WithChargeOwner(DataHubDetails.DataHubActorNumber.Value)
+            .WithChargeOwner(DataHubDetails.SystemOperatorActorNumber.Value)
             .Build();
         await HandleIntegrationEventAsync(monthlyPerChargeEvent);
         await AssertOutgoingMessageAsync(ActorRole.EnergySupplier);
