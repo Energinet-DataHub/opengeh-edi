@@ -26,10 +26,13 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
 {
     private bool _useAmountPerChargeResultProduced = true;
     private bool _useMonthlyAmountPerChargeResultProducedAsync = true;
+    private bool _useCalculationCompletedEvent;
 
     public void EnableAmountPerChargeResultProduced(bool enable) => _useAmountPerChargeResultProduced = enable;
 
     public void EnableMonthlyAmountPerChargeResultProduced(bool enable) => _useMonthlyAmountPerChargeResultProducedAsync = enable;
+
+    public void EnableCalculationCompletedEvent(bool enable) => _useCalculationCompletedEvent = enable;
 
     public Task<bool> UseExampleFeatureFlagAsync() => Task.FromResult(true);
 
@@ -47,5 +50,5 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
 
     public Task<bool> UseEnergyResultProducedAsync() => Task.FromResult(true);
 
-    public Task<bool> UseCalculationCompletedEventAsync() => Task.FromResult(false);
+    public Task<bool> UseCalculationCompletedEventAsync() => Task.FromResult(_useCalculationCompletedEvent);
 }
