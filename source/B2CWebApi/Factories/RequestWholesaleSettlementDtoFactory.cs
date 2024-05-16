@@ -23,8 +23,7 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Factories;
 
 public static class RequestWholesaleSettlementDtoFactory
 {
-    // TODO (MWO): fix value
-    private const string WholesaleSettlementMessageType = "E74";
+    private const string WholesaleSettlementMessageType = "D21";
     private const string Electricity = "23";
 
     public static RequestWholesaleSettlementDto Create(
@@ -99,14 +98,13 @@ public static class RequestWholesaleSettlementDtoFactory
         };
     }
 
-    // TODO (MWO): fix values
     private static string MapRoleNameToCode(string roleName)
     {
         ArgumentException.ThrowIfNullOrEmpty(roleName);
 
-        if (roleName.Equals(MarketRole.MeteredDataResponsible.Name, StringComparison.OrdinalIgnoreCase))
+        if (roleName.Equals(MarketRole.SystemOperator.Name, StringComparison.OrdinalIgnoreCase))
         {
-            return MarketRole.MeteredDataResponsible.Code;
+            return MarketRole.SystemOperator.Code;
         }
 
         if (roleName.Equals(MarketRole.EnergySupplier.Name, StringComparison.OrdinalIgnoreCase))
@@ -114,9 +112,9 @@ public static class RequestWholesaleSettlementDtoFactory
             return MarketRole.EnergySupplier.Code;
         }
 
-        if (roleName.Equals(MarketRole.BalanceResponsibleParty.Name, StringComparison.OrdinalIgnoreCase))
+        if (roleName.Equals(MarketRole.GridAccessProvider.Name, StringComparison.OrdinalIgnoreCase))
         {
-            return MarketRole.BalanceResponsibleParty.Code;
+            return MarketRole.GridAccessProvider.Code;
         }
 
         throw new ArgumentException($"roleName: {roleName}. is unsupported to map to a role name");
