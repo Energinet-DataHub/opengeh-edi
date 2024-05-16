@@ -69,4 +69,9 @@ public interface IOutgoingMessagesClient
     ///  Enqueue a accepted wholesale services message, no commit. Currently ONLY used by the Process module which handles the commit itself.
     /// </summary>
     Task<OutgoingMessageId> EnqueueAsync(AcceptedWholesaleServicesMessageDto acceptedWholesaleServicesMessage, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///  Enqueue a wholesale services total sum message, WITH commit. Currently ONLY used by the integration event.
+    /// </summary>
+    Task<OutgoingMessageId> EnqueueAndCommitAsync(WholesaleServicesTotalSumMessageDto wholesaleServicesTotalSumMessage, CancellationToken cancellationToken);
 }

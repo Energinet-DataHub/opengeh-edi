@@ -139,4 +139,17 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         return messageId;
     }
+
+    public async Task<OutgoingMessageId> EnqueueAndCommitAsync(
+        WholesaleServicesTotalSumMessageDto wholesaleServicesTotalSumMessage,
+        CancellationToken cancellationToken)
+    {
+        var message = OutgoingMessage.CreateMessage(
+            wholesaleServicesTotalSumMessage,
+            _serializer,
+            _systemDateTimeProvider.Now());
+        var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        return messageId;
+    }
 }

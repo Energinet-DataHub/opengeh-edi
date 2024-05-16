@@ -36,7 +36,7 @@ public record NotifyAggregatedMeasureDataDocumentAssertionInput(
     Resolution Resolution,
     IReadOnlyCollection<TimeSeriesPoint> Points,
     SettlementMethod SettlementMethod,
-    string? OriginalTransactionIdReference)
+    TransactionId? OriginalTransactionIdReference)
 {
-    public string? OriginalTransactionIdReference { get; set; } = OriginalTransactionIdReference;
+    public TransactionId? OriginalTransactionIdReference { get; set; } = OriginalTransactionIdReference;
 }

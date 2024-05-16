@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
@@ -74,7 +73,7 @@ public interface IAssertRejectRequestAggregatedMeasureDataDocument
     /// Asserts transaction id
     /// </summary>
     /// <param name="expectedTransactionId"></param>
-    IAssertRejectRequestAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId);
+    IAssertRejectRequestAggregatedMeasureDataDocument HasTransactionId(TransactionId expectedTransactionId);
 
     /// <summary>
     /// Asserts transaction id exists
@@ -97,5 +96,5 @@ public interface IAssertRejectRequestAggregatedMeasureDataDocument
     /// Asserts original transaction id
     /// </summary>
     /// <param name="expectedOriginalTransactionId"></param>
-    IAssertRejectRequestAggregatedMeasureDataDocument HasOriginalTransactionId(string expectedOriginalTransactionId);
+    IAssertRejectRequestAggregatedMeasureDataDocument HasOriginalTransactionId(TransactionId expectedOriginalTransactionId);
 }

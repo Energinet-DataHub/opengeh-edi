@@ -56,7 +56,12 @@ public class RejectRequestAggregatedMeasureDataEbixDocumentWriter : EbixDocument
             // Begin PayloadResponseEvent
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "PayloadResponseEvent", null).ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Identification", null, rejectedTimeSerie.TransactionId.ToString("N")).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(
+                    DocumentDetails.Prefix,
+                    "Identification",
+                    null,
+                    rejectedTimeSerie.TransactionId.Value)
+                .ConfigureAwait(false);
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "StatusType", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "listAgencyIdentifier", null, "6").ConfigureAwait(false);
@@ -68,7 +73,12 @@ public class RejectRequestAggregatedMeasureDataEbixDocumentWriter : EbixDocument
             await writer.WriteStringAsync(rejectedTimeSerie.RejectReasons.First().ErrorCode).ConfigureAwait(false);
             await writer.WriteEndElementAsync().ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "OriginalBusinessDocument", null, rejectedTimeSerie.OriginalTransactionIdReference).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(
+                    DocumentDetails.Prefix,
+                    "OriginalBusinessDocument",
+                    null,
+                    rejectedTimeSerie.OriginalTransactionIdReference.Value)
+                .ConfigureAwait(false);
 
             // End PayloadResponseEvent
             await writer.WriteEndElementAsync().ConfigureAwait(false);

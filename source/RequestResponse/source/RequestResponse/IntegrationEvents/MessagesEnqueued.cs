@@ -12,24 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain;
+// ReSharper disable once CheckNamespace -- Protobuf is in with another namespace
+namespace Energinet.DataHub.EnergySupplying.RequestResponse.IntegrationEvents;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions;
-
-/// <summary>
-/// Represent the Serie id and MarketActiveRecord provided by the actor when sending the request.
-/// </summary>
-public class BusinessTransactionId : ValueObject
+public partial class MessagesEnqueuedV1
 {
-    private BusinessTransactionId(string id)
-    {
-        Id = id;
-    }
-
-    public string Id { get; }
-
-    public static BusinessTransactionId Create(string transactionId)
-    {
-        return new BusinessTransactionId(transactionId);
-    }
+    public const string EventName = "MessagesEnqueuedV1";
+    public const int CurrentMinorVersion = 1;
 }

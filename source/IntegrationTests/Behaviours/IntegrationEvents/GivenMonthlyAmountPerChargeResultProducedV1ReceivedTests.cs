@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -29,9 +30,9 @@ using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents;
 
-public class GivenAmountPerChargeResultProducedV1ReceivedTests : WholesaleServicesBehaviourTestBase
+public class GivenMonthlyAmountPerChargeResultProducedV1ReceivedTests : WholesaleServicesBehaviourTestBase
 {
-    public GivenAmountPerChargeResultProducedV1ReceivedTests(IntegrationTestFixture fixture, ITestOutputHelper testOutputHelper)
+    public GivenMonthlyAmountPerChargeResultProducedV1ReceivedTests(IntegrationTestFixture fixture, ITestOutputHelper testOutputHelper)
         : base(fixture, testOutputHelper)
     {
     }
@@ -49,35 +50,23 @@ public class GivenAmountPerChargeResultProducedV1ReceivedTests : WholesaleServic
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
 
         // Arrange
-        // -- Maybe this should force a list of properties, instead of using a builder? Then we are forced to always provide each property.
-        var amountPerChargeResultProducedEvent = GivenAmountPerChargeResultProducedV1Event(
-            @event => @event
-                .WithCalculationType(AmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
-                .WithChargeOwner("5799999933444")
-                .WithChargeCode("25361478")
-                .WithChargeType(AmountPerChargeResultProducedV1.Types.ChargeType.Tariff)
-                .WithCurrency(AmountPerChargeResultProducedV1.Types.Currency.Dkk)
-                .WithEnergySupplier(
-                    "5799999933318") // Example says 5790001330552, but isn't this the sender, not the energy supplier?
-                .WithSettlementMethod(AmountPerChargeResultProducedV1.Types.SettlementMethod.Flex)
-                .WithMeteringPointType(AmountPerChargeResultProducedV1.Types.MeteringPointType.Consumption)
-                .WithGridAreaCode("244")
-                .WithQuantityUnit(AmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh)
-                .WithCalculationVersion(1)
-                .WithResolution(AmountPerChargeResultProducedV1.Types.Resolution.Hour)
-                .WithStartOfPeriod(CreateDateInstant(2022, 09, 06).ToTimestamp())
-                .WithEndOfPeriod(CreateDateInstant(2022, 09, 07).ToTimestamp())
-                .WithPoint(1, 10, 3, 30, AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated) // QuantityQualityCodeCalculated = "A06". "A01" from example doesn't exist?
-                .WithIsTax(false));
+        var monthlyAmountPerChargeResultProducedEvent = GivenMonthlyAmountPerChargeResultProducedV1Event(
+            periodStart: CreateDateInstant(2022, 09, 06),
+            periodEnd: CreateDateInstant(2022, 09, 07),
+            gridAreaCode: "244",
+            energySupplierId: "5799999933318",
+            chargeOwnerId: "5799999933444",
+            chargeCode: "25361478",
+            chargeType: MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Tariff,
+            isTax: false);
 
-        await GivenIntegrationEventReceived(amountPerChargeResultProducedEvent);
+        await GivenIntegrationEventReceived(monthlyAmountPerChargeResultProducedEvent);
 
         // Act
         var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(ActorNumber.Create("5799999933318"), ActorRole.EnergySupplier, documentFormat);
         var peekResultsForChargeOwner = await WhenActorPeeksAllMessages(ActorNumber.Create("5799999933444"), ActorRole.GridOperator, documentFormat);
 
         // Assert
-        // -- Maybe this should force a list of properties, instead of using a builder? Then we are forced to always assert each property.
         var peekResultForEnergySupplier = peekResultsForEnergySupplier.Should().ContainSingle().Subject;
         var peekResultForChargeOwner = peekResultsForChargeOwner.Should().ContainSingle().Subject;
 
@@ -93,24 +82,24 @@ public class GivenAmountPerChargeResultProducedV1ReceivedTests : WholesaleServic
             ChargeType: ChargeType.Tariff,
             Currency: Currency.DanishCrowns,
             EnergySupplierNumber: "5799999933318",
-            SettlementMethod: SettlementMethod.Flex,
-            MeteringPointType: MeteringPointType.Consumption,
+            SettlementMethod: null,
+            MeteringPointType: null,
             GridArea: "244",
             OriginalTransactionIdReference: null,
             PriceMeasurementUnit: MeasurementUnit.Kwh,
             ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
             QuantityMeasurementUnit: MeasurementUnit.Kwh,
             CalculationVersion: 1,
-            Resolution: Resolution.Hourly,
+            Resolution: Resolution.Monthly,
             Period: new Period(CreateDateInstant(2022, 09, 06), CreateDateInstant(2022, 09, 07)),
             Points: new[]
             {
                 new WholesaleServicesRequestSeries.Types.Point
                 {
-                    Price = DecimalValue.FromDecimal(10),
-                    Quantity = DecimalValue.FromDecimal(3),
+                    Price = null,
+                    Quantity = null,
                     Amount = DecimalValue.FromDecimal(30),
-                    QuantityQualities = { QuantityQuality.Calculated },
+                    QuantityQualities = { },
                 },
             });
 
@@ -140,28 +129,18 @@ public class GivenAmountPerChargeResultProducedV1ReceivedTests : WholesaleServic
         // Arrange
         var gridOwnerActorNumber = ActorNumber.Create("5799999933555");
         await GivenGridAreaOwnershipAsync("244", gridOwnerActorNumber);
-        // -- Maybe this should force a list of properties, instead of using a builder? Then we are forced to always provide each property.
-        var amountPerChargeResultProducedEvent = GivenAmountPerChargeResultProducedV1Event(
-            @event => @event
-                .WithCalculationType(AmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
-                .WithChargeOwner("5799999933444")
-                .WithChargeCode("25361478")
-                .WithChargeType(AmountPerChargeResultProducedV1.Types.ChargeType.Tariff)
-                .WithCurrency(AmountPerChargeResultProducedV1.Types.Currency.Dkk)
-                .WithEnergySupplier(
-                    "5799999933318") // Example says 5790001330552, but isn't this the sender, not the energy supplier?
-                .WithSettlementMethod(AmountPerChargeResultProducedV1.Types.SettlementMethod.Flex)
-                .WithMeteringPointType(AmountPerChargeResultProducedV1.Types.MeteringPointType.Consumption)
-                .WithGridAreaCode("244")
-                .WithQuantityUnit(AmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh)
-                .WithCalculationVersion(1)
-                .WithResolution(AmountPerChargeResultProducedV1.Types.Resolution.Hour)
-                .WithStartOfPeriod(CreateDateInstant(2022, 09, 06).ToTimestamp())
-                .WithEndOfPeriod(CreateDateInstant(2022, 09, 07).ToTimestamp())
-                .WithPoint(1, 10, 3, 30, AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated) // QuantityQualityCodeCalculated = "A06". "A01" from example doesn't exist?
-                .WithIsTax(true));
 
-        await GivenIntegrationEventReceived(amountPerChargeResultProducedEvent);
+        var monthlyAmountPerChargeResultProducedEvent = GivenMonthlyAmountPerChargeResultProducedV1Event(
+            periodStart: CreateDateInstant(2022, 09, 06),
+            periodEnd: CreateDateInstant(2022, 09, 07),
+            gridAreaCode: "244",
+            energySupplierId: "5799999933318",
+            chargeOwnerId: "5799999933444",
+            chargeCode: "25361478",
+            chargeType: MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Tariff,
+            isTax: true);
+
+        await GivenIntegrationEventReceived(monthlyAmountPerChargeResultProducedEvent);
 
         // Act
         var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(ActorNumber.Create("5799999933318"), ActorRole.EnergySupplier, documentFormat);
@@ -169,7 +148,6 @@ public class GivenAmountPerChargeResultProducedV1ReceivedTests : WholesaleServic
         var peekResultsForChargeOwner = await WhenActorPeeksAllMessages(ActorNumber.Create("5799999933444"), ActorRole.GridOperator, documentFormat);
 
         // Assert
-        // -- Maybe this should force a list of properties, instead of using a builder? Then we are forced to always assert each property.
         var peekResultForEnergySupplier = peekResultsForEnergySupplier.Should().ContainSingle().Subject;
         var peekResultForGridOperator = peekResultsForGridOperator.Should().ContainSingle().Subject;
         peekResultsForChargeOwner.Should().BeEmpty();
@@ -186,24 +164,24 @@ public class GivenAmountPerChargeResultProducedV1ReceivedTests : WholesaleServic
             ChargeType: ChargeType.Tariff,
             Currency: Currency.DanishCrowns,
             EnergySupplierNumber: "5799999933318",
-            SettlementMethod: SettlementMethod.Flex,
-            MeteringPointType: MeteringPointType.Consumption,
+            SettlementMethod: null,
+            MeteringPointType: null,
             GridArea: "244",
             OriginalTransactionIdReference: null,
             PriceMeasurementUnit: MeasurementUnit.Kwh,
             ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
             QuantityMeasurementUnit: MeasurementUnit.Kwh,
             CalculationVersion: 1,
-            Resolution: Resolution.Hourly,
+            Resolution: Resolution.Monthly,
             Period: new Period(CreateDateInstant(2022, 09, 06), CreateDateInstant(2022, 09, 07)),
             Points: new[]
             {
                 new WholesaleServicesRequestSeries.Types.Point
                 {
-                    Price = DecimalValue.FromDecimal(10),
-                    Quantity = DecimalValue.FromDecimal(3),
+                    Price = null,
+                    Quantity = null,
                     Amount = DecimalValue.FromDecimal(30),
-                    QuantityQualities = { QuantityQuality.Calculated },
+                    QuantityQualities = { },
                 },
             });
 
@@ -228,40 +206,27 @@ public class GivenAmountPerChargeResultProducedV1ReceivedTests : WholesaleServic
     public async Task When_ChargeIsNotTaxAndChargeOwnerIsSystemOperatorAndEnergySupplierAndSystemOperatorActorPeeksMessage_Then_ReceivesCorrectNotifyWholesaleServicesDocuments(
         DocumentFormat documentFormat)
     {
-        // receiver role = EZ
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
 
         // Arrange
         var chargeOwner = DataHubDetails.SystemOperatorActorNumber;
-        // -- Maybe this should force a list of properties, instead of using a builder? Then we are forced to always provide each property.
-        var amountPerChargeResultProducedEvent = GivenAmountPerChargeResultProducedV1Event(
-            @event => @event
-                .WithCalculationType(AmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
-                .WithChargeOwner(chargeOwner.Value)
-                .WithChargeCode("25361478")
-                .WithChargeType(AmountPerChargeResultProducedV1.Types.ChargeType.Tariff)
-                .WithCurrency(AmountPerChargeResultProducedV1.Types.Currency.Dkk)
-                .WithEnergySupplier(
-                    "5799999933318") // Example says 5790001330552, but isn't this the sender, not the energy supplier?
-                .WithSettlementMethod(AmountPerChargeResultProducedV1.Types.SettlementMethod.Flex)
-                .WithMeteringPointType(AmountPerChargeResultProducedV1.Types.MeteringPointType.Consumption)
-                .WithGridAreaCode("244")
-                .WithQuantityUnit(AmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh)
-                .WithCalculationVersion(1)
-                .WithResolution(AmountPerChargeResultProducedV1.Types.Resolution.Hour)
-                .WithStartOfPeriod(CreateDateInstant(2022, 09, 06).ToTimestamp())
-                .WithEndOfPeriod(CreateDateInstant(2022, 09, 07).ToTimestamp())
-                .WithPoint(1, 10, 3, 30, AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated) // QuantityQualityCodeCalculated = "A06". "A01" from example doesn't exist?
-                .WithIsTax(false));
+        var monthlyAmountPerChargeResultProducedEvent = GivenMonthlyAmountPerChargeResultProducedV1Event(
+            periodStart: CreateDateInstant(2022, 09, 06),
+            periodEnd: CreateDateInstant(2022, 09, 07),
+            gridAreaCode: "244",
+            energySupplierId: "5799999933318",
+            chargeOwnerId: chargeOwner.Value,
+            chargeCode: "25361478",
+            chargeType: MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Tariff,
+            isTax: false);
 
-        await GivenIntegrationEventReceived(amountPerChargeResultProducedEvent);
+        await GivenIntegrationEventReceived(monthlyAmountPerChargeResultProducedEvent);
 
         // Act
         var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(ActorNumber.Create("5799999933318"), ActorRole.EnergySupplier, documentFormat);
         var peekResultsForChargeOwner = await WhenActorPeeksAllMessages(ActorNumber.Create(chargeOwner.Value), ActorRole.SystemOperator, documentFormat);
 
         // Assert
-        // -- Maybe this should force a list of properties, instead of using a builder? Then we are forced to always assert each property.
         var peekResultForEnergySupplier = peekResultsForEnergySupplier.Should().ContainSingle().Subject;
         var peekResultForChargeOwner = peekResultsForChargeOwner.Should().ContainSingle().Subject;
 
@@ -272,29 +237,29 @@ public class GivenAmountPerChargeResultProducedV1ReceivedTests : WholesaleServic
             ReceiverRole: ActorRole.EnergySupplier,
             SenderId: DataHubDetails.DataHubActorNumber.Value,
             SenderRole: ActorRole.MeteredDataAdministrator,
-            ChargeTypeOwner: DataHubDetails.SystemOperatorActorNumber.Value,
+            ChargeTypeOwner: chargeOwner.Value,
             ChargeCode: "25361478",
             ChargeType: ChargeType.Tariff,
             Currency: Currency.DanishCrowns,
             EnergySupplierNumber: "5799999933318",
-            SettlementMethod: SettlementMethod.Flex,
-            MeteringPointType: MeteringPointType.Consumption,
+            SettlementMethod: null,
+            MeteringPointType: null,
             GridArea: "244",
             OriginalTransactionIdReference: null,
             PriceMeasurementUnit: MeasurementUnit.Kwh,
             ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
             QuantityMeasurementUnit: MeasurementUnit.Kwh,
             CalculationVersion: 1,
-            Resolution: Resolution.Hourly,
+            Resolution: Resolution.Monthly,
             Period: new Period(CreateDateInstant(2022, 09, 06), CreateDateInstant(2022, 09, 07)),
             Points: new[]
             {
                 new WholesaleServicesRequestSeries.Types.Point
                 {
-                    Price = DecimalValue.FromDecimal(10),
-                    Quantity = DecimalValue.FromDecimal(3),
+                    Price = null,
+                    Quantity = null,
                     Amount = DecimalValue.FromDecimal(30),
-                    QuantityQualities = { QuantityQuality.Calculated },
+                    QuantityQualities = { },
                 },
             });
 
@@ -327,27 +292,17 @@ public class GivenAmountPerChargeResultProducedV1ReceivedTests : WholesaleServic
         await GivenGridAreaOwnershipAsync("244", gridOwnerActorNumber);
         var chargeOwner = DataHubDetails.SystemOperatorActorNumber;
         // -- Maybe this should force a list of properties, instead of using a builder? Then we are forced to always provide each property.
-        var amountPerChargeResultProducedEvent = GivenAmountPerChargeResultProducedV1Event(
-            @event => @event
-                .WithCalculationType(AmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing)
-                .WithChargeOwner(chargeOwner.Value)
-                .WithChargeCode("25361478")
-                .WithChargeType(AmountPerChargeResultProducedV1.Types.ChargeType.Tariff)
-                .WithCurrency(AmountPerChargeResultProducedV1.Types.Currency.Dkk)
-                .WithEnergySupplier(
-                    "5799999933318") // Example says 5790001330552, but isn't this the sender, not the energy supplier?
-                .WithSettlementMethod(AmountPerChargeResultProducedV1.Types.SettlementMethod.Flex)
-                .WithMeteringPointType(AmountPerChargeResultProducedV1.Types.MeteringPointType.Consumption)
-                .WithGridAreaCode("244")
-                .WithQuantityUnit(AmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh)
-                .WithCalculationVersion(1)
-                .WithResolution(AmountPerChargeResultProducedV1.Types.Resolution.Hour)
-                .WithStartOfPeriod(CreateDateInstant(2022, 09, 06).ToTimestamp())
-                .WithEndOfPeriod(CreateDateInstant(2022, 09, 07).ToTimestamp())
-                .WithPoint(1, 10, 3, 30, AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated) // QuantityQualityCodeCalculated = "A06". "A01" from example doesn't exist?
-                .WithIsTax(true));
+        var monthlyAmountPerChargeResultProducedEvent = GivenMonthlyAmountPerChargeResultProducedV1Event(
+            periodStart: CreateDateInstant(2022, 09, 06),
+            periodEnd: CreateDateInstant(2022, 09, 07),
+            gridAreaCode: "244",
+            energySupplierId: "5799999933318",
+            chargeOwnerId: chargeOwner.Value,
+            chargeCode: "25361478",
+            chargeType: MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Tariff,
+            isTax: true);
 
-        await GivenIntegrationEventReceived(amountPerChargeResultProducedEvent);
+        await GivenIntegrationEventReceived(monthlyAmountPerChargeResultProducedEvent);
 
         // Act
         var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(ActorNumber.Create("5799999933318"), ActorRole.EnergySupplier, documentFormat);
@@ -355,7 +310,6 @@ public class GivenAmountPerChargeResultProducedV1ReceivedTests : WholesaleServic
         var peekResultsForChargeOwner = await WhenActorPeeksAllMessages(ActorNumber.Create(chargeOwner.Value), ActorRole.SystemOperator, documentFormat);
 
         // Assert
-        // -- Maybe this should force a list of properties, instead of using a builder? Then we are forced to always assert each property.
         var peekResultForEnergySupplier = peekResultsForEnergySupplier.Should().ContainSingle().Subject;
         var peekResultForGridOperator = peekResultsForGridOperator.Should().ContainSingle().Subject;
         peekResultsForChargeOwner.Should().BeEmpty();
@@ -367,29 +321,29 @@ public class GivenAmountPerChargeResultProducedV1ReceivedTests : WholesaleServic
             ReceiverRole: ActorRole.EnergySupplier,
             SenderId: DataHubDetails.DataHubActorNumber.Value,
             SenderRole: ActorRole.MeteredDataAdministrator,
-            ChargeTypeOwner: DataHubDetails.SystemOperatorActorNumber.Value,
+            ChargeTypeOwner: chargeOwner.Value,
             ChargeCode: "25361478",
             ChargeType: ChargeType.Tariff,
             Currency: Currency.DanishCrowns,
             EnergySupplierNumber: "5799999933318",
-            SettlementMethod: SettlementMethod.Flex,
-            MeteringPointType: MeteringPointType.Consumption,
+            SettlementMethod: null,
+            MeteringPointType: null,
             GridArea: "244",
             OriginalTransactionIdReference: null,
             PriceMeasurementUnit: MeasurementUnit.Kwh,
             ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
             QuantityMeasurementUnit: MeasurementUnit.Kwh,
             CalculationVersion: 1,
-            Resolution: Resolution.Hourly,
+            Resolution: Resolution.Monthly,
             Period: new Period(CreateDateInstant(2022, 09, 06), CreateDateInstant(2022, 09, 07)),
             Points: new[]
             {
                 new WholesaleServicesRequestSeries.Types.Point
                 {
-                    Price = DecimalValue.FromDecimal(10),
-                    Quantity = DecimalValue.FromDecimal(3),
+                    Price = null,
+                    Quantity = null,
                     Amount = DecimalValue.FromDecimal(30),
-                    QuantityQualities = { QuantityQuality.Calculated },
+                    QuantityQualities = { },
                 },
             });
 
@@ -407,5 +361,39 @@ public class GivenAmountPerChargeResultProducedV1ReceivedTests : WholesaleServic
             peekResultForGridOperator.Bundle,
             documentFormat,
             assertionInputForGridOperator);
+    }
+
+    private MonthlyAmountPerChargeResultProducedV1 GivenMonthlyAmountPerChargeResultProducedV1Event(
+        Instant periodStart,
+        Instant periodEnd,
+        string gridAreaCode,
+        string energySupplierId,
+        string chargeOwnerId,
+        string chargeCode,
+        MonthlyAmountPerChargeResultProducedV1.Types.ChargeType chargeType,
+        bool isTax)
+    {
+        var monthlyAmountPerChargeResultProducedV1 = new MonthlyAmountPerChargeResultProducedV1()
+        {
+            CalculationId = Guid.NewGuid().ToString(),
+            CalculationType = MonthlyAmountPerChargeResultProducedV1.Types.CalculationType.WholesaleFixing,
+            PeriodStartUtc = periodStart.ToTimestamp(),
+            PeriodEndUtc = periodEnd.ToTimestamp(),
+            GridAreaCode = gridAreaCode,
+            ChargeCode = chargeCode,
+            ChargeType = chargeType,
+            ChargeOwnerId = chargeOwnerId,
+            IsTax = isTax,
+            QuantityUnit = MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh,
+            EnergySupplierId = energySupplierId,
+            Currency = MonthlyAmountPerChargeResultProducedV1.Types.Currency.Dkk,
+            Amount = new Wholesale.Contracts.IntegrationEvents.Common.DecimalValue()
+            {
+                Nanos = 0, Units = 30,
+            },
+            CalculationResultVersion = 1,
+        };
+
+        return monthlyAmountPerChargeResultProducedV1;
     }
 }

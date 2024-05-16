@@ -55,14 +55,14 @@ public sealed class
         IReadOnlyCollection<RejectReasonDto> rejectReasons)
     {
         var rejectedWholesaleServices = new RejectedWholesaleServicesMessageSeries(
-            process.ProcessId.Id,
+            TransactionId.New(),
             rejectReasons.Select(
                     reason =>
                         new RejectedWholesaleServicesMessageRejectReason(
                             reason.ErrorCode,
                             reason.ErrorMessage))
                 .ToList(),
-            process.BusinessTransactionId.Id);
+            process.BusinessTransactionId);
 
         return new RejectedWholesaleServicesMessageDto(
             receiverNumber: process.RequestedByActor.ActorNumber,

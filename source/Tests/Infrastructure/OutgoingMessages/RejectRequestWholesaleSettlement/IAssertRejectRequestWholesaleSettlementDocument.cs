@@ -84,7 +84,7 @@ public interface IAssertRejectRequestWholesaleSettlementDocument
     ///     Asserts transaction id
     /// </summary>
     /// <param name="expectedTransactionId"></param>
-    IAssertRejectRequestWholesaleSettlementDocument HasTransactionId(Guid expectedTransactionId);
+    IAssertRejectRequestWholesaleSettlementDocument HasTransactionId(TransactionId expectedTransactionId);
 
     /// <summary>
     ///    Asserts transaction id exists
@@ -107,5 +107,5 @@ public interface IAssertRejectRequestWholesaleSettlementDocument
     ///     Asserts original transaction id
     /// </summary>
     /// <param name="expectedOriginalTransactionId"></param>
-    IAssertRejectRequestWholesaleSettlementDocument HasOriginalTransactionId(string expectedOriginalTransactionId);
+    IAssertRejectRequestWholesaleSettlementDocument HasOriginalTransactionId(TransactionId expectedOriginalTransactionId);
 }

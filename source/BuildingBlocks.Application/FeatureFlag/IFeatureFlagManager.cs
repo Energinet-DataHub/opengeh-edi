@@ -65,6 +65,11 @@ public interface IFeatureFlagManager
     Task<bool> UseEnergyResultProducedAsync();
 
     /// <summary>
+    /// Whether to allow handling TotalMonthlyAmountResultProduced events.
+    /// </summary>
+    Task<bool> UseTotalMonthlyAmountResultProducedAsync();
+
+    /// <summary>
     /// When true we use the 'EnqueueMessagesOrchestration' to prepare messages;
     /// otherwise we prepare messages based on the old implementation.
     /// </summary>

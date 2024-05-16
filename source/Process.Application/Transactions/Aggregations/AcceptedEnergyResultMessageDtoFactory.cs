@@ -49,7 +49,7 @@ public static class AcceptedEnergyResultMessageDtoFactory
             calculationResultVersion: acceptedEnergyResultTimeSeries.CalculationResultVersion,
             settlementVersion: aggregatedMeasureDataProcess.SettlementVersion?.Name,
             relatedToMessageId: aggregatedMeasureDataProcess.InitiatedByMessageId,
-            originalTransactionIdReference: aggregatedMeasureDataProcess.BusinessTransactionId.Id,
+            originalTransactionIdReference: aggregatedMeasureDataProcess.BusinessTransactionId,
             documentReceiverNumber: aggregatedMeasureDataProcess.OriginalActor.ActorNumber,
             documentReceiverRole: aggregatedMeasureDataProcess.OriginalActor.ActorRole);
     }

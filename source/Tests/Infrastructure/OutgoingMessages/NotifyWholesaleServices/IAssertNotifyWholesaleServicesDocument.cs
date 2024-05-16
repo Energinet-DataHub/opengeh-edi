@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -90,7 +89,7 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// Asserts transaction id of the first series element
     /// </summary>
     /// <param name="expectedTransactionId"></param>
-    IAssertNotifyWholesaleServicesDocument HasTransactionId(Guid expectedTransactionId);
+    IAssertNotifyWholesaleServicesDocument HasTransactionId(TransactionId expectedTransactionId);
 
     /// <summary>
     /// Asserts transaction exists in the first series element
@@ -119,7 +118,7 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// </summary>
     /// <param name="expectedOriginalTransactionIdReference"></param>
     IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(
-        string expectedOriginalTransactionIdReference);
+        TransactionId expectedOriginalTransactionIdReference);
 
     /// <summary>
     /// Asserts that the first series element does not have a reference id
@@ -151,10 +150,20 @@ public interface IAssertNotifyWholesaleServicesDocument
     IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType);
 
     /// <summary>
+    /// Asserts the metering point type of the first series element is not present
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument MeteringPointTypeDoesNotExist();
+
+    /// <summary>
     /// Asserts the charge type number of the first series element
     /// </summary>
     /// <param name="expectedChargeTypeNumber"></param>
     IAssertNotifyWholesaleServicesDocument HasChargeCode(string expectedChargeTypeNumber);
+
+    /// <summary>
+    /// Asserts the charge type number of the first series element is not present
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument ChargeCodeDoesNotExist();
 
     /// <summary>
     /// Asserts the charge type of the first series element
@@ -163,11 +172,21 @@ public interface IAssertNotifyWholesaleServicesDocument
     IAssertNotifyWholesaleServicesDocument HasChargeType(ChargeType expectedChargeType);
 
     /// <summary>
+    /// Asserts the charge type of the first series element is not present
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument ChargeTypeDoesNotExist();
+
+    /// <summary>
     /// Asserts the charge type owner of the first series element
     /// </summary>
     IAssertNotifyWholesaleServicesDocument HasChargeTypeOwner(
         ActorNumber expectedChargeTypeOwner,
         string codingScheme);
+
+    /// <summary>
+    /// Asserts the charge type owner of the first series element is not present
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument ChargeTypeOwnerDoesNotExist();
 
     /// <summary>
     /// Asserts grid area code of the first series element
@@ -193,6 +212,11 @@ public interface IAssertNotifyWholesaleServicesDocument
     IAssertNotifyWholesaleServicesDocument HasQuantityMeasurementUnit(MeasurementUnit expectedMeasurementUnit);
 
     /// <summary>
+    /// Asserts the price measure unit of the first series element is not present
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument PriceMeasurementUnitDoesNotExist();
+
+    /// <summary>
     /// Asserts the price measure unit of the first series element
     /// </summary>
     /// <param name="expectedPriceMeasurementUnit"></param>
@@ -215,6 +239,11 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// </summary>
     /// <param name="resolution"></param>
     IAssertNotifyWholesaleServicesDocument HasResolution(Resolution resolution);
+
+    /// <summary>
+    /// Asserts the resulution of the first series element is not present
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument ResolutionDoesNotExist();
 
     /// <summary>
     /// Asserts a point of the first series element
@@ -249,4 +278,8 @@ public interface IAssertNotifyWholesaleServicesDocument
 
     #endregion
 
+    /// <summary>
+    /// Asserts the list of points only contains a single point with the given amount
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmount(DecimalValue expectedAmount);
 }

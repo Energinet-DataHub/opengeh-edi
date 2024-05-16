@@ -57,13 +57,13 @@ public class RejectRequestWholesaleSettlementCimXmlDocumentWriter : CimXmlDocume
                     DocumentDetails.Prefix,
                     "mRID",
                     null,
-                    wholesaleServicesRecord.TransactionId.ToString())
+                    wholesaleServicesRecord.TransactionId.Value)
                 .ConfigureAwait(false);
             await writer.WriteElementStringAsync(
                     DocumentDetails.Prefix,
                     "originalTransactionIDReference_Series.mRID",
                     null,
-                    wholesaleServicesRecord.OriginalTransactionIdReference)
+                    wholesaleServicesRecord.OriginalTransactionIdReference.Value)
                 .ConfigureAwait(false);
 
             foreach (var reason in wholesaleServicesRecord.RejectReasons)

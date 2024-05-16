@@ -60,7 +60,7 @@ public class TestCreateOutgoingCommandHandler : IRequestHandler<TestCreateOutgoi
                 },
                 BusinessReason.BalanceFixing.Name,
                 1,
-                Guid.NewGuid().ToString(),
+                TransactionId.New(),
                 null,
                 MessageId.New());
             await _mediator.Publish(new EnqueueAcceptedEnergyResultMessageEvent(message), cancellationToken).ConfigureAwait(false);

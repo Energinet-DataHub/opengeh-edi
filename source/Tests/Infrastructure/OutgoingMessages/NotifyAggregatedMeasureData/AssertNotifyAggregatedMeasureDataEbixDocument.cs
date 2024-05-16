@@ -22,7 +22,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.Ebix;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 using FluentAssertions;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
@@ -71,9 +70,10 @@ public class AssertNotifyAggregatedMeasureDataEbixDocument : IAssertNotifyAggreg
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertNotifyAggregatedMeasureDataDocument HasTransactionId(TransactionId expectedTransactionId)
     {
-        _documentAsserter.HasValue($"PayloadEnergyTimeSeries[1]/Identification", expectedTransactionId.ToString("N"));
+        ArgumentNullException.ThrowIfNull(expectedTransactionId);
+        _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/Identification", expectedTransactionId.Value);
         return this;
     }
 
@@ -263,9 +263,13 @@ public class AssertNotifyAggregatedMeasureDataEbixDocument : IAssertNotifyAggreg
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasOriginalTransactionIdReference(string originalTransactionIdReference)
+    public IAssertNotifyAggregatedMeasureDataDocument HasOriginalTransactionIdReference(
+        TransactionId originalTransactionIdReference)
     {
-        _documentAsserter.HasValue("PayloadEnergyTimeSeries[1]/OriginalBusinessDocument", originalTransactionIdReference);
+        ArgumentNullException.ThrowIfNull(originalTransactionIdReference);
+        _documentAsserter.HasValue(
+            "PayloadEnergyTimeSeries[1]/OriginalBusinessDocument",
+            originalTransactionIdReference.Value);
         return this;
     }
 

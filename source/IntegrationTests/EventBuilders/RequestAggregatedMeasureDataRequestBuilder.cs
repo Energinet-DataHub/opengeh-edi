@@ -37,7 +37,7 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
         Instant periodEnd,
         ActorNumber? energySupplier,
         ActorNumber? balanceResponsibleParty,
-        IReadOnlyCollection<(string? GridArea, string TransactionId)> series,
+        IReadOnlyCollection<(string? GridArea, TransactionId TransactionId)> series,
         bool ensureValidRequest = true)
     {
         if (ensureValidRequest)
@@ -93,7 +93,7 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
         Instant periodEnd,
         ActorNumber? energySupplier,
         ActorNumber? balanceResponsibleParty,
-        IReadOnlyCollection<(string? GridArea, string TransactionId)> series)
+        IReadOnlyCollection<(string? GridArea, TransactionId TransactionId)> series)
     {
         return $@"<cim:RequestAggregatedMeasureData_MarketDocument xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:cim=""urn:ediel.org:measure:requestaggregatedmeasuredata:0:1"" xsi:schemaLocation=""urn:ediel.org:measure:requestaggregatedmeasuredata:0:1 urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd"">
     <cim:mRID>123564789123564789123564789123564789</cim:mRID>
@@ -107,7 +107,7 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
     <cim:createdDateTime>2022-12-17T09:30:47Z</cim:createdDateTime>
     {string.Join("\n", series.Select(s => $@"
         <cim:Series>
-            <cim:mRID>{s.TransactionId}</cim:mRID>
+            <cim:mRID>{s.TransactionId.Value}</cim:mRID>
             <!-- <cim:settlement_Series.version>D01</cim:settlement_Series.version> -->
 		    {GetMeteringPointTypeCimXmlSection(meteringPointType?.Code)}
 		    {GetSettlementMethodCimXmlSection(settlementMethod?.Code)}
@@ -165,7 +165,7 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
         Instant periodEnd,
         ActorNumber? energySupplierActorNumber,
         ActorNumber? balanceResponsiblePartyActorNumber,
-        IReadOnlyCollection<(string? GridArea, string TransactionId)> series)
+        IReadOnlyCollection<(string? GridArea, TransactionId TransactionId)> series)
     {
         return $@"{{
 	""RequestAggregatedMeasureData_MarketDocument"": {{
@@ -197,7 +197,7 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
 		""Series"": [
         {string.Join(",\n", series.Select(s => $@"
             {{
-				""mRID"": ""{s.TransactionId}"",
+				""mRID"": ""{s.TransactionId.Value}"",
                 {GetBalanceResponsiblePartyCimJsonSection(balanceResponsiblePartyActorNumber?.Value)}
 				""end_DateAndOrTime.dateTime"": ""{periodEnd}"",
                 {GetEnergySupplierCimJsonSection(energySupplierActorNumber?.Value)}

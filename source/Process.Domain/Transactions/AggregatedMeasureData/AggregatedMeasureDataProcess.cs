@@ -36,7 +36,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             ProcessId processId,
             RequestedByActor requestedByActor,
             OriginalActor originalActor,
-            BusinessTransactionId businessTransactionId,
+            TransactionId businessTransactionId,
             BusinessReason businessReason,
             MessageId initiatedByMessageId,
             string? meteringPointType,
@@ -115,7 +115,7 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
         /// </summary>
         public OriginalActor OriginalActor { get; }
 
-        public BusinessTransactionId BusinessTransactionId { get; }
+        public TransactionId BusinessTransactionId { get; }
 
         public BusinessReason BusinessReason { get; }
 
@@ -206,13 +206,13 @@ namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureDat
             RejectedAggregatedMeasureDataRequest rejectedAggregatedMeasureDataRequest)
         {
             var rejectedTimeSerie = new RejectedEnergyResultMessageSerie(
-                ProcessId.Id,
+                TransactionId.New(),
                 rejectedAggregatedMeasureDataRequest.RejectReasons.Select(reason =>
                         new RejectedEnergyResultMessageRejectReason(
                             reason.ErrorCode,
                             reason.ErrorMessage))
                     .ToList(),
-                BusinessTransactionId.Id);
+                BusinessTransactionId);
 
             return new RejectedEnergyResultMessageDto(
                 receiverNumber: RequestedByActor.ActorNumber,

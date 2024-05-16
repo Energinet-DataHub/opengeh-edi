@@ -40,7 +40,7 @@ public sealed class WholesaleServicesProcess : Entity
         ProcessId processId,
         RequestedByActor requestedByActor,
         OriginalActor originalActor,
-        BusinessTransactionId businessTransactionId,
+        TransactionId businessTransactionId,
         MessageId initiatedByMessageId,
         BusinessReason businessReason,
         string startOfPeriod,
@@ -119,7 +119,7 @@ public sealed class WholesaleServicesProcess : Entity
     /// </summary>
     public OriginalActor OriginalActor { get; }
 
-    public BusinessTransactionId BusinessTransactionId { get; }
+    public TransactionId BusinessTransactionId { get; }
 
     public MessageId InitiatedByMessageId { get; }
 

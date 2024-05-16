@@ -94,9 +94,10 @@ public class AssertRejectRequestWholesaleSettlementEbixDocument : IAssertRejectR
         return this;
     }
 
-    public IAssertRejectRequestWholesaleSettlementDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertRejectRequestWholesaleSettlementDocument HasTransactionId(TransactionId expectedTransactionId)
     {
-        _documentAsserter.HasValue("PayloadChargeEvent[1]/Identification", expectedTransactionId.ToString("N"));
+        ArgumentNullException.ThrowIfNull(expectedTransactionId);
+        _documentAsserter.HasValue("PayloadChargeEvent[1]/Identification", expectedTransactionId.Value);
         return this;
     }
 
@@ -107,9 +108,10 @@ public class AssertRejectRequestWholesaleSettlementEbixDocument : IAssertRejectR
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasOriginalTransactionId(
-        string expectedOriginalTransactionId)
+        TransactionId expectedOriginalTransactionId)
     {
-        _documentAsserter.HasValue("PayloadChargeEvent[1]/OriginalBusinessDocument", expectedOriginalTransactionId);
+        ArgumentNullException.ThrowIfNull(expectedOriginalTransactionId);
+        _documentAsserter.HasValue("PayloadChargeEvent[1]/OriginalBusinessDocument", expectedOriginalTransactionId.Value);
         return this;
     }
 

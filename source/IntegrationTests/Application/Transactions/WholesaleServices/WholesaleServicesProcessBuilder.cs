@@ -36,7 +36,7 @@ public class WholesaleServicesProcessBuilder
     private readonly string? _chargeTypeType = "D03";
     private readonly ActorRole _senderRole = ActorRole.EnergySupplier;
     private readonly MessageId _messageId = MessageId.New();
-    private BusinessTransactionId _businessTransactionId = BusinessTransactionId.Create("1234");
+    private TransactionId _businessTransactionId = TransactionId.From("1234");
     private SettlementVersion? _settlementVersion;
     private ActorNumber _senderNumber = ActorNumber.Create("5790000000000");
     private string? _energySupplierMarketParticipantId = ActorNumber.Create("5790000000001").Value;
@@ -66,9 +66,9 @@ public class WholesaleServicesProcessBuilder
         return this;
     }
 
-    public WholesaleServicesProcessBuilder SetBusinessTransactionId(Guid transactionId)
+    public WholesaleServicesProcessBuilder SetBusinessTransactionId(TransactionId transactionId)
     {
-        _businessTransactionId = BusinessTransactionId.Create(transactionId.ToString());
+        _businessTransactionId = transactionId;
         return this;
     }
 
