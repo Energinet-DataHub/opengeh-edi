@@ -55,8 +55,8 @@ public class RejectedEnergyResultMessageDto : OutgoingMessageDto
 }
 
 public record RejectedEnergyResultMessageSerie(
-    Guid TransactionId,
+    TransactionId TransactionId,
     IReadOnlyCollection<RejectedEnergyResultMessageRejectReason> RejectReasons,
-    string OriginalTransactionIdReference);
+    TransactionId OriginalTransactionIdReference);
 
 public record RejectedEnergyResultMessageRejectReason(string ErrorCode, string ErrorMessage);

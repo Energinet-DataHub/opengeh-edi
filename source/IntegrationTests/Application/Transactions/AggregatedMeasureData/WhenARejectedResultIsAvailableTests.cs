@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
@@ -80,7 +79,9 @@ public class WhenARejectedResultIsAvailableTests : TestBase
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
             .HasMessageRecordValue<RejectedEnergyResultMessageSerie>(timeSerie => timeSerie.RejectReasons.First().ErrorCode, rejectReason.ErrorCode)
             .HasMessageRecordValue<RejectedEnergyResultMessageSerie>(timeSerie => timeSerie.RejectReasons.Last().ErrorCode, rejectReason2.ErrorCode)
-            .HasMessageRecordValue<RejectedEnergyResultMessageSerie>(timeSerie => timeSerie.OriginalTransactionIdReference, process.BusinessTransactionId.Id);
+            .HasMessageRecordValue<RejectedEnergyResultMessageSerie>(
+                timeSerie => timeSerie.OriginalTransactionIdReference,
+                process.BusinessTransactionId);
     }
 
     protected override void Dispose(bool disposing)
@@ -108,7 +109,7 @@ public class WhenARejectedResultIsAvailableTests : TestBase
           ProcessId.New(),
           requestedByActor,
           OriginalActor.From(requestedByActor),
-          BusinessTransactionId.Create(Guid.NewGuid().ToString()),
+          TransactionId.New(),
           BusinessReason.BalanceFixing,
           MessageId.New(),
           null,

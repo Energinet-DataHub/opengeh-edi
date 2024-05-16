@@ -49,7 +49,7 @@ public static class AcceptedEnergyResultMessageDtoBuilder
         };
 
     private static readonly string _businessReasonName = BusinessReason.BalanceFixing.Code;
-    private static readonly string? _originalTransactionIdReference = Guid.NewGuid().ToString();
+    private static readonly TransactionId? _originalTransactionIdReference = TransactionId.New();
     private static readonly string? _settlementVersion = SettlementVersion.FirstCorrection.Code;
     private static readonly MessageId? _relatedToMessageId = MessageId.New();
     private static readonly EventId _eventId = EventId.From(Guid.NewGuid());

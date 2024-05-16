@@ -72,7 +72,7 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
 }
 
 public record WholesaleServicesSeries(
-    Guid TransactionId,
+    TransactionId TransactionId,
     long CalculationVersion,
     string? GridAreaCode,
     string? ChargeCode,
@@ -91,6 +91,6 @@ public record WholesaleServicesSeries(
     MeteringPointType? MeteringPointType,
     SettlementMethod? SettlementType, // TODO: To ensure backwards compatibility, will be removed in another PR.
     SettlementMethod? SettlementMethod,
-    string? OriginalTransactionIdReference = null);
+    TransactionId? OriginalTransactionIdReference = null);
 
 public record WholesaleServicesPoint(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);

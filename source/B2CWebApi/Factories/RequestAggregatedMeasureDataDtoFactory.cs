@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Globalization;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -37,8 +38,8 @@ public static class RequestAggregatedMeasureDataDtoFactory
 
         var senderRoleCode = MapRoleNameToCode(senderRole);
 
-        var serie = new RequestAggregatedMeasureDataSeries(
-            Guid.NewGuid().ToString(),
+        var series = new RequestAggregatedMeasureDataSeries(
+            TransactionId.New().Value,
             MapEvaluationPointType(request),
             MapSettlementMethod(request),
             InstantFormatFactory.SetInstantToMidnight(request.StartDate, dateTimeZone).ToString(),
@@ -58,7 +59,7 @@ public static class RequestAggregatedMeasureDataDtoFactory
             Guid.NewGuid().ToString(),
             now.ToString(),
             Electricity,
-            new[] { serie });
+            new[] { series });
     }
 
     private static string? SetSettlementVersion(CalculationType calculationType)

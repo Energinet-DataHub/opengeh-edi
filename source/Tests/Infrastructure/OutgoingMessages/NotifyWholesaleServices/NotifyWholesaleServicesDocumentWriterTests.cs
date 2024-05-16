@@ -22,8 +22,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
-using Energinet.DataHub.EDI.OutgoingMessages.Application;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
@@ -71,9 +69,6 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
     [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_notifyWholesaleServices_document(string documentFormat)
     {
-        var transactionId = documentFormat == nameof(DocumentFormat.Ebix)
-            ? SampleData.TransactionId.ToString().Substring(0, 35)
-            : SampleData.TransactionId.ToString();
         // Arrange
         var messageBuilder = _wholesaleServicesSeriesBuilder
             .WithMessageId(SampleData.MessageId)
@@ -93,7 +88,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             .WithMeasurementUnit(SampleData.MeasurementUnit)
             .WithPriceMeasurementUnit(SampleData.PriceMeasureUnit)
             .WithResolution(SampleData.Resolution)
-            .WithOriginalTransactionIdReference(transactionId)
+            .WithOriginalTransactionIdReference(SampleData.TransactionId)
             .WithPoints(new Collection<WholesaleServicesPoint>() { new(1, 1, 1, SampleData.Quantity, CalculatedQuantityQuality.Calculated) });
 
         // Act
@@ -126,7 +121,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             .HasResolution(SampleData.Resolution)
             .HasSumQuantityForPosition(1, SampleData.Quantity)
             .HasProductCode(ProductType.Tariff.Code)
-            .HasOriginalTransactionIdReference(transactionId)
+            .HasOriginalTransactionIdReference(SampleData.TransactionId)
             .SettlementVersionDoesNotExist()
             .DocumentIsValidAsync();
     }
@@ -137,9 +132,6 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
     [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_notifyWholesaleServices_document_with_optional_values_as_null(string documentFormat)
     {
-        var transactionId = documentFormat == nameof(DocumentFormat.Ebix)
-            ? SampleData.TransactionId.ToString().Substring(0, 35)
-            : SampleData.TransactionId.ToString();
         // Arrange
         // This is the wholesale series with most nullable fields.
         var serie = new WholesaleServicesTotalSumSeries(

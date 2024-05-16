@@ -76,7 +76,10 @@ public class WhenIncomingMessagesIsReceivedWithDelegationTests : TestBase
             Instant.FromUtc(2024, 01, 31, 0, 0),
             _originalActor.ActorNumber,
             null,
-            new List<(string? GridArea, string TransactionId)> { (gridAreaCode, "555555555555555555555555555555555555"), });
+            new List<(string? GridArea, TransactionId TransactionId)>
+            {
+                (gridAreaCode, TransactionId.From("555555555555555555555555555555555555")),
+            });
 
         await AddDelegationAsync(
             _originalActor,
@@ -137,7 +140,10 @@ public class WhenIncomingMessagesIsReceivedWithDelegationTests : TestBase
             Instant.FromUtc(2024, 01, 31, 0, 0),
             _originalActor.ActorNumber,
             null,
-            new List<(string? GridArea, string TransactionId)> { (gridAreaCode, "555555555555555555555555555555555555"), },
+            new List<(string? GridArea, TransactionId TransactionId)>
+            {
+                (gridAreaCode, TransactionId.From("555555555555555555555555555555555555")),
+            },
             true);
 
         await AddDelegationAsync(

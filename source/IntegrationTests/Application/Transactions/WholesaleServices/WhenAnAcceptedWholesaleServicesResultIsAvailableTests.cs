@@ -83,7 +83,9 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.MeteringPointType, MeteringPointType.Production)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.ChargeOwner!.Value, process.ChargeOwner)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.EnergySupplier.Value, process.EnergySupplierId)
-            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.OriginalTransactionIdReference, process.BusinessTransactionId.Id);
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.OriginalTransactionIdReference,
+                process.BusinessTransactionId);
     }
 
     [Fact]
@@ -118,7 +120,9 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.GridAreaCode, process.RequestedGridArea)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.ChargeOwner!.Value, process.ChargeOwner)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.EnergySupplier.Value, process.EnergySupplierId)
-            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.OriginalTransactionIdReference, process.BusinessTransactionId.Id);
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.OriginalTransactionIdReference,
+                process.BusinessTransactionId);
     }
 
     [Fact]
@@ -172,7 +176,7 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .Build();
         var secondProcess = WholesaleServicesProcessBuilder()
             .SetState(WholesaleServicesProcess.State.Sent)
-            .SetBusinessTransactionId(Guid.NewGuid())
+            .SetBusinessTransactionId(TransactionId.New())
             .Build();
         await Store(secondProcess);
         var secondAcceptedEvent = WholesaleServicesRequestAcceptedBuilder(firstProcess)
@@ -208,8 +212,10 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         var firstMessage = outgoingMessages.First();
         var secondMessage = outgoingMessages.Last();
 
-        var seriesIdOfFirstMessage = firstMessage.GetMessageValue<WholesaleServicesSeries, Guid>(series => series.TransactionId);
-        var seriesIdOfSecondMessage = secondMessage.GetMessageValue<WholesaleServicesSeries, Guid>(series => series.TransactionId);
+        var seriesIdOfFirstMessage =
+            firstMessage.GetMessageValue<WholesaleServicesSeries, TransactionId>(series => series.TransactionId);
+        var seriesIdOfSecondMessage =
+            secondMessage.GetMessageValue<WholesaleServicesSeries, TransactionId>(series => series.TransactionId);
 
         seriesIdOfFirstMessage.Should().NotBe(seriesIdOfSecondMessage);
     }

@@ -68,9 +68,10 @@ public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggrega
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertNotifyAggregatedMeasureDataDocument HasTransactionId(TransactionId expectedTransactionId)
     {
-        _documentAsserter.HasValue($"Series[1]/mRID", expectedTransactionId.ToString());
+        ArgumentNullException.ThrowIfNull(expectedTransactionId);
+        _documentAsserter.HasValue("Series[1]/mRID", expectedTransactionId.Value);
         return this;
     }
 
@@ -254,9 +255,13 @@ public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggrega
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasOriginalTransactionIdReference(string originalTransactionIdReference)
+    public IAssertNotifyAggregatedMeasureDataDocument HasOriginalTransactionIdReference(
+        TransactionId originalTransactionIdReference)
     {
-        _documentAsserter.HasValue("Series[1]/originalTransactionIDReference_Series.mRID", originalTransactionIdReference);
+        ArgumentNullException.ThrowIfNull(originalTransactionIdReference);
+        _documentAsserter.HasValue(
+            "Series[1]/originalTransactionIDReference_Series.mRID",
+            originalTransactionIdReference.Value);
         return this;
     }
 

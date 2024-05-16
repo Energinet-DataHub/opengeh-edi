@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.Process.Interfaces;
 
@@ -27,7 +28,7 @@ public record InitializeAggregatedMeasureDataProcessDto(
     IReadOnlyCollection<InitializeAggregatedMeasureDataProcessSeries> Series);
 
 public record InitializeAggregatedMeasureDataProcessSeries(
-    string Id,
+    TransactionId Id,
     string? MeteringPointType,
     string? SettlementMethod,
     string StartDateTime,

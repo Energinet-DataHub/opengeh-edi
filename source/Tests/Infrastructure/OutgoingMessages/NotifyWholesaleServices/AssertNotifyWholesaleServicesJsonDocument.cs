@@ -162,9 +162,10 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
     #endregion
 
-    public IAssertNotifyWholesaleServicesDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertNotifyWholesaleServicesDocument HasTransactionId(TransactionId expectedTransactionId)
     {
-        FirstWholesaleSeriesElement().GetProperty("mRID").GetString().Should().Be(expectedTransactionId.ToString());
+        ArgumentNullException.ThrowIfNull(expectedTransactionId);
+        FirstWholesaleSeriesElement().GetProperty("mRID").GetString().Should().Be(expectedTransactionId.Value);
 
         return this;
     }
@@ -200,13 +201,14 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
     }
 
     public IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(
-        string expectedOriginalTransactionIdReference)
+        TransactionId expectedOriginalTransactionIdReference)
     {
+        ArgumentNullException.ThrowIfNull(expectedOriginalTransactionIdReference);
         FirstWholesaleSeriesElement()
             .GetProperty("originalTransactionIDReference_Series.mRID")
             .GetString()
             .Should()
-            .Be(expectedOriginalTransactionIdReference);
+            .Be(expectedOriginalTransactionIdReference.Value);
         return this;
     }
 

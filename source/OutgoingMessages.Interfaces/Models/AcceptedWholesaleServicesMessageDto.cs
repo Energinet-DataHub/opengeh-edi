@@ -76,7 +76,7 @@ public class AcceptedWholesaleServicesMessageDto : WholesaleServicesMessageDto
 }
 
 public record AcceptedWholesaleServicesSeries(
-    Guid TransactionId,
+    TransactionId TransactionId,
     long CalculationVersion,
     string GridAreaCode,
     string ChargeCode,
@@ -93,7 +93,7 @@ public record AcceptedWholesaleServicesSeries(
     Resolution Resolution,
     MeteringPointType? MeteringPointType,
     SettlementMethod? SettlementMethod,
-    string OriginalTransactionIdReference) : WholesaleServicesSeries(
+    TransactionId OriginalTransactionIdReference) : WholesaleServicesSeries(
     TransactionId,
     CalculationVersion,
     GridAreaCode,

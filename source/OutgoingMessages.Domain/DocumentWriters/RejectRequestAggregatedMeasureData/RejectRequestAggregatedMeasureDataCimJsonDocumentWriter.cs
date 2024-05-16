@@ -73,8 +73,10 @@ public class RejectRequestAggregatedMeasureDataCimJsonDocumentWriter : IDocument
         {
             writer.WriteStartObject();
 
-            writer.WriteProperty("mRID", series.TransactionId.ToString());
-            writer.WriteProperty("originalTransactionIDReference_Series.mRID", series.OriginalTransactionIdReference);
+            writer.WriteProperty("mRID", series.TransactionId.Value);
+            writer.WriteProperty(
+                "originalTransactionIDReference_Series.mRID",
+                series.OriginalTransactionIdReference.Value);
 
             writer.WritePropertyName("Reason");
             writer.WriteStartArray();

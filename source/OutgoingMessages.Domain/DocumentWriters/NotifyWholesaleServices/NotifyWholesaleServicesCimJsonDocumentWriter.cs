@@ -90,7 +90,7 @@ public sealed class NotifyWholesaleServicesCimJsonDocumentWriter : IDocumentWrit
             {
                 writer.WriteStartObject();
                 {
-                    writer.WriteProperty("mRID", series.TransactionId.ToString());
+                    writer.WriteProperty("mRID", series.TransactionId.Value);
                     writer.WriteProperty("version", series.CalculationVersion.ToString(NumberFormatInfo.InvariantInfo));
 
                     if (series.SettlementVersion is not null)
@@ -102,7 +102,7 @@ public sealed class NotifyWholesaleServicesCimJsonDocumentWriter : IDocumentWrit
 
                     if (series.OriginalTransactionIdReference is not null)
                     {
-                        writer.WriteProperty("originalTransactionIDReference_Series.mRID", series.OriginalTransactionIdReference);
+                        writer.WriteProperty("originalTransactionIDReference_Series.mRID", series.OriginalTransactionIdReference.Value);
                     }
 
                     if (series.MeteringPointType is not null)

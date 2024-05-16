@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestWholesaleSettlement;
 
 // This is a copy of RejectedWholesaleServicesMessageSeries defined in the process module
 public record RejectedWholesaleServicesRecord(
-    Guid TransactionId,
+    TransactionId TransactionId,
     IReadOnlyCollection<RejectReason> RejectReasons,
-    string OriginalTransactionIdReference);
+    TransactionId OriginalTransactionIdReference);
 
 public record RejectReason(string ErrorCode, string ErrorMessage);

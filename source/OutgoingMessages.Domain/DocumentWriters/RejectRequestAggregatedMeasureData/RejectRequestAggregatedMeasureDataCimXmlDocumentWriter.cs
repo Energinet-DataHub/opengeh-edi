@@ -51,13 +51,18 @@ public class RejectRequestAggregatedMeasureDataCimXmlDocumentWriter : CimXmlDocu
         foreach (var rejectedTimeSerie in ParseFrom<RejectedTimeSerieMarketActivityRecord>(marketActivityPayloads))
         {
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, rejectedTimeSerie.TransactionId.ToString())
+            await writer.WriteElementStringAsync(
+                    DocumentDetails.Prefix,
+                    "mRID",
+                    null,
+                    rejectedTimeSerie.TransactionId.Value)
                  .ConfigureAwait(false);
             await writer.WriteElementStringAsync(
                 DocumentDetails.Prefix,
                 "originalTransactionIDReference_Series.mRID",
                 null,
-                rejectedTimeSerie.OriginalTransactionIdReference).ConfigureAwait(false);
+                rejectedTimeSerie.OriginalTransactionIdReference.Value)
+                .ConfigureAwait(false);
 
             foreach (var reason in rejectedTimeSerie.RejectReasons)
             {
