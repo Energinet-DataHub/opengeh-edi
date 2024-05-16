@@ -30,7 +30,7 @@
         <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.17.5" />
         <PackageReference Include="Dapper" Version="2.1.35" />
         <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="5.1.1" />
-        <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="9.1.2" />
+        <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="9.3.1" />
         <PackageReference Include="FluentAssertions" Version="6.12.0" />
         <PackageReference Include="FluentAssertions.Analyzers" Version="0.28.0">
           <PrivateAssets>all</PrivateAssets>

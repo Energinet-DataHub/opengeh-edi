@@ -39,4 +39,14 @@ public static class CurrencyMapper
             _ => throw new ArgumentOutOfRangeException(nameof(currency), currency, "Unknown currency from Wholesale"),
         };
     }
+
+    public static Currency Map(TotalMonthlyAmountResultProducedV1.Types.Currency currency)
+    {
+        return currency switch
+        {
+            TotalMonthlyAmountResultProducedV1.Types.Currency.Dkk => Currency.DanishCrowns,
+            TotalMonthlyAmountResultProducedV1.Types.Currency.Unspecified => throw new InvalidOperationException("Currency is not specified from Wholesale"),
+            _ => throw new ArgumentOutOfRangeException(nameof(currency), currency, "Unknown currency from Wholesale"),
+        };
+    }
 }
