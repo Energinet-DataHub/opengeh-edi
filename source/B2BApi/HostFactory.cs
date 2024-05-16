@@ -59,8 +59,6 @@ public static class HostFactory
                     services
                         // Logging
                         .AddApplicationInsightsForIsolatedWorker(DomainName)
-                        .ConfigureFunctionsApplicationInsights()
-                        .AddLogging()
 
                         // Health checks
                         .AddHealthChecksForIsolatedWorker()
