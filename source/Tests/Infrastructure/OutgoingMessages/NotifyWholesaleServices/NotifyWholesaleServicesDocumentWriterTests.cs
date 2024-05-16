@@ -132,9 +132,6 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
     [InlineData(nameof(DocumentFormat.Ebix))]
     public async Task Can_create_notifyWholesaleServices_document_with_optional_values_as_null(string documentFormat)
     {
-        var transactionId = documentFormat == nameof(DocumentFormat.Ebix)
-            ? SampleData.TransactionId.ToString().Substring(0, 35)
-            : SampleData.TransactionId.ToString();
         // Arrange
         // This is the wholesale series with most nullable fields.
         var serie = new WholesaleServicesTotalSumSeries(

@@ -60,7 +60,7 @@ public static class WholesaleServicesTotalSumMessageFactory
         ArgumentNullException.ThrowIfNull(message);
 
         return new WholesaleServicesTotalSumSeries(
-            TransactionId: Guid.NewGuid(), // TODO: Use TransactionId value object
+            TransactionId: TransactionId.New(),
             CalculationVersion: message.CalculationResultVersion,
             GridAreaCode: message.GridAreaCode,
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
