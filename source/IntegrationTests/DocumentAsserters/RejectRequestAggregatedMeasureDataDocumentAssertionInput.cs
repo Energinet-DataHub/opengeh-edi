@@ -25,6 +25,6 @@ public record RejectRequestAggregatedMeasureDataDocumentAssertionInput(
     // ActorRole ReceiverRole,
     // ActorRole SenderRole,
     string ReasonCode,
-    string OriginalTransactionIdReference,
+    TransactionId OriginalTransactionIdReference,
     string SeriesReasonCode,
     string SeriesReasonMessage);

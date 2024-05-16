@@ -27,9 +27,13 @@ public static class RejectedEnergyResultMessageDtoBuilder
     private static readonly string _businessReason = BusinessReason.BalanceFixing.Code;
     private static readonly ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
     private static readonly MessageId _relatedToMessageId = MessageId.Create(Guid.NewGuid().ToString());
+
     private static readonly RejectedEnergyResultMessageSerie _series = new(
         SampleData.TransactionId,
-        new List<RejectedEnergyResultMessageRejectReason> { new(SampleData.SerieReasonCode, SampleData.SerieReasonMessage) },
+        new List<RejectedEnergyResultMessageRejectReason>
+        {
+            new(SampleData.SerieReasonCode, SampleData.SerieReasonMessage),
+        },
         SampleData.OriginalTransactionId);
 
     private static readonly EventId _eventId = EventId.From(Guid.NewGuid().ToString());

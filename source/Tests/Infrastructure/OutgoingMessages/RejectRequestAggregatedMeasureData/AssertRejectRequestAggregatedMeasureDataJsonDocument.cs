@@ -99,9 +99,10 @@ public sealed class AssertRejectRequestAggregatedMeasureDataJsonDocument : IAsse
         return this;
     }
 
-    public IAssertRejectRequestAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasTransactionId(TransactionId expectedTransactionId)
     {
-        Assert.Equal(expectedTransactionId.ToString(), FirstSeriesElement().GetProperty("mRID").ToString());
+        ArgumentNullException.ThrowIfNull(expectedTransactionId);
+        Assert.Equal(expectedTransactionId.Value, FirstSeriesElement().GetProperty("mRID").ToString());
         return this;
     }
 
@@ -123,9 +124,13 @@ public sealed class AssertRejectRequestAggregatedMeasureDataJsonDocument : IAsse
         return this;
     }
 
-    public IAssertRejectRequestAggregatedMeasureDataDocument HasOriginalTransactionId(string expectedOriginalTransactionId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasOriginalTransactionId(
+        TransactionId expectedOriginalTransactionId)
     {
-        Assert.Equal(expectedOriginalTransactionId, FirstSeriesElement().GetProperty("originalTransactionIDReference_Series.mRID").ToString());
+        ArgumentNullException.ThrowIfNull(expectedOriginalTransactionId);
+        Assert.Equal(
+            expectedOriginalTransactionId.Value,
+            FirstSeriesElement().GetProperty("originalTransactionIDReference_Series.mRID").ToString());
         return this;
     }
 

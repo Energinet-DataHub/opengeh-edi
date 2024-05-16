@@ -79,7 +79,7 @@ public sealed class RejectRequestWholesaleSettlementDocumentWriterTests : IClass
                 .Should()
                 .Contain("OriginalBusinessDocument")
                 .And
-                .Contain(SampleData.OriginalTransactionId)
+                .Contain(SampleData.OriginalTransactionId.Value)
                 .And
                 .Contain("The actual length is greater than the MaxLength value");
         }

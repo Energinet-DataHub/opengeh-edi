@@ -16,24 +16,25 @@ using System;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Exceptions;
 
-public class InvalidMessageIdException : Exception
+public class InvalidTransactionIdException : Exception
 {
-    public InvalidMessageIdException(string message)
+    private InvalidTransactionIdException(string message)
         : base(message)
     {
     }
 
-    public InvalidMessageIdException()
+    private InvalidTransactionIdException()
     {
     }
 
-    public InvalidMessageIdException(string message, Exception innerException)
+    private InvalidTransactionIdException(string message, Exception innerException)
         : base(message, innerException)
     {
     }
 
-    public static InvalidMessageIdException Create(string? messageId)
+    public static InvalidTransactionIdException Create(string? transactionId)
     {
-        return new InvalidMessageIdException($"{messageId} is not a valid message id, Message ids must be at most 36 characters long");
+        return new InvalidTransactionIdException(
+            $"{transactionId} is not a valid transaction id; transaction ids must be at most 36 characters long");
     }
 }

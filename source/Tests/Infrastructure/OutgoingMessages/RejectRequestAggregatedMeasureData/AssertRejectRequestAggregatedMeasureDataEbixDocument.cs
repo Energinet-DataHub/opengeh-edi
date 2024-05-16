@@ -81,9 +81,10 @@ public class AssertRejectRequestAggregatedMeasureDataEbixDocument : IAssertRejec
         return this;
     }
 
-    public IAssertRejectRequestAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasTransactionId(TransactionId expectedTransactionId)
     {
-        _documentAsserter.HasValue($"PayloadResponseEvent[1]/Identification", expectedTransactionId.ToString("N"));
+        ArgumentNullException.ThrowIfNull(expectedTransactionId);
+        _documentAsserter.HasValue("PayloadResponseEvent[1]/Identification", expectedTransactionId.Value);
         return this;
     }
 
@@ -93,9 +94,10 @@ public class AssertRejectRequestAggregatedMeasureDataEbixDocument : IAssertRejec
         return this;
     }
 
-    public IAssertRejectRequestAggregatedMeasureDataDocument HasOriginalTransactionId(string expectedOriginalTransactionId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasOriginalTransactionId(TransactionId expectedOriginalTransactionId)
     {
-        _documentAsserter.HasValue("PayloadResponseEvent[1]/OriginalBusinessDocument", expectedOriginalTransactionId);
+        ArgumentNullException.ThrowIfNull(expectedOriginalTransactionId);
+        _documentAsserter.HasValue("PayloadResponseEvent[1]/OriginalBusinessDocument", expectedOriginalTransactionId.Value);
         return this;
     }
 

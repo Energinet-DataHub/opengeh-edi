@@ -76,9 +76,10 @@ public sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNotif
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertNotifyAggregatedMeasureDataDocument HasTransactionId(TransactionId expectedTransactionId)
     {
-        Assert.Equal(expectedTransactionId, FirstTimeSeriesElement().GetProperty("mRID").GetGuid());
+        ArgumentNullException.ThrowIfNull(expectedTransactionId);
+        Assert.Equal(expectedTransactionId.Value, FirstTimeSeriesElement().GetProperty("mRID").GetString());
         return this;
     }
 
@@ -323,9 +324,13 @@ public sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNotif
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasOriginalTransactionIdReference(string originalTransactionIdReference)
+    public IAssertNotifyAggregatedMeasureDataDocument HasOriginalTransactionIdReference(
+        TransactionId originalTransactionIdReference)
     {
-        Assert.Equal(originalTransactionIdReference, FirstTimeSeriesElement()
+        ArgumentNullException.ThrowIfNull(originalTransactionIdReference);
+        Assert.Equal(
+            originalTransactionIdReference.Value,
+            FirstTimeSeriesElement()
             .GetProperty("originalTransactionIDReference_Series.mRID")
             .ToString());
         return this;

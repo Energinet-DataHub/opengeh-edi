@@ -50,7 +50,7 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
         AcceptedWholesaleServicesSerieDto acceptedWholesaleServices)
     {
         var acceptedWholesaleCalculationSeries = new AcceptedWholesaleServicesSeries(
-            TransactionId: Guid.NewGuid(),
+            TransactionId: TransactionId.New(),
             CalculationVersion: acceptedWholesaleServices.CalculationResultVersion,
             GridAreaCode: acceptedWholesaleServices.GridArea,
             ChargeCode: acceptedWholesaleServices.ChargeCode,
@@ -67,7 +67,7 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
             acceptedWholesaleServices.Resolution,
             acceptedWholesaleServices.MeteringPointType,
             acceptedWholesaleServices.SettlementMethod,
-            OriginalTransactionIdReference: process.BusinessTransactionId.Id);
+            OriginalTransactionIdReference: process.BusinessTransactionId);
 
         return acceptedWholesaleCalculationSeries;
     }

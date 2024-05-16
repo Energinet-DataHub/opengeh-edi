@@ -47,7 +47,7 @@ public class NotifyAggregatedMeasureDataCimXmlDocumentWriter : CimXmlDocumentWri
         foreach (var timeSeries in ParseFrom<TimeSeriesMarketActivityRecord>(marketActivityPayloads))
         {
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "Series", null).ConfigureAwait(false);
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, timeSeries.TransactionId.ToString()).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "mRID", null, timeSeries.TransactionId.Value).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "version", null, timeSeries.CalculationResultVersion.ToString(NumberFormatInfo.InvariantInfo)).ConfigureAwait(false);
 
             await WriteElementIfHasValueAsync(
@@ -55,7 +55,7 @@ public class NotifyAggregatedMeasureDataCimXmlDocumentWriter : CimXmlDocumentWri
                     timeSeries.SettlementVersion is not null ? SettlementVersion.FromName(timeSeries.SettlementVersion).Code : null,
                     writer)
                 .ConfigureAwait(false);
-            await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", timeSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
+            await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", timeSeries.OriginalTransactionIdReference?.Value, writer).ConfigureAwait(false);
             await writer.WriteElementStringAsync(
                     DocumentDetails.Prefix,
                     "marketEvaluationPoint.type",

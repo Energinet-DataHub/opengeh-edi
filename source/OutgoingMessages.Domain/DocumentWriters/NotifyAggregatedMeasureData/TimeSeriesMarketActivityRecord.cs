@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAg
 
 // This is a copy of TimeSeries defined in the process module
 public record TimeSeriesMarketActivityRecord(
-    Guid TransactionId,
+    TransactionId TransactionId,
     string GridAreaCode,
     string MeteringPointType,
 
@@ -36,7 +36,7 @@ public record TimeSeriesMarketActivityRecord(
     Period Period,
     IReadOnlyCollection<Point> Point,
     long CalculationResultVersion,
-    string? OriginalTransactionIdReference = null,
+    TransactionId? OriginalTransactionIdReference = null,
     string? SettlementVersion = null);
 
 public record Point(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);

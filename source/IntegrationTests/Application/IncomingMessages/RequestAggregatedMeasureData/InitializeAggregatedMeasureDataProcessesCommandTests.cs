@@ -89,7 +89,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         var process = GetProcess(initializeProcessDto.SenderNumber);
         process.Should().NotBeNull();
         initializeProcessDto.Series.Should().NotBeEmpty();
-        process!.BusinessTransactionId.Id.Should().Be(initializeProcessDto.Series.First().Id);
+        process!.BusinessTransactionId.Should().Be(initializeProcessDto.Series.First().Id);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Initialized);
         process.Should().BeEquivalentTo(initializeProcessDto, opt => opt.Using(new ProcessAndRequestComparer()));
     }
@@ -117,7 +117,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         Assert.NotNull(process);
         Assert.Equal(process.ProcessId.Id.ToString(), message!.MessageId);
         Assert.Equal(exceptedServiceBusMessageSubject, message!.Subject);
-        Assert.Equal(initializeProcessDto.Series.First().Id, process!.BusinessTransactionId.Id);
+        Assert.Equal(initializeProcessDto.Series.First().Id, process!.BusinessTransactionId);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Sent);
     }
 
@@ -205,7 +205,7 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
                     },
                     {
                         nameof(AggregatedMeasureDataProcess.BusinessTransactionId),
-                        (p, r, s) => p.BusinessTransactionId.Id.Should().Be(s.Id)
+                        (p, r, s) => p.BusinessTransactionId.Should().Be(s.Id)
                     },
                     {
                         nameof(AggregatedMeasureDataProcess.RequestedByActor),

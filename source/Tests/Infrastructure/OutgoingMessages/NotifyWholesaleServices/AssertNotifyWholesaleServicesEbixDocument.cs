@@ -127,9 +127,10 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
 
     #region series validation
 
-    public IAssertNotifyWholesaleServicesDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertNotifyWholesaleServicesDocument HasTransactionId(TransactionId expectedTransactionId)
     {
-        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/Identification", expectedTransactionId.ToString("N"));
+        ArgumentNullException.ThrowIfNull(expectedTransactionId);
+        _documentAsserter.HasValue($"{PayloadEnergyTimeSeries}[1]/Identification", expectedTransactionId.Value);
         return this;
     }
 
@@ -471,11 +472,12 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
     }
 
     public IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(
-        string expectedOriginalTransactionIdReference)
+        TransactionId expectedOriginalTransactionIdReference)
     {
+        ArgumentNullException.ThrowIfNull(expectedOriginalTransactionIdReference);
         _documentAsserter.HasValue(
             $"{PayloadEnergyTimeSeries}[1]/OriginalBusinessDocument",
-            expectedOriginalTransactionIdReference);
+            expectedOriginalTransactionIdReference.Value);
         return this;
     }
 

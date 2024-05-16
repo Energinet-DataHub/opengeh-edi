@@ -110,9 +110,10 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
 
     #endregion
 
-    public IAssertNotifyWholesaleServicesDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertNotifyWholesaleServicesDocument HasTransactionId(TransactionId expectedTransactionId)
     {
-        _documentAsserter.HasValue($"Series[1]/mRID", expectedTransactionId.ToString());
+        ArgumentNullException.ThrowIfNull(expectedTransactionId);
+        _documentAsserter.HasValue("Series[1]/mRID", expectedTransactionId.Value);
         return this;
     }
 
@@ -136,11 +137,12 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
     }
 
     public IAssertNotifyWholesaleServicesDocument HasOriginalTransactionIdReference(
-        string expectedOriginalTransactionIdReference)
+        TransactionId expectedOriginalTransactionIdReference)
     {
+        ArgumentNullException.ThrowIfNull(expectedOriginalTransactionIdReference);
         _documentAsserter.HasValue(
             "Series[1]/originalTransactionIDReference_Series.mRID",
-            expectedOriginalTransactionIdReference);
+            expectedOriginalTransactionIdReference.Value);
         return this;
     }
 

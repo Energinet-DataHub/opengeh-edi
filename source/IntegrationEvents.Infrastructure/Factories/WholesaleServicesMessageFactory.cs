@@ -89,7 +89,7 @@ public sealed class WholesaleServicesMessageFactory
         ArgumentNullException.ThrowIfNull(message);
 
         return new WholesaleServicesSeries(
-            TransactionId: Guid.NewGuid(),
+            TransactionId: TransactionId.New(),
             CalculationVersion: message.CalculationResultVersion,
             GridAreaCode: message.GridAreaCode,
             ChargeCode: message.ChargeCode,
@@ -120,7 +120,7 @@ public sealed class WholesaleServicesMessageFactory
         ArgumentNullException.ThrowIfNull(message);
 
         return new WholesaleServicesSeries(
-            TransactionId: Guid.NewGuid(),
+            TransactionId: TransactionId.New(),
             CalculationVersion: message.CalculationResultVersion,
             GridAreaCode: message.GridAreaCode,
             ChargeCode: message.ChargeCode,

@@ -25,6 +25,6 @@ public record RejectRequestWholesaleSettlementDocumentAssertionInput(
     string SenderId,
     ActorRole SenderRole,
     string ReasonCode,
-    string OriginalTransactionIdReference,
+    TransactionId OriginalTransactionIdReference,
     string SeriesReasonCode,
     string SeriesReasonMessage);

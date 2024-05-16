@@ -26,8 +26,8 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators;
 
 public class IncomingMessageValidator
 {
-    private const int MessageIdLength = 36;
-    private const int TransactionIdLength = 36;
+    private const int MaxMessageIdLength = 36;
+    private const int MaxTransactionIdLength = 36;
 
     private readonly ISenderAuthorizer _senderAuthorizer;
     private readonly IReceiverValidator _receiverValidator;
@@ -114,7 +114,7 @@ public class IncomingMessageValidator
             errors.Add(new EmptyMessageId());
         }
 
-        if (message.MessageId.Length != MessageIdLength)
+        if (message.MessageId.Length > MaxMessageIdLength)
         {
             errors.Add(new InvalidMessageIdSize(message.MessageId));
         }
@@ -195,7 +195,7 @@ public class IncomingMessageValidator
         return transactionId switch
         {
             _ when string.IsNullOrEmpty(transactionId) => new EmptyTransactionId(),
-            _ when transactionId.Length != TransactionIdLength => new InvalidTransactionIdSize(transactionId),
+            _ when transactionId.Length > MaxTransactionIdLength => new InvalidTransactionIdSize(transactionId),
             _ when await TransactionIdIsDuplicatedAsync(senderNumber, transactionId, cancellationToken)
                 .ConfigureAwait(false) => new DuplicateTransactionIdDetected(transactionId),
             _ when transactionIdsToBeStored.Contains(transactionId) =>

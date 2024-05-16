@@ -70,7 +70,7 @@ public class WholesaleServicesTotalSumMessageDto : OutgoingMessageDto
 }
 
 public record WholesaleServicesTotalSumSeries(
-    Guid TransactionId,
+    TransactionId TransactionId,
     long CalculationVersion,
     string GridAreaCode,
     ActorNumber EnergySupplier,

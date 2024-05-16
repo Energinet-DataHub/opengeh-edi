@@ -79,9 +79,10 @@ public class AssertRejectRequestAggregatedMeasureDataXmlDocument : IAssertReject
         return this;
     }
 
-    public IAssertRejectRequestAggregatedMeasureDataDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasTransactionId(TransactionId expectedTransactionId)
     {
-        _documentAsserter.HasValue($"Series[1]/mRID", expectedTransactionId.ToString());
+        ArgumentNullException.ThrowIfNull(expectedTransactionId);
+        _documentAsserter.HasValue("Series[1]/mRID", expectedTransactionId.Value);
         return this;
     }
 
@@ -91,9 +92,13 @@ public class AssertRejectRequestAggregatedMeasureDataXmlDocument : IAssertReject
         return this;
     }
 
-    public IAssertRejectRequestAggregatedMeasureDataDocument HasOriginalTransactionId(string expectedOriginalTransactionId)
+    public IAssertRejectRequestAggregatedMeasureDataDocument HasOriginalTransactionId(
+        TransactionId expectedOriginalTransactionId)
     {
-        _documentAsserter.HasValue($"Series[1]/originalTransactionIDReference_Series.mRID", expectedOriginalTransactionId);
+        ArgumentNullException.ThrowIfNull(expectedOriginalTransactionId);
+        _documentAsserter.HasValue(
+            "Series[1]/originalTransactionIDReference_Series.mRID",
+            expectedOriginalTransactionId.Value);
         return this;
     }
 
