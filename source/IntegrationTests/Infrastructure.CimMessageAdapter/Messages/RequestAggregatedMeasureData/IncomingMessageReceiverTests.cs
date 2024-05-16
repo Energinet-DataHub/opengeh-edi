@@ -495,7 +495,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
     }
 
     [Fact]
-    public async Task Message_id_can_be_shorter_than_max_length()
+    public async Task Message_id_can_be_shorter_than_36_chars()
     {
         const string knownReceiverId = "5790001330552";
         const string knownReceiverRole = "DDZ";
@@ -518,7 +518,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
     }
 
     [Fact]
-    public async Task Message_id_cannot_be_longer_than_max_length()
+    public async Task Message_id_cannot_be_longer_than_36_chars()
     {
         const string knownReceiverId = "5790001330552";
         const string knownReceiverRole = "DDZ";
