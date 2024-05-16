@@ -37,14 +37,15 @@ public static class IntegrationEventExtensions
         IConfiguration configuration)
     {
         services
-            .AddTransient<IIntegrationEventProcessor, ProcessDelegationConfiguredEventProcessor>()
             .AddTransient<IIntegrationEventProcessor, EnergyResultProducedV2Processor>()
-            .AddTransient<IIntegrationEventProcessor, MonthlyAmountPerChargeResultProducedV1Processor>()
-            .AddTransient<IIntegrationEventProcessor, AmountPerChargeResultProducedV1Processor>()
             .AddTransient<IIntegrationEventProcessor, ActorActivatedIntegrationEventProcessor>()
             .AddTransient<IIntegrationEventProcessor, GridAreaOwnershipAssignedIntegrationEventProcessor>()
-            .AddTransient<IIntegrationEventProcessor, ActorCertificateCredentialsAssignedEventProcessor>()
             .AddTransient<IIntegrationEventProcessor, ActorCertificateCredentialsRemovedEventProcessor>()
+            .AddTransient<IIntegrationEventProcessor, ActorCertificateCredentialsAssignedEventProcessor>()
+            .AddTransient<IIntegrationEventProcessor, MonthlyAmountPerChargeResultProducedV1Processor>()
+            .AddTransient<IIntegrationEventProcessor, AmountPerChargeResultProducedV1Processor>()
+            .AddTransient<IIntegrationEventProcessor, ProcessDelegationConfiguredEventProcessor>()
+            .AddTransient<IIntegrationEventProcessor, CalculationCompletedV1Processor>()
             .AddTransient<IReadOnlyDictionary<string, IIntegrationEventProcessor>>(
                 sp => sp.GetServices<IIntegrationEventProcessor>()
                     .ToDictionary(m => m.EventTypeToHandle, m => m));
@@ -59,6 +60,7 @@ public static class IntegrationEventExtensions
             MonthlyAmountPerChargeResultProducedV1.Descriptor,
             AmountPerChargeResultProducedV1.Descriptor,
             ProcessDelegationConfigured.Descriptor,
+            CalculationCompletedV1.Descriptor,
         };
 
         services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);
