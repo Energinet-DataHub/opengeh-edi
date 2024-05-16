@@ -12,8 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Xunit;
+using Xunit.Abstractions;
+
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.CalculationCompleted;
 
-public class CalculationCompletedV1Tests
+public class CalculationCompletedV1ProcessorTests : TestBase
 {
+    public CalculationCompletedV1ProcessorTests(
+        IntegrationTestFixture integrationTestFixture,
+        ITestOutputHelper testOutputHelper)
+    : base(integrationTestFixture, testOutputHelper)
+    {
+    }
+
+    [Fact]
+    public void Given_FeatureIsEnabled_When_MessageIsHandled_Then_OrchestrationIsStarted()
+    {
+        FeatureFlagManagerStub.EnableCalculationCompletedEvent(true);
+
+        // Act
+    }
 }
