@@ -23,11 +23,11 @@ public record WholesaleCalculationMarketActivityRecord(
     TransactionId TransactionId,
     long CalculationVersion,
     string GridAreaCode,
-    string ChargeCode,
+    string? ChargeCode,
     bool IsTax,
     IReadOnlyCollection<Point> Points,
     ActorNumber EnergySupplier,
-    ActorNumber ChargeOwner,
+    ActorNumber? ChargeOwner,
     Period Period,
     SettlementVersion? SettlementVersion,
     MeasurementUnit QuantityMeasureUnit,
@@ -36,9 +36,9 @@ public record WholesaleCalculationMarketActivityRecord(
     [property: Obsolete("Only kept for backwards compatibility, use QuantityMeasureUnit instead")]
     MeasurementUnit? QuantityUnit,
 
-    MeasurementUnit PriceMeasureUnit,
+    MeasurementUnit? PriceMeasureUnit,
     Currency Currency,
-    ChargeType ChargeType,
+    ChargeType? ChargeType,
     Resolution Resolution,
     MeteringPointType? MeteringPointType,
 

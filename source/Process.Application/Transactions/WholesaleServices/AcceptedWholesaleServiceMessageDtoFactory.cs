@@ -37,7 +37,7 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
             receiverRole: process.RequestedByActor.ActorRole,
             documentReceiverNumber: process.OriginalActor.ActorNumber,
             documentReceiverRole: process.OriginalActor.ActorRole,
-            chargeOwnerId: message.ChargeOwner,
+            chargeOwnerId: acceptedWholesaleServices.ChargeOwnerId,
             processId: process.ProcessId.Id,
             eventId: eventId,
             businessReason: process.BusinessReason.Name,

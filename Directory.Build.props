@@ -1,7 +1,7 @@
 <Project>
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <LangVersion>11.0</LangVersion>
+        <LangVersion>12.0</LangVersion>
         <AnalysisMode>AllEnabledByDefault</AnalysisMode>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <Nullable>enable</Nullable>
@@ -18,7 +18,7 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.354">
+      <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>

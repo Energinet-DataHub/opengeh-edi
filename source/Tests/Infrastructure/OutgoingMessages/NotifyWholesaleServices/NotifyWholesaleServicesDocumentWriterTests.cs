@@ -19,6 +19,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
@@ -26,11 +27,15 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholes
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions.Execution;
+using NodaTime.Text;
 using Xunit;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 
@@ -117,6 +122,76 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             .HasSumQuantityForPosition(1, SampleData.Quantity)
             .HasProductCode(ProductType.Tariff.Code)
             .HasOriginalTransactionIdReference(SampleData.TransactionId)
+            .SettlementVersionDoesNotExist()
+            .DocumentIsValidAsync();
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    [InlineData(nameof(DocumentFormat.Ebix))]
+    public async Task Can_create_notifyWholesaleServices_document_with_optional_values_as_null(string documentFormat)
+    {
+        var transactionId = documentFormat == nameof(DocumentFormat.Ebix)
+            ? SampleData.TransactionId.ToString().Substring(0, 35)
+            : SampleData.TransactionId.ToString();
+        // Arrange
+        // This is the wholesale series with most nullable fields.
+        var serie = new WholesaleServicesTotalSumSeries(
+            TransactionId: SampleData.TransactionId,
+            CalculationVersion: 1,
+            GridAreaCode: SampleData.GridAreaCode,
+            EnergySupplier: SampleData.EnergySupplier,
+            Period: new Period(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc),
+            SettlementVersion: null,
+            QuantityMeasureUnit: MeasurementUnit.Kwh,
+            Currency: Currency.DanishCrowns,
+            Resolution: Resolution.Monthly,
+            Amount: 100);
+        var header = new OutgoingMessageHeader(
+            DataHubNames.BusinessReason.WholesaleFixing,
+            SampleData.SenderId.Value,
+            ActorRole.EnergySupplier.Code,
+            SampleData.ReceiverId.Value,
+            ActorRole.EnergySupplier.Code,
+            SampleData.MessageId,
+            InstantPattern.General.Parse(SampleData.Timestamp).Value);
+
+        // Act
+        var document = await WriteDocument(
+            header,
+            serie,
+            DocumentFormat.FromName(documentFormat));
+
+        // Assert
+        using var assertionScope = new AssertionScope();
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
+            .HasMessageId(SampleData.MessageId)
+            .HasBusinessReason(SampleData.BusinessReason, CodeListType.EbixDenmark) // "D05" (WholesaleFixing) is from CodeListType.EbixDenmark
+            .HasSenderId(SampleData.SenderId, "A10")
+            .HasSenderRole(ActorRole.EnergySupplier)
+            .HasReceiverId(SampleData.ReceiverId)
+            .HasReceiverRole(ActorRole.EnergySupplier, CodeListType.Ebix) // MDR is from CodeListType.Ebix
+            .HasTimestamp(SampleData.Timestamp)
+            .HasTransactionId(SampleData.TransactionId)
+            .HasCalculationVersion(SampleData.Version)
+            .ChargeCodeDoesNotExist()
+            .ChargeTypeDoesNotExist()
+            .ChargeTypeOwnerDoesNotExist()
+            .HasGridAreaCode(SampleData.GridAreaCode, "NDK")
+            .HasEnergySupplierNumber(SampleData.EnergySupplier, "A10")
+            .HasPeriod(new Period(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc))
+            .HasCurrency(SampleData.Currency)
+            .HasQuantityMeasurementUnit(SampleData.MeasurementUnit)
+            .PriceMeasurementUnitDoesNotExist()
+            .HasResolution(Resolution.Monthly)
+            .HasSinglePointWithAmount(new DecimalValue()
+            {
+                Nanos = 0,
+                Units = 100,
+            })
+            .HasProductCode(ProductType.Tariff.Code)
+            .OriginalTransactionIdReferenceDoesNotExist()
             .SettlementVersionDoesNotExist()
             .DocumentIsValidAsync();
     }

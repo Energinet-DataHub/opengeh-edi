@@ -59,4 +59,9 @@ public interface IFeatureFlagManager
     /// Whether to allow handling EnergyResultProducedV2 events.
     /// </summary>
     Task<bool> UseEnergyResultProducedAsync();
+
+    /// <summary>
+    /// Whether to allow handling TotalMonthlyAmountResultProduced events.
+    /// </summary>
+    Task<bool> UseTotalMonthlyAmountResultProducedAsync();
 }

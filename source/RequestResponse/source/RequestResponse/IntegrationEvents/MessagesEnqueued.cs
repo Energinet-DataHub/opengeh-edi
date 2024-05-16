@@ -12,16 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+// ReSharper disable once CheckNamespace -- Protobuf is in with another namespace
+namespace Energinet.DataHub.EnergySupplying.RequestResponse.IntegrationEvents;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
-
-public static class DataHubDetails
+public partial class MessagesEnqueuedV1
 {
-    public static ActorNumber DataHubActorNumber => ActorNumber.Create("5790001330552");
-
-    /// <summary>
-    /// System operator that owns Energinet charges
-    /// </summary>
-    public static ActorNumber SystemOperatorActorNumber => ActorNumber.Create("5790000432752");
+    public const string EventName = "MessagesEnqueuedV1";
+    public const int CurrentMinorVersion = 1;
 }

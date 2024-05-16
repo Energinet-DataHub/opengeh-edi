@@ -216,11 +216,17 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                     }
                 }
 
-                // <ChargeType />
-                await WriteCodeWithCodeListReferenceAttributesAsync("ChargeType", EbixCode.Of(series.ChargeType), writer).ConfigureAwait(false);
+                if (series.ChargeType is not null)
+                {
+                    // <ChargeType />
+                    await WriteCodeWithCodeListReferenceAttributesAsync("ChargeType", EbixCode.Of(series.ChargeType), writer).ConfigureAwait(false);
+                }
 
-                // <PartyChargeTypeID />
-                await writer.WriteElementStringAsync(DocumentDetails.Prefix, "PartyChargeTypeID", null, series.ChargeCode).ConfigureAwait(false);
+                if (series.ChargeCode is not null)
+                {
+                    // <PartyChargeTypeID />
+                    await writer.WriteElementStringAsync(DocumentDetails.Prefix, "PartyChargeTypeID", null, series.ChargeCode).ConfigureAwait(false);
+                }
 
                 // <OriginalBusinessDocument />
                 await WriteElementIfHasValueAsync(
@@ -229,14 +235,19 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
                         writer)
                     .ConfigureAwait(false);
 
-                // Begin <ChargeTypeOwnerEnergyParty>
-                await writer.WriteStartElementAsync(DocumentDetails.Prefix, "ChargeTypeOwnerEnergyParty", null).ConfigureAwait(false);
+                if (series.ChargeOwner is not null)
                 {
-                    // <Identification />
-                    await WriteGlnOrEicCodeWithAttributesAsync("Identification", series.ChargeOwner.Value, writer).ConfigureAwait(false);
+                    // Begin <ChargeTypeOwnerEnergyParty>
+                    await writer.WriteStartElementAsync(DocumentDetails.Prefix, "ChargeTypeOwnerEnergyParty", null)
+                        .ConfigureAwait(false);
+                    {
+                        // <Identification />
+                        await WriteGlnOrEicCodeWithAttributesAsync("Identification", series.ChargeOwner.Value, writer)
+                            .ConfigureAwait(false);
 
-                    await writer.WriteEndElementAsync().ConfigureAwait(false);
-                } // End </ChargeTypeOwnerEnergyParty>
+                        await writer.WriteEndElementAsync().ConfigureAwait(false);
+                    } // End </ChargeTypeOwnerEnergyParty>
+                }
 
                 // <Version />
                 await WriteElementIfHasValueAsync("Version", series.CalculationVersion.ToString(NumberFormatInfo.InvariantInfo), writer).ConfigureAwait(false);

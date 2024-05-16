@@ -13,84 +13,89 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-public class WholesaleServicesMessageDto : OutgoingMessageDto
+/// <summary>
+/// Represents the total sum of wholesale services for either Energy Supplier or Charge owner.
+/// </summary>
+public class WholesaleServicesTotalSumMessageDto : OutgoingMessageDto
 {
-    protected WholesaleServicesMessageDto(
-        ActorNumber receiverNumber,
+    protected WholesaleServicesTotalSumMessageDto(
         Guid? processId,
         EventId eventId,
-        string businessReason,
+        BusinessReason businessReason,
+        ActorNumber receiverNumber,
         ActorRole receiverRole,
-        ActorNumber chargeOwnerId,
-        WholesaleServicesSeries series,
+        WholesaleServicesTotalSumSeries series,
         MessageId? relatedToMessageId = null)
         : base(
             DocumentType.NotifyWholesaleServices,
             receiverNumber,
             processId,
             eventId,
-            businessReason,
+#pragma warning disable CA1062
+            businessReason.Name,
+#pragma warning restore CA1062
             receiverRole,
             DataHubDetails.DataHubActorNumber,
             ActorRole.MeteredDataAdministrator,
             relatedToMessageId)
     {
-        ChargeOwnerId = chargeOwnerId;
         Series = series;
     }
 
-    public ActorNumber ChargeOwnerId { get; }
+    public WholesaleServicesTotalSumSeries Series { get; }
 
-    public WholesaleServicesSeries Series { get; }
-
-    public static WholesaleServicesMessageDto Create(
+    public static WholesaleServicesTotalSumMessageDto Create(
         EventId eventId,
         ActorNumber receiverNumber,
         ActorRole receiverRole,
-        ActorNumber chargeOwnerId,
-        string businessReason,
-        WholesaleServicesSeries wholesaleSeries)
+        BusinessReason businessReason,
+        WholesaleServicesTotalSumSeries wholesaleSeries)
     {
         ArgumentNullException.ThrowIfNull(eventId);
         ArgumentNullException.ThrowIfNull(businessReason);
 
-        return new WholesaleServicesMessageDto(
+        return new WholesaleServicesTotalSumMessageDto(
             receiverNumber: receiverNumber,
             receiverRole: receiverRole,
             processId: null,
             eventId: eventId,
             businessReason: businessReason,
-            series: wholesaleSeries,
-            chargeOwnerId: chargeOwnerId);
+            series: wholesaleSeries);
     }
 }
 
-public record WholesaleServicesSeries(
-    TransactionId TransactionId,
+public record WholesaleServicesTotalSumSeries(
+    Guid TransactionId,
     long CalculationVersion,
-    string? GridAreaCode,
-    string? ChargeCode,
-    bool IsTax,
-    IReadOnlyCollection<WholesaleServicesPoint> Points,
+    string GridAreaCode,
     ActorNumber EnergySupplier,
-    ActorNumber? ChargeOwner,
     Period Period,
     SettlementVersion? SettlementVersion,
     MeasurementUnit QuantityMeasureUnit,
-    MeasurementUnit? QuantityUnit, // To ensure backwards compatibility, will be remove in another PR.
-    MeasurementUnit? PriceMeasureUnit,
     Currency Currency,
-    ChargeType? ChargeType,
     Resolution Resolution,
-    MeteringPointType? MeteringPointType,
-    SettlementMethod? SettlementType, // TODO: To ensure backwards compatibility, will be removed in another PR.
-    SettlementMethod? SettlementMethod,
-    TransactionId? OriginalTransactionIdReference = null);
-
-public record WholesaleServicesPoint(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);
+    decimal Amount) : WholesaleServicesSeries(
+    TransactionId: TransactionId,
+    CalculationVersion: CalculationVersion,
+    GridAreaCode: GridAreaCode,
+    ChargeCode: null,
+    IsTax: false,
+    Points: new[] { new WholesaleServicesPoint(1, null, null, Amount, null), },
+    EnergySupplier: EnergySupplier,
+    ChargeOwner: null,
+    Period: Period,
+    SettlementVersion: SettlementVersion,
+    QuantityMeasureUnit: QuantityMeasureUnit,
+    QuantityUnit: null,
+    PriceMeasureUnit: null,
+    Currency: Currency,
+    ChargeType: null,
+    MeteringPointType: null,
+    SettlementType: null,
+    SettlementMethod: null,
+    Resolution: Resolution);
