@@ -30,7 +30,7 @@
         <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.17.5" />
         <PackageReference Include="Dapper" Version="2.1.35" />
         <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="5.1.1" />
-        <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="9.1.2" />
+        <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="9.3.2" />
         <PackageReference Include="FluentAssertions" Version="6.12.0" />
         <PackageReference Include="FluentAssertions.Analyzers" Version="0.28.0">
           <PrivateAssets>all</PrivateAssets>
@@ -41,9 +41,9 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.1" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.2" />
-        <PackageReference Include="NodaTime" Version="3.1.11"/>
+        <PackageReference Include="NodaTime" Version="3.1.11" />
         <PackageReference Include="System.ServiceModel.Http" Version="6.2.0" />
-      <PackageReference Include="System.ServiceModel.Primitives" Version="8.0.0"/>
+      <PackageReference Include="System.ServiceModel.Primitives" Version="8.0.0" />
         <PackageReference Include="xunit" Version="2.7.1" />
         <PackageReference Include="xunit.categories" Version="2.0.8" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.5.8">
