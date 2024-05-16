@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.Tests.Factories;
 
 public class AcceptedWholesaleServicesSeriesBuilder
 {
-    private readonly Guid _transactionId = Guid.NewGuid();
+    private readonly TransactionId _transactionId = TransactionId.New();
     private readonly int _calculationResultVersion = 1;
     private readonly string _gridAreaCode = "870";
     private readonly MeteringPointType _meteringPointType = MeteringPointType.Consumption;
@@ -35,7 +35,7 @@ public class AcceptedWholesaleServicesSeriesBuilder
     private readonly string _chargeCode = "123";
     private readonly ChargeType _chargeType = ChargeType.Fee;
     private readonly ActorNumber _chargeOwner = ActorNumber.Create("1234567897777");
-    private readonly string _originalTransactionIdReference = Guid.NewGuid().ToString();
+    private readonly TransactionId _originalTransactionIdReference = TransactionId.New();
     private readonly List<WholesaleServicesPoint> _points = new() { new(1, 100, 100, 100, null) };
     private readonly Currency _currency = Currency.DanishCrowns;
     private readonly Period _period = new(Instant.FromUtc(2023, 11, 1, 0, 0), Instant.FromUtc(2023, 12, 1, 0, 0));

@@ -32,7 +32,7 @@ public class MessageId
 
     public static MessageId Create(string messageId)
     {
-        if (messageId is null || messageId.Length is not 36)
+        if (messageId is null || messageId.Length > 36)
             throw InvalidMessageIdException.Create(messageId);
 
         return new MessageId(messageId);

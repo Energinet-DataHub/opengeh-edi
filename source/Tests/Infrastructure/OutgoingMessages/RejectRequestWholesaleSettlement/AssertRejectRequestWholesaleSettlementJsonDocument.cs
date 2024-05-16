@@ -147,13 +147,15 @@ public sealed class AssertRejectRequestWholesaleSettlementJsonDocument : IAssert
         return this;
     }
 
-    public IAssertRejectRequestWholesaleSettlementDocument HasTransactionId(Guid expectedTransactionId)
+    public IAssertRejectRequestWholesaleSettlementDocument HasTransactionId(TransactionId expectedTransactionId)
     {
+        ArgumentNullException.ThrowIfNull(expectedTransactionId);
+
         FirstSeriesElement()
             .GetProperty("mRID")
             .GetString()
             .Should()
-            .Be(expectedTransactionId.ToString());
+            .Be(expectedTransactionId.Value);
         return this;
     }
 
@@ -188,13 +190,15 @@ public sealed class AssertRejectRequestWholesaleSettlementJsonDocument : IAssert
     }
 
     public IAssertRejectRequestWholesaleSettlementDocument HasOriginalTransactionId(
-        string expectedOriginalTransactionId)
+        TransactionId expectedOriginalTransactionId)
     {
+        ArgumentNullException.ThrowIfNull(expectedOriginalTransactionId);
+
         FirstSeriesElement()
             .GetProperty("originalTransactionIDReference_Series.mRID")
             .GetString()
             .Should()
-            .Be(expectedOriginalTransactionId);
+            .Be(expectedOriginalTransactionId.Value);
         return this;
     }
 

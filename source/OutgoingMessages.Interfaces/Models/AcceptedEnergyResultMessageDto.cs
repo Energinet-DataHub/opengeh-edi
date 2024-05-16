@@ -72,12 +72,12 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
         IReadOnlyCollection<AcceptedEnergyResultMessagePoint> points,
         string businessReasonName,
         long calculationResultVersion,
-        string? originalTransactionIdReference,
+        TransactionId? originalTransactionIdReference,
         string? settlementVersion,
         MessageId? relatedToMessageId)
     {
         var series = new AcceptedEnergyResultMessageTimeSeries(
-            TransactionId: Guid.NewGuid(),
+            TransactionId: TransactionId.New(),
             gridAreaCode,
             meteringPointType,
             null,
@@ -105,7 +105,7 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
 }
 
 public record AcceptedEnergyResultMessageTimeSeries(
-    Guid TransactionId,
+    TransactionId TransactionId,
     string GridAreaCode,
     string MeteringPointType,
     string? SettlementType, // TODO: To ensure backwards compatibility, will be remove in another PR.
@@ -117,7 +117,7 @@ public record AcceptedEnergyResultMessageTimeSeries(
     Period Period,
     IReadOnlyCollection<AcceptedEnergyResultMessagePoint> Point,
     long CalculationResultVersion,
-    string? OriginalTransactionIdReference = null,
+    TransactionId? OriginalTransactionIdReference = null,
     string? SettlementVersion = null);
 
 public record AcceptedEnergyResultMessagePoint(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);

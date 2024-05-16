@@ -72,7 +72,12 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
             // Begin PayloadEnergyTimeSeries
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "PayloadEnergyTimeSeries", null).ConfigureAwait(false);
 
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "Identification", null, timeSeries.TransactionId.ToString("N")).ConfigureAwait(false);
+            await writer.WriteElementStringAsync(
+                    DocumentDetails.Prefix,
+                    "Identification",
+                    null,
+                    timeSeries.TransactionId.Value)
+                .ConfigureAwait(false);
 
             await WriteCodeWithCodeListReferenceAttributesAsync("Function", "9", writer).ConfigureAwait(false);
 
@@ -187,7 +192,11 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
                 // End IntervalEnergyObservation
             }
 
-            await WriteElementIfHasValueAsync("OriginalBusinessDocument", timeSeries.OriginalTransactionIdReference, writer).ConfigureAwait(false);
+            await WriteElementIfHasValueAsync(
+                    "OriginalBusinessDocument",
+                    timeSeries.OriginalTransactionIdReference?.Value,
+                    writer)
+                .ConfigureAwait(false);
 
             await WriteElementIfHasValueAsync("Version", timeSeries.CalculationResultVersion.ToString(NumberFormatInfo.InvariantInfo), writer).ConfigureAwait(false);
 

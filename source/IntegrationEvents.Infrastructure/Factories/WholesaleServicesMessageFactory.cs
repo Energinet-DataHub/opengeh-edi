@@ -42,7 +42,10 @@ public sealed class WholesaleServicesMessageFactory
 
         var message = CreateWholesaleResultSeries(monthlyAmountPerChargeResultProducedV1);
 
-        var chargeOwner = await GetChargeOwnerReceiverAsync(message.GridAreaCode, monthlyAmountPerChargeResultProducedV1.ChargeOwnerId, message.IsTax)
+        var chargeOwner = await GetChargeOwnerReceiverAsync(
+                monthlyAmountPerChargeResultProducedV1.GridAreaCode,
+                monthlyAmountPerChargeResultProducedV1.ChargeOwnerId,
+                monthlyAmountPerChargeResultProducedV1.IsTax)
             .ConfigureAwait(false);
 
         return WholesaleServicesMessageDto.Create(
@@ -62,7 +65,10 @@ public sealed class WholesaleServicesMessageFactory
 
         var message = CreateWholesaleResultSeries(amountPerChargeResultProducedV1);
 
-        var chargeOwner = await GetChargeOwnerReceiverAsync(message.GridAreaCode, amountPerChargeResultProducedV1.ChargeOwnerId, message.IsTax)
+        var chargeOwner = await GetChargeOwnerReceiverAsync(
+                amountPerChargeResultProducedV1.GridAreaCode,
+                amountPerChargeResultProducedV1.ChargeOwnerId,
+                amountPerChargeResultProducedV1.IsTax)
             .ConfigureAwait(false);
 
         return WholesaleServicesMessageDto.Create(
@@ -80,7 +86,7 @@ public sealed class WholesaleServicesMessageFactory
         ArgumentNullException.ThrowIfNull(message);
 
         return new WholesaleServicesSeries(
-            TransactionId: Guid.NewGuid(),
+            TransactionId: TransactionId.New(),
             CalculationVersion: message.CalculationResultVersion,
             GridAreaCode: message.GridAreaCode,
             ChargeCode: message.ChargeCode,
@@ -110,7 +116,7 @@ public sealed class WholesaleServicesMessageFactory
         ArgumentNullException.ThrowIfNull(message);
 
         return new WholesaleServicesSeries(
-            TransactionId: Guid.NewGuid(),
+            TransactionId: TransactionId.New(),
             CalculationVersion: message.CalculationResultVersion,
             GridAreaCode: message.GridAreaCode,
             ChargeCode: message.ChargeCode,

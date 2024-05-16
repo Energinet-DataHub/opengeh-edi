@@ -60,4 +60,17 @@ public static class BusinessReasonMapper
             _ => throw new ArgumentOutOfRangeException(nameof(calculationType), calculationType, "Unknown calculation type from Wholesale"),
         };
     }
+
+    public static BusinessReason Map(TotalMonthlyAmountResultProducedV1.Types.CalculationType calculationType)
+    {
+        return calculationType switch
+        {
+            TotalMonthlyAmountResultProducedV1.Types.CalculationType.WholesaleFixing => BusinessReason.WholesaleFixing,
+            TotalMonthlyAmountResultProducedV1.Types.CalculationType.FirstCorrectionSettlement => BusinessReason.Correction,
+            TotalMonthlyAmountResultProducedV1.Types.CalculationType.SecondCorrectionSettlement => BusinessReason.Correction,
+            TotalMonthlyAmountResultProducedV1.Types.CalculationType.ThirdCorrectionSettlement => BusinessReason.Correction,
+            TotalMonthlyAmountResultProducedV1.Types.CalculationType.Unspecified => throw new InvalidOperationException("Calculation type is not specified from Wholesale"),
+            _ => throw new ArgumentOutOfRangeException(nameof(calculationType), calculationType, "Unknown calculation type from Wholesale"),
+        };
+    }
 }

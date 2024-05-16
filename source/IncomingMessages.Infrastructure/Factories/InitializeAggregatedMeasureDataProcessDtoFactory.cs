@@ -39,7 +39,7 @@ public static class InitializeAggregatedMeasureDataProcessDtoFactory
                             : Array.Empty<string>();
 
                     return new InitializeAggregatedMeasureDataProcessSeries(
-                        Id: series.TransactionId,
+                        Id: TransactionId.From(series.TransactionId),
                         MeteringPointType: series.MeteringPointType,
                         SettlementMethod: series.SettlementMethod,
                         StartDateTime: series.StartDateTime,

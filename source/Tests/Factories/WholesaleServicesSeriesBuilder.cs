@@ -36,7 +36,7 @@ public class WholesaleServicesSeriesBuilder
     private ActorNumber _senderActorNumber = ActorNumber.Create("1234567890321");
     private ActorRole _senderActorRole = ActorRole.MeteredDataAdministrator;
 
-    private Guid _transactionId = Guid.NewGuid();
+    private TransactionId _transactionId = TransactionId.New();
     private int _calculationResultVersion = 1;
     private string _gridAreaCode = "870";
     private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
@@ -48,7 +48,7 @@ public class WholesaleServicesSeriesBuilder
     private string _chargeCode = "123";
     private ChargeType _chargeType = ChargeType.Fee;
     private ActorNumber _chargeOwner = ActorNumber.Create("1234567897777");
-    private string? _originalTransactionIdReference;
+    private TransactionId? _originalTransactionIdReference;
     private SettlementVersion? _settlementVersion;
     private List<WholesaleServicesPoint> _points = new() { new(1, 100, 100, 100, null) };
 
@@ -88,7 +88,7 @@ public class WholesaleServicesSeriesBuilder
         return this;
     }
 
-    public WholesaleServicesSeriesBuilder WithTransactionId(Guid transactionId)
+    public WholesaleServicesSeriesBuilder WithTransactionId(TransactionId transactionId)
     {
         _transactionId = transactionId;
         return this;
@@ -148,7 +148,7 @@ public class WholesaleServicesSeriesBuilder
         return this;
     }
 
-    public WholesaleServicesSeriesBuilder WithOriginalTransactionIdReference(string originalTransactionIdReference)
+    public WholesaleServicesSeriesBuilder WithOriginalTransactionIdReference(TransactionId originalTransactionIdReference)
     {
         _originalTransactionIdReference = originalTransactionIdReference;
         return this;

@@ -66,7 +66,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         // Assert
         var process = GetProcess(marketMessage.Series.Single().RequestedByActor.ActorNumber);
         process.Should().NotBeNull();
-        process!.BusinessTransactionId.Id.Should().Be(marketMessage.Series.First().Id);
+        process!.BusinessTransactionId.Value.Should().Be(marketMessage.Series.First().Id);
         process.Should().BeEquivalentTo(marketMessage, opt => opt.Using(new ProcessAndRequestComparer()));
         await AssertProcessState(marketMessage.MessageId, WholesaleServicesProcess.State.Initialized);
     }
@@ -237,7 +237,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
                         },
                         {
                             nameof(WholesaleServicesProcess.BusinessTransactionId),
-                            (p, r, s) => p.BusinessTransactionId.Id.Should().Be(s.Id)
+                            (p, r, s) => p.BusinessTransactionId.Value.Should().Be(s.Id)
                         },
                         {
                             nameof(WholesaleServicesProcess.RequestedByActor),

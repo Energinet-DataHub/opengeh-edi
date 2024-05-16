@@ -75,7 +75,7 @@ public class NotifyAggregatedMeasureDataCimJsonDocumentWriter : IDocumentWriter
         {
             writer.WriteStartObject();
 
-            writer.WriteProperty("mRID", series.TransactionId.ToString());
+            writer.WriteProperty("mRID", series.TransactionId.Value);
             writer.WriteProperty("version", series.CalculationResultVersion.ToString(NumberFormatInfo.InvariantInfo));
 
             writer.WriteObject(
@@ -122,7 +122,7 @@ public class NotifyAggregatedMeasureDataCimJsonDocumentWriter : IDocumentWriter
 
             if (series.OriginalTransactionIdReference is not null)
             {
-                writer.WriteProperty("originalTransactionIDReference_Series.mRID", series.OriginalTransactionIdReference);
+                writer.WriteProperty("originalTransactionIDReference_Series.mRID", series.OriginalTransactionIdReference.Value);
             }
 
             writer.WriteObject(

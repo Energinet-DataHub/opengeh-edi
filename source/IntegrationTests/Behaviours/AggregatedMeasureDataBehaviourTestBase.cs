@@ -55,7 +55,7 @@ public abstract class AggregatedMeasureDataBehaviourTestBase : BehavioursTestBas
         (int Year, int Month, int Day) periodEnd,
         ActorNumber? energySupplier,
         ActorNumber? balanceResponsibleParty,
-        IReadOnlyCollection<(string? GridArea, string TransactionId)> series,
+        IReadOnlyCollection<(string? GridArea, TransactionId TransactionId)> series,
         bool assertRequestWasSuccessful = true)
     {
         var incomingMessageClient = GetService<IIncomingMessageClient>();

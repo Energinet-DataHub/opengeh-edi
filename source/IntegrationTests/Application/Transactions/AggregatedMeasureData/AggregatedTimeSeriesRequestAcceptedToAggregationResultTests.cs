@@ -417,7 +417,7 @@ public sealed class AggregatedTimeSeriesRequestAcceptedToAggregationResultTests 
             ProcessId.New(),
             requestedByActor,
             OriginalActor.From(requestedByActor),
-            BusinessTransactionId.Create(Guid.NewGuid().ToString()),
+            TransactionId.New(),
             BusinessReason.BalanceFixing,
             MessageId.New(),
             MeteringPointType.Production.Code,

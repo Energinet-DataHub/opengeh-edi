@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 using NodaTime.Text;
@@ -33,7 +32,7 @@ internal static class SampleData
 
     public static Instant CreationDate => InstantPattern.General.Parse("2022-02-12T23:00:00Z").Value;
 
-    public static Guid TransactionId => Guid.Parse("4E85A732-85FD-4D92-8FF3-72C052802716");
+    public static TransactionId TransactionId => TransactionId.From("4E85A73285FD4D928FF372C052802716");
 
     public static string ReasonCode => "A02";
 
@@ -43,5 +42,5 @@ internal static class SampleData
 
     public static string SerieReasonMessage => "Det virker ikke!";
 
-    public static string OriginalTransactionId => "4E85A73285FD4D928FF372C052802717";
+    public static TransactionId OriginalTransactionId => TransactionId.From("4E85A73285FD4D928FF372C052802717");
 }

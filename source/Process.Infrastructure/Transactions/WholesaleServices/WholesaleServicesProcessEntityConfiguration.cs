@@ -34,8 +34,8 @@ internal sealed class WholesaleServicesProcessEntityConfiguration : IEntityTypeC
                 fromDbValue => ProcessId.Create(fromDbValue));
         builder.Property(x => x.BusinessTransactionId)
             .HasConversion(
-                toDbValue => toDbValue.Id,
-                fromDbValue => BusinessTransactionId.Create(fromDbValue));
+                toDbValue => toDbValue.Value,
+                fromDbValue => TransactionId.From(fromDbValue));
         builder.Property(x => x.StartOfPeriod);
         builder.Property(x => x.EndOfPeriod);
         builder.Property(x => x.RequestedGridArea);
