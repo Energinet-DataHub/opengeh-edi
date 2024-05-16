@@ -84,7 +84,6 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
             TimeSeriesType.FlexConsumption => MeteringPointType.Consumption,
             TimeSeriesType.NonProfiledConsumption => MeteringPointType.Consumption,
             TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange,
-            TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange,
             TimeSeriesType.TotalConsumption => MeteringPointType.Consumption,
             TimeSeriesType.Unspecified => throw new InvalidOperationException(
                 $"Unknown {typeof(TimeSeriesType)}. Value: {timeSeriesType}'"),
@@ -101,7 +100,6 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
             TimeSeriesType.FlexConsumption => SettlementMethod.Flex,
             TimeSeriesType.NonProfiledConsumption => SettlementMethod.NonProfiled,
             TimeSeriesType.NetExchangePerGa => null,
-            TimeSeriesType.NetExchangePerNeighboringGa => null,
             TimeSeriesType.TotalConsumption => null,
             TimeSeriesType.Unspecified => throw new InvalidOperationException(
                 $"Unknown {typeof(TimeSeriesType)}. Value: {timeSeriesType}'"),
