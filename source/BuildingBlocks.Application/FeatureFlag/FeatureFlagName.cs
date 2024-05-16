@@ -27,4 +27,5 @@ public enum FeatureFlagName
     UsePeekMessages,
     UseRequestMessages,
     UseEnergyResultProduced,
+    UseTotalMonthlyAmountResultProduced,
 }

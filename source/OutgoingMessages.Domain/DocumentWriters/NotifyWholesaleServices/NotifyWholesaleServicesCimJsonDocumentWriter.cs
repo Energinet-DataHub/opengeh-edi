@@ -120,17 +120,27 @@ public sealed class NotifyWholesaleServicesCimJsonDocumentWriter : IDocumentWrit
                             KeyValuePair.Create("value", series.SettlementType?.Code ?? series.SettlementMethod!.Code));
                     }
 #pragma warning restore CS0618 // Type or member is obsolete
+                    if (series.ChargeCode is not null)
+                    {
+                        writer.WriteProperty("chargeType.mRID", series.ChargeCode);
+                    }
 
-                    writer.WriteProperty("chargeType.mRID", series.ChargeCode);
+                    if (series.ChargeType is not null)
+                    {
+                        writer.WriteObject(
+                            "chargeType.type",
+                            KeyValuePair.Create("value", series.ChargeType.Code));
+                    }
 
-                    writer.WriteObject(
-                        "chargeType.type",
-                        KeyValuePair.Create("value", series.ChargeType.Code));
-
-                    writer.WriteObject(
-                        "chargeType.chargeTypeOwner_MarketParticipant.mRID",
-                        new KeyValuePair<string, string>("codingScheme", CimCode.CodingSchemeOf(series.ChargeOwner)),
-                        new KeyValuePair<string, string>("value", series.ChargeOwner.Value));
+                    if (series.ChargeOwner is not null)
+                    {
+                        writer.WriteObject(
+                            "chargeType.chargeTypeOwner_MarketParticipant.mRID",
+                            new KeyValuePair<string, string>(
+                                "codingScheme",
+                                CimCode.CodingSchemeOf(series.ChargeOwner)),
+                            new KeyValuePair<string, string>("value", series.ChargeOwner.Value));
+                    }
 
                     writer.WriteObject(
                         "meteringGridArea_Domain.mRID",
@@ -150,9 +160,12 @@ public sealed class NotifyWholesaleServicesCimJsonDocumentWriter : IDocumentWrit
                         KeyValuePair.Create("value", series.QuantityUnit?.Code ?? series.QuantityMeasureUnit.Code));
 #pragma warning restore CS0618 // Type or member is obsolete
 
-                    writer.WriteObject(
-                        "price_Measure_Unit.name",
-                        KeyValuePair.Create("value", series.PriceMeasureUnit.Code));
+                    if (series.PriceMeasureUnit is not null)
+                    {
+                        writer.WriteObject(
+                            "price_Measure_Unit.name",
+                            KeyValuePair.Create("value", series.PriceMeasureUnit.Code));
+                    }
 
                     writer.WriteObject(
                         "currency_Unit.name",

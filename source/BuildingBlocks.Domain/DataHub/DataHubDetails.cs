@@ -19,4 +19,9 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 public static class DataHubDetails
 {
     public static ActorNumber DataHubActorNumber => ActorNumber.Create("5790001330552");
+
+    /// <summary>
+    /// System operator that owns Energinet charges
+    /// </summary>
+    public static ActorNumber SystemOperatorActorNumber => ActorNumber.Create("5790000432752");
 }

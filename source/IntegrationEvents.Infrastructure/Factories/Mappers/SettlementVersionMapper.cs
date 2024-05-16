@@ -60,4 +60,17 @@ public static class SettlementVersionMapper
             _ => throw new ArgumentOutOfRangeException(nameof(calculationType), calculationType, "Unknown calculation type from Wholesale"),
         };
     }
+
+    public static SettlementVersion? Map(TotalMonthlyAmountResultProducedV1.Types.CalculationType calculationType)
+    {
+        return calculationType switch
+        {
+            TotalMonthlyAmountResultProducedV1.Types.CalculationType.WholesaleFixing => null,
+            TotalMonthlyAmountResultProducedV1.Types.CalculationType.FirstCorrectionSettlement => SettlementVersion.FirstCorrection,
+            TotalMonthlyAmountResultProducedV1.Types.CalculationType.SecondCorrectionSettlement => SettlementVersion.SecondCorrection,
+            TotalMonthlyAmountResultProducedV1.Types.CalculationType.ThirdCorrectionSettlement => SettlementVersion.ThirdCorrection,
+            TotalMonthlyAmountResultProducedV1.Types.CalculationType.Unspecified => throw new InvalidOperationException("Calculation type is not specified from Wholesale"),
+            _ => throw new ArgumentOutOfRangeException(nameof(calculationType), calculationType, "Unknown calculation type from Wholesale"),
+        };
+    }
 }
