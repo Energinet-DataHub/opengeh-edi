@@ -41,7 +41,7 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        if (!await _featureManager.UseCalculationResultsCompletedEventAsync().ConfigureAwait(false))
+        if (!await _featureManager.UseCalculationCompletedEventAsync().ConfigureAwait(false))
         {
             return;
         }

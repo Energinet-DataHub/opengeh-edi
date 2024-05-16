@@ -15,7 +15,8 @@
 namespace BuildingBlocks.Application.FeatureFlag;
 
 /// <summary>
-/// List of all Feature Flags that exists in the system. A Feature Flag name must correspond to a value found in the app configuration as "FeatureManagement__NameOfFeatureFlag"
+/// List of all Feature Flags that exists in the system. A Feature Flag name must
+/// correspond to a value found in the app configuration as "FeatureManagement__NameOfFeatureFlag"
 /// </summary>
 public enum FeatureFlagName
 {
@@ -27,5 +28,5 @@ public enum FeatureFlagName
     UsePeekMessages,
     UseRequestMessages,
     UseEnergyResultProduced,
-    UseCalculationResultsCompletedEvent,
+    UseCalculationCompletedEvent,
 }

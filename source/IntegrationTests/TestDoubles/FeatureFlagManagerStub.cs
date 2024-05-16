@@ -47,5 +47,5 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
 
     public Task<bool> UseEnergyResultProducedAsync() => Task.FromResult(true);
 
-    public Task<bool> UseCalculationResultsCompletedEventAsync() => Task.FromResult(false);
+    public Task<bool> UseCalculationCompletedEventAsync() => Task.FromResult(false);
 }
