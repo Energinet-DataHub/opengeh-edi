@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
@@ -76,21 +77,50 @@ public static class NotifyWholesaleServicesDocumentAsserter
             // Assert type? (E31)
             // -- Assert series values --
             .TransactionIdExists()
-            .HasChargeTypeOwner(ActorNumber.Create(assertionInput.ChargeTypeOwner), "A10")
-            .HasChargeCode(assertionInput.ChargeCode)
-            .HasChargeType(assertionInput.ChargeType)
             .HasCurrency(assertionInput.Currency)
             .HasEnergySupplierNumber(ActorNumber.Create(assertionInput.EnergySupplierNumber), "A10")
-            .HasSettlementMethod(assertionInput.SettlementMethod)
-            .HasMeteringPointType(assertionInput.MeteringPointType)
             .HasGridAreaCode(assertionInput.GridArea, "NDK")
-            .HasPriceMeasurementUnit(assertionInput.PriceMeasurementUnit)
             .HasProductCode(assertionInput.ProductCode)
             .HasQuantityMeasurementUnit(assertionInput.QuantityMeasurementUnit)
             .HasCalculationVersion(assertionInput.CalculationVersion)
             .HasResolution(assertionInput.Resolution)
-            .HasPeriod(assertionInput.Period)
-            .HasPoints(assertionInput.Points);
+            .HasPeriod(assertionInput.Period);
+
+        var isTotalMonthlyAmount = assertionInput.Points.First().Price is null;
+        if (!isTotalMonthlyAmount)
+            asserter.HasPoints(assertionInput.Points);
+        else
+            asserter.HasSinglePointWithAmount(assertionInput.Points.First().Amount);
+
+        if (assertionInput.PriceMeasurementUnit is not null)
+            asserter.HasPriceMeasurementUnit(assertionInput.PriceMeasurementUnit);
+        else
+            asserter.PriceMeasurementUnitDoesNotExist();
+
+        if (assertionInput.MeteringPointType is not null)
+            asserter.HasMeteringPointType(assertionInput.MeteringPointType);
+        else
+            asserter.MeteringPointTypeDoesNotExist();
+
+        if (assertionInput.SettlementMethod is not null)
+            asserter.HasSettlementMethod(assertionInput.SettlementMethod);
+        else
+            asserter.SettlementMethodDoesNotExist();
+
+        if (assertionInput.ChargeType is not null)
+            asserter.HasChargeType(assertionInput.ChargeType);
+        else
+            asserter.ChargeTypeDoesNotExist();
+
+        if (assertionInput.ChargeCode is not null)
+            asserter.HasChargeCode(assertionInput.ChargeCode);
+        else
+            asserter.ChargeCodeDoesNotExist();
+
+        if (assertionInput.ChargeTypeOwner is not null)
+            asserter.HasChargeTypeOwner(ActorNumber.Create(assertionInput.ChargeTypeOwner), "A10");
+        else
+            asserter.ChargeTypeOwnerDoesNotExist();
 
         if (assertionInput.OriginalTransactionIdReference != null)
             asserter.HasOriginalTransactionIdReference(assertionInput.OriginalTransactionIdReference);

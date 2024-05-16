@@ -60,7 +60,10 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
                     e => $"==> '{p.InstanceLocation}' does not adhere to '{p.EvaluationPath}' with error: {e}\n"))
             .ToList();
 
-        validationResult.IsValid.Should().BeTrue($"because document should be valid. Validation errors:{Environment.NewLine}{{0}}", string.Join("\n", validationErrors));
+        validationResult.IsValid.Should()
+            .BeTrue(
+                $"because document should be valid. Validation errors:{Environment.NewLine}{{0}}",
+                string.Join("\n", validationErrors));
 
         return this;
     }
@@ -137,7 +140,9 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasReceiverRole(ActorRole expectedReceiverRole, CodeListType codeListType)
+    public IAssertNotifyWholesaleServicesDocument HasReceiverRole(
+        ActorRole expectedReceiverRole,
+        CodeListType codeListType)
     {
         ArgumentNullException.ThrowIfNull(expectedReceiverRole);
         _root.GetProperty("receiver_MarketParticipant.marketRole.type")
@@ -207,7 +212,10 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
     public IAssertNotifyWholesaleServicesDocument OriginalTransactionIdReferenceDoesNotExist()
     {
-        FirstWholesaleSeriesElement().TryGetProperty("originalTransactionIDReference_Series.mRID", out _).Should().BeFalse();
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("originalTransactionIDReference_Series.mRID", out _)
+            .Should()
+            .BeFalse();
         return this;
     }
 
@@ -252,6 +260,15 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         return this;
     }
 
+    public IAssertNotifyWholesaleServicesDocument MeteringPointTypeDoesNotExist()
+    {
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("marketEvaluationPoint.type", out _)
+            .Should()
+            .BeFalse();
+        return this;
+    }
+
     public IAssertNotifyWholesaleServicesDocument HasChargeCode(string expectedChargeTypeNumber)
     {
         FirstWholesaleSeriesElement()
@@ -259,7 +276,15 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
             .GetString()
             .Should()
             .Be(expectedChargeTypeNumber);
+        return this;
+    }
 
+    public IAssertNotifyWholesaleServicesDocument ChargeCodeDoesNotExist()
+    {
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("chargeType.mRID", out _)
+            .Should()
+            .BeFalse();
         return this;
     }
 
@@ -272,7 +297,15 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
             .GetString()
             .Should()
             .Be(expectedChargeType.Code);
+        return this;
+    }
 
+    public IAssertNotifyWholesaleServicesDocument ChargeTypeDoesNotExist()
+    {
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("chargeType.type", out _)
+            .Should()
+            .BeFalse();
         return this;
     }
 
@@ -294,7 +327,15 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
             .GetString()
             .Should()
             .Be(codingScheme);
+        return this;
+    }
 
+    public IAssertNotifyWholesaleServicesDocument ChargeTypeOwnerDoesNotExist()
+    {
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("chargeType.chargeTypeOwner_MarketParticipant.mRID", out _)
+            .Should()
+            .BeFalse();
         return this;
     }
 
@@ -355,7 +396,6 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
             .GetString()
             .Should()
             .Be(expectedMeasurementUnit.Code);
-
         return this;
     }
 
@@ -369,7 +409,15 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
             .GetString()
             .Should()
             .Be(expectedPriceMeasurementUnit.Code);
+        return this;
+    }
 
+    public IAssertNotifyWholesaleServicesDocument PriceMeasurementUnitDoesNotExist()
+    {
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("price_Measure_Unit.name", out _)
+            .Should()
+            .BeFalse();
         return this;
     }
 
@@ -419,11 +467,22 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
             .GetString()
             .Should()
             .Be(resolution.Code);
-
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSumQuantityForPosition(int expectedPosition, int expectedSumQuantity)
+    public IAssertNotifyWholesaleServicesDocument ResolutionDoesNotExist()
+    {
+        FirstWholesaleSeriesElement()
+            .GetProperty("Period")
+            .TryGetProperty("resolution", out _)
+            .Should()
+            .BeFalse();
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasSumQuantityForPosition(
+        int expectedPosition,
+        int expectedSumQuantity)
     {
         var point = FirstWholesaleSeriesElement()
             .GetProperty("Period")
@@ -473,13 +532,10 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
     public IAssertNotifyWholesaleServicesDocument SettlementMethodDoesNotExist()
     {
-        var act = () => FirstWholesaleSeriesElement()
-            .GetProperty("marketEvaluationPoint.settlementMethod");
-
-        act.Should()
-            .ThrowExactly<KeyNotFoundException>()
-            .WithMessage("The given key was not present in the dictionary.");
-
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("marketEvaluationPoint.settlementMethod", out _)
+            .Should()
+            .BeFalse();
         return this;
     }
 
@@ -506,20 +562,23 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         FirstWholesaleSeriesElement()
             .GetProperty("Period")
             .TryGetProperty("Point", out _)
-            .Should().BeTrue();
+            .Should()
+            .BeTrue();
 
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasPoints(IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points)
+    public IAssertNotifyWholesaleServicesDocument HasPoints(
+        IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points)
     {
         var pointsInDocument = FirstWholesaleSeriesElement()
             .GetProperty("Period")
             .GetProperty("Point")
             .EnumerateArray()
-            .OrderBy(p => p.GetProperty("position")
-                                        .GetProperty("value")
-                                        .GetInt32())
+            .OrderBy(
+                p => p.GetProperty("position")
+                    .GetProperty("value")
+                    .GetInt32())
             .ToList();
 
         pointsInDocument.Should().HaveSameCount(points);
@@ -575,15 +634,57 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         return this;
     }
 
+    public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmount(DecimalValue expectedAmount)
+    {
+        ArgumentNullException.ThrowIfNull(expectedAmount);
+        var pointsInDocument = FirstWholesaleSeriesElement()
+            .GetProperty("Period")
+            .GetProperty("Point")
+            .EnumerateArray()
+            .OrderBy(
+                p => p.GetProperty("position")
+                    .GetProperty("value")
+                    .GetInt32())
+            .ToList();
+
+        var pointInDocument = pointsInDocument.Single();
+        pointInDocument
+            .GetProperty("energySum_Quantity.quantity")
+            .GetDecimal()
+            .Should()
+            .Be(expectedAmount.ToDecimal());
+
+        pointInDocument
+            .GetProperty("position")
+            .GetProperty("value")
+            .GetInt32()
+            .Should()
+            .Be(1);
+
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("energy_Quantity.quantity", out _)
+            .Should()
+            .BeFalse();
+
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("price.amount", out _)
+            .Should()
+            .BeFalse();
+
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("quality", out _)
+            .Should()
+            .BeFalse();
+
+        return this;
+    }
+
     public IAssertNotifyWholesaleServicesDocument SettlementVersionDoesNotExist()
     {
-        var act = () => FirstWholesaleSeriesElement()
-            .GetProperty("settlement_Series.version");
-
-        act.Should()
-            .ThrowExactly<KeyNotFoundException>()
-            .WithMessage("The given key was not present in the dictionary.");
-
+        FirstWholesaleSeriesElement()
+            .TryGetProperty("settlement_Series.version", out _)
+            .Should()
+            .BeFalse();
         return this;
     }
 

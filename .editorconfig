@@ -446,7 +446,11 @@ dotnet_diagnostic.SA1312.severity = error
 dotnet_diagnostic.SA1313.severity = error
 dotnet_diagnostic.SA1400.severity = error
 dotnet_diagnostic.SA1401.severity = error
-dotnet_diagnostic.SA1402.severity = error
+
+# Change SA1402 (FileMayOnlyContainASingleType) to suggestion to allow records in same file as classes
+# Rule link: https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1402.md
+dotnet_diagnostic.SA1402.severity = suggestion
+
 dotnet_diagnostic.SA1403.severity = error
 dotnet_diagnostic.SA1404.severity = error
 dotnet_diagnostic.SA1405.severity = error

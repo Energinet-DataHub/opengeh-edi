@@ -40,6 +40,7 @@ public static class IntegrationEventExtensions
             .AddTransient<IIntegrationEventProcessor, ProcessDelegationConfiguredEventProcessor>()
             .AddTransient<IIntegrationEventProcessor, EnergyResultProducedV2Processor>()
             .AddTransient<IIntegrationEventProcessor, MonthlyAmountPerChargeResultProducedV1Processor>()
+            .AddTransient<IIntegrationEventProcessor, TotalMonthlyAmountResultProducedV1Processor>()
             .AddTransient<IIntegrationEventProcessor, AmountPerChargeResultProducedV1Processor>()
             .AddTransient<IIntegrationEventProcessor, ActorActivatedIntegrationEventProcessor>()
             .AddTransient<IIntegrationEventProcessor, GridAreaOwnershipAssignedIntegrationEventProcessor>()
@@ -57,6 +58,7 @@ public static class IntegrationEventExtensions
             ActorCertificateCredentialsRemoved.Descriptor,
             ActorCertificateCredentialsAssigned.Descriptor,
             MonthlyAmountPerChargeResultProducedV1.Descriptor,
+            TotalMonthlyAmountResultProducedV1.Descriptor,
             AmountPerChargeResultProducedV1.Descriptor,
             ProcessDelegationConfigured.Descriptor,
         };

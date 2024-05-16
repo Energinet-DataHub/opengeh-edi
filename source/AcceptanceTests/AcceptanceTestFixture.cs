@@ -42,7 +42,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
     public AcceptanceTestFixture()
     {
         var configurationBuilder = new ConfigurationBuilder()
-            .AddJsonFile("acceptancetest.dev002.settings.json", true)
+            .AddJsonFile("acceptancetest.dev001.settings.json", true)
             .AddEnvironmentVariables();
 
         var jsonConfiguration = configurationBuilder.Build();
@@ -90,7 +90,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
         MarketParticipantUri = new Uri(root.GetValue<string>("MARKET_PARTICIPANT_URI") ?? "https://app-webapi-markpart-u-001.azurewebsites.net");
         _b2cUsername = root.GetValue<string>("B2C_USERNAME") ?? throw new InvalidOperationException("B2C_USERNAME is not set in configuration");
         _b2cPassword = root.GetValue<string>("B2C_PASSWORD") ?? throw new InvalidOperationException("B2C_PASSWORD is not set in configuration");
-        EventPublisher = new IntegrationEventPublisher(serviceBusConnectionString, topicName);
+        EventPublisher = new IntegrationEventPublisher(serviceBusConnectionString, topicName, dbConnectionString);
         EdiInboxClient = new EdiInboxClient(ediInboxQueueName, serviceBusConnectionString);
         B2CAuthorizedHttpClient = new AsyncLazy<HttpClient>(CreateB2CAuthorizedHttpClientAsync);
     }
@@ -130,8 +130,17 @@ public class AcceptanceTestFixture : IAsyncLifetime
     {
         await EventPublisher.DisposeAsync().ConfigureAwait(false);
 
-        if (B2CAuthorizedHttpClient.IsStarted)
+        if (B2CAuthorizedHttpClient.IsStarted && !B2CAuthorizedHttpClient.Task.IsFaulted)
             (await B2CAuthorizedHttpClient).Dispose();
+
+        if (B2BMeteredDataResponsibleAuthorizedHttpClient.IsStarted && !B2BMeteredDataResponsibleAuthorizedHttpClient.Task.IsFaulted)
+            (await B2BMeteredDataResponsibleAuthorizedHttpClient).Dispose();
+
+        if (B2BEnergySupplierAuthorizedHttpClient.IsStarted && !B2BEnergySupplierAuthorizedHttpClient.Task.IsFaulted)
+            (await B2BEnergySupplierAuthorizedHttpClient).Dispose();
+
+        if (B2BSystemOperatorAuthorizedHttpClient.IsStarted && !B2BSystemOperatorAuthorizedHttpClient.Task.IsFaulted)
+            (await B2BSystemOperatorAuthorizedHttpClient).Dispose();
     }
 
     private static async Task<HttpClient> CreateB2BMeteredDataResponsibleAuthorizedHttpClientAsync(
