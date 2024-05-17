@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
@@ -26,13 +24,16 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
 {
     private readonly ILogger<CalculationCompletedV1Processor> _logger;
     private readonly IFeatureFlagManager _featureManager;
+    private readonly IDurableClientFactory _durableClientFactory;
 
     public CalculationCompletedV1Processor(
         ILogger<CalculationCompletedV1Processor> logger,
-        IFeatureFlagManager featureManager)
+        IFeatureFlagManager featureManager,
+        IDurableClientFactory durableClientFactory)
     {
         _logger = logger;
         _featureManager = featureManager;
+        _durableClientFactory = durableClientFactory;
     }
 
     public string EventTypeToHandle => CalculationCompletedV1.EventName;
@@ -46,9 +47,27 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
             return;
         }
 
+        // TODO: Improve
         var message = (CalculationCompletedV1)integrationEvent.Message;
+        var orchestrationInput = new EnqueueMessagesOrchestrationInput(
+            CalculationOrchestrationId: message.InstanceId,
+            CalculationId: message.CalculationId,
+            CalculationType: message.CalculationType.ToString(),
+            CalculationVersion: message.CalculationVersion);
 
-        // TODO: Handle event
-        return;
+        var durableClient = _durableClientFactory.CreateClient();
+        await durableClient.StartNewAsync("EnqueueMessagesOrchestration", orchestrationInput).ConfigureAwait(false);
     }
+
+    /// <summary>
+    ///
+    /// TODO: Refactor - currently copied here from B2BApi App
+    ///
+    /// An immutable input to start the equeue messages orchestration.
+    /// </summary>
+    public sealed record EnqueueMessagesOrchestrationInput(
+        string CalculationOrchestrationId,
+        string CalculationId, // TODO: Use correct type
+        string CalculationType, // TODO: Use correct type
+        long CalculationVersion);
 }
