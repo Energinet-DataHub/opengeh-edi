@@ -168,7 +168,7 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
             points.Add(new Point(
                 pointPosition,
                 Parse(point.Quantity),
-                CalculatedQuantityQualityMapper.Map(point.QuantityQualities.ToList().AsReadOnly()),
+                CalculatedQuantityQualityMapper.MapForWholesaleServices(point.QuantityQualities.ToList().AsReadOnly()),
                 Parse(point.Price),
                 Parse(point.Amount)));
 

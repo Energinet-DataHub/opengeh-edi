@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServic
 
 public static class PointsMapper
 {
-    public static IReadOnlyCollection<WholesaleServicesPoint> MapPoints(IReadOnlyCollection<Point> timeSeriesPoints)
+    public static IReadOnlyCollection<WholesaleServicesPoint> Map(IReadOnlyCollection<Point> timeSeriesPoints)
     {
         var points = timeSeriesPoints
             .Select(

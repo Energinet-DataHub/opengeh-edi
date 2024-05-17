@@ -25,7 +25,7 @@ namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories.Mappe
 
 public static class PointsMapper
 {
-    public static ReadOnlyCollection<EnergyResultMessagePoint> MapPoints(RepeatedField<EnergyResultProducedV2.Types.TimeSeriesPoint> timeSeriesPoints)
+    public static ReadOnlyCollection<EnergyResultMessagePoint> Map(RepeatedField<EnergyResultProducedV2.Types.TimeSeriesPoint> timeSeriesPoints)
     {
         ArgumentNullException.ThrowIfNull(timeSeriesPoints);
 
@@ -42,7 +42,7 @@ public static class PointsMapper
         return points;
     }
 
-    public static IReadOnlyCollection<WholesaleServicesPoint> MapPoints(RepeatedField<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint> timeSeriesPoints)
+    public static IReadOnlyCollection<WholesaleServicesPoint> Map(RepeatedField<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint> timeSeriesPoints)
     {
         var points = timeSeriesPoints
             .Select(

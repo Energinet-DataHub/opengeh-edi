@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
@@ -205,10 +204,11 @@ public sealed class CalculatedQuantityQualityMapperTests
 
     public sealed class EdiResponseTests
     {
-        public static IEnumerable<object[]> QuantityQualityMappingData()
+        public static IEnumerable<object[]> QuantityQualityEnergyResultMappingData()
         {
             // Example mappings from the documentation at https://energinet.atlassian.net/wiki/spaces/D3/pages/529989633/QuantityQuality.
             // Only available to Energinet employees.
+            // Note that this is used for RSM-014
             /*
              * | Combination QQ from RSM-012       | Calculated quantity quality |
              * |-----------------------------------+-----------------------------|
@@ -277,9 +277,90 @@ public sealed class CalculatedQuantityQualityMapperTests
                 new[] { QuantityQuality.Estimated }, CalculatedQuantityQuality.Estimated,
             };
 
+            yield return new object[] { new[] { QuantityQuality.Measured }, CalculatedQuantityQuality.Measured };
+
+            yield return new object[] { new[] { QuantityQuality.Calculated }, CalculatedQuantityQuality.Calculated };
+
             yield return new object[]
             {
-                new[] { QuantityQuality.Measured }, CalculatedQuantityQuality.Measured,
+                new[] { QuantityQuality.Missing, QuantityQuality.Calculated },
+                CalculatedQuantityQuality.Incomplete,
+            };
+
+            yield return new object[]
+            {
+                new[] { QuantityQuality.Estimated, QuantityQuality.Calculated },
+                CalculatedQuantityQuality.Estimated,
+            };
+
+            yield return new object[]
+            {
+                new[] { QuantityQuality.Estimated, QuantityQuality.Calculated, QuantityQuality.Measured },
+                CalculatedQuantityQuality.Estimated,
+            };
+
+            // The empty set is undefined.
+            yield return new object[] { new List<QuantityQuality>(), CalculatedQuantityQuality.NotAvailable };
+
+            // Additional test cases not based on examples from the documentation.
+            yield return new object[]
+            {
+                new[] { QuantityQuality.Measured, QuantityQuality.Measured, QuantityQuality.Calculated },
+                CalculatedQuantityQuality.Measured,
+            };
+        }
+
+        public static IEnumerable<object[]> QuantityQualityWholesaleServiceMappingData()
+        {
+            // Example mappings from the documentation at https://energinet.atlassian.net/wiki/spaces/D3/pages/529989633/QuantityQuality.
+            // Only available to Energinet employees.
+            // Note that this is used for RSM-019
+            /*
+             * | Combination QQ from RSM-012       | Calculated quantity quality |
+             * |-----------------------------------+-----------------------------|
+             * | Missing + Missing                 | Missing                     |
+             * | Missing + Estimated               | Incomplete                  |
+             * | Missing + Measured                | Incomplete                  |
+             * | Missing + Estimated + Measured    | Incomplete                  |
+             * | Estimated + Measured              | Calculated                  |
+             * | Estimated + Estimated             | Calculated                  |
+             * | Measured + Measured               | Calculated                  |
+             * | Calculated + Calculated           | Calculated                  |
+             * | Missing + Calculated              | Incomplete                  |
+             * | Estimated + Calculated            | Calculated                  |
+             * | Measured + Estimated + Calculated | Calculated                  |
+             */
+
+            // The following test cases are defined as an input array of quantity qualities and a singular expected output.
+            yield return new object[] { new[] { QuantityQuality.Missing }, CalculatedQuantityQuality.Missing };
+
+            yield return new object[]
+            {
+                new[] { QuantityQuality.Missing, QuantityQuality.Estimated }, CalculatedQuantityQuality.Incomplete,
+            };
+
+            yield return new object[]
+            {
+                new[] { QuantityQuality.Missing, QuantityQuality.Measured }, CalculatedQuantityQuality.Incomplete,
+            };
+
+            yield return new object[]
+            {
+                new[] { QuantityQuality.Missing, QuantityQuality.Estimated, QuantityQuality.Measured },
+                CalculatedQuantityQuality.Incomplete,
+            };
+
+            yield return new object[]
+            {
+                new[] { QuantityQuality.Estimated, QuantityQuality.Measured },
+                CalculatedQuantityQuality.Calculated,
+            };
+
+            yield return new object[] { new[] { QuantityQuality.Estimated }, CalculatedQuantityQuality.Calculated };
+
+            yield return new object[]
+            {
+                new[] { QuantityQuality.Measured }, CalculatedQuantityQuality.Calculated,
             };
 
             yield return new object[]
@@ -304,7 +385,7 @@ public sealed class CalculatedQuantityQualityMapperTests
                     QuantityQuality.Estimated,
                     QuantityQuality.Calculated,
                 },
-                CalculatedQuantityQuality.Estimated,
+                CalculatedQuantityQuality.Calculated,
             };
 
             yield return new object[]
@@ -315,7 +396,7 @@ public sealed class CalculatedQuantityQualityMapperTests
                     QuantityQuality.Calculated,
                     QuantityQuality.Measured,
                 },
-                CalculatedQuantityQuality.Estimated,
+                CalculatedQuantityQuality.Calculated,
             };
 
             // The empty set is undefined.
@@ -333,7 +414,7 @@ public sealed class CalculatedQuantityQualityMapperTests
                     QuantityQuality.Measured,
                     QuantityQuality.Calculated,
                 },
-                CalculatedQuantityQuality.Measured,
+                CalculatedQuantityQuality.Calculated,
             };
         }
 
@@ -343,24 +424,48 @@ public sealed class CalculatedQuantityQualityMapperTests
         }
 
         [Fact]
-        public void When_null_collection_throws_argument_null_exception()
+        public void Given_nullCollection_When_MapForEnergyResults_Then_ThrowsArgumentNullException()
         {
             // Arrange
             ICollection<QuantityQuality>? quality = null;
 
             // Act & Assert
-            var act = () => CalculatedQuantityQualityMapper.Map(quality);
+            var act = () => CalculatedQuantityQualityMapper.MapForEnergyResults(quality);
+            act.Should().ThrowExactly<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void Given_nullCollection_When_MapForWholesaleServices_Then_ThrowsArgumentNullException()
+        {
+            // Arrange
+            ICollection<QuantityQuality>? quality = null;
+
+            // Act & Assert
+            var act = () => CalculatedQuantityQualityMapper.MapForWholesaleServices(quality);
             act.Should().ThrowExactly<ArgumentNullException>();
         }
 
         [Theory]
-        [MemberData(nameof(QuantityQualityMappingData))]
-        public void Maps_quantity_quality_to_edi_quality_in_accordance_with_the_rules(
+        [MemberData(nameof(QuantityQualityEnergyResultMappingData))]
+        public void Given_EnergyResultQuantityQuality_When_MapForEnergyResults_Then_MapsToCorrectEdiQuality(
             ICollection<QuantityQuality> qualitySetFromWholesale,
             CalculatedQuantityQuality expectedCalculatedQuantityQuality)
         {
             // Act
-            var actual = CalculatedQuantityQualityMapper.Map(qualitySetFromWholesale);
+            var actual = CalculatedQuantityQualityMapper.MapForEnergyResults(qualitySetFromWholesale);
+
+            // Assert
+            actual.Should().Be(expectedCalculatedQuantityQuality);
+        }
+
+        [Theory]
+        [MemberData(nameof(QuantityQualityWholesaleServiceMappingData))]
+        public void Maps_wholesale_services_quantity_quality_to_edi_quality_in_accordance_with_the_rules(
+            ICollection<QuantityQuality> qualitySetFromWholesale,
+            CalculatedQuantityQuality expectedCalculatedQuantityQuality)
+        {
+            // Act
+            var actual = CalculatedQuantityQualityMapper.MapForWholesaleServices(qualitySetFromWholesale);
 
             // Assert
             actual.Should().Be(expectedCalculatedQuantityQuality);
@@ -371,7 +476,8 @@ public sealed class CalculatedQuantityQualityMapperTests
         public void Can_handle_all_quantity_qualities(QuantityQuality quantityQuality)
         {
             // Act
-            CalculatedQuantityQualityMapper.Map(new[] { quantityQuality });
+            CalculatedQuantityQualityMapper.MapForEnergyResults(new[] { quantityQuality });
+            CalculatedQuantityQualityMapper.MapForWholesaleServices(new[] { quantityQuality });
         }
     }
 
@@ -381,6 +487,7 @@ public sealed class CalculatedQuantityQualityMapperTests
         {
             // Example mappings from the documentation at https://energinet.atlassian.net/wiki/spaces/D3/pages/529989633/QuantityQuality.
             // Only available to Energinet employees.
+            // Note that this is used for RSM-019
             /*
              * | Combination QQ from RSM-012       | Calculated quantity quality |
              * |-----------------------------------+-----------------------------|
@@ -388,13 +495,13 @@ public sealed class CalculatedQuantityQualityMapperTests
              * | Missing + Estimated               | Incomplete                  |
              * | Missing + Measured                | Incomplete                  |
              * | Missing + Estimated + Measured    | Incomplete                  |
-             * | Estimated + Measured              | Estimated                   |
-             * | Estimated + Estimated             | Estimated                   |
-             * | Measured + Measured               | Measured                    |
+             * | Estimated + Measured              | Calculated                  |
+             * | Estimated + Estimated             | Calculated                  |
+             * | Measured + Measured               | Calculated                  |
              * | Calculated + Calculated           | Calculated                  |
              * | Missing + Calculated              | Incomplete                  |
-             * | Estimated + Calculated            | Estimated                   |
-             * | Measured + Estimated + Calculated | Estimated                   |
+             * | Estimated + Calculated            | Calculated                  |
+             * | Measured + Estimated + Calculated | Calculated                  |
              */
 
             // The following test cases are defined as an input array of quantity qualities and a singular expected output.
@@ -441,17 +548,19 @@ public sealed class CalculatedQuantityQualityMapperTests
                     AmountPerChargeResultProducedV1.Types.QuantityQuality.Estimated,
                     AmountPerChargeResultProducedV1.Types.QuantityQuality.Measured,
                 },
-                CalculatedQuantityQuality.Estimated,
+                CalculatedQuantityQuality.Calculated,
             };
 
             yield return new object[]
             {
-                new[] { AmountPerChargeResultProducedV1.Types.QuantityQuality.Estimated }, CalculatedQuantityQuality.Estimated,
+                new[] { AmountPerChargeResultProducedV1.Types.QuantityQuality.Estimated },
+                CalculatedQuantityQuality.Calculated,
             };
 
             yield return new object[]
             {
-                new[] { AmountPerChargeResultProducedV1.Types.QuantityQuality.Measured }, CalculatedQuantityQuality.Measured,
+                new[] { AmountPerChargeResultProducedV1.Types.QuantityQuality.Measured },
+                CalculatedQuantityQuality.Calculated,
             };
 
             yield return new object[]
@@ -476,7 +585,7 @@ public sealed class CalculatedQuantityQualityMapperTests
                     AmountPerChargeResultProducedV1.Types.QuantityQuality.Estimated,
                     AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated,
                 },
-                CalculatedQuantityQuality.Estimated,
+                CalculatedQuantityQuality.Calculated,
             };
 
             yield return new object[]
@@ -487,7 +596,7 @@ public sealed class CalculatedQuantityQualityMapperTests
                     AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated,
                     AmountPerChargeResultProducedV1.Types.QuantityQuality.Measured,
                 },
-                CalculatedQuantityQuality.Estimated,
+                CalculatedQuantityQuality.Calculated,
             };
 
             // The empty set is undefined.
@@ -505,7 +614,7 @@ public sealed class CalculatedQuantityQualityMapperTests
                     AmountPerChargeResultProducedV1.Types.QuantityQuality.Measured,
                     AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated,
                 },
-                CalculatedQuantityQuality.Measured,
+                CalculatedQuantityQuality.Calculated,
             };
         }
 
