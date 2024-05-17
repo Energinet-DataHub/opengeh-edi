@@ -47,7 +47,7 @@ public abstract class BaseEnumMapperTests
         var act = performMapping;
 
         // Assert
-        if (ValueIsValid(value, unspecifiedValue, invalidValues))
+        if (ValueIsValid(value, unspecifiedValue, default, invalidValues))
         {
             act.Should().NotThrow();
         }
@@ -65,6 +65,7 @@ public abstract class BaseEnumMapperTests
         Func<TEnumResult?> performMapping,
         TEnumInput value,
         TEnumInput unspecifiedValue,
+        TEnumInput? notSupportedValue = default,
         params TEnumInput[] invalidValues)
         where TEnumInput : Enum
     {
@@ -74,7 +75,7 @@ public abstract class BaseEnumMapperTests
         var act = performMapping;
 
         // Assert
-        if (ValueIsValid(value, unspecifiedValue, invalidValues))
+        if (ValueIsValid(value, unspecifiedValue, notSupportedValue, invalidValues))
         {
             var result = act.Should().NotThrow().Subject;
             result.Should().NotBeNull();
@@ -83,6 +84,10 @@ public abstract class BaseEnumMapperTests
         {
             var result = act();
             result.Should().BeNull();
+        }
+        else if (notSupportedValue is not null && value.Equals(notSupportedValue))
+        {
+            act.Should().Throw<NotSupportedException>();
         }
         else if (value.Equals(unspecifiedValue))
         {
@@ -121,10 +126,10 @@ public abstract class BaseEnumMapperTests
         }
     }
 
-    private static bool ValueIsValid<TEnum>(TEnum value, TEnum? unspecifiedValue, params TEnum[] invalidValues)
+    private static bool ValueIsValid<TEnum>(TEnum value, TEnum? unspecifiedValue, TEnum? notSupportedValue, params TEnum[] invalidValues)
         where TEnum : Enum
     {
-        var valid = (int)(object)value != InvalidEnumNumber && !value.Equals(unspecifiedValue) && !invalidValues.Contains(value);
+        var valid = (int)(object)value != InvalidEnumNumber && !value.Equals(unspecifiedValue) && !value.Equals(notSupportedValue) && !invalidValues.Contains(value);
 
         return valid;
     }
