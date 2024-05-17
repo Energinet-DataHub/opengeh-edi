@@ -19,11 +19,11 @@ using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
-internal class SendEnqueueMessagesCompletedActivity
+internal class SendMessagesEnqueuedActivity
 {
     private readonly IServiceBusSenderAdapter _senderCreator;
 
-    public SendEnqueueMessagesCompletedActivity(
+    public SendMessagesEnqueuedActivity(
         IServiceBusSenderFactory serviceBusSenderFactory,
         IOptions<WholesaleInboxOptions> options)
     {
@@ -33,7 +33,7 @@ internal class SendEnqueueMessagesCompletedActivity
         _senderCreator = serviceBusSenderFactory.GetSender(options.Value.QueueName);
     }
 
-    [Function(nameof(SendEnqueueMessagesCompletedActivity))]
+    [Function(nameof(SendMessagesEnqueuedActivity))]
     public async Task Run(
         [ActivityTrigger] string calculationOrchestrationId)
     {

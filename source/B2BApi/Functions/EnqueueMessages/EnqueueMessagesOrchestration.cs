@@ -35,7 +35,7 @@ internal class EnqueueMessagesOrchestration
         //// TODO: Call additional activities here
 
         await context.CallActivityAsync(
-            nameof(SendEnqueueMessagesCompletedActivity),
+            nameof(SendMessagesEnqueuedActivity),
             input.CalculationOrchestrationId);
 
         // TODO: Decide what to do
