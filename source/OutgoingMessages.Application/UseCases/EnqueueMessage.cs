@@ -71,7 +71,7 @@ public class EnqueueMessage
         await _outgoingMessageRepository.AddAsync(messageToEnqueue).ConfigureAwait(false);
 
         _logger.LogInformation(
-            "Message id enqueued: {MessageId} for Actor: {ActorNumber} for Event id: {EventId}",
+            "Enqueued message for OutgoingMessageId: {OutgoingMessageId} for ActorNumber: {ActorNumber} for Received Event id: {EventId}",
             messageToEnqueue.Id,
             messageToEnqueue.Receiver.Number.Value,
             messageToEnqueue.EventId);
