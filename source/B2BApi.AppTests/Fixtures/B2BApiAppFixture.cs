@@ -246,6 +246,12 @@ public class B2BApiAppFixture : IAsyncLifetime
             $"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.SendConnectionString)}",
             ServiceBusResourceProvider.ConnectionString);
 
+        // Feature Flags
+        // TODO: Need to be able swap this in test
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            "FeatureManagement__UseCalculationCompletedEvent",
+            "true");
+
         return appHostSettings;
     }
 }

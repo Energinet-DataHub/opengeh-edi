@@ -12,12 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
+using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
+using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
+using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Google.Protobuf;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -60,15 +65,17 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     ///  - A service bus message is sent as expected.
     /// </summary>
     [Fact]
-    public async Task Given_CalculationCompletedEvent_When_Received_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
+    public async Task Given_FeatureFlagIsEnabledAndCalculationOrchestrationId_When_CalculationCompletedEventIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
-        var calculationOrchestrationId = Guid.NewGuid();
-        var calculationCompletedEventMessage = new Azure.Messaging.ServiceBus.ServiceBusMessage();
+        var calculationOrchestrationId = Guid.NewGuid().ToString();
+        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId);
 
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
         await Fixture.TopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
+
+        await Task.Delay(TimeSpan.FromMinutes(3));
 
         // Assert
         // => Verify expected behaviour by searching the orchestration history
@@ -102,11 +109,40 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var verifyServiceBusMessages = await Fixture.ServiceBusListenerMock
             .When(msg =>
             {
-                return msg.Subject == calculationOrchestrationId.ToString();
+                return msg.Subject == calculationOrchestrationId;
             })
             .VerifyCountAsync(1);
 
         var wait = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(10));
         wait.Should().BeTrue("We did not receive the expected message on the ServiceBus");
+    }
+
+    // TODO: Improve
+    private static ServiceBusMessage CreateCalculationCompletedEventMessage(string calculationOrchestrationId)
+    {
+        var calcuationCompletedEvent = new CalculationCompletedV1
+        {
+            InstanceId = calculationOrchestrationId,
+            CalculationId = Guid.NewGuid().ToString(),
+            CalculationType = CalculationCompletedV1.Types.CalculationType.BalanceFixing,
+            CalculationVersion = 1,
+        };
+
+        return CreateServiceBusMessage(eventId: Guid.NewGuid(), calcuationCompletedEvent);
+    }
+
+    // TODO: Improve
+    private static ServiceBusMessage CreateServiceBusMessage(Guid eventId, IEventMessage eventMessage)
+    {
+        var serviceBusMessage = new ServiceBusMessage
+        {
+            Body = new BinaryData(eventMessage.ToByteArray()),
+            Subject = eventMessage.EventName,
+            MessageId = eventId.ToString(),
+        };
+
+        serviceBusMessage.ApplicationProperties.Add("EventMinorVersion", eventMessage.EventMinorVersion);
+
+        return serviceBusMessage;
     }
 }
