@@ -18,6 +18,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
+using Energinet.DataHub.EnergySupplying.RequestResponse.IntegrationEvents;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
@@ -109,7 +110,13 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var verifyServiceBusMessages = await Fixture.ServiceBusListenerMock
             .When(msg =>
             {
-                return msg.Subject == calculationOrchestrationId;
+                if (msg.Subject != MessagesEnqueuedV1.EventName)
+                {
+                    return false;
+                }
+
+                var parsedEvent = MessagesEnqueuedV1.Parser.ParseFrom(msg.Body);
+                return parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
             })
             .VerifyCountAsync(1);
 
@@ -117,7 +124,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         wait.Should().BeTrue("We did not receive the expected message on the ServiceBus");
     }
 
-    // TODO: Improve
+    // TODO: Is there a factory somewhere, or should it be created?
     private static ServiceBusMessage CreateCalculationCompletedEventMessage(string calculationOrchestrationId)
     {
         var calcuationCompletedEvent = new CalculationCompletedV1
@@ -131,7 +138,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         return CreateServiceBusMessage(eventId: Guid.NewGuid(), calcuationCompletedEvent);
     }
 
-    // TODO: Improve
+    // TODO: Is there a factory somewhere, or should it be created?
     private static ServiceBusMessage CreateServiceBusMessage(Guid eventId, IEventMessage eventMessage)
     {
         var serviceBusMessage = new ServiceBusMessage

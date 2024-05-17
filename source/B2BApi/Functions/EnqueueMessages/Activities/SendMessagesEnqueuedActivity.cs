@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
+using Energinet.DataHub.EnergySupplying.RequestResponse.IntegrationEvents;
+using Google.Protobuf;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Options;
 
@@ -37,11 +40,22 @@ internal class SendMessagesEnqueuedActivity
     public async Task Run(
         [ActivityTrigger] string calculationOrchestrationId)
     {
-        // TODO: Create correct service bus message
-        var serviceBusMessage = new Azure.Messaging.ServiceBus.ServiceBusMessage
+        // TODO: Also fill out CalculationId
+        var messagesEnqueuedEvent = new MessagesEnqueuedV1
         {
-            Subject = calculationOrchestrationId,
+            OrchestrationInstanceId = calculationOrchestrationId,
         };
+
+        // TODO: Is there a factory somewhere, or should it be created?
+        var eventId = Guid.NewGuid();
+        var serviceBusMessage = new ServiceBusMessage
+        {
+            Body = new BinaryData(messagesEnqueuedEvent.ToByteArray()),
+            Subject = MessagesEnqueuedV1.EventName,
+            MessageId = eventId.ToString(),
+        };
+
+        serviceBusMessage.ApplicationProperties.Add("EventMinorVersion", MessagesEnqueuedV1.CurrentMinorVersion);
 
         await _senderCreator.SendAsync(serviceBusMessage, CancellationToken.None).ConfigureAwait(false);
     }
