@@ -35,33 +35,20 @@ limitations under the License.
 		    <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="3.3.1" />
         <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
       <!--Microsoft.IdentityModel.XX has to be in sync, aka. same version-->
-      <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.5.1"/>
-      <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="7.5.1"/>
-      <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.5.1"/>
-    </ItemGroup>
-    <ItemGroup>
-        <None Update="host.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="local.settings.sample.json">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-          <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-        </None>
-        <None Update="local.settings.json">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-          <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-        </None>
+      <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.5.1" />
+      <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="7.5.1" />
+      <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.5.1" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
-      <ProjectReference Include="..\DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj"/>
-      <ProjectReference Include="..\DataAccess\DataAccess.csproj"/>
+      <ProjectReference Include="..\DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj" />
+      <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
       <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj" />
       <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj" />
       <ProjectReference Include="..\IntegrationEvents.Application\IntegrationEvents.Application.csproj" />
-      <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj"/>
+      <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
       <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Application\OutgoingMessages.Application.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Interfaces\OutgoingMessages.Interfaces.csproj" />
@@ -74,4 +61,13 @@ limitations under the License.
       <PrivateAssets>all</PrivateAssets>
     </ProjectReference>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Update="host.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="local.settings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
 </Project>

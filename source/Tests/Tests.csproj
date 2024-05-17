@@ -22,14 +22,14 @@ limitations under the License.
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="5.1.1" />
+        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="5.1.2" />
         <PackageReference Include="FluentAssertions" Version="6.12.0" />
         <PackageReference Include="FluentAssertions.Analyzers" Version="0.28.0">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
         <PackageReference Include="Nito.AsyncEx.Coordination" Version="5.1.2" />
         <PackageReference Include="xunit" Version="2.7.1" />
         <PackageReference Include="xunit.categories" Version="2.0.8" />
@@ -116,7 +116,7 @@ limitations under the License.
       <EmbeddedResource Include="CimMessageAdapter\Messages\json\WholesaleSettlement\FailSchemeValidationRequestWholesaleSettlement.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <None Remove="CimMessageAdapter\Messages\xml\WholesaleSettlement\RequestWholesaleSettlement.xml"/>
+      <None Remove="CimMessageAdapter\Messages\xml\WholesaleSettlement\RequestWholesaleSettlement.xml" />
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\WholesaleSettlement\RequestWholesaleSettlement.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
