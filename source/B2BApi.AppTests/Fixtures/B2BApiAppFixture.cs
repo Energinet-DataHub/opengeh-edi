@@ -20,11 +20,13 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
+using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Database;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -35,12 +37,21 @@ namespace Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 /// </summary>
 public class B2BApiAppFixture : IAsyncLifetime
 {
+    /// <summary>
+    /// Durable Functions Task Hub Name
+    /// See naming constraints: https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-task-hubs?tabs=csharp#task-hub-names
+    /// </summary>
+    private const string TaskHubName = "EdiTest01";
+
     public B2BApiAppFixture()
     {
         TestLogger = new TestDiagnosticsLogger();
         IntegrationTestConfiguration = new IntegrationTestConfiguration();
 
         AzuriteManager = new AzuriteManager(useOAuth: true);
+        DurableTaskManager = new DurableTaskManager(
+            "AzureWebJobsStorage",
+            AzuriteManager.FullConnectionString);
 
         DatabaseManager = new EdiDatabaseManager();
 
@@ -56,9 +67,14 @@ public class B2BApiAppFixture : IAsyncLifetime
     [NotNull]
     public FunctionAppHostManager? AppHostManager { get; private set; }
 
+    [NotNull]
+    public IDurableClient? DurableClient { get; private set; }
+
     private IntegrationTestConfiguration IntegrationTestConfiguration { get; }
 
     private AzuriteManager AzuriteManager { get; }
+
+    private DurableTaskManager DurableTaskManager { get; }
 
     private EdiDatabaseManager DatabaseManager { get; }
 
@@ -106,11 +122,15 @@ public class B2BApiAppFixture : IAsyncLifetime
         // Create and start host
         AppHostManager = new FunctionAppHostManager(appHostSettings, TestLogger);
         StartHost(AppHostManager);
+
+        // Create durable client when TaskHub has been created
+        DurableClient = DurableTaskManager.CreateClient(taskHubName: TaskHubName);
     }
 
     public async Task DisposeAsync()
     {
         AppHostManager.Dispose();
+        DurableTaskManager.Dispose();
         AzuriteManager.Dispose();
         await ServiceBusResourceProvider.DisposeAsync();
         await DatabaseManager.DeleteDatabaseAsync();
