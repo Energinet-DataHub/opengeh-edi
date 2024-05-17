@@ -85,13 +85,13 @@ public abstract class BaseEnumMapperTests
             var result = act();
             result.Should().BeNull();
         }
-        else if (notSupportedValue is not null && value.Equals(notSupportedValue))
-        {
-            act.Should().Throw<NotSupportedException>();
-        }
         else if (value.Equals(unspecifiedValue))
         {
             act.Should().Throw<InvalidOperationException>();
+        }
+        else if (notSupportedValue is not null && value.Equals(notSupportedValue))
+        {
+            act.Should().Throw<NotSupportedException>();
         }
         else
         {
