@@ -38,7 +38,7 @@ public static class RequestWholesaleSettlementDtoFactory
         var senderRoleCode = MapRoleNameToCode(senderRole);
 
         var series = new RequestWholesaleSettlementSeries(
-            Guid.NewGuid().ToString(),
+            TransactionId.New().Value,
             InstantFormatFactory.SetInstantToMidnight(request.StartDate, dateTimeZone).ToString(),
             string.IsNullOrWhiteSpace(request.EndDate) ? null : InstantFormatFactory.SetInstantToMidnight(request.EndDate, dateTimeZone, Duration.FromMilliseconds(1)).ToString(),
             request.GridArea,
