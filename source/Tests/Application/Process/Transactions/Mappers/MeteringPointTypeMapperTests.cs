@@ -20,13 +20,19 @@ namespace Energinet.DataHub.EDI.Tests.Application.Process.Transactions.Mappers;
 
 public class MeteringPointTypeMapperTests : BaseEnumMapperTests
 {
+    private readonly EnergyResultProducedV2.Types.TimeSeriesType[] _invalidValues =
+    {
+        EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerNeighboringGa,
+    };
+
     [Theory]
     [MemberData(nameof(GetEnumValues), typeof(EnergyResultProducedV2.Types.TimeSeriesType))]
     public void Ensure_handling_energy_result_produced(EnergyResultProducedV2.Types.TimeSeriesType value)
         => EnsureCanMapOrThrows(
             () => MeteringPointTypeMapper.Map(value),
             value,
-            unspecifiedValue: EnergyResultProducedV2.Types.TimeSeriesType.Unspecified);
+            unspecifiedValue: EnergyResultProducedV2.Types.TimeSeriesType.Unspecified,
+            invalidValues: _invalidValues);
 
     [Theory]
     [MemberData(nameof(GetEnumValues), typeof(AmountPerChargeResultProducedV1.Types.MeteringPointType))]
