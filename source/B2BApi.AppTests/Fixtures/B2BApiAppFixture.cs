@@ -18,6 +18,7 @@ using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
@@ -59,6 +60,10 @@ public class B2BApiAppFixture : IAsyncLifetime
             IntegrationTestConfiguration.ServiceBusConnectionString,
             TestLogger);
 
+        ServiceBusListenerMock = new ServiceBusListenerMock(
+            IntegrationTestConfiguration.ServiceBusConnectionString,
+            TestLogger);
+
         HostConfigurationBuilder = new FunctionAppHostConfigurationBuilder();
     }
 
@@ -69,6 +74,14 @@ public class B2BApiAppFixture : IAsyncLifetime
 
     [NotNull]
     public IDurableClient? DurableClient { get; private set; }
+
+    /// <summary>
+    /// Topic resource for integration events.
+    /// </summary>
+    [NotNull]
+    public TopicResource? TopicResource { get; private set; }
+
+    public ServiceBusListenerMock ServiceBusListenerMock { get; }
 
     private IntegrationTestConfiguration IntegrationTestConfiguration { get; }
 
@@ -95,7 +108,7 @@ public class B2BApiAppFixture : IAsyncLifetime
         var appHostSettings = CreateAppHostSettings("B2BApi", ref port);
 
         // ServiceBus entities
-        await ServiceBusResourceProvider
+        TopicResource = await ServiceBusResourceProvider
             .BuildTopic("integration-events")
             .Do(topic => appHostSettings.ProcessEnvironmentVariables
                 .Add($"{IntegrationEventsOptions.SectionName}__{nameof(IntegrationEventsOptions.TopicName)}", topic.Name))
@@ -108,7 +121,7 @@ public class B2BApiAppFixture : IAsyncLifetime
             .Do(queue => appHostSettings.ProcessEnvironmentVariables
                 .Add($"{EdiInboxOptions.SectionName}__{nameof(EdiInboxOptions.QueueName)}", queue.Name))
             .CreateAsync();
-        await ServiceBusResourceProvider
+        var wholesaleInboxQueueResource = await ServiceBusResourceProvider
             .BuildQueue("wholesale-inbox")
             .Do(queue => appHostSettings.ProcessEnvironmentVariables
                 .Add($"{WholesaleInboxOptions.SectionName}__{nameof(WholesaleInboxOptions.QueueName)}", queue.Name))
@@ -118,6 +131,9 @@ public class B2BApiAppFixture : IAsyncLifetime
             .Do(queue => appHostSettings.ProcessEnvironmentVariables
                 .Add($"{IncomingMessagesQueueOptions.SectionName}__{nameof(IncomingMessagesQueueOptions.QueueName)}", queue.Name))
             .CreateAsync();
+
+        // => Receive messages on Wholesale Inbox Queue
+        await ServiceBusListenerMock.AddQueueListenerAsync(wholesaleInboxQueueResource.Name);
 
         // Create and start host
         AppHostManager = new FunctionAppHostManager(appHostSettings, TestLogger);
