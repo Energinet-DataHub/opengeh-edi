@@ -33,14 +33,6 @@ limitations under the License.
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.17.2" OutputItemType="Analyzer" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.21.0" />
 		    <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="3.3.1" />
-		    <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.6.40">
-		      <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Update="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
         <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
       <!--Microsoft.IdentityModel.XX has to be in sync, aka. same version-->
       <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.5.1"/>

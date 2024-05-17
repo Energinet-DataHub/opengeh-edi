@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading.Tasks;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
@@ -36,7 +33,7 @@ public class ExecutionContextMiddleware : IFunctionsWorkerMiddleware
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
 
-        var executionContext = context.GetService<ExecutionContext>();
+        var executionContext = context.GetService<BuildingBlocks.Domain.ExecutionContext>();
         if (ExecutionType.TryFromName(context.FunctionDefinition.Name, out var executionType))
         {
             executionContext.SetExecutionType(executionType!);
