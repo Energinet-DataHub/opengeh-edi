@@ -46,5 +46,7 @@ public class MicrosoftFeatureFlagManager : IFeatureFlagManager
 
     public Task<bool> UseTotalMonthlyAmountResultProducedAsync() => IsEnabledAsync(FeatureFlagName.UseTotalMonthlyAmountResultProduced);
 
+    public Task<bool> UseCalculationCompletedEventAsync() => IsEnabledAsync(FeatureFlagName.UseCalculationCompletedEvent);
+
     private Task<bool> IsEnabledAsync(FeatureFlagName featureFlagName) => _featureManager.IsEnabledAsync(featureFlagName.ToString());
 }

@@ -37,15 +37,16 @@ public static class IntegrationEventExtensions
         IConfiguration configuration)
     {
         services
-            .AddTransient<IIntegrationEventProcessor, ProcessDelegationConfiguredEventProcessor>()
             .AddTransient<IIntegrationEventProcessor, EnergyResultProducedV2Processor>()
             .AddTransient<IIntegrationEventProcessor, MonthlyAmountPerChargeResultProducedV1Processor>()
             .AddTransient<IIntegrationEventProcessor, TotalMonthlyAmountResultProducedV1Processor>()
             .AddTransient<IIntegrationEventProcessor, AmountPerChargeResultProducedV1Processor>()
             .AddTransient<IIntegrationEventProcessor, ActorActivatedIntegrationEventProcessor>()
             .AddTransient<IIntegrationEventProcessor, GridAreaOwnershipAssignedIntegrationEventProcessor>()
-            .AddTransient<IIntegrationEventProcessor, ActorCertificateCredentialsAssignedEventProcessor>()
             .AddTransient<IIntegrationEventProcessor, ActorCertificateCredentialsRemovedEventProcessor>()
+            .AddTransient<IIntegrationEventProcessor, ActorCertificateCredentialsAssignedEventProcessor>()
+            .AddTransient<IIntegrationEventProcessor, ProcessDelegationConfiguredEventProcessor>()
+            .AddTransient<IIntegrationEventProcessor, CalculationCompletedV1Processor>()
             .AddTransient<IReadOnlyDictionary<string, IIntegrationEventProcessor>>(
                 sp => sp.GetServices<IIntegrationEventProcessor>()
                     .ToDictionary(m => m.EventTypeToHandle, m => m));
@@ -53,14 +54,15 @@ public static class IntegrationEventExtensions
         var integrationEventDescriptors = new List<MessageDescriptor>
         {
             EnergyResultProducedV2.Descriptor,
+            MonthlyAmountPerChargeResultProducedV1.Descriptor,
+            TotalMonthlyAmountResultProducedV1.Descriptor,
+            AmountPerChargeResultProducedV1.Descriptor,
             ActorActivated.Descriptor,
             GridAreaOwnershipAssigned.Descriptor,
             ActorCertificateCredentialsRemoved.Descriptor,
             ActorCertificateCredentialsAssigned.Descriptor,
-            MonthlyAmountPerChargeResultProducedV1.Descriptor,
-            TotalMonthlyAmountResultProducedV1.Descriptor,
-            AmountPerChargeResultProducedV1.Descriptor,
             ProcessDelegationConfigured.Descriptor,
+            CalculationCompletedV1.Descriptor,
         };
 
         services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);

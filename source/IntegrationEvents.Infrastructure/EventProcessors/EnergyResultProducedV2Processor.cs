@@ -56,6 +56,11 @@ public sealed class EnergyResultProducedV2Processor : IIntegrationEventProcessor
             return;
         }
 
+        if (await _featureManager.UseCalculationCompletedEventAsync().ConfigureAwait(false))
+        {
+            return;
+        }
+
         var energyResultProducedV2 = (EnergyResultProducedV2)integrationEvent.Message;
 
         if (!EnergyResultProducedProcessorExtensions.SupportedTimeSeriesTypes().Contains(energyResultProducedV2.TimeSeriesType))

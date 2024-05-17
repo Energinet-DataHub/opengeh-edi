@@ -15,12 +15,12 @@
 
     <ItemGroup>
       <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="3.3.1" />
-      <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="9.3.1" />
+      <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="9.3.2" />
       <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\DataAccess\DataAccess.csproj"/>
+      <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
       <ProjectReference Include="..\IntegrationEvents.Infrastructure\IntegrationEvents.Infrastructure.csproj" />
     </ItemGroup>
 
