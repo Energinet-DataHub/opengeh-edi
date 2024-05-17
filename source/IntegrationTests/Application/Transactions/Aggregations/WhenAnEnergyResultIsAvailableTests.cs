@@ -249,9 +249,7 @@ public class WhenAnEnergyResultIsAvailableTests : TestBase
 
     [Theory]
     [InlineData(CalculationType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.NetExchangePerGa)]
-    [InlineData(CalculationType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.NetExchangePerNeighboringGa)]
     [InlineData(CalculationType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.NetExchangePerGa)]
-    [InlineData(CalculationType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.NetExchangePerNeighboringGa)]
     public async Task Exchange_is_sent_to_the_grid_operator(CalculationType calculationType, string businessReasonName, TimeSeriesType timeSeriesType)
     {
         var businessReason = BusinessReason.FromName(businessReasonName);

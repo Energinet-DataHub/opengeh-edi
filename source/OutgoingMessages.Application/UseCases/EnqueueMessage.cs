@@ -70,7 +70,11 @@ public class EnqueueMessage
         // to minimize the cases where a message is uploaded to file storage but adding actor message queue fails
         await _outgoingMessageRepository.AddAsync(messageToEnqueue).ConfigureAwait(false);
 
-        _logger.LogInformation("Message enqueued: {Message} for Actor: {ActorNumber}", messageToEnqueue.Id, messageToEnqueue.Receiver.Number.Value);
+        _logger.LogInformation(
+            "Enqueued message for OutgoingMessageId: {OutgoingMessageId} for ActorNumber: {ActorNumber} for Received Event id: {EventId}",
+            messageToEnqueue.Id,
+            messageToEnqueue.Receiver.Number.Value,
+            messageToEnqueue.EventId);
 
         return messageToEnqueue.Id;
     }

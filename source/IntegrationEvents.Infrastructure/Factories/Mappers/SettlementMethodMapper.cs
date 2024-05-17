@@ -27,11 +27,10 @@ public static class SettlementMethodMapper
             // There exist no corresponding SettlementMethod for these TimeSeriesTypes
             EnergyResultProducedV2.Types.TimeSeriesType.Production or
             EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerGa or
-            EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerNeighboringGa or
             EnergyResultProducedV2.Types.TimeSeriesType.TotalConsumption => null,
-
             EnergyResultProducedV2.Types.TimeSeriesType.FlexConsumption => SettlementMethod.Flex,
             EnergyResultProducedV2.Types.TimeSeriesType.NonProfiledConsumption => SettlementMethod.NonProfiled,
+            EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerNeighboringGa => throw new NotSupportedException("NetExchangePerNeighboringGa is not supported as SettlementMethod"),
             EnergyResultProducedV2.Types.TimeSeriesType.Unspecified => throw new InvalidOperationException("Could not map time series type"),
             _ => throw new ArgumentOutOfRangeException(nameof(timeSeriesType), timeSeriesType, "Unknown time series type from Wholesale"),
         };

@@ -24,7 +24,6 @@ public class SettlementMethodMapperTests : BaseEnumMapperTests
     {
         EnergyResultProducedV2.Types.TimeSeriesType.Production,
         EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerGa,
-        EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerNeighboringGa,
         EnergyResultProducedV2.Types.TimeSeriesType.TotalConsumption,
     };
 
@@ -35,6 +34,7 @@ public class SettlementMethodMapperTests : BaseEnumMapperTests
             () => SettlementMethodMapper.Map(value),
             value,
             unspecifiedValue: EnergyResultProducedV2.Types.TimeSeriesType.Unspecified,
+            notSupportedValue: EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerNeighboringGa,
             invalidValues: _invalidValues);
 
     [Theory]
