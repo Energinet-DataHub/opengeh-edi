@@ -168,6 +168,7 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
 
     public IAssertNotifyWholesaleServicesDocument HasMeteringPointType(MeteringPointType expectedMeteringPointType)
     {
+        ArgumentNullException.ThrowIfNull(expectedMeteringPointType);
         _documentAsserter.HasValue(
             $"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/TypeOfMeteringPoint",
             expectedMeteringPointType.Code);
@@ -378,28 +379,36 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
         for (var i = 0; i < pointsInDocument.Count; i++)
         {
             pointsInDocument[i]
-                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("EnergySum"), _documentAsserter.XmlNamespaceManager)!
+                .XPathSelectElement(
+                    _documentAsserter.EnsureXPathHasPrefix("EnergySum"),
+                    _documentAsserter.XmlNamespaceManager)!
                 .Value
                 .ToDecimal()
                 .Should()
                 .Be(expectedPoints[i].Amount.ToDecimal());
 
             pointsInDocument[i]
-                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("EnergyQuantity"), _documentAsserter.XmlNamespaceManager)!
+                .XPathSelectElement(
+                    _documentAsserter.EnsureXPathHasPrefix("EnergyQuantity"),
+                    _documentAsserter.XmlNamespaceManager)!
                 .Value
                 .ToDecimal()
                 .Should()
                 .Be(expectedPoints[i].Quantity.ToDecimal());
 
             pointsInDocument[i]
-                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("Position"), _documentAsserter.XmlNamespaceManager)!
+                .XPathSelectElement(
+                    _documentAsserter.EnsureXPathHasPrefix("Position"),
+                    _documentAsserter.XmlNamespaceManager)!
                 .Value
                 .ToInt()
                 .Should()
                 .Be(i + 1);
 
             pointsInDocument[i]
-                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("EnergyPrice"), _documentAsserter.XmlNamespaceManager)!
+                .XPathSelectElement(
+                    _documentAsserter.EnsureXPathHasPrefix("EnergyPrice"),
+                    _documentAsserter.XmlNamespaceManager)!
                 .Value
                 .ToDecimal()
                 .Should()
@@ -416,7 +425,9 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
             };
 
             pointsInDocument[i]
-                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("QuantityQuality"), _documentAsserter.XmlNamespaceManager)!
+                .XPathSelectElement(
+                    _documentAsserter.EnsureXPathHasPrefix("QuantityQuality"),
+                    _documentAsserter.XmlNamespaceManager)!
                 .Value
                 .Should()
                 .Be(expectedQuantityQuality);
@@ -489,6 +500,7 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
 
     public IAssertNotifyWholesaleServicesDocument HasSettlementMethod(SettlementMethod expectedSettlementMethod)
     {
+        ArgumentNullException.ThrowIfNull(expectedSettlementMethod);
         _documentAsserter.HasValue(
             $"{PayloadEnergyTimeSeries}[1]/DetailMeasurementMeteringPointCharacteristic/SettlementMethod",
             expectedSettlementMethod.Code);

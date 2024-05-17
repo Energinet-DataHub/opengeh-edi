@@ -40,15 +40,13 @@ public sealed class WholesaleServicesMessageFactory
     {
         ArgumentNullException.ThrowIfNull(monthlyAmountPerChargeResultProducedV1);
 
-        var chargeOwner = await GetChargeOwnerAsync(
+        var message = CreateWholesaleResultSeries(monthlyAmountPerChargeResultProducedV1);
+
+        var chargeOwner = await GetChargeOwnerReceiverAsync(
                 monthlyAmountPerChargeResultProducedV1.GridAreaCode,
                 monthlyAmountPerChargeResultProducedV1.ChargeOwnerId,
                 monthlyAmountPerChargeResultProducedV1.IsTax)
             .ConfigureAwait(false);
-
-        var message = CreateWholesaleResultSeries(
-                monthlyAmountPerChargeResultProducedV1,
-                chargeOwner);
 
         return WholesaleServicesMessageDto.Create(
             eventId,
@@ -65,13 +63,13 @@ public sealed class WholesaleServicesMessageFactory
     {
         ArgumentNullException.ThrowIfNull(amountPerChargeResultProducedV1);
 
-        var chargeOwner = await GetChargeOwnerAsync(
+        var message = CreateWholesaleResultSeries(amountPerChargeResultProducedV1);
+
+        var chargeOwner = await GetChargeOwnerReceiverAsync(
                 amountPerChargeResultProducedV1.GridAreaCode,
                 amountPerChargeResultProducedV1.ChargeOwnerId,
                 amountPerChargeResultProducedV1.IsTax)
             .ConfigureAwait(false);
-
-        var message = CreateWholesaleResultSeries(amountPerChargeResultProducedV1, chargeOwner);
 
         return WholesaleServicesMessageDto.Create(
             eventId,
@@ -83,8 +81,7 @@ public sealed class WholesaleServicesMessageFactory
     }
 
     private WholesaleServicesSeries CreateWholesaleResultSeries(
-        MonthlyAmountPerChargeResultProducedV1 message,
-        ActorNumber chargeOwner)
+        MonthlyAmountPerChargeResultProducedV1 message)
     {
         ArgumentNullException.ThrowIfNull(message);
 
@@ -99,7 +96,7 @@ public sealed class WholesaleServicesMessageFactory
                 new WholesaleServicesPoint(1, null, null, message.Amount != null ? DecimalParser.Parse(message.Amount) : null, null),
             },
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
-            chargeOwner,
+            ActorNumber.Create(message.ChargeOwnerId),
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
             SettlementVersion: SettlementVersionMapper.Map(message.CalculationType),
             MeasurementUnitMapper.Map(message.QuantityUnit),
@@ -114,8 +111,7 @@ public sealed class WholesaleServicesMessageFactory
     }
 
     private WholesaleServicesSeries CreateWholesaleResultSeries(
-        AmountPerChargeResultProducedV1 message,
-        ActorNumber chargeOwner)
+        AmountPerChargeResultProducedV1 message)
     {
         ArgumentNullException.ThrowIfNull(message);
 
@@ -127,7 +123,7 @@ public sealed class WholesaleServicesMessageFactory
             IsTax: message.IsTax,
             Points: PointsMapper.MapPoints(message.TimeSeriesPoints),
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
-            chargeOwner,
+            ActorNumber.Create(message.ChargeOwnerId),
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
             SettlementVersion: SettlementVersionMapper.Map(message.CalculationType),
             MeasurementUnitMapper.Map(message.QuantityUnit),
@@ -141,7 +137,7 @@ public sealed class WholesaleServicesMessageFactory
             SettlementMethod: SettlementMethodMapper.Map(message.SettlementMethod));
     }
 
-    private async Task<ActorNumber> GetChargeOwnerAsync(string gridAreaCode, string chargeOwnerId, bool isTax)
+    private async Task<ActorNumber> GetChargeOwnerReceiverAsync(string gridAreaCode, string chargeOwnerId, bool isTax)
     {
         return isTax
             ? await _masterDataClient
