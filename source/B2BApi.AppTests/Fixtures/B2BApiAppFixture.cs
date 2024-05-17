@@ -204,6 +204,11 @@ public class B2BApiAppFixture : IAsyncLifetime
             "APPLICATIONINSIGHTS_CONNECTION_STRING",
             IntegrationTestConfiguration.ApplicationInsightsConnectionString);
 
+        // Durable Functions Task Hub Name
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            "OrchestrationsTaskHubName",
+            TaskHubName);
+
         // Document storage
         appHostSettings.ProcessEnvironmentVariables.Add(
             nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_URL),
