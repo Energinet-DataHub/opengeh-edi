@@ -20,6 +20,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
+using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Database;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
@@ -40,6 +41,8 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         AzuriteManager = new AzuriteManager(useOAuth: true);
 
+        DatabaseManager = new EdiDatabaseManager();
+
         ServiceBusResourceProvider = new ServiceBusResourceProvider(
             IntegrationTestConfiguration.ServiceBusConnectionString,
             TestLogger);
@@ -56,6 +59,8 @@ public class B2BApiAppFixture : IAsyncLifetime
 
     private AzuriteManager AzuriteManager { get; }
 
+    private EdiDatabaseManager DatabaseManager { get; }
+
     private ServiceBusResourceProvider ServiceBusResourceProvider { get; }
 
     private FunctionAppHostConfigurationBuilder HostConfigurationBuilder { get; }
@@ -64,6 +69,9 @@ public class B2BApiAppFixture : IAsyncLifetime
     {
         // Storage emulator
         AzuriteManager.StartAzurite();
+
+        // Database
+        await DatabaseManager.CreateDatabaseAsync();
 
         // Prepare host settings
         var port = 8000;
@@ -104,6 +112,7 @@ public class B2BApiAppFixture : IAsyncLifetime
         AppHostManager.Dispose();
         AzuriteManager.Dispose();
         await ServiceBusResourceProvider.DisposeAsync();
+        await DatabaseManager.DeleteDatabaseAsync();
     }
 
     /// <summary>
@@ -173,6 +182,11 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.ProcessEnvironmentVariables.Add(
             "APPLICATIONINSIGHTS_CONNECTION_STRING",
             IntegrationTestConfiguration.ApplicationInsightsConnectionString);
+
+        // Database
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            "DB_CONNECTION_STRING",
+            DatabaseManager.ConnectionString);
 
         // ServiceBus connection strings
         appHostSettings.ProcessEnvironmentVariables.Add(
