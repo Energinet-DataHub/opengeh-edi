@@ -63,22 +63,13 @@ public static class RequestWholesaleSettlementDtoFactory
 
     private static string? SetSettlementVersion(CalculationType calculationType)
     {
-        if (calculationType == CalculationType.FirstCorrection)
+        return calculationType switch
         {
-            return "D01";
-        }
-
-        if (calculationType == CalculationType.SecondCorrection)
-        {
-            return "D02";
-        }
-
-        if (calculationType == CalculationType.ThirdCorrection)
-        {
-            return "D03";
-        }
-
-        return null;
+            CalculationType.FirstCorrection => SettlementVersion.FirstCorrection.Code,
+            CalculationType.SecondCorrection => SettlementVersion.SecondCorrection.Code,
+            CalculationType.ThirdCorrection => SettlementVersion.ThirdCorrection.Code,
+            _ => null,
+        };
     }
 
     private static string MapToBusinessReasonCode(CalculationType requestCalculationType)
