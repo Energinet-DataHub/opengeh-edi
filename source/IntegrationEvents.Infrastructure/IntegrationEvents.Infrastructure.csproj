@@ -15,6 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="2.13.3" />
       <PackageReference Include="Dapper" Version="2.1.35" />
       <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="3.3.1" />
       <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="9.3.2" />
