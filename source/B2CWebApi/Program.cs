@@ -47,7 +47,7 @@ builder.Services
 
     // System timer
     .AddNodaTimeForApplication()
-    ////.AddSystemTimer()
+    .AddSystemTimer()
 
     // Modules
     .AddIncomingMessagesModule(builder.Configuration)
