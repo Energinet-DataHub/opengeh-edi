@@ -15,7 +15,6 @@
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
@@ -24,16 +23,13 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
 {
     private readonly ILogger<CalculationCompletedV1Processor> _logger;
     private readonly IFeatureFlagManager _featureManager;
-    private readonly IDurableClientFactory _durableClientFactory;
 
     public CalculationCompletedV1Processor(
         ILogger<CalculationCompletedV1Processor> logger,
-        IFeatureFlagManager featureManager,
-        IDurableClientFactory durableClientFactory)
+        IFeatureFlagManager featureManager)
     {
         _logger = logger;
         _featureManager = featureManager;
-        _durableClientFactory = durableClientFactory;
     }
 
     public string EventTypeToHandle => CalculationCompletedV1.EventName;
@@ -55,8 +51,8 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
             CalculationType: message.CalculationType.ToString(),
             CalculationVersion: message.CalculationVersion);
 
-        var durableClient = _durableClientFactory.CreateClient();
-        var instanceId = await durableClient.StartNewAsync("EnqueueMessagesOrchestration", orchestrationInput).ConfigureAwait(false);
+        ////var durableClient = _durableClientFactory.CreateClient();
+        ////var instanceId = await durableClient.StartNewAsync("EnqueueMessagesOrchestration", orchestrationInput).ConfigureAwait(false);
     }
 
     /// <summary>
