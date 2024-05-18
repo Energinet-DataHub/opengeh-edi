@@ -97,7 +97,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         activities.Should().NotBeNull().And.Equal(
         [
             "EnqueueMessagesOrchestration",
-            "SendEnqueueMessagesCompletedActivity",
+            "SendMessagesEnqueuedActivity",
             null
         ]);
 
