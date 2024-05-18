@@ -76,9 +76,9 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var beforeOrchestrationCreated = DateTime.UtcNow;
         await Fixture.TopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
 
-        await Task.Delay(TimeSpan.FromMinutes(3));
-
         // Assert
+        await Task.Delay(TimeSpan.FromSeconds(30));
+
         // => Verify expected behaviour by searching the orchestration history
         var orchestrationStatus = await Fixture.DurableClient.FindOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
 

@@ -56,7 +56,7 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
             CalculationVersion: message.CalculationVersion);
 
         var durableClient = _durableClientFactory.CreateClient();
-        await durableClient.StartNewAsync("EnqueueMessagesOrchestration", orchestrationInput).ConfigureAwait(false);
+        var instanceId = await durableClient.StartNewAsync("EnqueueMessagesOrchestration", orchestrationInput).ConfigureAwait(false);
     }
 
     /// <summary>

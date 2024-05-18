@@ -82,6 +82,7 @@ public static class HostFactory
                         {
                             options.ConnectionName = "AzureWebJobsStorage";
                             options.TaskHub = context.Configuration["OrchestrationsTaskHubName"]!;
+                            options.IsExternalClient = true;
                         })
 
                         // Modules

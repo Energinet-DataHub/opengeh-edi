@@ -57,6 +57,6 @@ internal class SendMessagesEnqueuedActivity
 
         serviceBusMessage.ApplicationProperties.Add("EventMinorVersion", MessagesEnqueuedV1.CurrentMinorVersion);
 
-        await _senderCreator.SendAsync(serviceBusMessage, CancellationToken.None).ConfigureAwait(false);
+        await _senderCreator.SendAsync(serviceBusMessage, CancellationToken.None);
     }
 }
