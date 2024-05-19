@@ -43,10 +43,11 @@ public static class HostFactory
             .ConfigureFunctionsWorkerDefaults(
                 worker =>
                 {
-                    // TODO: Fix 'UnHandledExceptionMiddleware' and 'ExecutionContextMiddleware', when they are enabled DF doesn't work.
-                    ////worker.UseMiddleware<UnHandledExceptionMiddleware>();
-                    ////worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
-                    ////worker.UseMiddleware<ExecutionContextMiddleware>();
+                    // TODO: Add warning somewhere !!!
+                    // => Any use of COnfigureAwait(false) within middleware which is used with Durable Function can cause it to freeze and never complete the Orchestration.
+                    worker.UseMiddleware<UnHandledExceptionMiddleware>();
+                    worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
+                    worker.UseMiddleware<ExecutionContextMiddleware>();
                 },
                 option =>
                 {

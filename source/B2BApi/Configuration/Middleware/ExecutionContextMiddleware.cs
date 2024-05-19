@@ -43,6 +43,6 @@ public class ExecutionContextMiddleware : IFunctionsWorkerMiddleware
             _logger.LogWarning("Could not determine execution type for function {FunctionName}", context.FunctionDefinition.Name);
         }
 
-        await next(context).ConfigureAwait(false);
+        await next(context);
     }
 }
