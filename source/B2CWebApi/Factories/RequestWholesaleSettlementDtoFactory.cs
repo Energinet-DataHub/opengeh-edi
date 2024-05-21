@@ -43,7 +43,7 @@ public static class RequestWholesaleSettlementDtoFactory
             string.IsNullOrWhiteSpace(request.EndDate) ? null : InstantFormatFactory.SetInstantToMidnight(request.EndDate, dateTimeZone, Duration.FromMilliseconds(1)).ToString(),
             request.GridArea,
             request.EnergySupplierId,
-            SetSettlementVersion(request.CalculationType),
+            MapToSettlementVersion(request.CalculationType),
             request.Resolution,
             request.ChargeOwner,
             request.ChargeTypes.Select(ct => new RequestWholesaleSettlementChargeType(ct.Id, ct.Type)).ToList());
@@ -61,7 +61,7 @@ public static class RequestWholesaleSettlementDtoFactory
             new[] { series });
     }
 
-    private static string? SetSettlementVersion(CalculationType calculationType)
+    private static string? MapToSettlementVersion(CalculationType calculationType)
     {
         return calculationType switch
         {
@@ -72,9 +72,9 @@ public static class RequestWholesaleSettlementDtoFactory
         };
     }
 
-    private static string MapToBusinessReasonCode(CalculationType requestCalculationType)
+    private static string MapToBusinessReasonCode(CalculationType calculationType)
     {
-        return requestCalculationType switch
+        return calculationType switch
         {
             CalculationType.PreliminaryAggregation => BusinessReason.PreliminaryAggregation.Code,
             CalculationType.BalanceFixing => BusinessReason.BalanceFixing.Code,
@@ -83,8 +83,8 @@ public static class RequestWholesaleSettlementDtoFactory
             CalculationType.SecondCorrection => BusinessReason.Correction.Code,
             CalculationType.ThirdCorrection => BusinessReason.Correction.Code,
             _ => throw new ArgumentOutOfRangeException(
-                nameof(requestCalculationType),
-                requestCalculationType,
+                nameof(calculationType),
+                calculationType,
                 "Unknown CalculationType"),
         };
     }
