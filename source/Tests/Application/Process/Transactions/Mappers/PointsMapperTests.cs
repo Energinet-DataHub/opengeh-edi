@@ -58,6 +58,7 @@ public class PointsMapperTests
             Time = new Timestamp { Seconds = 100000 },
             Quantity = new DecimalValue { Units = 123, Nanos = 1200000 },
             QuantityQualities = { AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated },
+            Price = new DecimalValue { Units = 122, Nanos = 1200000 },
         };
 
         // Act
