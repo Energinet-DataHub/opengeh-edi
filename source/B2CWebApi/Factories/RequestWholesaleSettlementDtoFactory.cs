@@ -12,23 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Globalization;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using NodaTime;
-using MeteringPointType = Energinet.DataHub.EDI.B2CWebApi.Models.MeteringPointType;
+using RequestWholesaleSettlementChargeType = Energinet.DataHub.EDI.IncomingMessages.Interfaces.RequestWholesaleSettlementChargeType;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Factories;
 
-public static class RequestAggregatedMeasureDataDtoFactory
+public static class RequestWholesaleSettlementDtoFactory
 {
-    private const string AggregatedMeasureDataMessageType = "E74";
+    private const string WholesaleSettlementMessageType = "D21";
     private const string Electricity = "23";
 
-    public static RequestAggregatedMeasureDataDto Create(
-        RequestAggregatedMeasureDataMarketRequest request,
+    public static RequestWholesaleSettlementDto Create(
+        RequestWholesaleSettlementMarketRequest request,
         string senderNumber,
         string senderRole,
         DateTimeZone dateTimeZone,
@@ -38,53 +37,44 @@ public static class RequestAggregatedMeasureDataDtoFactory
 
         var senderRoleCode = MapRoleNameToCode(senderRole);
 
-        var series = new RequestAggregatedMeasureDataSeries(
+        var series = new RequestWholesaleSettlementSeries(
             TransactionId.New().Value,
-            MapEvaluationPointType(request),
-            MapSettlementMethod(request),
             InstantFormatFactory.SetInstantToMidnight(request.StartDate, dateTimeZone).ToString(),
             string.IsNullOrWhiteSpace(request.EndDate) ? null : InstantFormatFactory.SetInstantToMidnight(request.EndDate, dateTimeZone, Duration.FromMilliseconds(1)).ToString(),
             request.GridArea,
             request.EnergySupplierId,
-            request.BalanceResponsibleId,
-            SetSettlementVersion(request.CalculationType));
+            MapToSettlementVersion(request.CalculationType),
+            request.Resolution,
+            request.ChargeOwner,
+            request.ChargeTypes.Select(ct => new RequestWholesaleSettlementChargeType(ct.Id, ct.Type)).ToList());
 
-        return new RequestAggregatedMeasureDataDto(
+        return new RequestWholesaleSettlementDto(
             senderNumber,
             senderRoleCode,
             DataHubDetails.DataHubActorNumber.Value,
             MarketRole.CalculationResponsibleRole.Code,
             MapToBusinessReasonCode(request.CalculationType),
-            AggregatedMeasureDataMessageType,
+            WholesaleSettlementMessageType,
             Guid.NewGuid().ToString(),
             now.ToString(),
             Electricity,
             new[] { series });
     }
 
-    private static string? SetSettlementVersion(CalculationType calculationType)
+    private static string? MapToSettlementVersion(CalculationType calculationType)
     {
-        if (calculationType == CalculationType.FirstCorrection)
+        return calculationType switch
         {
-            return "D01";
-        }
-
-        if (calculationType == CalculationType.SecondCorrection)
-        {
-            return "D02";
-        }
-
-        if (calculationType == CalculationType.ThirdCorrection)
-        {
-            return "D03";
-        }
-
-        return null;
+            CalculationType.FirstCorrection => SettlementVersion.FirstCorrection.Code,
+            CalculationType.SecondCorrection => SettlementVersion.SecondCorrection.Code,
+            CalculationType.ThirdCorrection => SettlementVersion.ThirdCorrection.Code,
+            _ => null,
+        };
     }
 
-    private static string MapToBusinessReasonCode(CalculationType requestCalculationType)
+    private static string MapToBusinessReasonCode(CalculationType calculationType)
     {
-        return requestCalculationType switch
+        return calculationType switch
         {
             CalculationType.PreliminaryAggregation => BusinessReason.PreliminaryAggregation.Code,
             CalculationType.BalanceFixing => BusinessReason.BalanceFixing.Code,
@@ -92,47 +82,20 @@ public static class RequestAggregatedMeasureDataDtoFactory
             CalculationType.FirstCorrection => BusinessReason.Correction.Code,
             CalculationType.SecondCorrection => BusinessReason.Correction.Code,
             CalculationType.ThirdCorrection => BusinessReason.Correction.Code,
-            _ => throw new ArgumentOutOfRangeException(nameof(requestCalculationType), requestCalculationType, "Unknown CalculationType"),
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(calculationType),
+                calculationType,
+                "Unknown CalculationType"),
         };
-    }
-
-    private static string? MapEvaluationPointType(RequestAggregatedMeasureDataMarketRequest request)
-    {
-        switch (request.MeteringPointType)
-        {
-            case MeteringPointType.Production:
-                return "E18";
-            case MeteringPointType.FlexConsumption:
-            case MeteringPointType.TotalConsumption:
-            case MeteringPointType.NonProfiledConsumption:
-                return "E17";
-            case MeteringPointType.Exchange:
-                return "E20";
-        }
-
-        return null;
-    }
-
-    private static string? MapSettlementMethod(RequestAggregatedMeasureDataMarketRequest request)
-    {
-        switch (request.MeteringPointType)
-        {
-            case MeteringPointType.FlexConsumption:
-                return "D01";
-            case MeteringPointType.NonProfiledConsumption:
-                return "E02";
-        }
-
-        return null;
     }
 
     private static string MapRoleNameToCode(string roleName)
     {
         ArgumentException.ThrowIfNullOrEmpty(roleName);
 
-        if (roleName.Equals(MarketRole.MeteredDataResponsible.Name, StringComparison.OrdinalIgnoreCase))
+        if (roleName.Equals(MarketRole.SystemOperator.Name, StringComparison.OrdinalIgnoreCase))
         {
-            return MarketRole.MeteredDataResponsible.Code;
+            return MarketRole.SystemOperator.Code;
         }
 
         if (roleName.Equals(MarketRole.EnergySupplier.Name, StringComparison.OrdinalIgnoreCase))
@@ -140,9 +103,9 @@ public static class RequestAggregatedMeasureDataDtoFactory
             return MarketRole.EnergySupplier.Code;
         }
 
-        if (roleName.Equals(MarketRole.BalanceResponsibleParty.Name, StringComparison.OrdinalIgnoreCase))
+        if (roleName.Equals(MarketRole.GridAccessProvider.Name, StringComparison.OrdinalIgnoreCase))
         {
-            return MarketRole.BalanceResponsibleParty.Code;
+            return MarketRole.GridAccessProvider.Code;
         }
 
         throw new ArgumentException($"roleName: {roleName}. is unsupported to map to a role name");

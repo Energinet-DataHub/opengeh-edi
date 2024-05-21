@@ -22,6 +22,7 @@ public class IncomingDocumentType : EnumerationType
     public static readonly IncomingDocumentType RequestAggregatedMeasureData = new(nameof(RequestAggregatedMeasureData));
     public static readonly IncomingDocumentType B2CRequestAggregatedMeasureData = new(nameof(B2CRequestAggregatedMeasureData));
     public static readonly IncomingDocumentType RequestWholesaleSettlement = new(nameof(RequestWholesaleSettlement));
+    public static readonly IncomingDocumentType B2CRequestWholesaleSettlement = new(nameof(RequestWholesaleSettlement));
 
     private IncomingDocumentType(string name)
         : base(name)
