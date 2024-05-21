@@ -99,7 +99,7 @@ public sealed class WholesaleServicesMessageFactory
             IsTax: message.IsTax,
             Points: new[]
             {
-                new WholesaleServicesPoint(1, null, null, message.Amount != null ? DecimalParser.Parse(message.Amount) : null, null),
+                new WholesaleServicesPoint(1, null, null, message.Amount != null ? DecimalParser.Parse(message.Amount) : null, CalculatedQuantityQuality.Calculated),
             },
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
             ActorNumber.Create(message.ChargeOwnerId),
