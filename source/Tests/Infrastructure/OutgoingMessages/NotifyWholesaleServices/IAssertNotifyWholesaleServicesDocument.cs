@@ -15,6 +15,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Edi.Responses;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
@@ -275,6 +276,11 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// Asserts the list of points exists exactly as given in the first series element
     /// </summary>
     IAssertNotifyWholesaleServicesDocument HasPoints(IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points);
+
+    /// <summary>
+    /// Asserts the list of points exists exactly as given in the first series element
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument HasPoints(IReadOnlyCollection<WholesaleServicesPoint> points);
 
     #endregion
 
