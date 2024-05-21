@@ -48,15 +48,20 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
             return;
         }
 
-        // TODO: Improve
+        var durableClient = _durableClientFactory.CreateClient();
+        var orchestrationInput = CreateOrchestrationInput(integrationEvent);
+        var instanceId = await durableClient.StartNewAsync("EnqueueMessagesOrchestration", orchestrationInput).ConfigureAwait(false);
+
+        _logger.LogInformation("Started 'EnqueueMessagesOrchestration' with id '{OrchestrationInstanceId}'.", instanceId);
+    }
+
+    private static EnqueueMessagesOrchestrationInput CreateOrchestrationInput(IntegrationEvent integrationEvent)
+    {
         var message = (CalculationCompletedV1)integrationEvent.Message;
-        var orchestrationInput = new EnqueueMessagesOrchestrationInput(
+        return new EnqueueMessagesOrchestrationInput(
             CalculationOrchestrationId: message.InstanceId,
             CalculationId: message.CalculationId,
-            CalculationType: message.CalculationType.ToString(),
+            CalculationType: message.CalculationType,
             CalculationVersion: message.CalculationVersion);
-
-        var durableClient = _durableClientFactory.CreateClient();
-        var instanceId = await durableClient.StartNewAsync("EnqueueMessagesOrchestration", orchestrationInput).ConfigureAwait(false);
     }
 }

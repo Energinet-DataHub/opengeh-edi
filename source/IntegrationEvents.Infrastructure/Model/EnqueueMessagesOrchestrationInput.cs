@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
+
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Model;
 
 /// <summary>
@@ -19,6 +21,6 @@ namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Model;
 /// </summary>
 public sealed record EnqueueMessagesOrchestrationInput(
     string CalculationOrchestrationId,
-    string CalculationId, // TODO: What is the correct type? Would have expected Guid but in "protobuf" it is string.
-    string CalculationType, // TODO: Use correct type
+    string CalculationId,
+    CalculationCompletedV1.Types.CalculationType CalculationType,
     long CalculationVersion);
