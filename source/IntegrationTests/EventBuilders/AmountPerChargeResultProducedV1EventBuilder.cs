@@ -26,7 +26,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 
 public class AmountPerChargeResultProducedV1EventBuilder
 {
-    private readonly List<(long Sum, long Quantity, int Position, long Price, AmountPerChargeResultProducedV1.Types.QuantityQuality Quality)> _points = new();
+    private readonly List<(long Sum, long Quantity, int Position, long? Price, AmountPerChargeResultProducedV1.Types.QuantityQuality Quality)> _points = new();
     private AmountPerChargeResultProducedV1.Types.MeteringPointType _meteringPointType = AmountPerChargeResultProducedV1.Types.MeteringPointType.Production;
     private AmountPerChargeResultProducedV1.Types.SettlementMethod _settlementMethod = AmountPerChargeResultProducedV1.Types.SettlementMethod.Flex;
     private Guid _calculationId = Guid.NewGuid();
@@ -169,7 +169,7 @@ public class AmountPerChargeResultProducedV1EventBuilder
         return this;
     }
 
-    internal AmountPerChargeResultProducedV1EventBuilder WithPoint(int position, long price, long quantity, long sum, AmountPerChargeResultProducedV1.Types.QuantityQuality quality)
+    internal AmountPerChargeResultProducedV1EventBuilder WithPoint(int position, long? price, long quantity, long sum, AmountPerChargeResultProducedV1.Types.QuantityQuality quality)
     {
         _points.Add((sum, quantity, position, price, quality));
         return this;
@@ -188,25 +188,34 @@ public class AmountPerChargeResultProducedV1EventBuilder
         if (_points.Count > 0)
         {
             timeSeriesPoints = _points
-                .Select(p => new AmountPerChargeResultProducedV1.Types.TimeSeriesPoint
+                .Select(p =>
                 {
-                    Time = _periodStartUtc.ToInstant().Plus(Duration.FromHours(resolutionInHours * p.Position)).ToTimestamp(),
-                    Price = new DecimalValue { Units = p.Price, Nanos = 0 },
-                    Quantity = new DecimalValue { Units = p.Quantity, Nanos = 0 },
-                    Amount = new DecimalValue { Units = p.Sum, Nanos = 0 },
-                    QuantityQualities = { p.Quality },
+                    var newPoint = new AmountPerChargeResultProducedV1.Types.TimeSeriesPoint
+                    {
+                        Time =
+                            _periodStartUtc.ToInstant()
+                                .Plus(Duration.FromHours(resolutionInHours * p.Position))
+                                .ToTimestamp(),
+                        Quantity = new DecimalValue { Units = p.Quantity, Nanos = 0 },
+                        Amount = new DecimalValue { Units = p.Sum, Nanos = 0 },
+                        QuantityQualities = { p.Quality },
+                    };
+                    if (p.Price != null)
+                        newPoint.Price = new DecimalValue { Units = p.Price.Value, Nanos = 0 };
+
+                    return newPoint;
                 })
                 .ToList();
         }
         else
         {
-            timeSeriesPoints = GenereateTimeSeriesPoints();
+            timeSeriesPoints = GenerateTimeSeriesPoints();
         }
 
         return timeSeriesPoints;
     }
 
-    private List<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint> GenereateTimeSeriesPoints()
+    private List<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint> GenerateTimeSeriesPoints()
     {
         var resolutionInHours = _resolution switch
         {

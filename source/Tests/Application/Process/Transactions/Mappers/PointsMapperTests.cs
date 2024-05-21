@@ -62,7 +62,7 @@ public class PointsMapperTests
 
         // Act
         var actual = PointsMapper
-            .Map(new RepeatedField<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint>() { protoPoint });
+            .Map(new RepeatedField<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint>() { protoPoint }, AmountPerChargeResultProducedV1.Types.ChargeType.Tariff);
 
         // Assert
         actual.Should().ContainSingle();

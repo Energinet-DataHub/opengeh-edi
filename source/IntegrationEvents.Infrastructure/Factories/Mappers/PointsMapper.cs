@@ -16,9 +16,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Protobuf;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
+using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common;
 using Google.Protobuf.Collections;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories.Mappers;
@@ -42,7 +44,9 @@ public static class PointsMapper
         return points;
     }
 
-    public static IReadOnlyCollection<WholesaleServicesPoint> Map(RepeatedField<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint> timeSeriesPoints)
+    public static IReadOnlyCollection<WholesaleServicesPoint> Map(
+        RepeatedField<AmountPerChargeResultProducedV1.Types.TimeSeriesPoint> timeSeriesPoints,
+        AmountPerChargeResultProducedV1.Types.ChargeType chargeType)
     {
         var points = timeSeriesPoints
             .Select(
@@ -51,10 +55,25 @@ public static class PointsMapper
                     DecimalParser.Parse(p.Quantity),
                     p.Price == null ? null : DecimalParser.Parse(p.Price),
                     p.Amount == null ? null : DecimalParser.Parse(p.Amount),
-                    CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(p.QuantityQualities)))
+                    GetQuantityQuality(p.Price, p.QuantityQualities, chargeType)))
             .ToList()
             .AsReadOnly();
 
         return points;
+    }
+
+    private static CalculatedQuantityQuality GetQuantityQuality(DecimalValue? price, RepeatedField<AmountPerChargeResultProducedV1.Types.QuantityQuality> quantityQualities, AmountPerChargeResultProducedV1.Types.ChargeType chargeType)
+    {
+        if (price == null)
+        {
+            return CalculatedQuantityQuality.Missing;
+        }
+
+        if (chargeType == AmountPerChargeResultProducedV1.Types.ChargeType.Subscription || chargeType == AmountPerChargeResultProducedV1.Types.ChargeType.Fee)
+        {
+            return CalculatedQuantityQuality.Calculated;
+        }
+
+        return CalculatedQuantityQualityMapper.QuantityQualityCollectionToEdiQuality(quantityQualities);
     }
 }

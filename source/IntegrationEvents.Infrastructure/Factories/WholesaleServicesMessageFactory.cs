@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -80,6 +81,11 @@ public sealed class WholesaleServicesMessageFactory
             wholesaleSeries: message);
     }
 
+    private static IReadOnlyCollection<WholesaleServicesPoint> PointsBasedOnChargeType(AmountPerChargeResultProducedV1 message)
+    {
+        return PointsMapper.Map(message.TimeSeriesPoints, message.ChargeType);
+    }
+
     private WholesaleServicesSeries CreateWholesaleResultSeries(
         MonthlyAmountPerChargeResultProducedV1 message)
     {
@@ -121,7 +127,7 @@ public sealed class WholesaleServicesMessageFactory
             GridAreaCode: message.GridAreaCode,
             ChargeCode: message.ChargeCode,
             IsTax: message.IsTax,
-            Points: PointsMapper.Map(message.TimeSeriesPoints),
+            Points: PointsBasedOnChargeType(message),
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
             ActorNumber.Create(message.ChargeOwnerId),
             Period: new Period(message.PeriodStartUtc.ToInstant(), message.PeriodEndUtc.ToInstant()),
