@@ -22,6 +22,7 @@ public static class MarketRole
     public static class CalculationResponsibleRole
     {
         public const string Code = "DGL";
+        public const string Name = "CalculationResponsible";
     }
 
     public static class EnergySupplier
@@ -40,5 +41,17 @@ public static class MarketRole
     {
         public const string Code = "DDK";
         public const string Name = "BalanceResponsibleParty";
+    }
+
+    public static class GridAccessProvider
+    {
+        public const string Code = "DDM";
+        public const string Name = "GridAccessProvider";
+    }
+
+    public static class SystemOperator
+    {
+        public const string Code = "EZ";
+        public const string Name = "SystemOperator";
     }
 }
