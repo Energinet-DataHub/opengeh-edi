@@ -62,6 +62,10 @@ public static class PointsMapper
         return points;
     }
 
+    /// <summary>
+    /// Quantity quality mappings is defined by the business.
+    /// See "https://energinet.atlassian.net/wiki/spaces/D3/pages/529989633/QuantityQuality" for more information.
+    /// </summary>
     private static CalculatedQuantityQuality GetQuantityQuality(DecimalValue? price, RepeatedField<AmountPerChargeResultProducedV1.Types.QuantityQuality> quantityQualities, AmountPerChargeResultProducedV1.Types.ChargeType chargeType)
     {
         if (price == null)
