@@ -22,6 +22,7 @@ public static class MarketRole
     public static class CalculationResponsibleRole
     {
         public const string Code = "DGL";
+        public const string Name = "CalculationResponsible";
     }
 
     public static class EnergySupplier
