@@ -90,6 +90,32 @@ public class WhenAnEnergyResultIsAvailableTests : TestBase
     }
 
     [Fact]
+    public async Task Non_profiled_consumption_result_is_not_sent_when_feature_calculation_completed_is_enabled()
+    {
+        await _gridAreaBuilder
+            .WithGridAreaCode(SampleData.GridAreaCode)
+            .WithActorNumber(SampleData.GridOperatorNumber)
+            .StoreAsync(GetService<IMasterDataClient>());
+
+        _eventBuilder
+            .WithCalculationType(CalculationType.BalanceFixing)
+            .AggregatedBy(SampleData.GridAreaCode, null, SampleData.EnergySupplierNumber.Value)
+            .ResultOf(TimeSeriesType.NonProfiledConsumption)
+            .WithResolution(Resolution.Quarter)
+            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod);
+
+        FeatureFlagManagerStub.EnableCalculationCompletedEvent(true);
+
+        await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
+
+        await AssertOutgoingMessage.OutgoingMessageIsNullAsync(
+            DocumentType.NotifyAggregatedMeasureData.Name,
+            BusinessReason.BalanceFixing.Name,
+            ActorRole.EnergySupplier,
+            GetService<IDatabaseConnectionFactory>());
+    }
+
+    [Fact]
     public async Task Total_non_profiled_consumption_is_sent_to_the_grid_operator()
     {
         await _gridAreaBuilder
@@ -223,9 +249,7 @@ public class WhenAnEnergyResultIsAvailableTests : TestBase
 
     [Theory]
     [InlineData(CalculationType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.NetExchangePerGa)]
-    [InlineData(CalculationType.BalanceFixing, nameof(BusinessReason.BalanceFixing), TimeSeriesType.NetExchangePerNeighboringGa)]
     [InlineData(CalculationType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.NetExchangePerGa)]
-    [InlineData(CalculationType.Aggregation, nameof(BusinessReason.PreliminaryAggregation), TimeSeriesType.NetExchangePerNeighboringGa)]
     public async Task Exchange_is_sent_to_the_grid_operator(CalculationType calculationType, string businessReasonName, TimeSeriesType timeSeriesType)
     {
         var businessReason = BusinessReason.FromName(businessReasonName);

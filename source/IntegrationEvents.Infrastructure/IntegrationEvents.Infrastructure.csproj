@@ -17,7 +17,7 @@
     <ItemGroup>
       <PackageReference Include="Dapper" Version="2.1.35" />
       <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="3.3.1" />
-      <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="9.3.1" />
+      <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="9.3.2" />
       <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
       <PackageReference Include="NodaTime.Serialization.Protobuf" Version="2.0.1" />
     </ItemGroup>

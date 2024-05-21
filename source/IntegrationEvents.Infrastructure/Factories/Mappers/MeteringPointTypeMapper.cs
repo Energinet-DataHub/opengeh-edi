@@ -28,8 +28,8 @@ public static class MeteringPointTypeMapper
             EnergyResultProducedV2.Types.TimeSeriesType.FlexConsumption => MeteringPointType.Consumption,
             EnergyResultProducedV2.Types.TimeSeriesType.NonProfiledConsumption => MeteringPointType.Consumption,
             EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerGa => MeteringPointType.Exchange,
-            EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerNeighboringGa => MeteringPointType.Exchange,
             EnergyResultProducedV2.Types.TimeSeriesType.TotalConsumption => MeteringPointType.Consumption,
+            EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerNeighboringGa => throw new InvalidOperationException("NetExchangePerNeighboringGa is not supported"),
             EnergyResultProducedV2.Types.TimeSeriesType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
             _ => throw new ArgumentOutOfRangeException(nameof(timeSeriesType), timeSeriesType, "Unknown time series type unit from Wholesale"),
         };

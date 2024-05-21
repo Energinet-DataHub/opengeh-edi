@@ -26,7 +26,6 @@ public static class EnergyResultProducedProcessorExtensions
             EnergyResultProducedV2.Types.TimeSeriesType.FlexConsumption,
             EnergyResultProducedV2.Types.TimeSeriesType.NonProfiledConsumption,
             EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerGa,
-            EnergyResultProducedV2.Types.TimeSeriesType.NetExchangePerNeighboringGa,
             EnergyResultProducedV2.Types.TimeSeriesType.TotalConsumption,
         };
 }
