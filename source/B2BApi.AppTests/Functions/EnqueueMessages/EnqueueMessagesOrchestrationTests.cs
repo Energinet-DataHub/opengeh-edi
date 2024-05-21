@@ -124,7 +124,6 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         wait.Should().BeTrue("We did not receive the expected message on the ServiceBus");
     }
 
-    // TODO: Is there a factory somewhere, or should it be created?
     private static ServiceBusMessage CreateCalculationCompletedEventMessage(string calculationOrchestrationId)
     {
         var calcuationCompletedEvent = new CalculationCompletedV1
@@ -138,7 +137,6 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         return CreateServiceBusMessage(eventId: Guid.NewGuid(), calcuationCompletedEvent);
     }
 
-    // TODO: Is there a factory somewhere, or should it be created?
     private static ServiceBusMessage CreateServiceBusMessage(Guid eventId, IEventMessage eventMessage)
     {
         var serviceBusMessage = new ServiceBusMessage

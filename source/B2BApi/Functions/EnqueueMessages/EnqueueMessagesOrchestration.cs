@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Model;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 
@@ -36,7 +37,10 @@ internal class EnqueueMessagesOrchestration
 
         await context.CallActivityAsync(
             nameof(SendMessagesEnqueuedActivity),
-            input.CalculationOrchestrationId);
+            new SendMessagesEnqueuedInput(
+                context.InstanceId,
+                input.CalculationOrchestrationId,
+                input.CalculationId));
 
         // TODO: Decide what to do
         return "Success";

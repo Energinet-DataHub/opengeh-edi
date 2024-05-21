@@ -15,10 +15,9 @@
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 
 /// <summary>
-/// An immutable input to start the equeue messages orchestration.
+/// An immutable input to start the send messages enqueued activity.
 /// </summary>
-public sealed record EnqueueMessagesOrchestrationInput(
-    string CalculationOrchestrationId,
-    Guid CalculationId,
-    string CalculationType, // TODO: Use correct type
-    long CalculationVersion);
+public sealed record SendMessagesEnqueuedInput(
+    string OrchestrationInstanceId,
+    string CalculationOrchestrationInstanceId,
+    string CalculationId);

@@ -14,6 +14,7 @@
 
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Model;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
 using Microsoft.Extensions.Logging;
@@ -58,16 +59,4 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
         var durableClient = _durableClientFactory.CreateClient();
         var instanceId = await durableClient.StartNewAsync("EnqueueMessagesOrchestration", orchestrationInput).ConfigureAwait(false);
     }
-
-    /// <summary>
-    ///
-    /// TODO: Refactor - currently copied here from B2BApi App
-    ///
-    /// An immutable input to start the equeue messages orchestration.
-    /// </summary>
-    public sealed record EnqueueMessagesOrchestrationInput(
-        string CalculationOrchestrationId,
-        string CalculationId, // TODO: Use correct type
-        string CalculationType, // TODO: Use correct type
-        long CalculationVersion);
 }

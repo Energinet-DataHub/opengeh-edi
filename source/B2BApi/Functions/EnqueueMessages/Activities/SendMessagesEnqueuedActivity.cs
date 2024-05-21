@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EnergySupplying.RequestResponse.IntegrationEvents;
@@ -38,16 +39,22 @@ internal class SendMessagesEnqueuedActivity
 
     [Function(nameof(SendMessagesEnqueuedActivity))]
     public async Task Run(
-        [ActivityTrigger] string calculationOrchestrationId)
+        [ActivityTrigger] SendMessagesEnqueuedInput input)
     {
-        // TODO: Also fill out CalculationId
         var messagesEnqueuedEvent = new MessagesEnqueuedV1
         {
-            OrchestrationInstanceId = calculationOrchestrationId,
+            OrchestrationInstanceId = input.CalculationOrchestrationInstanceId,
+            CalculationId = input.CalculationId,
         };
 
-        // TODO: Is there a factory somewhere, or should it be created?
-        var eventId = Guid.NewGuid();
+        var eventId = Guid.Parse(input.OrchestrationInstanceId);
+        var serviceBusMessage = CreateServiceBusMessage(messagesEnqueuedEvent, eventId);
+
+        await _senderCreator.SendAsync(serviceBusMessage, CancellationToken.None);
+    }
+
+    private static ServiceBusMessage CreateServiceBusMessage(MessagesEnqueuedV1 messagesEnqueuedEvent, Guid eventId)
+    {
         var serviceBusMessage = new ServiceBusMessage
         {
             Body = new BinaryData(messagesEnqueuedEvent.ToByteArray()),
@@ -56,7 +63,6 @@ internal class SendMessagesEnqueuedActivity
         };
 
         serviceBusMessage.ApplicationProperties.Add("EventMinorVersion", MessagesEnqueuedV1.CurrentMinorVersion);
-
-        await _senderCreator.SendAsync(serviceBusMessage, CancellationToken.None);
+        return serviceBusMessage;
     }
 }
