@@ -165,6 +165,14 @@ public class B2BApiAppFixture : IAsyncLifetime
         TestLogger.TestOutputHelper = testOutputHelper;
     }
 
+    public void EnsureAppHostUsesFeatureFlagValue(bool featureFlagValue)
+    {
+        AppHostManager.RestartHostIfChanges(new Dictionary<string, string>
+        {
+            { "FeatureManagement__UseCalculationCompletedEvent", featureFlagValue.ToString().ToLower() },
+        });
+    }
+
     private static void StartHost(FunctionAppHostManager hostManager)
     {
         IEnumerable<string> hostStartupLog;
@@ -246,11 +254,10 @@ public class B2BApiAppFixture : IAsyncLifetime
             $"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.SendConnectionString)}",
             ServiceBusResourceProvider.ConnectionString);
 
-        // Feature Flags
-        // TODO: Need to be able swap this in test
+        // Feature Flags: Default values
         appHostSettings.ProcessEnvironmentVariables.Add(
             "FeatureManagement__UseCalculationCompletedEvent",
-            "true");
+            true.ToString().ToLower());
 
         return appHostSettings;
     }

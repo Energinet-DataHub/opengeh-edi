@@ -24,6 +24,7 @@ using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Google.Protobuf;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -59,6 +60,38 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         return Task.CompletedTask;
     }
 
+    [Fact]
+    public async Task Given_FeatureFlagIsDisabled_When_CalculationCompletedEventIsSent_Then_OrchestrationIsNeverStarted()
+    {
+        // Arrange
+        Fixture.EnsureAppHostUsesFeatureFlagValue(false);
+
+        var calculationOrchestrationId = Guid.NewGuid().ToString();
+        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId);
+
+        // Act
+        var beforeOrchestrationCreated = DateTime.UtcNow;
+        await Fixture.TopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
+
+        // Assert
+        await Task.Delay(TimeSpan.FromSeconds(30));
+
+        var filter = new OrchestrationStatusQueryCondition()
+        {
+            CreatedTimeFrom = beforeOrchestrationCreated,
+            RuntimeStatus =
+            [
+                OrchestrationRuntimeStatus.Pending,
+                OrchestrationRuntimeStatus.Running,
+                OrchestrationRuntimeStatus.Completed,
+            ],
+        };
+        var queryResult = await Fixture.DurableClient.ListInstancesAsync(filter, CancellationToken.None);
+
+        var actualOrchestrationStatus = queryResult.DurableOrchestrationState.FirstOrDefault();
+        actualOrchestrationStatus.Should().BeNull();
+    }
+
     /// <summary>
     /// Verifies that:
     ///  - The orchestration can complete a full run.
@@ -69,6 +102,8 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_FeatureFlagIsEnabledAndCalculationOrchestrationId_When_CalculationCompletedEventIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
+        Fixture.EnsureAppHostUsesFeatureFlagValue(true);
+
         var calculationOrchestrationId = Guid.NewGuid().ToString();
         var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId);
 
