@@ -33,8 +33,6 @@ internal class EnqueueMessagesOrchestration
             return "Error: No input specified.";
         }
 
-        //// TODO: Call additional activities here
-
         await context.CallActivityAsync(
             nameof(SendMessagesEnqueuedActivity),
             new SendMessagesEnqueuedInput(
@@ -42,7 +40,6 @@ internal class EnqueueMessagesOrchestration
                 input.CalculationOrchestrationId,
                 input.CalculationId));
 
-        // TODO: Decide what to do
         return "Success";
     }
 }
