@@ -12,12 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.Extensions.Options;
@@ -62,6 +57,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Google.Protobuf;
 using MediatR;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

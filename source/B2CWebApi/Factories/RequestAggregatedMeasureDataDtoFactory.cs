@@ -47,14 +47,14 @@ public static class RequestAggregatedMeasureDataDtoFactory
             request.GridArea,
             request.EnergySupplierId,
             request.BalanceResponsibleId,
-            SetSettlementVersion(request.ProcessType));
+            SetSettlementVersion(request.CalculationType));
 
         return new RequestAggregatedMeasureDataDto(
             senderNumber,
             senderRoleCode,
             DataHubDetails.DataHubActorNumber.Value,
             MarketRole.CalculationResponsibleRole.Code,
-            MapToBusinessReasonCode(request.ProcessType),
+            MapToBusinessReasonCode(request.CalculationType),
             AggregatedMeasureDataMessageType,
             Guid.NewGuid().ToString(),
             now.ToString(),
