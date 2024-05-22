@@ -496,6 +496,7 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         var translatedQuantityQuality = expectedQuantityQuality switch
         {
             // For WholesaleServices then calculated, estimated and measured is written as calculated
+            CalculatedQuantityQuality.NotAvailable => CimCode.QuantityQualityCodeNotAvailable,
             CalculatedQuantityQuality.Missing => CimCode.QuantityQualityCodeIncomplete,
             CalculatedQuantityQuality.Incomplete => CimCode.QuantityQualityCodeIncomplete,
             CalculatedQuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,

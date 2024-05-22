@@ -494,13 +494,13 @@ public sealed class CalculatedQuantityQualityMapperTests
              * | Missing + Missing                 | Missing                     |
              * | Missing + Estimated               | Incomplete                  |
              * | Missing + Measured                | Incomplete                  |
+             * | Missing + Calculated              | Incomplete                  |
              * | Missing + Estimated + Measured    | Incomplete                  |
              * | Estimated + Measured              | Calculated                  |
              * | Estimated + Estimated             | Calculated                  |
+             * | Estimated + Calculated            | Calculated                  |
              * | Measured + Measured               | Calculated                  |
              * | Calculated + Calculated           | Calculated                  |
-             * | Missing + Calculated              | Incomplete                  |
-             * | Estimated + Calculated            | Calculated                  |
              * | Measured + Estimated + Calculated | Calculated                  |
              */
 

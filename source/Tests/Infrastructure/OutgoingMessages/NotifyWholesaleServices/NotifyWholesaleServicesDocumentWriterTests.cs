@@ -423,12 +423,14 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         var missingQuantityQualityPoint = new WholesaleServicesPoint(1, 1, 100, 100, CalculatedQuantityQuality.Missing);
         var incompleteQuantityQualityPoint = new WholesaleServicesPoint(2, 1, 100, 100, CalculatedQuantityQuality.Incomplete);
         var calculatedQuantityQualityPoint = new WholesaleServicesPoint(3, 1, 100, 100, CalculatedQuantityQuality.Calculated);
+        var notAvaliableQuantityQualityPoint = new WholesaleServicesPoint(4, 1, 100, 100, CalculatedQuantityQuality.NotAvailable);
 
         var point = new List<WholesaleServicesPoint>()
         {
             missingQuantityQualityPoint,
             incompleteQuantityQualityPoint,
             calculatedQuantityQualityPoint,
+            notAvaliableQuantityQualityPoint,
         };
 
         // Arrange
@@ -438,6 +440,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
                 missingQuantityQualityPoint,
                 incompleteQuantityQualityPoint,
                 calculatedQuantityQualityPoint,
+                notAvaliableQuantityQualityPoint,
             });
 
         // Act

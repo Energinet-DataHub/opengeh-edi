@@ -31,7 +31,6 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
-using Energinet.DataHub.EDI.Tests.Application.Process.Transactions.Mappers;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -228,7 +227,7 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .WithEnergySupplier(energySupplier)
             .WithChargeCode(chargeCode)
             .WithChargeType(AmountPerChargeResultProducedV1.Types.ChargeType.Fee)
-            // Fees do not have quantity qualities, hence the
+            // Fees do not have quantity qualities, but the price is relevant for the written quantity quality
             .WithPoint(1, 2, 3, 6, AmountPerChargeResultProducedV1.Types.QuantityQuality.Missing)
             .WithChargeOwner(chargeOwner)
             .WithQuantityUnit(AmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh)
