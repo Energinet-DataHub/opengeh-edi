@@ -79,7 +79,7 @@ public record WholesaleServicesTotalSumSeries(
     MeasurementUnit QuantityMeasureUnit,
     Currency Currency,
     Resolution Resolution,
-    decimal Amount) : WholesaleServicesSeries(
+    decimal? Amount) : WholesaleServicesSeries(
     TransactionId: TransactionId,
     CalculationVersion: CalculationVersion,
     GridAreaCode: GridAreaCode,

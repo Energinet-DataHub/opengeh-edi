@@ -69,7 +69,7 @@ public static class WholesaleServicesTotalSumMessageFactory
             QuantityMeasureUnit: MeasurementUnit.Kwh,
             Currency: CurrencyMapper.Map(message.Currency),
             Resolution: Resolution.Monthly,
-            Amount: DecimalParser.Parse(message.Amount));
+            Amount: message.Amount != null ? DecimalParser.Parse(message.Amount) : null);
     }
 
     private static ActorRole GetChargeOwnerRole(ActorNumber chargeOwnerId)
