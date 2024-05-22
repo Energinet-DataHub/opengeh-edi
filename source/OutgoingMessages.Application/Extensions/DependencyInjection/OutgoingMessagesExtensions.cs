@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
@@ -46,7 +45,7 @@ public static class OutgoingMessagesExtensions
         ArgumentNullException.ThrowIfNull(configuration);
         services.AddBuildingBlocks(configuration)
             .AddScopedSqlDbContext<ActorMessageQueueContext>(configuration)
-            .AddScoped<ExecutionContext>();
+            .AddScoped<BuildingBlocks.Domain.ExecutionContext>();
 
         //AddMessageGenerationServices
         services.AddScoped<DocumentFactory>()

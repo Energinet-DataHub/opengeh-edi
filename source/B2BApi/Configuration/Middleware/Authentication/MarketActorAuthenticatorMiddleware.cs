@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
@@ -43,15 +40,16 @@ namespace Energinet.DataHub.EDI.B2BApi.Configuration.Middleware.Authentication
             if (context.EndpointIsOmittedFromAuth())
             {
                 _logger.LogInformation("Functions is omitted from auth, skipping authentication");
-                await next(context).ConfigureAwait(false);
+                await next(context);
                 return;
             }
 
-            var httpRequestData = await context.GetHttpRequestDataAsync().ConfigureAwait(false) ?? throw new ArgumentException("No HTTP request data was available, even though the function was not omitted from auth");
+            var httpRequestData = await context.GetHttpRequestDataAsync()
+                ?? throw new ArgumentException("No HTTP request data was available, even though the function was not omitted from auth");
 
             var authenticationMethod = authenticationMethods.Single(a => a.ShouldHandle(httpRequestData));
 
-            var authenticated = await authenticationMethod.AuthenticateAsync(httpRequestData, context.CancellationToken).ConfigureAwait(false);
+            var authenticated = await authenticationMethod.AuthenticateAsync(httpRequestData, context.CancellationToken);
 
             if (!authenticated)
             {
@@ -62,7 +60,7 @@ namespace Energinet.DataHub.EDI.B2BApi.Configuration.Middleware.Authentication
 
             var serializer = context.GetService<ISerializer>();
             WriteAuthenticatedIdentityToLog(authenticatedActor.CurrentActorIdentity, serializer);
-            await next(context).ConfigureAwait(false);
+            await next(context);
         }
 
         private void WriteAuthenticatedIdentityToLog(ActorIdentity? actorIdentity, ISerializer serializer)

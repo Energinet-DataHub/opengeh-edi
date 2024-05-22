@@ -69,7 +69,7 @@ public static class ProcessExtensions
         services
             .AddScopedSqlDbContext<ProcessContext>(configuration)
             .AddMediatR()
-            .AddScoped<ExecutionContext>();
+            .AddScoped<BuildingBlocks.Domain.ExecutionContext>();
 
         //ProcessingConfiguration
         services.AddScoped<DomainEventsAccessor>()

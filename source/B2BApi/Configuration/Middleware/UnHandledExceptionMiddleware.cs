@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker.Middleware;
@@ -44,21 +41,19 @@ public class UnHandledExceptionMiddleware : IFunctionsWorkerMiddleware
         // If the endpoint is omitted from auth, we dont want to intercept exceptions.
         if (context.EndpointIsOmittedFromAuth())
         {
-            await next(context).ConfigureAwait(false);
+            await next(context);
         }
         else
         {
             try
             {
-                await next(context).ConfigureAwait(false);
+                await next(context);
             }
-    #pragma warning disable CA1031
             catch (Exception ex)
-    #pragma warning restore CA1031
             {
                 _logger.LogError(ex, "Error processing invocation: {Ex}", ex.Message);
 
-                var httpReqData = await context.GetHttpRequestDataAsync().ConfigureAwait(false);
+                var httpReqData = await context.GetHttpRequestDataAsync();
 
                 if (httpReqData != null)
                 {
@@ -68,7 +63,7 @@ public class UnHandledExceptionMiddleware : IFunctionsWorkerMiddleware
                     // https://github.com/Azure/azure-functions-dotnet-worker/issues/776
                     await newHttpResponse.WriteAsJsonAsync(
                         new { Message = "An unexpected error occurred! Please try later." },
-                        newHttpResponse.StatusCode).ConfigureAwait(false);
+                        newHttpResponse.StatusCode);
 
                     var invocationResult = context.GetInvocationResult();
 

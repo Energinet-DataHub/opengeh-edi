@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Model;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
@@ -26,13 +25,16 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
 {
     private readonly ILogger<CalculationCompletedV1Processor> _logger;
     private readonly IFeatureFlagManager _featureManager;
+    private readonly IDurableClientFactory _durableClientFactory;
 
     public CalculationCompletedV1Processor(
         ILogger<CalculationCompletedV1Processor> logger,
-        IFeatureFlagManager featureManager)
+        IFeatureFlagManager featureManager,
+        IDurableClientFactory durableClientFactory)
     {
         _logger = logger;
         _featureManager = featureManager;
+        _durableClientFactory = durableClientFactory;
     }
 
     public string EventTypeToHandle => CalculationCompletedV1.EventName;
@@ -46,9 +48,20 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
             return;
         }
 
-        var message = (CalculationCompletedV1)integrationEvent.Message;
+        var durableClient = _durableClientFactory.CreateClient();
+        var orchestrationInput = CreateOrchestrationInput(integrationEvent);
+        var instanceId = await durableClient.StartNewAsync("EnqueueMessagesOrchestration", orchestrationInput).ConfigureAwait(false);
 
-        // TODO: Handle event
-        return;
+        _logger.LogInformation("Started 'EnqueueMessagesOrchestration' with id '{OrchestrationInstanceId}'.", instanceId);
+    }
+
+    private static EnqueueMessagesOrchestrationInput CreateOrchestrationInput(IntegrationEvent integrationEvent)
+    {
+        var message = (CalculationCompletedV1)integrationEvent.Message;
+        return new EnqueueMessagesOrchestrationInput(
+            CalculationOrchestrationId: message.InstanceId,
+            CalculationId: message.CalculationId,
+            CalculationType: message.CalculationType,
+            CalculationVersion: message.CalculationVersion);
     }
 }

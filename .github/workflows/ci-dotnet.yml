@@ -23,7 +23,6 @@ jobs:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v13
     with:
       solution_file_path: source/EDI.sln
-      dotnet_version: 8.0.200
 
   # Run all tests in 'IntegrationTests.dll'
   integration_tests:
@@ -32,7 +31,6 @@ jobs:
       job_name: Integration tests
       tests_dll_file_path: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
       download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
-      dotnet_version: 8.0.200
       use_azure_functions_tools: true
 
   # Run all tests in 'ArchitectureTests.dll'
@@ -42,7 +40,6 @@ jobs:
       job_name: Architecture tests
       tests_dll_file_path: \source\ArchitectureTests\bin\Release\net8.0\Energinet.DataHub.EDI.ArchitectureTests.dll
       download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
-      dotnet_version: 8.0.200
 
   # Run all tests in 'Tests.dll'
   tests:
@@ -51,4 +48,18 @@ jobs:
       job_name: Tests
       tests_dll_file_path: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.Tests.dll
       download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
-      dotnet_version: 8.0.200
+
+  # Run all tests in 'Tests.dll'
+  b2bapi_apptests:
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v13
+    with:
+      job_name: B2BApi AppTests
+      tests_dll_file_path: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.B2BApi.AppTests.dll
+      use_azure_functions_tools: true
+      azure_integrationtest_tenant_id: ${{ vars.integration_test_azure_tenant_id }}
+      azure_integrationtest_subscription_id: ${{ vars.integration_test_azure_subscription_id }}
+      azure_integrationtest_spn_id: ${{ vars.integration_test_azure_spn_id_oidc }}
+      azure_keyvault_url: ${{ vars.integration_test_azure_keyvault_url }}
+      environment: AzureAuth
+      run_integration_tests: true
+      download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
