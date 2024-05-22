@@ -60,7 +60,6 @@ jobs:
       azure_integrationtest_subscription_id: ${{ vars.integration_test_azure_subscription_id }}
       azure_integrationtest_spn_id: ${{ vars.integration_test_azure_spn_id_oidc }}
       azure_keyvault_url: ${{ vars.integration_test_azure_keyvault_url }}
-      azure_b2csecrets_keyvault_url: ${{ vars.integration_test_azure_b2csecrets_keyvault_url }}
       environment: AzureAuth
       run_integration_tests: true
       download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
