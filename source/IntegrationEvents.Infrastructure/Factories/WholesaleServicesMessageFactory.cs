@@ -104,7 +104,7 @@ public sealed class WholesaleServicesMessageFactory
                     null,
                     null,
                     message.Amount != null ? DecimalParser.Parse(message.Amount) : null,
-                    CalculatedQuantityQuality.Calculated),
+                    message.Amount != null ? CalculatedQuantityQuality.Calculated : CalculatedQuantityQuality.Missing),
             },
             EnergySupplier: ActorNumber.Create(message.EnergySupplierId),
             ActorNumber.Create(message.ChargeOwnerId),
