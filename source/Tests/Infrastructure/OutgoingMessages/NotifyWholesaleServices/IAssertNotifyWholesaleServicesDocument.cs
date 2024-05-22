@@ -285,7 +285,7 @@ public interface IAssertNotifyWholesaleServicesDocument
     #endregion
 
     /// <summary>
-    /// Asserts the list of points only contains a single point with the given amount
+    /// Asserts the list of points only contains a single point with the given amount and calculated quality
     /// </summary>
     IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndCalculatedQuantity(DecimalValue expectedAmount);
 }
