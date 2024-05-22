@@ -49,6 +49,6 @@ public record WholesaleCalculationMarketActivityRecord(
     SettlementMethod? SettlementMethod,
     TransactionId? OriginalTransactionIdReference);
 
-// TODO: CalculatedQuantityQuality is not nullable for "WholesaleServicesPoint". So should should not.
+// TODO: CalculatedQuantityQuality is not nullable for "WholesaleServicesPoint". So this should not.
 // Kept for backwards compatibility, should be removed at a later time
 public record Point(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);
