@@ -26,6 +26,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
+using NodaTime.Text;
 using Xunit;
 using Xunit.Abstractions;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
@@ -673,5 +674,105 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
         }
 
         gridAreas.Should().BeEquivalentTo("143", "512", "877");
+    }
+
+    [Theory]
+    [InlineData("Xml")]
+    [InlineData("Json")]
+    public async Task AndGiven_RequestContainsWrongEnergySupplierInSeries_When_OriginalEnergySupplier_Then_ReceivesOneRejectWholesaleSettlementDocumentsWithCorrectContent(string incomingDocumentFormatName)
+    {
+        // Arrange
+        var incomingDocumentFormat = DocumentFormat.FromName(incomingDocumentFormatName);
+        var senderSpy = CreateServiceBusSenderSpy();
+        var actor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.EnergySupplier);
+        var energySupplierNumber = ActorNumber.Create("3333333333333");
+        var chargeOwnerNumber = ActorNumber.Create("5799999933444");
+
+        GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
+        GivenAuthenticatedActorIs(actor.ActorNumber, actor.ActorRole);
+
+        // Act
+        await GivenReceivedWholesaleServicesRequest(
+            documentFormat: incomingDocumentFormat,
+            senderActorNumber: actor.ActorNumber,
+            senderActorRole: actor.ActorRole,
+            periodStart: (2024, 1, 1),
+            periodEnd: (2024, 1, 31),
+            energySupplier: energySupplierNumber,
+            chargeOwner: chargeOwnerNumber,
+            chargeCode: "25361478",
+            chargeType: ChargeType.Tariff,
+            isMonthly: false,
+            new (string? GridArea, TransactionId TransactionId)[]
+            {
+                ("512", TransactionId.From("123564789123564789123564789123564787")),
+            });
+
+        await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
+
+        // Assert
+        var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
+            senderSpy,
+            new WholesaleServicesMessageAssertionInput(
+                new List<string> { "512" },
+                actor.ActorNumber.Value,
+                actor.ActorRole.Name,
+                energySupplierNumber.Value,
+                chargeOwnerNumber.Value,
+                null,
+                DataHubNames.BusinessReason.WholesaleFixing,
+                new List<(string ChargeType, string ChargeCode)> { (DataHubNames.ChargeType.Tariff, "25361478"), },
+                new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
+                null));
+
+        // TODO: Assert correct process is created?
+
+        /*
+         *  --- PART 2: Receive data from Wholesale and create RSM document ---
+         */
+
+        // Arrange
+
+        // Generate a mock WholesaleRequestAccepted response from Wholesale, based on the WholesaleServicesRequest
+        // It is very important that the generated data is correct,
+        // since (almost) all assertion after this point is based on this data
+        var wholesaleServicesRequestRejectedMessage = WholesaleServicesResponseEventBuilder
+            .GenerateRejectedFrom(message.WholesaleServicesRequest);
+
+        await GivenWholesaleServicesRequestRejectedIsReceived(message.ProcessId, wholesaleServicesRequestRejectedMessage);
+
+        // Act
+        var actorPeekResults = await WhenActorPeeksAllMessages(
+            actor.ActorNumber,
+            actor.ActorRole,
+            incomingDocumentFormat);
+
+        // Assert
+        PeekResultDto peekResult;
+        using (new AssertionScope())
+        {
+            peekResult = actorPeekResults.Should().ContainSingle("because there should only be one rejected message.")
+                .Subject;
+
+            peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
+        }
+
+        var expectedReasonMessage = "Elleverandør i header og payload stemmer ikke overens / "
+                                    + "Energysupplier in header and payload must be the same";
+
+        await ThenRejectRequestWholesaleSettlementDocumentIsCorrect(
+            peekResult.Bundle,
+            incomingDocumentFormat,
+            new RejectRequestWholesaleSettlementDocumentAssertionInput(
+                InstantPattern.General.Parse("2024-07-01T14:57:09Z").Value,
+                BusinessReason.WholesaleFixing,
+                actor.ActorNumber.Value,
+                actor.ActorRole,
+                "5790001330552",
+                ActorRole.MeteredDataAdministrator,
+                ReasonCode.FullyRejected.Code,
+                TransactionId.From("123564789123564789123564789123564787"),
+                "E16",
+                expectedReasonMessage));
     }
 }
