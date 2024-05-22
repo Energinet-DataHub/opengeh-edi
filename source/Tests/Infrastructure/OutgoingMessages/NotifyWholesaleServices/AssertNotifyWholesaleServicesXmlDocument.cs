@@ -25,6 +25,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions;
+using Google.Protobuf.Collections;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
@@ -400,7 +401,9 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndCalculatedQuantity(DecimalValue expectedAmount)
+    public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndQuality(
+        DecimalValue expectedAmount,
+        QuantityQuality quantityQualities)
     {
         ArgumentNullException.ThrowIfNull(expectedAmount);
         var pointsInDocument = _documentAsserter
@@ -425,7 +428,7 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
             .Should()
             .Be(1);
 
-        AssertQuantityQuality(pointsInDocument, 0, CalculatedQuantityQuality.Calculated);
+        AssertQuantityQuality(pointsInDocument, 0, quantityQualities);
 
         _documentAsserter.IsNotPresent("Series[1]/Period/Point[1]/energy_Quantity.quantity");
 

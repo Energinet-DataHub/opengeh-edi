@@ -22,7 +22,7 @@ using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using Duration = NodaTime.Duration;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
+namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
 public class AmountPerChargeResultProducedV1EventBuilder
 {

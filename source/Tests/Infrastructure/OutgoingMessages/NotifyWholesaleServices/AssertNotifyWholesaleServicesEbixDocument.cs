@@ -26,6 +26,8 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions;
+using Google.Protobuf.Collections;
+using Microsoft.IdentityModel.Tokens;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
@@ -420,7 +422,9 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndCalculatedQuantity(DecimalValue expectedAmount)
+    public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndQuality(
+        DecimalValue expectedAmount,
+        QuantityQuality quantityQualities)
     {
         var pointsInDocument = _documentAsserter
             .GetElements($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation")!;
@@ -445,7 +449,7 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
             .Should()
             .Be(1);
 
-        AssertQuantityQuality(pointsInDocument, 0, CalculatedQuantityQuality.Calculated);
+        AssertQuantityQuality(pointsInDocument, 0, quantityQualities);
 
         _documentAsserter.IsNotPresent($"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[1]/EnergyQuantity");
 

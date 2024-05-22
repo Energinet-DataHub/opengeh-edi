@@ -198,7 +198,8 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
         // Assert
         var message = await AssertOutgoingMessageAsync(businessReason: BusinessReason.Correction);
         message
-            .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.SettlementVersion, SettlementVersion.FirstCorrection);
+            .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.SettlementVersion, SettlementVersion.FirstCorrection)
+            .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.Points.First().QuantityQuality, CalculatedQuantityQuality.Missing);
     }
 
     [Fact]

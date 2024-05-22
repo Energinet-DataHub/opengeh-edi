@@ -183,11 +183,13 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             .HasQuantityMeasurementUnit(SampleData.MeasurementUnit)
             .PriceMeasurementUnitDoesNotExist()
             .HasResolution(Resolution.Monthly)
-            .HasSinglePointWithAmountAndCalculatedQuantity(new DecimalValue()
-            {
-                Nanos = 0,
-                Units = 100,
-            })
+            .HasSinglePointWithAmountAndQuality(
+                new DecimalValue()
+                    {
+                        Nanos = 0,
+                        Units = 100,
+                    },
+                QuantityQuality.Calculated)
             .HasProductCode(ProductType.Tariff.Code)
             .OriginalTransactionIdReferenceDoesNotExist()
             .SettlementVersionDoesNotExist()

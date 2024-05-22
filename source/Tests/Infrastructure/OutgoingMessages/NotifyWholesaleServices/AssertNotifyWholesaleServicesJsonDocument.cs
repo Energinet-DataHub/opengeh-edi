@@ -26,6 +26,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
+using Google.Protobuf.Collections;
 using Json.Schema;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
@@ -638,7 +639,9 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndCalculatedQuantity(DecimalValue expectedAmount)
+    public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndQuality(
+        DecimalValue expectedAmount,
+        QuantityQuality quantityQualities)
     {
         ArgumentNullException.ThrowIfNull(expectedAmount);
         var pointsInDocument = FirstWholesaleSeriesElement()
@@ -665,7 +668,7 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
             .Should()
             .Be(1);
 
-        AssertQuantityQuality(pointsInDocument, 0, CalculatedQuantityQuality.Calculated);
+        AssertQuantityQuality(pointsInDocument, 0, quantityQualities);
 
         FirstWholesaleSeriesElement()
             .TryGetProperty("energy_Quantity.quantity", out _)

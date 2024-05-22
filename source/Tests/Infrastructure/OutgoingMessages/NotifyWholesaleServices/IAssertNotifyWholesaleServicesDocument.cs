@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Edi.Responses;
+using Google.Protobuf.Collections;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
@@ -287,5 +288,7 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// <summary>
     /// Asserts the list of points only contains a single point with the given amount and calculated quality
     /// </summary>
-    IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndCalculatedQuantity(DecimalValue expectedAmount);
+    IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndQuality(
+        DecimalValue expectedAmount,
+        QuantityQuality quantityQualities);
 }
