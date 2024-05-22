@@ -119,17 +119,7 @@ public class AssertEbixDocument
 
         if (!validationResult.IsValid && skipIdentificationLengthValidation)
         {
-            var ignoreMaxLengthErrorsFor = new List<string>()
-            {
-                "NotifyAggregatedWholesaleServices:v3:Identification",
-                "NotifyAggregatedWholesaleServices:v3:OriginalBusinessDocument",
-                "RejectAggregatedBillingInformation:v3:Identification",
-                "RejectAggregatedBillingInformation:v3:OriginalBusinessDocument",
-                "DK_AggregatedMeteredDataTimeSeries:v3:Identification",
-                "DK_AggregatedMeteredDataTimeSeries:v3:OriginalBusinessDocument",
-                "DK_RejectRequestMeteredDataAggregated:v3:Identification",
-                "DK_RejectRequestMeteredDataAggregated:v3:OriginalBusinessDocument",
-            };
+            var ignoreMaxLengthErrorsFor = new List<string>() { };
 
             var validationErrorsExceptId = validationResult.ValidationErrors
                 .Where(errorMessage =>
