@@ -458,9 +458,6 @@ public class BehavioursTestBase : IDisposable
             .AddLogging()
             .AddScoped<ISystemDateTimeProvider>(_ => _systemDateTimeProviderStub);
 
-        // Durable Task
-        _services.AddDurableClientFactory();
-
         _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
             .AddIntegrationEventModule(config)
             .AddOutgoingMessagesModule(config)

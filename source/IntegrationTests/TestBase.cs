@@ -308,9 +308,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                 .AddLogging()
                 .AddScoped<ISystemDateTimeProvider>(_ => new SystemDateTimeProviderStub());
 
-            // Durable Task
-            _services.AddDurableClientFactory();
-
             _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
                 .AddIntegrationEventModule(config)
             .AddOutgoingMessagesModule(config)

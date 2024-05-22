@@ -25,7 +25,6 @@ using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyI
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 
@@ -75,14 +74,6 @@ public static class HostFactory
 
                         // Serializer
                         .AddSerializer()
-
-                        // Durable Task
-                        .AddDurableClientFactory(options =>
-                        {
-                            options.ConnectionName = "AzureWebJobsStorage";
-                            options.TaskHub = context.Configuration["OrchestrationsTaskHubName"]!;
-                            options.IsExternalClient = true;
-                        })
 
                         // Modules
                         .AddIntegrationEventModule(context.Configuration)
