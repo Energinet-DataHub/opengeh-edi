@@ -64,7 +64,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_FeatureFlagIsDisabled_When_CalculationCompletedEventIsSent_Then_OrchestrationIsNeverStarted()
     {
         // Arrange
-        Fixture.EnsureAppHostUsesFeatureFlagValue(false);
+        Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: false);
 
         var calculationOrchestrationId = Guid.NewGuid().ToString();
         var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId);
@@ -102,7 +102,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_FeatureFlagIsEnabledAndCalculationOrchestrationId_When_CalculationCompletedEventIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
-        Fixture.EnsureAppHostUsesFeatureFlagValue(true);
+        Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: true);
 
         var calculationOrchestrationId = Guid.NewGuid().ToString();
         var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId);

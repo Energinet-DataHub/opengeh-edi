@@ -165,11 +165,11 @@ public class B2BApiAppFixture : IAsyncLifetime
         TestLogger.TestOutputHelper = testOutputHelper;
     }
 
-    public void EnsureAppHostUsesFeatureFlagValue(bool featureFlagValue)
+    public void EnsureAppHostUsesFeatureFlagValue(bool enableCalculationCompletedEvent)
     {
         AppHostManager.RestartHostIfChanges(new Dictionary<string, string>
         {
-            { "FeatureManagement__UseCalculationCompletedEvent", featureFlagValue.ToString().ToLower() },
+            { "FeatureManagement__UseCalculationCompletedEvent", enableCalculationCompletedEvent.ToString().ToLower() },
         });
     }
 
