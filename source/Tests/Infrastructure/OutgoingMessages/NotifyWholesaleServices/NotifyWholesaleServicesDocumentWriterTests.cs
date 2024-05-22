@@ -35,6 +35,7 @@ using FluentAssertions.Execution;
 using NodaTime.Text;
 using Xunit;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Point = Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Point;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
@@ -134,7 +135,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
     {
         // Arrange
         // This is the wholesale series with most nullable fields.
-        var serie = new WholesaleServicesTotalSumSeries(
+        var series = new WholesaleServicesTotalSumSeries(
             TransactionId: SampleData.TransactionId,
             CalculationVersion: 1,
             GridAreaCode: SampleData.GridAreaCode,
@@ -157,7 +158,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         // Act
         var document = await WriteDocument(
             header,
-            serie,
+            series,
             DocumentFormat.FromName(documentFormat));
 
         // Assert
@@ -182,7 +183,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             .HasQuantityMeasurementUnit(SampleData.MeasurementUnit)
             .PriceMeasurementUnitDoesNotExist()
             .HasResolution(Resolution.Monthly)
-            .HasSinglePointWithAmount(new DecimalValue()
+            .HasSinglePointWithAmountAndCalculatedQuantity(new DecimalValue()
             {
                 Nanos = 0,
                 Units = 100,
@@ -201,7 +202,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
     {
         // Arrange
         var messageBuilder = _wholesaleServicesSeriesBuilder
-            .WithPoints(new Collection<WholesaleServicesPoint>() { new(1, 1, 1, null, null) });
+            .WithPoints(new Collection<WholesaleServicesPoint>() { new(1, 1, 1, null, CalculatedQuantityQuality.Missing) });
 
         // Act
         var document = await WriteDocument(
@@ -268,8 +269,8 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
     public async Task Can_create_notifyWholesaleServices_document_with_calculated_hourly_tariff_amounts_for_flex_consumption(string documentFormat)
     {
         // Arrange
-        var firstPoint = new WholesaleServicesPoint(1, 1, 100, 100, null);
-        var secondPoint = new WholesaleServicesPoint(2, 1, 200, 200, null);
+        var firstPoint = new WholesaleServicesPoint(1, 1, 100, 100, CalculatedQuantityQuality.Missing);
+        var secondPoint = new WholesaleServicesPoint(2, 1, 200, 200, CalculatedQuantityQuality.Missing);
 
         var messageBuilder = _wholesaleServicesSeriesBuilder
             .WithSettlementMethod(SettlementMethod.Flex)
@@ -304,8 +305,8 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
     public async Task Can_create_notifyWholesaleServices_document_with_calculated_hourly_tariff_amounts_for_production(string documentFormat)
     {
         // Arrange
-        var firstPoint = new WholesaleServicesPoint(1, 1, 100, 100, null);
-        var secondPoint = new WholesaleServicesPoint(2, 1, 200, 100, null);
+        var firstPoint = new WholesaleServicesPoint(1, 1, 100, 100, CalculatedQuantityQuality.Missing);
+        var secondPoint = new WholesaleServicesPoint(2, 1, 200, 100, CalculatedQuantityQuality.Missing);
 
         var messageBuilder = _wholesaleServicesSeriesBuilder
                 .WithSettlementMethod(null)
@@ -340,8 +341,8 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
     public async Task Can_create_notifyWholesaleServices_document_with_calculated_hourly_tariff_amounts_for_consumption(string documentFormat)
     {
         // Arrange
-        var firstPoint = new WholesaleServicesPoint(1, 1, 100, 100, null);
-        var secondPoint = new WholesaleServicesPoint(2, 1, 200, 200, null);
+        var firstPoint = new WholesaleServicesPoint(1, 1, 100, 100, CalculatedQuantityQuality.Missing);
+        var secondPoint = new WholesaleServicesPoint(2, 1, 200, 200, CalculatedQuantityQuality.Missing);
 
         var messageBuilder = _wholesaleServicesSeriesBuilder
             .WithSettlementMethod(SettlementMethod.NonProfiled)
@@ -410,6 +411,44 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         // Assert
         await AssertDocument(document, DocumentFormat.FromName(documentFormat))
             .HasResolution(Resolution.Daily)
+            .DocumentIsValidAsync();
+    }
+
+    [Theory]
+    [InlineData(nameof(DocumentFormat.Xml))]
+    [InlineData(nameof(DocumentFormat.Json))]
+    [InlineData(nameof(DocumentFormat.Ebix))]
+    public async Task Given_CalculatedQuantityQuality_When_writingDocument_Then_HasExpectedQuantityQuality(string documentFormat)
+    {
+        var missingQuantityQualityPoint = new WholesaleServicesPoint(1, 1, 100, 100, CalculatedQuantityQuality.Missing);
+        var incompleteQuantityQualityPoint = new WholesaleServicesPoint(2, 1, 100, 100, CalculatedQuantityQuality.Incomplete);
+        var calculatedQuantityQualityPoint = new WholesaleServicesPoint(3, 1, 100, 100, CalculatedQuantityQuality.Calculated);
+
+        var point = new List<WholesaleServicesPoint>()
+        {
+            missingQuantityQualityPoint,
+            incompleteQuantityQualityPoint,
+            calculatedQuantityQualityPoint,
+        };
+
+        // Arrange
+        var messageBuilder = _wholesaleServicesSeriesBuilder
+            .WithPoints(new()
+            {
+                missingQuantityQualityPoint,
+                incompleteQuantityQualityPoint,
+                calculatedQuantityQualityPoint,
+            });
+
+        // Act
+        var document = await WriteDocument(
+            messageBuilder.BuildHeader(),
+            messageBuilder.BuildWholesaleCalculation(),
+            DocumentFormat.FromName(documentFormat));
+
+        // Assert
+        await AssertDocument(document, DocumentFormat.FromName(documentFormat))
+            .HasPoints(point)
             .DocumentIsValidAsync();
     }
 
