@@ -25,6 +25,7 @@ using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf.Reflection;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -78,6 +79,14 @@ public static class IntegrationEventExtensions
             .ValidateDataAnnotations();
 
         services.AddDapperConnectionToDatabase(configuration);
+
+        // Durable Task
+        services.AddDurableClientFactory(options =>
+        {
+            options.ConnectionName = "AzureWebJobsStorage";
+            options.TaskHub = configuration["OrchestrationsTaskHubName"]!;
+            options.IsExternalClient = true;
+        });
 
         return services;
     }
