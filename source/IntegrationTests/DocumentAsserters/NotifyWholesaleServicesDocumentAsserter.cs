@@ -94,7 +94,7 @@ public static class NotifyWholesaleServicesDocumentAsserter
         }
         else
         {
-            var quality = assertionInput.Points.First().QuantityQualities.Count == 1
+            var quality = assertionInput.Points.First().QuantityQualities.Count != 0
                 ? assertionInput.Points.First().QuantityQualities.Single()
                 : QuantityQuality.Calculated;
             asserter.HasSinglePointWithAmountAndQuality(assertionInput.Points.First().Amount, quality);
