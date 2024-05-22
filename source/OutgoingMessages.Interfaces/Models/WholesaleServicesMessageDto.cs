@@ -93,4 +93,4 @@ public record WholesaleServicesSeries(
     SettlementMethod? SettlementMethod,
     TransactionId? OriginalTransactionIdReference = null);
 
-public record WholesaleServicesPoint(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);
+public record WholesaleServicesPoint(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality QuantityQuality);

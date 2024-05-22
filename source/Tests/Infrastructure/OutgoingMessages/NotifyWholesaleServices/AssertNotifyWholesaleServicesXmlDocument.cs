@@ -400,7 +400,7 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmount(DecimalValue expectedAmount)
+    public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndCalculatedQuantity(DecimalValue expectedAmount)
     {
         ArgumentNullException.ThrowIfNull(expectedAmount);
         var pointsInDocument = _documentAsserter
@@ -425,11 +425,11 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
             .Should()
             .Be(1);
 
+        AssertQuantityQuality(pointsInDocument, 0, CalculatedQuantityQuality.Calculated);
+
         _documentAsserter.IsNotPresent("Series[1]/Period/Point[1]/energy_Quantity.quantity");
 
         _documentAsserter.IsNotPresent("Series[1]/Period/Point[1]/price.amount");
-
-        _documentAsserter.IsNotPresent("Series[1]/Period/Point[1]/quality");
 
         return this;
     }
@@ -491,34 +491,27 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
     private void AssertQuantityQuality(
         IList<XElement> pointsInDocument,
         int i,
-        CalculatedQuantityQuality? expectedQuantityQuality)
+        CalculatedQuantityQuality expectedQuantityQuality)
     {
-        if (expectedQuantityQuality != null)
+        var translatedQuantityQuality = expectedQuantityQuality switch
         {
-            var translatedQuantityQuality = expectedQuantityQuality switch
-            {
-                // For WholesaleServices then calculated, estimated and measured is written as calculated
-                CalculatedQuantityQuality.Missing => CimCode.QuantityQualityCodeIncomplete,
-                CalculatedQuantityQuality.Incomplete => CimCode.QuantityQualityCodeIncomplete,
-                CalculatedQuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,
-                CalculatedQuantityQuality.Estimated => CimCode.QuantityQualityCodeCalculated,
-                CalculatedQuantityQuality.Measured => CimCode.QuantityQualityCodeCalculated,
-                _ => throw new NotImplementedException(
-                    $"Quantity quality {expectedQuantityQuality} not implemented"),
-            };
+            // For WholesaleServices then calculated, estimated and measured is written as calculated
+            CalculatedQuantityQuality.Missing => CimCode.QuantityQualityCodeIncomplete,
+            CalculatedQuantityQuality.Incomplete => CimCode.QuantityQualityCodeIncomplete,
+            CalculatedQuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,
+            CalculatedQuantityQuality.Estimated => CimCode.QuantityQualityCodeCalculated,
+            CalculatedQuantityQuality.Measured => CimCode.QuantityQualityCodeCalculated,
+            _ => throw new NotImplementedException(
+                $"Quantity quality {expectedQuantityQuality} not implemented"),
+        };
 
-            pointsInDocument[i]
-                .XPathSelectElement(
-                    _documentAsserter.EnsureXPathHasPrefix("quality"),
-                    _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .Should()
-                .Be(translatedQuantityQuality);
-        }
-        else
-        {
-            _documentAsserter.IsNotPresent(_documentAsserter.EnsureXPathHasPrefix("quality"));
-        }
+        pointsInDocument[i]
+            .XPathSelectElement(
+                _documentAsserter.EnsureXPathHasPrefix("quality"),
+                _documentAsserter.XmlNamespaceManager)!
+            .Value
+            .Should()
+            .Be(translatedQuantityQuality);
     }
 
     private void AssertQuantityQuality(

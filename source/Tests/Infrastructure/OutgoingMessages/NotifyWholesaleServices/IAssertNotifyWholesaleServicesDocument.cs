@@ -287,5 +287,5 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// <summary>
     /// Asserts the list of points only contains a single point with the given amount
     /// </summary>
-    IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmount(DecimalValue expectedAmount);
+    IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndCalculatedQuantity(DecimalValue expectedAmount);
 }

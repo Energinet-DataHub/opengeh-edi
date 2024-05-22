@@ -90,7 +90,7 @@ public static class NotifyWholesaleServicesDocumentAsserter
         if (!isTotalMonthlyAmount)
             asserter.HasPoints(assertionInput.Points);
         else
-            asserter.HasSinglePointWithAmount(assertionInput.Points.First().Amount);
+            asserter.HasSinglePointWithAmountAndCalculatedQuantity(assertionInput.Points.First().Amount);
 
         if (assertionInput.PriceMeasurementUnit is not null)
             asserter.HasPriceMeasurementUnit(assertionInput.PriceMeasurementUnit);

@@ -50,7 +50,7 @@ public class WholesaleServicesSeriesBuilder
     private ActorNumber _chargeOwner = ActorNumber.Create("1234567897777");
     private TransactionId? _originalTransactionIdReference;
     private SettlementVersion? _settlementVersion;
-    private List<WholesaleServicesPoint> _points = new() { new(1, 100, 100, 100, null) };
+    private List<WholesaleServicesPoint> _points = new() { new(1, 100, 100, 100, CalculatedQuantityQuality.Missing) };
 
     private Currency _currency = Currency.DanishCrowns;
     private Period _period = new(Instant.FromUtc(2023, 11, 1, 0, 0), Instant.FromUtc(2023, 12, 1, 0, 0));

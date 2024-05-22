@@ -420,7 +420,7 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmount(DecimalValue expectedAmount)
+    public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndCalculatedQuantity(DecimalValue expectedAmount)
     {
         var pointsInDocument = _documentAsserter
             .GetElements($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation")!;
@@ -445,11 +445,11 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
             .Should()
             .Be(1);
 
+        AssertQuantityQuality(pointsInDocument, 0, CalculatedQuantityQuality.Calculated);
+
         _documentAsserter.IsNotPresent($"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[1]/EnergyQuantity");
 
         _documentAsserter.IsNotPresent("PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[1]/EnergyPrice");
-
-        _documentAsserter.IsNotPresent($"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[1]/QuantityQuality");
 
         return this;
     }
@@ -589,37 +589,30 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
     private void AssertQuantityQuality(
         IList<XElement> pointsInDocument,
         int i,
-        CalculatedQuantityQuality? expectedQuantityQuality)
+        CalculatedQuantityQuality expectedQuantityQuality)
     {
-        if (expectedQuantityQuality != null)
+        var translatedQuantityQuality = expectedQuantityQuality switch
         {
-            var translatedQuantityQuality = expectedQuantityQuality switch
-            {
-                // For WholesaleServices then calculated, estimated and measured is written as calculated
-                CalculatedQuantityQuality.Missing => null,
-                CalculatedQuantityQuality.NotAvailable => null,
-                CalculatedQuantityQuality.Incomplete => EbixCode.QuantityQualityCodeCalculated,
-                CalculatedQuantityQuality.Calculated => EbixCode.QuantityQualityCodeCalculated,
-                CalculatedQuantityQuality.Estimated => EbixCode.QuantityQualityCodeCalculated,
-                CalculatedQuantityQuality.Measured => EbixCode.QuantityQualityCodeCalculated,
-                _ => throw new NotImplementedException(
-                    $"Quantity quality {expectedQuantityQuality} not implemented"),
-            };
+            // For WholesaleServices then calculated, estimated and measured is written as calculated
+            CalculatedQuantityQuality.Missing => null,
+            CalculatedQuantityQuality.NotAvailable => null,
+            CalculatedQuantityQuality.Incomplete => EbixCode.QuantityQualityCodeCalculated,
+            CalculatedQuantityQuality.Calculated => EbixCode.QuantityQualityCodeCalculated,
+            CalculatedQuantityQuality.Estimated => EbixCode.QuantityQualityCodeCalculated,
+            CalculatedQuantityQuality.Measured => EbixCode.QuantityQualityCodeCalculated,
+            _ => throw new NotImplementedException(
+                $"Quantity quality {expectedQuantityQuality} not implemented"),
+        };
 
-            if (translatedQuantityQuality != null)
-            {
-                pointsInDocument[i]
-                    .XPathSelectElement(
-                        _documentAsserter.EnsureXPathHasPrefix("QuantityQuality"),
-                        _documentAsserter.XmlNamespaceManager)!
-                    .Value
-                    .Should()
-                    .Be(translatedQuantityQuality);
-            }
-            else
-            {
-                _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{i + 1}]/QuantityQuality");
-            }
+        if (translatedQuantityQuality != null)
+        {
+            pointsInDocument[i]
+                .XPathSelectElement(
+                    _documentAsserter.EnsureXPathHasPrefix("QuantityQuality"),
+                    _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .Should()
+                .Be(translatedQuantityQuality);
         }
         else
         {
