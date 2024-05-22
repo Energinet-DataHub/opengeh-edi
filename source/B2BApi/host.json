@@ -1,16 +1,21 @@
 {
-    "version": "2.0",
-    "logging": {
-        "applicationInsights": {
-            "samplingSettings": {
-                "isEnabled": true,
-                "excludedTypes": "Request;Exception"
-            }
-        },
-      "logLevel": {
-        "default": "Information",
-        "Energinet.Datahub.Edi": "Information",
-        "Energinet.Datahub.Core": "Information"
-      }
+  "version": "2.0",
+  "extensions": {
+    "durableTask": {
+      "hubName": "%OrchestrationsTaskHubName%"
     }
+  },
+  "logging": {
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true,
+        "excludedTypes": "Request;Exception"
+      }
+    },
+    "logLevel": {
+      "default": "Information",
+      "Energinet.Datahub.Edi": "Information",
+      "Energinet.Datahub.Core": "Information"
+    }
+  }
 }
