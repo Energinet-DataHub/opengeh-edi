@@ -28,7 +28,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
             string businessReason,
             ActorNumber senderId,
             ActorRole senderRole,
-            BundleId assignedBundleId,
+            string messageId,
             IReadOnlyCollection<OutgoingMessage> outgoingMessages,
             MessageId? relatedToMessageId = null)
         {
@@ -38,7 +38,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
             BusinessReason = businessReason;
             SenderId = senderId;
             SenderRole = senderRole;
-            AssignedBundleId = assignedBundleId;
+            MessageId = messageId;
             OutgoingMessages = outgoingMessages;
             RelatedToMessageId = relatedToMessageId;
         }
@@ -61,7 +61,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
         /// </summary>
         public Receiver DocumentReceiver { get; }
 
-        public BundleId AssignedBundleId { get; private set; }
+        public string MessageId { get; }
 
         public MessageId? RelatedToMessageId { get; private set; }
 

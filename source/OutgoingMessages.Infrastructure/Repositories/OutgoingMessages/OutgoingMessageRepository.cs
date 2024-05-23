@@ -47,8 +47,10 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
         _context.OutgoingMessages.Add(message);
     }
 
-    public async Task<OutgoingMessageBundle> GetAsync(BundleId bundleId)
+    public async Task<OutgoingMessageBundle> GetAsync(BundleId bundleId, string? messageId)
     {
+        ArgumentNullException.ThrowIfNull(messageId);
+
         var outgoingMessages = await _context.OutgoingMessages.Where(x => x.AssignedBundleId == bundleId)
             .ToListAsync()
             .ConfigureAwait(false);
@@ -67,7 +69,7 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
             firstMessage.BusinessReason,
             firstMessage.SenderId,
             firstMessage.SenderRole,
-            bundleId,
+            messageId,
             outgoingMessages,
             firstMessage.RelatedToMessageId);
     }

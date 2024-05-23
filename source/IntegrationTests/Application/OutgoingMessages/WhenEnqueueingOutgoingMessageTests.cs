@@ -152,7 +152,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             connection
                 .QuerySingleOrDefaultAsync<Guid>(sql);
 
-        Assert.Equal(result.MessageId, id);
+        Assert.Equal(result.BundleId, id);
     }
 
     [Fact]
@@ -167,7 +167,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             DocumentFormat.Xml);
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(peekRequestDto, CancellationToken.None);
         var dequeueCommand = new DequeueRequestDto(
-            peekResult.MessageId!.Value.ToString(),
+            peekResult.MessageId!,
             message.ReceiverRole,
             message.ReceiverNumber);
 
@@ -436,11 +436,12 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
 
         await connection.ExecuteAsync(
-            @"INSERT INTO [dbo].[Bundles] (Id, ActorMessageQueueId, DocumentTypeInBundle, IsDequeued, IsClosed, MessageCount, MaxMessageCount, BusinessReason, Created, RelatedToMessageId)
-                    VALUES (@Id, @ActorMessageQueueId, @DocumentTypeInBundle, @IsDequeued, @IsClosed, @MessageCount, @MaxMessageCount, @BusinessReason, @Created, @RelatedToMessageId)",
+            @"INSERT INTO [dbo].[Bundles] (Id, MessageId, ActorMessageQueueId, DocumentTypeInBundle, IsDequeued, IsClosed, MessageCount, MaxMessageCount, BusinessReason, Created, RelatedToMessageId)
+                    VALUES (@Id, @MessageId, @ActorMessageQueueId, @DocumentTypeInBundle, @IsDequeued, @IsClosed, @MessageCount, @MaxMessageCount, @BusinessReason, @Created, @RelatedToMessageId)",
             new
             {
                 Id = id,
+                MessageId = EbixUuidFactory.FromGuid(id),
                 ActorMessageQueueId = actorMessageQueueId,
                 DocumentTypeInBundle = documentType.Name,
                 IsDequeued = false,

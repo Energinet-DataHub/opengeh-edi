@@ -113,7 +113,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
             balanceResponsibleParty: balanceResponsibleParty,
             new (string? GridArea, TransactionId TransactionId)[]
             {
-                ("512", TransactionId.From("123564789123564789123564789123564787")),
+                ("512", TransactionId.From("12356478912356478912356478912356478")),
             });
 
         // Act
@@ -185,7 +185,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
                 SettlementMethod: SettlementMethod.Flex,
                 MeteringPointType: MeteringPointType.Consumption,
                 GridAreaCode: "512",
-                OriginalTransactionIdReference: TransactionId.From("123564789123564789123564789123564787"),
+                OriginalTransactionIdReference: TransactionId.From("12356478912356478912356478912356478"),
                 ProductCode: ProductType.EnergyActive.Code,
                 QuantityMeasurementUnit: MeasurementUnit.Kwh,
                 CalculationVersion: GetNow().ToUnixTimeTicks(),
@@ -229,7 +229,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
             balanceResponsibleParty: balanceResponsibleParty,
             new (string? GridArea, TransactionId TransactionId)[]
             {
-                (null, TransactionId.From("123564789123564789123564789123564787")),
+                (null, TransactionId.From("12356478912356478912356478912356478")),
             });
 
         // Act
@@ -308,7 +308,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
                     SettlementMethod: SettlementMethod.Flex,
                     MeteringPointType: MeteringPointType.Consumption,
                     GridAreaCode: seriesRequest.GridArea,
-                    OriginalTransactionIdReference: TransactionId.From("123564789123564789123564789123564787"),
+                    OriginalTransactionIdReference: TransactionId.From("12356478912356478912356478912356478"),
                     ProductCode: ProductType.EnergyActive.Code,
                     QuantityMeasurementUnit: MeasurementUnit.Kwh,
                     CalculationVersion: GetNow().ToUnixTimeTicks(),
@@ -358,7 +358,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
             balanceResponsibleParty: balanceResponsibleOrNull,
             new (string? GridArea, TransactionId TransactionId)[]
             {
-                (gridAreaOrNull, TransactionId.From("123564789123564789123564789123564787")),
+                (gridAreaOrNull, TransactionId.From("12356478912356478912356478912356478")),
             });
 
         // Act
@@ -431,7 +431,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
                 SettlementMethod: SettlementMethod.Flex,
                 MeteringPointType: MeteringPointType.Consumption,
                 GridAreaCode: "512",
-                OriginalTransactionIdReference: TransactionId.From("123564789123564789123564789123564787"),
+                OriginalTransactionIdReference: TransactionId.From("12356478912356478912356478912356478"),
                 ProductCode: ProductType.EnergyActive.Code,
                 QuantityMeasurementUnit: MeasurementUnit.Kwh,
                 CalculationVersion: GetNow().ToUnixTimeTicks(),
@@ -465,9 +465,9 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
 
         var gridAreasWithTransactionId = new (string? GridArea, TransactionId TransactionId)[]
         {
-            ("143", TransactionId.From("123564789123564789123564789123564786")),
-            ("512", TransactionId.From("123564789123564789123564789123564787")),
-            ("877", TransactionId.From("123564789123564789123564789123564788")),
+            ("143", TransactionId.From("12356478912356478912356478912356478")),
+            ("512", TransactionId.From("12356478912356478912356478912356479")),
+            ("877", TransactionId.From("12356478912356478912356478912356470")),
         };
 
         await GivenReceivedAggregatedMeasureDataRequest(

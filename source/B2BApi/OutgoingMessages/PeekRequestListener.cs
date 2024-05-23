@@ -98,7 +98,7 @@ public class PeekRequestListener
                 cancellationToken)
             .ConfigureAwait(false);
 
-        if (peekResult.MessageId is null)
+        if (peekResult.BundleId is null)
         {
             response.StatusCode = HttpStatusCode.NoContent;
             return response;
@@ -112,7 +112,7 @@ public class PeekRequestListener
 
         response.Body = peekResult.Bundle;
         response.Headers.Add("content-type", contentType);
-        response.Headers.Add("MessageId", peekResult.MessageId.ToString());
+        response.Headers.Add("MessageId", peekResult.MessageId);
         response.StatusCode = HttpStatusCode.OK;
         return response;
     }
