@@ -117,6 +117,14 @@ public static class WholesaleServicesResponseEventBuilder
                 ErrorMessage = "Det er kun muligt at anmode om data på for en hel måned i forbindelse med en engrosfiksering eller korrektioner / It is only possible to request data for a full month in relation to wholesalefixing or corrections",
             });
         }
+        else if (request.EnergySupplierId != request.RequestedForActorNumber)
+        {
+            rejectedMessage.RejectReasons.Add(new RejectReason
+            {
+                ErrorCode = "E16",
+                ErrorMessage = "Elleverandør i header og payload stemmer ikke overens / Energysupplier in header and payload must be the same",
+            });
+        }
         else
         {
             throw new NotImplementedException("Cannot generate rejected message for request");
