@@ -435,7 +435,7 @@ public sealed class CalculatedQuantityQualityMapperTests
         }
 
         [Fact]
-        public void Given_nullCollection_When_MapForWholesaleServices_Then_ThrowsArgumentNullException()
+        public void Given_NullCollection_When_MapForWholesaleServices_Then_ThrowsArgumentNullException()
         {
             // Arrange
             ICollection<QuantityQuality>? quality = null;

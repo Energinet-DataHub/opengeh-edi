@@ -169,9 +169,14 @@ public class AmountPerChargeResultProducedV1EventBuilder
         return this;
     }
 
-    internal AmountPerChargeResultProducedV1EventBuilder WithPoint(int position, long? price, long quantity, long sum, AmountPerChargeResultProducedV1.Types.QuantityQuality quality)
+    internal AmountPerChargeResultProducedV1EventBuilder WithPoint(
+        int position,
+        long? price,
+        long quantity,
+        long amount,
+        AmountPerChargeResultProducedV1.Types.QuantityQuality quality)
     {
-        _points.Add((sum, quantity, position, price, quality));
+        _points.Add((amount, quantity, position, price, quality));
         return this;
     }
 
