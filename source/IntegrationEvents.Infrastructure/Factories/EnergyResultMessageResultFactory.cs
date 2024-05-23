@@ -56,7 +56,7 @@ public class EnergyResultMessageResultFactory
             energySupplierNumber: aggregationData.EnergySupplierNumber,
             balanceResponsibleNumber: aggregationData.BalanceResponsibleNumber,
             period: new Period(integrationEvent.PeriodStartUtc.ToInstant(), integrationEvent.PeriodEndUtc.ToInstant()),
-            points: PointsMapper.MapPoints(integrationEvent.TimeSeriesPoints),
+            points: PointsMapper.Map(integrationEvent.TimeSeriesPoints),
             businessReasonName: BusinessReasonMapper.Map(integrationEvent.CalculationType).Name,
             calculationResultVersion: integrationEvent.CalculationResultVersion,
             settlementVersion: SettlementVersionMapper.Map(integrationEvent.CalculationType)?.Name);

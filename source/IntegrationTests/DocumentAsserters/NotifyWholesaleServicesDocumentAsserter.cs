@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Ebix;
+using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 
@@ -88,9 +89,16 @@ public static class NotifyWholesaleServicesDocumentAsserter
 
         var isTotalMonthlyAmount = assertionInput.Points.First().Price is null;
         if (!isTotalMonthlyAmount)
+        {
             asserter.HasPoints(assertionInput.Points);
+        }
         else
-            asserter.HasSinglePointWithAmount(assertionInput.Points.First().Amount);
+        {
+            var quality = assertionInput.Points.First().QuantityQualities.Count != 0
+                ? assertionInput.Points.First().QuantityQualities.Single()
+                : QuantityQuality.Calculated;
+            asserter.HasSinglePointWithAmountAndQuality(assertionInput.Points.First().Amount, quality);
+        }
 
         if (assertionInput.PriceMeasurementUnit is not null)
             asserter.HasPriceMeasurementUnit(assertionInput.PriceMeasurementUnit);

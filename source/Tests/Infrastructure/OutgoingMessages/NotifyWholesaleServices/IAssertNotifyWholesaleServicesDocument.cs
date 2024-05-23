@@ -15,7 +15,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Edi.Responses;
+using Google.Protobuf.Collections;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
@@ -276,10 +278,17 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// </summary>
     IAssertNotifyWholesaleServicesDocument HasPoints(IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points);
 
+    /// <summary>
+    /// Asserts the list of points exists exactly as given in the first series element
+    /// </summary>
+    IAssertNotifyWholesaleServicesDocument HasPoints(IReadOnlyCollection<WholesaleServicesPoint> points);
+
     #endregion
 
     /// <summary>
-    /// Asserts the list of points only contains a single point with the given amount
+    /// Asserts the list of points only contains a single point with the given amount and calculated quality
     /// </summary>
-    IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmount(DecimalValue expectedAmount);
+    IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndQuality(
+        DecimalValue expectedAmount,
+        QuantityQuality quantityQualities);
 }

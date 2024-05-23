@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -100,7 +99,7 @@ public class GivenTotalMonthlyAmountResultProducedV1ReceivedTests : WholesaleSer
                     Price = null,
                     Quantity = null,
                     Amount = Energinet.DataHub.Edi.Responses.DecimalValue.FromDecimal(8888.000008888M),
-                    QuantityQualities = { },
+                    QuantityQualities = { QuantityQuality.Calculated },
                 },
             });
 
@@ -167,7 +166,71 @@ public class GivenTotalMonthlyAmountResultProducedV1ReceivedTests : WholesaleSer
                     Price = null,
                     Quantity = null,
                     Amount = Energinet.DataHub.Edi.Responses.DecimalValue.FromDecimal(8888.000008888M),
-                    QuantityQualities = { },
+                    QuantityQualities = { QuantityQuality.Calculated },
+                },
+            });
+
+        await ThenNotifyWholesaleServicesDocumentIsCorrect(
+            peekResultForEnergySupplier.Bundle,
+            documentFormat,
+            expectedDocumentToEnergySupplier);
+    }
+
+    [Theory]
+    [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
+    public async Task Given_MissingAmount_When_EnergySupplierActorPeeksMessage_Then_ReceivesCorrectNotifyWholesaleServicesDocument(
+        DocumentFormat documentFormat)
+    {
+        // Arrange
+        GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
+
+        var energySupplierId = "5790002243172";
+        var totalMonthlyAmountResultProducedEvent = GivenTotalMonthlyAmountResultProducedV1Event(
+            TotalMonthlyAmountResultProducedV1.Types.CalculationType.WholesaleFixing,
+            periodStart: CreateDateInstant(2023, 12, 31),
+            periodEnd: CreateDateInstant(2024, 01, 31),
+            gridAreaCode: "740",
+            energySupplierId: energySupplierId,
+            chargeOwnerId: null,
+            amount: null);
+
+        await GivenIntegrationEventReceived(totalMonthlyAmountResultProducedEvent);
+
+        // Act
+        var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(ActorNumber.Create(energySupplierId), ActorRole.EnergySupplier, documentFormat);
+
+        // Assert
+        var peekResultForEnergySupplier = peekResultsForEnergySupplier.Should().ContainSingle().Subject;
+        var expectedDocumentToEnergySupplier = new NotifyWholesaleServicesDocumentAssertionInput(
+            Timestamp: "2022-09-07T13:37:05Z",
+            BusinessReasonWithSettlementVersion: new(BusinessReason.WholesaleFixing, null),
+            ReceiverId: "5790002243172",
+            ReceiverRole: ActorRole.EnergySupplier,
+            SenderId: DataHubDetails.DataHubActorNumber.Value,
+            SenderRole: ActorRole.MeteredDataAdministrator,
+            ChargeTypeOwner: null, //ChargeOwner is not allowed in the document for total sum
+            ChargeCode: null,
+            ChargeType: null,
+            Currency: Currency.DanishCrowns,
+            EnergySupplierNumber: "5790002243172",
+            SettlementMethod: null,
+            MeteringPointType: null,
+            GridArea: "740",
+            OriginalTransactionIdReference: null,
+            PriceMeasurementUnit: null,
+            ProductCode: "5790001330590",
+            QuantityMeasurementUnit: MeasurementUnit.Kwh,
+            CalculationVersion: 1,
+            Resolution: Resolution.Monthly,
+            Period: new Period(CreateDateInstant(2023, 12, 31), CreateDateInstant(2024, 01, 31)),
+            Points: new[]
+            {
+                new WholesaleServicesRequestSeries.Types.Point
+                {
+                    Price = null,
+                    Quantity = null,
+                    Amount = Energinet.DataHub.Edi.Responses.DecimalValue.FromDecimal(0),
+                    QuantityQualities = { QuantityQuality.Calculated },
                 },
             });
 
@@ -184,7 +247,7 @@ public class GivenTotalMonthlyAmountResultProducedV1ReceivedTests : WholesaleSer
         string gridAreaCode,
         string energySupplierId,
         string? chargeOwnerId,
-        DecimalValue amount)
+        DecimalValue? amount = null)
     {
         var totalMonthlyAmountResultProducedV1Event = new TotalMonthlyAmountResultProducedV1()
         {
@@ -195,9 +258,13 @@ public class GivenTotalMonthlyAmountResultProducedV1ReceivedTests : WholesaleSer
             GridAreaCode = gridAreaCode,
             EnergySupplierId = energySupplierId,
             Currency = TotalMonthlyAmountResultProducedV1.Types.Currency.Dkk,
-            Amount = amount,
             CalculationResultVersion = 1,
         };
+
+        if (amount != null)
+        {
+            totalMonthlyAmountResultProducedV1Event.Amount = amount;
+        }
 
         if (chargeOwnerId is not null)
             totalMonthlyAmountResultProducedV1Event.ChargeOwnerId = chargeOwnerId;

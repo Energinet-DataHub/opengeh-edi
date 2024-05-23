@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
@@ -49,4 +47,7 @@ public record WholesaleCalculationMarketActivityRecord(
     SettlementMethod? SettlementMethod,
     TransactionId? OriginalTransactionIdReference);
 
+// TODO: CalculatedQuantityQuality is not nullable for "WholesaleServicesPoint".
+// But it is kept nullable, since we might have outgoing messages in the blob storage where CalculatedQuantityQuality is null.
+// Kept for backwards compatibility
 public record Point(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);

@@ -18,12 +18,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using System.Xml.XPath;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.Ebix;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions;
+using Google.Protobuf.Collections;
+using Microsoft.IdentityModel.Tokens;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
@@ -378,65 +382,49 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
 
         for (var i = 0; i < pointsInDocument.Count; i++)
         {
-            pointsInDocument[i]
-                .XPathSelectElement(
-                    _documentAsserter.EnsureXPathHasPrefix("EnergySum"),
-                    _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .ToDecimal()
-                .Should()
-                .Be(expectedPoints[i].Amount.ToDecimal());
+            AssertEnergySum(pointsInDocument, i, expectedPoints[i].Amount.ToDecimal());
 
-            pointsInDocument[i]
-                .XPathSelectElement(
-                    _documentAsserter.EnsureXPathHasPrefix("EnergyQuantity"),
-                    _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .ToDecimal()
-                .Should()
-                .Be(expectedPoints[i].Quantity.ToDecimal());
+            AssertQuantity(pointsInDocument, i, expectedPoints[i].Quantity.ToDecimal());
 
-            pointsInDocument[i]
-                .XPathSelectElement(
-                    _documentAsserter.EnsureXPathHasPrefix("Position"),
-                    _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .ToInt()
-                .Should()
-                .Be(i + 1);
+            AssertPosition(pointsInDocument, i);
 
-            pointsInDocument[i]
-                .XPathSelectElement(
-                    _documentAsserter.EnsureXPathHasPrefix("EnergyPrice"),
-                    _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .ToDecimal()
-                .Should()
-                .Be(expectedPoints[i].Price.ToDecimal());
+            AssertPrice(pointsInDocument, i, expectedPoints[i].Price.ToDecimal());
 
-            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
-            {
-                // For WholesaleServices then calculated, estimated and measured is written as calculated
-                QuantityQuality.Calculated => EbixCode.QuantityQualityCodeCalculated,
-                QuantityQuality.Estimated => EbixCode.QuantityQualityCodeCalculated,
-                QuantityQuality.Measured => EbixCode.QuantityQualityCodeCalculated,
-                _ => throw new NotImplementedException(
-                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
-            };
-
-            pointsInDocument[i]
-                .XPathSelectElement(
-                    _documentAsserter.EnsureXPathHasPrefix("QuantityQuality"),
-                    _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .Should()
-                .Be(expectedQuantityQuality);
+            AssertQuantityQuality(pointsInDocument, i, expectedPoints[i].QuantityQualities.Single());
         }
 
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmount(DecimalValue expectedAmount)
+    public IAssertNotifyWholesaleServicesDocument HasPoints(
+        IReadOnlyCollection<WholesaleServicesPoint> points)
+    {
+        var pointsInDocument = _documentAsserter
+            .GetElements($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation")!;
+
+        pointsInDocument.Should().HaveSameCount(points);
+
+        var expectedPoints = points.OrderBy(p => p.Position).ToList();
+
+        for (var i = 0; i < pointsInDocument.Count; i++)
+        {
+            AssertEnergySum(pointsInDocument, i, expectedPoints[i].Amount);
+
+            AssertQuantity(pointsInDocument, i, expectedPoints[i].Quantity);
+
+            AssertPosition(pointsInDocument, i);
+
+            AssertPrice(pointsInDocument, i, expectedPoints[i].Price);
+
+            AssertQuantityQuality(pointsInDocument, i, expectedPoints[i].QuantityQuality);
+        }
+
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndQuality(
+        DecimalValue expectedAmount,
+        QuantityQuality quantityQualities)
     {
         var pointsInDocument = _documentAsserter
             .GetElements($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation")!;
@@ -461,11 +449,11 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
             .Should()
             .Be(1);
 
+        AssertQuantityQuality(pointsInDocument, 0, quantityQualities);
+
         _documentAsserter.IsNotPresent($"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[1]/EnergyQuantity");
 
         _documentAsserter.IsNotPresent("PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[1]/EnergyPrice");
-
-        _documentAsserter.IsNotPresent($"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[1]/QuantityQuality");
 
         return this;
     }
@@ -553,4 +541,125 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
         ActorNumberType.Eic => EbixDocumentWriter.EicCode,
         _ => throw new ArgumentOutOfRangeException(nameof(actorNumberType), actorNumberType, "Invalid ActorNumberType"),
     };
+
+    private void AssertEnergySum(IList<XElement> pointsInDocument, int i, decimal? expectedAmount)
+    {
+        pointsInDocument[i]
+            .XPathSelectElement(
+                _documentAsserter.EnsureXPathHasPrefix("EnergySum"),
+                _documentAsserter.XmlNamespaceManager)!
+            .Value
+            .ToDecimal()
+            .Should()
+            .Be(expectedAmount);
+    }
+
+    private void AssertQuantity(IList<XElement> pointsInDocument, int i, decimal? expectedQuantity)
+    {
+        pointsInDocument[i]
+            .XPathSelectElement(
+                _documentAsserter.EnsureXPathHasPrefix("EnergyQuantity"),
+                _documentAsserter.XmlNamespaceManager)!
+            .Value
+            .ToDecimal()
+            .Should()
+            .Be(expectedQuantity);
+    }
+
+    private void AssertPosition(IList<XElement> pointsInDocument, int i)
+    {
+        pointsInDocument[i]
+            .XPathSelectElement(
+                _documentAsserter.EnsureXPathHasPrefix("Position"),
+                _documentAsserter.XmlNamespaceManager)!
+            .Value
+            .ToInt()
+            .Should()
+            .Be(i + 1);
+    }
+
+    private void AssertPrice(IList<XElement> pointsInDocument, int i, decimal? expectedPrice)
+    {
+        pointsInDocument[i]
+            .XPathSelectElement(
+                _documentAsserter.EnsureXPathHasPrefix("EnergyPrice"),
+                _documentAsserter.XmlNamespaceManager)!
+            .Value
+            .ToDecimal()
+            .Should()
+            .Be(expectedPrice);
+    }
+
+    private void AssertQuantityQuality(
+        IList<XElement> pointsInDocument,
+        int i,
+        CalculatedQuantityQuality expectedQuantityQuality)
+    {
+        var translatedQuantityQuality = expectedQuantityQuality switch
+        {
+            // For WholesaleServices then calculated, estimated and measured is written as calculated
+            CalculatedQuantityQuality.Missing => null,
+            CalculatedQuantityQuality.NotAvailable => null,
+            CalculatedQuantityQuality.Incomplete => EbixCode.QuantityQualityCodeCalculated,
+            CalculatedQuantityQuality.Calculated => EbixCode.QuantityQualityCodeCalculated,
+            CalculatedQuantityQuality.Estimated => EbixCode.QuantityQualityCodeCalculated,
+            CalculatedQuantityQuality.Measured => EbixCode.QuantityQualityCodeCalculated,
+            _ => throw new NotImplementedException(
+                $"Quantity quality {expectedQuantityQuality} not implemented"),
+        };
+
+        if (translatedQuantityQuality != null)
+        {
+            pointsInDocument[i]
+                .XPathSelectElement(
+                    _documentAsserter.EnsureXPathHasPrefix("QuantityQuality"),
+                    _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .Should()
+                .Be(translatedQuantityQuality);
+        }
+        else
+        {
+            _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{i + 1}]/QuantityQuality");
+        }
+    }
+
+    private void AssertQuantityQuality(
+        IList<XElement> pointsInDocument,
+        int i,
+        QuantityQuality? expectedQuantityQuality)
+    {
+        if (expectedQuantityQuality != null)
+        {
+            var translatedQuantityQuality = expectedQuantityQuality switch
+            {
+                // For WholesaleServices then calculated, estimated and measured is written as calculated
+                QuantityQuality.Missing => null,
+                QuantityQuality.Calculated => EbixCode.QuantityQualityCodeCalculated,
+                QuantityQuality.Estimated => EbixCode.QuantityQualityCodeCalculated,
+                QuantityQuality.Measured => EbixCode.QuantityQualityCodeCalculated,
+                _ => throw new NotImplementedException(
+                    $"Quantity quality {expectedQuantityQuality} not implemented"),
+            };
+
+            if (translatedQuantityQuality != null)
+            {
+                pointsInDocument[i]
+                    .XPathSelectElement(
+                        _documentAsserter.EnsureXPathHasPrefix("QuantityQuality"),
+                        _documentAsserter.XmlNamespaceManager)!
+                    .Value
+                    .Should()
+                    .Be(translatedQuantityQuality);
+            }
+            else
+            {
+                _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{i + 1}]/QuantityQuality");
+            }
+        }
+        else
+        {
+            _documentAsserter.IsNotPresent($"Series[1]/Period/Point[{i + 1}]/QuantityQuality");
+        }
+    }
 }
