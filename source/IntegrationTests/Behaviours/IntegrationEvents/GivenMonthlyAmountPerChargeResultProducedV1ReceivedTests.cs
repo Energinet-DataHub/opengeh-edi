@@ -45,7 +45,7 @@ public class GivenMonthlyAmountPerChargeResultProducedV1ReceivedTests : Wholesal
 #pragma warning restore CS1570 // XML comment has badly formed XML
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
-    public async Task When_ChargeIsNotTaxAndEnergySupplierAndChargeOwnerActorPeeksMessage_Then_ReceivesCorrectNotifyWholesaleServicesDocuments(DocumentFormat documentFormat)
+    public async Task AndGiven_ChargeIsNotTax_When_EnergySupplierAndChargeOwnerActorPeeksMessage_Then_ReceivesCorrectNotifyWholesaleServicesDocuments(DocumentFormat documentFormat)
     {
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
 
@@ -121,7 +121,7 @@ public class GivenMonthlyAmountPerChargeResultProducedV1ReceivedTests : Wholesal
 
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
-    public async Task When_ChargeIsTaxAndEnergySupplierAndGridOwnerActorPeeksMessage_Then_ReceivesCorrectNotifyWholesaleServicesDocument(
+    public async Task AndGiven_ChargeIsTax_When_EnergySupplierAndGridOwnerActorPeeksMessage_Then_ReceivesCorrectNotifyWholesaleServicesDocument(
         DocumentFormat documentFormat)
     {
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
@@ -203,7 +203,7 @@ public class GivenMonthlyAmountPerChargeResultProducedV1ReceivedTests : Wholesal
 
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
-    public async Task When_ChargeIsNotTaxAndChargeOwnerIsSystemOperatorAndEnergySupplierAndSystemOperatorActorPeeksMessage_Then_ReceivesCorrectNotifyWholesaleServicesDocuments(
+    public async Task AndGiven_ChargeIsNotTaxAndChargeOwnerIsSystemOperator_When_EnergySupplierAndSystemOperatorActorPeeksMessage_Then_ReceivesCorrectNotifyWholesaleServicesDocuments(
         DocumentFormat documentFormat)
     {
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
@@ -281,7 +281,7 @@ public class GivenMonthlyAmountPerChargeResultProducedV1ReceivedTests : Wholesal
 
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
-    public async Task When_ChargeIsTaxAndChargeOwnerIsSystemOperatorAndEnergySupplierAndGridOwnerActorPeeksMessage_Then_ReceivesCorrectNotifyWholesaleServicesDocuments(
+    public async Task AndGiven_ChargeIsTaxAndChargeOwnerIsSystemOperator_When_EnergySupplierAndGridOwnerActorPeeksMessage_Then_ReceivesCorrectNotifyWholesaleServicesDocuments(
         DocumentFormat documentFormat)
     {
         // receiver role = EZ
@@ -363,6 +363,77 @@ public class GivenMonthlyAmountPerChargeResultProducedV1ReceivedTests : Wholesal
             assertionInputForGridOperator);
     }
 
+    [Theory]
+    [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
+    public async Task AndGiven_MissingAmount_When_EnergySupplierPeeksMessage_Then_ReceivesCorrectNotifyWholesaleServicesDocuments(
+        DocumentFormat documentFormat)
+    {
+        // receiver role = EZ
+        GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
+
+        // Arrange
+        var gridOwnerActorNumber = ActorNumber.Create("5799999933555");
+        await GivenGridAreaOwnershipAsync("244", gridOwnerActorNumber);
+        var chargeOwner = DataHubDetails.SystemOperatorActorNumber;
+        // -- Maybe this should force a list of properties, instead of using a builder? Then we are forced to always provide each property.
+        var monthlyAmountPerChargeResultProducedEvent = GivenMonthlyAmountPerChargeResultProducedV1Event(
+            periodStart: CreateDateInstant(2022, 09, 06),
+            periodEnd: CreateDateInstant(2022, 09, 07),
+            gridAreaCode: "244",
+            energySupplierId: "5799999933318",
+            chargeOwnerId: chargeOwner.Value,
+            chargeCode: "25361478",
+            chargeType: MonthlyAmountPerChargeResultProducedV1.Types.ChargeType.Tariff,
+            isTax: true,
+            withoutAmount: true);
+
+        await GivenIntegrationEventReceived(monthlyAmountPerChargeResultProducedEvent);
+
+        // Act
+        var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(ActorNumber.Create("5799999933318"), ActorRole.EnergySupplier, documentFormat);
+
+        // Assert
+        var peekResultForEnergySupplier = peekResultsForEnergySupplier.Should().ContainSingle().Subject;
+
+        var assertionInputForEnergySupplier = new NotifyWholesaleServicesDocumentAssertionInput(
+            Timestamp: "2022-09-07T13:37:05Z",
+            BusinessReasonWithSettlementVersion: new(BusinessReason.WholesaleFixing, null),
+            ReceiverId: "5799999933318",
+            ReceiverRole: ActorRole.EnergySupplier,
+            SenderId: DataHubDetails.DataHubActorNumber.Value,
+            SenderRole: ActorRole.MeteredDataAdministrator,
+            ChargeTypeOwner: chargeOwner.Value,
+            ChargeCode: "25361478",
+            ChargeType: ChargeType.Tariff,
+            Currency: Currency.DanishCrowns,
+            EnergySupplierNumber: "5799999933318",
+            SettlementMethod: null,
+            MeteringPointType: null,
+            GridArea: "244",
+            OriginalTransactionIdReference: null,
+            PriceMeasurementUnit: MeasurementUnit.Kwh,
+            ProductCode: "5790001330590",
+            QuantityMeasurementUnit: MeasurementUnit.Kwh,
+            CalculationVersion: 1,
+            Resolution: Resolution.Monthly,
+            Period: new Period(CreateDateInstant(2022, 09, 06), CreateDateInstant(2022, 09, 07)),
+            Points: new[]
+            {
+                new WholesaleServicesRequestSeries.Types.Point
+                {
+                    Price = null,
+                    Quantity = null,
+                    Amount = DecimalValue.FromDecimal(0),
+                    QuantityQualities = { QuantityQuality.Missing },
+                },
+            });
+
+        await ThenNotifyWholesaleServicesDocumentIsCorrect(
+            peekResultForEnergySupplier.Bundle,
+            documentFormat,
+            assertionInputForEnergySupplier);
+    }
+
     private MonthlyAmountPerChargeResultProducedV1 GivenMonthlyAmountPerChargeResultProducedV1Event(
         Instant periodStart,
         Instant periodEnd,
@@ -371,7 +442,8 @@ public class GivenMonthlyAmountPerChargeResultProducedV1ReceivedTests : Wholesal
         string chargeOwnerId,
         string chargeCode,
         MonthlyAmountPerChargeResultProducedV1.Types.ChargeType chargeType,
-        bool isTax)
+        bool isTax,
+        bool withoutAmount = false)
     {
         var monthlyAmountPerChargeResultProducedV1 = new MonthlyAmountPerChargeResultProducedV1()
         {
@@ -387,12 +459,13 @@ public class GivenMonthlyAmountPerChargeResultProducedV1ReceivedTests : Wholesal
             QuantityUnit = MonthlyAmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh,
             EnergySupplierId = energySupplierId,
             Currency = MonthlyAmountPerChargeResultProducedV1.Types.Currency.Dkk,
-            Amount = new Wholesale.Contracts.IntegrationEvents.Common.DecimalValue()
-            {
-                Nanos = 0, Units = 30,
-            },
             CalculationResultVersion = 1,
         };
+        if (!withoutAmount)
+        {
+            monthlyAmountPerChargeResultProducedV1.Amount =
+                new Wholesale.Contracts.IntegrationEvents.Common.DecimalValue() { Nanos = 0, Units = 30, };
+        }
 
         return monthlyAmountPerChargeResultProducedV1;
     }

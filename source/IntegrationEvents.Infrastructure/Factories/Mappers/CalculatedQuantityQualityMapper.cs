@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories.Mappers;
@@ -42,19 +41,22 @@ namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories.Mappe
 ///         <item>
 ///             <description>
 ///                 If the collection contains Estimated, regardless of the other values, it returns
-///                 CalculatedQuantityQuality.Estimated.
+///                 CalculatedQuantityQuality.Estimated for EnergyResultProducedV2.Types.QuantityQuality.
+///                 CalculatedQuantityQuality.Calculated for AmountPerChargeResultProducedV1.Types.QuantityQuality.
 ///             </description>
 ///         </item>
 ///         <item>
 ///             <description>
 ///                 If the collection contains Measured, regardless of the other values, it returns
-///                 CalculatedQuantityQuality.Measured.
+///                 CalculatedQuantityQuality.Measured for EnergyResultProducedV2.Types.QuantityQuality.
+///                 CalculatedQuantityQuality.Calculated for AmountPerChargeResultProducedV1.Types.QuantityQuality.
 ///             </description>
 ///         </item>
 ///         <item>
 ///             <description>
 ///                 If the collection contains Calculated, regardless of the other values, it returns
-///                 CalculatedQuantityQuality.Calculated.
+///                 CalculatedQuantityQuality.Calculated for EnergyResultProducedV2.Types.QuantityQuality.
+///                 CalculatedQuantityQuality.Calculated for AmountPerChargeResultProducedV1.Types.QuantityQuality.
 ///             </description>
 ///         </item>
 ///         <item>
@@ -94,25 +96,6 @@ public static class CalculatedQuantityQualityMapper
     /// <param name="quantityQualities">The collection of quantity qualities to convert.</param>
     /// <returns>The calculated quantity quality based on the input collection.</returns>
     public static CalculatedQuantityQuality QuantityQualityCollectionToEdiQuality(
-        ICollection<QuantityQuality> quantityQualities)
-    {
-        ArgumentNullException.ThrowIfNull(quantityQualities);
-
-        return (missing: quantityQualities.Contains(QuantityQuality.Missing),
-                estimated: quantityQualities.Contains(QuantityQuality.Estimated),
-                measured: quantityQualities.Contains(QuantityQuality.Measured),
-                calculated: quantityQualities.Contains(QuantityQuality.Calculated)) switch
-            {
-                (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality.Missing,
-                (missing: true, _, _, _) => CalculatedQuantityQuality.Incomplete,
-                (_, estimated: true, _, _) => CalculatedQuantityQuality.Estimated,
-                (_, _, measured: true, _) => CalculatedQuantityQuality.Measured,
-                (_, _, _, calculated: true) => CalculatedQuantityQuality.Calculated,
-                _ => CalculatedQuantityQuality.NotAvailable,
-            };
-    }
-
-    public static CalculatedQuantityQuality QuantityQualityCollectionToEdiQuality(
         ICollection<AmountPerChargeResultProducedV1.Types.QuantityQuality> quantityQualities)
     {
         ArgumentNullException.ThrowIfNull(quantityQualities);
@@ -124,8 +107,8 @@ public static class CalculatedQuantityQualityMapper
             {
                 (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality.Missing,
                 (missing: true, _, _, _) => CalculatedQuantityQuality.Incomplete,
-                (_, estimated: true, _, _) => CalculatedQuantityQuality.Estimated,
-                (_, _, measured: true, _) => CalculatedQuantityQuality.Measured,
+                (_, estimated: true, _, _) => CalculatedQuantityQuality.Calculated,
+                (_, _, measured: true, _) => CalculatedQuantityQuality.Calculated,
                 (_, _, _, calculated: true) => CalculatedQuantityQuality.Calculated,
                 _ => CalculatedQuantityQuality.NotAvailable,
             };

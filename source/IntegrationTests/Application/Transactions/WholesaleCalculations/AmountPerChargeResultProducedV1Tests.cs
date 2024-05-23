@@ -31,7 +31,6 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
-using Energinet.DataHub.EDI.Tests.Application.Process.Transactions.Mappers;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -228,6 +227,8 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .WithEnergySupplier(energySupplier)
             .WithChargeCode(chargeCode)
             .WithChargeType(AmountPerChargeResultProducedV1.Types.ChargeType.Fee)
+            // Fees do not have quantity qualities, but the price is relevant for the written quantity quality
+            .WithPoint(1, 2, 3, 6, AmountPerChargeResultProducedV1.Types.QuantityQuality.Missing)
             .WithChargeOwner(chargeOwner)
             .WithQuantityUnit(AmountPerChargeResultProducedV1.Types.QuantityUnit.Kwh)
             .WithIsTax(isTax)
@@ -267,6 +268,9 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.SettlementMethod, SettlementMethod.Flex)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.MeteringPointType, MeteringPointType.Production)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.Resolution, Resolution.Hourly);
+        message.GetMessageValue<WholesaleServicesSeries, IReadOnlyCollection<WholesaleServicesPoint>>(s => s.Points)
+            .Should()
+            .AllSatisfy(p => p.QuantityQuality.Should().Be(CalculatedQuantityQuality.Calculated));
     }
 
     [Theory]
@@ -287,6 +291,43 @@ public class AmountPerChargeResultProducedV1Tests : TestBase
 
         assertOutgoingMessage
             .HasMessageRecordValue<WholesaleServicesSeries>((series) => series.MeteringPointType, expectedMeteringPointType);
+    }
+
+    [Theory]
+    [InlineData(AmountPerChargeResultProducedV1.Types.ChargeType.Fee, 2, AmountPerChargeResultProducedV1.Types.QuantityQuality.Missing, CalculatedQuantityQuality.Calculated)]
+    [InlineData(AmountPerChargeResultProducedV1.Types.ChargeType.Fee, 2, AmountPerChargeResultProducedV1.Types.QuantityQuality.Estimated, CalculatedQuantityQuality.Calculated)]
+    [InlineData(AmountPerChargeResultProducedV1.Types.ChargeType.Fee, 2, AmountPerChargeResultProducedV1.Types.QuantityQuality.Measured, CalculatedQuantityQuality.Calculated)]
+    [InlineData(AmountPerChargeResultProducedV1.Types.ChargeType.Fee, 2, AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated, CalculatedQuantityQuality.Calculated)]
+    [InlineData(AmountPerChargeResultProducedV1.Types.ChargeType.Fee,  null, AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated, CalculatedQuantityQuality.Missing)]
+    [InlineData(AmountPerChargeResultProducedV1.Types.ChargeType.Subscription, 2, AmountPerChargeResultProducedV1.Types.QuantityQuality.Missing, CalculatedQuantityQuality.Calculated)]
+    [InlineData(AmountPerChargeResultProducedV1.Types.ChargeType.Subscription, 2, AmountPerChargeResultProducedV1.Types.QuantityQuality.Estimated, CalculatedQuantityQuality.Calculated)]
+    [InlineData(AmountPerChargeResultProducedV1.Types.ChargeType.Subscription, 2, AmountPerChargeResultProducedV1.Types.QuantityQuality.Measured, CalculatedQuantityQuality.Calculated)]
+    [InlineData(AmountPerChargeResultProducedV1.Types.ChargeType.Subscription, 2, AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated, CalculatedQuantityQuality.Calculated)]
+    [InlineData(AmountPerChargeResultProducedV1.Types.ChargeType.Subscription, null, AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated, CalculatedQuantityQuality.Missing)]
+    [InlineData(AmountPerChargeResultProducedV1.Types.ChargeType.Tariff,  2, AmountPerChargeResultProducedV1.Types.QuantityQuality.Missing, CalculatedQuantityQuality.Missing)]
+    [InlineData(AmountPerChargeResultProducedV1.Types.ChargeType.Tariff, 2, AmountPerChargeResultProducedV1.Types.QuantityQuality.Estimated, CalculatedQuantityQuality.Calculated)]
+    [InlineData(AmountPerChargeResultProducedV1.Types.ChargeType.Tariff, 2, AmountPerChargeResultProducedV1.Types.QuantityQuality.Measured, CalculatedQuantityQuality.Calculated)]
+    [InlineData(AmountPerChargeResultProducedV1.Types.ChargeType.Tariff, 2, AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated, CalculatedQuantityQuality.Calculated)]
+    [InlineData(AmountPerChargeResultProducedV1.Types.ChargeType.Tariff, null, AmountPerChargeResultProducedV1.Types.QuantityQuality.Calculated, CalculatedQuantityQuality.Missing)]
+    public async Task Given_QuantityQualityAndPrice_When_HandlesAmountPerChargeEvent_HasCorrectQuantityQuality(
+        AmountPerChargeResultProducedV1.Types.ChargeType chargeType,
+        int? price,
+        AmountPerChargeResultProducedV1.Types.QuantityQuality quality,
+        CalculatedQuantityQuality expectQuantityQuality)
+    {
+        // Arrange
+        var integrationEvent = _amountPerChargeEventBuilder
+            .WithChargeType(chargeType)
+            .WithPoint(1, price, 3, 6, quality)
+            .Build();
+
+        // Act
+        await HandleIntegrationEventAsync(integrationEvent);
+        var assertOutgoingMessage = await AssertOutgoingMessageAsync();
+
+        // Assert
+        assertOutgoingMessage
+            .HasMessageRecordValue<WholesaleServicesSeries>(series => series.Points.First().QuantityQuality, expectQuantityQuality);
     }
 
     private async Task HandleIntegrationEventAsync(AmountPerChargeResultProducedV1 @event, Guid? eventId = null)

@@ -17,12 +17,15 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using System.Xml.XPath;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions;
+using Google.Protobuf.Collections;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
@@ -358,64 +361,49 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
 
         for (var i = 0; i < pointsInDocument.Count; i++)
         {
-            pointsInDocument[i]
-                .XPathSelectElement(
-                    _documentAsserter.EnsureXPathHasPrefix("energySum_Quantity.quantity"),
-                    _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .ToDecimal()
-                .Should()
-                .Be(expectedPoints[i].Amount.ToDecimal());
+            AssertEnergySum(pointsInDocument, i, expectedPoints[i].Amount.ToDecimal());
 
-            pointsInDocument[i]
-                .XPathSelectElement(
-                    _documentAsserter.EnsureXPathHasPrefix("energy_Quantity.quantity"),
-                    _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .ToDecimal()
-                .Should()
-                .Be(expectedPoints[i].Quantity.ToDecimal());
+            AssertQuantity(pointsInDocument, i, expectedPoints[i].Quantity.ToDecimal());
 
-            pointsInDocument[i]
-                .XPathSelectElement(
-                    _documentAsserter.EnsureXPathHasPrefix("position"),
-                    _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .ToInt()
-                .Should()
-                .Be(i + 1);
+            AssertPosition(pointsInDocument, i);
 
-            pointsInDocument[i]
-                .XPathSelectElement(
-                    _documentAsserter.EnsureXPathHasPrefix("price.amount"),
-                    _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .ToDecimal()
-                .Should()
-                .Be(expectedPoints[i].Price.ToDecimal());
+            AssertPrice(pointsInDocument, i, expectedPoints[i].Price.ToDecimal());
 
-            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
-            {
-                // For WholesaleServices then calculated, estimated and measured is written as calculated
-                QuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,
-                QuantityQuality.Estimated => CimCode.QuantityQualityCodeCalculated,
-                QuantityQuality.Measured => CimCode.QuantityQualityCodeCalculated,
-                _ => throw new NotImplementedException(
-                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
-            };
-            pointsInDocument[i]
-                .XPathSelectElement(
-                    _documentAsserter.EnsureXPathHasPrefix("quality"),
-                    _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .Should()
-                .Be(expectedQuantityQuality);
+            AssertQuantityQuality(pointsInDocument, i, expectedPoints[i].QuantityQualities.Single());
         }
 
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmount(DecimalValue expectedAmount)
+    public IAssertNotifyWholesaleServicesDocument HasPoints(
+        IReadOnlyCollection<WholesaleServicesPoint> points)
+    {
+        var pointsInDocument = _documentAsserter
+            .GetElements("Series[1]/Period/Point")!;
+
+        pointsInDocument.Should().HaveSameCount(points);
+
+        var expectedPoints = points.OrderBy(p => p.Position).ToList();
+
+        for (var i = 0; i < pointsInDocument.Count; i++)
+        {
+            AssertEnergySum(pointsInDocument, i, expectedPoints[i].Amount);
+
+            AssertQuantity(pointsInDocument, i, expectedPoints[i].Quantity);
+
+            AssertPosition(pointsInDocument, i);
+
+            AssertPrice(pointsInDocument, i, expectedPoints[i].Price);
+
+            AssertQuantityQuality(pointsInDocument, i, expectedPoints[i].QuantityQuality);
+        }
+
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndQuality(
+        DecimalValue expectedAmount,
+        QuantityQuality quantityQualities)
     {
         ArgumentNullException.ThrowIfNull(expectedAmount);
         var pointsInDocument = _documentAsserter
@@ -440,11 +428,11 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
             .Should()
             .Be(1);
 
+        AssertQuantityQuality(pointsInDocument, 0, quantityQualities);
+
         _documentAsserter.IsNotPresent("Series[1]/Period/Point[1]/energy_Quantity.quantity");
 
         _documentAsserter.IsNotPresent("Series[1]/Period/Point[1]/price.amount");
-
-        _documentAsserter.IsNotPresent("Series[1]/Period/Point[1]/quality");
 
         return this;
     }
@@ -453,5 +441,112 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
     {
         _documentAsserter.IsNotPresent("Series[1]/settlement_Series.version");
         return this;
+    }
+
+    private void AssertEnergySum(IList<XElement> pointsInDocument, int i, decimal? expectedAmount)
+    {
+        pointsInDocument[i]
+            .XPathSelectElement(
+                _documentAsserter.EnsureXPathHasPrefix("energySum_Quantity.quantity"),
+                _documentAsserter.XmlNamespaceManager)!
+            .Value
+            .ToDecimal()
+            .Should()
+            .Be(expectedAmount);
+    }
+
+    private void AssertQuantity(IList<XElement> pointsInDocument, int i, decimal? expectedQuantity)
+    {
+        pointsInDocument[i]
+            .XPathSelectElement(
+                _documentAsserter.EnsureXPathHasPrefix("energy_Quantity.quantity"),
+                _documentAsserter.XmlNamespaceManager)!
+            .Value
+            .ToDecimal()
+            .Should()
+            .Be(expectedQuantity);
+    }
+
+    private void AssertPosition(IList<XElement> pointsInDocument, int i)
+    {
+        pointsInDocument[i]
+            .XPathSelectElement(
+                _documentAsserter.EnsureXPathHasPrefix("position"),
+                _documentAsserter.XmlNamespaceManager)!
+            .Value
+            .ToInt()
+            .Should()
+            .Be(i + 1);
+    }
+
+    private void AssertPrice(IList<XElement> pointsInDocument, int i, decimal? expectedPrice)
+    {
+        pointsInDocument[i]
+            .XPathSelectElement(
+                _documentAsserter.EnsureXPathHasPrefix("price.amount"),
+                _documentAsserter.XmlNamespaceManager)!
+            .Value
+            .ToDecimal()
+            .Should()
+            .Be(expectedPrice);
+    }
+
+    private void AssertQuantityQuality(
+        IList<XElement> pointsInDocument,
+        int i,
+        CalculatedQuantityQuality expectedQuantityQuality)
+    {
+        var translatedQuantityQuality = expectedQuantityQuality switch
+        {
+            // For WholesaleServices then calculated, estimated and measured is written as calculated
+            CalculatedQuantityQuality.NotAvailable => CimCode.QuantityQualityCodeNotAvailable,
+            CalculatedQuantityQuality.Missing => CimCode.QuantityQualityCodeIncomplete,
+            CalculatedQuantityQuality.Incomplete => CimCode.QuantityQualityCodeIncomplete,
+            CalculatedQuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,
+            CalculatedQuantityQuality.Estimated => CimCode.QuantityQualityCodeCalculated,
+            CalculatedQuantityQuality.Measured => CimCode.QuantityQualityCodeCalculated,
+            _ => throw new NotImplementedException(
+                $"Quantity quality {expectedQuantityQuality} not implemented"),
+        };
+
+        pointsInDocument[i]
+            .XPathSelectElement(
+                _documentAsserter.EnsureXPathHasPrefix("quality"),
+                _documentAsserter.XmlNamespaceManager)!
+            .Value
+            .Should()
+            .Be(translatedQuantityQuality);
+    }
+
+    private void AssertQuantityQuality(
+        IList<XElement> pointsInDocument,
+        int i,
+        QuantityQuality? expectedQuantityQuality)
+    {
+        if (expectedQuantityQuality != null)
+        {
+            var translatedQuantityQuality = expectedQuantityQuality switch
+            {
+                // For WholesaleServices then calculated, estimated and measured is written as calculated
+                QuantityQuality.Missing => CimCode.QuantityQualityCodeIncomplete,
+                QuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,
+                QuantityQuality.Estimated => CimCode.QuantityQualityCodeCalculated,
+                QuantityQuality.Measured => CimCode.QuantityQualityCodeCalculated,
+                _ => throw new NotImplementedException(
+                    $"Quantity quality {expectedQuantityQuality} not implemented"),
+            };
+
+            pointsInDocument[i]
+                .XPathSelectElement(
+                    _documentAsserter.EnsureXPathHasPrefix("quality"),
+                    _documentAsserter.XmlNamespaceManager)!
+                .Value
+                .Should()
+                .Be(translatedQuantityQuality);
+        }
+        else
+        {
+            _documentAsserter.IsNotPresent(_documentAsserter.EnsureXPathHasPrefix("quality"));
+        }
     }
 }
