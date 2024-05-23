@@ -79,13 +79,13 @@ public record WholesaleServicesTotalSumSeries(
     MeasurementUnit QuantityMeasureUnit,
     Currency Currency,
     Resolution Resolution,
-    decimal Amount) : WholesaleServicesSeries(
+    decimal? Amount) : WholesaleServicesSeries(
     TransactionId: TransactionId,
     CalculationVersion: CalculationVersion,
     GridAreaCode: GridAreaCode,
     ChargeCode: null,
     IsTax: false,
-    Points: new[] { new WholesaleServicesPoint(1, null, null, Amount, null), },
+    Points: new[] { new WholesaleServicesPoint(1, null, null, Amount, CalculatedQuantityQuality.Calculated), },
     EnergySupplier: EnergySupplier,
     ChargeOwner: null,
     Period: Period,

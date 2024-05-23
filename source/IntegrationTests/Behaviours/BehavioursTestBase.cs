@@ -33,7 +33,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyIn
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
@@ -57,7 +57,6 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Google.Protobuf;
 using MediatR;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -66,9 +65,7 @@ using Microsoft.Extensions.Logging;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
-using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
-using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 

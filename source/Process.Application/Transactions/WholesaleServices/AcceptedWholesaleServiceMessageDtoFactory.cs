@@ -55,7 +55,7 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
             GridAreaCode: acceptedWholesaleServices.GridArea,
             ChargeCode: acceptedWholesaleServices.ChargeCode,
             IsTax: false,
-            Points: PointsMapper.MapPoints(acceptedWholesaleServices.Points),
+            Points: PointsMapper.Map(acceptedWholesaleServices.Points),
             EnergySupplier: acceptedWholesaleServices.EnergySupplierId,
             ChargeOwner: acceptedWholesaleServices.ChargeOwnerId,
             Period: new Period(acceptedWholesaleServices.StartOfPeriod, acceptedWholesaleServices.EndOfPeriod),

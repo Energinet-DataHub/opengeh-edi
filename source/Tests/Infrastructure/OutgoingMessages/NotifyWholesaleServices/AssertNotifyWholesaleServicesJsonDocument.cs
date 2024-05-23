@@ -23,8 +23,10 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
+using Google.Protobuf.Collections;
 using Json.Schema;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
@@ -590,54 +592,56 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
         for (var i = 0; i < pointsInDocument.Count; i++)
         {
-            pointsInDocument[i]
-                .GetProperty("energySum_Quantity.quantity")
-                .GetDecimal()
-                .Should()
-                .Be(expectedPoints[i].Amount.ToDecimal());
+            AssertEnergySum(pointsInDocument, i, expectedPoints[i].Amount.ToDecimal());
 
-            pointsInDocument[i]
-                .GetProperty("energy_Quantity.quantity")
-                .GetDecimal()
-                .Should()
-                .Be(expectedPoints[i].Quantity.ToDecimal());
+            AssertQuantity(pointsInDocument, i, expectedPoints[i].Quantity.ToDecimal());
 
-            pointsInDocument[i]
-                .GetProperty("position")
-                .GetProperty("value")
-                .GetInt32()
-                .Should()
-                .Be(i + 1);
+            AssertPosition(pointsInDocument, i);
 
-            pointsInDocument[i]
-                .GetProperty("price.amount")
-                .GetProperty("value")
-                .GetDecimal()
-                .Should()
-                .Be(expectedPoints[i].Price.ToDecimal());
+            AssertPrice(pointsInDocument, i, expectedPoints[i].Price.ToDecimal());
 
-            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
-            {
-                // For WholesaleServices then calculated, estimated and measured is written as calculated
-                QuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,
-                QuantityQuality.Estimated => CimCode.QuantityQualityCodeCalculated,
-                QuantityQuality.Measured => CimCode.QuantityQualityCodeCalculated,
-                _ => throw new NotImplementedException(
-                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
-            };
-
-            pointsInDocument[i]
-                .GetProperty("quality")
-                .GetProperty("value")
-                .GetString()
-                .Should()
-                .Be(expectedQuantityQuality);
+            AssertQuantityQuality(pointsInDocument, i, expectedPoints[i].QuantityQualities.Single());
         }
 
         return this;
     }
 
-    public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmount(DecimalValue expectedAmount)
+    public IAssertNotifyWholesaleServicesDocument HasPoints(
+        IReadOnlyCollection<WholesaleServicesPoint> points)
+    {
+        var pointsInDocument = FirstWholesaleSeriesElement()
+            .GetProperty("Period")
+            .GetProperty("Point")
+            .EnumerateArray()
+            .OrderBy(
+                p => p.GetProperty("position")
+                    .GetProperty("value")
+                    .GetInt32())
+            .ToList();
+
+        pointsInDocument.Should().HaveSameCount(points);
+
+        var expectedPoints = points.OrderBy(p => p.Position).ToList();
+
+        for (var i = 0; i < pointsInDocument.Count; i++)
+        {
+            AssertEnergySum(pointsInDocument, i, expectedPoints[i].Amount);
+
+            AssertQuantity(pointsInDocument, i, expectedPoints[i].Quantity);
+
+            AssertPosition(pointsInDocument, i);
+
+            AssertPrice(pointsInDocument, i, expectedPoints[i].Price);
+
+            AssertQuantityQuality(pointsInDocument, i, expectedPoints[i].QuantityQuality);
+        }
+
+        return this;
+    }
+
+    public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndQuality(
+        DecimalValue expectedAmount,
+        QuantityQuality quantityQualities)
     {
         ArgumentNullException.ThrowIfNull(expectedAmount);
         var pointsInDocument = FirstWholesaleSeriesElement()
@@ -664,6 +668,8 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
             .Should()
             .Be(1);
 
+        AssertQuantityQuality(pointsInDocument, 0, quantityQualities);
+
         FirstWholesaleSeriesElement()
             .TryGetProperty("energy_Quantity.quantity", out _)
             .Should()
@@ -671,11 +677,6 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
         FirstWholesaleSeriesElement()
             .TryGetProperty("price.amount", out _)
-            .Should()
-            .BeFalse();
-
-        FirstWholesaleSeriesElement()
-            .TryGetProperty("quality", out _)
             .Should()
             .BeFalse();
 
@@ -689,6 +690,104 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
             .Should()
             .BeFalse();
         return this;
+    }
+
+    private static void AssertEnergySum(List<JsonElement> pointsInDocument, int i, decimal? expectedAmount)
+    {
+        pointsInDocument[i]
+            .GetProperty("energySum_Quantity.quantity")
+            .GetDecimal()
+            .Should()
+            .Be(expectedAmount);
+    }
+
+    private static void AssertQuantity(List<JsonElement> pointsInDocument, int i, decimal? expectedQuantity)
+    {
+        pointsInDocument[i]
+            .GetProperty("energy_Quantity.quantity")
+            .GetDecimal()
+            .Should()
+            .Be(expectedQuantity);
+    }
+
+    private static void AssertPosition(List<JsonElement> pointsInDocument, int i)
+    {
+        pointsInDocument[i]
+            .GetProperty("position")
+            .GetProperty("value")
+            .GetInt32()
+            .Should()
+            .Be(i + 1);
+    }
+
+    private static void AssertPrice(List<JsonElement> pointsInDocument, int i, decimal? expectedPrice)
+    {
+        pointsInDocument[i]
+            .GetProperty("price.amount")
+            .GetProperty("value")
+            .GetDecimal()
+            .Should()
+            .Be(expectedPrice);
+    }
+
+    private static void AssertQuantityQuality(
+        List<JsonElement> pointsInDocument,
+        int i,
+        CalculatedQuantityQuality expectedQuantityQuality)
+    {
+        var translatedQuantityQuality = expectedQuantityQuality switch
+        {
+            // For WholesaleServices then calculated, estimated and measured is written as calculated
+            CalculatedQuantityQuality.NotAvailable => CimCode.QuantityQualityCodeNotAvailable,
+            CalculatedQuantityQuality.Missing => CimCode.QuantityQualityCodeIncomplete,
+            CalculatedQuantityQuality.Incomplete => CimCode.QuantityQualityCodeIncomplete,
+            CalculatedQuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,
+            CalculatedQuantityQuality.Estimated => CimCode.QuantityQualityCodeCalculated,
+            CalculatedQuantityQuality.Measured => CimCode.QuantityQualityCodeCalculated,
+            _ => throw new NotImplementedException(
+                $"Quantity quality {expectedQuantityQuality} not implemented"),
+        };
+
+        pointsInDocument[i]
+            .GetProperty("quality")
+            .GetProperty("value")
+            .GetString()
+            .Should()
+            .Be(translatedQuantityQuality);
+    }
+
+    private static void AssertQuantityQuality(
+        List<JsonElement> pointsInDocument,
+        int i,
+        QuantityQuality? expectedQuantityQuality)
+    {
+        if (expectedQuantityQuality != null)
+        {
+            var translatedQuantityQuality = expectedQuantityQuality switch
+            {
+                // For WholesaleServices then calculated, estimated and measured is written as calculated
+                QuantityQuality.Missing => CimCode.QuantityQualityCodeIncomplete,
+                QuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,
+                QuantityQuality.Estimated => CimCode.QuantityQualityCodeCalculated,
+                QuantityQuality.Measured => CimCode.QuantityQualityCodeCalculated,
+                _ => throw new NotImplementedException(
+                    $"Quantity quality {expectedQuantityQuality} not implemented"),
+            };
+
+            pointsInDocument[i]
+                .GetProperty("quality")
+                .GetProperty("value")
+                .GetString()
+                .Should()
+                .Be(translatedQuantityQuality);
+        }
+        else
+        {
+            pointsInDocument[i]
+                .TryGetProperty("quality", out _)
+                .Should()
+                .BeFalse();
+        }
     }
 
     private JsonElement FirstWholesaleSeriesElement()

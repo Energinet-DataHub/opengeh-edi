@@ -150,7 +150,7 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
 
     private static CalculatedQuantityQuality MapQuality(ICollection<QuantityQuality> quantityQualities)
     {
-        return CalculatedQuantityQualityMapper.Map(quantityQualities);
+        return CalculatedQuantityQualityMapper.MapForEnergyResults(quantityQualities);
     }
 
     private static decimal? Parse(DecimalValue? input)

@@ -36,7 +36,7 @@ public class AcceptedWholesaleServicesSeriesBuilder
     private readonly ChargeType _chargeType = ChargeType.Fee;
     private readonly ActorNumber _chargeOwner = ActorNumber.Create("1234567897777");
     private readonly TransactionId _originalTransactionIdReference = TransactionId.New();
-    private readonly List<WholesaleServicesPoint> _points = new() { new(1, 100, 100, 100, null) };
+    private readonly List<WholesaleServicesPoint> _points = new() { new(1, 100, 100, 100, CalculatedQuantityQuality.Missing) };
     private readonly Currency _currency = Currency.DanishCrowns;
     private readonly Period _period = new(Instant.FromUtc(2023, 11, 1, 0, 0), Instant.FromUtc(2023, 12, 1, 0, 0));
     private SettlementVersion? _settlementVersion;

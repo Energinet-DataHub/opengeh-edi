@@ -14,6 +14,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
@@ -177,7 +178,9 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.PriceMeasureUnit, MeasurementUnit.Kwh)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.Currency, Currency.DanishCrowns)
             .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.ChargeType, ChargeType.Fee)
-            .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.Resolution, Resolution.Monthly);
+            .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.Resolution, Resolution.Monthly)
+            .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.Points.Count, 1)
+            .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.Points.First().QuantityQuality, CalculatedQuantityQuality.Calculated);
     }
 
     [Fact]
@@ -195,7 +198,8 @@ public class MonthlyAmountPerChargeResultProducedV1Tests : TestBase
         // Assert
         var message = await AssertOutgoingMessageAsync(businessReason: BusinessReason.Correction);
         message
-            .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.SettlementVersion, SettlementVersion.FirstCorrection);
+            .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.SettlementVersion, SettlementVersion.FirstCorrection)
+            .HasMessageRecordValue<WholesaleServicesSeries>(wholesaleCalculation => wholesaleCalculation.Points.First().QuantityQuality, CalculatedQuantityQuality.Missing);
     }
 
     [Fact]
