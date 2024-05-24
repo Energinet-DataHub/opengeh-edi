@@ -34,6 +34,13 @@ internal class EnqueueMessagesOrchestration
         }
 
         await context.CallActivityAsync(
+            nameof(EnqueueMessagesActivity),
+            new EnqueueMessagesInput(
+                input.CalculationId,
+                input.CalculationVersion,
+                input.CalculationType));
+
+        await context.CallActivityAsync(
             nameof(SendMessagesEnqueuedActivity),
             new SendMessagesEnqueuedInput(
                 context.InstanceId,
