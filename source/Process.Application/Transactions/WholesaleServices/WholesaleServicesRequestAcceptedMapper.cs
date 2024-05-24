@@ -42,24 +42,24 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         ArgumentNullException.ThrowIfNull(wholesaleServicesRequestAccepted);
 
         var acceptedWholesaleServicesSeries = new List<AcceptedWholesaleServicesSerieDto>();
-        foreach (var aggregation in wholesaleServicesRequestAccepted.Series)
+        foreach (var wholesaleSeries in wholesaleServicesRequestAccepted.Series)
         {
             acceptedWholesaleServicesSeries.Add(new AcceptedWholesaleServicesSerieDto(
-                MapPoints(aggregation.TimeSeriesPoints),
-                MapMeteringPointType(aggregation.MeteringPointType),
-                MapResolution(aggregation.Resolution),
-                MapChargeType(aggregation.ChargeType),
-                MapMeasurementUnit(aggregation.QuantityUnit),
-                SettlementVersion: MapSettlementVersion(aggregation.CalculationType),
-                MapSettlementMethod(aggregation.SettlementMethod),
-                MapCurrency(aggregation.Currency),
-                ActorNumber.Create(aggregation.ChargeOwnerId),
-                ActorNumber.Create(aggregation.EnergySupplierId),
-                aggregation.GridArea,
-                aggregation.ChargeCode,
-                aggregation.Period.StartOfPeriod.ToInstant(),
-                aggregation.Period.EndOfPeriod.ToInstant(),
-                aggregation.CalculationResultVersion));
+                MapPoints(wholesaleSeries.TimeSeriesPoints),
+                MapMeteringPointType(wholesaleSeries.MeteringPointType),
+                MapResolution(wholesaleSeries.Resolution),
+                MapChargeType(wholesaleSeries.ChargeType),
+                MapMeasurementUnit(wholesaleSeries.QuantityUnit),
+                SettlementVersion: MapSettlementVersion(wholesaleSeries.CalculationType),
+                MapSettlementMethod(wholesaleSeries.SettlementMethod),
+                MapCurrency(wholesaleSeries.Currency),
+                ActorNumber.Create(wholesaleSeries.ChargeOwnerId),
+                ActorNumber.Create(wholesaleSeries.EnergySupplierId),
+                wholesaleSeries.GridArea,
+                wholesaleSeries.ChargeCode,
+                wholesaleSeries.Period.StartOfPeriod.ToInstant(),
+                wholesaleSeries.Period.EndOfPeriod.ToInstant(),
+                wholesaleSeries.CalculationResultVersion));
         }
 
         return Task.FromResult<INotification>(new WholesaleServicesRequestWasAccepted(
@@ -148,6 +148,18 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         {
             WholesaleServicesRequestSeries.Types.MeteringPointType.Production => MeteringPointType.Production,
             WholesaleServicesRequestSeries.Types.MeteringPointType.Consumption => MeteringPointType.Consumption,
+            WholesaleServicesRequestSeries.Types.MeteringPointType.VeProduction => MeteringPointType.VeProduction,
+            WholesaleServicesRequestSeries.Types.MeteringPointType.NetProduction => MeteringPointType.NetProduction,
+            WholesaleServicesRequestSeries.Types.MeteringPointType.SupplyToGrid => MeteringPointType.SupplyToGrid,
+            WholesaleServicesRequestSeries.Types.MeteringPointType.ConsumptionFromGrid => MeteringPointType.ConsumptionFromGrid,
+            WholesaleServicesRequestSeries.Types.MeteringPointType.WholesaleServicesInformation => MeteringPointType.WholesaleServicesInformation,
+            WholesaleServicesRequestSeries.Types.MeteringPointType.OwnProduction => MeteringPointType.OwnProduction,
+            WholesaleServicesRequestSeries.Types.MeteringPointType.NetFromGrid => MeteringPointType.NetFromGrid,
+            WholesaleServicesRequestSeries.Types.MeteringPointType.NetToGrid => MeteringPointType.NetToGrid,
+            WholesaleServicesRequestSeries.Types.MeteringPointType.TotalConsumption => MeteringPointType.TotalConsumption,
+            WholesaleServicesRequestSeries.Types.MeteringPointType.ElectricalHeating => MeteringPointType.ElectricalHeating,
+            WholesaleServicesRequestSeries.Types.MeteringPointType.NetConsumption => MeteringPointType.NetConsumption,
+            WholesaleServicesRequestSeries.Types.MeteringPointType.EffectSettlement => MeteringPointType.EffectSettlement,
             WholesaleServicesRequestSeries.Types.MeteringPointType.Unspecified => null,
             _ => throw new InvalidOperationException("Unknown metering point type"),
         };
