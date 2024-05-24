@@ -31,14 +31,14 @@ internal class EnqueueMessagesActivity(
         [ActivityTrigger] EnqueueMessagesInput input)
     {
         // TODO: Decide "view" based on calculation type
-        var modelName = "x";
-        var tableName = "y";
+        var modelName = "wholesale_edi_results";
+        var tableName = "energy_result_points_per_ga_v1";
 
         // TODO:
         // Instead of a raw sql statement, we can encapsulate queries by inheriting from "DatabricksStatement".
         // See example "EnergyResultQueryStatement" in Wholesale
         var statement = DatabricksStatement
-            .FromRawSql($"SELECT * FROM {modelName}.{tableName}")
+            .FromRawSql($"SELECT * FROM {modelName}.{tableName} WHERE calculation_id = '{input.CalculationId}'")
             .Build();
 
         // TODO: What format is best? Json / Arrow ?
