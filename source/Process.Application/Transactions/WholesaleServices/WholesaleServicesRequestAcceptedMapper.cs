@@ -15,6 +15,7 @@
 using System.Collections.ObjectModel;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
+using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Mappers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.Edi.Responses;
@@ -46,7 +47,7 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         {
             acceptedWholesaleServicesSeries.Add(new AcceptedWholesaleServicesSerieDto(
                 MapPoints(wholesaleSeries.TimeSeriesPoints),
-                MapMeteringPointType(wholesaleSeries.MeteringPointType),
+                MeteringPointTypeMapper.Map(wholesaleSeries.MeteringPointType),
                 MapResolution(wholesaleSeries.Resolution),
                 MapChargeType(wholesaleSeries.ChargeType),
                 MapMeasurementUnit(wholesaleSeries.QuantityUnit),
@@ -139,29 +140,6 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
             WholesaleServicesRequestSeries.Types.Resolution.Monthly => Resolution.Monthly,
             WholesaleServicesRequestSeries.Types.Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution"),
             _ => throw new InvalidOperationException("Unknown resolution"),
-        };
-    }
-
-    private static MeteringPointType? MapMeteringPointType(WholesaleServicesRequestSeries.Types.MeteringPointType meteringPointType)
-    {
-        return meteringPointType switch
-        {
-            WholesaleServicesRequestSeries.Types.MeteringPointType.Production => MeteringPointType.Production,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.Consumption => MeteringPointType.Consumption,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.VeProduction => MeteringPointType.VeProduction,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.NetProduction => MeteringPointType.NetProduction,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.SupplyToGrid => MeteringPointType.SupplyToGrid,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.ConsumptionFromGrid => MeteringPointType.ConsumptionFromGrid,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.WholesaleServicesInformation => MeteringPointType.WholesaleServicesInformation,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.OwnProduction => MeteringPointType.OwnProduction,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.NetFromGrid => MeteringPointType.NetFromGrid,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.NetToGrid => MeteringPointType.NetToGrid,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.TotalConsumption => MeteringPointType.TotalConsumption,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.ElectricalHeating => MeteringPointType.ElectricalHeating,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.NetConsumption => MeteringPointType.NetConsumption,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.EffectSettlement => MeteringPointType.EffectSettlement,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.Unspecified => null,
-            _ => throw new InvalidOperationException("Unknown metering point type"),
         };
     }
 

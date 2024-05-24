@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories.Mappers;
+using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Xunit;
 
@@ -42,4 +43,12 @@ public class MeteringPointTypeMapperTests : BaseEnumMapperTests
             () => MeteringPointTypeMapper.Map(value),
             value,
             unspecifiedValue: AmountPerChargeResultProducedV1.Types.MeteringPointType.Unspecified);
+
+    [Theory]
+    [MemberData(nameof(GetEnumValues), typeof(WholesaleServicesRequestSeries.Types.MeteringPointType))]
+    public void Given_WholesaleServiceMeteringPointType_When_Mapping_Then_HandlesExceptedValues(
+        WholesaleServicesRequestSeries.Types.MeteringPointType value)
+        => EnsureCanMapOrReturnsNull(
+            () => Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Mappers.MeteringPointTypeMapper.Map(value),
+            value);
 }
