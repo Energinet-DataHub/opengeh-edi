@@ -2,8 +2,8 @@
 
 As of right now, the following naming convention is [automatically enforced](./Behaviours/MetaTests.cs) for tests
 located in the `Behaviours` folder.
-But not for tests located outside of this folder, it is therefore up to the individual to enfore the descriped
-guidelines/convention
+It is not enforced for tests located outside of this particular folder, and it is thus the responsibility of the
+developer to enforce and adhere to the following guidelines.
 
 ## Tests structure
 
@@ -24,13 +24,20 @@ public static void Given_ImportantVariable_When_AlteringImportantVariable_Then_I
 }
 ```
 
-That is. Most, if not all, of the variable are defined as the first thing.
+That is, we are adhering to the well-established "Arrange, Act, and Assert"-pattern (AAA, 3As, ...).
+There exists a plethora of information and guidelines regarding AAA, but for the uninitiated, it can be summarised as:
 
-Hereafter executing the method(s) one wants to test. Save the return value in a variable with a descriptive name,
-if this is not doable use `actual` as the variable name.
+- In the arrange section, you bring the system under test (SUT) and its dependencies to a desired state
+- In the act section, you call methods on the SUT, pass the prepared dependencies, and capture the output value (if any)
+- In the assert section, you verify the outcome. The outcome may be represented by a return value, the final state of
+  the SUT and its collaborators, or the methods the SUT called on those collaborators
 
-Then the assertions begin.
-When asserting it is preferred to use `FluentAssertion` and make use of `AssertionScope()`, as in the example above.
+We have a few EDI-specific conventions, in addition to the established AAA conventions:
+
+If no suitable name can be given to the return value, actual or result are good fallback values
+When doing assertions, we much prefer the usage of `FluentAssertion` and the utilisation of `AssertionScope`.
+This is to ensure the assertions are readable, gives good error messages, and that a given test return all errors
+immediately.
 
 ## Naming the tests
 
@@ -38,7 +45,7 @@ The structure described in the [section above](#tests-structure) give rise to th
 schema `Given_XXX_When_YYY_Then_ZZZ`.
 Where:
 
-`XXX` states the important variables (Related to the `//Arrange` section of the test).
+`XXX` states the important set-up (Related to the `//Arrange` section of the test).
 
 `YYY` is the action or a description of the action that is tested (Related to the `//Act` section of the test).
 
@@ -46,20 +53,19 @@ Where:
 
 ### Alternative test naming
 
-If one from whatever reason should follow another naming convention than stated in the [naming section](#naming-the-tests) one should add the `[ExcludeFromNameConventionCheck]` attribute to the test. As is done in the following example:
+If, for whatever (good) reason, one desire to deviate from the [naming section](#naming-the-tests), one should utilise
+the [ExcludeFromNameConventionCheck] attribute.
+This should however not be done lightly, and adding the justification in a comment to the test is recommended.
+Eg:
 
 ```cs
+    // Some sort of justification in the form of a comment, summary or the like.
     [ExcludeFromNameConventionCheck]
     public static void ThisDoesNotSatisfyTheNamingConventionFact()
     {
         
     }
 ```
-
-Which serves two purposes.
-
-- Firstly: That the test is excluded for the [naming convention check](./Behaviours/MetaTests.cs).
-- Secondly: It makes it clear that one purposely did not follow the naming convention. And hopefully has a good reason for doing so.  
 
 ## Folder structure
 
