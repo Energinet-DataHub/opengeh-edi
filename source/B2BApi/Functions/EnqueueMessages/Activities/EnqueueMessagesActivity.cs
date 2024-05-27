@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
-using Energinet.DataHub.Core.Databricks.SqlStatementExecution.Formats;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
@@ -22,29 +22,22 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 // TODO: Decide where code for accessing DataLake should be placed; for now I'm just writing it as plain code within the activity.
 // TODO: Decide if we need to reference NuGet package "Energinet.DataHub.Core.Databricks.SqlStatementExecution" directly here, or not.
 internal class EnqueueMessagesActivity(
-    DatabricksSqlWarehouseQueryExecutor warehouseQueryExecutor)
+    IOutgoingMessagesClient outgoingMessagesClient,
+    EnergyResultEnumerator energyResultEnumerator)
 {
-    private readonly DatabricksSqlWarehouseQueryExecutor _warehouseQueryExecutor = warehouseQueryExecutor;
+    private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
+
+    // TODO: Decide "view" (and hence enumerator) based on calculation type
+    private readonly EnergyResultEnumerator _energyResultEnumerator = energyResultEnumerator;
 
     [Function(nameof(EnqueueMessagesActivity))]
     public async Task Run(
         [ActivityTrigger] EnqueueMessagesInput input)
     {
-        // TODO: Decide "view" based on calculation type
-        var modelName = "wholesale_edi_results";
-        var tableName = "energy_result_points_per_ga_v1";
-
-        // TODO:
-        // Instead of a raw sql statement, we can encapsulate queries by inheriting from "DatabricksStatement".
-        // See example "EnergyResultQueryStatement" in Wholesale
-        var statement = DatabricksStatement
-            .FromRawSql($"SELECT * FROM {modelName}.{tableName} WHERE calculation_id = '{input.CalculationId}'")
-            .Build();
-
-        // TODO: What format is best? Json / Arrow ?
-        await foreach (var nextRow in _warehouseQueryExecutor.ExecuteStatementAsync(statement, Format.JsonArray))
+        var calculationId = Guid.Parse(input.CalculationId);
+        await foreach (var nextMessage in _energyResultEnumerator.GetAsync(calculationId))
         {
-            // TODO: Parse/map data from row into "Outgoing message" type and send to processor
+            await _outgoingMessagesClient.EnqueueAndCommitAsync(nextMessage, CancellationToken.None);
         }
     }
 }
