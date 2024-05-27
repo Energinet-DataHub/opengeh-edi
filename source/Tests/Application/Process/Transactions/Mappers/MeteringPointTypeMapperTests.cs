@@ -48,7 +48,9 @@ public class MeteringPointTypeMapperTests : BaseEnumMapperTests
     [MemberData(nameof(GetEnumValues), typeof(WholesaleServicesRequestSeries.Types.MeteringPointType))]
     public void Given_WholesaleServiceMeteringPointType_When_Mapping_Then_HandlesExceptedValues(
         WholesaleServicesRequestSeries.Types.MeteringPointType value)
-        => EnsureCanMapOrReturnsNull(
-            () => Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Mappers.MeteringPointTypeMapper.Map(value),
-            value);
+        => EnsureCanMapOrThrows(
+            () => Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Mappers
+                .MeteringPointTypeMapper.Map(value),
+            value,
+            unspecifiedValue: WholesaleServicesRequestSeries.Types.MeteringPointType.Unspecified);
 }

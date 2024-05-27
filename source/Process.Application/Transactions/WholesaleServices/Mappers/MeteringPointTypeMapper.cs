@@ -19,7 +19,7 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServic
 
 public static class MeteringPointTypeMapper
 {
-    public static MeteringPointType? Map(WholesaleServicesRequestSeries.Types.MeteringPointType meteringPointType)
+    public static MeteringPointType Map(WholesaleServicesRequestSeries.Types.MeteringPointType meteringPointType)
     {
         return meteringPointType switch
         {
@@ -37,7 +37,7 @@ public static class MeteringPointTypeMapper
             WholesaleServicesRequestSeries.Types.MeteringPointType.ElectricalHeating => MeteringPointType.ElectricalHeating,
             WholesaleServicesRequestSeries.Types.MeteringPointType.NetConsumption => MeteringPointType.NetConsumption,
             WholesaleServicesRequestSeries.Types.MeteringPointType.EffectSettlement => MeteringPointType.EffectSettlement,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.Unspecified => null,
+            WholesaleServicesRequestSeries.Types.MeteringPointType.Unspecified => throw new InvalidOperationException("Unknown metering point type"),
             _ => throw new ArgumentOutOfRangeException(nameof(meteringPointType), meteringPointType, "Unknown metering point type"),
         };
     }

@@ -47,7 +47,7 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         {
             acceptedWholesaleServicesSeries.Add(new AcceptedWholesaleServicesSerieDto(
                 MapPoints(wholesaleSeries.TimeSeriesPoints),
-                MeteringPointTypeMapper.Map(wholesaleSeries.MeteringPointType),
+                MapMeteringPointType(wholesaleSeries),
                 MapResolution(wholesaleSeries.Resolution),
                 MapChargeType(wholesaleSeries.ChargeType),
                 MapMeasurementUnit(wholesaleSeries.QuantityUnit),
@@ -67,6 +67,14 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
             eventId,
             referenceId,
             acceptedWholesaleServicesSeries));
+    }
+
+    private static MeteringPointType? MapMeteringPointType(WholesaleServicesRequestSeries wholesaleSeries)
+    {
+        // Monthly sum does not have a metering point type
+        if (wholesaleSeries.HasMeteringPointType)
+            return MeteringPointTypeMapper.Map(wholesaleSeries.MeteringPointType);
+        return null;
     }
 
     private static SettlementVersion? MapSettlementVersion(
