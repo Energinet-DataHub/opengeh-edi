@@ -15,6 +15,7 @@
 using System.Collections.ObjectModel;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
+using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Mappers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.Edi.Responses;
@@ -42,30 +43,38 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         ArgumentNullException.ThrowIfNull(wholesaleServicesRequestAccepted);
 
         var acceptedWholesaleServicesSeries = new List<AcceptedWholesaleServicesSerieDto>();
-        foreach (var aggregation in wholesaleServicesRequestAccepted.Series)
+        foreach (var wholesaleSeries in wholesaleServicesRequestAccepted.Series)
         {
             acceptedWholesaleServicesSeries.Add(new AcceptedWholesaleServicesSerieDto(
-                MapPoints(aggregation.TimeSeriesPoints),
-                MapMeteringPointType(aggregation.MeteringPointType),
-                MapResolution(aggregation.Resolution),
-                MapChargeType(aggregation.ChargeType),
-                MapMeasurementUnit(aggregation.QuantityUnit),
-                SettlementVersion: MapSettlementVersion(aggregation.CalculationType),
-                MapSettlementMethod(aggregation.SettlementMethod),
-                MapCurrency(aggregation.Currency),
-                ActorNumber.Create(aggregation.ChargeOwnerId),
-                ActorNumber.Create(aggregation.EnergySupplierId),
-                aggregation.GridArea,
-                aggregation.ChargeCode,
-                aggregation.Period.StartOfPeriod.ToInstant(),
-                aggregation.Period.EndOfPeriod.ToInstant(),
-                aggregation.CalculationResultVersion));
+                MapPoints(wholesaleSeries.TimeSeriesPoints),
+                MapMeteringPointType(wholesaleSeries),
+                MapResolution(wholesaleSeries.Resolution),
+                MapChargeType(wholesaleSeries.ChargeType),
+                MapMeasurementUnit(wholesaleSeries.QuantityUnit),
+                SettlementVersion: MapSettlementVersion(wholesaleSeries.CalculationType),
+                MapSettlementMethod(wholesaleSeries.SettlementMethod),
+                MapCurrency(wholesaleSeries.Currency),
+                ActorNumber.Create(wholesaleSeries.ChargeOwnerId),
+                ActorNumber.Create(wholesaleSeries.EnergySupplierId),
+                wholesaleSeries.GridArea,
+                wholesaleSeries.ChargeCode,
+                wholesaleSeries.Period.StartOfPeriod.ToInstant(),
+                wholesaleSeries.Period.EndOfPeriod.ToInstant(),
+                wholesaleSeries.CalculationResultVersion));
         }
 
         return Task.FromResult<INotification>(new WholesaleServicesRequestWasAccepted(
             eventId,
             referenceId,
             acceptedWholesaleServicesSeries));
+    }
+
+    private static MeteringPointType? MapMeteringPointType(WholesaleServicesRequestSeries wholesaleSeries)
+    {
+        // Monthly sum does not have a metering point type
+        if (wholesaleSeries.HasMeteringPointType)
+            return MeteringPointTypeMapper.Map(wholesaleSeries.MeteringPointType);
+        return null;
     }
 
     private static SettlementVersion? MapSettlementVersion(
@@ -139,17 +148,6 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
             WholesaleServicesRequestSeries.Types.Resolution.Monthly => Resolution.Monthly,
             WholesaleServicesRequestSeries.Types.Resolution.Unspecified => throw new InvalidOperationException("Could not map resolution"),
             _ => throw new InvalidOperationException("Unknown resolution"),
-        };
-    }
-
-    private static MeteringPointType? MapMeteringPointType(WholesaleServicesRequestSeries.Types.MeteringPointType meteringPointType)
-    {
-        return meteringPointType switch
-        {
-            WholesaleServicesRequestSeries.Types.MeteringPointType.Production => MeteringPointType.Production,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.Consumption => MeteringPointType.Consumption,
-            WholesaleServicesRequestSeries.Types.MeteringPointType.Unspecified => null,
-            _ => throw new InvalidOperationException("Unknown metering point type"),
         };
     }
 
