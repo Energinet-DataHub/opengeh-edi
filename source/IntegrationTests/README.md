@@ -71,10 +71,17 @@ Eg:
 
 ### Behaviours test
 
-The `Behaviours` test have a special kind of folder structure.
-Since these kind of tests are supposed to test the behavior of the system given some external input.
-Which gives rise to a different kind of class naming, namely that the classes are named as the following: `Given{ExternalInput}Tests`.
-eg:
+Our Behaviours tests are additionally subject to further restrictions (or guidelines if you prefer)
+with related to folder structure and file naming.
+As the primary goal of these tests are to validate the behaviour of the (sub-)system given some
+external stimulus (e.g. an integration event or request),
+this external stimulus has to be part of the name of the given test class.
+All tests for the same external stimulus are therefore located in the same test file.
+In other words: all behaviour tests must be named as follows: Given{ExternalInput}Tests.
+
+Furthermore, the tests must be group according to the kind of stimulus we are testing: integration events,incoming requests, etc...
+This is achieved by folders IntegrationEvents, IncomingRequests, etc., directly in the root of Behaviours.
+The combination of these two rules are illustrated below with an example.
 
 ```text
 ├── Behaviours
@@ -88,14 +95,15 @@ eg:
 ├── EventBuilders
 ```
 
-By doing so, one does not need to specify the external input in the specific test method. Which allow the writer to
-specify the important variables in the test, as descripbed in [naming section](#naming-the-tests).
+By doing so, one does not have to "waste" space on specifying the external input in each and every single test method's [Given-part](#naming-the-tests),
+but can instead focus on the uniqueness of each given test.
 
-If one finds it unpleasent to have a class named `Given{ExternalInput}Tests` with a method named `Given{ImportantVairalbes}_When_YYY_Then_ZZZ`.
-Then it is possible the use the prefix `AndGiven_` instead of `Given_`. It is even possible to leave it out and start
-with `When_`.
+Similarly, if one finds it unpleasant to have a class named `Given{ExternalInput}Tests` with a method named `Given{ImportantSetup}_When_YYY_Then_ZZZ`,
+it is possible the use the prefix `AndGiven_` instead of `Given_`.
+In the cases where there are no additional setup, it is possible to start with `When_` directly.
+However, we advise caution in this case, as it is rare for a test to have no setup.
 
-### Propper integration tests
+### Proper integration tests
 
 Unlike the `Behaiviours` tests these tests are more isolated and test a single responsibility. Eg test of
 integrationEventHandlers, repositories and the like.
@@ -103,8 +111,8 @@ integrationEventHandlers, repositories and the like.
 Since the responsibility is different, so is the folder structure.
 In fact, there isn't any good structure for the time being :I.
 
-But one should try to keep the test for a single module to it's own folder.
-eg:
+That said, one should try to keep the test for a single module to it's own folder.
+This way they can be extracted to their own modules eventually, with relative ease.
 
 ```text
 IntegrationTests
@@ -122,8 +130,9 @@ IntegrationTests
 ├── EventBuilders
 ```
 
-Here `Trancastions` are supposed to test the `process` module and the `integrationEvent` module. Which should be moved
-to a more specialized test project at some point
+In the example above, the tests in the Transactions folder are testing both the Process and IntegrationEvent module.
+Ideally, if possible, the tests that are limited to a single module should be moved to that modules respective folder (or actual test module).
+For the cross-module integration tests, no well-established guideline currently exists.
 
-Note that the naming convention mentioned in the [naming section](#naming-the-tests) is not automatically enforced but
-it is prefer that one tries to follow it anyway.
+Do note, that while the [naming convention](#naming-the-tests) is not enforced here, it is advisable to adhere to it as much as possible.
+This ensures a consistent naming across the solution.
