@@ -85,7 +85,7 @@ public record WholesaleServicesTotalSumSeries(
     GridAreaCode: GridAreaCode,
     ChargeCode: null,
     IsTax: false,
-    Points: new[] { new WholesaleServicesPoint(1, null, null, Amount, CalculatedQuantityQuality.Calculated), },
+    Points: new[] { new WholesaleServicesPoint(1, null, null, Amount, Amount != null ? CalculatedQuantityQuality.Calculated : CalculatedQuantityQuality.Missing), },
     EnergySupplier: EnergySupplier,
     ChargeOwner: null,
     Period: Period,

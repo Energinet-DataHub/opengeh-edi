@@ -230,7 +230,7 @@ public class GivenTotalMonthlyAmountResultProducedV1ReceivedTests : WholesaleSer
                     Price = null,
                     Quantity = null,
                     Amount = Energinet.DataHub.Edi.Responses.DecimalValue.FromDecimal(0),
-                    QuantityQualities = { QuantityQuality.Calculated },
+                    QuantityQualities = { QuantityQuality.Missing },
                 },
             });
 
