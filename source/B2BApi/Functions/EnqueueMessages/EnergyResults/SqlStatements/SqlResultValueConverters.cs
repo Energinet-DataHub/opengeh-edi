@@ -13,10 +13,6 @@
 // limitations under the License.
 
 using System.Globalization;
-using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.SqlStatements.Mappers;
-using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.SqlStatements.Mappers.EnergyResult;
-using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model;
-using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.EnergyResults;
 using NodaTime;
 using NodaTime.Text;
 
@@ -26,33 +22,30 @@ public static class SqlResultValueConverters
 {
     public static Instant? ToInstant(string? value)
     {
-        if (value == null)
-            return null;
-        return InstantPattern.ExtendedIso.Parse(value).Value;
+        return value == null
+            ? null
+            : InstantPattern.ExtendedIso.Parse(value).Value;
     }
 
     public static decimal? ToDecimal(string? value)
     {
-        if (value == null)
-            return null;
-        return decimal.Parse(value, CultureInfo.InvariantCulture);
+        return value == null
+            ? null
+            : decimal.Parse(value, CultureInfo.InvariantCulture);
     }
 
     public static DateTimeOffset? ToDateTimeOffset(string? value)
     {
-        if (value == null)
-            return null;
-        return DateTimeOffset.Parse(value, CultureInfo.InvariantCulture);
+        return value == null
+            ? null
+            : DateTimeOffset.Parse(value, CultureInfo.InvariantCulture);
     }
 
-    public static IReadOnlyCollection<QuantityQuality>? ToQuantityQualities(string? value)
+    public static int? ToInt(string? value)
     {
-        return QuantityQualitiesMapper.FromDeltaTableValue(value);
-    }
-
-    public static TimeSeriesType ToTimeSeriesType(string value)
-    {
-        return TimeSeriesTypeMapper.FromDeltaTableValue(value);
+        return value == null
+            ? null
+            : int.Parse(value);
     }
 
     public static Guid ToGuid(string value)
@@ -66,10 +59,21 @@ public static class SqlResultValueConverters
         {
             "true" => true,
             "false" => false,
+
             _ => throw new ArgumentOutOfRangeException(
                 nameof(value),
                 actualValue: value,
                 "Value does not contain a valid string representation of a boolean."),
         };
     }
+
+    ////public static IReadOnlyCollection<QuantityQuality>? ToQuantityQualities(string? value)
+    ////{
+    ////    return QuantityQualitiesMapper.FromDeltaTableValue(value);
+    ////}
+
+    ////public static TimeSeriesType ToTimeSeriesType(string value)
+    ////{
+    ////    return TimeSeriesTypeMapper.FromDeltaTableValue(value);
+    ////}
 }
