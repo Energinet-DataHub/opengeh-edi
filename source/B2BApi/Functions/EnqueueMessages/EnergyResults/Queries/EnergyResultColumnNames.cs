@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults;
 /// that it is easy to compare (e.g. order of columns).
 /// See confluence: https://energinet.atlassian.net/wiki/spaces/D3/pages/849805314/Calculation+Result+Model#Energy-Result-Points-Per-Grid-Area
 /// </summary>
-public class EnergyResultViewColumnNames
+public class EnergyResultColumnNames
 {
     public const string CalculationId = "calculation_id";
     public const string CalculationType = "calculation_type";
@@ -46,38 +46,4 @@ public class EnergyResultViewColumnNames
     public const string Quantity = "quantity";
     public const string QuantityUnit = "quantity_unit";
     public const string QuantityQualities = "quantity_qualities";
-
-    public static IReadOnlyCollection<string> GetAllNames()
-    {
-        var fieldInfos = typeof(EnergyResultViewColumnNames).GetFields(BindingFlags.Public | BindingFlags.Static);
-        return fieldInfos.Select(x => x.GetValue(null)).Cast<string>().ToList();
-    }
-
-    public static string GetType(string columnName) =>
-         columnName switch
-         {
-             CalculationId => "string",
-             CalculationType => "string",
-
-             CalculationPeriodStart => "timestamp",
-             CalculationPeriodEnd => "timestamp",
-
-             CalculationVersion => "int",
-
-             ResultId => "string",
-
-             GridAreaCode => "string",
-
-             MeteringPointType => "string",
-             SettlementMethod => "string",
-
-             Resolution => "string",
-             Time => "timestamp",
-
-             Quantity => "decimal(18,3)",
-             QuantityUnit => "string",
-             QuantityQualities => "array<string>",
-
-             _ => throw new ArgumentOutOfRangeException(nameof(columnName), actualValue: columnName, "Unexpected column name."),
-         };
 }

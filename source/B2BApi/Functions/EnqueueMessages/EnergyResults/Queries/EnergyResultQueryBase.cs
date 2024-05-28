@@ -41,8 +41,8 @@ public abstract class EnergyResultQueryBase(Guid calculationId)
         return $@"
 SELECT {string.Join(", ", SqlColumnNames)}
 FROM {DatabaseName}.{DataObjectName}
-WHERE {EnergyResultViewColumnNames.CalculationId} = '{CalculationId}'
-ORDER BY {EnergyResultViewColumnNames.ResultId}, {EnergyResultViewColumnNames.Time}
+WHERE {EnergyResultColumnNames.CalculationId} = '{CalculationId}'
+ORDER BY {EnergyResultColumnNames.ResultId}, {EnergyResultColumnNames.Time}
 ";
     }
 }

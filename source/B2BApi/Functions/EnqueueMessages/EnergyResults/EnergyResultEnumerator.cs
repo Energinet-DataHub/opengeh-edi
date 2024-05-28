@@ -14,12 +14,15 @@
 
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution.Formats;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Factories;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Model;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Queries;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.SqlStatements;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults;
 
+// TODO: Decide if we need to reference NuGet package "Energinet.DataHub.Core.Databricks.SqlStatementExecution" directly here, or not.
 public class EnergyResultEnumerator
 {
     private readonly DatabricksSqlWarehouseQueryExecutor _databricksSqlWarehouseQueryExecutor;
@@ -33,9 +36,9 @@ public class EnergyResultEnumerator
         _logger = logger;
     }
 
-    public async IAsyncEnumerable<EnergyResultMessageDto> GetAsync(Guid calculationId)
+    public async IAsyncEnumerable<EnergyResultPerGridArea> GetAsync(Guid calculationId)
     {
-        var query = new EnergyResultViewQuery(calculationId);
+        var query = new EnergyResultPerGridAreaQuery(calculationId);
         await foreach (var messageDto in GetInternalAsync(query))
             yield return messageDto;
         _logger.LogDebug("Fetched all energy results for calculation {calculation_id}", calculationId);
@@ -43,33 +46,23 @@ public class EnergyResultEnumerator
 
     private static bool BelongsToDifferentResults(DatabricksSqlRow row, DatabricksSqlRow otherRow)
     {
-        return !row[EnergyResultViewColumnNames.ResultId]!.Equals(otherRow[EnergyResultViewColumnNames.ResultId]);
+        return !row[EnergyResultColumnNames.ResultId]!.Equals(otherRow[EnergyResultColumnNames.ResultId]);
     }
 
-    // TODO: Here we would like to create/map "EnergyResultMessageDto" to skip one layer of mapping
-    private async IAsyncEnumerable<EnergyResultMessageDto> GetInternalAsync(EnergyResultViewQuery query)
+    private async IAsyncEnumerable<EnergyResultPerGridArea> GetInternalAsync(EnergyResultPerGridAreaQuery query)
     {
         DatabricksSqlRow? currentRow = null;
         var resultCount = 0;
-        var timeSeriesPoints = new List<EnergyResultMessagePoint>();
-
-
-        // TODO: Maybe it would be faster to move to the "new model" if we first convert to "EnergyResultProducedV2" event
-        // and then use the factory "EnergyResultMessageResultFactory" to create "EnergyResultMessageDto" ????
-
-
-        // TODO: Parse/map data from "Energy Result data object" into "Outgoing message" type and send to processor - see "EnergyResultProducedV2Processor"
-        ////var message = await _energyResultMessageResultFactory
-        ////    .CreateAsync(EventId.From(integrationEvent.EventIdentification), energyResultProducedV2, CancellationToken.None);
+        var timeSeriesPoints = new List<EnergyTimeSeriesPoint>();
 
         await foreach (var nextRowAsDynamic in _databricksSqlWarehouseQueryExecutor.ExecuteStatementAsync(query, Format.JsonArray).ConfigureAwait(false))
         {
             var nextRow = new DatabricksSqlRow(nextRowAsDynamic);
-            var timeSeriesPoint = CreateTimeSeriesPoint(nextRow);
+            var timeSeriesPoint = EnergyTimeSeriesPointFactory.CreateTimeSeriesPoint(nextRow);
 
             if (currentRow != null && BelongsToDifferentResults(currentRow, nextRow))
             {
-                yield return CreateEnergyResult(currentRow!, timeSeriesPoints);
+                yield return EnergyResultPerGridAreaFactory.CreateEnergyResult(currentRow!, timeSeriesPoints);
                 resultCount++;
                 timeSeriesPoints = [];
             }
@@ -80,20 +73,10 @@ public class EnergyResultEnumerator
 
         if (currentRow != null)
         {
-            yield return CreateEnergyResult(currentRow, timeSeriesPoints);
+            yield return EnergyResultPerGridAreaFactory.CreateEnergyResult(currentRow, timeSeriesPoints);
             resultCount++;
         }
 
         _logger.LogDebug("Fetched {result_count} energy results", resultCount);
-    }
-
-    private EnergyResultMessageDto CreateEnergyResult(DatabricksSqlRow databricksSqlRow, List<EnergyResultMessagePoint> timeSeriesPoints)
-    {
-        throw new NotImplementedException();
-    }
-
-    private EnergyResultMessagePoint CreateTimeSeriesPoint(DatabricksSqlRow row)
-    {
-        throw new NotImplementedException();
     }
 }

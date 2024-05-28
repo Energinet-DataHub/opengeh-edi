@@ -20,32 +20,24 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.S
 
 public static class SqlResultValueConverters
 {
-    public static Instant? ToInstant(string? value)
+    public static Instant ToInstant(string value)
     {
-        return value == null
-            ? null
-            : InstantPattern.ExtendedIso.Parse(value).Value;
+        return InstantPattern.ExtendedIso.Parse(value).Value;
     }
 
-    public static decimal? ToDecimal(string? value)
+    public static decimal ToDecimal(string value)
     {
-        return value == null
-            ? null
-            : decimal.Parse(value, CultureInfo.InvariantCulture);
+        return decimal.Parse(value, CultureInfo.InvariantCulture);
     }
 
-    public static DateTimeOffset? ToDateTimeOffset(string? value)
+    public static DateTimeOffset ToDateTimeOffset(string value)
     {
-        return value == null
-            ? null
-            : DateTimeOffset.Parse(value, CultureInfo.InvariantCulture);
+        return DateTimeOffset.Parse(value, CultureInfo.InvariantCulture);
     }
 
-    public static int? ToInt(string? value)
+    public static int ToInt(string value)
     {
-        return value == null
-            ? null
-            : int.Parse(value);
+        return int.Parse(value);
     }
 
     public static Guid ToGuid(string value)
@@ -66,14 +58,4 @@ public static class SqlResultValueConverters
                 "Value does not contain a valid string representation of a boolean."),
         };
     }
-
-    ////public static IReadOnlyCollection<QuantityQuality>? ToQuantityQualities(string? value)
-    ////{
-    ////    return QuantityQualitiesMapper.FromDeltaTableValue(value);
-    ////}
-
-    ////public static TimeSeriesType ToTimeSeriesType(string value)
-    ////{
-    ////    return TimeSeriesTypeMapper.FromDeltaTableValue(value);
-    ////}
 }

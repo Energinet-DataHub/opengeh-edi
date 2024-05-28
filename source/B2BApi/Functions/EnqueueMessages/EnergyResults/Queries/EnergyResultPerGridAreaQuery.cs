@@ -12,21 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-// Copyright 2020 Energinet DataHub A/S
-//
-// Licensed under the Apache License, Version 2.0 (the "License2");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Queries;
 
 /// <summary>
@@ -44,18 +29,18 @@ public class EnergyResultPerGridAreaQuery(Guid calculationId)
     public override string DataObjectName => "energy_result_points_per_ga_v1";
 
     public override string[] SqlColumnNames => [
-        EnergyResultViewColumnNames.CalculationId,
-        EnergyResultViewColumnNames.CalculationType,
-        EnergyResultViewColumnNames.CalculationPeriodStart,
-        EnergyResultViewColumnNames.CalculationPeriodEnd,
-        EnergyResultViewColumnNames.CalculationVersion,
-        EnergyResultViewColumnNames.ResultId,
-        EnergyResultViewColumnNames.GridAreaCode,
-        EnergyResultViewColumnNames.MeteringPointType,
-        EnergyResultViewColumnNames.SettlementMethod,
-        EnergyResultViewColumnNames.Resolution,
-        EnergyResultViewColumnNames.Time,
-        EnergyResultViewColumnNames.Quantity,
-        EnergyResultViewColumnNames.QuantityUnit,
-        EnergyResultViewColumnNames.QuantityQualities];
+        EnergyResultColumnNames.CalculationId,
+        EnergyResultColumnNames.CalculationType,
+        EnergyResultColumnNames.CalculationPeriodStart,
+        EnergyResultColumnNames.CalculationPeriodEnd,
+        EnergyResultColumnNames.CalculationVersion,
+        EnergyResultColumnNames.ResultId,
+        EnergyResultColumnNames.GridAreaCode,
+        EnergyResultColumnNames.MeteringPointType,
+        EnergyResultColumnNames.SettlementMethod,
+        EnergyResultColumnNames.Resolution,
+        EnergyResultColumnNames.Time,
+        EnergyResultColumnNames.Quantity,
+        EnergyResultColumnNames.QuantityUnit,
+        EnergyResultColumnNames.QuantityQualities];
 }
