@@ -15,16 +15,19 @@
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware;
 using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 
@@ -74,6 +77,10 @@ public static class HostFactory
 
                         // Serializer
                         .AddSerializer()
+
+                        // TODO: Find the right place
+                        .AddDatabricksSqlStatementExecution(context.Configuration)
+                        .AddScoped<EnergyResultEnumerator>()
 
                         // Modules
                         .AddIntegrationEventModule(context.Configuration)

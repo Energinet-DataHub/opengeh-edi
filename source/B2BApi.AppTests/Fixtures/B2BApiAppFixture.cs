@@ -15,6 +15,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using BuildingBlocks.Application.Extensions.Options;
+using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
@@ -242,6 +243,17 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.ProcessEnvironmentVariables.Add(
             "DB_CONNECTION_STRING",
             DatabaseManager.ConnectionString);
+
+        // Databricks
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            nameof(DatabricksSqlStatementOptions.WorkspaceUrl),
+            IntegrationTestConfiguration.DatabricksSettings.WorkspaceUrl);
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            nameof(DatabricksSqlStatementOptions.WorkspaceToken),
+            IntegrationTestConfiguration.DatabricksSettings.WorkspaceAccessToken);
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            nameof(DatabricksSqlStatementOptions.WarehouseId),
+            IntegrationTestConfiguration.DatabricksSettings.WarehouseId);
 
         // ServiceBus connection strings
         appHostSettings.ProcessEnvironmentVariables.Add(
