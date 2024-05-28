@@ -19,21 +19,18 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
-// TODO: Decide where code for accessing DataLake should be placed; for now I'm just writing it as plain code within the activity.
-// TODO: Decide if we need to reference NuGet package "Energinet.DataHub.Core.Databricks.SqlStatementExecution" directly here, or not.
 internal class EnqueueMessagesActivity(
     IOutgoingMessagesClient outgoingMessagesClient,
     EnergyResultEnumerator energyResultEnumerator)
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
-
-    // TODO: Decide "view" (and hence enumerator) based on calculation type
     private readonly EnergyResultEnumerator _energyResultEnumerator = energyResultEnumerator;
 
     [Function(nameof(EnqueueMessagesActivity))]
     public async Task Run(
         [ActivityTrigger] EnqueueMessagesInput input)
     {
+        // TODO: Decide "view" based on calculation type
         var calculationId = Guid.Parse(input.CalculationId);
         await foreach (var nextMessage in _energyResultEnumerator.GetAsync(calculationId))
         {
