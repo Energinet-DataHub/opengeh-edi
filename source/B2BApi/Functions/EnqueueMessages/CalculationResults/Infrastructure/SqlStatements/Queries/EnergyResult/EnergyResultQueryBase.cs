@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Queries;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Infrastructure.SqlStatements.Queries.EnergyResult;
 
 public abstract class EnergyResultQueryBase(Guid calculationId)
     : DatabricksStatement

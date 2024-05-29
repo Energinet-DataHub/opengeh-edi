@@ -15,28 +15,30 @@
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Infrastructure.SqlStatements;
 
 /// <summary>
-/// This class is used to wrap the result (a dynamic type) of a Databricks SQL query.
+/// This class is used to wrap the result (a dynamic type) of a Databricks SQL query row.
 /// </summary>
 public class DatabricksSqlRow
 {
-    private readonly IDictionary<string, object?> _dictionary;
+    private readonly IReadOnlyDictionary<string, object?> _columns;
 
-    public DatabricksSqlRow(IDictionary<string, object?> dictionary)
+    public DatabricksSqlRow(IReadOnlyDictionary<string, object?> columns)
     {
-        _dictionary = dictionary;
+        _columns = columns;
     }
 
-    public string? this[string key]
+    public string? this[string columnName]
     {
         get
         {
-            var value = _dictionary[key];
-            return value == null ? null : Convert.ToString(value);
+            var value = _columns[columnName];
+            return value == null
+                ? null
+                : Convert.ToString(value);
         }
     }
 
     public override string ToString()
     {
-        return _dictionary.Aggregate(string.Empty, (current, kvp) => current + $"Key = {kvp.Key}, Value = {kvp.Value}");
+        return _columns.Aggregate(string.Empty, (current, kvp) => current + $"Key = {kvp.Key}, Value = {kvp.Value}");
     }
 }
