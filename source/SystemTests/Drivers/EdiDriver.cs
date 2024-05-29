@@ -17,21 +17,25 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using Energinet.DataHub.EDI.SystemTests.Exceptions;
+using Energinet.DataHub.EDI.SystemTests.Logging;
 using Energinet.DataHub.EDI.SystemTests.Models;
 using Nito.AsyncEx;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.SystemTests.Drivers;
 
 public sealed class EdiDriver
 {
+    private readonly TestLogger _logger;
     private readonly AsyncLazy<HttpClient> _httpClient;
     private readonly MicrosoftIdentityDriver _microsoftIdentityDriver;
 
-    internal EdiDriver(Uri apiManagementUri, string tenantId, string backendAppId)
+    internal EdiDriver(TestLogger logger, Uri apiManagementUri, string tenantId, string backendAppId)
     {
+        _logger = logger;
         ArgumentNullException.ThrowIfNull(apiManagementUri);
         _httpClient = new AsyncLazy<HttpClient>(() => GetHttpClientAsync(apiManagementUri));
-        _microsoftIdentityDriver = new MicrosoftIdentityDriver(tenantId, backendAppId);
+        _microsoftIdentityDriver = new MicrosoftIdentityDriver(logger, tenantId, backendAppId);
     }
 
     internal async Task<HttpResponseMessage> PeekAsync(Actor? actor, CancellationToken cancellationToken)
@@ -43,7 +47,7 @@ public sealed class EdiDriver
         request.Content = new StringContent(string.Empty, Encoding.UTF8, contentType);
         request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
         var peekResponse = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-        peekResponse.EnsureSuccessStatusCode();
+        await EnsureResponseSuccess(peekResponse);
         return peekResponse;
     }
 
@@ -55,7 +59,7 @@ public sealed class EdiDriver
         await AddAuthTokenToRequestAsync(actor, httpClient, cancellationToken).ConfigureAwait(false);
         using var request = new HttpRequestMessage(HttpMethod.Delete, $"v1.0/cim/dequeue/{messageId}");
         var dequeueResponse = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-        dequeueResponse.EnsureSuccessStatusCode();
+        await EnsureResponseSuccess(dequeueResponse);
     }
 
     internal async Task SendRequestAsync(Actor? actor, MessageType messageType, CancellationToken cancellationToken)
@@ -66,7 +70,7 @@ public sealed class EdiDriver
         request.Content = new StringContent(GetContent(messageType), Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         var response = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
+        await EnsureResponseSuccess(response);
     }
 
     /// <summary>
@@ -163,4 +167,6 @@ public sealed class EdiDriver
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", null);
         }
     }
+
+    private Task EnsureResponseSuccess(HttpResponseMessage response) => response.EnsureSuccessStatusCodeWithLogAsync(_logger);
 }
