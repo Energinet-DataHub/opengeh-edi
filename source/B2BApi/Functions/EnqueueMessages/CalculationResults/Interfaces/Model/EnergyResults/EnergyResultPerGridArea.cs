@@ -24,8 +24,8 @@ public sealed class EnergyResultPerGridArea(
     MeteringPointType meteringPointType,
     EnergyTimeSeriesPoint[] timeSeriesPoints,
     CalculationType calculationType,
-    Instant periodStart,
-    Instant periodEnd,
+    Instant periodStartUtc,
+    Instant periodEndUtc,
     EnergyResultResolution resolution,
     int calculationVersion,
     SettlementMethod? settlementMethod)
@@ -33,8 +33,8 @@ public sealed class EnergyResultPerGridArea(
         timeSeriesPoints,
         meteringPointType,
         calculationType,
-        periodStart,
-        periodEnd,
+        periodStartUtc,
+        periodEndUtc,
         resolution,
         calculationVersion,
         settlementMethod)
