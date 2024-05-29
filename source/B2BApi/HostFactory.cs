@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using BuildingBlocks.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
@@ -79,7 +80,8 @@ public static class HostFactory
                         .AddSerializer()
 
                         // TODO: Find the right place
-                        .AddDatabricksSqlStatementExecution(context.Configuration)
+                        .AddNodaTimeForApplication()
+                        .AddDatabricksSqlStatementForApplication(context.Configuration)
                         .AddScoped<EnergyResultEnumerator>()
 
                         // Modules
