@@ -15,6 +15,8 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.AcceptanceTests.Logging;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
@@ -23,11 +25,13 @@ public class B2BTokenReceiver
     private readonly HttpClient _httpClient;
     private readonly string _tenantId;
     private readonly string _backendAppId;
+    private readonly ITestOutputHelper _logger;
 
-    public B2BTokenReceiver(HttpClient httpClient, string tenantId, string backendAppId)
+    public B2BTokenReceiver(HttpClient httpClient, string tenantId, string backendAppId, ITestOutputHelper logger)
     {
         _tenantId = tenantId;
         _backendAppId = backendAppId;
+        _logger = logger;
         _httpClient = httpClient;
     }
 
@@ -51,7 +55,7 @@ public class B2BTokenReceiver
         });
 
         var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
+        await response.EnsureSuccessStatusCodeWithLogAsync(_logger);
 
         var accessToken = await response.Content.ReadFromJsonAsync<AccessTokenResponse>().ConfigureAwait(false);
 

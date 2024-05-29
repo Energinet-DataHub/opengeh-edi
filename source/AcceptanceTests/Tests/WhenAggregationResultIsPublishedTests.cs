@@ -15,6 +15,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
+using Xunit.Abstractions;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
@@ -23,17 +24,18 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
 [IntegrationTest]
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
-public sealed class WhenAggregationResultIsPublishedTests
+public sealed class WhenAggregationResultIsPublishedTests : BaseTestClass
 {
     private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureDataResult;
 
-    public WhenAggregationResultIsPublishedTests(AcceptanceTestFixture fixture)
+    public WhenAggregationResultIsPublishedTests(AcceptanceTestFixture fixture, ITestOutputHelper output)
+        : base(output, fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
         _notifyAggregatedMeasureDataResult = new NotifyAggregatedMeasureDataResultDsl(
             new EdiDriver(
-                fixture.B2BMeteredDataResponsibleAuthorizedHttpClient),
+                fixture.B2BMeteredDataResponsibleAuthorizedHttpClient, output),
             new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
     }
 
