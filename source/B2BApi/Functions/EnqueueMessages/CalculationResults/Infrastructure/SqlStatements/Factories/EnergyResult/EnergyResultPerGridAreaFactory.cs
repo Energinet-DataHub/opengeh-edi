@@ -32,14 +32,14 @@ public class EnergyResultPerGridAreaFactory
         var calculationType = databricksSqlRow[EnergyResultColumnNames.CalculationType];
         ArgumentException.ThrowIfNullOrWhiteSpace(calculationType);
 
-        var periodStart = databricksSqlRow[EnergyResultColumnNames.CalculationPeriodStart];
-        ArgumentException.ThrowIfNullOrWhiteSpace(periodStart);
+        var periodStartUtc = databricksSqlRow[EnergyResultColumnNames.CalculationPeriodStart];
+        ArgumentException.ThrowIfNullOrWhiteSpace(periodStartUtc);
 
-        var periodEnd = databricksSqlRow[EnergyResultColumnNames.CalculationPeriodEnd];
-        ArgumentException.ThrowIfNullOrWhiteSpace(periodEnd);
+        var periodEndUtc = databricksSqlRow[EnergyResultColumnNames.CalculationPeriodEnd];
+        ArgumentException.ThrowIfNullOrWhiteSpace(periodEndUtc);
 
-        var version = databricksSqlRow[EnergyResultColumnNames.CalculationVersion];
-        ArgumentException.ThrowIfNullOrWhiteSpace(version);
+        var calculationVersion = databricksSqlRow[EnergyResultColumnNames.CalculationVersion];
+        ArgumentException.ThrowIfNullOrWhiteSpace(calculationVersion);
 
         var resultId = databricksSqlRow[EnergyResultColumnNames.ResultId];
         ArgumentException.ThrowIfNullOrWhiteSpace(resultId);
@@ -62,10 +62,10 @@ public class EnergyResultPerGridAreaFactory
             MeteringPointTypeMapper.FromDeltaTableValue(meteringPointType),
             timeSeriesPoints.ToArray(),
             CalculationTypeMapper.FromDeltaTableValue(calculationType),
-            SqlResultValueConverters.ToInstant(periodStart),
-            SqlResultValueConverters.ToInstant(periodEnd),
+            SqlResultValueConverters.ToInstant(periodStartUtc),
+            SqlResultValueConverters.ToInstant(periodEndUtc),
             EnergyResultResolutionMapper.FromDeltaTableValue(resolution),
-            SqlResultValueConverters.ToInt(version),
+            SqlResultValueConverters.ToInt(calculationVersion),
             SettlementMethodMapper.FromDeltaTableValue(settlementMethod));
     }
 }
