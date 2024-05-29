@@ -12,21 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Interfaces.Model.EnergyResults;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Infrastructure.SqlStatements.Queries.EnergyResult;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
 internal class EnqueueMessagesActivity(
     IOutgoingMessagesClient outgoingMessagesClient,
-    EnergyResultEnumerator energyResultEnumerator)
+    EnergyResultEnumerator energyResultEnumerator,
+    EnergyResultMessageDtoFactory messageDtoFactory)
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
     private readonly EnergyResultEnumerator _energyResultEnumerator = energyResultEnumerator;
+    private readonly EnergyResultMessageDtoFactory _messageDtoFactory = messageDtoFactory;
 
     [Function(nameof(EnqueueMessagesActivity))]
     public async Task Run(
@@ -36,14 +38,10 @@ internal class EnqueueMessagesActivity(
         var calculationId = Guid.Parse(input.CalculationId);
         await foreach (var nextResult in _energyResultEnumerator.GetAsync(calculationId))
         {
-            var nextMessage = CreateMessage(nextResult);
+            // TODO: Can we use "result id" as "event id"? If so we can create it within the factory.
+            var eventId = EventId.From(nextResult.Id);
+            var nextMessage = await _messageDtoFactory.CreateAsync(eventId, nextResult, CancellationToken.None);
             await _outgoingMessagesClient.EnqueueAndCommitAsync(nextMessage, CancellationToken.None);
         }
-    }
-
-    // TODO: Map from energy result to outgoing message
-    private EnergyResultMessageDto CreateMessage(EnergyResultPerGridArea nextResult)
-    {
-        throw new NotImplementedException();
     }
 }

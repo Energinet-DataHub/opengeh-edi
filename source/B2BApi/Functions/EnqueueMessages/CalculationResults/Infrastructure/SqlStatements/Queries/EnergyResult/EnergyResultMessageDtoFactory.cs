@@ -21,14 +21,9 @@ using DomainModel = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Infrastructure.SqlStatements.Queries.EnergyResult;
 
-public class EnergyResultMessageDtoFactory
+public class EnergyResultMessageDtoFactory(IMasterDataClient masterDataClient)
 {
-    private readonly IMasterDataClient _masterDataClient;
-
-    public EnergyResultMessageDtoFactory(IMasterDataClient masterDataClient)
-    {
-        _masterDataClient = masterDataClient;
-    }
+    private readonly IMasterDataClient _masterDataClient = masterDataClient;
 
     public async Task<EnergyResultMessageDto> CreateAsync(
         DomainModel.EventId eventId,
