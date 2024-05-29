@@ -86,7 +86,7 @@ public class IncomingMessageClient : IIncomingMessageClient
             _logger.LogInformation(
                 "Failed to parse incoming message {DocumentType}. Errors: {Errors}",
                 documentType,
-                res.Errors);
+                string.Join(',', res.Errors));
             return _responseFactory.From(res, responseDocumentFormat);
         }
 
@@ -113,7 +113,7 @@ public class IncomingMessageClient : IIncomingMessageClient
             _logger.LogInformation(
                 "Failed to validate incoming message: {MessageId}. Errors: {Errors}",
                 incomingMarketMessageParserResult.IncomingMessage?.MessageId,
-                incomingMarketMessageParserResult.Errors);
+                string.Join(',', incomingMarketMessageParserResult.Errors));
             return _responseFactory.From(validationResult, responseDocumentFormat);
         }
 
@@ -131,7 +131,7 @@ public class IncomingMessageClient : IIncomingMessageClient
         _logger.LogInformation(
             "Failed to save incoming message: {MessageId}. Errors: {Errors}",
             incomingMarketMessageParserResult.IncomingMessage!.MessageId,
-            incomingMarketMessageParserResult.Errors);
+            string.Join(',', incomingMarketMessageParserResult.Errors));
         return _responseFactory.From(result, responseDocumentFormat);
     }
 
