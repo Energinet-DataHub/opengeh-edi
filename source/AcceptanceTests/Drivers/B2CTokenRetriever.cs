@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System.Net.Http.Json;
+using Energinet.DataHub.EDI.AcceptanceTests.Logging;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
@@ -23,14 +25,16 @@ public class B2CTokenRetriever
     private readonly string _backendBffScope;
     private readonly string _frontendAppId;
     private readonly Uri _marketParticipantUri;
+    private readonly ITestOutputHelper _logger;
 
-    public B2CTokenRetriever(HttpClient httpClient, Uri azureB2CTenantUri, string backendBffScope, string frontendAppId, Uri marketParticipantUri)
+    public B2CTokenRetriever(HttpClient httpClient, Uri azureB2CTenantUri, string backendBffScope, string frontendAppId, Uri marketParticipantUri, ITestOutputHelper logger)
     {
         _httpClient = httpClient;
         _azureB2CTenantUri = azureB2CTenantUri;
         _backendBffScope = backendBffScope;
         _frontendAppId = frontendAppId;
         _marketParticipantUri = marketParticipantUri;
+        _logger = logger;
     }
 
     public async Task<string> GetB2CTokenAsync(string username, string password)
@@ -51,7 +55,7 @@ public class B2CTokenRetriever
 
         var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
 
-        response.EnsureSuccessStatusCode();
+        await response.EnsureSuccessStatusCodeWithLogAsync(_logger);
 
         var tokenResult = await response.Content.ReadFromJsonAsync<AccessTokenResponse>().ConfigureAwait(false)
                     ?? throw new InvalidOperationException($"Couldn't get acceptance test B2C token for user {username}");
@@ -69,7 +73,7 @@ public class B2CTokenRetriever
             new Uri(_marketParticipantUri, $"token"),
             new { ActorId = actorId, ExternalToken = azureAdToken, }).ConfigureAwait(false);
 
-        response.EnsureSuccessStatusCode();
+        await response.EnsureSuccessStatusCodeWithLogAsync(_logger);
 
         var token = await response.Content.ReadFromJsonAsync<TokenFromMarketParticipantResponse>().ConfigureAwait(false)
                     ?? throw new InvalidOperationException("Couldn't get acceptance test token from market participant");

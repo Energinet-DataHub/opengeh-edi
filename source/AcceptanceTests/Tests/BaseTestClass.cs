@@ -20,22 +20,30 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
 public class BaseTestClass
 {
+    private readonly AcceptanceTestFixture _fixture;
+    private readonly Lazy<AggregatedMeasureDataRequestDsl> _aggregationRequest;
+
     protected BaseTestClass(ITestOutputHelper output, AcceptanceTestFixture fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
+        _fixture = fixture;
+        _fixture.Logger = output;
         Output = output;
-        BaseTestFixture = fixture;
-        AggregationRequest = new AggregatedMeasureDataRequestDsl(
-            new EdiDriver(
-                fixture.B2BEnergySupplierAuthorizedHttpClient),
-            new EdiProcessesDriver(fixture.ConnectionString),
-            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
+        _aggregationRequest = new Lazy<AggregatedMeasureDataRequestDsl>(CreateAggregatedMeasureDataRequestDsl);
     }
 
     protected ITestOutputHelper Output { get; }
 
-    protected AggregatedMeasureDataRequestDsl AggregationRequest { get; }
+    protected AggregatedMeasureDataRequestDsl AggregationRequest => _aggregationRequest.Value;
 
-    protected AcceptanceTestFixture BaseTestFixture { get; }
+    private AggregatedMeasureDataRequestDsl CreateAggregatedMeasureDataRequestDsl()
+    {
+        return new AggregatedMeasureDataRequestDsl(
+            new EdiDriver(
+                _fixture.B2BEnergySupplierAuthorizedHttpClient,
+                Output),
+            new EdiProcessesDriver(_fixture.ConnectionString),
+            new WholesaleDriver(_fixture.EventPublisher, _fixture.EdiInboxClient));
+    }
 }

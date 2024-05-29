@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.SystemTests.Dsl;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.SystemTests.Tests;
@@ -26,9 +27,9 @@ public sealed class WhenAuthenticationTokenIsMissingTests
 {
     private readonly AuthenticationTokenRequestDsl _authenticationTokenRequest;
 
-    public WhenAuthenticationTokenIsMissingTests(SystemTestFixture fixture)
+    public WhenAuthenticationTokenIsMissingTests(SystemTestFixture fixture, ITestOutputHelper testOutputHelper)
     {
-        ArgumentNullException.ThrowIfNull(fixture);
+        fixture.SetTestOutputHelper(testOutputHelper);
         _authenticationTokenRequest = new AuthenticationTokenRequestDsl(fixture.EdiDriver);
     }
 

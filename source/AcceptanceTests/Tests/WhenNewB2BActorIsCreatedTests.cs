@@ -15,6 +15,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
+using Xunit.Abstractions;
 using Xunit.Categories;
 #pragma warning disable CS0162 // Unreachable code detected
 
@@ -24,11 +25,12 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 [IntegrationTest]
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
 [SuppressMessage("ReSharper", "HeuristicUnreachableCode", Justification = "Unreachable code is disabled for local executions")]
-public sealed class WhenNewB2BActorIsCreatedTests
+public sealed class WhenNewB2BActorIsCreatedTests : BaseTestClass
 {
     private readonly ActorDsl _actorDsl;
 
-    public WhenNewB2BActorIsCreatedTests(AcceptanceTestFixture fixture)
+    public WhenNewB2BActorIsCreatedTests(AcceptanceTestFixture fixture, ITestOutputHelper output)
+        : base(output, fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
