@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Model.Common;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Interfaces.Model;
 
-/// <summary>
-/// Defines the settlement method
-/// </summary>
-public enum SettlementMethod
+public enum QuantityQuality
 {
-    Flex = 0,
-    NonProfiled = 1,
+    Missing,
+    Estimated,
+    Measured,
+    Calculated,
 }

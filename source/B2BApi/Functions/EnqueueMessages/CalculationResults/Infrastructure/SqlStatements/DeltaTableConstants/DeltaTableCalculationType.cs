@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Model.Common;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Infrastructure.SqlStatements.DeltaTableConstants;
 
-public enum QuantityQuality
+public static class DeltaTableCalculationType
 {
-    Missing,
-    Estimated,
-    Measured,
-    Calculated,
+    public const string Aggregation = "Aggregation";
+    public const string BalanceFixing = "BalanceFixing";
+    public const string WholesaleFixing = "WholesaleFixing";
+    public const string FirstCorrectionSettlement = "FirstCorrectionSettlement";
+    public const string SecondCorrectionSettlement = "SecondCorrectionSettlement";
+    public const string ThirdCorrectionSettlement = "ThirdCorrectionSettlement";
 }

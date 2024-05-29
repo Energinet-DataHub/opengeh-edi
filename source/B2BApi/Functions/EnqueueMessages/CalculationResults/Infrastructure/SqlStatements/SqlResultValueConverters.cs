@@ -16,7 +16,7 @@ using System.Globalization;
 using NodaTime;
 using NodaTime.Text;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.SqlStatements;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Infrastructure.SqlStatements;
 
 public static class SqlResultValueConverters
 {

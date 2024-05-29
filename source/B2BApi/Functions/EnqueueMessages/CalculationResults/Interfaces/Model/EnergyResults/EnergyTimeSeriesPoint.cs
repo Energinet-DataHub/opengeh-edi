@@ -12,14 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.SqlStatements.DeltaTableConstants;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Interfaces.Model;
 
-public static class DeltaTableCalculationType
-{
-    public const string Aggregation = "Aggregation";
-    public const string BalanceFixing = "BalanceFixing";
-    public const string WholesaleFixing = "WholesaleFixing";
-    public const string FirstCorrectionSettlement = "FirstCorrectionSettlement";
-    public const string SecondCorrectionSettlement = "SecondCorrectionSettlement";
-    public const string ThirdCorrectionSettlement = "ThirdCorrectionSettlement";
-}
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Model;
+
+/// <summary>
+/// Energy time series point.
+/// Immutable value object.
+/// </summary>
+/// <param name="Time"></param>
+/// <param name="Quantity"></param>
+/// <param name="Qualities"></param>
+public sealed record EnergyTimeSeriesPoint(
+    DateTimeOffset Time,
+    decimal Quantity,
+    IReadOnlyCollection<QuantityQuality> Qualities);

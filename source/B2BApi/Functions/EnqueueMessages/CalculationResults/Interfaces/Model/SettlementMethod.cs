@@ -12,18 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Model.Common;
-
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Model;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Interfaces.Model;
 
 /// <summary>
-/// Energy time series point.
-/// Immutable value object.
+/// Defines the settlement method
 /// </summary>
-/// <param name="Time"></param>
-/// <param name="Quantity"></param>
-/// <param name="Qualities"></param>
-public sealed record EnergyTimeSeriesPoint(
-    DateTimeOffset Time,
-    decimal Quantity,
-    IReadOnlyCollection<QuantityQuality> Qualities);
+public enum SettlementMethod
+{
+    Flex = 0,
+    NonProfiled = 1,
+}
