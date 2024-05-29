@@ -20,10 +20,10 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.M
 /// Energy time series point.
 /// Immutable value object.
 /// </summary>
-/// <param name="Time"></param>
+/// <param name="TimeUtc"></param>
 /// <param name="Quantity"></param>
 /// <param name="Qualities"></param>
 public sealed record EnergyTimeSeriesPoint(
-    DateTimeOffset Time,
+    DateTimeOffset TimeUtc,
     decimal Quantity,
     IReadOnlyCollection<QuantityQuality> Qualities);

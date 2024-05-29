@@ -24,10 +24,10 @@ public abstract class AggregatedTimeSeries
         EnergyTimeSeriesPoint[] timeSeriesPoints,
         MeteringPointType meteringPointType,
         CalculationType calculationType,
-        Instant periodStart,
-        Instant periodEnd,
+        Instant periodStartUtc,
+        Instant periodEndUtc,
         EnergyResultResolution resolution,
-        int version,
+        int calculationVersion,
         SettlementMethod? settlementMethod)
     {
         if (timeSeriesPoints.Length == 0)
@@ -37,28 +37,29 @@ public abstract class AggregatedTimeSeries
         TimeSeriesPoints = timeSeriesPoints;
         MeteringPointType = meteringPointType;
         CalculationType = calculationType;
-        PeriodStart = periodStart;
-        PeriodEnd = periodEnd;
+        PeriodStartUtc = periodStartUtc;
+        PeriodEndUtc = periodEndUtc;
         Resolution = resolution;
-        Version = version;
+        CalculationVersion = calculationVersion;
         SettlementMethod = settlementMethod;
     }
 
     public string GridAreaCode { get; init; }
 
+    // TODO: Can we use a read only collection type?
     public EnergyTimeSeriesPoint[] TimeSeriesPoints { get; init; }
 
     public MeteringPointType MeteringPointType { get; init; }
 
     public CalculationType CalculationType { get; init; }
 
-    public Instant PeriodStart { get; init; }
+    public Instant PeriodStartUtc { get; init; }
 
-    public Instant PeriodEnd { get; init; }
+    public Instant PeriodEndUtc { get; init; }
 
     public EnergyResultResolution Resolution { get; }
 
-    public int Version { get; init; }
+    public int CalculationVersion { get; init; }
 
     public SettlementMethod? SettlementMethod { get; init; }
 }

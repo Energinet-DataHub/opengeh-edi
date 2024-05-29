@@ -27,7 +27,7 @@ public sealed class EnergyResultPerGridArea(
     Instant periodStart,
     Instant periodEnd,
     EnergyResultResolution resolution,
-    int version,
+    int calculationVersion,
     SettlementMethod? settlementMethod)
     : AggregatedTimeSeries(gridAreaCode,
         timeSeriesPoints,
@@ -36,7 +36,7 @@ public sealed class EnergyResultPerGridArea(
         periodStart,
         periodEnd,
         resolution,
-        version,
+        calculationVersion,
         settlementMethod)
 {
     public Guid Id { get; } = id;
