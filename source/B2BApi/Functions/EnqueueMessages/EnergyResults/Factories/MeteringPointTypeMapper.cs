@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Model;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Model.Common;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Factories;
 

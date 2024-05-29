@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Model;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Model.Common;
 
 public enum QuantityQuality
 {

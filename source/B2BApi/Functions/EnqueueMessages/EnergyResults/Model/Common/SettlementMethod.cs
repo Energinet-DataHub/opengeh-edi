@@ -12,26 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Model;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Model.Common;
 
 /// <summary>
-/// Defines metering point type
+/// Defines the settlement method
 /// </summary>
-public enum MeteringPointType
+public enum SettlementMethod
 {
-    Consumption = 0,
-    Production = 1,
-    Exchange = 2,
-    VeProduction = 3,
-    NetProduction = 4,
-    SupplyToGrid = 5,
-    ConsumptionFromGrid = 6,
-    WholesaleServicesInformation = 7,
-    OwnProduction = 8,
-    NetFromGrid = 9,
-    NetToGrid = 10,
-    TotalConsumption = 11,
-    ElectricalHeating = 12,
-    NetConsumption = 13,
-    EffectSettlement = 14,
+    Flex = 0,
+    NonProfiled = 1,
 }
