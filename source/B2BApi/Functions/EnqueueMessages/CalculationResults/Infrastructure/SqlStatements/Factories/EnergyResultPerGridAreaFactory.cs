@@ -14,10 +14,12 @@
 
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Infrastructure.SqlStatements;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Infrastructure.SqlStatements.Mappers;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Infrastructure.SqlStatements.Mappers.EnergyResult;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Interfaces.Model.EnergyResults;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Model;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Factories;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Infrastructure.SqlStatements.Factories;
 
 public class EnergyResultPerGridAreaFactory
 {
@@ -63,7 +65,7 @@ public class EnergyResultPerGridAreaFactory
             CalculationTypeMapper.FromDeltaTableValue(calculationType),
             SqlResultValueConverters.ToInstant(periodStart),
             SqlResultValueConverters.ToInstant(periodEnd),
-            ResolutionMapper.FromDeltaTableValue(resolution),
+            EnergyResultResolutionMapper.FromDeltaTableValue(resolution),
             SqlResultValueConverters.ToInt(version),
             SettlementMethodMapper.FromDeltaTableValue(settlementMethod));
     }

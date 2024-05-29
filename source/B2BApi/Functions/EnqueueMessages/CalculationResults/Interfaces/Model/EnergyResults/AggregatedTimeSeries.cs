@@ -26,7 +26,7 @@ public abstract class AggregatedTimeSeries
         CalculationType calculationType,
         Instant periodStart,
         Instant periodEnd,
-        Resolution resolution,
+        EnergyResultResolution resolution,
         int version,
         SettlementMethod? settlementMethod)
     {
@@ -56,7 +56,7 @@ public abstract class AggregatedTimeSeries
 
     public Instant PeriodEnd { get; init; }
 
-    public Resolution Resolution { get; }
+    public EnergyResultResolution Resolution { get; }
 
     public int Version { get; init; }
 

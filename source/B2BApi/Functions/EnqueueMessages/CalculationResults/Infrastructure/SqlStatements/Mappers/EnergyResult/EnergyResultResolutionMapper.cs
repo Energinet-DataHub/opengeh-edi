@@ -12,31 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Interfaces.Model;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Interfaces.Model.EnergyResults;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Factories;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Infrastructure.SqlStatements.Mappers.EnergyResult;
 
-public static class ResolutionMapper
+public static class EnergyResultResolutionMapper
 {
-    public static Resolution FromDeltaTableValue(string resolution) =>
+    public static EnergyResultResolution FromDeltaTableValue(string resolution) =>
         resolution switch
         {
-            "PT15M" => Resolution.Quarter,
-            "PT1H" => Resolution.Hour,
+            "PT15M" => EnergyResultResolution.Quarter,
+            "PT1H" => EnergyResultResolution.Hour,
             _ => throw new ArgumentOutOfRangeException(
                 nameof(resolution),
                 actualValue: resolution,
                 "Value does not contain a valid string representation of a resolution."),
         };
 
-    public static string ToDeltaTableValue(Resolution resolution) =>
+    public static string ToDeltaTableValue(EnergyResultResolution resolution) =>
         resolution switch
         {
-            Resolution.Quarter => "PT15M",
-            Resolution.Hour => "PT1H",
+            EnergyResultResolution.Quarter => "PT15M",
+            EnergyResultResolution.Hour => "PT1H",
             _ => throw new ArgumentOutOfRangeException(
                 nameof(resolution),
                 actualValue: resolution,
-                $"Cannot map ${nameof(Resolution)} to delta table value"),
+                $"Cannot map ${nameof(EnergyResultResolution)} to delta table value"),
         };
 }

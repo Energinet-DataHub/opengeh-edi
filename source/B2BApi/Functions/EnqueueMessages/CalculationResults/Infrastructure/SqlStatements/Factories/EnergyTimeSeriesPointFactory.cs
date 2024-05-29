@@ -14,9 +14,10 @@
 
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Infrastructure.SqlStatements;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Infrastructure.SqlStatements.Mappers;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Model;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults.Factories;
+namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Infrastructure.SqlStatements.Factories;
 
 public static class EnergyTimeSeriesPointFactory
 {
