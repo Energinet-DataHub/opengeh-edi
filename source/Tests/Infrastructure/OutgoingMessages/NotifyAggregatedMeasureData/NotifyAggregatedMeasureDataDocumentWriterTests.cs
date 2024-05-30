@@ -12,14 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
-using Energinet.DataHub.EDI.OutgoingMessages.Application;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.Ebix;
@@ -281,6 +275,32 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
             .HasBusinessReason(BusinessReason.FromName(processType))
             .HasSettlementVersion(SettlementVersion.FromName(settlementVersion))
             .DocumentIsValidAsync();
+    }
+
+    [Fact]
+    public async Task Can_create_ebix_document_with_36_chars_transaction_id()
+    {
+        // Arrange
+        var transactionId = TransactionId.From("93dbd8bb-4fbb-4b9d-b57f-f6a5c16f7bdf");
+        var originalTransactionId = TransactionId.From("b340db36-ef97-4515-839c-1d8b544e9174");
+
+        _energyResultMessageTimeSeries
+            .WithTransactionId(transactionId)
+            .WithOriginalTransactionIdReference(originalTransactionId);
+
+        // Act
+        var document = await CreateDocument(_energyResultMessageTimeSeries, DocumentFormat.Ebix);
+
+        // Assert
+        var assertions = await new AssertNotifyAggregatedMeasureDataEbixDocument(
+                AssertEbixDocument.Document(document.Stream, "ns0", _documentValidation.Validator))
+            .HasStructureValidationErrorsAsync(
+            [
+                $"The value '{transactionId.Value}' is invalid according to its datatype",
+                $"The value '{originalTransactionId.Value}' is invalid according to its datatype",
+            ]);
+
+        assertions.HasTransactionId(transactionId).HasOriginalTransactionIdReference(originalTransactionId);
     }
 
     private Task<MarketDocumentStream> CreateDocument(EnergyResultMessageTimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)

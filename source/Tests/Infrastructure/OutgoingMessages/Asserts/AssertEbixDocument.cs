@@ -12,20 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
 using FluentAssertions;
-using FluentAssertions.Execution;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
@@ -143,6 +136,28 @@ public class AssertEbixDocument
         validationResult.IsValid.Should().BeTrue();
 
         return this;
+    }
+
+    public async Task<IReadOnlyCollection<string>> HasStructureValidationErrorsAsync(
+        DocumentType type,
+        string version = "0.1")
+    {
+        Assert.True(_originalMessage.Root!.Name == "MessageContainer");
+        Assert.NotNull(_originalMessage.Root!.Elements().Single(x => x.Name.LocalName == "MessageReference"));
+        Assert.NotNull(_originalMessage.Root!.Elements().Single(x => x.Name.LocalName == "DocumentType"));
+        Assert.NotNull(_originalMessage.Root!.Elements().Single(x => x.Name.LocalName == "MessageType"));
+        var validationResult = await _documentValidator!
+            .ValidateAsync(_stream, DocumentFormat.Ebix, type, CancellationToken.None, version)
+            .ConfigureAwait(false);
+
+        if (validationResult.IsValid)
+        {
+            return validationResult.ValidationErrors;
+        }
+
+        validationResult = ValidationResult.Invalid(validationResult.ValidationErrors.ToArray());
+
+        return validationResult.ValidationErrors;
     }
 
     public string EnsureXPathHasPrefix(string xpath)
