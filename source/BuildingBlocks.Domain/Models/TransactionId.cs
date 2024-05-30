@@ -46,7 +46,7 @@ public class TransactionId : ValueObject
 
     public static TransactionId New()
     {
-        return new TransactionId(EbixUuidFactory.NewEbixUuid().Id);
+        return new TransactionId(GloriousEbixUuid.NewGloriousEbixUuid().Id);
     }
 }
 

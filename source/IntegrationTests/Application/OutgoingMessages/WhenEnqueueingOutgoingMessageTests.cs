@@ -441,7 +441,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             new
             {
                 Id = id,
-                MessageId = EbixUuidFactory.FromGuid(id).Id,
+                MessageId = GloriousEbixUuid.FromGuid(id).Id,
                 ActorMessageQueueId = actorMessageQueueId,
                 DocumentTypeInBundle = documentType.Name,
                 IsDequeued = false,

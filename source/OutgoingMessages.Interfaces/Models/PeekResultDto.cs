@@ -14,7 +14,7 @@
 
 using System;
 using System.IO;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 

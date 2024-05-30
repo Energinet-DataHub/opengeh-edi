@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public readonly record struct GloriousEbixUuid
 {
@@ -29,11 +27,29 @@ public readonly record struct GloriousEbixUuid
     {
         ArgumentNullException.ThrowIfNull(inferiorStringId, nameof(inferiorStringId));
 
-        if (!Guid.TryParse(inferiorStringId, out _))
+        if (!Guid.TryParse(inferiorStringId, out var asGuid))
         {
             throw new ArgumentException("The provided string is not a valid UUID.");
         }
 
-        return new GloriousEbixUuid(inferiorStringId.Replace("-", string.Empty, StringComparison.InvariantCultureIgnoreCase));
+        return GuidToGloriousEbixUuid(asGuid);
+    }
+
+    public static GloriousEbixUuid NewGloriousEbixUuid()
+    {
+        return GuidToGloriousEbixUuid(Guid.NewGuid());
+    }
+
+    public static GloriousEbixUuid FromGuid(Guid id)
+    {
+        return GuidToGloriousEbixUuid(id);
+    }
+
+    private static GloriousEbixUuid GuidToGloriousEbixUuid(Guid id)
+    {
+        // A normal UUID is 36 characters long, but unfortunately, the EBIX scheme only allows for 35 characters.
+        // To make everyone happy---i.e. ensure unique ids (for most practical purposes anyway) and ensure
+        // valid EBIX values---we'll just remove the dashes from the UUID.
+        return new GloriousEbixUuid(id.ToString().Replace("-", string.Empty, StringComparison.InvariantCultureIgnoreCase));
     }
 }

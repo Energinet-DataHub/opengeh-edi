@@ -35,7 +35,7 @@ public sealed class Bundle
     {
         _maxNumberOfMessagesInABundle = maxNumberOfMessagesInABundle;
         Id = BundleId.New();
-        MessageId = EbixUuidFactory.FromGuid(Id.Id);
+        MessageId = GloriousEbixUuid.FromGuid(Id.Id);
         BusinessReason = businessReason;
         DocumentTypeInBundle = documentTypeInBundle;
         Created = created;
