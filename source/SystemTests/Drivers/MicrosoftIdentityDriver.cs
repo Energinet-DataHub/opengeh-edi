@@ -15,18 +15,22 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.SystemTests.Logging;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.SystemTests.Drivers;
 
 internal sealed class MicrosoftIdentityDriver
 {
+    private readonly TestLogger _logger;
     private readonly string _tenantId;
     private readonly string _backendAppId;
 
-    internal MicrosoftIdentityDriver(string tenantId, string backendAppId)
+    internal MicrosoftIdentityDriver(TestLogger logger, string tenantId, string backendAppId)
     {
         ArgumentNullException.ThrowIfNull(tenantId);
         ArgumentNullException.ThrowIfNull(backendAppId);
+        _logger = logger;
         _tenantId = tenantId;
         _backendAppId = backendAppId;
     }
@@ -47,7 +51,7 @@ internal sealed class MicrosoftIdentityDriver
 
         using var httpClient = new HttpClient();
         var response = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
+        await response.EnsureSuccessStatusCodeWithLogAsync(_logger);
 
         var accessToken = await response.Content.ReadFromJsonAsync<AccessTokenResponse>(cancellationToken: cancellationToken).ConfigureAwait(false);
 

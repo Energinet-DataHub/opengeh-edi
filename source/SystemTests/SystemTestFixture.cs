@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.EDI.SystemTests.Drivers;
 using Energinet.DataHub.EDI.SystemTests.Dsl;
+using Energinet.DataHub.EDI.SystemTests.Logging;
 using Energinet.DataHub.EDI.SystemTests.Models;
 using Microsoft.Extensions.Configuration;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.SystemTests;
 
@@ -26,7 +29,7 @@ public class SystemTestFixture : IAsyncLifetime
     public SystemTestFixture()
     {
         var configurationBuilder = new ConfigurationBuilder()
-            .AddJsonFile("systemtests.dev001.settings.json", true)
+            .AddJsonFile("systemtests.dev002.settings.json", true)
             .AddEnvironmentVariables();
 
         var jsonConfiguration = configurationBuilder.Build();
@@ -36,10 +39,12 @@ public class SystemTestFixture : IAsyncLifetime
 
         var root = configurationBuilder.Build();
 
+        Logger = new TestLogger();
+
         var tenantId = root.GetValue<string>("b2c-tenant-id") ?? throw new InvalidOperationException("b2c-tenant-id is not set in configuration");
         var backendAppId = root.GetValue<string>("backend-b2b-app-id") ?? throw new InvalidOperationException("backend-b2b-app-id is not set in configuration");
         var apiManagementUri = new Uri(root.GetValue<string>("apim-gateway-url") ?? throw new InvalidOperationException("apim-gateway-url secret is not set in configuration"));
-        EdiDriver = new EdiDriver(apiManagementUri, tenantId, backendAppId);
+        EdiDriver = new EdiDriver(Logger, apiManagementUri, tenantId, backendAppId);
 
         var meteredDataResponsibleClientId = root.GetValue<string>("METERED_DATA_RESPONSIBLE_CLIENT_ID") ?? throw new InvalidOperationException("METERED_DATA_RESPONSIBLE_CLIENT_ID is not set in configuration");
         var meteredDataResponsibleClientSecret = root.GetValue<string>("METERED_DATA_RESPONSIBLE_CLIENT_SECRET") ?? throw new InvalidOperationException("METERED_DATA_RESPONSIBLE_CLIENT_SECRET is not set in configuration");
@@ -58,6 +63,8 @@ public class SystemTestFixture : IAsyncLifetime
 
     public EdiDriver EdiDriver { get; }
 
+    public TestLogger Logger { get; set; }
+
     private DatahubDsl Datahub { get; }
 
     public async Task InitializeAsync()
@@ -65,6 +72,11 @@ public class SystemTestFixture : IAsyncLifetime
         // Ensure Queue is empty before starting tests.
         await EmptyQueueForAsync(MeteredDataResponsible, CancellationToken.None).ConfigureAwait(false);
         await EmptyQueueForAsync(SystemOperator, CancellationToken.None).ConfigureAwait(false);
+    }
+
+    public void SetTestOutputHelper(ITestOutputHelper testOutputHelper)
+    {
+        Logger.SetTestOutputHelper(testOutputHelper);
     }
 
     public Task DisposeAsync()
