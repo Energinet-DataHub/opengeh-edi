@@ -56,7 +56,7 @@ public sealed class Bundle
     /// </summary>
     public MessageId? RelatedToMessageId { get; private set; }
 
-    public string MessageId { get; private set; }
+    public GloriousEbixUuid MessageId { get; private set; }
 
     internal DocumentType DocumentTypeInBundle { get; }
 

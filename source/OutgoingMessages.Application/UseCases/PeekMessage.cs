@@ -82,6 +82,9 @@ public class PeekMessage
         if (peekResult.BundleId == null)
             return new PeekResultDto(null, null, null);
 
+        if (peekResult.MessageId == null)
+            return new PeekResultDto(null, null, null);
+
         var marketDocument = await _marketDocumentRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);
 
         if (marketDocument == null)
@@ -92,7 +95,7 @@ public class PeekMessage
             var marketDocumentStream = await _documentFactory.CreateFromAsync(outgoingMessageBundle, request.DocumentFormat, timestamp).ConfigureAwait(false);
 
             var archivedMessageToCreate = new ArchivedMessage(
-                peekResult.MessageId,
+                peekResult.MessageId.Value.Id,
                 outgoingMessageBundle.OutgoingMessages.Select(om => om.EventId).ToArray(),
                 outgoingMessageBundle.DocumentType.ToString(),
                 outgoingMessageBundle.SenderId.Value,

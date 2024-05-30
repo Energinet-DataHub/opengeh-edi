@@ -138,7 +138,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         peekResult.Bundle.Should().NotBeNull();
 
         var peekResultFileContent = await GetStreamContentAsStringAsync(peekResult.Bundle!);
-        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!);
+        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value.Id);
         archivedMessageFileStorageReference.Should().NotBeNull();
 
         var archivedMessageFileContent = await GetFileContentFromFileStorageAsync(
@@ -169,8 +169,8 @@ public class WhenAPeekIsRequestedTests : TestBase
         // Assert
         result.Bundle.Should().NotBeNull();
 
-        var archivedMessageId = await GetArchivedMessageIdFromDatabaseAsync(result.MessageId!);
-        var fileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(result.MessageId!);
+        var archivedMessageId = await GetArchivedMessageIdFromDatabaseAsync(result.MessageId!.Value.Id);
+        var fileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(result.MessageId!.Value.Id);
         fileStorageReference.Should().Be($"{receiverNumber}/{year:0000}/{month:00}/{date:00}/{archivedMessageId:N}");
     }
 
@@ -203,7 +203,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);
 
         var marketDocumentFileStorageReference = await GetMarketDocumentFileStorageReferenceFromDatabaseAsync(peekResult.BundleId!.Value);
-        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!);
+        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value.Id);
 
         marketDocumentFileStorageReference.Should().Be(archivedMessageFileStorageReference);
     }
@@ -302,7 +302,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         peekResult.Should().NotBeNull("because a peek result should be found");
         peekResult.MessageId.Should().NotBeNull("because a peek result with a message id should be found");
 
-        var archivedMessage = await GetArchivedMessageFromDatabaseAsync(peekResult.MessageId!);
+        var archivedMessage = await GetArchivedMessageFromDatabaseAsync(peekResult.MessageId!.Value.Id);
         ((object?)archivedMessage).Should().NotBeNull("because an archived message should exists");
 
         var expectedFileStorageReference = $"{receiverNumber}/{year:0000}/{month:00}/{day:00}/{archivedMessage!.Id:N}";
@@ -314,7 +314,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             { "EventIds", eventIds => eventIds.Should().Be(expectedEventId.Value) },
             { "FileStorageReference", fileStorageReference => fileStorageReference.Should().Be(expectedFileStorageReference) },
             { "Id", id => id.Should().NotBeNull() },
-            { "MessageId", messageId => messageId.Should().Be(peekResult.MessageId) },
+            { "MessageId", messageId => messageId.Should().Be(peekResult.MessageId.Value.Id) },
             { "ReceiverNumber", receiverNumber => receiverNumber.Should().Be(outgoingMessage.ReceiverNumber.Value) },
             { "RecordId", recordId => recordId.Should().NotBeNull() },
             { "RelatedToMessageId", relatedToMessageId => relatedToMessageId.Should().BeNull() },

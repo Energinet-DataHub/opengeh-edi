@@ -14,7 +14,8 @@
 
 using System;
 using System.IO;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-public record PeekResultDto(Stream? Bundle, Guid? BundleId, string? MessageId);
+public record PeekResultDto(Stream? Bundle, Guid? BundleId, GloriousEbixUuid? MessageId);

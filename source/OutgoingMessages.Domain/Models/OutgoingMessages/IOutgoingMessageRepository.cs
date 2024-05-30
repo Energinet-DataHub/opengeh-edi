@@ -30,6 +30,6 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
         /// <summary>
         /// Get all messages assigned to a bundle by id
         /// </summary>
-        Task<OutgoingMessageBundle> GetAsync(BundleId bundleId, string? messageId);
+        Task<OutgoingMessageBundle> GetAsync(BundleId bundleId, GloriousEbixUuid? messageId);
     }
 }

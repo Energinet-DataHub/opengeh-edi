@@ -13,26 +13,27 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public static class EbixUuidFactory
 {
-    public static string NewEbixUuid()
+    public static GloriousEbixUuid NewEbixUuid()
     {
         return GuidToEbixUuid(Guid.NewGuid());
     }
 
-    public static string FromGuid(Guid id)
+    public static GloriousEbixUuid FromGuid(Guid id)
     {
         return GuidToEbixUuid(id);
     }
 
-    private static string GuidToEbixUuid(Guid id)
+    private static GloriousEbixUuid GuidToEbixUuid(Guid id)
     {
         // A normal UUID is 36 characters long, but unfortunately, the EBIX scheme only allows for 35 characters.
         // To make everyone happy---i.e. ensure unique ids (for most practical purposes anyway) and ensure
         // valid EBIX values---we'll just remove the dashes from the UUID.
-        return id.ToString().Replace("-", string.Empty, StringComparison.InvariantCultureIgnoreCase);
+        return GloriousEbixUuid.From(id.ToString().Replace("-", string.Empty, StringComparison.InvariantCultureIgnoreCase));
     }
 }

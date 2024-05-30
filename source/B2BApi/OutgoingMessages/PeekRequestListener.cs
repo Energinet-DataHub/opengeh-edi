@@ -104,7 +104,7 @@ public class PeekRequestListener
             return response;
         }
 
-        if (peekResult.Bundle == null)
+        if (peekResult.Bundle == null || peekResult.MessageId == null)
         {
             response.StatusCode = HttpStatusCode.InternalServerError;
             return response;
@@ -112,7 +112,7 @@ public class PeekRequestListener
 
         response.Body = peekResult.Bundle;
         response.Headers.Add("content-type", contentType);
-        response.Headers.Add("MessageId", peekResult.MessageId);
+        response.Headers.Add("MessageId", peekResult.MessageId?.Id);
         response.StatusCode = HttpStatusCode.OK;
         return response;
     }

@@ -167,7 +167,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             DocumentFormat.Xml);
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(peekRequestDto, CancellationToken.None);
         var dequeueCommand = new DequeueRequestDto(
-            peekResult.MessageId!,
+            peekResult.MessageId!.Value.Id,
             message.ReceiverRole,
             message.ReceiverNumber);
 
@@ -441,7 +441,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             new
             {
                 Id = id,
-                MessageId = EbixUuidFactory.FromGuid(id),
+                MessageId = EbixUuidFactory.FromGuid(id).Id,
                 ActorMessageQueueId = actorMessageQueueId,
                 DocumentTypeInBundle = documentType.Name,
                 IsDequeued = false,

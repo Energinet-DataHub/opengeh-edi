@@ -50,7 +50,7 @@ public class DocumentFactory
                 bundle.SenderRole.Code,
                 bundle.Receiver.Number.Value,
                 bundle.DocumentReceiver.ActorRole.Code,
-                bundle.MessageId,
+                bundle.MessageId.Id,
                 timestamp),
             bundle.OutgoingMessages.Select(message => message.GetSerializedContent()).ToList());
     }

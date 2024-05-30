@@ -28,7 +28,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
             string businessReason,
             ActorNumber senderId,
             ActorRole senderRole,
-            string messageId,
+            GloriousEbixUuid messageId,
             IReadOnlyCollection<OutgoingMessage> outgoingMessages,
             MessageId? relatedToMessageId = null)
         {
@@ -61,7 +61,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
         /// </summary>
         public Receiver DocumentReceiver { get; }
 
-        public string MessageId { get; }
+        public GloriousEbixUuid MessageId { get; }
 
         public MessageId? RelatedToMessageId { get; private set; }
 

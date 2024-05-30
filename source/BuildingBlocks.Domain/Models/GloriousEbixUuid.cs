@@ -12,9 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
+using System;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 
-public sealed record PeekResult(BundleId? BundleId, GloriousEbixUuid? MessageId, DocumentType? DocumentType);
+public readonly record struct GloriousEbixUuid
+{
+    private GloriousEbixUuid(string id)
+    {
+        Id = id;
+    }
+
+    public string Id { get; }
+
+    public static GloriousEbixUuid From(string inferiorStringId)
+    {
+        ArgumentNullException.ThrowIfNull(inferiorStringId, nameof(inferiorStringId));
+
+        if (!Guid.TryParse(inferiorStringId, out _))
+        {
+            throw new ArgumentException("The provided string is not a valid UUID.");
+        }
+
+        return new GloriousEbixUuid(inferiorStringId.Replace("-", string.Empty, StringComparison.InvariantCultureIgnoreCase));
+    }
+}
