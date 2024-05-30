@@ -28,6 +28,8 @@ public class EnqueueMessagesActivityTests : IAsyncLifetime
     {
         var calculationId = Guid.NewGuid();
         ViewQuery = new EnergyResultPerGridAreaQuery(calculationId);
+
+        // TODO: Refactor "HttpClientFactory" in "TestCommon" to something specific
         DatabricksSchemaManager = new DatabricksSchemaManager(
             new HttpClientFactory(),
             databricksSettings: _integrationTestConfiguration.DatabricksSettings,
