@@ -12,36 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Infrastructure.SqlStatements.Queries.EnergyResult;
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.EnergyResults;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
 public class EnqueueMessagesActivity(
-    IOutgoingMessagesClient outgoingMessagesClient,
-    EnergyResultEnumerator energyResultEnumerator,
-    EnergyResultMessageDtoFactory messageDtoFactory)
+    IOutgoingMessagesClient outgoingMessagesClient)
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
-    private readonly EnergyResultEnumerator _energyResultEnumerator = energyResultEnumerator;
-    private readonly EnergyResultMessageDtoFactory _messageDtoFactory = messageDtoFactory;
 
     [Function(nameof(EnqueueMessagesActivity))]
     public async Task Run(
-        [ActivityTrigger] EnqueueMessagesInput input)
+        [ActivityTrigger] EnqueueMessagesInput inputDto)
     {
-        // TODO: Decide "view" / "query" based on calculation type
-        var calculationId = Guid.Parse(input.CalculationId);
-        await foreach (var nextResult in _energyResultEnumerator.GetAsync(calculationId))
-        {
-            // TODO: Can we use "result id" as "event id"? If so we can create it within the factory.
-            var eventId = EventId.From(nextResult.Id);
-            var nextMessage = await _messageDtoFactory.CreateAsync(eventId, nextResult, CancellationToken.None);
-            await _outgoingMessagesClient.EnqueueAndCommitAsync(nextMessage, CancellationToken.None);
-        }
+        // TODO: Get a proper event id!
+        await _outgoingMessagesClient.EnqueueByCalculationId(
+            new EnqueueMessagesInputDto(
+                Guid.Parse(inputDto.CalculationId),
+                inputDto.CalculationVersion,
+                Guid.Empty));
     }
 }

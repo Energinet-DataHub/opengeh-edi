@@ -74,4 +74,9 @@ public interface IOutgoingMessagesClient
     ///  Enqueue a wholesale services total sum message, WITH commit. Currently ONLY used by the integration event.
     /// </summary>
     Task<OutgoingMessageId> EnqueueAndCommitAsync(WholesaleServicesTotalSumMessageDto wholesaleServicesTotalSumMessage, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///  Enqueue energy results as outgoing messages for the given calculation id.
+    /// </summary>
+    Task EnqueueByCalculationId(EnqueueMessagesInputDto input);
 }
