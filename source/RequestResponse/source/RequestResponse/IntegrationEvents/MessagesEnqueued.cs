@@ -18,5 +18,5 @@ namespace Energinet.DataHub.EnergySupplying.RequestResponse.IntegrationEvents;
 public partial class MessagesEnqueuedV1
 {
     public const string EventName = "MessagesEnqueuedV1";
-    public const int CurrentMinorVersion = 1;
+    public const int CurrentMinorVersion = 2;
 }

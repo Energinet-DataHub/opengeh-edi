@@ -31,4 +31,6 @@ message MessagesEnqueuedV1 {
   * Example: 65801e3c-5131-426e-b1bb-7b186349c996
   */
   string calculation_id = 2; // The messages were enqueued for this calculation.
+  
+  bool success = 3; // True if the messages were enqueued successfully, false otherwise.
 }
