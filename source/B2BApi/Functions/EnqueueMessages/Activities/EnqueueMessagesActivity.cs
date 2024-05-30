@@ -29,7 +29,7 @@ public class EnqueueMessagesActivity(
         [ActivityTrigger] EnqueueMessagesInput inputDto)
     {
         // TODO: Get a proper event id!
-        await _outgoingMessagesClient.EnqueueByCalculationId(
+        await _outgoingMessagesClient.EnqueueByCalculationIdAsync(
             new EnqueueMessagesInputDto(
                 Guid.Parse(inputDto.CalculationId),
                 inputDto.CalculationVersion,

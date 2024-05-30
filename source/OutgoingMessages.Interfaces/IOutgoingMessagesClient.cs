@@ -78,5 +78,5 @@ public interface IOutgoingMessagesClient
     /// <summary>
     ///  Enqueue energy results as outgoing messages for the given calculation id.
     /// </summary>
-    Task EnqueueByCalculationId(EnqueueMessagesInputDto input);
+    Task EnqueueByCalculationIdAsync(EnqueueMessagesInputDto input);
 }
