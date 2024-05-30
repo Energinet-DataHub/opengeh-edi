@@ -34,7 +34,14 @@ public abstract class EnergyResultQueryBase(Guid calculationId)
     /// <summary>
     /// List of column names to select in query.
     /// </summary>
-    public abstract string[] SqlColumnNames { get; }
+    public string[] SqlColumnNames => SchemaDefinition.Keys.ToArray();
+
+    /// <summary>
+    /// The schema definition of the view expressed as (Column name, Data type, Is nullable).
+    ///
+    /// Can be used in tests to create a matching data object (e.g. table).
+    /// </summary>
+    public abstract Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition { get; }
 
     protected override string GetSqlStatement()
     {

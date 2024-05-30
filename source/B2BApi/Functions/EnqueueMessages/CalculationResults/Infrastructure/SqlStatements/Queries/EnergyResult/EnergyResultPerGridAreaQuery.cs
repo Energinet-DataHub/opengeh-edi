@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Infrastructure.SqlStatements.DeltaTableConstants;
+
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.CalculationResults.Infrastructure.SqlStatements.Queries.EnergyResult;
 
 /// <summary>
@@ -28,19 +30,28 @@ public class EnergyResultPerGridAreaQuery(Guid calculationId)
 
     public override string DataObjectName => "energy_result_points_per_ga_v1";
 
-    public override string[] SqlColumnNames => [
-        EnergyResultColumnNames.CalculationId,
-        EnergyResultColumnNames.CalculationType,
-        EnergyResultColumnNames.CalculationPeriodStart,
-        EnergyResultColumnNames.CalculationPeriodEnd,
-        EnergyResultColumnNames.CalculationVersion,
-        EnergyResultColumnNames.ResultId,
-        EnergyResultColumnNames.GridAreaCode,
-        EnergyResultColumnNames.MeteringPointType,
-        EnergyResultColumnNames.SettlementMethod,
-        EnergyResultColumnNames.Resolution,
-        EnergyResultColumnNames.Time,
-        EnergyResultColumnNames.Quantity,
-        EnergyResultColumnNames.QuantityUnit,
-        EnergyResultColumnNames.QuantityQualities];
+    // TODO:
+    // We could use the data type information for parsing; but in the end it would be even more powerfull
+    // if we could deserialize into strongly typed objects.
+    public override Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition => new()
+    {
+        // TODO: Define known data types as consts and use them in schema definition
+        { EnergyResultColumnNames.CalculationId,            (DeltaTableCommonTypes.String,      false) },
+        { EnergyResultColumnNames.CalculationType,          (DeltaTableCommonTypes.String,      false) },
+        { EnergyResultColumnNames.CalculationPeriodStart,   (DeltaTableCommonTypes.Timestamp,   false) },
+        { EnergyResultColumnNames.CalculationPeriodEnd,     (DeltaTableCommonTypes.Timestamp,   false) },
+        // TODO:
+        // In the documentation of the view this is "Int", but in the schema in Databricks I see it is "BigInt".
+        // If it is BigInt we must change the CalculationVersion in C# to be a "long".
+        { EnergyResultColumnNames.CalculationVersion,       (DeltaTableCommonTypes.BigInt,      false) },
+        { EnergyResultColumnNames.ResultId,                 (DeltaTableCommonTypes.String,      false) },
+        { EnergyResultColumnNames.GridAreaCode,             (DeltaTableCommonTypes.String,      false) },
+        { EnergyResultColumnNames.MeteringPointType,        (DeltaTableCommonTypes.String,      false) },
+        { EnergyResultColumnNames.SettlementMethod,         (DeltaTableCommonTypes.String,      true) },
+        { EnergyResultColumnNames.Resolution,               (DeltaTableCommonTypes.String,      false) },
+        { EnergyResultColumnNames.Time,                     (DeltaTableCommonTypes.Timestamp,   false) },
+        { EnergyResultColumnNames.Quantity,                 (DeltaTableCommonTypes.Decimal18x3, false) },
+        { EnergyResultColumnNames.QuantityUnit,             (DeltaTableCommonTypes.String,      false) },
+        { EnergyResultColumnNames.QuantityQualities,        (DeltaTableCommonTypes.ArrayOfStrings,       false) },
+    };
 }
