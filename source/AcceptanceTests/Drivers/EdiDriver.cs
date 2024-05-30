@@ -18,18 +18,22 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
+using Energinet.DataHub.EDI.AcceptanceTests.Logging;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Nito.AsyncEx;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 internal sealed class EdiDriver : IDisposable
 {
     private readonly AsyncLazy<HttpClient> _httpClient;
+    private readonly ITestOutputHelper _logger;
 
-    public EdiDriver(AsyncLazy<HttpClient> b2bHttpClient)
+    public EdiDriver(AsyncLazy<HttpClient> b2bHttpClient, ITestOutputHelper logger)
     {
         _httpClient = b2bHttpClient;
+        _logger = logger;
     }
 
     public void Dispose()
@@ -104,7 +108,7 @@ internal sealed class EdiDriver : IDisposable
             throw new BadWholesaleSettlementRequestException($"responseContent: {responseContent}");
         }
 
-        wholesaleSettlementResponse.EnsureSuccessStatusCode();
+        await wholesaleSettlementResponse.EnsureSuccessStatusCodeWithLogAsync(_logger);
         return requestContent.MessageId;
     }
 
@@ -123,7 +127,7 @@ internal sealed class EdiDriver : IDisposable
             throw new BadAggregatedMeasureDataRequestException($"responseContent: {responseContent}");
         }
 
-        aggregatedMeasureDataResponse.EnsureSuccessStatusCode();
+        await aggregatedMeasureDataResponse.EnsureSuccessStatusCodeWithLogAsync(_logger);
         return requestContent.MessageId;
     }
 
@@ -179,7 +183,7 @@ internal sealed class EdiDriver : IDisposable
         request.Content = new StringContent(string.Empty, Encoding.UTF8, contentType);
         request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
         var peekResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
-        peekResponse.EnsureSuccessStatusCode();
+        await peekResponse.EnsureSuccessStatusCodeWithLogAsync(_logger);
         return peekResponse;
     }
 
@@ -188,6 +192,6 @@ internal sealed class EdiDriver : IDisposable
         var b2bClient = await _httpClient;
         using var request = new HttpRequestMessage(HttpMethod.Delete, $"v1.0/cim/dequeue/{messageId}");
         var dequeueResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
-        dequeueResponse.EnsureSuccessStatusCode();
+        await dequeueResponse.EnsureSuccessStatusCodeWithLogAsync(_logger);
     }
 }

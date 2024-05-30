@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.SystemTests.Dsl;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.SystemTests.Tests;
@@ -27,10 +28,10 @@ public sealed class WhenAggregatedMeasureDataIsRequestedTests
     private readonly SystemTestFixture _fixture;
     private readonly AggregatedMeasureDataRequestDsl _aggregationRequest;
 
-    public WhenAggregatedMeasureDataIsRequestedTests(SystemTestFixture fixture)
+    public WhenAggregatedMeasureDataIsRequestedTests(SystemTestFixture fixture, ITestOutputHelper testOutputHelper)
     {
         _fixture = fixture;
-        ArgumentNullException.ThrowIfNull(fixture);
+        _fixture.SetTestOutputHelper(testOutputHelper);
         _aggregationRequest = new AggregatedMeasureDataRequestDsl(_fixture.EdiDriver);
     }
 
