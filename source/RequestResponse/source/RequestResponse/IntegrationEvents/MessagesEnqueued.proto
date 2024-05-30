@@ -32,5 +32,5 @@ message MessagesEnqueuedV1 {
   */
   string calculation_id = 2; // The messages were enqueued for this calculation.
   
-  bool success = 3; // True if the messages were enqueued successfully, false otherwise.
+  bool success = 3; // True if all messages were enqueued successfully, false otherwise.
 }
