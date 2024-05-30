@@ -21,7 +21,7 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
-internal class EnqueueMessagesActivity(
+public class EnqueueMessagesActivity(
     IOutgoingMessagesClient outgoingMessagesClient,
     EnergyResultEnumerator energyResultEnumerator,
     EnergyResultMessageDtoFactory messageDtoFactory)

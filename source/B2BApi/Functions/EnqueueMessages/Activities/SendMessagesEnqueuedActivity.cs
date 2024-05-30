@@ -23,7 +23,7 @@ using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
-internal class SendMessagesEnqueuedActivity
+public class SendMessagesEnqueuedActivity
 {
     private readonly IServiceBusSenderAdapter _senderCreator;
 
