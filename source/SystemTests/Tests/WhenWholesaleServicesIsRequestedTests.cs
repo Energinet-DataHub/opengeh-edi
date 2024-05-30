@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.SystemTests.Dsl;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.SystemTests.Tests;
@@ -27,10 +28,10 @@ public sealed class WhenWholesaleServicesIsRequestedTests
     private readonly SystemTestFixture _fixture;
     private readonly WholesaleServicesRequestDsl _wholesaleServicesRequest;
 
-    public WhenWholesaleServicesIsRequestedTests(SystemTestFixture fixture)
+    public WhenWholesaleServicesIsRequestedTests(SystemTestFixture fixture, ITestOutputHelper testOutputHelper)
     {
         _fixture = fixture;
-        ArgumentNullException.ThrowIfNull(fixture);
+        _fixture.SetTestOutputHelper(testOutputHelper);
         _wholesaleServicesRequest = new WholesaleServicesRequestDsl(_fixture.EdiDriver);
     }
 

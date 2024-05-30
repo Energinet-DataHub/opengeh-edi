@@ -15,6 +15,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
+using Xunit.Abstractions;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
@@ -25,16 +26,17 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
     Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 [IntegrationTest]
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
-public sealed class WhenAmountPerChargeResultResultIsPublishedTests
+public sealed class WhenAmountPerChargeResultResultIsPublishedTests : BaseTestClass
 {
     private readonly NotifyWholesaleServicesDsl _notifyWholesaleServices;
 
-    public WhenAmountPerChargeResultResultIsPublishedTests(AcceptanceTestFixture fixture)
+    public WhenAmountPerChargeResultResultIsPublishedTests(AcceptanceTestFixture fixture, ITestOutputHelper output)
+        : base(output, fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
         _notifyWholesaleServices = new NotifyWholesaleServicesDsl(
-            new EdiDriver(fixture.B2BEnergySupplierAuthorizedHttpClient),
+            new EdiDriver(fixture.B2BEnergySupplierAuthorizedHttpClient, output),
             new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
     }
 

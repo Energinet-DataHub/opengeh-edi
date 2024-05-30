@@ -17,6 +17,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration; // DO NOT REM
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Microsoft.Extensions.Configuration;
 using Nito.AsyncEx;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests;
 
@@ -42,7 +43,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
     public AcceptanceTestFixture()
     {
         var configurationBuilder = new ConfigurationBuilder()
-            .AddJsonFile("acceptancetest.dev001.settings.json", true)
+            .AddJsonFile("acceptancetest.dev002.settings.json", true)
             .AddEnvironmentVariables();
 
         var jsonConfiguration = configurationBuilder.Build();
@@ -95,6 +96,8 @@ public class AcceptanceTestFixture : IAsyncLifetime
         B2CAuthorizedHttpClient = new AsyncLazy<HttpClient>(CreateB2CAuthorizedHttpClientAsync);
     }
 
+    public ITestOutputHelper? Logger { get; set; }
+
     internal Uri MarketParticipantUri { get; }
 
     internal IntegrationEventPublisher EventPublisher { get; }
@@ -143,7 +146,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
             (await B2BSystemOperatorAuthorizedHttpClient).Dispose();
     }
 
-    private static async Task<HttpClient> CreateB2BMeteredDataResponsibleAuthorizedHttpClientAsync(
+    private async Task<HttpClient> CreateB2BMeteredDataResponsibleAuthorizedHttpClientAsync(
         string azureB2CTenantId,
         string azureEntraBackendAppId,
         string clientId,
@@ -152,7 +155,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
     {
         var httpTokenClient = new HttpClient();
 
-        var tokenRetriever = new B2BTokenReceiver(httpTokenClient, azureB2CTenantId, azureEntraBackendAppId);
+        var tokenRetriever = new B2BTokenReceiver(httpTokenClient, azureB2CTenantId, azureEntraBackendAppId, GetLogger());
         var token = await tokenRetriever
             .GetB2BTokenAsync(clientId, clientSecret)
             .ConfigureAwait(false);
@@ -163,7 +166,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
         return httpClient;
     }
 
-    private static async Task<HttpClient> CreateB2BEnergySupplierAuthorizedHttpClientAsync(
+    private async Task<HttpClient> CreateB2BEnergySupplierAuthorizedHttpClientAsync(
         string azureB2CTenantId,
         string azureEntraBackendAppId,
         string clientId,
@@ -172,7 +175,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
     {
         var httpTokenClient = new HttpClient();
 
-        var tokenRetriever = new B2BTokenReceiver(httpTokenClient, azureB2CTenantId, azureEntraBackendAppId);
+        var tokenRetriever = new B2BTokenReceiver(httpTokenClient, azureB2CTenantId, azureEntraBackendAppId, GetLogger());
         var token = await tokenRetriever
             .GetB2BTokenAsync(clientId, clientSecret)
             .ConfigureAwait(false);
@@ -183,7 +186,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
         return httpClient;
     }
 
-    private static async Task<HttpClient> CreateB2BSystemOperatorAuthorizedHttpClientAsync(
+    private async Task<HttpClient> CreateB2BSystemOperatorAuthorizedHttpClientAsync(
         string azureB2CTenantId,
         string azureEntraBackendAppId,
         string clientId,
@@ -192,7 +195,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
     {
         var httpTokenClient = new HttpClient();
 
-        var tokenRetriever = new B2BTokenReceiver(httpTokenClient, azureB2CTenantId, azureEntraBackendAppId);
+        var tokenRetriever = new B2BTokenReceiver(httpTokenClient, azureB2CTenantId, azureEntraBackendAppId, GetLogger());
         var token = await tokenRetriever
             .GetB2BTokenAsync(clientId, clientSecret)
             .ConfigureAwait(false);
@@ -207,10 +210,17 @@ public class AcceptanceTestFixture : IAsyncLifetime
     {
         var httpClient = new HttpClient();
 
-        var tokenRetriever = new B2CTokenRetriever(httpClient, _azureEntraB2CTenantUrl, _azureEntraBackendBffScope, _azureEntraFrontendAppId, MarketParticipantUri);
+        var tokenRetriever = new B2CTokenRetriever(httpClient, _azureEntraB2CTenantUrl, _azureEntraBackendBffScope, _azureEntraFrontendAppId, MarketParticipantUri, GetLogger());
         var token = await tokenRetriever.GetB2CTokenAsync(_b2cUsername, _b2cPassword).ConfigureAwait(false);
 
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
         return httpClient;
+    }
+
+    private ITestOutputHelper GetLogger()
+    {
+        return Logger
+               ?? throw new NullReferenceException(
+            "AcceptanceTestFixture.Logger must be set from tests. Inject ITestOutputHelper in tests constructor and set it on the fixture");
     }
 }

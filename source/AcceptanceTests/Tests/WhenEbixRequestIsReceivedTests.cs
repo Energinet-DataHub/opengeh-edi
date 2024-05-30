@@ -16,6 +16,7 @@ using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Xunit.Abstractions;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
@@ -24,14 +25,15 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 
 [IntegrationTest]
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
-public sealed class WhenEbixPeekRequestIsReceivedTests
+public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
 {
     private readonly EbixRequestDsl _ebixMDR;
     private readonly AcceptanceTestFixture _fixture;
     private readonly ActorDsl _actor;
     private readonly EbixRequestDsl _ebixEs;
 
-    public WhenEbixPeekRequestIsReceivedTests(AcceptanceTestFixture fixture)
+    public WhenEbixPeekRequestIsReceivedTests(AcceptanceTestFixture fixture, ITestOutputHelper output)
+        : base(output, fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
         _fixture = fixture;
