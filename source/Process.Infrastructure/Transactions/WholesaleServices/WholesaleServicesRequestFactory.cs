@@ -82,10 +82,8 @@ public static class WholesaleServicesRequestFactory
         return request;
     }
 
-    private static string MapChargeType(string? chargeType)
+    private static string MapChargeType(string chargeType)
     {
-        ArgumentNullException.ThrowIfNull(chargeType);
-
         return BuildingBlocks.Domain.Models.ChargeType.TryGetNameFromCode(chargeType, fallbackValue: chargeType);
     }
 }
