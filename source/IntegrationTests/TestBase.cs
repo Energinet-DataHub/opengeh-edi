@@ -24,6 +24,7 @@ using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.Extensions.Options;
 using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
+using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
@@ -289,6 +290,12 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                         [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = "Fake",
                         ["IntegrationEvents:TopicName"] = "NotEmpty",
                         ["IntegrationEvents:SubscriptionName"] = "NotEmpty",
+
+                        // Databricks
+                        // TODO: Use proper values
+                        [nameof(DatabricksSqlStatementOptions.WorkspaceUrl)] = "https://adb-1000.azuredatabricks.net/",
+                        [nameof(DatabricksSqlStatementOptions.WorkspaceToken)] = "FakeToken",
+                        [nameof(DatabricksSqlStatementOptions.WarehouseId)] = Guid.NewGuid().ToString(),
                     })
                 .Build();
 

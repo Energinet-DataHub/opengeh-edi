@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 
 /// <summary>
-/// Client for for interacting with outgoing messages.
+/// Client for interacting with outgoing messages.
 /// </summary>
 public interface IOutgoingMessagesClient
 {

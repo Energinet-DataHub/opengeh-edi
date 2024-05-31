@@ -161,7 +161,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         return messageId;
     }
 
-    public async Task EnqueueByCalculationId(EnqueueMessagesInputDto input)
+    public async Task EnqueueByCalculationIdAsync(EnqueueMessagesInputDto input)
     {
         // TODO: Decide "view" / "query" based on calculation type
         await foreach (var nextResult in _energyResultEnumerator.GetAsync(input.CalculationId))
