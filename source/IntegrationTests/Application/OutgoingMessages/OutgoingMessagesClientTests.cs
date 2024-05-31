@@ -18,9 +18,11 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
+using Microsoft.Extensions.Options;
 using Xunit;
 using Xunit.Abstractions;
 using HttpClientFactory = Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks.HttpClientFactory;
@@ -38,29 +40,28 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime, IClassFixtu
     private readonly Guid _calculationId = Guid.Parse("e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d");
     private readonly int _calculationVersion = 63;
 
-    private readonly EnergyResultPerGridAreaQuery _viewQuery;
     private readonly DatabricksSchemaManager _databricksSchemaManager;
 
     public OutgoingMessagesClientTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
-        _viewQuery = new EnergyResultPerGridAreaQuery(_calculationId);
-
-        // TODO: Refactor "HttpClientFactory" in "TestCommon" to something specific
         var integrationTestConfiguration = new IntegrationTestConfiguration();
         _databricksSchemaManager = new DatabricksSchemaManager(
             new HttpClientFactory(),
             databricksSettings: integrationTestConfiguration.DatabricksSettings,
-            schemaPrefix: _viewQuery.DatabaseName);
+            schemaPrefix: "edi_integration_tests");
     }
 
     public async Task InitializeAsync()
     {
         await _databricksSchemaManager.CreateSchemaAsync();
-        await _databricksSchemaManager.CreateTableAsync(_viewQuery);
+
+        var ediDatabricksOptions = Options.Create(new EdiDatabricksOptions { DatabaseName = _databricksSchemaManager.SchemaName });
+        var viewQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions, _calculationId);
+        await _databricksSchemaManager.CreateTableAsync(viewQuery);
 
         var testFilePath = Path.Combine("Application", "OutgoingMessages", "TestData", TestFilename);
-        await _databricksSchemaManager.InsertFromCsvFileAsync(_viewQuery, testFilePath);
+        await _databricksSchemaManager.InsertFromCsvFileAsync(viewQuery, testFilePath);
     }
 
     public async Task DisposeAsync()

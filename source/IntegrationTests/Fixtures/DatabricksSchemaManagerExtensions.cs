@@ -20,7 +20,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatem
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 
-// TODO: Refactor DatabricksSchemaManager.CreateTableAsync to use IReadOnlyDictionary for column definition
 // TODO: Can we extract our extensions to TestCommon in a way that it is useful for other teams?
 public static class DatabricksSchemaManagerExtensions
 {

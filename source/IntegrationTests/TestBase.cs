@@ -296,7 +296,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                         ["IntegrationEvents:SubscriptionName"] = "NotEmpty",
 
                         // Databricks
-                        // TODO: Use proper values
                         [nameof(DatabricksSqlStatementOptions.WorkspaceUrl)] = _integrationTestConfiguration.DatabricksSettings.WorkspaceUrl,
                         [nameof(DatabricksSqlStatementOptions.WorkspaceToken)] = _integrationTestConfiguration.DatabricksSettings.WorkspaceAccessToken,
                         [nameof(DatabricksSqlStatementOptions.WarehouseId)] = _integrationTestConfiguration.DatabricksSettings.WarehouseId,
