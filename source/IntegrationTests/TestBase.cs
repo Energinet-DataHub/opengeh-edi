@@ -12,13 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.Extensions.Options;
@@ -26,6 +20,7 @@ using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
@@ -50,6 +45,7 @@ using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjectio
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
@@ -61,7 +57,6 @@ using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Google.Protobuf;
 using MediatR;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -71,6 +66,7 @@ using Xunit;
 using Xunit.Abstractions;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using ExecutionContext = Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext;
+using HttpClientFactory = Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks.HttpClientFactory;
 using SampleData = Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.SampleData;
 
 namespace Energinet.DataHub.EDI.IntegrationTests
@@ -79,7 +75,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
     public class TestBase : IDisposable
     {
         // TODO: Not ideal, but we need to avoid creating it multiple times, so a quick fix for now
-        private static readonly IntegrationTestConfiguration _integrationTestConfiguration = new IntegrationTestConfiguration();
+        private static readonly IntegrationTestConfiguration _integrationTestConfiguration = new();
 
         private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
         private readonly ProcessContext _processContext;
@@ -90,17 +86,25 @@ namespace Energinet.DataHub.EDI.IntegrationTests
         protected TestBase(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         {
             ArgumentNullException.ThrowIfNull(integrationTestFixture);
+
+            DatabricksSchemaManager = new DatabricksSchemaManager(
+                new HttpClientFactory(),
+                databricksSettings: _integrationTestConfiguration.DatabricksSettings,
+                schemaPrefix: "edi_integration_tests");
+
             IntegrationTestFixture.CleanupDatabase();
             integrationTestFixture.CleanupFileStorage();
             _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
             TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
             InboxEventNotificationHandler = new TestNotificationHandlerSpy();
-            BuildServices(integrationTestFixture.AzuriteManager.BlobStorageConnectionString, testOutputHelper);
+            BuildServices(DatabricksSchemaManager.SchemaName, integrationTestFixture.AzuriteManager.BlobStorageConnectionString, testOutputHelper);
             _processContext = GetService<ProcessContext>();
             _incomingMessagesContext = GetService<IncomingMessagesContext>();
             AuthenticatedActor = GetService<AuthenticatedActor>();
             AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
         }
+
+        protected DatabricksSchemaManager DatabricksSchemaManager { get; }
 
         protected FeatureFlagManagerStub FeatureFlagManagerStub { get; } = new();
 
@@ -130,7 +134,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
             var blobContent = await blobClient.DownloadAsync();
 
-            if (!blobContent.HasValue) throw new InvalidOperationException($"Couldn't get file content from file storage (container: {container}, blob: {fileStorageReference})");
+            if (!blobContent.HasValue)
+                throw new InvalidOperationException($"Couldn't get file content from file storage (container: {container}, blob: {fileStorageReference})");
 
             var fileStringContent = await GetStreamContentAsStringAsync(blobContent.Value.Content);
             return fileStringContent;
@@ -187,7 +192,10 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, actorRole ?? ActorRole.EnergySupplier, documentFormat ?? DocumentFormat.Xml), CancellationToken.None);
         }
 
-        protected Task<string?> GetArchivedMessageFileStorageReferenceFromDatabaseAsync(Guid messageId) => GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId.ToString());
+        protected Task<string?> GetArchivedMessageFileStorageReferenceFromDatabaseAsync(Guid messageId)
+        {
+            return GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId.ToString());
+        }
 
         protected T GetService<T>()
             where T : notnull
@@ -197,7 +205,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
         protected void ClearDbContextCaches()
         {
-            if (_services == null) throw new InvalidOperationException("ServiceCollection is not yet initialized");
+            if (_services == null)
+                throw new InvalidOperationException("ServiceCollection is not yet initialized");
 
             var dbContextServices = _services
                 .Where(s => s.ServiceType.IsSubclassOf(typeof(DbContext)) || s.ServiceType == typeof(DbContext))
@@ -223,7 +232,8 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
         protected IServiceCollection GetServiceCollectionClone()
         {
-            if (_services == null) throw new InvalidOperationException("ServiceCollection is not yet initialized");
+            if (_services == null)
+                throw new InvalidOperationException("ServiceCollection is not yet initialized");
 
             var serviceCollectionClone = new ServiceCollection { _services };
 
@@ -275,7 +285,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
         }
 
-        private void BuildServices(string fileStorageConnectionString, ITestOutputHelper testOutputHelper)
+        private void BuildServices(string ediDatabricksDatabaseName, string fileStorageConnectionString, ITestOutputHelper testOutputHelper)
         {
             Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
             Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", IntegrationTestFixture.DatabaseConnectionString);
@@ -299,10 +309,12 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                         [nameof(DatabricksSqlStatementOptions.WorkspaceUrl)] = _integrationTestConfiguration.DatabricksSettings.WorkspaceUrl,
                         [nameof(DatabricksSqlStatementOptions.WorkspaceToken)] = _integrationTestConfiguration.DatabricksSettings.WorkspaceAccessToken,
                         [nameof(DatabricksSqlStatementOptions.WarehouseId)] = _integrationTestConfiguration.DatabricksSettings.WarehouseId,
+                        // => EDI views
+                        [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.DatabaseName)}"] = ediDatabricksDatabaseName,
                     })
                 .Build();
 
-            _services = new ServiceCollection();
+            _services = [];
             _services.AddScoped<IConfiguration>(_ => config);
 
             _services.AddTransient<InboxEventsProcessor>()

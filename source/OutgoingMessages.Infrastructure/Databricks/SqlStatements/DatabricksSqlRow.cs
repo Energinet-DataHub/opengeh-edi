@@ -17,14 +17,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlSt
 /// <summary>
 /// This class is used to wrap the result (a dynamic type) of a Databricks SQL query row.
 /// </summary>
-public class DatabricksSqlRow
+public class DatabricksSqlRow(IDictionary<string, object?> columns)
 {
-    private readonly IReadOnlyDictionary<string, object?> _columns;
-
-    public DatabricksSqlRow(IReadOnlyDictionary<string, object?> columns)
-    {
-        _columns = columns;
-    }
+    private readonly IDictionary<string, object?> _columns = columns;
 
     public string? this[string columnName]
     {
