@@ -29,7 +29,7 @@ public static class DatabricksSchemaManagerExtensions
     /// </summary>
     public static Task CreateTableAsync(this DatabricksSchemaManager schemaManager, IDeltaTableSchemaDescription schemaInfomation)
     {
-        return schemaManager.CreateTableAsync(schemaInfomation.DatabaseName, schemaInfomation.SchemaDefinition);
+        return schemaManager.CreateTableAsync(schemaInfomation.DataObjectName, schemaInfomation.SchemaDefinition);
     }
 
     /// <summary>
