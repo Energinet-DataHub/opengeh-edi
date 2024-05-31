@@ -91,7 +91,7 @@ public class PeekMessage
             var marketDocumentStream = await _documentFactory.CreateFromAsync(outgoingMessageBundle, request.DocumentFormat, timestamp).ConfigureAwait(false);
 
             var archivedMessageToCreate = new ArchivedMessage(
-                peekResult.BundleId.Id.ToString(),
+                request.DocumentFormat == DocumentFormat.Ebix ? peekResult.BundleId.Id.ToString("N") : peekResult.BundleId.Id.ToString(),
                 outgoingMessageBundle.OutgoingMessages.Select(om => om.EventId).ToArray(),
                 outgoingMessageBundle.DocumentType.ToString(),
                 outgoingMessageBundle.SenderId.Value,
@@ -107,7 +107,7 @@ public class PeekMessage
             _marketDocumentRepository.Add(marketDocument);
         }
 
-        return new PeekResultDto(marketDocument.GetMarketDocumentStream().Stream, marketDocument.BundleId.Id);
+        return new PeekResultDto(marketDocument.GetMarketDocumentStream().Stream, request.DocumentFormat == DocumentFormat.Ebix ? peekResult.BundleId.Id.ToString("N") : marketDocument.BundleId.Id.ToString());
     }
 
     private async Task PeekAndCommitToEnsureBundleIsClosedAsync(PeekRequestDto request)

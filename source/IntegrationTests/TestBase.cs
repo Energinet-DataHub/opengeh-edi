@@ -152,7 +152,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return fileStorageReference;
         }
 
-        protected async Task<string?> GetMarketDocumentFileStorageReferenceFromDatabaseAsync(Guid bundleId)
+        protected async Task<string?> GetMarketDocumentFileStorageReferenceFromDatabaseAsync(string bundleId)
         {
             using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
             var fileStorageReference = await connection.ExecuteScalarAsync<string>($"SELECT FileStorageReference FROM [dbo].[MarketDocuments] WHERE BundleId = '{bundleId}'");
