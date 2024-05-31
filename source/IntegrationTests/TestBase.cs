@@ -25,6 +25,7 @@ using BuildingBlocks.Application.Extensions.Options;
 using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
@@ -77,6 +78,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests
     [Collection("IntegrationTest")]
     public class TestBase : IDisposable
     {
+        // TODO: Not ideal, but we need to avoid creating it multiple times, so a quick fix for now
+        private static readonly IntegrationTestConfiguration _integrationTestConfiguration = new IntegrationTestConfiguration();
+
         private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
         private readonly ProcessContext _processContext;
         private readonly IncomingMessagesContext _incomingMessagesContext;
@@ -293,9 +297,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
                         // Databricks
                         // TODO: Use proper values
-                        [nameof(DatabricksSqlStatementOptions.WorkspaceUrl)] = "https://adb-1000.azuredatabricks.net/",
-                        [nameof(DatabricksSqlStatementOptions.WorkspaceToken)] = "FakeToken",
-                        [nameof(DatabricksSqlStatementOptions.WarehouseId)] = Guid.NewGuid().ToString(),
+                        [nameof(DatabricksSqlStatementOptions.WorkspaceUrl)] = _integrationTestConfiguration.DatabricksSettings.WorkspaceUrl,
+                        [nameof(DatabricksSqlStatementOptions.WorkspaceToken)] = _integrationTestConfiguration.DatabricksSettings.WorkspaceAccessToken,
+                        [nameof(DatabricksSqlStatementOptions.WarehouseId)] = _integrationTestConfiguration.DatabricksSettings.WarehouseId,
                     })
                 .Build();
 

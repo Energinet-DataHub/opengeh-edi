@@ -33,6 +33,6 @@ public class EnqueueMessagesActivity(
             new EnqueueMessagesInputDto(
                 Guid.Parse(inputDto.CalculationId),
                 inputDto.CalculationVersion,
-                Guid.Empty));
+                EventId: Guid.Empty));
     }
 }

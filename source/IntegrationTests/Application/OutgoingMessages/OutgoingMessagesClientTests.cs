@@ -12,54 +12,81 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Dapper;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 using HttpClientFactory = Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks.HttpClientFactory;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
-public class OutgoingMessagesClientTests : IAsyncLifetime
+public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime, IClassFixture<IntegrationTestFixture>
 {
-    private static readonly IntegrationTestConfiguration _integrationTestConfiguration = new();
+    /// <summary>
+    /// Located in 'Application\OutgoingMessages\TestData'
+    /// </summary>
+    private const string TestFilename = "balance_fixing_01-11-2022_01-12-2022_ga_543.csv";
 
-    public OutgoingMessagesClientTests()
+    // Values matching test file values
+    private readonly Guid _calculationId = Guid.Parse("e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d");
+    private readonly int _calculationVersion = 63;
+
+    private readonly EnergyResultPerGridAreaQuery _viewQuery;
+    private readonly DatabricksSchemaManager _databricksSchemaManager;
+
+    public OutgoingMessagesClientTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationTestFixture, testOutputHelper)
     {
-        var calculationIdInTestFile = Guid.Parse("e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d");
-        ViewQuery = new EnergyResultPerGridAreaQuery(calculationIdInTestFile);
+        _viewQuery = new EnergyResultPerGridAreaQuery(_calculationId);
 
         // TODO: Refactor "HttpClientFactory" in "TestCommon" to something specific
-        DatabricksSchemaManager = new DatabricksSchemaManager(
+        var integrationTestConfiguration = new IntegrationTestConfiguration();
+        _databricksSchemaManager = new DatabricksSchemaManager(
             new HttpClientFactory(),
-            databricksSettings: _integrationTestConfiguration.DatabricksSettings,
-            schemaPrefix: ViewQuery.DatabaseName);
+            databricksSettings: integrationTestConfiguration.DatabricksSettings,
+            schemaPrefix: _viewQuery.DatabaseName);
     }
-
-    private EnergyResultPerGridAreaQuery ViewQuery { get; }
-
-    private DatabricksSchemaManager DatabricksSchemaManager { get; }
 
     public async Task InitializeAsync()
     {
-        await DatabricksSchemaManager.CreateSchemaAsync();
-        await DatabricksSchemaManager.CreateTableAsync(ViewQuery);
+        await _databricksSchemaManager.CreateSchemaAsync();
+        await _databricksSchemaManager.CreateTableAsync(_viewQuery);
 
-        var filename = "balance_fixing_01-11-2022_01-12-2022_ga_543.csv";
-        var testFilePath = Path.Combine("Application", "OutgoingMessages", "TestData", filename);
-        await DatabricksSchemaManager.InsertFromCsvFileAsync(ViewQuery, testFilePath);
+        var testFilePath = Path.Combine("Application", "OutgoingMessages", "TestData", TestFilename);
+        await _databricksSchemaManager.InsertFromCsvFileAsync(_viewQuery, testFilePath);
     }
 
     public async Task DisposeAsync()
     {
-        await DatabricksSchemaManager.DropSchemaAsync();
+        await _databricksSchemaManager.DropSchemaAsync();
     }
 
     [Fact]
-    public async Task GivenX_WhenY_ThenZ()
+    public async Task GivenCalculationWithIdIsCompleted_WhenEnqueueByCalculationId_ThenOutgoingMessagesAreEnqueued()
     {
+        var sut = GetService<IOutgoingMessagesClient>();
+        var input = new EnqueueMessagesInputDto(
+            _calculationId,
+            _calculationVersion,
+            EventId: Guid.NewGuid());
+
         // Act
-        await Task.Delay(3000);
+        await sut.EnqueueByCalculationIdAsync(input);
+
+        // Assert
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        var sql = "SELECT * FROM [dbo].[OutgoingMessages]";
+        var result = await
+            connection
+                .QueryAsync(sql);
+
+        var actualCount = result;
     }
 }
