@@ -14,20 +14,21 @@
 
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
+using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Xunit;
 using HttpClientFactory = Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks.HttpClientFactory;
 
-namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.EnqueueMessages.Activities;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
-public class EnqueueMessagesActivityTests : IAsyncLifetime
+public class OutgoingMessagesClientTests : IAsyncLifetime
 {
     private static readonly IntegrationTestConfiguration _integrationTestConfiguration = new();
 
-    public EnqueueMessagesActivityTests()
+    public OutgoingMessagesClientTests()
     {
-        var calculationId = Guid.NewGuid();
-        ViewQuery = new EnergyResultPerGridAreaQuery(calculationId);
+        var calculationIdInTestFile = Guid.Parse("e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d");
+        ViewQuery = new EnergyResultPerGridAreaQuery(calculationIdInTestFile);
 
         // TODO: Refactor "HttpClientFactory" in "TestCommon" to something specific
         DatabricksSchemaManager = new DatabricksSchemaManager(
@@ -43,11 +44,11 @@ public class EnqueueMessagesActivityTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await DatabricksSchemaManager.CreateSchemaAsync();
+        await DatabricksSchemaManager.CreateTableAsync(ViewQuery);
 
-        // TODO: Refactor DatabricksSchemaManager.CreateTableAsync to use IReadOnlyDictionary for column definition
-        await DatabricksSchemaManager.CreateTableAsync(
-            ViewQuery.DataObjectName,
-            ViewQuery.SchemaDefinition);
+        var filename = "balance_fixing_01-11-2022_01-12-2022_ga_543.csv";
+        var testFilePath = Path.Combine("Application", "OutgoingMessages", "TestData", filename);
+        await DatabricksSchemaManager.InsertFromCsvFileAsync(ViewQuery, testFilePath);
     }
 
     public async Task DisposeAsync()

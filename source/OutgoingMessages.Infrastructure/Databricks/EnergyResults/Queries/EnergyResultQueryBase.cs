@@ -13,11 +13,12 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 
 public abstract class EnergyResultQueryBase(Guid calculationId)
-    : DatabricksStatement
+    : DatabricksStatement, IDeltaTableSchemaDescription
 {
     /// <summary>
     /// Name of database to query in.
