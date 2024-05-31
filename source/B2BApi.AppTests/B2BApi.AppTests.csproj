@@ -25,6 +25,7 @@
     <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
     <ProjectReference Include="..\IntegrationEvents.Application\IntegrationEvents.Application.csproj" />
+    <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
     <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
   </ItemGroup>
 

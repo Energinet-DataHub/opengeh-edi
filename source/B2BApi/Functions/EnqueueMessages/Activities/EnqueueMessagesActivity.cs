@@ -19,7 +19,8 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
-internal class EnqueueMessagesActivity(IOutgoingMessagesClient outgoingMessagesClient)
+public class EnqueueMessagesActivity(
+    IOutgoingMessagesClient outgoingMessagesClient)
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
 
@@ -28,7 +29,7 @@ internal class EnqueueMessagesActivity(IOutgoingMessagesClient outgoingMessagesC
         [ActivityTrigger] EnqueueMessagesInput inputDto)
     {
         // TODO: Get a proper event id!
-        await _outgoingMessagesClient.EnqueueByCalculationId(
+        await _outgoingMessagesClient.EnqueueByCalculationIdAsync(
             new EnqueueMessagesInputDto(
                 Guid.Parse(inputDto.CalculationId),
                 inputDto.CalculationVersion,
