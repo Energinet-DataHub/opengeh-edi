@@ -146,7 +146,7 @@ public class XmlMessageParser : XmlBaseParser
             }
             else if (reader.Is("aggregationSeries_Period.resolution", ns))
             {
-                resolution = await reader.ReadElementContentAsStringAsync().ConfigureAwait(false);
+                resolution = reader.ReadString();
             }
             else if (reader.Depth == 3 && reader.Is("type", ns))
             {
