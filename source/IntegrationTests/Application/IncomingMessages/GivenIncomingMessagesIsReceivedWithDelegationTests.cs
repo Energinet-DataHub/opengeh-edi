@@ -34,7 +34,7 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 
-public class WhenIncomingMessagesIsReceivedWithDelegationTests : TestBase
+public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
 {
     private readonly SystemDateTimeProviderStub _dateTimeProvider;
     private readonly IIncomingMessageClient _incomingMessagesRequest;
@@ -45,7 +45,7 @@ public class WhenIncomingMessagesIsReceivedWithDelegationTests : TestBase
     private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
     private readonly AuthenticatedActor _authenticatedActor;
 
-    public WhenIncomingMessagesIsReceivedWithDelegationTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+    public GivenIncomingMessagesIsReceivedWithDelegationTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
         _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();
@@ -178,6 +178,136 @@ public class WhenIncomingMessagesIsReceivedWithDelegationTests : TestBase
         response.IsErrorResponse.Should().BeTrue();
         response.MessageBody.Should().Contain("The authenticated user does not hold the required role");
         _senderSpy.LatestMessage.Should().BeNull();
+    }
+
+    [Theory]
+    [InlineData("1111111111111", null, "EnergySupplier")]
+    [InlineData(null, "1111111111111", "BalanceResponsibleParty")]
+    public async Task When_DelegationIsSetupByAnotherActorThenTheOneDataIsRequestedFrom_Then_ReturnsErrorMessage(string? requestDataFromEnergySupplierId, string? requestDateFromBalanceResponsible, string requesterActorRole)
+    {
+        // Arrange
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
+        _dateTimeProvider.SetNow(now);
+        var gridAreaCode = "512";
+        var documentFormat = DocumentFormat.Json;
+        _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
+
+        var messageStream = RequestAggregatedMeasureDataRequestBuilder.CreateIncomingMessage(
+            DocumentFormat.Json,
+            _delegatedTo.ActorNumber,
+            ActorRole.FromName(requesterActorRole),
+            null,
+            null,
+            Instant.FromUtc(2024, 01, 01, 0, 0),
+            Instant.FromUtc(2024, 01, 31, 0, 0),
+            requestDataFromEnergySupplierId != null ? ActorNumber.Create(requestDataFromEnergySupplierId) : null,
+            requestDateFromBalanceResponsible != null ? ActorNumber.Create(requestDateFromBalanceResponsible) : null,
+            new List<(string? GridArea, TransactionId TransactionId)>
+            {
+                (gridAreaCode, TransactionId.From("555555555555555555555555555555555555")),
+            });
+
+        var delegatedByAnotherActorThenDataOwner = new Actor(ActorNumber.Create("3333333333333"), ActorRole.FromName(requesterActorRole));
+        // Delegation for another actor EnergySupplier or BalanceResponsibleParty
+        // on the same grid area as the requested
+        await AddDelegationAsync(
+            delegatedByAnotherActorThenDataOwner,
+            _delegatedTo,
+            gridAreaCode,
+            ProcessType.RequestEnergyResults,
+            startsAt: now,
+            stopsAt: now.Plus(Duration.FromSeconds(1)));
+
+        // Act
+        var response = await _incomingMessagesRequest.RegisterAndSendAsync(
+            messageStream,
+            documentFormat,
+            IncomingDocumentType.RequestAggregatedMeasureData,
+            documentFormat,
+            CancellationToken.None);
+
+        // Assert
+        using var scope = new AssertionScope();
+        response.IsErrorResponse.Should().BeTrue();
+        response.MessageBody.Should().Contain("The authenticated user does not hold the required role");
+        _senderSpy.LatestMessage.Should().BeNull();
+    }
+
+    [Theory]
+    [InlineData("1111111111111", null, "EnergySupplier")]
+    [InlineData(null, "1111111111111", "BalanceResponsibleParty")]
+    public async Task When_RequestIsWithoutGridAreaAndAnotherDelegationExistsForAnotherActor_Then_ReceiveMessageForExpectedGridArea(string? requestDataForEnergySupplierId, string? requestDateForBalanceResponsible, string requesterActorRole)
+    {
+        // Arrange
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
+        _dateTimeProvider.SetNow(now);
+        var gridAreaCode = "512";
+        var documentFormat = DocumentFormat.Json;
+        _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
+
+        var messageStream = RequestAggregatedMeasureDataRequestBuilder.CreateIncomingMessage(
+            DocumentFormat.Json,
+            _delegatedTo.ActorNumber,
+            ActorRole.FromName(requesterActorRole),
+            null,
+            null,
+            Instant.FromUtc(2024, 01, 01, 0, 0),
+            Instant.FromUtc(2024, 01, 31, 0, 0),
+            requestDataForEnergySupplierId != null ? ActorNumber.Create(requestDataForEnergySupplierId) : null,
+            requestDateForBalanceResponsible != null ? ActorNumber.Create(requestDateForBalanceResponsible) : null,
+            new List<(string? GridArea, TransactionId TransactionId)>
+            {
+                (null, TransactionId.From("555555555555555555555555555555555555")),
+            });
+
+        await AddDelegationAsync(
+            _originalActor,
+            _delegatedTo,
+            gridAreaCode,
+            ProcessType.RequestEnergyResults,
+            startsAt: now,
+            stopsAt: now.Plus(Duration.FromSeconds(1)));
+
+        var delegatedByAnotherActorThenRequestDataFor = new Actor(ActorNumber.Create("3333333333333"), ActorRole.FromName(requesterActorRole));
+        var anotherGridAreaCode = "804";
+        await AddDelegationAsync(
+            delegatedByAnotherActorThenRequestDataFor,
+            _delegatedTo,
+            anotherGridAreaCode,
+            ProcessType.RequestEnergyResults,
+            startsAt: now,
+            stopsAt: now.Plus(Duration.FromSeconds(1)));
+
+        // Act
+        var response = await _incomingMessagesRequest.RegisterAndSendAsync(
+            messageStream,
+            documentFormat,
+            IncomingDocumentType.RequestAggregatedMeasureData,
+            documentFormat,
+            CancellationToken.None);
+
+        // Assert
+        using (new AssertionScope())
+        {
+            response.IsErrorResponse.Should().BeFalse();
+            response.MessageBody.Should().BeNullOrEmpty();
+
+            _senderSpy.LatestMessage.Should().NotBeNull();
+        }
+
+        using (new AssertionScope())
+        {
+            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeAggregatedMeasureDataProcessDto>();
+            var series = message.Series.Should().ContainSingle().Subject;
+            series.RequestedByActor.ActorRole.Should().Be(_delegatedTo.ActorRole);
+            series.RequestedByActor.ActorNumber.Should().Be(_delegatedTo.ActorNumber);
+            series.OriginalActor.ActorRole.Should().Be(_originalActor.ActorRole);
+            series.OriginalActor.ActorNumber.Should().Be(_originalActor.ActorNumber);
+            series.EnergySupplierNumber.Should().Be(_originalActor.ActorNumber.Value);
+            series.RequestedGridAreaCode.Should().Be(gridAreaCode);
+            series.GridAreas.Should().Equal(gridAreaCode);
+            series.GridAreas.Should().NotContain(anotherGridAreaCode);
+        }
     }
 
     protected override void Dispose(bool disposing)
