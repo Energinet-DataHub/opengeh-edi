@@ -13,6 +13,9 @@
 // limitations under the License.
 
 using BuildingBlocks.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
+using Energinet.DataHub.Core.Databricks.SqlStatementExecution.Diagnostics.HealthChecks;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
@@ -81,7 +84,12 @@ public static class OutgoingMessagesExtensions
         services.AddTransient<IDataRetention, DequeuedBundlesRetention>();
 
         //Databricks
-        services.AddScoped<EnergyResultEnumerator>();
+        services
+            .AddNodaTimeForApplication()
+            .AddScoped<EnergyResultEnumerator>()
+            .AddDatabricksSqlStatementExecution(configuration)
+            .AddHealthChecks()
+            .AddDatabricksSqlStatementApiHealthCheck(name: "DatabricksSqlStatementApi");
 
         return services;
     }

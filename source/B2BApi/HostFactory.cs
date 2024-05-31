@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using BuildingBlocks.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
@@ -26,7 +25,6 @@ using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyI
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 
@@ -76,10 +74,6 @@ public static class HostFactory
 
                         // Serializer
                         .AddSerializer()
-
-                        // TODO: Find the right place
-                        .AddNodaTimeForApplication()
-                        .AddDatabricksSqlStatementForApplication(context.Configuration)
 
                         // Modules
                         .AddIntegrationEventModule(context.Configuration)
