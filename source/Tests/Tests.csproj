@@ -62,6 +62,12 @@ limitations under the License.
       <None Remove="json\Reject request Change of Supplier.json" />
       <None Remove="json\Request Change of Supplier.json" />
       <None Remove="json\Invalid Request Change of Supplier.json" />
+      <None Update="CimMessageAdapter\Messages\json\WholesaleSettlement\RequestWholesaleSettlement.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="CimMessageAdapter\Messages\xml\WholesaleSettlement\RequestWholesaleSettlement.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
@@ -86,9 +92,9 @@ limitations under the License.
       <EmbeddedResource Include="CimMessageAdapter\Messages\xml\WholesaleSettlement\RequestWholesaleSettlementOneSmallOneBigSeries.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\WholesaleSettlement\RequestWholesaleSettlementTwoSeries.xml">
+      <None Include="CimMessageAdapter\Messages\xml\WholesaleSettlement\RequestWholesaleSettlementTwoSeries.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
+      </None>
       <None Include="CimMessageAdapter\Messages\json\AggregatedMeasure\InvalidJsonAggregatedMeasureData.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
@@ -104,20 +110,12 @@ limitations under the License.
       <None Remove="CimMessageAdapter\Messages\xml\RequestChangeAccountingPointCharacteristics.xml" />
       <None Remove="CimMessageAdapter\Messages\xml\RequestChangeCustomerCharacteristics.xml" />
       <None Remove="CimMessageAdapter\Messages\json\AggregatedMeasure\Request Aggregated Measure Data.json" />
-      <None Remove="CimMessageAdapter\Messages\json\WholesaleSettlement\RequestWholesaleSettlement.json" />
-      <EmbeddedResource Include="CimMessageAdapter\Messages\json\WholesaleSettlement\RequestWholesaleSettlement.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
       <None Remove="CimMessageAdapter\Messages\json\WholesaleSettlement\InvalidRequestWholesaleSettlement.json" />
       <EmbeddedResource Include="CimMessageAdapter\Messages\json\WholesaleSettlement\InvalidJsonRequestWholesaleSettlement.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <None Remove="CimMessageAdapter\Messages\json\WholesaleSettlement\FailRequestWholesaleSettlement.json" />
       <EmbeddedResource Include="CimMessageAdapter\Messages\json\WholesaleSettlement\FailSchemeValidationRequestWholesaleSettlement.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <None Remove="CimMessageAdapter\Messages\xml\WholesaleSettlement\RequestWholesaleSettlement.xml" />
-      <EmbeddedResource Include="CimMessageAdapter\Messages\xml\WholesaleSettlement\RequestWholesaleSettlement.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
     </ItemGroup>

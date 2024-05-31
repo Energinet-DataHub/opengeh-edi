@@ -12,13 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
@@ -35,7 +29,8 @@ namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.WholesaleSettle
 
 public class MessageParserTests
 {
-    private const string SeriesDummy = "{\"mRID\":\"25836143\",\"aggregationSeries_Period.resolution\":\"PT1M\",\"chargeTypeOwner_MarketParticipant.mRID\":{\"codingScheme\":\"A10\",\"value\":\"570001110111\"},\"end_DateAndOrTime.dateTime\": \"2022-08-31T22:00:00Z\",\"energySupplier_MarketParticipant.mRID\":{\"codingScheme\":\"A10\",\"value\":\"5799999933318\"},\"meteringGridArea_Domain.mRID\":{\"codingScheme\": \"NDK\",\"value\":\"244\"},\"settlement_Series.version\":{\"value\":\"D01\"},\"start_DateAndOrTime.dateTime\":\"2022-08-17T22:00:00Z\",\"ChargeType\":[{\"mRID\":\"EA-001\",\"type\":{\"value\":\"D03\"}}]},";
+    private const string SeriesDummy =
+        "{\"mRID\":\"25836143\",\"aggregationSeries_Period.resolution\":\"P1M\",\"chargeTypeOwner_MarketParticipant.mRID\":{\"codingScheme\":\"A10\",\"value\":\"570001110111\"},\"end_DateAndOrTime.dateTime\": \"2022-08-31T22:00:00Z\",\"energySupplier_MarketParticipant.mRID\":{\"codingScheme\":\"A10\",\"value\":\"5799999933318\"},\"meteringGridArea_Domain.mRID\":{\"codingScheme\": \"NDK\",\"value\":\"244\"},\"settlement_Series.version\":{\"value\":\"D01\"},\"start_DateAndOrTime.dateTime\":\"2022-08-17T22:00:00Z\",\"ChargeType\":[{\"mRID\":\"EA-001\",\"type\":{\"value\":\"D03\"}}]},";
 
     private static readonly string PathToMessages =
         $"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}";
@@ -115,7 +110,6 @@ public class MessageParserTests
         {
             Assert.NotNull(serie);
             Assert.Equal("25836143", serie.TransactionId);
-            Assert.Equal("PT1M", serie.Resolution);
             Assert.Equal("570001110111", serie.ChargeOwner);
             Assert.Equal("5799999933318", serie.EnergySupplierId);
             Assert.Equal("2022-08-31T22:00:00Z", serie.EndDateTime);
@@ -125,6 +119,7 @@ public class MessageParserTests
             Assert.Single(serie.ChargeTypes);
             Assert.Equal("EA-001", serie.ChargeTypes.First().Id);
             Assert.Equal("D03", serie.ChargeTypes.First().Type);
+            Assert.Equal("P1M", serie.Resolution);
         }
     }
 
