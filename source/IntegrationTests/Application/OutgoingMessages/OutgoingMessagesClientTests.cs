@@ -14,12 +14,17 @@
 
 using Dapper;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
+using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
+using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Xunit;
 using Xunit.Abstractions;
@@ -36,6 +41,8 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime, IClassFixtu
     // Values matching test file values
     private readonly Guid _calculationId = Guid.Parse("e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d");
     private readonly int _calculationVersion = 63;
+
+    private readonly GridAreaOwnershipAssignedEventBuilder _gridAreaOwnershipAssignedEventBuilder = new();
 
     public OutgoingMessagesClientTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
@@ -69,16 +76,29 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime, IClassFixtu
             _calculationVersion,
             EventId: Guid.NewGuid());
 
+        var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedEventBuilder
+            .WithGridAreaCode("543")
+            .Build();
+        await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent01);
+
         // Act
         await sut.EnqueueByCalculationIdAsync(input);
 
         // Assert
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = "SELECT * FROM [dbo].[OutgoingMessages]";
-        var result = await
-            connection
-                .QueryAsync(sql);
+        var result = await connection.QueryAsync(sql);
 
-        var actualCount = result;
+        var actualCount = result.Count();
+        actualCount.Should().Be(5);
+    }
+
+    private async Task HavingReceivedAndHandledIntegrationEventAsync(string eventType, GridAreaOwnershipAssigned gridAreaOwnershipAssigned)
+    {
+        var integrationEventHandler = GetService<IIntegrationEventHandler>();
+
+        var integrationEvent = new IntegrationEvent(Guid.NewGuid(), eventType, 1, gridAreaOwnershipAssigned);
+
+        await integrationEventHandler.HandleAsync(integrationEvent).ConfigureAwait(false);
     }
 }
