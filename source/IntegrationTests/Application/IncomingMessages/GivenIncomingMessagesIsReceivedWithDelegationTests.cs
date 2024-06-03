@@ -180,7 +180,7 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
     [Theory]
     [InlineData("1111111111111", null, "EnergySupplier")]
     [InlineData(null, "1111111111111", "BalanceResponsibleParty")]
-    public async Task GivenAnd_RequestMessageActorIsNotSameAsDelegatedBy_Then_ReturnsErrorMessage(string? requestDataFromEnergySupplierId, string? requestDateFromBalanceResponsible, string requesterActorRole)
+    public async Task AndGivenAnd_RequestMessageActorIsNotSameAsDelegatedBy_Then_ReturnsErrorMessage(string? requestDataFromEnergySupplierId, string? requestDateFromBalanceResponsible, string requesterActorRole)
     {
         // Arrange
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
@@ -204,11 +204,11 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
                 (gridAreaCode, TransactionId.From("555555555555555555555555555555555555")),
             });
 
-        var delegatedByAnotherActorThenActorRequested = new Actor(ActorNumber.Create("3333333333333"), ActorRole.FromName(requesterActorRole));
-        // Delegation for another EnergySupplier or BalanceResponsibleParty
-        // on the same grid area as the requested
+        // Delegation by another EnergySupplier or BalanceResponsibleParty
+        // on the same grid area as the request
+        var delegatedByAnotherActorThenRequestedActor = new Actor(ActorNumber.Create("3333333333333"), ActorRole.FromName(requesterActorRole));
         await AddDelegationAsync(
-            delegatedByAnotherActorThenActorRequested,
+            delegatedByAnotherActorThenRequestedActor,
             _delegatedTo,
             gridAreaCode,
             ProcessType.RequestEnergyResults,
@@ -233,7 +233,7 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
     [Theory]
     [InlineData("1111111111111", null, "EnergySupplier")]
     [InlineData(null, "1111111111111", "BalanceResponsibleParty")]
-    public async Task GivenAnd_RequestMessageWithoutGridArea_WhenAnotherDelegationExistByAnotherActor_Then_ReceiveMessageForExpectedGridArea(string? requestDataForEnergySupplierId, string? requestDateForBalanceResponsible, string requesterActorRoleName)
+    public async Task AndGiven_RequestMessageWithoutGridArea_When_AnotherDelegationExistByAnotherActor_Then_ReceiveMessageForExpectedGridArea(string? requestDataForEnergySupplierId, string? requestDateForBalanceResponsible, string requesterActorRoleName)
     {
         // Arrange
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
@@ -268,10 +268,10 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
             startsAt: now,
             stopsAt: now.Plus(Duration.FromSeconds(1)));
 
-        var delegatedByAnotherActorThenActorRequested = new Actor(ActorNumber.Create("3333333333333"), originalActorRole);
+        var delegatedByAnotherActorThenRequestedActor = new Actor(ActorNumber.Create("3333333333333"), originalActorRole);
         var anotherGridAreaCode = "804";
         await AddDelegationAsync(
-            delegatedByAnotherActorThenActorRequested,
+            delegatedByAnotherActorThenRequestedActor,
             _delegatedTo,
             anotherGridAreaCode,
             ProcessType.RequestEnergyResults,
