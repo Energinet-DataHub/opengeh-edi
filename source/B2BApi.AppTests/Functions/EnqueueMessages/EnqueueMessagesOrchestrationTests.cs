@@ -44,22 +44,21 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
     private B2BApiAppFixture Fixture { get; }
 
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
         Fixture.AppHostManager.ClearHostLog();
 
         // Clear mappings etc. before each test
         Fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
 
-        return Task.CompletedTask;
+        // Ensure that databricks does not contain data, unless the test explicit adds it
+        await Fixture.DatabricksSchemaManager.DropSchemaAsync();
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
-        Fixture.DatabricksSchemaManager.DropSchemaAsync();
+        await Fixture.DatabricksSchemaManager.DropSchemaAsync();
         Fixture.SetTestOutputHelper(null!);
-
-        return Task.CompletedTask;
     }
 
     [Fact]
@@ -159,9 +158,10 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
                 var parsedEvent = ActorMessagesEnqueuedV1.Parser.ParseFrom(msg.Body);
 
                 var matchingOrchestrationId = parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
+                var matchingCalculationId = parsedEvent.CalculationId == calculationId.ToString();
                 var isSuccessful = parsedEvent.Success;
 
-                return matchingOrchestrationId && isSuccessful;
+                return matchingOrchestrationId && matchingCalculationId && isSuccessful;
             })
             .VerifyCountAsync(1);
 

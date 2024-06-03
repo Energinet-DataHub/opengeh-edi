@@ -42,9 +42,6 @@ public class EnergyResultPerGridAreaQuery(
         { EnergyResultColumnNames.CalculationType,          (DeltaTableCommonTypes.String,      false) },
         { EnergyResultColumnNames.CalculationPeriodStart,   (DeltaTableCommonTypes.Timestamp,   false) },
         { EnergyResultColumnNames.CalculationPeriodEnd,     (DeltaTableCommonTypes.Timestamp,   false) },
-        // TODO:
-        // In the documentation of the view this is "Int", but in the schema in Databricks I see it is "BigInt".
-        // If it is BigInt we must change the CalculationVersion in C# to be a "long".
         { EnergyResultColumnNames.CalculationVersion,       (DeltaTableCommonTypes.BigInt,      false) },
         { EnergyResultColumnNames.ResultId,                 (DeltaTableCommonTypes.String,      false) },
         { EnergyResultColumnNames.GridAreaCode,             (DeltaTableCommonTypes.String,      false) },
