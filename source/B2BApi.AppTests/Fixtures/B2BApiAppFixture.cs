@@ -161,7 +161,6 @@ public class B2BApiAppFixture : IAsyncLifetime
         AzuriteManager.Dispose();
         await ServiceBusResourceProvider.DisposeAsync();
         await DatabaseManager.DeleteDatabaseAsync();
-        await DatabricksSchemaManager.DropSchemaAsync();
     }
 
     /// <summary>
