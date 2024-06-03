@@ -199,12 +199,12 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var verifyServiceBusMessages = await Fixture.ServiceBusListenerMock
             .When(msg =>
             {
-                if (msg.Subject != MessagesEnqueuedV1.EventName)
+                if (msg.Subject != ActorMessagesEnqueuedV1.EventName)
                 {
                     return false;
                 }
 
-                var parsedEvent = MessagesEnqueuedV1.Parser.ParseFrom(msg.Body);
+                var parsedEvent = ActorMessagesEnqueuedV1.Parser.ParseFrom(msg.Body);
 
                 var matchingOrchestrationId = parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
 
