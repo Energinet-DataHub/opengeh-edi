@@ -366,16 +366,15 @@ public class WhenAPeekIsRequestedTests : TestBase
         var ebixAsserter = NotifyAggregatedMeasureDataDocumentAsserter.CreateEbixAsserter(peekResult.Bundle!);
         var messageId = ebixAsserter.GetElement("HeaderEnergyDocument/Identification")!.LastNode?.ToString();
 
-        // dequeue with -
         // Assert / Then
         peekResult.MessageId.Should().Be(messageId);
 
         var archivedMessage = await GetArchivedMessageFromDatabaseAsync(messageId!);
         ((object?)archivedMessage).Should().NotBeNull("because an archived message should exists");
         var outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
-        var dres = await outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(messageId!, ActorRole.EnergySupplier, ActorNumber.Create("5790000555551")), CancellationToken.None);
-        //var dres = await outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(Guid.Parse(messageId!).ToString(), ActorRole.EnergySupplier, ActorNumber.Create("5790000555551")), CancellationToken.None);
-        dres.Success.Should().BeTrue();
+        var dequeueRequestResultDto = await outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(messageId!, ActorRole.EnergySupplier, ActorNumber.Create("5790000555551")), CancellationToken.None);
+        //var dequeueRequestResultDto = await outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(Guid.Parse(messageId!).ToString(), ActorRole.EnergySupplier, ActorNumber.Create("5790000555551")), CancellationToken.None);
+        dequeueRequestResultDto.Success.Should().BeTrue();
     }
 
     private async Task<bool> BundleIsRegistered()
