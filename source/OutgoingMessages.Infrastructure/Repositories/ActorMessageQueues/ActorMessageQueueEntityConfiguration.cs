@@ -52,6 +52,7 @@ public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<Act
             navigationBuilder.Property<MessageId>("MessageId")
                 .HasColumnName("MessageId")
                 .HasConversion(toDb => toDb.Value, fromDb => MessageId.Create(fromDb));
+            navigationBuilder.HasIndex(b => b.MessageId).HasDatabaseName("IX_Bundles_MessageId");
             navigationBuilder.Property<DocumentType>("DocumentTypeInBundle").HasColumnName("DocumentTypeInBundle")
                 .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<DocumentType>(fromDbValue));
             navigationBuilder.Property<BusinessReason>("BusinessReason").HasColumnName("BusinessReason")
