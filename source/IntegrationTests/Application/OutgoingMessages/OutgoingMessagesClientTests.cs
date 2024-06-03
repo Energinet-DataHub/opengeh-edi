@@ -31,7 +31,7 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
-public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime, IClassFixture<IntegrationTestFixture>
+public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
 {
     /// <summary>
     /// Located in 'Application\OutgoingMessages\TestData'
@@ -54,7 +54,6 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime, IClassFixtu
         await DatabricksSchemaManager.CreateSchemaAsync();
 
         var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
-        ////Options.Create(new EdiDatabricksOptions { DatabaseName = DatabricksSchemaManager.SchemaName });
         var viewQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions, _calculationId);
         await DatabricksSchemaManager.CreateTableAsync(viewQuery);
 
