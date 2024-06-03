@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
 
@@ -24,6 +25,6 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Energ
 /// <param name="Quantity"></param>
 /// <param name="Qualities"></param>
 public sealed record EnergyTimeSeriesPoint(
-    DateTimeOffset TimeUtc,
+    Instant TimeUtc,
     decimal Quantity,
     IReadOnlyCollection<QuantityQuality> Qualities);

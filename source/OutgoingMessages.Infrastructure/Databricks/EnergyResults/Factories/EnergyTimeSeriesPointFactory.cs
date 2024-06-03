@@ -33,7 +33,7 @@ public static class EnergyTimeSeriesPointFactory
         ArgumentException.ThrowIfNullOrWhiteSpace(qualities);
 
         return new EnergyTimeSeriesPoint(
-            SqlResultValueConverters.ToDateTimeOffset(time),
+            SqlResultValueConverters.ToInstant(time),
             SqlResultValueConverters.ToDecimal(quantity),
             QuantityQualitiesMapper.FromDeltaTableValue(qualities));
     }
