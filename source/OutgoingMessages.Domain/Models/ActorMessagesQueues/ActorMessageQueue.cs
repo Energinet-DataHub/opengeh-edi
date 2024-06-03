@@ -80,9 +80,9 @@ public class ActorMessageQueue
         return new PeekResult(bundle?.Id, bundle?.MessageId, bundle?.DocumentTypeInBundle);
     }
 
-    public bool Dequeue(BundleId bundleId)
+    public bool Dequeue(MessageId messageId)
     {
-        var bundle = _bundles.FirstOrDefault(bundle => bundle.Id == bundleId && bundle.IsDequeued == false);
+        var bundle = _bundles.FirstOrDefault(bundle => bundle.MessageId.Value == messageId.Value && bundle.IsDequeued == false);
         if (bundle == null)
         {
             return false;

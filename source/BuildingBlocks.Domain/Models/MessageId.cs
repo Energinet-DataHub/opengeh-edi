@@ -40,6 +40,9 @@ public class MessageId
 
     public static MessageId New()
     {
-        return new MessageId(Guid.NewGuid().ToString());
+        // A normal UUID is 36 characters long, but unfortunately, the EBIX scheme only allows for 35 characters.
+        // To make everyone happy---i.e. ensure unique ids (for most practical purposes anyway) and ensure
+        // valid EBIX values---we'll just remove the dashes from the UUID.
+        return new MessageId(Guid.NewGuid().ToString().Replace("-", string.Empty, StringComparison.InvariantCultureIgnoreCase));
     }
 }

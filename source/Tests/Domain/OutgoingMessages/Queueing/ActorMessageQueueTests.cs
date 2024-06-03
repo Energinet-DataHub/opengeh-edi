@@ -80,7 +80,7 @@ public class ActorMessageQueueTests
 
         var result = actorMessageQueue.Peek();
 
-        Assert.True(actorMessageQueue.Dequeue(result.BundleId!));
+        Assert.True(actorMessageQueue.Dequeue(result.MessageId!));
         Assert.Null(actorMessageQueue.Peek().BundleId);
     }
 
@@ -93,7 +93,7 @@ public class ActorMessageQueueTests
         actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing), SystemClock.Instance.GetCurrentInstant(), maxNumberOfMessagesInABundle: 1);
 
         var firstBundle = actorMessageQueue.Peek();
-        actorMessageQueue.Dequeue(firstBundle.BundleId!);
+        actorMessageQueue.Dequeue(firstBundle.MessageId!);
         var secondBundle = actorMessageQueue.Peek();
 
         Assert.NotNull(firstBundle.BundleId);
@@ -110,9 +110,9 @@ public class ActorMessageQueueTests
         actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing, DocumentType.RejectRequestAggregatedMeasureData), SystemClock.Instance.GetCurrentInstant(), maxNumberOfMessagesInABundle: 2);
 
         var firstPeekResult = actorMessageQueue.Peek(MessageCategory.Aggregations);
-        actorMessageQueue.Dequeue(firstPeekResult.BundleId!);
+        actorMessageQueue.Dequeue(firstPeekResult.MessageId!);
         var secondPeekResult = actorMessageQueue.Peek(MessageCategory.Aggregations);
-        actorMessageQueue.Dequeue(secondPeekResult.BundleId!);
+        actorMessageQueue.Dequeue(secondPeekResult.MessageId!);
 
         Assert.Equal(DocumentType.NotifyAggregatedMeasureData, firstPeekResult.DocumentType);
         Assert.Equal(DocumentType.RejectRequestAggregatedMeasureData, secondPeekResult.DocumentType);

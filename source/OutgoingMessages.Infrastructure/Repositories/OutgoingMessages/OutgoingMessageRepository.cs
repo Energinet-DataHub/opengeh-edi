@@ -49,7 +49,7 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
         _context.OutgoingMessages.Add(message);
     }
 
-    public async Task<OutgoingMessageBundle> GetAsync(BundleId bundleId, GloriousEbixUuid? messageId)
+    public async Task<OutgoingMessageBundle> GetAsync(BundleId bundleId, MessageId? messageId)
     {
         ArgumentNullException.ThrowIfNull(messageId);
 
@@ -71,7 +71,7 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
             firstMessage.BusinessReason,
             firstMessage.SenderId,
             firstMessage.SenderRole,
-            messageId.Value,
+            messageId,
             outgoingMessages,
             firstMessage.RelatedToMessageId);
     }

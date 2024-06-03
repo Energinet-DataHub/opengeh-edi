@@ -49,9 +49,9 @@ public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<Act
                 .HasConversion(toDbValue => toDbValue.Id, fromDbValue => BundleId.Create(fromDbValue));
             navigationBuilder.Property<bool>("IsClosed").HasColumnName("IsClosed");
             navigationBuilder.Property<bool>("IsDequeued").HasColumnName("IsDequeued");
-            navigationBuilder.Property<GloriousEbixUuid>("MessageId")
+            navigationBuilder.Property<MessageId>("MessageId")
                 .HasColumnName("MessageId")
-                .HasConversion(toDb => toDb.Id, fromDb => GloriousEbixUuid.From(fromDb));
+                .HasConversion(toDb => toDb.Value, fromDb => MessageId.Create(fromDb));
             navigationBuilder.Property<DocumentType>("DocumentTypeInBundle").HasColumnName("DocumentTypeInBundle")
                 .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<DocumentType>(fromDbValue));
             navigationBuilder.Property<BusinessReason>("BusinessReason").HasColumnName("BusinessReason")

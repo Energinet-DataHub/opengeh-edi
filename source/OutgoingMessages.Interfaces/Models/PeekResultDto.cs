@@ -18,4 +18,4 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-public record PeekResultDto(Stream? Bundle, Guid? BundleId, GloriousEbixUuid? MessageId);
+public record PeekResultDto(Stream? Bundle, Guid? BundleId, MessageId? MessageId);

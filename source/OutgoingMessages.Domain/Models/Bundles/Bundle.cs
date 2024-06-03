@@ -35,7 +35,7 @@ public sealed class Bundle
     {
         _maxNumberOfMessagesInABundle = maxNumberOfMessagesInABundle;
         Id = BundleId.New();
-        MessageId = GloriousEbixUuid.FromGuid(Id.Id);
+        MessageId = MessageId.New();
         BusinessReason = businessReason;
         DocumentTypeInBundle = documentTypeInBundle;
         Created = created;
@@ -56,7 +56,7 @@ public sealed class Bundle
     /// </summary>
     public MessageId? RelatedToMessageId { get; private set; }
 
-    public GloriousEbixUuid MessageId { get; private set; }
+    public MessageId MessageId { get; private set; }
 
     internal DocumentType DocumentTypeInBundle { get; }
 

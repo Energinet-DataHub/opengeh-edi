@@ -354,7 +354,7 @@ public class BehavioursTestBase : IDisposable
                 break;
 
             peekResults.Add(peekResult);
-            await WhenActorDequeuesMessage(peekResult.MessageId.Value.Id, actorNumber, actorRole);
+            await WhenActorDequeuesMessage(peekResult.MessageId.Value, actorNumber, actorRole);
         }
 
         return peekResults;

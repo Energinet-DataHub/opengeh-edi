@@ -46,7 +46,10 @@ public class TransactionId : ValueObject
 
     public static TransactionId New()
     {
-        return new TransactionId(GloriousEbixUuid.NewGloriousEbixUuid().Id);
+        // A normal UUID is 36 characters long, but unfortunately, the EBIX scheme only allows for 35 characters.
+        // To make everyone happy---i.e. ensure unique ids (for most practical purposes anyway) and ensure
+        // valid EBIX values---we'll just remove the dashes from the UUID.
+        return new TransactionId(Guid.NewGuid().ToString().Replace("-", string.Empty, StringComparison.InvariantCultureIgnoreCase));
     }
 }
 
