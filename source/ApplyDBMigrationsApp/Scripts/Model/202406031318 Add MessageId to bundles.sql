@@ -1,5 +1,5 @@
 ALTER TABLE [dbo].[Bundles]
-    ADD [MessageId] NVARCHAR(16) NULL;
+    ADD [MessageId] NVARCHAR(36) NULL;
 GO
 
 UPDATE [dbo].[Bundles]
