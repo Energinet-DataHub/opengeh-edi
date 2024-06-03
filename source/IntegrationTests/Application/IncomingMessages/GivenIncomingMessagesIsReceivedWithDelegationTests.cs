@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
@@ -183,7 +180,7 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
     [Theory]
     [InlineData("1111111111111", null, "EnergySupplier")]
     [InlineData(null, "1111111111111", "BalanceResponsibleParty")]
-    public async Task When_DelegationIsSetupByAnotherActorThenTheOneDataIsRequestedFrom_Then_ReturnsErrorMessage(string? requestDataFromEnergySupplierId, string? requestDateFromBalanceResponsible, string requesterActorRole)
+    public async Task GivenAnd_RequestMessageActorIsNotSameAsDelegatedBy_Then_ReturnsErrorMessage(string? requestDataFromEnergySupplierId, string? requestDateFromBalanceResponsible, string requesterActorRole)
     {
         // Arrange
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
@@ -207,11 +204,11 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
                 (gridAreaCode, TransactionId.From("555555555555555555555555555555555555")),
             });
 
-        var delegatedByAnotherActorThenDataOwner = new Actor(ActorNumber.Create("3333333333333"), ActorRole.FromName(requesterActorRole));
-        // Delegation for another actor EnergySupplier or BalanceResponsibleParty
+        var delegatedByAnotherActorThenActorRequested = new Actor(ActorNumber.Create("3333333333333"), ActorRole.FromName(requesterActorRole));
+        // Delegation for another EnergySupplier or BalanceResponsibleParty
         // on the same grid area as the requested
         await AddDelegationAsync(
-            delegatedByAnotherActorThenDataOwner,
+            delegatedByAnotherActorThenActorRequested,
             _delegatedTo,
             gridAreaCode,
             ProcessType.RequestEnergyResults,
@@ -230,48 +227,51 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
         using var scope = new AssertionScope();
         response.IsErrorResponse.Should().BeTrue();
         response.MessageBody.Should().Contain("The authenticated user does not hold the required role");
-        _senderSpy.LatestMessage.Should().BeNull();
+        _senderSpy.LatestMessage.Should().BeNull("Since there does not exist a delegation from the energySupplier/balanceResponsible on the requested grid area");
     }
 
     [Theory]
     [InlineData("1111111111111", null, "EnergySupplier")]
     [InlineData(null, "1111111111111", "BalanceResponsibleParty")]
-    public async Task When_RequestIsWithoutGridAreaAndAnotherDelegationExistsForAnotherActor_Then_ReceiveMessageForExpectedGridArea(string? requestDataForEnergySupplierId, string? requestDateForBalanceResponsible, string requesterActorRole)
+    public async Task GivenAnd_RequestMessageWithoutGridArea_WhenAnotherDelegationExistByAnotherActor_Then_ReceiveMessageForExpectedGridArea(string? requestDataForEnergySupplierId, string? requestDateForBalanceResponsible, string requesterActorRoleName)
     {
         // Arrange
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
         _dateTimeProvider.SetNow(now);
-        var gridAreaCode = "512";
+        var expectedGridAreaCode = "512";
         var documentFormat = DocumentFormat.Json;
         _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
 
+        var energySupplier = requestDataForEnergySupplierId != null ? ActorNumber.Create(requestDataForEnergySupplierId) : null;
+        var balanceResponsibleParty = requestDateForBalanceResponsible != null ? ActorNumber.Create(requestDateForBalanceResponsible) : null;
+        var originalActorRole = ActorRole.FromName(requesterActorRoleName);
         var messageStream = RequestAggregatedMeasureDataRequestBuilder.CreateIncomingMessage(
             DocumentFormat.Json,
             _delegatedTo.ActorNumber,
-            ActorRole.FromName(requesterActorRole),
+            originalActorRole,
             null,
             null,
             Instant.FromUtc(2024, 01, 01, 0, 0),
             Instant.FromUtc(2024, 01, 31, 0, 0),
-            requestDataForEnergySupplierId != null ? ActorNumber.Create(requestDataForEnergySupplierId) : null,
-            requestDateForBalanceResponsible != null ? ActorNumber.Create(requestDateForBalanceResponsible) : null,
+            energySupplier,
+            balanceResponsibleParty,
             new List<(string? GridArea, TransactionId TransactionId)>
             {
                 (null, TransactionId.From("555555555555555555555555555555555555")),
             });
 
         await AddDelegationAsync(
-            _originalActor,
+            new Actor(originalActorRole == ActorRole.EnergySupplier ? energySupplier! : balanceResponsibleParty!, originalActorRole),
             _delegatedTo,
-            gridAreaCode,
+            expectedGridAreaCode,
             ProcessType.RequestEnergyResults,
             startsAt: now,
             stopsAt: now.Plus(Duration.FromSeconds(1)));
 
-        var delegatedByAnotherActorThenRequestDataFor = new Actor(ActorNumber.Create("3333333333333"), ActorRole.FromName(requesterActorRole));
+        var delegatedByAnotherActorThenActorRequested = new Actor(ActorNumber.Create("3333333333333"), originalActorRole);
         var anotherGridAreaCode = "804";
         await AddDelegationAsync(
-            delegatedByAnotherActorThenRequestDataFor,
+            delegatedByAnotherActorThenActorRequested,
             _delegatedTo,
             anotherGridAreaCode,
             ProcessType.RequestEnergyResults,
@@ -301,12 +301,12 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
             var series = message.Series.Should().ContainSingle().Subject;
             series.RequestedByActor.ActorRole.Should().Be(_delegatedTo.ActorRole);
             series.RequestedByActor.ActorNumber.Should().Be(_delegatedTo.ActorNumber);
-            series.OriginalActor.ActorRole.Should().Be(_originalActor.ActorRole);
+            series.OriginalActor.ActorRole.Should().Be(originalActorRole);
             series.OriginalActor.ActorNumber.Should().Be(_originalActor.ActorNumber);
-            series.EnergySupplierNumber.Should().Be(_originalActor.ActorNumber.Value);
-            series.RequestedGridAreaCode.Should().Be(gridAreaCode);
-            series.GridAreas.Should().Equal(gridAreaCode);
-            series.GridAreas.Should().NotContain(anotherGridAreaCode);
+            series.EnergySupplierNumber.Should().Be(energySupplier?.Value);
+            series.BalanceResponsibleNumber.Should().Be(balanceResponsibleParty?.Value);
+            series.RequestedGridAreaCode.Should().BeNull();
+            series.GridAreas.Should().Equal(expectedGridAreaCode);
         }
     }
 

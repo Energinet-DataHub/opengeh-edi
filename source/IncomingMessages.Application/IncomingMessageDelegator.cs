@@ -93,8 +93,9 @@ public class IncomingMessageDelegator
                 continue;
             }
 
+            var delegatedTo = new Actor(requestedByActorNumber, requestedByActorRole);
             var delegations = await _masterDataClient.GetProcessesDelegatedToAsync(
-                    new Actor(requestedByActorNumber, requestedByActorRole),
+                    delegatedTo,
                     series.GridArea,
                     processType,
                     cancellationToken)
@@ -114,7 +115,6 @@ public class IncomingMessageDelegator
                 }
 
                 var originalActorNumber = series.GetActorNumberForRole(originalActorRole, gridAreaOwner);
-
                 if (originalActorNumber == null)
                 {
                     // Some part of the incoming message is invalid, since we cannot find the original
@@ -127,7 +127,25 @@ public class IncomingMessageDelegator
                     return;
                 }
 
-                series.DelegateSeries(originalActorNumber, requestedByActorRole, delegations.Select(d => d.GridAreaCode).ToArray());
+                var delegationsForOriginalActor = delegations
+                    .Where(d => d.DelegatedBy.ActorNumber == originalActorNumber)
+                    .ToList();
+                if (delegationsForOriginalActor.Count == 0)
+                {
+                    _logger.LogInformation(
+                        "Cannot find delegation relation ship between delegatedBy {DelegatedBy} and delegatedTo {DelegatedTo} on grid area {GridArea} for process {ProcessType} in incoming message {DocumentType} (message id: {MessageId}",
+                        new Actor(originalActorNumber, originalActorRole).ToString(),
+                        delegatedTo.ToString(),
+                        series.GridArea,
+                        processType,
+                        documentType,
+                        message.MessageId);
+
+                    // The original actor number is not delegated to the requested by actor, so do nothing
+                    return;
+                }
+
+                series.DelegateSeries(originalActorNumber, requestedByActorRole, delegationsForOriginalActor.Select(d => d.GridAreaCode).ToArray());
             }
         }
     }
