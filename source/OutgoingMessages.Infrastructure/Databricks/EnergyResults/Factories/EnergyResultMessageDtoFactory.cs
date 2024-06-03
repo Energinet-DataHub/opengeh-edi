@@ -42,14 +42,14 @@ public class EnergyResultMessageDtoFactory()
             energySupplierNumber: null,
             balanceResponsibleNumber: null,
             period: new DomainModel.Period(energyResult.PeriodStartUtc, energyResult.PeriodEndUtc),
-            points: MapToOutgoingPoints(energyResult.TimeSeriesPoints),
+            points: CreateEnergyResultMessagePoints(energyResult.TimeSeriesPoints),
             businessReasonName: MapToDomainBusinessReason(energyResult.CalculationType).Name,
             calculationResultVersion: energyResult.CalculationVersion,
             settlementVersion: MapToDomainSettlementVersion(energyResult.CalculationType)?.Name);
     }
 
     // TODO: Move to mapper?
-    private static IReadOnlyCollection<EnergyResultMessagePoint> MapToOutgoingPoints(EnergyTimeSeriesPoint[] timeSeriesPoints)
+    private static IReadOnlyCollection<EnergyResultMessagePoint> CreateEnergyResultMessagePoints(EnergyTimeSeriesPoint[] timeSeriesPoints)
     {
         ArgumentNullException.ThrowIfNull(timeSeriesPoints);
 
