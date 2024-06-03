@@ -130,6 +130,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         activities.Should().NotBeNull().And.Equal(
         [
             "EnqueueMessagesOrchestration",
+            "EnqueueMessagesActivity",
             "SendMessagesEnqueuedActivity",
             null
         ]);
@@ -149,7 +150,13 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
                 }
 
                 var parsedEvent = MessagesEnqueuedV1.Parser.ParseFrom(msg.Body);
-                return parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
+
+                var matchingOrchestrationId = parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
+
+                // TODO: This should come from the paredEvent, but is it relies on https://github.com/Energinet-DataHub/opengeh-edi/pull/1035
+                var isSuccessful = true;
+
+                return matchingOrchestrationId && isSuccessful;
             })
             .VerifyCountAsync(1);
 
