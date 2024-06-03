@@ -41,7 +41,7 @@ public class SendMessagesEnqueuedActivity
     public async Task Run(
         [ActivityTrigger] SendMessagesEnqueuedInput input)
     {
-        var messagesEnqueuedEvent = new MessagesEnqueuedV1
+        var messagesEnqueuedEvent = new ActorMessagesEnqueuedV1
         {
             OrchestrationInstanceId = input.CalculationOrchestrationInstanceId,
             CalculationId = input.CalculationId,
@@ -53,16 +53,16 @@ public class SendMessagesEnqueuedActivity
         await _senderCreator.SendAsync(serviceBusMessage, CancellationToken.None);
     }
 
-    private static ServiceBusMessage CreateServiceBusMessage(MessagesEnqueuedV1 messagesEnqueuedEvent, Guid eventId)
+    private static ServiceBusMessage CreateServiceBusMessage(ActorMessagesEnqueuedV1 messagesEnqueuedEvent, Guid eventId)
     {
         var serviceBusMessage = new ServiceBusMessage
         {
             Body = new BinaryData(messagesEnqueuedEvent.ToByteArray()),
-            Subject = MessagesEnqueuedV1.EventName,
+            Subject = ActorMessagesEnqueuedV1.EventName,
             MessageId = eventId.ToString(),
         };
 
-        serviceBusMessage.ApplicationProperties.Add("EventMinorVersion", MessagesEnqueuedV1.CurrentMinorVersion);
+        serviceBusMessage.ApplicationProperties.Add("EventMinorVersion", ActorMessagesEnqueuedV1.CurrentMinorVersion);
         return serviceBusMessage;
     }
 }
