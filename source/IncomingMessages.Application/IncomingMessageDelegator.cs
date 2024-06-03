@@ -133,7 +133,7 @@ public class IncomingMessageDelegator
                 if (delegationsForOriginalActor.Count == 0)
                 {
                     _logger.LogInformation(
-                        "Cannot find delegation relation ship between delegatedBy {DelegatedBy} and delegatedTo {DelegatedTo} on grid area {GridArea} for process {ProcessType} in incoming message {DocumentType} (message id: {MessageId}",
+                        "Cannot find delegation relationship between delegatedBy {DelegatedBy} and delegatedTo {DelegatedTo} on grid area {GridArea} for process {ProcessType} in incoming message {DocumentType} (message id: {MessageId}",
                         new Actor(originalActorNumber, originalActorRole).ToString(),
                         delegatedTo.ToString(),
                         series.GridArea,
