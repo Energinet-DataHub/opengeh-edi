@@ -52,12 +52,15 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         Fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
 
         // Ensure that databricks does not contain data, unless the test explicit adds it
-        await Fixture.DatabricksSchemaManager.DropSchemaAsync();
+        if (Fixture.DatabricksSchemaManager.SchemaExists)
+            await Fixture.DatabricksSchemaManager.DropSchemaAsync();
     }
 
     public async Task DisposeAsync()
     {
-        await Fixture.DatabricksSchemaManager.DropSchemaAsync();
+        if (Fixture.DatabricksSchemaManager.SchemaExists)
+            await Fixture.DatabricksSchemaManager.DropSchemaAsync();
+
         Fixture.SetTestOutputHelper(null!);
     }
 
@@ -255,7 +258,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     /// <returns>The calculation id of the hardcoded data which was added to databricks</returns>
     private async Task<Guid> AddDatabricksData()
     {
-        // This ID has to match the hardcoded calculataionId in the file balance_fixing_01-11-2022_01-12-2022_ga_543.csv
+        // This ID has to match the hardcoded calculation id in the file balance_fixing_01-11-2022_01-12-2022_ga_543.csv
         var calculationId = Guid.Parse("e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d");
         await Fixture.DatabricksSchemaManager.CreateSchemaAsync();
 
@@ -267,8 +270,8 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             calculationId);
         await Fixture.DatabricksSchemaManager.CreateTableAsync(viewQuery);
 
-        var testFilename = "balance_fixing_01-11-2022_01-12-2022_ga_543.csv";
-        var testFilePath = Path.Combine("TestData", testFilename);
+        const string testDataFileName = "balance_fixing_01-11-2022_01-12-2022_ga_543.csv";
+        var testFilePath = Path.Combine("TestData", testDataFileName);
         await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, testFilePath);
 
         return calculationId;
