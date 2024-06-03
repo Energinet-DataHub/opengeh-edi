@@ -43,9 +43,9 @@ public class EnergyResultMessageDtoFactory()
             balanceResponsibleNumber: null,
             period: new DomainModel.Period(energyResult.PeriodStartUtc, energyResult.PeriodEndUtc),
             points: CreateEnergyResultMessagePoints(energyResult.TimeSeriesPoints),
-            businessReasonName: MapToDomainBusinessReason(energyResult.CalculationType).Name,
+            businessReasonName: MapToBusinessReason(energyResult.CalculationType).Name,
             calculationResultVersion: energyResult.CalculationVersion,
-            settlementVersion: MapToDomainSettlementVersion(energyResult.CalculationType)?.Name);
+            settlementVersion: MapToSettlementVersion(energyResult.CalculationType)?.Name);
     }
 
     // TODO: Move to mapper?
@@ -86,7 +86,7 @@ public class EnergyResultMessageDtoFactory()
     }
 
     // TODO: Move to mapper?
-    private static DomainModel.BusinessReason MapToDomainBusinessReason(CalculationType calculationType)
+    private static DomainModel.BusinessReason MapToBusinessReason(CalculationType calculationType)
     {
         return calculationType switch
         {
@@ -105,7 +105,7 @@ public class EnergyResultMessageDtoFactory()
     }
 
     // TODO: Move to mapper?
-    private static DomainModel.SettlementVersion? MapToDomainSettlementVersion(CalculationType calculationType)
+    private static DomainModel.SettlementVersion? MapToSettlementVersion(CalculationType calculationType)
     {
         return calculationType switch
         {
