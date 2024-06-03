@@ -987,8 +987,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
         var delegatedToRole = ActorRole.FromName(delegatedToRoleName);
 
         var senderSpy = CreateServiceBusSenderSpy();
-        var originalActor = new Actor(ActorNumber.Create("1111111111111"), ActorRole: originalActorRole);
-        var delegatedToActor = new Actor(ActorNumber: ActorNumber.Create("2222222222222"), ActorRole: delegatedToRole);
+        var originalActor = new Actor(ActorNumber.Create("1111111111111"), actorRole: originalActorRole);
+        var delegatedToActor = new Actor(actorNumber: ActorNumber.Create("2222222222222"), actorRole: delegatedToRole);
 
         if (originalActor.ActorRole == ActorRole.GridOperator)
             await GivenGridAreaOwnershipAsync("804", originalActor.ActorNumber);
