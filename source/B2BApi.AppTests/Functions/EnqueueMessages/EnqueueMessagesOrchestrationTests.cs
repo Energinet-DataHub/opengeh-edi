@@ -249,8 +249,13 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         return serviceBusMessage;
     }
 
+    /// <summary>
+    /// Adds hardcoded data to databricks.
+    /// </summary>
+    /// <returns>The calculation id of the hardcoded data which was added to databricks</returns>
     private async Task<Guid> AddDatabricksData()
     {
+        // This ID has to match the hardcoded calculataionId in the file balance_fixing_01-11-2022_01-12-2022_ga_543.csv
         var calculationId = Guid.Parse("e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d");
         await Fixture.DatabricksSchemaManager.CreateSchemaAsync();
 
