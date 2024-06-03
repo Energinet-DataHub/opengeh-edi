@@ -23,38 +23,10 @@ public static class ResolutionMapper
         {
             "PT15M" => Resolution.QuarterHourly,
             "PT1H" => Resolution.Hourly,
+
             _ => throw new ArgumentOutOfRangeException(
                 nameof(resolution),
                 actualValue: resolution,
                 "Value does not contain a valid string representation of a resolution."),
         };
-
-    public static string ToDeltaTableValue(Resolution resolution)
-    {
-        string resolutionToReturn;
-        switch (resolution)
-        {
-            case Resolution res when res == Resolution.QuarterHourly:
-                {
-                    resolutionToReturn = "PT15M";
-                    break;
-                }
-
-            case Resolution res when res == Resolution.Hourly:
-                {
-                    resolutionToReturn = "PT1H";
-                    break;
-                }
-
-            default:
-                {
-                    throw new ArgumentOutOfRangeException(
-                        nameof(resolution),
-                        actualValue: resolution,
-                        $"Cannot map ${nameof(Resolution)} to delta table value");
-                }
-        }
-
-        return resolutionToReturn;
-    }
 }
