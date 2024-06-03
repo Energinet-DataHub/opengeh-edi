@@ -21,7 +21,7 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 /// Represents a message id which used in communication between EDI and actors.
 /// </summary>
 [Serializable]
-public class MessageId
+public readonly record struct MessageId
 {
     private MessageId(string value)
     {

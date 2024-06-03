@@ -167,7 +167,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             DocumentFormat.Xml);
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(peekRequestDto, CancellationToken.None);
         var dequeueCommand = new DequeueRequestDto(
-            peekResult.MessageId!.Value,
+            peekResult.MessageId!.Value.Value,
             message.ReceiverRole,
             message.ReceiverNumber);
 

@@ -71,7 +71,7 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
             firstMessage.BusinessReason,
             firstMessage.SenderId,
             firstMessage.SenderRole,
-            messageId,
+            messageId.Value,
             outgoingMessages,
             firstMessage.RelatedToMessageId);
     }

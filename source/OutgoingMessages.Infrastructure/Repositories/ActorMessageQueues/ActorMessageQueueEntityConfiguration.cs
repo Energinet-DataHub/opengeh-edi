@@ -61,7 +61,7 @@ public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<Act
             navigationBuilder.Property<Instant>("Created").HasColumnName("Created");
             navigationBuilder.Property<MessageId?>("RelatedToMessageId").HasColumnName("RelatedToMessageId")
                 .HasConversion(
-                    toDbValue => toDbValue != null ? toDbValue.Value : null,
+                    toDbValue => toDbValue != null ? toDbValue.Value.Value : null,
                     fromDbValue => fromDbValue != null ? MessageId.Create(fromDbValue) : null);
             navigationBuilder.WithOwner().HasForeignKey("ActorMessageQueueId");
         });
