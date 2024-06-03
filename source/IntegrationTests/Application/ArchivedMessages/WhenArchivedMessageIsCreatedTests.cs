@@ -92,7 +92,7 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
 
         var archivedMessage = CreateArchivedMessage(
             archivedMessageType: archivedMessageType,
-            messageId: messageId,
+            messageId: messageId.Value,
             senderNumber: senderNumber,
             receiverNumber: receiverNumber,
             timestamp: Instant.FromUtc(year, month, date, 0, 0));
@@ -102,7 +102,7 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
 
         await ArchiveMessage(archivedMessage);
 
-        var actualFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId);
+        var actualFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId.Value);
 
         using var assertionScope = new AssertionScope();
         archivedMessage.FileStorageReference.Category.Value.Should().Be("archived");
