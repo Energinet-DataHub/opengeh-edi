@@ -20,4 +20,5 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 public sealed record SendMessagesEnqueuedInput(
     string OrchestrationInstanceId,
     string CalculationOrchestrationInstanceId,
-    string CalculationId);
+    string CalculationId,
+    bool Success);

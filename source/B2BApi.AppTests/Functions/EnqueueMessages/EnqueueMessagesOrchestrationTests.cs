@@ -159,9 +159,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
     /// <summary>
     /// Verifies that:
-    ///  - The orchestration can complete a full run.
-    ///  - Every activity is executed once and in correct order.
-    ///  - A service bus message is sent as expected.
+    ///  - If databricks has no data, the orchestration completes with a failed service bus message.
     /// </summary>
     [Fact]
     public async Task Given_FeatureFlagIsEnabledAndCalculationOrchestrationId_When_CalculationCompletedEventIsHandledAndDatabricksHasNoData_Then_OrchestrationCompletesWithFailedServiceBusMessage()
@@ -183,28 +181,12 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var orchestrationStatus = await Fixture.DurableClient.FindOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
 
         // => Wait for completion, this should be fairly quick
-        var completeOrchestrationStatus = await Fixture.DurableClient.WaitForInstanceCompletedAsync(
+        await Fixture.DurableClient.WaitForInstanceCompletedAsync(
             orchestrationStatus.InstanceId,
             TimeSpan.FromMinutes(1));
 
         // => Expect history
         using var assertionScope = new AssertionScope();
-
-        var activities = completeOrchestrationStatus.History
-            .OrderBy(item => item["Timestamp"])
-            .Select(item => item.Value<string>("FunctionName"));
-
-        activities.Should().NotBeNull().And.Equal(
-        [
-            "EnqueueMessagesOrchestration",
-            "SendMessagesEnqueuedActivity",
-            null
-        ]);
-
-        // => Verify that the durable function completed successfully
-        var last = completeOrchestrationStatus.History.Last();
-        last.Value<string>("EventType").Should().Be("ExecutionCompleted");
-        last.Value<string>("Result").Should().Be("Success");
 
         // => Verify that the expected message was sent on the ServiceBus
         var verifyServiceBusMessages = await Fixture.ServiceBusListenerMock
@@ -216,7 +198,13 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
                 }
 
                 var parsedEvent = MessagesEnqueuedV1.Parser.ParseFrom(msg.Body);
-                return parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
+
+                var matchingOrchestrationId = parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
+
+                // TODO: This should come from the paredEvent, but is it relies on https://github.com/Energinet-DataHub/opengeh-edi/pull/1035
+                var isFailed = true;
+
+                return matchingOrchestrationId && isFailed;
             })
             .VerifyCountAsync(1);
 

@@ -28,13 +28,21 @@ public class EnqueueMessagesActivity(
     public async Task<int> Run(
         [ActivityTrigger] EnqueueMessagesInput inputDto)
     {
-        // TODO: Get a proper event id!
-        var numberOfEnqueuedMessages = await _outgoingMessagesClient.EnqueueByCalculationIdAsync(
-            new EnqueueMessagesInputDto(
-                Guid.Parse(inputDto.CalculationId),
-                inputDto.CalculationVersion,
-                EventId: Guid.Empty));
+        try
+        {
+            // TODO: Get a proper event id!
+            // TODO: With this implementation, we have one try to fetch data. Do we want multiple tries?
+            var numberOfEnqueuedMessages = await _outgoingMessagesClient.EnqueueByCalculationIdAsync(
+                new EnqueueMessagesInputDto(
+                    Guid.Parse(inputDto.CalculationId),
+                    inputDto.CalculationVersion,
+                    Guid.Empty));
 
-        return numberOfEnqueuedMessages;
+            return numberOfEnqueuedMessages;
+        }
+        catch (Exception)
+        {
+            return 0;
+        }
     }
 }

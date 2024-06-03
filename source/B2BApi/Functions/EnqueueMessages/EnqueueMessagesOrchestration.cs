@@ -40,16 +40,15 @@ internal class EnqueueMessagesOrchestration
                 input.CalculationVersion,
                 input.CalculationType));
 
-        // if (numberOfEnqueuedMessages < 1)
-        // {
-        //
-        // }
+        var messagesWasSuccessfullyEnqueued = numberOfEnqueuedMessages > 0;
+
         await context.CallActivityAsync(
             nameof(SendMessagesEnqueuedActivity),
             new SendMessagesEnqueuedInput(
                 context.InstanceId,
                 input.CalculationOrchestrationId,
-                input.CalculationId));
+                input.CalculationId,
+                messagesWasSuccessfullyEnqueued));
 
         return "Success";
     }
