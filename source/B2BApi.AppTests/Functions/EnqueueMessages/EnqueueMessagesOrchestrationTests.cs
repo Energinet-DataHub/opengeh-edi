@@ -153,7 +153,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
                 var matchingOrchestrationId = parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
 
-                // TODO: This should come from the paredEvent, but is it relies on https://github.com/Energinet-DataHub/opengeh-edi/pull/1035
+                // TODO: This should come from the paredEvent, but it relies on https://github.com/Energinet-DataHub/opengeh-edi/pull/1035
                 var isSuccessful = true;
 
                 return matchingOrchestrationId && isSuccessful;
@@ -208,7 +208,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
                 var matchingOrchestrationId = parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
 
-                // TODO: This should come from the paredEvent, but is it relies on https://github.com/Energinet-DataHub/opengeh-edi/pull/1035
+                // TODO: This should come from the paredEvent, but it relies on https://github.com/Energinet-DataHub/opengeh-edi/pull/1035
                 var isFailed = true;
 
                 return matchingOrchestrationId && isFailed;
