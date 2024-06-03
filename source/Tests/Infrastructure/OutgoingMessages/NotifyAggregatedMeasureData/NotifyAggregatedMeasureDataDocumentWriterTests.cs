@@ -278,13 +278,15 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
     }
 
     [Fact]
-    public async Task Can_create_ebix_document_with_36_chars_transaction_id()
+    public async Task Can_support_existing_ebix_documents_with_36_char_ids()
     {
         // Arrange
+        var messageId = MessageId.Create("26be9856-db4c-451b-a275-18d5fa364285");
         var transactionId = TransactionId.From("93dbd8bb-4fbb-4b9d-b57f-f6a5c16f7bdf");
         var originalTransactionId = TransactionId.From("b340db36-ef97-4515-839c-1d8b544e9174");
 
         _energyResultMessageTimeSeries
+            .WithMessageId(messageId.Value)
             .WithTransactionId(transactionId)
             .WithOriginalTransactionIdReference(originalTransactionId);
 
@@ -296,11 +298,15 @@ public class NotifyAggregatedMeasureDataDocumentWriterTests : IClassFixture<Docu
                 AssertEbixDocument.Document(document.Stream, "ns0", _documentValidation.Validator))
             .HasStructureValidationErrorsAsync(
             [
+                $"The value '{messageId.Value}' is invalid according to its datatype",
                 $"The value '{transactionId.Value}' is invalid according to its datatype",
                 $"The value '{originalTransactionId.Value}' is invalid according to its datatype",
             ]);
 
-        assertions.HasTransactionId(transactionId).HasOriginalTransactionIdReference(originalTransactionId);
+        assertions
+            .HasMessageId(messageId.Value)
+            .HasTransactionId(transactionId)
+            .HasOriginalTransactionIdReference(originalTransactionId);
     }
 
     private Task<MarketDocumentStream> CreateDocument(EnergyResultMessageTimeSeriesBuilder resultBuilder, DocumentFormat documentFormat)
