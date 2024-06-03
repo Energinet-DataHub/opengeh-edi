@@ -110,28 +110,6 @@ public class AssertEbixDocument
         Assert.NotNull(_originalMessage.Root!.Elements().Single(x => x.Name.LocalName == "MessageType"));
         var validationResult = await _documentValidator!.ValidateAsync(_stream, DocumentFormat.Ebix, type, CancellationToken.None, version).ConfigureAwait(false);
 
-        if (!validationResult.IsValid && skipIdentificationLengthValidation)
-        {
-            var ignoreMaxLengthErrorsFor = new List<string>() { };
-
-            var validationErrorsExceptId = validationResult.ValidationErrors
-                .Where(errorMessage =>
-                {
-                    var isMaxLengthError = errorMessage.Contains(
-                        "The actual length is greater than the MaxLength value",
-                        StringComparison.OrdinalIgnoreCase);
-
-                    var isIgnoredElement = ignoreMaxLengthErrorsFor.Any(name =>
-                        errorMessage.Contains($"{name}' element is invalid", StringComparison.InvariantCulture));
-
-                    var ignoreError = isMaxLengthError && isIgnoredElement;
-                    return !ignoreError;
-                })
-                .ToArray();
-
-            validationResult = ValidationResult.Invalid(validationErrorsExceptId);
-        }
-
         validationResult.ValidationErrors.Should().BeEmpty();
         validationResult.IsValid.Should().BeTrue();
 
