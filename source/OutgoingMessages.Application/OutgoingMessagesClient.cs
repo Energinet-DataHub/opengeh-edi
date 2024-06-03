@@ -161,14 +161,19 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         return messageId;
     }
 
-    public async Task EnqueueByCalculationIdAsync(EnqueueMessagesInputDto input)
+    public async Task<int> EnqueueByCalculationIdAsync(EnqueueMessagesInputDto input)
     {
+        var numberOfEnqueuedMessages = 0;
+
         // TODO: Decide "view" / "query" based on calculation type
         await foreach (var nextResult in _energyResultEnumerator.GetAsync(input.CalculationId))
         {
             var receiverNumber = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(nextResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
             var nextMessage = EnergyResultMessageDtoFactory.CreateAsync(EventId.From(input.EventId), nextResult, receiverNumber);
             await EnqueueAndCommitAsync(nextMessage, CancellationToken.None);
+            numberOfEnqueuedMessages++;
         }
+
+        return numberOfEnqueuedMessages;
     }
 }

@@ -25,14 +25,16 @@ public class EnqueueMessagesActivity(
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
 
     [Function(nameof(EnqueueMessagesActivity))]
-    public async Task Run(
+    public async Task<int> Run(
         [ActivityTrigger] EnqueueMessagesInput inputDto)
     {
         // TODO: Get a proper event id!
-        await _outgoingMessagesClient.EnqueueByCalculationIdAsync(
+        var numberOfEnqueuedMessages = await _outgoingMessagesClient.EnqueueByCalculationIdAsync(
             new EnqueueMessagesInputDto(
                 Guid.Parse(inputDto.CalculationId),
                 inputDto.CalculationVersion,
                 Guid.Empty));
+
+        return numberOfEnqueuedMessages;
     }
 }

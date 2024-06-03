@@ -33,13 +33,17 @@ internal class EnqueueMessagesOrchestration
             return "Error: No input specified.";
         }
 
-        await context.CallActivityAsync(
+        var numberOfEnqueuedMessages = await context.CallActivityAsync<int>(
             nameof(EnqueueMessagesActivity),
             new EnqueueMessagesInput(
                 input.CalculationId,
                 input.CalculationVersion,
                 input.CalculationType));
 
+        // if (numberOfEnqueuedMessages < 1)
+        // {
+        //
+        // }
         await context.CallActivityAsync(
             nameof(SendMessagesEnqueuedActivity),
             new SendMessagesEnqueuedInput(

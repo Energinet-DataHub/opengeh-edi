@@ -157,9 +157,76 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         wait.Should().BeTrue("We did not receive the expected message on the ServiceBus");
     }
 
+    /// <summary>
+    /// Verifies that:
+    ///  - The orchestration can complete a full run.
+    ///  - Every activity is executed once and in correct order.
+    ///  - A service bus message is sent as expected.
+    /// </summary>
+    [Fact]
+    public async Task Given_FeatureFlagIsEnabledAndCalculationOrchestrationId_When_CalculationCompletedEventIsHandledAndDatabricksHasNoData_Then_OrchestrationCompletesWithFailedServiceBusMessage()
+    {
+        // Arrange
+        Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: true);
+
+        var calculationOrchestrationId = Guid.NewGuid().ToString();
+        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId);
+
+        // Act
+        var beforeOrchestrationCreated = DateTime.UtcNow;
+        await Fixture.TopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
+
+        // Assert
+        await Task.Delay(TimeSpan.FromSeconds(30));
+
+        // => Verify expected behaviour by searching the orchestration history
+        var orchestrationStatus = await Fixture.DurableClient.FindOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
+
+        // => Wait for completion, this should be fairly quick
+        var completeOrchestrationStatus = await Fixture.DurableClient.WaitForInstanceCompletedAsync(
+            orchestrationStatus.InstanceId,
+            TimeSpan.FromMinutes(1));
+
+        // => Expect history
+        using var assertionScope = new AssertionScope();
+
+        var activities = completeOrchestrationStatus.History
+            .OrderBy(item => item["Timestamp"])
+            .Select(item => item.Value<string>("FunctionName"));
+
+        activities.Should().NotBeNull().And.Equal(
+        [
+            "EnqueueMessagesOrchestration",
+            "SendMessagesEnqueuedActivity",
+            null
+        ]);
+
+        // => Verify that the durable function completed successfully
+        var last = completeOrchestrationStatus.History.Last();
+        last.Value<string>("EventType").Should().Be("ExecutionCompleted");
+        last.Value<string>("Result").Should().Be("Success");
+
+        // => Verify that the expected message was sent on the ServiceBus
+        var verifyServiceBusMessages = await Fixture.ServiceBusListenerMock
+            .When(msg =>
+            {
+                if (msg.Subject != MessagesEnqueuedV1.EventName)
+                {
+                    return false;
+                }
+
+                var parsedEvent = MessagesEnqueuedV1.Parser.ParseFrom(msg.Body);
+                return parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
+            })
+            .VerifyCountAsync(1);
+
+        var wait = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(10));
+        wait.Should().BeTrue("We did not receive the expected message on the ServiceBus");
+    }
+
     private static ServiceBusMessage CreateCalculationCompletedEventMessage(string calculationOrchestrationId)
     {
-        var calcuationCompletedEvent = new CalculationCompletedV1
+        var calculationCompletedEvent = new CalculationCompletedV1
         {
             InstanceId = calculationOrchestrationId,
             CalculationId = Guid.NewGuid().ToString(),
@@ -167,7 +234,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             CalculationVersion = 1,
         };
 
-        return CreateServiceBusMessage(eventId: Guid.NewGuid(), calcuationCompletedEvent);
+        return CreateServiceBusMessage(eventId: Guid.NewGuid(), calculationCompletedEvent);
     }
 
     private static ServiceBusMessage CreateServiceBusMessage(Guid eventId, IEventMessage eventMessage)
