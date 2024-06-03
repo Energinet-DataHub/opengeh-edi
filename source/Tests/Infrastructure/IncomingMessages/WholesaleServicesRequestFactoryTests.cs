@@ -36,7 +36,7 @@ public class WholesaleServicesRequestFactoryTests
         string? type)
     {
         // Arrange
-        var requestedByActor = RequestedByActor.From(ActorNumber.Create("8200000008033"), ActorRole.GridOperator);
+        var requestedByActor = RequestedByActor.From(ActorNumber.Create("1111111111111"), ActorRole.GridOperator);
 
         var process = new WholesaleServicesProcess(
             ProcessId.New(),
@@ -51,7 +51,7 @@ public class WholesaleServicesRequestFactoryTests
             null,
             null,
             null,
-            "5790000432752",
+            "2222222222222",
             [new ChargeType(ChargeTypeId.New(), id, type)],
             ["904"]);
 
