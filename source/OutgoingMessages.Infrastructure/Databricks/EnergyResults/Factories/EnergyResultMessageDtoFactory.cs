@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -29,6 +30,7 @@ public class EnergyResultMessageDtoFactory()
         ArgumentNullException.ThrowIfNull(energyResult);
 
         var receiverRole = DomainModel.ActorRole.MeteredDataResponsible;
+        var (businessReason, settlementVersion) = MapToBusinessReasonAndSettlementVersion(energyResult.CalculationType);
 
         return EnergyResultMessageDto.Create(
             eventId,
@@ -43,9 +45,9 @@ public class EnergyResultMessageDtoFactory()
             balanceResponsibleNumber: null,
             period: new DomainModel.Period(energyResult.PeriodStartUtc, energyResult.PeriodEndUtc),
             points: CreateEnergyResultMessagePoints(energyResult.TimeSeriesPoints),
-            businessReasonName: MapToBusinessReason(energyResult.CalculationType).Name,
+            businessReasonName: businessReason.Name,
             calculationResultVersion: energyResult.CalculationVersion,
-            settlementVersion: MapToSettlementVersion(energyResult.CalculationType)?.Name);
+            settlementVersion: settlementVersion?.Name);
     }
 
     // TODO: Move to mapper?
@@ -86,9 +88,9 @@ public class EnergyResultMessageDtoFactory()
     }
 
     // TODO: Move to mapper?
-    private static DomainModel.BusinessReason MapToBusinessReason(CalculationType calculationType)
+    private static (DomainModel.BusinessReason BusinessReason, DomainModel.SettlementVersion? SettlementVersion) MapToBusinessReasonAndSettlementVersion(CalculationType calculationType)
     {
-        return calculationType switch
+        var businessReason = calculationType switch
         {
             CalculationType.Aggregation => DomainModel.BusinessReason.PreliminaryAggregation,
             CalculationType.BalanceFixing => DomainModel.BusinessReason.BalanceFixing,
@@ -102,12 +104,8 @@ public class EnergyResultMessageDtoFactory()
                 actualValue: calculationType,
                 "Value does not contain a valid calculation type."),
         };
-    }
 
-    // TODO: Move to mapper?
-    private static DomainModel.SettlementVersion? MapToSettlementVersion(CalculationType calculationType)
-    {
-        return calculationType switch
+        var settlementVersion = calculationType switch
         {
             CalculationType.BalanceFixing or CalculationType.Aggregation or CalculationType.WholesaleFixing => null,
             CalculationType.FirstCorrectionSettlement => DomainModel.SettlementVersion.FirstCorrection,
@@ -119,5 +117,7 @@ public class EnergyResultMessageDtoFactory()
                 calculationType,
                 "Value does not contain a valid calculation type."),
         };
+
+        return (businessReason, settlementVersion);
     }
 }
