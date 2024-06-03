@@ -69,14 +69,15 @@ public static class WholesaleServicesRequestFactory
 
         foreach (var chargeType in process.ChargeTypes)
         {
-            request.ChargeTypes.Add(
-                (chargeType.Id, chargeType.Type) switch
-                {
-                    (null, null) => new ChargeType(),
-                    (null, var type) => new ChargeType { ChargeType_ = MapChargeType(type) },
-                    (var id, null) => new ChargeType { ChargeCode = id },
-                    var (id, type) => new ChargeType { ChargeCode = id, ChargeType_ = MapChargeType(type) },
-                });
+            var ct = new ChargeType();
+
+            if (chargeType.Id != null)
+                ct.ChargeCode = chargeType.Id;
+
+            if (chargeType.Type != null)
+                ct.ChargeType_ = MapChargeType(chargeType.Type);
+
+            request.ChargeTypes.Add(ct);
         }
 
         return request;

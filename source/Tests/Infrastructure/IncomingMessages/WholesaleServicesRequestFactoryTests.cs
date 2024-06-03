@@ -61,11 +61,15 @@ public class WholesaleServicesRequestFactoryTests
         // Assert
         serviceBusMessage.Should().NotBeNull();
         serviceBusMessage.Body.Should().NotBeNull();
-        serviceBusMessage.Subject.Should().Be("WholesaleServicesRequest");
+        serviceBusMessage.Subject.Should().Be(nameof(WholesaleServicesRequest));
 
-        WholesaleServicesRequest.Parser.ParseFrom(serviceBusMessage.Body)
+        var chargeType = WholesaleServicesRequest.Parser.ParseFrom(serviceBusMessage.Body)
             .ChargeTypes
             .Should()
-            .ContainSingle();
+            .ContainSingle()
+            .Subject;
+
+        chargeType.ChargeCode.Should().Be(id ?? string.Empty);
+        chargeType.ChargeType_.Should().Be(type is null ? string.Empty : "Tariff");
     }
 }
