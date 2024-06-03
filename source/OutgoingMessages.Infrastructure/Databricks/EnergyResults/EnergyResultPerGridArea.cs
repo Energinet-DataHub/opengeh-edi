@@ -31,7 +31,8 @@ public sealed class EnergyResultPerGridArea(
     Resolution resolution,
     int calculationVersion,
     SettlementMethod? settlementMethod)
-    : AggregatedTimeSeries(gridAreaCode,
+    : AggregatedTimeSeries(
+        gridAreaCode,
         timeSeriesPoints,
         meteringPointType,
         calculationType,
