@@ -14,16 +14,22 @@
 
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
+using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 
-public abstract class EnergyResultQueryBase(Guid calculationId)
+public abstract class EnergyResultQueryBase(
+        IOptions<EdiDatabricksOptions> ediDatabricksOptions,
+        Guid calculationId)
     : DatabricksStatement, IDeltaTableSchemaDescription
 {
+    private readonly EdiDatabricksOptions _ediDatabricksOptions = ediDatabricksOptions.Value;
+
     /// <summary>
     /// Name of database to query in.
     /// </summary>
-    public abstract string DatabaseName { get; }
+    public string DatabaseName => _ediDatabricksOptions.DatabaseName;
 
     /// <summary>
     /// Name of view or table to query in.

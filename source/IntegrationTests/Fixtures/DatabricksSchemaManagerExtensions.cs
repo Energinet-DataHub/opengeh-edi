@@ -20,7 +20,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatem
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 
-// TODO: Refactor DatabricksSchemaManager.CreateTableAsync to use IReadOnlyDictionary for column definition
 // TODO: Can we extract our extensions to TestCommon in a way that it is useful for other teams?
 public static class DatabricksSchemaManagerExtensions
 {
@@ -66,20 +65,25 @@ public static class DatabricksSchemaManagerExtensions
     /// Parse CSV column value into a delta table "insertable" value.
     /// Only arrays require special handling; all other values can be inserted as "strings".
     /// </summary>
-    private static string ParseColumnValue(IDeltaTableSchemaDescription schemaInfomation, CsvReader csv, int columnIndex)
+    private static string ParseColumnValue(IDeltaTableSchemaDescription schemaInfomation, CsvReader csvReader, int columnIndex)
     {
-        var columnName = csv.HeaderRecord[columnIndex];
+        var columnName = csvReader.HeaderRecord[columnIndex];
+        var columnValue = csvReader.GetField(columnIndex);
+
         if (schemaInfomation.SchemaDefinition[columnName].DataType == DeltaTableCommonTypes.ArrayOfStrings)
         {
-            var arrayContent = csv.GetField(columnIndex)
+            var arrayContent = columnValue
                 .Replace('[', '(')
                 .Replace(']', ')');
 
             return $"Array{arrayContent}";
         }
-        else
+
+        if (schemaInfomation.SchemaDefinition[columnName].IsNullable && columnValue == string.Empty)
         {
-            return $"'{csv.GetField(columnIndex)}'";
+            return "NULL";
         }
+
+        return $"'{columnValue}'";
     }
 }

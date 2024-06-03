@@ -17,27 +17,24 @@ using Energinet.DataHub.Core.Databricks.SqlStatementExecution.Formats;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 
-// TODO: Decide if we need to reference NuGet package "Energinet.DataHub.Core.Databricks.SqlStatementExecution" directly here, or not.
-public class EnergyResultEnumerator
+public class EnergyResultEnumerator(
+    DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor,
+    IOptions<EdiDatabricksOptions> ediDatabricksOptions,
+    ILogger<EnergyResultEnumerator> logger)
 {
-    private readonly DatabricksSqlWarehouseQueryExecutor _databricksSqlWarehouseQueryExecutor;
-    private readonly ILogger<EnergyResultEnumerator> _logger;
-
-    public EnergyResultEnumerator(
-        DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor,
-        ILogger<EnergyResultEnumerator> logger)
-    {
-        _databricksSqlWarehouseQueryExecutor = databricksSqlWarehouseQueryExecutor;
-        _logger = logger;
-    }
+    private readonly DatabricksSqlWarehouseQueryExecutor _databricksSqlWarehouseQueryExecutor = databricksSqlWarehouseQueryExecutor;
+    private readonly IOptions<EdiDatabricksOptions> _ediDatabricksOptions = ediDatabricksOptions;
+    private readonly ILogger<EnergyResultEnumerator> _logger = logger;
 
     public async IAsyncEnumerable<EnergyResultPerGridArea> GetAsync(Guid calculationId)
     {
-        var query = new EnergyResultPerGridAreaQuery(calculationId);
+        var query = new EnergyResultPerGridAreaQuery(_ediDatabricksOptions, calculationId);
         await foreach (var messageDto in GetInternalAsync(query))
             yield return messageDto;
         _logger.LogDebug("Fetched all energy results for calculation {calculation_id}", calculationId);

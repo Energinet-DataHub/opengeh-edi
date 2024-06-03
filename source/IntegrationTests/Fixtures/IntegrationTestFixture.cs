@@ -18,6 +18,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
 using Microsoft.Extensions.Configuration;
 using Xunit;
