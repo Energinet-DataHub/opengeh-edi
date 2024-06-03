@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Dapper;
-using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;

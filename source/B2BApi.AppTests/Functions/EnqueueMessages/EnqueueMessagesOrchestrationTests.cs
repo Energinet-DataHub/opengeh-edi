@@ -16,6 +16,8 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EnergySupplying.RequestResponse.IntegrationEvents;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
@@ -23,6 +25,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Google.Protobuf;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using Microsoft.Extensions.Options;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -53,6 +56,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
     public Task DisposeAsync()
     {
+        Fixture.DatabricksSchemaManager.DropSchemaAsync();
         Fixture.SetTestOutputHelper(null!);
 
         return Task.CompletedTask;
@@ -102,8 +106,11 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         // Arrange
         Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: true);
 
+        // create databricks data
+        var calculationId = await AddDatabricksData();
+
         var calculationOrchestrationId = Guid.NewGuid().ToString();
-        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId);
+        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId, calculationId.ToString());
 
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
@@ -132,7 +139,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             "EnqueueMessagesOrchestration",
             "EnqueueMessagesActivity",
             "SendMessagesEnqueuedActivity",
-            null
+            null,
         ]);
 
         // => Verify that the durable function completed successfully
@@ -152,9 +159,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
                 var parsedEvent = ActorMessagesEnqueuedV1.Parser.ParseFrom(msg.Body);
 
                 var matchingOrchestrationId = parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
-
-                // TODO: This should come from the paredEvent, but it relies on https://github.com/Energinet-DataHub/opengeh-edi/pull/1035
-                var isSuccessful = true;
+                var isSuccessful = parsedEvent.Success;
 
                 return matchingOrchestrationId && isSuccessful;
             })
@@ -207,9 +212,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
                 var parsedEvent = ActorMessagesEnqueuedV1.Parser.ParseFrom(msg.Body);
 
                 var matchingOrchestrationId = parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
-
-                // TODO: This should come from the paredEvent, but it relies on https://github.com/Energinet-DataHub/opengeh-edi/pull/1035
-                var isFailed = true;
+                var isFailed = parsedEvent.Success == false;
 
                 return matchingOrchestrationId && isFailed;
             })
@@ -219,12 +222,12 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         wait.Should().BeTrue("We did not receive the expected message on the ServiceBus");
     }
 
-    private static ServiceBusMessage CreateCalculationCompletedEventMessage(string calculationOrchestrationId)
+    private static ServiceBusMessage CreateCalculationCompletedEventMessage(string calculationOrchestrationId, string? calculationId = null)
     {
         var calculationCompletedEvent = new CalculationCompletedV1
         {
             InstanceId = calculationOrchestrationId,
-            CalculationId = Guid.NewGuid().ToString(),
+            CalculationId = calculationId ?? Guid.NewGuid().ToString(),
             CalculationType = CalculationCompletedV1.Types.CalculationType.BalanceFixing,
             CalculationVersion = 1,
         };
@@ -244,5 +247,25 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         serviceBusMessage.ApplicationProperties.Add("EventMinorVersion", eventMessage.EventMinorVersion);
 
         return serviceBusMessage;
+    }
+
+    private async Task<Guid> AddDatabricksData()
+    {
+        var calculationId = Guid.Parse("e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d");
+        await Fixture.DatabricksSchemaManager.CreateSchemaAsync();
+
+        var ediOptions = Options.Create(
+            new EdiDatabricksOptions { DatabaseName = Fixture.DatabricksSchemaManager.SchemaName });
+
+        var viewQuery = new EnergyResultPerGridAreaQuery(
+            ediOptions,
+            calculationId);
+        await Fixture.DatabricksSchemaManager.CreateTableAsync(viewQuery);
+
+        var testFilename = "balance_fixing_01-11-2022_01-12-2022_ga_543.csv";
+        var testFilePath = Path.Combine("TestData", testFilename);
+        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, testFilePath);
+
+        return calculationId;
     }
 }

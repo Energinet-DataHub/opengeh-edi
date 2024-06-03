@@ -45,6 +45,7 @@ public class SendMessagesEnqueuedActivity
         {
             OrchestrationInstanceId = input.CalculationOrchestrationInstanceId,
             CalculationId = input.CalculationId,
+            Success = input.Success,
         };
 
         var eventId = Guid.Parse(input.OrchestrationInstanceId);

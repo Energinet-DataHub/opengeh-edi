@@ -18,6 +18,7 @@ using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
@@ -27,10 +28,12 @@ using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Database;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.Options;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Xunit;
 using Xunit.Abstractions;
+using HttpClientFactory = Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks.HttpClientFactory;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 
@@ -66,6 +69,11 @@ public class B2BApiAppFixture : IAsyncLifetime
             TestLogger);
 
         HostConfigurationBuilder = new FunctionAppHostConfigurationBuilder();
+
+        DatabricksSchemaManager = new DatabricksSchemaManager(
+            new HttpClientFactory(),
+            IntegrationTestConfiguration.DatabricksSettings,
+            "edi_integration_tests");
     }
 
     public ITestDiagnosticsLogger TestLogger { get; }
@@ -83,6 +91,8 @@ public class B2BApiAppFixture : IAsyncLifetime
     public TopicResource? TopicResource { get; private set; }
 
     public ServiceBusListenerMock ServiceBusListenerMock { get; }
+
+    public DatabricksSchemaManager DatabricksSchemaManager { get; }
 
     private IntegrationTestConfiguration IntegrationTestConfiguration { get; }
 
@@ -128,7 +138,7 @@ public class B2BApiAppFixture : IAsyncLifetime
                 .Add($"{WholesaleInboxOptions.SectionName}__{nameof(WholesaleInboxOptions.QueueName)}", queue.Name))
             .CreateAsync();
         await ServiceBusResourceProvider
-            .BuildQueue("incomming-messages")
+            .BuildQueue("incoming-messages")
             .Do(queue => appHostSettings.ProcessEnvironmentVariables
                 .Add($"{IncomingMessagesQueueOptions.SectionName}__{nameof(IncomingMessagesQueueOptions.QueueName)}", queue.Name))
             .CreateAsync();
@@ -254,6 +264,9 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.ProcessEnvironmentVariables.Add(
             nameof(DatabricksSqlStatementOptions.WarehouseId),
             IntegrationTestConfiguration.DatabricksSettings.WarehouseId);
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.DatabaseName)}",
+            DatabricksSchemaManager.SchemaName);
 
         // ServiceBus connection strings
         appHostSettings.ProcessEnvironmentVariables.Add(
