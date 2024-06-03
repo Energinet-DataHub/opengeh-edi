@@ -11,3 +11,5 @@ ALTER TABLE [dbo].[Bundles]
 ALTER
 COLUMN [MessageId] NVARCHAR(36) NOT NULL;
 GO
+
+CREATE INDEX IX_Bundles_MessageId ON [dbo].[Bundles] ([MessageId])
