@@ -58,14 +58,14 @@ public class EnergyResultMessageDtoFactory()
                 (p, index) => new EnergyResultMessagePoint(
                     index + 1, // Position starts at 1, so position = index + 1
                     p.Quantity,
-                    MapToDomainQuality(p.Qualities),
+                    MapToCalculatedQuantityQuality(p.Qualities),
                     p.TimeUtc.ToString()))
             .ToList()
             .AsReadOnly();
     }
 
     // TODO: Move to mapper?
-    private static DomainModel.CalculatedQuantityQuality MapToDomainQuality(IReadOnlyCollection<QuantityQuality> qualities)
+    private static DomainModel.CalculatedQuantityQuality MapToCalculatedQuantityQuality(IReadOnlyCollection<QuantityQuality> qualities)
     {
         ArgumentNullException.ThrowIfNull(qualities);
 
