@@ -83,7 +83,7 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
     [InlineData(ArchivedMessageType.OutgoingMessage)]
     public async Task Archived_document_is_saved_at_correct_path(ArchivedMessageType archivedMessageType)
     {
-        var messageId = Guid.NewGuid().ToString();
+        var messageId = MessageId.New();
         var senderNumber = "1122334455667788";
         var receiverNumber = "8877665544332211";
         int year = 2024,
