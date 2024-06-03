@@ -24,11 +24,14 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
+using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
@@ -131,14 +134,14 @@ public class WhenAPeekIsRequestedTests : TestBase
         await EnqueueMessage(message);
 
         // Act
-        var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);
+        var peekResult = await PeekMessageAsync(MessageCategory.Aggregations, null, null, DocumentFormat.Ebix);
 
         // Assert
         using var assertScope = new AssertionScope();
         peekResult.Bundle.Should().NotBeNull();
 
         var peekResultFileContent = await GetStreamContentAsStringAsync(peekResult.Bundle!);
-        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value);
+        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!);
         archivedMessageFileStorageReference.Should().NotBeNull();
 
         var archivedMessageFileContent = await GetFileContentFromFileStorageAsync(
@@ -169,8 +172,8 @@ public class WhenAPeekIsRequestedTests : TestBase
         // Assert
         result.Bundle.Should().NotBeNull();
 
-        var archivedMessageId = await GetArchivedMessageIdFromDatabaseAsync(result.MessageId!.Value.ToString());
-        var fileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(result.MessageId!.Value);
+        var archivedMessageId = await GetArchivedMessageIdFromDatabaseAsync(result.MessageId!);
+        var fileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(result.MessageId!);
         fileStorageReference.Should().Be($"{receiverNumber}/{year:0000}/{month:00}/{date:00}/{archivedMessageId:N}");
     }
 
@@ -187,7 +190,7 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         result.MessageId.Should().NotBeNull();
 
-        var marketDocumentExists = await MarketDocumentExists(result.MessageId!.Value);
+        var marketDocumentExists = await MarketDocumentExists(result.MessageId!);
         marketDocumentExists.Should().BeTrue();
     }
 
@@ -202,8 +205,8 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);
 
-        var marketDocumentFileStorageReference = await GetMarketDocumentFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value);
-        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value);
+        var marketDocumentFileStorageReference = await GetMarketDocumentFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!);
+        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!);
 
         marketDocumentFileStorageReference.Should().Be(archivedMessageFileStorageReference);
     }
@@ -296,13 +299,15 @@ public class WhenAPeekIsRequestedTests : TestBase
         _dateTimeProvider.SetNow(expectedTimestamp.ToInstant());
 
         // Act / When
-        var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);
+        var peekResult = await PeekMessageAsync(MessageCategory.Aggregations, null, null, DocumentFormat.Ebix);
+        var sr = new StreamReader(peekResult.Bundle!);
+        var txt = await sr.ReadToEndAsync();
 
         // Assert / Then
         peekResult.Should().NotBeNull("because a peek result should be found");
         peekResult.MessageId.Should().NotBeNull("because a peek result with a message id should be found");
 
-        var archivedMessage = await GetArchivedMessageFromDatabaseAsync(peekResult.MessageId!.Value.ToString());
+        var archivedMessage = await GetArchivedMessageFromDatabaseAsync(peekResult.MessageId!);
         ((object?)archivedMessage).Should().NotBeNull("because an archived message should exists");
 
         var expectedFileStorageReference = $"{receiverNumber}/{year:0000}/{month:00}/{day:00}/{archivedMessage!.Id:N}";
@@ -314,7 +319,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             { "EventIds", eventIds => eventIds.Should().Be(expectedEventId.Value) },
             { "FileStorageReference", fileStorageReference => fileStorageReference.Should().Be(expectedFileStorageReference) },
             { "Id", id => id.Should().NotBeNull() },
-            { "MessageId", messageId => messageId.Should().Be(peekResult.MessageId.ToString()) },
+            { "MessageId", messageId => messageId.Should().Be(peekResult.MessageId!.ToString()) },
             { "ReceiverNumber", receiverNumber => receiverNumber.Should().Be(outgoingMessage.ReceiverNumber.Value) },
             { "RecordId", recordId => recordId.Should().NotBeNull() },
             { "RelatedToMessageId", relatedToMessageId => relatedToMessageId.Should().BeNull() },
@@ -333,6 +338,45 @@ public class WhenAPeekIsRequestedTests : TestBase
             assertProperties.Keys.Should().Contain(dbPropertyName);
     }
 
+    [Fact]
+    public async Task Given_OutgoingMessage_When_MessageIsPeeked_WithEbix_Then_MessageIsArchivedOnExpectedMessageId()
+    {
+        // Arrange / Given
+        var expectedEventId = EventId.From(Guid.NewGuid());
+        var receiverNumber = SampleData.NewEnergySupplierNumber;
+        var outgoingMessage = _energyResultMessageDtoBuilder
+            .WithReceiverNumber(receiverNumber)
+            .WithReceiverRole(ActorRole.EnergySupplier)
+            .WithEventId(expectedEventId)
+            .Build();
+
+        await EnqueueMessage(outgoingMessage);
+
+        var year = 2023;
+        var month = 1;
+        var day = 1;
+        var hour = 13;
+        var minute = 37;
+        var expectedTimestamp = new DateTime(year, month, day, hour, minute, 0, DateTimeKind.Utc);
+        _dateTimeProvider.SetNow(expectedTimestamp.ToInstant());
+
+        // Act / When
+        var peekResult = await PeekMessageAsync(MessageCategory.Aggregations, null, null, DocumentFormat.Ebix);
+        var peekResult2 = await PeekMessageAsync(MessageCategory.Aggregations, null, null, DocumentFormat.Ebix);
+        var ebixAsserter = NotifyAggregatedMeasureDataDocumentAsserter.CreateEbixAsserter(peekResult.Bundle!);
+        var messageId = ebixAsserter.GetElement("HeaderEnergyDocument/Identification")!.LastNode?.ToString();
+
+        // Assert / Then
+        peekResult.MessageId.Should().Be(messageId);
+
+        var archivedMessage = await GetArchivedMessageFromDatabaseAsync(messageId!);
+        ((object?)archivedMessage).Should().NotBeNull("because an archived message should exists");
+        var outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
+        var dequeueRequestResultDto = await outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(messageId!, ActorRole.EnergySupplier, ActorNumber.Create("5790000555551")), CancellationToken.None);
+        //var dequeueRequestResultDto = await outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(Guid.Parse(messageId!).ToString(), ActorRole.EnergySupplier, ActorNumber.Create("5790000555551")), CancellationToken.None);
+        dequeueRequestResultDto.Success.Should().BeTrue();
+    }
+
     private async Task<bool> BundleIsRegistered()
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
@@ -341,7 +385,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         return numberOfBundles == 1;
     }
 
-    private async Task<bool> MarketDocumentExists(Guid marketDocumentBundleId)
+    private async Task<bool> MarketDocumentExists(string marketDocumentBundleId)
     {
         var sqlStatement =
             $"SELECT COUNT(*) FROM [dbo].[MarketDocuments] WHERE BundleId = '{marketDocumentBundleId}'";

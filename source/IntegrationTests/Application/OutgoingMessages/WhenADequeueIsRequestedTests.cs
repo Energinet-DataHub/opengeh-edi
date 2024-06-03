@@ -78,7 +78,7 @@ public class WhenADequeueIsRequestedTests : TestBase
             DocumentFormat.Xml),
             CancellationToken.None);
 
-        var dequeueResult = await _outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(peekResult.MessageId.GetValueOrDefault().ToString(), ActorRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)), CancellationToken.None);
+        var dequeueResult = await _outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(peekResult.MessageId!, ActorRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)), CancellationToken.None);
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var found = await connection
             .QuerySingleOrDefaultAsync<bool>("SELECT IsDequeued FROM [dbo].Bundles");
@@ -114,7 +114,7 @@ public class WhenADequeueIsRequestedTests : TestBase
         // Act
         var dequeueResult = await _outgoingMessagesClient.DequeueAndCommitAsync(
             new DequeueRequestDto(
-                peekResult.MessageId.GetValueOrDefault().ToString(),
+                peekResult.MessageId!,
                 ActorRole.MeteredDataResponsible,
                 actorNumber),
             CancellationToken.None);

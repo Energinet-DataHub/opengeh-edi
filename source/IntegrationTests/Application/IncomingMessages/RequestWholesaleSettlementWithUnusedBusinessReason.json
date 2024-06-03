@@ -27,7 +27,7 @@
 		},
 		"Series": [
       {
-        "mRID": "123564789123564789123564789123564787",
+        "mRID": "12356478912356478912356478912356478",
         "aggregationSeries_Period.resolution": "PT1M",
         "chargeTypeOwner_MarketParticipant.mRID": {
           "codingScheme": "A10",

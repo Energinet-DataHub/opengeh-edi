@@ -150,7 +150,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var sql = "SELECT top 1 id FROM [dbo].[Bundles] order by created";
         var id = await
             connection
-                .QuerySingleOrDefaultAsync<Guid>(sql);
+                .QuerySingleOrDefaultAsync<string>(sql);
 
         Assert.Equal(result.MessageId, id);
     }
@@ -167,7 +167,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             DocumentFormat.Xml);
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(peekRequestDto, CancellationToken.None);
         var dequeueCommand = new DequeueRequestDto(
-            peekResult.MessageId!.Value.ToString(),
+            peekResult.MessageId!,
             message.ReceiverRole,
             message.ReceiverNumber);
 

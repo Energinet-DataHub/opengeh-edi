@@ -220,7 +220,8 @@ public abstract class EbixDocumentWriter : IDocumentWriter
 
         // Begin HeaderEnergyDocument
         await writer.WriteStartElementAsync(documentDetails.Prefix, "HeaderEnergyDocument", null).ConfigureAwait(false);
-        await writer.WriteElementStringAsync(documentDetails.Prefix, "Identification", null, header.MessageId)
+        // We replace the '-' in the string to ensure that we do not bypass the 35 character limit
+        await writer.WriteElementStringAsync(documentDetails.Prefix, "Identification", null, header.MessageId.Replace("-", string.Empty, StringComparison.InvariantCulture))
             .ConfigureAwait(false);
         await WriteCodeWithCodeListReferenceAttributesAsync("DocumentType", documentDetails.TypeCode, writer).ConfigureAwait(false);
 
