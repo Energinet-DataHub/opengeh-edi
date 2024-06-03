@@ -14,4 +14,14 @@
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public sealed record Actor(ActorNumber ActorNumber, ActorRole ActorRole);
+public sealed class Actor(ActorNumber actorNumber, ActorRole actorRole)
+{
+    public ActorNumber ActorNumber { get; init; } = actorNumber;
+
+    public ActorRole ActorRole { get; init; } = actorRole;
+
+    public override string ToString()
+    {
+        return $"ActorNumber: {ActorNumber.Value}, ActorRole: {ActorRole.Name}";
+    }
+}
