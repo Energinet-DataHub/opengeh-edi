@@ -16,6 +16,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Exceptions;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -49,13 +51,17 @@ public class DequeueMessage
             request = request with { ActorRole = request.ActorRole.ForActorMessageQueue(), };
         }
 
-        if (Guid.TryParse(request.MessageId, out var messageId) == false)
+        MessageId messageId;
+        try
+        {
+            messageId = MessageId.Create(request.MessageId);
+        }
+        catch (InvalidMessageIdException)
         {
             _logger.LogWarning("Invalid message id: {MessageId}", request.MessageId);
             return new DequeueRequestResultDto(false);
         }
 
-        var bundleId = BundleId.Create(messageId);
         var actorQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.ActorRole).ConfigureAwait(false);
         if (actorQueue == null)
         {
@@ -63,8 +69,8 @@ public class DequeueMessage
             return new DequeueRequestResultDto(false);
         }
 
-        var successful = actorQueue.Dequeue(bundleId);
-        _logger.LogInformation("Dequeue request result: {Successful} for bundleId: {BundleId}", successful, bundleId);
+        var successful = actorQueue.Dequeue(messageId);
+        _logger.LogInformation("Dequeue request result: {Successful} for messageId: {BundleId}", successful, messageId.Value);
         return new DequeueRequestResultDto(successful);
     }
 }

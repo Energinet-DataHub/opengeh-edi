@@ -73,13 +73,17 @@ public class PeekMessage
 
         var actorMessageQueue = await
             _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.ActorRole).ConfigureAwait(false);
+
         if (actorMessageQueue is null)
-            return new PeekResultDto(null);
+            return new PeekResultDto(null, null);
 
         var peekResult = request.DocumentFormat == DocumentFormat.Ebix ? actorMessageQueue.Peek() : actorMessageQueue.Peek(request.MessageCategory);
 
         if (peekResult.BundleId == null)
-            return new PeekResultDto(null);
+            return new PeekResultDto(null, null);
+
+        if (peekResult.MessageId == null)
+            return new PeekResultDto(null, null);
 
         var marketDocument = await _marketDocumentRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);
 
@@ -87,11 +91,11 @@ public class PeekMessage
         {
             var timestamp = _systemDateTimeProvider.Now();
 
-            var outgoingMessageBundle = await _outgoingMessageRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);
+            var outgoingMessageBundle = await _outgoingMessageRepository.GetAsync(peekResult.BundleId, peekResult.MessageId).ConfigureAwait(false);
             var marketDocumentStream = await _documentFactory.CreateFromAsync(outgoingMessageBundle, request.DocumentFormat, timestamp).ConfigureAwait(false);
 
             var archivedMessageToCreate = new ArchivedMessage(
-                peekResult.BundleId.Id.ToString(),
+                peekResult.MessageId.Value.Value,
                 outgoingMessageBundle.OutgoingMessages.Select(om => om.EventId).ToArray(),
                 outgoingMessageBundle.DocumentType.ToString(),
                 outgoingMessageBundle.SenderId.Value,
@@ -101,13 +105,14 @@ public class PeekMessage
                 ArchivedMessageType.OutgoingMessage,
                 marketDocumentStream,
                 outgoingMessageBundle.RelatedToMessageId);
+
             var archivedFile = await _archivedMessageClient.CreateAsync(archivedMessageToCreate, cancellationToken).ConfigureAwait(false);
 
             marketDocument = new MarketDocument(peekResult.BundleId, archivedFile);
             _marketDocumentRepository.Add(marketDocument);
         }
 
-        return new PeekResultDto(marketDocument.GetMarketDocumentStream().Stream, marketDocument.BundleId.Id);
+        return new PeekResultDto(marketDocument.GetMarketDocumentStream().Stream, peekResult.MessageId);
     }
 
     private async Task PeekAndCommitToEnsureBundleIsClosedAsync(PeekRequestDto request)

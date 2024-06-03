@@ -15,7 +15,9 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
@@ -47,8 +49,10 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
         _context.OutgoingMessages.Add(message);
     }
 
-    public async Task<OutgoingMessageBundle> GetAsync(BundleId bundleId)
+    public async Task<OutgoingMessageBundle> GetAsync(BundleId bundleId, MessageId? messageId)
     {
+        ArgumentNullException.ThrowIfNull(messageId);
+
         var outgoingMessages = await _context.OutgoingMessages.Where(x => x.AssignedBundleId == bundleId)
             .ToListAsync()
             .ConfigureAwait(false);
@@ -67,7 +71,7 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
             firstMessage.BusinessReason,
             firstMessage.SenderId,
             firstMessage.SenderRole,
-            bundleId,
+            messageId.Value,
             outgoingMessages,
             firstMessage.RelatedToMessageId);
     }

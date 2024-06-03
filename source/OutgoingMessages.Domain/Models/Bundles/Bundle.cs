@@ -16,6 +16,9 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using NodaTime;
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor.
+// Consider declaring as nullable.
+
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 
 public sealed class Bundle
@@ -23,29 +26,25 @@ public sealed class Bundle
     private readonly int _maxNumberOfMessagesInABundle;
     private int _messageCount;
 
-#pragma warning disable
-
-    private Bundle()
-    {
-    }
-
-    internal Bundle(BundleId id, BusinessReason businessReason, DocumentType documentTypeInBundle, int maxNumberOfMessagesInABundle, Instant created, MessageId? relatedToMessageId)
+    internal Bundle(
+        BusinessReason businessReason,
+        DocumentType documentTypeInBundle,
+        int maxNumberOfMessagesInABundle,
+        Instant created,
+        MessageId? relatedToMessageId)
     {
         _maxNumberOfMessagesInABundle = maxNumberOfMessagesInABundle;
-        Id = id;
+        Id = BundleId.New();
+        MessageId = MessageId.New();
         BusinessReason = businessReason;
         DocumentTypeInBundle = documentTypeInBundle;
         Created = created;
         RelatedToMessageId = relatedToMessageId;
     }
 
-    internal DocumentType DocumentTypeInBundle { get; }
-
-    internal BundleId Id { get; }
-
-    internal BusinessReason BusinessReason { get; }
-
-    internal bool IsClosed { get; private set; }
+    private Bundle()
+    {
+    }
 
     public bool IsDequeued { get; private set; }
 
@@ -57,10 +56,26 @@ public sealed class Bundle
     /// </summary>
     public MessageId? RelatedToMessageId { get; private set; }
 
+    public MessageId MessageId { get; private set; }
+
+    internal DocumentType DocumentTypeInBundle { get; }
+
+    internal BundleId Id { get; }
+
+    internal BusinessReason BusinessReason { get; }
+
+    internal bool IsClosed { get; private set; }
+
+    public void CloseBundle()
+    {
+        IsClosed = true;
+    }
+
     internal void Add(OutgoingMessage outgoingMessage)
     {
         if (IsClosed)
             return;
+
         outgoingMessage.AssignToBundle(Id);
         _messageCount++;
         CloseBundleIfFull();
@@ -74,10 +89,5 @@ public sealed class Bundle
     private void CloseBundleIfFull()
     {
         IsClosed = _maxNumberOfMessagesInABundle == _messageCount;
-    }
-
-    public void CloseBundle()
-    {
-        IsClosed = true;
     }
 }
