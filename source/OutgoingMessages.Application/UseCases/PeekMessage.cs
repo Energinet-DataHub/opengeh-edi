@@ -75,15 +75,15 @@ public class PeekMessage
             _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.ActorRole).ConfigureAwait(false);
 
         if (actorMessageQueue is null)
-            return new PeekResultDto(null, null, null);
+            return new PeekResultDto(null, null);
 
         var peekResult = request.DocumentFormat == DocumentFormat.Ebix ? actorMessageQueue.Peek() : actorMessageQueue.Peek(request.MessageCategory);
 
         if (peekResult.BundleId == null)
-            return new PeekResultDto(null, null, null);
+            return new PeekResultDto(null, null);
 
         if (peekResult.MessageId == null)
-            return new PeekResultDto(null, null, null);
+            return new PeekResultDto(null, null);
 
         var marketDocument = await _marketDocumentRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);
 
@@ -112,7 +112,7 @@ public class PeekMessage
             _marketDocumentRepository.Add(marketDocument);
         }
 
-        return new PeekResultDto(marketDocument.GetMarketDocumentStream().Stream, marketDocument.BundleId.Id, peekResult.MessageId);
+        return new PeekResultDto(marketDocument.GetMarketDocumentStream().Stream, peekResult.MessageId);
     }
 
     private async Task PeekAndCommitToEnsureBundleIsClosedAsync(PeekRequestDto request)

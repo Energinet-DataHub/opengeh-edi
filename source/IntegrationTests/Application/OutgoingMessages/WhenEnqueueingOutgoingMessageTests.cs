@@ -147,12 +147,12 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
 
         var result = await _outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(message.ReceiverNumber, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Ebix), CancellationToken.None);
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var sql = "SELECT top 1 id FROM [dbo].[Bundles] order by created";
+        var sql = "SELECT top 1 MessageId FROM [dbo].[Bundles] order by created";
         var id = await
             connection
-                .QuerySingleOrDefaultAsync<Guid>(sql);
+                .QuerySingleOrDefaultAsync<string>(sql);
 
-        Assert.Equal(result.BundleId, id);
+        Assert.Equal(result.MessageId!.Value.Value, id);
     }
 
     [Fact]

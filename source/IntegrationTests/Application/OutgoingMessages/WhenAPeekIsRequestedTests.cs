@@ -187,7 +187,7 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         result.MessageId.Should().NotBeNull();
 
-        var marketDocumentExists = await MarketDocumentExists(result.BundleId!.Value);
+        var marketDocumentExists = await MarketDocumentExists(result.MessageId!.Value);
         marketDocumentExists.Should().BeTrue();
     }
 
@@ -202,7 +202,7 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);
 
-        var marketDocumentFileStorageReference = await GetMarketDocumentFileStorageReferenceFromDatabaseAsync(peekResult.BundleId!.Value);
+        var marketDocumentFileStorageReference = await GetMarketDocumentFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value);
         var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value.Value);
 
         marketDocumentFileStorageReference.Should().Be(archivedMessageFileStorageReference);
@@ -341,12 +341,16 @@ public class WhenAPeekIsRequestedTests : TestBase
         return numberOfBundles == 1;
     }
 
-    private async Task<bool> MarketDocumentExists(Guid marketDocumentBundleId)
+    private async Task<bool> MarketDocumentExists(MessageId marketDocumentMessageId)
     {
         var sqlStatement =
-            $"SELECT COUNT(*) FROM [dbo].[MarketDocuments] WHERE BundleId = '{marketDocumentBundleId}'";
+            $"SELECT COUNT(*) "
+            + $"FROM [dbo].[MarketDocuments] md JOIN [dbo].[Bundles] b ON md.BundleId = b.Id "
+            + $"WHERE b.MessageId = '{marketDocumentMessageId.Value}'";
+
         using var connection =
             await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+
         var exists = await connection.ExecuteScalarAsync<bool>(sqlStatement);
 
         return exists;
