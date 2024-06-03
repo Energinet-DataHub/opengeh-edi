@@ -166,11 +166,11 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         var numberOfEnqueuedMessages = 0;
 
         // TODO: Decide "view" / "query" based on calculation type
-        await foreach (var nextResult in _energyResultEnumerator.GetAsync(input.CalculationId))
+        await foreach (var energyResult in _energyResultEnumerator.GetAsync(input.CalculationId))
         {
-            var receiverNumber = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(nextResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
-            var nextMessage = EnergyResultMessageDtoFactory.CreateAsync(EventId.From(input.EventId), nextResult, receiverNumber);
-            await EnqueueAndCommitAsync(nextMessage, CancellationToken.None);
+            var receiverNumber = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(energyResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
+            var energyResultMessage = EnergyResultMessageDtoFactory.CreateAsync(EventId.From(input.EventId), energyResult, receiverNumber);
+            await EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None);
             numberOfEnqueuedMessages++;
         }
 
