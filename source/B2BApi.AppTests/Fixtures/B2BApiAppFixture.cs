@@ -73,7 +73,7 @@ public class B2BApiAppFixture : IAsyncLifetime
         DatabricksSchemaManager = new DatabricksSchemaManager(
             new HttpClientFactory(),
             IntegrationTestConfiguration.DatabricksSettings,
-            "edi_integration_tests");
+            "edi_B2BApi_tests");
     }
 
     public ITestDiagnosticsLogger TestLogger { get; }
