@@ -23,18 +23,9 @@ public static class EnergyTimeSeriesPointFactory
 {
     public static EnergyTimeSeriesPoint CreateTimeSeriesPoint(DatabricksSqlRow databricksSqlRow)
     {
-        var time = databricksSqlRow[EnergyResultColumnNames.Time];
-        ArgumentException.ThrowIfNullOrWhiteSpace(time);
-
-        var quantity = databricksSqlRow[EnergyResultColumnNames.Quantity];
-        ArgumentException.ThrowIfNullOrWhiteSpace(quantity);
-
-        var qualities = databricksSqlRow[EnergyResultColumnNames.QuantityQualities];
-        ArgumentException.ThrowIfNullOrWhiteSpace(qualities);
-
         return new EnergyTimeSeriesPoint(
-            SqlResultValueConverters.ToInstant(time),
-            SqlResultValueConverters.ToDecimal(quantity),
-            QuantityQualitiesMapper.FromDeltaTableValue(qualities));
+            databricksSqlRow.ToInstant(EnergyResultColumnNames.Time),
+            databricksSqlRow.ToDecimal(EnergyResultColumnNames.Quantity),
+            QuantityQualitiesMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.QuantityQualities)));
     }
 }

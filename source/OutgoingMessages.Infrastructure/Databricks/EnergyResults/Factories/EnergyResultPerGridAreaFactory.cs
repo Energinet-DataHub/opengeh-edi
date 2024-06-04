@@ -25,46 +25,17 @@ public class EnergyResultPerGridAreaFactory
         DatabricksSqlRow databricksSqlRow,
         IReadOnlyList<EnergyTimeSeriesPoint> timeSeriesPoints)
     {
-        var calculationId = databricksSqlRow[EnergyResultColumnNames.CalculationId];
-        ArgumentException.ThrowIfNullOrWhiteSpace(calculationId);
-
-        var calculationType = databricksSqlRow[EnergyResultColumnNames.CalculationType];
-        ArgumentException.ThrowIfNullOrWhiteSpace(calculationType);
-
-        var periodStartUtc = databricksSqlRow[EnergyResultColumnNames.CalculationPeriodStart];
-        ArgumentException.ThrowIfNullOrWhiteSpace(periodStartUtc);
-
-        var periodEndUtc = databricksSqlRow[EnergyResultColumnNames.CalculationPeriodEnd];
-        ArgumentException.ThrowIfNullOrWhiteSpace(periodEndUtc);
-
-        var calculationVersion = databricksSqlRow[EnergyResultColumnNames.CalculationVersion];
-        ArgumentException.ThrowIfNullOrWhiteSpace(calculationVersion);
-
-        var resultId = databricksSqlRow[EnergyResultColumnNames.ResultId];
-        ArgumentException.ThrowIfNullOrWhiteSpace(resultId);
-
-        var gridAreaCode = databricksSqlRow[EnergyResultColumnNames.GridAreaCode];
-        ArgumentException.ThrowIfNullOrWhiteSpace(gridAreaCode);
-
-        var meteringPointType = databricksSqlRow[EnergyResultColumnNames.MeteringPointType];
-        ArgumentException.ThrowIfNullOrWhiteSpace(meteringPointType);
-
-        var resolution = databricksSqlRow[EnergyResultColumnNames.Resolution];
-        ArgumentException.ThrowIfNullOrWhiteSpace(resolution);
-
-        var settlementMethod = databricksSqlRow[EnergyResultColumnNames.SettlementMethod];
-
         return new EnergyResultPerGridArea(
-            SqlResultValueConverters.ToGuid(resultId),
-            SqlResultValueConverters.ToGuid(calculationId),
-            gridAreaCode,
-            MeteringPointTypeMapper.FromDeltaTableValue(meteringPointType),
+            databricksSqlRow.ToGuid(EnergyResultColumnNames.ResultId),
+            databricksSqlRow.ToGuid(EnergyResultColumnNames.CalculationId),
+            databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.GridAreaCode),
+            MeteringPointTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.MeteringPointType)),
             timeSeriesPoints.ToArray(),
-            CalculationTypeMapper.FromDeltaTableValue(calculationType),
-            SqlResultValueConverters.ToInstant(periodStartUtc),
-            SqlResultValueConverters.ToInstant(periodEndUtc),
-            ResolutionMapper.FromDeltaTableValue(resolution),
-            SqlResultValueConverters.ToLong(calculationVersion),
-            SettlementMethodMapper.FromDeltaTableValue(settlementMethod));
+            CalculationTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.CalculationType)),
+            databricksSqlRow.ToInstant(EnergyResultColumnNames.CalculationPeriodStart),
+            databricksSqlRow.ToInstant(EnergyResultColumnNames.CalculationPeriodEnd),
+            ResolutionMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.Resolution)),
+            databricksSqlRow.ToLong(EnergyResultColumnNames.CalculationVersion),
+            SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow[EnergyResultColumnNames.SettlementMethod]));
     }
 }

@@ -20,44 +20,72 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlSt
 
 public static class SqlResultValueConverters
 {
-    public static Instant ToInstant(string value)
+    public static string ToNonEmptyString(this DatabricksSqlRow row, string columnName)
     {
+        var value = row[columnName];
+        ArgumentException.ThrowIfNullOrWhiteSpace(value);
+
+        return value;
+    }
+
+    public static Instant ToInstant(this DatabricksSqlRow row, string columnName)
+    {
+        var value = row[columnName];
+        ArgumentException.ThrowIfNullOrWhiteSpace(value);
+
         return InstantPattern.ExtendedIso.Parse(value).Value;
     }
 
-    public static decimal ToDecimal(string value)
+    public static decimal ToDecimal(this DatabricksSqlRow row, string columnName)
     {
+        var value = row[columnName];
+        ArgumentException.ThrowIfNullOrWhiteSpace(value);
+
         return decimal.Parse(value, CultureInfo.InvariantCulture);
     }
 
-    public static DateTimeOffset ToDateTimeOffset(string value)
+    public static DateTimeOffset ToDateTimeOffset(this DatabricksSqlRow row, string columnName)
     {
+        var value = row[columnName];
+        ArgumentException.ThrowIfNullOrWhiteSpace(value);
+
         return DateTimeOffset.Parse(value, CultureInfo.InvariantCulture);
     }
 
     /// <summary>
     /// Parse from Databricks "INT" to int.
     /// </summary>
-    public static int ToInt(string value)
+    public static int ToInt(this DatabricksSqlRow row, string columnName)
     {
+        var value = row[columnName];
+        ArgumentException.ThrowIfNullOrWhiteSpace(value);
+
         return int.Parse(value);
     }
 
     /// <summary>
     /// Parse from Databricks "BIGINT" to long.
     /// </summary>
-    public static long ToLong(string value)
+    public static long ToLong(this DatabricksSqlRow row, string columnName)
     {
+        var value = row[columnName];
+        ArgumentException.ThrowIfNullOrWhiteSpace(value);
+
         return long.Parse(value);
     }
 
-    public static Guid ToGuid(string value)
+    public static Guid ToGuid(this DatabricksSqlRow row, string columnName)
     {
+        var value = row[columnName];
+        ArgumentException.ThrowIfNullOrWhiteSpace(value);
+
         return Guid.Parse(value);
     }
 
-    public static bool ToBool(string value)
+    public static bool ToBool(this DatabricksSqlRow row, string columnName)
     {
+        var value = row[columnName];
+
         return value switch
         {
             "true" => true,
