@@ -21,5 +21,4 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 /// </summary>
 public sealed record EnqueueMessagesInput(
     string CalculationId, // TODO: If we are sure this is a Guid, we should use that type anywhere possible
-    long CalculationVersion,
-    CalculationCompletedV1.Types.CalculationType CalculationType);
+    long CalculationVersion);
