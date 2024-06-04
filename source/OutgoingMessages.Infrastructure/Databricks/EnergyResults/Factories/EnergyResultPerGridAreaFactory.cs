@@ -27,9 +27,9 @@ public class EnergyResultPerGridAreaFactory
         DatabricksSqlRow databricksSqlRow,
         IReadOnlyList<EnergyTimeSeriesPoint> timeSeriesPoints)
     {
-        var typedResolution = ResolutionMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.Resolution));
+        var resolution = ResolutionMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.Resolution));
 
-        var period = GetPeriod(timeSeriesPoints, typedResolution);
+        var period = GetPeriod(timeSeriesPoints, resolution);
 
         return new EnergyResultPerGridArea(
             databricksSqlRow.ToGuid(EnergyResultColumnNames.ResultId),
@@ -40,7 +40,7 @@ public class EnergyResultPerGridAreaFactory
             CalculationTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.CalculationType)),
             period.Start,
             period.End,
-            typedResolution,
+            resolution,
             databricksSqlRow.ToLong(EnergyResultColumnNames.CalculationVersion),
             SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)));
     }
