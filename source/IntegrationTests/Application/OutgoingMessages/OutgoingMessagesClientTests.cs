@@ -39,7 +39,6 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
 
     // Values matching test file values
     private readonly Guid _calculationId = Guid.Parse("e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d");
-    private readonly long _calculationVersion = 63;
 
     private readonly GridAreaOwnershipAssignedEventBuilder _gridAreaOwnershipAssignedEventBuilder = new();
 
@@ -71,7 +70,6 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         var sut = GetService<IOutgoingMessagesClient>();
         var input = new EnqueueMessagesInputDto(
             _calculationId,
-            _calculationVersion,
             EventId: Guid.NewGuid());
 
         var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedEventBuilder

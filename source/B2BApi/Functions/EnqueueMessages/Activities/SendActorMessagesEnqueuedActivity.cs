@@ -44,7 +44,7 @@ public class SendActorMessagesEnqueuedActivity
         var messagesEnqueuedEvent = new ActorMessagesEnqueuedV1
         {
             OrchestrationInstanceId = input.CalculationOrchestrationInstanceId,
-            CalculationId = input.CalculationId,
+            CalculationId = input.CalculationId.ToString(),
             Success = input.Success,
         };
 
