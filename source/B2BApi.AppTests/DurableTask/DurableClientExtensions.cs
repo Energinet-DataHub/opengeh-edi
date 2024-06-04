@@ -23,19 +23,14 @@ namespace Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 public static class DurableClientExtensions
 {
     /// <summary>
-    /// Wait for an orchestration that is either running or completed,
+    /// Search for an orchestration that is either running or completed,
     /// and which was started at, or later, than given <paramref name="createdTimeFrom"/>.
     ///
     /// If more than one orchestration exists an exception is thrown.
     /// </summary>
-    /// <param name="client"></param>
-    /// <param name="createdTimeFrom"></param>
-    /// <param name="waitTimeLimit">Max time to wait for orchestration. If not specified it defaults to 30 seconds.</param>
-    /// <returns>If started within given <paramref name="waitTimeLimit"/> it returns the orchestration status; otherwise it throws an exception.</returns>
-    public static async Task<DurableOrchestrationStatus> WaitForOrchestationStatusAsync(
+    public static async Task<DurableOrchestrationStatus> FindOrchestationStatusAsync(
         this IDurableClient client,
-        DateTime createdTimeFrom,
-        TimeSpan? waitTimeLimit = null)
+        DateTime createdTimeFrom)
     {
         var filter = new OrchestrationStatusQueryCondition()
         {
@@ -46,21 +41,9 @@ public static class DurableClientExtensions
                 OrchestrationRuntimeStatus.Completed,
             ],
         };
+        var queryResult = await client.ListInstancesAsync(filter, CancellationToken.None);
 
-        IEnumerable<DurableOrchestrationStatus> durableOrchestrationState = [];
-        var isAvailable = await Awaiter.TryWaitUntilConditionAsync(
-            async () =>
-            {
-                var queryResult = await client.ListInstancesAsync(filter, CancellationToken.None);
-                durableOrchestrationState = queryResult.DurableOrchestrationState;
-                return durableOrchestrationState != null && durableOrchestrationState.Any();
-            },
-            waitTimeLimit ?? TimeSpan.FromSeconds(30),
-            delay: TimeSpan.FromSeconds(5));
-
-        return isAvailable
-            ? durableOrchestrationState.Single()
-            : throw new Exception($"Orchestration did not start within configured wait time limit.");
+        return queryResult.DurableOrchestrationState.Single();
     }
 
     /// <summary>

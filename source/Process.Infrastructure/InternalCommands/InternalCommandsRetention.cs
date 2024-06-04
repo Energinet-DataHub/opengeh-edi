@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System.Data.Common;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Data.SqlClient;
