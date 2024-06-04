@@ -33,6 +33,8 @@ internal class EnqueueMessagesOrchestration
             return "Error: No input specified.";
         }
 
+        // TODO: Have activity per view/query, fan-out/fan-in => https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-cloud-backup?tabs=csharp
+        // TODO: All decisions must live in orchestrator (e.g. "switch" on calculation type)
         var numberOfEnqueuedMessages = await context.CallActivityAsync<int>(
             nameof(EnqueueMessagesActivity),
             new EnqueueMessagesInput(
