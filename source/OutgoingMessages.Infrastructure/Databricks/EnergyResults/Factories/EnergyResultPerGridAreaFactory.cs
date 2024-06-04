@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
 
@@ -25,6 +27,10 @@ public class EnergyResultPerGridAreaFactory
         DatabricksSqlRow databricksSqlRow,
         IReadOnlyList<EnergyTimeSeriesPoint> timeSeriesPoints)
     {
+        var typedResolution = ResolutionMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.Resolution));
+
+        var period = GetPeriod(timeSeriesPoints, typedResolution);
+
         return new EnergyResultPerGridArea(
             databricksSqlRow.ToGuid(EnergyResultColumnNames.ResultId),
             databricksSqlRow.ToGuid(EnergyResultColumnNames.CalculationId),
@@ -32,10 +38,40 @@ public class EnergyResultPerGridAreaFactory
             MeteringPointTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.MeteringPointType)),
             timeSeriesPoints.ToArray(),
             CalculationTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.CalculationType)),
-            databricksSqlRow.ToInstant(EnergyResultColumnNames.CalculationPeriodStart),
-            databricksSqlRow.ToInstant(EnergyResultColumnNames.CalculationPeriodEnd),
-            ResolutionMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.Resolution)),
+            period.Start,
+            period.End,
+            typedResolution,
             databricksSqlRow.ToLong(EnergyResultColumnNames.CalculationVersion),
             SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)));
+    }
+
+    private static (Instant Start, Instant End) GetPeriod(IReadOnlyList<EnergyTimeSeriesPoint> timeSeriesPoints, Resolution resolution)
+    {
+        var start = timeSeriesPoints.Min(x => x.TimeUtc);
+        var resolutionInMinutes = GetResolutionInMinutes(resolution);
+        // The end data is the start of the next period.
+        var end = timeSeriesPoints.Max(x => x.TimeUtc).Plus(Duration.FromMinutes(resolutionInMinutes));
+        return (start, end);
+    }
+
+    private static int GetResolutionInMinutes(Resolution resolution)
+    {
+        var resolutionInMinutes = 0;
+        switch (resolution)
+        {
+            case var res when res == Resolution.QuarterHourly:
+                resolutionInMinutes = 15;
+                break;
+            case var res when res == Resolution.Hourly:
+                resolutionInMinutes = 60;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(
+                    nameof(resolution),
+                    resolution,
+                    "Unknown databricks resolution");
+        }
+
+        return resolutionInMinutes;
     }
 }
