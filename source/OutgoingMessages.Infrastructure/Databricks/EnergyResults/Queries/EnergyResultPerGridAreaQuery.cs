@@ -32,12 +32,8 @@ public class EnergyResultPerGridAreaQuery(
 {
     public override string DataObjectName => "energy_result_points_per_ga_v1";
 
-    // TODO:
-    // We could use the data type information for parsing; but in the end it would be even more powerfull
-    // if we could deserialize into strongly typed objects.
     public override Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition => new()
     {
-        // TODO: Define known data types as consts and use them in schema definition
         { EnergyResultColumnNames.CalculationId,            (DeltaTableCommonTypes.String,      false) },
         { EnergyResultColumnNames.CalculationType,          (DeltaTableCommonTypes.String,      false) },
         { EnergyResultColumnNames.CalculationPeriodStart,   (DeltaTableCommonTypes.Timestamp,   false) },

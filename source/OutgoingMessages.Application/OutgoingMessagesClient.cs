@@ -165,7 +165,6 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     {
         var numberOfEnqueuedMessages = 0;
 
-        // TODO: Decide "view" / "query" based on calculation type
         await foreach (var energyResult in _energyResultEnumerator.GetAsync(input.CalculationId))
         {
             var receiverNumber = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(energyResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
