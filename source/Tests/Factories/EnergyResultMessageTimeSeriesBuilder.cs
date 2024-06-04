@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -35,6 +33,7 @@ public class EnergyResultMessageTimeSeriesBuilder
     private string _senderNumber = "1234567890321";
     private ActorRole _senderRole = ActorRole.MeteredDataAdministrator;
     private TransactionId _transactionId = TransactionId.New();
+    private TransactionId _originalTransactionIdReference = TransactionId.New();
     private string _gridAreaCode = "870";
     private MeteringPointType _meteringPointType = MeteringPointType.Consumption;
     private SettlementMethod? _settlementMethod = SettlementMethod.NonProfiled;
@@ -81,6 +80,12 @@ public class EnergyResultMessageTimeSeriesBuilder
     public EnergyResultMessageTimeSeriesBuilder WithTransactionId(TransactionId transactionId)
     {
         _transactionId = transactionId;
+        return this;
+    }
+
+    public EnergyResultMessageTimeSeriesBuilder WithOriginalTransactionIdReference(TransactionId transactionId)
+    {
+        _originalTransactionIdReference = transactionId;
         return this;
     }
 
@@ -190,7 +195,7 @@ public class EnergyResultMessageTimeSeriesBuilder
             _period,
             points,
             _calculationResultVersion,
-            null,
+            _originalTransactionIdReference,
             _settlementVersion?.Name);
     }
 

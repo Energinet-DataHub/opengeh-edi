@@ -209,6 +209,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202310231618 Change SettlementVersion of AggregatedMeasuredDataProcess type to nvarchar.sql" />
     <None Remove="Scripts\Model\202404170840 Add CreatedAt and CreatedBy and ModifiedAt and ModifiedBy columns to OutgoingMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202404170840 Add CreatedAt and CreatedBy and ModifiedAt and ModifiedBy columns to OutgoingMessages.sql" />
+    <None Remove="Scripts\Model\202406031318 Add MessageId to bundles.sql" />
+    <EmbeddedResource Include="Scripts\Model\202406031318 Add MessageId to bundles.sql" />
   </ItemGroup>
 
   <ItemGroup>

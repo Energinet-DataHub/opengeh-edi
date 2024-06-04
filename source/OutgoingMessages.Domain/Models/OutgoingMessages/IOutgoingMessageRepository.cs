@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
@@ -30,6 +31,6 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
         /// <summary>
         /// Get all messages assigned to a bundle by id
         /// </summary>
-        Task<OutgoingMessageBundle> GetAsync(BundleId bundleId);
+        Task<OutgoingMessageBundle> GetAsync(BundleId bundleId, MessageId? messageId);
     }
 }

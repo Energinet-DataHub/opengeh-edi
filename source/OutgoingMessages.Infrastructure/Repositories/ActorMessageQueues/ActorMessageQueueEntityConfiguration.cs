@@ -14,6 +14,7 @@
 
 using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Microsoft.EntityFrameworkCore;
@@ -48,6 +49,8 @@ public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<Act
                 .HasConversion(toDbValue => toDbValue.Id, fromDbValue => BundleId.Create(fromDbValue));
             navigationBuilder.Property<bool>("IsClosed").HasColumnName("IsClosed");
             navigationBuilder.Property<bool>("IsDequeued").HasColumnName("IsDequeued");
+            navigationBuilder.Property<MessageId>("MessageId").HasColumnName("MessageId")
+                .HasConversion(toDb => toDb.Value, fromDb => MessageId.Create(fromDb));
             navigationBuilder.Property<DocumentType>("DocumentTypeInBundle").HasColumnName("DocumentTypeInBundle")
                 .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<DocumentType>(fromDbValue));
             navigationBuilder.Property<BusinessReason>("BusinessReason").HasColumnName("BusinessReason")
@@ -57,7 +60,7 @@ public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<Act
             navigationBuilder.Property<Instant>("Created").HasColumnName("Created");
             navigationBuilder.Property<MessageId?>("RelatedToMessageId").HasColumnName("RelatedToMessageId")
                 .HasConversion(
-                    toDbValue => toDbValue != null ? toDbValue.Value : null,
+                    toDbValue => toDbValue != null ? toDbValue.Value.Value : null,
                     fromDbValue => fromDbValue != null ? MessageId.Create(fromDbValue) : null);
             navigationBuilder.WithOwner().HasForeignKey("ActorMessageQueueId");
         });

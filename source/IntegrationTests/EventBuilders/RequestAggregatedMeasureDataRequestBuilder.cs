@@ -96,7 +96,7 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
         IReadOnlyCollection<(string? GridArea, TransactionId TransactionId)> series)
     {
         return $@"<cim:RequestAggregatedMeasureData_MarketDocument xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:cim=""urn:ediel.org:measure:requestaggregatedmeasuredata:0:1"" xsi:schemaLocation=""urn:ediel.org:measure:requestaggregatedmeasuredata:0:1 urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd"">
-    <cim:mRID>123564789123564789123564789123564789</cim:mRID>
+    <cim:mRID>12356478912356478912356478912356478</cim:mRID>
     <cim:type>E74</cim:type>
     <cim:process.processType>D04</cim:process.processType>
     <cim:businessSector.type>23</cim:businessSector.type>
