@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 
 /// <summary>
-/// Client for interacting with outgoing messages.
+/// Client for for interacting with outgoing messages.
 /// </summary>
 public interface IOutgoingMessagesClient
 {
@@ -72,9 +74,4 @@ public interface IOutgoingMessagesClient
     ///  Enqueue a wholesale services total sum message, WITH commit. Currently ONLY used by the integration event.
     /// </summary>
     Task<OutgoingMessageId> EnqueueAndCommitAsync(WholesaleServicesTotalSumMessageDto wholesaleServicesTotalSumMessage, CancellationToken cancellationToken);
-
-    /// <summary>
-    ///  Enqueue energy results as outgoing messages for the given calculation id.
-    /// </summary>
-    Task<int> EnqueueEnergyResultsForGridAreaOwnersAsync(EnqueueMessagesInputDto input);
 }

@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
@@ -33,8 +31,6 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly ISerializer _serializer;
-    private readonly IMasterDataClient _masterDataClient;
-    private readonly EnergyResultEnumerator _energyResultEnumerator;
 
     public OutgoingMessagesClient(
         PeekMessage peekMessage,
@@ -42,9 +38,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         EnqueueMessage enqueueMessage,
         ActorMessageQueueContext actorMessageQueueContext,
         ISystemDateTimeProvider systemDateTimeProvider,
-        ISerializer serializer,
-        IMasterDataClient masterDataClient,
-        EnergyResultEnumerator energyResultEnumerator)
+        ISerializer serializer)
     {
         _peekMessage = peekMessage;
         _dequeueMessage = dequeueMessage;
@@ -52,8 +46,6 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         _actorMessageQueueContext = actorMessageQueueContext;
         _systemDateTimeProvider = systemDateTimeProvider;
         _serializer = serializer;
-        _masterDataClient = masterDataClient;
-        _energyResultEnumerator = energyResultEnumerator;
     }
 
     public async Task<DequeueRequestResultDto> DequeueAndCommitAsync(DequeueRequestDto request, CancellationToken cancellationToken)
@@ -159,20 +151,5 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return messageId;
-    }
-
-    public async Task<int> EnqueueEnergyResultsForGridAreaOwnersAsync(EnqueueMessagesInputDto input)
-    {
-        var numberOfEnqueuedMessages = 0;
-
-        await foreach (var energyResult in _energyResultEnumerator.GetAsync(input.CalculationId))
-        {
-            var receiverNumber = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(energyResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
-            var energyResultMessage = EnergyResultMessageDtoFactory.CreateAsync(EventId.From(input.EventId), energyResult, receiverNumber);
-            await EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None);
-            numberOfEnqueuedMessages++;
-        }
-
-        return numberOfEnqueuedMessages;
     }
 }

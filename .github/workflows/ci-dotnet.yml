@@ -30,14 +30,8 @@ jobs:
     with:
       job_name: Integration tests
       tests_dll_file_path: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
-      use_azure_functions_tools: true
-      azure_integrationtest_tenant_id: ${{ vars.integration_test_azure_tenant_id }}
-      azure_integrationtest_subscription_id: ${{ vars.integration_test_azure_subscription_id }}
-      azure_integrationtest_spn_id: ${{ vars.integration_test_azure_spn_id_oidc }}
-      azure_keyvault_url: ${{ vars.integration_test_azure_keyvault_url }}
-      environment: AzureAuth
-      run_integration_tests: true
       download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
+      use_azure_functions_tools: true
 
   # Run all tests in 'ArchitectureTests.dll'
   architecture_tests:

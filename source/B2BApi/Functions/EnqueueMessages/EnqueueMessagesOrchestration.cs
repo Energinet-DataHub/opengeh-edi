@@ -33,21 +33,12 @@ internal class EnqueueMessagesOrchestration
             return "Error: No input specified.";
         }
 
-        // TODO: Have activity per view/query, fan-out/fan-in => https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-cloud-backup?tabs=csharp
-        // TODO: All decisions must live in orchestrator (e.g. "switch" on calculation type)
-        var numberOfEnqueuedMessages = await context.CallActivityAsync<int>(
-            nameof(EnqueueEnergyResultsForGridAreaOwnersActivity),
-            new EnqueueMessagesInput(input.CalculationId, input.EventId));
-
-        var messagesWasSuccessfullyEnqueued = numberOfEnqueuedMessages > 0;
-
         await context.CallActivityAsync(
-            nameof(SendActorMessagesEnqueuedActivity),
+            nameof(SendMessagesEnqueuedActivity),
             new SendMessagesEnqueuedInput(
                 context.InstanceId,
                 input.CalculationOrchestrationId,
-                input.CalculationId,
-                messagesWasSuccessfullyEnqueued));
+                input.CalculationId));
 
         return "Success";
     }

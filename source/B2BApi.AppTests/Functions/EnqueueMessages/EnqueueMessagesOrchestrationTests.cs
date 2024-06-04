@@ -14,17 +14,17 @@
 
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
+using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EnergySupplying.RequestResponse.IntegrationEvents;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Google.Protobuf;
-using Microsoft.Extensions.Options;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -53,12 +53,11 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         return Task.CompletedTask;
     }
 
-    public async Task DisposeAsync()
+    public Task DisposeAsync()
     {
-        if (Fixture.DatabricksSchemaManager.SchemaExists)
-            await Fixture.DatabricksSchemaManager.DropSchemaAsync();
-
         Fixture.SetTestOutputHelper(null!);
+
+        return Task.CompletedTask;
     }
 
     [Fact]
@@ -75,10 +74,22 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         await Fixture.TopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
 
         // Assert
-        var act = async () => await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
-        await act.Should()
-            .ThrowAsync<Exception>()
-            .WithMessage("Orchestration did not start within configured wait time*");
+        await Task.Delay(TimeSpan.FromSeconds(30));
+
+        var filter = new OrchestrationStatusQueryCondition()
+        {
+            CreatedTimeFrom = beforeOrchestrationCreated,
+            RuntimeStatus =
+            [
+                OrchestrationRuntimeStatus.Pending,
+                OrchestrationRuntimeStatus.Running,
+                OrchestrationRuntimeStatus.Completed,
+            ],
+        };
+        var queryResult = await Fixture.DurableClient.ListInstancesAsync(filter, CancellationToken.None);
+
+        var actualOrchestrationStatus = queryResult.DurableOrchestrationState.FirstOrDefault();
+        actualOrchestrationStatus.Should().BeNull();
     }
 
     /// <summary>
@@ -93,22 +104,22 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         // Arrange
         Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: true);
 
-        var calculationId = await ClearAndAddDatabricksData();
-
         var calculationOrchestrationId = Guid.NewGuid().ToString();
-        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId, calculationId.ToString());
+        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId);
 
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
         await Fixture.TopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
 
         // Assert
+        await Task.Delay(TimeSpan.FromSeconds(30));
+
         // => Verify expected behaviour by searching the orchestration history
-        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
+        var orchestrationStatus = await Fixture.DurableClient.FindOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
 
         // => Wait for completion, this should be fairly quick
         var completeOrchestrationStatus = await Fixture.DurableClient.WaitForInstanceCompletedAsync(
-            actualOrchestrationStatus.InstanceId,
+            orchestrationStatus.InstanceId,
             TimeSpan.FromMinutes(1));
 
         // => Expect history
@@ -121,9 +132,8 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         activities.Should().NotBeNull().And.Equal(
         [
             "EnqueueMessagesOrchestration",
-            "EnqueueEnergyResultsForGridAreaOwnersActivity",
-            "SendActorMessagesEnqueuedActivity",
-            null,
+            "SendMessagesEnqueuedActivity",
+            null
         ]);
 
         // => Verify that the durable function completed successfully
@@ -141,12 +151,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
                 }
 
                 var parsedEvent = ActorMessagesEnqueuedV1.Parser.ParseFrom(msg.Body);
-
-                var matchingOrchestrationId = parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
-                var matchingCalculationId = parsedEvent.CalculationId == calculationId.ToString();
-                var isSuccessful = parsedEvent.Success;
-
-                return matchingOrchestrationId && matchingCalculationId && isSuccessful;
+                return parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
             })
             .VerifyCountAsync(1);
 
@@ -154,70 +159,17 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         wait.Should().BeTrue("We did not receive the expected message on the ServiceBus");
     }
 
-    /// <summary>
-    /// Verifies that:
-    /// - If databricks has no data for the CalculationId, then ActorMessageEnqueued.Success is false.
-    /// </summary>
-    [Fact]
-    public async Task Given_DatabricksHasNoData_When_CalculationCompletedEventIsHandled_Then_ServiceBusMessageHasFailedStatus()
+    private static ServiceBusMessage CreateCalculationCompletedEventMessage(string calculationOrchestrationId)
     {
-        // Arrange
-        Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: true);
-
-        var calculationId = Guid.NewGuid().ToString();
-        var calculationOrchestrationId = Guid.NewGuid().ToString();
-        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId, calculationId);
-
-        // Act
-        var beforeOrchestrationCreated = DateTime.UtcNow;
-        await Fixture.TopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
-
-        // Assert
-        // => Verify expected behaviour by searching the orchestration history
-        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
-
-        // => Wait for completion, this should be fairly quick
-        await Fixture.DurableClient.WaitForInstanceCompletedAsync(
-            actualOrchestrationStatus.InstanceId,
-            TimeSpan.FromMinutes(1));
-
-        // => Expect history
-        using var assertionScope = new AssertionScope();
-
-        // => Verify that the expected message was sent on the ServiceBus
-        var verifyServiceBusMessages = await Fixture.ServiceBusListenerMock
-            .When(msg =>
-            {
-                if (msg.Subject != ActorMessagesEnqueuedV1.EventName)
-                {
-                    return false;
-                }
-
-                var parsedEvent = ActorMessagesEnqueuedV1.Parser.ParseFrom(msg.Body);
-
-                var matchingOrchestrationId = parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
-                var matchingCalculationId = parsedEvent.CalculationId == calculationId;
-                var isFailed = parsedEvent.Success == false;
-
-                return matchingOrchestrationId && matchingCalculationId && isFailed;
-            })
-            .VerifyCountAsync(1);
-
-        var wait = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(10));
-        wait.Should().BeTrue("We did not receive the expected message on the ServiceBus");
-    }
-
-    private static ServiceBusMessage CreateCalculationCompletedEventMessage(string calculationOrchestrationId, string? calculationId = null)
-    {
-        var calculationCompletedEvent = new CalculationCompletedV1
+        var calcuationCompletedEvent = new CalculationCompletedV1
         {
             InstanceId = calculationOrchestrationId,
-            CalculationId = calculationId ?? Guid.NewGuid().ToString(),
+            CalculationId = Guid.NewGuid().ToString(),
             CalculationType = CalculationCompletedV1.Types.CalculationType.BalanceFixing,
             CalculationVersion = 1,
         };
 
-        return CreateServiceBusMessage(eventId: Guid.NewGuid(), calculationCompletedEvent);
+        return CreateServiceBusMessage(eventId: Guid.NewGuid(), calcuationCompletedEvent);
     }
 
     private static ServiceBusMessage CreateServiceBusMessage(Guid eventId, IEventMessage eventMessage)
@@ -232,34 +184,5 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         serviceBusMessage.ApplicationProperties.Add("EventMinorVersion", eventMessage.EventMinorVersion);
 
         return serviceBusMessage;
-    }
-
-    /// <summary>
-    /// Adds hardcoded data to databricks.
-    /// </summary>
-    /// <returns>The calculation id of the hardcoded data which was added to databricks</returns>
-    private async Task<Guid> ClearAndAddDatabricksData()
-    {
-        // Ensure that databricks does not contain data, unless the test explicit adds it
-        if (Fixture.DatabricksSchemaManager.SchemaExists)
-            await Fixture.DatabricksSchemaManager.DropSchemaAsync();
-
-        // This ID has to match the hardcoded calculation id in the file balance_fixing_01-11-2022_01-12-2022_ga_543.csv
-        var calculationId = Guid.Parse("e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d");
-        await Fixture.DatabricksSchemaManager.CreateSchemaAsync();
-
-        var ediOptions = Options.Create(
-            new EdiDatabricksOptions { DatabaseName = Fixture.DatabricksSchemaManager.SchemaName });
-
-        var viewQuery = new EnergyResultPerGridAreaQuery(
-            ediOptions,
-            calculationId);
-        await Fixture.DatabricksSchemaManager.CreateTableAsync(viewQuery);
-
-        const string testDataFileName = "balance_fixing_01-11-2022_01-12-2022_ga_543.csv";
-        var testFilePath = Path.Combine("TestData", testDataFileName);
-        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, testFilePath);
-
-        return calculationId;
     }
 }
