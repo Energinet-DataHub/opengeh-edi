@@ -72,6 +72,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
             _calculationId,
             EventId: Guid.NewGuid());
 
+        // The grid area in the mocked data needs an owner. Since the messages need a receiver.
         var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedEventBuilder
             .WithGridAreaCode("543")
             .Build();
