@@ -12,13 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
@@ -35,7 +30,6 @@ using FluentAssertions.Execution;
 using NodaTime.Text;
 using Xunit;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
-using Point = Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Point;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
@@ -475,6 +469,41 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         await AssertDocument(document, documentFormat)
             .HasMeteringPointType(meteringPointType)
             .DocumentIsValidAsync();
+    }
+
+    [Fact]
+    public async Task Can_support_existing_ebix_documents_with_36_char_ids()
+    {
+        // Arrange
+        var messageId = MessageId.Create("26be9856-db4c-451b-a275-18d5fa364285");
+        var transactionId = TransactionId.From("93dbd8bb-4fbb-4b9d-b57f-f6a5c16f7bdf");
+        var originalTransactionId = TransactionId.From("b340db36-ef97-4515-839c-1d8b544e9174");
+
+        var messageBuilder = _wholesaleServicesSeriesBuilder
+            .WithMessageId(messageId.Value)
+            .WithTransactionId(transactionId)
+            .WithOriginalTransactionIdReference(originalTransactionId);
+
+        // Act
+        var document = await WriteDocument(
+            messageBuilder.BuildHeader(),
+            messageBuilder.BuildWholesaleCalculation(),
+            DocumentFormat.Ebix);
+
+        // Assert
+        var assertions = await new AssertNotifyWholesaleServicesEbixDocument(
+                AssertEbixDocument.Document(document.Stream, "ns0", _documentValidation.Validator))
+            .HasStructureValidationErrorsAsync(
+            [
+                $"The value '{messageId.Value}' is invalid according to its datatype",
+                $"The value '{transactionId.Value}' is invalid according to its datatype",
+                $"The value '{originalTransactionId.Value}' is invalid according to its datatype",
+            ]);
+
+        assertions
+            .HasMessageId(messageId.Value)
+            .HasTransactionId(transactionId)
+            .HasOriginalTransactionIdReference(originalTransactionId);
     }
 
     private Task<MarketDocumentStream> WriteDocument(OutgoingMessageHeader header, WholesaleServicesSeries wholesaleServicesSeries, DocumentFormat documentFormat)

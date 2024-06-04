@@ -120,7 +120,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
             isMonthly: false,
             new (string? GridArea, TransactionId TransactionId)[]
             {
-                ("512", TransactionId.From("123564789123564789123564789123564787")),
+                ("512", TransactionId.From("12356478912356478912356478912356478")),
             });
 
         // Act
@@ -195,7 +195,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                 SettlementMethod: SettlementMethod.Flex,
                 MeteringPointType: MeteringPointType.Consumption,
                 GridArea: "512",
-                TransactionId.From("123564789123564789123564789123564787"),
+                TransactionId.From("12356478912356478912356478912356478"),
                 PriceMeasurementUnit: MeasurementUnit.Kwh,
                 ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
                 QuantityMeasurementUnit: MeasurementUnit.Kwh,
@@ -246,7 +246,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
             isMonthly: false,
             new (string? GridArea, TransactionId TransactionId)[]
             {
-                (null, TransactionId.From("123564789123564789123564789123564787")),
+                (null, TransactionId.From("12356478912356478912356478912356478")),
             });
 
         // Act
@@ -333,7 +333,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                     SettlementMethod: SettlementMethod.Flex,
                     MeteringPointType: MeteringPointType.Consumption,
                     GridArea: seriesRequest.GridArea,
-                    TransactionId.From("123564789123564789123564789123564787"),
+                    TransactionId.From("12356478912356478912356478912356478"),
                     PriceMeasurementUnit: MeasurementUnit.Kwh,
                     ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
                     QuantityMeasurementUnit: MeasurementUnit.Kwh,
@@ -385,7 +385,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
             isMonthly: false,
             new (string? GridArea, TransactionId TransactionId)[]
             {
-                (gridAreaOrNull, TransactionId.From("123564789123564789123564789123564787")),
+                (gridAreaOrNull, TransactionId.From("12356478912356478912356478912356478")),
             });
 
         // Act
@@ -465,7 +465,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                 SettlementMethod: SettlementMethod.Flex,
                 MeteringPointType: MeteringPointType.Consumption,
                 GridArea: "512",
-                TransactionId.From("123564789123564789123564789123564787"),
+                TransactionId.From("12356478912356478912356478912356478"),
                 PriceMeasurementUnit: MeasurementUnit.Kwh,
                 ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
                 QuantityMeasurementUnit: MeasurementUnit.Kwh,
@@ -506,9 +506,9 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
 
         var gridAreasWithTransactionId = new (string? GridArea, TransactionId TransactionId)[]
         {
-            ("143", TransactionId.From("123564789123564789123564789123564786")),
-            ("512", TransactionId.From("123564789123564789123564789123564787")),
-            ("877", TransactionId.From("123564789123564789123564789123564788")),
+            ("143", TransactionId.From("12356478912356478912356478912356476")),
+            ("512", TransactionId.From("12356478912356478912356478912356477")),
+            ("877", TransactionId.From("12356478912356478912356478912356478")),
         };
 
         await GivenReceivedWholesaleServicesRequest(

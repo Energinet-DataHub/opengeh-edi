@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
@@ -71,17 +69,22 @@ public static class WholesaleServicesRequestFactory
 
         foreach (var chargeType in process.ChargeTypes)
         {
-            request.ChargeTypes.Add(
-                new ChargeType() { ChargeCode = chargeType.Id, ChargeType_ = MapChargeType(chargeType.Type) });
+            var ct = new ChargeType();
+
+            if (chargeType.Id != null)
+                ct.ChargeCode = chargeType.Id;
+
+            if (chargeType.Type != null)
+                ct.ChargeType_ = MapChargeType(chargeType.Type);
+
+            request.ChargeTypes.Add(ct);
         }
 
         return request;
     }
 
-    private static string? MapChargeType(string? chargeType)
+    private static string MapChargeType(string chargeType)
     {
-        if (chargeType == null) return null;
-
         return BuildingBlocks.Domain.Models.ChargeType.TryGetNameFromCode(chargeType, fallbackValue: chargeType);
     }
 }

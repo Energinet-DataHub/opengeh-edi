@@ -37,7 +37,7 @@ limitations under the License.
 		    <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="3.3.1" />
         <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
       <!--Microsoft.IdentityModel.XX has to be in sync, aka. same version-->
-      <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.5.2" />
+      <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.6.0" />
       <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="7.5.2" />
       <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.5.2" />
     </ItemGroup>

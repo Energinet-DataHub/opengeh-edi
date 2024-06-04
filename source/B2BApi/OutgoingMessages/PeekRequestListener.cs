@@ -112,7 +112,7 @@ public class PeekRequestListener
 
         response.Body = peekResult.Bundle;
         response.Headers.Add("content-type", contentType);
-        response.Headers.Add("MessageId", peekResult.MessageId.ToString());
+        response.Headers.Add("MessageId", peekResult.MessageId?.Value);
         response.StatusCode = HttpStatusCode.OK;
         return response;
     }

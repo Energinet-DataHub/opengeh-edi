@@ -25,7 +25,7 @@ limitations under the License.
     <PackageReference Include="dbup-sqlserver" Version="5.0.8" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.2" />
+    <PackageReference Include="System.Text.Json" Version="8.0.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -209,6 +209,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202310231618 Change SettlementVersion of AggregatedMeasuredDataProcess type to nvarchar.sql" />
     <None Remove="Scripts\Model\202404170840 Add CreatedAt and CreatedBy and ModifiedAt and ModifiedBy columns to OutgoingMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202404170840 Add CreatedAt and CreatedBy and ModifiedAt and ModifiedBy columns to OutgoingMessages.sql" />
+    <None Remove="Scripts\Model\202406031318 Add MessageId to bundles.sql" />
+    <EmbeddedResource Include="Scripts\Model\202406031318 Add MessageId to bundles.sql" />
   </ItemGroup>
 
   <ItemGroup>

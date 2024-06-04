@@ -138,7 +138,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         peekResult.Bundle.Should().NotBeNull();
 
         var peekResultFileContent = await GetStreamContentAsStringAsync(peekResult.Bundle!);
-        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value);
+        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value.Value);
         archivedMessageFileStorageReference.Should().NotBeNull();
 
         var archivedMessageFileContent = await GetFileContentFromFileStorageAsync(
@@ -169,8 +169,8 @@ public class WhenAPeekIsRequestedTests : TestBase
         // Assert
         result.Bundle.Should().NotBeNull();
 
-        var archivedMessageId = await GetArchivedMessageIdFromDatabaseAsync(result.MessageId!.Value.ToString());
-        var fileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(result.MessageId!.Value);
+        var archivedMessageId = await GetArchivedMessageIdFromDatabaseAsync(result.MessageId!.Value.Value);
+        var fileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(result.MessageId!.Value.Value);
         fileStorageReference.Should().Be($"{receiverNumber}/{year:0000}/{month:00}/{date:00}/{archivedMessageId:N}");
     }
 
@@ -203,7 +203,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);
 
         var marketDocumentFileStorageReference = await GetMarketDocumentFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value);
-        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value);
+        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value.Value);
 
         marketDocumentFileStorageReference.Should().Be(archivedMessageFileStorageReference);
     }
@@ -302,7 +302,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         peekResult.Should().NotBeNull("because a peek result should be found");
         peekResult.MessageId.Should().NotBeNull("because a peek result with a message id should be found");
 
-        var archivedMessage = await GetArchivedMessageFromDatabaseAsync(peekResult.MessageId!.Value.ToString());
+        var archivedMessage = await GetArchivedMessageFromDatabaseAsync(peekResult.MessageId!.Value.Value);
         ((object?)archivedMessage).Should().NotBeNull("because an archived message should exists");
 
         var expectedFileStorageReference = $"{receiverNumber}/{year:0000}/{month:00}/{day:00}/{archivedMessage!.Id:N}";
@@ -314,7 +314,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             { "EventIds", eventIds => eventIds.Should().Be(expectedEventId.Value) },
             { "FileStorageReference", fileStorageReference => fileStorageReference.Should().Be(expectedFileStorageReference) },
             { "Id", id => id.Should().NotBeNull() },
-            { "MessageId", messageId => messageId.Should().Be(peekResult.MessageId.ToString()) },
+            { "MessageId", messageId => messageId.Should().Be(peekResult.MessageId.Value.Value) },
             { "ReceiverNumber", receiverNumber => receiverNumber.Should().Be(outgoingMessage.ReceiverNumber.Value) },
             { "RecordId", recordId => recordId.Should().NotBeNull() },
             { "RelatedToMessageId", relatedToMessageId => relatedToMessageId.Should().BeNull() },
@@ -341,12 +341,16 @@ public class WhenAPeekIsRequestedTests : TestBase
         return numberOfBundles == 1;
     }
 
-    private async Task<bool> MarketDocumentExists(Guid marketDocumentBundleId)
+    private async Task<bool> MarketDocumentExists(MessageId marketDocumentMessageId)
     {
         var sqlStatement =
-            $"SELECT COUNT(*) FROM [dbo].[MarketDocuments] WHERE BundleId = '{marketDocumentBundleId}'";
+            $"SELECT COUNT(*) "
+            + $"FROM [dbo].[MarketDocuments] md JOIN [dbo].[Bundles] b ON md.BundleId = b.Id "
+            + $"WHERE b.MessageId = '{marketDocumentMessageId.Value}'";
+
         using var connection =
             await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+
         var exists = await connection.ExecuteScalarAsync<bool>(sqlStatement);
 
         return exists;

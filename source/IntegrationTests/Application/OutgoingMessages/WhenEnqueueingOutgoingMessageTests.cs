@@ -147,12 +147,12 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
 
         var result = await _outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(message.ReceiverNumber, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Ebix), CancellationToken.None);
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var sql = "SELECT top 1 id FROM [dbo].[Bundles] order by created";
+        var sql = "SELECT top 1 MessageId FROM [dbo].[Bundles] order by created";
         var id = await
             connection
-                .QuerySingleOrDefaultAsync<Guid>(sql);
+                .QuerySingleOrDefaultAsync<string>(sql);
 
-        Assert.Equal(result.MessageId, id);
+        Assert.Equal(result.MessageId!.Value.Value, id);
     }
 
     [Fact]
@@ -167,7 +167,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             DocumentFormat.Xml);
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(peekRequestDto, CancellationToken.None);
         var dequeueCommand = new DequeueRequestDto(
-            peekResult.MessageId!.Value.ToString(),
+            peekResult.MessageId!.Value.Value,
             message.ReceiverRole,
             message.ReceiverNumber);
 
@@ -436,11 +436,12 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
 
         await connection.ExecuteAsync(
-            @"INSERT INTO [dbo].[Bundles] (Id, ActorMessageQueueId, DocumentTypeInBundle, IsDequeued, IsClosed, MessageCount, MaxMessageCount, BusinessReason, Created, RelatedToMessageId)
-                    VALUES (@Id, @ActorMessageQueueId, @DocumentTypeInBundle, @IsDequeued, @IsClosed, @MessageCount, @MaxMessageCount, @BusinessReason, @Created, @RelatedToMessageId)",
+            @"INSERT INTO [dbo].[Bundles] (Id, MessageId, ActorMessageQueueId, DocumentTypeInBundle, IsDequeued, IsClosed, MessageCount, MaxMessageCount, BusinessReason, Created, RelatedToMessageId)
+                    VALUES (@Id, @MessageId, @ActorMessageQueueId, @DocumentTypeInBundle, @IsDequeued, @IsClosed, @MessageCount, @MaxMessageCount, @BusinessReason, @Created, @RelatedToMessageId)",
             new
             {
                 Id = id,
+                MessageId = id.ToString("N"),
                 ActorMessageQueueId = actorMessageQueueId,
                 DocumentTypeInBundle = documentType.Name,
                 IsDequeued = false,

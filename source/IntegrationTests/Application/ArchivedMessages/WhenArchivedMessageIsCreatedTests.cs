@@ -83,15 +83,16 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
     [InlineData(ArchivedMessageType.OutgoingMessage)]
     public async Task Archived_document_is_saved_at_correct_path(ArchivedMessageType archivedMessageType)
     {
-        var messageId = Guid.NewGuid();
+        var messageId = MessageId.New();
         var senderNumber = "1122334455667788";
         var receiverNumber = "8877665544332211";
         int year = 2024,
             month = 01,
             date = 25;
+
         var archivedMessage = CreateArchivedMessage(
             archivedMessageType: archivedMessageType,
-            messageId: messageId.ToString(),
+            messageId: messageId.Value,
             senderNumber: senderNumber,
             receiverNumber: receiverNumber,
             timestamp: Instant.FromUtc(year, month, date, 0, 0));
@@ -101,7 +102,7 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
 
         await ArchiveMessage(archivedMessage);
 
-        var actualFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId);
+        var actualFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId.Value);
 
         using var assertionScope = new AssertionScope();
         archivedMessage.FileStorageReference.Category.Value.Should().Be("archived");
