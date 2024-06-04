@@ -39,8 +39,7 @@ internal class EnqueueMessagesOrchestration
             nameof(EnqueueEnergyResultsForGridAreaOwnersActivity),
             new EnqueueMessagesInput(
                 input.CalculationId,
-                input.CalculationVersion,
-                input.CalculationType));
+                input.CalculationVersion));
 
         var messagesWasSuccessfullyEnqueued = numberOfEnqueuedMessages > 0;
 
