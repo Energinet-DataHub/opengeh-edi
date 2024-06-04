@@ -16,6 +16,7 @@ using Dapper;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
@@ -32,31 +33,25 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
 {
-    /// <summary>
-    /// Located in 'Application\OutgoingMessages\TestData'
-    /// </summary>
-    private const string TestFilename = "balance_fixing_01-11-2022_01-12-2022_ga_543.csv";
-
-    // Values matching test file values
-    private readonly Guid _calculationId = Guid.Parse("e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d");
-
     private readonly GridAreaOwnershipAssignedEventBuilder _gridAreaOwnershipAssignedEventBuilder = new();
 
     public OutgoingMessagesClientTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
+        TestDataDescription = new EnergyResultTestDataDescription();
     }
+
+    public EnergyResultTestDataDescription TestDataDescription { get; }
 
     public async Task InitializeAsync()
     {
         await Fixture.DatabricksSchemaManager.CreateSchemaAsync();
 
         var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
-        var viewQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions, _calculationId);
+        var viewQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions, TestDataDescription.CalculationId);
         await Fixture.DatabricksSchemaManager.CreateTableAsync(viewQuery);
 
-        var testFilePath = Path.Combine("Application", "OutgoingMessages", "TestData", TestFilename);
-        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, testFilePath);
+        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, TestDataDescription.TestFilePath);
     }
 
     public async Task DisposeAsync()
@@ -69,7 +64,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
     {
         var sut = GetService<IOutgoingMessagesClient>();
         var input = new EnqueueMessagesInputDto(
-            _calculationId,
+            TestDataDescription.CalculationId,
             EventId: Guid.NewGuid());
 
         // The grid area in the mocked data needs an owner. Since the messages need a receiver.
@@ -87,7 +82,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         var result = await connection.QueryAsync(sql);
 
         var actualCount = result.Count();
-        actualCount.Should().Be(5);
+        actualCount.Should().Be(TestDataDescription.ExpectedOutgoingMessagesCount);
     }
 
     private async Task HavingReceivedAndHandledIntegrationEventAsync(string eventType, GridAreaOwnershipAssigned gridAreaOwnershipAssigned)
