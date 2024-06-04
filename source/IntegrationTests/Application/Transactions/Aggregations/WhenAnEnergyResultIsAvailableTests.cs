@@ -363,6 +363,24 @@ public class WhenAnEnergyResultIsAvailableTests : TestBase
             GetService<IDatabaseConnectionFactory>());
     }
 
+    [Fact]
+    public async Task Energy_result_from_wholesale_calculation_to_balance_responsbile_per_energy_supplier_is_not_sent()
+    {
+        _eventBuilder
+            .WithCalculationType(CalculationType.WholesaleFixing)
+            .AggregatedBy(SampleData.GridAreaCode, SampleData.BalanceResponsibleNumber.Value, SampleData.EnergySupplierNumber.Value)
+            .WithResolution(Resolution.Quarter)
+            .WithPeriod(SampleData.StartOfPeriod, SampleData.EndOfPeriod);
+
+        await HavingReceivedAndHandledIntegrationEventAsync(EnergyResultProducedV2.EventName, _eventBuilder.Build());
+
+        await AssertOutgoingMessage.OutgoingMessageIsNullAsync(
+            DocumentType.NotifyAggregatedMeasureData.Name,
+            BusinessReason.BalanceFixing.Name,
+            ActorRole.BalanceResponsibleParty,
+            GetService<IDatabaseConnectionFactory>());
+    }
+
     private async Task<AssertOutgoingMessage> OutgoingMessageAsync(ActorRole roleOfReceiver, BusinessReason businessReason)
     {
         return await AssertOutgoingMessage.OutgoingMessageAsync(
