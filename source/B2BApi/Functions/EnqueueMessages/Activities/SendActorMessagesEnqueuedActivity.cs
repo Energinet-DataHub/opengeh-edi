@@ -23,11 +23,11 @@ using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
-internal class SendMessagesEnqueuedActivity
+public class SendActorMessagesEnqueuedActivity
 {
     private readonly IServiceBusSenderAdapter _senderCreator;
 
-    public SendMessagesEnqueuedActivity(
+    public SendActorMessagesEnqueuedActivity(
         IServiceBusSenderFactory serviceBusSenderFactory,
         IOptions<WholesaleInboxOptions> options)
     {
@@ -37,14 +37,15 @@ internal class SendMessagesEnqueuedActivity
         _senderCreator = serviceBusSenderFactory.GetSender(options.Value.QueueName);
     }
 
-    [Function(nameof(SendMessagesEnqueuedActivity))]
+    [Function(nameof(SendActorMessagesEnqueuedActivity))]
     public async Task Run(
         [ActivityTrigger] SendMessagesEnqueuedInput input)
     {
         var messagesEnqueuedEvent = new ActorMessagesEnqueuedV1
         {
             OrchestrationInstanceId = input.CalculationOrchestrationInstanceId,
-            CalculationId = input.CalculationId,
+            CalculationId = input.CalculationId.ToString(),
+            Success = input.Success,
         };
 
         var eventId = Guid.Parse(input.OrchestrationInstanceId);

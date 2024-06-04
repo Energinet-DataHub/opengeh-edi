@@ -60,8 +60,7 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
         var message = (CalculationCompletedV1)integrationEvent.Message;
         return new EnqueueMessagesOrchestrationInput(
             CalculationOrchestrationId: message.InstanceId,
-            CalculationId: message.CalculationId,
-            CalculationType: message.CalculationType,
-            CalculationVersion: message.CalculationVersion);
+            CalculationId: Guid.Parse(message.CalculationId),
+            EventId: Guid.Parse(integrationEvent.EventIdentification.ToString()));
     }
 }

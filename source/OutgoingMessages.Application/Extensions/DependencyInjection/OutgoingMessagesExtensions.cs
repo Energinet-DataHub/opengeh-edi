@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using BuildingBlocks.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
+using Energinet.DataHub.Core.Databricks.SqlStatementExecution.Diagnostics.HealthChecks;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
@@ -27,6 +29,8 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.ActorMessageQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.OutgoingMessages;
@@ -79,6 +83,18 @@ public static class OutgoingMessagesExtensions
 
         //DataRetentionConfiguration
         services.AddTransient<IDataRetention, DequeuedBundlesRetention>();
+
+        //Databricks
+        services
+            .AddOptions<EdiDatabricksOptions>()
+            .BindConfiguration(EdiDatabricksOptions.SectionName)
+            .ValidateDataAnnotations();
+        services
+            .AddNodaTimeForApplication()
+            .AddScoped<EnergyResultEnumerator>()
+            .AddDatabricksSqlStatementExecution(configuration)
+            .AddHealthChecks()
+                .AddDatabricksSqlStatementApiHealthCheck(name: "DatabricksSqlStatementApi");
 
         return services;
     }
