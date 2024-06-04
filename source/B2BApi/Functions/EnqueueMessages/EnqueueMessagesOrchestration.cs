@@ -37,7 +37,7 @@ internal class EnqueueMessagesOrchestration
         // TODO: All decisions must live in orchestrator (e.g. "switch" on calculation type)
         var numberOfEnqueuedMessages = await context.CallActivityAsync<int>(
             nameof(EnqueueEnergyResultsForGridAreaOwnersActivity),
-            new EnqueueMessagesInput(input.CalculationId));
+            new EnqueueMessagesInput(input.CalculationId, input.EventId));
 
         var messagesWasSuccessfullyEnqueued = numberOfEnqueuedMessages > 0;
 

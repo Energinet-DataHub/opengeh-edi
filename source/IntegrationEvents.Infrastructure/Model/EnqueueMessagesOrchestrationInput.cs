@@ -22,5 +22,4 @@ namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Model;
 public sealed record EnqueueMessagesOrchestrationInput(
     string CalculationOrchestrationId,
     Guid CalculationId,
-    CalculationCompletedV1.Types.CalculationType CalculationType,
-    long CalculationVersion);
+    Guid EventId);

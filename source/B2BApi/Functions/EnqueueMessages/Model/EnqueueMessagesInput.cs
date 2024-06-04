@@ -18,4 +18,5 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 /// An immutable input to start the enqueue messages activity.
 /// </summary>
 public sealed record EnqueueMessagesInput(
-    Guid CalculationId);
+    Guid CalculationId,
+    Guid EventId);
