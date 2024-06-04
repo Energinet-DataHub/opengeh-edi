@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Xml.XPath;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.Ebix;
@@ -127,6 +123,19 @@ public class AssertNotifyAggregatedMeasureDataEbixDocument : IAssertNotifyAggreg
     public async Task<IAssertNotifyAggregatedMeasureDataDocument> DocumentIsValidAsync()
     {
         await _documentAsserter.HasValidStructureAsync(DocumentType.NotifyAggregatedMeasureData, "3", _skipIdentificationLengthValidation).ConfigureAwait(false);
+        return this;
+    }
+
+    public async Task<IAssertNotifyAggregatedMeasureDataDocument> HasStructureValidationErrorsAsync(
+        IReadOnlyCollection<string> errors)
+    {
+        var actualErrors = await _documentAsserter
+            .HasStructureValidationErrorsAsync(DocumentType.NotifyAggregatedMeasureData, "3")
+            .ConfigureAwait(false);
+
+        actualErrors.Should()
+            .SatisfyRespectively(errors.Select<string, Action<string>>(e => ae => ae.Should().Contain(e)).ToList());
+
         return this;
     }
 

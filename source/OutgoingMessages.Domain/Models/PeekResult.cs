@@ -17,15 +17,4 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 
-public class PeekResult
-{
-    public PeekResult(BundleId? bundleId, DocumentType? documentType)
-    {
-        BundleId = bundleId;
-        DocumentType = documentType;
-    }
-
-    public BundleId? BundleId { get; }
-
-    public DocumentType? DocumentType { get; }
-}
+public sealed record PeekResult(BundleId? BundleId, MessageId? MessageId, DocumentType? DocumentType);

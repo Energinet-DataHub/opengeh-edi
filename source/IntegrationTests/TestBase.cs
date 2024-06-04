@@ -152,10 +152,12 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return fileStorageReference;
         }
 
-        protected async Task<string?> GetMarketDocumentFileStorageReferenceFromDatabaseAsync(Guid bundleId)
+        protected async Task<string?> GetMarketDocumentFileStorageReferenceFromDatabaseAsync(MessageId messageId)
         {
             using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-            var fileStorageReference = await connection.ExecuteScalarAsync<string>($"SELECT FileStorageReference FROM [dbo].[MarketDocuments] WHERE BundleId = '{bundleId}'");
+            var fileStorageReference = await connection.ExecuteScalarAsync<string>($"SELECT md.FileStorageReference "
+                + $"FROM [dbo].[MarketDocuments] md JOIN [dbo].[Bundles] b ON md.BundleId = b.Id "
+                + $"WHERE b.MessageId = '{messageId.Value}'");
 
             return fileStorageReference;
         }
@@ -181,8 +183,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             var outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
             return outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, actorRole ?? ActorRole.EnergySupplier, documentFormat ?? DocumentFormat.Xml), CancellationToken.None);
         }
-
-        protected Task<string?> GetArchivedMessageFileStorageReferenceFromDatabaseAsync(Guid messageId) => GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId.ToString());
 
         protected T GetService<T>()
             where T : notnull

@@ -68,17 +68,21 @@ public class ActorMessageQueue
 
     public PeekResult Peek()
     {
-        return new PeekResult(NextBundleToPeek()?.Id, NextBundleToPeek()?.DocumentTypeInBundle);
+        var bundle = NextBundleToPeek();
+
+        return new PeekResult(bundle?.Id, bundle?.MessageId, bundle?.DocumentTypeInBundle);
     }
 
     public PeekResult Peek(MessageCategory category)
     {
-        return new PeekResult(NextBundleToPeek(category)?.Id, NextBundleToPeek(category)?.DocumentTypeInBundle);
+        var bundle = NextBundleToPeek(category);
+
+        return new PeekResult(bundle?.Id, bundle?.MessageId, bundle?.DocumentTypeInBundle);
     }
 
-    public bool Dequeue(BundleId bundleId)
+    public bool Dequeue(MessageId messageId)
     {
-        var bundle = _bundles.FirstOrDefault(bundle => bundle.Id == bundleId && bundle.IsDequeued == false);
+        var bundle = _bundles.FirstOrDefault(bundle => bundle.MessageId.Value == messageId.Value && bundle.IsDequeued == false);
         if (bundle == null)
         {
             return false;
@@ -107,16 +111,18 @@ public class ActorMessageQueue
 
     private Bundle CreateBundleOf(BusinessReason businessReason, DocumentType messageType, int maxNumberOfMessagesInABundle, Instant created, MessageId? relatedToMessageId = null)
     {
-        var bundle = new Bundle(BundleId.New(), businessReason, messageType, maxNumberOfMessagesInABundle, created, relatedToMessageId);
+        var bundle = new Bundle(businessReason, messageType, maxNumberOfMessagesInABundle, created, relatedToMessageId);
         _bundles.Add(bundle);
         return bundle;
     }
 
     private Bundle? NextBundleToPeek(MessageCategory? category = null)
     {
-        var nextBundleToPeek = category is not null ?
-            _bundles.Where(bundle => !bundle.IsDequeued && bundle.DocumentTypeInBundle.Category.Equals(category)).OrderBy(bundle => bundle.Created).FirstOrDefault() :
-            _bundles.Where(bundle => !bundle.IsDequeued).OrderBy(bundle => bundle.Created).FirstOrDefault();
+        var nextBundleToPeek = category is not null
+            ? _bundles
+                .Where(bundle => !bundle.IsDequeued && bundle.DocumentTypeInBundle.Category.Equals(category))
+                .MinBy(bundle => bundle.Created)
+            : _bundles.Where(bundle => !bundle.IsDequeued).MinBy(bundle => bundle.Created);
 
         nextBundleToPeek?.CloseBundle();
 

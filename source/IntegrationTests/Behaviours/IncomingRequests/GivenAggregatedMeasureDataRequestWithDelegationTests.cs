@@ -142,7 +142,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
             balanceResponsibleParty: balanceResponsibleParty,
             new (string? GridArea, TransactionId TransactionId)[]
             {
-                ("512", TransactionId.From("123564789123564789123564789123564787")),
+                ("512", TransactionId.From("12356478912356478912356478912356478")),
             });
 
         // Act
@@ -218,7 +218,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
                 SettlementMethod: SettlementMethod.Flex,
                 MeteringPointType: MeteringPointType.Consumption,
                 GridAreaCode: "512",
-                OriginalTransactionIdReference: TransactionId.From("123564789123564789123564789123564787"),
+                OriginalTransactionIdReference: TransactionId.From("12356478912356478912356478912356478"),
                 ProductCode: "8716867000030", // Example says "8716867000030", but document writes as "5790001330590"?
                 QuantityMeasurementUnit: MeasurementUnit.Kwh,
                 CalculationVersion: GetNow().ToUnixTimeTicks(),
@@ -284,7 +284,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
             balanceResponsibleParty: balanceResponsibleParty,
             new (string? GridArea, TransactionId TransactionId)[]
             {
-                ("512", TransactionId.From("123564789123564789123564789123564787")),
+                ("512", TransactionId.From("12356478912356478912356478912356478")),
             });
 
         // Act
@@ -356,7 +356,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
                 delegatedToActor.ActorNumber.Value,
                 InstantPattern.General.Parse("2024-07-01T14:57:09Z").Value,
                 ReasonCode.FullyRejected.Code,
-                TransactionId.From("123564789123564789123564789123564787"),
+                TransactionId.From("12356478912356478912356478912356478"),
                 "E17",
                 expectedReasonMessage));
     }
@@ -409,7 +409,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
             balanceResponsibleParty,
             new (string? GridArea, TransactionId TransactionId)[]
             {
-                ("512", TransactionId.From("123564789123564789123564789123564787")),
+                ("512", TransactionId.From("12356478912356478912356478912356478")),
             });
 
         // Act
@@ -485,7 +485,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
                 SettlementMethod: SettlementMethod.Flex,
                 MeteringPointType: MeteringPointType.Consumption,
                 GridAreaCode: "512",
-                OriginalTransactionIdReference: TransactionId.From("123564789123564789123564789123564787"),
+                OriginalTransactionIdReference: TransactionId.From("12356478912356478912356478912356478"),
                 ProductCode: "8716867000030", // Example says "8716867000030", but document writes as "5790001330590"?
                 QuantityMeasurementUnit: MeasurementUnit.Kwh,
                 CalculationVersion: GetNow().ToUnixTimeTicks(),
@@ -551,7 +551,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
             balanceResponsibleParty: balanceResponsibleParty,
             new (string? GridArea, TransactionId TransactionId)[]
             {
-                (null, TransactionId.From("123564789123564789123564789123564787")),
+                (null, TransactionId.From("12356478912356478912356478912356478")),
             });
 
         // Act
@@ -633,7 +633,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
                     SettlementMethod: SettlementMethod.Flex,
                     MeteringPointType: MeteringPointType.Consumption,
                     GridAreaCode: seriesRequest.GridArea,
-                    OriginalTransactionIdReference: TransactionId.From("123564789123564789123564789123564787"),
+                    OriginalTransactionIdReference: TransactionId.From("12356478912356478912356478912356478"),
                     ProductCode: "8716867000030", // Example says "8716867000030", but document writes as "5790001330590"?
                     QuantityMeasurementUnit: MeasurementUnit.Kwh,
                     CalculationVersion: GetNow().ToUnixTimeTicks(),
@@ -709,7 +709,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
             balanceResponsibleParty: balanceResponsibleParty,
             new (string? GridArea, TransactionId TransactionId)[]
             {
-                (null, TransactionId.From("123564789123564789123564789123564787")),
+                (null, TransactionId.From("12356478912356478912356478912356478")),
             });
 
         // Act
@@ -781,7 +781,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
                 delegatedToActor.ActorNumber.Value,
                 InstantPattern.General.Parse("2024-07-01T14:57:09Z").Value,
                 ReasonCode.FullyRejected.Code,
-                TransactionId.From("123564789123564789123564789123564787"),
+                TransactionId.From("12356478912356478912356478912356478"),
                 "E17",
                 expectedReasonMessage));
     }
@@ -832,7 +832,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
             balanceResponsibleParty: balanceResponsibleParty,
             new (string? GridArea, TransactionId TransactionId)[]
             {
-                (null, TransactionId.From("123564789123564789123564789123564787")),
+                (null, TransactionId.From("12356478912356478912356478912356478")),
             });
 
         // Act
@@ -916,7 +916,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
                     SettlementMethod: SettlementMethod.Flex,
                     MeteringPointType: MeteringPointType.Consumption,
                     GridAreaCode: seriesRequest.GridArea,
-                    OriginalTransactionIdReference: TransactionId.From("123564789123564789123564789123564787"),
+                    OriginalTransactionIdReference: TransactionId.From("12356478912356478912356478912356478"),
                     ProductCode: ProductType.EnergyActive.Code,
                     QuantityMeasurementUnit: MeasurementUnit.Kwh,
                     CalculationVersion: GetNow().ToUnixTimeTicks(),
@@ -970,7 +970,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
             null,
             new (string? GridArea, TransactionId TransactionId)[]
             {
-                (null, TransactionId.From("123564789123564789123564789123564787")),
+                (null, TransactionId.From("12356478912356478912356478912356478")),
             },
             assertRequestWasSuccessful: false);
 

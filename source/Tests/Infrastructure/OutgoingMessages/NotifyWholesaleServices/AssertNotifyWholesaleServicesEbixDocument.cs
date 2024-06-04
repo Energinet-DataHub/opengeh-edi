@@ -12,12 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -26,8 +22,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions;
-using Google.Protobuf.Collections;
-using Microsoft.IdentityModel.Tokens;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
@@ -338,6 +332,23 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
                 "3",
                 _skipIdentificationLengthValidation)
             .ConfigureAwait(false);
+        return this;
+    }
+
+    public async Task<IAssertNotifyWholesaleServicesDocument> HasStructureValidationErrorsAsync(
+        IReadOnlyCollection<string> errors)
+    {
+        var actualErrors = await _documentAsserter
+            .HasStructureValidationErrorsAsync(DocumentType.NotifyWholesaleServices, "3")
+            .ConfigureAwait(false);
+
+        actualErrors
+            .Where(ae => errors.Aggregate(false, (b, s) => b || ae.Contains(s)))
+            .Should()
+            .HaveCount(errors.Count)
+            .And
+            .SatisfyRespectively(errors.Select<string, Action<string>>(e => ae => ae.Should().Contain(e)).ToList());
+
         return this;
     }
 
