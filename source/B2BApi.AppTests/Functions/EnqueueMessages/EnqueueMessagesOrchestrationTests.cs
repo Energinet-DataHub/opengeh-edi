@@ -78,22 +78,10 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         await Fixture.TopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
 
         // Assert
-        await Task.Delay(TimeSpan.FromSeconds(30));
-
-        var filter = new OrchestrationStatusQueryCondition()
-        {
-            CreatedTimeFrom = beforeOrchestrationCreated,
-            RuntimeStatus =
-            [
-                OrchestrationRuntimeStatus.Pending,
-                OrchestrationRuntimeStatus.Running,
-                OrchestrationRuntimeStatus.Completed,
-            ],
-        };
-        var queryResult = await Fixture.DurableClient.ListInstancesAsync(filter, CancellationToken.None);
-
-        var actualOrchestrationStatus = queryResult.DurableOrchestrationState.FirstOrDefault();
-        actualOrchestrationStatus.Should().BeNull();
+        var act = async () => await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
+        await act.Should()
+            .ThrowAsync<Exception>()
+            .WithMessage("Orchestration did not start within configured wait time*");
     }
 
     /// <summary>
@@ -119,14 +107,12 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         await Fixture.TopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
 
         // Assert
-        await Task.Delay(TimeSpan.FromSeconds(30));
-
         // => Verify expected behaviour by searching the orchestration history
-        var orchestrationStatus = await Fixture.DurableClient.FindOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
+        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
 
         // => Wait for completion, this should be fairly quick
         var completeOrchestrationStatus = await Fixture.DurableClient.WaitForInstanceCompletedAsync(
-            orchestrationStatus.InstanceId,
+            actualOrchestrationStatus.InstanceId,
             TimeSpan.FromMinutes(1));
 
         // => Expect history
@@ -190,14 +176,12 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         await Fixture.TopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
 
         // Assert
-        await Task.Delay(TimeSpan.FromSeconds(30));
-
         // => Verify expected behaviour by searching the orchestration history
-        var orchestrationStatus = await Fixture.DurableClient.FindOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
+        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
 
         // => Wait for completion, this should be fairly quick
         await Fixture.DurableClient.WaitForInstanceCompletedAsync(
-            orchestrationStatus.InstanceId,
+            actualOrchestrationStatus.InstanceId,
             TimeSpan.FromMinutes(1));
 
         // => Expect history
