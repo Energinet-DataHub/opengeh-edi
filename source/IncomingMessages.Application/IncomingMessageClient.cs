@@ -87,6 +87,7 @@ public class IncomingMessageClient : IIncomingMessageClient
                 "Failed to parse incoming message {DocumentType}. Errors: {Errors}",
                 documentType,
                 string.Join(',', res.Errors));
+
             return _responseFactory.From(res, responseDocumentFormat);
         }
 

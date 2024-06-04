@@ -12,21 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
+
+public abstract class ValidationError
 {
-    public abstract class ValidationError
+    protected ValidationError(string message, string code, string? target = null)
     {
-        protected ValidationError(string message, string code, string? target = null)
-        {
-            Message = message;
-            Code = code;
-            Target = target;
-        }
+        Message = message;
+        Code = code;
+        Target = target;
+    }
 
-        public string Message { get; }
+    public string Message { get; }
 
-        public string Code { get; }
+    public string Code { get; }
 
-        public string? Target { get; }
+    public string? Target { get; }
+
+    public override string ToString()
+    {
+        return $"Code: {Code}, Message: {Message}, Target: {Target}";
     }
 }

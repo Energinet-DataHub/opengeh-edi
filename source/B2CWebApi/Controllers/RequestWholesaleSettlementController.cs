@@ -76,7 +76,7 @@ public class RequestWholesaleSettlementController : ControllerBase
 
         if (responseMessage.IsErrorResponse)
         {
-            return BadRequest();
+            return BadRequest(responseMessage.MessageBody);
         }
 
         return Ok(responseMessage.MessageBody);
