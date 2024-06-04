@@ -439,7 +439,6 @@ public class BehavioursTestBase : IDisposable
                     ["IntegrationEvents:SubscriptionName"] = "NotEmpty",
 
                     // Databricks
-                    // TODO: Use proper values
                     [nameof(DatabricksSqlStatementOptions.WorkspaceUrl)] = "https://adb-1000.azuredatabricks.net/",
                     [nameof(DatabricksSqlStatementOptions.WorkspaceToken)] = "FakeToken",
                     [nameof(DatabricksSqlStatementOptions.WarehouseId)] = Guid.NewGuid().ToString(),

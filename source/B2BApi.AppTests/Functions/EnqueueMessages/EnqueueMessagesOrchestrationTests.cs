@@ -24,7 +24,6 @@ using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Google.Protobuf;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Options;
 using Xunit;
 using Xunit.Abstractions;
@@ -44,16 +43,14 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
     private B2BApiAppFixture Fixture { get; }
 
-    public async Task InitializeAsync()
+    public Task InitializeAsync()
     {
         Fixture.AppHostManager.ClearHostLog();
 
         // Clear mappings etc. before each test
         Fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
 
-        // Ensure that databricks does not contain data, unless the test explicit adds it
-        if (Fixture.DatabricksSchemaManager.SchemaExists)
-            await Fixture.DatabricksSchemaManager.DropSchemaAsync();
+        return Task.CompletedTask;
     }
 
     public async Task DisposeAsync()
@@ -96,8 +93,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         // Arrange
         Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: true);
 
-        // create databricks data
-        var calculationId = await AddDatabricksData();
+        var calculationId = await ClearAndAddDatabricksData();
 
         var calculationOrchestrationId = Guid.NewGuid().ToString();
         var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId, calculationId.ToString());
@@ -242,8 +238,12 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     /// Adds hardcoded data to databricks.
     /// </summary>
     /// <returns>The calculation id of the hardcoded data which was added to databricks</returns>
-    private async Task<Guid> AddDatabricksData()
+    private async Task<Guid> ClearAndAddDatabricksData()
     {
+        // Ensure that databricks does not contain data, unless the test explicit adds it
+        if (Fixture.DatabricksSchemaManager.SchemaExists)
+            await Fixture.DatabricksSchemaManager.DropSchemaAsync();
+
         // This ID has to match the hardcoded calculation id in the file balance_fixing_01-11-2022_01-12-2022_ga_543.csv
         var calculationId = Guid.Parse("e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d");
         await Fixture.DatabricksSchemaManager.CreateSchemaAsync();
