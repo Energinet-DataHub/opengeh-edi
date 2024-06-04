@@ -90,34 +90,19 @@ public class EnergyResultMessageDtoFactory()
     // TODO: Move to mapper?
     private static (DomainModel.BusinessReason BusinessReason, DomainModel.SettlementVersion? SettlementVersion) MapToBusinessReasonAndSettlementVersion(CalculationType calculationType)
     {
-        var businessReason = calculationType switch
+        return calculationType switch
         {
-            CalculationType.Aggregation => DomainModel.BusinessReason.PreliminaryAggregation,
-            CalculationType.BalanceFixing => DomainModel.BusinessReason.BalanceFixing,
-            CalculationType.WholesaleFixing => DomainModel.BusinessReason.WholesaleFixing,
-            CalculationType.FirstCorrectionSettlement => DomainModel.BusinessReason.Correction,
-            CalculationType.SecondCorrectionSettlement => DomainModel.BusinessReason.Correction,
-            CalculationType.ThirdCorrectionSettlement => DomainModel.BusinessReason.Correction,
+            CalculationType.Aggregation => (DomainModel.BusinessReason.PreliminaryAggregation, null),
+            CalculationType.BalanceFixing => (DomainModel.BusinessReason.BalanceFixing, null),
+            CalculationType.WholesaleFixing => (DomainModel.BusinessReason.WholesaleFixing, null),
+            CalculationType.FirstCorrectionSettlement => (DomainModel.BusinessReason.Correction, SettlementVersion.FirstCorrection),
+            CalculationType.SecondCorrectionSettlement => (DomainModel.BusinessReason.Correction, SettlementVersion.SecondCorrection),
+            CalculationType.ThirdCorrectionSettlement => (DomainModel.BusinessReason.Correction, SettlementVersion.ThirdCorrection),
 
             _ => throw new ArgumentOutOfRangeException(
                 nameof(calculationType),
                 actualValue: calculationType,
                 "Value does not contain a valid calculation type."),
         };
-
-        var settlementVersion = calculationType switch
-        {
-            CalculationType.BalanceFixing or CalculationType.Aggregation or CalculationType.WholesaleFixing => null,
-            CalculationType.FirstCorrectionSettlement => DomainModel.SettlementVersion.FirstCorrection,
-            CalculationType.SecondCorrectionSettlement => DomainModel.SettlementVersion.SecondCorrection,
-            CalculationType.ThirdCorrectionSettlement => DomainModel.SettlementVersion.ThirdCorrection,
-
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(calculationType),
-                calculationType,
-                "Value does not contain a valid calculation type."),
-        };
-
-        return (businessReason, settlementVersion);
     }
 }
