@@ -19,5 +19,4 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 /// </summary>
 public record EnqueueMessagesInputDto(
     Guid CalculationId,
-    long CalculationVersion,
     Guid EventId);

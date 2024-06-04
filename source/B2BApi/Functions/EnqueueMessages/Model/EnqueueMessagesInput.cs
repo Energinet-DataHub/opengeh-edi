@@ -12,14 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
-
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 
 /// <summary>
 /// An immutable input to start the enqueue messages activity.
 /// </summary>
 public sealed record EnqueueMessagesInput(
-    string CalculationId, // TODO: If we are sure this is a Guid, we should use that type anywhere possible
-    long CalculationVersion,
-    CalculationCompletedV1.Types.CalculationType CalculationType);
+    Guid CalculationId);

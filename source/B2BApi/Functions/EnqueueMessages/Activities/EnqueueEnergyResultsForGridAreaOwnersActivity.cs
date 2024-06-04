@@ -34,8 +34,7 @@ public class EnqueueEnergyResultsForGridAreaOwnersActivity(
             // TODO: With this implementation, we have one try to fetch data. Do we want multiple tries?
             var numberOfEnqueuedMessages = await _outgoingMessagesClient.EnqueueEnergyResultsForGridAreaOwnersAsync(
                 new EnqueueMessagesInputDto(
-                    Guid.Parse(inputDto.CalculationId),
-                    inputDto.CalculationVersion,
+                    inputDto.CalculationId,
                     Guid.Empty));
 
             return numberOfEnqueuedMessages;
