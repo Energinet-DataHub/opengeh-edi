@@ -66,7 +66,6 @@ using Xunit;
 using Xunit.Abstractions;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using ExecutionContext = Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext;
-using HttpClientFactory = Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks.HttpClientFactory;
 using SampleData = Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.SampleData;
 
 namespace Energinet.DataHub.EDI.IntegrationTests
@@ -74,9 +73,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests
     [Collection("IntegrationTest")]
     public class TestBase : IDisposable
     {
-        // TODO: Not ideal, but we need to avoid creating it multiple times, so a quick fix for now
-        private static readonly IntegrationTestConfiguration _integrationTestConfiguration = new();
-
         private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
         private readonly ProcessContext _processContext;
         private readonly IncomingMessagesContext _incomingMessagesContext;
@@ -85,26 +81,21 @@ namespace Energinet.DataHub.EDI.IntegrationTests
 
         protected TestBase(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         {
-            ArgumentNullException.ThrowIfNull(integrationTestFixture);
-
-            DatabricksSchemaManager = new DatabricksSchemaManager(
-                new HttpClientFactory(),
-                databricksSettings: _integrationTestConfiguration.DatabricksSettings,
-                schemaPrefix: "edi_integration_tests");
+            Fixture = integrationTestFixture;
 
             IntegrationTestFixture.CleanupDatabase();
-            integrationTestFixture.CleanupFileStorage();
+            Fixture.CleanupFileStorage();
             _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
             TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
             InboxEventNotificationHandler = new TestNotificationHandlerSpy();
-            BuildServices(DatabricksSchemaManager.SchemaName, integrationTestFixture.AzuriteManager.BlobStorageConnectionString, testOutputHelper);
+            BuildServices(testOutputHelper);
             _processContext = GetService<ProcessContext>();
             _incomingMessagesContext = GetService<IncomingMessagesContext>();
             AuthenticatedActor = GetService<AuthenticatedActor>();
             AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
         }
 
-        protected DatabricksSchemaManager DatabricksSchemaManager { get; }
+        protected IntegrationTestFixture Fixture { get; }
 
         protected FeatureFlagManagerStub FeatureFlagManagerStub { get; } = new();
 
@@ -287,11 +278,11 @@ namespace Energinet.DataHub.EDI.IntegrationTests
             return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
         }
 
-        private void BuildServices(string ediDatabricksDatabaseName, string fileStorageConnectionString, ITestOutputHelper testOutputHelper)
+        private void BuildServices(ITestOutputHelper testOutputHelper)
         {
             Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
             Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", IntegrationTestFixture.DatabaseConnectionString);
-            Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", fileStorageConnectionString);
+            Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", Fixture.AzuriteManager.BlobStorageConnectionString);
 
             var config = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
@@ -308,11 +299,11 @@ namespace Energinet.DataHub.EDI.IntegrationTests
                         ["IntegrationEvents:SubscriptionName"] = "NotEmpty",
 
                         // Databricks
-                        [nameof(DatabricksSqlStatementOptions.WorkspaceUrl)] = _integrationTestConfiguration.DatabricksSettings.WorkspaceUrl,
-                        [nameof(DatabricksSqlStatementOptions.WorkspaceToken)] = _integrationTestConfiguration.DatabricksSettings.WorkspaceAccessToken,
-                        [nameof(DatabricksSqlStatementOptions.WarehouseId)] = _integrationTestConfiguration.DatabricksSettings.WarehouseId,
+                        [nameof(DatabricksSqlStatementOptions.WorkspaceUrl)] = Fixture.IntegrationTestConfiguration.DatabricksSettings.WorkspaceUrl,
+                        [nameof(DatabricksSqlStatementOptions.WorkspaceToken)] = Fixture.IntegrationTestConfiguration.DatabricksSettings.WorkspaceAccessToken,
+                        [nameof(DatabricksSqlStatementOptions.WarehouseId)] = Fixture.IntegrationTestConfiguration.DatabricksSettings.WarehouseId,
                         // => EDI views
-                        [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.DatabaseName)}"] = ediDatabricksDatabaseName,
+                        [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.DatabaseName)}"] = Fixture.DatabricksSchemaManager.SchemaName,
                     })
                 .Build();
 

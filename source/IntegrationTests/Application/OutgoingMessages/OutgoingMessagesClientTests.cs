@@ -50,19 +50,19 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await DatabricksSchemaManager.CreateSchemaAsync();
+        await Fixture.DatabricksSchemaManager.CreateSchemaAsync();
 
         var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
         var viewQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions, _calculationId);
-        await DatabricksSchemaManager.CreateTableAsync(viewQuery);
+        await Fixture.DatabricksSchemaManager.CreateTableAsync(viewQuery);
 
         var testFilePath = Path.Combine("Application", "OutgoingMessages", "TestData", TestFilename);
-        await DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, testFilePath);
+        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, testFilePath);
     }
 
     public async Task DisposeAsync()
     {
-        await DatabricksSchemaManager.DropSchemaAsync();
+        await Fixture.DatabricksSchemaManager.DropSchemaAsync();
     }
 
     [Fact]
