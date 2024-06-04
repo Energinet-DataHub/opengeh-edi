@@ -160,16 +160,17 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
     /// <summary>
     /// Verifies that:
-    ///  - If databricks has no data, the orchestration completes with a failed service bus message.
+    /// - If databricks has no data for the CalculationId, then ActorMessageEnqueued.Success is false.
     /// </summary>
     [Fact]
-    public async Task Given_FeatureFlagIsEnabledAndCalculationOrchestrationId_When_CalculationCompletedEventIsHandledAndDatabricksHasNoData_Then_OrchestrationCompletesWithFailedServiceBusMessage()
+    public async Task Given_DatabricksHasNoData_When_CalculationCompletedEventIsHandled_Then_ServiceBusMessageHasFailedStatus()
     {
         // Arrange
         Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: true);
 
+        var calculationId = Guid.NewGuid().ToString();
         var calculationOrchestrationId = Guid.NewGuid().ToString();
-        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId);
+        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId, calculationId);
 
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
@@ -199,9 +200,10 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
                 var parsedEvent = ActorMessagesEnqueuedV1.Parser.ParseFrom(msg.Body);
 
                 var matchingOrchestrationId = parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
+                var matchingCalculationId = parsedEvent.CalculationId == calculationId;
                 var isFailed = parsedEvent.Success == false;
 
-                return matchingOrchestrationId && isFailed;
+                return matchingOrchestrationId && matchingCalculationId && isFailed;
             })
             .VerifyCountAsync(1);
 
