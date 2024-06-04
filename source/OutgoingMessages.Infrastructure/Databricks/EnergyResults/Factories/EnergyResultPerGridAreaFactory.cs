@@ -36,6 +36,6 @@ public class EnergyResultPerGridAreaFactory
             databricksSqlRow.ToInstant(EnergyResultColumnNames.CalculationPeriodEnd),
             ResolutionMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.Resolution)),
             databricksSqlRow.ToLong(EnergyResultColumnNames.CalculationVersion),
-            SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow[EnergyResultColumnNames.SettlementMethod]));
+            SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)));
     }
 }

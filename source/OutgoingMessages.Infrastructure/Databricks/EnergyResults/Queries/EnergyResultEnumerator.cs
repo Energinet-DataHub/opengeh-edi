@@ -42,7 +42,7 @@ public class EnergyResultEnumerator(
 
     private static bool BelongsToDifferentResults(DatabricksSqlRow row, DatabricksSqlRow otherRow)
     {
-        return !row[EnergyResultColumnNames.ResultId]!.Equals(otherRow[EnergyResultColumnNames.ResultId]);
+        return !row.ToGuid(EnergyResultColumnNames.ResultId).Equals(otherRow.ToGuid(EnergyResultColumnNames.ResultId));
     }
 
     private async IAsyncEnumerable<EnergyResultPerGridArea> GetInternalAsync(EnergyResultPerGridAreaQuery query)
