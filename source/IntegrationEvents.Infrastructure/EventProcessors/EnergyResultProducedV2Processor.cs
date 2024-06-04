@@ -71,6 +71,17 @@ public sealed class EnergyResultProducedV2Processor : IIntegrationEventProcessor
             return;
         }
 
+        if (energyResultProducedV2 is
+            {
+                CalculationType: EnergyResultProducedV2.Types.CalculationType.WholesaleFixing,
+                AggregationPerEnergysupplierPerBalanceresponsiblepartyPerGridarea: not null
+            })
+        {
+            _logger.LogInformation(
+                "Energy Result to a Balance Responsible per Energy Supplier should be ignored for wholesale fixing calculation type.");
+            return;
+        }
+
         var message = await _energyResultMessageResultFactory
             .CreateAsync(EventId.From(integrationEvent.EventIdentification), energyResultProducedV2, CancellationToken.None)
             .ConfigureAwait(false);
