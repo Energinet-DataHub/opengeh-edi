@@ -28,7 +28,7 @@ public abstract class AggregatedTimeSeries
         Instant periodStartUtc,
         Instant periodEndUtc,
         Resolution resolution,
-        int calculationVersion,
+        long calculationVersion,
         SettlementMethod? settlementMethod)
     {
         if (timeSeriesPoints.Length == 0)
@@ -60,7 +60,7 @@ public abstract class AggregatedTimeSeries
 
     public Resolution Resolution { get; }
 
-    public int CalculationVersion { get; init; }
+    public long CalculationVersion { get; init; }
 
     public SettlementMethod? SettlementMethod { get; init; }
 }

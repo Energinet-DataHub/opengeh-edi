@@ -39,7 +39,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
 
     // Values matching test file values
     private readonly Guid _calculationId = Guid.Parse("e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d");
-    private readonly int _calculationVersion = 63;
+    private readonly long _calculationVersion = 63;
 
     private readonly GridAreaOwnershipAssignedEventBuilder _gridAreaOwnershipAssignedEventBuilder = new();
 

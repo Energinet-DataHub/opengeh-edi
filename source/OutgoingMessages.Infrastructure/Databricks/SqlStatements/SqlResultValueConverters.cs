@@ -35,9 +35,20 @@ public static class SqlResultValueConverters
         return DateTimeOffset.Parse(value, CultureInfo.InvariantCulture);
     }
 
+    /// <summary>
+    /// Parse from Databricks "INT" to int.
+    /// </summary>
     public static int ToInt(string value)
     {
         return int.Parse(value);
+    }
+
+    /// <summary>
+    /// Parse from Databricks "BIGINT" to long.
+    /// </summary>
+    public static long ToLong(string value)
+    {
+        return long.Parse(value);
     }
 
     public static Guid ToGuid(string value)

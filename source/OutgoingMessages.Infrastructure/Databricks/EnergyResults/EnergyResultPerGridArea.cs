@@ -29,7 +29,7 @@ public sealed class EnergyResultPerGridArea(
     Instant periodStartUtc,
     Instant periodEndUtc,
     Resolution resolution,
-    int calculationVersion,
+    long calculationVersion,
     SettlementMethod? settlementMethod)
     : AggregatedTimeSeries(
         gridAreaCode,

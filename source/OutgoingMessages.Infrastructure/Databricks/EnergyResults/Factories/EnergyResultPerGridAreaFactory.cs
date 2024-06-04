@@ -64,7 +64,7 @@ public class EnergyResultPerGridAreaFactory
             SqlResultValueConverters.ToInstant(periodStartUtc),
             SqlResultValueConverters.ToInstant(periodEndUtc),
             ResolutionMapper.FromDeltaTableValue(resolution),
-            SqlResultValueConverters.ToInt(calculationVersion),
+            SqlResultValueConverters.ToLong(calculationVersion),
             SettlementMethodMapper.FromDeltaTableValue(settlementMethod));
     }
 }
