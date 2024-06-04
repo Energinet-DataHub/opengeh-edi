@@ -19,12 +19,12 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
-public class EnqueueMessagesActivity(
+public class EnqueueEnergyResultsForGridAreaOwnersActivity(
     IOutgoingMessagesClient outgoingMessagesClient)
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
 
-    [Function(nameof(EnqueueMessagesActivity))]
+    [Function(nameof(EnqueueEnergyResultsForGridAreaOwnersActivity))]
     public async Task<int> Run(
         [ActivityTrigger] EnqueueMessagesInput inputDto)
     {
@@ -32,7 +32,7 @@ public class EnqueueMessagesActivity(
         {
             // TODO: Get a proper event id!
             // TODO: With this implementation, we have one try to fetch data. Do we want multiple tries?
-            var numberOfEnqueuedMessages = await _outgoingMessagesClient.EnqueueByCalculationIdAsync(
+            var numberOfEnqueuedMessages = await _outgoingMessagesClient.EnqueueEnergyResultsForGridAreaOwnersAsync(
                 new EnqueueMessagesInputDto(
                     Guid.Parse(inputDto.CalculationId),
                     inputDto.CalculationVersion,

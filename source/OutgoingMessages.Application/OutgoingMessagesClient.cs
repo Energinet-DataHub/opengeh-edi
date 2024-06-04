@@ -161,7 +161,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         return messageId;
     }
 
-    public async Task<int> EnqueueByCalculationIdAsync(EnqueueMessagesInputDto input)
+    public async Task<int> EnqueueEnergyResultsForGridAreaOwnersAsync(EnqueueMessagesInputDto input)
     {
         var numberOfEnqueuedMessages = 0;
 

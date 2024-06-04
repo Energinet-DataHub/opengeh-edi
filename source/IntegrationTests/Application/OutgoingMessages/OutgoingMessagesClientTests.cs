@@ -80,7 +80,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent01);
 
         // Act
-        await sut.EnqueueByCalculationIdAsync(input);
+        await sut.EnqueueEnergyResultsForGridAreaOwnersAsync(input);
 
         // Assert
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
