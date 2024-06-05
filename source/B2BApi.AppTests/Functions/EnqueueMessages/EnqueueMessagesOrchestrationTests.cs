@@ -252,7 +252,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             new EdiDatabricksOptions { DatabaseName = Fixture.DatabricksSchemaManager.SchemaName });
 
         var viewQuery = new EnergyResultPerGridAreaQuery(
-            ediOptions,
+            ediOptions.Value,
             calculationId);
         await Fixture.DatabricksSchemaManager.CreateTableAsync(viewQuery);
 

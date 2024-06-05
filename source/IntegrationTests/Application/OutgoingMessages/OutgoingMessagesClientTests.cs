@@ -56,7 +56,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         var testDataDescription = new EnergyResultPerGridAreaDescription();
 
         var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
-        var viewQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions, testDataDescription.CalculationId);
+        var viewQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions.Value, testDataDescription.CalculationId);
 
         await HavingReceivedAndHandledGridAreaOwnershipAssignedEventAsync(testDataDescription.GridAreaCode);
         await SeedDatabricksWithDataAsync(testDataDescription, viewQuery);
@@ -84,7 +84,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         var testDataDescription = new EnergyResultPerBrpGridAreaDescription();
 
         var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
-        var viewQuery = new EnergyResultPerBrpGridAreaQuery(ediDatabricksOptions, testDataDescription.CalculationId);
+        var viewQuery = new EnergyResultPerBrpGridAreaQuery(ediDatabricksOptions.Value, testDataDescription.CalculationId);
 
         await HavingReceivedAndHandledGridAreaOwnershipAssignedEventAsync(testDataDescription.GridAreaCode);
         await SeedDatabricksWithDataAsync(testDataDescription, viewQuery);
@@ -113,7 +113,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         var testDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
 
         var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
-        var viewQuery = new EnergyResultPerEnergySupplierBrpGridAreaQuery(ediDatabricksOptions, testDataDescription.CalculationId);
+        var viewQuery = new EnergyResultPerEnergySupplierBrpGridAreaQuery(ediDatabricksOptions.Value, testDataDescription.CalculationId);
 
         await HavingReceivedAndHandledGridAreaOwnershipAssignedEventAsync(testDataDescription.GridAreaCode);
         await SeedDatabricksWithDataAsync(testDataDescription, viewQuery);

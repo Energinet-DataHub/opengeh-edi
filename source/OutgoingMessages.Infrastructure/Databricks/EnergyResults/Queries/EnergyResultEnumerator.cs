@@ -28,29 +28,22 @@ public class EnergyResultEnumerator(
     ILogger<EnergyResultEnumerator> logger)
 {
     private readonly DatabricksSqlWarehouseQueryExecutor _databricksSqlWarehouseQueryExecutor = databricksSqlWarehouseQueryExecutor;
-    private readonly IOptions<EdiDatabricksOptions> _ediDatabricksOptions = ediDatabricksOptions;
+    private readonly EdiDatabricksOptions _ediDatabricksOptions = ediDatabricksOptions.Value;
     private readonly ILogger<EnergyResultEnumerator> _logger = logger;
 
-    public async IAsyncEnumerable<EnergyResultPerGridArea> GetAsync(Guid calculationId)
-    {
-        var query = new EnergyResultPerGridAreaQuery(_ediDatabricksOptions, calculationId);
-        await foreach (var messageDto in GetInternalAsync(query))
-            yield return messageDto;
-        _logger.LogDebug("Fetched all energy results for calculation {calculation_id}", calculationId);
-    }
+    public EdiDatabricksOptions EdiDatabricksOptions => _ediDatabricksOptions;
 
-    private static bool BelongsToDifferentResults(DatabricksSqlRow row, DatabricksSqlRow otherRow)
-    {
-        return !row.ToGuid(EnergyResultColumnNames.ResultId).Equals(otherRow.ToGuid(EnergyResultColumnNames.ResultId));
-    }
-
-    private async IAsyncEnumerable<EnergyResultPerGridArea> GetInternalAsync(EnergyResultPerGridAreaQuery query)
+    public async IAsyncEnumerable<EnergyResultPerGridArea> GetAsync(EnergyResultQueryBase query)
     {
         DatabricksSqlRow? currentRow = null;
         var resultCount = 0;
         var timeSeriesPoints = new List<EnergyTimeSeriesPoint>();
 
-        await foreach (var nextRow in _databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(query).ConfigureAwait(false))
+        var statement = DatabricksStatement
+            .FromRawSql(query.BuildSqlQuery())
+            .Build();
+
+        await foreach (var nextRow in _databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement).ConfigureAwait(false))
         {
             var timeSeriesPoint = EnergyTimeSeriesPointFactory.CreateTimeSeriesPoint(nextRow);
 
@@ -71,6 +64,11 @@ public class EnergyResultEnumerator(
             resultCount++;
         }
 
-        _logger.LogDebug("Fetched {result_count} energy results", resultCount);
+        _logger.LogDebug("Fetched {result_count} energy results for calculation {calculation_id}", resultCount, query.CalculationId);
+    }
+
+    private static bool BelongsToDifferentResults(DatabricksSqlRow row, DatabricksSqlRow otherRow)
+    {
+        return !row.ToGuid(EnergyResultColumnNames.ResultId).Equals(otherRow.ToGuid(EnergyResultColumnNames.ResultId));
     }
 }

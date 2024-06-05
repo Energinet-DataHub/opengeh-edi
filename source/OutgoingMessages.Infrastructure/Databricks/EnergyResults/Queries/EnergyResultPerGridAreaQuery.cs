@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
-using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 
@@ -26,9 +25,11 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Energ
 /// See confluence: https://energinet.atlassian.net/wiki/spaces/D3/pages/849805314/Calculation+Result+Model#Energy-Result-Points-Per-Grid-Area
 /// </summary>
 public class EnergyResultPerGridAreaQuery(
-        IOptions<EdiDatabricksOptions> ediDatabricksOptions,
+        EdiDatabricksOptions ediDatabricksOptions,
         Guid calculationId)
-    : EnergyResultQueryBase(ediDatabricksOptions, calculationId)
+    : EnergyResultQueryBase(
+        ediDatabricksOptions,
+        calculationId)
 {
     public override string DataObjectName => "energy_result_points_per_ga_v1";
 
