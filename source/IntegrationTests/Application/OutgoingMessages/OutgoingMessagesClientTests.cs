@@ -51,7 +51,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
     }
 
     [Fact]
-    public async Task GivenCalculationWithIdIsCompleted_WhenEnqueueByCalculationId_ThenOutgoingMessagesAreEnqueued()
+    public async Task GivenCalculationWithIdIsCompleted_WhenEnqueueEnergyResultsForGridAreaOwners_ThenOutgoingMessagesAreEnqueued()
     {
         var testDataDescription = new EnergyResultPerGridAreaDescription();
 
