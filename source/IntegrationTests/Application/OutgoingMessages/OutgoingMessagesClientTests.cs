@@ -78,7 +78,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         actualCount.Should().Be(testDataDescription.ExpectedOutgoingMessagesCount);
     }
 
-    [Fact(Skip = "Implement matching query and EnqueueEnergyResultsForBalanceResponsiblesAsync")]
+    [Fact(Skip = "Implement matching query enumerator and EnqueueEnergyResultsForBalanceResponsiblesAsync")]
     public async Task GivenCalculationWithIdIsCompleted_WhenEnqueueEnergyResultsForBalanceResponsibles_ThenOutgoingMessagesAreEnqueued()
     {
         var testDataDescription = new EnergyResultPerBrpGridAreaDescription();
@@ -107,7 +107,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         actualCount.Should().Be(testDataDescription.ExpectedOutgoingMessagesCount);
     }
 
-    [Fact(Skip = "Implement matching query and EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersAsync")]
+    [Fact(Skip = "Implement matching query enumerator and EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersAsync")]
     public async Task GivenCalculationWithIdIsCompleted_WhenEnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliers_ThenOutgoingMessagesAreEnqueued()
     {
         var testDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
