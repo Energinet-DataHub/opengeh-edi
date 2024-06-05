@@ -38,20 +38,11 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
     public OutgoingMessagesClientTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
-        EnergyResultPerGaDescription = new EnergyResultPerGaDescription();
     }
-
-    public EnergyResultPerGaDescription EnergyResultPerGaDescription { get; }
 
     public async Task InitializeAsync()
     {
         await Fixture.DatabricksSchemaManager.CreateSchemaAsync();
-
-        var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
-        var viewQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions, EnergyResultPerGaDescription.CalculationId);
-        await Fixture.DatabricksSchemaManager.CreateTableAsync(viewQuery);
-
-        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, EnergyResultPerGaDescription.TestFilePath);
     }
 
     public async Task DisposeAsync()
@@ -62,16 +53,18 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
     [Fact]
     public async Task GivenCalculationWithIdIsCompleted_WhenEnqueueByCalculationId_ThenOutgoingMessagesAreEnqueued()
     {
+        var testDataDescription = new EnergyResultPerGridAreaDescription();
+
+        var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
+        var viewQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions, testDataDescription.CalculationId);
+
+        await HavingReceivedAndHandledGridAreaOwnershipAssignedEventAsync(testDataDescription.GridAreaCode);
+        await SeedDatabricksWithDataAsync(testDataDescription, viewQuery);
+
         var sut = GetService<IOutgoingMessagesClient>();
         var input = new EnqueueMessagesInputDto(
-            EnergyResultPerGaDescription.CalculationId,
+            testDataDescription.CalculationId,
             EventId: Guid.NewGuid());
-
-        // The grid area in the mocked data needs an owner. Since the messages need a receiver.
-        var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedEventBuilder
-            .WithGridAreaCode(EnergyResultPerGaDescription.GridAreaCode)
-            .Build();
-        await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent01);
 
         // Act
         await sut.EnqueueEnergyResultsForGridAreaOwnersAsync(input);
@@ -82,18 +75,29 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         var result = await connection.QueryAsync(sql);
 
         var actualCount = result.Count();
-        actualCount.Should().Be(EnergyResultPerGaDescription.ExpectedOutgoingMessagesCount);
+        actualCount.Should().Be(testDataDescription.ExpectedOutgoingMessagesCount);
     }
 
-    private async Task HavingReceivedAndHandledIntegrationEventAsync(string eventType, GridAreaOwnershipAssigned gridAreaOwnershipAssigned)
+    private async Task SeedDatabricksWithDataAsync(EnergyResultPerGridAreaDescription testDataDescription, EnergyResultPerGridAreaQuery viewQuery)
     {
+        await Fixture.DatabricksSchemaManager.CreateTableAsync(viewQuery);
+        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, testDataDescription.TestFilePath);
+    }
+
+    private async Task HavingReceivedAndHandledGridAreaOwnershipAssignedEventAsync(string gridAreaCode)
+    {
+        // The grid area in the mocked data needs an owner. Since the messages need a receiver.
+        var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedEventBuilder
+            .WithGridAreaCode(gridAreaCode)
+            .Build();
+
         var integrationEventHandler = GetService<IIntegrationEventHandler>();
 
         var integrationEvent = new IntegrationEvent(
             Guid.NewGuid(),
-            eventType,
+            GridAreaOwnershipAssigned.EventName,
             EventMinorVersion: 1,
-            gridAreaOwnershipAssigned);
+            gridAreaOwnershipAssignedEvent01);
 
         await integrationEventHandler.HandleAsync(integrationEvent).ConfigureAwait(false);
     }
