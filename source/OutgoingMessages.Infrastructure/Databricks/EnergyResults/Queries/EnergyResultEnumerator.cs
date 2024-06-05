@@ -51,9 +51,8 @@ public class EnergyResultEnumerator(
         var resultCount = 0;
         var timeSeriesPoints = new List<EnergyTimeSeriesPoint>();
 
-        await foreach (var nextRowAsDynamic in _databricksSqlWarehouseQueryExecutor.ExecuteStatementAsync(query, Format.JsonArray).ConfigureAwait(false))
+        await foreach (var nextRow in _databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(query).ConfigureAwait(false))
         {
-            var nextRow = new DatabricksSqlRow(nextRowAsDynamic);
             var timeSeriesPoint = EnergyTimeSeriesPointFactory.CreateTimeSeriesPoint(nextRow);
 
             if (currentRow != null && BelongsToDifferentResults(currentRow, nextRow))
