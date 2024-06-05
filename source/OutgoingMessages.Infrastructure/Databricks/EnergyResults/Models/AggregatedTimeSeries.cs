@@ -22,7 +22,7 @@ public abstract class AggregatedTimeSeries
 {
     public AggregatedTimeSeries(
         string gridAreaCode,
-        EnergyTimeSeriesPoint[] timeSeriesPoints,
+        IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints,
         MeteringPointType meteringPointType,
         CalculationType calculationType,
         Instant periodStartUtc,
@@ -31,7 +31,7 @@ public abstract class AggregatedTimeSeries
         long calculationVersion,
         SettlementMethod? settlementMethod)
     {
-        if (timeSeriesPoints.Length == 0)
+        if (timeSeriesPoints.Count == 0)
             throw new ArgumentException($"{nameof(timeSeriesPoints)} are empty.");
 
         GridAreaCode = gridAreaCode;
@@ -47,8 +47,7 @@ public abstract class AggregatedTimeSeries
 
     public string GridAreaCode { get; init; }
 
-    // TODO: Can we use a read only collection type?
-    public EnergyTimeSeriesPoint[] TimeSeriesPoints { get; init; }
+    public IReadOnlyCollection<EnergyTimeSeriesPoint> TimeSeriesPoints { get; init; }
 
     public MeteringPointType MeteringPointType { get; init; }
 

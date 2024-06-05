@@ -12,15 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 
-public abstract class EnergyResultQueryBase(
+public abstract class EnergyResultQueryBase<TResult>(
         EdiDatabricksOptions ediDatabricksOptions,
         Guid calculationId)
     : IDeltaTableSchemaDescription
+    where TResult : AggregatedTimeSeries
 {
     private readonly EdiDatabricksOptions _ediDatabricksOptions = ediDatabricksOptions;
 
@@ -43,7 +47,45 @@ public abstract class EnergyResultQueryBase(
     /// </summary>
     public abstract Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition { get; }
 
-    public string BuildSqlQuery()
+    internal async IAsyncEnumerable<TResult> GetAsync(DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor)
+    {
+        ArgumentNullException.ThrowIfNull(databricksSqlWarehouseQueryExecutor);
+
+        DatabricksSqlRow? currentRow = null;
+        var timeSeriesPoints = new List<EnergyTimeSeriesPoint>();
+
+        var statement = DatabricksStatement
+            .FromRawSql(BuildSqlQuery())
+            .Build();
+
+        await foreach (var nextRow in databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement).ConfigureAwait(false))
+        {
+            var timeSeriesPoint = EnergyTimeSeriesPointFactory.CreateTimeSeriesPoint(nextRow);
+
+            if (currentRow != null && BelongsToDifferentResults(currentRow, nextRow))
+            {
+                yield return CreateEnergyResult(currentRow!, timeSeriesPoints);
+                timeSeriesPoints = [];
+            }
+
+            timeSeriesPoints.Add(timeSeriesPoint);
+            currentRow = nextRow;
+        }
+
+        if (currentRow != null)
+        {
+            yield return CreateEnergyResult(currentRow, timeSeriesPoints);
+        }
+    }
+
+    protected abstract TResult CreateEnergyResult(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints);
+
+    private static bool BelongsToDifferentResults(DatabricksSqlRow row, DatabricksSqlRow otherRow)
+    {
+        return !row.ToGuid(EnergyResultColumnNames.ResultId).Equals(otherRow.ToGuid(EnergyResultColumnNames.ResultId));
+    }
+
+    private string BuildSqlQuery()
     {
         var columnNames = SchemaDefinition.Keys.ToArray();
 

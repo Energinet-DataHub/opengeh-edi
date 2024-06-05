@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestDa
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -136,7 +137,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         actualCount.Should().Be(testDataDescription.ExpectedOutgoingMessagesCount);
     }
 
-    private async Task SeedDatabricksWithDataAsync(EnergyResultTestDataDescription testDataDescription, EnergyResultQueryBase viewQuery)
+    private async Task SeedDatabricksWithDataAsync(EnergyResultTestDataDescription testDataDescription, IDeltaTableSchemaDescription viewQuery)
     {
         await Fixture.DatabricksSchemaManager.CreateTableAsync(viewQuery);
         await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, testDataDescription.TestFilePath);

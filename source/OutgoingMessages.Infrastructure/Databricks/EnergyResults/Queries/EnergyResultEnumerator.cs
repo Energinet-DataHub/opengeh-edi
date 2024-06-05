@@ -13,9 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -33,42 +31,17 @@ public class EnergyResultEnumerator(
 
     public EdiDatabricksOptions EdiDatabricksOptions => _ediDatabricksOptions;
 
-    public async IAsyncEnumerable<EnergyResultPerGridArea> GetAsync(EnergyResultQueryBase query)
+    public async IAsyncEnumerable<TResult> GetAsync<TResult>(EnergyResultQueryBase<TResult> query)
+        where TResult : AggregatedTimeSeries
     {
-        DatabricksSqlRow? currentRow = null;
         var resultCount = 0;
-        var timeSeriesPoints = new List<EnergyTimeSeriesPoint>();
 
-        var statement = DatabricksStatement
-            .FromRawSql(query.BuildSqlQuery())
-            .Build();
-
-        await foreach (var nextRow in _databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement).ConfigureAwait(false))
+        await foreach (var energyResult in query.GetAsync(_databricksSqlWarehouseQueryExecutor).ConfigureAwait(false))
         {
-            var timeSeriesPoint = EnergyTimeSeriesPointFactory.CreateTimeSeriesPoint(nextRow);
-
-            if (currentRow != null && BelongsToDifferentResults(currentRow, nextRow))
-            {
-                yield return EnergyResultPerGridAreaFactory.CreateEnergyResult(currentRow!, timeSeriesPoints);
-                resultCount++;
-                timeSeriesPoints = [];
-            }
-
-            timeSeriesPoints.Add(timeSeriesPoint);
-            currentRow = nextRow;
-        }
-
-        if (currentRow != null)
-        {
-            yield return EnergyResultPerGridAreaFactory.CreateEnergyResult(currentRow, timeSeriesPoints);
+            yield return energyResult;
             resultCount++;
         }
 
         _logger.LogDebug("Fetched {result_count} energy results for calculation {calculation_id}", resultCount, query.CalculationId);
-    }
-
-    private static bool BelongsToDifferentResults(DatabricksSqlRow row, DatabricksSqlRow otherRow)
-    {
-        return !row.ToGuid(EnergyResultColumnNames.ResultId).Equals(otherRow.ToGuid(EnergyResultColumnNames.ResultId));
     }
 }

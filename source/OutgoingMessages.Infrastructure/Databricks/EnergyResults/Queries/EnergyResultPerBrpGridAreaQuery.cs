@@ -13,6 +13,9 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
@@ -27,7 +30,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Energ
 public class EnergyResultPerBrpGridAreaQuery(
         EdiDatabricksOptions ediDatabricksOptions,
         Guid calculationId)
-    : EnergyResultQueryBase(
+    : EnergyResultQueryBase<EnergyResultPerGridArea>(
         ediDatabricksOptions,
         calculationId)
 {
@@ -51,4 +54,9 @@ public class EnergyResultPerBrpGridAreaQuery(
         { EnergyResultColumnNames.QuantityUnit,                 (DeltaTableCommonTypes.String,          false) },
         { EnergyResultColumnNames.QuantityQualities,            (DeltaTableCommonTypes.ArrayOfStrings,  false) },
     };
+
+    protected override EnergyResultPerGridArea CreateEnergyResult(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
+    {
+        return EnergyResultPerGridAreaFactory.CreateEnergyResult(databricksSqlRow, timeSeriesPoints);
+    }
 }

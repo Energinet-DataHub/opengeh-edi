@@ -25,7 +25,7 @@ public class EnergyResultPerGridAreaFactory
 {
     public static EnergyResultPerGridArea CreateEnergyResult(
         DatabricksSqlRow databricksSqlRow,
-        IReadOnlyList<EnergyTimeSeriesPoint> timeSeriesPoints)
+        IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
     {
         var resolution = ResolutionMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.Resolution));
 
@@ -36,7 +36,7 @@ public class EnergyResultPerGridAreaFactory
             databricksSqlRow.ToGuid(EnergyResultColumnNames.CalculationId),
             databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.GridAreaCode),
             MeteringPointTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.MeteringPointType)),
-            timeSeriesPoints.ToArray(),
+            timeSeriesPoints,
             CalculationTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.CalculationType)),
             period.Start,
             period.End,
@@ -45,7 +45,7 @@ public class EnergyResultPerGridAreaFactory
             SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)));
     }
 
-    private static (Instant Start, Instant End) GetPeriod(IReadOnlyList<EnergyTimeSeriesPoint> timeSeriesPoints, Resolution resolution)
+    private static (Instant Start, Instant End) GetPeriod(IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints, Resolution resolution)
     {
         var start = timeSeriesPoints.Min(x => x.TimeUtc);
         var resolutionInMinutes = GetResolutionInMinutes(resolution);

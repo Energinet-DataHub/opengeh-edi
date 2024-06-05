@@ -169,6 +169,9 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         var query = new EnergyResultPerGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
         await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
         {
+            // TODO:
+            // It should be possible to move retrieval of Grid Area Owner into enumerator
+            // AND create the EnergyResultMessageDto directly in queries
             var receiverNumber = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(energyResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
             var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult, receiverNumber);
             await EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);

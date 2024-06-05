@@ -51,7 +51,7 @@ public class EnergyResultMessageDtoFactory()
     }
 
     // TODO: Move to mapper?
-    private static IReadOnlyCollection<EnergyResultMessagePoint> CreateEnergyResultMessagePoints(EnergyTimeSeriesPoint[] timeSeriesPoints)
+    private static IReadOnlyCollection<EnergyResultMessagePoint> CreateEnergyResultMessagePoints(IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
     {
         ArgumentNullException.ThrowIfNull(timeSeriesPoints);
 

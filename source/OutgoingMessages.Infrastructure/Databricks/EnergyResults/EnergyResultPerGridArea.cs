@@ -24,7 +24,7 @@ public sealed class EnergyResultPerGridArea(
     Guid calculationId,
     string gridAreaCode,
     MeteringPointType meteringPointType,
-    EnergyTimeSeriesPoint[] timeSeriesPoints,
+    IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints,
     CalculationType calculationType,
     Instant periodStartUtc,
     Instant periodEndUtc,
