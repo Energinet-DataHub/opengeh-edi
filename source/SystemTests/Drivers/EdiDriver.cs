@@ -47,7 +47,7 @@ public sealed class EdiDriver
         request.Content = new StringContent(string.Empty, Encoding.UTF8, contentType);
         request.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
         var peekResponse = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-        await EnsureResponseSuccess(peekResponse);
+        await EnsureResponseSuccessAsync(peekResponse);
         return peekResponse;
     }
 
@@ -59,7 +59,7 @@ public sealed class EdiDriver
         await AddAuthTokenToRequestAsync(actor, httpClient, cancellationToken).ConfigureAwait(false);
         using var request = new HttpRequestMessage(HttpMethod.Delete, $"v1.0/cim/dequeue/{messageId}");
         var dequeueResponse = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-        await EnsureResponseSuccess(dequeueResponse);
+        await EnsureResponseSuccessAsync(dequeueResponse);
     }
 
     internal async Task SendRequestAsync(Actor? actor, MessageType messageType, CancellationToken cancellationToken)
@@ -70,7 +70,7 @@ public sealed class EdiDriver
         request.Content = new StringContent(GetContent(messageType), Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         var response = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-        await EnsureResponseSuccess(response);
+        await EnsureResponseSuccessAsync(response);
     }
 
     /// <summary>
@@ -168,5 +168,5 @@ public sealed class EdiDriver
         }
     }
 
-    private Task EnsureResponseSuccess(HttpResponseMessage response) => response.EnsureSuccessStatusCodeWithLogAsync(_logger);
+    private Task EnsureResponseSuccessAsync(HttpResponseMessage response) => response.EnsureSuccessStatusCodeWithLogAsync(_logger);
 }
