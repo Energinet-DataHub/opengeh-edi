@@ -18,29 +18,28 @@ using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 
-namespace Energinet.DataHub.EDI.B2BApi.Configuration
+namespace Energinet.DataHub.EDI.B2BApi.Configuration;
+
+public class SystemTimer
 {
-    public class SystemTimer
+    private readonly IMediator _mediator;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+
+    public SystemTimer(IMediator mediator, ISystemDateTimeProvider systemDateTimeProvider)
     {
-        private readonly IMediator _mediator;
-        private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+        _mediator = mediator;
+        _systemDateTimeProvider = systemDateTimeProvider;
+    }
 
-        public SystemTimer(IMediator mediator, ISystemDateTimeProvider systemDateTimeProvider)
-        {
-            _mediator = mediator;
-            _systemDateTimeProvider = systemDateTimeProvider;
-        }
+    [Function("TenSecondsHasPassed")]
+    public Task TenSecondsHasPassedAsync([TimerTrigger("*/10 * * * * *")] TimerInfo timerTimerInfo, FunctionContext context)
+    {
+        return _mediator.Publish(new TenSecondsHasHasPassed(_systemDateTimeProvider.Now()));
+    }
 
-        [Function("TenSecondsHasPassed")]
-        public Task TenSecondsHasPassedAsync([TimerTrigger("*/10 * * * * *")] TimerInfo timerTimerInfo, FunctionContext context)
-        {
-            return _mediator.Publish(new TenSecondsHasHasPassed(_systemDateTimeProvider.Now()));
-        }
-
-        [Function("ADayHasPassed")]
-        public Task ADayHasPassedAsync([TimerTrigger("0 0 0 * * *")] TimerInfo timerTimerInfo, FunctionContext context)
-        {
-            return _mediator.Publish(new ADayHasPassed(_systemDateTimeProvider.Now()));
-        }
+    [Function("ADayHasPassed")]
+    public Task ADayHasPassedAsync([TimerTrigger("0 0 0 * * *")] TimerInfo timerTimerInfo, FunctionContext context)
+    {
+        return _mediator.Publish(new ADayHasPassed(_systemDateTimeProvider.Now()));
     }
 }

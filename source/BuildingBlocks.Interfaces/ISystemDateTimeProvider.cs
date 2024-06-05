@@ -14,17 +14,16 @@
 
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Interfaces
+namespace Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+
+/// <summary>
+/// System time provider
+/// </summary>
+public interface ISystemDateTimeProvider
 {
     /// <summary>
-    /// System time provider
+    /// Return current date and time
     /// </summary>
-    public interface ISystemDateTimeProvider
-    {
-        /// <summary>
-        /// Return current date and time
-        /// </summary>
-        /// <returns><see cref="Instant"/></returns>
-        Instant Now();
-    }
+    /// <returns><see cref="Instant"/></returns>
+    Instant Now();
 }

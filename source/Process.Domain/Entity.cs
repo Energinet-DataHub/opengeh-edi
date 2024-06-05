@@ -14,40 +14,39 @@
 
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.EDI.Process.Domain
+namespace Energinet.DataHub.EDI.Process.Domain;
+
+public abstract class Entity
 {
-    public abstract class Entity
+    private readonly List<DomainEvent> _domainEvents = new();
+
+    /// <summary>
+    /// Domain events occurred.
+    /// </summary>
+    public IReadOnlyCollection<DomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+
+    /// <summary>
+    /// Clears all recorded events
+    /// </summary>
+    public void ClearDomainEvents()
     {
-        private readonly List<DomainEvent> _domainEvents = new();
+        _domainEvents.Clear();
+    }
 
-        /// <summary>
-        /// Domain events occurred.
-        /// </summary>
-        public IReadOnlyCollection<DomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+    /// <summary>
+    /// Remove the domain event if exists.
+    /// </summary>
+    public void ClearDomainEvent(DomainEvent domainEvent)
+    {
+        _domainEvents.Remove(domainEvent);
+    }
 
-        /// <summary>
-        /// Clears all recorded events
-        /// </summary>
-        public void ClearDomainEvents()
-        {
-            _domainEvents.Clear();
-        }
-
-        /// <summary>
-        /// Remove the domain event if exists.
-        /// </summary>
-        public void ClearDomainEvent(DomainEvent domainEvent)
-        {
-            _domainEvents.Remove(domainEvent);
-        }
-
-        /// <summary>
-        /// Add domain event.
-        /// </summary>
-        /// <param name="domainEvent">Domain event.</param>
-        protected void AddDomainEvent(DomainEvent domainEvent)
-        {
-            _domainEvents.Add(domainEvent);
-        }
+    /// <summary>
+    /// Add domain event.
+    /// </summary>
+    /// <param name="domainEvent">Domain event.</param>
+    protected void AddDomainEvent(DomainEvent domainEvent)
+    {
+        _domainEvents.Add(domainEvent);
     }
 }

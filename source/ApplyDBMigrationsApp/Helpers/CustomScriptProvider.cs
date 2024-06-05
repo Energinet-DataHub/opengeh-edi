@@ -20,28 +20,27 @@ using DbUp.Engine;
 using DbUp.Engine.Transactions;
 using DbUp.ScriptProviders;
 
-namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers
+namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
+
+public class CustomScriptProvider : EmbeddedScriptProvider, IScriptProvider
 {
-    public class CustomScriptProvider : EmbeddedScriptProvider, IScriptProvider
+    public CustomScriptProvider(Assembly assembly, Func<string, bool> filter)
+        : base(assembly, filter)
     {
-        public CustomScriptProvider(Assembly assembly, Func<string, bool> filter)
-            : base(assembly, filter)
-        {
-        }
+    }
 
-        public new IEnumerable<SqlScript> GetScripts(IConnectionManager connectionManager)
-        {
-            var sqlScripts = base.GetScripts(connectionManager).ToList();
+    public new IEnumerable<SqlScript> GetScripts(IConnectionManager connectionManager)
+    {
+        var sqlScripts = base.GetScripts(connectionManager).ToList();
 
-            foreach (var script in sqlScripts)
+        foreach (var script in sqlScripts)
+        {
+            if (!NamingConvention.Regex.IsMatch(script.Name))
             {
-                if (!NamingConvention.Regex.IsMatch(script.Name))
-                {
-                    throw new FormatException($"The script '{script.Name}' doesn't adhere to the naming convention.");
-                }
+                throw new FormatException($"The script '{script.Name}' doesn't adhere to the naming convention.");
             }
-
-            return sqlScripts;
         }
+
+        return sqlScripts;
     }
 }

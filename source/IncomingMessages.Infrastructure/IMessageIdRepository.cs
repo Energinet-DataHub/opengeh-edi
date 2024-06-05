@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
+
+/// <summary>
+/// Store containing message id for all received market documents
+/// </summary>
+public interface IMessageIdRepository
 {
     /// <summary>
-    /// Store containing message id for all received market documents
+    /// Store message id for the sender
     /// </summary>
-    public interface IMessageIdRepository
-    {
-        /// <summary>
-        /// Store message id for the sender
-        /// </summary>
-        Task AddAsync(string senderNumber, string messageId, CancellationToken cancellationToken);
+    Task AddAsync(string senderNumber, string messageId, CancellationToken cancellationToken);
 
-        /// <summary>
-        /// Checks if <paramref name="messageId"/> is already registered by the sender <paramref name="senderNumber"/>
-        /// </summary>
-        Task<bool> MessageIdExistsAsync(string senderNumber, string messageId, CancellationToken cancellationToken);
-    }
+    /// <summary>
+    /// Checks if <paramref name="messageId"/> is already registered by the sender <paramref name="senderNumber"/>
+    /// </summary>
+    Task<bool> MessageIdExistsAsync(string senderNumber, string messageId, CancellationToken cancellationToken);
 }

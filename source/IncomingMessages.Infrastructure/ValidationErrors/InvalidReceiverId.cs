@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
+
+public class InvalidReceiverId : ValidationError
 {
-    public class InvalidReceiverId : ValidationError
+    public InvalidReceiverId(string receiverId)
+        : base($"Receiver id {receiverId} is not a valid receiver", "00303", "ReceiverId")
     {
-        public InvalidReceiverId(string receiverId)
-            : base($"Receiver id {receiverId} is not a valid receiver", "00303", "ReceiverId")
-        {
-        }
     }
 }

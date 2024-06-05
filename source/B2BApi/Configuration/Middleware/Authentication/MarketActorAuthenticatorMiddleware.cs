@@ -19,54 +19,53 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.B2BApi.Configuration.Middleware.Authentication
+namespace Energinet.DataHub.EDI.B2BApi.Configuration.Middleware.Authentication;
+
+public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
 {
-    public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
+    private readonly ILogger<MarketActorAuthenticatorMiddleware> _logger;
+
+    public MarketActorAuthenticatorMiddleware(ILogger<MarketActorAuthenticatorMiddleware> logger)
     {
-        private readonly ILogger<MarketActorAuthenticatorMiddleware> _logger;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        public MarketActorAuthenticatorMiddleware(ILogger<MarketActorAuthenticatorMiddleware> logger)
+    public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(next);
+        var authenticatedActor = context.GetService<AuthenticatedActor>();
+        var authenticationMethods = context.GetServices<IAuthenticationMethod>();
+
+        if (context.EndpointIsOmittedFromAuth())
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
-        {
-            ArgumentNullException.ThrowIfNull(context);
-            ArgumentNullException.ThrowIfNull(next);
-            var authenticatedActor = context.GetService<AuthenticatedActor>();
-            var authenticationMethods = context.GetServices<IAuthenticationMethod>();
-
-            if (context.EndpointIsOmittedFromAuth())
-            {
-                _logger.LogInformation("Functions is omitted from auth, skipping authentication");
-                await next(context);
-                return;
-            }
-
-            var httpRequestData = await context.GetHttpRequestDataAsync()
-                ?? throw new ArgumentException("No HTTP request data was available, even though the function was not omitted from auth");
-
-            var authenticationMethod = authenticationMethods.Single(a => a.ShouldHandle(httpRequestData));
-
-            var authenticated = await authenticationMethod.AuthenticateAsync(httpRequestData, context.CancellationToken);
-
-            if (!authenticated)
-            {
-                _logger.LogError("Could not authenticate market actor identity by using {AuthenticationMethod}", authenticationMethod.GetType().Name);
-                context.RespondWithUnauthorized(httpRequestData);
-                return;
-            }
-
-            var serializer = context.GetService<ISerializer>();
-            WriteAuthenticatedIdentityToLog(authenticatedActor.CurrentActorIdentity, serializer);
+            _logger.LogInformation("Functions is omitted from auth, skipping authentication");
             await next(context);
+            return;
         }
 
-        private void WriteAuthenticatedIdentityToLog(ActorIdentity? actorIdentity, ISerializer serializer)
+        var httpRequestData = await context.GetHttpRequestDataAsync()
+            ?? throw new ArgumentException("No HTTP request data was available, even though the function was not omitted from auth");
+
+        var authenticationMethod = authenticationMethods.Single(a => a.ShouldHandle(httpRequestData));
+
+        var authenticated = await authenticationMethod.AuthenticateAsync(httpRequestData, context.CancellationToken);
+
+        if (!authenticated)
         {
-            _logger.LogInformation("Successfully authenticated market actor identity.");
-            _logger.LogInformation(serializer.Serialize(actorIdentity));
+            _logger.LogError("Could not authenticate market actor identity by using {AuthenticationMethod}", authenticationMethod.GetType().Name);
+            context.RespondWithUnauthorized(httpRequestData);
+            return;
         }
+
+        var serializer = context.GetService<ISerializer>();
+        WriteAuthenticatedIdentityToLog(authenticatedActor.CurrentActorIdentity, serializer);
+        await next(context);
+    }
+
+    private void WriteAuthenticatedIdentityToLog(ActorIdentity? actorIdentity, ISerializer serializer)
+    {
+        _logger.LogInformation("Successfully authenticated market actor identity.");
+        _logger.LogInformation(serializer.Serialize(actorIdentity));
     }
 }

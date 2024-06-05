@@ -18,37 +18,36 @@ using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
+namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
+
+public class CommandScheduler : ICommandScheduler
 {
-    public class CommandScheduler : ICommandScheduler
+    private readonly InternalCommandMapper _internalCommandMapper;
+    private readonly ProcessContext _context;
+    private readonly ISerializer _serializer;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+
+    public CommandScheduler(
+        InternalCommandMapper internalCommandMapper,
+        ProcessContext context,
+        ISerializer serializer,
+        ISystemDateTimeProvider systemDateTimeProvider)
     {
-        private readonly InternalCommandMapper _internalCommandMapper;
-        private readonly ProcessContext _context;
-        private readonly ISerializer _serializer;
-        private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+        _internalCommandMapper = internalCommandMapper;
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+        _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+        _systemDateTimeProvider =
+            systemDateTimeProvider ?? throw new ArgumentNullException(nameof(systemDateTimeProvider));
+    }
 
-        public CommandScheduler(
-            InternalCommandMapper internalCommandMapper,
-            ProcessContext context,
-            ISerializer serializer,
-            ISystemDateTimeProvider systemDateTimeProvider)
-        {
-            _internalCommandMapper = internalCommandMapper;
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-            _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-            _systemDateTimeProvider =
-                systemDateTimeProvider ?? throw new ArgumentNullException(nameof(systemDateTimeProvider));
-        }
+    public async Task EnqueueAsync<TCommand>(TCommand command)
+        where TCommand : InternalCommand
+    {
+        ArgumentNullException.ThrowIfNull(command);
 
-        public async Task EnqueueAsync<TCommand>(TCommand command)
-            where TCommand : InternalCommand
-        {
-            ArgumentNullException.ThrowIfNull(command);
-
-            var data = _serializer.Serialize(command);
-            var commandMetadata = _internalCommandMapper.GetByType(command.GetType());
-            var queuedCommand = new QueuedInternalCommand(command.Id, commandMetadata.CommandName, data, _systemDateTimeProvider.Now());
-            await _context.QueuedInternalCommands.AddAsync(queuedCommand).ConfigureAwait(false);
-        }
+        var data = _serializer.Serialize(command);
+        var commandMetadata = _internalCommandMapper.GetByType(command.GetType());
+        var queuedCommand = new QueuedInternalCommand(command.Id, commandMetadata.CommandName, data, _systemDateTimeProvider.Now());
+        await _context.QueuedInternalCommands.AddAsync(queuedCommand).ConfigureAwait(false);
     }
 }

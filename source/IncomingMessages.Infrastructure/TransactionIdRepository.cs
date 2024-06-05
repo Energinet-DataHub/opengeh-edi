@@ -15,55 +15,54 @@
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
+
+public class TransactionIdRepository : ITransactionIdRepository
 {
-    public class TransactionIdRepository : ITransactionIdRepository
+    private readonly IncomingMessagesContext _incomingMessagesContext;
+
+    public TransactionIdRepository(IncomingMessagesContext incomingMessagesContext)
     {
-        private readonly IncomingMessagesContext _incomingMessagesContext;
+        _incomingMessagesContext = incomingMessagesContext;
+    }
 
-        public TransactionIdRepository(IncomingMessagesContext incomingMessagesContext)
+    public async Task<bool> TransactionIdExistsAsync(
+        string senderId,
+        string transactionId,
+        CancellationToken cancellationToken)
+    {
+        var transaction = await GetTransactionFromDbAsync(senderId, transactionId, cancellationToken).ConfigureAwait(false)
+                          ?? GetTransactionFromInMemoryCollection(senderId, transactionId);
+
+        return transaction != null;
+    }
+
+    public async Task AddAsync(
+        string senderId,
+        IReadOnlyCollection<string> transactionIds,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(transactionIds);
+
+        foreach (var transactionId in transactionIds)
         {
-            _incomingMessagesContext = incomingMessagesContext;
+           await _incomingMessagesContext.TransactionIdForSenders.AddAsync(new TransactionIdForSender(transactionId, senderId), cancellationToken).ConfigureAwait(false);
         }
+    }
 
-        public async Task<bool> TransactionIdExistsAsync(
-            string senderId,
-            string transactionId,
-            CancellationToken cancellationToken)
-        {
-            var transaction = await GetTransactionFromDbAsync(senderId, transactionId, cancellationToken).ConfigureAwait(false)
-                              ?? GetTransactionFromInMemoryCollection(senderId, transactionId);
+    private TransactionIdForSender? GetTransactionFromInMemoryCollection(string senderId, string transactionId)
+    {
+        return _incomingMessagesContext.TransactionIdForSenders.Local
+            .FirstOrDefault(x => x.TransactionId == transactionId && x.SenderId == senderId);
+    }
 
-            return transaction != null;
-        }
-
-        public async Task AddAsync(
-            string senderId,
-            IReadOnlyCollection<string> transactionIds,
-            CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(transactionIds);
-
-            foreach (var transactionId in transactionIds)
-            {
-               await _incomingMessagesContext.TransactionIdForSenders.AddAsync(new TransactionIdForSender(transactionId, senderId), cancellationToken).ConfigureAwait(false);
-            }
-        }
-
-        private TransactionIdForSender? GetTransactionFromInMemoryCollection(string senderId, string transactionId)
-        {
-            return _incomingMessagesContext.TransactionIdForSenders.Local
-                .FirstOrDefault(x => x.TransactionId == transactionId && x.SenderId == senderId);
-        }
-
-        private async Task<TransactionIdForSender?> GetTransactionFromDbAsync(string senderId, string transactionId, CancellationToken cancellationToken)
-        {
-            return await _incomingMessagesContext.TransactionIdForSenders
-                .FirstOrDefaultAsync(
-                    transactionIdForSender => transactionIdForSender.TransactionId == transactionId
-                         && transactionIdForSender.SenderId == senderId,
-                    cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
-        }
+    private async Task<TransactionIdForSender?> GetTransactionFromDbAsync(string senderId, string transactionId, CancellationToken cancellationToken)
+    {
+        return await _incomingMessagesContext.TransactionIdForSenders
+            .FirstOrDefaultAsync(
+                transactionIdForSender => transactionIdForSender.TransactionId == transactionId
+                     && transactionIdForSender.SenderId == senderId,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
     }
 }

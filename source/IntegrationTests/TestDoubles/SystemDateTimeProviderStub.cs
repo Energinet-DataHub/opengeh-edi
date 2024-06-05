@@ -15,20 +15,19 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles
+namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+
+public class SystemDateTimeProviderStub : ISystemDateTimeProvider
 {
-    public class SystemDateTimeProviderStub : ISystemDateTimeProvider
+    private Instant _now = SystemClock.Instance.GetCurrentInstant();
+
+    public void SetNow(Instant now)
     {
-        private Instant _now = SystemClock.Instance.GetCurrentInstant();
+        _now = now;
+    }
 
-        public void SetNow(Instant now)
-        {
-            _now = now;
-        }
-
-        public Instant Now()
-        {
-            return _now;
-        }
+    public Instant Now()
+    {
+        return _now;
     }
 }

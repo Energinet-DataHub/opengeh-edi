@@ -15,23 +15,22 @@
 using System.Linq;
 using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
 
-namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp
+namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp;
+
+public static class Program
 {
-    public static class Program
+    public static int Main(string[] args)
     {
-        public static int Main(string[] args)
-        {
-            var connectionString = ParseConnectionStringFrom(args);
-            var isDryRun = args.Contains("dryRun");
+        var connectionString = ParseConnectionStringFrom(args);
+        var isDryRun = args.Contains("dryRun");
 
-            var upgradeResult = DbUpgradeRunner.RunDbUpgrade(connectionString, isDryRun);
+        var upgradeResult = DbUpgradeRunner.RunDbUpgrade(connectionString, isDryRun);
 
-            return ResultReporter.ReportResult(upgradeResult);
-        }
+        return ResultReporter.ReportResult(upgradeResult);
+    }
 
-        private static string ParseConnectionStringFrom(string[] args)
-        {
-            return args.First();
-        }
+    private static string ParseConnectionStringFrom(string[] args)
+    {
+        return args.First();
     }
 }

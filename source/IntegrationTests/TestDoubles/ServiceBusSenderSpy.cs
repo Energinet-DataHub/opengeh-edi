@@ -21,61 +21,60 @@ using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles
+namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+
+public sealed class ServiceBusSenderSpy : IServiceBusSenderAdapter
 {
-    public sealed class ServiceBusSenderSpy : IServiceBusSenderAdapter
+    public ServiceBusSenderSpy(string topicName)
     {
-        public ServiceBusSenderSpy(string topicName)
-        {
-            TopicName = topicName;
-            MessagesSent = new List<ServiceBusMessage>();
-        }
+        TopicName = topicName;
+        MessagesSent = new List<ServiceBusMessage>();
+    }
 
-        public bool ShouldFail { get; set; }
+    public bool ShouldFail { get; set; }
 
-        public string TopicName { get; }
+    public string TopicName { get; }
 
-        public ServiceBusMessage? LatestMessage => MessagesSent.LastOrDefault();
+    public ServiceBusMessage? LatestMessage => MessagesSent.LastOrDefault();
 
-        public ICollection<ServiceBusMessage> MessagesSent { get; private set; }
+    public ICollection<ServiceBusMessage> MessagesSent { get; private set; }
 
-        public bool MessageSent { get; private set; }
+    public bool MessageSent { get; private set; }
 
-        public Task SendAsync(ServiceBusMessage message, CancellationToken cancellationToken)
-        {
-            if (ShouldFail)
-                throw new ServiceBusException();
+    public Task SendAsync(ServiceBusMessage message, CancellationToken cancellationToken)
+    {
+        if (ShouldFail)
+            throw new ServiceBusException();
 
-            MessagesSent.Add(message);
-            MessageSent = true;
+        MessagesSent.Add(message);
+        MessageSent = true;
 
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
+    }
 
-        public Task SendAsync(ReadOnlyCollection<ServiceBusMessage> messages, CancellationToken cancellationToken)
-        {
-            if (ShouldFail)
-                throw new ServiceBusException();
+    public Task SendAsync(ReadOnlyCollection<ServiceBusMessage> messages, CancellationToken cancellationToken)
+    {
+        if (ShouldFail)
+            throw new ServiceBusException();
 
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
+    }
 
-        public void Reset()
-        {
-            MessageSent = false;
-            MessagesSent.Clear();
-        }
+    public void Reset()
+    {
+        MessageSent = false;
+        MessagesSent.Clear();
+    }
 
 #pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
-        public ValueTask DisposeAsync()
-        {
-            Dispose();
-            return ValueTask.CompletedTask;
-        }
+    public ValueTask DisposeAsync()
+    {
+        Dispose();
+        return ValueTask.CompletedTask;
+    }
 
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
     }
 }
