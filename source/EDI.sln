@@ -95,7 +95,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationEvents.Infrastru
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SystemTests", "SystemTests\SystemTests.csproj", "{FD20CD54-D099-45E4-87C6-FF78C43A19F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "B2BApi.AppTests", "B2BApi.AppTests\B2BApi.AppTests.csproj", "{81B1C1E2-7406-42D7-AC2C-460C7475B95C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "B2BApi.AppTests", "B2BApi.AppTests\B2BApi.AppTests.csproj", "{81B1C1E2-7406-42D7-AC2C-460C7475B95C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_ConfigurationFiles", "_ConfigurationFiles", "{CC2100D1-AA83-4C5C-8C76-9E5CED7CA5EF}"
+	ProjectSection(SolutionItems) = preProject
+		..\.editorconfig = ..\.editorconfig
+		..\Directory.Build.props = ..\Directory.Build.props
+		..\stylecop.json = ..\stylecop.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

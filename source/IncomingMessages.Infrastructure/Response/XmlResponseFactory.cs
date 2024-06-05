@@ -18,50 +18,49 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
+
+public class XmlResponseFactory : IResponseFactory
 {
-    public class XmlResponseFactory : IResponseFactory
-    {
 #pragma warning disable CA1822
-        public DocumentFormat HandledFormat => DocumentFormat.Xml;
+    public DocumentFormat HandledFormat => DocumentFormat.Xml;
 #pragma warning restore CA1822
 
-        public ResponseMessage From(Result result)
-        {
-            ArgumentNullException.ThrowIfNull(result);
-            return result.Success ? new ResponseMessage() : new ResponseMessage(CreateMessageBodyFrom(result));
-        }
+    public ResponseMessage From(Result result)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+        return result.Success ? new ResponseMessage() : new ResponseMessage(CreateMessageBodyFrom(result));
+    }
 
-        private static string CreateMessageBodyFrom(Result result)
-        {
-            ArgumentNullException.ThrowIfNull(result);
-            var messageBody = new StringBuilder();
-            var settings = new XmlWriterSettings() { OmitXmlDeclaration = true, };
+    private static string CreateMessageBodyFrom(Result result)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+        var messageBody = new StringBuilder();
+        var settings = new XmlWriterSettings() { OmitXmlDeclaration = true, };
 
-            using var writer = XmlWriter.Create(messageBody, settings);
-            writer.WriteStartElement("Error");
-            writer.WriteElementString("Code", result.Errors.Count == 1 ? result.Errors.First().Code : "BadRequest");
-            writer.WriteElementString("Message", result.Errors.Count == 1 ? result.Errors.First().Message : "Multiple errors in message");
-            writer.WriteElementString("Target", result.Errors.Count == 1 ? result.Errors.First().Target : string.Empty);
-            if (result.Errors.Count > 1)
+        using var writer = XmlWriter.Create(messageBody, settings);
+        writer.WriteStartElement("Error");
+        writer.WriteElementString("Code", result.Errors.Count == 1 ? result.Errors.First().Code : "BadRequest");
+        writer.WriteElementString("Message", result.Errors.Count == 1 ? result.Errors.First().Message : "Multiple errors in message");
+        writer.WriteElementString("Target", result.Errors.Count == 1 ? result.Errors.First().Target : string.Empty);
+        if (result.Errors.Count > 1)
+        {
+            writer.WriteStartElement("Details");
+            foreach (var validationError in result.Errors)
             {
-                writer.WriteStartElement("Details");
-                foreach (var validationError in result.Errors)
-                {
-                    writer.WriteStartElement("Error");
-                    writer.WriteElementString("Code", validationError.Code);
-                    writer.WriteElementString("Message", validationError.Message);
-                    writer.WriteElementString("Target", validationError.Target);
-                    writer.WriteEndElement();
-                }
-
+                writer.WriteStartElement("Error");
+                writer.WriteElementString("Code", validationError.Code);
+                writer.WriteElementString("Message", validationError.Message);
+                writer.WriteElementString("Target", validationError.Target);
                 writer.WriteEndElement();
             }
 
             writer.WriteEndElement();
-            writer.Close();
-
-            return messageBody.ToString();
         }
+
+        writer.WriteEndElement();
+        writer.Close();
+
+        return messageBody.ToString();
     }
 }

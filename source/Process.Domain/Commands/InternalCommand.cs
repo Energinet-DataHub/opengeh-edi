@@ -15,21 +15,20 @@
 using System;
 using MediatR;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Commands
+namespace Energinet.DataHub.EDI.Process.Domain.Commands;
+
+[Serializable]
+public abstract class InternalCommand : ICommand<Unit>
 {
-    [Serializable]
-    public abstract class InternalCommand : ICommand<Unit>
+    protected InternalCommand()
     {
-        protected InternalCommand()
-        {
-            Id = Guid.NewGuid();
-        }
-
-        protected InternalCommand(Guid id)
-        {
-            Id = id;
-        }
-
-        public Guid Id { get; }
+        Id = Guid.NewGuid();
     }
+
+    protected InternalCommand(Guid id)
+    {
+        Id = id;
+    }
+
+    public Guid Id { get; }
 }

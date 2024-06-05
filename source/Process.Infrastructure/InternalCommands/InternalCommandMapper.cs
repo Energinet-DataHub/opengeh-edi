@@ -16,38 +16,37 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
+namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
+
+public class InternalCommandMapper
 {
-    public class InternalCommandMapper
+    private readonly Dictionary<string, CommandMetadata> _values = new();
+
+    public void Add(string eventName, Type eventType)
     {
-        private readonly Dictionary<string, CommandMetadata> _values = new();
-
-        public void Add(string eventName, Type eventType)
-        {
-            var metadata = new CommandMetadata(eventName, eventType);
-            _values.Add(metadata.CommandName, metadata);
-        }
-
-        public CommandMetadata GetByName(string commandName)
-        {
-            if (_values.TryGetValue(commandName, out var metadata) == false)
-            {
-                throw new InvalidOperationException(
-                    $"No event metadata is registered for event {commandName}");
-            }
-
-            return metadata;
-        }
-
-        public CommandMetadata GetByType(Type commandType)
-        {
-            ArgumentNullException.ThrowIfNull(commandType);
-            return _values.Values
-                       .FirstOrDefault(metadata => metadata.CommandType == commandType) ??
-                   throw new InvalidOperationException(
-                       $"No command metadata is registered for type {commandType.FullName}");
-        }
+        var metadata = new CommandMetadata(eventName, eventType);
+        _values.Add(metadata.CommandName, metadata);
     }
 
-    public record CommandMetadata(string CommandName, Type CommandType);
+    public CommandMetadata GetByName(string commandName)
+    {
+        if (_values.TryGetValue(commandName, out var metadata) == false)
+        {
+            throw new InvalidOperationException(
+                $"No event metadata is registered for event {commandName}");
+        }
+
+        return metadata;
+    }
+
+    public CommandMetadata GetByType(Type commandType)
+    {
+        ArgumentNullException.ThrowIfNull(commandType);
+        return _values.Values
+                   .FirstOrDefault(metadata => metadata.CommandType == commandType) ??
+               throw new InvalidOperationException(
+                   $"No command metadata is registered for type {commandType.FullName}");
+    }
 }
+
+public record CommandMetadata(string CommandName, Type CommandType);

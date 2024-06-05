@@ -14,25 +14,24 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
+
+public class MessageRecordParser : IMessageRecordParser
 {
-    public class MessageRecordParser : IMessageRecordParser
+    private readonly ISerializer _serializer;
+
+    public MessageRecordParser(ISerializer serializer)
     {
-        private readonly ISerializer _serializer;
+        _serializer = serializer;
+    }
 
-        public MessageRecordParser(ISerializer serializer)
-        {
-            _serializer = serializer;
-        }
+    public string From<TMessageRecord>(TMessageRecord messageRecord)
+    {
+        return _serializer.Serialize(messageRecord);
+    }
 
-        public string From<TMessageRecord>(TMessageRecord messageRecord)
-        {
-            return _serializer.Serialize(messageRecord);
-        }
-
-        public TMessageRecord From<TMessageRecord>(string payload)
-        {
-            return _serializer.Deserialize<TMessageRecord>(payload);
-        }
+    public TMessageRecord From<TMessageRecord>(string payload)
+    {
+        return _serializer.Deserialize<TMessageRecord>(payload);
     }
 }

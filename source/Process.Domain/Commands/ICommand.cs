@@ -14,14 +14,14 @@
 
 using MediatR;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Commands
+namespace Energinet.DataHub.EDI.Process.Domain.Commands;
+
+#pragma warning disable CA1040
+/// <summary>
+/// CQRS command object
+/// </summary>
+public interface ICommand<out TResponse> : IRequest<TResponse>
 {
-    #pragma warning disable CA1040
-    /// <summary>
-    /// CQRS command object
-    /// </summary>
-    public interface ICommand<out TResponse> : IRequest<TResponse>
-    {
-    }
-#pragma warning restore
 }
+#pragma warning restore
+

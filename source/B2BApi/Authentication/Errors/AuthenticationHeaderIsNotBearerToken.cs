@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2BApi.Authentication.Errors
+namespace Energinet.DataHub.EDI.B2BApi.Authentication.Errors;
+
+public class AuthenticationHeaderIsNotBearerToken : AuthenticationError
 {
-    public class AuthenticationHeaderIsNotBearerToken : AuthenticationError
+    public AuthenticationHeaderIsNotBearerToken()
+        : base("The value defined in authorization header does not start with 'bearer'.")
     {
-        public AuthenticationHeaderIsNotBearerToken()
-            : base("The value defined in authorization header does not start with 'bearer'.")
-        {
-        }
     }
 }

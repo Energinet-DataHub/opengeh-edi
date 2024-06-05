@@ -15,15 +15,14 @@
 using MediatR;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents
-{
-    public class TenSecondsHasHasPassed : INotification
-    {
-        public TenSecondsHasHasPassed(Instant now)
-        {
-            Now = now;
-        }
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 
-        public Instant Now { get; }
+public class TenSecondsHasHasPassed : INotification
+{
+    public TenSecondsHasHasPassed(Instant now)
+    {
+        Now = now;
     }
+
+    public Instant Now { get; }
 }

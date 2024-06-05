@@ -16,25 +16,24 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
-{
-    public class QueuedInternalCommandEntityConfiguration : IEntityTypeConfiguration<QueuedInternalCommand>
-    {
-        public void Configure(EntityTypeBuilder<QueuedInternalCommand> builder)
-        {
-            ArgumentNullException.ThrowIfNull(builder);
+namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 
-            builder.ToTable("QueuedInternalCommands", "dbo");
-            builder.HasKey(x => x.Id);
-            builder.Property(x => x.Data)
-                .HasColumnName("Data");
-            builder.Property(x => x.Type)
-                .HasColumnName("Type");
-            builder.Property(x => x.CreationDate)
-                .HasColumnName("CreationDate");
-            builder.Property(x => x.ProcessedDate)
-                .HasColumnName("ProcessedDate");
-            builder.Property(x => x.ErrorMessage);
-        }
+public class QueuedInternalCommandEntityConfiguration : IEntityTypeConfiguration<QueuedInternalCommand>
+{
+    public void Configure(EntityTypeBuilder<QueuedInternalCommand> builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        builder.ToTable("QueuedInternalCommands", "dbo");
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Data)
+            .HasColumnName("Data");
+        builder.Property(x => x.Type)
+            .HasColumnName("Type");
+        builder.Property(x => x.CreationDate)
+            .HasColumnName("CreationDate");
+        builder.Property(x => x.ProcessedDate)
+            .HasColumnName("ProcessedDate");
+        builder.Property(x => x.ErrorMessage);
     }
 }

@@ -16,24 +16,23 @@ using System.Collections.Generic;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser
+namespace Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
+
+public class IncomingMarketMessageParserResult
 {
-    public class IncomingMarketMessageParserResult
+    public IncomingMarketMessageParserResult(params ValidationError[] errors)
     {
-        public IncomingMarketMessageParserResult(params ValidationError[] errors)
-        {
-            Errors = errors;
-        }
-
-        public IncomingMarketMessageParserResult(IIncomingMessage incomingMessage)
-        {
-            IncomingMessage = incomingMessage;
-        }
-
-        public IReadOnlyCollection<ValidationError> Errors { get; } = new List<ValidationError>();
-
-        public bool Success => Errors.Count == 0;
-
-        public IIncomingMessage? IncomingMessage { get; }
+        Errors = errors;
     }
+
+    public IncomingMarketMessageParserResult(IIncomingMessage incomingMessage)
+    {
+        IncomingMessage = incomingMessage;
+    }
+
+    public IReadOnlyCollection<ValidationError> Errors { get; } = new List<ValidationError>();
+
+    public bool Success => Errors.Count == 0;
+
+    public IIncomingMessage? IncomingMessage { get; }
 }

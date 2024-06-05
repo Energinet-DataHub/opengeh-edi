@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors
-{
-    public class DuplicateTransactionIdDetected : ValidationError
-    {
-        public DuplicateTransactionIdDetected(string transactionId)
-            : base($"Transaction id '{transactionId}' is not unique and will not be processed.", "00102", "TransactionId")
-        {
-        }
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
-        public DuplicateTransactionIdDetected()
-            : base("Duplicated transaction id found", "00110", "TransactionId")
-        {
-        }
+public class DuplicateTransactionIdDetected : ValidationError
+{
+    public DuplicateTransactionIdDetected(string transactionId)
+        : base($"Transaction id '{transactionId}' is not unique and will not be processed.", "00102", "TransactionId")
+    {
+    }
+
+    public DuplicateTransactionIdDetected()
+        : base("Duplicated transaction id found", "00110", "TransactionId")
+    {
     }
 }

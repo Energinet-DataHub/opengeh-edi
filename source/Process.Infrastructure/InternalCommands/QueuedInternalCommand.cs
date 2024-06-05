@@ -17,40 +17,39 @@ using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
+namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
+
+public class QueuedInternalCommand
 {
-    public class QueuedInternalCommand
+    public QueuedInternalCommand(Guid id, string type, string data, Instant creationDate)
     {
-        public QueuedInternalCommand(Guid id, string type, string data, Instant creationDate)
-        {
-            Id = id;
-            Type = type;
-            Data = data;
-            CreationDate = creationDate;
-        }
+        Id = id;
+        Type = type;
+        Data = data;
+        CreationDate = creationDate;
+    }
 
-        public Guid Id { get; }
+    public Guid Id { get; }
 
-        public string Type { get;  }
+    public string Type { get;  }
 
-        public string Data { get; }
+    public string Data { get; }
 
-        public Instant CreationDate { get; }
+    public Instant CreationDate { get; }
 
-        public Instant? ProcessedDate { get; set; }
+    public Instant? ProcessedDate { get; set; }
 
-        public string? ErrorMessage { get; private set; }
+    public string? ErrorMessage { get; private set; }
 
-        public void SetProcessed(Instant now)
-        {
-            ProcessedDate = now;
-        }
+    public void SetProcessed(Instant now)
+    {
+        ProcessedDate = now;
+    }
 
-        public InternalCommand ToCommand(ISerializer serializer)
-        {
-            ArgumentNullException.ThrowIfNull(serializer);
-            var storedCommandType = System.Type.GetType(Type, true);
-            return (InternalCommand)serializer.Deserialize(Data, storedCommandType!);
-        }
+    public InternalCommand ToCommand(ISerializer serializer)
+    {
+        ArgumentNullException.ThrowIfNull(serializer);
+        var storedCommandType = System.Type.GetType(Type, true);
+        return (InternalCommand)serializer.Deserialize(Data, storedCommandType!);
     }
 }

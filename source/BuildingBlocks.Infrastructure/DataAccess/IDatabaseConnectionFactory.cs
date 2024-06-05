@@ -16,25 +16,24 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+
+/// <summary>
+/// Factory for creating database connections
+/// </summary>
+public interface IDatabaseConnectionFactory
 {
     /// <summary>
-    /// Factory for creating database connections
+    /// Creates and open a connection
     /// </summary>
-    public interface IDatabaseConnectionFactory
-    {
-        /// <summary>
-        /// Creates and open a connection
-        /// </summary>
-        /// <remarks>Returned connection must be disposed</remarks>
-        /// <returns><see cref="IDbConnection"/></returns>
-        IDbConnection GetConnectionAndOpen();
+    /// <remarks>Returned connection must be disposed</remarks>
+    /// <returns><see cref="IDbConnection"/></returns>
+    IDbConnection GetConnectionAndOpen();
 
-        /// <summary>
-        /// Creates and open a connection
-        /// </summary>
-        /// <remarks>Returned connection must be disposed</remarks>
-        /// <returns><see cref="IDbConnection"/></returns>
-        ValueTask<IDbConnection> GetConnectionAndOpenAsync(CancellationToken cancellationToken);
-    }
+    /// <summary>
+    /// Creates and open a connection
+    /// </summary>
+    /// <remarks>Returned connection must be disposed</remarks>
+    /// <returns><see cref="IDbConnection"/></returns>
+    ValueTask<IDbConnection> GetConnectionAndOpenAsync(CancellationToken cancellationToken);
 }

@@ -14,14 +14,13 @@
 
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
-{
-    public record OutgoingMessageHeader(
-        string BusinessReason,
-        string SenderId,
-        string SenderRole,
-        string ReceiverId,
-        string ReceiverRole,
-        string MessageId,
-        Instant TimeStamp);
-}
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
+
+public record OutgoingMessageHeader(
+    string BusinessReason,
+    string SenderId,
+    string SenderRole,
+    string ReceiverId,
+    string ReceiverRole,
+    string MessageId,
+    Instant TimeStamp);

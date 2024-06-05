@@ -26,62 +26,61 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.MarketD
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.OutgoingMessages;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
+
+public class ActorMessageQueueContext : DbContext
 {
-    public class ActorMessageQueueContext : DbContext
-    {
-        private readonly Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext _executionContext;
-        private readonly AuthenticatedActor _authenticatedActor;
-        private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext _executionContext;
+    private readonly AuthenticatedActor _authenticatedActor;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
 #nullable disable
-        public ActorMessageQueueContext(
-            DbContextOptions<ActorMessageQueueContext> options,
-            Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext executionContext,
-            AuthenticatedActor authenticatedActor,
-            ISystemDateTimeProvider systemDateTimeProvider)
-            : base(options)
-        {
-            _executionContext = executionContext;
-            _authenticatedActor = authenticatedActor;
-            _systemDateTimeProvider = systemDateTimeProvider;
-        }
+    public ActorMessageQueueContext(
+        DbContextOptions<ActorMessageQueueContext> options,
+        Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext executionContext,
+        AuthenticatedActor authenticatedActor,
+        ISystemDateTimeProvider systemDateTimeProvider)
+        : base(options)
+    {
+        _executionContext = executionContext;
+        _authenticatedActor = authenticatedActor;
+        _systemDateTimeProvider = systemDateTimeProvider;
+    }
 
-        public DbSet<OutgoingMessage> OutgoingMessages { get; private set; }
+    public DbSet<OutgoingMessage> OutgoingMessages { get; private set; }
 
-        public DbSet<ActorMessageQueue> ActorMessageQueues { get; private set; }
+    public DbSet<ActorMessageQueue> ActorMessageQueues { get; private set; }
 
-        public DbSet<MarketDocument> MarketDocuments { get; private set; }
+    public DbSet<MarketDocument> MarketDocuments { get; private set; }
 
-        public override int SaveChanges()
-        {
-            throw new NotSupportedException("Use the async version instead");
-        }
+    public override int SaveChanges()
+    {
+        throw new NotSupportedException("Use the async version instead");
+    }
 
-        public override int SaveChanges(bool acceptAllChangesOnSuccess)
-        {
-            throw new NotSupportedException("Use the async version instead");
-        }
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        throw new NotSupportedException("Use the async version instead");
+    }
 
-        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
-        {
-            this.UpdateAuditFields(_executionContext, _authenticatedActor, _systemDateTimeProvider);
-            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-        }
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    {
+        this.UpdateAuditFields(_executionContext, _authenticatedActor, _systemDateTimeProvider);
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
 
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            this.UpdateAuditFields(_executionContext, _authenticatedActor, _systemDateTimeProvider);
-            return base.SaveChangesAsync(cancellationToken);
-        }
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        this.UpdateAuditFields(_executionContext, _authenticatedActor, _systemDateTimeProvider);
+        return base.SaveChangesAsync(cancellationToken);
+    }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            ArgumentNullException.ThrowIfNull(modelBuilder);
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(modelBuilder);
 
-            modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new ActorMessageQueueEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new MarketDocumentEntityConfiguration());
-        }
+        modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ActorMessageQueueEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new MarketDocumentEntityConfiguration());
     }
 }
