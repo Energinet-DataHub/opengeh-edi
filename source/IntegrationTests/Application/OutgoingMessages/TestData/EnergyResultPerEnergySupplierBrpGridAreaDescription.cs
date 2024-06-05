@@ -17,13 +17,13 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyRes
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 
 /// <summary>
-/// Test data description for scenario using the view described by <see cref="EnergyResultPerGridAreaQuery"/>.
+/// Test data description for scenario using the view described by <see cref="EnergyResultPerEnergySupplierBrpGridAreaQuery"/>.
 /// </summary>
-public class EnergyResultPerGridAreaDescription
+public class EnergyResultPerEnergySupplierBrpGridAreaDescription
     : EnergyResultTestDataDescription
 {
-    public EnergyResultPerGridAreaDescription()
-        : base("balance_fixing_01-11-2022_01-12-2022_ga_543_per_ga_v1.csv")
+    public EnergyResultPerEnergySupplierBrpGridAreaDescription()
+        : base("balance_fixing_01-11-2022_01-12-2022_ga_543_per_es_brp_ga_v1.csv")
     {
     }
 
@@ -31,5 +31,6 @@ public class EnergyResultPerGridAreaDescription
 
     public override string GridAreaCode => "543";
 
+    // TODO: Update to match expected count
     public override int ExpectedOutgoingMessagesCount => 5;
 }
