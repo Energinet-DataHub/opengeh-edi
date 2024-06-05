@@ -17,25 +17,24 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.B2BApi.Authentication
+namespace Energinet.DataHub.EDI.B2BApi.Authentication;
+
+/// <summary>
+/// Service for authenticating an market actor
+/// </summary>
+public interface IMarketActorAuthenticator
 {
     /// <summary>
-    /// Service for authenticating an market actor
+    /// Authenticates a market actor from a claims principal
     /// </summary>
-    public interface IMarketActorAuthenticator
-    {
-        /// <summary>
-        /// Authenticates a market actor from a claims principal
-        /// </summary>
-        /// <param name="claimsPrincipal"></param>
-        /// <param name="cancellationToken"></param>
-        Task<bool> AuthenticateAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken);
+    /// <param name="claimsPrincipal"></param>
+    /// <param name="cancellationToken"></param>
+    Task<bool> AuthenticateAsync(ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken);
 
-        /// <summary>
-        /// Authenticates a market actor
-        /// </summary>
-        /// <param name="actorNumber">Actor number, typically found from the external id in the `azp` claim</param>
-        /// <param name="marketRole">User role, typically found from the `role` claim</param>
-        bool Authenticate(ActorNumber? actorNumber, ActorRole? marketRole);
-    }
+    /// <summary>
+    /// Authenticates a market actor
+    /// </summary>
+    /// <param name="actorNumber">Actor number, typically found from the external id in the `azp` claim</param>
+    /// <param name="marketRole">User role, typically found from the `role` claim</param>
+    bool Authenticate(ActorNumber? actorNumber, ActorRole? marketRole);
 }

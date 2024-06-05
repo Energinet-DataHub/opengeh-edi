@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2BApi.Authentication.Errors
-{
-    public abstract class AuthenticationError
-    {
-        protected AuthenticationError(string message)
-        {
-            Message = message;
-        }
+namespace Energinet.DataHub.EDI.B2BApi.Authentication.Errors;
 
-        public string Message { get; set; }
+public abstract class AuthenticationError
+{
+    protected AuthenticationError(string message)
+    {
+        Message = message;
     }
+
+    public string Message { get; set; }
 }

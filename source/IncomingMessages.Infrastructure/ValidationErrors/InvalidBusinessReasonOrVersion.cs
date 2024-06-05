@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
+
+public class InvalidBusinessReasonOrVersion : ValidationError
 {
-    public class InvalidBusinessReasonOrVersion : ValidationError
+    public InvalidBusinessReasonOrVersion(string businessReason, string version)
+        : base($"Schema version {version} for business process type {businessReason} does not exist", "00301")
     {
-        public InvalidBusinessReasonOrVersion(string businessReason, string version)
-            : base($"Schema version {version} for business process type {businessReason} does not exist", "00301")
-        {
-        }
     }
 }

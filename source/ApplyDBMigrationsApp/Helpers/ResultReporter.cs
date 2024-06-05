@@ -15,41 +15,40 @@
 using System;
 using DbUp.Engine;
 
-namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers
+namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
+
+public static class ResultReporter
 {
-    public static class ResultReporter
+    private const int SuccessResult = 0;
+    private const int FailureResult = -1;
+
+    public static int ReportResult(DatabaseUpgradeResult result)
     {
-        private const int SuccessResult = 0;
-        private const int FailureResult = -1;
+        ArgumentNullException.ThrowIfNull(result);
 
-        public static int ReportResult(DatabaseUpgradeResult result)
+        if (!result.Successful)
         {
-            ArgumentNullException.ThrowIfNull(result);
-
-            if (!result.Successful)
-            {
-                return ReportFailure(result);
-            }
-            else
-            {
-                return ReportSuccess();
-            }
+            return ReportFailure(result);
         }
-
-        private static int ReportFailure(DatabaseUpgradeResult result)
+        else
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(result.Error);
-            Console.ResetColor();
-            return FailureResult;
+            return ReportSuccess();
         }
+    }
 
-        private static int ReportSuccess()
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Success!");
-            Console.ResetColor();
-            return SuccessResult;
-        }
+    private static int ReportFailure(DatabaseUpgradeResult result)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine(result.Error);
+        Console.ResetColor();
+        return FailureResult;
+    }
+
+    private static int ReportSuccess()
+    {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("Success!");
+        Console.ResetColor();
+        return SuccessResult;
     }
 }

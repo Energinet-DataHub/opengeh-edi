@@ -66,6 +66,8 @@ public class TestCreateOutgoingCommandHandler : IRequestHandler<TestCreateOutgoi
             await _mediator.Publish(new EnqueueAcceptedEnergyResultMessageEvent(message), cancellationToken).ConfigureAwait(false);
         }
 
+#pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
         return await Unit.Task;
+#pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
     }
 }

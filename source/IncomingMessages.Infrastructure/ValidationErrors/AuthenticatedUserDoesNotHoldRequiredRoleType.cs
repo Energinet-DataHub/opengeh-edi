@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
+
+public class AuthenticatedUserDoesNotHoldRequiredRoleType : ValidationError
 {
-    public class AuthenticatedUserDoesNotHoldRequiredRoleType : ValidationError
+    public AuthenticatedUserDoesNotHoldRequiredRoleType()
+        : base("The authenticated user does not hold the required role", "00001")
     {
-        public AuthenticatedUserDoesNotHoldRequiredRoleType()
-            : base("The authenticated user does not hold the required role", "00001")
-        {
-        }
     }
 }

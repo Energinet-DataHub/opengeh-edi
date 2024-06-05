@@ -14,30 +14,29 @@
 
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
+
+public class IncomingMessagesContext : DbContext
 {
-    public class IncomingMessagesContext : DbContext
+    #nullable disable
+    public IncomingMessagesContext(DbContextOptions<IncomingMessagesContext> options)
+        : base(options)
     {
-        #nullable disable
-        public IncomingMessagesContext(DbContextOptions<IncomingMessagesContext> options)
-            : base(options)
-        {
-        }
+    }
 
-        public IncomingMessagesContext()
-        {
-        }
+    public IncomingMessagesContext()
+    {
+    }
 
-        public DbSet<MessageIdForSender> MessageIdForSenders { get; private set; }
+    public DbSet<MessageIdForSender> MessageIdForSenders { get; private set; }
 
-        public DbSet<TransactionIdForSender> TransactionIdForSenders { get; private set; }
+    public DbSet<TransactionIdForSender> TransactionIdForSenders { get; private set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            ArgumentNullException.ThrowIfNull(modelBuilder);
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(modelBuilder);
 
-            modelBuilder.ApplyConfiguration(new MessageIdEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new TransactionIdEntityConfiguration());
-        }
+        modelBuilder.ApplyConfiguration(new MessageIdEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new TransactionIdEntityConfiguration());
     }
 }

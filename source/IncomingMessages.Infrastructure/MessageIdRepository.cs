@@ -15,57 +15,56 @@
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
+
+public class MessageIdRepository : IMessageIdRepository
 {
-    public class MessageIdRepository : IMessageIdRepository
+    private readonly IncomingMessagesContext _incomingMessagesContext;
+
+    public MessageIdRepository(
+        IncomingMessagesContext incomingMessagesContext)
     {
-        private readonly IncomingMessagesContext _incomingMessagesContext;
+        _incomingMessagesContext = incomingMessagesContext;
+    }
 
-        public MessageIdRepository(
-            IncomingMessagesContext incomingMessagesContext)
-        {
-            _incomingMessagesContext = incomingMessagesContext;
-        }
+    public async Task AddAsync(string senderNumber, string messageId, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(senderNumber);
 
-        public async Task AddAsync(string senderNumber, string messageId, CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(senderNumber);
+        await _incomingMessagesContext.MessageIdForSenders.AddAsync(
+                new MessageIdForSender(messageId, senderNumber), cancellationToken)
+            .ConfigureAwait(false);
+    }
 
-            await _incomingMessagesContext.MessageIdForSenders.AddAsync(
-                    new MessageIdForSender(messageId, senderNumber), cancellationToken)
-                .ConfigureAwait(false);
-        }
+    public async Task<bool> MessageIdExistsAsync(
+        string senderNumber,
+        string messageId,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(senderNumber);
 
-        public async Task<bool> MessageIdExistsAsync(
-            string senderNumber,
-            string messageId,
-            CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(senderNumber);
+        var message = await GetMessageFromDbAsync(senderNumber, messageId, cancellationToken).ConfigureAwait(false)
+                          ?? GetMessageFromInMemoryCollection(senderNumber, messageId);
 
-            var message = await GetMessageFromDbAsync(senderNumber, messageId, cancellationToken).ConfigureAwait(false)
-                              ?? GetMessageFromInMemoryCollection(senderNumber, messageId);
+        return message != null;
+    }
 
-            return message != null;
-        }
+    private MessageIdForSender? GetMessageFromInMemoryCollection(string senderNumber, string messageId)
+    {
+        return _incomingMessagesContext.MessageIdForSenders.Local
+            .FirstOrDefault(x => x.MessageId == messageId && x.SenderId == senderNumber);
+    }
 
-        private MessageIdForSender? GetMessageFromInMemoryCollection(string senderNumber, string messageId)
-        {
-            return _incomingMessagesContext.MessageIdForSenders.Local
-                .FirstOrDefault(x => x.MessageId == messageId && x.SenderId == senderNumber);
-        }
-
-        private async Task<MessageIdForSender?> GetMessageFromDbAsync(
-            string senderId,
-            string messageId,
-            CancellationToken cancellationToken)
-        {
-            return await _incomingMessagesContext.MessageIdForSenders
-                .FirstOrDefaultAsync(
-                    messageIdForSender => messageIdForSender.MessageId == messageId
-                                              && messageIdForSender.SenderId == senderId,
-                    cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
-        }
+    private async Task<MessageIdForSender?> GetMessageFromDbAsync(
+        string senderId,
+        string messageId,
+        CancellationToken cancellationToken)
+    {
+        return await _incomingMessagesContext.MessageIdForSenders
+            .FirstOrDefaultAsync(
+                messageIdForSender => messageIdForSender.MessageId == messageId
+                                          && messageIdForSender.SenderId == senderId,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
     }
 }

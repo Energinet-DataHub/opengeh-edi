@@ -18,30 +18,29 @@ using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
+
+/// <summary>
+/// Azure Service Bus Client sender adapter
+/// </summary>
+public interface IServiceBusSenderAdapter : IAsyncDisposable, IDisposable
 {
     /// <summary>
-    /// Azure Service Bus Client sender adapter
+    /// Topic name
     /// </summary>
-    public interface IServiceBusSenderAdapter : IAsyncDisposable, IDisposable
-    {
-        /// <summary>
-        /// Topic name
-        /// </summary>
-        string TopicName { get; }
+    string TopicName { get; }
 
-        /// <summary>
-        /// Send service bys message to topic/queue
-        /// </summary>
-        /// <param name="message"></param>
-        /// <param name="cancellationToken"></param>
-        Task SendAsync(ServiceBusMessage message, CancellationToken cancellationToken);
+    /// <summary>
+    /// Send service bys message to topic/queue
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="cancellationToken"></param>
+    Task SendAsync(ServiceBusMessage message, CancellationToken cancellationToken);
 
-        /// <summary>
-        /// Send service bys messages to topic/queue
-        /// </summary>
-        /// <param name="messages"></param>
-        /// <param name="cancellationToken"></param>
-        Task SendAsync(ReadOnlyCollection<ServiceBusMessage> messages, CancellationToken cancellationToken);
-    }
+    /// <summary>
+    /// Send service bys messages to topic/queue
+    /// </summary>
+    /// <param name="messages"></param>
+    /// <param name="cancellationToken"></param>
+    Task SendAsync(ReadOnlyCollection<ServiceBusMessage> messages, CancellationToken cancellationToken);
 }

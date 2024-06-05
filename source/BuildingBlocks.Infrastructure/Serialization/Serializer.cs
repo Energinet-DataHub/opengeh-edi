@@ -21,51 +21,50 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization.Converte
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using NodaTime.Serialization.SystemTextJson;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
+
+/// <summary>
+/// JSON serializer that specifically support NodaTime's <see cref="NodaTime.Instant"/>.
+/// </summary>
+public class Serializer : ISerializer
 {
-    /// <summary>
-    /// JSON serializer that specifically support NodaTime's <see cref="NodaTime.Instant"/>.
-    /// </summary>
-    public class Serializer : ISerializer
+    private readonly JsonSerializerOptions _options;
+
+    public Serializer()
     {
-        private readonly JsonSerializerOptions _options;
+        _options = new JsonSerializerOptions();
+        _options.PropertyNameCaseInsensitive = true;
+        _options.Converters.Add(NodaConverters.InstantConverter);
+        _options.Converters.Add(new CustomJsonConverterForType());
+        _options.Converters.Add(new ObjectToInferredTypesConverter());
+    }
 
-        public Serializer()
-        {
-            _options = new JsonSerializerOptions();
-            _options.PropertyNameCaseInsensitive = true;
-            _options.Converters.Add(NodaConverters.InstantConverter);
-            _options.Converters.Add(new CustomJsonConverterForType());
-            _options.Converters.Add(new ObjectToInferredTypesConverter());
-        }
+    public ValueTask<TValue> DeserializeAsync<TValue>(Stream json, CancellationToken cancellationToken)
+    {
+        return System.Text.Json.JsonSerializer.DeserializeAsync<TValue>(json, _options, cancellationToken)!;
+    }
 
-        public ValueTask<TValue> DeserializeAsync<TValue>(Stream json, CancellationToken cancellationToken)
-        {
-            return System.Text.Json.JsonSerializer.DeserializeAsync<TValue>(json, _options, cancellationToken)!;
-        }
+    public TValue Deserialize<TValue>(string json)
+    {
+        return System.Text.Json.JsonSerializer.Deserialize<TValue>(json, _options)!;
+    }
 
-        public TValue Deserialize<TValue>(string json)
-        {
-            return System.Text.Json.JsonSerializer.Deserialize<TValue>(json, _options)!;
-        }
+    public object Deserialize(string json, Type returnType)
+    {
+        return System.Text.Json.JsonSerializer.Deserialize(json, returnType, _options)!;
+    }
 
-        public object Deserialize(string json, Type returnType)
-        {
-            return System.Text.Json.JsonSerializer.Deserialize(json, returnType, _options)!;
-        }
+    public string Serialize<TValue>(TValue value)
+    {
+        if (value == null) throw new ArgumentNullException(nameof(value));
+        return System.Text.Json.JsonSerializer.Serialize<object>(value, _options);
+    }
 
-        public string Serialize<TValue>(TValue value)
-        {
-            if (value == null) throw new ArgumentNullException(nameof(value));
-            return System.Text.Json.JsonSerializer.Serialize<object>(value, _options);
-        }
+    public Task SerializeAsync<TValue>(Stream stream, TValue value)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(value);
 
-        public Task SerializeAsync<TValue>(Stream stream, TValue value)
-        {
-            ArgumentNullException.ThrowIfNull(stream);
-            ArgumentNullException.ThrowIfNull(value);
-
-            return JsonSerializer.SerializeAsync(stream, value, _options);
-        }
+        return JsonSerializer.SerializeAsync(stream, value, _options);
     }
 }

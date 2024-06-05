@@ -17,54 +17,53 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
+
+public class OutgoingMessageBundle
 {
-    public class OutgoingMessageBundle
+    public OutgoingMessageBundle(
+        DocumentType documentType,
+        Receiver receiver,
+        Receiver documentReceiver,
+        string businessReason,
+        ActorNumber senderId,
+        ActorRole senderRole,
+        MessageId messageId,
+        IReadOnlyCollection<OutgoingMessage> outgoingMessages,
+        MessageId? relatedToMessageId = null)
     {
-        public OutgoingMessageBundle(
-            DocumentType documentType,
-            Receiver receiver,
-            Receiver documentReceiver,
-            string businessReason,
-            ActorNumber senderId,
-            ActorRole senderRole,
-            MessageId messageId,
-            IReadOnlyCollection<OutgoingMessage> outgoingMessages,
-            MessageId? relatedToMessageId = null)
-        {
-            DocumentType = documentType;
-            Receiver = receiver;
-            DocumentReceiver = documentReceiver;
-            BusinessReason = businessReason;
-            SenderId = senderId;
-            SenderRole = senderRole;
-            MessageId = messageId;
-            OutgoingMessages = outgoingMessages;
-            RelatedToMessageId = relatedToMessageId;
-        }
-
-        public DocumentType DocumentType { get; }
-
-        public string BusinessReason { get; }
-
-        public ActorNumber SenderId { get; }
-
-        public ActorRole SenderRole { get; }
-
-        /// <summary>
-        /// The actual receiver of the document.
-        /// </summary>
-        public Receiver Receiver { get; }
-
-        /// <summary>
-        /// The receiver written within the document.
-        /// </summary>
-        public Receiver DocumentReceiver { get; }
-
-        public MessageId MessageId { get; }
-
-        public MessageId? RelatedToMessageId { get; private set; }
-
-        public IReadOnlyCollection<OutgoingMessage> OutgoingMessages { get; set; }
+        DocumentType = documentType;
+        Receiver = receiver;
+        DocumentReceiver = documentReceiver;
+        BusinessReason = businessReason;
+        SenderId = senderId;
+        SenderRole = senderRole;
+        MessageId = messageId;
+        OutgoingMessages = outgoingMessages;
+        RelatedToMessageId = relatedToMessageId;
     }
+
+    public DocumentType DocumentType { get; }
+
+    public string BusinessReason { get; }
+
+    public ActorNumber SenderId { get; }
+
+    public ActorRole SenderRole { get; }
+
+    /// <summary>
+    /// The actual receiver of the document.
+    /// </summary>
+    public Receiver Receiver { get; }
+
+    /// <summary>
+    /// The receiver written within the document.
+    /// </summary>
+    public Receiver DocumentReceiver { get; }
+
+    public MessageId MessageId { get; }
+
+    public MessageId? RelatedToMessageId { get; private set; }
+
+    public IReadOnlyCollection<OutgoingMessage> OutgoingMessages { get; set; }
 }

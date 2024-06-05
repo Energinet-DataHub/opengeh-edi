@@ -21,32 +21,31 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 
-namespace Energinet.DataHub.EDI.DataAccess.DataAccess
+namespace Energinet.DataHub.EDI.DataAccess.DataAccess;
+
+public class SqlDatabaseConnectionFactory : IDatabaseConnectionFactory
 {
-    public class SqlDatabaseConnectionFactory : IDatabaseConnectionFactory
+    private readonly SqlDatabaseConnectionOptions _options;
+
+    public SqlDatabaseConnectionFactory(IOptions<SqlDatabaseConnectionOptions> options)
     {
-        private readonly SqlDatabaseConnectionOptions _options;
+        ArgumentNullException.ThrowIfNull(options);
+        _options = options.Value;
+    }
 
-        public SqlDatabaseConnectionFactory(IOptions<SqlDatabaseConnectionOptions> options)
-        {
-            ArgumentNullException.ThrowIfNull(options);
-            _options = options.Value;
-        }
+    public IDbConnection GetConnectionAndOpen()
+    {
+        var connection = new SqlConnection(_options.DB_CONNECTION_STRING);
+        connection.Open();
 
-        public IDbConnection GetConnectionAndOpen()
-        {
-            var connection = new SqlConnection(_options.DB_CONNECTION_STRING);
-            connection.Open();
+        return connection;
+    }
 
-            return connection;
-        }
+    public async ValueTask<IDbConnection> GetConnectionAndOpenAsync(CancellationToken cancellationToken)
+    {
+        var connection = new SqlConnection(_options.DB_CONNECTION_STRING);
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
 
-        public async ValueTask<IDbConnection> GetConnectionAndOpenAsync(CancellationToken cancellationToken)
-        {
-            var connection = new SqlConnection(_options.DB_CONNECTION_STRING);
-            await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-
-            return connection;
-        }
+        return connection;
     }
 }

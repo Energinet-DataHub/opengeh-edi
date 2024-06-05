@@ -15,10 +15,9 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DateTime
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DateTime;
+
+public class SystemDateTimeProvider : ISystemDateTimeProvider
 {
-    public class SystemDateTimeProvider : ISystemDateTimeProvider
-    {
-        public Instant Now() => SystemClock.Instance.GetCurrentInstant();
-    }
+    public Instant Now() => SystemClock.Instance.GetCurrentInstant();
 }
