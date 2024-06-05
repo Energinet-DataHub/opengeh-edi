@@ -18,20 +18,19 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using MediatR;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
+namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
+
+public class ProcessInternalCommandsOnTimeHasPassed : INotificationHandler<TenSecondsHasHasPassed>
 {
-    public class ProcessInternalCommandsOnTimeHasPassed : INotificationHandler<TenSecondsHasHasPassed>
+    private readonly InternalCommandProcessor _internalCommandProcessor;
+
+    public ProcessInternalCommandsOnTimeHasPassed(InternalCommandProcessor internalCommandProcessor)
     {
-        private readonly InternalCommandProcessor _internalCommandProcessor;
+        _internalCommandProcessor = internalCommandProcessor ?? throw new ArgumentNullException(nameof(internalCommandProcessor));
+    }
 
-        public ProcessInternalCommandsOnTimeHasPassed(InternalCommandProcessor internalCommandProcessor)
-        {
-            _internalCommandProcessor = internalCommandProcessor ?? throw new ArgumentNullException(nameof(internalCommandProcessor));
-        }
-
-        public Task Handle(TenSecondsHasHasPassed notification, CancellationToken cancellationToken)
-        {
-            return _internalCommandProcessor.ProcessPendingAsync(cancellationToken);
-        }
+    public Task Handle(TenSecondsHasHasPassed notification, CancellationToken cancellationToken)
+    {
+        return _internalCommandProcessor.ProcessPendingAsync(cancellationToken);
     }
 }

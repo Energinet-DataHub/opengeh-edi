@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
+
+public class DuplicateMessageIdDetected : ValidationError
 {
-    public class DuplicateMessageIdDetected : ValidationError
+    public DuplicateMessageIdDetected(string messageId)
+        : base($"Message id '{messageId}' is not unique", "00101", "MessageId")
     {
-        public DuplicateMessageIdDetected(string messageId)
-            : base($"Message id '{messageId}' is not unique", "00101", "MessageId")
-        {
-        }
     }
 }

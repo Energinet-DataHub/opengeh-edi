@@ -14,31 +14,30 @@
 
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
+
+public class Result
 {
-    public class Result
+    private Result()
     {
-        private Result()
-        {
-        }
+    }
 
-        private Result(IReadOnlyCollection<ValidationError> errors)
-        {
-            Errors = errors;
-        }
+    private Result(IReadOnlyCollection<ValidationError> errors)
+    {
+        Errors = errors;
+    }
 
-        public bool Success => Errors.Count == 0;
+    public bool Success => Errors.Count == 0;
 
-        public IReadOnlyCollection<ValidationError> Errors { get; } = new List<ValidationError>();
+    public IReadOnlyCollection<ValidationError> Errors { get; } = new List<ValidationError>();
 
-        public static Result Failure(params ValidationError[] errors)
-        {
-            return new Result(errors);
-        }
+    public static Result Failure(params ValidationError[] errors)
+    {
+        return new Result(errors);
+    }
 
-        public static Result Succeeded()
-        {
-            return new Result();
-        }
+    public static Result Succeeded()
+    {
+        return new Result();
     }
 }

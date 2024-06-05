@@ -19,26 +19,25 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands
+namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
+
+public class InternalCommandAccessor
 {
-    public class InternalCommandAccessor
+    private readonly ProcessContext _context;
+
+    public InternalCommandAccessor(ProcessContext context)
     {
-        private readonly ProcessContext _context;
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
 
-        public InternalCommandAccessor(ProcessContext context)
-        {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-        }
+    public async Task<ImmutableList<QueuedInternalCommand>> GetPendingAsync()
+    {
+        var commands = await _context
+            .QueuedInternalCommands
+            .Where(cmd => cmd.ProcessedDate == null)
+            .ToListAsync()
+            .ConfigureAwait(false);
 
-        public async Task<ImmutableList<QueuedInternalCommand>> GetPendingAsync()
-        {
-            var commands = await _context
-                .QueuedInternalCommands
-                .Where(cmd => cmd.ProcessedDate == null)
-                .ToListAsync()
-                .ConfigureAwait(false);
-
-            return ImmutableList<QueuedInternalCommand>.Empty.AddRange(commands);
-        }
+        return ImmutableList<QueuedInternalCommand>.Empty.AddRange(commands);
     }
 }

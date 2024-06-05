@@ -168,8 +168,8 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         await foreach (var energyResult in _energyResultEnumerator.GetAsync(input.CalculationId))
         {
             var receiverNumber = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(energyResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
-            var energyResultMessage = EnergyResultMessageDtoFactory.CreateAsync(EventId.From(input.EventId), energyResult, receiverNumber);
-            await EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None);
+            var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult, receiverNumber);
+            await EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);
             numberOfEnqueuedMessages++;
         }
 

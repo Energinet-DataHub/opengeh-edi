@@ -16,28 +16,27 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization.Converters
-{
-    public class ObjectToInferredTypesConverter : JsonConverter<object>
-    {
-        public override object Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            return reader.TokenType switch
-            {
-                JsonTokenType.True => true,
-                JsonTokenType.False => false,
-                JsonTokenType.Number when reader.TryGetInt64(out var l) => l,
-                JsonTokenType.Number => reader.GetDouble(),
-                JsonTokenType.String when reader.TryGetDateTime(out var datetime) => datetime,
-                JsonTokenType.String => reader.GetString() ?? string.Empty,
-                _ => JsonDocument.ParseValue(ref reader).RootElement.Clone(),
-            };
-        }
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization.Converters;
 
-        public override void Write(
-            Utf8JsonWriter writer,
-            object? value,
-            JsonSerializerOptions options) =>
-            System.Text.Json.JsonSerializer.Serialize(writer, value, value?.GetType() ?? throw new InvalidOperationException("Could not get runtime type"), options);
+public class ObjectToInferredTypesConverter : JsonConverter<object>
+{
+    public override object Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return reader.TokenType switch
+        {
+            JsonTokenType.True => true,
+            JsonTokenType.False => false,
+            JsonTokenType.Number when reader.TryGetInt64(out var l) => l,
+            JsonTokenType.Number => reader.GetDouble(),
+            JsonTokenType.String when reader.TryGetDateTime(out var datetime) => datetime,
+            JsonTokenType.String => reader.GetString() ?? string.Empty,
+            _ => JsonDocument.ParseValue(ref reader).RootElement.Clone(),
+        };
     }
+
+    public override void Write(
+        Utf8JsonWriter writer,
+        object? value,
+        JsonSerializerOptions options) =>
+        System.Text.Json.JsonSerializer.Serialize(writer, value, value?.GetType() ?? throw new InvalidOperationException("Could not get runtime type"), options);
 }

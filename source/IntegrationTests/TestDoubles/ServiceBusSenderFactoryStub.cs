@@ -18,41 +18,40 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles
+namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+
+public sealed class ServiceBusSenderFactoryStub : IServiceBusSenderFactory
 {
-    public sealed class ServiceBusSenderFactoryStub : IServiceBusSenderFactory
+    private readonly List<IServiceBusSenderAdapter> _senders = new();
+
+    public IServiceBusSenderAdapter GetSender(string topicName)
     {
-        private readonly List<IServiceBusSenderAdapter> _senders = new();
+        return _senders.First(a => a.TopicName.Equals(topicName, StringComparison.OrdinalIgnoreCase));
+    }
 
-        public IServiceBusSenderAdapter GetSender(string topicName)
+    #pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
+    public async ValueTask DisposeAsync()
+    {
+        foreach (var serviceBusSenderAdapter in _senders)
         {
-            return _senders.First(a => a.TopicName.Equals(topicName, StringComparison.OrdinalIgnoreCase));
+            await serviceBusSenderAdapter.DisposeAsync().ConfigureAwait(false);
         }
 
-        #pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
-        public async ValueTask DisposeAsync()
-        {
-            foreach (var serviceBusSenderAdapter in _senders)
-            {
-                await serviceBusSenderAdapter.DisposeAsync().ConfigureAwait(false);
-            }
+        GC.SuppressFinalize(this);
+    }
 
-            GC.SuppressFinalize(this);
+    public void Dispose()
+    {
+        foreach (var serviceBusSenderAdapter in _senders)
+        {
+            serviceBusSenderAdapter.Dispose();
         }
 
-        public void Dispose()
-        {
-            foreach (var serviceBusSenderAdapter in _senders)
-            {
-                serviceBusSenderAdapter.Dispose();
-            }
+        GC.SuppressFinalize(this);
+    }
 
-            GC.SuppressFinalize(this);
-        }
-
-        internal void AddSenderSpy(IServiceBusSenderAdapter senderAdapter)
-        {
-            _senders.Add(senderAdapter);
-        }
+    internal void AddSenderSpy(IServiceBusSenderAdapter senderAdapter)
+    {
+        _senders.Add(senderAdapter);
     }
 }

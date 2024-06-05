@@ -12,24 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
+
+/// <summary>
+/// Service for parsing a message record to- and from a string payload
+/// </summary>
+public interface IMessageRecordParser
 {
     /// <summary>
-    /// Service for parsing a message record to- and from a string payload
+    /// Parses a message record to a string
     /// </summary>
-    public interface IMessageRecordParser
-    {
-        /// <summary>
-        /// Parses a message record to a string
-        /// </summary>
-        /// <param name="messageRecord"></param>
-        /// <returns><see cref="string"/></returns>
-        string From<TMessageRecord>(TMessageRecord messageRecord);
+    /// <param name="messageRecord"></param>
+    /// <returns><see cref="string"/></returns>
+    string From<TMessageRecord>(TMessageRecord messageRecord);
 
-        /// <summary>
-        /// Parses a market activity record from a string payload
-        /// </summary>
-        /// <param name="payload"></param>
-        TMessageRecord From<TMessageRecord>(string payload);
-    }
+    /// <summary>
+    /// Parses a market activity record from a string payload
+    /// </summary>
+    /// <param name="payload"></param>
+    TMessageRecord From<TMessageRecord>(string payload);
 }

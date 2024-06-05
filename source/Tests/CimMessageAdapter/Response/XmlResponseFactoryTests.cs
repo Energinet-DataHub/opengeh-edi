@@ -21,65 +21,64 @@ using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Response
+namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Response;
+
+[UnitTest]
+public class XmlResponseFactoryTests
 {
-    [UnitTest]
-    public class XmlResponseFactoryTests
+    private readonly XmlResponseFactory _responseFactory;
+
+    public XmlResponseFactoryTests()
     {
-        private readonly XmlResponseFactory _responseFactory;
+        _responseFactory = new XmlResponseFactory();
+    }
 
-        public XmlResponseFactoryTests()
-        {
-            _responseFactory = new XmlResponseFactory();
-        }
+    [Fact]
+    public void Generates_single_error_response()
+    {
+        var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
+        var result = Result.Failure(duplicateMessageIdError);
 
-        [Fact]
-        public void Generates_single_error_response()
-        {
-            var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
-            var result = Result.Failure(duplicateMessageIdError);
+        var response = CreateResponse(result);
 
-            var response = CreateResponse(result);
+        Assert.True(response.IsErrorResponse);
+        AssertHasValue(response, "Code", duplicateMessageIdError.Code);
+        AssertHasValue(response, "Message", duplicateMessageIdError.Message);
+    }
 
-            Assert.True(response.IsErrorResponse);
-            AssertHasValue(response, "Code", duplicateMessageIdError.Code);
-            AssertHasValue(response, "Message", duplicateMessageIdError.Message);
-        }
+    [Fact]
+    public void Generates_multiple_errors_response()
+    {
+        var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
+        var duplicateTransactionIdError = new DuplicateTransactionIdDetected("Fake transaction id");
+        var result = Result.Failure(duplicateMessageIdError, duplicateTransactionIdError);
 
-        [Fact]
-        public void Generates_multiple_errors_response()
-        {
-            var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
-            var duplicateTransactionIdError = new DuplicateTransactionIdDetected("Fake transaction id");
-            var result = Result.Failure(duplicateMessageIdError, duplicateTransactionIdError);
+        var response = CreateResponse(result);
 
-            var response = CreateResponse(result);
+        Assert.True(response.IsErrorResponse);
+        AssertHasValue(response, "Code", "BadRequest");
+        AssertHasValue(response, "Message", "Multiple errors in message");
+        AssertContainsError(response, duplicateMessageIdError);
+        AssertContainsError(response, duplicateTransactionIdError);
+    }
 
-            Assert.True(response.IsErrorResponse);
-            AssertHasValue(response, "Code", "BadRequest");
-            AssertHasValue(response, "Message", "Multiple errors in message");
-            AssertContainsError(response, duplicateMessageIdError);
-            AssertContainsError(response, duplicateTransactionIdError);
-        }
+    private static void AssertHasValue(ResponseMessage responseMessage, string elementName, string expectedValue)
+    {
+        var document = XDocument.Parse(responseMessage.MessageBody);
+        Assert.Equal(expectedValue, document?.Element("Error")?.Element(elementName)?.Value);
+    }
 
-        private static void AssertHasValue(ResponseMessage responseMessage, string elementName, string expectedValue)
-        {
-            var document = XDocument.Parse(responseMessage.MessageBody);
-            Assert.Equal(expectedValue, document?.Element("Error")?.Element(elementName)?.Value);
-        }
+    private static void AssertContainsError(ResponseMessage responseMessage, ValidationError validationError)
+    {
+        var document = XDocument.Parse(responseMessage.MessageBody);
+        var errors = document.Element("Error")?.Element("Details")?.Elements().ToList();
 
-        private static void AssertContainsError(ResponseMessage responseMessage, ValidationError validationError)
-        {
-            var document = XDocument.Parse(responseMessage.MessageBody);
-            var errors = document.Element("Error")?.Element("Details")?.Elements().ToList();
+        Assert.Contains(errors!, error => error.Element("Code")?.Value == validationError.Code);
+        Assert.Contains(errors!, error => error.Element("Message")?.Value == validationError.Message);
+    }
 
-            Assert.Contains(errors!, error => error.Element("Code")?.Value == validationError.Code);
-            Assert.Contains(errors!, error => error.Element("Message")?.Value == validationError.Message);
-        }
-
-        private ResponseMessage CreateResponse(Result result)
-        {
-            return _responseFactory.From(result);
-        }
+    private ResponseMessage CreateResponse(Result result)
+    {
+        return _responseFactory.From(result);
     }
 }

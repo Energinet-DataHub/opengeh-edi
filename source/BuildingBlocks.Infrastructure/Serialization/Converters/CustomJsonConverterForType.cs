@@ -16,27 +16,26 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization.Converters
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization.Converters;
+
+/// <summary>
+/// Workaround for System.Type with System.Text.Json using converters
+/// https://github.com/dotnet/runtime/issues/31567
+/// </summary>
+internal sealed class CustomJsonConverterForType : JsonConverter<Type>
 {
-    /// <summary>
-    /// Workaround for System.Type with System.Text.Json using converters
-    /// https://github.com/dotnet/runtime/issues/31567
-    /// </summary>
-    internal sealed class CustomJsonConverterForType : JsonConverter<Type>
+    public override Type Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        public override Type Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            // Caution: Deserialization of type instances like this is not recommended and should be avoided
-            // since it can lead to potential security issues.
+        // Caution: Deserialization of type instances like this is not recommended and should be avoided
+        // since it can lead to potential security issues.
 
-            // string assemblyQualifiedName = reader.GetString();
-            // return Type.GetType(assemblyQualifiedName);
-            throw new NotSupportedException();
-        }
+        // string assemblyQualifiedName = reader.GetString();
+        // return Type.GetType(assemblyQualifiedName);
+        throw new NotSupportedException();
+    }
 
-        public override void Write(Utf8JsonWriter writer, Type value, JsonSerializerOptions options)
-        {
-            writer.WriteStringValue(value.Name);
-        }
+    public override void Write(Utf8JsonWriter writer, Type value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.Name);
     }
 }

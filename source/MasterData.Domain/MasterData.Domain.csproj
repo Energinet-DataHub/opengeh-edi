@@ -4,6 +4,12 @@
     <RootNamespace>Energinet.DataHub.EDI.MasterData.Domain</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj"/>
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.10.48">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
   </ItemGroup>
 </Project>

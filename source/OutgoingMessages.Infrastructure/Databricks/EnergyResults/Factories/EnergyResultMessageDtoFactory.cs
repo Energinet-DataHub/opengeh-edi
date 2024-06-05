@@ -22,7 +22,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Energ
 
 public class EnergyResultMessageDtoFactory()
 {
-    public static EnergyResultMessageDto CreateAsync(
+    public static EnergyResultMessageDto Create(
         DomainModel.EventId eventId,
         EnergyResultPerGridArea energyResult,
         DomainModel.ActorNumber receiverNumber)

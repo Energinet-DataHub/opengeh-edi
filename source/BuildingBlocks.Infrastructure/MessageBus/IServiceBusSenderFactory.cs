@@ -14,18 +14,17 @@
 
 using System;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
+
+/// <summary>
+/// Factory for Azure Service Bus client sender adapters
+/// </summary>
+public interface IServiceBusSenderFactory : IAsyncDisposable, IDisposable
 {
     /// <summary>
-    /// Factory for Azure Service Bus client sender adapters
+    /// Get sender for specified topic
     /// </summary>
-    public interface IServiceBusSenderFactory : IAsyncDisposable, IDisposable
-    {
-        /// <summary>
-        /// Get sender for specified topic
-        /// </summary>
-        /// <param name="topicName">Topic name</param>
-        /// <returns><see cref="IServiceBusSenderAdapter"/></returns>
-        IServiceBusSenderAdapter GetSender(string topicName);
-    }
+    /// <param name="topicName">Topic name</param>
+    /// <returns><see cref="IServiceBusSenderAdapter"/></returns>
+    IServiceBusSenderAdapter GetSender(string topicName);
 }

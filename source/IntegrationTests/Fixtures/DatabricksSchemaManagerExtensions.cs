@@ -42,11 +42,11 @@ public static class DatabricksSchemaManagerExtensions
         using (var streamReader = new StreamReader(testFilePath))
         using (var csvReader = new CsvReader(streamReader, CultureInfo.InvariantCulture))
         {
-            csvReader.Read();
+            await csvReader.ReadAsync();
             csvReader.ReadHeader();
 
             var rows = new List<string[]>();
-            while (csvReader.Read())
+            while (await csvReader.ReadAsync())
             {
                 var row = new string[csvReader.HeaderRecord.Length];
                 for (var columnIndex = 0; columnIndex < csvReader.ColumnCount; columnIndex++)

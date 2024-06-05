@@ -21,105 +21,104 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.OutgoingMessages
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.OutgoingMessages;
+
+public class OutgoingMessageEntityConfiguration : IEntityTypeConfiguration<OutgoingMessage>
 {
-    public class OutgoingMessageEntityConfiguration : IEntityTypeConfiguration<OutgoingMessage>
+    public void Configure(EntityTypeBuilder<OutgoingMessage> builder)
     {
-        public void Configure(EntityTypeBuilder<OutgoingMessage> builder)
-        {
-            ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(builder);
 
-            builder.ToTable("OutgoingMessages", "dbo");
+        builder.ToTable("OutgoingMessages", "dbo");
 
-            builder.HasKey(x => x.Id);
-            builder.Property(x => x.Id)
-                .ValueGeneratedNever()
-                .HasConversion(
-                    outgoingMessageId => outgoingMessageId.Value,
-                    dbValue => OutgoingMessageId.CreateFromExisting(dbValue));
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id)
+            .ValueGeneratedNever()
+            .HasConversion(
+                outgoingMessageId => outgoingMessageId.Value,
+                dbValue => OutgoingMessageId.CreateFromExisting(dbValue));
 
-            builder.Property(x => x.DocumentType)
-                .HasConversion(
-                    toDbValue => toDbValue.Name,
-                    fromDbValue => EnumerationType.FromName<DocumentType>(fromDbValue));
+        builder.Property(x => x.DocumentType)
+            .HasConversion(
+                toDbValue => toDbValue.Name,
+                fromDbValue => EnumerationType.FromName<DocumentType>(fromDbValue));
 
-            builder.Property(x => x.ProcessId);
+        builder.Property(x => x.ProcessId);
 
-            builder.Property(x => x.BusinessReason);
+        builder.Property(x => x.BusinessReason);
 
-            builder.Property(x => x.GridAreaCode);
+        builder.Property(x => x.GridAreaCode);
 
-            builder.Property(x => x.EventId)
-                .HasConversion(
-                    eventId => eventId.Value,
-                    dbValue => EventId.From(dbValue));
+        builder.Property(x => x.EventId)
+            .HasConversion(
+                eventId => eventId.Value,
+                dbValue => EventId.From(dbValue));
 
-            builder.Property(x => x.SenderId)
-                .HasConversion(
-                    toDbValue => toDbValue.Value,
-                    fromDbValue => ActorNumber.Create(fromDbValue));
+        builder.Property(x => x.SenderId)
+            .HasConversion(
+                toDbValue => toDbValue.Value,
+                fromDbValue => ActorNumber.Create(fromDbValue));
 
-            builder.Property(x => x.SenderRole)
-                .HasConversion(
-                    toDbValue => toDbValue.Code,
-                    fromDbValue => ActorRole.FromCode(fromDbValue));
+        builder.Property(x => x.SenderRole)
+            .HasConversion(
+                toDbValue => toDbValue.Code,
+                fromDbValue => ActorRole.FromCode(fromDbValue));
 
-            builder.Property(x => x.AssignedBundleId).HasConversion(
-                toDbValue => toDbValue == null ? Guid.Empty : toDbValue.Id,
-                fromDbValue => fromDbValue == Guid.Empty ? null : BundleId.Create(fromDbValue));
+        builder.Property(x => x.AssignedBundleId).HasConversion(
+            toDbValue => toDbValue == null ? Guid.Empty : toDbValue.Id,
+            fromDbValue => fromDbValue == Guid.Empty ? null : BundleId.Create(fromDbValue));
 
-            builder.Ignore(x => x.Receiver);
+        builder.Ignore(x => x.Receiver);
 
-            builder.Property(om => om.FileStorageReference)
-                .HasConversion(
-                    fileStorageReference => fileStorageReference.Path,
-                    dbValue => new FileStorageReference(OutgoingMessage.FileStorageCategory, dbValue));
-            builder.Property(x => x.RelatedToMessageId)
-                .HasConversion(
-                    toDbValue => toDbValue != null ? toDbValue.Value.Value : null,
-                    fromDbValue => fromDbValue != null ? MessageId.Create(fromDbValue) : null);
-            builder.Property(x => x.MessageCreatedFromProcess)
-                .HasConversion(
-                    toDbValue => toDbValue.Name,
-                    fromDbValue => ProcessType.FromName(fromDbValue));
+        builder.Property(om => om.FileStorageReference)
+            .HasConversion(
+                fileStorageReference => fileStorageReference.Path,
+                dbValue => new FileStorageReference(OutgoingMessage.FileStorageCategory, dbValue));
+        builder.Property(x => x.RelatedToMessageId)
+            .HasConversion(
+                toDbValue => toDbValue != null ? toDbValue.Value.Value : null,
+                fromDbValue => fromDbValue != null ? MessageId.Create(fromDbValue) : null);
+        builder.Property(x => x.MessageCreatedFromProcess)
+            .HasConversion(
+                toDbValue => toDbValue.Name,
+                fromDbValue => ProcessType.FromName(fromDbValue));
 
-            builder.OwnsOne(
-                o => o.DocumentReceiver,
-                r =>
-                {
-                    r.Property(x => x.Number)
-                        .HasConversion(
-                            toDbValue => toDbValue.Value,
-                            fromDbValue => ActorNumber.Create(fromDbValue))
-                        .HasColumnName("DocumentReceiverNumber");
-                    r.Property(x => x.ActorRole)
-                        .HasConversion(
-                            toDbValue => toDbValue.Code,
-                            fromDbValue => ActorRole.FromCode(fromDbValue))
-                        .HasColumnName("DocumentReceiverRole");
-                });
+        builder.OwnsOne(
+            o => o.DocumentReceiver,
+            r =>
+            {
+                r.Property(x => x.Number)
+                    .HasConversion(
+                        toDbValue => toDbValue.Value,
+                        fromDbValue => ActorNumber.Create(fromDbValue))
+                    .HasColumnName("DocumentReceiverNumber");
+                r.Property(x => x.ActorRole)
+                    .HasConversion(
+                        toDbValue => toDbValue.Code,
+                        fromDbValue => ActorRole.FromCode(fromDbValue))
+                    .HasColumnName("DocumentReceiverRole");
+            });
 
-            builder.OwnsOne(
-                o => o.Receiver,
-                r =>
-                {
-                    r.Property(x => x.Number)
-                        .HasConversion(
-                            toDbValue => toDbValue.Value,
-                            fromDbValue => ActorNumber.Create(fromDbValue))
-                        .HasColumnName("ReceiverNumber");
-                    r.Property(x => x.ActorRole)
-                        .HasConversion(
-                            toDbValue => toDbValue.Code,
-                            fromDbValue => ActorRole.FromCode(fromDbValue))
-                        .HasColumnName("ReceiverRole");
-                });
+        builder.OwnsOne(
+            o => o.Receiver,
+            r =>
+            {
+                r.Property(x => x.Number)
+                    .HasConversion(
+                        toDbValue => toDbValue.Value,
+                        fromDbValue => ActorNumber.Create(fromDbValue))
+                    .HasColumnName("ReceiverNumber");
+                r.Property(x => x.ActorRole)
+                    .HasConversion(
+                        toDbValue => toDbValue.Code,
+                        fromDbValue => ActorRole.FromCode(fromDbValue))
+                    .HasColumnName("ReceiverRole");
+            });
 
-            builder.Property(x => x.CreatedAt);
+        builder.Property(x => x.CreatedAt);
 
-            builder.Property<string>("CreatedBy");
-            builder.Property<string?>("ModifiedBy");
-            builder.Property<Instant?>("ModifiedAt");
-        }
+        builder.Property<string>("CreatedBy");
+        builder.Property<string?>("ModifiedBy");
+        builder.Property<Instant?>("ModifiedAt");
     }
 }

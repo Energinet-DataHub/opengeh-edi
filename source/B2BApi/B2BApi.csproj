@@ -40,6 +40,10 @@ limitations under the License.
       <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.6.0" />
       <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="7.5.2" />
       <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.5.2" />
+      <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.10.48">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />

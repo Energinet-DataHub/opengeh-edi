@@ -11,16 +11,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj"/>
-    <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj"/>
+    <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\IncomingMessages.Domain\IncomingMessages.Domain.csproj" />
-    <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj"/>
-    <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj"/>
+    <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj" />
+    <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="JsonSchema.Net" Version="4.1.1"/>
-    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0"/>
+    <PackageReference Include="JsonSchema.Net" Version="4.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.10.48">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -492,25 +496,25 @@
     <EmbeddedResource Include="DocumentValidation\Schemas\Json\urn-entsoe-eu-wgedi-codelists.schema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Schemas\Json\Reject-request-aggregated-measure-data-assembly-model.schema.json"/>
+    <None Remove="DocumentValidation\Schemas\Json\Reject-request-aggregated-measure-data-assembly-model.schema.json" />
     <EmbeddedResource Include="DocumentValidation\Schemas\Json\Reject-request-aggregated-measure-data-assembly-model.schema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\CimXml\Schemas\urn-ediel-org-structure-requestchangeaccountingpointcharacteristics-0-1.xsd"/>
+    <None Remove="DocumentValidation\CimXml\Schemas\urn-ediel-org-structure-requestchangeaccountingpointcharacteristics-0-1.xsd" />
     <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-structure-requestchangeaccountingpointcharacteristics-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\CimXml\Schemas\urn-ediel-org-measure-notifywholesaleservices-0-1.xsd"/>
+    <None Remove="DocumentValidation\CimXml\Schemas\urn-ediel-org-measure-notifywholesaleservices-0-1.xsd" />
     <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-measure-notifywholesaleservices-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Schemas\Json\Notify-wholesale-services-assembly-model.schema.json"/>
+    <None Remove="DocumentValidation\Schemas\Json\Notify-wholesale-services-assembly-model.schema.json" />
     <EmbeddedResource Include="DocumentValidation\Schemas\Json\Notify-wholesale-services-assembly-model.schema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_AggregatedBusinessInformationEntities_0p1pA.xsd"/>
-    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_BusinessDataType_0p1pA.xsd"/>
-    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_DK_NotifyAggregatedWholesaleServices_0p9pC.xsd"/>
+    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_AggregatedBusinessInformationEntities_0p1pA.xsd" />
+    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_BusinessDataType_0p1pA.xsd" />
+    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_DK_NotifyAggregatedWholesaleServices_0p9pC.xsd" />
     <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000002_0p1pA.xsd" />
     <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000004_0p1pA.xsd" />
     <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000005_0p1pA.xsd" />
