@@ -296,6 +296,7 @@ dotnet_diagnostic.CA1848.severity = suggestion
 dotnet_diagnostic.CA1900.severity = warning
 dotnet_diagnostic.CA1901.severity = warning
 dotnet_diagnostic.CA2002.severity = warning
+dotnet_diagnostic.CA2007.severity = error
 dotnet_diagnostic.CA2100.severity = warning
 dotnet_diagnostic.CA2101.severity = warning
 dotnet_diagnostic.CA2108.severity = warning
@@ -344,6 +345,14 @@ dotnet_diagnostic.CS1591.severity = none
 # Rule link: https://learn.microsoft.com/da-dk/dotnet/fundamentals/code-analysis/quality-rules/ca1822
 dotnet_diagnostic.CA1822.severity = none
 
+###############################
+# VS Threading Analyzers      #
+###############################
+
+# See rules here: https://github.com/microsoft/vs-threading/blob/main/doc/analyzers/index.md
+
+dotnet_diagnostic.VSTHRD111.severity = error    # VSTHRD111: [Similar to CA2007] Use ConfigureAwait(bool)
+dotnet_diagnostic.VSTHRD200.severity = error    # VSTHRD200: Use "Async" suffix for async methods
 
 ###############################
 # StyleCop Analyzers          #
@@ -574,6 +583,16 @@ dotnet_diagnostic.VSTHRD200.severity = none     # VSTHRD200: Use "Async" suffix 
 ###############################
 # Durable Functions           #
 ###############################
+
+#
+# The intention of this section is to match c# code files
+# that is functions Middleware and which then might be
+# used in combination with Durable Functions.
+#
+[*Middleware.cs]
+
+dotnet_diagnostic.CA2007.severity = none        # CA2007: Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.VSTHRD111.severity = none	    # VSTHRD111: [Similar to CA2007] Use ConfigureAwait(bool)
 
 #
 # The intention of this section is to match c# code files
