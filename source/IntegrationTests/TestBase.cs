@@ -79,25 +79,25 @@ public class TestBase : IDisposable
     private ServiceCollection? _services;
     private bool _disposed;
 
-        protected TestBase(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
-        {
-            Fixture = integrationTestFixture;
+    protected TestBase(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+    {
+        Fixture = integrationTestFixture;
 
-            IntegrationTestFixture.CleanupDatabase();
-            Fixture.CleanupFileStorage();
-            _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
-            TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
-            InboxEventNotificationHandler = new TestNotificationHandlerSpy();
-            BuildServices(testOutputHelper);
-            _processContext = GetService<ProcessContext>();
-            _incomingMessagesContext = GetService<IncomingMessagesContext>();
-            AuthenticatedActor = GetService<AuthenticatedActor>();
-            AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
-        }
+        IntegrationTestFixture.CleanupDatabase();
+        Fixture.CleanupFileStorage();
+        _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
+        TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
+        InboxEventNotificationHandler = new TestNotificationHandlerSpy();
+        BuildServices(testOutputHelper);
+        _processContext = GetService<ProcessContext>();
+        _incomingMessagesContext = GetService<IncomingMessagesContext>();
+        AuthenticatedActor = GetService<AuthenticatedActor>();
+        AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
+    }
 
-        protected IntegrationTestFixture Fixture { get; }
+    protected IntegrationTestFixture Fixture { get; }
 
-        protected FeatureFlagManagerStub FeatureFlagManagerStub { get; } = new();
+    protected FeatureFlagManagerStub FeatureFlagManagerStub { get; } = new();
 
     protected AuthenticatedActor AuthenticatedActor { get; }
 
@@ -125,8 +125,8 @@ public class TestBase : IDisposable
 
         var blobContent = await blobClient.DownloadAsync();
 
-            if (!blobContent.HasValue)
-                throw new InvalidOperationException($"Couldn't get file content from file storage (container: {container}, blob: {fileStorageReference})");
+        if (!blobContent.HasValue)
+            throw new InvalidOperationException($"Couldn't get file content from file storage (container: {container}, blob: {fileStorageReference})");
 
         var fileStringContent = await GetStreamContentAsStringAsync(blobContent.Value.Content);
         return fileStringContent;
@@ -185,21 +185,21 @@ public class TestBase : IDisposable
         return outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, actorRole ?? ActorRole.EnergySupplier, documentFormat ?? DocumentFormat.Xml), CancellationToken.None);
     }
 
-        protected Task<string?> GetArchivedMessageFileStorageReferenceFromDatabaseAsync(Guid messageId)
-        {
-            return GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId.ToString());
-        }
+    protected Task<string?> GetArchivedMessageFileStorageReferenceFromDatabaseAsync(Guid messageId)
+    {
+        return GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId.ToString());
+    }
 
-        protected T GetService<T>()
-            where T : notnull
-        {
-            return ServiceProvider.GetRequiredService<T>();
-        }
+    protected T GetService<T>()
+        where T : notnull
+    {
+        return ServiceProvider.GetRequiredService<T>();
+    }
 
-        protected void ClearDbContextCaches()
-        {
-            if (_services == null)
-                throw new InvalidOperationException("ServiceCollection is not yet initialized");
+    protected void ClearDbContextCaches()
+    {
+        if (_services == null)
+            throw new InvalidOperationException("ServiceCollection is not yet initialized");
 
         var dbContextServices = _services
             .Where(s => s.ServiceType.IsSubclassOf(typeof(DbContext)) || s.ServiceType == typeof(DbContext))
@@ -223,10 +223,10 @@ public class TestBase : IDisposable
         _disposed = true;
     }
 
-        protected IServiceCollection GetServiceCollectionClone()
-        {
-            if (_services == null)
-                throw new InvalidOperationException("ServiceCollection is not yet initialized");
+    protected IServiceCollection GetServiceCollectionClone()
+    {
+        if (_services == null)
+            throw new InvalidOperationException("ServiceCollection is not yet initialized");
 
         var serviceCollectionClone = new ServiceCollection { _services };
 
@@ -278,37 +278,37 @@ public class TestBase : IDisposable
         return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
     }
 
-        private void BuildServices(ITestOutputHelper testOutputHelper)
-        {
-            Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
-            Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", IntegrationTestFixture.DatabaseConnectionString);
-            Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", Fixture.AzuriteManager.BlobStorageConnectionString);
+    private void BuildServices(ITestOutputHelper testOutputHelper)
+    {
+        Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
+        Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", IntegrationTestFixture.DatabaseConnectionString);
+        Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", Fixture.AzuriteManager.BlobStorageConnectionString);
 
-            var config = new ConfigurationBuilder()
-                .AddEnvironmentVariables()
-                .AddInMemoryCollection(
-                    new Dictionary<string, string?>
-                    {
-                        [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ManageConnectionString)}"] = "Fake",
-                        [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ListenConnectionString)}"] = "Fake",
-                        [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.SendConnectionString)}"] = "Fake",
-                        [$"{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}"] = "Fake",
-                        [$"{WholesaleInboxOptions.SectionName}:{nameof(WholesaleInboxOptions.QueueName)}"] = "Fake",
-                        [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = "Fake",
-                        ["IntegrationEvents:TopicName"] = "NotEmpty",
-                        ["IntegrationEvents:SubscriptionName"] = "NotEmpty",
+        var config = new ConfigurationBuilder()
+            .AddEnvironmentVariables()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ManageConnectionString)}"] = "Fake",
+                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ListenConnectionString)}"] = "Fake",
+                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.SendConnectionString)}"] = "Fake",
+                    [$"{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}"] = "Fake",
+                    [$"{WholesaleInboxOptions.SectionName}:{nameof(WholesaleInboxOptions.QueueName)}"] = "Fake",
+                    [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = "Fake",
+                    ["IntegrationEvents:TopicName"] = "NotEmpty",
+                    ["IntegrationEvents:SubscriptionName"] = "NotEmpty",
 
-                        // Databricks
-                        [nameof(DatabricksSqlStatementOptions.WorkspaceUrl)] = Fixture.IntegrationTestConfiguration.DatabricksSettings.WorkspaceUrl,
-                        [nameof(DatabricksSqlStatementOptions.WorkspaceToken)] = Fixture.IntegrationTestConfiguration.DatabricksSettings.WorkspaceAccessToken,
-                        [nameof(DatabricksSqlStatementOptions.WarehouseId)] = Fixture.IntegrationTestConfiguration.DatabricksSettings.WarehouseId,
-                        // => EDI views
-                        [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.DatabaseName)}"] = Fixture.DatabricksSchemaManager.SchemaName,
-                    })
-                .Build();
+                    // Databricks
+                    [nameof(DatabricksSqlStatementOptions.WorkspaceUrl)] = Fixture.IntegrationTestConfiguration.DatabricksSettings.WorkspaceUrl,
+                    [nameof(DatabricksSqlStatementOptions.WorkspaceToken)] = Fixture.IntegrationTestConfiguration.DatabricksSettings.WorkspaceAccessToken,
+                    [nameof(DatabricksSqlStatementOptions.WarehouseId)] = Fixture.IntegrationTestConfiguration.DatabricksSettings.WarehouseId,
+                    // => EDI views
+                    [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.DatabaseName)}"] = Fixture.DatabricksSchemaManager.SchemaName,
+                })
+            .Build();
 
-            _services = [];
-            _services.AddScoped<IConfiguration>(_ => config);
+        _services = [];
+        _services.AddScoped<IConfiguration>(_ => config);
 
         _services.AddTransient<InboxEventsProcessor>()
             .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>>(

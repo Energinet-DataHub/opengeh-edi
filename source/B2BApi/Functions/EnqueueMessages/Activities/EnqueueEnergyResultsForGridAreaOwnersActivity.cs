@@ -34,7 +34,8 @@ public class EnqueueEnergyResultsForGridAreaOwnersActivity(
             var numberOfEnqueuedMessages = await _outgoingMessagesClient.EnqueueEnergyResultsForGridAreaOwnersAsync(
                 new EnqueueMessagesInputDto(
                     inputDto.CalculationId,
-                    inputDto.EventId));
+                    inputDto.EventId))
+                .ConfigureAwait(false);
 
             return numberOfEnqueuedMessages;
         }

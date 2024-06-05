@@ -28,21 +28,21 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
 {
     private bool _disposed;
 
-        public IntegrationTestFixture()
-        {
-            IntegrationTestConfiguration = new IntegrationTestConfiguration();
+    public IntegrationTestFixture()
+    {
+        IntegrationTestConfiguration = new IntegrationTestConfiguration();
 
-            DatabricksSchemaManager = new DatabricksSchemaManager(
-                new HttpClientFactory(),
-                databricksSettings: IntegrationTestConfiguration.DatabricksSettings,
-                schemaPrefix: "edi_integration_tests");
-        }
+        DatabricksSchemaManager = new DatabricksSchemaManager(
+            new HttpClientFactory(),
+            databricksSettings: IntegrationTestConfiguration.DatabricksSettings,
+            schemaPrefix: "edi_integration_tests");
+    }
 
-        public static string DatabaseConnectionString
+    public static string DatabaseConnectionString
+    {
+        get
         {
-            get
-            {
-                var connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;Initial Catalog=B2BTransactions;Integrated Security=True;Connection Timeout=60";
+            var connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;Initial Catalog=B2BTransactions;Integrated Security=True;Connection Timeout=60";
 
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.local.json", optional: true)
@@ -64,39 +64,39 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
 
     public AzuriteManager AzuriteManager { get; } = new(true);
 
-        public IntegrationTestConfiguration IntegrationTestConfiguration { get; }
+    public IntegrationTestConfiguration IntegrationTestConfiguration { get; }
 
-        public DatabricksSchemaManager DatabricksSchemaManager { get; }
+    public DatabricksSchemaManager DatabricksSchemaManager { get; }
 
-        public static void CleanupDatabase()
-        {
-            var cleanupStatement =
-                $"DELETE FROM [dbo].[MoveInTransactions] " +
-                $"DELETE FROM [dbo].[UpdateCustomerMasterDataTransactions] " +
-                $"DELETE FROM [dbo].[MessageRegistry] " +
-                $"DELETE FROM [dbo].[TransactionRegistry]" +
-                $"DELETE FROM [dbo].[OutgoingMessages] " +
-                $"DELETE FROM [dbo].[ReasonTranslations] " +
-                $"DELETE FROM [dbo].[QueuedInternalCommands] " +
-                $"DELETE FROM [dbo].[MarketEvaluationPoints]" +
-                $"DELETE FROM [dbo].[Actor]" +
-                $"DELETE FROM [dbo].[ReceivedIntegrationEvents]" +
-                $"DELETE FROM [dbo].[AggregatedMeasureDataProcessGridAreas]" +
-                $"DELETE FROM [dbo].[AggregatedMeasureDataProcesses]" +
-                $"DELETE FROM [dbo].[ArchivedMessages]" +
-                $"DELETE FROM [dbo].[MarketDocuments]" +
-                $"DELETE FROM [dbo].[Bundles]" +
-                $"DELETE FROM [dbo].[ActorMessageQueues]" +
-                $"DELETE FROM [dbo].[ReceivedInboxEvents]" +
-                $"DELETE FROM [dbo].[MessageRegistry]" +
-                $"DELETE FROM [dbo].[TransactionRegistry]" +
-                $"DELETE FROM [dbo].[Actor]" +
-                $"DELETE FROM [dbo].[GridAreaOwner]" +
-                $"DELETE FROM [dbo].[ActorCertificate]" +
-                $"DELETE FROM [dbo].[WholesaleServicesProcessChargeTypes]" +
-                $"DELETE FROM [dbo].[WholesaleServicesProcessGridAreas]" +
-                $"DELETE FROM [dbo].[WholesaleServicesProcesses]" +
-                $"DELETE FROM [dbo].[ProcessDelegation]";
+    public static void CleanupDatabase()
+    {
+        var cleanupStatement =
+            $"DELETE FROM [dbo].[MoveInTransactions] " +
+            $"DELETE FROM [dbo].[UpdateCustomerMasterDataTransactions] " +
+            $"DELETE FROM [dbo].[MessageRegistry] " +
+            $"DELETE FROM [dbo].[TransactionRegistry]" +
+            $"DELETE FROM [dbo].[OutgoingMessages] " +
+            $"DELETE FROM [dbo].[ReasonTranslations] " +
+            $"DELETE FROM [dbo].[QueuedInternalCommands] " +
+            $"DELETE FROM [dbo].[MarketEvaluationPoints]" +
+            $"DELETE FROM [dbo].[Actor]" +
+            $"DELETE FROM [dbo].[ReceivedIntegrationEvents]" +
+            $"DELETE FROM [dbo].[AggregatedMeasureDataProcessGridAreas]" +
+            $"DELETE FROM [dbo].[AggregatedMeasureDataProcesses]" +
+            $"DELETE FROM [dbo].[ArchivedMessages]" +
+            $"DELETE FROM [dbo].[MarketDocuments]" +
+            $"DELETE FROM [dbo].[Bundles]" +
+            $"DELETE FROM [dbo].[ActorMessageQueues]" +
+            $"DELETE FROM [dbo].[ReceivedInboxEvents]" +
+            $"DELETE FROM [dbo].[MessageRegistry]" +
+            $"DELETE FROM [dbo].[TransactionRegistry]" +
+            $"DELETE FROM [dbo].[Actor]" +
+            $"DELETE FROM [dbo].[GridAreaOwner]" +
+            $"DELETE FROM [dbo].[ActorCertificate]" +
+            $"DELETE FROM [dbo].[WholesaleServicesProcessChargeTypes]" +
+            $"DELETE FROM [dbo].[WholesaleServicesProcessGridAreas]" +
+            $"DELETE FROM [dbo].[WholesaleServicesProcesses]" +
+            $"DELETE FROM [dbo].[ProcessDelegation]";
 
         using var connection = new SqlConnection(DatabaseConnectionString);
         connection.Open();
