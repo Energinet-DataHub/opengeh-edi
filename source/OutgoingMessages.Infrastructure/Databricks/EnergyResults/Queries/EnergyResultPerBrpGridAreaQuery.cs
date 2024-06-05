@@ -19,18 +19,18 @@ using Microsoft.Extensions.Options;
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 
 /// <summary>
-/// The query we must perform on the 'Energy Result Per Grid Area' view.
+/// The query we must perform on the 'nergy Result Per Balance Responsible Party, Grid Area' view.
 ///
 /// Keep the code updated with regards to the documentation in confluence in a way
 /// that it is easy to compare (e.g. order of columns).
-/// See confluence: https://energinet.atlassian.net/wiki/spaces/D3/pages/849805314/Calculation+Result+Model#Energy-Result-Points-Per-Grid-Area
+/// See confluence: https://energinet.atlassian.net/wiki/spaces/D3/pages/849805314/Calculation+Result+Model#Energy-Result-Per-Balance-Responsible-Party%2C-Grid-Area
 /// </summary>
-public class EnergyResultPerGridAreaQuery(
+public class EnergyResultPerBrpGridAreaQuery(
         IOptions<EdiDatabricksOptions> ediDatabricksOptions,
         Guid calculationId)
     : EnergyResultQueryBase(ediDatabricksOptions, calculationId)
 {
-    public override string DataObjectName => "energy_result_points_per_ga_v1";
+    public override string DataObjectName => "energy_result_points_per_brp_ga_v1";
 
     public override Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition => new()
     {
@@ -41,6 +41,7 @@ public class EnergyResultPerGridAreaQuery(
         { EnergyResultColumnNames.CalculationVersion,           (DeltaTableCommonTypes.BigInt,          false) },
         { EnergyResultColumnNames.ResultId,                     (DeltaTableCommonTypes.String,          false) },
         { EnergyResultColumnNames.GridAreaCode,                 (DeltaTableCommonTypes.String,          false) },
+        { EnergyResultColumnNames.BalanceResponsiblePartyId,    (DeltaTableCommonTypes.String,          false) },
         { EnergyResultColumnNames.MeteringPointType,            (DeltaTableCommonTypes.String,          false) },
         { EnergyResultColumnNames.SettlementMethod,             (DeltaTableCommonTypes.String,          true) },
         { EnergyResultColumnNames.Resolution,                   (DeltaTableCommonTypes.String,          false) },

@@ -15,11 +15,11 @@
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 
 /// <summary>
-/// A description containing key information of all columns in the view.
+/// A description containing key information of all columns in the views.
 ///
 /// Keep the code updated with regards to the documentation in confluence in a way
 /// that it is easy to compare (e.g. order of columns).
-/// See confluence: https://energinet.atlassian.net/wiki/spaces/D3/pages/849805314/Calculation+Result+Model#Energy-Result-Points-Per-Grid-Area
+/// See confluence: https://energinet.atlassian.net/wiki/spaces/D3/pages/849805314/Calculation+Result+Model
 /// </summary>
 public class EnergyResultColumnNames
 {
@@ -42,6 +42,10 @@ public class EnergyResultColumnNames
     public const string Time = "time";
 
     public const string Quantity = "quantity";
-    public const string QuantityUnit = "quantity_unit";
+    public const string QuantityUnit = "unit";
     public const string QuantityQualities = "quantity_qualities";
+
+    public const string BalanceResponsiblePartyId = "balance_responsible_party_id";
+
+    public const string EnergySupplierId = "energy_supplier_id";
 }
