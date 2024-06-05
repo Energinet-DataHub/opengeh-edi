@@ -16,21 +16,20 @@ using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages
+namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
+
+/// <summary>
+/// Store for outgoing actor messages
+/// </summary>
+public interface IOutgoingMessageRepository
 {
     /// <summary>
-    /// Store for outgoing actor messages
+    /// Add outgoing message to database and file storage
     /// </summary>
-    public interface IOutgoingMessageRepository
-    {
-        /// <summary>
-        /// Add outgoing message to database and file storage
-        /// </summary>
-        Task AddAsync(OutgoingMessage message);
+    Task AddAsync(OutgoingMessage message);
 
-        /// <summary>
-        /// Get all messages assigned to a bundle by id
-        /// </summary>
-        Task<OutgoingMessageBundle> GetAsync(BundleId bundleId, MessageId? messageId);
-    }
+    /// <summary>
+    /// Get all messages assigned to a bundle by id
+    /// </summary>
+    Task<OutgoingMessageBundle> GetAsync(BundleId bundleId, MessageId? messageId);
 }

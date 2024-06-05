@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
+
+public class InvalidReceiverRole : ValidationError
 {
-    public class InvalidReceiverRole : ValidationError
+    public InvalidReceiverRole()
+        : base("Invalid receiver role", "00304", "marketRole.type")
     {
-        public InvalidReceiverRole()
-            : base("Invalid receiver role", "00304", "marketRole.type")
-        {
-        }
     }
 }

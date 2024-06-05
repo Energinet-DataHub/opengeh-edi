@@ -51,7 +51,7 @@ public class SendActorMessagesEnqueuedActivity
         var eventId = Guid.Parse(input.OrchestrationInstanceId);
         var serviceBusMessage = CreateServiceBusMessage(messagesEnqueuedEvent, eventId);
 
-        await _senderCreator.SendAsync(serviceBusMessage, CancellationToken.None);
+        await _senderCreator.SendAsync(serviceBusMessage, CancellationToken.None).ConfigureAwait(false);
     }
 
     private static ServiceBusMessage CreateServiceBusMessage(ActorMessagesEnqueuedV1 messagesEnqueuedEvent, Guid eventId)

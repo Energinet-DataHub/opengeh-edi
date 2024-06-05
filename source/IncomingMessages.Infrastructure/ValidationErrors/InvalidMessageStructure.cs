@@ -12,25 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
+
+public class InvalidMessageStructure : ValidationError
 {
-    public class InvalidMessageStructure : ValidationError
+    private InvalidMessageStructure(string message)
+        : base(message, "00302")
     {
-        private InvalidMessageStructure(string message)
-            : base(message, "00302")
-        {
-        }
+    }
 
-        public static InvalidMessageStructure From(Exception exception)
-        {
-            ArgumentNullException.ThrowIfNull(exception);
-            return new InvalidMessageStructure(exception.Message);
-        }
+    public static InvalidMessageStructure From(Exception exception)
+    {
+        ArgumentNullException.ThrowIfNull(exception);
+        return new InvalidMessageStructure(exception.Message);
+    }
 
-        public static InvalidMessageStructure From(string message)
-        {
-            ArgumentNullException.ThrowIfNull(message);
-            return new InvalidMessageStructure(message);
-        }
+    public static InvalidMessageStructure From(string message)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+        return new InvalidMessageStructure(message);
     }
 }

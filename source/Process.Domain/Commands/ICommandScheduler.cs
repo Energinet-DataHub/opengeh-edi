@@ -14,19 +14,18 @@
 
 using System.Threading.Tasks;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Commands
+namespace Energinet.DataHub.EDI.Process.Domain.Commands;
+
+/// <summary>
+/// Service for scheduling and enqueueing internal commands for later processing
+/// </summary>
+public interface ICommandScheduler
 {
     /// <summary>
-    /// Service for scheduling and enqueueing internal commands for later processing
+    /// Schedules or enqueues a command
     /// </summary>
-    public interface ICommandScheduler
-    {
-        /// <summary>
-        /// Schedules or enqueues a command
-        /// </summary>
-        /// <param name="command"></param>
-        /// <typeparam name="TCommand"><see cref="InternalCommand"/></typeparam>
-        Task EnqueueAsync<TCommand>(TCommand command)
-            where TCommand : InternalCommand;
-    }
+    /// <param name="command"></param>
+    /// <typeparam name="TCommand"><see cref="InternalCommand"/></typeparam>
+    Task EnqueueAsync<TCommand>(TCommand command)
+        where TCommand : InternalCommand;
 }

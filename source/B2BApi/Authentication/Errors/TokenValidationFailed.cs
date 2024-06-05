@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2BApi.Authentication.Errors
+namespace Energinet.DataHub.EDI.B2BApi.Authentication.Errors;
+
+public class TokenValidationFailed : AuthenticationError
 {
-    public class TokenValidationFailed : AuthenticationError
+    public TokenValidationFailed(string message)
+     : base(message)
     {
-        public TokenValidationFailed(string message)
-         : base(message)
-        {
-        }
     }
 }

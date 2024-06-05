@@ -12,42 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
+
+public sealed class CimXmlSchemas : SchemaBase, ISchema
 {
-    public sealed class CimXmlSchemas : SchemaBase, ISchema
+    private static readonly string _schemaPath = $"DocumentValidation{Path.DirectorySeparatorChar}CimXml{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
+
+    public CimXmlSchemas()
     {
-        private static readonly string _schemaPath = $"DocumentValidation{Path.DirectorySeparatorChar}CimXml{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
+        InitializeSchemas(FillSchemaDictionary(_schemaPath));
+    }
 
-        public CimXmlSchemas()
+    public string SchemaPath => _schemaPath;
+
+    string? ISchema.GetSchemaLocation(string businessProcessType, string version)
+    {
+        return GetSchemaLocation(businessProcessType, version);
+    }
+
+    protected override Dictionary<KeyValuePair<string, string>, string> FillSchemaDictionary(string schemaPath)
+    {
+        var schemaDictionary = new Dictionary<KeyValuePair<string, string>, string>();
+        var schemas = Directory.GetFiles(schemaPath).ToList();
+
+        foreach (var schema in schemas)
         {
-            InitializeSchemas(FillSchemaDictionary(_schemaPath));
-        }
-
-        public string SchemaPath => _schemaPath;
-
-        string? ISchema.GetSchemaLocation(string businessProcessType, string version)
-        {
-            return GetSchemaLocation(businessProcessType, version);
-        }
-
-        protected override Dictionary<KeyValuePair<string, string>, string> FillSchemaDictionary(string schemaPath)
-        {
-            var schemaDictionary = new Dictionary<KeyValuePair<string, string>, string>();
-            var schemas = Directory.GetFiles(schemaPath).ToList();
-
-            foreach (var schema in schemas)
+            var filename = Path.GetFileNameWithoutExtension(schema);
+            var filenameSplit = filename.Split('-');
+            if (filenameSplit.Length == 7)
             {
-                var filename = Path.GetFileNameWithoutExtension(schema);
-                var filenameSplit = filename.Split('-');
-                if (filenameSplit.Length == 7)
-                {
-                    schemaDictionary.Add(
-                        new KeyValuePair<string, string>(filenameSplit[4], filenameSplit[5] + "." + filenameSplit[6]),
-                        schema);
-                }
+                schemaDictionary.Add(
+                    new KeyValuePair<string, string>(filenameSplit[4], filenameSplit[5] + "." + filenameSplit[6]),
+                    schema);
             }
-
-            return schemaDictionary;
         }
+
+        return schemaDictionary;
     }
 }

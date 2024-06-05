@@ -17,55 +17,54 @@ using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
+
+public sealed class ServiceBusSenderFactory : IServiceBusSenderFactory
 {
-    public sealed class ServiceBusSenderFactory : IServiceBusSenderFactory
+    private readonly object _adaptersLock = new();
+    private readonly ConcurrentDictionary<string, IServiceBusSenderAdapter> _adapters = new();
+    private readonly ServiceBusClient _serviceBusClient;
+
+    public ServiceBusSenderFactory(ServiceBusClient serviceBusClient)
     {
-        private readonly object _adaptersLock = new();
-        private readonly ConcurrentDictionary<string, IServiceBusSenderAdapter> _adapters = new();
-        private readonly ServiceBusClient _serviceBusClient;
+        _serviceBusClient = serviceBusClient;
+    }
 
-        public ServiceBusSenderFactory(ServiceBusClient serviceBusClient)
+    public IServiceBusSenderAdapter GetSender(string topicName)
+    {
+        ArgumentNullException.ThrowIfNull(topicName);
+
+        var key = topicName.ToUpperInvariant();
+
+        _adapters.TryGetValue(key, out var adapter);
+        if (adapter is null)
         {
-            _serviceBusClient = serviceBusClient;
-        }
-
-        public IServiceBusSenderAdapter GetSender(string topicName)
-        {
-            ArgumentNullException.ThrowIfNull(topicName);
-
-            var key = topicName.ToUpperInvariant();
-
-            _adapters.TryGetValue(key, out var adapter);
-            if (adapter is null)
+            adapter = new ServiceBusSenderAdapter(_serviceBusClient, topicName);
+            lock (_adaptersLock)
             {
-                adapter = new ServiceBusSenderAdapter(_serviceBusClient, topicName);
-                lock (_adaptersLock)
-                {
-                    _adapters.TryAdd(key, adapter);
-                }
+                _adapters.TryAdd(key, adapter);
             }
-
-            return adapter;
         }
+
+        return adapter;
+    }
 
 #pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
-        public async ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
+    {
+        foreach (var serviceBusSenderAdapter in _adapters)
         {
-            foreach (var serviceBusSenderAdapter in _adapters)
-            {
-                await serviceBusSenderAdapter.Value.DisposeAsync().ConfigureAwait(false);
-            }
-
-            GC.SuppressFinalize(this);
+            await serviceBusSenderAdapter.Value.DisposeAsync().ConfigureAwait(false);
         }
 
-        public void Dispose()
+        GC.SuppressFinalize(this);
+    }
+
+    public void Dispose()
+    {
+        foreach (var serviceBusSenderAdapter in _adapters)
         {
-            foreach (var serviceBusSenderAdapter in _adapters)
-            {
-                serviceBusSenderAdapter.Value.Dispose();
-            }
+            serviceBusSenderAdapter.Value.Dispose();
         }
     }
 }

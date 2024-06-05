@@ -12,27 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
+
+/// <summary>
+/// Store containing transaction id for all received market activity records
+/// </summary>
+public interface ITransactionIdRepository
 {
     /// <summary>
-    /// Store containing transaction id for all received market activity records
+    /// Checks if <paramref name="transactionId"/> is already registered by the sender <paramref name="senderId"/>
     /// </summary>
-    public interface ITransactionIdRepository
-    {
-        /// <summary>
-        /// Checks if <paramref name="transactionId"/> is already registered by the sender <paramref name="senderId"/>
-        /// </summary>
-        /// <param name="senderId"></param>
-        /// <param name="transactionId"></param>
-        /// <param name="cancellationToken"></param>
-        Task<bool> TransactionIdExistsAsync(string senderId, string transactionId, CancellationToken cancellationToken);
+    /// <param name="senderId"></param>
+    /// <param name="transactionId"></param>
+    /// <param name="cancellationToken"></param>
+    Task<bool> TransactionIdExistsAsync(string senderId, string transactionId, CancellationToken cancellationToken);
 
-        /// <summary>
-        /// Store transaction ids for the specified sender
-        /// </summary>
-        Task AddAsync(
-            string senderId,
-            IReadOnlyCollection<string> transactionIds,
-            CancellationToken cancellationToken);
-    }
+    /// <summary>
+    /// Store transaction ids for the specified sender
+    /// </summary>
+    Task AddAsync(
+        string senderId,
+        IReadOnlyCollection<string> transactionIds,
+        CancellationToken cancellationToken);
 }

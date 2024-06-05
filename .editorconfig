@@ -195,6 +195,8 @@ csharp_style_conditional_delegate_call = true:suggestion
 # Code block preferences
 csharp_prefer_braces = when_multiline:error
 csharp_braces_for_ifelse = required_for_multiline_statement
+csharp_style_namespace_declarations = file_scoped:error
+dotnet_diagnostic.IDE0161.severity = error # When we move to .NET 9.0 we won't need this anymore: https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/language-rules#option-format
 
 # Unused value preferences
 csharp_style_unused_value_expression_statement_preference = discard_variable:silent
@@ -296,6 +298,7 @@ dotnet_diagnostic.CA1848.severity = suggestion
 dotnet_diagnostic.CA1900.severity = warning
 dotnet_diagnostic.CA1901.severity = warning
 dotnet_diagnostic.CA2002.severity = warning
+dotnet_diagnostic.CA2007.severity = error
 dotnet_diagnostic.CA2100.severity = warning
 dotnet_diagnostic.CA2101.severity = warning
 dotnet_diagnostic.CA2108.severity = warning
@@ -342,8 +345,16 @@ dotnet_diagnostic.CS1591.severity = none
 
 # Disable "Mark members as static" recommendation, since static makes it easy to introduce dependency lifecycle errors
 # Rule link: https://learn.microsoft.com/da-dk/dotnet/fundamentals/code-analysis/quality-rules/ca1822
-dotnet_diagnostic.CA1822.severity = none 
+dotnet_diagnostic.CA1822.severity = none
 
+###############################
+# VS Threading Analyzers      #
+###############################
+
+# See rules here: https://github.com/microsoft/vs-threading/blob/main/doc/analyzers/index.md
+
+dotnet_diagnostic.VSTHRD111.severity = error    # VSTHRD111: [Similar to CA2007] Use ConfigureAwait(bool)
+dotnet_diagnostic.VSTHRD200.severity = error    # VSTHRD200: Use "Async" suffix for async methods
 
 ###############################
 # StyleCop Analyzers          #
@@ -526,6 +537,10 @@ dotnet_diagnostic.SA1652.severity = none
 dotnet_diagnostic.SX1101.severity = error
 dotnet_diagnostic.SX1309.severity = error
 
+##############################################################
+# ReSharper                                                  #
+##############################################################
+
 # ReSharper properties
 resharper_csharp_wrap_after_declaration_lpar = true
 resharper_csharp_wrap_after_invocation_lpar = true
@@ -536,13 +551,67 @@ resharper_wrap_chained_method_calls = chop_if_long
 resharper_csharp_wrap_before_binary_opsign = true
 
 ##############################################################
-# C# Test Conventions                                        #
+# Overrides default configuration                            #
 ##############################################################
 
-[*{.test,Tests}.cs]
+# .NET Analyzers (CAxxxx)
+# See full list of rules here: https://github.com/dotnet/roslyn-analyzers/blob/main/src/NetAnalyzers/Core/AnalyzerReleases.Shipped.md
+#
+# VS Threading Analyzers (VSTHRDxxx)
+# See rules here: https://github.com/microsoft/vs-threading/blob/main/doc/analyzers/index.md
 
-dotnet_diagnostic.VSTHRD200.severity = none
-dotnet_diagnostic.CA1707.severity = none
+###############################
+# C# Test Conventions         #
+###############################
+
+#
+# The intention of this section is to match c# code files
+# that is part of a test project. This includes fixtures and
+# code that supports tests.
+#
+[**{Test,test}**.cs]
+
+dotnet_diagnostic.CA2007.severity = none        # CA2007: Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.VSTHRD111.severity = none	    # VSTHRD111: [Similar to CA2007] Use ConfigureAwait(bool)
+
+#
+# The intention of this section is to match c# code files
+# that is part of a class that contains tests or scenarios.
+#
+[*{Tests,Scenario}.cs]
+
+dotnet_diagnostic.VSTHRD200.severity = none     # VSTHRD200: Use "Async" suffix for async methods
+
+###############################
+# Durable Functions           #
+###############################
+
+#
+# The intention of this section is to match c# code files
+# that is functions Middleware and which then might be
+# used in combination with Durable Functions.
+#
+[*Middleware.cs]
+
+dotnet_diagnostic.CA2007.severity = none        # CA2007: Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.VSTHRD111.severity = none	    # VSTHRD111: [Similar to CA2007] Use ConfigureAwait(bool)
+
+#
+# The intention of this section is to match c# code files
+# that is either Durable Function Orchestrations or Activities.
+#
+[**/Functions/**/*{Orchestration}.cs]
+
+dotnet_diagnostic.CA2007.severity = none        # CA2007: Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.VSTHRD111.severity = none	    # VSTHRD111: [Similar to CA2007] Use ConfigureAwait(bool)
+
+#
+# The intention of this section is to match c# code files
+# that is either function Triggers, Durable Function Orchestrations or Activities.
+#
+[**/Functions/**/*{Orchestration,Activity,Trigger}.cs]
+
+dotnet_diagnostic.VSTHRD200.severity = none     # VSTHRD200: Use "Async" suffix for async methods
 
 ###############################
 # Code Style rules (IDE)      #

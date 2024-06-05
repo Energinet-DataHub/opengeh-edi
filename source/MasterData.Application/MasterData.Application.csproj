@@ -4,8 +4,14 @@
     <RootNamespace>Energinet.DataHub.EDI.MasterData.Application</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DataAccess\DataAccess.csproj"/>
-    <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj"/>
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.10.48">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
+    <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
     <ProjectReference Include="..\MasterData.Infrastructure\MasterData.Infrastructure.csproj" />
   </ItemGroup>
   <ItemDefinitionGroup>

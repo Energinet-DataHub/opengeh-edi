@@ -15,29 +15,28 @@
 using System;
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers
+namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
+
+/// <summary>
+/// Compare sql script file names
+/// </summary>
+public sealed class ScriptComparer : Comparer<string>
 {
-    /// <summary>
-    /// Compare sql script file names
-    /// </summary>
-    public sealed class ScriptComparer : Comparer<string>
-    {
-        private static readonly StringComparer _stringComparer = StringComparer.Ordinal;
+    private static readonly StringComparer _stringComparer = StringComparer.Ordinal;
 
 #pragma warning disable 8765 // Nullable doesn't match overriden, because of nullable.
-        public override int Compare(string x, string y)
+    public override int Compare(string x, string y)
+    {
+        var first = NamingConvention.Regex.Match(x);
+        var second = NamingConvention.Regex.Match(y);
+
+        if (first.Groups["timestamp"].Value == second.Groups["timestamp"].Value)
         {
-            var first = NamingConvention.Regex.Match(x);
-            var second = NamingConvention.Regex.Match(y);
-
-            if (first.Groups["timestamp"].Value == second.Groups["timestamp"].Value)
-            {
-                return first.Groups["type"].Value == second.Groups["type"].Value
-                    ? _stringComparer.Compare(first.Groups["name"].Value, second.Groups["name"].Value)
-                    : _stringComparer.Compare(first.Groups["type"].Value, second.Groups["type"].Value);
-            }
-
-            return _stringComparer.Compare(first.Groups["timestamp"].Value, second.Groups["timestamp"].Value);
+            return first.Groups["type"].Value == second.Groups["type"].Value
+                ? _stringComparer.Compare(first.Groups["name"].Value, second.Groups["name"].Value)
+                : _stringComparer.Compare(first.Groups["type"].Value, second.Groups["type"].Value);
         }
+
+        return _stringComparer.Compare(first.Groups["timestamp"].Value, second.Groups["timestamp"].Value);
     }
 }

@@ -12,31 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
+
+public class ValidationResult
 {
-    public class ValidationResult
+    private ValidationResult(IReadOnlyCollection<string> validationErrors)
     {
-        private ValidationResult(IReadOnlyCollection<string> validationErrors)
-        {
-            ValidationErrors = validationErrors;
-        }
+        ValidationErrors = validationErrors;
+    }
 
-        private ValidationResult()
-        {
-        }
+    private ValidationResult()
+    {
+    }
 
-        public bool IsValid => ValidationErrors.Count == 0;
+    public bool IsValid => ValidationErrors.Count == 0;
 
-        public IReadOnlyCollection<string> ValidationErrors { get; } = new List<string>();
+    public IReadOnlyCollection<string> ValidationErrors { get; } = new List<string>();
 
-        public static ValidationResult Valid()
-        {
-            return new ValidationResult();
-        }
+    public static ValidationResult Valid()
+    {
+        return new ValidationResult();
+    }
 
-        public static ValidationResult Invalid(IReadOnlyCollection<string> validationErrors)
-        {
-            return new ValidationResult(validationErrors);
-        }
+    public static ValidationResult Invalid(IReadOnlyCollection<string> validationErrors)
+    {
+        return new ValidationResult(validationErrors);
     }
 }

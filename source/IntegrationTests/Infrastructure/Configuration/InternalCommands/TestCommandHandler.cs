@@ -29,6 +29,8 @@ public class TestCommandHandler : IRequestHandler<TestCommand, Unit>
             throw new InvalidOperationException("This is a test exception");
         }
 
+#pragma warning disable VSTHRD003 // Avoid awaiting foreign Tasks
         return Unit.Task;
+#pragma warning restore VSTHRD003 // Avoid awaiting foreign Tasks
     }
 }

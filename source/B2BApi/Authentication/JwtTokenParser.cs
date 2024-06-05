@@ -21,68 +21,67 @@ using Energinet.DataHub.EDI.B2BApi.Authentication.Errors;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Energinet.DataHub.EDI.B2BApi.Authentication
+namespace Energinet.DataHub.EDI.B2BApi.Authentication;
+
+public class JwtTokenParser
 {
-    public class JwtTokenParser
+    private readonly TokenValidationParameters _validationParameters;
+
+    public JwtTokenParser(TokenValidationParameters validationParameters)
     {
-        private readonly TokenValidationParameters _validationParameters;
+        _validationParameters = validationParameters ?? throw new ArgumentNullException(nameof(validationParameters));
+    }
 
-        public JwtTokenParser(TokenValidationParameters validationParameters)
+    public Task<Result> ParseFromAsync(HttpHeaders requestHeaders)
+    {
+        ArgumentNullException.ThrowIfNull(requestHeaders);
+        if (requestHeaders.TryGetValues("authorization", out var authorizationHeaderValues) == false)
         {
-            _validationParameters = validationParameters ?? throw new ArgumentNullException(nameof(validationParameters));
+            return Task.FromResult(Result.Failed(new NoAuthenticationHeaderSet()));
         }
 
-        public Task<Result> ParseFromAsync(HttpHeaders requestHeaders)
+        var authorizationHeaderValue = authorizationHeaderValues.FirstOrDefault();
+        if (authorizationHeaderValue is null || IsBearer(authorizationHeaderValue) == false)
         {
-            ArgumentNullException.ThrowIfNull(requestHeaders);
-            if (requestHeaders.TryGetValues("authorization", out var authorizationHeaderValues) == false)
-            {
-                return Task.FromResult(Result.Failed(new NoAuthenticationHeaderSet()));
-            }
-
-            var authorizationHeaderValue = authorizationHeaderValues.FirstOrDefault();
-            if (authorizationHeaderValue is null || IsBearer(authorizationHeaderValue) == false)
-            {
-                return Task.FromResult(Result.Failed(new AuthenticationHeaderIsNotBearerToken()));
-            }
-
-            return ExtractPrincipalFromAsync(ParseBearerToken(authorizationHeaderValue));
+            return Task.FromResult(Result.Failed(new AuthenticationHeaderIsNotBearerToken()));
         }
 
-        private static string ParseBearerToken(string authorizationHeaderValue)
+        return ExtractPrincipalFromAsync(ParseBearerToken(authorizationHeaderValue));
+    }
+
+    private static string ParseBearerToken(string authorizationHeaderValue)
+    {
+        ArgumentNullException.ThrowIfNull(authorizationHeaderValue);
+        return authorizationHeaderValue.Substring(7);
+    }
+
+    private static bool IsBearer(string authorizationHeaderValue)
+    {
+        ArgumentNullException.ThrowIfNull(authorizationHeaderValue);
+        return authorizationHeaderValue.StartsWith("bearer", StringComparison.OrdinalIgnoreCase) && authorizationHeaderValue.Length > 7;
+    }
+
+    private async Task<Result> ExtractPrincipalFromAsync(string token)
+    {
+        try
         {
-            ArgumentNullException.ThrowIfNull(authorizationHeaderValue);
-            return authorizationHeaderValue.Substring(7);
+            var tokenHandler = new JsonWebTokenHandler();
+            var tokenValidation = await tokenHandler.ValidateTokenAsync(token, _validationParameters).ConfigureAwait(false);
+            if (tokenValidation.IsValid == false)
+            {
+                return Result.Failed(new TokenValidationFailed("Token validation failed"), token);
+            }
+
+            var principal = new ClaimsPrincipal(tokenValidation.ClaimsIdentity);
+            return Result.Succeeded(principal);
         }
-
-        private static bool IsBearer(string authorizationHeaderValue)
+        catch (ArgumentException e)
         {
-            ArgumentNullException.ThrowIfNull(authorizationHeaderValue);
-            return authorizationHeaderValue.StartsWith("bearer", StringComparison.OrdinalIgnoreCase) && authorizationHeaderValue.Length > 7;
+            return Result.Failed(new TokenValidationFailed(e.Message), token);
         }
-
-        private async Task<Result> ExtractPrincipalFromAsync(string token)
+        catch (SecurityTokenException e)
         {
-            try
-            {
-                var tokenHandler = new JsonWebTokenHandler();
-                var tokenValidation = await tokenHandler.ValidateTokenAsync(token, _validationParameters).ConfigureAwait(false);
-                if (tokenValidation.IsValid == false)
-                {
-                    return Result.Failed(new TokenValidationFailed("Token validation failed"), token);
-                }
-
-                var principal = new ClaimsPrincipal(tokenValidation.ClaimsIdentity);
-                return Result.Succeeded(principal);
-            }
-            catch (ArgumentException e)
-            {
-                return Result.Failed(new TokenValidationFailed(e.Message), token);
-            }
-            catch (SecurityTokenException e)
-            {
-                return Result.Failed(new TokenValidationFailed(e.Message), token);
-            }
+            return Result.Failed(new TokenValidationFailed(e.Message), token);
         }
     }
 }

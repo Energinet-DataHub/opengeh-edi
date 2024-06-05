@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation
-{
-    public abstract class SchemaProvider : ISchemaProvider
-    {
-        public abstract Task<T?> GetSchemaAsync<T>(string businessProcessType, string version, CancellationToken cancellationToken);
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
 
-        protected abstract Task<T?> LoadSchemaWithDependentSchemasAsync<T>(string location, CancellationToken cancellationToken);
-    }
+public abstract class SchemaProvider : ISchemaProvider
+{
+    public abstract Task<T?> GetSchemaAsync<T>(string businessProcessType, string version, CancellationToken cancellationToken);
+
+    protected abstract Task<T?> LoadSchemaWithDependentSchemasAsync<T>(string location, CancellationToken cancellationToken);
 }

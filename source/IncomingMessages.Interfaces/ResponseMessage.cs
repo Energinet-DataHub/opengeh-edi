@@ -12,23 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces
+namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+
+public class ResponseMessage
 {
-    public class ResponseMessage
+    public ResponseMessage(string messageBody)
     {
-        public ResponseMessage(string messageBody)
-        {
-            IsErrorResponse = true;
-            MessageBody = messageBody;
-        }
-
-        public ResponseMessage()
-        {
-            IsErrorResponse = false;
-        }
-
-        public string MessageBody { get; } = string.Empty;
-
-        public bool IsErrorResponse { get; }
+        IsErrorResponse = true;
+        MessageBody = messageBody;
     }
+
+    public ResponseMessage()
+    {
+        IsErrorResponse = false;
+    }
+
+    public string MessageBody { get; } = string.Empty;
+
+    public bool IsErrorResponse { get; }
 }

@@ -12,39 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+
+public class MessageHeader
 {
-    public class MessageHeader
+    public MessageHeader(string messageId, string messageType, string businessReason, string senderId, string senderRole, string receiverId, string receiverRole, string createdAt, string? businessType = null)
     {
-        public MessageHeader(string messageId, string messageType, string businessReason, string senderId, string senderRole, string receiverId, string receiverRole, string createdAt, string? businessType = null)
-        {
-            MessageId = messageId;
-            MessageType = messageType;
-            BusinessReason = businessReason;
-            SenderId = senderId;
-            SenderRole = senderRole;
-            ReceiverId = receiverId;
-            ReceiverRole = receiverRole;
-            CreatedAt = createdAt;
-            BusinessType = businessType;
-        }
-
-        public string MessageId { get; }
-
-        public string MessageType { get; }
-
-        public string BusinessReason { get; }
-
-        public string SenderId { get; }
-
-        public string SenderRole { get; }
-
-        public string ReceiverId { get; }
-
-        public string ReceiverRole { get; }
-
-        public string CreatedAt { get; }
-
-        public string? BusinessType { get; }
+        MessageId = messageId;
+        MessageType = messageType;
+        BusinessReason = businessReason;
+        SenderId = senderId;
+        SenderRole = senderRole;
+        ReceiverId = receiverId;
+        ReceiverRole = receiverRole;
+        CreatedAt = createdAt;
+        BusinessType = businessType;
     }
+
+    public string MessageId { get; }
+
+    public string MessageType { get; }
+
+    public string BusinessReason { get; }
+
+    public string SenderId { get; }
+
+    public string SenderRole { get; }
+
+    public string ReceiverId { get; }
+
+    public string ReceiverRole { get; }
+
+    public string CreatedAt { get; }
+
+    public string? BusinessType { get; }
 }

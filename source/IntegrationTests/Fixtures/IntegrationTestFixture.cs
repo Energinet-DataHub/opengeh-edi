@@ -22,11 +22,11 @@ using Microsoft.Extensions.Configuration;
 using Xunit;
 using HttpClientFactory = Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks.HttpClientFactory;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
+namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+
+public class IntegrationTestFixture : IDisposable, IAsyncLifetime
 {
-    public class IntegrationTestFixture : IDisposable, IAsyncLifetime
-    {
-        private bool _disposed;
+    private bool _disposed;
 
         public IntegrationTestFixture()
         {
@@ -44,25 +44,25 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
             {
                 var connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;Initial Catalog=B2BTransactions;Integrated Security=True;Connection Timeout=60";
 
-                var configuration = new ConfigurationBuilder()
-                    .AddJsonFile("appsettings.local.json", optional: true)
-                    .Build();
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.local.json", optional: true)
+                .Build();
 
-                var connectionStringFromConfig = configuration.GetConnectionString("Default");
-                if (!string.IsNullOrEmpty(connectionStringFromConfig))
-                    connectionString = connectionStringFromConfig;
+            var connectionStringFromConfig = configuration.GetConnectionString("Default");
+            if (!string.IsNullOrEmpty(connectionStringFromConfig))
+                connectionString = connectionStringFromConfig;
 
-                var environmentVariableConnectionString = Environment.GetEnvironmentVariable("B2B_MESSAGING_CONNECTION_STRING");
-                if (!string.IsNullOrWhiteSpace(environmentVariableConnectionString))
-                {
-                    connectionString = environmentVariableConnectionString;
-                }
-
-                return connectionString;
+            var environmentVariableConnectionString = Environment.GetEnvironmentVariable("B2B_MESSAGING_CONNECTION_STRING");
+            if (!string.IsNullOrWhiteSpace(environmentVariableConnectionString))
+            {
+                connectionString = environmentVariableConnectionString;
             }
-        }
 
-        public AzuriteManager AzuriteManager { get; } = new(true);
+            return connectionString;
+        }
+    }
+
+    public AzuriteManager AzuriteManager { get; } = new(true);
 
         public IntegrationTestConfiguration IntegrationTestConfiguration { get; }
 
@@ -98,103 +98,102 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures
                 $"DELETE FROM [dbo].[WholesaleServicesProcesses]" +
                 $"DELETE FROM [dbo].[ProcessDelegation]";
 
-            using var connection = new SqlConnection(DatabaseConnectionString);
-            connection.Open();
+        using var connection = new SqlConnection(DatabaseConnectionString);
+        connection.Open();
 
-            using (var command = new SqlCommand(cleanupStatement, connection))
-            {
-                command.ExecuteNonQuery();
-            }
-
-            connection.Close();
+        using (var command = new SqlCommand(cleanupStatement, connection))
+        {
+            command.ExecuteNonQuery();
         }
 
-        public Task InitializeAsync()
+        connection.Close();
+    }
+
+    public Task InitializeAsync()
+    {
+        CreateSchema();
+        CleanupDatabase();
+
+        AzuriteManager.StartAzurite();
+        CleanupFileStorage();
+
+        return Task.CompletedTask;
+    }
+
+    public Task DisposeAsync()
+    {
+        Dispose();
+        return Task.CompletedTask;
+    }
+
+    public void CleanupFileStorage(bool disposing = false)
+    {
+        var blobServiceClient = new BlobServiceClient(AzuriteManager.BlobStorageConnectionString);
+
+        var containers = blobServiceClient.GetBlobContainers();
+
+        foreach (var containerToDelete in containers)
+            blobServiceClient.DeleteBlobContainer(containerToDelete.Name);
+
+        if (disposing)
         {
-            CreateSchema();
+            // Cleanup actual Azurite "database" files
+            if (Directory.Exists("__blobstorage__"))
+                Directory.Delete("__blobstorage__", true);
+
+            if (Directory.Exists("__queuestorage__"))
+                Directory.Delete("__queuestorage__", true);
+
+            if (Directory.Exists("__tablestorage__"))
+                Directory.Delete("__tablestorage__", true);
+
+            if (File.Exists("__azurite_db_blob__.json"))
+                File.Delete("__azurite_db_blob__.json");
+
+            if (File.Exists("__azurite_db_blob_extent__.json"))
+                File.Delete("__azurite_db_blob_extent__.json");
+
+            if (File.Exists("__azurite_db_queue__.json"))
+                File.Delete("__azurite_db_queue__.json");
+
+            if (File.Exists("__azurite_db_queue_extent__.json"))
+                File.Delete("__azurite_db_queue_extent__.json");
+
+            if (File.Exists("__azurite_db_table__.json"))
+                File.Delete("__azurite_db_table__.json");
+
+            if (File.Exists("__azurite_db_table_extent__.json"))
+                File.Delete("__azurite_db_table_extent__.json");
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
             CleanupDatabase();
-
-            AzuriteManager.StartAzurite();
-            CleanupFileStorage();
-
-            return Task.CompletedTask;
+            CleanupFileStorage(true);
+            AzuriteManager.Dispose();
         }
 
-        public Task DisposeAsync()
-        {
-            Dispose();
-            return Task.CompletedTask;
-        }
+        _disposed = true;
+    }
 
-        public void CleanupFileStorage(bool disposing = false)
-        {
-            var blobServiceClient = new BlobServiceClient(AzuriteManager.BlobStorageConnectionString);
-
-            var containers = blobServiceClient.GetBlobContainers();
-
-            foreach (var containerToDelete in containers)
-                blobServiceClient.DeleteBlobContainer(containerToDelete.Name);
-
-            if (disposing)
-            {
-                // Cleanup actual Azurite "database" files
-                if (Directory.Exists("__blobstorage__"))
-                    Directory.Delete("__blobstorage__", true);
-
-                if (Directory.Exists("__queuestorage__"))
-                    Directory.Delete("__queuestorage__", true);
-
-                if (Directory.Exists("__tablestorage__"))
-                    Directory.Delete("__tablestorage__", true);
-
-                if (File.Exists("__azurite_db_blob__.json"))
-                    File.Delete("__azurite_db_blob__.json");
-
-                if (File.Exists("__azurite_db_blob_extent__.json"))
-                    File.Delete("__azurite_db_blob_extent__.json");
-
-                if (File.Exists("__azurite_db_queue__.json"))
-                    File.Delete("__azurite_db_queue__.json");
-
-                if (File.Exists("__azurite_db_queue_extent__.json"))
-                    File.Delete("__azurite_db_queue_extent__.json");
-
-                if (File.Exists("__azurite_db_table__.json"))
-                    File.Delete("__azurite_db_table__.json");
-
-                if (File.Exists("__azurite_db_table_extent__.json"))
-                    File.Delete("__azurite_db_table_extent__.json");
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-                CleanupDatabase();
-                CleanupFileStorage(true);
-                AzuriteManager.Dispose();
-            }
-
-            _disposed = true;
-        }
-
-        private static void CreateSchema()
-        {
-            var upgradeResult = DbUpgradeRunner.RunDbUpgrade(DatabaseConnectionString);
-            if (!upgradeResult.Successful)
-                throw new InvalidOperationException("Database upgrade failed", upgradeResult.Error);
-        }
+    private static void CreateSchema()
+    {
+        var upgradeResult = DbUpgradeRunner.RunDbUpgrade(DatabaseConnectionString);
+        if (!upgradeResult.Successful)
+            throw new InvalidOperationException("Database upgrade failed", upgradeResult.Error);
     }
 }

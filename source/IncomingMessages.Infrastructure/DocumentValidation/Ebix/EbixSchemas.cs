@@ -12,46 +12,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Ebix
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Ebix;
+
+public sealed class EbixSchemas : SchemaBase, ISchema
 {
-    public sealed class EbixSchemas : SchemaBase, ISchema
+    private static readonly string _schemaPath = $"DocumentValidation{Path.DirectorySeparatorChar}Ebix{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}document{Path.DirectorySeparatorChar}";
+
+    public EbixSchemas()
     {
-        private static readonly string _schemaPath = $"DocumentValidation{Path.DirectorySeparatorChar}Ebix{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}document{Path.DirectorySeparatorChar}";
+        InitializeSchemas(FillSchemaDictionary(_schemaPath));
+    }
 
-        public EbixSchemas()
+    public string SchemaPath => _schemaPath;
+
+    string? ISchema.GetSchemaLocation(string businessProcessType, string version)
+    {
+        return GetSchemaLocation(businessProcessType, version);
+    }
+
+    protected override Dictionary<KeyValuePair<string, string>, string> FillSchemaDictionary(string schemaPath)
+    {
+        var schemaDictionary = new Dictionary<KeyValuePair<string, string>, string>();
+        var directories = Directory.GetDirectories(schemaPath);
+        foreach (var directory in directories)
         {
-            InitializeSchemas(FillSchemaDictionary(_schemaPath));
-        }
-
-        public string SchemaPath => _schemaPath;
-
-        string? ISchema.GetSchemaLocation(string businessProcessType, string version)
-        {
-            return GetSchemaLocation(businessProcessType, version);
-        }
-
-        protected override Dictionary<KeyValuePair<string, string>, string> FillSchemaDictionary(string schemaPath)
-        {
-            var schemaDictionary = new Dictionary<KeyValuePair<string, string>, string>();
-            var directories = Directory.GetDirectories(schemaPath);
-            foreach (var directory in directories)
+            var schemas = Directory.GetFiles(directory).ToList();
+            foreach (var schema in schemas)
             {
-                var schemas = Directory.GetFiles(directory).ToList();
-                foreach (var schema in schemas)
+                var filename = Path.GetFileNameWithoutExtension(schema);
+                filename = filename.Replace("-", "_", StringComparison.InvariantCulture);
+                var filenameSplit = filename.Split('_');
+                if (filenameSplit.Length >= 3 && filenameSplit[0] == "ebIX" && filenameSplit[1] == "DK")
                 {
-                    var filename = Path.GetFileNameWithoutExtension(schema);
-                    filename = filename.Replace("-", "_", StringComparison.InvariantCulture);
-                    var filenameSplit = filename.Split('_');
-                    if (filenameSplit.Length >= 3 && filenameSplit[0] == "ebIX" && filenameSplit[1] == "DK")
-                    {
-                        schemaDictionary.Add(
-                            new KeyValuePair<string, string>(filenameSplit[1] + "_" + filenameSplit[2], "3"),
-                            schema);
-                    }
+                    schemaDictionary.Add(
+                        new KeyValuePair<string, string>(filenameSplit[1] + "_" + filenameSplit[2], "3"),
+                        schema);
                 }
             }
-
-            return schemaDictionary;
         }
+
+        return schemaDictionary;
     }
 }

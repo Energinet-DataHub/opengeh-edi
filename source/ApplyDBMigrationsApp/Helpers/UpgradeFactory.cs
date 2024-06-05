@@ -17,38 +17,37 @@ using System.Reflection;
 using DbUp;
 using DbUp.Engine;
 
-namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers
+namespace Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
+
+public static class UpgradeFactory
 {
-    public static class UpgradeFactory
+    public static UpgradeEngine GetUpgradeEngine(string connectionString, bool isDryRun = false)
     {
-        public static UpgradeEngine GetUpgradeEngine(string connectionString, bool isDryRun = false)
+        if (string.IsNullOrWhiteSpace(connectionString))
         {
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                throw new ArgumentException("Connection string must have a value");
-            }
-
-            EnsureDatabase.For.SqlDatabase(connectionString);
-
-            var builder = DeployChanges.To
-                .SqlDatabase(connectionString)
-                .WithScriptNameComparer(new ScriptComparer())
-                .WithScripts(
-                    new CustomScriptProvider(
-                        Assembly.GetExecutingAssembly(),
-                        file => file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) && file.Contains(".Scripts.Model.", StringComparison.OrdinalIgnoreCase)))
-                .LogToConsole();
-
-            if (isDryRun)
-            {
-                builder.WithTransactionAlwaysRollback();
-            }
-            else
-            {
-                builder.WithTransaction();
-            }
-
-            return builder.Build();
+            throw new ArgumentException("Connection string must have a value");
         }
+
+        EnsureDatabase.For.SqlDatabase(connectionString);
+
+        var builder = DeployChanges.To
+            .SqlDatabase(connectionString)
+            .WithScriptNameComparer(new ScriptComparer())
+            .WithScripts(
+                new CustomScriptProvider(
+                    Assembly.GetExecutingAssembly(),
+                    file => file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) && file.Contains(".Scripts.Model.", StringComparison.OrdinalIgnoreCase)))
+            .LogToConsole();
+
+        if (isDryRun)
+        {
+            builder.WithTransactionAlwaysRollback();
+        }
+        else
+        {
+            builder.WithTransaction();
+        }
+
+        return builder.Build();
     }
 }
