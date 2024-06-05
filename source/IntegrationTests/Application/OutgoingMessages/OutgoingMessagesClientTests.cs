@@ -38,20 +38,20 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
     public OutgoingMessagesClientTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
-        TestDataDescription = new EnergyResultTestDataDescription();
+        EnergyResultPerGaDescription = new EnergyResultPerGaDescription();
     }
 
-    public EnergyResultTestDataDescription TestDataDescription { get; }
+    public EnergyResultPerGaDescription EnergyResultPerGaDescription { get; }
 
     public async Task InitializeAsync()
     {
         await Fixture.DatabricksSchemaManager.CreateSchemaAsync();
 
         var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
-        var viewQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions, TestDataDescription.CalculationId);
+        var viewQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions, EnergyResultPerGaDescription.CalculationId);
         await Fixture.DatabricksSchemaManager.CreateTableAsync(viewQuery);
 
-        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, TestDataDescription.TestFilePath);
+        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, EnergyResultPerGaDescription.TestFilePath);
     }
 
     public async Task DisposeAsync()
@@ -64,12 +64,12 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
     {
         var sut = GetService<IOutgoingMessagesClient>();
         var input = new EnqueueMessagesInputDto(
-            TestDataDescription.CalculationId,
+            EnergyResultPerGaDescription.CalculationId,
             EventId: Guid.NewGuid());
 
         // The grid area in the mocked data needs an owner. Since the messages need a receiver.
         var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedEventBuilder
-            .WithGridAreaCode("543")
+            .WithGridAreaCode(EnergyResultPerGaDescription.GridAreaCode)
             .Build();
         await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent01);
 
@@ -82,14 +82,18 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         var result = await connection.QueryAsync(sql);
 
         var actualCount = result.Count();
-        actualCount.Should().Be(TestDataDescription.ExpectedOutgoingMessagesCount);
+        actualCount.Should().Be(EnergyResultPerGaDescription.ExpectedOutgoingMessagesCount);
     }
 
     private async Task HavingReceivedAndHandledIntegrationEventAsync(string eventType, GridAreaOwnershipAssigned gridAreaOwnershipAssigned)
     {
         var integrationEventHandler = GetService<IIntegrationEventHandler>();
 
-        var integrationEvent = new IntegrationEvent(Guid.NewGuid(), eventType, 1, gridAreaOwnershipAssigned);
+        var integrationEvent = new IntegrationEvent(
+            Guid.NewGuid(),
+            eventType,
+            EventMinorVersion: 1,
+            gridAreaOwnershipAssigned);
 
         await integrationEventHandler.HandleAsync(integrationEvent).ConfigureAwait(false);
     }

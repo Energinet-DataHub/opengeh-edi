@@ -18,11 +18,13 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.Te
 /// Contains information to prepare test input from a file, as well as
 /// information to drive and verify the expected behaviour, for a certain scenario.
 /// </summary>
-public class EnergyResultTestDataDescription
+public abstract class EnergyResultTestDataDescription
 {
-    public EnergyResultTestDataDescription()
+    protected EnergyResultTestDataDescription(string testFilename)
     {
-        TestFilePath = Path.Combine("Application", "OutgoingMessages", "TestData", "balance_fixing_01-11-2022_01-12-2022_ga_543.csv");
+        ArgumentException.ThrowIfNullOrWhiteSpace(testFilename);
+
+        TestFilePath = Path.Combine("Application", "OutgoingMessages", "TestData", testFilename);
     }
 
     /// <summary>
@@ -33,10 +35,15 @@ public class EnergyResultTestDataDescription
     /// <summary>
     /// Calculation id matching test file content.
     /// </summary>
-    public Guid CalculationId => Guid.Parse("e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d");
+    public abstract Guid CalculationId { get; }
+
+    /// <summary>
+    /// Grid area code matching test file content.
+    /// </summary>
+    public abstract string GridAreaCode { get; }
 
     /// <summary>
     /// Expected outgoing messages based on test file content.
     /// </summary>
-    public int ExpectedOutgoingMessagesCount => 5;
+    public abstract int ExpectedOutgoingMessagesCount { get; }
 }
