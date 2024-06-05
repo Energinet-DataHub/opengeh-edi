@@ -78,7 +78,65 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         actualCount.Should().Be(testDataDescription.ExpectedOutgoingMessagesCount);
     }
 
-    private async Task SeedDatabricksWithDataAsync(EnergyResultPerGridAreaDescription testDataDescription, EnergyResultPerGridAreaQuery viewQuery)
+    [Fact(Skip = "Implement matching query and EnqueueEnergyResultsForBalanceResponsiblesAsync")]
+    public async Task GivenCalculationWithIdIsCompleted_WhenEnqueueEnergyResultsForBalanceResponsibles_ThenOutgoingMessagesAreEnqueued()
+    {
+        var testDataDescription = new EnergyResultPerBrpGridAreaDescription();
+
+        var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
+        var viewQuery = new EnergyResultPerBrpGridAreaQuery(ediDatabricksOptions, testDataDescription.CalculationId);
+
+        await HavingReceivedAndHandledGridAreaOwnershipAssignedEventAsync(testDataDescription.GridAreaCode);
+        await SeedDatabricksWithDataAsync(testDataDescription, viewQuery);
+
+        var sut = GetService<IOutgoingMessagesClient>();
+        var input = new EnqueueMessagesInputDto(
+            testDataDescription.CalculationId,
+            EventId: Guid.NewGuid());
+
+        // Act
+        // TODO: Update to call "EnqueueEnergyResultsForBalanceResponsiblesAsync" when implemented
+        await sut.EnqueueEnergyResultsForGridAreaOwnersAsync(input);
+
+        // Assert
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        var sql = "SELECT * FROM [dbo].[OutgoingMessages]";
+        var result = await connection.QueryAsync(sql);
+
+        var actualCount = result.Count();
+        actualCount.Should().Be(testDataDescription.ExpectedOutgoingMessagesCount);
+    }
+
+    [Fact(Skip = "Implement matching query and EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersAsync")]
+    public async Task GivenCalculationWithIdIsCompleted_WhenEnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliers_ThenOutgoingMessagesAreEnqueued()
+    {
+        var testDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
+
+        var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
+        var viewQuery = new EnergyResultPerEnergySupplierBrpGridAreaQuery(ediDatabricksOptions, testDataDescription.CalculationId);
+
+        await HavingReceivedAndHandledGridAreaOwnershipAssignedEventAsync(testDataDescription.GridAreaCode);
+        await SeedDatabricksWithDataAsync(testDataDescription, viewQuery);
+
+        var sut = GetService<IOutgoingMessagesClient>();
+        var input = new EnqueueMessagesInputDto(
+            testDataDescription.CalculationId,
+            EventId: Guid.NewGuid());
+
+        // Act
+        // TODO: Update to call "EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersAsync" when implemented
+        await sut.EnqueueEnergyResultsForGridAreaOwnersAsync(input);
+
+        // Assert
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        var sql = "SELECT * FROM [dbo].[OutgoingMessages]";
+        var result = await connection.QueryAsync(sql);
+
+        var actualCount = result.Count();
+        actualCount.Should().Be(testDataDescription.ExpectedOutgoingMessagesCount);
+    }
+
+    private async Task SeedDatabricksWithDataAsync(EnergyResultTestDataDescription testDataDescription, EnergyResultQueryBase viewQuery)
     {
         await Fixture.DatabricksSchemaManager.CreateTableAsync(viewQuery);
         await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, testDataDescription.TestFilePath);
