@@ -70,7 +70,7 @@ limitations under the License.
       <ProjectReference Include="..\Process.Application\Process.Application.csproj" />
       <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
       <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
-      <ProjectReference Include="..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />
+      <ProjectReference Include="..\RequestResponse\source\Contracts\Contracts.csproj" />
       <ProjectReference Include="..\Tests\Tests.csproj" />
     </ItemGroup>
 

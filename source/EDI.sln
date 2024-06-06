@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArchitectureTests", "Archit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{87BCDB76-76A4-46A3-9F67-571847541C90}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RequestResponse", "RequestResponse\source\RequestResponse\RequestResponse.csproj", "{6A9A18B6-9445-45A0-813D-B7143DB9BC74}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contracts", "RequestResponse\source\Contracts\Contracts.csproj", "{6A9A18B6-9445-45A0-813D-B7143DB9BC74}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplyDBMigrationsApp", "ApplyDBMigrationsApp\ApplyDBMigrationsApp.csproj", "{600E0CAA-23B7-493D-90D0-6DDA72104673}"
 EndProject

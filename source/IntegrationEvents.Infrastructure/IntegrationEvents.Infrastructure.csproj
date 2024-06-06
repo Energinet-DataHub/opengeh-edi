@@ -11,7 +11,7 @@
       <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Interfaces\OutgoingMessages.Interfaces.csproj" />
 
-      <ProjectReference Include="..\RequestResponse\source\RequestResponse\RequestResponse.csproj" />
+      <ProjectReference Include="..\RequestResponse\source\Contracts\Contracts.csproj" />
     </ItemGroup>
 
     <ItemGroup>
