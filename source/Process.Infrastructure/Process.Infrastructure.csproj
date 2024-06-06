@@ -20,10 +20,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
+    <ProjectReference Include="..\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
     <ProjectReference Include="..\Process.Domain\Process.Domain.csproj" />
     <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
-    <ProjectReference Include="..\RequestResponse\source\Contracts\Contracts.csproj" />
   </ItemGroup>
 
 </Project>
