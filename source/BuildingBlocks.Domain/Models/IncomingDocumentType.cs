@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
-
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 public class IncomingDocumentType : EnumerationType
@@ -22,7 +19,7 @@ public class IncomingDocumentType : EnumerationType
     public static readonly IncomingDocumentType RequestAggregatedMeasureData = new(nameof(RequestAggregatedMeasureData));
     public static readonly IncomingDocumentType B2CRequestAggregatedMeasureData = new(nameof(B2CRequestAggregatedMeasureData));
     public static readonly IncomingDocumentType RequestWholesaleSettlement = new(nameof(RequestWholesaleSettlement));
-    public static readonly IncomingDocumentType B2CRequestWholesaleSettlement = new(nameof(RequestWholesaleSettlement));
+    public static readonly IncomingDocumentType B2CRequestWholesaleSettlement = new(nameof(B2CRequestWholesaleSettlement));
 
     private IncomingDocumentType(string name)
         : base(name)
