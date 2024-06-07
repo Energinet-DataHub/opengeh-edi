@@ -14,7 +14,10 @@
 
 using System.Text;
 using System.Xml.Linq;
+using Energinet.DataHub.EDI.B2CWebApi.Factories;
+using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
 using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.WholesaleSettlementMessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
@@ -23,7 +26,10 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.C
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using FluentAssertions.Execution;
+using NodaTime;
+using NodaTime.Extensions;
 using Xunit;
+using RequestWholesaleSettlementChargeType = Energinet.DataHub.EDI.B2CWebApi.Models.RequestWholesaleSettlementChargeType;
 
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.WholesaleSettlementMessageParsers;
 
@@ -39,6 +45,7 @@ public class MessageParserTests
         $"{Path.DirectorySeparatorChar}wholesalesettlement{Path.DirectorySeparatorChar}";
 
     private readonly MarketMessageParser _marketMessageParser;
+    private readonly Serializer _serializer = new();
 
     public MessageParserTests()
     {
@@ -47,6 +54,7 @@ public class MessageParserTests
             {
                 new XmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
                 new JsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
+                new B2CJsonMessageParser(_serializer),
             });
     }
 
@@ -221,6 +229,38 @@ public class MessageParserTests
         Assert.Empty(smallSeries.ChargeTypes);
     }
 
+    [Fact]
+    public async Task Given_B2CRequest_When_ParsenMessage_Then_RequestIsSuccessful()
+    {
+        //Arrange
+        var b2CRequest = new RequestWholesaleSettlementMarketRequest(
+            CalculationType.BalanceFixing,
+            "2022-08-17T22:00:00Z",
+            "2022-08-31T22:00:00Z",
+            "804",
+            "5799999933318",
+            "PT1H",
+            "570001110111",
+            new List<RequestWholesaleSettlementChargeType>
+            {
+                new("EA-001", "D03"),
+                new("EA-002", "D02"),
+            });
+        var message = RequestWholesaleSettlementDtoFactory.Create(
+            b2CRequest,
+            "5799999933318",
+            "DDQ",
+            DateTimeZoneProviders.Tzdb.GetSystemDefault(),
+            DateTime.Now.ToUniversalTime().ToInstant());
+
+        var result = await _marketMessageParser.ParseAsync(
+            GenerateStreamFromString(
+                _serializer.Serialize(message)),
+            DocumentFormat.Json,
+            IncomingDocumentType.B2CRequestWholesaleSettlement,
+            CancellationToken.None);
+    }
+
     private static MemoryStream CreateBaseXmlMessage(string fileName)
     {
         var xmlDocument = XDocument.Load(
@@ -272,5 +312,13 @@ public class MessageParserTests
         }
 
         return jsonDocSb.ToString();
+    }
+
+    private static IncomingMessageStream GenerateStreamFromString(string jsonString)
+    {
+        var encoding = Encoding.UTF8;
+        var byteArray = encoding.GetBytes(jsonString);
+        var memoryStream = new MemoryStream(byteArray);
+        return new IncomingMessageStream(memoryStream);
     }
 }

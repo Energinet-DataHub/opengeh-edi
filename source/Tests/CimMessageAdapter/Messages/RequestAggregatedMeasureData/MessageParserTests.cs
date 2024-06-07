@@ -12,13 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
@@ -57,7 +51,6 @@ public class MessageParserTests
             {
                 new XmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
                 new JsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
-                new B2CJsonMessageParser(new Serializer()),
             });
     }
 
