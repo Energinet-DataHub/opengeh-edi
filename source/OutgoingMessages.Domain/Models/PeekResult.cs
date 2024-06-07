@@ -17,4 +17,4 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 
-public sealed record PeekResult(BundleId? BundleId, MessageId? MessageId);
+public sealed record PeekResult(BundleId BundleId, MessageId MessageId);

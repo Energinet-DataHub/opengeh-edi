@@ -12,10 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -79,11 +75,10 @@ public class PeekMessage
 
         var peekResult = request.DocumentFormat == DocumentFormat.Ebix ? actorMessageQueue.Peek() : actorMessageQueue.Peek(request.MessageCategory);
 
-        if (peekResult.BundleId == null)
+        if (peekResult is null)
+        {
             return new PeekResultDto(null, null);
-
-        if (peekResult.MessageId == null)
-            return new PeekResultDto(null, null);
+        }
 
         var marketDocument = await _marketDocumentRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);
 

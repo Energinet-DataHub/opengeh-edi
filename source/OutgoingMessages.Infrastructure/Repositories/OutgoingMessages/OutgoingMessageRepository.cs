@@ -12,13 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -71,7 +66,7 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
             firstMessage.BusinessReason,
             firstMessage.SenderId,
             firstMessage.SenderRole,
-            peekResult.MessageId!.Value,
+            peekResult.MessageId,
             outgoingMessages,
             firstMessage.RelatedToMessageId);
     }
