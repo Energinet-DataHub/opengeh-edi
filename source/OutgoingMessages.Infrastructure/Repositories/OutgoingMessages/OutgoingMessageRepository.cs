@@ -49,11 +49,11 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
         _context.OutgoingMessages.Add(message);
     }
 
-    public async Task<OutgoingMessageBundle> GetAsync(BundleId bundleId, MessageId? messageId)
+    public async Task<OutgoingMessageBundle> GetAsync(PeekResult peekResult)
     {
-        ArgumentNullException.ThrowIfNull(messageId);
+        ArgumentNullException.ThrowIfNull(peekResult);
 
-        var outgoingMessages = await _context.OutgoingMessages.Where(x => x.AssignedBundleId == bundleId)
+        var outgoingMessages = await _context.OutgoingMessages.Where(x => x.AssignedBundleId == peekResult.BundleId)
             .ToListAsync()
             .ConfigureAwait(false);
 
@@ -71,7 +71,7 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
             firstMessage.BusinessReason,
             firstMessage.SenderId,
             firstMessage.SenderRole,
-            messageId.Value,
+            peekResult.MessageId!.Value,
             outgoingMessages,
             firstMessage.RelatedToMessageId);
     }

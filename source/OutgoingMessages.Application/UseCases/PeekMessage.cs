@@ -91,7 +91,7 @@ public class PeekMessage
         {
             var timestamp = _systemDateTimeProvider.Now();
 
-            var outgoingMessageBundle = await _outgoingMessageRepository.GetAsync(peekResult.BundleId, peekResult.MessageId).ConfigureAwait(false);
+            var outgoingMessageBundle = await _outgoingMessageRepository.GetAsync(peekResult).ConfigureAwait(false);
             var marketDocumentStream = await _documentFactory.CreateFromAsync(outgoingMessageBundle, request.DocumentFormat, timestamp).ConfigureAwait(false);
 
             var archivedMessageToCreate = new ArchivedMessage(
