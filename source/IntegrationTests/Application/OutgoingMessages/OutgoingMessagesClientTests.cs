@@ -79,7 +79,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         actualCount.Should().Be(testDataDescription.ExpectedOutgoingMessagesCount);
     }
 
-    [Fact(Skip = "Implement matching query enumerator and EnqueueEnergyResultsForBalanceResponsiblesAsync")]
+    [Fact]
     public async Task GivenCalculationWithIdIsCompleted_WhenEnqueueEnergyResultsForBalanceResponsibles_ThenOutgoingMessagesAreEnqueued()
     {
         var testDataDescription = new EnergyResultPerBrpGridAreaDescription();
@@ -96,8 +96,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
             EventId: Guid.NewGuid());
 
         // Act
-        // TODO: Update to call "EnqueueEnergyResultsForBalanceResponsiblesAsync" when implemented
-        await sut.EnqueueEnergyResultsForGridAreaOwnersAsync(input);
+        await sut.EnqueueEnergyResultsForBalanceResponsiblesAsync(input);
 
         // Assert
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
@@ -108,7 +107,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         actualCount.Should().Be(testDataDescription.ExpectedOutgoingMessagesCount);
     }
 
-    [Fact(Skip = "Implement matching query enumerator and EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersAsync")]
+    [Fact]
     public async Task GivenCalculationWithIdIsCompleted_WhenEnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliers_ThenOutgoingMessagesAreEnqueued()
     {
         var testDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
@@ -125,8 +124,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
             EventId: Guid.NewGuid());
 
         // Act
-        // TODO: Update to call "EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersAsync" when implemented
-        await sut.EnqueueEnergyResultsForGridAreaOwnersAsync(input);
+        await sut.EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersAsync(input);
 
         // Assert
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);

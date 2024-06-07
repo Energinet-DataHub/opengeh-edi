@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -168,11 +169,43 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         var query = new EnergyResultPerGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
         await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
         {
-            // TODO:
-            // It should be possible to move retrieval of Grid Area Owner into enumerator
-            // AND create the EnergyResultMessageDto directly in queries
+            // TODO: It should be possible to implement a cache for grid area owner, so we improve the performance of the loop
             var receiverNumber = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(energyResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
+            // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
             var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult, receiverNumber);
+            await EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);
+            numberOfEnqueuedMessages++;
+        }
+
+        return numberOfEnqueuedMessages;
+    }
+
+    public async Task<int> EnqueueEnergyResultsForBalanceResponsiblesAsync(EnqueueMessagesInputDto input)
+    {
+        var numberOfEnqueuedMessages = 0;
+
+        var query = new EnergyResultPerBrpGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
+        await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
+        {
+            // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
+            var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult);
+            await EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);
+            numberOfEnqueuedMessages++;
+        }
+
+        return numberOfEnqueuedMessages;
+    }
+
+    public async Task<int> EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersAsync(EnqueueMessagesInputDto input)
+    {
+        var numberOfEnqueuedMessages = 0;
+
+        var query = new EnergyResultPerEnergySupplierBrpGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
+        await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
+        {
+            // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
+            var receiverNumber = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(energyResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
+            var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult);
             await EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);
             numberOfEnqueuedMessages++;
         }

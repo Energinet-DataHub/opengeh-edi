@@ -41,7 +41,7 @@ public class DatabricksSqlRow(IDictionary<string, object?> columns)
     public string ToNonEmptyString(string columnName)
     {
         var value = ToNullableString(columnName);
-        ArgumentException.ThrowIfNullOrWhiteSpace(value);
+        ArgumentException.ThrowIfNullOrWhiteSpace(value, columnName);
 
         return value;
     }

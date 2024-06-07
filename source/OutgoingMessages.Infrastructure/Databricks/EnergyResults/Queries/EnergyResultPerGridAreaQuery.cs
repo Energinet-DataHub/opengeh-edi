@@ -56,6 +56,6 @@ public class EnergyResultPerGridAreaQuery(
 
     protected override EnergyResultPerGridArea CreateEnergyResult(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
     {
-        return EnergyResultPerGridAreaFactory.CreateEnergyResult(databricksSqlRow, timeSeriesPoints);
+        return EnergyResultPerGridAreaFactory.CreateEnergyResultPerGridArea(databricksSqlRow, timeSeriesPoints);
     }
 }

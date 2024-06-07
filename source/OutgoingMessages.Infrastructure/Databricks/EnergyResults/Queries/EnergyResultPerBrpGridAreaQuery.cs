@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
@@ -56,7 +57,6 @@ public class EnergyResultPerBrpGridAreaQuery(
 
     protected override EnergyResultPerBrpGridArea CreateEnergyResult(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
     {
-        // TODO: Create correct return type from sql row
-        throw new NotImplementedException();
+        return EnergyResultPerGridAreaFactory.CreateEnergyResultPerBrpGridArea(databricksSqlRow, timeSeriesPoints);
     }
 }

@@ -19,7 +19,6 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults;
 
-// TODO: Add BRP ID
 public sealed class EnergyResultPerBrpGridArea(
     Guid id,
     Guid calculationId,
@@ -31,7 +30,8 @@ public sealed class EnergyResultPerBrpGridArea(
     Instant periodEndUtc,
     Resolution resolution,
     long calculationVersion,
-    SettlementMethod? settlementMethod)
+    SettlementMethod? settlementMethod,
+    string balanceResponsiblePartyId)
     : AggregatedTimeSeries(
         gridAreaCode,
         timeSeriesPoints,
@@ -46,4 +46,6 @@ public sealed class EnergyResultPerBrpGridArea(
     public Guid Id { get; } = id;
 
     public Guid CalculationId { get; } = calculationId;
+
+    public string BalanceResponsiblePartyId { get; } = balanceResponsiblePartyId;
 }
