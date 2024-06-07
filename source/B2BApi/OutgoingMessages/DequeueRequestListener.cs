@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.B2BApi.Common;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
