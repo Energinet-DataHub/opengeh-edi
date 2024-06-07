@@ -21,6 +21,7 @@ using System.Text;
 using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
@@ -31,7 +32,7 @@ internal static class RequestWholesaleServicesRequestBuilder
     /// <summary>
     /// Create a stream containing a RequestWholesaleSettlement message in the specified format
     /// </summary>
-    public static IncomingMessageStream GetStream(
+    public static IncomingMarketMessageStream GetStream(
         DocumentFormat format,
         ActorNumber senderActorNumber,
         ActorRole senderActorRole,
@@ -78,7 +79,7 @@ internal static class RequestWholesaleServicesRequestBuilder
             throw new ArgumentOutOfRangeException(nameof(format), format, "Unsupported document format");
         }
 
-        return new IncomingMessageStream(new MemoryStream(Encoding.UTF8.GetBytes(content)));
+        return new IncomingMarketMessageStream(new MemoryStream(Encoding.UTF8.GetBytes(content)));
     }
 
     private static string GetCimJson(

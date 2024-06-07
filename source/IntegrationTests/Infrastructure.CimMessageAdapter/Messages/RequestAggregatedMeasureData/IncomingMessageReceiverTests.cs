@@ -23,11 +23,12 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
-using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
+using Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
+using Energinet.DataHub.EDI.IncomingMessages.Domain;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
@@ -44,7 +45,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
 {
     private readonly MarketMessageParser _marketMessageParser;
     private readonly ProcessContext _processContext;
-    private readonly IncomingMessageValidator _incomingMessageValidator;
+    private readonly ValidateIncomingMessage _validateIncomingMessage;
 
     public IncomingMessageReceiverTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
@@ -55,7 +56,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         var authenticatedActor = GetService<AuthenticatedActor>();
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234567890123"), restriction: Restriction.None,  ActorRole.FromCode("DDQ")));
 
-        _incomingMessageValidator = GetService<IncomingMessageValidator>();
+        _validateIncomingMessage = GetService<ValidateIncomingMessage>();
     }
 
     public static IEnumerable<object[]> AllowedActorRolesForAggregatedMeasureData =>
@@ -108,7 +109,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
@@ -125,7 +126,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
@@ -141,7 +142,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
@@ -177,7 +178,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
@@ -194,7 +195,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
@@ -210,7 +211,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
@@ -236,7 +237,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
 
         // Act
         var messageParser = await ParseMessageAsync(message);
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
@@ -262,7 +263,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
@@ -281,7 +282,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var resultFromFirstMessage = await _incomingMessageValidator.ValidateAsync(
+        var resultFromFirstMessage = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
@@ -294,7 +295,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser2 = await ParseMessageAsync(message02);
-        var resultFromSecondMessage = await _incomingMessageValidator.ValidateAsync(
+        var resultFromSecondMessage = await _validateIncomingMessage.ValidateAsync(
             messageParser2.IncomingMessage!,
             CancellationToken.None);
 
@@ -315,7 +316,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
@@ -331,7 +332,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
@@ -350,12 +351,12 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser01 = await ParseMessageAsync(message01);
-        var result01 = await _incomingMessageValidator.ValidateAsync(
+        var result01 = await _validateIncomingMessage.ValidateAsync(
             messageParser01.IncomingMessage!,
             CancellationToken.None);
 
         var messageParser02 = await ParseMessageAsync(message02);
-        var result02 = await _incomingMessageValidator.ValidateAsync(
+        var result02 = await _validateIncomingMessage.ValidateAsync(
             messageParser02.IncomingMessage!,
             CancellationToken.None);
 
@@ -377,7 +378,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         await StoreMessageIdForActorAsync(existingMessageId, senderActorNumber);
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
@@ -395,7 +396,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
@@ -413,7 +414,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
 
         var (incomingMessage, _) = await ParseWholesaleServicesMessageAsync(message);
 
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             incomingMessage!,
             CancellationToken.None);
 
@@ -510,7 +511,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
 
         var (incomingMessage, _) = await ParseMessageAsync(message);
 
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             incomingMessage!,
             CancellationToken.None);
 
@@ -533,7 +534,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
 
         var (incomingMessage, _) = await ParseMessageAsync(message);
 
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             incomingMessage!,
             CancellationToken.None);
 
@@ -576,7 +577,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
 
         var (incomingMessage, _) = await ParseMessageAsync(message);
 
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             incomingMessage!,
             CancellationToken.None);
 
@@ -592,7 +593,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
@@ -608,7 +609,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
@@ -624,7 +625,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
@@ -641,7 +642,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             .Message();
 
         var messageParser = await ParseMessageAsync(message);
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             messageParser.IncomingMessage!,
             CancellationToken.None);
 
@@ -692,7 +693,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
     private async Task<(RequestAggregatedMeasureDataMessage? IncomingMessage, IncomingMarketMessageParserResult ParserResult)> ParseMessageAsync(Stream message)
     {
         var messageParser = await _marketMessageParser.ParseAsync(
-            new IncomingMessageStream(message),
+            new IncomingMarketMessageStream(message),
             DocumentFormat.Xml,
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
@@ -702,7 +703,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
     private async Task<(RequestWholesaleServicesMessage? IncomingMessage, IncomingMarketMessageParserResult ParserResult)> ParseWholesaleServicesMessageAsync(Stream message)
     {
         var messageParser = await _marketMessageParser.ParseAsync(
-            new IncomingMessageStream(message),
+            new IncomingMarketMessageStream(message),
             DocumentFormat.Xml,
             IncomingDocumentType.RequestWholesaleSettlement,
             CancellationToken.None);

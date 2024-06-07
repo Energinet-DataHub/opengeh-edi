@@ -12,28 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
-using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators;
+using Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages.RequestAggregatedMeasureData;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.AggregatedMeasureDataRequestMessageParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageRegistration;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using AggregatedMeasureDataB2CJsonMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers.B2CJsonMessageParser;
-using AggregatedMeasureDataJsonMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers.JsonMessageParser;
-using AggregatedMeasureDataXmlMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers.XmlMessageParser;
-using WholesaleSettlementJsonMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.WholesaleSettlementMessageParsers.JsonMessageParser;
-using WholesaleSettlementXmlMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.WholesaleSettlementMessageParsers.XmlMessageParser;
+using AggregatedMeasureDataXmlMessageParser = Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.AggregatedMeasureDataRequestMessageParsers.XmlMessageParser;
+using WholesaleSettlementXmlMessageParser = Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.WholesaleSettlementMessageParsers.XmlMessageParser;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 
@@ -58,18 +55,18 @@ public static class IncomingMessagesExtensions
             .AddDapperConnectionToDatabase(configuration)
             .AddScopedSqlDbContext<IncomingMessagesContext>(configuration)
             .AddScoped<IIncomingMessageClient, IncomingMessageClient>()
-            .AddScoped<IncomingMessageDelegator>()
+            .AddScoped<DelegateIncomingMessage>()
             .AddScoped<ITransactionIdRepository, TransactionIdRepository>()
             .AddScoped<IMessageIdRepository, MessageIdRepository>()
-            .AddScoped<IMessageParser, AggregatedMeasureDataXmlMessageParser>()
-            .AddScoped<IMessageParser, AggregatedMeasureDataJsonMessageParser>()
-            .AddScoped<IMessageParser, AggregatedMeasureDataB2CJsonMessageParser>()
-            .AddScoped<IMessageParser, WholesaleSettlementJsonMessageParser>()
-            .AddScoped<IMessageParser, WholesaleSettlementXmlMessageParser>()
+            .AddScoped<IMarketMessageParser, AggregatedMeasureDataXmlMessageParser>()
+            .AddScoped<IMarketMessageParser, JsonMarketMessageParser>()
+            .AddScoped<IMarketMessageParser, B2CJsonMarketMessageParser>()
+            .AddScoped<IMarketMessageParser, Infrastructure.MessageParser.WholesaleSettlementMessageParsers.JsonMarketMessageParser>()
+            .AddScoped<IMarketMessageParser, WholesaleSettlementXmlMessageParser>()
             .AddScoped<MarketMessageParser>()
             .AddScoped<ISenderAuthorizer, SenderAuthorizer>()
             .AddScoped<IncomingMessagePublisher>()
-            .AddScoped<IncomingMessageValidator>()
+            .AddScoped<ValidateIncomingMessage>()
             .AddSingleton<IProcessTypeValidator, ProcessTypeValidator>()
             .AddSingleton<IMessageTypeValidator, MessageTypeValidator>()
             .AddSingleton<IBusinessTypeValidator, BusinessTypeValidator>()

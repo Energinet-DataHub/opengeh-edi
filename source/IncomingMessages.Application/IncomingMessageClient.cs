@@ -12,21 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
-using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Messages;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application;
@@ -34,49 +31,49 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application;
 public class IncomingMessageClient : IIncomingMessageClient
 {
     private readonly MarketMessageParser _marketMessageParser;
-    private readonly IncomingMessageValidator _incomingMessageValidator;
+    private readonly ValidateIncomingMessage _validateIncomingMessage;
     private readonly ResponseFactory _responseFactory;
     private readonly IArchivedMessagesClient _archivedMessagesClient;
     private readonly ILogger<IncomingMessageClient> _logger;
     private readonly IIncomingMessageReceiver _incomingMessageReceiver;
-    private readonly IncomingMessageDelegator _incomingMessageDelegator;
+    private readonly DelegateIncomingMessage _delegateIncomingMessage;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IFeatureFlagManager _featureFlagManager;
 
     public IncomingMessageClient(
         MarketMessageParser marketMessageParser,
-        IncomingMessageValidator incomingMessageValidator,
+        ValidateIncomingMessage validateIncomingMessage,
         ResponseFactory responseFactory,
         IArchivedMessagesClient archivedMessagesClient,
         ILogger<IncomingMessageClient> logger,
         IIncomingMessageReceiver incomingMessageReceiver,
-        IncomingMessageDelegator incomingMessageDelegator,
+        DelegateIncomingMessage delegateIncomingMessage,
         ISystemDateTimeProvider systemDateTimeProvider,
         IFeatureFlagManager featureFlagManager)
     {
         _marketMessageParser = marketMessageParser;
-        _incomingMessageValidator = incomingMessageValidator;
+        _validateIncomingMessage = validateIncomingMessage;
         _responseFactory = responseFactory;
         _archivedMessagesClient = archivedMessagesClient;
         _logger = logger;
         _incomingMessageReceiver = incomingMessageReceiver;
-        _incomingMessageDelegator = incomingMessageDelegator;
+        _delegateIncomingMessage = delegateIncomingMessage;
         _systemDateTimeProvider = systemDateTimeProvider;
         _featureFlagManager = featureFlagManager;
     }
 
-    public async Task<ResponseMessage> RegisterAndSendAsync(
-        IIncomingMessageStream incomingMessageStream,
+    public async Task<ResponseMessage> ReceiveIncomingMarketMessageAsync(
+        IIncomingMarketMessageStream incomingMarketMessageStream,
         DocumentFormat incomingDocumentFormat,
         IncomingDocumentType documentType,
         DocumentFormat responseDocumentFormat,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(documentType);
-        ArgumentNullException.ThrowIfNull(incomingMessageStream);
+        ArgumentNullException.ThrowIfNull(incomingMarketMessageStream);
 
         var incomingMarketMessageParserResult =
-            await _marketMessageParser.ParseAsync(incomingMessageStream, incomingDocumentFormat, documentType, cancellationToken)
+            await _marketMessageParser.ParseAsync(incomingMarketMessageStream, incomingDocumentFormat, documentType, cancellationToken)
                 .ConfigureAwait(false);
 
         if (incomingMarketMessageParserResult.Errors.Count != 0
@@ -92,7 +89,7 @@ public class IncomingMessageClient : IIncomingMessageClient
         }
 
         await ArchiveIncomingMessageAsync(
-                incomingMessageStream,
+                incomingMarketMessageStream,
                 incomingMarketMessageParserResult.IncomingMessage,
                 documentType,
                 cancellationToken)
@@ -100,12 +97,12 @@ public class IncomingMessageClient : IIncomingMessageClient
 
         if (await _featureFlagManager.UseMessageDelegationAsync().ConfigureAwait(false))
         {
-            await _incomingMessageDelegator
+            await _delegateIncomingMessage
                 .DelegateAsync(incomingMarketMessageParserResult.IncomingMessage, documentType, cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        var validationResult = await _incomingMessageValidator
+        var validationResult = await _validateIncomingMessage
             .ValidateAsync(incomingMarketMessageParserResult.IncomingMessage, cancellationToken)
             .ConfigureAwait(false);
 
@@ -137,7 +134,7 @@ public class IncomingMessageClient : IIncomingMessageClient
     }
 
     private async Task ArchiveIncomingMessageAsync(
-        IIncomingMessageStream incomingMessageStream,
+        IIncomingMarketMessageStream incomingMarketMessageStream,
         IIncomingMessage incomingMessage,
         IncomingDocumentType incomingDocumentType,
         CancellationToken cancellationToken)
@@ -151,7 +148,7 @@ public class IncomingMessageClient : IIncomingMessageClient
                 _systemDateTimeProvider.Now(),
                 incomingMessage.BusinessReason,
                 ArchivedMessageType.IncomingMessage,
-                incomingMessageStream),
+                incomingMarketMessageStream),
             cancellationToken).ConfigureAwait(false);
     }
 }

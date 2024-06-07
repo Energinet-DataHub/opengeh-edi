@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.B2BApi.Common;
 using Energinet.DataHub.EDI.B2BApi.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
@@ -88,8 +89,8 @@ public class IncomingMessageReceiver
         }
 
         var responseMessage = await _incomingMessageClient
-            .RegisterAndSendAsync(
-                new IncomingMessageStream(request.Body),
+            .ReceiveIncomingMarketMessageAsync(
+                new IncomingMarketMessageStream(request.Body),
                 incomingDocumentFormat: documentFormat,
                 incomingDocumentType,
                 responseDocumentFormat: documentFormat,
