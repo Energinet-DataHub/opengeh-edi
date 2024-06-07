@@ -67,14 +67,14 @@ public class ActorMessageQueue
     {
         var bundle = NextBundleToPeek();
 
-        return new PeekResult(bundle?.Id, bundle?.MessageId, bundle?.DocumentTypeInBundle);
+        return new PeekResult(bundle?.Id, bundle?.MessageId);
     }
 
     public PeekResult Peek(MessageCategory category)
     {
         var bundle = NextBundleToPeek(category);
 
-        return new PeekResult(bundle?.Id, bundle?.MessageId, bundle?.DocumentTypeInBundle);
+        return new PeekResult(bundle?.Id, bundle?.MessageId);
     }
 
     public bool Dequeue(MessageId messageId)

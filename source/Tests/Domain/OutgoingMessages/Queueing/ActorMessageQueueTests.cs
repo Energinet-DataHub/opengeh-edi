@@ -112,8 +112,6 @@ public class ActorMessageQueueTests
         var secondPeekResult = actorMessageQueue.Peek(MessageCategory.Aggregations);
         actorMessageQueue.Dequeue(secondPeekResult.MessageId!.Value);
 
-        Assert.Equal(DocumentType.NotifyAggregatedMeasureData, firstPeekResult.DocumentType);
-        Assert.Equal(DocumentType.RejectRequestAggregatedMeasureData, secondPeekResult.DocumentType);
         Assert.NotEqual(firstPeekResult.BundleId, secondPeekResult.BundleId);
     }
 
