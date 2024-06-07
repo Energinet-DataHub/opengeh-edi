@@ -20,6 +20,8 @@ using Energinet.DataHub.Core.App.WebApp.Extensions.Options;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.EDI.B2BApi;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
@@ -98,6 +100,14 @@ public class RegistrationTests
                 typeof(NotifyWholesaleServicesEbixDocumentWriter).Assembly,
             });
 
+    public static IEnumerable<object[]> GetMessageParserRequirements()
+        => ResolveTypesThatImplementType(
+            typeof(IMessageParser),
+            new[]
+            {
+                typeof(JsonMessageParser).Assembly,
+            });
+
     public static IEnumerable<object[]> GetFunctionRequirements()
     {
         var allTypes = ReflectionHelper.FindAllTypes();
@@ -149,6 +159,14 @@ public class RegistrationTests
     [Theory(DisplayName = nameof(All_document_writers_are_registered))]
     [MemberData(nameof(GetDocumentWritersRequirements))]
     public void All_document_writers_are_registered(Requirement requirement)
+    {
+        using var scope = _host.Services.CreateScope();
+        Assert.True(scope.ServiceProvider.CanSatisfyType(requirement));
+    }
+
+    [Theory(DisplayName = nameof(All_message_parsers_are_registered))]
+    [MemberData(nameof(GetMessageParserRequirements))]
+    public void All_message_parsers_are_registered(Requirement requirement)
     {
         using var scope = _host.Services.CreateScope();
         Assert.True(scope.ServiceProvider.CanSatisfyType(requirement));
