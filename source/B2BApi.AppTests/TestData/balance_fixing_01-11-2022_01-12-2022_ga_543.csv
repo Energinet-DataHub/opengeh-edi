@@ -1,2 +1,2 @@
-calculation_id,calculation_type,calculation_period_start,calculation_period_end,calculation_version,result_id,grid_area_code,metering_point_type,settlement_method,resolution,time,quantity,unit,quantity_qualities
+calculation_id,calculation_type,calculation_period_start,calculation_period_end,calculation_version,result_id,grid_area_code,metering_point_type,settlement_method,resolution,time,quantity,quantity_unit,quantity_qualities
 e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d,BalanceFixing,2022-01-11 23:00:00.000000,2022-01-12 23:00:00.000000,63,17582ba4-71db-4ce5-af70-b00a4676e357,543,consumption,"",PT1H,2022-01-11 23:00:00.000000,2617235.281,kWh,"[""missing"",""measured"",""calculated""]"
