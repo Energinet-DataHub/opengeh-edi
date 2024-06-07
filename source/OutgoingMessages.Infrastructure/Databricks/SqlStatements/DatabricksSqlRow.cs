@@ -41,7 +41,8 @@ public class DatabricksSqlRow(IDictionary<string, object?> columns)
     public string ToNonEmptyString(string columnName)
     {
         var value = ToNullableString(columnName);
-        ArgumentException.ThrowIfNullOrWhiteSpace(value, columnName);
+        // We set 'parameterName' to the 'columnName' so we get the name of the column which we failed on parsing.
+        ArgumentException.ThrowIfNullOrWhiteSpace(value, paramName: columnName);
 
         return value;
     }
