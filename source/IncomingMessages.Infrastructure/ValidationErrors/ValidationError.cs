@@ -31,6 +31,6 @@ public abstract class ValidationError
 
     public override string ToString()
     {
-        return $"Code: {Code}, Message: {Message}, Target: {Target}";
+        return $"'Code: {Code}, Message: {Message}, Target: {Target}'";
     }
 }
