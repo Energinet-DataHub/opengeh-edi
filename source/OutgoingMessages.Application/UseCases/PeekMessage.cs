@@ -95,7 +95,7 @@ public class PeekMessage
             var marketDocumentStream = await _documentFactory.CreateFromAsync(outgoingMessageBundle, request.DocumentFormat, timestamp).ConfigureAwait(false);
 
             var archivedMessageToCreate = new ArchivedMessage(
-                peekResult.MessageId.Value.Value,
+                outgoingMessageBundle.MessageId.Value,
                 outgoingMessageBundle.OutgoingMessages.Select(om => om.EventId).ToArray(),
                 outgoingMessageBundle.DocumentType.ToString(),
                 outgoingMessageBundle.SenderId.Value,
