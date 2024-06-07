@@ -25,6 +25,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
 using NodaTime.Extensions;
@@ -230,9 +231,9 @@ public class MessageParserTests
     }
 
     [Fact]
-    public async Task Given_B2CRequest_When_ParsenMessage_Then_RequestIsSuccessful()
+    public async Task Given_B2CRequest_When_Parsing_Then_SuccessfullyParsed()
     {
-        //Arrange
+        // Arrange
         var b2CRequest = new RequestWholesaleSettlementMarketRequest(
             CalculationType.BalanceFixing,
             "2022-08-17T22:00:00Z",
@@ -249,16 +250,20 @@ public class MessageParserTests
         var message = RequestWholesaleSettlementDtoFactory.Create(
             b2CRequest,
             "5799999933318",
-            "DDQ",
+            "EnergySupplier",
             DateTimeZoneProviders.Tzdb.GetSystemDefault(),
             DateTime.Now.ToUniversalTime().ToInstant());
 
+        // Act
         var result = await _marketMessageParser.ParseAsync(
             GenerateStreamFromString(
                 _serializer.Serialize(message)),
             DocumentFormat.Json,
             IncomingDocumentType.B2CRequestWholesaleSettlement,
             CancellationToken.None);
+
+        // Assert
+        result.Success.Should().BeTrue();
     }
 
     private static MemoryStream CreateBaseXmlMessage(string fileName)
