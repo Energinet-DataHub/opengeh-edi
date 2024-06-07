@@ -27,5 +27,5 @@ public class EdiDatabricksOptions
     /// Name of the database in which the views for EDI are located.
     /// </summary>
     [Required]
-    public string DatabaseName { get; set; } = "wholesale_edi_results";
+    public string DatabaseName { get; set; } = "wholesale_calculation_results";
 }
