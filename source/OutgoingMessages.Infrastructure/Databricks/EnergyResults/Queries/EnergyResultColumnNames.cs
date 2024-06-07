@@ -42,7 +42,7 @@ public class EnergyResultColumnNames
     public const string Time = "time";
 
     public const string Quantity = "quantity";
-    public const string QuantityUnit = "unit";
+    public const string QuantityUnit = "quantity_unit";
     public const string QuantityQualities = "quantity_qualities";
 
     public const string BalanceResponsiblePartyId = "balance_responsible_party_id";
