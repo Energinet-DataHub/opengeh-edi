@@ -51,6 +51,7 @@ public class MessageParserTests
             {
                 new XmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
                 new JsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
+                new B2CJsonMessageParser(new Serializer()),
             });
     }
 
