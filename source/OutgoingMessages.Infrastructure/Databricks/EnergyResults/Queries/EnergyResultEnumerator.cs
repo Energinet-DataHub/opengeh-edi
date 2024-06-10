@@ -13,10 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
-using Energinet.DataHub.Core.Databricks.SqlStatementExecution.Formats;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -29,50 +26,22 @@ public class EnergyResultEnumerator(
     ILogger<EnergyResultEnumerator> logger)
 {
     private readonly DatabricksSqlWarehouseQueryExecutor _databricksSqlWarehouseQueryExecutor = databricksSqlWarehouseQueryExecutor;
-    private readonly IOptions<EdiDatabricksOptions> _ediDatabricksOptions = ediDatabricksOptions;
+    private readonly EdiDatabricksOptions _ediDatabricksOptions = ediDatabricksOptions.Value;
     private readonly ILogger<EnergyResultEnumerator> _logger = logger;
 
-    public async IAsyncEnumerable<EnergyResultPerGridArea> GetAsync(Guid calculationId)
-    {
-        var query = new EnergyResultPerGridAreaQuery(_ediDatabricksOptions, calculationId);
-        await foreach (var messageDto in GetInternalAsync(query))
-            yield return messageDto;
-        _logger.LogDebug("Fetched all energy results for calculation {calculation_id}", calculationId);
-    }
+    public EdiDatabricksOptions EdiDatabricksOptions => _ediDatabricksOptions;
 
-    private static bool BelongsToDifferentResults(DatabricksSqlRow row, DatabricksSqlRow otherRow)
+    public async IAsyncEnumerable<TResult> GetAsync<TResult>(EnergyResultQueryBase<TResult> query)
+        where TResult : AggregatedTimeSeries
     {
-        return !row.ToGuid(EnergyResultColumnNames.ResultId).Equals(otherRow.ToGuid(EnergyResultColumnNames.ResultId));
-    }
-
-    private async IAsyncEnumerable<EnergyResultPerGridArea> GetInternalAsync(EnergyResultPerGridAreaQuery query)
-    {
-        DatabricksSqlRow? currentRow = null;
         var resultCount = 0;
-        var timeSeriesPoints = new List<EnergyTimeSeriesPoint>();
 
-        await foreach (var nextRowAsDynamic in _databricksSqlWarehouseQueryExecutor.ExecuteStatementAsync(query, Format.JsonArray).ConfigureAwait(false))
+        await foreach (var energyResult in query.GetAsync(_databricksSqlWarehouseQueryExecutor).ConfigureAwait(false))
         {
-            var nextRow = new DatabricksSqlRow(nextRowAsDynamic);
-            var timeSeriesPoint = EnergyTimeSeriesPointFactory.CreateTimeSeriesPoint(nextRow);
-
-            if (currentRow != null && BelongsToDifferentResults(currentRow, nextRow))
-            {
-                yield return EnergyResultPerGridAreaFactory.CreateEnergyResult(currentRow!, timeSeriesPoints);
-                resultCount++;
-                timeSeriesPoints = [];
-            }
-
-            timeSeriesPoints.Add(timeSeriesPoint);
-            currentRow = nextRow;
-        }
-
-        if (currentRow != null)
-        {
-            yield return EnergyResultPerGridAreaFactory.CreateEnergyResult(currentRow, timeSeriesPoints);
+            yield return energyResult;
             resultCount++;
         }
 
-        _logger.LogDebug("Fetched {result_count} energy results", resultCount);
+        _logger.LogDebug("Fetched {result_count} energy results for calculation {calculation_id}", resultCount, query.CalculationId);
     }
 }
