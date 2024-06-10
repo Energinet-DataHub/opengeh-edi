@@ -20,9 +20,9 @@ using Energinet.DataHub.Core.App.WebApp.Extensions.Options;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.EDI.B2BApi;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
-using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
-using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.WholesaleSettlementMessageParsers;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
@@ -102,10 +102,10 @@ public class RegistrationTests
 
     public static IEnumerable<object[]> GetMessageParserRequirements()
         => ResolveTypesThatImplementType(
-            typeof(IMessageParser),
+            typeof(IMarketMessageParser),
             new[]
             {
-                typeof(JsonMessageParser).Assembly,
+                typeof(WholesaleSettlementJsonMessageParser).Assembly,
             });
 
     public static IEnumerable<object[]> GetFunctionRequirements()

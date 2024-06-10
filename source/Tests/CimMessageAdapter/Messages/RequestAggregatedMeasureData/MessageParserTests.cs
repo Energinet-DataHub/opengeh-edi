@@ -50,9 +50,9 @@ public class MessageParserTests
         _marketMessageParser = new MarketMessageParser(
             new IMarketMessageParser[]
             {
-                new XmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
-                new JsonMarketMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
-                new B2CJsonMarketMessageParser(new Serializer()),
+                new AggregatedMeasureDataXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
+                new AggregatedMeasureDataJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
+                new AggregatedMeasureDataB2CJsonMessageParser(new Serializer()),
             });
     }
 

@@ -15,16 +15,15 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
-using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.WholesaleSettlementMessageParsers;
 
-public class B2CJsonMarketMessageParser : IMarketMessageParser
+public class WholesaleSettlementB2CJsonMessageParser : IMarketMessageParser
 {
     private readonly ISerializer _serializer;
 
-    public B2CJsonMarketMessageParser(
+    public WholesaleSettlementB2CJsonMessageParser(
         ISerializer serializer)
     {
         _serializer = serializer;

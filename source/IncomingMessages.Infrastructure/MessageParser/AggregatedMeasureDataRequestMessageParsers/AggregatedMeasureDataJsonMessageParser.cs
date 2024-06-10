@@ -22,13 +22,13 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.Factor
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.AggregatedMeasureDataRequestMessageParsers;
 
-public class JsonMarketMessageParser : JsonParserBase, IMarketMessageParser
+public class AggregatedMeasureDataJsonMessageParser : JsonParserBase, IMarketMessageParser
 {
     private const string SeriesElementName = "Series";
     private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";
     private const string DocumentName = "RequestAggregatedMeasureData";
 
-    public JsonMarketMessageParser(JsonSchemaProvider schemaProvider)
+    public AggregatedMeasureDataJsonMessageParser(JsonSchemaProvider schemaProvider)
         : base(schemaProvider)
     {
     }

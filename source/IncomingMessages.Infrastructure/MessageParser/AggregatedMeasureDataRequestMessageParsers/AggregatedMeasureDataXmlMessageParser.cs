@@ -23,12 +23,12 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.Factor
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.AggregatedMeasureDataRequestMessageParsers;
 
-public class XmlMessageParser : XmlBaseParser
+public class AggregatedMeasureDataXmlMessageParser : XmlBaseParser
 {
     private const string SeriesRecordElementName = "Series";
     private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";
 
-    public XmlMessageParser(CimXmlSchemaProvider schemaProvider)
+    public AggregatedMeasureDataXmlMessageParser(CimXmlSchemaProvider schemaProvider)
         : base(schemaProvider)
     {
     }

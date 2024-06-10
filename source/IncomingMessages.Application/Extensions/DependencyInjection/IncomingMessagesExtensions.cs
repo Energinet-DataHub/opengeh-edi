@@ -24,17 +24,12 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.AggregatedMeasureDataRequestMessageParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.WholesaleSettlementMessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageRegistration;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using AggregatedMeasureDataB2CJsonMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers.B2CJsonMessageParser;
-using AggregatedMeasureDataJsonMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers.JsonMessageParser;
-using AggregatedMeasureDataXmlMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers.XmlMessageParser;
-using WholesaleSettlementB2CJsonMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.WholesaleSettlementMessageParsers.B2CJsonMessageParser;
-using WholesaleSettlementJsonMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.WholesaleSettlementMessageParsers.JsonMessageParser;
-using WholesaleSettlementXmlMessageParser = Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.WholesaleSettlementMessageParsers.XmlMessageParser;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 
@@ -62,12 +57,12 @@ public static class IncomingMessagesExtensions
             .AddScoped<DelegateIncomingMessage>()
             .AddScoped<ITransactionIdRepository, TransactionIdRepository>()
             .AddScoped<IMessageIdRepository, MessageIdRepository>()
-            .AddScoped<IMessageParser, AggregatedMeasureDataXmlMessageParser>()
-            .AddScoped<IMessageParser, AggregatedMeasureDataJsonMessageParser>()
-            .AddScoped<IMessageParser, AggregatedMeasureDataB2CJsonMessageParser>()
-            .AddScoped<IMessageParser, WholesaleSettlementJsonMessageParser>()
-            .AddScoped<IMessageParser, WholesaleSettlementXmlMessageParser>()
-            .AddScoped<IMessageParser, WholesaleSettlementB2CJsonMessageParser>()
+            .AddScoped<IMarketMessageParser, AggregatedMeasureDataXmlMessageParser>()
+            .AddScoped<IMarketMessageParser, AggregatedMeasureDataJsonMessageParser>()
+            .AddScoped<IMarketMessageParser, AggregatedMeasureDataB2CJsonMessageParser>()
+            .AddScoped<IMarketMessageParser, WholesaleSettlementJsonMessageParser>()
+            .AddScoped<IMarketMessageParser, WholesaleSettlementXmlMessageParser>()
+            .AddScoped<IMarketMessageParser, WholesaleSettlementB2CJsonMessageParser>()
             .AddScoped<MarketMessageParser>()
             .AddScoped<ISenderAuthorizer, SenderAuthorizer>()
             .AddScoped<IncomingMessagePublisher>()

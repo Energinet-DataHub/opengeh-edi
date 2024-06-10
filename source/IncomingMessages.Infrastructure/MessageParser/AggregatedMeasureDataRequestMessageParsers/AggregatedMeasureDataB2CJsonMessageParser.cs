@@ -20,11 +20,11 @@ using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.AggregatedMeasureDataRequestMessageParsers;
 
-public class B2CJsonMarketMessageParser : IMarketMessageParser
+public class AggregatedMeasureDataB2CJsonMessageParser : IMarketMessageParser
 {
     private readonly ISerializer _serializer;
 
-    public B2CJsonMarketMessageParser(
+    public AggregatedMeasureDataB2CJsonMessageParser(
         ISerializer serializer)
         : base()
     {

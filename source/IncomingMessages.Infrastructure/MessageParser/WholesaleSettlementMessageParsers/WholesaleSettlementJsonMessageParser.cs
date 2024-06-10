@@ -21,13 +21,13 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.BasePa
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.WholesaleSettlementMessageParsers;
 
-public class JsonMarketMessageParser : JsonParserBase, IMarketMessageParser
+public class WholesaleSettlementJsonMessageParser : JsonParserBase, IMarketMessageParser
 {
     private const string SeriesElementName = "Series";
     private const string HeaderElementName = "RequestWholesaleSettlement_MarketDocument";
     private const string DocumentName = "RequestWholesaleSettlement";
 
-    public JsonMarketMessageParser(JsonSchemaProvider schemaProvider)
+    public WholesaleSettlementJsonMessageParser(JsonSchemaProvider schemaProvider)
         : base(schemaProvider)
     {
     }

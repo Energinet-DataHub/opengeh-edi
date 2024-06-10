@@ -22,12 +22,12 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.BasePa
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.WholesaleSettlementMessageParsers;
 
-public class XmlMessageParser : XmlBaseParser
+public class WholesaleSettlementXmlMessageParser : XmlBaseParser
 {
     private const string SeriesElementName = "Series";
     private const string HeaderElementName = "RequestWholesaleSettlement_MarketDocument";
 
-    public XmlMessageParser(CimXmlSchemaProvider schemaProvider)
+    public WholesaleSettlementXmlMessageParser(CimXmlSchemaProvider schemaProvider)
         : base(schemaProvider)
     {
     }
