@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.Core.App.WebApp.Extensions.Options;
+using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.EDI.B2BApi;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
+using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser.AggregatedMeasureDataRequestMessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
-using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
@@ -54,12 +53,16 @@ public class RegistrationTests
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", TestEnvironment.CreateConnectionString());
         Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", TestEnvironment.CreateDevelopmentStorageConnectionString());
 
-        // The following declaration slows down the test execution, since create a new Uri us a heavy operation
+        // The following declaration slows down the test execution, since creating a new Uri is a heavy operation
         Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL", TestEnvironment.CreateFakeStorageUrl());
 
         Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ManageConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
         Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
         Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.SendConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
+
+        Environment.SetEnvironmentVariable(nameof(DatabricksSqlStatementOptions.WorkspaceUrl), "https://adb-1000.azuredatabricks.net/");
+        Environment.SetEnvironmentVariable(nameof(DatabricksSqlStatementOptions.WorkspaceToken), "FakeToken");
+        Environment.SetEnvironmentVariable(nameof(DatabricksSqlStatementOptions.WarehouseId), Guid.NewGuid().ToString());
 
         _host = HostFactory.CreateHost(Program.TokenValidationParameters);
     }
@@ -95,6 +98,14 @@ public class RegistrationTests
             new[]
             {
                 typeof(NotifyWholesaleServicesEbixDocumentWriter).Assembly,
+            });
+
+    public static IEnumerable<object[]> GetMessageParserRequirements()
+        => ResolveTypesThatImplementType(
+            typeof(IMessageParser),
+            new[]
+            {
+                typeof(JsonMessageParser).Assembly,
             });
 
     public static IEnumerable<object[]> GetFunctionRequirements()
@@ -148,6 +159,14 @@ public class RegistrationTests
     [Theory(DisplayName = nameof(All_document_writers_are_registered))]
     [MemberData(nameof(GetDocumentWritersRequirements))]
     public void All_document_writers_are_registered(Requirement requirement)
+    {
+        using var scope = _host.Services.CreateScope();
+        Assert.True(scope.ServiceProvider.CanSatisfyType(requirement));
+    }
+
+    [Theory(DisplayName = nameof(All_message_parsers_are_registered))]
+    [MemberData(nameof(GetMessageParserRequirements))]
+    public void All_message_parsers_are_registered(Requirement requirement)
     {
         using var scope = _host.Services.CreateScope();
         Assert.True(scope.ServiceProvider.CanSatisfyType(requirement));

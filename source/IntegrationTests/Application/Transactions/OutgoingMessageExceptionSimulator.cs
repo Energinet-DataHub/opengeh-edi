@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions;
@@ -33,14 +31,18 @@ internal sealed class OutgoingMessageExceptionSimulator : OutgoingMessagesClient
         EnqueueMessage enqueueMessage,
         ActorMessageQueueContext actorMessageQueueContext,
         ISystemDateTimeProvider systemDateTimeProvider,
-        ISerializer serializer)
+        ISerializer serializer,
+        IMasterDataClient masterDataClient,
+        EnergyResultEnumerator energyResultEnumerator)
         : base(
             peekMessage,
             dequeueMessage,
             enqueueMessage,
             actorMessageQueueContext,
             systemDateTimeProvider,
-            serializer)
+            serializer,
+            masterDataClient,
+            energyResultEnumerator)
     {
     }
 

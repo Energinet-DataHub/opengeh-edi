@@ -17,6 +17,7 @@ using Azure.Messaging.ServiceBus;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.Extensions.Options;
 using BuildingBlocks.Application.FeatureFlag;
+using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
@@ -436,6 +437,11 @@ public class BehavioursTestBase : IDisposable
                     [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = MockServiceBusName,
                     ["IntegrationEvents:TopicName"] = "NotEmpty",
                     ["IntegrationEvents:SubscriptionName"] = "NotEmpty",
+
+                    // Databricks
+                    [nameof(DatabricksSqlStatementOptions.WorkspaceUrl)] = "https://adb-1000.azuredatabricks.net/",
+                    [nameof(DatabricksSqlStatementOptions.WorkspaceToken)] = "FakeToken",
+                    [nameof(DatabricksSqlStatementOptions.WarehouseId)] = Guid.NewGuid().ToString(),
                 })
             .Build();
 

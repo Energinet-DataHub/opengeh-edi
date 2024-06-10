@@ -12,18 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.Extensions.Options;
 using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
+using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
@@ -48,6 +45,7 @@ using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjectio
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
@@ -59,7 +57,6 @@ using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Google.Protobuf;
 using MediatR;
-using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -84,18 +81,21 @@ public class TestBase : IDisposable
 
     protected TestBase(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
     {
-        ArgumentNullException.ThrowIfNull(integrationTestFixture);
+        Fixture = integrationTestFixture;
+
         IntegrationTestFixture.CleanupDatabase();
-        integrationTestFixture.CleanupFileStorage();
+        Fixture.CleanupFileStorage();
         _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
         TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
         InboxEventNotificationHandler = new TestNotificationHandlerSpy();
-        BuildServices(integrationTestFixture.AzuriteManager.BlobStorageConnectionString, testOutputHelper);
+        BuildServices(testOutputHelper);
         _processContext = GetService<ProcessContext>();
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         AuthenticatedActor = GetService<AuthenticatedActor>();
         AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
     }
+
+    protected IntegrationTestFixture Fixture { get; }
 
     protected FeatureFlagManagerStub FeatureFlagManagerStub { get; } = new();
 
@@ -125,7 +125,8 @@ public class TestBase : IDisposable
 
         var blobContent = await blobClient.DownloadAsync();
 
-        if (!blobContent.HasValue) throw new InvalidOperationException($"Couldn't get file content from file storage (container: {container}, blob: {fileStorageReference})");
+        if (!blobContent.HasValue)
+            throw new InvalidOperationException($"Couldn't get file content from file storage (container: {container}, blob: {fileStorageReference})");
 
         var fileStringContent = await GetStreamContentAsStringAsync(blobContent.Value.Content);
         return fileStringContent;
@@ -184,6 +185,11 @@ public class TestBase : IDisposable
         return outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, actorRole ?? ActorRole.EnergySupplier, documentFormat ?? DocumentFormat.Xml), CancellationToken.None);
     }
 
+    protected Task<string?> GetArchivedMessageFileStorageReferenceFromDatabaseAsync(Guid messageId)
+    {
+        return GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageId.ToString());
+    }
+
     protected T GetService<T>()
         where T : notnull
     {
@@ -192,7 +198,8 @@ public class TestBase : IDisposable
 
     protected void ClearDbContextCaches()
     {
-        if (_services == null) throw new InvalidOperationException("ServiceCollection is not yet initialized");
+        if (_services == null)
+            throw new InvalidOperationException("ServiceCollection is not yet initialized");
 
         var dbContextServices = _services
             .Where(s => s.ServiceType.IsSubclassOf(typeof(DbContext)) || s.ServiceType == typeof(DbContext))
@@ -218,7 +225,8 @@ public class TestBase : IDisposable
 
     protected IServiceCollection GetServiceCollectionClone()
     {
-        if (_services == null) throw new InvalidOperationException("ServiceCollection is not yet initialized");
+        if (_services == null)
+            throw new InvalidOperationException("ServiceCollection is not yet initialized");
 
         var serviceCollectionClone = new ServiceCollection { _services };
 
@@ -270,11 +278,11 @@ public class TestBase : IDisposable
         return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
     }
 
-    private void BuildServices(string fileStorageConnectionString, ITestOutputHelper testOutputHelper)
+    private void BuildServices(ITestOutputHelper testOutputHelper)
     {
         Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", IntegrationTestFixture.DatabaseConnectionString);
-        Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", fileStorageConnectionString);
+        Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", Fixture.AzuriteManager.BlobStorageConnectionString);
 
         var config = new ConfigurationBuilder()
             .AddEnvironmentVariables()
@@ -289,10 +297,17 @@ public class TestBase : IDisposable
                     [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = "Fake",
                     ["IntegrationEvents:TopicName"] = "NotEmpty",
                     ["IntegrationEvents:SubscriptionName"] = "NotEmpty",
+
+                    // Databricks
+                    [nameof(DatabricksSqlStatementOptions.WorkspaceUrl)] = Fixture.IntegrationTestConfiguration.DatabricksSettings.WorkspaceUrl,
+                    [nameof(DatabricksSqlStatementOptions.WorkspaceToken)] = Fixture.IntegrationTestConfiguration.DatabricksSettings.WorkspaceAccessToken,
+                    [nameof(DatabricksSqlStatementOptions.WarehouseId)] = Fixture.IntegrationTestConfiguration.DatabricksSettings.WarehouseId,
+                    // => EDI views
+                    [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.DatabaseName)}"] = Fixture.DatabricksSchemaManager.SchemaName,
                 })
             .Build();
 
-        _services = new ServiceCollection();
+        _services = [];
         _services.AddScoped<IConfiguration>(_ => config);
 
         _services.AddTransient<InboxEventsProcessor>()

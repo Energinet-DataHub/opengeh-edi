@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using BuildingBlocks.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
+using Energinet.DataHub.Core.Databricks.SqlStatementExecution.Diagnostics.HealthChecks;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
@@ -27,6 +29,8 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.ActorMessageQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.OutgoingMessages;
@@ -47,7 +51,7 @@ public static class OutgoingMessagesExtensions
             .AddScopedSqlDbContext<ActorMessageQueueContext>(configuration)
             .AddScoped<BuildingBlocks.Domain.ExecutionContext>();
 
-        //AddMessageGenerationServices
+        // AddMessageGenerationServices
         services.AddScoped<DocumentFactory>()
             .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataCimXmlDocumentWriter>()
             .AddScoped<IDocumentWriter, NotifyAggregatedMeasureDataCimJsonDocumentWriter>()
@@ -63,22 +67,36 @@ public static class OutgoingMessagesExtensions
             .AddScoped<IDocumentWriter, RejectRequestWholesaleSettlementEbixDocumentWriter>()
             .AddScoped<IMessageRecordParser, MessageRecordParser>();
 
-        //MessageEnqueueingConfiguration
+        // MessageEnqueueingConfiguration
         services.AddTransient<EnqueueMessage>()
             .AddTransient<DelegateMessage>()
             .AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>()
             .AddTransient<IOutgoingMessagesClient, OutgoingMessagesClient>();
 
-        //PeekConfiguration
+        // PeekConfiguration
         services.AddScoped<IActorMessageQueueRepository, ActorMessageQueueRepository>()
             .AddScoped<IMarketDocumentRepository, MarketDocumentRepository>()
             .AddTransient<PeekMessage>();
 
-        //DequeConfiguration
+        // DequeConfiguration
         services.AddTransient<DequeueMessage>();
 
-        //DataRetentionConfiguration
+        // DataRetentionConfiguration
         services.AddTransient<IDataRetention, DequeuedBundlesRetention>();
+
+        // Databricks
+        services
+            .AddOptions<EdiDatabricksOptions>()
+            .BindConfiguration(EdiDatabricksOptions.SectionName)
+            .ValidateDataAnnotations();
+        services
+            .AddNodaTimeForApplication()
+            .AddScoped<EnergyResultEnumerator>()
+            .AddDatabricksSqlStatementExecution(configuration);
+
+        // TODO: We cannot enable this health check until we have a Databricks we can use from EDI; and we do not have a solution for perform startup registrations based on feature flags.
+        ////.AddHealthChecks()
+        ////    .AddDatabricksSqlStatementApiHealthCheck(name: "DatabricksSqlStatementApi");
 
         return services;
     }

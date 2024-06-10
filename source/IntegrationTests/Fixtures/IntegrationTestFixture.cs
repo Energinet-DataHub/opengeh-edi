@@ -12,21 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Data.SqlClient;
-using System.IO;
-using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
 using Microsoft.Extensions.Configuration;
 using Xunit;
+using HttpClientFactory = Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks.HttpClientFactory;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 
 public class IntegrationTestFixture : IDisposable, IAsyncLifetime
 {
     private bool _disposed;
+
+    public IntegrationTestFixture()
+    {
+        IntegrationTestConfiguration = new IntegrationTestConfiguration();
+
+        DatabricksSchemaManager = new DatabricksSchemaManager(
+            new HttpClientFactory(),
+            databricksSettings: IntegrationTestConfiguration.DatabricksSettings,
+            schemaPrefix: "edi_integration_tests");
+    }
 
     public static string DatabaseConnectionString
     {
@@ -53,6 +63,10 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
     }
 
     public AzuriteManager AzuriteManager { get; } = new(true);
+
+    public IntegrationTestConfiguration IntegrationTestConfiguration { get; }
+
+    public DatabricksSchemaManager DatabricksSchemaManager { get; }
 
     public static void CleanupDatabase()
     {
