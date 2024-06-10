@@ -325,12 +325,12 @@ public class TestBase : IDisposable
 
         _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
             .AddIntegrationEventModule(config)
-        .AddOutgoingMessagesModule(config)
-        .AddProcessModule(config)
-        .AddArchivedMessagesModule(config)
-        .AddIncomingMessagesModule(config)
-        .AddMasterDataModule(config)
-        .AddDataAccessUnitOfWorkModule(config);
+            .AddOutgoingMessagesModule(config)
+            .AddProcessModule(config)
+            .AddArchivedMessagesModule(config)
+            .AddIncomingMessagesModule(config)
+            .AddMasterDataModule(config)
+            .AddDataAccessUnitOfWorkModule(config);
 
         // Replace the services with stub implementations.
         // - Building blocks
