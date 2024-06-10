@@ -31,5 +31,5 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
 
     public override string GridAreaCode => "543";
 
-    public override int ExpectedOutgoingMessagesCount => 35;
+    public override int ExpectedOutgoingMessagesCount => 35 * 2; // 35 results, which we must prepare for BRP and ES
 }
