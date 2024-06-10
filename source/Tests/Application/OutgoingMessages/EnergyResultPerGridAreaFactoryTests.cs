@@ -68,7 +68,7 @@ public class EnergyResultPerGridAreaFactoryTests
         }
 
         // Act
-        var actual = EnergyResultPerGridAreaFactory.CreateEnergyResult(databricksSqlRow, timeSeriesPoints);
+        var actual = EnergyResultPerGridAreaFactory.CreateEnergyResultPerGridArea(databricksSqlRow, timeSeriesPoints);
 
         // Assert
         actual.Id.Should().Be("17582ba4-71db-4ce5-af70-b00a4676e357");
