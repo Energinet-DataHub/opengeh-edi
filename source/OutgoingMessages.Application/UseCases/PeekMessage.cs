@@ -56,7 +56,7 @@ public class PeekMessage
         _systemDateTimeProvider = systemDateTimeProvider;
     }
 
-    public async Task<PeekResultDto> PeekAsync(PeekRequestDto request, CancellationToken cancellationToken)
+    public async Task<PeekResultDto?> PeekAsync(PeekRequestDto request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -71,13 +71,15 @@ public class PeekMessage
             _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.ActorRole).ConfigureAwait(false);
 
         if (actorMessageQueue is null)
-            return new PeekResultDto(null, null);
+        {
+            return null;
+        }
 
         var peekResult = request.DocumentFormat == DocumentFormat.Ebix ? actorMessageQueue.Peek() : actorMessageQueue.Peek(request.MessageCategory);
 
         if (peekResult is null)
         {
-            return new PeekResultDto(null, null);
+            return null;
         }
 
         var marketDocument = await _marketDocumentRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);

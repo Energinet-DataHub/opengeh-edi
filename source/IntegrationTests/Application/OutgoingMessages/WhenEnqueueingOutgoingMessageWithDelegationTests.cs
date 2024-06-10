@@ -375,7 +375,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             actorNumber: receiverQueue.ActorNumber,
             actorRole: receiverQueue.ActorRole);
 
-        AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
+        AssertXmlMessage.Document(XDocument.Load(result!.Bundle!))
             .IsDocumentType(DocumentType.NotifyAggregatedMeasureData)
             .IsBusinessReason(BusinessReason.BalanceFixing)
             .HasReceiverRole(receiverDocument.ActorRole)

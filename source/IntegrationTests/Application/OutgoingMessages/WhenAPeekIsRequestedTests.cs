@@ -77,7 +77,7 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         var result = await PeekMessageAsync(MessageCategory.None);
 
-        Assert.Null(result.Bundle);
+        Assert.Null(result);
         Assert.True(await BundleIsRegistered());
     }
 
@@ -92,7 +92,7 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         var result = await PeekMessageAsync(MessageCategory.Aggregations);
 
-        AssertXmlMessage.Document(XDocument.Load(result.Bundle!))
+        AssertXmlMessage.Document(XDocument.Load(result!.Bundle))
             .IsDocumentType(DocumentType.NotifyAggregatedMeasureData)
             .IsBusinessReason(BusinessReason.BalanceFixing)
             .HasSerieRecordCount(1);
@@ -112,8 +112,8 @@ public class WhenAPeekIsRequestedTests : TestBase
         ClearDbContextCaches(); // Else the MarketDocument is cached in Entity Framework
         var secondPeekResult = await PeekMessageAsync(MessageCategory.Aggregations);
 
-        Assert.NotNull(firstPeekResult.MessageId);
-        Assert.NotNull(secondPeekResult.MessageId);
+        Assert.NotNull(firstPeekResult);
+        Assert.NotNull(secondPeekResult);
 
         var firstPeekContent = await GetStreamContentAsStringAsync(firstPeekResult.Bundle!);
         var secondPeekContent = await GetStreamContentAsStringAsync(secondPeekResult.Bundle!);
@@ -135,10 +135,10 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         // Assert
         using var assertScope = new AssertionScope();
-        peekResult.Bundle.Should().NotBeNull();
+        peekResult.Should().NotBeNull();
 
-        var peekResultFileContent = await GetStreamContentAsStringAsync(peekResult.Bundle!);
-        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value.Value);
+        var peekResultFileContent = await GetStreamContentAsStringAsync(peekResult!.Bundle);
+        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId.Value);
         archivedMessageFileStorageReference.Should().NotBeNull();
 
         var archivedMessageFileContent = await GetFileContentFromFileStorageAsync(
@@ -167,10 +167,10 @@ public class WhenAPeekIsRequestedTests : TestBase
         var result = await PeekMessageAsync(MessageCategory.Aggregations);
 
         // Assert
-        result.Bundle.Should().NotBeNull();
+        result.Should().NotBeNull();
 
-        var archivedMessageId = await GetArchivedMessageIdFromDatabaseAsync(result.MessageId!.Value.Value);
-        var fileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(result.MessageId!.Value.Value);
+        var archivedMessageId = await GetArchivedMessageIdFromDatabaseAsync(result!.MessageId.Value);
+        var fileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(result.MessageId.Value);
         fileStorageReference.Should().Be($"{receiverNumber}/{year:0000}/{month:00}/{date:00}/{archivedMessageId:N}");
     }
 
@@ -185,9 +185,9 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         var result = await PeekMessageAsync(MessageCategory.Aggregations);
 
-        result.MessageId.Should().NotBeNull();
+        result.Should().NotBeNull();
 
-        var marketDocumentExists = await MarketDocumentExists(result.MessageId!.Value);
+        var marketDocumentExists = await MarketDocumentExists(result!.MessageId);
         marketDocumentExists.Should().BeTrue();
     }
 
@@ -202,8 +202,8 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);
 
-        var marketDocumentFileStorageReference = await GetMarketDocumentFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value);
-        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId!.Value.Value);
+        var marketDocumentFileStorageReference = await GetMarketDocumentFileStorageReferenceFromDatabaseAsync(peekResult!.MessageId);
+        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(peekResult.MessageId.Value);
 
         marketDocumentFileStorageReference.Should().Be(archivedMessageFileStorageReference);
     }
@@ -229,7 +229,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         var peekResult = await PeekMessageAsync(MessageCategory.Aggregations, actorNumber: actorNumber, actorRole: ActorRole.MeteredDataResponsible);
 
         // Assert
-        peekResult.MessageId.Should().NotBeNull();
+        peekResult.Should().NotBeNull();
     }
 
     [Theory]
@@ -300,9 +300,9 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         // Assert / Then
         peekResult.Should().NotBeNull("because a peek result should be found");
-        peekResult.MessageId.Should().NotBeNull("because a peek result with a message id should be found");
+        peekResult!.MessageId.Should().NotBeNull("because a peek result with a message id should be found");
 
-        var archivedMessage = await GetArchivedMessageFromDatabaseAsync(peekResult.MessageId!.Value.Value);
+        var archivedMessage = await GetArchivedMessageFromDatabaseAsync(peekResult.MessageId.Value);
         ((object?)archivedMessage).Should().NotBeNull("because an archived message should exists");
 
         var expectedFileStorageReference = $"{receiverNumber}/{year:0000}/{month:00}/{day:00}/{archivedMessage!.Id:N}";
@@ -314,7 +314,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             { "EventIds", eventIds => eventIds.Should().Be(expectedEventId.Value) },
             { "FileStorageReference", fileStorageReference => fileStorageReference.Should().Be(expectedFileStorageReference) },
             { "Id", id => id.Should().NotBeNull() },
-            { "MessageId", messageId => messageId.Should().Be(peekResult.MessageId.Value.Value) },
+            { "MessageId", messageId => messageId.Should().Be(peekResult.MessageId.Value) },
             { "ReceiverNumber", receiverNumber => receiverNumber.Should().Be(outgoingMessage.ReceiverNumber.Value) },
             { "RecordId", recordId => recordId.Should().NotBeNull() },
             { "RelatedToMessageId", relatedToMessageId => relatedToMessageId.Should().BeNull() },

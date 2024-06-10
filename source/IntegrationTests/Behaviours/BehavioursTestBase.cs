@@ -156,7 +156,7 @@ public class BehavioursTestBase : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    protected async Task<PeekResultDto> WhenPeekMessageAsync(
+    protected async Task<PeekResultDto?> WhenPeekMessageAsync(
         MessageCategory category,
         ActorNumber actorNumber,
         ActorRole actorRole,
@@ -333,7 +333,7 @@ public class BehavioursTestBase : IDisposable
         await serviceScope.ServiceProvider.GetRequiredService<IIntegrationEventHandler>().HandleAsync(integrationEvent);
     }
 
-    protected async Task<PeekResultDto> WhenActorPeeksMessage(ActorNumber actorNumber, ActorRole actorRole, DocumentFormat documentFormat)
+    protected async Task<PeekResultDto?> WhenActorPeeksMessage(ActorNumber actorNumber, ActorRole actorRole, DocumentFormat documentFormat)
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
         var outgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
@@ -350,11 +350,11 @@ public class BehavioursTestBase : IDisposable
         {
             var peekResult = await WhenActorPeeksMessage(actorNumber, actorRole, documentFormat);
 
-            if (peekResult.MessageId == null)
+            if (peekResult is null)
                 break;
 
             peekResults.Add(peekResult);
-            await WhenActorDequeuesMessage(peekResult.MessageId.Value.Value, actorNumber, actorRole);
+            await WhenActorDequeuesMessage(peekResult.MessageId.Value, actorNumber, actorRole);
         }
 
         return peekResults;

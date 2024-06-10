@@ -55,7 +55,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         return dequeueRequestResult;
     }
 
-    public async Task<PeekResultDto> PeekAndCommitAsync(PeekRequestDto request, CancellationToken cancellationToken)
+    public async Task<PeekResultDto?> PeekAndCommitAsync(PeekRequestDto request, CancellationToken cancellationToken)
     {
         var peekResult = await _peekMessage.PeekAsync(request, cancellationToken).ConfigureAwait(false);
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
