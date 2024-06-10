@@ -16,7 +16,7 @@ using System.Xml;
 using System.Xml.Schema;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Cim.CimXml;
 
 public class CimXmlSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
 {

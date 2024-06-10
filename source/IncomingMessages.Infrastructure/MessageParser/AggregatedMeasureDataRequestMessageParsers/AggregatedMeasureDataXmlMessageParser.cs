@@ -16,7 +16,7 @@ using System.Xml;
 using System.Xml.Schema;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.CimXml;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Cim.CimXml;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.BaseParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.BaseParsers.Xml;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.Factories;
