@@ -31,6 +31,5 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
 
     public override string GridAreaCode => "543";
 
-    // TODO: Update to match expected count
-    public override int ExpectedOutgoingMessagesCount => 5;
+    public override int ExpectedOutgoingMessagesCount => 35;
 }
