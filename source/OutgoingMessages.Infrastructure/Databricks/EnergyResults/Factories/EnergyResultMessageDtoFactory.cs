@@ -101,7 +101,7 @@ public class EnergyResultMessageDtoFactory()
             settlementVersion: settlementVersion?.Name);
     }
 
-    public static EnergyResultMessageDto CreateForBalanceResponsible(
+    public static EnergyResultMessageDto CreateForBalanceResponsiblePrEnergySupplier(
         EventId eventId,
         EnergyResultPerEnergySupplierBrpGridArea energyResult)
     {

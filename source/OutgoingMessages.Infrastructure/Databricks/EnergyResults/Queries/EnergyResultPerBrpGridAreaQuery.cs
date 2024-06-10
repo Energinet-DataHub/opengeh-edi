@@ -21,7 +21,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 
 /// <summary>
-/// The query we must perform on the 'nergy Result Per Balance Responsible Party, Grid Area' view.
+/// The query we must perform on the 'Energy Result Per Balance Responsible Party, Grid Area' view.
 ///
 /// Keep the code updated with regards to the documentation in confluence in a way
 /// that it is easy to compare (e.g. order of columns).
