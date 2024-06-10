@@ -608,7 +608,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
         foreach (var peekResult in delegatedActorPeekResults)
         {
             peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
-            var peekResultGridArea = await GetGridAreaFromNotifyAggregatedMeasureDataDocument(peekResult.Bundle!, peekDocumentFormat);
+            var peekResultGridArea = await GetGridAreaFromNotifyAggregatedMeasureDataDocument(peekResult.Bundle, peekDocumentFormat);
 
             resultGridAreas.Add(peekResultGridArea);
 
@@ -891,7 +891,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
         foreach (var peekResult in originalActorPeekResults)
         {
             peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
-            var peekResultGridArea = await GetGridAreaFromNotifyAggregatedMeasureDataDocument(peekResult.Bundle!, peekDocumentFormat);
+            var peekResultGridArea = await GetGridAreaFromNotifyAggregatedMeasureDataDocument(peekResult.Bundle, peekDocumentFormat);
 
             resultGridAreas.Add(peekResultGridArea);
 

@@ -283,7 +283,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
         foreach (var peekResult in peekResults)
         {
             peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
-            var peekResultGridArea = await GetGridAreaFromNotifyAggregatedMeasureDataDocument(peekResult.Bundle!, peekDocumentFormat);
+            var peekResultGridArea = await GetGridAreaFromNotifyAggregatedMeasureDataDocument(peekResult.Bundle, peekDocumentFormat);
 
             resultGridAreas.Add(peekResultGridArea);
 
@@ -568,7 +568,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
         {
             peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
 
-            var expectedGridArea = await GetGridAreaFromNotifyAggregatedMeasureDataDocument(peekResult.Bundle!, peekDocumentFormat);
+            var expectedGridArea = await GetGridAreaFromNotifyAggregatedMeasureDataDocument(peekResult.Bundle, peekDocumentFormat);
             gridAreas.Add(expectedGridArea);
 
             var acceptedResponse = acceptedResponses

@@ -305,7 +305,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
         foreach (var peekResult in peekResults)
         {
             peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
-            var peekResultGridArea = await GetGridAreaFromNotifyWholesaleServicesDocument(peekResult.Bundle!, peekDocumentFormat);
+            var peekResultGridArea = await GetGridAreaFromNotifyWholesaleServicesDocument(peekResult.Bundle, peekDocumentFormat);
 
             resultGridAreas.Add(peekResultGridArea);
 
@@ -625,7 +625,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
         {
             peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
 
-            var expectedGridArea = await GetGridAreaFromNotifyWholesaleServicesDocument(peekResult.Bundle!, peekDocumentFormat);
+            var expectedGridArea = await GetGridAreaFromNotifyWholesaleServicesDocument(peekResult.Bundle, peekDocumentFormat);
             gridAreas.Add(expectedGridArea);
 
             var acceptedResponse = acceptedResponses

@@ -115,8 +115,8 @@ public class WhenAPeekIsRequestedTests : TestBase
         Assert.NotNull(firstPeekResult);
         Assert.NotNull(secondPeekResult);
 
-        var firstPeekContent = await GetStreamContentAsStringAsync(firstPeekResult.Bundle!);
-        var secondPeekContent = await GetStreamContentAsStringAsync(secondPeekResult.Bundle!);
+        var firstPeekContent = await GetStreamContentAsStringAsync(firstPeekResult.Bundle);
+        var secondPeekContent = await GetStreamContentAsStringAsync(secondPeekResult.Bundle);
         Assert.Equal(firstPeekContent, secondPeekContent);
     }
 
@@ -322,7 +322,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         };
 
         using var assertionScope = new AssertionScope();
-        var archivedMessageAsDictionary = (IDictionary<string, object>)archivedMessage!;
+        var archivedMessageAsDictionary = (IDictionary<string, object>)archivedMessage;
 
         foreach (var assertProperty in assertProperties)
             assertProperty.Value(archivedMessageAsDictionary[assertProperty.Key]);

@@ -67,7 +67,7 @@ public static class HostFactory
                         .AddDataRetention()
 
                         // Security
-                        .AddB2BAuthentication(tokenValidationParameters!)
+                        .AddB2BAuthentication(tokenValidationParameters)
 
                         // System timer
                         .AddSystemTimer()

@@ -175,7 +175,7 @@ public class ActorMessageQueueTests
         var messageAssignedToSecondBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
         actorMessageQueue.Enqueue(messageAssignedToSecondBundle, SystemClock.Instance.GetCurrentInstant());
 
-        Assert.NotEqual(messageAssignedToFirstBundle!.AssignedBundleId, messageAssignedToSecondBundle.AssignedBundleId);
+        Assert.NotEqual(messageAssignedToFirstBundle.AssignedBundleId, messageAssignedToSecondBundle.AssignedBundleId);
     }
 
     private static OutgoingMessage CreateOutgoingMessage(
