@@ -207,7 +207,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             var energyResultPerEnergySupplierMessage = EnergyResultMessageDtoFactory.CreateForEnergySupplier(EventId.From(input.EventId), energyResult);
             await EnqueueAndCommitAsync(energyResultPerEnergySupplierMessage, CancellationToken.None).ConfigureAwait(false);
             numberOfEnqueuedMessages++;
-            var energyResultPerBalanceResponsibleMessage = EnergyResultMessageDtoFactory.CreateForBalanceResponsible(EventId.From(input.EventId), energyResult);
+            var energyResultPerBalanceResponsibleMessage = EnergyResultMessageDtoFactory.CreateForBalanceResponsiblePrEnergySupplier(EventId.From(input.EventId), energyResult);
             await EnqueueAndCommitAsync(energyResultPerBalanceResponsibleMessage, CancellationToken.None).ConfigureAwait(false);
             numberOfEnqueuedMessages++;
         }
