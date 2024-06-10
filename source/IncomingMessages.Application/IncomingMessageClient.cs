@@ -80,10 +80,11 @@ public class IncomingMessageClient : IIncomingMessageClient
             || incomingMarketMessageParserResult.IncomingMessage == null)
         {
             var res = Result.Failure(incomingMarketMessageParserResult.Errors.ToArray());
+
             _logger.LogInformation(
                 "Failed to parse incoming message {DocumentType}. Errors: {Errors}",
                 documentType,
-                string.Join(',', res.Errors));
+                string.Join(',', res.Errors.Select(e => e.ToString())));
 
             return _responseFactory.From(res, responseDocumentFormat);
         }

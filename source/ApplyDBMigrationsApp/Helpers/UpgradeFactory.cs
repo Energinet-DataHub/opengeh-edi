@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Reflection;
 using DbUp;
 using DbUp.Engine;
@@ -38,6 +37,8 @@ public static class UpgradeFactory
                     Assembly.GetExecutingAssembly(),
                     file => file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) && file.Contains(".Scripts.Model.", StringComparison.OrdinalIgnoreCase)))
             .LogToConsole();
+
+        builder.Configure(configure => configure.ScriptExecutor.ExecutionTimeoutSeconds = 5 * 60); // 5 minutes timeout
 
         if (isDryRun)
         {
