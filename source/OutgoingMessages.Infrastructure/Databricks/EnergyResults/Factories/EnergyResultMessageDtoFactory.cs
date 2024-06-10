@@ -29,13 +29,12 @@ public class EnergyResultMessageDtoFactory()
     {
         ArgumentNullException.ThrowIfNull(energyResult);
 
-        var receiverRole = DomainModel.ActorRole.MeteredDataResponsible;
         var (businessReason, settlementVersion) = MapToBusinessReasonAndSettlementVersion(energyResult.CalculationType);
 
         return EnergyResultMessageDto.Create(
             eventId,
             receiverNumber: receiverNumber,
-            receiverRole: receiverRole,
+            receiverRole: DomainModel.ActorRole.MeteredDataResponsible,
             gridAreaCode: energyResult.GridAreaCode,
             meteringPointType: energyResult.MeteringPointType.Name,
             settlementMethod: energyResult.SettlementMethod?.Name,
@@ -56,20 +55,44 @@ public class EnergyResultMessageDtoFactory()
     {
         ArgumentNullException.ThrowIfNull(energyResult);
 
-        var receiverRole = DomainModel.ActorRole.BalanceResponsibleParty;
-        var receiverNumber = ActorNumber.Create(energyResult.BalanceResponsiblePartyId);
         var (businessReason, settlementVersion) = MapToBusinessReasonAndSettlementVersion(energyResult.CalculationType);
 
         return EnergyResultMessageDto.Create(
             eventId,
-            receiverNumber: receiverNumber,
-            receiverRole: receiverRole,
+            receiverNumber: ActorNumber.Create(energyResult.BalanceResponsiblePartyId),
+            receiverRole: DomainModel.ActorRole.BalanceResponsibleParty,
             gridAreaCode: energyResult.GridAreaCode,
             meteringPointType: energyResult.MeteringPointType.Name,
             settlementMethod: energyResult.SettlementMethod?.Name,
             measureUnitType: DomainModel.MeasurementUnit.Kwh.Name, // TODO: Should this be read from Databricks?
             resolution: energyResult.Resolution.Name,
             energySupplierNumber: null,
+            balanceResponsibleNumber: energyResult.BalanceResponsiblePartyId,
+            period: new DomainModel.Period(energyResult.PeriodStartUtc, energyResult.PeriodEndUtc),
+            points: CreateEnergyResultMessagePoints(energyResult.TimeSeriesPoints),
+            businessReasonName: businessReason.Name,
+            calculationResultVersion: energyResult.CalculationVersion,
+            settlementVersion: settlementVersion?.Name);
+    }
+
+    public static EnergyResultMessageDto CreateForEnergySupplier(
+        EventId eventId,
+        EnergyResultPerEnergySupplierBrpGridArea energyResult)
+    {
+        ArgumentNullException.ThrowIfNull(energyResult);
+
+        var (businessReason, settlementVersion) = MapToBusinessReasonAndSettlementVersion(energyResult.CalculationType);
+
+        return EnergyResultMessageDto.Create(
+            eventId,
+            receiverNumber: ActorNumber.Create(energyResult.EnergySupplierId),
+            receiverRole: DomainModel.ActorRole.EnergySupplier,
+            gridAreaCode: energyResult.GridAreaCode,
+            meteringPointType: energyResult.MeteringPointType.Name,
+            settlementMethod: energyResult.SettlementMethod?.Name,
+            measureUnitType: DomainModel.MeasurementUnit.Kwh.Name, // TODO: Should this be read from Databricks?
+            resolution: energyResult.Resolution.Name,
+            energySupplierNumber: energyResult.EnergySupplierId,
             balanceResponsibleNumber: null,
             period: new DomainModel.Period(energyResult.PeriodStartUtc, energyResult.PeriodEndUtc),
             points: CreateEnergyResultMessagePoints(energyResult.TimeSeriesPoints),
@@ -78,27 +101,25 @@ public class EnergyResultMessageDtoFactory()
             settlementVersion: settlementVersion?.Name);
     }
 
-    public static EnergyResultMessageDto Create(
+    public static EnergyResultMessageDto CreateForBalanceResponsible(
         EventId eventId,
         EnergyResultPerEnergySupplierBrpGridArea energyResult)
     {
         ArgumentNullException.ThrowIfNull(energyResult);
 
-        var receiverRole = DomainModel.ActorRole.EnergySupplier; // TODO: Not sure this is always the same value for this scenario?
-        var receiverNumber = ActorNumber.Create(energyResult.EnergySupplierId); // TODO: Not sure this is always the same value for this scenario? When is BalanceResponsibleParty used in here?
         var (businessReason, settlementVersion) = MapToBusinessReasonAndSettlementVersion(energyResult.CalculationType);
 
         return EnergyResultMessageDto.Create(
             eventId,
-            receiverNumber: receiverNumber,
-            receiverRole: receiverRole,
+            receiverNumber: ActorNumber.Create(energyResult.BalanceResponsiblePartyId),
+            receiverRole: DomainModel.ActorRole.BalanceResponsibleParty,
             gridAreaCode: energyResult.GridAreaCode,
             meteringPointType: energyResult.MeteringPointType.Name,
             settlementMethod: energyResult.SettlementMethod?.Name,
             measureUnitType: DomainModel.MeasurementUnit.Kwh.Name, // TODO: Should this be read from Databricks?
             resolution: energyResult.Resolution.Name,
-            energySupplierNumber: null,
-            balanceResponsibleNumber: null,
+            energySupplierNumber: energyResult.EnergySupplierId,
+            balanceResponsibleNumber: energyResult.BalanceResponsiblePartyId,
             period: new DomainModel.Period(energyResult.PeriodStartUtc, energyResult.PeriodEndUtc),
             points: CreateEnergyResultMessagePoints(energyResult.TimeSeriesPoints),
             businessReasonName: businessReason.Name,

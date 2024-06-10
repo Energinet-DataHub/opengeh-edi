@@ -204,7 +204,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
         {
             // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
-            var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult);
+            var energyResultMessage = EnergyResultMessageDtoFactory.CreateForEnergySupplier(EventId.From(input.EventId), energyResult);
             await EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);
             numberOfEnqueuedMessages++;
         }
