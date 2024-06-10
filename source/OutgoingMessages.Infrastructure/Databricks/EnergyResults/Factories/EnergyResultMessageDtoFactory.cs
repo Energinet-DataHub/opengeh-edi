@@ -57,11 +57,12 @@ public class EnergyResultMessageDtoFactory()
         ArgumentNullException.ThrowIfNull(energyResult);
 
         var receiverRole = DomainModel.ActorRole.BalanceResponsibleParty;
+        var receiverNumber = ActorNumber.Create(energyResult.BalanceResponsiblePartyId);
         var (businessReason, settlementVersion) = MapToBusinessReasonAndSettlementVersion(energyResult.CalculationType);
 
         return EnergyResultMessageDto.Create(
             eventId,
-            receiverNumber: ActorNumber.Create(energyResult.BalanceResponsiblePartyId),
+            receiverNumber: receiverNumber,
             receiverRole: receiverRole,
             gridAreaCode: energyResult.GridAreaCode,
             meteringPointType: energyResult.MeteringPointType.Name,
@@ -84,11 +85,12 @@ public class EnergyResultMessageDtoFactory()
         ArgumentNullException.ThrowIfNull(energyResult);
 
         var receiverRole = DomainModel.ActorRole.EnergySupplier; // TODO: Not sure this is always the same value for this scenario?
+        var receiverNumber = ActorNumber.Create(energyResult.EnergySupplierId); // TODO: Not sure this is always the same value for this scenario? When is BalanceResponsibleParty used in here?
         var (businessReason, settlementVersion) = MapToBusinessReasonAndSettlementVersion(energyResult.CalculationType);
 
         return EnergyResultMessageDto.Create(
             eventId,
-            receiverNumber: ActorNumber.Create(energyResult.EnergySupplierId), // TODO: Not sure this is always the same value for this scenario? When is BalanceResponsibleParty used in here?
+            receiverNumber: receiverNumber,
             receiverRole: receiverRole,
             gridAreaCode: energyResult.GridAreaCode,
             meteringPointType: energyResult.MeteringPointType.Name,
@@ -104,7 +106,6 @@ public class EnergyResultMessageDtoFactory()
             settlementVersion: settlementVersion?.Name);
     }
 
-    // TODO: Move to mapper?
     private static IReadOnlyCollection<EnergyResultMessagePoint> CreateEnergyResultMessagePoints(IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
     {
         ArgumentNullException.ThrowIfNull(timeSeriesPoints);
@@ -120,7 +121,6 @@ public class EnergyResultMessageDtoFactory()
             .AsReadOnly();
     }
 
-    // TODO: Move to mapper?
     private static DomainModel.CalculatedQuantityQuality MapToCalculatedQuantityQuality(IReadOnlyCollection<QuantityQuality> qualities)
     {
         ArgumentNullException.ThrowIfNull(qualities);
@@ -141,7 +141,6 @@ public class EnergyResultMessageDtoFactory()
         };
     }
 
-    // TODO: Move to mapper?
     private static (DomainModel.BusinessReason BusinessReason, DomainModel.SettlementVersion? SettlementVersion) MapToBusinessReasonAndSettlementVersion(CalculationType calculationType)
     {
         return calculationType switch
