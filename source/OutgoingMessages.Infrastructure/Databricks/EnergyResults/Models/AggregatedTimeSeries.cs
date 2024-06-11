@@ -29,7 +29,8 @@ public abstract class AggregatedTimeSeries
         Instant periodEndUtc,
         Resolution resolution,
         long calculationVersion,
-        SettlementMethod? settlementMethod)
+        SettlementMethod? settlementMethod,
+        MeasurementUnit measureUnitType)
     {
         if (timeSeriesPoints.Count == 0)
             throw new ArgumentException($"{nameof(timeSeriesPoints)} are empty.");
@@ -43,6 +44,7 @@ public abstract class AggregatedTimeSeries
         Resolution = resolution;
         CalculationVersion = calculationVersion;
         SettlementMethod = settlementMethod;
+        MeasureUnitType = measureUnitType;
     }
 
     public string GridAreaCode { get; init; }
@@ -62,4 +64,6 @@ public abstract class AggregatedTimeSeries
     public long CalculationVersion { get; init; }
 
     public SettlementMethod? SettlementMethod { get; init; }
+
+    public MeasurementUnit MeasureUnitType { get; init; }
 }
