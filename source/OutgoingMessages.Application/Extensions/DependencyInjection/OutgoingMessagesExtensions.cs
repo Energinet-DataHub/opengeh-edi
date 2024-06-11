@@ -92,11 +92,9 @@ public static class OutgoingMessagesExtensions
         services
             .AddNodaTimeForApplication()
             .AddScoped<EnergyResultEnumerator>()
-            .AddDatabricksSqlStatementExecution(configuration);
-
-        // TODO: We cannot enable this health check until we have a Databricks we can use from EDI; and we do not have a solution for perform startup registrations based on feature flags.
-        ////.AddHealthChecks()
-        ////    .AddDatabricksSqlStatementApiHealthCheck(name: "DatabricksSqlStatementApi");
+            .AddDatabricksSqlStatementExecution(configuration)
+            .AddHealthChecks()
+                .AddDatabricksSqlStatementApiHealthCheck(name: "DatabricksSqlStatementApi");
 
         return services;
     }
