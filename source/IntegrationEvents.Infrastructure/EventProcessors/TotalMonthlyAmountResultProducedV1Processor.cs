@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Extensions;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
@@ -49,6 +47,14 @@ public class TotalMonthlyAmountResultProducedV1Processor : IIntegrationEventProc
         }
 
         var totalMonthlyAmountResultProducedV1 = (TotalMonthlyAmountResultProducedV1)integrationEvent.Message;
+
+        var isHandledByCalculationCompletedEvent = await totalMonthlyAmountResultProducedV1.CalculationType
+            .IsHandledByCalculationCompletedEventAsync(_featureManager)
+            .ConfigureAwait(false);
+
+        if (isHandledByCalculationCompletedEvent)
+            return;
+
         var message = WholesaleServicesTotalSumMessageFactory.CreateMessage(
             EventId.From(integrationEvent.EventIdentification),
             totalMonthlyAmountResultProducedV1);
