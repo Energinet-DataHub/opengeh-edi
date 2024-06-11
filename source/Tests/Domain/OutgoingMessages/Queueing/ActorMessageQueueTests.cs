@@ -13,9 +13,11 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
+using FluentAssertions;
 using NodaTime;
 using Xunit;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
@@ -52,7 +54,7 @@ public class ActorMessageQueueTests
 
         var result = actorMessageQueue.Peek();
 
-        Assert.Null(result.BundleId);
+        result.Should().BeNull();
     }
 
     [Fact]
@@ -65,7 +67,12 @@ public class ActorMessageQueueTests
 
         var result = actorMessageQueue.Peek();
 
-        Assert.Equal(outgoingMessage.AssignedBundleId, result.BundleId);
+        result.Should()
+            .NotBeNull()
+            .And.BeOfType<PeekResult>()
+            .Subject.BundleId
+            .Should()
+            .Be(outgoingMessage.AssignedBundleId);
     }
 
     [Fact]
@@ -76,10 +83,14 @@ public class ActorMessageQueueTests
         var outgoingMessage = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
         actorMessageQueue.Enqueue(outgoingMessage, SystemClock.Instance.GetCurrentInstant());
 
-        var result = actorMessageQueue.Peek();
+        var peekResult = actorMessageQueue.Peek();
+        peekResult.Should().NotBeNull();
 
-        Assert.True(actorMessageQueue.Dequeue(result.MessageId!.Value));
-        Assert.Null(actorMessageQueue.Peek().BundleId);
+        var dequeueResult = actorMessageQueue.Dequeue(peekResult!.MessageId);
+        dequeueResult.Should().BeTrue("we should be able to dequeue what we just peeked");
+
+        var newPeekResult = actorMessageQueue.Peek();
+        newPeekResult.Should().BeNull();
     }
 
     [Fact]
@@ -91,12 +102,15 @@ public class ActorMessageQueueTests
         actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing), SystemClock.Instance.GetCurrentInstant(), maxNumberOfMessagesInABundle: 1);
 
         var firstBundle = actorMessageQueue.Peek();
-        actorMessageQueue.Dequeue(firstBundle.MessageId!.Value);
-        var secondBundle = actorMessageQueue.Peek();
+        firstBundle.Should().NotBeNull();
 
-        Assert.NotNull(firstBundle.BundleId);
-        Assert.NotNull(secondBundle.BundleId);
-        Assert.NotEqual(firstBundle.BundleId, secondBundle.BundleId);
+        var dequeueResult = actorMessageQueue.Dequeue(firstBundle!.MessageId);
+        dequeueResult.Should().BeTrue("we should be able to dequeue what we just peeked");
+
+        var secondBundle = actorMessageQueue.Peek();
+        secondBundle.Should().NotBeNull();
+
+        firstBundle.BundleId.Should().NotBe(secondBundle!.BundleId);
     }
 
     [Fact]
@@ -107,14 +121,16 @@ public class ActorMessageQueueTests
         actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.MoveIn, DocumentType.NotifyAggregatedMeasureData), SystemClock.Instance.GetCurrentInstant(), maxNumberOfMessagesInABundle: 2);
         actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing, DocumentType.RejectRequestAggregatedMeasureData), SystemClock.Instance.GetCurrentInstant(), maxNumberOfMessagesInABundle: 2);
 
-        var firstPeekResult = actorMessageQueue.Peek(MessageCategory.Aggregations);
-        actorMessageQueue.Dequeue(firstPeekResult.MessageId!.Value);
-        var secondPeekResult = actorMessageQueue.Peek(MessageCategory.Aggregations);
-        actorMessageQueue.Dequeue(secondPeekResult.MessageId!.Value);
+        var firstBundle = actorMessageQueue.Peek();
+        firstBundle.Should().NotBeNull();
 
-        Assert.Equal(DocumentType.NotifyAggregatedMeasureData, firstPeekResult.DocumentType);
-        Assert.Equal(DocumentType.RejectRequestAggregatedMeasureData, secondPeekResult.DocumentType);
-        Assert.NotEqual(firstPeekResult.BundleId, secondPeekResult.BundleId);
+        var dequeueResult = actorMessageQueue.Dequeue(firstBundle!.MessageId);
+        dequeueResult.Should().BeTrue("we should be able to dequeue what we just peeked");
+
+        var secondBundle = actorMessageQueue.Peek();
+        secondBundle.Should().NotBeNull();
+
+        firstBundle.BundleId.Should().NotBe(secondBundle!.BundleId);
     }
 
     [Fact]
@@ -128,8 +144,8 @@ public class ActorMessageQueueTests
         actorMessageQueue.Enqueue(messageAssignedToSecondBundle, SystemClock.Instance.GetCurrentInstant(), 1);
 
         var result = actorMessageQueue.Peek();
-
-        Assert.Equal(messageAssignedToFirstBundle.AssignedBundleId, result.BundleId);
+        result.Should().NotBeNull();
+        result!.BundleId.Should().Be(messageAssignedToFirstBundle.AssignedBundleId);
     }
 
     [Fact]
@@ -159,7 +175,7 @@ public class ActorMessageQueueTests
         var messageAssignedToSecondBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
         actorMessageQueue.Enqueue(messageAssignedToSecondBundle, SystemClock.Instance.GetCurrentInstant());
 
-        Assert.NotEqual(messageAssignedToFirstBundle!.AssignedBundleId, messageAssignedToSecondBundle.AssignedBundleId);
+        Assert.NotEqual(messageAssignedToFirstBundle.AssignedBundleId, messageAssignedToSecondBundle.AssignedBundleId);
     }
 
     private static OutgoingMessage CreateOutgoingMessage(

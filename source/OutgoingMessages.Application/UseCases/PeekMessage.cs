@@ -12,10 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -60,7 +56,7 @@ public class PeekMessage
         _systemDateTimeProvider = systemDateTimeProvider;
     }
 
-    public async Task<PeekResultDto> PeekAsync(PeekRequestDto request, CancellationToken cancellationToken)
+    public async Task<PeekResultDto?> PeekAsync(PeekRequestDto request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -75,15 +71,16 @@ public class PeekMessage
             _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.ActorRole).ConfigureAwait(false);
 
         if (actorMessageQueue is null)
-            return new PeekResultDto(null, null);
+        {
+            return null;
+        }
 
         var peekResult = request.DocumentFormat == DocumentFormat.Ebix ? actorMessageQueue.Peek() : actorMessageQueue.Peek(request.MessageCategory);
 
-        if (peekResult.BundleId == null)
-            return new PeekResultDto(null, null);
-
-        if (peekResult.MessageId == null)
-            return new PeekResultDto(null, null);
+        if (peekResult is null)
+        {
+            return null;
+        }
 
         var marketDocument = await _marketDocumentRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);
 
@@ -91,11 +88,11 @@ public class PeekMessage
         {
             var timestamp = _systemDateTimeProvider.Now();
 
-            var outgoingMessageBundle = await _outgoingMessageRepository.GetAsync(peekResult.BundleId, peekResult.MessageId).ConfigureAwait(false);
+            var outgoingMessageBundle = await _outgoingMessageRepository.GetAsync(peekResult).ConfigureAwait(false);
             var marketDocumentStream = await _documentFactory.CreateFromAsync(outgoingMessageBundle, request.DocumentFormat, timestamp).ConfigureAwait(false);
 
             var archivedMessageToCreate = new ArchivedMessage(
-                peekResult.MessageId.Value.Value,
+                outgoingMessageBundle.MessageId.Value,
                 outgoingMessageBundle.OutgoingMessages.Select(om => om.EventId).ToArray(),
                 outgoingMessageBundle.DocumentType.ToString(),
                 outgoingMessageBundle.SenderId.Value,

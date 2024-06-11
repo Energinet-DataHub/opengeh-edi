@@ -130,7 +130,7 @@ public class NotifyAggregatedMeasureDataCimXmlDocumentWriter : CimXmlDocumentWri
                 await writer.WriteElementStringAsync(DocumentDetails.Prefix, "position", null, point.Position.ToString(NumberFormatInfo.InvariantInfo)).ConfigureAwait(false);
                 if (point.Quantity is not null)
                 {
-                    await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity", null, point.Quantity.Value.ToString(NumberFormatInfo.InvariantInfo)!).ConfigureAwait(false);
+                    await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity", null, point.Quantity.Value.ToString(NumberFormatInfo.InvariantInfo)).ConfigureAwait(false);
                 }
 
                 await WriteQualityIfRequiredAsync(writer, point).ConfigureAwait(false);

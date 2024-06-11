@@ -115,9 +115,9 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
         var process = GetProcess(initializeProcessDto.SenderNumber);
         Assert.NotNull(message);
         Assert.NotNull(process);
-        Assert.Equal(process.ProcessId.Id.ToString(), message!.MessageId);
-        Assert.Equal(exceptedServiceBusMessageSubject, message!.Subject);
-        Assert.Equal(initializeProcessDto.Series.First().Id, process!.BusinessTransactionId);
+        Assert.Equal(process.ProcessId.Id.ToString(), message.MessageId);
+        Assert.Equal(exceptedServiceBusMessageSubject, message.Subject);
+        Assert.Equal(initializeProcessDto.Series.First().Id, process.BusinessTransactionId);
         AssertProcessState(process, AggregatedMeasureDataProcess.State.Sent);
     }
 
