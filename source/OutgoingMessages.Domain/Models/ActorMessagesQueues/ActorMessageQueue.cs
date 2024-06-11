@@ -63,18 +63,22 @@ public class ActorMessageQueue
         return documentType.Category == MessageCategory.Aggregations ? 1 : 10000;
     }
 
-    public PeekResult Peek()
+    public PeekResult? Peek()
     {
         var bundle = NextBundleToPeek();
 
-        return new PeekResult(bundle?.Id, bundle?.MessageId, bundle?.DocumentTypeInBundle);
+        return bundle is not null
+            ? new PeekResult(bundle.Id, bundle.MessageId)
+            : null;
     }
 
-    public PeekResult Peek(MessageCategory category)
+    public PeekResult? Peek(MessageCategory category)
     {
         var bundle = NextBundleToPeek(category);
 
-        return new PeekResult(bundle?.Id, bundle?.MessageId, bundle?.DocumentTypeInBundle);
+        return bundle is not null
+            ? new PeekResult(bundle.Id, bundle.MessageId)
+            : null;
     }
 
     public bool Dequeue(MessageId messageId)

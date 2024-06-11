@@ -31,5 +31,5 @@ public interface IOutgoingMessageRepository
     /// <summary>
     /// Get all messages assigned to a bundle by id
     /// </summary>
-    Task<OutgoingMessageBundle> GetAsync(BundleId bundleId, MessageId? messageId);
+    Task<OutgoingMessageBundle> GetAsync(PeekResult peekResult);
 }

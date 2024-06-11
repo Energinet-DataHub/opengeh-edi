@@ -88,7 +88,7 @@ public class AssertOutgoingMessage
         var assertOutgoingMessages = new List<AssertOutgoingMessage>();
         foreach (var outgoingMessage in outgoingMessages)
         {
-            var outgoingMessageFileStorageReference = (string?)outgoingMessage!.FileStorageReference;
+            var outgoingMessageFileStorageReference = (string?)outgoingMessage.FileStorageReference;
             outgoingMessageFileStorageReference.Should().NotBeNull("because an outgoing message should always have a file storage reference");
 
             var fileStorageFile = await fileStorageClient.DownloadAsync(new FileStorageReference(FileStorageCategory.OutgoingMessage(), outgoingMessageFileStorageReference!));

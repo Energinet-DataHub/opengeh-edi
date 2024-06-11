@@ -98,21 +98,15 @@ public class PeekRequestListener
                 cancellationToken)
             .ConfigureAwait(false);
 
-        if (peekResult.MessageId is null)
+        if (peekResult is null)
         {
             response.StatusCode = HttpStatusCode.NoContent;
             return response;
         }
 
-        if (peekResult.Bundle == null)
-        {
-            response.StatusCode = HttpStatusCode.InternalServerError;
-            return response;
-        }
-
         response.Body = peekResult.Bundle;
         response.Headers.Add("content-type", contentType);
-        response.Headers.Add("MessageId", peekResult.MessageId?.Value);
+        response.Headers.Add("MessageId", peekResult.MessageId.Value);
         response.StatusCode = HttpStatusCode.OK;
         return response;
     }

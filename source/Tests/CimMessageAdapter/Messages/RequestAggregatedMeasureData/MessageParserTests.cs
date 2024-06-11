@@ -92,7 +92,7 @@ public class MessageParserTests
         var result = await _marketMessageParser.ParseAsync(new IncomingMessageStream(message), format, IncomingDocumentType.RequestAggregatedMeasureData, CancellationToken.None);
         using var assertionScope = new AssertionScope();
         Assert.True(result.Success);
-        var marketMessage = (RequestAggregatedMeasureDataMessage)result!.IncomingMessage!;
+        var marketMessage = (RequestAggregatedMeasureDataMessage)result.IncomingMessage!;
         Assert.NotNull(marketMessage);
         Assert.Equal("123564789123564789123564789123564789", marketMessage.MessageId);
         Assert.Equal("D05", marketMessage.BusinessReason);
@@ -125,7 +125,7 @@ public class MessageParserTests
         var result = await _marketMessageParser.ParseAsync(new IncomingMessageStream(message), format, IncomingDocumentType.B2CRequestAggregatedMeasureData, CancellationToken.None);
         using var assertionScope = new AssertionScope();
         Assert.True(result.Success);
-        var marketMessage = (RequestAggregatedMeasureDataMessage)result!.IncomingMessage!;
+        var marketMessage = (RequestAggregatedMeasureDataMessage)result.IncomingMessage!;
         Assert.NotNull(marketMessage);
         Assert.Equal("123564789123564789123564789123564789", marketMessage.MessageId);
         Assert.Equal("D05", marketMessage.BusinessReason);

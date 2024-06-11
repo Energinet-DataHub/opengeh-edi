@@ -133,7 +133,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
                 DocumentFormat.Xml),
             CancellationToken.None);
 
-        Assert.NotNull(result.MessageId);
+        Assert.NotNull(result);
     }
 
     [Fact]
@@ -152,7 +152,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             connection
                 .QuerySingleOrDefaultAsync<string>(sql);
 
-        Assert.Equal(result.MessageId!.Value.Value, id);
+        Assert.Equal(result!.MessageId.Value, id);
     }
 
     [Fact]
@@ -167,7 +167,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             DocumentFormat.Xml);
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(peekRequestDto, CancellationToken.None);
         var dequeueCommand = new DequeueRequestDto(
-            peekResult.MessageId!.Value.Value,
+            peekResult!.MessageId.Value,
             message.ReceiverRole,
             message.ReceiverNumber);
 

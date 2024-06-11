@@ -33,7 +33,7 @@ public interface IOutgoingMessagesClient
     /// </summary>
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
-    Task<PeekResultDto> PeekAndCommitAsync(PeekRequestDto request, CancellationToken cancellationToken);
+    Task<PeekResultDto?> PeekAndCommitAsync(PeekRequestDto request, CancellationToken cancellationToken);
 
     /// <summary>
     ///  Enqueue a accepted energy result message, no commit. Currently ONLY used by the Process module which handles the commit itself.
