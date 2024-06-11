@@ -349,7 +349,6 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
         var resultGridAreas = new List<string>();
         foreach (var peekResult in delegatedActorPeekResults)
         {
-            peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
             var peekResultGridArea = await GetGridAreaFromNotifyWholesaleServicesDocument(peekResult.Bundle, peekDocumentFormat);
 
             resultGridAreas.Add(peekResultGridArea);
@@ -786,7 +785,6 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
         var resultGridAreas = new List<string>();
         foreach (var peekResult in originalActorPeekResults)
         {
-            peekResult.Bundle.Should().NotBeNull("because peek result should contain a document stream");
             var peekResultGridArea = await GetGridAreaFromNotifyWholesaleServicesDocument(peekResult.Bundle, peekDocumentFormat);
 
             resultGridAreas.Add(peekResultGridArea);

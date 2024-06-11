@@ -17,4 +17,10 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 
+/// <summary>
+/// The result of peeking an actor's queue.
+/// The result contains the bundle id and the message id of the next message in the queue.
+/// The bundle id is used to identify the bundle that the message belongs to, and is used internally in EDI.
+/// The message id is the mRID in the message header, and is used by the actor to identify and dequeue the message.
+/// </summary>
 public sealed record PeekResult(BundleId BundleId, MessageId MessageId);
