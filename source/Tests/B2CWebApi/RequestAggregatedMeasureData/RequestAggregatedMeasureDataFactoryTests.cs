@@ -89,7 +89,7 @@ public class RequestAggregatedMeasureDataFactoryTests
             _dateTimeZone,
             SystemClock.Instance.GetCurrentInstant());
 
-        var endDate = InstantPattern.General.Parse(result.Serie.First()!.EndDateAndOrTimeDateTime!).GetValueOrThrow();
+        var endDate = InstantPattern.General.Parse(result.Serie.First().EndDateAndOrTimeDateTime!).GetValueOrThrow();
         Assert.Equal(endDay - 1, endDate.Day());
     }
 }

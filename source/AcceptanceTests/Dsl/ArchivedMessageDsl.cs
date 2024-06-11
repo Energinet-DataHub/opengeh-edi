@@ -32,7 +32,7 @@ public class ArchivedMessageDsl
     {
         var archivedMessages = await _ediB2CDriver.RequestArchivedMessageSearchAsync(
             ArchivedMessageData.GetSearchableDataObject(
-            messageId!,
+            messageId,
             null!,
             null!,
             null!,

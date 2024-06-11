@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.IO;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-public record PeekResultDto(Stream? Bundle, MessageId? MessageId);
+public sealed record PeekResultDto(Stream Bundle, MessageId MessageId);

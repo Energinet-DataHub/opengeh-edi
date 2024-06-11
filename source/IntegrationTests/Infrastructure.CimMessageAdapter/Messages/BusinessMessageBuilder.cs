@@ -94,9 +94,9 @@ public class BusinessMessageBuilder
         var serieElement = root!
             .Element(_xmlNamespace + "Series")!
             .Elements()
-            .First(serieElement => serieElement.Name.LocalName!.Equals("mRID", StringComparison.Ordinal));
+            .First(serieElement => serieElement.Name.LocalName.Equals("mRID", StringComparison.Ordinal));
 
-        serieElement!.Value = transactionId;
+        serieElement.Value = transactionId;
         return this;
     }
 

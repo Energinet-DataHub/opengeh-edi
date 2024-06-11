@@ -43,7 +43,7 @@ public class AssertEbixDocument
         _document = XDocument.Parse(elm.ToString());
 
         _xmlNamespaceManager = new XmlNamespaceManager(reader.NameTable);
-        _xmlNamespaceManager.AddNamespace(prefix, _document!.Root!.Name.NamespaceName);
+        _xmlNamespaceManager.AddNamespace(prefix, _document.Root!.Name.NamespaceName);
         stream = new MemoryStream();
         _document.Save(stream);
         stream.Position = 0;

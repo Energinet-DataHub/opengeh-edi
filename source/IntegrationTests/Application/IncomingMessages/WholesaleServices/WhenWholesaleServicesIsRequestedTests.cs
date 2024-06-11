@@ -89,7 +89,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
         message.Should().NotBeNull();
         message!.Subject.Should().Be(exceptedServiceBusMessageSubject);
         process.Should().BeEquivalentTo(marketMessage, opt => opt.Using(new ProcessAndRequestComparer()));
-        await AssertProcessState(marketMessage!.MessageId, WholesaleServicesProcess.State.Sent);
+        await AssertProcessState(marketMessage.MessageId, WholesaleServicesProcess.State.Sent);
     }
 
     [Fact]
@@ -170,7 +170,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
 
         // Assert
         _senderSpy.LatestMessage.Should().BeNull();
-        await AssertProcessState(marketMessage!.MessageId, WholesaleServicesProcess.State.Sent);
+        await AssertProcessState(marketMessage.MessageId, WholesaleServicesProcess.State.Sent);
     }
 
     [Fact]
@@ -187,7 +187,7 @@ public class WhenWholesaleServicesIsRequestedTests : TestBase
 
         // Assert
         _senderSpy.LatestMessage.Should().BeNull();
-        await AssertProcessState(marketMessage!.MessageId, WholesaleServicesProcess.State.Initialized);
+        await AssertProcessState(marketMessage.MessageId, WholesaleServicesProcess.State.Initialized);
     }
 
     protected override void Dispose(bool disposing)
