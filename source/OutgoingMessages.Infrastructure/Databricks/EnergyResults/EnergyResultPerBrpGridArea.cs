@@ -19,7 +19,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults;
 
-public sealed class EnergyResultPerGridArea(
+public sealed class EnergyResultPerBrpGridArea(
     Guid id,
     Guid calculationId,
     string gridAreaCode,
@@ -30,7 +30,8 @@ public sealed class EnergyResultPerGridArea(
     Instant periodEndUtc,
     Resolution resolution,
     long calculationVersion,
-    SettlementMethod? settlementMethod)
+    SettlementMethod? settlementMethod,
+    string balanceResponsiblePartyId)
     : AggregatedTimeSeries(
         gridAreaCode,
         timeSeriesPoints,
@@ -45,4 +46,6 @@ public sealed class EnergyResultPerGridArea(
     public Guid Id { get; } = id;
 
     public Guid CalculationId { get; } = calculationId;
+
+    public string BalanceResponsiblePartyId { get; } = balanceResponsiblePartyId;
 }

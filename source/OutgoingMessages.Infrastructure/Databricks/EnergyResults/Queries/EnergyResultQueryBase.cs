@@ -13,18 +13,20 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
-using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 
-public abstract class EnergyResultQueryBase(
-        IOptions<EdiDatabricksOptions> ediDatabricksOptions,
+public abstract class EnergyResultQueryBase<TResult>(
+        EdiDatabricksOptions ediDatabricksOptions,
         Guid calculationId)
-    : DatabricksStatement, IDeltaTableSchemaDescription
+    : IDeltaTableSchemaDescription
+    where TResult : AggregatedTimeSeries
 {
-    private readonly EdiDatabricksOptions _ediDatabricksOptions = ediDatabricksOptions.Value;
+    private readonly EdiDatabricksOptions _ediDatabricksOptions = ediDatabricksOptions;
 
     /// <summary>
     /// Name of database to query in.
@@ -39,24 +41,59 @@ public abstract class EnergyResultQueryBase(
     public Guid CalculationId { get; } = calculationId;
 
     /// <summary>
-    /// List of column names to select in query.
-    /// </summary>
-    public string[] SqlColumnNames => SchemaDefinition.Keys.ToArray();
-
-    /// <summary>
     /// The schema definition of the view expressed as (Column name, Data type, Is nullable).
     ///
     /// Can be used in tests to create a matching data object (e.g. table).
     /// </summary>
     public abstract Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition { get; }
 
-    protected override string GetSqlStatement()
+    internal async IAsyncEnumerable<TResult> GetAsync(DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor)
     {
-        return $@"
-SELECT {string.Join(", ", SqlColumnNames)}
-FROM {DatabaseName}.{DataObjectName}
-WHERE {EnergyResultColumnNames.CalculationId} = '{CalculationId}'
-ORDER BY {EnergyResultColumnNames.ResultId}, {EnergyResultColumnNames.Time}
-";
+        ArgumentNullException.ThrowIfNull(databricksSqlWarehouseQueryExecutor);
+
+        DatabricksSqlRow? currentRow = null;
+        var timeSeriesPoints = new List<EnergyTimeSeriesPoint>();
+
+        var statement = DatabricksStatement
+            .FromRawSql(BuildSqlQuery())
+            .Build();
+
+        await foreach (var nextRow in databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement).ConfigureAwait(false))
+        {
+            var timeSeriesPoint = EnergyTimeSeriesPointFactory.CreateTimeSeriesPoint(nextRow);
+
+            if (currentRow != null && BelongsToDifferentResults(currentRow, nextRow))
+            {
+                yield return CreateEnergyResult(currentRow!, timeSeriesPoints);
+                timeSeriesPoints = [];
+            }
+
+            timeSeriesPoints.Add(timeSeriesPoint);
+            currentRow = nextRow;
+        }
+
+        if (currentRow != null)
+        {
+            yield return CreateEnergyResult(currentRow, timeSeriesPoints);
+        }
+    }
+
+    protected abstract TResult CreateEnergyResult(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints);
+
+    private static bool BelongsToDifferentResults(DatabricksSqlRow row, DatabricksSqlRow otherRow)
+    {
+        return !row.ToGuid(EnergyResultColumnNames.ResultId).Equals(otherRow.ToGuid(EnergyResultColumnNames.ResultId));
+    }
+
+    private string BuildSqlQuery()
+    {
+        var columnNames = SchemaDefinition.Keys.ToArray();
+
+        return $"""
+            SELECT {string.Join(", ", columnNames)}
+            FROM {DatabaseName}.{DataObjectName}
+            WHERE {EnergyResultColumnNames.CalculationId} = '{CalculationId}'
+            ORDER BY {EnergyResultColumnNames.ResultId}, {EnergyResultColumnNames.Time}
+            """;
     }
 }

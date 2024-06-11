@@ -74,7 +74,17 @@ public interface IOutgoingMessagesClient
     Task<OutgoingMessageId> EnqueueAndCommitAsync(WholesaleServicesTotalSumMessageDto wholesaleServicesTotalSumMessage, CancellationToken cancellationToken);
 
     /// <summary>
-    ///  Enqueue energy results as outgoing messages for the given calculation id.
+    ///  Enqueue energy results for Grid Area Owners as outgoing messages for the given calculation id.
     /// </summary>
     Task<int> EnqueueEnergyResultsForGridAreaOwnersAsync(EnqueueMessagesInputDto input);
+
+    /// <summary>
+    ///  Enqueue energy results for Balance Responsibles as outgoing messages for the given calculation id.
+    /// </summary>
+    Task<int> EnqueueEnergyResultsForBalanceResponsiblesAsync(EnqueueMessagesInputDto input);
+
+    /// <summary>
+    ///  Enqueue energy results for Balance Responsible and Energy Supplier as outgoing messages for the given calculation id.
+    /// </summary>
+    Task<int> EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersAsync(EnqueueMessagesInputDto input);
 }
