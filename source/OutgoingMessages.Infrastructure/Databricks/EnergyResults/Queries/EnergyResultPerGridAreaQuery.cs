@@ -34,7 +34,7 @@ public class EnergyResultPerGridAreaQuery(
         ediDatabricksOptions,
         calculationId)
 {
-    public override string DataObjectName => "energy_result_points_per_ga_v1";
+    public override string DataObjectName => "energy_per_ga_v1";
 
     public override Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition => new()
     {
