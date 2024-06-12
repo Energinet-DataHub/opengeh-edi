@@ -38,7 +38,7 @@ public class EnergyResultMessageDtoFactory()
             gridAreaCode: energyResult.GridAreaCode,
             meteringPointType: energyResult.MeteringPointType.Name,
             settlementMethod: energyResult.SettlementMethod?.Name,
-            measureUnitType: DomainModel.MeasurementUnit.Kwh.Name, // TODO: Should this be read from Databricks?
+            measureUnitType: energyResult.MeasureUnitType.Name,
             resolution: energyResult.Resolution.Name,
             energySupplierNumber: null,
             balanceResponsibleNumber: null,
@@ -64,7 +64,7 @@ public class EnergyResultMessageDtoFactory()
             gridAreaCode: energyResult.GridAreaCode,
             meteringPointType: energyResult.MeteringPointType.Name,
             settlementMethod: energyResult.SettlementMethod?.Name,
-            measureUnitType: DomainModel.MeasurementUnit.Kwh.Name, // TODO: Should this be read from Databricks?
+            measureUnitType: energyResult.MeasureUnitType.Name,
             resolution: energyResult.Resolution.Name,
             energySupplierNumber: null,
             balanceResponsibleNumber: energyResult.BalanceResponsiblePartyId,
@@ -90,7 +90,7 @@ public class EnergyResultMessageDtoFactory()
             gridAreaCode: energyResult.GridAreaCode,
             meteringPointType: energyResult.MeteringPointType.Name,
             settlementMethod: energyResult.SettlementMethod?.Name,
-            measureUnitType: DomainModel.MeasurementUnit.Kwh.Name, // TODO: Should this be read from Databricks?
+            measureUnitType: energyResult.MeasureUnitType.Name,
             resolution: energyResult.Resolution.Name,
             energySupplierNumber: energyResult.EnergySupplierId,
             balanceResponsibleNumber: null,
@@ -116,7 +116,7 @@ public class EnergyResultMessageDtoFactory()
             gridAreaCode: energyResult.GridAreaCode,
             meteringPointType: energyResult.MeteringPointType.Name,
             settlementMethod: energyResult.SettlementMethod?.Name,
-            measureUnitType: DomainModel.MeasurementUnit.Kwh.Name, // TODO: Should this be read from Databricks?
+            measureUnitType: energyResult.MeasureUnitType.Name,
             resolution: energyResult.Resolution.Name,
             energySupplierNumber: energyResult.EnergySupplierId,
             balanceResponsibleNumber: energyResult.BalanceResponsiblePartyId,
