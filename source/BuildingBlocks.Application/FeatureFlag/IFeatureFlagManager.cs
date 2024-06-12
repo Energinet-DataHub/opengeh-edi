@@ -25,11 +25,6 @@ namespace BuildingBlocks.Application.FeatureFlag;
 public interface IFeatureFlagManager
 {
     /// <summary>
-    /// A Feature Flag example
-    /// </summary>
-    Task<bool> UseExampleFeatureFlagAsync();
-
-    /// <summary>
     /// Whether to allow handling MonthlyAmountPerChargeResultProduced events
     /// </summary>
     Task<bool> UseMonthlyAmountPerChargeResultProducedAsync();

@@ -28,8 +28,6 @@ public class MicrosoftFeatureFlagManager : IFeatureFlagManager
         _featureManager = featureManager;
     }
 
-    public Task<bool> UseExampleFeatureFlagAsync() => IsEnabledAsync(FeatureFlagName.UseExampleFeatureFlag);
-
     public Task<bool> UseMonthlyAmountPerChargeResultProducedAsync() => IsEnabledAsync(FeatureFlagName.UseMonthlyAmountPerChargeResultProduced);
 
     public Task<bool> UseAmountPerChargeResultProducedAsync() => IsEnabledAsync(FeatureFlagName.UseAmountPerChargeResultProduced);

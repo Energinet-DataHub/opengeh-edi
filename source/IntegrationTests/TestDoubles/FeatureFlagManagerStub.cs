@@ -33,8 +33,6 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
 
     public void EnableCalculationCompletedEvent(bool enable) => _useCalculationCompletedEvent = enable;
 
-    public Task<bool> UseExampleFeatureFlagAsync() => Task.FromResult(true);
-
     public Task<bool> UseMonthlyAmountPerChargeResultProducedAsync() => Task.FromResult(_useMonthlyAmountPerChargeResultProducedAsync);
 
     public Task<bool> UseAmountPerChargeResultProducedAsync() => Task.FromResult(_useAmountPerChargeResultProduced);
