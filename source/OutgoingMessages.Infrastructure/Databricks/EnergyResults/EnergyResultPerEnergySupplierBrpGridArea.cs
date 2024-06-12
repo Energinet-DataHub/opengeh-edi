@@ -31,6 +31,7 @@ public sealed class EnergyResultPerEnergySupplierBrpGridArea(
     Resolution resolution,
     long calculationVersion,
     SettlementMethod? settlementMethod,
+    MeasurementUnit measureUnitType,
     string balanceResponsiblePartyId,
     string energySupplierId)
     : AggregatedTimeSeries(
@@ -42,7 +43,8 @@ public sealed class EnergyResultPerEnergySupplierBrpGridArea(
         periodEndUtc,
         resolution,
         calculationVersion,
-        settlementMethod)
+        settlementMethod,
+        measureUnitType)
 {
     public Guid Id { get; } = id;
 
