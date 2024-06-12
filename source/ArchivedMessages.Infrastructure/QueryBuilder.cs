@@ -51,7 +51,7 @@ internal sealed class QueryBuilder
         if (request.SenderNumber is not null && request.ReceiverNumber is not null)
         {
             AddFilter(
-                "SenderNumber=@SenderNumber OR ReceiverNumber=@ReceiverNumber",
+                "(SenderNumber=@SenderNumber OR ReceiverNumber=@ReceiverNumber)",
                 new KeyValuePair<string, object>("SenderNumber", request.SenderNumber),
                 new KeyValuePair<string, object>("ReceiverNumber", request.ReceiverNumber));
         }
