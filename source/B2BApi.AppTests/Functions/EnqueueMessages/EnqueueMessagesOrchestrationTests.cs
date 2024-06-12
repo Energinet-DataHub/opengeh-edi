@@ -125,7 +125,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         // => Verify expected behaviour by searching the orchestration history
         var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
 
-        // => Wait for completion, this should be fairly quick
+        // => Wait for completion
         var completeOrchestrationStatus = await Fixture.DurableClient.WaitForInstanceCompletedAsync(
             actualOrchestrationStatus.InstanceId,
             TimeSpan.FromMinutes(5));
