@@ -26,7 +26,7 @@ internal static class EnergyResultProducedV2Factory
         {
             Resolution = EnergyResultProducedV2.Types.Resolution.Quarter,
             QuantityUnit = EnergyResultProducedV2.Types.QuantityUnit.Kwh,
-            CalculationType = EnergyResultProducedV2.Types.CalculationType.BalanceFixing,
+            CalculationType = EnergyResultProducedV2.Types.CalculationType.WholesaleFixing, // Use WholesaleFixing since BalanceFixing uses CalculationCompletedEvent handling
             TimeSeriesType = EnergyResultProducedV2.Types.TimeSeriesType.Production,
             CalculationId = Guid.NewGuid().ToString(),
             AggregationPerGridarea =
@@ -55,7 +55,7 @@ internal static class EnergyResultProducedV2Factory
         {
             Resolution = EnergyResultProducedV2.Types.Resolution.Quarter,
             QuantityUnit = EnergyResultProducedV2.Types.QuantityUnit.Kwh,
-            CalculationType = EnergyResultProducedV2.Types.CalculationType.BalanceFixing,
+            CalculationType = EnergyResultProducedV2.Types.CalculationType.WholesaleFixing, // Use WholesaleFixing since BalanceFixing uses CalculationCompletedEvent handling
             TimeSeriesType = EnergyResultProducedV2.Types.TimeSeriesType.Production,
             CalculationId = Guid.NewGuid().ToString(),
             AggregationPerBalanceresponsiblepartyPerGridarea =
