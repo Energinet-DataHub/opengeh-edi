@@ -61,14 +61,25 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         Fixture.SetTestOutputHelper(null!);
     }
 
-    [Fact]
-    public async Task Given_FeatureFlagIsDisabled_When_CalculationCompletedEventIsSent_Then_OrchestrationIsNeverStarted()
+    [Theory]
+    [InlineData(null)]
+    [InlineData(CalculationCompletedV1.Types.CalculationType.BalanceFixing)]
+    [InlineData(CalculationCompletedV1.Types.CalculationType.WholesaleFixing)]
+    public async Task Given_FeatureFlagIsDisabledForCalculationType_When_CalculationCompletedEventIsSent_Then_OrchestrationIsNeverStarted(CalculationCompletedV1.Types.CalculationType? calculationTypeToTest)
     {
         // Arrange
-        Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: false);
+        // => If calculationTypeToTest is null, then we test disabling the UseCalculationCompletedEvent feature flag
+        // => If calculationTypeToTest is BalanceFixing, then we test disabling the balance fixing feature flag
+        // => If calculationTypeToTest is WholesaleFixing, then we test disabling the wholesale fixing feature flag
+        Fixture.EnsureAppHostUsesFeatureFlagValue(
+            enableCalculationCompletedEvent: calculationTypeToTest != null,
+            enableCalculationCompletedEventForBalanceFixing: calculationTypeToTest != CalculationCompletedV1.Types.CalculationType.BalanceFixing,
+            enableCalculationCompletedEventForWholesaleFixing: calculationTypeToTest != CalculationCompletedV1.Types.CalculationType.WholesaleFixing);
 
         var calculationOrchestrationId = Guid.NewGuid().ToString();
-        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId);
+        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
+            calculationOrchestrationId,
+            calculationTypeToTest);
 
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
@@ -91,12 +102,18 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_FeatureFlagIsEnabledAndCalculationOrchestrationId_When_CalculationCompletedEventIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
-        Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: true);
+        Fixture.EnsureAppHostUsesFeatureFlagValue(
+            enableCalculationCompletedEvent: true,
+            enableCalculationCompletedEventForBalanceFixing: true,
+            enableCalculationCompletedEventForWholesaleFixing: false);
 
         var calculationId = await ClearAndAddDatabricksData();
 
         var calculationOrchestrationId = Guid.NewGuid().ToString();
-        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId, calculationId.ToString());
+        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
+            calculationOrchestrationId,
+            CalculationCompletedV1.Types.CalculationType.BalanceFixing,
+            calculationId.ToString());
 
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
@@ -151,7 +168,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             .VerifyCountAsync(1);
 
         var wait = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(10));
-        wait.Should().BeTrue("We did not receive the expected message on the ServiceBus");
+        wait.Should().BeTrue("ActorMessagesEnqueuedV1 service bus message should be sent");
     }
 
     /// <summary>
@@ -162,11 +179,17 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_DatabricksHasNoData_When_CalculationCompletedEventIsHandled_Then_ServiceBusMessageHasFailedStatus()
     {
         // Arrange
-        Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: true);
+        Fixture.EnsureAppHostUsesFeatureFlagValue(
+            enableCalculationCompletedEvent: true,
+            enableCalculationCompletedEventForBalanceFixing: true,
+            enableCalculationCompletedEventForWholesaleFixing: false);
 
         var calculationId = Guid.NewGuid().ToString();
         var calculationOrchestrationId = Guid.NewGuid().ToString();
-        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId, calculationId);
+        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
+            calculationOrchestrationId,
+            CalculationCompletedV1.Types.CalculationType.BalanceFixing,
+            calculationId);
 
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
@@ -207,13 +230,16 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         wait.Should().BeTrue("We did not receive the expected message on the ServiceBus");
     }
 
-    private static ServiceBusMessage CreateCalculationCompletedEventMessage(string calculationOrchestrationId, string? calculationId = null)
+    private static ServiceBusMessage CreateCalculationCompletedEventMessage(
+        string calculationOrchestrationId,
+        CalculationCompletedV1.Types.CalculationType? calculationType = null,
+        string? calculationId = null)
     {
         var calculationCompletedEvent = new CalculationCompletedV1
         {
             InstanceId = calculationOrchestrationId,
             CalculationId = calculationId ?? Guid.NewGuid().ToString(),
-            CalculationType = CalculationCompletedV1.Types.CalculationType.BalanceFixing,
+            CalculationType = calculationType ?? CalculationCompletedV1.Types.CalculationType.BalanceFixing,
             CalculationVersion = 1,
         };
 
