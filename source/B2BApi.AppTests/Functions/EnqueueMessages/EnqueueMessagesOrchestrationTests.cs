@@ -16,7 +16,9 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EnergySupplying.RequestResponse.IntegrationEvents;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
@@ -126,7 +128,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         // => Wait for completion, this should be fairly quick
         var completeOrchestrationStatus = await Fixture.DurableClient.WaitForInstanceCompletedAsync(
             actualOrchestrationStatus.InstanceId,
-            TimeSpan.FromMinutes(1));
+            TimeSpan.FromMinutes(5));
 
         // => Expect history
         using var assertionScope = new AssertionScope();
@@ -139,6 +141,8 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         [
             "EnqueueMessagesOrchestration",
             "EnqueueEnergyResultsForGridAreaOwnersActivity",
+            "EnqueueEnergyResultsForBalanceResponsiblesActivity",
+            "EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity",
             "SendActorMessagesEnqueuedActivity",
             null,
         ]);
@@ -270,22 +274,29 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         if (Fixture.DatabricksSchemaManager.SchemaExists)
             await Fixture.DatabricksSchemaManager.DropSchemaAsync();
 
-        // This ID has to match the hardcoded calculation id in the file balance_fixing_01-11-2022_01-12-2022_ga_543.csv
-        var calculationId = Guid.Parse("e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d");
         await Fixture.DatabricksSchemaManager.CreateSchemaAsync();
+        var ediDatabricksOptions = Options.Create(new EdiDatabricksOptions { DatabaseName = Fixture.DatabricksSchemaManager.SchemaName });
 
-        var ediOptions = Options.Create(
-            new EdiDatabricksOptions { DatabaseName = Fixture.DatabricksSchemaManager.SchemaName });
+        var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
+        var perGridAreaQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions.Value, perGridAreaDataDescription.CalculationId);
+        await SeedDatabricksWithDataAsync(perGridAreaDataDescription, perGridAreaQuery);
 
-        var viewQuery = new EnergyResultPerGridAreaQuery(
-            ediOptions.Value,
-            calculationId);
+        var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
+        var perBrpGridAreaQuery = new EnergyResultPerBrpGridAreaQuery(ediDatabricksOptions.Value, perGridAreaDataDescription.CalculationId);
+        await SeedDatabricksWithDataAsync(perBrpGridAreaDataDescription, perBrpGridAreaQuery);
+
+        var perBrdAndESGridAreaDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
+        var perBrpAndESGridAreaQuery = new EnergyResultPerEnergySupplierBrpGridAreaQuery(ediDatabricksOptions.Value, perGridAreaDataDescription.CalculationId);
+        await SeedDatabricksWithDataAsync(perBrdAndESGridAreaDataDescription, perBrpAndESGridAreaQuery);
+
+        return perGridAreaDataDescription.CalculationId;
+    }
+
+    private async Task SeedDatabricksWithDataAsync(EnergyResultTestDataDescription testDataDescription, IDeltaTableSchemaDescription viewQuery)
+    {
         await Fixture.DatabricksSchemaManager.CreateTableAsync(viewQuery);
 
-        const string testDataFileName = "balance_fixing_01-11-2022_01-12-2022_ga_543.csv";
-        var testFilePath = Path.Combine("TestData", testDataFileName);
+        var testFilePath = Path.Combine("Functions", "EnqueueMessages", "TestData", testDataDescription.TestFilename);
         await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, testFilePath);
-
-        return calculationId;
     }
 }

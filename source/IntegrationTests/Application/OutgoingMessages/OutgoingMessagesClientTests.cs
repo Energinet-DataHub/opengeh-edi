@@ -136,7 +136,9 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
     private async Task SeedDatabricksWithDataAsync(EnergyResultTestDataDescription testDataDescription, IDeltaTableSchemaDescription viewQuery)
     {
         await Fixture.DatabricksSchemaManager.CreateTableAsync(viewQuery);
-        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, testDataDescription.TestFilePath);
+
+        var testFilePath = Path.Combine("Application", "OutgoingMessages", "TestData", testDataDescription.TestFilename);
+        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, testFilePath);
     }
 
     private async Task HavingReceivedAndHandledGridAreaOwnershipAssignedEventAsync(string gridAreaCode)
