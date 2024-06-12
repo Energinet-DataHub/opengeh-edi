@@ -42,7 +42,8 @@ public class EnergyResultPerGridAreaFactory
             period.End,
             resolution,
             databricksSqlRow.ToLong(EnergyResultColumnNames.CalculationVersion),
-            SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)));
+            SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)),
+            MeasurementUnitMapper.Map(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)));
     }
 
     internal static EnergyResultPerBrpGridArea CreateEnergyResultPerBrpGridArea(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
@@ -63,6 +64,7 @@ public class EnergyResultPerGridAreaFactory
             resolution,
             databricksSqlRow.ToLong(EnergyResultColumnNames.CalculationVersion),
             SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)),
+            MeasurementUnitMapper.Map(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)),
             databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.BalanceResponsiblePartyId));
     }
 
@@ -84,6 +86,7 @@ public class EnergyResultPerGridAreaFactory
             resolution,
             databricksSqlRow.ToLong(EnergyResultColumnNames.CalculationVersion),
             SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)),
+            MeasurementUnitMapper.Map(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)),
             databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.BalanceResponsiblePartyId),
             databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.EnergySupplierId));
     }

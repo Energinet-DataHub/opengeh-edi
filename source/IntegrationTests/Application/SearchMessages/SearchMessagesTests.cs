@@ -12,20 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using FluentAssertions;
+using FluentAssertions.Execution;
+using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime;
 using NodaTime.Text;
 using Xunit;
@@ -67,6 +63,7 @@ public class SearchMessagesTests : TestBase
     {
         await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-04-01T22:00:00Z")));
         await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z")));
+        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-06-01T22:00:00Z")));
 
         var result = await _archivedMessagesClient.SearchAsync(
             new GetMessagesQuery(new MessageCreationPeriod(
@@ -406,6 +403,43 @@ public class SearchMessagesTests : TestBase
         {
             Assert.Equal(expectedActorNumber, actualActorNumber);
         }
+    }
+
+    [Fact]
+    public async Task Given_RequestWithReceiverAndSender_When_RequestingWithinPeriod_Then_ReturnsExpectedMessage()
+    {
+        // Arrange
+        var expectedActorNumber = ActorNumber.Create("1234512345888").Value;
+        var startDate = CreatedAt("2023-05-07T22:00:00Z");
+
+        var messageWithinSearchPeriod = CreateArchivedMessage(
+            senderNumber: expectedActorNumber,
+            receiverNumber: expectedActorNumber,
+            createdAt: startDate);
+        var messageOutsideSearchPeriod = CreateArchivedMessage(
+            senderNumber: expectedActorNumber,
+            receiverNumber: expectedActorNumber,
+            createdAt: startDate.PlusDays(3));
+
+        await ArchiveMessage(messageWithinSearchPeriod);
+        await ArchiveMessage(messageOutsideSearchPeriod);
+
+        // Act
+        var result = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(
+                ReceiverNumber: expectedActorNumber,
+                SenderNumber: expectedActorNumber,
+                CreationPeriod: new MessageCreationPeriod(
+                startDate.PlusDays(-2),
+                startDate.PlusDays(2))),
+            CancellationToken.None);
+
+        // Assert
+        using var assertionScope = new AssertionScope();
+        result.Messages.Should()
+            .ContainSingle()
+            .Subject.MessageId
+            .Should().Be(messageWithinSearchPeriod.MessageId);
     }
 
     private static Instant CreatedAt(string date)
