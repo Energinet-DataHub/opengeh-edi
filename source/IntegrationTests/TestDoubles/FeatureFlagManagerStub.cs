@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
@@ -34,8 +33,6 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
 
     public void EnableCalculationCompletedEvent(bool enable) => _useCalculationCompletedEvent = enable;
 
-    public Task<bool> UseExampleFeatureFlagAsync() => Task.FromResult(true);
-
     public Task<bool> UseMonthlyAmountPerChargeResultProducedAsync() => Task.FromResult(_useMonthlyAmountPerChargeResultProducedAsync);
 
     public Task<bool> UseAmountPerChargeResultProducedAsync() => Task.FromResult(_useAmountPerChargeResultProduced);
@@ -53,4 +50,8 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
     public Task<bool> UseTotalMonthlyAmountResultProducedAsync() => Task.FromResult(true);
 
     public Task<bool> UseCalculationCompletedEventAsync() => Task.FromResult(_useCalculationCompletedEvent);
+
+    public Task<bool> UseCalculationCompletedEventForBalanceFixingAsync() => Task.FromResult(_useCalculationCompletedEvent);
+
+    public Task<bool> UseCalculationCompletedEventForWholesaleFixingAsync() => Task.FromResult(_useCalculationCompletedEvent);
 }

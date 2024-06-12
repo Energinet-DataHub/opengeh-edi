@@ -14,6 +14,7 @@
 
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Extensions;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Model;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
@@ -48,19 +49,27 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
             return;
         }
 
+        var message = (CalculationCompletedV1)integrationEvent.Message;
+
+        var isFeatureEnabledForCalculationType = await message.CalculationType
+            .IsHandledByCalculationCompletedEventAsync(_featureManager)
+            .ConfigureAwait(false);
+
+        if (!isFeatureEnabledForCalculationType)
+            return;
+
         var durableClient = _durableClientFactory.CreateClient();
-        var orchestrationInput = CreateOrchestrationInput(integrationEvent);
+        var orchestrationInput = CreateOrchestrationInput(message, integrationEvent.EventIdentification);
         var instanceId = await durableClient.StartNewAsync("EnqueueMessagesOrchestration", orchestrationInput).ConfigureAwait(false);
 
         _logger.LogInformation("Started 'EnqueueMessagesOrchestration' with id '{OrchestrationInstanceId}'.", instanceId);
     }
 
-    private static EnqueueMessagesOrchestrationInput CreateOrchestrationInput(IntegrationEvent integrationEvent)
+    private static EnqueueMessagesOrchestrationInput CreateOrchestrationInput(CalculationCompletedV1 message, Guid eventIdentification)
     {
-        var message = (CalculationCompletedV1)integrationEvent.Message;
         return new EnqueueMessagesOrchestrationInput(
             CalculationOrchestrationId: message.InstanceId,
             CalculationId: Guid.Parse(message.CalculationId),
-            EventId: Guid.Parse(integrationEvent.EventIdentification.ToString()));
+            EventId: eventIdentification);
     }
 }

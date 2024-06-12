@@ -12,12 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Extensions;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
@@ -56,12 +53,14 @@ public sealed class EnergyResultProducedV2Processor : IIntegrationEventProcessor
             return;
         }
 
-        if (await _featureManager.UseCalculationCompletedEventAsync().ConfigureAwait(false))
-        {
-            return;
-        }
-
         var energyResultProducedV2 = (EnergyResultProducedV2)integrationEvent.Message;
+
+        var isHandledByCalculationCompletedEvent = await energyResultProducedV2.CalculationType
+            .IsHandledByCalculationCompletedEventAsync(_featureManager)
+            .ConfigureAwait(false);
+
+        if (isHandledByCalculationCompletedEvent)
+            return;
 
         if (!EnergyResultProducedProcessorExtensions.SupportedTimeSeriesTypes().Contains(energyResultProducedV2.TimeSeriesType))
         {

@@ -25,11 +25,6 @@ namespace BuildingBlocks.Application.FeatureFlag;
 public interface IFeatureFlagManager
 {
     /// <summary>
-    /// A Feature Flag example
-    /// </summary>
-    Task<bool> UseExampleFeatureFlagAsync();
-
-    /// <summary>
     /// Whether to allow handling MonthlyAmountPerChargeResultProduced events
     /// </summary>
     Task<bool> UseMonthlyAmountPerChargeResultProducedAsync();
@@ -74,4 +69,16 @@ public interface IFeatureFlagManager
     /// otherwise we prepare messages based on the old implementation.
     /// </summary>
     Task<bool> UseCalculationCompletedEventAsync();
+
+    /// <summary>
+    /// When true we use the 'EnqueueMessagesOrchestration' to prepare messages if the calculation type is balance fixing;
+    /// otherwise we prepare messages based on the old implementation.
+    /// </summary>
+    Task<bool> UseCalculationCompletedEventForBalanceFixingAsync();
+
+    /// <summary>
+    /// When true we use the 'EnqueueMessagesOrchestration' to prepare messages if the calculation type is wholesale fixing;
+    /// otherwise we prepare messages based on the old implementation.
+    /// </summary>
+    Task<bool> UseCalculationCompletedEventForWholesaleFixingAsync();
 }
