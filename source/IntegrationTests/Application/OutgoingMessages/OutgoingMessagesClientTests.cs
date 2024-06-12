@@ -133,12 +133,10 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         actualCount.Should().Be(testDataDescription.ExpectedOutgoingMessagesCount);
     }
 
-    private async Task SeedDatabricksWithDataAsync(EnergyResultTestDataDescription testDataDescription, IDeltaTableSchemaDescription viewQuery)
+    private async Task SeedDatabricksWithDataAsync(EnergyResultTestDataDescription testDataDescription, IDeltaTableSchemaDescription schemaInfomation)
     {
-        await Fixture.DatabricksSchemaManager.CreateTableAsync(viewQuery);
-
-        var testFilePath = Path.Combine("Application", "OutgoingMessages", "TestData", testDataDescription.TestFilename);
-        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, testFilePath);
+        await Fixture.DatabricksSchemaManager.CreateTableAsync(schemaInfomation);
+        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(schemaInfomation, testDataDescription.TestFilePath);
     }
 
     private async Task HavingReceivedAndHandledGridAreaOwnershipAssignedEventAsync(string gridAreaCode)

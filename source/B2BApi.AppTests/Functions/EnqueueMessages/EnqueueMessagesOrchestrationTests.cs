@@ -266,6 +266,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
     /// <summary>
     /// Adds hardcoded data to databricks.
+    /// Notice we reuse test data from the `OutgoingMessagesClientTests`
     /// </summary>
     /// <returns>The calculation id of the hardcoded data which was added to databricks</returns>
     private async Task<Guid> ClearAndAddDatabricksData()
@@ -292,11 +293,9 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         return perGridAreaDataDescription.CalculationId;
     }
 
-    private async Task SeedDatabricksWithDataAsync(EnergyResultTestDataDescription testDataDescription, IDeltaTableSchemaDescription viewQuery)
+    private async Task SeedDatabricksWithDataAsync(EnergyResultTestDataDescription testDataDescription, IDeltaTableSchemaDescription schemaInfomation)
     {
-        await Fixture.DatabricksSchemaManager.CreateTableAsync(viewQuery);
-
-        var testFilePath = Path.Combine("Functions", "EnqueueMessages", "TestData", testDataDescription.TestFilename);
-        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, testFilePath);
+        await Fixture.DatabricksSchemaManager.CreateTableAsync(schemaInfomation);
+        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(schemaInfomation, testDataDescription.TestFilePath);
     }
 }

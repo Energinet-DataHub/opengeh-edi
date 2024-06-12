@@ -8,25 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\IntegrationTests\Application\OutgoingMessages\TestData\EnergyResultPerBrpGridAreaDescription.cs" Link="Functions\EnqueueMessages\TestData\EnergyResultPerBrpGridAreaDescription.cs" />
-    <Compile Include="..\IntegrationTests\Application\OutgoingMessages\TestData\EnergyResultPerEnergySupplierBrpGridAreaDescription.cs" Link="Functions\EnqueueMessages\TestData\EnergyResultPerEnergySupplierBrpGridAreaDescription.cs" />
-    <Compile Include="..\IntegrationTests\Application\OutgoingMessages\TestData\EnergyResultPerGridAreaDescription.cs" Link="Functions\EnqueueMessages\TestData\EnergyResultPerGridAreaDescription.cs" />
-    <Compile Include="..\IntegrationTests\Application\OutgoingMessages\TestData\EnergyResultTestDataDescription.cs" Link="Functions\EnqueueMessages\TestData\EnergyResultTestDataDescription.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\IntegrationTests\Application\OutgoingMessages\TestData\balance_fixing_01-11-2022_01-12-2022_ga_543_per_brp_ga_v1.csv" Link="Functions\EnqueueMessages\TestData\balance_fixing_01-11-2022_01-12-2022_ga_543_per_brp_ga_v1.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\IntegrationTests\Application\OutgoingMessages\TestData\balance_fixing_01-11-2022_01-12-2022_ga_543_per_es_brp_ga_v1.csv" Link="Functions\EnqueueMessages\TestData\balance_fixing_01-11-2022_01-12-2022_ga_543_per_es_brp_ga_v1.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\IntegrationTests\Application\OutgoingMessages\TestData\balance_fixing_01-11-2022_01-12-2022_ga_543_per_ga_v1.csv" Link="Functions\EnqueueMessages\TestData\balance_fixing_01-11-2022_01-12-2022_ga_543_per_ga_v1.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="FluentAssertions.Analyzers" Version="0.32.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -53,6 +34,7 @@
     <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
     <ProjectReference Include="..\IntegrationEvents.Application\IntegrationEvents.Application.csproj" />
+    <ProjectReference Include="..\IntegrationTests\IntegrationTests.csproj" />
     <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
     <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
   </ItemGroup>

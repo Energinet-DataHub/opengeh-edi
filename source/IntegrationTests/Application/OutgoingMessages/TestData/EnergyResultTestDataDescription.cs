@@ -23,13 +23,14 @@ public abstract class EnergyResultTestDataDescription
     protected EnergyResultTestDataDescription(string testFilename)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(testFilename);
-        TestFilename = testFilename;
+
+        TestFilePath = Path.Combine("Application", "OutgoingMessages", "TestData", testFilename);
     }
 
     /// <summary>
-    /// Name of test file.
+    /// Relative path to test file.
     /// </summary>
-    public string TestFilename { get; }
+    public string TestFilePath { get; }
 
     /// <summary>
     /// Calculation id matching test file content.
