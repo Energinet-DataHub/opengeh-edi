@@ -55,7 +55,7 @@ public static class DurableClientExtensions
                 durableOrchestrationState = queryResult.DurableOrchestrationState;
                 return durableOrchestrationState != null && durableOrchestrationState.Any();
             },
-            waitTimeLimit ?? TimeSpan.FromSeconds(30),
+            waitTimeLimit ?? TimeSpan.FromSeconds(60),
             delay: TimeSpan.FromSeconds(5));
 
         return isAvailable
