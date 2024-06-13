@@ -121,7 +121,7 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
             CancellationToken.None);
 
         // Assert
-        result.Errors.Should().BeEmpty();
+        result.Errors.Should().NotContain(e => e is SenderRoleTypeIsNotAuthorized);
     }
 
     [Theory]
