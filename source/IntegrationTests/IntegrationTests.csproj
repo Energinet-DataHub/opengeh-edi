@@ -125,13 +125,13 @@ limitations under the License.
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
       <None Update="Application\OutgoingMessages\TestData\balance_fixing_01-11-2022_01-12-2022_ga_543_per_brp_ga_v1.csv">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Application\OutgoingMessages\TestData\balance_fixing_01-11-2022_01-12-2022_ga_543_per_es_brp_ga_v1.csv">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Application\OutgoingMessages\TestData\balance_fixing_01-11-2022_01-12-2022_ga_543_per_ga_v1.csv">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="appsettings.local.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
