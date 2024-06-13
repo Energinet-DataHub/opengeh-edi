@@ -27,7 +27,7 @@ public class EnergyResultPerGridAreaDescription
     {
     }
 
-    public override Guid CalculationId => Guid.Parse("9d4ff72b-fca9-44cd-a829-5b1d9766e1a0");
+    public override Guid CalculationId => Guid.Parse("a8cfe7c7-f197-405c-b922-52153fa0332d");
 
     public override string GridAreaCode => "543";
 

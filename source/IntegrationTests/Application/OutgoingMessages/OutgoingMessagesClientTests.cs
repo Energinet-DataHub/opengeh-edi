@@ -87,7 +87,6 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
         var viewQuery = new EnergyResultPerBrpGridAreaQuery(ediDatabricksOptions.Value, testDataDescription.CalculationId);
 
-        await HavingReceivedAndHandledGridAreaOwnershipAssignedEventAsync(testDataDescription.GridAreaCode);
         await SeedDatabricksWithDataAsync(testDataDescription, viewQuery);
 
         var sut = GetService<IOutgoingMessagesClient>();
@@ -115,7 +114,6 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
         var viewQuery = new EnergyResultPerEnergySupplierBrpGridAreaQuery(ediDatabricksOptions.Value, testDataDescription.CalculationId);
 
-        await HavingReceivedAndHandledGridAreaOwnershipAssignedEventAsync(testDataDescription.GridAreaCode);
         await SeedDatabricksWithDataAsync(testDataDescription, viewQuery);
 
         var sut = GetService<IOutgoingMessagesClient>();
@@ -135,10 +133,10 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         actualCount.Should().Be(testDataDescription.ExpectedOutgoingMessagesCount);
     }
 
-    private async Task SeedDatabricksWithDataAsync(EnergyResultTestDataDescription testDataDescription, IDeltaTableSchemaDescription viewQuery)
+    private async Task SeedDatabricksWithDataAsync(EnergyResultTestDataDescription testDataDescription, IDeltaTableSchemaDescription schemaInfomation)
     {
-        await Fixture.DatabricksSchemaManager.CreateTableAsync(viewQuery);
-        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, testDataDescription.TestFilePath);
+        await Fixture.DatabricksSchemaManager.CreateTableAsync(schemaInfomation);
+        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(schemaInfomation, testDataDescription.TestFilePath);
     }
 
     private async Task HavingReceivedAndHandledGridAreaOwnershipAssignedEventAsync(string gridAreaCode)
