@@ -12,12 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
@@ -29,6 +23,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.TestData;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
@@ -67,18 +62,8 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             new object[] { ActorRole.GridOperator.Code },
         };
 
-    public static IEnumerable<object[]> AllowedActorRolesForWholesaleServices =>
-        new List<object[]>
-        {
-            new object[] { ActorRole.EnergySupplier.Code },
-            new object[] { ActorRole.GridOperator.Code },
-            new object[] { ActorRole.SystemOperator.Code },
-        };
-
     public async Task InitializeAsync()
     {
-#pragma warning disable CA2007
-
         await CreateActorIfNotExistAsync(
             new CreateActorDto(
                 SampleData.StsAssignedUserId,
@@ -402,24 +387,6 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         Assert.DoesNotContain(result.Errors, error => error is SenderRoleTypeIsNotAuthorized);
     }
 
-    [Theory]
-    [MemberData(nameof(AllowedActorRolesForWholesaleServices))]
-    public async Task Sender_role_type_for_wholesale_services_must_be_the_role_of(string role)
-    {
-        await using var message = BusinessMessageBuilder
-            .RequestWholesaleServices()
-            .WithSenderRole(role)
-            .Message();
-
-        var (incomingMessage, _) = await ParseWholesaleServicesMessageAsync(message);
-
-        var result = await _incomingMessageValidator.ValidateAsync(
-            incomingMessage!,
-            CancellationToken.None);
-
-        result.Errors.Should().NotContain(e => e is SenderRoleTypeIsNotAuthorized);
-    }
-
     [Fact]
     public async Task Return_failure_if_xml_schema_for_business_reason_does_not_exist()
     {
@@ -697,16 +664,6 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             IncomingDocumentType.RequestAggregatedMeasureData,
             CancellationToken.None);
         return (IncomingMessage: (RequestAggregatedMeasureDataMessage?)messageParser.IncomingMessage, ParserResult: messageParser);
-    }
-
-    private async Task<(RequestWholesaleServicesMessage? IncomingMessage, IncomingMarketMessageParserResult ParserResult)> ParseWholesaleServicesMessageAsync(Stream message)
-    {
-        var messageParser = await _marketMessageParser.ParseAsync(
-            new IncomingMessageStream(message),
-            DocumentFormat.Xml,
-            IncomingDocumentType.RequestWholesaleSettlement,
-            CancellationToken.None);
-        return (IncomingMessage: (RequestWholesaleServicesMessage?)messageParser.IncomingMessage, ParserResult: messageParser);
     }
 
     private async Task StoreMessageIdForActorAsync(string messageId, string senderActorNumber)
