@@ -97,7 +97,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     /// <summary>
     /// Verifies that:
     ///  - The orchestration can complete a full run.
-    ///  - Every activity is executed once and in correct order.
+    ///  - Every activity is executed once. We cannot be sure in which order, because we use fan-out/fan-in.
     ///  - A service bus message is sent as expected.
     /// </summary>
     [Fact]
@@ -137,7 +137,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             .OrderBy(item => item["Timestamp"])
             .Select(item => item.Value<string>("FunctionName"));
 
-        activities.Should().NotBeNull().And.Equal(
+        activities.Should().NotBeNull().And.BeEquivalentTo(
         [
             "EnqueueMessagesOrchestration",
             "EnqueueEnergyResultsForGridAreaOwnersActivity",
