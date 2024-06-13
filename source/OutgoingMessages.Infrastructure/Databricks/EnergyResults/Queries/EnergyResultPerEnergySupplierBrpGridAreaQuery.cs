@@ -40,8 +40,6 @@ public class EnergyResultPerEnergySupplierBrpGridAreaQuery(
     {
         { EnergyResultColumnNames.CalculationId,                (DeltaTableCommonTypes.String,          false) },
         { EnergyResultColumnNames.CalculationType,              (DeltaTableCommonTypes.String,          false) },
-        { EnergyResultColumnNames.CalculationPeriodStart,       (DeltaTableCommonTypes.Timestamp,       false) },
-        { EnergyResultColumnNames.CalculationPeriodEnd,         (DeltaTableCommonTypes.Timestamp,       false) },
         { EnergyResultColumnNames.CalculationVersion,           (DeltaTableCommonTypes.BigInt,          false) },
         { EnergyResultColumnNames.ResultId,                     (DeltaTableCommonTypes.String,          false) },
         { EnergyResultColumnNames.GridAreaCode,                 (DeltaTableCommonTypes.String,          false) },
