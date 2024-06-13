@@ -82,6 +82,9 @@ public class AcceptanceTestFixture : IAsyncLifetime
         var systemOperatorSecret = root.GetValue<string>("SYSTEM_OPERATOR_CLIENT_SECRET") ?? throw new InvalidOperationException("SYSTEM_OPERATOR_CLIENT_SECRET is not set in configuration");
         B2BSystemOperatorAuthorizedHttpClient = new AsyncLazy<HttpClient>(() => CreateB2BSystemOperatorAuthorizedHttpClientAsync(azureB2CTenantId, azureEntraBackendAppId, systemOperatorId, systemOperatorSecret, ApiManagementUri));
 
+        BalanceFixingCalculationId = root.GetValue<Guid?>("BALANCE_FIXING_CALCULATION_ID") ?? throw new InvalidOperationException("BALANCE_FIXING_CALCULATION_ID is not set in configuration");
+        WholesaleFixingCalculationId = root.GetValue<Guid?>("WHOLESALE_FIXING_CALCULATION_ID") ?? throw new InvalidOperationException("WHOLESALE_FIXING_CALCULATION_ID is not set in configuration");
+
         EbixCertificateThumbprint = root.GetValue<string>("EBIX_CERTIFICATE_THUMBPRINT") ?? "39D64F012A19C6F6FDFB0EA91D417873599D3325";
         EbixCertificatePasswordForMeterDataResponsible = root.GetValue<string>("EBIX_CERTIFICATE_PASSWORD_MDR") ?? throw new InvalidOperationException("EBIX_CERTIFICATE_PASSWORD_MDR is not set in configuration");
         EbixCertificatePasswordForEnergySupplier = root.GetValue<string>("EBIX_CERTIFICATE_PASSWORD_ES") ?? throw new InvalidOperationException("EBIX_CERTIFICATE_PASSWORD_ES is not set in configuration");
@@ -89,12 +92,17 @@ public class AcceptanceTestFixture : IAsyncLifetime
         _azureEntraFrontendAppId = root.GetValue<string>("AZURE_ENTRA_FRONTEND_APP_ID") ?? "bf76fc24-cfec-498f-8979-ab4123792472";
         _azureEntraBackendBffScope = root.GetValue<string>("AZURE_ENTRA_BACKEND_BFF_SCOPE") ?? "https://devDataHubB2C.onmicrosoft.com/backend-bff/api";
         MarketParticipantUri = new Uri(root.GetValue<string>("MARKET_PARTICIPANT_URI") ?? "https://app-webapi-markpart-u-001.azurewebsites.net");
+
         _b2cUsername = root.GetValue<string>("B2C_USERNAME") ?? throw new InvalidOperationException("B2C_USERNAME is not set in configuration");
         _b2cPassword = root.GetValue<string>("B2C_PASSWORD") ?? throw new InvalidOperationException("B2C_PASSWORD is not set in configuration");
         EventPublisher = new IntegrationEventPublisher(serviceBusConnectionString, topicName, dbConnectionString);
         EdiInboxClient = new EdiInboxClient(ediInboxQueueName, serviceBusConnectionString);
         B2CAuthorizedHttpClient = new AsyncLazy<HttpClient>(CreateB2CAuthorizedHttpClientAsync);
     }
+
+    public Guid BalanceFixingCalculationId { get; }
+
+    public Guid WholesaleFixingCalculationId { get; }
 
     public ITestOutputHelper? Logger { get; set; }
 

@@ -125,4 +125,18 @@ internal sealed class WholesaleDriver
 
         await _inboxEdiClient.SendAsync(message, cancellationToken).ConfigureAwait(false);
     }
+
+    internal Task PublishCalculationCompletedAsync(
+        Guid calculationId,
+        CalculationCompletedV1.Types.CalculationType calculationType)
+    {
+        var calculationCompleted = CalculationCompletedV1Factory.CreateCalculationCompleted(
+            calculationId,
+            calculationType);
+
+        return _integrationEventPublisher.PublishAsync(
+            CalculationCompletedV1.EventName,
+            calculationCompleted.ToByteArray(),
+            waitForHandled: true);
+    }
 }
