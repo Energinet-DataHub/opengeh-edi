@@ -16,7 +16,9 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EnergySupplying.RequestResponse.IntegrationEvents;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
@@ -95,7 +97,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     /// <summary>
     /// Verifies that:
     ///  - The orchestration can complete a full run.
-    ///  - Every activity is executed once and in correct order.
+    ///  - Every activity is executed once. We cannot be sure in which order, because we use fan-out/fan-in.
     ///  - A service bus message is sent as expected.
     /// </summary>
     [Fact]
@@ -123,10 +125,10 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         // => Verify expected behaviour by searching the orchestration history
         var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
 
-        // => Wait for completion, this should be fairly quick
+        // => Wait for completion
         var completeOrchestrationStatus = await Fixture.DurableClient.WaitForInstanceCompletedAsync(
             actualOrchestrationStatus.InstanceId,
-            TimeSpan.FromMinutes(1));
+            TimeSpan.FromMinutes(5));
 
         // => Expect history
         using var assertionScope = new AssertionScope();
@@ -135,10 +137,12 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             .OrderBy(item => item["Timestamp"])
             .Select(item => item.Value<string>("FunctionName"));
 
-        activities.Should().NotBeNull().And.Equal(
+        activities.Should().NotBeNull().And.BeEquivalentTo(
         [
             "EnqueueMessagesOrchestration",
             "EnqueueEnergyResultsForGridAreaOwnersActivity",
+            "EnqueueEnergyResultsForBalanceResponsiblesActivity",
+            "EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity",
             "SendActorMessagesEnqueuedActivity",
             null,
         ]);
@@ -262,6 +266,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
     /// <summary>
     /// Adds hardcoded data to databricks.
+    /// Notice we reuse test data from the `OutgoingMessagesClientTests`
     /// </summary>
     /// <returns>The calculation id of the hardcoded data which was added to databricks</returns>
     private async Task<Guid> ClearAndAddDatabricksData()
@@ -270,22 +275,29 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         if (Fixture.DatabricksSchemaManager.SchemaExists)
             await Fixture.DatabricksSchemaManager.DropSchemaAsync();
 
-        // This ID has to match the hardcoded calculation id in the file balance_fixing_01-11-2022_01-12-2022_ga_543.csv
-        var calculationId = Guid.Parse("e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d");
         await Fixture.DatabricksSchemaManager.CreateSchemaAsync();
+        var ediDatabricksOptions = Options.Create(new EdiDatabricksOptions { DatabaseName = Fixture.DatabricksSchemaManager.SchemaName });
 
-        var ediOptions = Options.Create(
-            new EdiDatabricksOptions { DatabaseName = Fixture.DatabricksSchemaManager.SchemaName });
+        var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
+        var perGridAreaQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions.Value, perGridAreaDataDescription.CalculationId);
+        var perGridAreTask = SeedDatabricksWithDataAsync(perGridAreaDataDescription, perGridAreaQuery);
 
-        var viewQuery = new EnergyResultPerGridAreaQuery(
-            ediOptions.Value,
-            calculationId);
-        await Fixture.DatabricksSchemaManager.CreateTableAsync(viewQuery);
+        var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
+        var perBrpGridAreaQuery = new EnergyResultPerBrpGridAreaQuery(ediDatabricksOptions.Value, perGridAreaDataDescription.CalculationId);
+        var perBrpGriaAreaTask = SeedDatabricksWithDataAsync(perBrpGridAreaDataDescription, perBrpGridAreaQuery);
 
-        const string testDataFileName = "balance_fixing_01-11-2022_01-12-2022_ga_543.csv";
-        var testFilePath = Path.Combine("TestData", testDataFileName);
-        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, testFilePath);
+        var perBrdAndESGridAreaDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
+        var perBrpAndESGridAreaQuery = new EnergyResultPerEnergySupplierBrpGridAreaQuery(ediDatabricksOptions.Value, perGridAreaDataDescription.CalculationId);
+        var perBrpAndESGridAreTask = SeedDatabricksWithDataAsync(perBrdAndESGridAreaDataDescription, perBrpAndESGridAreaQuery);
 
-        return calculationId;
+        await Task.WhenAll(perGridAreTask, perBrpGriaAreaTask, perBrpAndESGridAreTask);
+
+        return perGridAreaDataDescription.CalculationId;
+    }
+
+    private async Task SeedDatabricksWithDataAsync(EnergyResultTestDataDescription testDataDescription, IDeltaTableSchemaDescription schemaInfomation)
+    {
+        await Fixture.DatabricksSchemaManager.CreateTableAsync(schemaInfomation);
+        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(schemaInfomation, testDataDescription.TestFilePath);
     }
 }
