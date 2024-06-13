@@ -33,7 +33,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
 
 public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
 {
-    private static readonly string PathToJsonAttributes = $"DocumentValidation{Path.DirectorySeparatorChar}"
+    private static readonly string PathToJsonSchemaCodeLists = $"DocumentValidation{Path.DirectorySeparatorChar}"
                                                           + $"Schemas{Path.DirectorySeparatorChar}"
                                                           + $"Json{Path.DirectorySeparatorChar}"
                                                           + $"urn-entsoe-eu-wgedi-codelists.schema.json";
@@ -61,7 +61,7 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
 
     public static IEnumerable<object[]> JsonMessageTypes()
     {
-        var jsonDoc = File.ReadAllText(PathToJsonAttributes);
+        var jsonDoc = File.ReadAllText(PathToJsonSchemaCodeLists);
 
         var stream = new MemoryStream();
         using var writer = new StreamWriter(stream: stream, encoding: Encoding.UTF8, bufferSize: 4096, leaveOpen: true);
@@ -73,10 +73,10 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
         var messageTypesDeclaration = document.RootElement
             .GetProperty("definitions")
             .GetProperty("StandardMessageTypeList");
-        var messageTypes = messageTypesDeclaration.GetProperty("enum").EnumerateArray();
+        var schemaValidMessageTypes = messageTypesDeclaration.GetProperty("enum").EnumerateArray();
 
-        var returnValue = new List<object[]>(messageTypes.Count());
-        foreach (var type in messageTypes)
+        var returnValue = new List<object[]>(schemaValidMessageTypes.Count());
+        foreach (var type in schemaValidMessageTypes)
         {
             var value = type.GetString()!;
             returnValue.Add(new object[] { value });
@@ -105,8 +105,9 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
 
     [Theory]
     [MemberData(nameof(AllowedActorRolesForWholesaleServices))]
-    public async Task Sender_role_type_for_wholesale_services_must_be_the_role_of(string role)
+    public async Task Given_AllowedActorRoles_When_Validation_Then_ReturnNoError(string role)
     {
+        // Arrange
         await using var message = BusinessMessageBuilder
             .RequestWholesaleServices()
             .WithSenderRole(role)
@@ -114,17 +115,20 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
 
         var (incomingMessage, _) = await ParseWholesaleServicesMessageAsync(message);
 
+        // Act
         var result = await _incomingMessageValidator.ValidateAsync(
             incomingMessage!,
             CancellationToken.None);
 
-        result.Errors.Should().NotContain(e => e is SenderRoleTypeIsNotAuthorized);
+        // Assert
+        result.Errors.Should().BeEmpty();
     }
 
     [Theory]
     [MemberData(nameof(JsonMessageTypes))]
-    public async Task Given_RequestWithMessageTypeNotD21_When_Validating_Then_ReturnErrorMessage(string type)
+    public async Task Given_RequestWithMessageTypeNotD21_When_Validating_Then_ReturnError(string type)
     {
+        // Arrange
         await using var message = BusinessMessageBuilder
             .RequestWholesaleServices()
             .WithMessageType(type)
@@ -132,10 +136,12 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
 
         var (incomingMessage, _) = await ParseWholesaleServicesMessageAsync(message);
 
+        // Act
         var result = await _incomingMessageValidator.ValidateAsync(
             incomingMessage!,
             CancellationToken.None);
 
+        // Assert
         if (type != "D21")
         {
             result.Errors.Should().ContainSingle()
@@ -146,6 +152,7 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
     [Fact]
     public async Task Given_RequestWithMessageTypeD11_When_Validating_Then_ReturnNoErrors()
     {
+        // Arrange
         await using var message = BusinessMessageBuilder
             .RequestWholesaleServices()
             .WithMessageType("D21")
@@ -153,10 +160,12 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
 
         var (incomingMessage, _) = await ParseWholesaleServicesMessageAsync(message);
 
+        // Act
         var result = await _incomingMessageValidator.ValidateAsync(
             incomingMessage!,
             CancellationToken.None);
 
+        // Assert
         result.Errors.Should().BeEmpty();
     }
 
