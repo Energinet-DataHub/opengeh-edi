@@ -20,6 +20,6 @@
 
   "EBIX_APIM_URL": "<URL to use, when you want to peek/dequeue in EbiX>",
 
-  "BALANCE_FIXING_CALCULATION_ID": "05018715-70cb-4ef4-bfa0-5f75e9f4622e",
-  "WHOLESALE_FIXING_CALCULATION_ID": "13d57d2d-7e97-410e-9856-85554281770e"
+  "BALANCE_FIXING_CALCULATION_ID": "<balance fixing calculation id that has results in databrick views>",
+  "WHOLESALE_FIXING_CALCULATION_ID": "<wholesale fixing calculation id that has results in databrick views>"
 }
