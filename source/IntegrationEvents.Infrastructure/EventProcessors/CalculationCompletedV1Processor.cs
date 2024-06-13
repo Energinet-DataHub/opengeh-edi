@@ -46,6 +46,9 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
 
         if (!await _featureManager.UseCalculationCompletedEventAsync().ConfigureAwait(false))
         {
+            _logger.LogInformation(
+                "CalculationCompletedV1 event (id: {EventIdentification}) skipped because UseCalculationCompletedEvent feature is disabled.",
+                integrationEvent.EventIdentification);
             return;
         }
 
@@ -56,13 +59,26 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
             .ConfigureAwait(false);
 
         if (!isFeatureEnabledForCalculationType)
+        {
+            _logger.LogInformation(
+                "CalculationCompletedV1 event (id: {EventIdentification}) skipped because UseCalculationCompletedEvent feature is disabled for calculation type (type: {CalculationType}, calculation id: {CalculationId}, instance id: {OrchestrationInstanceId}).",
+                integrationEvent.EventIdentification,
+                message.CalculationType,
+                message.CalculationId,
+                message.InstanceId);
             return;
+        }
 
         var durableClient = _durableClientFactory.CreateClient();
         var orchestrationInput = CreateOrchestrationInput(message, integrationEvent.EventIdentification);
         var instanceId = await durableClient.StartNewAsync("EnqueueMessagesOrchestration", orchestrationInput).ConfigureAwait(false);
 
-        _logger.LogInformation("Started 'EnqueueMessagesOrchestration' with id '{OrchestrationInstanceId}'.", instanceId);
+        _logger.LogInformation(
+            "Started 'EnqueueMessagesOrchestration' (id '{OrchestrationInstanceId}', calculation id: {CalculationId}, calculation type: {CalculationType}, calculation orchestration id: {CalculationOrchestrationId}.",
+            instanceId,
+            message.CalculationId,
+            message.CalculationType,
+            message.InstanceId);
     }
 
     private static EnqueueMessagesOrchestrationInput CreateOrchestrationInput(CalculationCompletedV1 message, Guid eventIdentification)

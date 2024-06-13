@@ -64,6 +64,7 @@ public class SendActorMessagesEnqueuedActivity
         };
 
         serviceBusMessage.ApplicationProperties.Add("EventMinorVersion", ActorMessagesEnqueuedV1.CurrentMinorVersion);
+        serviceBusMessage.ApplicationProperties.Add("ReferenceId", eventId.ToString());
         return serviceBusMessage;
     }
 }
