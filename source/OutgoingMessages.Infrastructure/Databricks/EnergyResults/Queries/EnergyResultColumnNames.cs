@@ -26,9 +26,6 @@ public class EnergyResultColumnNames
     public const string CalculationId = "calculation_id";
     public const string CalculationType = "calculation_type";
 
-    public const string CalculationPeriodStart = "calculation_period_start";
-    public const string CalculationPeriodEnd = "calculation_period_end";
-
     public const string CalculationVersion = "calculation_version";
 
     public const string ResultId = "result_id";
