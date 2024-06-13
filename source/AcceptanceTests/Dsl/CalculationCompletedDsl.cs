@@ -25,15 +25,16 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
     Justification = "Dsl classes uses a naming convention based on the business domain")]
 public sealed class CalculationCompletedDsl
 {
-    // TODO: Use config variables for calculation id's
-    private static readonly Guid _balanceFixingCalculationId = Guid.Parse("f0db1f58-e444-4fba-878e-e21b4523c7e1");
-    private static readonly Guid _wholesaleFixingCalculationId = Guid.Parse("13d57d2d-7e97-410e-9856-85554281770e");
+    private readonly Guid _balanceFixingCalculationId;
+    private readonly Guid _wholesaleFixingCalculationId;
 
     private readonly WholesaleDriver _wholesaleDriver;
     private readonly EdiDriver _ediDriver;
 
-    internal CalculationCompletedDsl(EdiDriver ediDriver, WholesaleDriver wholesaleDriver)
+    internal CalculationCompletedDsl(AcceptanceTestFixture fixture, EdiDriver ediDriver, WholesaleDriver wholesaleDriver)
     {
+        _balanceFixingCalculationId = fixture.BalanceFixingCalculationId;
+        _wholesaleFixingCalculationId = fixture.WholesaleFixingCalculationId;
         _wholesaleDriver = wholesaleDriver;
         _ediDriver = ediDriver;
     }
@@ -63,5 +64,7 @@ public sealed class CalculationCompletedDsl
         messageId.Should().NotBeNull();
         contentString.Should().NotBeNull();
         contentString.Should().Contain("NotifyAggregatedMeasureData_MarketDocument");
+
+        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
     }
 }

@@ -31,6 +31,7 @@ public class WhenCalculationCompletedIsPublishedTests : BaseTestClass
         ArgumentNullException.ThrowIfNull(fixture);
 
         _calculationCompleted = new CalculationCompletedDsl(
+            fixture,
             new EdiDriver(
                 fixture.B2BMeteredDataResponsibleAuthorizedHttpClient, output),
             new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
