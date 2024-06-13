@@ -105,9 +105,12 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
 
     [Theory]
     [MemberData(nameof(AllowedActorRolesForWholesaleServices))]
-    public async Task Given_AllowedActorRoles_When_Validation_Then_ReturnNoError(string role)
+    public async Task Given_AllowedActorRoles_When_Validation_Then_ReturnNoErrors(string role)
     {
         // Arrange
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("5799999933318"), restriction: Restriction.None,  ActorRole.FromCode(role)));
+
         await using var message = BusinessMessageBuilder
             .RequestWholesaleServices()
             .WithSenderRole(role)
@@ -121,7 +124,8 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
             CancellationToken.None);
 
         // Assert
-        result.Errors.Should().NotContain(e => e is SenderRoleTypeIsNotAuthorized);
+        //result.Errors.Should().NotContain(e => e is SenderRoleTypeIsNotAuthorized);
+        result.Errors.Should().BeEmpty();
     }
 
     [Theory]
