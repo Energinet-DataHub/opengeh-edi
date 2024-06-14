@@ -173,6 +173,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             var receiverNumber = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(energyResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
             // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
             var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult, receiverNumber);
+            // TODO: Add retry with polly
             await EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);
             numberOfEnqueuedMessages++;
         }
@@ -189,6 +190,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         {
             // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
             var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult);
+            // TODO: Add retry with polly
             await EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);
             numberOfEnqueuedMessages++;
         }
@@ -205,9 +207,11 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         {
             // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
             var energyResultPerEnergySupplierMessage = EnergyResultMessageDtoFactory.CreateForEnergySupplier(EventId.From(input.EventId), energyResult);
+            // TODO: Add retry with polly
             await EnqueueAndCommitAsync(energyResultPerEnergySupplierMessage, CancellationToken.None).ConfigureAwait(false);
             numberOfEnqueuedMessages++;
             var energyResultPerBalanceResponsibleMessage = EnergyResultMessageDtoFactory.CreateForBalanceResponsiblePrEnergySupplier(EventId.From(input.EventId), energyResult);
+            // TODO: Add retry with polly
             await EnqueueAndCommitAsync(energyResultPerBalanceResponsibleMessage, CancellationToken.None).ConfigureAwait(false);
             numberOfEnqueuedMessages++;
         }
