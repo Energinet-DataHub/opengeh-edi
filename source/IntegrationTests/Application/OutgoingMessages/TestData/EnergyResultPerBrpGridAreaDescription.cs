@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
+using NodaTime;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 
@@ -32,4 +35,27 @@ public class EnergyResultPerBrpGridAreaDescription
     public override string GridAreaCode => "543";
 
     public override int ExpectedOutgoingMessagesCount => 20;
+
+    public Period Period => new(
+        Instant.FromUtc(2022, 1, 11, 23, 0, 0),
+        Instant.FromUtc(2022, 1, 12, 23, 0, 0));
+
+    public ExampleDataForActor<ExampleMessageForBalanceResponsible> ExampleBalanceResponsible => new(
+        ActorNumber: ActorNumber.Create("7080000729821"),
+        ExpectedOutgoingMessagesCount: 3,
+        ExampleMessageData: new ExampleMessageForBalanceResponsible(
+            GridArea: "543",
+            MeteringPointType.Consumption,
+            SettlementMethod.Flex,
+            Resolution.Hourly,
+            111));
 }
+
+public record ExampleDataForActor<TMessageData>(ActorNumber ActorNumber, int ExpectedOutgoingMessagesCount, TMessageData ExampleMessageData);
+
+public record ExampleMessageForBalanceResponsible(
+    string GridArea,
+    MeteringPointType MeteringPointType,
+    SettlementMethod SettlementMethod,
+    Resolution Resolution,
+    int Version);
