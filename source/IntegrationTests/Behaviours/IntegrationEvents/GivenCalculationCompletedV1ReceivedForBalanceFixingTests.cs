@@ -18,7 +18,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using FluentAssertions;
@@ -32,7 +31,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents;
 public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBehaviourTestBase, IAsyncLifetime
 {
     private readonly IntegrationTestFixture _fixture;
-    private readonly EnergyResultPerGridAreaDescription _energyResultPerGridAreaTestDataDescription;
+    private readonly IOptions<EdiDatabricksOptions> _ediDatabricksOptions;
 
     public GivenCalculationCompletedV1ReceivedTests(
         IntegrationTestFixture integrationTestFixture,
@@ -40,17 +39,12 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
             : base(integrationTestFixture, testOutputHelper)
     {
         _fixture = integrationTestFixture;
-        _energyResultPerGridAreaTestDataDescription = new EnergyResultPerGridAreaDescription();
+        _ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
     }
 
     public async Task InitializeAsync()
     {
         await _fixture.DatabricksSchemaManager.CreateSchemaAsync();
-        var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
-
-        var energyResultPerGridAreaQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions.Value, _energyResultPerGridAreaTestDataDescription.CalculationId);
-
-        await SeedDatabricksWithDataAsync(_energyResultPerGridAreaTestDataDescription, energyResultPerGridAreaQuery);
     }
 
     public async Task DisposeAsync()
@@ -63,10 +57,12 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
     public async Task AndGiven_CalculationIsBalanceFixing_WhenGridOperatorPeeksMessages_ThenReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
     {
         // Given (arrange)
+        var testDataDescription = await GivenDatabricksResultDataForEnergyResultPerGridAreaAsync();
+
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
         var gridOperator = new Actor(ActorNumber.Create("1111111111111"), ActorRole.GridOperator);
-        var gridArea = _energyResultPerGridAreaTestDataDescription.GridAreaCode;
-        var calculationId = _energyResultPerGridAreaTestDataDescription.CalculationId;
+        var gridArea = testDataDescription.GridAreaCode;
+        var calculationId = testDataDescription.CalculationId;
 
         await GivenGridAreaOwnershipAsync(gridArea, gridOperator.ActorNumber);
         await GivenEnqueueEnergyResultsForGridAreaOwnersAsync(calculationId);
@@ -78,7 +74,7 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
             documentFormat);
 
         // Then (assert)
-        peekResultsForGridOperator.Should().HaveCount(_energyResultPerGridAreaTestDataDescription.ExpectedOutgoingMessagesCount);
+        peekResultsForGridOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesCount);
 
         // TODO: Assert correct document content
     }
@@ -91,9 +87,13 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
     }
 
-    private async Task SeedDatabricksWithDataAsync(EnergyResultTestDataDescription testDataDescription, IDeltaTableSchemaDescription schemaInfomation)
+    private async Task<EnergyResultTestDataDescription> GivenDatabricksResultDataForEnergyResultPerGridAreaAsync()
     {
-        await _fixture.DatabricksSchemaManager.CreateTableAsync(schemaInfomation);
-        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(schemaInfomation, testDataDescription.TestFilePath);
+        var energyResultPerGridAreaTestDataDescription = new EnergyResultPerGridAreaDescription();
+        var energyResultPerGridAreaQuery = new EnergyResultPerGridAreaQuery(_ediDatabricksOptions.Value, energyResultPerGridAreaTestDataDescription.CalculationId);
+
+        await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerGridAreaQuery);
+        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerGridAreaQuery, energyResultPerGridAreaTestDataDescription.TestFilePath);
+        return energyResultPerGridAreaTestDataDescription;
     }
 }
