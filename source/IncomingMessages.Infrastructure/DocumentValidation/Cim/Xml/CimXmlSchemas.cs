@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Cim.CimXml;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Cim.Xml;
 
 public sealed class CimXmlSchemas : SchemaBase, ISchema
 {
-    private static readonly string _schemaPath = $"DocumentValidation{Path.DirectorySeparatorChar}CimXml{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
+    private static readonly string _schemaPath = $"DocumentValidation{Path.DirectorySeparatorChar}Cim{Path.DirectorySeparatorChar}Xml{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
 
     public CimXmlSchemas()
     {

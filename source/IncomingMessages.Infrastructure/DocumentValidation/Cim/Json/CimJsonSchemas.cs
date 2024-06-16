@@ -14,12 +14,12 @@
 
 using Json.Schema;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Cim.CimJson;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Cim.Json;
 
 public sealed class CimJsonSchemas : SchemaBase, ISchema
 {
     private const string SchemaBaseUri = @"file:///C:/Users/Public/Documents/iec.ch/TC57/2020/";
-    private static readonly string _schemaPath = $"DocumentValidation{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}Json{Path.DirectorySeparatorChar}";
+    private static readonly string _schemaPath = $"DocumentValidation{Path.DirectorySeparatorChar}Cim{Path.DirectorySeparatorChar}Json{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
     private static readonly Mutex _mutex = new();
 
     public CimJsonSchemas()
