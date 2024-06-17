@@ -23,6 +23,8 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyRes
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Polly;
+using Polly.Retry;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 
@@ -36,6 +38,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     private readonly ISerializer _serializer;
     private readonly IMasterDataClient _masterDataClient;
     private readonly EnergyResultEnumerator _energyResultEnumerator;
+    private readonly AsyncRetryPolicy _retryExecutionPolicy;
 
     public OutgoingMessagesClient(
         PeekMessage peekMessage,
@@ -55,6 +58,13 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         _serializer = serializer;
         _masterDataClient = masterDataClient;
         _energyResultEnumerator = energyResultEnumerator;
+
+        // TODO: Refactor as part of #5.2
+        _retryExecutionPolicy = Policy
+            .Handle<Exception>()
+            .WaitAndRetryAsync(
+                retryCount: 2,
+                sleepDurationProvider: _ => TimeSpan.FromSeconds(2));
     }
 
     public async Task<DequeueRequestResultDto> DequeueAndCommitAsync(DequeueRequestDto request, CancellationToken cancellationToken)
@@ -173,8 +183,8 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             var receiverNumber = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(energyResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
             // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
             var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult, receiverNumber);
-            // TODO: Add retry with polly
-            await EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);
+            await _retryExecutionPolicy.ExecuteAsync(() =>
+                EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None)).ConfigureAwait(false);
             numberOfEnqueuedMessages++;
         }
 
@@ -190,8 +200,8 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         {
             // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
             var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult);
-            // TODO: Add retry with polly
-            await EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);
+            await _retryExecutionPolicy.ExecuteAsync(() =>
+                EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None)).ConfigureAwait(false);
             numberOfEnqueuedMessages++;
         }
 
@@ -207,12 +217,13 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         {
             // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
             var energyResultPerEnergySupplierMessage = EnergyResultMessageDtoFactory.CreateForEnergySupplier(EventId.From(input.EventId), energyResult);
-            // TODO: Add retry with polly
-            await EnqueueAndCommitAsync(energyResultPerEnergySupplierMessage, CancellationToken.None).ConfigureAwait(false);
+            await _retryExecutionPolicy.ExecuteAsync(() =>
+                EnqueueAndCommitAsync(energyResultPerEnergySupplierMessage, CancellationToken.None)).ConfigureAwait(false);
             numberOfEnqueuedMessages++;
+
             var energyResultPerBalanceResponsibleMessage = EnergyResultMessageDtoFactory.CreateForBalanceResponsiblePrEnergySupplier(EventId.From(input.EventId), energyResult);
-            // TODO: Add retry with polly
-            await EnqueueAndCommitAsync(energyResultPerBalanceResponsibleMessage, CancellationToken.None).ConfigureAwait(false);
+            await _retryExecutionPolicy.ExecuteAsync(() =>
+                EnqueueAndCommitAsync(energyResultPerBalanceResponsibleMessage, CancellationToken.None)).ConfigureAwait(false);
             numberOfEnqueuedMessages++;
         }
 
