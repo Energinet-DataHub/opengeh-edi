@@ -65,7 +65,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         var testDataDescription = await GivenDatabricksResultDataForEnergyResultPerGridArea();
         var expectedMessagesCount = testDataDescription.ExpectedOutgoingMessagesCount;
         var expectedPeriod = testDataDescription.Period;
-        var exampleMessageData = testDataDescription.ExampleMessageData;
+        var exampleMessageData = testDataDescription.ExampleEnergyResultMessageData;
 
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
         var gridOperator = new Actor(ActorNumber.Create("1111111111111"), ActorRole.GridOperator);

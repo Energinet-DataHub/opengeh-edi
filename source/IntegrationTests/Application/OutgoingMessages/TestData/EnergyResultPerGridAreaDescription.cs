@@ -42,7 +42,7 @@ public class EnergyResultPerGridAreaDescription
         Instant.FromUtc(2022, 1, 11, 23, 0, 0),
         Instant.FromUtc(2022, 1, 12, 23, 0, 0));
 
-    public ExampleMessageForActor ExampleMessageData => new(
+    public ExampleEnergyResultMessageForActor ExampleEnergyResultMessageData => new(
         GridArea: GridAreaCode,
         MeteringPointType.Consumption,
         SettlementMethod.Flex,

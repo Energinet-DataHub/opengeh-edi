@@ -42,10 +42,10 @@ public class EnergyResultPerBrpGridAreaDescription
         Instant.FromUtc(2022, 1, 11, 23, 0, 0),
         Instant.FromUtc(2022, 1, 12, 23, 0, 0));
 
-    public ExampleDataForActor<ExampleMessageForActor> ExampleBalanceResponsible => new(
+    public ExampleDataForActor<ExampleEnergyResultMessageForActor> ExampleBalanceResponsible => new(
         ActorNumber: ActorNumber.Create("7080000729821"),
         ExpectedOutgoingMessagesCount: 3,
-        ExampleMessageData: new ExampleMessageForActor(
+        ExampleMessageData: new ExampleEnergyResultMessageForActor(
             GridArea: "543",
             MeteringPointType.Consumption,
             SettlementMethod.Flex,

@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 
-public record ExampleMessageForActor(
+public record ExampleEnergyResultMessageForActor(
     string GridArea,
     MeteringPointType MeteringPointType,
     SettlementMethod? SettlementMethod,

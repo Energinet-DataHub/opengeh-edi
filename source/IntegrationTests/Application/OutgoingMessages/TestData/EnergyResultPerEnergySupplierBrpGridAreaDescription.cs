@@ -41,10 +41,10 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
         Instant.FromUtc(2022, 1, 11, 23, 0, 0),
         Instant.FromUtc(2022, 1, 12, 23, 0, 0));
 
-    public ExampleDataForActor<ExampleMessageForActor> ExampleEnergySupplier => new(
+    public ExampleDataForActor<ExampleEnergyResultMessageForActor> ExampleEnergySupplier => new(
         ActorNumber: ActorNumber.Create("5790002105289"),
         ExpectedOutgoingMessagesCount: 2,
-        ExampleMessageData: new ExampleMessageForActor(
+        ExampleMessageData: new ExampleEnergyResultMessageForActor(
             GridArea: "543",
             MeteringPointType.Consumption,
             SettlementMethod.NonProfiled,
@@ -56,10 +56,10 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
                 3011.368m,
                 CalculatedQuantityQuality.Incomplete)));
 
-    public ExampleDataForActor<ExampleMessageForActor> ExampleBalanceResponsible => new(
+    public ExampleDataForActor<ExampleEnergyResultMessageForActor> ExampleBalanceResponsible => new(
         ActorNumber: ActorNumber.Create("7080000729821"),
         ExpectedOutgoingMessagesCount: 5,
-        ExampleMessageData: new ExampleMessageForActor(
+        ExampleMessageData: new ExampleEnergyResultMessageForActor(
             GridArea: "543",
             MeteringPointType.Production,
             null,
