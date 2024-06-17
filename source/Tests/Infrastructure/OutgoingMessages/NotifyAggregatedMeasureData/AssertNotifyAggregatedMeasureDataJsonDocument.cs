@@ -12,19 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
-using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions;
 using Json.Schema;
 using Xunit;
@@ -256,7 +250,7 @@ public sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNotif
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<TimeSeriesPoint> points)
+    public IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<TimeSeriesPointAssertionInput> points)
     {
         var pointsInDocument = FirstTimeSeriesElement()
             .GetProperty("Period")
@@ -284,16 +278,9 @@ public sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNotif
                 .GetProperty("quantity")
                 .GetDecimal()
                 .Should()
-                .Be(expectedPoints[i].Quantity.ToDecimal());
+                .Be(expectedPoints[i].Quantity);
 
-            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
-            {
-                QuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,
-                QuantityQuality.Estimated => CimCode.QuantityQualityCodeEstimated,
-                QuantityQuality.Measured => CimCode.QuantityQualityCodeMeasured,
-                _ => throw new NotImplementedException(
-                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
-            };
+            var expectedQuantityQuality = CimCode.ForEnergyResultOf(expectedPoints[i].Quality);
 
             pointsInDocument[i]
                 .GetProperty("quality")

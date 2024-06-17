@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
@@ -193,7 +194,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
                 Period: new Period(
                     CreateDateInstant(2024, 1, 1),
                     CreateDateInstant(2024, 1, 31)),
-                Points: acceptedResponse.Series.Single().TimeSeriesPoints));
+                Points: TimeSeriesPointAssertionInput.From(acceptedResponse.Series.Single().TimeSeriesPoints)));
     }
 
     [Theory]
@@ -316,7 +317,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
                     Period: new Period(
                         CreateDateInstant(2024, 1, 1),
                         CreateDateInstant(2024, 1, 31)),
-                    Points: seriesRequest.TimeSeriesPoints));
+                    Points: TimeSeriesPointAssertionInput.From(seriesRequest.TimeSeriesPoints)));
         }
 
         resultGridAreas.Should().BeEquivalentTo("106", "509");
@@ -439,7 +440,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
                 Period: new Period(
                     CreateDateInstant(2024, 1, 1),
                     CreateDateInstant(2024, 1, 31)),
-                Points: acceptedResponse.Series.Single().TimeSeriesPoints));
+                Points: TimeSeriesPointAssertionInput.From(acceptedResponse.Series.Single().TimeSeriesPoints)));
     }
 
     [Theory]
@@ -605,7 +606,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
                     Period: new Period(
                         CreateDateInstant(2024, 1, 1),
                         CreateDateInstant(2024, 1, 31)),
-                    Points: acceptedResponse.AcceptedResponse.Series.Single().TimeSeriesPoints));
+                    Points: TimeSeriesPointAssertionInput.From(acceptedResponse.AcceptedResponse.Series.Single().TimeSeriesPoints)));
         }
 
         gridAreas.Should().BeEquivalentTo("143", "512", "877");

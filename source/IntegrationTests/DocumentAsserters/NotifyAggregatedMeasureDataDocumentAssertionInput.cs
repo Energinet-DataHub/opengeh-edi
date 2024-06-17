@@ -15,6 +15,7 @@
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
@@ -34,9 +35,6 @@ public record NotifyAggregatedMeasureDataDocumentAssertionInput(
     MeasurementUnit QuantityMeasurementUnit,
     Period Period,
     Resolution Resolution,
-    IReadOnlyCollection<TimeSeriesPoint> Points,
+    IReadOnlyCollection<TimeSeriesPointAssertionInput> Points,
     SettlementMethod SettlementMethod,
-    TransactionId? OriginalTransactionIdReference)
-{
-    public TransactionId? OriginalTransactionIdReference { get; set; } = OriginalTransactionIdReference;
-}
+    TransactionId? OriginalTransactionIdReference);

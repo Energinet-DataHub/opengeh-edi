@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
+using NodaTime;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 
@@ -32,4 +34,8 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
     public override string GridAreaCode => "543";
 
     public override int ExpectedOutgoingMessagesCount => 35 * 2; // 35 results, which we must prepare for BRP and ES
+
+    public override Period Period => new(
+        Instant.FromUtc(2022, 1, 11, 23, 0, 0),
+        Instant.FromUtc(2022, 1, 12, 23, 0, 0));
 }

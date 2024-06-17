@@ -191,7 +191,7 @@ public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggrega
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<TimeSeriesPoint> points)
+    public IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<TimeSeriesPointAssertionInput> points)
     {
         var pointsInDocument = _documentAsserter
             .GetElements("Series[1]/Period/Point")!;
@@ -214,16 +214,9 @@ public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggrega
                 .Value
                 .ToDecimal()
                 .Should()
-                .Be(expectedPoints[i].Quantity.ToDecimal());
+                .Be(expectedPoints[i].Quantity);
 
-            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
-            {
-                QuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,
-                QuantityQuality.Measured => CimCode.QuantityQualityCodeMeasured,
-                QuantityQuality.Estimated => CimCode.QuantityQualityCodeEstimated,
-                _ => throw new NotImplementedException(
-                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
-            };
+            var expectedQuantityQuality = CimCode.ForEnergyResultOf(expectedPoints[i].Quality);
 
             pointsInDocument[i]
                 .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("quality"), _documentAsserter.XmlNamespaceManager)!

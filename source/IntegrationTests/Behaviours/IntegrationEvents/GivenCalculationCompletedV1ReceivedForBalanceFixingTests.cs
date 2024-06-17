@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Xunit;
@@ -58,10 +59,13 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
 
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
-    public async Task AndGiven_CalculationIsBalanceFixing_WhenGridOperatorPeeksMessages_ThenReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
+    public async Task AndGiven_CalculationIsBalanceFixing_When_GridOperatorPeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
     {
         // Given (arrange)
         var testDataDescription = await GivenDatabricksResultDataForEnergyResultPerGridAreaAsync();
+        var expectedMessagesCount = testDataDescription.ExpectedOutgoingMessagesCount;
+        var expectedPeriod = testDataDescription.Period;
+        var exampleMessageData = testDataDescription.ExampleMessageData;
 
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
         var gridOperator = new Actor(ActorNumber.Create("1111111111111"), ActorRole.GridOperator);
@@ -78,15 +82,40 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
             documentFormat);
 
         // Then (assert)
-        peekResultsForGridOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesCount);
+        peekResultsForGridOperator.Should().HaveCount(expectedMessagesCount);
 
-        // TODO: Assert correct document content
+        var assertionInput = new NotifyAggregatedMeasureDataDocumentAssertionInput(
+            Timestamp: "2022-09-07T13:37:05Z",
+            BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
+                BusinessReason.BalanceFixing,
+                null),
+            ReceiverId: gridOperator.ActorNumber,
+            // ReceiverRole: originalActor.ActorRole,
+            SenderId: ActorNumber.Create("5790001330552"), // Sender is always DataHub
+            // SenderRole: ActorRole.MeteredDataAdministrator,
+            EnergySupplierNumber: null,
+            BalanceResponsibleNumber: null,
+            SettlementMethod: exampleMessageData.SettlementMethod,
+            MeteringPointType: exampleMessageData.MeteringPointType,
+            GridAreaCode: exampleMessageData.GridArea,
+            OriginalTransactionIdReference: null,
+            ProductCode: ProductType.EnergyActive.Code,
+            QuantityMeasurementUnit: MeasurementUnit.Kwh,
+            CalculationVersion: exampleMessageData.Version,
+            Resolution: exampleMessageData.Resolution,
+            Period: expectedPeriod,
+            Points: exampleMessageData.Points);
+
+        await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
+            peekResultsForGridOperator,
+            documentFormat,
+            assertionInput);
     }
 
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
     public async Task
-        AndGiven_CalculationIsBalanceFixing_WhenBalanceResponsiblePeeksMessages_ThenReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
+        AndGiven_CalculationIsBalanceFixing_When_BalanceResponsiblePeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
     {
         // Given (arrange)
         var testDataDescription = await GivenDatabricksResultDataForEnergyResultPerBalanceResponsible();
@@ -111,44 +140,32 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
         // Then (assert)
         peekResultsForBalanceResponsible.Should().HaveCount(expectedMessagesCount);
 
-        // => Add "NotBeNull()" assertions for each expected message except one, since there is no .AnySatisfy()
-        // method and we only want to assert that one of the messages is correct.
-        var assertions = Enumerable
-            .Repeat<Action<PeekResultDto>>(r => r.Should().NotBeNull(), expectedMessagesCount - 1)
-            .ToList();
+        var assertionInput = new NotifyAggregatedMeasureDataDocumentAssertionInput(
+            Timestamp: "2022-09-07T13:37:05Z",
+            BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
+                BusinessReason.BalanceFixing,
+                null),
+            ReceiverId: balanceResponsible.ActorNumber,
+            // ReceiverRole: originalActor.ActorRole,
+            SenderId: ActorNumber.Create("5790001330552"), // Sender is always DataHub
+            // SenderRole: ActorRole.MeteredDataAdministrator,
+            EnergySupplierNumber: null,
+            BalanceResponsibleNumber: balanceResponsible.ActorNumber,
+            SettlementMethod: exampleMessageData.SettlementMethod,
+            MeteringPointType: exampleMessageData.MeteringPointType,
+            GridAreaCode: exampleMessageData.GridArea,
+            OriginalTransactionIdReference: null,
+            ProductCode: ProductType.EnergyActive.Code,
+            QuantityMeasurementUnit: MeasurementUnit.Kwh,
+            CalculationVersion: exampleMessageData.Version,
+            Resolution: exampleMessageData.Resolution,
+            Period: expectedPeriod,
+            Points: exampleMessageData.Points);
 
-        assertions.Add(
-            async r =>
-            {
-                var assertionInput = new NotifyAggregatedMeasureDataDocumentAssertionInput(
-                    Timestamp: "2022-09-07T13:37:05Z",
-                    BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
-                        BusinessReason.BalanceFixing,
-                        null),
-                    ReceiverId: balanceResponsible.ActorNumber,
-                    // ReceiverRole: originalActor.ActorRole,
-                    SenderId: ActorNumber.Create("5790001330552"), // Sender is always DataHub
-                    // SenderRole: ActorRole.MeteredDataAdministrator,
-                    EnergySupplierNumber: null,
-                    BalanceResponsibleNumber: balanceResponsible.ActorNumber,
-                    SettlementMethod: exampleMessageData.SettlementMethod,
-                    MeteringPointType: exampleMessageData.MeteringPointType,
-                    GridAreaCode: exampleMessageData.GridArea,
-                    OriginalTransactionIdReference: null,
-                    ProductCode: ProductType.EnergyActive.Code,
-                    QuantityMeasurementUnit: MeasurementUnit.Kwh,
-                    CalculationVersion: exampleMessageData.Version,
-                    Resolution: exampleMessageData.Resolution,
-                    Period: expectedPeriod,
-                    Points: exampleMessageData.Points);
-
-                await ThenNotifyAggregatedMeasureDataDocumentIsCorrect(
-                    r.Bundle,
-                    documentFormat,
-                    assertionInput);
-            });
-
-        peekResultsForBalanceResponsible.Should().SatisfyRespectively(assertions);
+        await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
+            peekResultsForBalanceResponsible,
+            documentFormat,
+            assertionInput);
     }
 
     private Task GivenEnqueueEnergyResultsForGridAreaOwnersAsync(Guid calculationId)
@@ -195,5 +212,38 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
         await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerEnergySupplierQuery);
         await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerEnergySupplierQuery, energyResultPerEnergySupplierDescription.TestFilePath);
         return energyResultPerEnergySupplierDescription;
+    }
+
+    private async Task ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
+        List<PeekResultDto> peekResults,
+        DocumentFormat documentFormat,
+        NotifyAggregatedMeasureDataDocumentAssertionInput assertionInput)
+    {
+        using var assertionScope = new AssertionScope();
+
+        // We need to assert that one of the messages is correct and don't care about the rest. However we have no
+        // way of knowing which message is the correct one, so we will assert all of them and count the number of
+        // failed/successful assertions.
+        var failedAssertions = new List<Exception>();
+        var successfulAssertions = 0;
+        foreach (var peekResultDto in peekResults)
+        {
+            try
+            {
+                await ThenNotifyAggregatedMeasureDataDocumentIsCorrect(
+                    peekResultDto.Bundle,
+                    documentFormat,
+                    assertionInput);
+
+                successfulAssertions++;
+            }
+            catch (Exception e)
+            {
+                failedAssertions.Add(e);
+            }
+        }
+
+        failedAssertions.Should().HaveCount(peekResults.Count - 1);
+        successfulAssertions.Should().Be(1);
     }
 }

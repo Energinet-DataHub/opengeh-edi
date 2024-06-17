@@ -13,8 +13,10 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
@@ -39,47 +41,31 @@ public class EnergyResultPerBrpGridAreaDescription
 
     public override int ExpectedOutgoingMessagesCount => 20;
 
-    public Period Period => new(
+    public override Period Period => new(
         Instant.FromUtc(2022, 1, 11, 23, 0, 0),
         Instant.FromUtc(2022, 1, 12, 23, 0, 0));
 
-    public ExampleDataForActor<ExampleMessageForBalanceResponsible> ExampleBalanceResponsible => new(
+    public ExampleDataForActor<ExampleMessageForActor> ExampleBalanceResponsible => new(
         ActorNumber: ActorNumber.Create("7080000729821"),
         ExpectedOutgoingMessagesCount: 3,
-        ExampleMessageData: new ExampleMessageForBalanceResponsible(
+        ExampleMessageData: new ExampleMessageForActor(
             GridArea: "543",
             MeteringPointType.Consumption,
             SettlementMethod.Flex,
             Resolution.Hourly,
             111,
-            CreatePointsForDay(
+            TimeSeriesPointsFactory.CreatePointsForDay(
                 Period.Start,
                 1211.912m,
-                QuantityQuality.Measured)));
-
-    private IReadOnlyCollection<TimeSeriesPoint> CreatePointsForDay(Instant start, decimal quantity, QuantityQuality quality)
-    {
-        var points = new List<TimeSeriesPoint>();
-        for (var i = 0; i < 24; i++)
-        {
-            points.Add(new TimeSeriesPoint
-            {
-                Time = start.Plus(Duration.FromHours(i)).ToTimestamp(),
-                Quantity = DecimalValue.FromDecimal(quantity),
-                QuantityQualities = { quality },
-            });
-        }
-
-        return points;
-    }
+                CalculatedQuantityQuality.Measured)));
 }
 
 public record ExampleDataForActor<TMessageData>(ActorNumber ActorNumber, int ExpectedOutgoingMessagesCount, TMessageData ExampleMessageData);
 
-public record ExampleMessageForBalanceResponsible(
+public record ExampleMessageForActor(
     string GridArea,
     MeteringPointType MeteringPointType,
     SettlementMethod SettlementMethod,
     Resolution Resolution,
     int Version,
-    IReadOnlyCollection<TimeSeriesPoint> Points);
+    IReadOnlyCollection<TimeSeriesPointAssertionInput> Points);
