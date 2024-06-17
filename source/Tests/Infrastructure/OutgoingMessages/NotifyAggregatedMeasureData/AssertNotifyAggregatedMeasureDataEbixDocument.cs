@@ -236,6 +236,8 @@ public class AssertNotifyAggregatedMeasureDataEbixDocument : IAssertNotifyAggreg
 
             var expectedQuantityQuality = EbixCode.ForEnergyResultOf(expectedPoints[i].Quality);
 
+            // If the quality is Missing or NotAvailable, QuantityQuality should be replaced by
+            // a QuantityMissing element in ebIX
             if (expectedQuantityQuality == null)
             {
                 pointsInDocument[i]

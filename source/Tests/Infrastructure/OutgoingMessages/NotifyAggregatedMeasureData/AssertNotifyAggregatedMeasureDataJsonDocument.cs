@@ -265,29 +265,34 @@ public sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNotif
 
         var expectedPoints = points.OrderBy(p => p.Time).ToList();
 
-        for (var i = 0; i < pointsInDocument.Count; i++)
+        for (var index = 0; index < pointsInDocument.Count; index++)
         {
-            pointsInDocument[i]
+            var expectedPoint = expectedPoints[index];
+            var expectedPosition = index + 1;
+
+            pointsInDocument[index]
                 .GetProperty("position")
                 .GetProperty("value")
                 .GetInt32()
                 .Should()
-                .Be(i + 1);
+                .Be(expectedPosition);
 
-            pointsInDocument[i]
+            pointsInDocument[index]
                 .GetProperty("quantity")
                 .GetDecimal()
                 .Should()
-                .Be(expectedPoints[i].Quantity);
+                .Be(expectedPoint.Quantity);
 
-            var expectedQuantityQuality = CimCode.ForEnergyResultOf(expectedPoints[i].Quality);
-
-            pointsInDocument[i]
-                .GetProperty("quality")
-                .GetProperty("value")
-                .GetString()
-                .Should()
-                .Be(expectedQuantityQuality);
+            // If the quality is measured, the quality element should not be present in CIM
+            if (expectedPoint.Quality == CalculatedQuantityQuality.Measured)
+            {
+                QualityIsNotPresentForPosition(expectedPosition);
+            }
+            else
+            {
+                var expectedQuality = CimCode.ForEnergyResultOf(expectedPoint.Quality);
+                QualityIsPresentForPosition(expectedPosition, expectedQuality);
+            }
         }
 
         return this;
