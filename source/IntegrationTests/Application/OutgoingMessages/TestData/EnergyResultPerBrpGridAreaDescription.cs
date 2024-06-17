@@ -65,7 +65,7 @@ public record ExampleDataForActor<TMessageData>(ActorNumber ActorNumber, int Exp
 public record ExampleMessageForActor(
     string GridArea,
     MeteringPointType MeteringPointType,
-    SettlementMethod SettlementMethod,
+    SettlementMethod? SettlementMethod,
     Resolution Resolution,
     int Version,
     IReadOnlyCollection<TimeSeriesPointAssertionInput> Points);

@@ -33,12 +33,12 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents;
 
 [SuppressMessage("Usage", "VSTHRD101:Avoid unsupported async delegates", Justification = "Test method")]
-public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBehaviourTestBase, IAsyncLifetime
+public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : AggregatedMeasureDataBehaviourTestBase, IAsyncLifetime
 {
     private readonly IntegrationTestFixture _fixture;
     private readonly IOptions<EdiDatabricksOptions> _ediDatabricksOptions;
 
-    public GivenCalculationCompletedV1ReceivedTests(
+    public GivenCalculationCompletedV1ReceivedForBalanceFixingTests(
         IntegrationTestFixture integrationTestFixture,
         ITestOutputHelper testOutputHelper)
             : base(integrationTestFixture, testOutputHelper)
@@ -59,10 +59,10 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
 
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
-    public async Task AndGiven_CalculationIsBalanceFixing_When_GridOperatorPeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
+    public async Task AndGiven_EnqueueEnergyResultsForGridOperators_When_GridOperatorPeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
     {
         // Given (arrange)
-        var testDataDescription = await GivenDatabricksResultDataForEnergyResultPerGridAreaAsync();
+        var testDataDescription = await GivenDatabricksResultDataForEnergyResultPerGridArea();
         var expectedMessagesCount = testDataDescription.ExpectedOutgoingMessagesCount;
         var expectedPeriod = testDataDescription.Period;
         var exampleMessageData = testDataDescription.ExampleMessageData;
@@ -73,7 +73,7 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
         var calculationId = testDataDescription.CalculationId;
 
         await GivenGridAreaOwnershipAsync(gridArea, gridOperator.ActorNumber);
-        await GivenEnqueueEnergyResultsForGridAreaOwnersAsync(calculationId);
+        await GivenEnqueueEnergyResultsForGridOperatorsAsync(calculationId);
 
         // When (act)
         var peekResultsForGridOperator = await WhenActorPeeksAllMessages(
@@ -115,7 +115,7 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
     public async Task
-        AndGiven_CalculationIsBalanceFixing_When_BalanceResponsiblePeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
+        AndGiven_EnqueueEnergyResultsForBalanceResponsibles_When_BalanceResponsiblePeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
     {
         // Given (arrange)
         var testDataDescription = await GivenDatabricksResultDataForEnergyResultPerBalanceResponsible();
@@ -129,7 +129,7 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
         var calculationId = testDataDescription.CalculationId;
         var expectedPeriod = testDataDescription.Period;
 
-        await GivenEnqueueEnergyResultsForBalanceResponsiblesAsync(calculationId);
+        await GivenEnqueueEnergyResultsForBalanceResponsibles(calculationId);
 
         // When (act)
         var peekResultsForBalanceResponsible = await WhenActorPeeksAllMessages(
@@ -168,7 +168,106 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
             assertionInput);
     }
 
-    private Task GivenEnqueueEnergyResultsForGridAreaOwnersAsync(Guid calculationId)
+    [Theory]
+    [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
+    public async Task
+        AndGiven_EnqueueEnergyResultsForEnergySuppliers_When_EnergySupplierAndBalanceReponsiblePeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
+    {
+        // Given (arrange)
+        var testDataDescription = await GivenDatabricksResultDataForEnergyResultPerEnergySupplier();
+        var (
+            energySupplierActorNumber,
+            energySupplierExpectedMessagesCount,
+            energySupplierExampleMessageData) = testDataDescription.ExampleEnergySupplier;
+
+        var (
+            balanceResponsibleActorNumber,
+            balanceResponsibleExpectedMessagesCount,
+            balanceResponsibleExampleMessageData) = testDataDescription.ExampleBalanceResponsible;
+
+        GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
+        var energySupplier = new Actor(energySupplierActorNumber, ActorRole.EnergySupplier);
+        var balanceResponsible = new Actor(balanceResponsibleActorNumber, ActorRole.BalanceResponsibleParty);
+        var calculationId = testDataDescription.CalculationId;
+        var expectedPeriod = testDataDescription.Period;
+
+        await GivenEnqueueEnergyResultsForEnergySuppliers(calculationId);
+
+        // When (act)
+        var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(
+            energySupplier.ActorNumber,
+            energySupplier.ActorRole,
+            documentFormat);
+
+        var peekResultsForBalanceResponsible = await WhenActorPeeksAllMessages(
+            balanceResponsible.ActorNumber,
+            balanceResponsible.ActorRole,
+            documentFormat);
+
+        // Then (assert)
+
+        // Assert energy supplier peek result
+        peekResultsForEnergySupplier.Should().HaveCount(energySupplierExpectedMessagesCount);
+
+        var energySupplierAssertionInput = new NotifyAggregatedMeasureDataDocumentAssertionInput(
+            Timestamp: "2022-09-07T13:37:05Z",
+            BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
+                BusinessReason.BalanceFixing,
+                null),
+            ReceiverId: energySupplier.ActorNumber,
+            // ReceiverRole: originalActor.ActorRole,
+            SenderId: ActorNumber.Create("5790001330552"), // Sender is always DataHub
+            // SenderRole: ActorRole.MeteredDataAdministrator,
+            EnergySupplierNumber: energySupplier.ActorNumber,
+            BalanceResponsibleNumber: null,
+            SettlementMethod: energySupplierExampleMessageData.SettlementMethod,
+            MeteringPointType: energySupplierExampleMessageData.MeteringPointType,
+            GridAreaCode: energySupplierExampleMessageData.GridArea,
+            OriginalTransactionIdReference: null,
+            ProductCode: ProductType.EnergyActive.Code,
+            QuantityMeasurementUnit: MeasurementUnit.Kwh,
+            CalculationVersion: energySupplierExampleMessageData.Version,
+            Resolution: energySupplierExampleMessageData.Resolution,
+            Period: expectedPeriod,
+            Points: energySupplierExampleMessageData.Points);
+
+        await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
+            peekResultsForEnergySupplier,
+            documentFormat,
+            energySupplierAssertionInput);
+
+        // Assert balance responsible peek result
+        peekResultsForBalanceResponsible.Should().HaveCount(balanceResponsibleExpectedMessagesCount);
+
+        var balanceResponsibleAssertionInput = new NotifyAggregatedMeasureDataDocumentAssertionInput(
+            Timestamp: "2022-09-07T13:37:05Z",
+            BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
+                BusinessReason.BalanceFixing,
+                null),
+            ReceiverId: balanceResponsible.ActorNumber,
+            // ReceiverRole: originalActor.ActorRole,
+            SenderId: ActorNumber.Create("5790001330552"), // Sender is always DataHub
+            // SenderRole: ActorRole.MeteredDataAdministrator,
+            EnergySupplierNumber: null,
+            BalanceResponsibleNumber: balanceResponsible.ActorNumber,
+            SettlementMethod: balanceResponsibleExampleMessageData.SettlementMethod,
+            MeteringPointType: balanceResponsibleExampleMessageData.MeteringPointType,
+            GridAreaCode: balanceResponsibleExampleMessageData.GridArea,
+            OriginalTransactionIdReference: null,
+            ProductCode: ProductType.EnergyActive.Code,
+            QuantityMeasurementUnit: MeasurementUnit.Kwh,
+            CalculationVersion: balanceResponsibleExampleMessageData.Version,
+            Resolution: balanceResponsibleExampleMessageData.Resolution,
+            Period: expectedPeriod,
+            Points: balanceResponsibleExampleMessageData.Points);
+
+        await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
+            peekResultsForBalanceResponsible,
+            documentFormat,
+            balanceResponsibleAssertionInput);
+    }
+
+    private Task GivenEnqueueEnergyResultsForGridOperatorsAsync(Guid calculationId)
     {
         var activity = new EnqueueEnergyResultsForGridAreaOwnersActivity(
             GetService<IOutgoingMessagesClient>());
@@ -176,7 +275,7 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
     }
 
-    private Task GivenEnqueueEnergyResultsForBalanceResponsiblesAsync(Guid calculationId)
+    private Task GivenEnqueueEnergyResultsForBalanceResponsibles(Guid calculationId)
     {
         var activity = new EnqueueEnergyResultsForBalanceResponsiblesActivity(
             GetService<IOutgoingMessagesClient>());
@@ -184,7 +283,27 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
     }
 
-    private async Task<EnergyResultPerGridAreaDescription> GivenDatabricksResultDataForEnergyResultPerGridAreaAsync()
+    private Task GivenEnqueueEnergyResultsForEnergySuppliers(Guid calculationId)
+    {
+        var activity = new EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity(
+            GetService<IOutgoingMessagesClient>());
+
+        return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
+    }
+
+    private async Task<(
+        EnergyResultPerGridAreaDescription PerGridArea,
+        EnergyResultPerBrpGridAreaDescription PerBalanceResponsible,
+        EnergyResultPerEnergySupplierBrpGridAreaDescription PerEnergySupplier)> GivenDatabricksResultDataForAllAggregationViews()
+    {
+        var perGridArea = await GivenDatabricksResultDataForEnergyResultPerGridArea();
+        var perBalanceResponsible = await GivenDatabricksResultDataForEnergyResultPerBalanceResponsible();
+        var perEnergySupplier = await GivenDatabricksResultDataForEnergyResultPerEnergySupplier();
+
+        return (perGridArea, perBalanceResponsible, perEnergySupplier);
+    }
+
+    private async Task<EnergyResultPerGridAreaDescription> GivenDatabricksResultDataForEnergyResultPerGridArea()
     {
         var energyResultPerGridAreaTestDataDescription = new EnergyResultPerGridAreaDescription();
         var energyResultPerGridAreaQuery = new EnergyResultPerGridAreaQuery(_ediDatabricksOptions.Value, energyResultPerGridAreaTestDataDescription.CalculationId);
@@ -204,7 +323,7 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
         return energyResultPerBrpDescription;
     }
 
-    private async Task<EnergyResultPerEnergySupplierBrpGridAreaDescription> GivenDatabricksResultDataForEnergyResultPerEnergySupplierAsync()
+    private async Task<EnergyResultPerEnergySupplierBrpGridAreaDescription> GivenDatabricksResultDataForEnergyResultPerEnergySupplier()
     {
         var energyResultPerEnergySupplierDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
         var energyResultPerEnergySupplierQuery = new EnergyResultPerEnergySupplierBrpGridAreaQuery(_ediDatabricksOptions.Value, energyResultPerEnergySupplierDescription.CalculationId);
