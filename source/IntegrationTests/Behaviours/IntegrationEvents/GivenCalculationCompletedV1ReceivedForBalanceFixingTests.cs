@@ -219,8 +219,6 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
         DocumentFormat documentFormat,
         NotifyAggregatedMeasureDataDocumentAssertionInput assertionInput)
     {
-        using var assertionScope = new AssertionScope();
-
         // We need to assert that one of the messages is correct and don't care about the rest. However we have no
         // way of knowing which message is the correct one, so we will assert all of them and count the number of
         // failed/successful assertions.
@@ -230,10 +228,13 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
         {
             try
             {
-                await ThenNotifyAggregatedMeasureDataDocumentIsCorrect(
-                    peekResultDto.Bundle,
-                    documentFormat,
-                    assertionInput);
+                using (new AssertionScope())
+                {
+                    await ThenNotifyAggregatedMeasureDataDocumentIsCorrect(
+                        peekResultDto.Bundle,
+                        documentFormat,
+                        assertionInput);
+                }
 
                 successfulAssertions++;
             }
