@@ -53,6 +53,7 @@ public class EnergyResultPerBrpGridAreaDescription
             MeteringPointType.Consumption,
             SettlementMethod.Flex,
             Resolution.Hourly,
+            null,
             111,
             TimeSeriesPointsFactory.CreatePointsForDay(
                 Period.Start,
@@ -67,5 +68,6 @@ public record ExampleMessageForActor(
     MeteringPointType MeteringPointType,
     SettlementMethod? SettlementMethod,
     Resolution Resolution,
+    ActorNumber? EnergySupplier,
     int Version,
     IReadOnlyCollection<TimeSeriesPointAssertionInput> Points);

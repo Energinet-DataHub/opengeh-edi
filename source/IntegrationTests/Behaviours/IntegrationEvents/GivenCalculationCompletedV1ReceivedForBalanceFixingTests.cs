@@ -248,7 +248,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             // ReceiverRole: originalActor.ActorRole,
             SenderId: ActorNumber.Create("5790001330552"), // Sender is always DataHub
             // SenderRole: ActorRole.MeteredDataAdministrator,
-            EnergySupplierNumber: null,
+            EnergySupplierNumber: balanceResponsibleExampleMessageData.EnergySupplier,
             BalanceResponsibleNumber: balanceResponsible.ActorNumber,
             SettlementMethod: balanceResponsibleExampleMessageData.SettlementMethod,
             MeteringPointType: balanceResponsibleExampleMessageData.MeteringPointType,

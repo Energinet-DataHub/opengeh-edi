@@ -48,6 +48,7 @@ public class EnergyResultPerGridAreaDescription
         MeteringPointType.Consumption,
         SettlementMethod.Flex,
         Resolution.Hourly,
+        null,
         111,
         TimeSeriesPointsFactory.CreatePointsForDay(
             Period.Start,

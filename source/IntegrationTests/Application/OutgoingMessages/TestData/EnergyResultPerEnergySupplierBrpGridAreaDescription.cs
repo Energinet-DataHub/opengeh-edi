@@ -49,6 +49,7 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
             MeteringPointType.Consumption,
             SettlementMethod.NonProfiled,
             Resolution.Hourly,
+            ActorNumber.Create("5790002105289"),
             111,
             TimeSeriesPointsFactory.CreatePointsForDay(
                 Period.Start,
@@ -57,12 +58,13 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
 
     public ExampleDataForActor<ExampleMessageForActor> ExampleBalanceResponsible => new(
         ActorNumber: ActorNumber.Create("7080000729821"),
-        ExpectedOutgoingMessagesCount: 2,
+        ExpectedOutgoingMessagesCount: 5,
         ExampleMessageData: new ExampleMessageForActor(
             GridArea: "543",
             MeteringPointType.Production,
             null,
             Resolution.Hourly,
+            ActorNumber.Create("7080000729821"),
             111,
             TimeSeriesPointsFactory.CreatePointsForDay(
                 Period.Start,
