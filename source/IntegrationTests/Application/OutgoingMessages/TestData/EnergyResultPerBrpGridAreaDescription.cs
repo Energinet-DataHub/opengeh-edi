@@ -15,10 +15,7 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
-using Energinet.DataHub.Edi.Responses;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using NodaTime;
-using NodaTime.Serialization.Protobuf;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
@@ -60,14 +57,3 @@ public class EnergyResultPerBrpGridAreaDescription
                 1211.912m,
                 CalculatedQuantityQuality.Measured)));
 }
-
-public record ExampleDataForActor<TMessageData>(ActorNumber ActorNumber, int ExpectedOutgoingMessagesCount, TMessageData ExampleMessageData);
-
-public record ExampleMessageForActor(
-    string GridArea,
-    MeteringPointType MeteringPointType,
-    SettlementMethod? SettlementMethod,
-    Resolution Resolution,
-    ActorNumber? EnergySupplier,
-    int Version,
-    IReadOnlyCollection<TimeSeriesPointAssertionInput> Points);
