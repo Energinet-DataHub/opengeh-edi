@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -60,7 +61,7 @@ public sealed class IntegrationEventHandler : IIntegrationEventHandler
 
         using var connection = await _databaseConnectionFactory.GetConnectionAndOpenAsync(CancellationToken.None)
             .ConfigureAwait(false);
-        using var transaction = connection.BeginTransaction();
+        using var transaction = connection.BeginTransaction(IsolationLevel.ReadUncommitted);
         try
         {
             var addResult = await _receivedIntegrationEventRepository

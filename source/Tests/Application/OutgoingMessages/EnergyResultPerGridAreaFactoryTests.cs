@@ -41,6 +41,7 @@ public class EnergyResultPerGridAreaFactoryTests
             { EnergyResultColumnNames.MeteringPointType, "consumption" },
             { EnergyResultColumnNames.SettlementMethod, null },
             { EnergyResultColumnNames.Resolution, "PT1H" },
+            { EnergyResultColumnNames.QuantityUnit, "kWh" },
         });
 
         var timeSeriesPoints = new List<EnergyTimeSeriesPoint>()
@@ -68,7 +69,7 @@ public class EnergyResultPerGridAreaFactoryTests
         }
 
         // Act
-        var actual = EnergyResultPerGridAreaFactory.CreateEnergyResult(databricksSqlRow, timeSeriesPoints);
+        var actual = EnergyResultPerGridAreaFactory.CreateEnergyResultPerGridArea(databricksSqlRow, timeSeriesPoints);
 
         // Assert
         actual.Id.Should().Be("17582ba4-71db-4ce5-af70-b00a4676e357");
@@ -81,5 +82,6 @@ public class EnergyResultPerGridAreaFactoryTests
         actual.Resolution.Should().Be(Resolution.Hourly);
         actual.CalculationVersion.Should().Be(63);
         actual.SettlementMethod.Should().BeNull();
+        actual.MeasureUnitType.Should().Be(MeasurementUnit.Kwh);
     }
 }

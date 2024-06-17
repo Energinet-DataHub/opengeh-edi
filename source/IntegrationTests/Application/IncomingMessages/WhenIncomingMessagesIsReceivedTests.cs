@@ -381,7 +381,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         };
 
         using var assertionScope = new AssertionScope();
-        var archivedMessageAsDictionary = (IDictionary<string, object>)archivedMessage!;
+        var archivedMessageAsDictionary = (IDictionary<string, object>)archivedMessage;
 
         foreach (var assertProperty in assertProperties)
             assertProperty.Value(archivedMessageAsDictionary[assertProperty.Key]);

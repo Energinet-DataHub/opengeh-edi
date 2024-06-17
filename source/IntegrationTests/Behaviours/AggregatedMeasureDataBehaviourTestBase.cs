@@ -121,7 +121,7 @@ public abstract class AggregatedMeasureDataBehaviourTestBase : BehavioursTestBas
 
             gridAreaCimXmlElement.Should().NotBeNull("because grid area should be present in the CIM XML document");
             gridAreaCimXmlElement!.Value.Should().NotBeNull("because grid area value should not be null in the CIM XML document");
-            return gridAreaCimXmlElement!.Value;
+            return gridAreaCimXmlElement.Value;
         }
 
         if (documentFormat == DocumentFormat.Json)

@@ -29,17 +29,16 @@ public class EnergyResultMessageDtoFactory()
     {
         ArgumentNullException.ThrowIfNull(energyResult);
 
-        var receiverRole = DomainModel.ActorRole.MeteredDataResponsible;
         var (businessReason, settlementVersion) = MapToBusinessReasonAndSettlementVersion(energyResult.CalculationType);
 
         return EnergyResultMessageDto.Create(
             eventId,
             receiverNumber: receiverNumber,
-            receiverRole: receiverRole,
+            receiverRole: DomainModel.ActorRole.MeteredDataResponsible,
             gridAreaCode: energyResult.GridAreaCode,
             meteringPointType: energyResult.MeteringPointType.Name,
             settlementMethod: energyResult.SettlementMethod?.Name,
-            measureUnitType: DomainModel.MeasurementUnit.Kwh.Name, // TODO: Should this be read from Databricks?
+            measureUnitType: energyResult.MeasureUnitType.Name,
             resolution: energyResult.Resolution.Name,
             energySupplierNumber: null,
             balanceResponsibleNumber: null,
@@ -50,8 +49,85 @@ public class EnergyResultMessageDtoFactory()
             settlementVersion: settlementVersion?.Name);
     }
 
-    // TODO: Move to mapper?
-    private static IReadOnlyCollection<EnergyResultMessagePoint> CreateEnergyResultMessagePoints(EnergyTimeSeriesPoint[] timeSeriesPoints)
+    public static EnergyResultMessageDto Create(
+        EventId eventId,
+        EnergyResultPerBrpGridArea energyResult)
+    {
+        ArgumentNullException.ThrowIfNull(energyResult);
+
+        var (businessReason, settlementVersion) = MapToBusinessReasonAndSettlementVersion(energyResult.CalculationType);
+
+        return EnergyResultMessageDto.Create(
+            eventId,
+            receiverNumber: ActorNumber.Create(energyResult.BalanceResponsiblePartyId),
+            receiverRole: DomainModel.ActorRole.BalanceResponsibleParty,
+            gridAreaCode: energyResult.GridAreaCode,
+            meteringPointType: energyResult.MeteringPointType.Name,
+            settlementMethod: energyResult.SettlementMethod?.Name,
+            measureUnitType: energyResult.MeasureUnitType.Name,
+            resolution: energyResult.Resolution.Name,
+            energySupplierNumber: null,
+            balanceResponsibleNumber: energyResult.BalanceResponsiblePartyId,
+            period: new DomainModel.Period(energyResult.PeriodStartUtc, energyResult.PeriodEndUtc),
+            points: CreateEnergyResultMessagePoints(energyResult.TimeSeriesPoints),
+            businessReasonName: businessReason.Name,
+            calculationResultVersion: energyResult.CalculationVersion,
+            settlementVersion: settlementVersion?.Name);
+    }
+
+    public static EnergyResultMessageDto CreateForEnergySupplier(
+        EventId eventId,
+        EnergyResultPerEnergySupplierBrpGridArea energyResult)
+    {
+        ArgumentNullException.ThrowIfNull(energyResult);
+
+        var (businessReason, settlementVersion) = MapToBusinessReasonAndSettlementVersion(energyResult.CalculationType);
+
+        return EnergyResultMessageDto.Create(
+            eventId,
+            receiverNumber: ActorNumber.Create(energyResult.EnergySupplierId),
+            receiverRole: DomainModel.ActorRole.EnergySupplier,
+            gridAreaCode: energyResult.GridAreaCode,
+            meteringPointType: energyResult.MeteringPointType.Name,
+            settlementMethod: energyResult.SettlementMethod?.Name,
+            measureUnitType: energyResult.MeasureUnitType.Name,
+            resolution: energyResult.Resolution.Name,
+            energySupplierNumber: energyResult.EnergySupplierId,
+            balanceResponsibleNumber: null,
+            period: new DomainModel.Period(energyResult.PeriodStartUtc, energyResult.PeriodEndUtc),
+            points: CreateEnergyResultMessagePoints(energyResult.TimeSeriesPoints),
+            businessReasonName: businessReason.Name,
+            calculationResultVersion: energyResult.CalculationVersion,
+            settlementVersion: settlementVersion?.Name);
+    }
+
+    public static EnergyResultMessageDto CreateForBalanceResponsiblePrEnergySupplier(
+        EventId eventId,
+        EnergyResultPerEnergySupplierBrpGridArea energyResult)
+    {
+        ArgumentNullException.ThrowIfNull(energyResult);
+
+        var (businessReason, settlementVersion) = MapToBusinessReasonAndSettlementVersion(energyResult.CalculationType);
+
+        return EnergyResultMessageDto.Create(
+            eventId,
+            receiverNumber: ActorNumber.Create(energyResult.BalanceResponsiblePartyId),
+            receiverRole: DomainModel.ActorRole.BalanceResponsibleParty,
+            gridAreaCode: energyResult.GridAreaCode,
+            meteringPointType: energyResult.MeteringPointType.Name,
+            settlementMethod: energyResult.SettlementMethod?.Name,
+            measureUnitType: energyResult.MeasureUnitType.Name,
+            resolution: energyResult.Resolution.Name,
+            energySupplierNumber: energyResult.EnergySupplierId,
+            balanceResponsibleNumber: energyResult.BalanceResponsiblePartyId,
+            period: new DomainModel.Period(energyResult.PeriodStartUtc, energyResult.PeriodEndUtc),
+            points: CreateEnergyResultMessagePoints(energyResult.TimeSeriesPoints),
+            businessReasonName: businessReason.Name,
+            calculationResultVersion: energyResult.CalculationVersion,
+            settlementVersion: settlementVersion?.Name);
+    }
+
+    private static IReadOnlyCollection<EnergyResultMessagePoint> CreateEnergyResultMessagePoints(IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
     {
         ArgumentNullException.ThrowIfNull(timeSeriesPoints);
 
@@ -66,7 +142,6 @@ public class EnergyResultMessageDtoFactory()
             .AsReadOnly();
     }
 
-    // TODO: Move to mapper?
     private static DomainModel.CalculatedQuantityQuality MapToCalculatedQuantityQuality(IReadOnlyCollection<QuantityQuality> qualities)
     {
         ArgumentNullException.ThrowIfNull(qualities);
@@ -87,7 +162,6 @@ public class EnergyResultMessageDtoFactory()
         };
     }
 
-    // TODO: Move to mapper?
     private static (DomainModel.BusinessReason BusinessReason, DomainModel.SettlementVersion? SettlementVersion) MapToBusinessReasonAndSettlementVersion(CalculationType calculationType)
     {
         return calculationType switch

@@ -86,8 +86,8 @@ public static class IncomingMessagesExtensions
 
             // Health checks
             .TryAddExternalDomainServiceBusQueuesHealthCheck(
-                configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>()!.ListenConnectionString!,
-                configuration.GetSection(IncomingMessagesQueueOptions.SectionName).Get<IncomingMessagesQueueOptions>()!.QueueName!);
+                configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>()!.ListenConnectionString,
+                configuration.GetSection(IncomingMessagesQueueOptions.SectionName).Get<IncomingMessagesQueueOptions>()!.QueueName);
 
         return services;
     }

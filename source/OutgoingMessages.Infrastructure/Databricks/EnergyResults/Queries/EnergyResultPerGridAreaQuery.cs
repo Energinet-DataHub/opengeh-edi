@@ -13,8 +13,10 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
-using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 
@@ -26,27 +28,34 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Energ
 /// See confluence: https://energinet.atlassian.net/wiki/spaces/D3/pages/849805314/Calculation+Result+Model#Energy-Result-Points-Per-Grid-Area
 /// </summary>
 public class EnergyResultPerGridAreaQuery(
-        IOptions<EdiDatabricksOptions> ediDatabricksOptions,
+        EdiDatabricksOptions ediDatabricksOptions,
         Guid calculationId)
-    : EnergyResultQueryBase(ediDatabricksOptions, calculationId)
+    : EnergyResultQueryBase<EnergyResultPerGridArea>(
+        ediDatabricksOptions,
+        calculationId)
 {
-    public override string DataObjectName => "energy_result_points_per_ga_v1";
+    public override string DataObjectName => "energy_per_ga_v1";
 
     public override Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition => new()
     {
-        { EnergyResultColumnNames.CalculationId,            (DeltaTableCommonTypes.String,      false) },
-        { EnergyResultColumnNames.CalculationType,          (DeltaTableCommonTypes.String,      false) },
-        { EnergyResultColumnNames.CalculationPeriodStart,   (DeltaTableCommonTypes.Timestamp,   false) },
-        { EnergyResultColumnNames.CalculationPeriodEnd,     (DeltaTableCommonTypes.Timestamp,   false) },
-        { EnergyResultColumnNames.CalculationVersion,       (DeltaTableCommonTypes.BigInt,      false) },
-        { EnergyResultColumnNames.ResultId,                 (DeltaTableCommonTypes.String,      false) },
-        { EnergyResultColumnNames.GridAreaCode,             (DeltaTableCommonTypes.String,      false) },
-        { EnergyResultColumnNames.MeteringPointType,        (DeltaTableCommonTypes.String,      false) },
-        { EnergyResultColumnNames.SettlementMethod,         (DeltaTableCommonTypes.String,      true) },
-        { EnergyResultColumnNames.Resolution,               (DeltaTableCommonTypes.String,      false) },
-        { EnergyResultColumnNames.Time,                     (DeltaTableCommonTypes.Timestamp,   false) },
-        { EnergyResultColumnNames.Quantity,                 (DeltaTableCommonTypes.Decimal18x3, false) },
-        { EnergyResultColumnNames.QuantityUnit,             (DeltaTableCommonTypes.String,      false) },
-        { EnergyResultColumnNames.QuantityQualities,        (DeltaTableCommonTypes.ArrayOfStrings,       false) },
+        { EnergyResultColumnNames.CalculationId,                (DeltaTableCommonTypes.String,          false) },
+        { EnergyResultColumnNames.CalculationType,              (DeltaTableCommonTypes.String,          false) },
+        { EnergyResultColumnNames.CalculationPeriodStart,       (DeltaTableCommonTypes.Timestamp,       false) },
+        { EnergyResultColumnNames.CalculationPeriodEnd,         (DeltaTableCommonTypes.Timestamp,       false) },
+        { EnergyResultColumnNames.CalculationVersion,           (DeltaTableCommonTypes.BigInt,          false) },
+        { EnergyResultColumnNames.ResultId,                     (DeltaTableCommonTypes.String,          false) },
+        { EnergyResultColumnNames.GridAreaCode,                 (DeltaTableCommonTypes.String,          false) },
+        { EnergyResultColumnNames.MeteringPointType,            (DeltaTableCommonTypes.String,          false) },
+        { EnergyResultColumnNames.SettlementMethod,             (DeltaTableCommonTypes.String,          true) },
+        { EnergyResultColumnNames.Resolution,                   (DeltaTableCommonTypes.String,          false) },
+        { EnergyResultColumnNames.Time,                         (DeltaTableCommonTypes.Timestamp,       false) },
+        { EnergyResultColumnNames.Quantity,                     (DeltaTableCommonTypes.Decimal18x3,     false) },
+        { EnergyResultColumnNames.QuantityUnit,                 (DeltaTableCommonTypes.String,          false) },
+        { EnergyResultColumnNames.QuantityQualities,            (DeltaTableCommonTypes.ArrayOfStrings,  false) },
     };
+
+    protected override EnergyResultPerGridArea CreateEnergyResult(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
+    {
+        return EnergyResultPerGridAreaFactory.CreateEnergyResultPerGridArea(databricksSqlRow, timeSeriesPoints);
+    }
 }

@@ -78,12 +78,6 @@ public class DelegateIncomingMessage
             if ((originalActorRole == ActorRole.GridOperator || originalActorRole == ActorRole.MeteredDataResponsible)
                 && series.GridArea == null)
             {
-                // TODO: How do we handle this case for MDR/DDM?
-                // If you request with gridarea == null, then we can't find the grid area owner. This means delegation
-                // will be skipped, but this will cause the sync validation the actornumber in the message
-                // is not the same as the logged in actor. This means that Wholesale's async validation for grid area
-                // will never be reached, since the message is not valid. Maybe it's okay that they just get a sync
-                // validation error (unauthorized sender id), since their request is invalid.
                 continue;
             }
 

@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.IO;
-using System.Linq;
 using System.Xml.Linq;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages;
@@ -94,9 +91,9 @@ public class BusinessMessageBuilder
         var serieElement = root!
             .Element(_xmlNamespace + "Series")!
             .Elements()
-            .First(serieElement => serieElement.Name.LocalName!.Equals("mRID", StringComparison.Ordinal));
+            .First(serieElement => serieElement.Name.LocalName.Equals("mRID", StringComparison.Ordinal));
 
-        serieElement!.Value = transactionId;
+        serieElement.Value = transactionId;
         return this;
     }
 

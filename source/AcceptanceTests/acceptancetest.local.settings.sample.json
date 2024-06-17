@@ -1,10 +1,5 @@
 ﻿{
-  "METERED_DATA_RESPONSIBLE_CLIENT_ID": "<client id to generate token for metered data responsible>",
-  "METERED_DATA_RESPONSIBLE_CLIENT_SECRET": "<client secret to generate token for metered data responsible>",
-  "ENERGY_SUPPLIER_CLIENT_ID": "<client id to generate token for energy supplier>",
-  "ENERGY_SUPPLIER_CLIENT_SECRET": "<client secret to generate token for energy supplier>",
-
-  "SHARED_KEYVAULT_NAME": "<SHARED_KEYVAULT_NAME>",
+   "SHARED_KEYVAULT_NAME": "<SHARED_KEYVAULT_NAME>",
   "EBIX_CERTIFICATE_PASSWORD_MDR": "<certificate password for performing an ebix peek in api management for the meter data responsible>",
   "EBIX_CERTIFICATE_PASSWORD_ES": "<certificate password for performing an ebix peek in api management for the energysupplier>",
 
@@ -23,5 +18,8 @@
   "B2C_PASSWORD": "<password for user in b2c tenant>",
   "MARKET_PARTICIPANT_URI": "<market participant url>",
 
-  "EBIX_APIM_URL": "<URL to use, when you want to peek/dequeue in EbiX>"
+  "EBIX_APIM_URL": "<URL to use, when you want to peek/dequeue in EbiX>",
+
+  "BALANCE_FIXING_CALCULATION_ID": "<balance fixing calculation id that has results in databrick views>",
+  "WHOLESALE_FIXING_CALCULATION_ID": "<wholesale fixing calculation id that has results in databrick views>"
 }

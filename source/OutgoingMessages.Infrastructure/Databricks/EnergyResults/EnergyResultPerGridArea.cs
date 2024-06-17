@@ -24,13 +24,14 @@ public sealed class EnergyResultPerGridArea(
     Guid calculationId,
     string gridAreaCode,
     MeteringPointType meteringPointType,
-    EnergyTimeSeriesPoint[] timeSeriesPoints,
+    IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints,
     CalculationType calculationType,
     Instant periodStartUtc,
     Instant periodEndUtc,
     Resolution resolution,
     long calculationVersion,
-    SettlementMethod? settlementMethod)
+    SettlementMethod? settlementMethod,
+    MeasurementUnit measureUnitType)
     : AggregatedTimeSeries(
         gridAreaCode,
         timeSeriesPoints,
@@ -40,7 +41,8 @@ public sealed class EnergyResultPerGridArea(
         periodEndUtc,
         resolution,
         calculationVersion,
-        settlementMethod)
+        settlementMethod,
+        measureUnitType)
 {
     public Guid Id { get; } = id;
 

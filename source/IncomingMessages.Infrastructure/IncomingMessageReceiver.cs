@@ -21,6 +21,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageRegistration;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 
@@ -30,17 +31,20 @@ public class IncomingMessageReceiver : IIncomingMessageReceiver
     private readonly IncomingMessagesContext _incomingMessagesContext;
     private readonly IMessageIdRepository _messageIdRepository;
     private readonly ITransactionIdRepository _transactionIdRepository;
+    private readonly ILogger<IncomingMessageReceiver> _logger;
 
     public IncomingMessageReceiver(
         IncomingMessagePublisher incomingMessagePublisher,
         IncomingMessagesContext incomingMessagesContext,
         IMessageIdRepository messageIdRepository,
-        ITransactionIdRepository transactionIdRepository)
+        ITransactionIdRepository transactionIdRepository,
+        ILogger<IncomingMessageReceiver> logger)
     {
         _incomingMessagePublisher = incomingMessagePublisher;
         _incomingMessagesContext = incomingMessagesContext;
         _messageIdRepository = messageIdRepository;
         _transactionIdRepository = transactionIdRepository;
+        _logger = logger;
     }
 
     public async Task<Result> ReceiveAsync(IIncomingMessage incomingMessage, CancellationToken cancellationToken)
@@ -65,6 +69,8 @@ public class IncomingMessageReceiver : IIncomingMessageReceiver
                 })
                 .SaveChangesAsync(new DbContext[] { _incomingMessagesContext, })
                 .ConfigureAwait(false);
+            var transactionIds = string.Join(',', incomingMessage.Series.Select(x => x.TransactionId));
+            _logger.LogInformation("Message with id {MessageId} received with transaction ids {TransactionIds}", incomingMessage.MessageId, transactionIds);
         }
         catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlException
                                            && sqlException.Message.Contains(

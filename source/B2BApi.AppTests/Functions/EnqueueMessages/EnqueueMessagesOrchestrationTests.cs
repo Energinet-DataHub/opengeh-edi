@@ -16,7 +16,9 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EnergySupplying.RequestResponse.IntegrationEvents;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
@@ -61,14 +63,25 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         Fixture.SetTestOutputHelper(null!);
     }
 
-    [Fact]
-    public async Task Given_FeatureFlagIsDisabled_When_CalculationCompletedEventIsSent_Then_OrchestrationIsNeverStarted()
+    [Theory]
+    [InlineData(null)]
+    [InlineData(CalculationCompletedV1.Types.CalculationType.BalanceFixing)]
+    [InlineData(CalculationCompletedV1.Types.CalculationType.WholesaleFixing)]
+    public async Task Given_FeatureFlagIsDisabledForCalculationType_When_CalculationCompletedEventIsSent_Then_OrchestrationIsNeverStarted(CalculationCompletedV1.Types.CalculationType? calculationTypeToTest)
     {
         // Arrange
-        Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: false);
+        // => If calculationTypeToTest is null, then we test disabling the UseCalculationCompletedEvent feature flag
+        // => If calculationTypeToTest is BalanceFixing, then we test disabling the balance fixing feature flag
+        // => If calculationTypeToTest is WholesaleFixing, then we test disabling the wholesale fixing feature flag
+        Fixture.EnsureAppHostUsesFeatureFlagValue(
+            enableCalculationCompletedEvent: calculationTypeToTest != null,
+            enableCalculationCompletedEventForBalanceFixing: calculationTypeToTest != CalculationCompletedV1.Types.CalculationType.BalanceFixing,
+            enableCalculationCompletedEventForWholesaleFixing: calculationTypeToTest != CalculationCompletedV1.Types.CalculationType.WholesaleFixing);
 
         var calculationOrchestrationId = Guid.NewGuid().ToString();
-        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId);
+        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
+            calculationOrchestrationId,
+            calculationTypeToTest);
 
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
@@ -84,19 +97,25 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     /// <summary>
     /// Verifies that:
     ///  - The orchestration can complete a full run.
-    ///  - Every activity is executed once and in correct order.
+    ///  - Every activity is executed once. We cannot be sure in which order, because we use fan-out/fan-in.
     ///  - A service bus message is sent as expected.
     /// </summary>
     [Fact]
     public async Task Given_FeatureFlagIsEnabledAndCalculationOrchestrationId_When_CalculationCompletedEventIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
-        Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: true);
+        Fixture.EnsureAppHostUsesFeatureFlagValue(
+            enableCalculationCompletedEvent: true,
+            enableCalculationCompletedEventForBalanceFixing: true,
+            enableCalculationCompletedEventForWholesaleFixing: false);
 
         var calculationId = await ClearAndAddDatabricksData();
 
         var calculationOrchestrationId = Guid.NewGuid().ToString();
-        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId, calculationId.ToString());
+        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
+            calculationOrchestrationId,
+            CalculationCompletedV1.Types.CalculationType.BalanceFixing,
+            calculationId.ToString());
 
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
@@ -106,10 +125,10 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         // => Verify expected behaviour by searching the orchestration history
         var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
 
-        // => Wait for completion, this should be fairly quick
+        // => Wait for completion
         var completeOrchestrationStatus = await Fixture.DurableClient.WaitForInstanceCompletedAsync(
             actualOrchestrationStatus.InstanceId,
-            TimeSpan.FromMinutes(1));
+            TimeSpan.FromMinutes(5));
 
         // => Expect history
         using var assertionScope = new AssertionScope();
@@ -118,10 +137,12 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             .OrderBy(item => item["Timestamp"])
             .Select(item => item.Value<string>("FunctionName"));
 
-        activities.Should().NotBeNull().And.Equal(
+        activities.Should().NotBeNull().And.BeEquivalentTo(
         [
             "EnqueueMessagesOrchestration",
             "EnqueueEnergyResultsForGridAreaOwnersActivity",
+            "EnqueueEnergyResultsForBalanceResponsiblesActivity",
+            "EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity",
             "SendActorMessagesEnqueuedActivity",
             null,
         ]);
@@ -151,7 +172,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             .VerifyCountAsync(1);
 
         var wait = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(10));
-        wait.Should().BeTrue("We did not receive the expected message on the ServiceBus");
+        wait.Should().BeTrue("ActorMessagesEnqueuedV1 service bus message should be sent");
     }
 
     /// <summary>
@@ -162,11 +183,17 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_DatabricksHasNoData_When_CalculationCompletedEventIsHandled_Then_ServiceBusMessageHasFailedStatus()
     {
         // Arrange
-        Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: true);
+        Fixture.EnsureAppHostUsesFeatureFlagValue(
+            enableCalculationCompletedEvent: true,
+            enableCalculationCompletedEventForBalanceFixing: true,
+            enableCalculationCompletedEventForWholesaleFixing: false);
 
         var calculationId = Guid.NewGuid().ToString();
         var calculationOrchestrationId = Guid.NewGuid().ToString();
-        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId, calculationId);
+        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
+            calculationOrchestrationId,
+            CalculationCompletedV1.Types.CalculationType.BalanceFixing,
+            calculationId);
 
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
@@ -207,13 +234,16 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         wait.Should().BeTrue("We did not receive the expected message on the ServiceBus");
     }
 
-    private static ServiceBusMessage CreateCalculationCompletedEventMessage(string calculationOrchestrationId, string? calculationId = null)
+    private static ServiceBusMessage CreateCalculationCompletedEventMessage(
+        string calculationOrchestrationId,
+        CalculationCompletedV1.Types.CalculationType? calculationType = null,
+        string? calculationId = null)
     {
         var calculationCompletedEvent = new CalculationCompletedV1
         {
             InstanceId = calculationOrchestrationId,
             CalculationId = calculationId ?? Guid.NewGuid().ToString(),
-            CalculationType = CalculationCompletedV1.Types.CalculationType.BalanceFixing,
+            CalculationType = calculationType ?? CalculationCompletedV1.Types.CalculationType.BalanceFixing,
             CalculationVersion = 1,
         };
 
@@ -236,6 +266,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
     /// <summary>
     /// Adds hardcoded data to databricks.
+    /// Notice we reuse test data from the `OutgoingMessagesClientTests`
     /// </summary>
     /// <returns>The calculation id of the hardcoded data which was added to databricks</returns>
     private async Task<Guid> ClearAndAddDatabricksData()
@@ -244,22 +275,29 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         if (Fixture.DatabricksSchemaManager.SchemaExists)
             await Fixture.DatabricksSchemaManager.DropSchemaAsync();
 
-        // This ID has to match the hardcoded calculation id in the file balance_fixing_01-11-2022_01-12-2022_ga_543.csv
-        var calculationId = Guid.Parse("e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d");
         await Fixture.DatabricksSchemaManager.CreateSchemaAsync();
+        var ediDatabricksOptions = Options.Create(new EdiDatabricksOptions { DatabaseName = Fixture.DatabricksSchemaManager.SchemaName });
 
-        var ediOptions = Options.Create(
-            new EdiDatabricksOptions { DatabaseName = Fixture.DatabricksSchemaManager.SchemaName });
+        var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
+        var perGridAreaQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions.Value, perGridAreaDataDescription.CalculationId);
+        var perGridAreTask = SeedDatabricksWithDataAsync(perGridAreaDataDescription, perGridAreaQuery);
 
-        var viewQuery = new EnergyResultPerGridAreaQuery(
-            ediOptions,
-            calculationId);
-        await Fixture.DatabricksSchemaManager.CreateTableAsync(viewQuery);
+        var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
+        var perBrpGridAreaQuery = new EnergyResultPerBrpGridAreaQuery(ediDatabricksOptions.Value, perGridAreaDataDescription.CalculationId);
+        var perBrpGriaAreaTask = SeedDatabricksWithDataAsync(perBrpGridAreaDataDescription, perBrpGridAreaQuery);
 
-        const string testDataFileName = "balance_fixing_01-11-2022_01-12-2022_ga_543.csv";
-        var testFilePath = Path.Combine("TestData", testDataFileName);
-        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(viewQuery, testFilePath);
+        var perBrdAndESGridAreaDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
+        var perBrpAndESGridAreaQuery = new EnergyResultPerEnergySupplierBrpGridAreaQuery(ediDatabricksOptions.Value, perGridAreaDataDescription.CalculationId);
+        var perBrpAndESGridAreTask = SeedDatabricksWithDataAsync(perBrdAndESGridAreaDataDescription, perBrpAndESGridAreaQuery);
 
-        return calculationId;
+        await Task.WhenAll(perGridAreTask, perBrpGriaAreaTask, perBrpAndESGridAreTask);
+
+        return perGridAreaDataDescription.CalculationId;
+    }
+
+    private async Task SeedDatabricksWithDataAsync(EnergyResultTestDataDescription testDataDescription, IDeltaTableSchemaDescription schemaInfomation)
+    {
+        await Fixture.DatabricksSchemaManager.CreateTableAsync(schemaInfomation);
+        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(schemaInfomation, testDataDescription.TestFilePath);
     }
 }

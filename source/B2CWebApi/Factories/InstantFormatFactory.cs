@@ -25,7 +25,7 @@ public static class InstantFormatFactory
 
         if (addDuration is not null)
         {
-            instant = instant.Plus(addDuration!.Value);
+            instant = instant.Plus(addDuration.Value);
         }
 
         var zonedDateTime = new ZonedDateTime(instant, dateTimeZone);
