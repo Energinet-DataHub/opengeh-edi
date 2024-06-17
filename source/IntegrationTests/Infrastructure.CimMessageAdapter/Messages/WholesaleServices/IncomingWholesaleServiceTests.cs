@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Application.MessageParser;
-using Energinet.DataHub.EDI.IncomingMessages.Application.MessageValidators;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Messages;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.ValidationErrors;
-using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
+using Energinet.DataHub.EDI.IncomingMessages.Domain;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.TestData;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
@@ -34,12 +33,13 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
 public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
 {
     private static readonly string PathToJsonSchemaCodeLists = $"DocumentValidation{Path.DirectorySeparatorChar}"
-                                                          + $"Schemas{Path.DirectorySeparatorChar}"
-                                                          + $"Json{Path.DirectorySeparatorChar}"
-                                                          + $"urn-entsoe-eu-wgedi-codelists.schema.json";
+                                                               + $"Cim{Path.DirectorySeparatorChar}"
+                                                               + $"Json{Path.DirectorySeparatorChar}"
+                                                               + $"Schemas{Path.DirectorySeparatorChar}"
+                                                               + $"urn-entsoe-eu-wgedi-codelists.schema.json";
 
     private readonly MarketMessageParser _marketMessageParser;
-    private readonly IncomingMessageValidator _incomingMessageValidator;
+    private readonly ValidateIncomingMessage _validateIncomingMessage;
 
     public IncomingWholesaleServiceTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
@@ -48,7 +48,7 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("5799999933318"), restriction: Restriction.None,  ActorRole.FromCode("DDQ")));
 
         _marketMessageParser = GetService<MarketMessageParser>();
-        _incomingMessageValidator = GetService<IncomingMessageValidator>();
+        _validateIncomingMessage = GetService<ValidateIncomingMessage>();
     }
 
     public static IEnumerable<object[]> AllowedActorRolesForWholesaleServices =>
@@ -119,7 +119,7 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
         var (incomingMessage, _) = await ParseWholesaleServicesMessageAsync(message);
 
         // Act
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             incomingMessage!,
             CancellationToken.None);
 
@@ -141,7 +141,7 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
         var (incomingMessage, _) = await ParseWholesaleServicesMessageAsync(message);
 
         // Act
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             incomingMessage!,
             CancellationToken.None);
 
@@ -165,7 +165,7 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
         var (incomingMessage, _) = await ParseWholesaleServicesMessageAsync(message);
 
         // Act
-        var result = await _incomingMessageValidator.ValidateAsync(
+        var result = await _validateIncomingMessage.ValidateAsync(
             incomingMessage!,
             CancellationToken.None);
 
@@ -176,7 +176,7 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
     private async Task<(RequestWholesaleServicesMessage? IncomingMessage, IncomingMarketMessageParserResult ParserResult)> ParseWholesaleServicesMessageAsync(Stream message)
     {
         var messageParser = await _marketMessageParser.ParseAsync(
-            new IncomingMessageStream(message),
+            new IncomingMarketMessageStream(message),
             DocumentFormat.Xml,
             IncomingDocumentType.RequestWholesaleSettlement,
             CancellationToken.None);
