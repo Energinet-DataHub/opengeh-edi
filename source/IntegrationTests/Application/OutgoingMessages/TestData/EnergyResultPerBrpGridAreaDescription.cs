@@ -14,8 +14,11 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
+using Energinet.DataHub.Edi.Responses;
 using NodaTime;
+using NodaTime.Serialization.Protobuf;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 
@@ -48,7 +51,27 @@ public class EnergyResultPerBrpGridAreaDescription
             MeteringPointType.Consumption,
             SettlementMethod.Flex,
             Resolution.Hourly,
-            111));
+            111,
+            CreatePointsForDay(
+                Period.Start,
+                1211.912m,
+                QuantityQuality.Measured)));
+
+    private IReadOnlyCollection<TimeSeriesPoint> CreatePointsForDay(Instant start, decimal quantity, QuantityQuality quality)
+    {
+        var points = new List<TimeSeriesPoint>();
+        for (var i = 0; i < 24; i++)
+        {
+            points.Add(new TimeSeriesPoint
+            {
+                Time = start.Plus(Duration.FromHours(i)).ToTimestamp(),
+                Quantity = DecimalValue.FromDecimal(quantity),
+                QuantityQualities = { quality },
+            });
+        }
+
+        return points;
+    }
 }
 
 public record ExampleDataForActor<TMessageData>(ActorNumber ActorNumber, int ExpectedOutgoingMessagesCount, TMessageData ExampleMessageData);
@@ -58,4 +81,5 @@ public record ExampleMessageForBalanceResponsible(
     MeteringPointType MeteringPointType,
     SettlementMethod SettlementMethod,
     Resolution Resolution,
-    int Version);
+    int Version,
+    IReadOnlyCollection<TimeSeriesPoint> Points);

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -21,6 +22,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using NodaTime;
@@ -29,6 +31,7 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents;
 
+[SuppressMessage("Usage", "VSTHRD101:Avoid unsupported async delegates", Justification = "Test method")]
 public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBehaviourTestBase, IAsyncLifetime
 {
     private readonly IntegrationTestFixture _fixture;
@@ -82,24 +85,21 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
 
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
-    public async Task AndGiven_CalculationIsBalanceFixing_WhenBalanceResponsiblePeeksMessages_ThenReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
+    public async Task
+        AndGiven_CalculationIsBalanceFixing_WhenBalanceResponsiblePeeksMessages_ThenReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
     {
         // Given (arrange)
         var testDataDescription = await GivenDatabricksResultDataForEnergyResultPerBalanceResponsible();
         var (
             balanceResponsibleActorNumber,
-            expectedOutgoingMessagesCount,
+            expectedMessagesCount,
             exampleMessageData) = testDataDescription.ExampleBalanceResponsible;
 
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
-        // var gridOperator = new Actor(ActorNumber.Create("1111111111111"), ActorRole.GridOperator);
         var balanceResponsible = new Actor(balanceResponsibleActorNumber, ActorRole.BalanceResponsibleParty);
-        // var gridArea = testDataDescription.GridAreaCode;
         var calculationId = testDataDescription.CalculationId;
         var expectedPeriod = testDataDescription.Period;
 
-        // await GivenGridAreaOwnershipAsync(gridArea, gridOperator.ActorNumber);
-        // await GivenEnqueueEnergyResultsForGridAreaOwnersAsync(calculationId);
         await GivenEnqueueEnergyResultsForBalanceResponsiblesAsync(calculationId);
 
         // When (act)
@@ -109,37 +109,46 @@ public class GivenCalculationCompletedV1ReceivedTests : AggregatedMeasureDataBeh
             documentFormat);
 
         // Then (assert)
-        peekResultsForBalanceResponsible.Should().HaveCount(expectedOutgoingMessagesCount);
+        peekResultsForBalanceResponsible.Should().HaveCount(expectedMessagesCount);
 
-        // TODO: Find correct peek result to assert
-        var peekResult = peekResultsForBalanceResponsible.First();
+        // => Add "NotBeNull()" assertions for each expected message except one, since there is no .AnySatisfy()
+        // method and we only want to assert that one of the messages is correct.
+        var assertions = Enumerable
+            .Repeat<Action<PeekResultDto>>(r => r.Should().NotBeNull(), expectedMessagesCount - 1)
+            .ToList();
 
-        var assertionInput = new NotifyAggregatedMeasureDataDocumentAssertionInput(
-            Timestamp: "2022-09-07T13:37:05Z",
-            BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
-                BusinessReason.BalanceFixing,
-                null),
-            ReceiverId: balanceResponsible.ActorNumber,
-            // ReceiverRole: originalActor.ActorRole,
-            SenderId: ActorNumber.Create("5790001330552"), // Sender is always DataHub
-            // SenderRole: ActorRole.MeteredDataAdministrator,
-            EnergySupplierNumber: null,
-            BalanceResponsibleNumber: balanceResponsible.ActorNumber,
-            SettlementMethod: exampleMessageData.SettlementMethod,
-            MeteringPointType: exampleMessageData.MeteringPointType,
-            GridAreaCode: exampleMessageData.GridArea,
-            OriginalTransactionIdReference: null,
-            ProductCode: ProductType.EnergyActive.Code,
-            QuantityMeasurementUnit: MeasurementUnit.Kwh,
-            CalculationVersion: exampleMessageData.Version,
-            Resolution: exampleMessageData.Resolution,
-            Period: expectedPeriod,
-            Points: []);
+        assertions.Add(
+            async r =>
+            {
+                var assertionInput = new NotifyAggregatedMeasureDataDocumentAssertionInput(
+                    Timestamp: "2022-09-07T13:37:05Z",
+                    BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
+                        BusinessReason.BalanceFixing,
+                        null),
+                    ReceiverId: balanceResponsible.ActorNumber,
+                    // ReceiverRole: originalActor.ActorRole,
+                    SenderId: ActorNumber.Create("5790001330552"), // Sender is always DataHub
+                    // SenderRole: ActorRole.MeteredDataAdministrator,
+                    EnergySupplierNumber: null,
+                    BalanceResponsibleNumber: balanceResponsible.ActorNumber,
+                    SettlementMethod: exampleMessageData.SettlementMethod,
+                    MeteringPointType: exampleMessageData.MeteringPointType,
+                    GridAreaCode: exampleMessageData.GridArea,
+                    OriginalTransactionIdReference: null,
+                    ProductCode: ProductType.EnergyActive.Code,
+                    QuantityMeasurementUnit: MeasurementUnit.Kwh,
+                    CalculationVersion: exampleMessageData.Version,
+                    Resolution: exampleMessageData.Resolution,
+                    Period: expectedPeriod,
+                    Points: exampleMessageData.Points);
 
-        await ThenNotifyAggregatedMeasureDataDocumentIsCorrect(
-            peekResult.Bundle,
-            documentFormat,
-            assertionInput);
+                await ThenNotifyAggregatedMeasureDataDocumentIsCorrect(
+                    r.Bundle,
+                    documentFormat,
+                    assertionInput);
+            });
+
+        peekResultsForBalanceResponsible.Should().SatisfyRespectively(assertions);
     }
 
     private Task GivenEnqueueEnergyResultsForGridAreaOwnersAsync(Guid calculationId)
