@@ -104,13 +104,13 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     [Theory]
     [InlineData(CalculationCompletedV1.Types.CalculationType.BalanceFixing)]
     [InlineData(CalculationCompletedV1.Types.CalculationType.WholesaleFixing)]
-    public async Task Given_FeatureFlagIsEnabledAndCalculationTypeIsBalanceFixingAndCalculationOrchestrationId_When_CalculationCompletedEventIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage(CalculationCompletedV1.Types.CalculationType calculationTypeToTest)
+    public async Task Given_FeatureFlagIsEnabledAndCalculationOrchestrationId_When_CalculationCompletedEventIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage(CalculationCompletedV1.Types.CalculationType calculationTypeToTest)
     {
         // Arrange
         Fixture.EnsureAppHostUsesFeatureFlagValue(
             enableCalculationCompletedEvent: true,
             enableCalculationCompletedEventForBalanceFixing: true,
-            enableCalculationCompletedEventForWholesaleFixing: false);
+            enableCalculationCompletedEventForWholesaleFixing: true);
 
         var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
         var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
@@ -201,7 +201,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         Fixture.EnsureAppHostUsesFeatureFlagValue(
             enableCalculationCompletedEvent: true,
             enableCalculationCompletedEventForBalanceFixing: true,
-            enableCalculationCompletedEventForWholesaleFixing: false);
+            enableCalculationCompletedEventForWholesaleFixing: true);
 
         var calculationId = Guid.NewGuid().ToString();
         var calculationOrchestrationId = Guid.NewGuid().ToString();
