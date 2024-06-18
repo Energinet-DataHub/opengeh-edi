@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
+using Energinet.DataHub.Edi.Responses;
 using NodaTime;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 
@@ -28,7 +32,7 @@ public class WholesaleResultForAmountPerChargeDescription
     /// Test data is exported from Databricks using the view 'wholesale_results_amount_per_charge'
     ///    select * from view
     ///    where grid_area_code = 804
-    ///    and time greaterThan '2023-01-31T23:00:00.000'
+    ///    and time greaterThanOrEqual '2023-01-31T23:00:00.000'
     ///    and time smallerThan '2023-02-28T23:00:00.000'
     ///    and energy_supplier_id = '5790001662233'
     ///    and calculation_version  = 65
@@ -45,7 +49,22 @@ public class WholesaleResultForAmountPerChargeDescription
 
     public override int ExpectedOutgoingMessagesCount => 14;
 
+    public int ExpectedOutgoingMessagesForGridOwnerCount => 4;
+
+    public int ExpectedOutgoingMessagesForEnergySupplierCount => 7;
+
     public override Period Period => new(
         Instant.FromUtc(2023, 1, 31, 23, 0, 0),
-        Instant.FromUtc(2022, 2, 28, 23, 0, 0));
+        Instant.FromUtc(2023, 2, 28, 23, 0, 0));
+
+    public ExampleWholesaleResultMessageForActor ExampleWholesaleResultMessageData => new(
+        GridArea: GridAreaCode,
+        Currency.DanishCrowns,
+        ActorNumber.Create("5790001662233"),
+        MeteringPointType.Consumption,
+        SettlementMethod.Flex,
+        Resolution.Daily,
+        65,
+        Points: TimeSeriesPointsFactory
+            .CreatePointsForPeriod(Period, Resolution.Daily, 0.348m, 2, 0.697M, QuantityQuality.Calculated));
 }

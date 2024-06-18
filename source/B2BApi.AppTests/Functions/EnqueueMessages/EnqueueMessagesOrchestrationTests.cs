@@ -98,7 +98,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     /// <summary>
     /// Verifies that:
     ///  - The orchestration can complete a full run.
-    ///  - Every activity is executed once for Balance Fixing. We cannot be sure in which order, because we use fan-out/fan-in.
+    ///  - Every activity is executed once. We cannot be sure in which order, because we use fan-out/fan-in.
     ///  - A service bus message is sent as expected.
     /// </summary>
     [Theory]
