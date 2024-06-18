@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
@@ -194,8 +195,13 @@ public interface IAssertNotifyAggregatedMeasureDataDocument
     /// </summary>
     IAssertNotifyAggregatedMeasureDataDocument HasResolution(Resolution resolution);
 
+    // /// <summary>
+    // /// Asserts the points based on the Wholesale response
+    // /// </summary>
+    // IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<TimeSeriesPoint> points);
+
     /// <summary>
-    /// Asserts the points based on the Wholesale response
+    /// Asserts the points
     /// </summary>
-    IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<TimeSeriesPoint> points);
+    IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<TimeSeriesPointAssertionInput> points);
 }
