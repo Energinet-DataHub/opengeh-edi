@@ -101,31 +101,29 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     ///  - Every activity is executed once. We cannot be sure in which order, because we use fan-out/fan-in.
     ///  - A service bus message is sent as expected.
     /// </summary>
-    [Theory]
-    [InlineData(CalculationCompletedV1.Types.CalculationType.BalanceFixing)]
-    [InlineData(CalculationCompletedV1.Types.CalculationType.WholesaleFixing)]
-    public async Task Given_FeatureFlagIsEnabledAndCalculationOrchestrationId_When_CalculationCompletedEventIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage(CalculationCompletedV1.Types.CalculationType calculationTypeToTest)
+    [Fact]
+    public async Task Given_FeatureFlagIsEnabledAndCalculationOrchestrationId_When_CalculationCompletedEventIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
         Fixture.EnsureAppHostUsesFeatureFlagValue(
             enableCalculationCompletedEvent: true,
             enableCalculationCompletedEventForBalanceFixing: true,
-            enableCalculationCompletedEventForWholesaleFixing: true);
+            enableCalculationCompletedEventForWholesaleFixing: false);
 
         var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
         var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
         var perBrpAndEsGridAreaDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
-        var forAmountPerChargeDataDescription = new WholesaleResultForAmountPerChargeDescription();
-        var calculationId = await ClearAndAddDatabricksEnergyData(
+        var forAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
+        var calculationId = await ClearAndAddDatabricksData(
             perGridAreaDataDescription,
             perBrpGridAreaDataDescription,
             perBrpAndEsGridAreaDataDescription,
-            forAmountPerChargeDataDescription);
+            forAmountPerChargeDescription);
 
         var calculationOrchestrationId = Guid.NewGuid().ToString();
         var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
             calculationOrchestrationId,
-            calculationTypeToTest,
+            CalculationCompletedV1.Types.CalculationType.BalanceFixing,
             calculationId.ToString());
 
         // Act
@@ -155,7 +153,99 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             ("EnqueueEnergyResultsForGridAreaOwnersActivity", perGridAreaDataDescription.ExpectedOutgoingMessagesCount.ToString()),
             ("EnqueueEnergyResultsForBalanceResponsiblesActivity", perBrpGridAreaDataDescription.ExpectedOutgoingMessagesCount.ToString()),
             ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", perBrpAndEsGridAreaDataDescription.ExpectedOutgoingMessagesCount.ToString()),
-            ("EnqueueWholesaleResultsForAmountPerChargesActivity", perBrpAndEsGridAreaDataDescription.ExpectedOutgoingMessagesCount.ToString()),
+            ("EnqueueWholesaleResultsForAmountPerChargesActivity", "0"),
+            ("SendActorMessagesEnqueuedActivity", null),
+            (null, "Success"),
+        ]);
+
+        // => Verify that the durable function completed successfully
+        var last = completeOrchestrationStatus.History.Last();
+        last.Value<string>("EventType").Should().Be("ExecutionCompleted");
+        last.Value<string>("Result").Should().Be("Success");
+
+        // => Verify that the expected message was sent on the ServiceBus
+        var verifyServiceBusMessages = await Fixture.ServiceBusListenerMock
+            .When(msg =>
+            {
+                if (msg.Subject != ActorMessagesEnqueuedV1.EventName)
+                {
+                    return false;
+                }
+
+                var parsedEvent = ActorMessagesEnqueuedV1.Parser.ParseFrom(msg.Body);
+
+                var matchingOrchestrationId = parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
+                var matchingCalculationId = parsedEvent.CalculationId == calculationId.ToString();
+                var isSuccessful = parsedEvent.Success;
+
+                return matchingOrchestrationId && matchingCalculationId && isSuccessful;
+            })
+            .VerifyCountAsync(1);
+
+        var wait = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(10));
+        wait.Should().BeTrue("ActorMessagesEnqueuedV1 service bus message should be sent");
+    }
+
+    /// <summary>
+    /// Verifies that:
+    ///  - The orchestration can complete a full run.
+    ///  - Every activity is executed once. We cannot be sure in which order, because we use fan-out/fan-in.
+    ///  - A service bus message is sent as expected.
+    /// </summary>
+    [Fact]
+    public async Task Given_FeatureFlagIsEnabledAndCalculationOrchestrationId_When_CalculationCompletedEventForWholesaleFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
+    {
+        // Arrange
+        Fixture.EnsureAppHostUsesFeatureFlagValue(
+            enableCalculationCompletedEvent: true,
+            enableCalculationCompletedEventForBalanceFixing: true,
+            enableCalculationCompletedEventForWholesaleFixing: true);
+
+        var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
+        var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
+        var perBrpAndEsGridAreaDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
+        var forAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
+        await ClearAndAddDatabricksData(
+            perGridAreaDataDescription,
+            perBrpGridAreaDataDescription,
+            perBrpAndEsGridAreaDataDescription,
+            forAmountPerChargeDescription);
+        var calculationId = forAmountPerChargeDescription.CalculationId;
+
+        var calculationOrchestrationId = Guid.NewGuid().ToString();
+        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
+            calculationOrchestrationId,
+            CalculationCompletedV1.Types.CalculationType.WholesaleFixing,
+            calculationId.ToString());
+
+        // Act
+        var beforeOrchestrationCreated = DateTime.UtcNow;
+        await Fixture.TopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
+
+        // Assert
+        // => Verify expected behaviour by searching the orchestration history
+        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
+
+        // => Wait for completion
+        var completeOrchestrationStatus = await Fixture.DurableClient.WaitForInstanceCompletedAsync(
+            actualOrchestrationStatus.InstanceId,
+            TimeSpan.FromMinutes(5));
+
+        // => Expect history
+        using var assertionScope = new AssertionScope();
+
+        var activities = completeOrchestrationStatus.History
+            .OrderBy(item => item["Timestamp"])
+            .Select(item =>
+                (item.Value<string>("FunctionName"), item.Value<string>("Result")));
+
+        activities.Should().NotBeNull().And.BeEquivalentTo(
+        [
+            ("EnqueueMessagesOrchestration", null),
+            ("EnqueueEnergyResultsForGridAreaOwnersActivity", "0"),
+            ("EnqueueEnergyResultsForBalanceResponsiblesActivity", "0"),
+            ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", "0"),
+            ("EnqueueWholesaleResultsForAmountPerChargesActivity", forAmountPerChargeDescription.ExpectedOutgoingMessagesCount.ToString()),
             ("SendActorMessagesEnqueuedActivity", null),
             (null, "Success"),
         ]);
@@ -284,7 +374,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     /// Notice we reuse test data from the `OutgoingMessagesClientTests`
     /// </summary>
     /// <returns>The calculation id of the hardcoded data which was added to databricks</returns>
-    private async Task<Guid> ClearAndAddDatabricksEnergyData(
+    private async Task<Guid> ClearAndAddDatabricksData(
         EnergyResultPerGridAreaDescription perGridAreaDataDescription,
         EnergyResultPerBrpGridAreaDescription perBrpGridAreaDataDescription,
         EnergyResultPerEnergySupplierBrpGridAreaDescription perBrdAndESGridAreaDataDescription,
@@ -304,12 +394,9 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var perBrpGriaAreaTask = SeedDatabricksWithDataAsync(perBrpGridAreaDataDescription, perBrpGridAreaQuery);
 
         var perBrpAndESGridAreaQuery = new EnergyResultPerEnergySupplierBrpGridAreaQuery(ediDatabricksOptions.Value, perGridAreaDataDescription.CalculationId);
-        var perBrpAndESGridAreaTask = SeedDatabricksWithDataAsync(perBrdAndESGridAreaDataDescription, perBrpAndESGridAreaQuery);
+        var perBrpAndESGridAreTask = SeedDatabricksWithDataAsync(perBrdAndESGridAreaDataDescription, perBrpAndESGridAreaQuery);
 
-        var forAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(ediDatabricksOptions.Value, forAmountPerChargeDescription.CalculationId);
-        var forAmountPerChargeTask = SeedDatabricksWithDataAsync(forAmountPerChargeDescription, forAmountPerChargeQuery);
-
-        await Task.WhenAll(perGridAreTask, perBrpGriaAreaTask, perBrpAndESGridAreaTask, forAmountPerChargeTask);
+        await Task.WhenAll(perGridAreTask, perBrpGriaAreaTask, perBrpAndESGridAreTask);
 
         return perGridAreaDataDescription.CalculationId;
     }
