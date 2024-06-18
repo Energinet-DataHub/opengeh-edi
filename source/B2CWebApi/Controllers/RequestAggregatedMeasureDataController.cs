@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime;
@@ -64,7 +65,7 @@ public class RequestAggregatedMeasureDataController : ControllerBase
                 _dateTimeZone,
                 _systemDateTimeProvider.Now());
 
-        var responseMessage = await _incomingMessageClient.RegisterAndSendAsync(
+        var responseMessage = await _incomingMessageClient.ReceiveIncomingMarketMessageAsync(
                 GenerateStreamFromString(_serializer.Serialize(message)),
                 DocumentFormat.Json,
                 IncomingDocumentType.B2CRequestAggregatedMeasureData,
@@ -80,11 +81,11 @@ public class RequestAggregatedMeasureDataController : ControllerBase
         return Ok(responseMessage.MessageBody);
     }
 
-    private static IncomingMessageStream GenerateStreamFromString(string jsonString)
+    private static IncomingMarketMessageStream GenerateStreamFromString(string jsonString)
     {
         var encoding = Encoding.UTF8;
         var byteArray = encoding.GetBytes(jsonString);
         var memoryStream = new MemoryStream(byteArray);
-        return new IncomingMessageStream(memoryStream);
+        return new IncomingMarketMessageStream(memoryStream);
     }
 }
