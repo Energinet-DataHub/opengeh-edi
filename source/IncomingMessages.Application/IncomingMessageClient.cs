@@ -12,144 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using BuildingBlocks.Application.FeatureFlag;
-using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application;
 
 public class IncomingMessageClient : IIncomingMessageClient
 {
-    private readonly MarketMessageParser _marketMessageParser;
-    private readonly ValidateIncomingMessage _validateIncomingMessage;
-    private readonly ResponseFactory _responseFactory;
-    private readonly IArchivedMessagesClient _archivedMessagesClient;
-    private readonly ILogger<IncomingMessageClient> _logger;
-    private readonly IIncomingMessageReceiver _incomingMessageReceiver;
-    private readonly DelegateIncomingMessage _delegateIncomingMessage;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly IFeatureFlagManager _featureFlagManager;
+    private readonly ReceiveIncomingMarketMessage _receiveIncomingMarketMessage;
 
-    public IncomingMessageClient(
-        MarketMessageParser marketMessageParser,
-        ValidateIncomingMessage validateIncomingMessage,
-        ResponseFactory responseFactory,
-        IArchivedMessagesClient archivedMessagesClient,
-        ILogger<IncomingMessageClient> logger,
-        IIncomingMessageReceiver incomingMessageReceiver,
-        DelegateIncomingMessage delegateIncomingMessage,
-        ISystemDateTimeProvider systemDateTimeProvider,
-        IFeatureFlagManager featureFlagManager)
+    public IncomingMessageClient(ReceiveIncomingMarketMessage receiveIncomingMarketMessage)
     {
-        _marketMessageParser = marketMessageParser;
-        _validateIncomingMessage = validateIncomingMessage;
-        _responseFactory = responseFactory;
-        _archivedMessagesClient = archivedMessagesClient;
-        _logger = logger;
-        _incomingMessageReceiver = incomingMessageReceiver;
-        _delegateIncomingMessage = delegateIncomingMessage;
-        _systemDateTimeProvider = systemDateTimeProvider;
-        _featureFlagManager = featureFlagManager;
+        _receiveIncomingMarketMessage = receiveIncomingMarketMessage;
     }
 
     public async Task<ResponseMessage> ReceiveIncomingMarketMessageAsync(
         IIncomingMarketMessageStream incomingMarketMessageStream,
         DocumentFormat incomingDocumentFormat,
-        IncomingDocumentType documentType,
+        IncomingDocumentType incomingDocumentType,
         DocumentFormat responseDocumentFormat,
         CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(documentType);
+        ArgumentNullException.ThrowIfNull(incomingDocumentType);
         ArgumentNullException.ThrowIfNull(incomingMarketMessageStream);
 
-        var incomingMarketMessageParserResult =
-            await _marketMessageParser.ParseAsync(incomingMarketMessageStream, incomingDocumentFormat, documentType, cancellationToken)
-                .ConfigureAwait(false);
-
-        if (incomingMarketMessageParserResult.Errors.Count != 0
-            || incomingMarketMessageParserResult.IncomingMessage == null)
-        {
-            var res = Result.Failure(incomingMarketMessageParserResult.Errors.ToArray());
-
-            _logger.LogInformation(
-                "Failed to parse incoming message {DocumentType}. Errors: {Errors}",
-                documentType,
-                string.Join(',', res.Errors.Select(e => e.ToString())));
-
-            return _responseFactory.From(res, responseDocumentFormat);
-        }
-
-        await ArchiveIncomingMessageAsync(
-                incomingMarketMessageStream,
-                incomingMarketMessageParserResult.IncomingMessage,
-                documentType,
-                cancellationToken)
-            .ConfigureAwait(false);
-
-        if (await _featureFlagManager.UseMessageDelegationAsync().ConfigureAwait(false))
-        {
-            await _delegateIncomingMessage
-                .DelegateAsync(incomingMarketMessageParserResult.IncomingMessage, documentType, cancellationToken)
-                .ConfigureAwait(false);
-        }
-
-        var validationResult = await _validateIncomingMessage
-            .ValidateAsync(incomingMarketMessageParserResult.IncomingMessage, cancellationToken)
-            .ConfigureAwait(false);
-
-        if (!validationResult.Success)
-        {
-            _logger.LogInformation(
-                "Failed to validate incoming message: {MessageId}. Errors: {Errors}",
-                incomingMarketMessageParserResult.IncomingMessage?.MessageId,
-                string.Join(',', incomingMarketMessageParserResult.Errors.Select(e => e.ToString())));
-            return _responseFactory.From(validationResult, responseDocumentFormat);
-        }
-
-        var result = await _incomingMessageReceiver
-            .ReceiveAsync(
-                    incomingMarketMessageParserResult.IncomingMessage,
-                    cancellationToken)
-            .ConfigureAwait(false);
-
-        if (result.Success)
-        {
-            return new ResponseMessage();
-        }
-
-        _logger.LogInformation(
-            "Failed to save incoming message: {MessageId}. Errors: {Errors}",
-            incomingMarketMessageParserResult.IncomingMessage!.MessageId,
-            string.Join(',', incomingMarketMessageParserResult.Errors.Select(e => e.ToString())));
-        return _responseFactory.From(result, responseDocumentFormat);
-    }
-
-    private async Task ArchiveIncomingMessageAsync(
-        IIncomingMarketMessageStream incomingMarketMessageStream,
-        IIncomingMessage incomingMessage,
-        IncomingDocumentType incomingDocumentType,
-        CancellationToken cancellationToken)
-    {
-        await _archivedMessagesClient.CreateAsync(
-            new ArchivedMessage(
-                incomingMessage.MessageId,
-                incomingDocumentType.Name,
-                incomingMessage.SenderNumber,
-                incomingMessage.ReceiverNumber,
-                _systemDateTimeProvider.Now(),
-                incomingMessage.BusinessReason,
-                ArchivedMessageType.IncomingMessage,
-                incomingMarketMessageStream),
+        return await _receiveIncomingMarketMessage.ReceiveIncomingMarketMessageAsync(
+            incomingMarketMessageStream,
+            incomingDocumentFormat,
+            incomingDocumentType,
+            responseDocumentFormat,
             cancellationToken).ConfigureAwait(false);
     }
 }

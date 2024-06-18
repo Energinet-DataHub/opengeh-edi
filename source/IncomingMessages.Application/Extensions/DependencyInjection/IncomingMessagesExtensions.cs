@@ -54,6 +54,7 @@ public static class IncomingMessagesExtensions
             .AddDapperConnectionToDatabase(configuration)
             .AddScopedSqlDbContext<IncomingMessagesContext>(configuration)
             .AddScoped<IIncomingMessageClient, IncomingMessageClient>()
+            .AddScoped<ReceiveIncomingMarketMessage>()
             .AddScoped<DelegateIncomingMessage>()
             .AddScoped<ITransactionIdRepository, TransactionIdRepository>()
             .AddScoped<IMessageIdRepository, MessageIdRepository>()

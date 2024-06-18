@@ -28,7 +28,7 @@ public interface IIncomingMessageClient
     Task<ResponseMessage> ReceiveIncomingMarketMessageAsync(
         IIncomingMarketMessageStream incomingMarketMessageStream,
         DocumentFormat incomingDocumentFormat,
-        IncomingDocumentType documentType,
+        IncomingDocumentType incomingDocumentType,
         DocumentFormat responseDocumentFormat,
         CancellationToken cancellationToken);
 }
