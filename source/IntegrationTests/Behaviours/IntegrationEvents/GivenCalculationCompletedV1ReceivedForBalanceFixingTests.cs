@@ -63,17 +63,13 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
     {
         // Given (arrange)
         var testDataDescription = await GivenDatabricksResultDataForEnergyResultPerGridArea();
-        var expectedMessagesCount = testDataDescription.ExpectedOutgoingMessagesCount;
-        var expectedPeriod = testDataDescription.Period;
-        var exampleMessageData = testDataDescription.ExampleEnergyResultMessageData;
+        var testMessageData = testDataDescription.ExampleEnergyResultMessageData;
 
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
         var gridOperator = new Actor(ActorNumber.Create("1111111111111"), ActorRole.GridOperator);
-        var gridArea = testDataDescription.GridAreaCode;
-        var calculationId = testDataDescription.CalculationId;
 
-        await GivenGridAreaOwnershipAsync(gridArea, gridOperator.ActorNumber);
-        await GivenEnqueueEnergyResultsForGridOperatorsAsync(calculationId);
+        await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCode, gridOperator.ActorNumber);
+        await GivenEnqueueEnergyResultsForGridOperatorsAsync(testDataDescription.CalculationId);
 
         // When (act)
         var peekResultsForGridOperator = await WhenActorPeeksAllMessages(
@@ -82,7 +78,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             documentFormat);
 
         // Then (assert)
-        peekResultsForGridOperator.Should().HaveCount(expectedMessagesCount);
+        peekResultsForGridOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesCount);
 
         var assertionInput = new NotifyAggregatedMeasureDataDocumentAssertionInput(
             Timestamp: "2022-09-07T13:37:05Z",
@@ -95,16 +91,16 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             // SenderRole: ActorRole.MeteredDataAdministrator,
             EnergySupplierNumber: null,
             BalanceResponsibleNumber: null,
-            SettlementMethod: exampleMessageData.SettlementMethod,
-            MeteringPointType: exampleMessageData.MeteringPointType,
-            GridAreaCode: exampleMessageData.GridArea,
+            SettlementMethod: testMessageData.SettlementMethod,
+            MeteringPointType: testMessageData.MeteringPointType,
+            GridAreaCode: testMessageData.GridArea,
             OriginalTransactionIdReference: null,
             ProductCode: ProductType.EnergyActive.Code,
             QuantityMeasurementUnit: MeasurementUnit.Kwh,
-            CalculationVersion: exampleMessageData.Version,
-            Resolution: exampleMessageData.Resolution,
-            Period: expectedPeriod,
-            Points: exampleMessageData.Points);
+            CalculationVersion: testMessageData.Version,
+            Resolution: testMessageData.Resolution,
+            Period: testDataDescription.Period,
+            Points: testMessageData.Points);
 
         await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
             peekResultsForGridOperator,
@@ -119,17 +115,14 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
     {
         // Given (arrange)
         var testDataDescription = await GivenDatabricksResultDataForEnergyResultPerBalanceResponsible();
-        var (
-            balanceResponsibleActorNumber,
-            expectedMessagesCount,
-            exampleMessageData) = testDataDescription.ExampleBalanceResponsible;
+        var testMessageData = testDataDescription.ExampleBalanceResponsible.ExampleMessageData;
 
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
-        var balanceResponsible = new Actor(balanceResponsibleActorNumber, ActorRole.BalanceResponsibleParty);
-        var calculationId = testDataDescription.CalculationId;
-        var expectedPeriod = testDataDescription.Period;
+        var balanceResponsible = new Actor(
+            testDataDescription.ExampleBalanceResponsible.ActorNumber,
+            ActorRole.BalanceResponsibleParty);
 
-        await GivenEnqueueEnergyResultsForBalanceResponsibles(calculationId);
+        await GivenEnqueueEnergyResultsForBalanceResponsibles(testDataDescription.CalculationId);
 
         // When (act)
         var peekResultsForBalanceResponsible = await WhenActorPeeksAllMessages(
@@ -138,7 +131,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             documentFormat);
 
         // Then (assert)
-        peekResultsForBalanceResponsible.Should().HaveCount(expectedMessagesCount);
+        peekResultsForBalanceResponsible.Should().HaveCount(testDataDescription.ExampleBalanceResponsible.ExpectedOutgoingMessagesCount);
 
         var assertionInput = new NotifyAggregatedMeasureDataDocumentAssertionInput(
             Timestamp: "2022-09-07T13:37:05Z",
@@ -151,16 +144,16 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             // SenderRole: ActorRole.MeteredDataAdministrator,
             EnergySupplierNumber: null,
             BalanceResponsibleNumber: balanceResponsible.ActorNumber,
-            SettlementMethod: exampleMessageData.SettlementMethod,
-            MeteringPointType: exampleMessageData.MeteringPointType,
-            GridAreaCode: exampleMessageData.GridArea,
+            SettlementMethod: testMessageData.SettlementMethod,
+            MeteringPointType: testMessageData.MeteringPointType,
+            GridAreaCode: testMessageData.GridArea,
             OriginalTransactionIdReference: null,
             ProductCode: ProductType.EnergyActive.Code,
             QuantityMeasurementUnit: MeasurementUnit.Kwh,
-            CalculationVersion: exampleMessageData.Version,
-            Resolution: exampleMessageData.Resolution,
-            Period: expectedPeriod,
-            Points: exampleMessageData.Points);
+            CalculationVersion: testMessageData.Version,
+            Resolution: testMessageData.Resolution,
+            Period: testDataDescription.Period,
+            Points: testMessageData.Points);
 
         await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
             peekResultsForBalanceResponsible,
@@ -175,23 +168,14 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
     {
         // Given (arrange)
         var testDataDescription = await GivenDatabricksResultDataForEnergyResultPerEnergySupplier();
-        var (
-            energySupplierActorNumber,
-            energySupplierExpectedMessagesCount,
-            energySupplierExampleMessageData) = testDataDescription.ExampleEnergySupplier;
-
-        var (
-            balanceResponsibleActorNumber,
-            balanceResponsibleExpectedMessagesCount,
-            balanceResponsibleExampleMessageData) = testDataDescription.ExampleBalanceResponsible;
+        var energySupplierTestMessageData = testDataDescription.ExampleEnergySupplier.ExampleMessageData;
+        var balanceResponsibleTestMessageData = testDataDescription.ExampleBalanceResponsible.ExampleMessageData;
 
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
-        var energySupplier = new Actor(energySupplierActorNumber, ActorRole.EnergySupplier);
-        var balanceResponsible = new Actor(balanceResponsibleActorNumber, ActorRole.BalanceResponsibleParty);
-        var calculationId = testDataDescription.CalculationId;
-        var expectedPeriod = testDataDescription.Period;
+        var energySupplier = new Actor(testDataDescription.ExampleEnergySupplier.ActorNumber, ActorRole.EnergySupplier);
+        var balanceResponsible = new Actor(testDataDescription.ExampleBalanceResponsible.ActorNumber, ActorRole.BalanceResponsibleParty);
 
-        await GivenEnqueueEnergyResultsForEnergySuppliers(calculationId);
+        await GivenEnqueueEnergyResultsForEnergySuppliers(testDataDescription.CalculationId);
 
         // When (act)
         var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(
@@ -207,7 +191,9 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         // Then (assert)
 
         // Assert energy supplier peek result
-        peekResultsForEnergySupplier.Should().HaveCount(energySupplierExpectedMessagesCount);
+        peekResultsForEnergySupplier
+            .Should()
+            .HaveCount(testDataDescription.ExampleEnergySupplier.ExpectedOutgoingMessagesCount);
 
         var energySupplierAssertionInput = new NotifyAggregatedMeasureDataDocumentAssertionInput(
             Timestamp: "2022-09-07T13:37:05Z",
@@ -220,16 +206,16 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             // SenderRole: ActorRole.MeteredDataAdministrator,
             EnergySupplierNumber: energySupplier.ActorNumber,
             BalanceResponsibleNumber: null,
-            SettlementMethod: energySupplierExampleMessageData.SettlementMethod,
-            MeteringPointType: energySupplierExampleMessageData.MeteringPointType,
-            GridAreaCode: energySupplierExampleMessageData.GridArea,
+            SettlementMethod: energySupplierTestMessageData.SettlementMethod,
+            MeteringPointType: energySupplierTestMessageData.MeteringPointType,
+            GridAreaCode: energySupplierTestMessageData.GridArea,
             OriginalTransactionIdReference: null,
             ProductCode: ProductType.EnergyActive.Code,
             QuantityMeasurementUnit: MeasurementUnit.Kwh,
-            CalculationVersion: energySupplierExampleMessageData.Version,
-            Resolution: energySupplierExampleMessageData.Resolution,
-            Period: expectedPeriod,
-            Points: energySupplierExampleMessageData.Points);
+            CalculationVersion: energySupplierTestMessageData.Version,
+            Resolution: energySupplierTestMessageData.Resolution,
+            Period: testDataDescription.Period,
+            Points: energySupplierTestMessageData.Points);
 
         await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
             peekResultsForEnergySupplier,
@@ -237,7 +223,9 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             energySupplierAssertionInput);
 
         // Assert balance responsible peek result
-        peekResultsForBalanceResponsible.Should().HaveCount(balanceResponsibleExpectedMessagesCount);
+        peekResultsForBalanceResponsible
+            .Should()
+            .HaveCount(testDataDescription.ExampleBalanceResponsible.ExpectedOutgoingMessagesCount);
 
         var balanceResponsibleAssertionInput = new NotifyAggregatedMeasureDataDocumentAssertionInput(
             Timestamp: "2022-09-07T13:37:05Z",
@@ -248,18 +236,18 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             // ReceiverRole: originalActor.ActorRole,
             SenderId: ActorNumber.Create("5790001330552"), // Sender is always DataHub
             // SenderRole: ActorRole.MeteredDataAdministrator,
-            EnergySupplierNumber: balanceResponsibleExampleMessageData.EnergySupplier,
+            EnergySupplierNumber: balanceResponsibleTestMessageData.EnergySupplier,
             BalanceResponsibleNumber: balanceResponsible.ActorNumber,
-            SettlementMethod: balanceResponsibleExampleMessageData.SettlementMethod,
-            MeteringPointType: balanceResponsibleExampleMessageData.MeteringPointType,
-            GridAreaCode: balanceResponsibleExampleMessageData.GridArea,
+            SettlementMethod: balanceResponsibleTestMessageData.SettlementMethod,
+            MeteringPointType: balanceResponsibleTestMessageData.MeteringPointType,
+            GridAreaCode: balanceResponsibleTestMessageData.GridArea,
             OriginalTransactionIdReference: null,
             ProductCode: ProductType.EnergyActive.Code,
             QuantityMeasurementUnit: MeasurementUnit.Kwh,
-            CalculationVersion: balanceResponsibleExampleMessageData.Version,
-            Resolution: balanceResponsibleExampleMessageData.Resolution,
-            Period: expectedPeriod,
-            Points: balanceResponsibleExampleMessageData.Points);
+            CalculationVersion: balanceResponsibleTestMessageData.Version,
+            Resolution: balanceResponsibleTestMessageData.Resolution,
+            Period: testDataDescription.Period,
+            Points: balanceResponsibleTestMessageData.Points);
 
         await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
             peekResultsForBalanceResponsible,
@@ -333,14 +321,15 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         return energyResultPerEnergySupplierDescription;
     }
 
+    /// <summary>
+    /// Assert that one of the messages is correct and don't care about the rest. We have no way of knowing which
+    /// message is the correct one, so we will assert all of them and count the number of failed/successful assertions.
+    /// </summary>
     private async Task ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
         List<PeekResultDto> peekResults,
         DocumentFormat documentFormat,
         NotifyAggregatedMeasureDataDocumentAssertionInput assertionInput)
     {
-        // We need to assert that one of the messages is correct and don't care about the rest. However we have no
-        // way of knowing which message is the correct one, so we will assert all of them and count the number of
-        // failed/successful assertions.
         var failedAssertions = new List<Exception>();
         var successfulAssertions = 0;
         foreach (var peekResultDto in peekResults)
