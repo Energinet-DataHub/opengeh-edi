@@ -191,7 +191,7 @@ public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggrega
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<TimeSeriesPoint> points)
+    public IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<TimeSeriesPointAssertionInput> points)
     {
         var pointsInDocument = _documentAsserter
             .GetElements("Series[1]/Period/Point")!;
@@ -200,36 +200,35 @@ public class AssertNotifyAggregatedMeasureDataXmlDocument : IAssertNotifyAggrega
 
         var expectedPoints = points.OrderBy(p => p.Time).ToList();
 
-        for (var i = 0; i < pointsInDocument.Count; i++)
+        for (var index = 0; index < pointsInDocument.Count; index++)
         {
-            pointsInDocument[i]
+            var expectedPoint = expectedPoints[index];
+            var expectedPosition = index + 1;
+
+            pointsInDocument[index]
                 .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("position"), _documentAsserter.XmlNamespaceManager)!
                 .Value
                 .ToInt()
                 .Should()
-                .Be(i + 1);
+                .Be(expectedPosition);
 
-            pointsInDocument[i]
+            pointsInDocument[index]
                 .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("quantity"), _documentAsserter.XmlNamespaceManager)!
                 .Value
                 .ToDecimal()
                 .Should()
-                .Be(expectedPoints[i].Quantity.ToDecimal());
+                .Be(expectedPoint.Quantity);
 
-            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+            // If the quality is measured, the quality element should not be present in CIM
+            if (expectedPoint.Quality == CalculatedQuantityQuality.Measured)
             {
-                QuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,
-                QuantityQuality.Measured => CimCode.QuantityQualityCodeMeasured,
-                QuantityQuality.Estimated => CimCode.QuantityQualityCodeEstimated,
-                _ => throw new NotImplementedException(
-                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
-            };
-
-            pointsInDocument[i]
-                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("quality"), _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .Should()
-                .Be(expectedQuantityQuality);
+                QualityIsNotPresentForPosition(expectedPosition);
+            }
+            else
+            {
+                var expectedQuality = CimCode.ForEnergyResultOf(expectedPoint.Quality);
+                QualityIsPresentForPosition(expectedPosition, expectedQuality);
+            }
         }
 
         return this;
