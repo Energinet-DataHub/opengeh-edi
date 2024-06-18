@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
+namespace Energinet.DataHub.EDI.IncomingMessages.Application;
 
 public class DelegateIncomingMessage
 {
