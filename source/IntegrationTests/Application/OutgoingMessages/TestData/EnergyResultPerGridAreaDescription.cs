@@ -24,10 +24,10 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.Te
 /// <summary>
 /// Test data description for scenario using the view described by <see cref="EnergyResultPerGridAreaQuery"/>.
 /// </summary>
-public class PerGridAreaDescription
+public class EnergyResultPerGridAreaDescription
     : TestDataDescription
 {
-    public PerGridAreaDescription()
+    public EnergyResultPerGridAreaDescription()
         : base("balance_fixing_01-11-2022_01-12-2022_ga_543_per_ga_v1.csv")
     {
     }

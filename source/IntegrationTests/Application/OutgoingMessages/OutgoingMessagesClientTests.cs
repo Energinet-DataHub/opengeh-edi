@@ -55,7 +55,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
     [Fact]
     public async Task GivenCalculationWithIdIsCompleted_WhenEnqueueEnergyResultsForGridAreaOwners_ThenOutgoingMessagesAreEnqueued()
     {
-        var testDataDescription = new PerGridAreaDescription();
+        var testDataDescription = new EnergyResultPerGridAreaDescription();
 
         var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
         var viewQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions.Value, testDataDescription.CalculationId);
@@ -83,7 +83,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
     [Fact]
     public async Task GivenCalculationWithIdIsCompleted_WhenEnqueueEnergyResultsForBalanceResponsibles_ThenOutgoingMessagesAreEnqueued()
     {
-        var testDataDescription = new PerBrpGridAreaDescription();
+        var testDataDescription = new EnergyResultPerBrpGridAreaDescription();
 
         var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
         var viewQuery = new EnergyResultPerBrpGridAreaQuery(ediDatabricksOptions.Value, testDataDescription.CalculationId);
@@ -110,7 +110,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
     [Fact]
     public async Task GivenCalculationWithIdIsCompleted_WhenEnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliers_ThenOutgoingMessagesAreEnqueued()
     {
-        var testDataDescription = new PerEnergySupplierBrpGridAreaDescription();
+        var testDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
 
         var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
         var viewQuery = new EnergyResultPerEnergySupplierBrpGridAreaQuery(ediDatabricksOptions.Value, testDataDescription.CalculationId);
