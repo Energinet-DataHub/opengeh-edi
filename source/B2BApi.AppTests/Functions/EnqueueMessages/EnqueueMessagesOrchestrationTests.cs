@@ -109,7 +109,10 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             enableCalculationCompletedEventForBalanceFixing: true,
             enableCalculationCompletedEventForWholesaleFixing: false);
 
-        var calculationId = await ClearAndAddDatabricksData();
+        var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
+        var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
+        var perBrdAndESGridAreaDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
+        var calculationId = await ClearAndAddDatabricksData(perGridAreaDataDescription, perBrpGridAreaDataDescription, perBrdAndESGridAreaDataDescription);
 
         var calculationOrchestrationId = Guid.NewGuid().ToString();
         var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
@@ -135,16 +138,17 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
         var activities = completeOrchestrationStatus.History
             .OrderBy(item => item["Timestamp"])
-            .Select(item => item.Value<string>("FunctionName"));
+            .Select(item =>
+                (item.Value<string>("FunctionName"), item.Value<string>("Result")));
 
         activities.Should().NotBeNull().And.BeEquivalentTo(
         [
-            "EnqueueMessagesOrchestration",
-            "EnqueueEnergyResultsForGridAreaOwnersActivity",
-            "EnqueueEnergyResultsForBalanceResponsiblesActivity",
-            "EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity",
-            "SendActorMessagesEnqueuedActivity",
-            null,
+            ("EnqueueMessagesOrchestration", null),
+            ("EnqueueEnergyResultsForGridAreaOwnersActivity", perGridAreaDataDescription.ExpectedOutgoingMessagesCount.ToString()),
+            ("EnqueueEnergyResultsForBalanceResponsiblesActivity", perBrpGridAreaDataDescription.ExpectedOutgoingMessagesCount.ToString()),
+            ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", perBrdAndESGridAreaDataDescription.ExpectedOutgoingMessagesCount.ToString()),
+            ("SendActorMessagesEnqueuedActivity", null),
+            (null, "Success"),
         ]);
 
         // => Verify that the durable function completed successfully
@@ -352,7 +356,10 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     /// Notice we reuse test data from the `OutgoingMessagesClientTests`
     /// </summary>
     /// <returns>The calculation id of the hardcoded data which was added to databricks</returns>
-    private async Task<Guid> ClearAndAddDatabricksData()
+    private async Task<Guid> ClearAndAddDatabricksData(
+        EnergyResultPerGridAreaDescription perGridAreaDataDescription,
+        EnergyResultPerBrpGridAreaDescription perBrpGridAreaDataDescription,
+        EnergyResultPerEnergySupplierBrpGridAreaDescription perBrdAndESGridAreaDataDescription)
     {
         // Ensure that databricks does not contain data, unless the test explicit adds it
         if (Fixture.DatabricksSchemaManager.SchemaExists)
@@ -361,15 +368,15 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         await Fixture.DatabricksSchemaManager.CreateSchemaAsync();
         var ediDatabricksOptions = Options.Create(new EdiDatabricksOptions { DatabaseName = Fixture.DatabricksSchemaManager.SchemaName });
 
-        var perGridAreaDataDescription = new PerGridAreaDescription();
+        var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
         var perGridAreaQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions.Value, perGridAreaDataDescription.CalculationId);
         var perGridAreTask = SeedDatabricksWithDataAsync(perGridAreaDataDescription, perGridAreaQuery);
 
-        var perBrpGridAreaDataDescription = new PerBrpGridAreaDescription();
+        var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
         var perBrpGridAreaQuery = new EnergyResultPerBrpGridAreaQuery(ediDatabricksOptions.Value, perGridAreaDataDescription.CalculationId);
         var perBrpGriaAreaTask = SeedDatabricksWithDataAsync(perBrpGridAreaDataDescription, perBrpGridAreaQuery);
 
-        var perBrdAndESGridAreaDataDescription = new PerEnergySupplierBrpGridAreaDescription();
+        var perBrdAndESGridAreaDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
         var perBrpAndESGridAreaQuery = new EnergyResultPerEnergySupplierBrpGridAreaQuery(ediDatabricksOptions.Value, perGridAreaDataDescription.CalculationId);
         var perBrpAndESGridAreTask = SeedDatabricksWithDataAsync(perBrdAndESGridAreaDataDescription, perBrpAndESGridAreaQuery);
 

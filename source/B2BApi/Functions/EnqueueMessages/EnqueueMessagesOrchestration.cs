@@ -33,27 +33,24 @@ internal class EnqueueMessagesOrchestration
             return "Error: No input specified.";
         }
 
+        // TODO: Use fan-out/fan-in when we have a solution for handling the creation of the actor queue.
         // Fan-out/fan-in => https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-cloud-backup?tabs=csharp
-        var tasks = new Task<int>[4];
-        tasks[0] = context.CallActivityAsync<int>(
+        var numberOfEnqueuedMessages = await context.CallActivityAsync<int>(
             nameof(EnqueueEnergyResultsForGridAreaOwnersActivity),
             new EnqueueMessagesInput(input.CalculationId, input.EventId));
 
-        tasks[1] = context.CallActivityAsync<int>(
+        numberOfEnqueuedMessages += await context.CallActivityAsync<int>(
             nameof(EnqueueEnergyResultsForBalanceResponsiblesActivity),
             new EnqueueMessagesInput(input.CalculationId, input.EventId));
 
-        tasks[2] = context.CallActivityAsync<int>(
+        numberOfEnqueuedMessages += await context.CallActivityAsync<int>(
             nameof(EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity),
             new EnqueueMessagesInput(input.CalculationId, input.EventId));
 
-        tasks[2] = context.CallActivityAsync<int>(
+        numberOfEnqueuedMessages += await context.CallActivityAsync<int>(
             nameof(EnqueueWholesaleResultsForAmountPerChargesActivity),
             new EnqueueMessagesInput(input.CalculationId, input.EventId));
 
-        await Task.WhenAll(tasks);
-
-        var numberOfEnqueuedMessages = tasks.Sum(t => t.Result);
         var messagesWasSuccessfullyEnqueued = numberOfEnqueuedMessages > 0;
 
         await context.CallActivityAsync(

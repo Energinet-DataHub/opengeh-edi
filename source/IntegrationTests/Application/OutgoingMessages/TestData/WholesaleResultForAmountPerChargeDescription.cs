@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
+using NodaTime;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 
@@ -42,4 +44,8 @@ public class WholesaleResultForAmountPerChargeDescription
     public override string GridAreaCode => "804";
 
     public override int ExpectedOutgoingMessagesCount => 14;
+
+    public override Period Period => new(
+        Instant.FromUtc(2023, 1, 31, 23, 0, 0),
+        Instant.FromUtc(2022, 2, 28, 23, 0, 0));
 }

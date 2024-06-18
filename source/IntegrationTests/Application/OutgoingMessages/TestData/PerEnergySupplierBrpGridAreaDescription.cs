@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
+using NodaTime;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 
@@ -32,4 +36,38 @@ public class PerEnergySupplierBrpGridAreaDescription
     public override string GridAreaCode => "543";
 
     public override int ExpectedOutgoingMessagesCount => 35 * 2; // 35 results, which we must prepare for BRP and ES
+
+    public override Period Period => new(
+        Instant.FromUtc(2022, 1, 11, 23, 0, 0),
+        Instant.FromUtc(2022, 1, 12, 23, 0, 0));
+
+    public ExampleDataForActor<ExampleEnergyResultMessageForActor> ExampleEnergySupplier => new(
+        ActorNumber: ActorNumber.Create("5790002105289"),
+        ExpectedOutgoingMessagesCount: 2,
+        ExampleMessageData: new ExampleEnergyResultMessageForActor(
+            GridArea: "543",
+            MeteringPointType.Consumption,
+            SettlementMethod.NonProfiled,
+            Resolution.Hourly,
+            ActorNumber.Create("5790002105289"),
+            111,
+            TimeSeriesPointsFactory.CreatePointsForDay(
+                Period.Start,
+                3011.368m,
+                CalculatedQuantityQuality.Incomplete)));
+
+    public ExampleDataForActor<ExampleEnergyResultMessageForActor> ExampleBalanceResponsible => new(
+        ActorNumber: ActorNumber.Create("7080000729821"),
+        ExpectedOutgoingMessagesCount: 5,
+        ExampleMessageData: new ExampleEnergyResultMessageForActor(
+            GridArea: "543",
+            MeteringPointType.Production,
+            null,
+            Resolution.Hourly,
+            ActorNumber.Create("7080000729821"),
+            111,
+            TimeSeriesPointsFactory.CreatePointsForDay(
+                Period.Start,
+                39471.336m,
+                CalculatedQuantityQuality.Measured)));
 }

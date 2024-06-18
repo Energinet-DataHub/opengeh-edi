@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 
 /// <summary>
@@ -46,4 +48,9 @@ public abstract class TestDataDescription
     /// Expected outgoing messages based on test file content.
     /// </summary>
     public abstract int ExpectedOutgoingMessagesCount { get; }
+
+    /// <summary>
+    /// Period start/end matching the file content.
+    /// </summary>
+    public abstract Period Period { get;  }
 }
