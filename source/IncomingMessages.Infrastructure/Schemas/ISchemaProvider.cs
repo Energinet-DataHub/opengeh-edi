@@ -15,7 +15,7 @@
 using System.Xml.Schema;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas;
 
 /// <summary>
 /// Provides XML schemas for CIM messages

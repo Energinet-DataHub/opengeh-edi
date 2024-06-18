@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Cim.Xml;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Ebix;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Xml;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Ebix;
+using Energinet.DataHub.EDI.Tests.DocumentValidation;
 
 namespace Energinet.DataHub.EDI.Tests.Fixtures;
 

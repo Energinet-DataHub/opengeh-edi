@@ -16,10 +16,10 @@ using System.Xml;
 using System.Xml.Schema;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Cim.Xml;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.BaseParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.BaseParsers.Xml;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.Factories;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Xml;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.AggregatedMeasureDataRequestMessageParsers;
 

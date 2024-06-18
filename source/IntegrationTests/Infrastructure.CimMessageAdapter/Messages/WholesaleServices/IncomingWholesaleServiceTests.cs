@@ -32,7 +32,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapte
 
 public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
 {
-    private static readonly string PathToJsonSchemaCodeLists = $"DocumentValidation{Path.DirectorySeparatorChar}"
+    private static readonly string PathToJsonSchemaCodeLists = $"Schemas{Path.DirectorySeparatorChar}"
                                                                + $"Cim{Path.DirectorySeparatorChar}"
                                                                + $"Json{Path.DirectorySeparatorChar}"
                                                                + $"Schemas{Path.DirectorySeparatorChar}"

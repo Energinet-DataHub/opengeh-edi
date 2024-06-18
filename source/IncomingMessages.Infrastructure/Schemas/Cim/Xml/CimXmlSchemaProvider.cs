@@ -16,22 +16,22 @@ using System.Xml;
 using System.Xml.Schema;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Ebix;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Xml;
 
-public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
+public class CimXmlSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
 {
     private readonly ISchema _schema;
-    private readonly Dictionary<string, XmlSchema> _schemaCache;
 
-    public EbixSchemaProvider()
+    public CimXmlSchemaProvider(CimXmlSchemas schemas)
     {
-        _schema = new EbixSchemas();
-        _schemaCache = new Dictionary<string, XmlSchema>();
+        _schema = schemas;
     }
 
     public Task<XmlSchema?> GetAsync(DocumentType type, string version, CancellationToken cancellationToken)
     {
-        var schemaName = _schema.GetSchemaLocation(ParseDocumentType(type), version);
+        ArgumentNullException.ThrowIfNull(type, nameof(type));
+
+        var schemaName = _schema.GetSchemaLocation(type.Name, version);
 
         if (schemaName == null)
         {
@@ -59,23 +59,12 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
         string location, CancellationToken cancellationToken)
         where T : default
     {
-        ArgumentNullException.ThrowIfNull(location);
-
-        // Ensure that only backslashes are used in paths
-        location = location.Replace("/", "\\", StringComparison.InvariantCulture);
-        XmlSchema? cached;
-        if (_schemaCache.TryGetValue(location, out cached))
-            return (T)(object)cached;
-
         using var reader = new XmlTextReader(location);
-        var xmlSchema = XmlSchema.Read(reader, null) ?? throw new XmlSchemaException($"Could not read schema at {location}");
-
-        _schemaCache.Add(location, xmlSchema);
-
-        // Extract path of the current XSD as includes are relative to this
-        var pathElements = location.Split('\\').ToList();
-        pathElements.RemoveAt(pathElements.Count - 1);
-        var relativeSchemaPath = string.Join("\\", pathElements) + "\\";
+        var xmlSchema = XmlSchema.Read(reader, null);
+        if (xmlSchema is null)
+        {
+            throw new XmlSchemaException($"Could not read schema at {location}");
+        }
 
         foreach (XmlSchemaExternal external in xmlSchema.Includes)
         {
@@ -86,24 +75,10 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
 
             external.Schema =
                 await LoadSchemaWithDependentSchemasAsync<XmlSchema>(
-                        relativeSchemaPath + external.SchemaLocation, cancellationToken)
+                        _schema.SchemaPath + external.SchemaLocation, cancellationToken)
                     .ConfigureAwait(false);
         }
 
         return (T)(object)xmlSchema;
-    }
-
-    private static string ParseDocumentType(DocumentType document)
-    {
-        if (document == DocumentType.NotifyAggregatedMeasureData)
-            return "DK_AggregatedMeteredDataTimeSeries";
-        if (document == DocumentType.RejectRequestAggregatedMeasureData)
-            return "DK_RejectRequestMeteredDataAggregated";
-        if (document == DocumentType.NotifyWholesaleServices)
-            return "DK_NotifyAggregatedWholesaleServices";
-        if (document == DocumentType.RejectRequestWholesaleSettlement)
-            return "DK_RejectAggregatedBillingInformation";
-
-        throw new InvalidOperationException("Unknown document type");
     }
 }

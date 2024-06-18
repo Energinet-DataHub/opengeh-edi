@@ -24,9 +24,7 @@ public class AggregatedMeasureDataB2CJsonMessageParser : IMarketMessageParser
 {
     private readonly ISerializer _serializer;
 
-    public AggregatedMeasureDataB2CJsonMessageParser(
-        ISerializer serializer)
-        : base()
+    public AggregatedMeasureDataB2CJsonMessageParser(ISerializer serializer)
     {
         _serializer = serializer;
     }

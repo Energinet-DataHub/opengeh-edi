@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.DocumentValidation.Ebix;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Xml;
 
-public sealed class EbixSchemas : SchemaBase, ISchema
+public sealed class CimXmlSchemas : SchemaBase, ISchema
 {
-    private static readonly string _schemaPath = $"DocumentValidation{Path.DirectorySeparatorChar}Ebix{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}document{Path.DirectorySeparatorChar}";
+    private static readonly string _schemaPath = $"Schemas{Path.DirectorySeparatorChar}Cim{Path.DirectorySeparatorChar}Xml{Path.DirectorySeparatorChar}Schemas{Path.DirectorySeparatorChar}";
 
-    public EbixSchemas()
+    public CimXmlSchemas()
     {
         InitializeSchemas(FillSchemaDictionary(_schemaPath));
     }
@@ -33,21 +33,17 @@ public sealed class EbixSchemas : SchemaBase, ISchema
     protected override Dictionary<KeyValuePair<string, string>, string> FillSchemaDictionary(string schemaPath)
     {
         var schemaDictionary = new Dictionary<KeyValuePair<string, string>, string>();
-        var directories = Directory.GetDirectories(schemaPath);
-        foreach (var directory in directories)
+        var schemas = Directory.GetFiles(schemaPath).ToList();
+
+        foreach (var schema in schemas)
         {
-            var schemas = Directory.GetFiles(directory).ToList();
-            foreach (var schema in schemas)
+            var filename = Path.GetFileNameWithoutExtension(schema);
+            var filenameSplit = filename.Split('-');
+            if (filenameSplit.Length == 7)
             {
-                var filename = Path.GetFileNameWithoutExtension(schema);
-                filename = filename.Replace("-", "_", StringComparison.InvariantCulture);
-                var filenameSplit = filename.Split('_');
-                if (filenameSplit.Length >= 3 && filenameSplit[0] == "ebIX" && filenameSplit[1] == "DK")
-                {
-                    schemaDictionary.Add(
-                        new KeyValuePair<string, string>(filenameSplit[1] + "_" + filenameSplit[2], "3"),
-                        schema);
-                }
+                schemaDictionary.Add(
+                    new KeyValuePair<string, string>(filenameSplit[4], filenameSplit[5] + "." + filenameSplit[6]),
+                    schema);
             }
         }
 
