@@ -81,7 +81,6 @@ public static class NotifyAggregatedMeasureDataDocumentAsserter
             .HasGridAreaCode(assertionInput.GridAreaCode)
             .HasProductCode(assertionInput.ProductCode)
             .HasQuantityMeasurementUnit(assertionInput.QuantityMeasurementUnit)
-            .HasSettlementMethod(assertionInput.SettlementMethod)
             .HasResolution(assertionInput.Resolution)
             .HasPeriod(assertionInput.Period)
             .HasPoints(assertionInput.Points);
@@ -101,6 +100,11 @@ public static class NotifyAggregatedMeasureDataDocumentAsserter
         {
             asserter.SettlementVersionIsNotPresent();
         }
+
+        if (assertionInput.SettlementMethod is not null)
+            asserter.HasSettlementMethod(assertionInput.SettlementMethod);
+        else
+            asserter.SettlementMethodIsNotPresent();
 
         if (assertionInput.EnergySupplierNumber != null)
             asserter.HasEnergySupplierNumber(assertionInput.EnergySupplierNumber.Value);
