@@ -139,6 +139,9 @@ limitations under the License.
       <None Update="integrationtest.local.settings.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="Application\OutgoingMessages\TestData\wholesale_fixing_01-02-20232_28-02-2023_ga_804_amount_per_charge_v1.csv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

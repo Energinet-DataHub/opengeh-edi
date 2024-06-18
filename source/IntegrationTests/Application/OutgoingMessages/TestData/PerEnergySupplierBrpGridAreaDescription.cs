@@ -19,10 +19,10 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.Te
 /// <summary>
 /// Test data description for scenario using the view described by <see cref="EnergyResultPerEnergySupplierBrpGridAreaQuery"/>.
 /// </summary>
-public class EnergyResultPerEnergySupplierBrpGridAreaDescription
-    : EnergyResultTestDataDescription
+public class PerEnergySupplierBrpGridAreaDescription
+    : TestDataDescription
 {
-    public EnergyResultPerEnergySupplierBrpGridAreaDescription()
+    public PerEnergySupplierBrpGridAreaDescription()
         : base("balance_fixing_01-11-2022_01-12-2022_ga_543_per_es_brp_ga_v1.csv")
     {
     }

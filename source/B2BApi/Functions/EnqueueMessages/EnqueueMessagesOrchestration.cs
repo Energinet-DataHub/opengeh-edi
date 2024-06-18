@@ -34,7 +34,7 @@ internal class EnqueueMessagesOrchestration
         }
 
         // Fan-out/fan-in => https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-cloud-backup?tabs=csharp
-        var tasks = new Task<int>[3];
+        var tasks = new Task<int>[4];
         tasks[0] = context.CallActivityAsync<int>(
             nameof(EnqueueEnergyResultsForGridAreaOwnersActivity),
             new EnqueueMessagesInput(input.CalculationId, input.EventId));
@@ -45,6 +45,10 @@ internal class EnqueueMessagesOrchestration
 
         tasks[2] = context.CallActivityAsync<int>(
             nameof(EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity),
+            new EnqueueMessagesInput(input.CalculationId, input.EventId));
+
+        tasks[2] = context.CallActivityAsync<int>(
+            nameof(EnqueueWholesaleResultsForAmountPerChargesActivity),
             new EnqueueMessagesInput(input.CalculationId, input.EventId));
 
         await Task.WhenAll(tasks);

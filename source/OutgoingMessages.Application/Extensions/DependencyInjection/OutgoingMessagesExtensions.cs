@@ -30,6 +30,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.ActorMessageQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.MarketDocuments;
@@ -92,6 +93,7 @@ public static class OutgoingMessagesExtensions
         services
             .AddNodaTimeForApplication()
             .AddScoped<EnergyResultEnumerator>()
+            .AddScoped<WholesaleResultEnumerator>()
             .AddDatabricksSqlStatementExecution(configuration)
             .AddHealthChecks()
                 .AddDatabricksSqlStatementApiHealthCheck(name: "DatabricksSqlStatementApi");

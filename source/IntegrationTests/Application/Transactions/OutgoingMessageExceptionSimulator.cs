@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions;
@@ -33,7 +34,8 @@ internal sealed class OutgoingMessageExceptionSimulator : OutgoingMessagesClient
         ISystemDateTimeProvider systemDateTimeProvider,
         ISerializer serializer,
         IMasterDataClient masterDataClient,
-        EnergyResultEnumerator energyResultEnumerator)
+        EnergyResultEnumerator energyResultEnumerator,
+        WholesaleResultEnumerator wholesaleResultEnumerator)
         : base(
             peekMessage,
             dequeueMessage,
@@ -42,7 +44,8 @@ internal sealed class OutgoingMessageExceptionSimulator : OutgoingMessagesClient
             systemDateTimeProvider,
             serializer,
             masterDataClient,
-            energyResultEnumerator)
+            energyResultEnumerator,
+            wholesaleResultEnumerator)
     {
     }
 
