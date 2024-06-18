@@ -25,6 +25,6 @@ public sealed record ArchivedMessageStream : StreamValueObject, IArchivedMessage
     public ArchivedMessageStream(IMarketDocumentStream marketDocumentStream)
         : base(marketDocumentStream?.Stream) { }
 
-    public ArchivedMessageStream(IIncomingMessageStream incomingMessageStream)
-        : base(incomingMessageStream?.Stream) { }
+    public ArchivedMessageStream(IIncomingMarketMessageStream incomingMarketMessageStream)
+        : base(incomingMarketMessageStream?.Stream) { }
 }

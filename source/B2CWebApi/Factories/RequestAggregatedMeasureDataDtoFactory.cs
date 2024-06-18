@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using NodaTime;
 using MeteringPointType = Energinet.DataHub.EDI.B2CWebApi.Models.MeteringPointType;
 

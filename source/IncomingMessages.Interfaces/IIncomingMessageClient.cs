@@ -13,16 +13,22 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 
-#pragma warning disable SA1600
+/// <summary>
+/// Responsible for interactions with incoming messages module
+/// </summary>
 public interface IIncomingMessageClient
 {
-    Task<ResponseMessage> RegisterAndSendAsync(
-        IIncomingMessageStream incomingMessageStream,
+    /// <summary>
+    /// Responsible for receiving the incoming market message.
+    /// </summary>
+    Task<ResponseMessage> ReceiveIncomingMarketMessageAsync(
+        IIncomingMarketMessageStream incomingMarketMessageStream,
         DocumentFormat incomingDocumentFormat,
-        IncomingDocumentType documentType,
+        IncomingDocumentType incomingDocumentType,
         DocumentFormat responseDocumentFormat,
         CancellationToken cancellationToken);
 }
