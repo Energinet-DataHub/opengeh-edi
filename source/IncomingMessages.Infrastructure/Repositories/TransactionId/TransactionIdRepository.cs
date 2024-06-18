@@ -15,7 +15,7 @@
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageRegistration;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.TransactionId;
 
 public class TransactionIdRepository : ITransactionIdRepository
 {

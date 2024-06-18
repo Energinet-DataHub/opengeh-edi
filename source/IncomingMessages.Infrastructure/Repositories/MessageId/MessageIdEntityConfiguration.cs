@@ -15,17 +15,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageRegistration;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.MessageId;
 
-public class TransactionIdEntityConfiguration : IEntityTypeConfiguration<TransactionIdForSender>
+public class MessageIdEntityConfiguration : IEntityTypeConfiguration<MessageIdForSender>
 {
-    public void Configure(EntityTypeBuilder<TransactionIdForSender> builder)
+    public void Configure(EntityTypeBuilder<MessageIdForSender> builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        builder.ToTable("TransactionRegistry", "dbo");
-        builder.HasKey(entity => entity.TransactionId);
-        builder.Property(entity => entity.TransactionId);
+        builder.ToTable("MessageRegistry", "dbo");
+        builder.HasKey(entity => entity.MessageId);
+        builder.Property(entity => entity.MessageId);
         builder.Property(entity => entity.SenderId);
     }
 }
