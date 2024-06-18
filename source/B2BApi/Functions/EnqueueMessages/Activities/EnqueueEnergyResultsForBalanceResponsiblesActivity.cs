@@ -38,14 +38,16 @@ public class EnqueueEnergyResultsForBalanceResponsiblesActivity(
             var query = new EnergyResultPerBrpGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
             await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
             {
-                // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
-                var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult);
+                using (var scope = _serviceScopeFactory.CreateScope())
+                {
+                    var scopedClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
 
-                using var scope = _serviceScopeFactory.CreateScope();
-                var scopedClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-                await scopedClient.EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);
+                    // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
+                    var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult);
+                    await scopedClient.EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);
 
-                numberOfEnqueuedMessages++;
+                    numberOfEnqueuedMessages++;
+                }
             }
 
             return numberOfEnqueuedMessages;

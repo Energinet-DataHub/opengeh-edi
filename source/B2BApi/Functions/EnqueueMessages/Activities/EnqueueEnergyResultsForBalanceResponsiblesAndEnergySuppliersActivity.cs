@@ -38,17 +38,19 @@ public class EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivit
             var query = new EnergyResultPerEnergySupplierBrpGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
             await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
             {
-                using var scope = _serviceScopeFactory.CreateScope();
-                var scopedClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+                using (var scope = _serviceScopeFactory.CreateScope())
+                {
+                    var scopedClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
 
-                // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
-                var energyResultPerEnergySupplierMessage = EnergyResultMessageDtoFactory.CreateForEnergySupplier(EventId.From(input.EventId), energyResult);
-                await scopedClient.EnqueueAndCommitAsync(energyResultPerEnergySupplierMessage, CancellationToken.None).ConfigureAwait(false);
-                numberOfEnqueuedMessages++;
+                    // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
+                    var energyResultPerEnergySupplierMessage = EnergyResultMessageDtoFactory.CreateForEnergySupplier(EventId.From(input.EventId), energyResult);
+                    await scopedClient.EnqueueAndCommitAsync(energyResultPerEnergySupplierMessage, CancellationToken.None).ConfigureAwait(false);
+                    numberOfEnqueuedMessages++;
 
-                var energyResultPerBalanceResponsibleMessage = EnergyResultMessageDtoFactory.CreateForBalanceResponsiblePrEnergySupplier(EventId.From(input.EventId), energyResult);
-                await scopedClient.EnqueueAndCommitAsync(energyResultPerBalanceResponsibleMessage, CancellationToken.None).ConfigureAwait(false);
-                numberOfEnqueuedMessages++;
+                    var energyResultPerBalanceResponsibleMessage = EnergyResultMessageDtoFactory.CreateForBalanceResponsiblePrEnergySupplier(EventId.From(input.EventId), energyResult);
+                    await scopedClient.EnqueueAndCommitAsync(energyResultPerBalanceResponsibleMessage, CancellationToken.None).ConfigureAwait(false);
+                    numberOfEnqueuedMessages++;
+                }
             }
 
             return numberOfEnqueuedMessages;
