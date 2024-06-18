@@ -34,7 +34,7 @@ public class WholesaleAmountPerChargeFactoryTests
             new Dictionary<string, object?>
         {
              { WholesaleResultColumnNames.CalculationId, "e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d" },
-             { WholesaleResultColumnNames.CalculationType, "WholesaleFixing" },
+             { WholesaleResultColumnNames.CalculationType, "wholesale_fixing" },
              { WholesaleResultColumnNames.CalculationVersion, "65" },
              { WholesaleResultColumnNames.ResultId, "17582ba4-71db-4ce5-af70-b00a4676e357" },
              { WholesaleResultColumnNames.GridAreaCode, "543" },
