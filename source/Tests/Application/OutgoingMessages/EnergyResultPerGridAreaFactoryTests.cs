@@ -34,7 +34,7 @@ public class EnergyResultPerGridAreaFactoryTests
             new Dictionary<string, object?>
         {
             { EnergyResultColumnNames.CalculationId, "e7a26e65-be5e-4db0-ba0e-a6bb4ae2ef3d" },
-            { EnergyResultColumnNames.CalculationType, "BalanceFixing" },
+            { EnergyResultColumnNames.CalculationType, "balance_fixing" },
             { EnergyResultColumnNames.CalculationVersion, "63" },
             { EnergyResultColumnNames.ResultId, "17582ba4-71db-4ce5-af70-b00a4676e357" },
             { EnergyResultColumnNames.GridAreaCode, "543" },
