@@ -14,9 +14,9 @@
 
 using System.Collections.ObjectModel;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.BaseParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.BaseParsers;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.Factories;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.AggregatedMeasureDataRequestMessageParsers;
 
 public static class RequestAggregatedMeasureDataMessageFactory
 {

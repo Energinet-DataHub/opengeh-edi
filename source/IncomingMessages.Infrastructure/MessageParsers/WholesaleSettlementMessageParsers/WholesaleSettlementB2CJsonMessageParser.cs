@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.WholesaleSettlementMessageParsers;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.WholesaleSettlementMessageParsers;
 
 public class WholesaleSettlementB2CJsonMessageParser : IMarketMessageParser
 {

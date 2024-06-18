@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas;
 using Json.Schema;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.BaseParsers;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.BaseParsers;
 
 public abstract class JsonParserBase
 {

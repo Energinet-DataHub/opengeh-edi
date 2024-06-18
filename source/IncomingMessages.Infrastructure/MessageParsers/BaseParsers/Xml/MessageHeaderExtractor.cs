@@ -14,7 +14,7 @@
 
 using System.Xml;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.BaseParsers.Xml;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.BaseParsers.Xml;
 
 internal static class MessageHeaderExtractor
 {

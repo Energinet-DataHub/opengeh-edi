@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 
 /// <summary>
 /// Parses market messages from a stream

@@ -15,7 +15,7 @@
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 
 public class IncomingMarketMessageParserResult
 {

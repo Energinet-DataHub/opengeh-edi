@@ -16,28 +16,32 @@ using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.BaseParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.BaseParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Json;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParser.WholesaleSettlementMessageParsers;
+namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.AggregatedMeasureDataRequestMessageParsers;
 
-public class WholesaleSettlementJsonMessageParser : JsonParserBase, IMarketMessageParser
+public class AggregatedMeasureDataJsonMessageParser : JsonParserBase, IMarketMessageParser
 {
     private const string SeriesElementName = "Series";
-    private const string HeaderElementName = "RequestWholesaleSettlement_MarketDocument";
-    private const string DocumentName = "RequestWholesaleSettlement";
+    private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";
+    private const string DocumentName = "RequestAggregatedMeasureData";
 
-    public WholesaleSettlementJsonMessageParser(JsonSchemaProvider schemaProvider)
+    public AggregatedMeasureDataJsonMessageParser(JsonSchemaProvider schemaProvider)
         : base(schemaProvider)
     {
     }
 
     public DocumentFormat HandledFormat => DocumentFormat.Json;
 
-    public IncomingDocumentType DocumentType => IncomingDocumentType.RequestWholesaleSettlement;
+    public IncomingDocumentType DocumentType => IncomingDocumentType.RequestAggregatedMeasureData;
 
-    public async Task<IncomingMarketMessageParserResult> ParseAsync(IIncomingMarketMessageStream incomingMarketMessageStream, CancellationToken cancellationToken)
+    public async Task<IncomingMarketMessageParserResult> ParseAsync(
+        IIncomingMarketMessageStream incomingMarketMessageStream,
+        CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(incomingMarketMessageStream);
+
         var schema = await GetSchemaAsync(DocumentName, cancellationToken).ConfigureAwait(false);
         if (schema is null)
         {
@@ -76,60 +80,37 @@ public class WholesaleSettlementJsonMessageParser : JsonParserBase, IMarketMessa
         }
     }
 
+    private static RequestAggregatedMeasureDataMessageSeries SeriesFrom(JsonElement element)
+    {
+        return new RequestAggregatedMeasureDataMessageSeries(
+            element.GetProperty("mRID").ToString(),
+            GetPropertyWithValue(element, "marketEvaluationPoint.type"),
+            GetPropertyWithValue(element, "marketEvaluationPoint.settlementMethod"),
+            element.GetProperty("start_DateAndOrTime.dateTime").ToString(),
+            element.TryGetProperty("end_DateAndOrTime.dateTime", out var endDateProperty) ? endDateProperty.ToString() : null,
+            GetPropertyWithValue(element, "meteringGridArea_Domain.mRID"),
+            GetPropertyWithValue(element, "energySupplier_MarketParticipant.mRID"),
+            GetPropertyWithValue(element, "balanceResponsibleParty_MarketParticipant.mRID"),
+            GetPropertyWithValue(element, "settlement_Series.version"));
+    }
+
+    private static string? GetPropertyWithValue(JsonElement element, string propertyName)
+    {
+        return element.TryGetProperty(propertyName, out var property) ? property.GetProperty("value").ToString() : null;
+    }
+
     private static IncomingMarketMessageParserResult ParseJsonData(
         MessageHeader header,
         JsonElement seriesJson)
     {
-        var series = new List<RequestWholesaleServicesSeries>();
+        var series = new List<RequestAggregatedMeasureDataMessageSeries>();
 
         foreach (var jsonElement in seriesJson.EnumerateArray())
         {
             series.Add(SeriesFrom(jsonElement));
         }
 
-        return new IncomingMarketMessageParserResult(new RequestWholesaleServicesMessage(
-            header.SenderId,
-            header.SenderRole,
-            header.ReceiverId,
-            header.ReceiverRole,
-            header.BusinessReason,
-            header.MessageType,
-            header.MessageId,
-            header.CreatedAt,
-            header.BusinessType,
-            series.AsReadOnly()));
-    }
-
-    private static RequestWholesaleServicesSeries SeriesFrom(JsonElement element)
-    {
-        var chargeTypes = new List<RequestWholesaleServicesChargeType>();
-        JsonElement? chargeTypeElements = element.TryGetProperty("ChargeType", out var chargeTypesElement)
-            ? chargeTypesElement
-            : null;
-        if (chargeTypeElements != null)
-        {
-            foreach (var chargeTypeElement in chargeTypeElements.Value.EnumerateArray())
-            {
-                chargeTypes.Add(new RequestWholesaleServicesChargeType(
-                    chargeTypeElement.TryGetProperty("mRID", out var id) ? id.ToString() : null,
-                    GetPropertyWithValue(chargeTypeElement, "type")));
-            }
-        }
-
-        return new RequestWholesaleServicesSeries(
-            element.GetProperty("mRID").ToString(),
-            element.GetProperty("start_DateAndOrTime.dateTime").ToString(),
-            element.TryGetProperty("end_DateAndOrTime.dateTime", out var endDateProperty) ? endDateProperty.ToString() : null,
-            GetPropertyWithValue(element, "meteringGridArea_Domain.mRID"),
-            GetPropertyWithValue(element, "energySupplier_MarketParticipant.mRID"),
-            GetPropertyWithValue(element, "settlement_Series.version"),
-            element.TryGetProperty("aggregationSeries_Period.resolution", out var resolution) ? resolution.ToString() : null,
-            GetPropertyWithValue(element, "chargeTypeOwner_MarketParticipant.mRID"),
-            chargeTypes);
-    }
-
-    private static string? GetPropertyWithValue(JsonElement element, string propertyName)
-    {
-        return element.TryGetProperty(propertyName, out var property) ? property.GetProperty("value").ToString() : null;
+        return new IncomingMarketMessageParserResult(
+            RequestAggregatedMeasureDataMessageFactory.Create(header, series.AsReadOnly()));
     }
 }
