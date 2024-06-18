@@ -20,6 +20,7 @@ using System.Linq;
 using System.Text;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
@@ -27,7 +28,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Used only in tests")]
 internal static class RequestAggregatedMeasureDataRequestBuilder
 {
-    public static IncomingMessageStream CreateIncomingMessage(
+    public static IncomingMarketMessageStream CreateIncomingMessage(
         DocumentFormat format,
         ActorNumber senderActorNumber,
         ActorRole senderActorRole,
@@ -81,7 +82,7 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
             throw new ArgumentOutOfRangeException(nameof(format), format, "Unsupported document format");
         }
 
-        return new IncomingMessageStream(new MemoryStream(Encoding.UTF8.GetBytes(content)));
+        return new IncomingMarketMessageStream(new MemoryStream(Encoding.UTF8.GetBytes(content)));
     }
 
     private static string GetCimXml(

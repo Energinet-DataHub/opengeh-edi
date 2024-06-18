@@ -52,8 +52,8 @@ public class ArchivedMessage
         Instant createdAt,
         string? businessReason,
         ArchivedMessageType archivedMessageType,
-        IIncomingMessageStream incomingMessageStream)
-        : this(messageId, Array.Empty<EventId>(), documentType, senderNumber, receiverNumber, createdAt, businessReason, archivedMessageType, new ArchivedMessageStream(incomingMessageStream)) { }
+        IIncomingMarketMessageStream incomingMarketMessageStream)
+        : this(messageId, Array.Empty<EventId>(), documentType, senderNumber, receiverNumber, createdAt, businessReason, archivedMessageType, new ArchivedMessageStream(incomingMarketMessageStream)) { }
 
     private ArchivedMessage(
         string? messageId,
