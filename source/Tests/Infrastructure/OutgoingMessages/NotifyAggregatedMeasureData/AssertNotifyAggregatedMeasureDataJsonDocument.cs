@@ -12,19 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Json;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
-using Energinet.DataHub.Edi.Responses;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions;
 using Json.Schema;
 using Xunit;
@@ -256,7 +250,7 @@ public sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNotif
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<TimeSeriesPoint> points)
+    public IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<TimeSeriesPointAssertionInput> points)
     {
         var pointsInDocument = FirstTimeSeriesElement()
             .GetProperty("Period")
@@ -271,36 +265,34 @@ public sealed class AssertNotifyAggregatedMeasureDataJsonDocument : IAssertNotif
 
         var expectedPoints = points.OrderBy(p => p.Time).ToList();
 
-        for (var i = 0; i < pointsInDocument.Count; i++)
+        for (var index = 0; index < pointsInDocument.Count; index++)
         {
-            pointsInDocument[i]
+            var expectedPoint = expectedPoints[index];
+            var expectedPosition = index + 1;
+
+            pointsInDocument[index]
                 .GetProperty("position")
                 .GetProperty("value")
                 .GetInt32()
                 .Should()
-                .Be(i + 1);
+                .Be(expectedPosition);
 
-            pointsInDocument[i]
+            pointsInDocument[index]
                 .GetProperty("quantity")
                 .GetDecimal()
                 .Should()
-                .Be(expectedPoints[i].Quantity.ToDecimal());
+                .Be(expectedPoint.Quantity);
 
-            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+            // If the quality is measured, the quality element should not be present in CIM
+            if (expectedPoint.Quality == CalculatedQuantityQuality.Measured)
             {
-                QuantityQuality.Calculated => CimCode.QuantityQualityCodeCalculated,
-                QuantityQuality.Estimated => CimCode.QuantityQualityCodeEstimated,
-                QuantityQuality.Measured => CimCode.QuantityQualityCodeMeasured,
-                _ => throw new NotImplementedException(
-                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
-            };
-
-            pointsInDocument[i]
-                .GetProperty("quality")
-                .GetProperty("value")
-                .GetString()
-                .Should()
-                .Be(expectedQuantityQuality);
+                QualityIsNotPresentForPosition(expectedPosition);
+            }
+            else
+            {
+                var expectedQuality = CimCode.ForEnergyResultOf(expectedPoint.Quality);
+                QualityIsPresentForPosition(expectedPosition, expectedQuality);
+            }
         }
 
         return this;

@@ -16,7 +16,6 @@ using System.Globalization;
 using System.Xml.XPath;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.Ebix;
-using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
@@ -210,7 +209,7 @@ public class AssertNotifyAggregatedMeasureDataEbixDocument : IAssertNotifyAggreg
         return this;
     }
 
-    public IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<TimeSeriesPoint> points)
+    public IAssertNotifyAggregatedMeasureDataDocument HasPoints(IReadOnlyCollection<TimeSeriesPointAssertionInput> points)
     {
         var pointsInDocument = _documentAsserter
             .GetElements($"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation")!;
@@ -233,22 +232,33 @@ public class AssertNotifyAggregatedMeasureDataEbixDocument : IAssertNotifyAggreg
                 .Value
                 .ToDecimal()
                 .Should()
-                .Be(expectedPoints[i].Quantity.ToDecimal());
+                .Be(expectedPoints[i].Quantity);
 
-            var expectedQuantityQuality = expectedPoints[i].QuantityQualities.Single() switch
+            var expectedQuantityQuality = EbixCode.ForEnergyResultOf(expectedPoints[i].Quality);
+
+            // If the quality is Missing or NotAvailable, QuantityQuality should be replaced by
+            // a QuantityMissing element in ebIX
+            if (expectedQuantityQuality == null)
             {
-                QuantityQuality.Calculated => EbixCode.QuantityQualityCodeCalculated,
-                QuantityQuality.Estimated => EbixCode.QuantityQualityCodeEstimated,
-                QuantityQuality.Measured => EbixCode.QuantityQualityCodeMeasured,
-                _ => throw new NotImplementedException(
-                    $"Quantity quality {expectedPoints[i].QuantityQualities.Single()} not implemented"),
-            };
+                pointsInDocument[i]
+                    .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("QuantityQuality"), _documentAsserter.XmlNamespaceManager)
+                    .Should()
+                    .BeNull();
 
-            pointsInDocument[i]
-                .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("QuantityQuality"), _documentAsserter.XmlNamespaceManager)!
-                .Value
-                .Should()
-                .Be(expectedQuantityQuality);
+                pointsInDocument[i]
+                    .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("QuantityMissing"), _documentAsserter.XmlNamespaceManager)!
+                    .Value
+                    .Should()
+                    .Be("true");
+            }
+            else
+            {
+                pointsInDocument[i]
+                    .XPathSelectElement(_documentAsserter.EnsureXPathHasPrefix("QuantityQuality"), _documentAsserter.XmlNamespaceManager)!
+                    .Value
+                    .Should()
+                    .Be(expectedQuantityQuality);
+            }
         }
 
         return this;
