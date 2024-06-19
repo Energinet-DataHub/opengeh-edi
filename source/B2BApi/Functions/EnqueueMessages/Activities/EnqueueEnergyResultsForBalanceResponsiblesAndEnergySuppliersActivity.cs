@@ -46,7 +46,13 @@ public class EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivit
                     var energyResultPerEnergySupplierMessage = EnergyResultMessageDtoFactory.CreateForEnergySupplier(EventId.From(input.EventId), energyResult);
                     await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResultPerEnergySupplierMessage, CancellationToken.None).ConfigureAwait(false);
                     numberOfEnqueuedMessages++;
+                }
 
+                using (var scope = _serviceScopeFactory.CreateScope())
+                {
+                    var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+
+                    // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
                     var energyResultPerBalanceResponsibleMessage = EnergyResultMessageDtoFactory.CreateForBalanceResponsiblePrEnergySupplier(EventId.From(input.EventId), energyResult);
                     await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResultPerBalanceResponsibleMessage, CancellationToken.None).ConfigureAwait(false);
                     numberOfEnqueuedMessages++;
