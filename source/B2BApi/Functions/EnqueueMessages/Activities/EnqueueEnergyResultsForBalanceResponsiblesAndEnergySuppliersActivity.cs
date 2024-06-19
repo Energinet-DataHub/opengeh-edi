@@ -31,31 +31,48 @@ public class EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivit
     public async Task<int> Run(
         [ActivityTrigger] EnqueueMessagesInput input)
     {
+        var numberOfEnqueuedMessages = 0;
+        var numberOfFailedMessages = 0;
+
         try
         {
-            var numberOfEnqueuedMessages = 0;
-
             var query = new EnergyResultPerEnergySupplierBrpGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
             await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
             {
                 using (var scope = _serviceScopeFactory.CreateScope())
                 {
-                    var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+                    try
+                    {
+                        var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
 
-                    // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
-                    var energyResultPerEnergySupplierMessage = EnergyResultMessageDtoFactory.CreateForEnergySupplier(EventId.From(input.EventId), energyResult);
-                    await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResultPerEnergySupplierMessage, CancellationToken.None).ConfigureAwait(false);
-                    numberOfEnqueuedMessages++;
+                        // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
+                        var energyResultPerEnergySupplierMessage = EnergyResultMessageDtoFactory.CreateForEnergySupplier(EventId.From(input.EventId), energyResult);
+                        await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResultPerEnergySupplierMessage, CancellationToken.None).ConfigureAwait(false);
+
+                        numberOfEnqueuedMessages++;
+                    }
+                    catch
+                    {
+                        numberOfFailedMessages++;
+                    }
                 }
 
                 using (var scope = _serviceScopeFactory.CreateScope())
                 {
-                    var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+                    try
+                    {
+                        var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
 
-                    // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
-                    var energyResultPerBalanceResponsibleMessage = EnergyResultMessageDtoFactory.CreateForBalanceResponsiblePrEnergySupplier(EventId.From(input.EventId), energyResult);
-                    await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResultPerBalanceResponsibleMessage, CancellationToken.None).ConfigureAwait(false);
-                    numberOfEnqueuedMessages++;
+                        // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
+                        var energyResultPerBalanceResponsibleMessage = EnergyResultMessageDtoFactory.CreateForBalanceResponsiblePrEnergySupplier(EventId.From(input.EventId), energyResult);
+                        await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResultPerBalanceResponsibleMessage, CancellationToken.None).ConfigureAwait(false);
+
+                        numberOfEnqueuedMessages++;
+                    }
+                    catch
+                    {
+                        numberOfFailedMessages++;
+                    }
                 }
             }
 
@@ -63,7 +80,7 @@ public class EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivit
         }
         catch (Exception)
         {
-            return 0;
+            return numberOfEnqueuedMessages;
         }
     }
 }

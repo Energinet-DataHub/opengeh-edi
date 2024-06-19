@@ -31,25 +31,33 @@ public class EnqueueEnergyResultsForGridAreaOwnersActivity(
     public async Task<int> Run(
         [ActivityTrigger] EnqueueMessagesInput input)
     {
+        var numberOfEnqueuedMessages = 0;
+        var numberOfFailedMessages = 0;
+
         try
         {
-            var numberOfEnqueuedMessages = 0;
-
             var query = new EnergyResultPerGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
             await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
             {
                 using (var scope = _serviceScopeFactory.CreateScope())
                 {
-                    var scopedMasterDataClient = scope.ServiceProvider.GetRequiredService<IMasterDataClient>();
-                    var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+                    try
+                    {
+                        var scopedMasterDataClient = scope.ServiceProvider.GetRequiredService<IMasterDataClient>();
+                        var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
 
-                    // TODO: It should be possible to implement a cache for grid area owner, so we improve the performance of the loop
-                    var receiverNumber = await scopedMasterDataClient.GetGridOwnerForGridAreaCodeAsync(energyResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
-                    // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
-                    var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult, receiverNumber);
-                    await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);
+                        // TODO: It should be possible to implement a cache for grid area owner, so we improve the performance of the loop
+                        var receiverNumber = await scopedMasterDataClient.GetGridOwnerForGridAreaCodeAsync(energyResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
+                        // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
+                        var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult, receiverNumber);
+                        await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);
 
-                    numberOfEnqueuedMessages++;
+                        numberOfEnqueuedMessages++;
+                    }
+                    catch
+                    {
+                        numberOfFailedMessages++;
+                    }
                 }
             }
 
@@ -57,7 +65,7 @@ public class EnqueueEnergyResultsForGridAreaOwnersActivity(
         }
         catch (Exception)
         {
-            return 0;
+            return numberOfEnqueuedMessages;
         }
     }
 }
