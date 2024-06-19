@@ -27,7 +27,7 @@ public class WholesaleAmountPerChargeQuery(
         ediDatabricksOptions,
         calculationId)
 {
-    public override string DataObjectName => "amount_per_charge_v1";
+    public override string DataObjectName => "amounts_per_charge_v1";
 
     public override Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition => new()
     {
