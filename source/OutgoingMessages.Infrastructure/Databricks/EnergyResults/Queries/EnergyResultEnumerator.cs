@@ -15,6 +15,7 @@
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -32,7 +33,7 @@ public class EnergyResultEnumerator(
     public EdiDatabricksOptions EdiDatabricksOptions => _ediDatabricksOptions;
 
     public async IAsyncEnumerable<TResult> GetAsync<TResult>(EnergyResultQueryBase<TResult> query)
-        where TResult : AggregatedTimeSeries
+        where TResult : OutgoingMessageDto
     {
         var resultCount = 0;
 

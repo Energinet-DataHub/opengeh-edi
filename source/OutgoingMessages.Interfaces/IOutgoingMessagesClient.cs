@@ -18,6 +18,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 
 /// <summary>
 /// Client for interacting with outgoing messages.
+/// TODO: This should only contain methods for interacting with outgoing messages from the outside,
+/// ie. enqueuing EnergyResultMessageDto or WholesaleServicesMessageDto should be removed, since they are called
+/// from OutgoingMessages.Infrastructure after changing to databrick views.
 /// </summary>
 public interface IOutgoingMessagesClient
 {
@@ -59,6 +62,21 @@ public interface IOutgoingMessagesClient
     Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultMessageDto energyResultMessage, CancellationToken cancellationToken);
 
     /// <summary>
+    ///  Enqueue a energy result message for the "grid area" aggregation level, WITH commit.
+    /// </summary>
+    Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultPerGridAreaMessageDto energyResultMessage, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Enqueue a energy result message for the "balance responsible, grid area" aggregation level, WITH commit.
+    /// </summary>
+    Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultPerBalanceResponsibleMessageDto energyResultMessage, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Enqueue a energy result message for the "energy supplier, balance responsible, grid area" aggregation level, WITH commit.
+    /// </summary>
+    Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto energyResultMessage, CancellationToken cancellationToken);
+
+    /// <summary>
     ///  Enqueue wholesale messages, handles enqueuing messages to all appropriate parties (Receiver, ChargeOwner) in a single transaction.
     /// </summary>
     Task EnqueueAndCommitAsync(WholesaleServicesMessageDto wholesaleServicesMessage, CancellationToken cancellationToken);
@@ -76,15 +94,15 @@ public interface IOutgoingMessagesClient
     /// <summary>
     ///  Enqueue energy results for Grid Area Owners as outgoing messages for the given calculation id.
     /// </summary>
-    Task<int> EnqueueEnergyResultsForGridAreaOwnersAsync(EnqueueMessagesInputDto input);
+    Task<int> EnqueueEnergyResultsPerGridAreaAsync(EnqueueMessagesInputDto input);
 
     /// <summary>
     ///  Enqueue energy results for Balance Responsibles as outgoing messages for the given calculation id.
     /// </summary>
-    Task<int> EnqueueEnergyResultsForBalanceResponsiblesAsync(EnqueueMessagesInputDto input);
+    Task<int> EnqueueEnergyResultsPerBalanceResponsibleAsync(EnqueueMessagesInputDto input);
 
     /// <summary>
     ///  Enqueue energy results for Balance Responsible and Energy Supplier as outgoing messages for the given calculation id.
     /// </summary>
-    Task<int> EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersAsync(EnqueueMessagesInputDto input);
+    Task<int> EnqueueEnergyResultsPerEnergySupplierPerBalanceResponsibleAsync(EnqueueMessagesInputDto input);
 }

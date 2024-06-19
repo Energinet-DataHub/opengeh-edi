@@ -18,10 +18,11 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyRes
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using NodaTime;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
 
-public class EnergyResultPerGridAreaFactory
+public static class EnergyResultPerGridAreaFactory
 {
     public static EnergyResultPerGridArea CreateEnergyResultPerGridArea(
         DatabricksSqlRow databricksSqlRow,
@@ -46,58 +47,13 @@ public class EnergyResultPerGridAreaFactory
             MeasurementUnitMapper.Map(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)));
     }
 
-    internal static EnergyResultPerBrpGridArea CreateEnergyResultPerBrpGridArea(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
-    {
-        var resolution = ResolutionMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.Resolution));
-
-        var period = GetPeriod(timeSeriesPoints, resolution);
-
-        return new EnergyResultPerBrpGridArea(
-            databricksSqlRow.ToGuid(EnergyResultColumnNames.ResultId),
-            databricksSqlRow.ToGuid(EnergyResultColumnNames.CalculationId),
-            databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.GridAreaCode),
-            MeteringPointTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.MeteringPointType)),
-            timeSeriesPoints,
-            CalculationTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.CalculationType)),
-            period.Start,
-            period.End,
-            resolution,
-            databricksSqlRow.ToLong(EnergyResultColumnNames.CalculationVersion),
-            SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)),
-            MeasurementUnitMapper.Map(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)),
-            databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.BalanceResponsiblePartyId));
-    }
-
-    internal static EnergyResultPerEnergySupplierBrpGridArea CreateEnergyResultPerEnergySupplierBrpGridArea(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
-    {
-        var resolution = ResolutionMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.Resolution));
-
-        var period = GetPeriod(timeSeriesPoints, resolution);
-
-        return new EnergyResultPerEnergySupplierBrpGridArea(
-            databricksSqlRow.ToGuid(EnergyResultColumnNames.ResultId),
-            databricksSqlRow.ToGuid(EnergyResultColumnNames.CalculationId),
-            databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.GridAreaCode),
-            MeteringPointTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.MeteringPointType)),
-            timeSeriesPoints,
-            CalculationTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.CalculationType)),
-            period.Start,
-            period.End,
-            resolution,
-            databricksSqlRow.ToLong(EnergyResultColumnNames.CalculationVersion),
-            SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)),
-            MeasurementUnitMapper.Map(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)),
-            databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.BalanceResponsiblePartyId),
-            databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.EnergySupplierId));
-    }
-
-    private static (Instant Start, Instant End) GetPeriod(IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints, Resolution resolution)
+    internal static Period GetPeriod(IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints, Resolution resolution)
     {
         var start = timeSeriesPoints.Min(x => x.TimeUtc);
         var resolutionInMinutes = GetResolutionInMinutes(resolution);
         // The end data is the start of the next period.
         var end = timeSeriesPoints.Max(x => x.TimeUtc).Plus(Duration.FromMinutes(resolutionInMinutes));
-        return (start, end);
+        return new Period(start, end);
     }
 
     private static int GetResolutionInMinutes(Resolution resolution)

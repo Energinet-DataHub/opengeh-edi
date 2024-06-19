@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -25,20 +22,19 @@ public class EnergyResultMessageDto : OutgoingMessageDto
     private EnergyResultMessageDto(
         ActorNumber receiverNumber,
         EventId eventId,
-        string businessReason,
+        string businessReasonName,
         ActorRole receiverRole,
-        EnergyResultMessageTimeSeries series,
-        MessageId? relatedToMessageId = null)
+        EnergyResultMessageTimeSeries series)
         : base(
             DocumentType.NotifyAggregatedMeasureData,
             receiverNumber,
             null,
             eventId,
-            businessReason,
+            businessReasonName,
             receiverRole,
             DataHubDetails.DataHubActorNumber,
             ActorRole.MeteredDataAdministrator,
-            relatedToMessageId)
+            null)
     {
         Series = series;
     }
