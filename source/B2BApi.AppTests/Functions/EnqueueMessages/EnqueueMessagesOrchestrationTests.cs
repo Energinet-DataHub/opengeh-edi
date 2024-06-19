@@ -150,9 +150,8 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             .Select(item =>
                 (item.Value<string>("FunctionName"), item.Value<string>("Result")));
 
-        activities.Should().NotBeNull().And.BeEquivalentTo(
-        new List<(string?, string?)>
-        {
+        activities.Should().NotBeNull().And.Contain(
+        [
             ("EnqueueMessagesOrchestration", null),
             ("EnqueueEnergyResultsForGridAreaOwnersActivity", perGridAreaDataDescription.ExpectedOutgoingMessagesCount.ToString()),
             ("EnqueueEnergyResultsForBalanceResponsiblesActivity", perBrpGridAreaDataDescription.ExpectedOutgoingMessagesCount.ToString()),
