@@ -39,7 +39,7 @@ public class WholesaleResultForAmountPerChargeDescription
     /// Environment: Dev002.
     /// </remarks>
     public WholesaleResultForAmountPerChargeDescription()
-        : base("wholesale_fixing_01-02-20232_28-02-2023_ga_804_amount_per_charge_v1.csv")
+        : base("wholesale_fixing_01-02-2023_28-02-2023_ga_804_amount_per_charge_v1.csv")
     {
     }
 

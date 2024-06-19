@@ -101,14 +101,17 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     ///  - Every activity is executed once. We cannot be sure in which order, because we use fan-out/fan-in.
     ///  - A service bus message is sent as expected.
     /// </summary>
+    /// <remarks>
+    /// Feature flags are enabled for all calculation types to ensure activities is executed.
+    /// </remarks>
     [Fact]
-    public async Task Given_FeatureFlagIsEnabledAndCalculationOrchestrationId_When_CalculationCompletedEventIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
+    public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
         Fixture.EnsureAppHostUsesFeatureFlagValue(
             enableCalculationCompletedEvent: true,
             enableCalculationCompletedEventForBalanceFixing: true,
-            enableCalculationCompletedEventForWholesaleFixing: false);
+            enableCalculationCompletedEventForWholesaleFixing: true);
 
         var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
         var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
@@ -192,8 +195,11 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     ///  - Every activity is executed once. We cannot be sure in which order, because we use fan-out/fan-in.
     ///  - A service bus message is sent as expected.
     /// </summary>
+    /// <remarks>
+    /// Feature flags are enabled for all calculation types to ensure activities is executed.
+    /// </remarks>
     [Fact]
-    public async Task Given_FeatureFlagIsEnabledAndCalculationOrchestrationId_When_CalculationCompletedEventForWholesaleFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
+    public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventForWholesaleFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
         Fixture.EnsureAppHostUsesFeatureFlagValue(

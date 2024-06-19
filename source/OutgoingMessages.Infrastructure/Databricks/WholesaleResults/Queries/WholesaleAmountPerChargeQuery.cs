@@ -55,7 +55,6 @@ public class WholesaleAmountPerChargeQuery(
 
     protected override WholesaleAmountPerCharge CreateWholesaleResult(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
-        ArgumentNullException.ThrowIfNull(databricksSqlRow);
         return WholesaleAmountPerChargeFactory.CreatewholesaleResultForAmountPerCharge(databricksSqlRow, timeSeriesPoints);
     }
 }

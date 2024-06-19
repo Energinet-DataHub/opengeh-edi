@@ -25,6 +25,6 @@ public static class CurrencyMapper
             _ => throw new ArgumentOutOfRangeException(
                 nameof(currency),
                 actualValue: currency,
-                "Value does not contain a valid string representation of a settlement method."),
+                "Value does not contain a valid string representation of a currency."),
         };
 }
