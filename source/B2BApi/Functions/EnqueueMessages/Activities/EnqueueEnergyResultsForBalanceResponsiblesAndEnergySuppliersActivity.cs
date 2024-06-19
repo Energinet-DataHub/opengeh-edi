@@ -16,15 +16,14 @@ using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
 public class EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity(
-    IServiceScopeFactory serviceScopeFactory,
+    IOutgoingMessagesClient outgoingMessagesClient,
     EnergyResultEnumerator energyResultEnumerator)
 {
-    private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
+    private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
     private readonly EnergyResultEnumerator _energyResultEnumerator = energyResultEnumerator;
 
     [Function(nameof(EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity))]
@@ -38,19 +37,14 @@ public class EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivit
             var query = new EnergyResultPerEnergySupplierBrpGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
             await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
             {
-                using (var scope = _serviceScopeFactory.CreateScope())
-                {
-                    var scopedClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+                // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
+                var energyResultPerEnergySupplierMessage = EnergyResultMessageDtoFactory.CreateForEnergySupplier(EventId.From(input.EventId), energyResult);
+                await _outgoingMessagesClient.EnqueueAndCommitAsync(energyResultPerEnergySupplierMessage, CancellationToken.None).ConfigureAwait(false);
+                numberOfEnqueuedMessages++;
 
-                    // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
-                    var energyResultPerEnergySupplierMessage = EnergyResultMessageDtoFactory.CreateForEnergySupplier(EventId.From(input.EventId), energyResult);
-                    await scopedClient.EnqueueAndCommitAsync(energyResultPerEnergySupplierMessage, CancellationToken.None).ConfigureAwait(false);
-                    numberOfEnqueuedMessages++;
-
-                    var energyResultPerBalanceResponsibleMessage = EnergyResultMessageDtoFactory.CreateForBalanceResponsiblePrEnergySupplier(EventId.From(input.EventId), energyResult);
-                    await scopedClient.EnqueueAndCommitAsync(energyResultPerBalanceResponsibleMessage, CancellationToken.None).ConfigureAwait(false);
-                    numberOfEnqueuedMessages++;
-                }
+                var energyResultPerBalanceResponsibleMessage = EnergyResultMessageDtoFactory.CreateForBalanceResponsiblePrEnergySupplier(EventId.From(input.EventId), energyResult);
+                await _outgoingMessagesClient.EnqueueAndCommitAsync(energyResultPerBalanceResponsibleMessage, CancellationToken.None).ConfigureAwait(false);
+                numberOfEnqueuedMessages++;
             }
 
             return numberOfEnqueuedMessages;
