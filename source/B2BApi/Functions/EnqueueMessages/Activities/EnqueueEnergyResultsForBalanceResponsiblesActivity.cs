@@ -16,14 +16,15 @@ using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
 public class EnqueueEnergyResultsForBalanceResponsiblesActivity(
-    IOutgoingMessagesClient outgoingMessagesClient,
+    IServiceScopeFactory serviceScopeFactory,
     EnergyResultEnumerator energyResultEnumerator)
 {
-    private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
+    private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
     private readonly EnergyResultEnumerator _energyResultEnumerator = energyResultEnumerator;
 
     [Function(nameof(EnqueueEnergyResultsForBalanceResponsiblesActivity))]
@@ -37,11 +38,16 @@ public class EnqueueEnergyResultsForBalanceResponsiblesActivity(
             var query = new EnergyResultPerBrpGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
             await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
             {
-                // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
-                var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult);
-                await _outgoingMessagesClient.EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);
+                using (var scope = _serviceScopeFactory.CreateScope())
+                {
+                    var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
 
-                numberOfEnqueuedMessages++;
+                    // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
+                    var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult);
+                    await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);
+
+                    numberOfEnqueuedMessages++;
+                }
             }
 
             return numberOfEnqueuedMessages;
