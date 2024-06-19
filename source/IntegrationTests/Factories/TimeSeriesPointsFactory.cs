@@ -13,8 +13,11 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using NodaTime;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
@@ -35,5 +38,49 @@ internal static class TimeSeriesPointsFactory
         }
 
         return points;
+    }
+
+    public static IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> CreatePointsForPeriod(
+        Period period,
+        Resolution resolution,
+        decimal price,
+        decimal quantity,
+        decimal amount,
+        QuantityQuality calculatedQuality)
+    {
+        var points = new List<WholesaleServicesRequestSeries.Types.Point>();
+
+        var currentTime = period.Start.ToDateTimeOffset();
+        while (currentTime < period.End.ToDateTimeOffset())
+        {
+            points.Add(new WholesaleServicesRequestSeries.Types.Point
+            {
+                Price = DecimalValue.FromDecimal(price),
+                Quantity = DecimalValue.FromDecimal(quantity),
+                Amount = DecimalValue.FromDecimal(amount),
+                QuantityQualities = { calculatedQuality },
+            });
+            currentTime = GetDateTimeWithResolutionOffset(resolution, currentTime);
+        }
+
+        return points;
+    }
+
+    private static DateTimeOffset GetDateTimeWithResolutionOffset(Resolution resolution, DateTimeOffset dateTime)
+    {
+        switch (resolution)
+        {
+            case var res when res == Resolution.Hourly:
+                return dateTime.AddMinutes(60);
+            case var res when res == Resolution.Daily:
+                return dateTime.AddDays(1);
+            case var res when res == Resolution.Monthly:
+                return dateTime.AddMonths(1);
+            default:
+                throw new ArgumentOutOfRangeException(
+                    nameof(resolution),
+                    resolution,
+                    "Unknown databricks resolution");
+        }
     }
 }

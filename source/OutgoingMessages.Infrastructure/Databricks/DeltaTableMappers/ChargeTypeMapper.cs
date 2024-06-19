@@ -16,18 +16,19 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 
-public static class MeasurementUnitMapper
+public static class ChargeTypeMapper
 {
-    public static MeasurementUnit Map(string? measurementUnit)
-    {
-        return measurementUnit switch
+    public static ChargeType? FromDeltaTableValue(string? chargeType) =>
+        chargeType switch
         {
-            "kWh" => MeasurementUnit.Kwh,
-            "pcs" => MeasurementUnit.Pieces,
+            "subscription" => ChargeType.Subscription,
+            "fee" => ChargeType.Fee,
+            "tariff" => ChargeType.Tariff,
+            null => null,
+
             _ => throw new ArgumentOutOfRangeException(
-                nameof(MeasurementUnit),
-                measurementUnit,
-                "Value does not contain a valid string representation of a measurement unit."),
+                nameof(chargeType),
+                actualValue: chargeType,
+                "Value does not contain a valid string representation of a settlement method."),
         };
-    }
 }

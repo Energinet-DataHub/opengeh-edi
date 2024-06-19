@@ -20,9 +20,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.Te
 /// Contains information to prepare test input from a file, as well as
 /// information to drive and verify the expected behaviour, for a certain scenario.
 /// </summary>
-public abstract class EnergyResultTestDataDescription
+public abstract class TestDataDescription
 {
-    protected EnergyResultTestDataDescription(string testFilename)
+    protected TestDataDescription(string testFilename)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(testFilename);
 
