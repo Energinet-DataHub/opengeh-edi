@@ -92,4 +92,9 @@ public interface IOutgoingMessagesClient
     ///  Enqueue wholesale results for Amount Per Charge to Energy Supplier and ChargeOwner as outgoing messages for the given calculation id.
     /// </summary>
     Task<int> EnqueueWholesaleResultsForAmountPerChargeAsync(EnqueueMessagesInputDto input);
+
+    /// <summary>
+    ///  Enqueue wholesale results for Monthly Amount Per Charge to Energy Supplier and ChargeOwner as outgoing messages for the given calculation id.
+    /// </summary>
+    Task<int> EnqueueWholesaleResultsForMonthlyAmountPerChargeAsync(EnqueueMessagesInputDto input);
 }

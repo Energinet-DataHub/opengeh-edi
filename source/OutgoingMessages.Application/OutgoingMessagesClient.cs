@@ -234,4 +234,20 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
 
         return numberOfEnqueuedMessages;
     }
+
+    public async Task<int> EnqueueWholesaleResultsForMonthlyAmountPerChargeAsync(EnqueueMessagesInputDto input)
+    {
+        var numberOfEnqueuedMessages = 0;
+
+        var query = new WholesaleMonthlyAmountPerChargeQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
+        await foreach (var wholesaleResult in _wholesaleResultEnumerator.GetAsync(query))
+        {
+            var gridOwner = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(wholesaleResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
+            var wholesaleResultMessage = WholesaleResultMessageDtoFactory.Create(EventId.From(input.EventId), wholesaleResult, gridOwner);
+            await EnqueueAndCommitAsync(wholesaleResultMessage, CancellationToken.None).ConfigureAwait(false);
+            numberOfEnqueuedMessages += 2;
+        }
+
+        return numberOfEnqueuedMessages;
+    }
 }

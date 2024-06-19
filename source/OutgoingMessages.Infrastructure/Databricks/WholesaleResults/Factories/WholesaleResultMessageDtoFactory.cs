@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Factories;
@@ -23,6 +24,31 @@ public static class WholesaleResultMessageDtoFactory
     public static WholesaleServicesMessageDto Create(
         EventId eventId,
         WholesaleAmountPerCharge wholesaleResult,
+        ActorNumber gridAreaOwner)
+    {
+        ArgumentNullException.ThrowIfNull(wholesaleResult);
+
+        var (businessReason, settlementVersion) =
+            MapToBusinessReasonAndSettlementVersion(wholesaleResult.CalculationType);
+        var message = CreateWholesaleResultSeries(wholesaleResult, settlementVersion);
+
+        var chargeOwner = GetChargeOwnerReceiver(
+            gridAreaOwner,
+            ActorNumber.Create(wholesaleResult.ChargeOwnerId),
+            wholesaleResult.IsTax);
+
+        return WholesaleServicesMessageDto.Create(
+            eventId,
+            receiverNumber: message.EnergySupplier,
+            receiverRole: ActorRole.EnergySupplier,
+            chargeOwnerId: chargeOwner,
+            businessReason: businessReason.Name,
+            wholesaleSeries: message);
+    }
+
+    public static WholesaleServicesMessageDto Create(
+        EventId eventId,
+        WholesaleMonthlyAmountPerCharge wholesaleResult,
         ActorNumber gridAreaOwner)
     {
         ArgumentNullException.ThrowIfNull(wholesaleResult);
@@ -57,7 +83,7 @@ public static class WholesaleResultMessageDtoFactory
             GridAreaCode: result.GridAreaCode,
             ChargeCode: result.ChargeCode,
             IsTax: result.IsTax,
-            Points: PointsBasedOnChargeType(result),
+            Points: PointsBasedOnChargeType(result.TimeSeriesPoints, result.ChargeType),
             EnergySupplier: ActorNumber.Create(result.EnergySupplierId),
             ChargeOwner: ActorNumber.Create(result.ChargeOwnerId),
             Period: new Period(result.PeriodStartUtc, result.PeriodEndUtc),
@@ -73,18 +99,48 @@ public static class WholesaleResultMessageDtoFactory
             SettlementMethod: result.SettlementMethod);
     }
 
-    private static IReadOnlyCollection<WholesaleServicesPoint> PointsBasedOnChargeType(WholesaleAmountPerCharge result)
+    private static WholesaleServicesSeries CreateWholesaleResultSeries(
+        WholesaleMonthlyAmountPerCharge result,
+        SettlementVersion? settlementVersion)
     {
-        return result.TimeSeriesPoints
-            .Select(
-                (p, index) => new WholesaleServicesPoint(
-                    index + 1, // Position starts at 1, so position = index + 1
-                    p.Quantity,
-                    p.Price,
-                    p.Amount,
-                    GetQuantityQuality(p.Price, p.Qualities, result.ChargeType)))
-            .ToList()
-            .AsReadOnly();
+        ArgumentNullException.ThrowIfNull(result);
+
+        return new WholesaleServicesSeries(
+            TransactionId: TransactionId.New(),
+            CalculationVersion: result.CalculationVersion,
+            GridAreaCode: result.GridAreaCode,
+            ChargeCode: result.ChargeCode,
+            IsTax: result.IsTax,
+            Points: PointsBasedOnChargeType(result.TimeSeriesPoints, result.ChargeType),
+            EnergySupplier: ActorNumber.Create(result.EnergySupplierId),
+            ChargeOwner: ActorNumber.Create(result.ChargeOwnerId),
+            Period: new Period(result.PeriodStartUtc, result.PeriodEndUtc),
+            SettlementVersion: settlementVersion,
+            QuantityMeasureUnit: result.QuantityUnit,
+            null,
+            PriceMeasureUnit: MeasurementUnit.Kwh,
+            Currency: result.Currency,
+            ChargeType: result.ChargeType,
+            Resolution: result.Resolution,
+            MeteringPointType: null,
+            null,
+            SettlementMethod: null);
+    }
+
+    private static IReadOnlyCollection<WholesaleServicesPoint> PointsBasedOnChargeType(
+        IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints,
+        ChargeType chargeType)
+    {
+        return timeSeriesPoints
+        .Select(
+            (p, index) => new WholesaleServicesPoint(
+                index + 1, // Position starts at 1, so position = index + 1
+                p.Quantity,
+                p.Price,
+                p.Amount,
+                GetQuantityQuality(p.Price, p.Qualities, chargeType)))
+        .ToList()
+        .AsReadOnly();
     }
 
     /// <summary>

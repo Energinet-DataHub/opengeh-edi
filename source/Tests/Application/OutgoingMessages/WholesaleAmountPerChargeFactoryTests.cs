@@ -77,7 +77,7 @@ public class WholesaleAmountPerChargeFactoryTests
         }
 
         // Act
-        var actual = WholesaleAmountPerChargeFactory.CreatewholesaleResultForAmountPerCharge(databricksSqlRow, timeSeriesPoints);
+        var actual = WholesaleAmountPerChargeFactory.Create(databricksSqlRow, timeSeriesPoints);
 
         // Assert
         actual.Id.Should().Be("17582ba4-71db-4ce5-af70-b00a4676e357");

@@ -22,18 +22,15 @@ using NodaTime.Extensions;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Factories;
 
-public class WholesaleAmountPerChargeFactory
+public class WholesaleMontlyAmountPerChargeFactory
 {
-    public static WholesaleAmountPerCharge Create(
+    public static WholesaleMonthlyAmountPerCharge Create(
         DatabricksSqlRow databricksSqlRow,
         IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
-        var resolution =
-            ResolutionMapper.FromDeltaTableValue(
-                databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.Resolution));
-        var period = GetPeriod(timeSeriesPoints, resolution);
+        var period = GetPeriod(timeSeriesPoints);
 
-        return new WholesaleAmountPerCharge(
+        return new WholesaleMonthlyAmountPerCharge(
             databricksSqlRow.ToGuid(WholesaleResultColumnNames.ResultId),
             databricksSqlRow.ToGuid(WholesaleResultColumnNames.CalculationId),
             CalculationTypeMapper.FromDeltaTableValue(
@@ -48,42 +45,19 @@ public class WholesaleAmountPerChargeFactory
             CurrencyMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.Currency)),
             ChargeTypeMapper.FromDeltaTableValue(
                 databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.ChargeType)),
-            resolution,
-            MeteringPointTypeMapper.FromDeltaTableValue(
-                databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.MeteringPointType)),
-            SettlementMethodMapper.FromDeltaTableValue(
-                databricksSqlRow.ToNullableString(WholesaleResultColumnNames.SettlementMethod)),
+            Resolution.Monthly,
             timeSeriesPoints,
             databricksSqlRow.ToBool(WholesaleResultColumnNames.IsTax),
             databricksSqlRow.ToNullableString(WholesaleResultColumnNames.ChargeCode));
     }
 
     private static (Instant Start, Instant End) GetPeriod(
-        IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints,
-        Resolution resolution)
+        IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
         var start = timeSeriesPoints.Min(x => x.TimeUtc);
         var end = timeSeriesPoints.Max(x => x.TimeUtc);
         // The end date is the start of the next period.
-        var endWithResolutionOffset = GetDateTimeWithResolutionOffset(resolution, end.ToDateTimeOffset());
+        var endWithResolutionOffset = end.ToDateTimeOffset().AddMonths(1);
         return (start, endWithResolutionOffset.ToInstant());
-    }
-
-    private static DateTimeOffset GetDateTimeWithResolutionOffset(Resolution resolution, DateTimeOffset dateTime)
-    {
-        switch (resolution)
-        {
-            case var res when res == Resolution.Hourly:
-                return dateTime.AddMinutes(60);
-            case var res when res == Resolution.Daily:
-                return dateTime.AddDays(1);
-            case var res when res == Resolution.Monthly:
-                return dateTime.AddMonths(1);
-            default:
-                throw new ArgumentOutOfRangeException(
-                    nameof(resolution),
-                    resolution,
-                    "Unknown databricks resolution");
-        }
     }
 }

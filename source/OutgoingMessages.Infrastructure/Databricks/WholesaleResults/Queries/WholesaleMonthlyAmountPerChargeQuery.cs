@@ -20,14 +20,14 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 
-public class WholesaleAmountPerChargeQuery(
+public class WholesaleMonthlyAmountPerChargeQuery(
     EdiDatabricksOptions ediDatabricksOptions,
     Guid calculationId)
-    : WholesaleResultQueryBase<WholesaleAmountPerCharge>(
+    : WholesaleResultQueryBase<WholesaleMonthlyAmountPerCharge>(
         ediDatabricksOptions,
         calculationId)
 {
-    public override string DataObjectName => "amounts_per_charge_v1";
+    public override string DataObjectName => "monthly_amounts_per_charge_v1";
 
     public override Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition => new()
     {
@@ -40,21 +40,15 @@ public class WholesaleAmountPerChargeQuery(
         { WholesaleResultColumnNames.ChargeCode,                (DeltaTableCommonTypes.String,              false) },
         { WholesaleResultColumnNames.ChargeType,                (DeltaTableCommonTypes.String,              false) },
         { WholesaleResultColumnNames.ChargeOwnerId,             (DeltaTableCommonTypes.String,              false) },
-        { WholesaleResultColumnNames.Resolution,                (DeltaTableCommonTypes.String,              false) },
         { WholesaleResultColumnNames.QuantityUnit,              (DeltaTableCommonTypes.String,              false) },
-        { WholesaleResultColumnNames.MeteringPointType,         (DeltaTableCommonTypes.String,              false) },
-        { WholesaleResultColumnNames.SettlementMethod,          (DeltaTableCommonTypes.String,              true) },
         { WholesaleResultColumnNames.IsTax,                     (DeltaTableCommonTypes.String,              false) },
         { WholesaleResultColumnNames.Currency,                  (DeltaTableCommonTypes.String,              false) },
         { WholesaleResultColumnNames.Time,                      (DeltaTableCommonTypes.Timestamp,           false) },
-        { WholesaleResultColumnNames.Quantity,                  (DeltaTableCommonTypes.Decimal18x3,         false) },
-        { WholesaleResultColumnNames.QuantityQualities,         (DeltaTableCommonTypes.ArrayOfStrings,      true) },
-        { WholesaleResultColumnNames.Price,                     (DeltaTableCommonTypes.Decimal18x3,         true) },
         { WholesaleResultColumnNames.Amount,                    (DeltaTableCommonTypes.Decimal18x3,         true) },
     };
 
-    protected override WholesaleAmountPerCharge CreateWholesaleResult(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
+    protected override WholesaleMonthlyAmountPerCharge CreateWholesaleResult(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
-        return WholesaleAmountPerChargeFactory.Create(databricksSqlRow, timeSeriesPoints);
+        return WholesaleMontlyAmountPerChargeFactory.Create(databricksSqlRow, timeSeriesPoints);
     }
 }

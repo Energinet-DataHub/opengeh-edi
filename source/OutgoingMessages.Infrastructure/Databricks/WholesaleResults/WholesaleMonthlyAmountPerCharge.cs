@@ -19,7 +19,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults;
 
-public sealed class WholesaleAmountPerCharge(
+public sealed class WholesaleMonthlyAmountPerCharge(
     Guid id,
     Guid calculationId,
     CalculationType calculationType,
@@ -33,8 +33,6 @@ public sealed class WholesaleAmountPerCharge(
     Currency currency,
     ChargeType chargeType,
     Resolution resolution,
-    MeteringPointType? meteringPointType,
-    SettlementMethod? settlementMethod,
     IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints,
     bool isTax,
     string? chargeCode) : WholesaleTimeSeries(
@@ -55,10 +53,6 @@ public sealed class WholesaleAmountPerCharge(
     public string ChargeOwnerId { get; } = chargeOwnerId;
 
     public ChargeType ChargeType { get; } = chargeType;
-
-    public MeteringPointType? MeteringPointType { get; } = meteringPointType;
-
-    public SettlementMethod? SettlementMethod { get; } = settlementMethod;
 
     public IReadOnlyCollection<WholesaleTimeSeriesPoint> TimeSeriesPoints { get; } = timeSeriesPoints;
 

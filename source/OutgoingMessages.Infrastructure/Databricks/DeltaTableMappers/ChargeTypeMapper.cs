@@ -18,13 +18,12 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Delta
 
 public static class ChargeTypeMapper
 {
-    public static ChargeType? FromDeltaTableValue(string? chargeType) =>
+    public static ChargeType FromDeltaTableValue(string chargeType) =>
         chargeType switch
         {
             "subscription" => ChargeType.Subscription,
             "fee" => ChargeType.Fee,
             "tariff" => ChargeType.Tariff,
-            null => null,
 
             _ => throw new ArgumentOutOfRangeException(
                 nameof(chargeType),

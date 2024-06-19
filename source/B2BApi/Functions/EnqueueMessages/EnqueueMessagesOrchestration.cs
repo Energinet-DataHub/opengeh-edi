@@ -51,6 +51,10 @@ internal class EnqueueMessagesOrchestration
             nameof(EnqueueWholesaleResultsForAmountPerChargesActivity),
             new EnqueueMessagesInput(input.CalculationId, input.EventId));
 
+        numberOfEnqueuedMessages += await context.CallActivityAsync<int>(
+            nameof(EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity),
+            new EnqueueMessagesInput(input.CalculationId, input.EventId));
+
         var messagesWasSuccessfullyEnqueued = numberOfEnqueuedMessages > 0;
 
         await context.CallActivityAsync(
