@@ -377,7 +377,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     private async Task<Guid> ClearAndAddDatabricksData(
         EnergyResultPerGridAreaDescription perGridAreaDataDescription,
         EnergyResultPerBrpGridAreaDescription perBrpGridAreaDataDescription,
-        EnergyResultPerEnergySupplierBrpGridAreaDescription perBrdAndESGridAreaDataDescription,
+        EnergyResultPerEnergySupplierBrpGridAreaDescription perBrpAndEsGridAreaDataDescription,
         WholesaleResultForAmountPerChargeDescription forAmountPerChargeDescription)
     {
         // Ensure that databricks does not contain data, unless the test explicit adds it
@@ -394,9 +394,12 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var perBrpGriaAreaTask = SeedDatabricksWithDataAsync(perBrpGridAreaDataDescription, perBrpGridAreaQuery);
 
         var perBrpAndESGridAreaQuery = new EnergyResultPerEnergySupplierBrpGridAreaQuery(ediDatabricksOptions.Value, perGridAreaDataDescription.CalculationId);
-        var perBrpAndESGridAreTask = SeedDatabricksWithDataAsync(perBrdAndESGridAreaDataDescription, perBrpAndESGridAreaQuery);
+        var perBrpAndESGridAreTask = SeedDatabricksWithDataAsync(perBrpAndEsGridAreaDataDescription, perBrpAndESGridAreaQuery);
 
-        await Task.WhenAll(perGridAreTask, perBrpGriaAreaTask, perBrpAndESGridAreTask);
+        var forAmountPerChargeQuery = new EnergyResultPerEnergySupplierBrpGridAreaQuery(ediDatabricksOptions.Value, forAmountPerChargeDescription.CalculationId);
+        var forAmountPerChargeTask = SeedDatabricksWithDataAsync(forAmountPerChargeDescription, forAmountPerChargeQuery);
+
+        await Task.WhenAll(perGridAreTask, perBrpGriaAreaTask, perBrpAndESGridAreTask, forAmountPerChargeTask);
 
         return perGridAreaDataDescription.CalculationId;
     }
