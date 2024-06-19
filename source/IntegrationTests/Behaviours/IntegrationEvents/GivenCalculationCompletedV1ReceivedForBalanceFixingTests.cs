@@ -26,6 +26,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Xunit;
@@ -259,7 +260,8 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
     private Task GivenEnqueueEnergyResultsPerGridAreaAsync(Guid calculationId)
     {
         var activity = new EnqueueEnergyResultsForGridAreaOwnersActivity(
-            GetService<IOutgoingMessagesClient>());
+            GetService<IServiceScopeFactory>(),
+            GetService<EnergyResultEnumerator>());
 
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
     }
@@ -267,7 +269,8 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
     private Task GivenEnqueueEnergyResultsPerBalanceResponsible(Guid calculationId)
     {
         var activity = new EnqueueEnergyResultsForBalanceResponsiblesActivity(
-            GetService<IOutgoingMessagesClient>());
+            GetService<IServiceScopeFactory>(),
+            GetService<EnergyResultEnumerator>());
 
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
     }
@@ -275,7 +278,8 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
     private Task GivenEnqueueEnergyResultsPerEnergySuppliersPerBalanceResponsible(Guid calculationId)
     {
         var activity = new EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity(
-            GetService<IOutgoingMessagesClient>());
+            GetService<IServiceScopeFactory>(),
+            GetService<EnergyResultEnumerator>());
 
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
     }
