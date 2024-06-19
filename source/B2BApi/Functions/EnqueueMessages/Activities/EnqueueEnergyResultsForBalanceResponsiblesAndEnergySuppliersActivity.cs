@@ -34,53 +34,48 @@ public class EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivit
         var numberOfEnqueuedMessages = 0;
         var numberOfFailedMessages = 0;
 
-        try
+        var query = new EnergyResultPerEnergySupplierBrpGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
+        await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
         {
-            var query = new EnergyResultPerEnergySupplierBrpGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
-            await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
+            using (var scope = _serviceScopeFactory.CreateScope())
             {
-                using (var scope = _serviceScopeFactory.CreateScope())
+                try
                 {
-                    try
-                    {
-                        var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+                    var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
 
-                        // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
-                        var energyResultPerEnergySupplierMessage = EnergyResultMessageDtoFactory.CreateForEnergySupplier(EventId.From(input.EventId), energyResult);
-                        await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResultPerEnergySupplierMessage, CancellationToken.None).ConfigureAwait(false);
+                    // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
+                    var energyResultPerEnergySupplierMessage = EnergyResultMessageDtoFactory.CreateForEnergySupplier(EventId.From(input.EventId), energyResult);
+                    await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResultPerEnergySupplierMessage, CancellationToken.None).ConfigureAwait(false);
 
-                        numberOfEnqueuedMessages++;
-                    }
-                    catch
-                    {
-                        numberOfFailedMessages++;
-                    }
+                    numberOfEnqueuedMessages++;
                 }
-
-                using (var scope = _serviceScopeFactory.CreateScope())
+                catch
                 {
-                    try
-                    {
-                        var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-
-                        // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
-                        var energyResultPerBalanceResponsibleMessage = EnergyResultMessageDtoFactory.CreateForBalanceResponsiblePrEnergySupplier(EventId.From(input.EventId), energyResult);
-                        await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResultPerBalanceResponsibleMessage, CancellationToken.None).ConfigureAwait(false);
-
-                        numberOfEnqueuedMessages++;
-                    }
-                    catch
-                    {
-                        numberOfFailedMessages++;
-                    }
+                    numberOfFailedMessages++;
                 }
             }
 
-            return numberOfEnqueuedMessages;
+            using (var scope = _serviceScopeFactory.CreateScope())
+            {
+                try
+                {
+                    var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+
+                    // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
+                    var energyResultPerBalanceResponsibleMessage = EnergyResultMessageDtoFactory.CreateForBalanceResponsiblePrEnergySupplier(EventId.From(input.EventId), energyResult);
+                    await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResultPerBalanceResponsibleMessage, CancellationToken.None).ConfigureAwait(false);
+
+                    numberOfEnqueuedMessages++;
+                }
+                catch
+                {
+                    numberOfFailedMessages++;
+                }
+            }
         }
-        catch (Exception)
-        {
-            return numberOfEnqueuedMessages;
-        }
+
+        return numberOfFailedMessages > 0
+            ? throw new Exception($"Enqueue messages activity failed. CalculationId='{input.CalculationId}' EventId='{input.EventId}' NumberOfFailedMessaages='{numberOfFailedMessages}'")
+            : numberOfEnqueuedMessages;
     }
 }

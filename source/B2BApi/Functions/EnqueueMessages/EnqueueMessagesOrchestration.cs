@@ -33,25 +33,28 @@ internal class EnqueueMessagesOrchestration
             return "Error: No input specified.";
         }
 
+        var retryOptions = CreateRetryOptions();
+
         // Fan-out/fan-in => https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-cloud-backup?tabs=csharp
         var tasks = new Task<int>[3];
         tasks[0] = context.CallActivityAsync<int>(
             nameof(EnqueueEnergyResultsForGridAreaOwnersActivity),
-            new EnqueueMessagesInput(input.CalculationId, input.EventId));
+            new EnqueueMessagesInput(input.CalculationId, input.EventId),
+            options: retryOptions);
 
         tasks[1] = context.CallActivityAsync<int>(
             nameof(EnqueueEnergyResultsForBalanceResponsiblesActivity),
-            new EnqueueMessagesInput(input.CalculationId, input.EventId));
+            new EnqueueMessagesInput(input.CalculationId, input.EventId),
+            options: retryOptions);
 
         tasks[2] = context.CallActivityAsync<int>(
             nameof(EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity),
-            new EnqueueMessagesInput(input.CalculationId, input.EventId));
+            new EnqueueMessagesInput(input.CalculationId, input.EventId),
+            options: retryOptions);
 
         await Task.WhenAll(tasks);
 
-        var numberOfEnqueuedMessages = tasks.Sum(t => t.Result);
-        var messagesWasSuccessfullyEnqueued = numberOfEnqueuedMessages > 0;
-
+        var messagesWasSuccessfullyEnqueued = MessagesWasSuccessfullyEnqueued(tasks.Select(t => t.Result));
         await context.CallActivityAsync(
             nameof(SendActorMessagesEnqueuedActivity),
             new SendMessagesEnqueuedInput(
@@ -61,5 +64,19 @@ internal class EnqueueMessagesOrchestration
                 messagesWasSuccessfullyEnqueued));
 
         return "Success";
+    }
+
+    private static TaskOptions CreateRetryOptions()
+    {
+        return TaskOptions.FromRetryPolicy(new RetryPolicy(
+            maxNumberOfAttempts: int.MaxValue,
+            firstRetryInterval: TimeSpan.FromSeconds(2),
+            backoffCoefficient: 2.0,
+            maxRetryInterval: TimeSpan.FromHours(1)));
+    }
+
+    private static bool MessagesWasSuccessfullyEnqueued(IEnumerable<int> enqueueMessagesResults)
+    {
+        return enqueueMessagesResults.Sum() > 0;
     }
 }
