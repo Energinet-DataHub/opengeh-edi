@@ -16,18 +16,15 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 
-public static class MeasurementUnitMapper
+public static class CurrencyMapper
 {
-    public static MeasurementUnit Map(string? measurementUnit)
-    {
-        return measurementUnit switch
+    public static Currency FromDeltaTableValue(string currency) =>
+        currency switch
         {
-            "kWh" => MeasurementUnit.Kwh,
-            "pcs" => MeasurementUnit.Pieces,
+            "DKK" => Currency.DanishCrowns,
             _ => throw new ArgumentOutOfRangeException(
-                nameof(MeasurementUnit),
-                measurementUnit,
-                "Value does not contain a valid string representation of a measurement unit."),
+                nameof(currency),
+                actualValue: currency,
+                "Value does not contain a valid string representation of a currency."),
         };
-    }
 }
