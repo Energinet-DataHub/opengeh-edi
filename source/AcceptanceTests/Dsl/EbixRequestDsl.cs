@@ -17,6 +17,7 @@ using System.ServiceModel.Security;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
+using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using FluentAssertions;
 using FluentAssertions.Execution;
 
@@ -24,12 +25,17 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
 internal sealed class EbixRequestDsl
 {
+    private readonly Guid _balanceFixingCalculationId;
+    private readonly Guid _wholesaleFixingCalculationId;
+
     private readonly WholesaleDriver _wholesale;
     private readonly EbixDriver _ebix;
 
 #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
-    public EbixRequestDsl(WholesaleDriver wholesale, EbixDriver ebix)
+    public EbixRequestDsl(AcceptanceTestFixture fixture, WholesaleDriver wholesale, EbixDriver ebix)
     {
+        _balanceFixingCalculationId = fixture.BalanceFixingCalculationId;
+        _wholesaleFixingCalculationId = fixture.WholesaleFixingCalculationId;
         _wholesale = wholesale;
         _ebix = ebix;
     }
@@ -39,6 +45,24 @@ internal sealed class EbixRequestDsl
     internal async Task EmptyQueueForActor()
     {
         await _ebix.EmptyQueueAsync().ConfigureAwait(false);
+    }
+
+    internal async Task PublishCalculationCompletedForBalanceFixing()
+    {
+        await _ebix.EmptyQueueAsync().ConfigureAwait(false);
+
+        await _wholesale.PublishCalculationCompletedAsync(
+            _balanceFixingCalculationId,
+            CalculationCompletedV1.Types.CalculationType.BalanceFixing);
+    }
+
+    internal async Task PublishCalculationCompletedForWholesaleFixing()
+    {
+        await _ebix.EmptyQueueAsync().ConfigureAwait(false);
+
+        await _wholesale.PublishCalculationCompletedAsync(
+            _wholesaleFixingCalculationId,
+            CalculationCompletedV1.Types.CalculationType.WholesaleFixing);
     }
 
     internal Task PublishAggregationResult(string gridArea)

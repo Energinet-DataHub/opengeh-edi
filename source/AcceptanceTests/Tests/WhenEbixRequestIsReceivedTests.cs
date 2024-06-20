@@ -39,49 +39,67 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
         _fixture = fixture;
 
         _ebixMDR = new EbixRequestDsl(
+            fixture,
             new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient),
             new EbixDriver(new Uri(fixture.EbixUri, "/ebix"), fixture.EbixCertificatePasswordForMeterDataResponsible, ActorRole.MeteredDataAdministrator));
         _ebixEs = new EbixRequestDsl(
+            fixture,
             new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient),
             new EbixDriver(new Uri(fixture.EbixUri, "/ebix"), fixture.EbixCertificatePasswordForEnergySupplier, ActorRole.EnergySupplier));
         _actor = new ActorDsl(new MarketParticipantDriver(fixture.EventPublisher), new EdiActorDriver(fixture.ConnectionString));
     }
 
     [Fact]
-    public async Task Actor_can_peek_and_dequeue_aggregation_result_in_ebIX_format()
+    public async Task Actor_can_peek_and_dequeue_energy_result_in_ebIX_format()
     {
         await _ebixMDR.EmptyQueueForActor();
 
-        await _ebixMDR.PublishAggregationResult(AcceptanceTestFixture.EbixActorGridArea);
+        await _ebixMDR.PublishCalculationCompletedForBalanceFixing();
+        // await _ebixMDR.PublishAggregationResult(AcceptanceTestFixture.EbixActorGridArea);
 
         await _ebixMDR.ConfirmEnergyResultIsAvailable();
     }
 
-    [Fact]
-    public async Task Actor_can_peek_and_dequeue_monthly_sum_per_charge_in_ebIX_format()
+    // TODO: Find ebIX actor with Wholesale data, or get Wholesale to create data for ebIX energy supplier actor 5790000610976 in grid area 543
+    [Fact(Skip = "The ebIX energy supplier actor 5790000610976 (in grid area 543) does currently not have any Wholesale data")]
+    public async Task Actor_can_peek_and_dequeue_wholesale_result_in_ebIX_format()
     {
         await _ebixEs.EmptyQueueForActor();
 
-        await _ebixEs.PublishMonthlySumPrCharge(
-            AcceptanceTestFixture.EbixActorGridArea,
-            AcceptanceTestFixture.ActorNumber,
-            AcceptanceTestFixture.ChargeOwnerId);
+        await _ebixEs.PublishCalculationCompletedForWholesaleFixing();
+        //     await _ebixEs.PublishAmountPerChargeResult(
+        //         AcceptanceTestFixture.EbixActorGridArea,
+        //         AcceptanceTestFixture.ActorNumber,
+        //         AcceptanceTestFixture.ChargeOwnerId);
 
         await _ebixEs.ConfirmWholesaleResultIsAvailable();
     }
 
-    [Fact]
-    public async Task Actor_can_peek_and_dequeue_amount_per_charge_in_ebIX_format()
-    {
-        await _ebixEs.EmptyQueueForActor();
-
-        await _ebixEs.PublishAmountPerChargeResult(
-            AcceptanceTestFixture.EbixActorGridArea,
-            AcceptanceTestFixture.ActorNumber,
-            AcceptanceTestFixture.ChargeOwnerId);
-
-        await _ebixEs.ConfirmWholesaleResultIsAvailable();
-    }
+    // [Fact]
+    // public async Task Actor_can_peek_and_dequeue_monthly_sum_per_charge_in_ebIX_format()
+    // {
+    //     await _ebixEs.EmptyQueueForActor();
+    //
+    //     await _ebixEs.PublishMonthlySumPrCharge(
+    //         AcceptanceTestFixture.EbixActorGridArea,
+    //         AcceptanceTestFixture.ActorNumber,
+    //         AcceptanceTestFixture.ChargeOwnerId);
+    //
+    //     await _ebixEs.ConfirmWholesaleResultIsAvailable();
+    // }
+    //
+    // [Fact]
+    // public async Task Actor_can_peek_and_dequeue_amount_per_charge_in_ebIX_format()
+    // {
+    //     await _ebixEs.EmptyQueueForActor();
+    //
+    //     await _ebixEs.PublishAmountPerChargeResult(
+    //         AcceptanceTestFixture.EbixActorGridArea,
+    //         AcceptanceTestFixture.ActorNumber,
+    //         AcceptanceTestFixture.ChargeOwnerId);
+    //
+    //     await _ebixEs.ConfirmWholesaleResultIsAvailable();
+    // }
 
     [Fact]
     public async Task Dequeue_request_without_content_gives_ebIX_error_B2B_900()

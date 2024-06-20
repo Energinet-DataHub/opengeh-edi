@@ -36,11 +36,12 @@ public sealed class WhenAmountPerChargeResultResultIsPublishedTests : BaseTestCl
         ArgumentNullException.ThrowIfNull(fixture);
 
         _notifyWholesaleServices = new NotifyWholesaleServicesDsl(
+            fixture,
             new EdiDriver(fixture.B2BEnergySupplierAuthorizedHttpClient, output),
             new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
     }
 
-    [Fact]
+    [Fact(Skip = "Dev environments uses message orchestration instead of integration events for creating actor messages")]
     public async Task Actor_can_peek_and_dequeue_amount_charge_result()
     {
         await _notifyWholesaleServices.PublishAmountPerChargeResult(

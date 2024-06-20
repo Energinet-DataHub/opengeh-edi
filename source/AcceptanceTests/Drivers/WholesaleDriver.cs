@@ -134,6 +134,7 @@ internal sealed class WholesaleDriver
             calculationId,
             calculationType);
 
+        // TODO: Wait for orchestration to complete
         return _integrationEventPublisher.PublishAsync(
             CalculationCompletedV1.EventName,
             calculationCompleted.ToByteArray(),

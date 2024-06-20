@@ -44,4 +44,12 @@ public class WhenCalculationCompletedIsPublishedTests : BaseTestClass
 
         await _calculationCompleted.ConfirmEnergyResultIsAvailable();
     }
+
+    [Fact]
+    public async Task Actor_can_peek_and_dequeue_wholesale_and_energy_result_from_wholesale_fixing()
+    {
+        await _calculationCompleted.PublishForWholesaleFixingCalculation();
+
+        await _calculationCompleted.ConfirmWholesaleResultsAndEnergyResultsAreAvailable();
+    }
 }

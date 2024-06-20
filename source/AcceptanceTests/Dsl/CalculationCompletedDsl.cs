@@ -48,8 +48,10 @@ public sealed class CalculationCompletedDsl
             CalculationCompletedV1.Types.CalculationType.BalanceFixing);
     }
 
-    internal async Task PublishForWholesaleFixing()
+    internal async Task PublishForWholesaleFixingCalculation()
     {
+        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+
         await _wholesaleDriver.PublishCalculationCompletedAsync(
             _wholesaleFixingCalculationId,
             CalculationCompletedV1.Types.CalculationType.WholesaleFixing);
@@ -57,6 +59,8 @@ public sealed class CalculationCompletedDsl
 
     internal async Task ConfirmEnergyResultIsAvailable()
     {
+        // TODO: Wait for orchestration to complete
+
         var peekResponse = await _ediDriver.PeekMessageAsync().ConfigureAwait(false);
         var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
         var contentString = await peekResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -64,6 +68,36 @@ public sealed class CalculationCompletedDsl
         messageId.Should().NotBeNull();
         contentString.Should().NotBeNull();
         contentString.Should().Contain("NotifyAggregatedMeasureData_MarketDocument");
+
+        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+    }
+
+    internal async Task ConfirmWholesaleResultsAndEnergyResultsAreAvailable()
+    {
+        // TODO: Wait for orchestration to complete
+
+        var peekResponses = await _ediDriver.PeekAllMessagesAsync()
+            .ConfigureAwait(false);
+
+        peekResponses.Should()
+            .NotBeEmpty()
+            .And.AllSatisfy(
+                r => r.Headers
+                    .GetValues("MessageId")
+                    .FirstOrDefault()
+                    .Should()
+                    .NotBeNullOrEmpty(),
+                "because all peek responses should contain a MessageId");
+
+        var peekContents = await Task.WhenAll(peekResponses.Select(r => r.Content.ReadAsStringAsync()));
+        peekContents
+            .Should()
+            .ContainMatch(
+                "*NotifyWholesaleServices_MarketDocument*",
+                "because the peek responses should contain at least one NotifyWholesaleServices document")
+            .And.ContainMatch(
+                "*NotifyAggregatedMeasureData_MarketDocument*",
+                "because the peek responses should contain at least one NotifyAggregatedMeasureData document");
 
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
     }
