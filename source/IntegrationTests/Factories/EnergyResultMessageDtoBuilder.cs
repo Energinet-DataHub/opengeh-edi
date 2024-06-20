@@ -24,6 +24,7 @@ public class EnergyResultMessageDtoBuilder
     private const string GridAreaCode = "805";
     private readonly IReadOnlyCollection<EnergyResultMessagePoint> _points = new List<EnergyResultMessagePoint>();
     private EventId _eventId = EventId.From(Guid.NewGuid());
+    private ExternalId _externalId = ExternalId.From(Guid.NewGuid());
     private BusinessReason _businessReason = BusinessReason.BalanceFixing;
     private SettlementVersion? _settlementVersion;
     private ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
@@ -76,6 +77,12 @@ public class EnergyResultMessageDtoBuilder
     public EnergyResultMessageDtoBuilder WithEventId(EventId eventId)
     {
         _eventId = eventId;
+        return this;
+    }
+
+    public EnergyResultMessageDtoBuilder WithExternalId(ExternalId externalId)
+    {
+        _externalId = externalId;
         return this;
     }
 }

@@ -109,6 +109,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.NotNull(result!.CreatedBy),
             () => Assert.Null(result!.ModifiedAt),
             () => Assert.Null(result!.ModifiedBy),
+            () => Assert.Equal(message.ExternalId.Value, result!.ExternalId),
         };
 
         Assert.Multiple(propertyAssertions);
@@ -360,6 +361,37 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         fromDb.OutgoingMessageReceiverRole.Should().Be(ActorRole.MeteredDataResponsible.Code);
     }
 
+    [Fact]
+    public async Task Outgoing_message_must_only_be_enqueued_once_based_on_receiver_and_externalId()
+    {
+        // Arrange
+        var receiverId = ActorNumber.Create("1234567891912");
+        var receiverRole = ActorRole.MeteredDataAdministrator;
+        var externalId = new ExternalId(Guid.NewGuid());
+
+        var message = _energyResultMessageDtoBuilder
+            .WithReceiverNumber(receiverId.Value)
+            .WithReceiverRole(receiverRole)
+            .WithExternalId(externalId)
+            .Build();
+
+        var countBeforeEnqueue = await GetCountOfOutgoingMessagesFromDatabase();
+
+        // Act
+        var firstId = await EnqueueAndCommitAsync(message);
+        var secondId = await EnqueueAndCommitAsync(message);
+
+        // Assert
+        var countAfterEnqueue = await GetCountOfOutgoingMessagesFromDatabase();
+
+        // No messages are in the database before enqueue is called
+        countBeforeEnqueue.Should().Be(0);
+        // The message enqueued twice should have the same id
+        firstId.Should().Be(secondId);
+        // Only one message should be in the database after enqueue is called twice
+        countAfterEnqueue.Should().Be(1);
+    }
+
     protected override void Dispose(bool disposing)
     {
         _context.Dispose();
@@ -398,6 +430,14 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var assignedBundleId = await connection.ExecuteScalarAsync<Guid>($"SELECT AssignedBundleId FROM [dbo].[OutgoingMessages] WHERE Id = '{id.Value}'");
 
         return assignedBundleId;
+    }
+
+    private async Task<int> GetCountOfOutgoingMessagesFromDatabase()
+    {
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        var numberOfMessages = await connection
+            .ExecuteScalarAsync<int>("SELECT COUNT(*) FROM dbo.OutgoingMessages");
+        return numberOfMessages;
     }
 
     private async Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultMessageDto message)

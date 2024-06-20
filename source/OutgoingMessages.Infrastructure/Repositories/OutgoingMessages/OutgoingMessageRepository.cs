@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -69,6 +71,11 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
             peekResult.MessageId,
             outgoingMessages,
             firstMessage.RelatedToMessageId);
+    }
+
+    public async Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId)
+    {
+        return await _context.OutgoingMessages.FirstOrDefaultAsync(x => x.Receiver.Number == receiver.Number && x.Receiver.ActorRole == receiver.ActorRole && x.ExternalId == externalId).ConfigureAwait(false);
     }
 
     private async Task DownloadAndSetMessageRecordAsync(OutgoingMessage outgoingMessage)
