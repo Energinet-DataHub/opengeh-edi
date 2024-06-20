@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -59,33 +60,33 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
 
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
-    public async Task AndGiven_EnqueueEnergyResultsForGridOperators_When_GridOperatorPeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
+    public async Task AndGiven_EnqueueEnergyResultsPerGridArea_When_MeteredDataResponsiblePeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
     {
         // Given (arrange)
         var testDataDescription = await GivenDatabricksResultDataForEnergyResultPerGridArea();
         var testMessageData = testDataDescription.ExampleEnergyResultMessageData;
 
         GivenNowIs(Instant.FromUtc(2022, 09, 07, 13, 37, 05));
-        var gridOperator = new Actor(ActorNumber.Create("1111111111111"), ActorRole.GridOperator);
+        var meteredDataResponsible = new Actor(ActorNumber.Create("1111111111111"), ActorRole.MeteredDataResponsible);
 
-        await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCode, gridOperator.ActorNumber);
-        await GivenEnqueueEnergyResultsForGridOperatorsAsync(testDataDescription.CalculationId);
+        await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCode, meteredDataResponsible.ActorNumber);
+        await GivenEnqueueEnergyResultsPerGridAreaAsync(testDataDescription.CalculationId);
 
         // When (act)
-        var peekResultsForGridOperator = await WhenActorPeeksAllMessages(
-            gridOperator.ActorNumber,
-            gridOperator.ActorRole,
+        var peekResultsForMeteredDataResponsible = await WhenActorPeeksAllMessages(
+            meteredDataResponsible.ActorNumber,
+            meteredDataResponsible.ActorRole,
             documentFormat);
 
         // Then (assert)
-        peekResultsForGridOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesCount);
+        peekResultsForMeteredDataResponsible.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesCount);
 
         var assertionInput = new NotifyAggregatedMeasureDataDocumentAssertionInput(
             Timestamp: "2022-09-07T13:37:05Z",
             BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
                 BusinessReason.BalanceFixing,
                 null),
-            ReceiverId: gridOperator.ActorNumber,
+            ReceiverId: meteredDataResponsible.ActorNumber,
             // ReceiverRole: originalActor.ActorRole,
             SenderId: ActorNumber.Create("5790001330552"), // Sender is always DataHub
             // SenderRole: ActorRole.MeteredDataAdministrator,
@@ -103,7 +104,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             Points: testMessageData.Points);
 
         await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
-            peekResultsForGridOperator,
+            peekResultsForMeteredDataResponsible,
             documentFormat,
             assertionInput);
     }
@@ -111,7 +112,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
     public async Task
-        AndGiven_EnqueueEnergyResultsForBalanceResponsibles_When_BalanceResponsiblePeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
+        AndGiven_EnqueueEnergyResultsPerBalanceResponsible_When_BalanceResponsiblePeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
     {
         // Given (arrange)
         var testDataDescription = await GivenDatabricksResultDataForEnergyResultPerBalanceResponsible();
@@ -122,7 +123,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             testDataDescription.ExampleBalanceResponsible.ActorNumber,
             ActorRole.BalanceResponsibleParty);
 
-        await GivenEnqueueEnergyResultsForBalanceResponsibles(testDataDescription.CalculationId);
+        await GivenEnqueueEnergyResultsPerBalanceResponsible(testDataDescription.CalculationId);
 
         // When (act)
         var peekResultsForBalanceResponsible = await WhenActorPeeksAllMessages(
@@ -164,7 +165,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
     public async Task
-        AndGiven_EnqueueEnergyResultsForEnergySuppliers_When_EnergySupplierAndBalanceReponsiblePeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
+        AndGiven_EnqueueEnergyResultsPerEnergySuppliersPerBalanceResponsible_When_EnergySupplierAndBalanceReponsiblePeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
     {
         // Given (arrange)
         var testDataDescription = await GivenDatabricksResultDataForEnergyResultPerEnergySupplier();
@@ -175,7 +176,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         var energySupplier = new Actor(testDataDescription.ExampleEnergySupplier.ActorNumber, ActorRole.EnergySupplier);
         var balanceResponsible = new Actor(testDataDescription.ExampleBalanceResponsible.ActorNumber, ActorRole.BalanceResponsibleParty);
 
-        await GivenEnqueueEnergyResultsForEnergySuppliers(testDataDescription.CalculationId);
+        await GivenEnqueueEnergyResultsPerEnergySuppliersPerBalanceResponsible(testDataDescription.CalculationId);
 
         // When (act)
         var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(
@@ -255,7 +256,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             balanceResponsibleAssertionInput);
     }
 
-    private Task GivenEnqueueEnergyResultsForGridOperatorsAsync(Guid calculationId)
+    private Task GivenEnqueueEnergyResultsPerGridAreaAsync(Guid calculationId)
     {
         var activity = new EnqueueEnergyResultsForGridAreaOwnersActivity(
             GetService<IOutgoingMessagesClient>());
@@ -263,7 +264,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
     }
 
-    private Task GivenEnqueueEnergyResultsForBalanceResponsibles(Guid calculationId)
+    private Task GivenEnqueueEnergyResultsPerBalanceResponsible(Guid calculationId)
     {
         var activity = new EnqueueEnergyResultsForBalanceResponsiblesActivity(
             GetService<IOutgoingMessagesClient>());
@@ -271,7 +272,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
     }
 
-    private Task GivenEnqueueEnergyResultsForEnergySuppliers(Guid calculationId)
+    private Task GivenEnqueueEnergyResultsPerEnergySuppliersPerBalanceResponsible(Guid calculationId)
     {
         var activity = new EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity(
             GetService<IOutgoingMessagesClient>());
@@ -279,22 +280,10 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
     }
 
-    private async Task<(
-        EnergyResultPerGridAreaDescription PerGridArea,
-        EnergyResultPerBrpGridAreaDescription PerBalanceResponsible,
-        EnergyResultPerEnergySupplierBrpGridAreaDescription PerEnergySupplier)> GivenDatabricksResultDataForAllAggregationViews()
-    {
-        var perGridArea = await GivenDatabricksResultDataForEnergyResultPerGridArea();
-        var perBalanceResponsible = await GivenDatabricksResultDataForEnergyResultPerBalanceResponsible();
-        var perEnergySupplier = await GivenDatabricksResultDataForEnergyResultPerEnergySupplier();
-
-        return (perGridArea, perBalanceResponsible, perEnergySupplier);
-    }
-
     private async Task<EnergyResultPerGridAreaDescription> GivenDatabricksResultDataForEnergyResultPerGridArea()
     {
         var energyResultPerGridAreaTestDataDescription = new EnergyResultPerGridAreaDescription();
-        var energyResultPerGridAreaQuery = new EnergyResultPerGridAreaQuery(_ediDatabricksOptions.Value, energyResultPerGridAreaTestDataDescription.CalculationId);
+        var energyResultPerGridAreaQuery = new EnergyResultPerGridAreaQuery(_ediDatabricksOptions.Value,  GetService<IMasterDataClient>(), EventId.From(Guid.NewGuid()), energyResultPerGridAreaTestDataDescription.CalculationId);
 
         await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerGridAreaQuery);
         await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerGridAreaQuery, energyResultPerGridAreaTestDataDescription.TestFilePath);
@@ -304,7 +293,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
     private async Task<EnergyResultPerBrpGridAreaDescription> GivenDatabricksResultDataForEnergyResultPerBalanceResponsible()
     {
         var energyResultPerBrpDescription = new EnergyResultPerBrpGridAreaDescription();
-        var energyResultPerBrpQuery = new EnergyResultPerBrpGridAreaQuery(_ediDatabricksOptions.Value, energyResultPerBrpDescription.CalculationId);
+        var energyResultPerBrpQuery = new EnergyResultPerBalanceResponsiblePerGridAreaQuery(_ediDatabricksOptions.Value, EventId.From(Guid.NewGuid()), energyResultPerBrpDescription.CalculationId);
 
         await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerBrpQuery);
         await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerBrpQuery, energyResultPerBrpDescription.TestFilePath);
@@ -314,7 +303,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
     private async Task<EnergyResultPerEnergySupplierBrpGridAreaDescription> GivenDatabricksResultDataForEnergyResultPerEnergySupplier()
     {
         var energyResultPerEnergySupplierDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
-        var energyResultPerEnergySupplierQuery = new EnergyResultPerEnergySupplierBrpGridAreaQuery(_ediDatabricksOptions.Value, energyResultPerEnergySupplierDescription.CalculationId);
+        var energyResultPerEnergySupplierQuery = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(_ediDatabricksOptions.Value, EventId.From(Guid.NewGuid()), energyResultPerEnergySupplierDescription.CalculationId);
 
         await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerEnergySupplierQuery);
         await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerEnergySupplierQuery, energyResultPerEnergySupplierDescription.TestFilePath);

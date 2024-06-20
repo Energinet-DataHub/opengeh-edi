@@ -21,10 +21,10 @@ using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 
 /// <summary>
-/// Test data description for scenario using the view described by <see cref="EnergyResultPerEnergySupplierBrpGridAreaQuery"/>.
+/// Test data description for scenario using the view described by <see cref="EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery"/>.
 /// </summary>
 public class EnergyResultPerEnergySupplierBrpGridAreaDescription
-    : EnergyResultTestDataDescription
+    : TestDataDescription
 {
     public EnergyResultPerEnergySupplierBrpGridAreaDescription()
         : base("balance_fixing_01-11-2022_01-12-2022_ga_543_per_es_brp_ga_v1.csv")

@@ -13,19 +13,18 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Factories;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 
-public abstract class EnergyResultQueryBase<TResult>(
+public abstract class WholesaleResultQueryBase<TResult>(
         EdiDatabricksOptions ediDatabricksOptions,
         Guid calculationId)
     : IDeltaTableSchemaDescription
-    where TResult : OutgoingMessageDto
+    where TResult : WholesaleTimeSeries
 {
     private readonly EdiDatabricksOptions _ediDatabricksOptions = ediDatabricksOptions;
 
@@ -53,7 +52,7 @@ public abstract class EnergyResultQueryBase<TResult>(
         ArgumentNullException.ThrowIfNull(databricksSqlWarehouseQueryExecutor);
 
         DatabricksSqlRow? currentRow = null;
-        var timeSeriesPoints = new List<EnergyTimeSeriesPoint>();
+        var timeSeriesPoints = new List<WholesaleTimeSeriesPoint>();
 
         var statement = DatabricksStatement
             .FromRawSql(BuildSqlQuery())
@@ -61,11 +60,11 @@ public abstract class EnergyResultQueryBase<TResult>(
 
         await foreach (var nextRow in databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement).ConfigureAwait(false))
         {
-            var timeSeriesPoint = EnergyTimeSeriesPointFactory.CreateTimeSeriesPoint(nextRow);
+            var timeSeriesPoint = WholesaleTimeSeriesPointFactory.Create(nextRow);
 
             if (currentRow != null && BelongsToDifferentResults(currentRow, nextRow))
             {
-                yield return await CreateEnergyResultAsync(currentRow!, timeSeriesPoints).ConfigureAwait(false);
+                yield return CreateWholesaleResult(currentRow!, timeSeriesPoints);
                 timeSeriesPoints = [];
             }
 
@@ -75,15 +74,15 @@ public abstract class EnergyResultQueryBase<TResult>(
 
         if (currentRow != null)
         {
-            yield return await CreateEnergyResultAsync(currentRow, timeSeriesPoints).ConfigureAwait(false);
+            yield return CreateWholesaleResult(currentRow, timeSeriesPoints);
         }
     }
 
-    protected abstract Task<TResult> CreateEnergyResultAsync(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints);
+    protected abstract TResult CreateWholesaleResult(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints);
 
     private static bool BelongsToDifferentResults(DatabricksSqlRow row, DatabricksSqlRow otherRow)
     {
-        return !row.ToGuid(EnergyResultColumnNames.ResultId).Equals(otherRow.ToGuid(EnergyResultColumnNames.ResultId));
+        return !row.ToGuid(WholesaleResultColumnNames.ResultId).Equals(otherRow.ToGuid(WholesaleResultColumnNames.ResultId));
     }
 
     private string BuildSqlQuery()
@@ -93,8 +92,8 @@ public abstract class EnergyResultQueryBase<TResult>(
         return $"""
             SELECT {string.Join(", ", columnNames)}
             FROM {DatabaseName}.{DataObjectName}
-            WHERE {EnergyResultColumnNames.CalculationId} = '{CalculationId}'
-            ORDER BY {EnergyResultColumnNames.ResultId}, {EnergyResultColumnNames.Time}
+            WHERE {WholesaleResultColumnNames.CalculationId} = '{CalculationId}'
+            ORDER BY {WholesaleResultColumnNames.ResultId}, {WholesaleResultColumnNames.Time}
             """;
     }
 }

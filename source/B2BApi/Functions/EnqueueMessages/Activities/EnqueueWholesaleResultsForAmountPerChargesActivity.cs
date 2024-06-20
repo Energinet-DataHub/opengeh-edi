@@ -20,21 +20,21 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
-public class EnqueueEnergyResultsForGridAreaOwnersActivity(
+public class EnqueueWholesaleResultsForAmountPerChargesActivity(
     IOutgoingMessagesClient outgoingMessagesClient)
 {
     private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
 
-    [Function(nameof(EnqueueEnergyResultsForGridAreaOwnersActivity))]
+    [Function(nameof(EnqueueWholesaleResultsForAmountPerChargesActivity))]
     public async Task<int> Run(
         [ActivityTrigger] EnqueueMessagesInput inputDto)
     {
         try
         {
-            var numberOfEnqueuedMessages = await _outgoingMessagesClient.EnqueueEnergyResultsPerGridAreaAsync(
-                new EnqueueMessagesInputDto(
-                    inputDto.CalculationId,
-                    EventId.From(inputDto.EventId)))
+            var numberOfEnqueuedMessages = await _outgoingMessagesClient.EnqueueWholesaleResultsForAmountPerChargeAsync(
+                    new EnqueueMessagesInputDto(
+                        inputDto.CalculationId,
+                        EventId.From(inputDto.EventId)))
                 .ConfigureAwait(false);
 
             return numberOfEnqueuedMessages;

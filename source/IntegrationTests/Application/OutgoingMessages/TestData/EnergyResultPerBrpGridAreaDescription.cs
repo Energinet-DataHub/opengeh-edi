@@ -22,10 +22,10 @@ using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 
 /// <summary>
-/// Test data description for scenario using the view described by <see cref="EnergyResultPerBrpGridAreaQuery"/>.
+/// Test data description for scenario using the view described by <see cref="EnergyResultPerBalanceResponsiblePerGridAreaQuery"/>.
 /// </summary>
 public class EnergyResultPerBrpGridAreaDescription
-    : EnergyResultTestDataDescription
+    : TestDataDescription
 {
     public EnergyResultPerBrpGridAreaDescription()
         : base("balance_fixing_01-11-2022_01-12-2022_ga_543_per_brp_ga_v1.csv")

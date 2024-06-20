@@ -22,112 +22,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Energ
 
 public class EnergyResultMessageDtoFactory()
 {
-    public static EnergyResultMessageDto Create(
-        DomainModel.EventId eventId,
-        EnergyResultPerGridArea energyResult,
-        DomainModel.ActorNumber receiverNumber)
-    {
-        ArgumentNullException.ThrowIfNull(energyResult);
-
-        var (businessReason, settlementVersion) = MapToBusinessReasonAndSettlementVersion(energyResult.CalculationType);
-
-        return EnergyResultMessageDto.Create(
-            eventId,
-            receiverNumber: receiverNumber,
-            receiverRole: DomainModel.ActorRole.MeteredDataResponsible,
-            gridAreaCode: energyResult.GridAreaCode,
-            meteringPointType: energyResult.MeteringPointType.Name,
-            settlementMethod: energyResult.SettlementMethod?.Name,
-            measureUnitType: energyResult.MeasureUnitType.Name,
-            resolution: energyResult.Resolution.Name,
-            energySupplierNumber: null,
-            balanceResponsibleNumber: null,
-            period: new DomainModel.Period(energyResult.PeriodStartUtc, energyResult.PeriodEndUtc),
-            points: CreateEnergyResultMessagePoints(energyResult.TimeSeriesPoints),
-            businessReasonName: businessReason.Name,
-            calculationResultVersion: energyResult.CalculationVersion,
-            settlementVersion: settlementVersion?.Name);
-    }
-
-    public static EnergyResultMessageDto Create(
-        EventId eventId,
-        EnergyResultPerBrpGridArea energyResult)
-    {
-        ArgumentNullException.ThrowIfNull(energyResult);
-
-        var (businessReason, settlementVersion) = MapToBusinessReasonAndSettlementVersion(energyResult.CalculationType);
-
-        return EnergyResultMessageDto.Create(
-            eventId,
-            receiverNumber: ActorNumber.Create(energyResult.BalanceResponsiblePartyId),
-            receiverRole: DomainModel.ActorRole.BalanceResponsibleParty,
-            gridAreaCode: energyResult.GridAreaCode,
-            meteringPointType: energyResult.MeteringPointType.Name,
-            settlementMethod: energyResult.SettlementMethod?.Name,
-            measureUnitType: energyResult.MeasureUnitType.Name,
-            resolution: energyResult.Resolution.Name,
-            energySupplierNumber: null,
-            balanceResponsibleNumber: energyResult.BalanceResponsiblePartyId,
-            period: new DomainModel.Period(energyResult.PeriodStartUtc, energyResult.PeriodEndUtc),
-            points: CreateEnergyResultMessagePoints(energyResult.TimeSeriesPoints),
-            businessReasonName: businessReason.Name,
-            calculationResultVersion: energyResult.CalculationVersion,
-            settlementVersion: settlementVersion?.Name);
-    }
-
-    public static EnergyResultMessageDto CreateForEnergySupplier(
-        EventId eventId,
-        EnergyResultPerEnergySupplierBrpGridArea energyResult)
-    {
-        ArgumentNullException.ThrowIfNull(energyResult);
-
-        var (businessReason, settlementVersion) = MapToBusinessReasonAndSettlementVersion(energyResult.CalculationType);
-
-        return EnergyResultMessageDto.Create(
-            eventId,
-            receiverNumber: ActorNumber.Create(energyResult.EnergySupplierId),
-            receiverRole: DomainModel.ActorRole.EnergySupplier,
-            gridAreaCode: energyResult.GridAreaCode,
-            meteringPointType: energyResult.MeteringPointType.Name,
-            settlementMethod: energyResult.SettlementMethod?.Name,
-            measureUnitType: energyResult.MeasureUnitType.Name,
-            resolution: energyResult.Resolution.Name,
-            energySupplierNumber: energyResult.EnergySupplierId,
-            balanceResponsibleNumber: null,
-            period: new DomainModel.Period(energyResult.PeriodStartUtc, energyResult.PeriodEndUtc),
-            points: CreateEnergyResultMessagePoints(energyResult.TimeSeriesPoints),
-            businessReasonName: businessReason.Name,
-            calculationResultVersion: energyResult.CalculationVersion,
-            settlementVersion: settlementVersion?.Name);
-    }
-
-    public static EnergyResultMessageDto CreateForBalanceResponsiblePrEnergySupplier(
-        EventId eventId,
-        EnergyResultPerEnergySupplierBrpGridArea energyResult)
-    {
-        ArgumentNullException.ThrowIfNull(energyResult);
-
-        var (businessReason, settlementVersion) = MapToBusinessReasonAndSettlementVersion(energyResult.CalculationType);
-
-        return EnergyResultMessageDto.Create(
-            eventId,
-            receiverNumber: ActorNumber.Create(energyResult.BalanceResponsiblePartyId),
-            receiverRole: DomainModel.ActorRole.BalanceResponsibleParty,
-            gridAreaCode: energyResult.GridAreaCode,
-            meteringPointType: energyResult.MeteringPointType.Name,
-            settlementMethod: energyResult.SettlementMethod?.Name,
-            measureUnitType: energyResult.MeasureUnitType.Name,
-            resolution: energyResult.Resolution.Name,
-            energySupplierNumber: energyResult.EnergySupplierId,
-            balanceResponsibleNumber: energyResult.BalanceResponsiblePartyId,
-            period: new DomainModel.Period(energyResult.PeriodStartUtc, energyResult.PeriodEndUtc),
-            points: CreateEnergyResultMessagePoints(energyResult.TimeSeriesPoints),
-            businessReasonName: businessReason.Name,
-            calculationResultVersion: energyResult.CalculationVersion,
-            settlementVersion: settlementVersion?.Name);
-    }
-
-    private static IReadOnlyCollection<EnergyResultMessagePoint> CreateEnergyResultMessagePoints(IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
+    public static IReadOnlyCollection<EnergyResultMessagePoint> CreateEnergyResultMessagePoints(IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
     {
         ArgumentNullException.ThrowIfNull(timeSeriesPoints);
 
@@ -142,7 +37,25 @@ public class EnergyResultMessageDtoFactory()
             .AsReadOnly();
     }
 
-    private static DomainModel.CalculatedQuantityQuality MapToCalculatedQuantityQuality(IReadOnlyCollection<QuantityQuality> qualities)
+    public static (BusinessReason BusinessReason, SettlementVersion? SettlementVersion) MapToBusinessReasonAndSettlementVersion(CalculationType calculationType)
+    {
+        return calculationType switch
+        {
+            CalculationType.Aggregation => (BusinessReason.PreliminaryAggregation, null),
+            CalculationType.BalanceFixing => (BusinessReason.BalanceFixing, null),
+            CalculationType.WholesaleFixing => (BusinessReason.WholesaleFixing, null),
+            CalculationType.FirstCorrectionSettlement => (BusinessReason.Correction, SettlementVersion.FirstCorrection),
+            CalculationType.SecondCorrectionSettlement => (BusinessReason.Correction, SettlementVersion.SecondCorrection),
+            CalculationType.ThirdCorrectionSettlement => (BusinessReason.Correction, SettlementVersion.ThirdCorrection),
+
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(calculationType),
+                actualValue: calculationType,
+                "Value does not contain a valid calculation type."),
+        };
+    }
+
+    private static CalculatedQuantityQuality MapToCalculatedQuantityQuality(IReadOnlyCollection<QuantityQuality> qualities)
     {
         ArgumentNullException.ThrowIfNull(qualities);
 
@@ -152,31 +65,13 @@ public class EnergyResultMessageDtoFactory()
             measured: qualities.Contains(QuantityQuality.Measured),
             calculated: qualities.Contains(QuantityQuality.Calculated)) switch
         {
-            (missing: true, estimated: false, measured: false, calculated: false) => DomainModel.CalculatedQuantityQuality.Missing,
-            (missing: true, _, _, _) => DomainModel.CalculatedQuantityQuality.Incomplete,
-            (_, estimated: true, _, _) => DomainModel.CalculatedQuantityQuality.Estimated,
-            (_, _, measured: true, _) => DomainModel.CalculatedQuantityQuality.Measured,
-            (_, _, _, calculated: true) => DomainModel.CalculatedQuantityQuality.Calculated,
+            (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality.Missing,
+            (missing: true, _, _, _) => CalculatedQuantityQuality.Incomplete,
+            (_, estimated: true, _, _) => CalculatedQuantityQuality.Estimated,
+            (_, _, measured: true, _) => CalculatedQuantityQuality.Measured,
+            (_, _, _, calculated: true) => CalculatedQuantityQuality.Calculated,
 
-            _ => DomainModel.CalculatedQuantityQuality.NotAvailable,
-        };
-    }
-
-    private static (DomainModel.BusinessReason BusinessReason, DomainModel.SettlementVersion? SettlementVersion) MapToBusinessReasonAndSettlementVersion(CalculationType calculationType)
-    {
-        return calculationType switch
-        {
-            CalculationType.Aggregation => (DomainModel.BusinessReason.PreliminaryAggregation, null),
-            CalculationType.BalanceFixing => (DomainModel.BusinessReason.BalanceFixing, null),
-            CalculationType.WholesaleFixing => (DomainModel.BusinessReason.WholesaleFixing, null),
-            CalculationType.FirstCorrectionSettlement => (DomainModel.BusinessReason.Correction, SettlementVersion.FirstCorrection),
-            CalculationType.SecondCorrectionSettlement => (DomainModel.BusinessReason.Correction, SettlementVersion.SecondCorrection),
-            CalculationType.ThirdCorrectionSettlement => (DomainModel.BusinessReason.Correction, SettlementVersion.ThirdCorrection),
-
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(calculationType),
-                actualValue: calculationType,
-                "Value does not contain a valid calculation type."),
+            _ => CalculatedQuantityQuality.NotAvailable,
         };
     }
 }

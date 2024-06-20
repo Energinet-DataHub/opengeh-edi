@@ -13,36 +13,35 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 
-public class EnergyResultEnumerator(
+public class WholesaleResultEnumerator(
     DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor,
     IOptions<EdiDatabricksOptions> ediDatabricksOptions,
-    ILogger<EnergyResultEnumerator> logger)
+    ILogger<WholesaleResultEnumerator> logger)
 {
     private readonly DatabricksSqlWarehouseQueryExecutor _databricksSqlWarehouseQueryExecutor = databricksSqlWarehouseQueryExecutor;
     private readonly EdiDatabricksOptions _ediDatabricksOptions = ediDatabricksOptions.Value;
-    private readonly ILogger<EnergyResultEnumerator> _logger = logger;
+    private readonly ILogger<WholesaleResultEnumerator> _logger = logger;
 
     public EdiDatabricksOptions EdiDatabricksOptions => _ediDatabricksOptions;
 
-    public async IAsyncEnumerable<TResult> GetAsync<TResult>(EnergyResultQueryBase<TResult> query)
-        where TResult : OutgoingMessageDto
+    public async IAsyncEnumerable<TResult> GetAsync<TResult>(WholesaleResultQueryBase<TResult> query)
+        where TResult : WholesaleTimeSeries
     {
         var resultCount = 0;
 
-        await foreach (var energyResult in query.GetAsync(_databricksSqlWarehouseQueryExecutor).ConfigureAwait(false))
+        await foreach (var wholesaleResult in query.GetAsync(_databricksSqlWarehouseQueryExecutor).ConfigureAwait(false))
         {
-            yield return energyResult;
+            yield return wholesaleResult;
             resultCount++;
         }
 
-        _logger.LogDebug("Fetched {result_count} energy results for calculation {calculation_id}", resultCount, query.CalculationId);
+        _logger.LogDebug("Fetched {result_count} wholesale results for calculation {calculation_id}", resultCount, query.CalculationId);
     }
 }

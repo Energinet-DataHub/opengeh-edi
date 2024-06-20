@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
+using NodaTime;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
 
 /// <summary>
-/// An immutable input to start the enqueue messages activity.
+/// Time series point from wholesale results.
+/// Immutable value object.
 /// </summary>
-public record EnqueueMessagesInputDto(
-    Guid CalculationId,
-    EventId EventId);
+public sealed record WholesaleTimeSeriesPoint(Instant TimeUtc, decimal? Quantity, IReadOnlyCollection<QuantityQuality> Qualities, decimal? Price, decimal? Amount);

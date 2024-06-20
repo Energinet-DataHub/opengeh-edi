@@ -23,6 +23,8 @@ public static class ResolutionMapper
         {
             "PT15M" => Resolution.QuarterHourly,
             "PT1H" => Resolution.Hourly,
+            "P1D" => Resolution.Daily,
+            "P1M" => Resolution.Monthly,
 
             _ => throw new ArgumentOutOfRangeException(
                 nameof(resolution),

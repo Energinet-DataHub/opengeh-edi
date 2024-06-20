@@ -76,6 +76,11 @@ public static class DatabricksSchemaManagerExtensions
         var columnName = csvReader.HeaderRecord[columnIndex];
         var columnValue = csvReader.GetField(columnIndex);
 
+        if (schemaInfomation.SchemaDefinition[columnName].IsNullable && columnValue == string.Empty)
+        {
+            return "NULL";
+        }
+
         if (schemaInfomation.SchemaDefinition[columnName].DataType == DeltaTableCommonTypes.ArrayOfStrings)
         {
             var arrayContent = columnValue
@@ -83,11 +88,6 @@ public static class DatabricksSchemaManagerExtensions
                 .Replace(']', ')');
 
             return $"Array{arrayContent}";
-        }
-
-        if (schemaInfomation.SchemaDefinition[columnName].IsNullable && columnValue == string.Empty)
-        {
-            return "NULL";
         }
 
         return $"'{columnValue}'";

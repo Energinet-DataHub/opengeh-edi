@@ -13,21 +13,17 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.Edi.Responses;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 
-public static class MeasurementUnitMapper
-{
-    public static MeasurementUnit Map(string? measurementUnit)
-    {
-        return measurementUnit switch
-        {
-            "kWh" => MeasurementUnit.Kwh,
-            "pcs" => MeasurementUnit.Pieces,
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(MeasurementUnit),
-                measurementUnit,
-                "Value does not contain a valid string representation of a measurement unit."),
-        };
-    }
-}
+public record ExampleWholesaleResultMessageForActor(
+    string GridArea,
+    Currency Currency,
+    ActorNumber EnergySupplier,
+    MeteringPointType MeteringPointType,
+    SettlementMethod? SettlementMethod,
+    Resolution Resolution,
+    int Version,
+    IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> Points);

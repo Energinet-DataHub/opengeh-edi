@@ -12,11 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 
@@ -29,11 +33,16 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Energ
 /// </summary>
 public class EnergyResultPerGridAreaQuery(
         EdiDatabricksOptions ediDatabricksOptions,
+        IMasterDataClient masterDataClient,
+        EventId eventId,
         Guid calculationId)
-    : EnergyResultQueryBase<EnergyResultPerGridArea>(
+    : EnergyResultQueryBase<EnergyResultPerGridAreaMessageDto>(
         ediDatabricksOptions,
         calculationId)
 {
+    private readonly IMasterDataClient _masterDataClient = masterDataClient;
+    private readonly EventId _eventId = eventId;
+
     public override string DataObjectName => "energy_per_ga_v1";
 
     public override Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition => new()
@@ -54,8 +63,32 @@ public class EnergyResultPerGridAreaQuery(
         { EnergyResultColumnNames.QuantityQualities,            (DeltaTableCommonTypes.ArrayOfStrings,  false) },
     };
 
-    protected override EnergyResultPerGridArea CreateEnergyResult(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
+    protected override async Task<EnergyResultPerGridAreaMessageDto> CreateEnergyResultAsync(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
     {
-        return EnergyResultPerGridAreaFactory.CreateEnergyResultPerGridArea(databricksSqlRow, timeSeriesPoints);
+        var gridArea = databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.GridAreaCode);
+
+        // TODO: Should we implement caching of the grid area owner for each grid area?
+        var gridAreaOwnerNumber = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(gridArea, CancellationToken.None).ConfigureAwait(false);
+
+        var resolution = ResolutionMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.Resolution));
+        var calculationType = CalculationTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.CalculationType));
+        var (businessReason, settlementVersion) = EnergyResultMessageDtoFactory.MapToBusinessReasonAndSettlementVersion(calculationType);
+
+        var messageDto = new EnergyResultPerGridAreaMessageDto(
+            eventId: _eventId,
+            calculationResultId: databricksSqlRow.ToGuid(EnergyResultColumnNames.ResultId),
+            calculationResultVersion: databricksSqlRow.ToLong(EnergyResultColumnNames.CalculationVersion),
+            businessReason: businessReason,
+            settlementVersion: settlementVersion,
+            gridArea: databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.GridAreaCode),
+            meteringPointType: MeteringPointTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.MeteringPointType)),
+            settlementMethod: SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)),
+            measurementUnit: MeasurementUnitMapper.Map(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)),
+            resolution: resolution,
+            period: EnergyResultPerGridAreaFactory.GetPeriod(timeSeriesPoints, resolution),
+            meteredDataResponsibleNumber: gridAreaOwnerNumber,
+            points: EnergyResultMessageDtoFactory.CreateEnergyResultMessagePoints(timeSeriesPoints));
+
+        return messageDto;
     }
 }
