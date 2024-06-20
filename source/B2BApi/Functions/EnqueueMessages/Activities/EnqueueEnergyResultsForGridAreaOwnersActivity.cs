@@ -14,17 +14,24 @@
 
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
+/// <summary>
+/// Enqueue energy results for Grid Area Owners as outgoing messages for the given calculation id.
+/// </summary>
 public class EnqueueEnergyResultsForGridAreaOwnersActivity(
     IServiceScopeFactory serviceScopeFactory,
+    IMasterDataClient masterDataClient,
     EnergyResultEnumerator energyResultEnumerator)
 {
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
+    private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly EnergyResultEnumerator _energyResultEnumerator = energyResultEnumerator;
 
     [Function(nameof(EnqueueEnergyResultsForGridAreaOwnersActivity))]
@@ -34,21 +41,20 @@ public class EnqueueEnergyResultsForGridAreaOwnersActivity(
         var numberOfHandledResults = 0;
         var numberOfFailedResults = 0;
 
-        var query = new EnergyResultPerGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
+        var query = new EnergyResultPerGridAreaQuery(
+            _energyResultEnumerator.EdiDatabricksOptions,
+            _masterDataClient,
+            EventId.From(input.EventId),
+            input.CalculationId);
         await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
         {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 try
                 {
-                    var scopedMasterDataClient = scope.ServiceProvider.GetRequiredService<IMasterDataClient>();
                     var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-
-                    // TODO: It should be possible to implement a cache for grid area owner, so we improve the performance of the loop
-                    var receiverNumber = await scopedMasterDataClient.GetGridOwnerForGridAreaCodeAsync(energyResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
-                    // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
-                    var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult, receiverNumber);
-                    await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);
+                    // TODO: Did not use returned "numberOfEnqueuedMessages", let's talk
+                    await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResult, CancellationToken.None).ConfigureAwait(false);
 
                     numberOfHandledResults++;
                 }

@@ -161,7 +161,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             ("EnqueueWholesaleResultsForAmountPerChargesActivity", "0"),
             ("SendActorMessagesEnqueuedActivity", null),
             (null, "Success"),
-        });
+        ]);
 
         // => Verify that the durable function completed successfully
         var last = completeOrchestrationStatus.History.Last();
@@ -256,7 +256,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             ("EnqueueWholesaleResultsForAmountPerChargesActivity", forAmountPerChargeDescription.ExpectedCalculationResultsCount.ToString()),
             ("SendActorMessagesEnqueuedActivity", null),
             (null, "Success"),
-        });
+        ]);
 
         // => Verify that the durable function completed successfully
         var last = completeOrchestrationStatus.History.Last();
@@ -344,7 +344,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             TimeSpan.FromSeconds(30),
             delay: TimeSpan.FromSeconds(5));
 
-        isExpected.Should().BeTrue("because we expect the actual history to contain the expected history.");
+        isExpected.Should().BeTrue("because we expect the actual history to contain the expected history");
     }
 
     private static ServiceBusMessage CreateCalculationCompletedEventMessage(

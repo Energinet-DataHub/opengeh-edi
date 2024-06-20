@@ -258,6 +258,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
     {
         var activity = new EnqueueEnergyResultsForGridAreaOwnersActivity(
             GetService<IServiceScopeFactory>(),
+            GetService<IMasterDataClient>(),
             GetService<EnergyResultEnumerator>());
 
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
