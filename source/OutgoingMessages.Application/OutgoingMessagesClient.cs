@@ -125,10 +125,12 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         return messageId;
     }
 
-    public async Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultPerGridAreaMessageDto energyResultMessage, CancellationToken cancellationToken)
+    public async Task<OutgoingMessageId> EnqueueAndCommitAsync(
+        EnergyResultPerGridAreaMessageDto messageDto,
+        CancellationToken cancellationToken)
     {
         var message = OutgoingMessage.CreateMessage(
-            energyResultMessage,
+            messageDto,
             _serializer,
             _systemDateTimeProvider.Now());
 
@@ -138,18 +140,40 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         return messageId;
     }
 
-    public Task<OutgoingMessageId> EnqueueAndCommitAsync(
-        EnergyResultPerBalanceResponsibleMessageDto energyResultMessage,
+    public async Task<OutgoingMessageId> EnqueueAndCommitAsync(
+        EnergyResultPerBalanceResponsibleMessageDto messageDto,
         CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var message = OutgoingMessage.CreateMessage(
+            messageDto,
+            _serializer,
+            _systemDateTimeProvider.Now());
+
+        var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        return messageId;
     }
 
-    public Task<OutgoingMessageId> EnqueueAndCommitAsync(
-        EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto energyResultMessage,
+    public async Task<List<OutgoingMessageId>> EnqueueAndCommitAsync(
+        EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto messageDto,
         CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var messages = OutgoingMessage.CreateMessages(
+            messageDto,
+            _serializer,
+            _systemDateTimeProvider.Now());
+
+        List<OutgoingMessageId> messageIds = new();
+        foreach (var message in messages)
+        {
+            var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+            messageIds.Add(messageId);
+        }
+
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        return messageIds;
     }
 
     public virtual async Task EnqueueAndCommitAsync(

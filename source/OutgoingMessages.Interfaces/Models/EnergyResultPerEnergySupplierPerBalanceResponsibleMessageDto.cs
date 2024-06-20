@@ -71,7 +71,26 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto
             null,
             settlementVersion?.Name);
 
-        SeriesForEnergySupplier = SeriesForBalanceResponsible with { BalanceResponsibleNumber = null, };
+        SeriesForEnergySupplier = new EnergyResultMessageTimeSeries(
+            TransactionId.New(),
+            gridArea,
+            meteringPointType.Name,
+            null,
+            settlementMethod?.Name,
+            measurementUnit.Name,
+            resolution.Name,
+            energySupplierNumber.Value,
+            null,
+            period,
+            points.Select(p => new EnergyResultMessagePoint(
+                    p.Position,
+                    p.Quantity,
+                    p.QuantityQuality,
+                    p.SampleTime))
+                .ToList(),
+            calculationResultVersion,
+            null,
+            settlementVersion?.Name);
 
         GridArea = gridArea;
         EnergySupplierNumber = energySupplierNumber;

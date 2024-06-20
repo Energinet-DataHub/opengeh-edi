@@ -64,17 +64,17 @@ public interface IOutgoingMessagesClient
     /// <summary>
     ///  Enqueue a energy result message for the "grid area" aggregation level, WITH commit.
     /// </summary>
-    Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultPerGridAreaMessageDto energyResultMessage, CancellationToken cancellationToken);
+    Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultPerGridAreaMessageDto messageDto, CancellationToken cancellationToken);
 
     /// <summary>
     /// Enqueue a energy result message for the "balance responsible, grid area" aggregation level, WITH commit.
     /// </summary>
-    Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultPerBalanceResponsibleMessageDto energyResultMessage, CancellationToken cancellationToken);
+    Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultPerBalanceResponsibleMessageDto messageDto, CancellationToken cancellationToken);
 
     /// <summary>
     /// Enqueue a energy result message for the "energy supplier, balance responsible, grid area" aggregation level, WITH commit.
     /// </summary>
-    Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto energyResultMessage, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<OutgoingMessageId>> EnqueueAndCommitAsync(EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto messageDto, CancellationToken cancellationToken);
 
     /// <summary>
     ///  Enqueue wholesale messages, handles enqueuing messages to all appropriate parties (Receiver, ChargeOwner) in a single transaction.
