@@ -22,7 +22,7 @@ using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 
 /// <summary>
-/// Test data description for scenario using the view described by <see cref="EnergyResultPerBrpGridAreaQuery"/>.
+/// Test data description for scenario using the view described by <see cref="EnergyResultPerBalanceResponsiblePerGridAreaQuery"/>.
 /// </summary>
 public class EnergyResultPerBrpGridAreaDescription
     : TestDataDescription
