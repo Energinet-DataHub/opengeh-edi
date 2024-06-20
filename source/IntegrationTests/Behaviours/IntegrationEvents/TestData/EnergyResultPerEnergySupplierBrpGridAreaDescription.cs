@@ -17,18 +17,17 @@ using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using NodaTime;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
-using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
 
 /// <summary>
-/// Test data description for scenario using the view described by <see cref="EnergyResultPerBalanceResponsiblePerGridAreaQuery"/>.
+/// Test data description for scenario using the view described by <see cref="EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery"/>.
 /// </summary>
-public class EnergyResultPerBrpGridAreaDescription
+public class EnergyResultPerEnergySupplierBrpGridAreaDescription
     : TestDataDescription
 {
-    public EnergyResultPerBrpGridAreaDescription()
-        : base("balance_fixing_01-11-2022_01-12-2022_ga_543_per_brp_ga_v1.csv")
+    public EnergyResultPerEnergySupplierBrpGridAreaDescription()
+        : base("balance_fixing_01-11-2022_01-12-2022_ga_543_per_es_brp_ga_v1.csv")
     {
     }
 
@@ -36,26 +35,41 @@ public class EnergyResultPerBrpGridAreaDescription
 
     public override string GridAreaCode => "543";
 
-    public override int ExpectedCalculationResultsCount => 20;
+    public override int ExpectedCalculationResultsCount => 35;
 
-    public override int ExpectedOutgoingMessagesCount => 20;
+    public override int ExpectedOutgoingMessagesCount => ExpectedCalculationResultsCount * 2; // We must prepare a message for BRP and ES
 
     public override Period Period => new(
         Instant.FromUtc(2022, 1, 11, 23, 0, 0),
         Instant.FromUtc(2022, 1, 12, 23, 0, 0));
 
-    public ExampleDataForActor<ExampleEnergyResultMessageForActor> ExampleBalanceResponsible => new(
-        ActorNumber: ActorNumber.Create("7080000729821"),
-        ExpectedOutgoingMessagesCount: 3,
+    public ExampleDataForActor<ExampleEnergyResultMessageForActor> ExampleEnergySupplier => new(
+        ActorNumber: ActorNumber.Create("5790002105289"),
+        ExpectedOutgoingMessagesCount: 2,
         ExampleMessageData: new ExampleEnergyResultMessageForActor(
             GridArea: "543",
             MeteringPointType.Consumption,
-            SettlementMethod.Flex,
+            SettlementMethod.NonProfiled,
             Resolution.Hourly,
-            null,
+            ActorNumber.Create("5790002105289"),
             111,
             TimeSeriesPointsFactory.CreatePointsForDay(
                 Period.Start,
-                1211.912m,
+                3011.368m,
+                CalculatedQuantityQuality.Incomplete)));
+
+    public ExampleDataForActor<ExampleEnergyResultMessageForActor> ExampleBalanceResponsible => new(
+        ActorNumber: ActorNumber.Create("7080000729821"),
+        ExpectedOutgoingMessagesCount: 5,
+        ExampleMessageData: new ExampleEnergyResultMessageForActor(
+            GridArea: "543",
+            MeteringPointType.Production,
+            null,
+            Resolution.Hourly,
+            ActorNumber.Create("7080000729821"),
+            111,
+            TimeSeriesPointsFactory.CreatePointsForDay(
+                Period.Start,
+                39471.336m,
                 CalculatedQuantityQuality.Measured)));
 }

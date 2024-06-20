@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
 
 /// <summary>
 /// Contains information to prepare test input from a file, as well as
@@ -26,7 +26,7 @@ public abstract class TestDataDescription
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(testFilename);
 
-        TestFilePath = Path.Combine("Application", "OutgoingMessages", "TestData", testFilename);
+        TestFilePath = Path.Combine("Behaviours", "IntegrationEvents", "TestData", testFilename);
     }
 
     /// <summary>
@@ -57,5 +57,5 @@ public abstract class TestDataDescription
     /// <summary>
     /// Period start/end matching the file content.
     /// </summary>
-    public abstract Period Period { get;  }
+    public abstract Period Period { get; }
 }
