@@ -155,7 +155,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         return messageId;
     }
 
-    public async Task<List<OutgoingMessageId>> EnqueueAndCommitAsync(
+    public async Task<IReadOnlyCollection<OutgoingMessageId>> EnqueueAndCommitAsync(
         EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto messageDto,
         CancellationToken cancellationToken)
     {
