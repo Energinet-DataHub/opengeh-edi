@@ -27,7 +27,7 @@ public abstract class OutgoingMessageDto
         ActorNumber receiverNumber,
         Guid? processId,
         EventId eventId,
-        string businessReason,
+        string businessReasonName,
         ActorRole receiverRole,
         ActorNumber senderId,
         ActorRole senderRole,
@@ -37,7 +37,7 @@ public abstract class OutgoingMessageDto
         ReceiverNumber = receiverNumber;
         ProcessId = processId;
         EventId = eventId;
-        BusinessReason = businessReason;
+        BusinessReason = businessReasonName;
         ReceiverRole = receiverRole;
         SenderId = senderId;
         SenderRole = senderRole;

@@ -151,7 +151,8 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
                 (item.Value<string>("FunctionName"), item.Value<string>("Result")));
 
         activities.Should().NotBeNull().And.BeEquivalentTo(
-        [
+        new List<(string?, string?)>
+        {
             ("EnqueueMessagesOrchestration", null),
             ("EnqueueEnergyResultsForGridAreaOwnersActivity", perGridAreaDataDescription.ExpectedOutgoingMessagesCount.ToString()),
             ("EnqueueEnergyResultsForBalanceResponsiblesActivity", perBrpGridAreaDataDescription.ExpectedOutgoingMessagesCount.ToString()),
@@ -159,7 +160,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             ("EnqueueWholesaleResultsForAmountPerChargesActivity", "0"),
             ("SendActorMessagesEnqueuedActivity", null),
             (null, "Success"),
-        ]);
+        });
 
         // => Verify that the durable function completed successfully
         var last = completeOrchestrationStatus.History.Last();
@@ -246,7 +247,8 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
                 (item.Value<string>("FunctionName"), item.Value<string>("Result")));
 
         activities.Should().NotBeNull().And.BeEquivalentTo(
-        [
+        new List<(string?, string?)>
+        {
             ("EnqueueMessagesOrchestration", null),
             ("EnqueueEnergyResultsForGridAreaOwnersActivity", "0"),
             ("EnqueueEnergyResultsForBalanceResponsiblesActivity", "0"),
@@ -254,7 +256,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             ("EnqueueWholesaleResultsForAmountPerChargesActivity", forAmountPerChargeDescription.ExpectedOutgoingMessagesCount.ToString()),
             ("SendActorMessagesEnqueuedActivity", null),
             (null, "Success"),
-        ]);
+        });
 
         // => Verify that the durable function completed successfully
         var last = completeOrchestrationStatus.History.Last();
@@ -393,13 +395,14 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         await Fixture.DatabricksSchemaManager.CreateSchemaAsync();
         var ediDatabricksOptions = Options.Create(new EdiDatabricksOptions { DatabaseName = Fixture.DatabricksSchemaManager.SchemaName });
 
-        var perGridAreaQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions.Value, perGridAreaDataDescription.CalculationId);
+        // TODO: Seperate schema information from query
+        var perGridAreaQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions.Value, null!, null!, perGridAreaDataDescription.CalculationId);
         var perGridAreTask = SeedDatabricksWithDataAsync(perGridAreaDataDescription, perGridAreaQuery);
 
-        var perBrpGridAreaQuery = new EnergyResultPerBrpGridAreaQuery(ediDatabricksOptions.Value, perGridAreaDataDescription.CalculationId);
+        var perBrpGridAreaQuery = new EnergyResultPerBalanceResponsiblePerGridAreaQuery(ediDatabricksOptions.Value, null!, perGridAreaDataDescription.CalculationId);
         var perBrpGriaAreaTask = SeedDatabricksWithDataAsync(perBrpGridAreaDataDescription, perBrpGridAreaQuery);
 
-        var perBrpAndESGridAreaQuery = new EnergyResultPerEnergySupplierBrpGridAreaQuery(ediDatabricksOptions.Value, perGridAreaDataDescription.CalculationId);
+        var perBrpAndESGridAreaQuery = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(ediDatabricksOptions.Value, null!, perGridAreaDataDescription.CalculationId);
         var perBrpAndESGridAreTask = SeedDatabricksWithDataAsync(perBrpAndEsGridAreaDataDescription, perBrpAndESGridAreaQuery);
 
         var forAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(ediDatabricksOptions.Value, forAmountPerChargeDescription.CalculationId);
