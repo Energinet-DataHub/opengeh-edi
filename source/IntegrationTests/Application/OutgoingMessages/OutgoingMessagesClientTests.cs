@@ -150,7 +150,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         var sut = GetService<IOutgoingMessagesClient>();
         var input = new EnqueueMessagesInputDto(
             testDataDescription.CalculationId,
-            EventId: Guid.NewGuid());
+            EventId: EventId.From(Guid.NewGuid()));
 
         // Act
         await sut.EnqueueWholesaleResultsForAmountPerChargeAsync(input);
