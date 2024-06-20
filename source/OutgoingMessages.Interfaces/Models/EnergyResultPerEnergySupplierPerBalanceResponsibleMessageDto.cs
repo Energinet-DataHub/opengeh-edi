@@ -17,9 +17,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-/// <summary>
-/// An outgoing message dto for the "EnergySupplier, BalanceResponsible, GridArea" aggregation level with
-/// the balance responsible as the receiver
+/// /// <summary>
+/// An outgoing message dto with an energy result for a balance responsible and an energy supplier in a grid area
 /// </summary>
 public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto
     : OutgoingMessageDto

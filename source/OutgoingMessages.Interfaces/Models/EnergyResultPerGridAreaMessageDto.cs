@@ -17,9 +17,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-/// <summary>
-/// An outgoing message dto for the "GridArea" aggregation level with
-/// the metered data responsible as the receiver
+/// /// <summary>
+/// An outgoing message dto with an energy result for a metered data responsible in a grid area
 /// </summary>
 public class EnergyResultPerGridAreaMessageDto
     : OutgoingMessageDto

@@ -18,8 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 /// <summary>
-/// An outgoing message dto for the "BalanceResponsible, GridArea" aggregation level with
-/// the balance responsible as the receiver
+/// An outgoing message dto with an energy result for a balance responsible in a grid area
 /// </summary>
 public class EnergyResultPerBalanceResponsibleMessageDto
     : OutgoingMessageDto
