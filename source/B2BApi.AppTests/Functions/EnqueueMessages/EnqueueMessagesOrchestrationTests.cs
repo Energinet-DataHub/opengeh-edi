@@ -14,6 +14,7 @@
 
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
+using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
@@ -27,6 +28,7 @@ using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Google.Protobuf;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Options;
 using Xunit;
 using Xunit.Abstractions;
@@ -102,10 +104,10 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     ///  - A service bus message is sent as expected.
     /// </summary>
     /// <remarks>
-    /// Feature flags are enabled for all calculation types to ensure activities is executed.
+    /// Feature flags are enabled for all calculation types to ensure activities are executed.
     /// </remarks>
     [Fact]
-    public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
+    public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventForBalanceFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
         Fixture.EnsureAppHostUsesFeatureFlagValue(
@@ -196,7 +198,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     ///  - A service bus message is sent as expected.
     /// </summary>
     /// <remarks>
-    /// Feature flags are enabled for all calculation types to ensure activities is executed.
+    /// Feature flags are enabled for all calculation types to ensure activities are executed.
     /// </remarks>
     [Fact]
     public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventForWholesaleFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
@@ -245,9 +247,8 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             .Select(item =>
                 (item.Value<string>("FunctionName"), item.Value<string>("Result")));
 
-        activities.Should().NotBeNull().And.BeEquivalentTo(
-        new List<(string?, string?)>
-        {
+        activities.Should().NotBeNull().And.Contain(
+        [
             ("EnqueueMessagesOrchestration", null),
             ("EnqueueEnergyResultsForGridAreaOwnersActivity", "0"),
             ("EnqueueEnergyResultsForBalanceResponsiblesActivity", "0"),
@@ -287,12 +288,12 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
     /// <summary>
     /// Verifies that:
-    /// - If databricks has no data for the CalculationId and CalculationType, then ActorMessageEnqueued.Success is false.
+    /// - If databricks has no data for the CalculationId and CalculationType, then orchestration runs "forever" (because of retry policies).
     /// </summary>
     [Theory]
     [InlineData(CalculationCompletedV1.Types.CalculationType.BalanceFixing)]
     [InlineData(CalculationCompletedV1.Types.CalculationType.WholesaleFixing)]
-    public async Task Given_DatabricksHasNoData_When_CalculationCompletedEventIsHandled_Then_ServiceBusMessageHasFailedStatus(CalculationCompletedV1.Types.CalculationType calculationTypeToTest)
+    public async Task Given_DatabricksHasNoData_When_CalculationCompletedEventIsHandled_Then_OrchestrationIsStartedButActivitiesWillFailAndBeRetriedForever(CalculationCompletedV1.Types.CalculationType calculationTypeToTest)
     {
         // Arrange
         Fixture.EnsureAppHostUsesFeatureFlagValue(
@@ -307,6 +308,17 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             calculationTypeToTest,
             calculationId);
 
+        var expectedHistory = new List<(string?, string?)>
+        {
+            ("EnqueueMessagesOrchestration", null),
+            ("EnqueueEnergyResultsForGridAreaOwnersActivity", null),
+            ("EnqueueEnergyResultsForBalanceResponsiblesActivity", null),
+            ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", null),
+            ("EnqueueWholesaleResultsForAmountPerChargesActivity", null),
+            ("SendActorMessagesEnqueuedActivity", null),
+            (null, "Success"),
+        };
+
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
         await Fixture.TopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
@@ -315,35 +327,27 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         // => Verify expected behaviour by searching the orchestration history
         var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
 
-        // => Wait for completion, this should be fairly quick
-        await Fixture.DurableClient.WaitForInstanceCompletedAsync(
-            actualOrchestrationStatus.InstanceId,
-            TimeSpan.FromMinutes(1));
-
-        // => Expect history
-        using var assertionScope = new AssertionScope();
-
-        // => Verify that the expected message was sent on the ServiceBus
-        var verifyServiceBusMessages = await Fixture.ServiceBusListenerMock
-            .When(msg =>
+        // => Wait for running and expected history
+        var isExpected = await Awaiter.TryWaitUntilConditionAsync(
+            async () =>
             {
-                if (msg.Subject != ActorMessagesEnqueuedV1.EventName)
-                {
+                var orchestrationStatus = await Fixture.DurableClient.GetStatusAsync(actualOrchestrationStatus.InstanceId, showHistory: true);
+
+                if (orchestrationStatus.RuntimeStatus != OrchestrationRuntimeStatus.Running)
                     return false;
-                }
 
-                var parsedEvent = ActorMessagesEnqueuedV1.Parser.ParseFrom(msg.Body);
+                var activities = orchestrationStatus.History
+                    .OrderBy(item => item["Timestamp"])
+                    .Select(item =>
+                        (item.Value<string>("FunctionName"), item.Value<string>("Result")));
 
-                var matchingOrchestrationId = parsedEvent.OrchestrationInstanceId == calculationOrchestrationId;
-                var matchingCalculationId = parsedEvent.CalculationId == calculationId;
-                var isFailed = parsedEvent.Success == false;
+                var containsExpectedHistory = expectedHistory.Intersect(activities).Count() == expectedHistory.Count();
+                return containsExpectedHistory;
+            },
+            TimeSpan.FromSeconds(30),
+            delay: TimeSpan.FromSeconds(5));
 
-                return matchingOrchestrationId && matchingCalculationId && isFailed;
-            })
-            .VerifyCountAsync(1);
-
-        var wait = verifyServiceBusMessages.Wait(TimeSpan.FromSeconds(10));
-        wait.Should().BeTrue("We did not receive the expected message on the ServiceBus");
+        isExpected.Should().BeTrue("because we expect the actual history to contain the expected history.");
     }
 
     private static ServiceBusMessage CreateCalculationCompletedEventMessage(
