@@ -59,12 +59,7 @@ public class EnergyResultPerGridAreaMessageDto
             null,
             null,
             period,
-            points.Select(p => new EnergyResultMessagePoint(
-                    p.Position,
-                    p.Quantity,
-                    p.QuantityQuality,
-                    p.SampleTime))
-                .ToList(),
+            points,
             calculationResultVersion,
             null,
             settlementVersion?.Name);

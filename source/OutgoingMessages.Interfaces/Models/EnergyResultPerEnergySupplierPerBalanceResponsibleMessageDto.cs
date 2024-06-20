@@ -60,12 +60,7 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto
             energySupplierNumber.Value,
             balanceResponsibleNumber.Value,
             period,
-            points.Select(p => new EnergyResultMessagePoint(
-                    p.Position,
-                    p.Quantity,
-                    p.QuantityQuality,
-                    p.SampleTime))
-                .ToList(),
+            points,
             calculationResultVersion,
             null,
             settlementVersion?.Name);
@@ -81,12 +76,7 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto
             energySupplierNumber.Value,
             null,
             period,
-            points.Select(p => new EnergyResultMessagePoint(
-                    p.Position,
-                    p.Quantity,
-                    p.QuantityQuality,
-                    p.SampleTime))
-                .ToList(),
+            points,
             calculationResultVersion,
             null,
             settlementVersion?.Name);
