@@ -35,7 +35,9 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
 
     public override string GridAreaCode => "543";
 
-    public override int ExpectedOutgoingMessagesCount => 35 * 2; // 35 results, which we must prepare for BRP and ES
+    public override int ExpectedCalculationResultsCount => 35;
+
+    public override int ExpectedOutgoingMessagesCount => ExpectedCalculationResultsCount * 2; // We must prepare a message for BRP and ES
 
     public override Period Period => new(
         Instant.FromUtc(2022, 1, 11, 23, 0, 0),

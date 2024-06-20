@@ -45,6 +45,11 @@ public abstract class TestDataDescription
     public abstract string GridAreaCode { get; }
 
     /// <summary>
+    /// Expected calculation results based on test file content.
+    /// </summary>
+    public abstract int ExpectedCalculationResultsCount { get; }
+
+    /// <summary>
     /// Expected outgoing messages based on test file content.
     /// </summary>
     public abstract int ExpectedOutgoingMessagesCount { get; }

@@ -36,6 +36,8 @@ public class EnergyResultPerGridAreaDescription
 
     public override string GridAreaCode => "543";
 
+    public override int ExpectedCalculationResultsCount => 5;
+
     public override int ExpectedOutgoingMessagesCount => 5;
 
     public override Period Period => new(

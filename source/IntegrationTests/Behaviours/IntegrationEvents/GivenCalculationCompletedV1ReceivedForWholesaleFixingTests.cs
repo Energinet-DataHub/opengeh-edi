@@ -26,6 +26,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Xunit;
@@ -150,7 +151,8 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
     private Task GivenEnqueueWholesaleResultsForAmountPerChargesAsync(Guid calculationId)
     {
         var activity = new EnqueueWholesaleResultsForAmountPerChargesActivity(
-            GetService<IOutgoingMessagesClient>());
+            GetService<IServiceScopeFactory>(),
+            GetService<WholesaleResultEnumerator>());
 
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
     }

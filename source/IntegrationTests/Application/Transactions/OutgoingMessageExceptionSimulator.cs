@@ -32,20 +32,14 @@ internal sealed class OutgoingMessageExceptionSimulator : OutgoingMessagesClient
         EnqueueMessage enqueueMessage,
         ActorMessageQueueContext actorMessageQueueContext,
         ISystemDateTimeProvider systemDateTimeProvider,
-        ISerializer serializer,
-        IMasterDataClient masterDataClient,
-        EnergyResultEnumerator energyResultEnumerator,
-        WholesaleResultEnumerator wholesaleResultEnumerator)
+        ISerializer serializer)
         : base(
             peekMessage,
             dequeueMessage,
             enqueueMessage,
             actorMessageQueueContext,
             systemDateTimeProvider,
-            serializer,
-            masterDataClient,
-            energyResultEnumerator,
-            wholesaleResultEnumerator)
+            serializer)
     {
     }
 

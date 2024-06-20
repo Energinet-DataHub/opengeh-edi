@@ -18,7 +18,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -33,9 +32,6 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly ISerializer _serializer;
-    private readonly IMasterDataClient _masterDataClient;
-    private readonly EnergyResultEnumerator _energyResultEnumerator;
-    private readonly WholesaleResultEnumerator _wholesaleResultEnumerator;
 
     public OutgoingMessagesClient(
         PeekMessage peekMessage,
@@ -43,10 +39,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         EnqueueMessage enqueueMessage,
         ActorMessageQueueContext actorMessageQueueContext,
         ISystemDateTimeProvider systemDateTimeProvider,
-        ISerializer serializer,
-        IMasterDataClient masterDataClient,
-        EnergyResultEnumerator energyResultEnumerator,
-        WholesaleResultEnumerator wholesaleResultEnumerator)
+        ISerializer serializer)
     {
         _peekMessage = peekMessage;
         _dequeueMessage = dequeueMessage;
@@ -54,9 +47,6 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         _actorMessageQueueContext = actorMessageQueueContext;
         _systemDateTimeProvider = systemDateTimeProvider;
         _serializer = serializer;
-        _masterDataClient = masterDataClient;
-        _energyResultEnumerator = energyResultEnumerator;
-        _wholesaleResultEnumerator = wholesaleResultEnumerator;
     }
 
     public async Task<DequeueRequestResultDto> DequeueAndCommitAsync(DequeueRequestDto request, CancellationToken cancellationToken)

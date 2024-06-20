@@ -153,9 +153,9 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         activities.Should().NotBeNull().And.Contain(
         [
             ("EnqueueMessagesOrchestration", null),
-            ("EnqueueEnergyResultsForGridAreaOwnersActivity", perGridAreaDataDescription.ExpectedOutgoingMessagesCount.ToString()),
-            ("EnqueueEnergyResultsForBalanceResponsiblesActivity", perBrpGridAreaDataDescription.ExpectedOutgoingMessagesCount.ToString()),
-            ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", perBrpAndEsGridAreaDataDescription.ExpectedOutgoingMessagesCount.ToString()),
+            ("EnqueueEnergyResultsForGridAreaOwnersActivity", perGridAreaDataDescription.ExpectedCalculationResultsCount.ToString()),
+            ("EnqueueEnergyResultsForBalanceResponsiblesActivity", perBrpGridAreaDataDescription.ExpectedCalculationResultsCount.ToString()),
+            ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", perBrpAndEsGridAreaDataDescription.ExpectedCalculationResultsCount.ToString()),
             ("EnqueueWholesaleResultsForAmountPerChargesActivity", "0"),
             ("SendActorMessagesEnqueuedActivity", null),
             (null, "Success"),
@@ -252,7 +252,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             ("EnqueueEnergyResultsForGridAreaOwnersActivity", "0"),
             ("EnqueueEnergyResultsForBalanceResponsiblesActivity", "0"),
             ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", "0"),
-            ("EnqueueWholesaleResultsForAmountPerChargesActivity", forAmountPerChargeDescription.ExpectedOutgoingMessagesCount.ToString()),
+            ("EnqueueWholesaleResultsForAmountPerChargesActivity", forAmountPerChargeDescription.ExpectedCalculationResultsCount.ToString()),
             ("SendActorMessagesEnqueuedActivity", null),
             (null, "Success"),
         });

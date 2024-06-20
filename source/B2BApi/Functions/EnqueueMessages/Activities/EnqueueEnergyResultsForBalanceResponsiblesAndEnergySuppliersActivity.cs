@@ -31,8 +31,8 @@ public class EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivit
     public async Task<int> Run(
         [ActivityTrigger] EnqueueMessagesInput input)
     {
-        var numberOfEnqueuedMessages = 0;
-        var numberOfFailedMessages = 0;
+        var numberOfHandledResults = 0;
+        var numberOfFailedResults = 0;
 
         var query = new EnergyResultPerEnergySupplierBrpGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
         await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
@@ -47,35 +47,21 @@ public class EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivit
                     var energyResultPerEnergySupplierMessage = EnergyResultMessageDtoFactory.CreateForEnergySupplier(EventId.From(input.EventId), energyResult);
                     await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResultPerEnergySupplierMessage, CancellationToken.None).ConfigureAwait(false);
 
-                    numberOfEnqueuedMessages++;
-                }
-                catch
-                {
-                    numberOfFailedMessages++;
-                }
-            }
-
-            using (var scope = _serviceScopeFactory.CreateScope())
-            {
-                try
-                {
-                    var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-
                     // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
                     var energyResultPerBalanceResponsibleMessage = EnergyResultMessageDtoFactory.CreateForBalanceResponsiblePrEnergySupplier(EventId.From(input.EventId), energyResult);
                     await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResultPerBalanceResponsibleMessage, CancellationToken.None).ConfigureAwait(false);
 
-                    numberOfEnqueuedMessages++;
+                    numberOfHandledResults++;
                 }
                 catch
                 {
-                    numberOfFailedMessages++;
+                    numberOfFailedResults++;
                 }
             }
         }
 
-        return numberOfFailedMessages > 0
-            ? throw new Exception($"Enqueue messages activity failed. CalculationId='{input.CalculationId}' EventId='{input.EventId}' NumberOfFailedMessaages='{numberOfFailedMessages}'")
-            : numberOfEnqueuedMessages;
+        return numberOfFailedResults > 0
+            ? throw new Exception($"Enqueue messages activity failed. CalculationId='{input.CalculationId}' EventId='{input.EventId}' NumberOfFailedResults='{numberOfFailedResults}'")
+            : numberOfHandledResults;
     }
 }

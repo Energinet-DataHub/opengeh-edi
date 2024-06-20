@@ -54,14 +54,14 @@ internal class EnqueueMessagesOrchestration
 
         await Task.WhenAll(tasks);
 
-        var messagesWasSuccessfullyEnqueued = MessagesWasSuccessfullyEnqueued(tasks.Select(t => t.Result));
+        var resultsWasSuccessfullyHandled = ResultsWasSuccessfullyHandled(tasks.Select(t => t.Result));
         await context.CallActivityAsync(
             nameof(SendActorMessagesEnqueuedActivity),
             new SendMessagesEnqueuedInput(
                 context.InstanceId,
                 input.CalculationOrchestrationId,
                 input.CalculationId,
-                messagesWasSuccessfullyEnqueued));
+                resultsWasSuccessfullyHandled));
 
         return "Success";
     }
@@ -75,8 +75,8 @@ internal class EnqueueMessagesOrchestration
             maxRetryInterval: TimeSpan.FromHours(1)));
     }
 
-    private static bool MessagesWasSuccessfullyEnqueued(IEnumerable<int> enqueueMessagesResults)
+    private static bool ResultsWasSuccessfullyHandled(IEnumerable<int> numberOfHandledResults)
     {
-        return enqueueMessagesResults.Sum() > 0;
+        return numberOfHandledResults.Sum() > 0;
     }
 }

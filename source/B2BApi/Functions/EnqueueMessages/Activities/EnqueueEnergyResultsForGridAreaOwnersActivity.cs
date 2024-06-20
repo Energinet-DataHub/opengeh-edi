@@ -31,8 +31,8 @@ public class EnqueueEnergyResultsForGridAreaOwnersActivity(
     public async Task<int> Run(
         [ActivityTrigger] EnqueueMessagesInput input)
     {
-        var numberOfEnqueuedMessages = 0;
-        var numberOfFailedMessages = 0;
+        var numberOfHandledResults = 0;
+        var numberOfFailedResults = 0;
 
         var query = new EnergyResultPerGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
         await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
@@ -50,17 +50,17 @@ public class EnqueueEnergyResultsForGridAreaOwnersActivity(
                     var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult, receiverNumber);
                     await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);
 
-                    numberOfEnqueuedMessages++;
+                    numberOfHandledResults++;
                 }
                 catch
                 {
-                    numberOfFailedMessages++;
+                    numberOfFailedResults++;
                 }
             }
         }
 
-        return numberOfFailedMessages > 0
-            ? throw new Exception($"Enqueue messages activity failed. CalculationId='{input.CalculationId}' EventId='{input.EventId}' NumberOfFailedMessaages='{numberOfFailedMessages}'")
-            : numberOfEnqueuedMessages;
+        return numberOfFailedResults > 0
+            ? throw new Exception($"Enqueue messages activity failed. CalculationId='{input.CalculationId}' EventId='{input.EventId}' NumberOfFailedResults='{numberOfFailedResults}'")
+            : numberOfHandledResults;
     }
 }
