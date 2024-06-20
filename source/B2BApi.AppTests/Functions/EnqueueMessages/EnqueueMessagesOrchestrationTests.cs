@@ -151,7 +151,8 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
                 (item.Value<string>("FunctionName"), item.Value<string>("Result")));
 
         activities.Should().NotBeNull().And.BeEquivalentTo(
-        [
+        new List<(string?, string?)>
+        {
             ("EnqueueMessagesOrchestration", null),
             ("EnqueueEnergyResultsForGridAreaOwnersActivity", perGridAreaDataDescription.ExpectedOutgoingMessagesCount.ToString()),
             ("EnqueueEnergyResultsForBalanceResponsiblesActivity", perBrpGridAreaDataDescription.ExpectedOutgoingMessagesCount.ToString()),
@@ -159,7 +160,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             ("EnqueueWholesaleResultsForAmountPerChargesActivity", "0"),
             ("SendActorMessagesEnqueuedActivity", null),
             (null, "Success"),
-        ]);
+        });
 
         // => Verify that the durable function completed successfully
         var last = completeOrchestrationStatus.History.Last();
@@ -246,7 +247,8 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
                 (item.Value<string>("FunctionName"), item.Value<string>("Result")));
 
         activities.Should().NotBeNull().And.BeEquivalentTo(
-        [
+        new List<(string?, string?)>
+        {
             ("EnqueueMessagesOrchestration", null),
             ("EnqueueEnergyResultsForGridAreaOwnersActivity", "0"),
             ("EnqueueEnergyResultsForBalanceResponsiblesActivity", "0"),
@@ -254,7 +256,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             ("EnqueueWholesaleResultsForAmountPerChargesActivity", forAmountPerChargeDescription.ExpectedOutgoingMessagesCount.ToString()),
             ("SendActorMessagesEnqueuedActivity", null),
             (null, "Success"),
-        ]);
+        });
 
         // => Verify that the durable function completed successfully
         var last = completeOrchestrationStatus.History.Last();

@@ -256,8 +256,8 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
 
         await foreach (var energyResultPerEnergySupplierPerBalanceResponsible in _energyResultEnumerator.GetAsync(query))
         {
-            await EnqueueAndCommitAsync(energyResultPerEnergySupplierPerBalanceResponsible, CancellationToken.None).ConfigureAwait(false);
-            numberOfEnqueuedMessages++;
+            var createdMessages = await EnqueueAndCommitAsync(energyResultPerEnergySupplierPerBalanceResponsible, CancellationToken.None).ConfigureAwait(false);
+            numberOfEnqueuedMessages += createdMessages.Count;
         }
 
         return numberOfEnqueuedMessages;
