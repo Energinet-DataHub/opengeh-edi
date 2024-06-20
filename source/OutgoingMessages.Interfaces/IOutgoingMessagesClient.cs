@@ -105,4 +105,9 @@ public interface IOutgoingMessagesClient
     ///  Enqueue energy results for Balance Responsible and Energy Supplier as outgoing messages for the given calculation id.
     /// </summary>
     Task<int> EnqueueEnergyResultsPerEnergySupplierPerBalanceResponsibleAsync(EnqueueMessagesInputDto input);
+
+    /// <summary>
+    ///  Enqueue wholesale results for Amount Per Charge to Energy Supplier and ChargeOwner as outgoing messages for the given calculation id.
+    /// </summary>
+    Task<int> EnqueueWholesaleResultsForAmountPerChargeAsync(EnqueueMessagesInputDto input);
 }

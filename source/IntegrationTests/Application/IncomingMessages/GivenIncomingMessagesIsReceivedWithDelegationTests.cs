@@ -87,7 +87,7 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
             stopsAt: now.Plus(Duration.FromSeconds(1)));
 
         // Act
-        var response = await _incomingMessagesRequest.RegisterAndSendAsync(
+        var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
             messageStream,
             documentFormat,
             IncomingDocumentType.RequestAggregatedMeasureData,
@@ -163,7 +163,7 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
             sequenceNumber: 2);
 
         // Act
-        var response = await _incomingMessagesRequest.RegisterAndSendAsync(
+        var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
             messageStream,
             documentFormat,
             IncomingDocumentType.RequestAggregatedMeasureData,
@@ -216,7 +216,7 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
             stopsAt: now.Plus(Duration.FromSeconds(1)));
 
         // Act
-        var response = await _incomingMessagesRequest.RegisterAndSendAsync(
+        var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
             messageStream,
             documentFormat,
             IncomingDocumentType.RequestAggregatedMeasureData,
@@ -279,7 +279,7 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
             stopsAt: now.Plus(Duration.FromSeconds(1)));
 
         // Act
-        var response = await _incomingMessagesRequest.RegisterAndSendAsync(
+        var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
             messageStream,
             documentFormat,
             IncomingDocumentType.RequestAggregatedMeasureData,

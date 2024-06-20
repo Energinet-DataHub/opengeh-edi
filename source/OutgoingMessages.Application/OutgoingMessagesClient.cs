@@ -18,6 +18,8 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Factories;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
@@ -33,6 +35,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     private readonly ISerializer _serializer;
     private readonly IMasterDataClient _masterDataClient;
     private readonly EnergyResultEnumerator _energyResultEnumerator;
+    private readonly WholesaleResultEnumerator _wholesaleResultEnumerator;
 
     public OutgoingMessagesClient(
         PeekMessage peekMessage,
@@ -42,7 +45,8 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         ISystemDateTimeProvider systemDateTimeProvider,
         ISerializer serializer,
         IMasterDataClient masterDataClient,
-        EnergyResultEnumerator energyResultEnumerator)
+        EnergyResultEnumerator energyResultEnumerator,
+        WholesaleResultEnumerator wholesaleResultEnumerator)
     {
         _peekMessage = peekMessage;
         _dequeueMessage = dequeueMessage;
@@ -52,6 +56,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         _serializer = serializer;
         _masterDataClient = masterDataClient;
         _energyResultEnumerator = energyResultEnumerator;
+        _wholesaleResultEnumerator = wholesaleResultEnumerator;
     }
 
     public async Task<DequeueRequestResultDto> DequeueAndCommitAsync(DequeueRequestDto request, CancellationToken cancellationToken)
@@ -229,6 +234,22 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         {
             await EnqueueAndCommitAsync(energyResultPerEnergySupplierPerBalanceResponsible, CancellationToken.None).ConfigureAwait(false);
             numberOfEnqueuedMessages++;
+        }
+
+        return numberOfEnqueuedMessages;
+    }
+
+    public async Task<int> EnqueueWholesaleResultsForAmountPerChargeAsync(EnqueueMessagesInputDto input)
+    {
+        var numberOfEnqueuedMessages = 0;
+
+        var query = new WholesaleAmountPerChargeQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
+        await foreach (var wholesaleResult in _wholesaleResultEnumerator.GetAsync(query))
+        {
+            var gridOwner = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(wholesaleResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
+            var wholesaleResultMessage = WholesaleResultMessageDtoFactory.Create(input.EventId, wholesaleResult, gridOwner);
+            await EnqueueAndCommitAsync(wholesaleResultMessage, CancellationToken.None).ConfigureAwait(false);
+            numberOfEnqueuedMessages += 2;
         }
 
         return numberOfEnqueuedMessages;

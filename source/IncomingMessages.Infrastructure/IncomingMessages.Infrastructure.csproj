@@ -26,919 +26,942 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
+  
   <ItemGroup>
-    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-measure-notifyaggregatedmeasuredata-0-1.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\5_000001-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\5_000001-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-measure-rejectrequestaggregatedmeasuredata-0-1.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\5_000002-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\5_000002-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-structure-accountingpointcharacteristics-0-1.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000001-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000001-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-structure-characteristicsofacustomeratanap-0-1.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000002-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000002-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-structure-confirmrequestchangeaccountingpointcharacteristics-0-1.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000004-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000004-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000005-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000005-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-structure-genericnotification-0-1.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000006-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000006-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-structure-rejectrequestchangeaccountingpointcharacteristics-0-1.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000007-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000007-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-structure-rejectrequestchangeofsupplier-0-1.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000008-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000008-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-structure-requestchangecustomercharacteristics-0-1.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000009-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000009-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000010-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000010-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-entsoe-eu-local-extension-types.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000012-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000012-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-entsoe-eu-wgedi-codelists.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000013-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000013-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_AggregatedMeteredDataTimeSeries\ebIX_AggregatedBusinessInformationEntities-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000014-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000014-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_AggregatedMeteredDataTimeSeries\ebIX_BusinessDataType-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000017-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000017-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_AggregatedMeteredDataTimeSeries\ebIX_DK_AggregatedMeteredDataTimeSeries-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000018-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000018-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_RejectRequestMeteredDataAggregated\ebIX_AggregatedBusinessInformationEntities-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000019-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000019-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_RejectRequestMeteredDataAggregated\ebIX_BusinessDataType-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000020-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000020-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_RejectRequestMeteredDataAggregated\ebIX_DK_RejectRequestMeteredDataAggregated-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000021-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000021-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000022-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000022-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000001-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000023-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000023-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000002-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000024-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000024-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000004-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000028-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000028-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000005-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000029-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000029-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000006-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000030-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000030-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000007-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000032-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000032-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000008-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000033-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000033-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000009-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000034-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000034-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000010-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000035-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000035-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000012-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000040-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000040-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000013-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000041-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000041-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000014-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000042-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000042-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000017-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000045-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000045-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000018-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000046-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000046-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000019-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000047-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000047-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000020-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000052-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000052-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000021-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000053-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000053-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000022-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000056-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000056-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000023-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000057-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000057-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000024-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000058-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000058-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000028-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000059-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000059-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000029-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000060-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000060-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000030-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000061-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000061-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000032-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000062-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000062-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000033-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000063-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000063-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000034-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000064-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000064-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000035-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000065-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000065-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000040-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000066-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000066-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000041-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000067-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000067-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000042-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000068-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000068-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000045-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000069-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000069-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000046-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000075-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000075-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000047-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000076-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000076-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000052-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000077-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000077-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000053-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000078-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000078-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000056-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000079-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000079-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000057-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000080-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000080-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000058-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000081-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000081-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000059-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000082-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000082-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000060-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000083-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000083-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000061-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000084-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000084-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000062-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000085-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000085-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000063-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000086-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000086-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000064-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000088-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000088-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000065-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000089-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000089-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000066-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000092-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000092-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000067-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000093-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000093-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000068-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000095-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000095-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000069-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000096-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000096-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000075-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000101-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000101-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000076-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000102-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000102-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000077-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000103-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000103-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000078-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000104-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000104-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000079-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000105-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000105-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000080-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000106-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000106-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000081-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000107-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000107-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000082-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000108-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000108-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000083-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000110-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000110-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000084-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000111-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000111-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000085-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000112-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000112-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000086-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_000157-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_000157-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000088-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_201308142016-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_201308142016-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000089-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_201308142031-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_201308142031-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000092-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_201309031304-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_201309031304-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000093-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_201309031325-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_201309031325-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000095-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_BE0001-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_BE0001-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000096-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_BE0002-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_BE0002-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000101-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_BE0003-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_BE0003-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000102-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_BE0003_Bp0p0.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_BE0003_Bp0p0.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000103-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_BE0004-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_BE0004-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000104-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_BE0005-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_BE0005-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000105-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_CH0001-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_CH0001-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000106-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_CH0002-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_CH0002-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000107-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_DK20130716-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_DK20130716-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000108-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_DK2013071602-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_DK2013071602-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000110-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_DK2013071604-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_DK2013071604-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000111-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_DK2013071605-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_DK2013071605-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000112-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_DK201308142005-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_DK201308142005-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_000157-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_DK201812171008-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_DK201812171008-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_201308142016-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_DK201812171009-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_DK201812171009-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_201308142031-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_NL0001-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_NL0001-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_201309031304-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_NL0002-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_NL0002-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_201309031325-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_NL0003-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_NL0003-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_BE0001-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_NL0004-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_NL0004-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_BE0002-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_NL0005-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_NL0005-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_BE0003-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_NL0006-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_NL0006-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_BE0004-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_NL0007-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_NL0007-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_BE0005-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_NL0008-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_NL0008-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_CH0001-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_NL0009-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_NL0009-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_CH0002-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_NL0010-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_NL0010-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_DK20130716-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_NL0011-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_NL0011-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_DK2013071602-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_NL0012-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_NL0012-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_DK2013071604-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_NL0013-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_NL0013-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_DK2013071605-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_NL0014-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_NL0014-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_DK201308142005-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_NL0015-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_NL0015-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_DK201812171008-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_NL0016-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_NL0016-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_DK201812171009-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_NL0017-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_NL0017-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_NL0001-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\260_NL0018-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\260_NL0018-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_NL0002-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\305_000001-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\305_000001-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_NL0003-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\305_000002-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\305_000002-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_NL0004-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\DK_000087-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\DK_000087-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_NL0005-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\DK_000106-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\DK_000106-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_NL0006-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\DK_201309031334-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\DK_201309031334-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_NL0007-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\DK_DK0001-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\DK_DK0001-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_NL0008-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\DK_DK0003-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\DK_DK0003-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_NL0009-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\DK_DK0007-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\DK_DK0007-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_NL0010-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\DK_DK0008-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\DK_DK0008-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_NL0011-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\DK_DK2013090301-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\DK_DK2013090301-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_NL0012-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\DK_DK2013090302-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\DK_DK2013090302-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_NL0013-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_Acknowledgement_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_Acknowledgement_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_NL0014-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_AggregatedMeteredDataTimeSeries_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_AggregatedMeteredDataTimeSeries_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_NL0015-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmCancelChangeOfSupplier_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmCancelChangeOfSupplier_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_NL0016-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmCancelEndOfSupply_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmCancelEndOfSupply_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_NL0017-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmCancellation_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmCancellation_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_NL0018-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmChangeOfSupplier_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmChangeOfSupplier_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\305_000001-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmEndOfSupply_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmEndOfSupply_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\305_000002-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmReallocateChangeOfSupplier_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmReallocateChangeOfSupplier_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\5_000001-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmServices_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmServices_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\5_000002-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmUpdateChargeInformation_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmUpdateChargeInformation_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\DK_000087-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmUpdateMasterDataCharge_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmUpdateMasterDataCharge_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\DK_000106-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmUpdateMasterDataConsumer_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmUpdateMasterDataConsumer_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\DK_201309031334-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmUpdateMasterDataMeteringPoint_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_ConfirmUpdateMasterDataMeteringPoint_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\DK_DK0001-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_LoadProfile_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_LoadProfile_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\DK_DK0003-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_MeteredDataTimeSeries_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_MeteredDataTimeSeries_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\DK_DK0007-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_NonContinuousMetering_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_NonContinuousMetering_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\DK_DK0008-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_NotifyAggregatedWholesaleServices_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_NotifyAggregatedWholesaleServices_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\DK_DK2013090301-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_NotifyCancellation_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_NotifyCancellation_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\DK_DK2013090302-2.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_NotifyChangeOfSupplier_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_NotifyChangeOfSupplier_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Schemas\Json\Confirm-request-Change-of-Supplier-assembly-model.schema.json">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_NotifyChargeInformation_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_NotifyChargeInformation_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Schemas\Json\Notify-Aggregated-Measure-Data-assembly-model.schema.json">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_NotifyMasterDataCharge_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_NotifyMasterDataCharge_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Schemas\Json\Reject-request-Change-of-Supplier-assembly-model.schema.json">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_NotifyMasterDataConsumer_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_NotifyMasterDataConsumer_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Schemas\Json\Request-aggregated-measure-data-assembly-model.schema.json">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_NotifyMasterDataMeteringPoint_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_NotifyMasterDataMeteringPoint_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Schemas\Json\Request-Change-of-Supplier-assembly-model.schema.json">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_NotifyMissingData_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_NotifyMissingData_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Schemas\Json\urn-entsoe-eu-local-extension-types.schema.json">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_NotifyVolumes_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_NotifyVolumes_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="DocumentValidation\Schemas\Json\urn-entsoe-eu-wgedi-codelists.schema.json">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_QueryChargeInformation_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_QueryChargeInformation_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Schemas\Json\Reject-request-aggregated-measure-data-assembly-model.schema.json" />
-    <EmbeddedResource Include="DocumentValidation\Schemas\Json\Reject-request-aggregated-measure-data-assembly-model.schema.json">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_QueryMasterData_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_QueryMasterData_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\CimXml\Schemas\urn-ediel-org-structure-requestchangeaccountingpointcharacteristics-0-1.xsd" />
-    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-structure-requestchangeaccountingpointcharacteristics-0-1.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_QueryMasterDataCharge_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_QueryMasterDataCharge_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\CimXml\Schemas\urn-ediel-org-measure-notifywholesaleservices-0-1.xsd" />
-    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-measure-notifywholesaleservices-0-1.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectAggregatedBillingInformation_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectAggregatedBillingInformation_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Schemas\Json\Notify-wholesale-services-assembly-model.schema.json" />
-    <EmbeddedResource Include="DocumentValidation\Schemas\Json\Notify-wholesale-services-assembly-model.schema.json">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectCancelChangeOfSupplier_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectCancelChangeOfSupplier_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_AggregatedBusinessInformationEntities_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_BusinessDataType_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_DK_NotifyAggregatedWholesaleServices_0p9pC.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000002_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000004_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000005_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000006_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000007_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000008_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000009_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000010_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000012_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000013_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000014_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000017_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000018_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000019_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000020_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000021_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000022_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000023_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000024_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000028_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000029_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000030_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000032_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000033_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000034_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000035_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000040_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000041_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000042_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000045_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000046_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000047_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000052_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000053_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000056_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000057_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000058_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000059_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000060_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000061_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000062_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000063_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000064_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000065_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000066_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000067_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000068_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000069_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000075_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000076_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000077_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000078_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000079_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000080_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000081_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000082_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000083_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000084_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000085_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000086_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000088_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000089_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000092_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000093_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000095_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000096_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000101_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000102_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000103_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000104_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000105_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000106_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000107_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000108_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000110_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000111_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000112_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000157_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_201308142016_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_201308142031_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_201309031304_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_201309031325_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_BE0001_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_BE0002_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_BE0003_Bp0p0.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\260_BE0003_Bp0p0.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectCancelEndOfSupply_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectCancelEndOfSupply_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_BE0004_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_BE0005_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_CH0001_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_CH0002_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_DK20130716_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_DK2013071602_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_DK2013071604_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_DK2013071605_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_DK201308142005_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_DK201812171008_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_DK201812171009_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_NL0001_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_NL0002_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_NL0003_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_NL0004_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_NL0005_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_NL0006_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_NL0007_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_NL0008_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_NL0009_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_NL0010_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_NL0011_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_NL0012_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_NL0013_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_NL0014_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_NL0015_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_NL0016_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_NL0017_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_NL0018_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\305_000001_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\305_000002_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\DK_000087_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\DK_000106_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\DK_201309031334_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\DK_DK0001_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\DK_DK0003_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\DK_DK0007_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\DK_DK0008_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\DK_DK2013090301_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\DK_DK2013090302_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_AggregatedBusinessInformationEntities_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_BusinessDataType_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_Acknowledgement_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_Acknowledgement_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectCancellation_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectCancellation_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_AggregatedMeteredDataTimeSeries_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_AggregatedMeteredDataTimeSeries_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectChangeOfSupplier_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectChangeOfSupplier_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmCancelChangeOfSupplier_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmCancelChangeOfSupplier_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectEndOfSupply_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectEndOfSupply_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmCancelEndOfSupply_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmCancelEndOfSupply_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectMasterDataCharge_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectMasterDataCharge_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmCancellation_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmCancellation_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectQueryChargeInformation_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectQueryChargeInformation_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmChangeOfSupplier_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmChangeOfSupplier_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectQueryMasterData_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectQueryMasterData_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmEndOfSupply_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmEndOfSupply_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectReallocateChangeOfSupplier_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectReallocateChangeOfSupplier_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmReallocateChangeOfSupplier_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmReallocateChangeOfSupplier_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectRequestMeteredDataAggregated_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectRequestMeteredDataAggregated_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmServices_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmServices_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectRequestMeteredDataValidated_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectRequestMeteredDataValidated_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmUpdateChargeInformation_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmUpdateChargeInformation_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectServices_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectServices_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmUpdateMasterDataCharge_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmUpdateMasterDataCharge_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectUpdateChargeInformation_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectUpdateChargeInformation_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmUpdateMasterDataConsumer_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmUpdateMasterDataConsumer_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectUpdateMasterDataCharge_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectUpdateMasterDataCharge_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmUpdateMasterDataMeteringPoint_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ConfirmUpdateMasterDataMeteringPoint_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectUpdateMasterDataConsumer_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectUpdateMasterDataConsumer_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_LoadProfile_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_LoadProfile_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectUpdateMasterDataMeteringPoint_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RejectUpdateMasterDataMeteringPoint_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_MeteredDataTimeSeries_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_MeteredDataTimeSeries_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestAggregatedBillingInformation_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestAggregatedBillingInformation_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NonContinuousMetering_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NonContinuousMetering_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestCancelChangeOfSupplier_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestCancelChangeOfSupplier_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NotifyAggregatedWholesaleServices_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NotifyAggregatedWholesaleServices_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestCancelEndOfSupply_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestCancelEndOfSupply_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NotifyCancellation_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NotifyCancellation_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestCancellation_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestCancellation_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NotifyChangeOfSupplier_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NotifyChangeOfSupplier_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestChangeOfSupplier_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestChangeOfSupplier_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NotifyChargeInformation_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NotifyChargeInformation_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestEndOfSupply_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestEndOfSupply_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NotifyMasterDataCharge_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NotifyMasterDataCharge_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestMeteredDataAggregated_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestMeteredDataAggregated_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NotifyMasterDataConsumer_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NotifyMasterDataConsumer_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestMeteredDataValidated_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestMeteredDataValidated_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NotifyMasterDataMeteringPoint_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NotifyMasterDataMeteringPoint_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestReallocateChangeOfSupplier_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestReallocateChangeOfSupplier_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NotifyMissingData_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NotifyMissingData_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestServices_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestServices_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NotifyVolumes_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_NotifyVolumes_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestUpdateChargeInformation_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestUpdateChargeInformation_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_QueryChargeInformation_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_QueryChargeInformation_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestUpdateMasterDataCharge_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestUpdateMasterDataCharge_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_QueryMasterData_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_QueryMasterData_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestUpdateMasterDataConsumer_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestUpdateMasterDataConsumer_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_QueryMasterDataCharge_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_QueryMasterDataCharge_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestUpdateMasterDataMeteringPoint_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_RequestUpdateMasterDataMeteringPoint_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectAggregatedBillingInformation_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectAggregatedBillingInformation_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_ResponseMasterDataCharge_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_ResponseMasterDataCharge_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectCancelChangeOfSupplier_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectCancelChangeOfSupplier_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_ResponseMasterDataConsumer_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_ResponseMasterDataConsumer_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectCancelEndOfSupply_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectCancelEndOfSupply_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_ResponseMasterDataMeteringPoint_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_ResponseMasterDataMeteringPoint_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectCancellation_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectCancellation_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\generic\ebIX_DK_ResponseQueryChargeInformation_0p9pC.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\generic\ebIX_DK_ResponseQueryChargeInformation_0p9pC.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectChangeOfSupplier_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectChangeOfSupplier_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\document\DK_AggregatedMeteredDataTimeSeries\ebIX_AggregatedBusinessInformationEntities-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_AggregatedMeteredDataTimeSeries\ebIX_AggregatedBusinessInformationEntities-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectEndOfSupply_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectEndOfSupply_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\document\DK_AggregatedMeteredDataTimeSeries\ebIX_BusinessDataType-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_AggregatedMeteredDataTimeSeries\ebIX_BusinessDataType-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectMasterDataCharge_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectMasterDataCharge_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\document\DK_AggregatedMeteredDataTimeSeries\ebIX_DK_AggregatedMeteredDataTimeSeries-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_AggregatedMeteredDataTimeSeries\ebIX_DK_AggregatedMeteredDataTimeSeries-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectQueryChargeInformation_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectQueryChargeInformation_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_AggregatedBusinessInformationEntities-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_AggregatedBusinessInformationEntities-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectQueryMasterData_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectQueryMasterData_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_BusinessDataType-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_BusinessDataType-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectReallocateChangeOfSupplier_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectReallocateChangeOfSupplier_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_DK_NotifyAggregatedWholesaleServices-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_DK_NotifyAggregatedWholesaleServices-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectRequestMeteredDataAggregated_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectRequestMeteredDataAggregated_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_AggregatedBusinessInformationEntities-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_AggregatedBusinessInformationEntities-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectRequestMeteredDataValidated_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectRequestMeteredDataValidated_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_BusinessDataType-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_BusinessDataType-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectServices_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectServices_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_DK_RejectAggregatedBillingInformation-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_DK_RejectAggregatedBillingInformation-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectUpdateChargeInformation_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectUpdateChargeInformation_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\document\DK_RejectRequestMeteredDataAggregated\ebIX_AggregatedBusinessInformationEntities-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_RejectRequestMeteredDataAggregated\ebIX_AggregatedBusinessInformationEntities-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectUpdateMasterDataCharge_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectUpdateMasterDataCharge_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\document\DK_RejectRequestMeteredDataAggregated\ebIX_BusinessDataType-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_RejectRequestMeteredDataAggregated\ebIX_BusinessDataType-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectUpdateMasterDataConsumer_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectUpdateMasterDataConsumer_0p9pC.xsd">
+    <None Remove="Schemas\Ebix\Schemas\document\DK_RejectRequestMeteredDataAggregated\ebIX_DK_RejectRequestMeteredDataAggregated-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_RejectRequestMeteredDataAggregated\ebIX_DK_RejectRequestMeteredDataAggregated-2.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectUpdateMasterDataMeteringPoint_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RejectUpdateMasterDataMeteringPoint_0p9pC.xsd">
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-notifyaggregatedmeasuredata-0-1.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-notifyaggregatedmeasuredata-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestAggregatedBillingInformation_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestAggregatedBillingInformation_0p9pC.xsd">
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-notifywholesaleservices-0-1.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-notifywholesaleservices-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestCancelChangeOfSupplier_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestCancelChangeOfSupplier_0p9pC.xsd">
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-rejectrequestaggregatedmeasuredata-0-1.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-rejectrequestaggregatedmeasuredata-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestCancelEndOfSupply_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestCancelEndOfSupply_0p9pC.xsd">
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-rejectrequestwholesalesettlement-0-1.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-rejectrequestwholesalesettlement-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestCancellation_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestCancellation_0p9pC.xsd">
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-requestaggregatedmeasuredata-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestChangeOfSupplier_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestChangeOfSupplier_0p9pC.xsd">
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-requestwholesalesettlement-0-1.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-ediel-org-measure-requestwholesalesettlement-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestEndOfSupply_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestEndOfSupply_0p9pC.xsd">
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-accountingpointcharacteristics-0-1.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-accountingpointcharacteristics-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestMeteredDataAggregated_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestMeteredDataAggregated_0p9pC.xsd">
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-characteristicsofacustomeratanap-0-1.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-characteristicsofacustomeratanap-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestMeteredDataValidated_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestMeteredDataValidated_0p9pC.xsd">
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-confirmrequestchangeaccountingpointcharacteristics-0-1.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-confirmrequestchangeaccountingpointcharacteristics-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestReallocateChangeOfSupplier_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestReallocateChangeOfSupplier_0p9pC.xsd">
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-confirmrequestchangeofsupplier-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestServices_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestServices_0p9pC.xsd">
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-genericnotification-0-1.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-genericnotification-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestUpdateChargeInformation_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestUpdateChargeInformation_0p9pC.xsd">
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-rejectrequestchangeaccountingpointcharacteristics-0-1.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-rejectrequestchangeaccountingpointcharacteristics-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\5_000001_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\5_000002_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260_000001_0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\260__0p1pA.xsd" />
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestUpdateMasterDataCharge_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestUpdateMasterDataCharge_0p9pC.xsd">
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-rejectrequestchangeofsupplier-0-1.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-rejectrequestchangeofsupplier-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestUpdateMasterDataConsumer_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestUpdateMasterDataConsumer_0p9pC.xsd">
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-requestchangeaccountingpointcharacteristics-0-1.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-requestchangeaccountingpointcharacteristics-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestUpdateMasterDataMeteringPoint_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_RequestUpdateMasterDataMeteringPoint_0p9pC.xsd">
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-requestchangecustomercharacteristics-0-1.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-requestchangecustomercharacteristics-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ResponseMasterDataCharge_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ResponseMasterDataCharge_0p9pC.xsd">
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-ediel-org-structure-requestchangeofsupplier-0-1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ResponseMasterDataConsumer_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ResponseMasterDataConsumer_0p9pC.xsd">
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-entsoe-eu-local-extension-types.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-entsoe-eu-local-extension-types.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ResponseMasterDataMeteringPoint_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ResponseMasterDataMeteringPoint_0p9pC.xsd">
+    <None Remove="Schemas\Cim\Xml\Schemas\urn-entsoe-eu-wgedi-codelists.xsd" />
+    <EmbeddedResource Include="Schemas\Cim\Xml\Schemas\urn-entsoe-eu-wgedi-codelists.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ResponseQueryChargeInformation_0p9pC.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\generic\ebIX_DK_ResponseQueryChargeInformation_0p9pC.xsd">
+    <None Remove="Schemas\Cim\Json\Schemas\Confirm-request-Change-of-Supplier-assembly-model.schema.json" />
+    <EmbeddedResource Include="Schemas\Cim\Json\Schemas\Confirm-request-Change-of-Supplier-assembly-model.schema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_AggregatedBusinessInformationEntities-2.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_AggregatedBusinessInformationEntities-2.xsd">
+    <None Remove="Schemas\Cim\Json\Schemas\Notify-Aggregated-Measure-Data-assembly-model.schema.json" />
+    <EmbeddedResource Include="Schemas\Cim\Json\Schemas\Notify-Aggregated-Measure-Data-assembly-model.schema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_BusinessDataType-2.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_BusinessDataType-2.xsd">
+    <None Remove="Schemas\Cim\Json\Schemas\Notify-wholesale-services-assembly-model.schema.json" />
+    <EmbeddedResource Include="Schemas\Cim\Json\Schemas\Notify-wholesale-services-assembly-model.schema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_DK_NotifyAggregatedWholesaleServices-2.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_NotifyAggregatedWholesaleServices\ebIX_DK_NotifyAggregatedWholesaleServices-2.xsd">
+    <None Remove="Schemas\Cim\Json\Schemas\Reject-request-aggregated-measure-data-assembly-model.schema.json" />
+    <EmbeddedResource Include="Schemas\Cim\Json\Schemas\Reject-request-aggregated-measure-data-assembly-model.schema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Schemas\Json\Request-wholesale-settlement-assembly-model.schema.json" />
-    <EmbeddedResource Include="DocumentValidation\Schemas\Json\Request-wholesale-settlement-assembly-model.schema.json">
+    <None Remove="Schemas\Cim\Json\Schemas\Reject-request-Change-of-Supplier-assembly-model.schema.json" />
+    <EmbeddedResource Include="Schemas\Cim\Json\Schemas\Reject-request-Change-of-Supplier-assembly-model.schema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Schemas\Json\Reject-request-wholesale-settlement-assembly-model.schema.json" />
-    <EmbeddedResource Include="DocumentValidation\Schemas\Json\Reject-request-wholesale-settlement-assembly-model.schema.json">
+    <None Remove="Schemas\Cim\Json\Schemas\Reject-request-wholesale-settlement-assembly-model.schema.json" />
+    <EmbeddedResource Include="Schemas\Cim\Json\Schemas\Reject-request-wholesale-settlement-assembly-model.schema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\CimXml\Schemas\urn-ediel-org-measure-rejectrequestwholesalesettlement-0-1.xsd" />
-    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-measure-rejectrequestwholesalesettlement-0-1.xsd">
+    <None Remove="Schemas\Cim\Json\Schemas\Request-aggregated-measure-data-assembly-model.schema.json" />
+    <EmbeddedResource Include="Schemas\Cim\Json\Schemas\Request-aggregated-measure-data-assembly-model.schema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_AggregatedBusinessInformationEntities-2.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_AggregatedBusinessInformationEntities-2.xsd">
+    <None Remove="Schemas\Cim\Json\Schemas\Request-Change-of-Supplier-assembly-model.schema.json" />
+    <EmbeddedResource Include="Schemas\Cim\Json\Schemas\Request-Change-of-Supplier-assembly-model.schema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_BusinessDataType-2.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_BusinessDataType-2.xsd">
+    <None Remove="Schemas\Cim\Json\Schemas\Request-wholesale-settlement-assembly-model.schema.json" />
+    <EmbeddedResource Include="Schemas\Cim\Json\Schemas\Request-wholesale-settlement-assembly-model.schema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_DK_RejectAggregatedBillingInformation-2.xsd" />
-    <EmbeddedResource Include="DocumentValidation\Ebix\Schemas\document\DK_RejectAggregatedBillingInformation\ebIX_DK_RejectAggregatedBillingInformation-2.xsd">
+    <None Remove="Schemas\Cim\Json\Schemas\urn-entsoe-eu-local-extension-types.schema.json" />
+    <EmbeddedResource Include="Schemas\Cim\Json\Schemas\urn-entsoe-eu-local-extension-types.schema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <None Remove="DocumentValidation\CimXml\Schemas\urn-ediel-org-measure-requestwholesalesettlement-0-1.xsd" />
-    <EmbeddedResource Include="DocumentValidation\CimXml\Schemas\urn-ediel-org-measure-requestwholesalesettlement-0-1.xsd">
+    <None Remove="Schemas\Cim\Json\Schemas\urn-entsoe-eu-wgedi-codelists.schema.json" />
+    <EmbeddedResource Include="Schemas\Cim\Json\Schemas\urn-entsoe-eu-wgedi-codelists.schema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

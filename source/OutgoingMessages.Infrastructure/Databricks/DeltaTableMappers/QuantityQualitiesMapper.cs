@@ -25,4 +25,14 @@ public static class QuantityQualitiesMapper
 
         return qualities.Select(QuantityQualityMapper.FromDeltaTableValue).ToArray();
     }
+
+    public static IReadOnlyCollection<QuantityQuality> TryFromDeltaTableValue(string? value)
+    {
+        if (value is null)
+            return new List<QuantityQuality>();
+
+        var qualities = JsonSerializer.Deserialize<string[]>(value)!;
+
+        return qualities.Select(QuantityQualityMapper.FromDeltaTableValue).ToArray();
+    }
 }

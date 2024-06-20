@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -135,7 +136,35 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         actualCount.Should().Be(testDataDescription.ExpectedOutgoingMessagesCount);
     }
 
-    private async Task SeedDatabricksWithDataAsync(EnergyResultTestDataDescription testDataDescription, IDeltaTableSchemaDescription schemaInfomation)
+    [Fact]
+    public async Task GivenCalculationWithIdIsCompleted_WhenEnqueueWholesaleServicesForEnergySupplierAndGridOwner_ThenOutgoingMessagesAreEnqueued()
+    {
+        var testDataDescription = new WholesaleResultForAmountPerChargeDescription();
+
+        var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
+        var viewQuery = new WholesaleAmountPerChargeQuery(ediDatabricksOptions.Value, testDataDescription.CalculationId);
+
+        await HavingReceivedAndHandledGridAreaOwnershipAssignedEventAsync(testDataDescription.GridAreaCode);
+        await SeedDatabricksWithDataAsync(testDataDescription, viewQuery);
+
+        var sut = GetService<IOutgoingMessagesClient>();
+        var input = new EnqueueMessagesInputDto(
+            testDataDescription.CalculationId,
+            EventId: Guid.NewGuid());
+
+        // Act
+        await sut.EnqueueWholesaleResultsForAmountPerChargeAsync(input);
+
+        // Assert
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        var sql = "SELECT * FROM [dbo].[OutgoingMessages]";
+        var result = await connection.QueryAsync(sql);
+
+        var actualCount = result.Count();
+        actualCount.Should().Be(testDataDescription.ExpectedOutgoingMessagesCount);
+    }
+
+    private async Task SeedDatabricksWithDataAsync(TestDataDescription testDataDescription, IDeltaTableSchemaDescription schemaInfomation)
     {
         await Fixture.DatabricksSchemaManager.CreateTableAsync(schemaInfomation);
         await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(schemaInfomation, testDataDescription.TestFilePath);

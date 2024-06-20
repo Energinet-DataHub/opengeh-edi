@@ -61,6 +61,15 @@ public class DatabricksSqlRow(IDictionary<string, object?> columns)
         return decimal.Parse(value, CultureInfo.InvariantCulture);
     }
 
+    public decimal? ToNullableDecimal(string columnName)
+    {
+        var value = ToNullableString(columnName);
+
+        return value is not null ?
+            decimal.Parse(value, CultureInfo.InvariantCulture)
+            : null;
+    }
+
     /// <summary>
     /// Parse from Databricks "INT" to int.
     /// </summary>

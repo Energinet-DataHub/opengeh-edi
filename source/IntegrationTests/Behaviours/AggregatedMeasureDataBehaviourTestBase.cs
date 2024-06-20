@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -74,7 +75,7 @@ public abstract class AggregatedMeasureDataBehaviourTestBase : BehavioursTestBas
             ensureValidRequest: assertRequestWasSuccessful);
 
         var response = await
-            incomingMessageClient.RegisterAndSendAsync(
+            incomingMessageClient.ReceiveIncomingMarketMessageAsync(
                 incomingMessageStream,
                 documentFormat,
                 IncomingDocumentType.RequestAggregatedMeasureData,

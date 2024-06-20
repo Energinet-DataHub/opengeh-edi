@@ -280,18 +280,6 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
     }
 
-    private async Task<(
-        EnergyResultPerGridAreaDescription PerGridArea,
-        EnergyResultPerBrpGridAreaDescription PerBalanceResponsible,
-        EnergyResultPerEnergySupplierBrpGridAreaDescription PerEnergySupplier)> GivenDatabricksResultDataForAllAggregationViews()
-    {
-        var perGridArea = await GivenDatabricksResultDataForEnergyResultPerGridArea();
-        var perBalanceResponsible = await GivenDatabricksResultDataForEnergyResultPerBalanceResponsible();
-        var perEnergySupplier = await GivenDatabricksResultDataForEnergyResultPerEnergySupplier();
-
-        return (perGridArea, perBalanceResponsible, perEnergySupplier);
-    }
-
     private async Task<EnergyResultPerGridAreaDescription> GivenDatabricksResultDataForEnergyResultPerGridArea()
     {
         var energyResultPerGridAreaTestDataDescription = new EnergyResultPerGridAreaDescription();
