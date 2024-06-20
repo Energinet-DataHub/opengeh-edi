@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatem
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 
@@ -24,7 +25,7 @@ public abstract class WholesaleResultQueryBase<TResult>(
         EdiDatabricksOptions ediDatabricksOptions,
         Guid calculationId)
     : IDeltaTableSchemaDescription
-    where TResult : WholesaleTimeSeries
+    where TResult : OutgoingMessageDto
 {
     private readonly EdiDatabricksOptions _ediDatabricksOptions = ediDatabricksOptions;
 
@@ -64,7 +65,7 @@ public abstract class WholesaleResultQueryBase<TResult>(
 
             if (currentRow != null && BelongsToDifferentResults(currentRow, nextRow))
             {
-                yield return CreateWholesaleResult(currentRow!, timeSeriesPoints);
+                yield return await CreateWholesaleResultAsync(currentRow!, timeSeriesPoints).ConfigureAwait(false);
                 timeSeriesPoints = [];
             }
 
@@ -74,11 +75,13 @@ public abstract class WholesaleResultQueryBase<TResult>(
 
         if (currentRow != null)
         {
-            yield return CreateWholesaleResult(currentRow, timeSeriesPoints);
+            yield return await CreateWholesaleResultAsync(currentRow, timeSeriesPoints).ConfigureAwait(false);
         }
     }
 
-    protected abstract TResult CreateWholesaleResult(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints);
+    protected abstract Task<TResult> CreateWholesaleResultAsync(
+        DatabricksSqlRow databricksSqlRow,
+        IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints);
 
     private static bool BelongsToDifferentResults(DatabricksSqlRow row, DatabricksSqlRow otherRow)
     {

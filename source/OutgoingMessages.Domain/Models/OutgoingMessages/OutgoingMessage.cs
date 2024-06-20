@@ -294,6 +294,50 @@ public class OutgoingMessage
     }
 
     /// <summary>
+    /// This method creates two outgoing messages, one for the receiver and one for the charge owner, based on the wholesaleResultMessage.
+    /// </summary>
+    public static IReadOnlyCollection<OutgoingMessage> CreateMessages(
+        WholesaleAmountPerChargeDto wholesaleAmountPerChargeDto,
+        ISerializer serializer,
+        Instant timestamp)
+    {
+        ArgumentNullException.ThrowIfNull(serializer);
+        ArgumentNullException.ThrowIfNull(wholesaleAmountPerChargeDto);
+
+        return new List<OutgoingMessage>()
+        {
+            new(
+                wholesaleAmountPerChargeDto.EventId,
+                wholesaleAmountPerChargeDto.DocumentType,
+                wholesaleAmountPerChargeDto.EnergySupplierReceiverId,
+                wholesaleAmountPerChargeDto.ProcessId,
+                wholesaleAmountPerChargeDto.BusinessReason,
+                ActorRole.EnergySupplier,
+                wholesaleAmountPerChargeDto.SenderId,
+                wholesaleAmountPerChargeDto.SenderRole,
+                serializer.Serialize(wholesaleAmountPerChargeDto.Series),
+                timestamp,
+                ProcessType.ReceiveWholesaleResults,
+                wholesaleAmountPerChargeDto.RelatedToMessageId,
+                wholesaleAmountPerChargeDto.Series.GridAreaCode),
+            new(
+                wholesaleAmountPerChargeDto.EventId,
+                wholesaleAmountPerChargeDto.DocumentType,
+                wholesaleAmountPerChargeDto.ChargeOwnerReceiverId,
+                wholesaleAmountPerChargeDto.ProcessId,
+                wholesaleAmountPerChargeDto.BusinessReason,
+                GetChargeOwnerRole(wholesaleAmountPerChargeDto.ChargeOwnerReceiverId),
+                wholesaleAmountPerChargeDto.SenderId,
+                wholesaleAmountPerChargeDto.SenderRole,
+                serializer.Serialize(wholesaleAmountPerChargeDto.Series),
+                timestamp,
+                ProcessType.ReceiveWholesaleResults,
+                wholesaleAmountPerChargeDto.RelatedToMessageId,
+                wholesaleAmountPerChargeDto.Series.GridAreaCode),
+        };
+    }
+
+    /// <summary>
     ///     This method create a single outgoing message, for the receiver, based on the rejected WholesaleServicesMessage.
     /// </summary>
     public static OutgoingMessage CreateMessage(

@@ -43,7 +43,7 @@ public class EnergyResultPerGridAreaFactory
             resolution,
             databricksSqlRow.ToLong(EnergyResultColumnNames.CalculationVersion),
             SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)),
-            MeasurementUnitMapper.Map(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)));
+            MeasurementUnitMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)));
     }
 
     internal static EnergyResultPerBrpGridArea CreateEnergyResultPerBrpGridArea(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
@@ -64,7 +64,7 @@ public class EnergyResultPerGridAreaFactory
             resolution,
             databricksSqlRow.ToLong(EnergyResultColumnNames.CalculationVersion),
             SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)),
-            MeasurementUnitMapper.Map(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)),
+            MeasurementUnitMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)),
             databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.BalanceResponsiblePartyId));
     }
 
@@ -86,7 +86,7 @@ public class EnergyResultPerGridAreaFactory
             resolution,
             databricksSqlRow.ToLong(EnergyResultColumnNames.CalculationVersion),
             SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)),
-            MeasurementUnitMapper.Map(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)),
+            MeasurementUnitMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)),
             databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.BalanceResponsiblePartyId),
             databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.EnergySupplierId));
     }

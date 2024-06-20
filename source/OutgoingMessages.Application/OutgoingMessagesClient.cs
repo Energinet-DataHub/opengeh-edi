@@ -141,6 +141,22 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
+    public virtual async Task EnqueueAndCommitAsync(
+        WholesaleAmountPerChargeDto wholesaleAmountPerChargeDto,
+        CancellationToken cancellationToken)
+    {
+        var messages = OutgoingMessage.CreateMessages(
+            wholesaleAmountPerChargeDto,
+            _serializer,
+            _systemDateTimeProvider.Now());
+        foreach (var message in messages)
+        {
+            await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        }
+
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
     public async Task<OutgoingMessageId> EnqueueAsync(
         AcceptedWholesaleServicesMessageDto acceptedWholesaleServicesMessage,
         CancellationToken cancellationToken)
@@ -223,12 +239,10 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     {
         var numberOfEnqueuedMessages = 0;
 
-        var query = new WholesaleAmountPerChargeQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
+        var query = new WholesaleAmountPerChargeQuery(_energyResultEnumerator.EdiDatabricksOptions, _masterDataClient, EventId.From(input.EventId), input.CalculationId);
         await foreach (var wholesaleResult in _wholesaleResultEnumerator.GetAsync(query))
         {
-            var gridOwner = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(wholesaleResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
-            var wholesaleResultMessage = WholesaleResultMessageDtoFactory.Create(EventId.From(input.EventId), wholesaleResult, gridOwner);
-            await EnqueueAndCommitAsync(wholesaleResultMessage, CancellationToken.None).ConfigureAwait(false);
+            await EnqueueAndCommitAsync(wholesaleResult, CancellationToken.None).ConfigureAwait(false);
             numberOfEnqueuedMessages += 2;
         }
 
