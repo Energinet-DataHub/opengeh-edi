@@ -399,10 +399,10 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var perGridAreaQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions.Value, null!, null!, perGridAreaDataDescription.CalculationId);
         var perGridAreTask = SeedDatabricksWithDataAsync(perGridAreaDataDescription, perGridAreaQuery);
 
-        var perBrpGridAreaQuery = new EnergyResultPerBrpGridAreaQuery(ediDatabricksOptions.Value, null!, perGridAreaDataDescription.CalculationId);
+        var perBrpGridAreaQuery = new EnergyResultPerBalanceResponsiblePerGridAreaQuery(ediDatabricksOptions.Value, null!, perGridAreaDataDescription.CalculationId);
         var perBrpGriaAreaTask = SeedDatabricksWithDataAsync(perBrpGridAreaDataDescription, perBrpGridAreaQuery);
 
-        var perBrpAndESGridAreaQuery = new EnergyResultPerEnergySupplierBrpGridAreaQuery(ediDatabricksOptions.Value, null!, perGridAreaDataDescription.CalculationId);
+        var perBrpAndESGridAreaQuery = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(ediDatabricksOptions.Value, null!, perGridAreaDataDescription.CalculationId);
         var perBrpAndESGridAreTask = SeedDatabricksWithDataAsync(perBrpAndEsGridAreaDataDescription, perBrpAndESGridAreaQuery);
 
         var forAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(ediDatabricksOptions.Value, forAmountPerChargeDescription.CalculationId);

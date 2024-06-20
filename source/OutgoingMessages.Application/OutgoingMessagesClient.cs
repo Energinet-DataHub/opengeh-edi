@@ -235,7 +235,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     {
         var numberOfEnqueuedMessages = 0;
 
-        var query = new EnergyResultPerBrpGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.EventId, input.CalculationId);
+        var query = new EnergyResultPerBalanceResponsiblePerGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.EventId, input.CalculationId);
         await foreach (var energyResultPerBalanceResponsible in _energyResultEnumerator.GetAsync(query))
         {
             await EnqueueAndCommitAsync(energyResultPerBalanceResponsible, CancellationToken.None).ConfigureAwait(false);
@@ -249,7 +249,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     {
         var numberOfEnqueuedMessages = 0;
 
-        var query = new EnergyResultPerEnergySupplierBrpGridAreaQuery(
+        var query = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(
             _energyResultEnumerator.EdiDatabricksOptions,
             input.EventId,
             input.CalculationId);

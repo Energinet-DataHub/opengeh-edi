@@ -88,7 +88,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         var testDataDescription = new EnergyResultPerBrpGridAreaDescription();
 
         var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
-        var viewQuery = new EnergyResultPerBrpGridAreaQuery(ediDatabricksOptions.Value, EventId.From(Guid.NewGuid()), testDataDescription.CalculationId);
+        var viewQuery = new EnergyResultPerBalanceResponsiblePerGridAreaQuery(ediDatabricksOptions.Value, EventId.From(Guid.NewGuid()), testDataDescription.CalculationId);
 
         await SeedDatabricksWithDataAsync(testDataDescription, viewQuery);
 
@@ -115,7 +115,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         var testDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
 
         var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
-        var viewQuery = new EnergyResultPerEnergySupplierBrpGridAreaQuery(ediDatabricksOptions.Value, EventId.From(Guid.NewGuid()), testDataDescription.CalculationId);
+        var viewQuery = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(ediDatabricksOptions.Value, EventId.From(Guid.NewGuid()), testDataDescription.CalculationId);
 
         await SeedDatabricksWithDataAsync(testDataDescription, viewQuery);
 

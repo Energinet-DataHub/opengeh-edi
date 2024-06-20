@@ -293,7 +293,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
     private async Task<EnergyResultPerBrpGridAreaDescription> GivenDatabricksResultDataForEnergyResultPerBalanceResponsible()
     {
         var energyResultPerBrpDescription = new EnergyResultPerBrpGridAreaDescription();
-        var energyResultPerBrpQuery = new EnergyResultPerBrpGridAreaQuery(_ediDatabricksOptions.Value, EventId.From(Guid.NewGuid()), energyResultPerBrpDescription.CalculationId);
+        var energyResultPerBrpQuery = new EnergyResultPerBalanceResponsiblePerGridAreaQuery(_ediDatabricksOptions.Value, EventId.From(Guid.NewGuid()), energyResultPerBrpDescription.CalculationId);
 
         await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerBrpQuery);
         await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerBrpQuery, energyResultPerBrpDescription.TestFilePath);
@@ -303,7 +303,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
     private async Task<EnergyResultPerEnergySupplierBrpGridAreaDescription> GivenDatabricksResultDataForEnergyResultPerEnergySupplier()
     {
         var energyResultPerEnergySupplierDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
-        var energyResultPerEnergySupplierQuery = new EnergyResultPerEnergySupplierBrpGridAreaQuery(_ediDatabricksOptions.Value, EventId.From(Guid.NewGuid()), energyResultPerEnergySupplierDescription.CalculationId);
+        var energyResultPerEnergySupplierQuery = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(_ediDatabricksOptions.Value, EventId.From(Guid.NewGuid()), energyResultPerEnergySupplierDescription.CalculationId);
 
         await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerEnergySupplierQuery);
         await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerEnergySupplierQuery, energyResultPerEnergySupplierDescription.TestFilePath);
