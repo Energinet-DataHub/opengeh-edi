@@ -17,6 +17,9 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
+/// <summary>
+/// TODO: Delete this when we remove publishing energy results from integration events
+/// </summary>
 public class EnergyResultMessageDto : OutgoingMessageDto
 {
     private EnergyResultMessageDto(
