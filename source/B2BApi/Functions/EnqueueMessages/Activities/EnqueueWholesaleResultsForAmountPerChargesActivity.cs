@@ -50,7 +50,7 @@ public class EnqueueWholesaleResultsForAmountPerChargesActivity(
                     var wholesaleResultMessage = WholesaleResultMessageDtoFactory.Create(EventId.From(input.EventId), wholesaleResult, gridOwner);
                     await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(wholesaleResultMessage, CancellationToken.None).ConfigureAwait(false);
 
-                    numberOfHandledResults += 2;
+                    numberOfHandledResults++;
                 }
                 catch
                 {
