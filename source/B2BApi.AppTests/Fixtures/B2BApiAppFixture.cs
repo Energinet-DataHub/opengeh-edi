@@ -54,6 +54,7 @@ public class B2BApiAppFixture : IAsyncLifetime
         IntegrationTestConfiguration = new IntegrationTestConfiguration();
 
         AzuriteManager = new AzuriteManager(useOAuth: true);
+        CleanupAzuriteStorage();
         DurableTaskManager = new DurableTaskManager(
             "AzureWebJobsStorage",
             AzuriteManager.FullConnectionString);
@@ -221,6 +222,41 @@ public class B2BApiAppFixture : IAsyncLifetime
 #else
         return "Release";
 #endif
+    }
+
+    /// <summary>
+    /// Cleanup Azurite storage to avoid especially Durable Functions
+    /// to continue working on old orchestrations that e.g. failed in
+    /// previous runs.
+    /// </summary>
+    private static void CleanupAzuriteStorage()
+    {
+        if (Directory.Exists("__blobstorage__"))
+            Directory.Delete("__blobstorage__", true);
+
+        if (Directory.Exists("__queuestorage__"))
+            Directory.Delete("__queuestorage__", true);
+
+        if (Directory.Exists("__tablestorage__"))
+            Directory.Delete("__tablestorage__", true);
+
+        if (File.Exists("__azurite_db_blob__.json"))
+            File.Delete("__azurite_db_blob__.json");
+
+        if (File.Exists("__azurite_db_blob_extent__.json"))
+            File.Delete("__azurite_db_blob_extent__.json");
+
+        if (File.Exists("__azurite_db_queue__.json"))
+            File.Delete("__azurite_db_queue__.json");
+
+        if (File.Exists("__azurite_db_queue_extent__.json"))
+            File.Delete("__azurite_db_queue_extent__.json");
+
+        if (File.Exists("__azurite_db_table__.json"))
+            File.Delete("__azurite_db_table__.json");
+
+        if (File.Exists("__azurite_db_table_extent__.json"))
+            File.Delete("__azurite_db_table_extent__.json");
     }
 
     private FunctionAppHostSettings CreateAppHostSettings(string csprojName, ref int port)

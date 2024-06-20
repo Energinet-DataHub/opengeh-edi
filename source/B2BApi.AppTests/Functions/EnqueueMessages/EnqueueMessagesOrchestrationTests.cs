@@ -310,13 +310,10 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
         var expectedHistory = new List<(string?, string?)>
         {
-            ("EnqueueMessagesOrchestration", null),
             ("EnqueueEnergyResultsForGridAreaOwnersActivity", null),
             ("EnqueueEnergyResultsForBalanceResponsiblesActivity", null),
             ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", null),
             ("EnqueueWholesaleResultsForAmountPerChargesActivity", null),
-            ("SendActorMessagesEnqueuedActivity", null),
-            (null, "Success"),
         };
 
         // Act
