@@ -8,7 +8,7 @@ WHERE [ExternalId] IS NULL;
 GO
 
 ALTER TABLE [dbo].[OutgoingMessages]
-    ADD [ExternalId] UNIQUEIDENTIFIER NOT NULL; 
+    ALTER COLUMN [ExternalId] UNIQUEIDENTIFIER NOT NULL; 
 GO
 
-CREATE INDEX IX_OutgoingMessageIdempotency ON [dbo].[OutgoingMessages] (ExternalId, ReceiverNumber, ReceiverRole);
+CREATE UNIQUE INDEX IDX_OutgoingMessageIdempotency ON [dbo].[OutgoingMessages] (ExternalId, ReceiverNumber, ReceiverRole);

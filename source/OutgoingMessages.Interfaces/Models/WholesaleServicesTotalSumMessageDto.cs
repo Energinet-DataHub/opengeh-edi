@@ -42,6 +42,7 @@ public class WholesaleServicesTotalSumMessageDto : OutgoingMessageDto
             receiverRole,
             DataHubDetails.DataHubActorNumber,
             ActorRole.MeteredDataAdministrator,
+            new ExternalId(Guid.NewGuid()), // TODO: LRN Should come from calculationresultid
             relatedToMessageId)
     {
         Series = series;

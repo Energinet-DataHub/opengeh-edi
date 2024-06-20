@@ -39,6 +39,7 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
             receiverRole,
             DataHubDetails.DataHubActorNumber,
             ActorRole.MeteredDataAdministrator,
+            new ExternalId(Guid.NewGuid()),
             relatedToMessageId)
     {
         ChargeOwnerId = chargeOwnerId;

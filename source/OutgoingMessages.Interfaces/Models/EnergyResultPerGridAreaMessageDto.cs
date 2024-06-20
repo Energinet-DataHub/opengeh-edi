@@ -46,6 +46,7 @@ public class EnergyResultPerGridAreaMessageDto
             receiverRole: ActorRole.MeteredDataResponsible,
             senderId: DataHubDetails.DataHubActorNumber,
             senderRole: ActorRole.MeteredDataAdministrator,
+            externalId: new ExternalId(calculationResultId),
             relatedToMessageId: null)
     {
         Series = new EnergyResultMessageTimeSeries(
@@ -63,11 +64,7 @@ public class EnergyResultPerGridAreaMessageDto
             calculationResultVersion,
             null,
             settlementVersion?.Name);
-
-        CalculationResultId = calculationResultId;
     }
 
     public EnergyResultMessageTimeSeries Series { get; }
-
-    public Guid CalculationResultId { get; }
 }
