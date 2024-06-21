@@ -57,7 +57,7 @@ public class OutgoingMessageEntityConfiguration : IEntityTypeConfiguration<Outgo
         builder.Property(x => x.ExternalId)
             .HasConversion(
                 externalId => externalId.Value,
-                dbValue => ExternalId.From(dbValue));
+                dbValue => new ExternalId(dbValue));
 
         builder.Property(x => x.SenderId)
             .HasConversion(

@@ -29,6 +29,4 @@ public record ExternalId
     }
 
     public Guid Value { get; }
-
-    public static ExternalId From(Guid value) => new(value);
 }
