@@ -362,11 +362,11 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     }
 
     [Fact]
-    public async Task Outgoing_message_must_only_be_enqueued_once_based_on_receiver_and_externalId()
+    public async Task Outgoing_message_must_only_be_enqueued_once_to_an_receiver_with_externalId()
     {
         // Arrange
         var receiverId = ActorNumber.Create("1234567891912");
-        var receiverRole = ActorRole.MeteredDataAdministrator;
+        var receiverRole = ActorRole.EnergySupplier;
         var externalId = new ExternalId(Guid.NewGuid());
 
         var message = _energyResultMessageDtoBuilder
@@ -390,6 +390,44 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         firstId.Should().Be(secondId);
         // Only one message should be in the database after enqueue is called twice
         countAfterEnqueue.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task Outgoing_message_can_be_enqueued_multiple_times_to_same_receiver_with_different_roles_and_same_externalId()
+    {
+        // Arrange
+        var receiverId = ActorNumber.Create("1234567891912");
+        var firstReceiverRole = ActorRole.EnergySupplier;
+        var secondReceiverRole = ActorRole.BalanceResponsibleParty;
+        var externalId = new ExternalId(Guid.NewGuid());
+
+        var messageForFirstRole = _energyResultMessageDtoBuilder
+            .WithReceiverNumber(receiverId.Value)
+            .WithReceiverRole(firstReceiverRole)
+            .WithExternalId(externalId)
+            .Build();
+
+        var messageForSecondRole = _energyResultMessageDtoBuilder
+            .WithReceiverNumber(receiverId.Value)
+            .WithReceiverRole(secondReceiverRole)
+            .WithExternalId(externalId)
+            .Build();
+
+        var countBeforeEnqueue = await GetCountOfOutgoingMessagesFromDatabase();
+
+        // Act
+        var firstId = await EnqueueAndCommitAsync(messageForFirstRole);
+        var secondId = await EnqueueAndCommitAsync(messageForSecondRole);
+
+        // Assert
+        var countAfterEnqueue = await GetCountOfOutgoingMessagesFromDatabase();
+
+        // No messages are in the database before enqueue is called
+        countBeforeEnqueue.Should().Be(0);
+        // The messages enqueued now each should have a different id
+        firstId.Should().NotBe(secondId);
+        // Only one message should be in the database after enqueue is called twice
+        countAfterEnqueue.Should().Be(2);
     }
 
     protected override void Dispose(bool disposing)
