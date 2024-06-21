@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -42,7 +41,7 @@ public class WholesaleServicesTotalSumMessageDto : OutgoingMessageDto
             receiverRole,
             DataHubDetails.DataHubActorNumber,
             ActorRole.MeteredDataAdministrator,
-            new ExternalId(Guid.NewGuid()), // TODO: LRN Should come from calculationresultid
+            new ExternalId(Guid.NewGuid()),
             relatedToMessageId)
     {
         Series = series;

@@ -432,7 +432,8 @@ public class OutgoingMessage
                 timestamp,
                 ProcessType.ReceiveWholesaleResults,
                 wholesaleAmountPerChargeDto.RelatedToMessageId,
-                wholesaleAmountPerChargeDto.Series.GridAreaCode),
+                wholesaleAmountPerChargeDto.Series.GridAreaCode,
+                wholesaleAmountPerChargeDto.ExternalId),
             new(
                 wholesaleAmountPerChargeDto.EventId,
                 wholesaleAmountPerChargeDto.DocumentType,
@@ -446,7 +447,8 @@ public class OutgoingMessage
                 timestamp,
                 ProcessType.ReceiveWholesaleResults,
                 wholesaleAmountPerChargeDto.RelatedToMessageId,
-                wholesaleAmountPerChargeDto.Series.GridAreaCode),
+                wholesaleAmountPerChargeDto.Series.GridAreaCode,
+                wholesaleAmountPerChargeDto.ExternalId),
         };
     }
 
