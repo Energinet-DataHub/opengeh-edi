@@ -49,6 +49,8 @@ public class WholesaleResultForAmountPerChargeDescription
 
     public override int ExpectedCalculationResultsCount => 7;
 
+    public int ExpectedOutgoingMessagesForSystemOperatorCount => 3;
+
     public int ExpectedOutgoingMessagesForGridOwnerCount => 4;
 
     public int ExpectedOutgoingMessagesForEnergySupplierCount => ExpectedCalculationResultsCount;

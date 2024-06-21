@@ -14,12 +14,9 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions;
@@ -46,11 +43,8 @@ internal sealed class OutgoingMessageExceptionSimulator : OutgoingMessagesClient
     public override Task EnqueueAndCommitAsync(WholesaleServicesMessageDto wholesaleServicesMessage, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(wholesaleServicesMessage);
-        if (wholesaleServicesMessage.ReceiverRole == ActorRole.EnergySupplier)
-        {
-            throw new InvalidDataException("Simulated exception.");
-        }
-
-        return base.EnqueueAndCommitAsync(wholesaleServicesMessage, cancellationToken);
+        return wholesaleServicesMessage.ReceiverRole == ActorRole.EnergySupplier
+            ? throw new InvalidDataException("Simulated exception.")
+            : base.EnqueueAndCommitAsync(wholesaleServicesMessage, cancellationToken);
     }
 }

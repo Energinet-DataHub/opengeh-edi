@@ -13,12 +13,9 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
@@ -154,7 +151,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             _serializer,
             _systemDateTimeProvider.Now());
 
-        List<OutgoingMessageId> messageIds = new();
+        List<OutgoingMessageId> messageIds = [];
         foreach (var message in messages)
         {
             var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
@@ -172,6 +169,22 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     {
         var messages = OutgoingMessage.CreateMessages(
             wholesaleServicesMessage,
+            _serializer,
+            _systemDateTimeProvider.Now());
+        foreach (var message in messages)
+        {
+            await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        }
+
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task EnqueueAndCommitAsync(
+        WholesaleAmountPerChargeDto wholesaleAmountPerChargeDto,
+        CancellationToken cancellationToken)
+    {
+        var messages = OutgoingMessage.CreateMessages(
+            wholesaleAmountPerChargeDto,
             _serializer,
             _systemDateTimeProvider.Now());
         foreach (var message in messages)

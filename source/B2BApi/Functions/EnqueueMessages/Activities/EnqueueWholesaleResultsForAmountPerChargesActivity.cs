@@ -15,7 +15,6 @@
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Microsoft.Azure.Functions.Worker;
@@ -28,9 +27,11 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 /// </summary>
 public class EnqueueWholesaleResultsForAmountPerChargesActivity(
     IServiceScopeFactory serviceScopeFactory,
+    IMasterDataClient masterDataClient,
     WholesaleResultEnumerator wholesaleResultEnumerator)
 {
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
+    private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly WholesaleResultEnumerator _wholesaleResultEnumerator = wholesaleResultEnumerator;
 
     [Function(nameof(EnqueueWholesaleResultsForAmountPerChargesActivity))]
@@ -40,19 +41,19 @@ public class EnqueueWholesaleResultsForAmountPerChargesActivity(
         var numberOfHandledResults = 0;
         var numberOfFailedResults = 0;
 
-        var query = new WholesaleAmountPerChargeQuery(_wholesaleResultEnumerator.EdiDatabricksOptions, input.CalculationId);
+        var query = new WholesaleAmountPerChargeQuery(
+            _wholesaleResultEnumerator.EdiDatabricksOptions,
+            _masterDataClient,
+            EventId.From(input.EventId),
+            input.CalculationId);
         await foreach (var wholesaleResult in _wholesaleResultEnumerator.GetAsync(query))
         {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 try
                 {
-                    var scopedMasterDataClient = scope.ServiceProvider.GetRequiredService<IMasterDataClient>();
                     var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-
-                    var gridOwner = await scopedMasterDataClient.GetGridOwnerForGridAreaCodeAsync(wholesaleResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
-                    var wholesaleResultMessage = WholesaleResultMessageDtoFactory.Create(EventId.From(input.EventId), wholesaleResult, gridOwner);
-                    await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(wholesaleResultMessage, CancellationToken.None).ConfigureAwait(false);
+                    await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(wholesaleResult, CancellationToken.None).ConfigureAwait(false);
 
                     numberOfHandledResults++;
                 }

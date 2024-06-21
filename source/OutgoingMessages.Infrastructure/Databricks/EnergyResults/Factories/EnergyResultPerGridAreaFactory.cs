@@ -44,7 +44,7 @@ public static class EnergyResultPerGridAreaFactory
             resolution,
             databricksSqlRow.ToLong(EnergyResultColumnNames.CalculationVersion),
             SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)),
-            MeasurementUnitMapper.Map(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)));
+            MeasurementUnitMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)));
     }
 
     internal static Period GetPeriod(IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints, Resolution resolution)
