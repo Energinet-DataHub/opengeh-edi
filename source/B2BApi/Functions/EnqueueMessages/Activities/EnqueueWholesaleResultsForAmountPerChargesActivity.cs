@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Azure.Functions.Worker;
@@ -33,7 +34,7 @@ public class EnqueueWholesaleResultsForAmountPerChargesActivity(
             var numberOfEnqueuedMessages = await _outgoingMessagesClient.EnqueueWholesaleResultsForAmountPerChargeAsync(
                     new EnqueueMessagesInputDto(
                         inputDto.CalculationId,
-                        inputDto.EventId))
+                        EventId.From(inputDto.EventId)))
                 .ConfigureAwait(false);
 
             return numberOfEnqueuedMessages;

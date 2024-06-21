@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 
@@ -27,13 +30,16 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Energ
 /// that it is easy to compare (e.g. order of columns).
 /// See confluence: https://energinet.atlassian.net/wiki/spaces/D3/pages/849805314/Calculation+Result+Model#Energy-Result-Per-Energy-Supplier%2C-Balance-Responsible-Party%2C-Grid-Area
 /// </summary>
-public class EnergyResultPerEnergySupplierBrpGridAreaQuery(
+public class EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(
         EdiDatabricksOptions ediDatabricksOptions,
+        EventId eventId,
         Guid calculationId)
-    : EnergyResultQueryBase<EnergyResultPerEnergySupplierBrpGridArea>(
+    : EnergyResultQueryBase<EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto>(
         ediDatabricksOptions,
         calculationId)
 {
+    private readonly EventId _eventId = eventId;
+
     public override string DataObjectName => "energy_per_es_brp_ga_v1";
 
     public override Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition => new()
@@ -56,8 +62,28 @@ public class EnergyResultPerEnergySupplierBrpGridAreaQuery(
         { EnergyResultColumnNames.QuantityQualities,            (DeltaTableCommonTypes.ArrayOfStrings,  false) },
     };
 
-    protected override EnergyResultPerEnergySupplierBrpGridArea CreateEnergyResult(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
+    protected override Task<EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto> CreateEnergyResultAsync(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
     {
-        return EnergyResultPerGridAreaFactory.CreateEnergyResultPerEnergySupplierBrpGridArea(databricksSqlRow, timeSeriesPoints);
+        var resolution = ResolutionMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.Resolution));
+        var calculationType = CalculationTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.CalculationType));
+        var (businessReason, settlementVersion) = EnergyResultMessageDtoFactory.MapToBusinessReasonAndSettlementVersion(calculationType);
+
+        var messageDto = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto(
+            eventId: _eventId,
+            calculationResultId: databricksSqlRow.ToGuid(EnergyResultColumnNames.ResultId),
+            calculationResultVersion: databricksSqlRow.ToLong(EnergyResultColumnNames.CalculationVersion),
+            businessReason: businessReason,
+            settlementVersion: settlementVersion,
+            gridArea: databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.GridAreaCode),
+            meteringPointType: MeteringPointTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.MeteringPointType)),
+            settlementMethod: SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)),
+            measurementUnit: MeasurementUnitMapper.Map(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)),
+            resolution: resolution,
+            period: EnergyResultPerGridAreaFactory.GetPeriod(timeSeriesPoints, resolution),
+            balanceResponsibleNumber: ActorNumber.Create(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.BalanceResponsiblePartyId)),
+            energySupplierNumber: ActorNumber.Create(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.EnergySupplierId)),
+            points: EnergyResultMessageDtoFactory.CreateEnergyResultMessagePoints(timeSeriesPoints));
+
+        return Task.FromResult(messageDto);
     }
 }

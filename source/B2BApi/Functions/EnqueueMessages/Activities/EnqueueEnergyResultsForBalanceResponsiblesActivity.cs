@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Azure.Functions.Worker;
@@ -30,10 +31,10 @@ public class EnqueueEnergyResultsForBalanceResponsiblesActivity(
     {
         try
         {
-            var numberOfEnqueuedMessages = await _outgoingMessagesClient.EnqueueEnergyResultsForBalanceResponsiblesAsync(
+            var numberOfEnqueuedMessages = await _outgoingMessagesClient.EnqueueEnergyResultsPerBalanceResponsibleAsync(
                 new EnqueueMessagesInputDto(
                     inputDto.CalculationId,
-                    inputDto.EventId))
+                    EventId.From(inputDto.EventId)))
                 .ConfigureAwait(false);
 
             return numberOfEnqueuedMessages;

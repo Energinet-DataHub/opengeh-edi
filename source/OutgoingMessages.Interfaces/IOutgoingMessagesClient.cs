@@ -18,78 +18,96 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 
 /// <summary>
 /// Client for interacting with outgoing messages.
+/// TODO: This should only contain methods for interacting with outgoing messages from the outside,
+/// ie. enqueuing EnergyResultMessageDto or WholesaleServicesMessageDto should be removed, since they are called
+/// from OutgoingMessages.Infrastructure after changing to databrick views.
 /// </summary>
 public interface IOutgoingMessagesClient
 {
     /// <summary>
-    ///  Dequeues a message from the queue and commit.
+    /// Dequeues a message from the queue and commit.
     /// </summary>
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
     Task<DequeueRequestResultDto> DequeueAndCommitAsync(DequeueRequestDto request, CancellationToken cancellationToken);
 
     /// <summary>
-    ///  Peek a message from the queue and commit.
+    /// Peek a message from the queue and commit.
     /// </summary>
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
     Task<PeekResultDto?> PeekAndCommitAsync(PeekRequestDto request, CancellationToken cancellationToken);
 
     /// <summary>
-    ///  Enqueue a accepted energy result message, no commit. Currently ONLY used by the Process module which handles the commit itself.
+    /// Enqueue a accepted energy result message, no commit. Currently ONLY used by the Process module which handles the commit itself.
     /// </summary>
     Task<OutgoingMessageId> EnqueueAsync(AcceptedEnergyResultMessageDto acceptedEnergyResultMessage, CancellationToken cancellationToken);
 
     /// <summary>
-    ///  Enqueue a rejected energy result message, no commit. Currently ONLY used by the Process module which handles the commit itself.
+    /// Enqueue a rejected energy result message, no commit. Currently ONLY used by the Process module which handles the commit itself.
     /// </summary>
     Task<OutgoingMessageId> EnqueueAsync(RejectedEnergyResultMessageDto rejectedEnergyResultMessage, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Enqueue a rejected wholesale service message, no commit. Currently ONLY used by the Process module which handles the
-    ///     commit itself.
+    /// Enqueue a rejected wholesale service message, no commit. Currently ONLY used by the Process module which handles the
+    /// commit itself.
     /// </summary>
     Task<OutgoingMessageId> EnqueueAsync(
         RejectedWholesaleServicesMessageDto rejectedWholesaleServicesMessage,
         CancellationToken cancellationToken);
 
     /// <summary>
-    ///  Enqueue a energy result message, WITH commit. Currently ONLY used by the integration event.
+    /// Enqueue a energy result message, WITH commit. Currently ONLY used by the integration event.
     /// </summary>
     Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultMessageDto energyResultMessage, CancellationToken cancellationToken);
 
     /// <summary>
-    ///  Enqueue wholesale messages, handles enqueuing messages to all appropriate parties (Receiver, ChargeOwner) in a single transaction.
+    /// Enqueue an energy result message for a metered data responsible in a grid area, WITH commit.
+    /// </summary>
+    Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultPerGridAreaMessageDto messageDto, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Enqueue an energy result message for a balance responsible in a grid area, WITH commit.
+    /// </summary>
+    Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultPerBalanceResponsibleMessageDto messageDto, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Enqueue energy result messages for an energy supplier and a balance responsible in a grid area, WITH commit.
+    /// </summary>
+    Task<IReadOnlyCollection<OutgoingMessageId>> EnqueueAndCommitAsync(EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto messageDto, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Enqueue wholesale messages, handles enqueuing messages to all appropriate parties (Receiver, ChargeOwner) in a single transaction.
     /// </summary>
     Task EnqueueAndCommitAsync(WholesaleServicesMessageDto wholesaleServicesMessage, CancellationToken cancellationToken);
 
     /// <summary>
-    ///  Enqueue a accepted wholesale services message, no commit. Currently ONLY used by the Process module which handles the commit itself.
+    /// Enqueue an accepted wholesale services message, no commit. Currently ONLY used by the Process module which handles the commit itself.
     /// </summary>
     Task<OutgoingMessageId> EnqueueAsync(AcceptedWholesaleServicesMessageDto acceptedWholesaleServicesMessage, CancellationToken cancellationToken);
 
     /// <summary>
-    ///  Enqueue a wholesale services total sum message, WITH commit. Currently ONLY used by the integration event.
+    /// Enqueue a wholesale services total sum message, WITH commit. Currently ONLY used by the integration event.
     /// </summary>
     Task<OutgoingMessageId> EnqueueAndCommitAsync(WholesaleServicesTotalSumMessageDto wholesaleServicesTotalSumMessage, CancellationToken cancellationToken);
 
     /// <summary>
-    ///  Enqueue energy results for Grid Area Owners as outgoing messages for the given calculation id.
+    /// Enqueue energy results for Grid Area Owners as outgoing messages for the given calculation id.
     /// </summary>
-    Task<int> EnqueueEnergyResultsForGridAreaOwnersAsync(EnqueueMessagesInputDto input);
+    Task<int> EnqueueEnergyResultsPerGridAreaAsync(EnqueueMessagesInputDto input);
 
     /// <summary>
-    ///  Enqueue energy results for Balance Responsibles as outgoing messages for the given calculation id.
+    /// Enqueue energy results for Balance Responsibles as outgoing messages for the given calculation id.
     /// </summary>
-    Task<int> EnqueueEnergyResultsForBalanceResponsiblesAsync(EnqueueMessagesInputDto input);
+    Task<int> EnqueueEnergyResultsPerBalanceResponsibleAsync(EnqueueMessagesInputDto input);
 
     /// <summary>
-    ///  Enqueue energy results for Balance Responsible and Energy Supplier as outgoing messages for the given calculation id.
+    /// Enqueue energy results for Balance Responsibles and Energy Suppliers as outgoing messages for the given calculation id.
     /// </summary>
-    Task<int> EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersAsync(EnqueueMessagesInputDto input);
+    Task<int> EnqueueEnergyResultsPerEnergySupplierPerBalanceResponsibleAsync(EnqueueMessagesInputDto input);
 
     /// <summary>
-    ///  Enqueue wholesale results for Amount Per Charge to Energy Supplier and ChargeOwner as outgoing messages for the given calculation id.
+    /// Enqueue wholesale results for Amount Per Charge to Energy Supplier and ChargeOwner as outgoing messages for the given calculation id.
     /// </summary>
     Task<int> EnqueueWholesaleResultsForAmountPerChargeAsync(EnqueueMessagesInputDto input);
 
