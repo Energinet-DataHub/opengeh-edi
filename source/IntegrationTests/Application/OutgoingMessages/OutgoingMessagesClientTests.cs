@@ -142,7 +142,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         var testDataDescription = new WholesaleResultForAmountPerChargeDescription();
 
         var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
-        var viewQuery = new WholesaleAmountPerChargeQuery(ediDatabricksOptions.Value, testDataDescription.CalculationId);
+        var viewQuery = new WholesaleAmountPerChargeQuery(ediDatabricksOptions.Value, GetService<IMasterDataClient>(), EventId.From(Guid.NewGuid()), testDataDescription.CalculationId);
 
         await HavingReceivedAndHandledGridAreaOwnershipAssignedEventAsync(testDataDescription.GridAreaCode);
         await SeedDatabricksWithDataAsync(testDataDescription, viewQuery);
