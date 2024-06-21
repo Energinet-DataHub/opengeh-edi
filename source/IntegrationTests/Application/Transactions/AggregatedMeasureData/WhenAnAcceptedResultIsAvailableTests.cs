@@ -93,9 +93,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId)
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1)
-            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(
-                timeSerie => timeSerie.OriginalTransactionIdReference,
-                process.BusinessTransactionId);
+            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.OriginalTransactionIdReference, process.BusinessTransactionId)
+            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.OriginalTransactionIdReference, process.BusinessTransactionId); // Should add settlementversion test here
     }
 
     [Fact]
@@ -122,7 +121,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasReceiverRole(process.RequestedByActor.ActorRole.Code)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
-            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
+            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1)
+            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.SettlementVersion, null);
     }
 
     [Fact]
