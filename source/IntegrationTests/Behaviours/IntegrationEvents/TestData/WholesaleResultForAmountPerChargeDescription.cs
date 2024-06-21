@@ -49,11 +49,9 @@ public class WholesaleResultForAmountPerChargeDescription
 
     public override int ExpectedCalculationResultsCount => 7;
 
-    public override int ExpectedOutgoingMessagesCount => 14;
-
     public int ExpectedOutgoingMessagesForGridOwnerCount => 4;
 
-    public int ExpectedOutgoingMessagesForEnergySupplierCount => 7;
+    public int ExpectedOutgoingMessagesForEnergySupplierCount => ExpectedCalculationResultsCount;
 
     public override Period Period => new(
         Instant.FromUtc(2023, 1, 31, 23, 0, 0),

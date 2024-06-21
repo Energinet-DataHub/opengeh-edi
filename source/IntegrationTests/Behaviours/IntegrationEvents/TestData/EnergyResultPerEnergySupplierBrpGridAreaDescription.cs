@@ -37,8 +37,6 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
 
     public override int ExpectedCalculationResultsCount => 35;
 
-    public override int ExpectedOutgoingMessagesCount => ExpectedCalculationResultsCount * 2; // We must prepare a message for BRP and ES
-
     public override Period Period => new(
         Instant.FromUtc(2022, 1, 11, 23, 0, 0),
         Instant.FromUtc(2022, 1, 12, 23, 0, 0));

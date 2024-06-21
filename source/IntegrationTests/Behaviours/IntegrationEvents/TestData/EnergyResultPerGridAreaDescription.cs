@@ -38,7 +38,7 @@ public class EnergyResultPerGridAreaDescription
 
     public override int ExpectedCalculationResultsCount => 5;
 
-    public override int ExpectedOutgoingMessagesCount => 5;
+    public int ExpectedOutgoingMessagesForGridOwnerCount => ExpectedCalculationResultsCount;
 
     public override Period Period => new(
         Instant.FromUtc(2022, 1, 11, 23, 0, 0),

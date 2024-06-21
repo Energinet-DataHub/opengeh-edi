@@ -38,8 +38,6 @@ public class EnergyResultPerBrpGridAreaDescription
 
     public override int ExpectedCalculationResultsCount => 20;
 
-    public override int ExpectedOutgoingMessagesCount => 20;
-
     public override Period Period => new(
         Instant.FromUtc(2022, 1, 11, 23, 0, 0),
         Instant.FromUtc(2022, 1, 12, 23, 0, 0));

@@ -77,7 +77,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             documentFormat);
 
         // Then (assert)
-        peekResultsForMeteredDataResponsible.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesCount);
+        peekResultsForMeteredDataResponsible.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForGridOwnerCount);
 
         var assertionInput = new NotifyAggregatedMeasureDataDocumentAssertionInput(
             Timestamp: "2022-09-07T13:37:05Z",

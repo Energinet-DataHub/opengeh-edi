@@ -50,11 +50,6 @@ public abstract class TestDataDescription
     public abstract int ExpectedCalculationResultsCount { get; }
 
     /// <summary>
-    /// Expected outgoing messages based on test file content.
-    /// </summary>
-    public abstract int ExpectedOutgoingMessagesCount { get; }
-
-    /// <summary>
     /// Period start/end matching the file content.
     /// </summary>
     public abstract Period Period { get; }
