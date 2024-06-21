@@ -12,15 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -120,9 +117,62 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             energyResultMessage,
             _serializer,
             _systemDateTimeProvider.Now());
+
         var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
         return messageId;
+    }
+
+    public async Task<OutgoingMessageId> EnqueueAndCommitAsync(
+        EnergyResultPerGridAreaMessageDto messageDto,
+        CancellationToken cancellationToken)
+    {
+        var message = OutgoingMessage.CreateMessage(
+            messageDto,
+            _serializer,
+            _systemDateTimeProvider.Now());
+
+        var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        return messageId;
+    }
+
+    public async Task<OutgoingMessageId> EnqueueAndCommitAsync(
+        EnergyResultPerBalanceResponsibleMessageDto messageDto,
+        CancellationToken cancellationToken)
+    {
+        var message = OutgoingMessage.CreateMessage(
+            messageDto,
+            _serializer,
+            _systemDateTimeProvider.Now());
+
+        var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        return messageId;
+    }
+
+    public async Task<IReadOnlyCollection<OutgoingMessageId>> EnqueueAndCommitAsync(
+        EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto messageDto,
+        CancellationToken cancellationToken)
+    {
+        var messages = OutgoingMessage.CreateMessages(
+            messageDto,
+            _serializer,
+            _systemDateTimeProvider.Now());
+
+        List<OutgoingMessageId> messageIds = new();
+        foreach (var message in messages)
+        {
+            var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+            messageIds.Add(messageId);
+        }
+
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        return messageIds;
     }
 
     public virtual async Task EnqueueAndCommitAsync(
@@ -182,54 +232,47 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         return messageId;
     }
 
-    public async Task<int> EnqueueEnergyResultsForGridAreaOwnersAsync(EnqueueMessagesInputDto input)
+    public async Task<int> EnqueueEnergyResultsPerGridAreaAsync(EnqueueMessagesInputDto input)
     {
         var numberOfEnqueuedMessages = 0;
 
-        var query = new EnergyResultPerGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
-        await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
+        var query = new EnergyResultPerGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, _masterDataClient, input.EventId, input.CalculationId);
+        await foreach (var energyResultPerGridArea in _energyResultEnumerator.GetAsync(query))
         {
-            // TODO: It should be possible to implement a cache for grid area owner, so we improve the performance of the loop
-            var receiverNumber = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(energyResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
-            // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
-            var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult, receiverNumber);
-            await EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);
+            await EnqueueAndCommitAsync(energyResultPerGridArea, CancellationToken.None).ConfigureAwait(false);
             numberOfEnqueuedMessages++;
         }
 
         return numberOfEnqueuedMessages;
     }
 
-    public async Task<int> EnqueueEnergyResultsForBalanceResponsiblesAsync(EnqueueMessagesInputDto input)
+    public async Task<int> EnqueueEnergyResultsPerBalanceResponsibleAsync(EnqueueMessagesInputDto input)
     {
         var numberOfEnqueuedMessages = 0;
 
-        var query = new EnergyResultPerBrpGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
-        await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
+        var query = new EnergyResultPerBalanceResponsiblePerGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.EventId, input.CalculationId);
+        await foreach (var energyResultPerBalanceResponsible in _energyResultEnumerator.GetAsync(query))
         {
-            // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
-            var energyResultMessage = EnergyResultMessageDtoFactory.Create(EventId.From(input.EventId), energyResult);
-            await EnqueueAndCommitAsync(energyResultMessage, CancellationToken.None).ConfigureAwait(false);
+            await EnqueueAndCommitAsync(energyResultPerBalanceResponsible, CancellationToken.None).ConfigureAwait(false);
             numberOfEnqueuedMessages++;
         }
 
         return numberOfEnqueuedMessages;
     }
 
-    public async Task<int> EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersAsync(EnqueueMessagesInputDto input)
+    public async Task<int> EnqueueEnergyResultsPerEnergySupplierPerBalanceResponsibleAsync(EnqueueMessagesInputDto input)
     {
         var numberOfEnqueuedMessages = 0;
 
-        var query = new EnergyResultPerEnergySupplierBrpGridAreaQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
-        await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
+        var query = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(
+            _energyResultEnumerator.EdiDatabricksOptions,
+            input.EventId,
+            input.CalculationId);
+
+        await foreach (var energyResultPerEnergySupplierPerBalanceResponsible in _energyResultEnumerator.GetAsync(query))
         {
-            // TODO: It should be possible to create the EnergyResultMessageDto directly in queries
-            var energyResultPerEnergySupplierMessage = EnergyResultMessageDtoFactory.CreateForEnergySupplier(EventId.From(input.EventId), energyResult);
-            await EnqueueAndCommitAsync(energyResultPerEnergySupplierMessage, CancellationToken.None).ConfigureAwait(false);
-            numberOfEnqueuedMessages++;
-            var energyResultPerBalanceResponsibleMessage = EnergyResultMessageDtoFactory.CreateForBalanceResponsiblePrEnergySupplier(EventId.From(input.EventId), energyResult);
-            await EnqueueAndCommitAsync(energyResultPerBalanceResponsibleMessage, CancellationToken.None).ConfigureAwait(false);
-            numberOfEnqueuedMessages++;
+            var createdMessages = await EnqueueAndCommitAsync(energyResultPerEnergySupplierPerBalanceResponsible, CancellationToken.None).ConfigureAwait(false);
+            numberOfEnqueuedMessages += createdMessages.Count;
         }
 
         return numberOfEnqueuedMessages;
@@ -239,7 +282,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     {
         var numberOfEnqueuedMessages = 0;
 
-        var query = new WholesaleAmountPerChargeQuery(_energyResultEnumerator.EdiDatabricksOptions, _masterDataClient, EventId.From(input.EventId), input.CalculationId);
+        var query = new WholesaleAmountPerChargeQuery(_energyResultEnumerator.EdiDatabricksOptions, _masterDataClient, input.EventId, input.CalculationId);
         await foreach (var wholesaleResult in _wholesaleResultEnumerator.GetAsync(query))
         {
             await EnqueueAndCommitAsync(wholesaleResult, CancellationToken.None).ConfigureAwait(false);

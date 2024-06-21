@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -158,7 +159,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
     private async Task<WholesaleResultForAmountPerChargeDescription> GivenDatabricksResultDataForWholesaleResultAmountPerCharge()
     {
         var wholesaleResultForAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
-        var wholesaleAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(_ediDatabricksOptions.Value, wholesaleResultForAmountPerChargeDescription.CalculationId);
+        var wholesaleAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(_ediDatabricksOptions.Value,  GetService<IMasterDataClient>(), EventId.From(Guid.NewGuid()), wholesaleResultForAmountPerChargeDescription.CalculationId);
 
         await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleAmountPerChargeQuery);
         await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleAmountPerChargeQuery, wholesaleResultForAmountPerChargeDescription.TestFilePath);

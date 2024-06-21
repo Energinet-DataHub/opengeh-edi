@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyRes
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 
@@ -24,7 +25,7 @@ public abstract class EnergyResultQueryBase<TResult>(
         EdiDatabricksOptions ediDatabricksOptions,
         Guid calculationId)
     : IDeltaTableSchemaDescription
-    where TResult : AggregatedTimeSeries
+    where TResult : OutgoingMessageDto
 {
     private readonly EdiDatabricksOptions _ediDatabricksOptions = ediDatabricksOptions;
 
@@ -64,7 +65,7 @@ public abstract class EnergyResultQueryBase<TResult>(
 
             if (currentRow != null && BelongsToDifferentResults(currentRow, nextRow))
             {
-                yield return CreateEnergyResult(currentRow!, timeSeriesPoints);
+                yield return await CreateEnergyResultAsync(currentRow!, timeSeriesPoints).ConfigureAwait(false);
                 timeSeriesPoints = [];
             }
 
@@ -74,11 +75,11 @@ public abstract class EnergyResultQueryBase<TResult>(
 
         if (currentRow != null)
         {
-            yield return CreateEnergyResult(currentRow, timeSeriesPoints);
+            yield return await CreateEnergyResultAsync(currentRow, timeSeriesPoints).ConfigureAwait(false);
         }
     }
 
-    protected abstract TResult CreateEnergyResult(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints);
+    protected abstract Task<TResult> CreateEnergyResultAsync(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints);
 
     private static bool BelongsToDifferentResults(DatabricksSqlRow row, DatabricksSqlRow otherRow)
     {

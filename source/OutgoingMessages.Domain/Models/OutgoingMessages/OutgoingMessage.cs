@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -247,6 +245,106 @@ public class OutgoingMessage
             ProcessType.ReceiveEnergyResults,
             energyResultMessage.RelatedToMessageId,
             energyResultMessage.Series.GridAreaCode);
+    }
+
+    /// <summary>
+    /// Create one outgoing message for the metered data responsible, based on the <paramref name="messageDto"/>.
+    /// </summary>
+    public static OutgoingMessage CreateMessage(
+        EnergyResultPerGridAreaMessageDto messageDto,
+        ISerializer serializer,
+        Instant timestamp)
+    {
+        ArgumentNullException.ThrowIfNull(serializer);
+        ArgumentNullException.ThrowIfNull(messageDto);
+
+        return new OutgoingMessage(
+            messageDto.EventId,
+            messageDto.DocumentType,
+            messageDto.ReceiverNumber,
+            messageDto.ProcessId,
+            messageDto.BusinessReason,
+            messageDto.ReceiverRole,
+            messageDto.SenderId,
+            messageDto.SenderRole,
+            serializer.Serialize(messageDto.Series),
+            timestamp,
+            ProcessType.ReceiveEnergyResults,
+            messageDto.RelatedToMessageId,
+            messageDto.Series.GridAreaCode);
+    }
+
+    /// <summary>
+    /// Create one outgoing message for the balance responsible, based on the <paramref name="messageDto"/>.
+    /// </summary>
+    public static OutgoingMessage CreateMessage(
+        EnergyResultPerBalanceResponsibleMessageDto messageDto,
+        ISerializer serializer,
+        Instant timestamp)
+    {
+        ArgumentNullException.ThrowIfNull(serializer);
+        ArgumentNullException.ThrowIfNull(messageDto);
+
+        return new OutgoingMessage(
+            messageDto.EventId,
+            messageDto.DocumentType,
+            messageDto.ReceiverNumber,
+            messageDto.ProcessId,
+            messageDto.BusinessReason,
+            messageDto.ReceiverRole,
+            messageDto.SenderId,
+            messageDto.SenderRole,
+            serializer.Serialize(messageDto.Series),
+            timestamp,
+            ProcessType.ReceiveEnergyResults,
+            messageDto.RelatedToMessageId,
+            messageDto.Series.GridAreaCode);
+    }
+
+    /// <summary>
+    /// Create two outgoing messages, one for the balance responsible and one for the energy supplier,
+    /// based on the <paramref name="messageDto"/>.
+    /// </summary>
+    public static List<OutgoingMessage> CreateMessages(
+        EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto messageDto,
+        ISerializer serializer,
+        Instant timestamp)
+    {
+        ArgumentNullException.ThrowIfNull(serializer);
+        ArgumentNullException.ThrowIfNull(messageDto);
+
+        return
+        [
+            new OutgoingMessage(
+                eventId: messageDto.EventId,
+                documentType: messageDto.DocumentType,
+                processId: messageDto.ProcessId,
+                businessReason: messageDto.BusinessReason,
+                receiverId: messageDto.EnergySupplierNumber,
+                receiverRole: ActorRole.EnergySupplier,
+                senderId: messageDto.SenderId,
+                senderRole: messageDto.SenderRole,
+                serializedContent: serializer.Serialize(messageDto.SeriesForEnergySupplier),
+                createdAt: timestamp,
+                messageCreatedFromProcess: ProcessType.ReceiveEnergyResults,
+                relatedToMessageId: messageDto.RelatedToMessageId,
+                gridAreaCode: messageDto.GridArea),
+
+            new OutgoingMessage(
+                eventId: messageDto.EventId,
+                documentType: messageDto.DocumentType,
+                processId: messageDto.ProcessId,
+                businessReason: messageDto.BusinessReason,
+                receiverId: messageDto.BalanceResponsibleNumber,
+                receiverRole: ActorRole.BalanceResponsibleParty,
+                senderId: messageDto.SenderId,
+                senderRole: messageDto.SenderRole,
+                serializedContent: serializer.Serialize(messageDto.SeriesForBalanceResponsible),
+                createdAt: timestamp,
+                messageCreatedFromProcess: ProcessType.ReceiveEnergyResults,
+                relatedToMessageId: messageDto.RelatedToMessageId,
+                gridAreaCode: messageDto.GridArea),
+        ];
     }
 
     /// <summary>

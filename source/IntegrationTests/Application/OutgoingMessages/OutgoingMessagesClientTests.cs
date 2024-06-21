@@ -15,10 +15,12 @@
 using Dapper;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
@@ -58,7 +60,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         var testDataDescription = new EnergyResultPerGridAreaDescription();
 
         var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
-        var viewQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions.Value, testDataDescription.CalculationId);
+        var viewQuery = new EnergyResultPerGridAreaQuery(ediDatabricksOptions.Value, GetService<IMasterDataClient>(), EventId.From(Guid.NewGuid()), testDataDescription.CalculationId);
 
         await HavingReceivedAndHandledGridAreaOwnershipAssignedEventAsync(testDataDescription.GridAreaCode);
         await SeedDatabricksWithDataAsync(testDataDescription, viewQuery);
@@ -66,10 +68,10 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         var sut = GetService<IOutgoingMessagesClient>();
         var input = new EnqueueMessagesInputDto(
             testDataDescription.CalculationId,
-            EventId: Guid.NewGuid());
+            EventId: EventId.From(Guid.NewGuid()));
 
         // Act
-        await sut.EnqueueEnergyResultsForGridAreaOwnersAsync(input);
+        await sut.EnqueueEnergyResultsPerGridAreaAsync(input);
 
         // Assert
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
@@ -86,17 +88,17 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         var testDataDescription = new EnergyResultPerBrpGridAreaDescription();
 
         var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
-        var viewQuery = new EnergyResultPerBrpGridAreaQuery(ediDatabricksOptions.Value, testDataDescription.CalculationId);
+        var viewQuery = new EnergyResultPerBalanceResponsiblePerGridAreaQuery(ediDatabricksOptions.Value, EventId.From(Guid.NewGuid()), testDataDescription.CalculationId);
 
         await SeedDatabricksWithDataAsync(testDataDescription, viewQuery);
 
         var sut = GetService<IOutgoingMessagesClient>();
         var input = new EnqueueMessagesInputDto(
             testDataDescription.CalculationId,
-            EventId: Guid.NewGuid());
+            EventId: EventId.From(Guid.NewGuid()));
 
         // Act
-        await sut.EnqueueEnergyResultsForBalanceResponsiblesAsync(input);
+        await sut.EnqueueEnergyResultsPerBalanceResponsibleAsync(input);
 
         // Assert
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
@@ -113,17 +115,17 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         var testDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
 
         var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
-        var viewQuery = new EnergyResultPerEnergySupplierBrpGridAreaQuery(ediDatabricksOptions.Value, testDataDescription.CalculationId);
+        var viewQuery = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(ediDatabricksOptions.Value, EventId.From(Guid.NewGuid()), testDataDescription.CalculationId);
 
         await SeedDatabricksWithDataAsync(testDataDescription, viewQuery);
 
         var sut = GetService<IOutgoingMessagesClient>();
         var input = new EnqueueMessagesInputDto(
             testDataDescription.CalculationId,
-            EventId: Guid.NewGuid());
+            EventId: EventId.From(Guid.NewGuid()));
 
         // Act
-        await sut.EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersAsync(input);
+        await sut.EnqueueEnergyResultsPerEnergySupplierPerBalanceResponsibleAsync(input);
 
         // Assert
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
@@ -140,7 +142,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         var testDataDescription = new WholesaleResultForAmountPerChargeDescription();
 
         var ediDatabricksOptions = GetService<IOptions<EdiDatabricksOptions>>();
-        var viewQuery = new WholesaleAmountPerChargeQuery(ediDatabricksOptions.Value, testDataDescription.CalculationId);
+        var viewQuery = new WholesaleAmountPerChargeQuery(ediDatabricksOptions.Value, GetService<IMasterDataClient>(), EventId.From(Guid.NewGuid()), testDataDescription.CalculationId);
 
         await HavingReceivedAndHandledGridAreaOwnershipAssignedEventAsync(testDataDescription.GridAreaCode);
         await SeedDatabricksWithDataAsync(testDataDescription, viewQuery);
@@ -148,7 +150,7 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
         var sut = GetService<IOutgoingMessagesClient>();
         var input = new EnqueueMessagesInputDto(
             testDataDescription.CalculationId,
-            EventId: Guid.NewGuid());
+            EventId: EventId.From(Guid.NewGuid()));
 
         // Act
         await sut.EnqueueWholesaleResultsForAmountPerChargeAsync(input);
