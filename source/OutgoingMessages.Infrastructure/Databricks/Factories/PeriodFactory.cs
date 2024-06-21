@@ -43,7 +43,7 @@ public static class PeriodFactory
                 throw new ArgumentOutOfRangeException(
                     nameof(resolution),
                     resolution,
-                    "Unknown databricks resolution");
+                    "Unknown resolution");
         }
     }
 }
