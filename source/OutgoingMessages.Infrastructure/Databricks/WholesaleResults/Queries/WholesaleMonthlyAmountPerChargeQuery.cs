@@ -17,13 +17,14 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatem
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 
 public class WholesaleMonthlyAmountPerChargeQuery(
     EdiDatabricksOptions ediDatabricksOptions,
     Guid calculationId)
-    : WholesaleResultQueryBase<WholesaleMonthlyAmountPerCharge>(
+    : WholesaleResultQueryBase<WholesaleMontlyAmountPerChargeDto>(
         ediDatabricksOptions,
         calculationId)
 {
@@ -47,8 +48,8 @@ public class WholesaleMonthlyAmountPerChargeQuery(
         { WholesaleResultColumnNames.Amount,                    (DeltaTableCommonTypes.Decimal18x3,         true) },
     };
 
-    protected override WholesaleMonthlyAmountPerCharge CreateWholesaleResult(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
+    protected override Task<WholesaleMontlyAmountPerChargeDto> CreateWholesaleResultAsync(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
-        return WholesaleMontlyAmountPerChargeFactory.Create(databricksSqlRow, timeSeriesPoints);
+        throw new NotImplementedException();
     }
 }

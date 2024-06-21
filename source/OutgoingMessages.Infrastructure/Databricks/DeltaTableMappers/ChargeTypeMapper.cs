@@ -30,4 +30,18 @@ public static class ChargeTypeMapper
                 actualValue: chargeType,
                 "Value does not contain a valid string representation of a settlement method."),
         };
+
+    public static ChargeType? FromDeltaTableValueAsNullable(string? chargeType) =>
+        chargeType switch
+        {
+            "subscription" => ChargeType.Subscription,
+            "fee" => ChargeType.Fee,
+            "tariff" => ChargeType.Tariff,
+            null => null,
+
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(chargeType),
+                actualValue: chargeType,
+                "Value does not contain a valid string representation of a settlement method."),
+        };
 }

@@ -41,7 +41,7 @@ public class WholesaleMontlyAmountPerChargeFactory
             databricksSqlRow.ToLong(WholesaleResultColumnNames.CalculationVersion),
             period.Start,
             period.End,
-            MeasurementUnitMapper.Map(databricksSqlRow.ToNullableString(WholesaleResultColumnNames.QuantityUnit)),
+            MeasurementUnitMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(WholesaleResultColumnNames.QuantityUnit)),
             CurrencyMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.Currency)),
             ChargeTypeMapper.FromDeltaTableValue(
                 databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.ChargeType)),
