@@ -225,8 +225,8 @@ public class B2BApiAppFixture : IAsyncLifetime
     }
 
     /// <summary>
-    /// Cleanup Azurite storage to avoid especially Durable Functions
-    /// to continue working on old orchestrations that e.g. failed in
+    /// Cleanup Azurite storage to avoid situations where Durable Functions
+    /// would otherwise continue working on old orchestrations that e.g. failed in
     /// previous runs.
     /// </summary>
     private static void CleanupAzuriteStorage()
