@@ -68,13 +68,19 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         var testMessageData = testDataDescription.ExampleWholesaleResultMessageData;
 
         GivenNowIs(Instant.FromUtc(2023, 09, 07, 13, 37, 05));
-        var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
+        var systemOperator = new Actor(DataHubDetails.SystemOperatorActorNumber, ActorRole.SystemOperator);
         var gridOperator = new Actor(ActorNumber.Create("8500000000502"), ActorRole.GridOperator);
+        var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
 
         await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCode, gridOperator.ActorNumber);
         await GivenEnqueueWholesaleResultsForAmountPerChargesAsync(testDataDescription.CalculationId);
 
         // When (act)
+        var peekResultsForSystemOperatorOperator = await WhenActorPeeksAllMessages(
+            systemOperator.ActorNumber,
+            systemOperator.ActorRole,
+            documentFormat);
+
         var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(
             energySupplier.ActorNumber,
             energySupplier.ActorRole,
@@ -86,14 +92,39 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             documentFormat);
 
         // Then (assert)
+        peekResultsForSystemOperatorOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForSystemOperatorCount);
         peekResultsForGridOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForGridOwnerCount);
         peekResultsForEnergySupplier.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForEnergySupplierCount);
+
+        var expectedDocumentToSystemOperator = new NotifyWholesaleServicesDocumentAssertionInput(
+            Timestamp: "2023-09-07T13:37:05Z",
+            BusinessReasonWithSettlementVersion: new(BusinessReason.WholesaleFixing, null),
+            ReceiverId: systemOperator.ActorNumber.Value,
+            ReceiverRole: systemOperator.ActorRole,
+            SenderId: DataHubDetails.DataHubActorNumber.Value,
+            SenderRole: ActorRole.MeteredDataAdministrator,
+            ChargeTypeOwner: systemOperator.ActorNumber.Value,
+            ChargeCode: "Sub-804",
+            ChargeType: ChargeType.Subscription,
+            Currency: testMessageData.Currency,
+            EnergySupplierNumber: testMessageData.EnergySupplier.Value,
+            SettlementMethod: testMessageData.SettlementMethod,
+            MeteringPointType: testMessageData.MeteringPointType,
+            GridArea: testMessageData.GridArea,
+            OriginalTransactionIdReference: null,
+            PriceMeasurementUnit: MeasurementUnit.Kwh,
+            ProductCode: "5790001330590",
+            QuantityMeasurementUnit: MeasurementUnit.Pieces,
+            CalculationVersion: testMessageData.Version,
+            Resolution: testMessageData.Resolution,
+            Period: testDataDescription.Period,
+            Points: testMessageData.Points);
 
         var expectedDocumentToChargeOwner = new NotifyWholesaleServicesDocumentAssertionInput(
             Timestamp: "2023-09-07T13:37:05Z",
             BusinessReasonWithSettlementVersion: new(BusinessReason.WholesaleFixing, null),
             ReceiverId: gridOperator.ActorNumber.Value,
-            ReceiverRole: ActorRole.GridOperator,
+            ReceiverRole: gridOperator.ActorRole,
             SenderId: DataHubDetails.DataHubActorNumber.Value,
             SenderRole: ActorRole.MeteredDataAdministrator,
             ChargeTypeOwner: gridOperator.ActorNumber.Value,
