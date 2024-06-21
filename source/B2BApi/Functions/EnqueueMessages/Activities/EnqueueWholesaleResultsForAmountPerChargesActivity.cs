@@ -50,9 +50,7 @@ public class EnqueueWholesaleResultsForAmountPerChargesActivity(
                     var scopedMasterDataClient = scope.ServiceProvider.GetRequiredService<IMasterDataClient>();
                     var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
 
-                    // TODO: It should be possible to implement a cache for grid area owner, so we improve the performance of the loop
                     var gridOwner = await scopedMasterDataClient.GetGridOwnerForGridAreaCodeAsync(wholesaleResult.GridAreaCode, CancellationToken.None).ConfigureAwait(false);
-                    // TODO: It should be possible to create the WholesaleServicesMessageDto directly in queries
                     var wholesaleResultMessage = WholesaleResultMessageDtoFactory.Create(EventId.From(input.EventId), wholesaleResult, gridOwner);
                     await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(wholesaleResultMessage, CancellationToken.None).ConfigureAwait(false);
 
