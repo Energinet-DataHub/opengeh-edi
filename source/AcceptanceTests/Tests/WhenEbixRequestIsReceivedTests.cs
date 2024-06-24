@@ -59,22 +59,17 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
         await _ebixMDR.EmptyQueueForActor();
 
         await _ebixMDR.PublishCalculationCompletedForBalanceFixing();
-        // await _ebixMDR.PublishAggregationResult(AcceptanceTestFixture.EbixActorGridArea);
 
         await _ebixMDR.ConfirmEnergyResultIsAvailable();
     }
 
     // TODO: Find ebIX actor with Wholesale data, or get Wholesale to create data for ebIX energy supplier actor 5790000610976 in grid area 543
-    [Fact(Skip = "The ebIX energy supplier actor 5790000610976 (in grid area 543) does currently not have any Wholesale data")]
+    [Fact(Skip = "The ebIX energy supplier actor 5790000610976 (in grid area 543) does not currently have any Wholesale data")]
     public async Task Actor_can_peek_and_dequeue_wholesale_result_in_ebIX_format()
     {
         await _ebixEs.EmptyQueueForActor();
 
         await _ebixEs.PublishCalculationCompletedForWholesaleFixing();
-        //     await _ebixEs.PublishAmountPerChargeResult(
-        //         AcceptanceTestFixture.EbixActorGridArea,
-        //         AcceptanceTestFixture.ActorNumber,
-        //         AcceptanceTestFixture.ChargeOwnerId);
 
         await _ebixEs.ConfirmWholesaleResultIsAvailable();
     }

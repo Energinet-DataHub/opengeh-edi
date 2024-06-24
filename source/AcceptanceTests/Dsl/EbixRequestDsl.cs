@@ -59,8 +59,8 @@ internal sealed class EbixRequestDsl
             _balanceFixingCalculationId,
             CalculationCompletedV1.Types.CalculationType.BalanceFixing);
 
-        var orchestration = await _edi.WaitForOrchestrationStartedAtAsync(calculationCompletedAt);
-        await _edi.WaitForOrchestrationCompletedAtAsync(orchestration.InstanceId);
+        var orchestration = await _edi.WaitForOrchestrationStartedAsync(calculationCompletedAt);
+        await _edi.WaitForOrchestrationCompletedAsync(orchestration.InstanceId);
     }
 
     internal async Task PublishCalculationCompletedForWholesaleFixing()

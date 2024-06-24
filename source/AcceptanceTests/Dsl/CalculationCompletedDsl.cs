@@ -18,6 +18,7 @@ using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
@@ -31,13 +32,15 @@ public sealed class CalculationCompletedDsl
     private readonly Guid _wholesaleFixingCalculationId;
 
     private readonly WholesaleDriver _wholesaleDriver;
+    private readonly ITestOutputHelper _logger;
     private readonly EdiDriver _ediDriver;
 
-    internal CalculationCompletedDsl(AcceptanceTestFixture fixture, EdiDriver ediDriver, WholesaleDriver wholesaleDriver)
+    internal CalculationCompletedDsl(AcceptanceTestFixture fixture, EdiDriver ediDriver, WholesaleDriver wholesaleDriver, ITestOutputHelper logger)
     {
         _balanceFixingCalculationId = fixture.BalanceFixingCalculationId;
         _wholesaleFixingCalculationId = fixture.WholesaleFixingCalculationId;
         _wholesaleDriver = wholesaleDriver;
+        _logger = logger;
         _ediDriver = ediDriver;
     }
 
@@ -45,26 +48,18 @@ public sealed class CalculationCompletedDsl
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
 
-        var calculationCompletedAt = SystemClock.Instance.GetCurrentInstant();
-        await _wholesaleDriver.PublishCalculationCompletedAsync(
-            _balanceFixingCalculationId,
-            CalculationCompletedV1.Types.CalculationType.BalanceFixing);
-
-        var orchestration = await _ediDriver.WaitForOrchestrationStartedAtAsync(calculationCompletedAt);
-        await _ediDriver.WaitForOrchestrationCompletedAtAsync(orchestration.InstanceId);
+        await StartAndWaitForOrchestrationToComplete(
+            CalculationCompletedV1.Types.CalculationType.BalanceFixing,
+            _balanceFixingCalculationId);
     }
 
     internal async Task PublishForWholesaleFixingCalculation()
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
 
-        var calculationCompletedAt = SystemClock.Instance.GetCurrentInstant();
-        await _wholesaleDriver.PublishCalculationCompletedAsync(
-            _wholesaleFixingCalculationId,
-            CalculationCompletedV1.Types.CalculationType.WholesaleFixing);
-
-        var orchestration = await _ediDriver.WaitForOrchestrationStartedAtAsync(calculationCompletedAt);
-        await _ediDriver.WaitForOrchestrationCompletedAtAsync(orchestration.InstanceId);
+        await StartAndWaitForOrchestrationToComplete(
+            CalculationCompletedV1.Types.CalculationType.WholesaleFixing,
+            _wholesaleFixingCalculationId);
     }
 
     /// <summary>
@@ -134,5 +129,33 @@ public sealed class CalculationCompletedDsl
         notifyAggregatedMeasureDataDocuments.Should().HaveCount(5, $"because there should be 5 energy results for actor 5790000392551 as MDR in the calculation {_wholesaleFixingCalculationId}");
 
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+    }
+
+    private async Task StartAndWaitForOrchestrationToComplete(
+        CalculationCompletedV1.Types.CalculationType calculationType,
+        Guid calculationId)
+    {
+        // Get current instant and subtract 1 second to ensure that the orchestration is started after the instant
+        // In some cases the orchestration can be started before a second has passed which meant that the orchestration
+        // would not be retrieved by the durable client
+        var orchestrationStartedAfter = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromSeconds(1));
+
+        _logger.WriteLine("Publish calculation completed for calculation with id {0}", _balanceFixingCalculationId);
+        await _wholesaleDriver.PublishCalculationCompletedAsync(
+            calculationId,
+            calculationType);
+
+        _logger.WriteLine("Wait for message orchestration to be started after {0}", orchestrationStartedAfter.ToString());
+        var orchestration = await _ediDriver.WaitForOrchestrationStartedAsync(orchestrationStartedAfter);
+        orchestration.Input.Value<string>("CalculationId")
+            .Should()
+            .Be(
+                calculationId.ToString(),
+                $"because the orchestration should be for the given calculation id {calculationId}");
+
+        _logger.WriteLine("Wait for message orchestration to be completed for instance id {0}", orchestration.InstanceId);
+        await _ediDriver.WaitForOrchestrationCompletedAsync(orchestration.InstanceId);
+
+        _logger.WriteLine("Message orchestration completed for instance id {0}, took {1}", orchestration.InstanceId, SystemClock.Instance.GetCurrentInstant() - orchestrationStartedAfter);
     }
 }

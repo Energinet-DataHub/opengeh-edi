@@ -49,8 +49,8 @@ internal sealed class NotifyWholesaleServicesDsl
             _wholesaleFixingCalculationId,
             CalculationCompletedV1.Types.CalculationType.WholesaleFixing);
 
-        var orchestration = await _ediDriver.WaitForOrchestrationStartedAtAsync(calculationCompletedAt);
-        await _ediDriver.WaitForOrchestrationCompletedAtAsync(orchestration.InstanceId);
+        var orchestration = await _ediDriver.WaitForOrchestrationStartedAsync(calculationCompletedAt);
+        await _ediDriver.WaitForOrchestrationCompletedAsync(orchestration.InstanceId);
     }
 
     internal async Task PublishAmountPerChargeResult(

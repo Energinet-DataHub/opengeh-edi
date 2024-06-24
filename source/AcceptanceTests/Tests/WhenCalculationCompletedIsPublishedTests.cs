@@ -36,7 +36,8 @@ public class WhenCalculationCompletedIsPublishedTests : BaseTestClass
                 fixture.DurableClient,
                 fixture.B2BMeteredDataResponsibleAuthorizedHttpClient,
                 output),
-            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
+            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient),
+            output);
     }
 
     [Fact]

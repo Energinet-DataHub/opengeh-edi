@@ -40,7 +40,8 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         _calculationCompleted = new CalculationCompletedDsl(
             fixture,
             new EdiDriver(fixture.DurableClient, fixture.B2BEnergySupplierAuthorizedHttpClient, output),
-            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
+            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient),
+            output);
 
         _notifyWholesaleServices = new NotifyWholesaleServicesDsl(
             fixture,
