@@ -51,9 +51,8 @@ public class WholesaleAmountPerChargeDto : OutgoingMessageDto
             receiverRole: null!,
             null!,
             null!,
-            null)
+            new ExternalId(calculationResultId))
     {
-        CalculationResultId = calculationResultId;
         EnergySupplierReceiverId = energySupplierReceiverId;
         ChargeOwnerReceiverId = chargeOwnerReceiverId;
 
@@ -78,8 +77,6 @@ public class WholesaleAmountPerChargeDto : OutgoingMessageDto
             null,
             SettlementMethod: settlementMethod);
     }
-
-    public Guid CalculationResultId { get; }
 
     public ActorNumber EnergySupplierReceiverId { get; }
 

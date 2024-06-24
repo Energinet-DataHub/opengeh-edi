@@ -47,6 +47,7 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto
             receiverRole: ActorRole.BalanceResponsibleParty,
             senderId: DataHubDetails.DataHubActorNumber,
             senderRole: ActorRole.MeteredDataAdministrator,
+            externalId: new ExternalId(calculationResultId),
             relatedToMessageId: null)
     {
         SeriesForBalanceResponsible = new EnergyResultMessageTimeSeries(
@@ -84,7 +85,6 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto
         GridArea = gridArea;
         EnergySupplierNumber = energySupplierNumber;
         BalanceResponsibleNumber = balanceResponsibleNumber;
-        CalculationResultId = calculationResultId;
     }
 
     public EnergyResultMessageTimeSeries SeriesForBalanceResponsible { get; }
@@ -96,6 +96,4 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto
     public ActorNumber EnergySupplierNumber { get; }
 
     public ActorNumber BalanceResponsibleNumber { get; }
-
-    public Guid CalculationResultId { get; }
 }
