@@ -46,7 +46,7 @@ public static class AcceptedEnergyResultMessageDtoFactory
             points: AcceptedEnergyResultMessageMapper.MapPoints(acceptedEnergyResultTimeSeries.Points),
             businessReasonName: aggregatedMeasureDataProcess.BusinessReason.Name,
             calculationResultVersion: acceptedEnergyResultTimeSeries.CalculationResultVersion,
-            settlementVersion: aggregatedMeasureDataProcess.SettlementVersion?.Name,
+            settlementVersion: acceptedEnergyResultTimeSeries.SettlementVersion?.Name,
             relatedToMessageId: aggregatedMeasureDataProcess.InitiatedByMessageId,
             originalTransactionIdReference: aggregatedMeasureDataProcess.BusinessTransactionId,
             documentReceiverNumber: aggregatedMeasureDataProcess.OriginalActor.ActorNumber,

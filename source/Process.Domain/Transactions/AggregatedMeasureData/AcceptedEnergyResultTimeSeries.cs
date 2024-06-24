@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
@@ -29,10 +27,8 @@ public record AcceptedEnergyResultTimeSeries(
     string GridAreaCode,
     long CalculationResultVersion,
     Instant StartOfPeriod,
-    Instant EndOfPeriod);
+    Instant EndOfPeriod,
+    SettlementVersion? SettlementVersion);
 
 [Serializable]
 public record Point(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);
-
-[Serializable]
-public record GridAreaDetails(string GridAreaCode, string OperatorNumber);
