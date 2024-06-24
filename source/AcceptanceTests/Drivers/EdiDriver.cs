@@ -69,37 +69,14 @@ internal sealed class EdiDriver : IDisposable
         throw new TimeoutException("Unable to retrieve peek result within time limit");
     }
 
-    internal async Task<IReadOnlyCollection<HttpResponseMessage>> PeekAllMessagesAsync(DocumentFormat? documentFormat = null, bool isFirstPeek = true, int retryCount = 0)
+    internal async Task<IReadOnlyCollection<HttpResponseMessage>> PeekAllMessagesAsync(DocumentFormat? documentFormat = null)
     {
-        HttpResponseMessage peekResponse;
-        if (isFirstPeek)
-        {
-            // If this is the first peek, we want to wait for the first message to be available, which PeekMessageAsync() does
-            peekResponse = await PeekMessageAsync(documentFormat);
-        }
-        else
-        {
-            // On subsequent peeks we do not want to wait 10 minutes when no more messages are available, so we use PeekAsync() directly
-            peekResponse = await PeekAsync(documentFormat);
-        }
-
-        // TODO: Lower timeout if we wait for orchestration to complete
-        // 10 max retries with 30 second wait time gives a max wait time of 300 seconds (10 retries * 30 seconds = 300 seconds = 5 minutes)
-        var waitTime = TimeSpan.FromSeconds(30);
-        var maxRetries = 10;
-        if (peekResponse.StatusCode == HttpStatusCode.NoContent && retryCount < maxRetries)
-        {
-            // Received no content - wait before and trying again
-            await Task.Delay(waitTime);
-            return await PeekAllMessagesAsync(
-                documentFormat,
-                isFirstPeek: false,
-                retryCount: retryCount + 1);
-        }
+        // We use PeekAsync() directly since we don't want to wait for messages to become available (which PeekMessageAsync does)
+        var peekResponse = await PeekAsync(documentFormat);
 
         if (peekResponse.StatusCode == HttpStatusCode.NoContent)
         {
-            // Received no content and max retry count is exceeded - break out of recursive loop (and return the found results)
+            // Received no content - break out of recursive loop and return the found results
             return [];
         }
 
@@ -108,10 +85,9 @@ internal sealed class EdiDriver : IDisposable
 
         var results = new List<HttpResponseMessage> { peekResponse };
 
-        if (!isFirstPeek) // If first peek then PeekMessageAsync() handles dequeuing internally
-            await DequeueAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
+        await DequeueAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
 
-        results.AddRange(await PeekAllMessagesAsync(documentFormat, false).ConfigureAwait(false));
+        results.AddRange(await PeekAllMessagesAsync(documentFormat).ConfigureAwait(false));
 
         return results;
     }
@@ -190,7 +166,7 @@ internal sealed class EdiDriver : IDisposable
         return orchestration;
     }
 
-    internal async Task WaitForOrchestratonCompletedAtAsync(string orchestrationInstanceId)
+    internal async Task WaitForOrchestrationCompletedAtAsync(string orchestrationInstanceId)
     {
         await _durableClient.WaitForInstanceCompletedAsync(orchestrationInstanceId, TimeSpan.FromMinutes(10));
     }

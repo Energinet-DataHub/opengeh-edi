@@ -15,6 +15,7 @@
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using FluentAssertions;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
@@ -43,9 +44,13 @@ internal sealed class NotifyWholesaleServicesDsl
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
 
+        var calculationCompletedAt = SystemClock.Instance.GetCurrentInstant();
         await _wholesaleDriver.PublishCalculationCompletedAsync(
             _wholesaleFixingCalculationId,
             CalculationCompletedV1.Types.CalculationType.WholesaleFixing);
+
+        var orchestration = await _ediDriver.WaitForOrchestrationStartedAtAsync(calculationCompletedAt);
+        await _ediDriver.WaitForOrchestrationCompletedAtAsync(orchestration.InstanceId);
     }
 
     internal async Task PublishAmountPerChargeResult(

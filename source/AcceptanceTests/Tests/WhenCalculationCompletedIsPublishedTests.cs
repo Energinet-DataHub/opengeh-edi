@@ -44,7 +44,7 @@ public class WhenCalculationCompletedIsPublishedTests : BaseTestClass
     {
         await _calculationCompleted.PublishForBalanceFixingCalculation();
 
-        await _calculationCompleted.ConfirmEnergyResultIsAvailable();
+        await _calculationCompleted.ConfirmEnergyResultsAreAvailable();
     }
 
     [Fact]

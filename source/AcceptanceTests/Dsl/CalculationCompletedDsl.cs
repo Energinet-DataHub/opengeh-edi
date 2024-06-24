@@ -16,6 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
@@ -50,7 +51,7 @@ public sealed class CalculationCompletedDsl
             CalculationCompletedV1.Types.CalculationType.BalanceFixing);
 
         var orchestration = await _ediDriver.WaitForOrchestrationStartedAtAsync(calculationCompletedAt);
-        await _ediDriver.WaitForOrchestratonCompletedAtAsync(orchestration.InstanceId);
+        await _ediDriver.WaitForOrchestrationCompletedAtAsync(orchestration.InstanceId);
     }
 
     internal async Task PublishForWholesaleFixingCalculation()
@@ -63,27 +64,53 @@ public sealed class CalculationCompletedDsl
             CalculationCompletedV1.Types.CalculationType.WholesaleFixing);
 
         var orchestration = await _ediDriver.WaitForOrchestrationStartedAtAsync(calculationCompletedAt);
-        await _ediDriver.WaitForOrchestratonCompletedAtAsync(orchestration.InstanceId);
+        await _ediDriver.WaitForOrchestrationCompletedAtAsync(orchestration.InstanceId);
     }
 
-    internal async Task ConfirmEnergyResultIsAvailable()
+    /// <summary>
+    /// Asserts that 5 energy results are available for the actor 5790000392551 as MDR when
+    /// the calculation is a balance fixing in the period 1/2/2023 - 3/2/2023
+    /// Calculation on d002: https://dev002.datahub3.dk/wholesale/calculations?id=05018715-70cb-4ef4-bfa0-5f75e9f4622e
+    /// </summary>
+    internal async Task ConfirmEnergyResultsAreAvailable()
     {
-        var peekResponse = await _ediDriver.PeekMessageAsync().ConfigureAwait(false);
-        var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
-        var contentString = await peekResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var peekResponses = await _ediDriver.PeekAllMessagesAsync()
+            .ConfigureAwait(false);
 
-        messageId.Should().NotBeNull();
-        contentString.Should().NotBeNull();
-        contentString.Should().Contain("NotifyAggregatedMeasureData_MarketDocument");
+        using var assertionScope = new AssertionScope();
+
+        peekResponses.Should()
+            .HaveCount(5, $"because there should be 5 energy results for actor 5790000392551 as MDR in the calculation {_balanceFixingCalculationId}")
+            .And.AllSatisfy(
+                r => r.Headers
+                    .GetValues("MessageId")
+                    .FirstOrDefault()
+                    .Should()
+                    .NotBeNullOrEmpty(),
+                "because all peek responses should contain a MessageId");
+
+        var responseDocuments = await Task.WhenAll(peekResponses.Select(r => r.Content.ReadAsStringAsync()));
+        responseDocuments
+            .Should()
+            .AllSatisfy(
+                document => document.Should().Match(
+                    "*NotifyAggregatedMeasureData_MarketDocument*",
+                    "because the peek responses should contain only NotifyAggregatedMeasureData documents"));
 
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Asserts that 19 wholesale results and 5 energy results are available for the actor 5790000392551 as MDR when
+    /// the calculation is a wholesale fixing in the period 1/2/2023 - 28/2/2023
+    /// Calculation on d002: https://dev002.datahub3.dk/wholesale/calculations?id=13d57d2d-7e97-410e-9856-85554281770e
+    /// </summary>
     internal async Task ConfirmWholesaleResultsAndEnergyResultsAreAvailable()
     {
         var peekResponses = await _ediDriver.PeekAllMessagesAsync()
             .ConfigureAwait(false);
 
+        using var assertionScope = new AssertionScope();
         peekResponses.Should()
             .NotBeEmpty()
             .And.AllSatisfy(
@@ -94,15 +121,17 @@ public sealed class CalculationCompletedDsl
                     .NotBeNullOrEmpty(),
                 "because all peek responses should contain a MessageId");
 
-        var peekContents = await Task.WhenAll(peekResponses.Select(r => r.Content.ReadAsStringAsync()));
-        peekContents
-            .Should()
-            .ContainMatch(
-                "*NotifyWholesaleServices_MarketDocument*",
-                "because the peek responses should contain at least one NotifyWholesaleServices document")
-            .And.ContainMatch(
-                "*NotifyAggregatedMeasureData_MarketDocument*",
-                "because the peek responses should contain at least one NotifyAggregatedMeasureData document");
+        var responseDocuments = await Task.WhenAll(peekResponses.Select(r => r.Content.ReadAsStringAsync()));
+
+        var notifyWholesaleServicesDocuments = responseDocuments
+            .Where(document => document.Contains("NotifyWholesaleServices_MarketDocument"))
+            .ToList();
+        notifyWholesaleServicesDocuments.Should().HaveCount(19, $"because there should be 19 wholesale results for actor 5790000392551 as MDR in the calculation {_wholesaleFixingCalculationId}");
+
+        var notifyAggregatedMeasureDataDocuments = responseDocuments
+            .Where(document => document.Contains("NotifyAggregatedMeasureData_MarketDocument"))
+            .ToList();
+        notifyAggregatedMeasureDataDocuments.Should().HaveCount(5, $"because there should be 5 energy results for actor 5790000392551 as MDR in the calculation {_wholesaleFixingCalculationId}");
 
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
     }

@@ -27,6 +27,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 {
     private readonly ArchivedMessageDsl _archivedMessage;
     private readonly NotifyWholesaleServicesDsl _notifyWholesaleServices;
+    private readonly CalculationCompletedDsl _calculationCompleted;
 
     public WhenArchivedMessageIsRequestedTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
         : base(output, fixture)
@@ -35,6 +36,11 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 
         _archivedMessage = new ArchivedMessageDsl(
             new EdiB2CDriver(fixture.B2CAuthorizedHttpClient, fixture.ApiManagementUri));
+
+        _calculationCompleted = new CalculationCompletedDsl(
+            fixture,
+            new EdiDriver(fixture.DurableClient, fixture.B2BEnergySupplierAuthorizedHttpClient, output),
+            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
 
         _notifyWholesaleServices = new NotifyWholesaleServicesDsl(
             fixture,
@@ -45,7 +51,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
     [Fact]
     public async Task B2C_actor_can_get_the_archived_message_after_peeking_the_message()
     {
-        await _notifyWholesaleServices.PublishCalculationCompletedForWholesaleFixing();
+        await _calculationCompleted.PublishForWholesaleFixingCalculation();
 
         var messageId = await _notifyWholesaleServices.ConfirmResultIsAvailable();
 

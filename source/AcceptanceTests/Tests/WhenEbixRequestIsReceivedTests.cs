@@ -41,11 +41,15 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
         _ebixMDR = new EbixRequestDsl(
             fixture,
             new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient),
-            new EbixDriver(new Uri(fixture.EbixUri, "/ebix"), fixture.EbixCertificatePasswordForMeterDataResponsible, ActorRole.MeteredDataAdministrator));
+            new EbixDriver(new Uri(fixture.EbixUri, "/ebix"), fixture.EbixCertificatePasswordForMeterDataResponsible, ActorRole.MeteredDataAdministrator),
+            new EdiDriver(fixture.DurableClient, fixture.B2BMeteredDataResponsibleAuthorizedHttpClient, output));
+
         _ebixEs = new EbixRequestDsl(
             fixture,
             new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient),
-            new EbixDriver(new Uri(fixture.EbixUri, "/ebix"), fixture.EbixCertificatePasswordForEnergySupplier, ActorRole.EnergySupplier));
+            new EbixDriver(new Uri(fixture.EbixUri, "/ebix"), fixture.EbixCertificatePasswordForEnergySupplier, ActorRole.EnergySupplier),
+            new EdiDriver(fixture.DurableClient, fixture.B2BMeteredDataResponsibleAuthorizedHttpClient, output));
+
         _actor = new ActorDsl(new MarketParticipantDriver(fixture.EventPublisher), new EdiActorDriver(fixture.ConnectionString));
     }
 
@@ -74,32 +78,6 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
 
         await _ebixEs.ConfirmWholesaleResultIsAvailable();
     }
-
-    // [Fact]
-    // public async Task Actor_can_peek_and_dequeue_monthly_sum_per_charge_in_ebIX_format()
-    // {
-    //     await _ebixEs.EmptyQueueForActor();
-    //
-    //     await _ebixEs.PublishMonthlySumPrCharge(
-    //         AcceptanceTestFixture.EbixActorGridArea,
-    //         AcceptanceTestFixture.ActorNumber,
-    //         AcceptanceTestFixture.ChargeOwnerId);
-    //
-    //     await _ebixEs.ConfirmWholesaleResultIsAvailable();
-    // }
-    //
-    // [Fact]
-    // public async Task Actor_can_peek_and_dequeue_amount_per_charge_in_ebIX_format()
-    // {
-    //     await _ebixEs.EmptyQueueForActor();
-    //
-    //     await _ebixEs.PublishAmountPerChargeResult(
-    //         AcceptanceTestFixture.EbixActorGridArea,
-    //         AcceptanceTestFixture.ActorNumber,
-    //         AcceptanceTestFixture.ChargeOwnerId);
-    //
-    //     await _ebixEs.ConfirmWholesaleResultIsAvailable();
-    // }
 
     [Fact]
     public async Task Dequeue_request_without_content_gives_ebIX_error_B2B_900()

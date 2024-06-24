@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
@@ -30,14 +31,16 @@ internal sealed class EbixRequestDsl
 
     private readonly WholesaleDriver _wholesale;
     private readonly EbixDriver _ebix;
+    private readonly EdiDriver _edi;
 
 #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
-    public EbixRequestDsl(AcceptanceTestFixture fixture, WholesaleDriver wholesale, EbixDriver ebix)
+    public EbixRequestDsl(AcceptanceTestFixture fixture, WholesaleDriver wholesale, EbixDriver ebix, EdiDriver edi)
     {
         _balanceFixingCalculationId = fixture.BalanceFixingCalculationId;
         _wholesaleFixingCalculationId = fixture.WholesaleFixingCalculationId;
         _wholesale = wholesale;
         _ebix = ebix;
+        _edi = edi;
     }
 
     #pragma warning disable VSTHRD200
@@ -51,9 +54,13 @@ internal sealed class EbixRequestDsl
     {
         await _ebix.EmptyQueueAsync().ConfigureAwait(false);
 
+        var calculationCompletedAt = SystemClock.Instance.GetCurrentInstant();
         await _wholesale.PublishCalculationCompletedAsync(
             _balanceFixingCalculationId,
             CalculationCompletedV1.Types.CalculationType.BalanceFixing);
+
+        var orchestration = await _edi.WaitForOrchestrationStartedAtAsync(calculationCompletedAt);
+        await _edi.WaitForOrchestrationCompletedAtAsync(orchestration.InstanceId);
     }
 
     internal async Task PublishCalculationCompletedForWholesaleFixing()
