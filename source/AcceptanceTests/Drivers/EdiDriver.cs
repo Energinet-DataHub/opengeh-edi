@@ -48,7 +48,9 @@ internal sealed class EdiDriver : IDisposable
     internal async Task<HttpResponseMessage> PeekMessageAsync(DocumentFormat? documentFormat = null)
     {
         var stopWatch = Stopwatch.StartNew();
-        while (stopWatch.ElapsedMilliseconds < 600000)
+
+        var timeoutAfter = TimeSpan.FromSeconds(10);
+        while (stopWatch.ElapsedMilliseconds < timeoutAfter.TotalMilliseconds)
         {
             var peekResponse = await PeekAsync(documentFormat)
                 .ConfigureAwait(false);
