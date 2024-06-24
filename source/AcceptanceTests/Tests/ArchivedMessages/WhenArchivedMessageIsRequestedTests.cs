@@ -26,7 +26,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.ArchivedMessages;
 public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 {
     private readonly ArchivedMessageDsl _archivedMessage;
-    private readonly NotifyWholesaleServicesDsl _notifyWholesaleServices;
+    private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureData;
     private readonly CalculationCompletedDsl _calculationCompleted;
 
     public WhenArchivedMessageIsRequestedTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
@@ -37,7 +37,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         _archivedMessage = new ArchivedMessageDsl(
             new EdiB2CDriver(fixture.B2CAuthorizedHttpClient, fixture.ApiManagementUri));
 
-        var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BEnergySupplierAuthorizedHttpClient, output);
+        var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BMeteredDataResponsibleAuthorizedHttpClient, output);
         var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
         _calculationCompleted = new CalculationCompletedDsl(
             ediDriver,
@@ -45,15 +45,15 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
             output,
             fixture.BalanceFixingCalculationId,
             fixture.WholesaleFixingCalculationId);
-        _notifyWholesaleServices = new NotifyWholesaleServicesDsl(ediDriver, wholesaleDriver);
+        _notifyAggregatedMeasureData = new NotifyAggregatedMeasureDataResultDsl(ediDriver, wholesaleDriver);
     }
 
     [Fact]
     public async Task B2C_actor_can_get_the_archived_message_after_peeking_the_message()
     {
-        await _calculationCompleted.PublishForWholesaleFixingCalculation();
+        await _calculationCompleted.PublishForBalanceFixingCalculation();
 
-        var messageId = await _notifyWholesaleServices.ConfirmResultIsAvailable();
+        var messageId = await _notifyAggregatedMeasureData.ConfirmResultIsAvailable();
 
         await _archivedMessage.ConfirmMessageIsArchived(messageId);
     }

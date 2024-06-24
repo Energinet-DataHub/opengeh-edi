@@ -36,7 +36,7 @@ internal sealed class NotifyAggregatedMeasureDataResultDsl
         await _wholesaleDriver.PublishAggregationResultAsync(gridAreaCode).ConfigureAwait(false);
     }
 
-    internal async Task ConfirmResultIsAvailable()
+    internal async Task<string> ConfirmResultIsAvailable()
     {
         var peekResponse = await _ediDriver.PeekMessageAsync().ConfigureAwait(false);
         var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
@@ -45,6 +45,8 @@ internal sealed class NotifyAggregatedMeasureDataResultDsl
         messageId.Should().NotBeNull();
         contentString.Should().NotBeNull();
         contentString.Should().Contain("NotifyAggregatedMeasureData_MarketDocument");
+
+        return messageId!;
     }
 
     internal async Task ConfirmRejectResultIsAvailable()
