@@ -41,7 +41,6 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
         var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
 
         _notifyWholesaleServices = new NotifyWholesaleServicesDsl(
-            fixture,
             ediDriver,
             wholesaleDriver);
 

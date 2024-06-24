@@ -36,7 +36,6 @@ public sealed class WhenMonthlyAmountPerChargeResultResultIsPublishedTests : Bas
         ArgumentNullException.ThrowIfNull(fixture);
 
         _notifyWholesaleServices = new NotifyWholesaleServicesDsl(
-            fixture,
             new EdiDriver(fixture.DurableClient, fixture.B2BEnergySupplierAuthorizedHttpClient, output),
             new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
     }

@@ -45,7 +45,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
             output,
             fixture.BalanceFixingCalculationId,
             fixture.WholesaleFixingCalculationId);
-        _notifyWholesaleServices = new NotifyWholesaleServicesDsl(fixture, ediDriver, wholesaleDriver);
+        _notifyWholesaleServices = new NotifyWholesaleServicesDsl(ediDriver, wholesaleDriver);
     }
 
     [Fact]

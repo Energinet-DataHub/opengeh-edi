@@ -21,15 +21,13 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
 internal sealed class NotifyWholesaleServicesDsl
 {
-    private readonly Guid _wholesaleFixingCalculationId;
     private readonly WholesaleDriver _wholesaleDriver;
     private readonly EdiDriver _ediDriver;
 
     #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
 
-    internal NotifyWholesaleServicesDsl(AcceptanceTestFixture fixture, EdiDriver ediDriverDriver, WholesaleDriver wholesaleDriverDriver)
+    internal NotifyWholesaleServicesDsl(EdiDriver ediDriverDriver, WholesaleDriver wholesaleDriverDriver)
     {
-        _wholesaleFixingCalculationId = fixture.WholesaleFixingCalculationId;
         _ediDriver = ediDriverDriver;
         _wholesaleDriver = wholesaleDriverDriver;
     }
