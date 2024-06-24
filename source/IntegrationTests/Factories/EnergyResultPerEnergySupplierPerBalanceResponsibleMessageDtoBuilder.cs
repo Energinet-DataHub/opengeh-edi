@@ -49,18 +49,6 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
             _calculationResultId);
     }
 
-    public EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder WithEventId(EventId eventId)
-    {
-        _eventId = eventId;
-        return this;
-    }
-
-    public EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder WithBusinessReason(BusinessReason businessReason)
-    {
-        _businessReason = businessReason;
-        return this;
-    }
-
     public EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder WithCalculationResultId(Guid calculationResultId)
     {
         _calculationResultId = calculationResultId;
