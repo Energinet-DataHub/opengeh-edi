@@ -49,6 +49,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     private readonly ActorMessageQueueContext _context;
     private readonly IFileStorageClient _fileStorageClient;
     private readonly WholesaleAmountPerChargeDtoBuilder _wholesaleAmountPerChargeDtoBuilder;
+    private readonly EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder;
 
     public WhenEnqueueingOutgoingMessageTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
@@ -60,6 +61,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         _systemDateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
         _context = GetService<ActorMessageQueueContext>();
         _wholesaleAmountPerChargeDtoBuilder = new WholesaleAmountPerChargeDtoBuilder();
+        _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
     }
 
     [Fact]
@@ -368,12 +370,10 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     {
         // Arrange
         var receiverId = ActorNumber.Create("1234567891912");
-        var receiverRole = ActorRole.EnergySupplier;
         var externalId = Guid.NewGuid();
 
         var message = _wholesaleAmountPerChargeDtoBuilder
             .WithReceiverNumber(receiverId.Value)
-            .WithReceiverRole(receiverRole)
             .WithCalculationResultId(externalId)
             .Build();
 
@@ -389,6 +389,34 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         // No messages are in the database before enqueue is called
         countBeforeEnqueue.Should().Be(0);
         // Only two message should be in the database after enqueue is called twice one for the energy supplier and one for the charge owner
+        countAfterEnqueue.Should().Be(2);
+    }
+
+    [Fact]
+    public async Task Outgoing_message_can_be_enqueued_multiple_times_to_same_receiver_with_different_roles_and_same_externalId()
+    {
+        // Arrange
+        var receiverId = ActorNumber.Create("1234567891912");
+        var externalId = Guid.NewGuid();
+
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithEnergySupplierReceiverNumber(receiverId.Value)
+            .WithBalanceResponsiblePartyReceiverNumber(receiverId.Value)
+            .WithCalculationResultId(externalId)
+            .Build();
+
+        var countBeforeEnqueue = await GetCountOfOutgoingMessagesFromDatabase();
+
+        // Act
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+
+        // Assert
+        var countAfterEnqueue = await GetCountOfOutgoingMessagesFromDatabase();
+
+        // No messages are in the database before enqueue is called
+        countBeforeEnqueue.Should().Be(0);
+        // Only two message should be in the database after enqueue is called twice, one message for the energy supplier and one for the balance responsible.
         countAfterEnqueue.Should().Be(2);
     }
 

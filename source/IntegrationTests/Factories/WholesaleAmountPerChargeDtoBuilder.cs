@@ -21,13 +21,10 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
 public class WholesaleAmountPerChargeDtoBuilder
 {
-    private readonly Guid _processId = Guid.NewGuid();
     private EventId _eventId = EventId.From(Guid.NewGuid());
     private BusinessReason _businessReason = BusinessReason.WholesaleFixing;
     private ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
-    private ActorRole _receiverRole = ActorRole.EnergySupplier;
     private ActorNumber _chargeOwnerId = ActorNumber.Create("1234567891911");
-    private ActorRole _chargeOwnerRole = ActorRole.GridOperator;
     private Guid _calculationResultId;
 
     public WholesaleAmountPerChargeDto Build()
@@ -39,7 +36,7 @@ public class WholesaleAmountPerChargeDtoBuilder
             _receiverNumber,
             _chargeOwnerId,
             _chargeOwnerId,
-            BusinessReason.WholesaleFixing.ToString(),
+            _businessReason.ToString(),
             "805",
             false,
             new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
@@ -57,18 +54,6 @@ public class WholesaleAmountPerChargeDtoBuilder
             });
     }
 
-    public WholesaleAmountPerChargeDtoBuilder WithEventId(EventId eventId)
-    {
-        _eventId = eventId;
-        return this;
-    }
-
-    public WholesaleAmountPerChargeDtoBuilder WithBusinessReason(BusinessReason businessReason)
-    {
-        _businessReason = businessReason;
-        return this;
-    }
-
     public WholesaleAmountPerChargeDtoBuilder WithCalculationResultId(Guid calculationResultId)
     {
         _calculationResultId = calculationResultId;
@@ -78,12 +63,6 @@ public class WholesaleAmountPerChargeDtoBuilder
     public WholesaleAmountPerChargeDtoBuilder WithReceiverNumber(string receiverIdValue)
     {
         _receiverNumber = ActorNumber.Create(receiverIdValue);
-        return this;
-    }
-
-    public WholesaleAmountPerChargeDtoBuilder WithReceiverRole(ActorRole receiverRole)
-    {
-        _receiverRole = receiverRole;
         return this;
     }
 }
