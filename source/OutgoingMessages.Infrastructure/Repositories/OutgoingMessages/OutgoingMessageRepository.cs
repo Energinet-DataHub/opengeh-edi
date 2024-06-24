@@ -75,7 +75,9 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
 
     public async Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId)
     {
-        return await _context.OutgoingMessages.FirstOrDefaultAsync(x => x.Receiver.Number == receiver.Number && x.Receiver.ActorRole == receiver.ActorRole && x.ExternalId == externalId).ConfigureAwait(false);
+        return await _context.OutgoingMessages.FirstOrDefaultAsync(x => x.Receiver.Number == receiver.Number &&
+                                                                        x.Receiver.ActorRole == receiver.ActorRole &&
+                                                                        x.ExternalId == externalId).ConfigureAwait(false);
     }
 
     private async Task DownloadAndSetMessageRecordAsync(OutgoingMessage outgoingMessage)
