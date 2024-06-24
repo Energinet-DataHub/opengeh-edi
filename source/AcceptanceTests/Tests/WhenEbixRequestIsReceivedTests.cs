@@ -28,29 +28,38 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
 public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
 {
     private readonly EbixRequestDsl _ebixMDR;
-    private readonly AcceptanceTestFixture _fixture;
     private readonly ActorDsl _actor;
     private readonly EbixRequestDsl _ebixEs;
+    private readonly CalculationCompletedDsl _calculationCompleted;
+    private readonly string _ebixCertificateThumbprint;
 
     public WhenEbixPeekRequestIsReceivedTests(AcceptanceTestFixture fixture, ITestOutputHelper output)
         : base(output, fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
-        _fixture = fixture;
+
+        _ebixCertificateThumbprint = fixture.EbixCertificateThumbprint;
 
         _ebixMDR = new EbixRequestDsl(
-            fixture,
-            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient),
-            new EbixDriver(new Uri(fixture.EbixUri, "/ebix"), fixture.EbixCertificatePasswordForMeterDataResponsible, ActorRole.MeteredDataAdministrator),
-            new EdiDriver(fixture.DurableClient, fixture.B2BMeteredDataResponsibleAuthorizedHttpClient, output));
+            new EbixDriver(
+                new Uri(fixture.EbixUri, "/ebix"),
+                fixture.EbixCertificatePasswordForMeterDataResponsible,
+                ActorRole.MeteredDataAdministrator));
 
         _ebixEs = new EbixRequestDsl(
-            fixture,
-            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient),
-            new EbixDriver(new Uri(fixture.EbixUri, "/ebix"), fixture.EbixCertificatePasswordForEnergySupplier, ActorRole.EnergySupplier),
-            new EdiDriver(fixture.DurableClient, fixture.B2BMeteredDataResponsibleAuthorizedHttpClient, output));
+            new EbixDriver(
+                new Uri(fixture.EbixUri, "/ebix"),
+                fixture.EbixCertificatePasswordForEnergySupplier,
+                ActorRole.EnergySupplier));
 
         _actor = new ActorDsl(new MarketParticipantDriver(fixture.EventPublisher), new EdiActorDriver(fixture.ConnectionString));
+
+        _calculationCompleted = new CalculationCompletedDsl(
+            new EdiDriver(fixture.DurableClient, fixture.B2BMeteredDataResponsibleAuthorizedHttpClient, output),
+            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient),
+            output,
+            fixture.BalanceFixingCalculationId,
+            fixture.WholesaleFixingCalculationId);
     }
 
     [Fact]
@@ -58,7 +67,7 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
     {
         await _ebixMDR.EmptyQueueForActor();
 
-        await _ebixMDR.PublishCalculationCompletedForBalanceFixing();
+        await _calculationCompleted.PublishForBalanceFixingCalculation();
 
         await _ebixMDR.ConfirmEnergyResultIsAvailable();
     }
@@ -69,7 +78,7 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
     {
         await _ebixEs.EmptyQueueForActor();
 
-        await _ebixEs.PublishCalculationCompletedForWholesaleFixing();
+        await _calculationCompleted.PublishForWholesaleFixingCalculation();
 
         await _ebixEs.ConfirmWholesaleResultIsAvailable();
     }
@@ -101,20 +110,20 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
     [Fact]
     public async Task Actor_cannot_peek_when_certificate_has_been_removed()
     {
-        await _actor.PublishActorCertificateCredentialsRemoved(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
+        await _actor.PublishActorCertificateCredentialsRemoved(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _ebixCertificateThumbprint);
 
         await _ebixMDR.ConfirmPeekWithRemovedCertificateIsNotAllowed();
 
-        await _actor.ActorCertificateCredentialsAssigned(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
+        await _actor.ActorCertificateCredentialsAssigned(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _ebixCertificateThumbprint);
     }
 
     [Fact]
     public async Task Actor_cannot_dequeue_when_certificated_has_been_removed()
     {
-        await _actor.PublishActorCertificateCredentialsRemoved(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
+        await _actor.PublishActorCertificateCredentialsRemoved(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _ebixCertificateThumbprint);
 
         await _ebixMDR.ConfirmDequeueWithRemovedCertificateIsNotAllowed();
 
-        await _actor.ActorCertificateCredentialsAssigned(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _fixture.EbixCertificateThumbprint);
+        await _actor.ActorCertificateCredentialsAssigned(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _ebixCertificateThumbprint);
     }
 }

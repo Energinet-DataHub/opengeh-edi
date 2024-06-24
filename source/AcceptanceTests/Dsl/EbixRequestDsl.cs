@@ -26,21 +26,12 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
 internal sealed class EbixRequestDsl
 {
-    private readonly Guid _balanceFixingCalculationId;
-    private readonly Guid _wholesaleFixingCalculationId;
-
-    private readonly WholesaleDriver _wholesale;
     private readonly EbixDriver _ebix;
-    private readonly EdiDriver _edi;
 
 #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
-    public EbixRequestDsl(AcceptanceTestFixture fixture, WholesaleDriver wholesale, EbixDriver ebix, EdiDriver edi)
+    public EbixRequestDsl(EbixDriver ebix)
     {
-        _balanceFixingCalculationId = fixture.BalanceFixingCalculationId;
-        _wholesaleFixingCalculationId = fixture.WholesaleFixingCalculationId;
-        _wholesale = wholesale;
         _ebix = ebix;
-        _edi = edi;
     }
 
     #pragma warning disable VSTHRD200
@@ -48,38 +39,6 @@ internal sealed class EbixRequestDsl
     internal async Task EmptyQueueForActor()
     {
         await _ebix.EmptyQueueAsync().ConfigureAwait(false);
-    }
-
-    internal async Task PublishCalculationCompletedForBalanceFixing()
-    {
-        await _ebix.EmptyQueueAsync().ConfigureAwait(false);
-
-        var calculationCompletedAt = SystemClock.Instance.GetCurrentInstant();
-        await _wholesale.PublishCalculationCompletedAsync(
-            _balanceFixingCalculationId,
-            CalculationCompletedV1.Types.CalculationType.BalanceFixing);
-
-        var orchestration = await _edi.WaitForOrchestrationStartedAsync(calculationCompletedAt);
-        await _edi.WaitForOrchestrationCompletedAsync(orchestration.InstanceId);
-    }
-
-    internal async Task PublishCalculationCompletedForWholesaleFixing()
-    {
-        await _ebix.EmptyQueueAsync().ConfigureAwait(false);
-
-        await _wholesale.PublishCalculationCompletedAsync(
-            _wholesaleFixingCalculationId,
-            CalculationCompletedV1.Types.CalculationType.WholesaleFixing);
-    }
-
-    internal Task PublishAggregationResult(string gridArea)
-    {
-        return _wholesale.PublishAggregationResultAsync(gridArea);
-    }
-
-    internal Task PublishMonthlySumPrCharge(string gridArea, string energySupplierId, string chargeOwnerId)
-    {
-        return _wholesale.PublishMonthlyAmountPerChargeResultAsync(gridArea, energySupplierId, chargeOwnerId);
     }
 
     internal async Task ConfirmEnergyResultIsAvailable()
@@ -150,11 +109,6 @@ internal sealed class EbixRequestDsl
         Assert.Multiple(
              () => Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode),
              () => Assert.Contains("Certificate rejected", response.ReasonPhrase, StringComparison.InvariantCultureIgnoreCase));
-    }
-
-    internal Task PublishAmountPerChargeResult(string gridArea, string energySupplierId, string chargeOwnerId)
-    {
-        return _wholesale.PublishAmountPerChargeResultAsync(gridArea, energySupplierId, chargeOwnerId);
     }
 
     internal async Task ConfirmDequeueWithRemovedCertificateIsNotAllowed()
