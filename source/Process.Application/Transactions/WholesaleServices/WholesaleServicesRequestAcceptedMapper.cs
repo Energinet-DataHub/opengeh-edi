@@ -24,6 +24,7 @@ using MediatR;
 using NodaTime.Serialization.Protobuf;
 using DecimalValue = Energinet.DataHub.Edi.Responses.DecimalValue;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
+using SettlementVersion = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementVersion;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
 
