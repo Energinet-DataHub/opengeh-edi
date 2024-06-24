@@ -49,7 +49,6 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     private readonly ActorMessageQueueContext _context;
     private readonly IFileStorageClient _fileStorageClient;
     private readonly WholesaleAmountPerChargeDtoBuilder _wholesaleAmountPerChargeDtoBuilder;
-    private readonly EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder;
 
     public WhenEnqueueingOutgoingMessageTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
@@ -61,7 +60,6 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         _systemDateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
         _context = GetService<ActorMessageQueueContext>();
         _wholesaleAmountPerChargeDtoBuilder = new WholesaleAmountPerChargeDtoBuilder();
-        _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
     }
 
     [Fact]
