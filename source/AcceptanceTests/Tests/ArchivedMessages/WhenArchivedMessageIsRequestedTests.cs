@@ -37,16 +37,15 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         _archivedMessage = new ArchivedMessageDsl(
             new EdiB2CDriver(fixture.B2CAuthorizedHttpClient, fixture.ApiManagementUri));
 
+        var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BEnergySupplierAuthorizedHttpClient, output);
+        var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
         _calculationCompleted = new CalculationCompletedDsl(
-            fixture,
-            new EdiDriver(fixture.DurableClient, fixture.B2BEnergySupplierAuthorizedHttpClient, output),
-            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient),
-            output);
-
-        _notifyWholesaleServices = new NotifyWholesaleServicesDsl(
-            fixture,
-            new EdiDriver(fixture.DurableClient, fixture.B2BEnergySupplierAuthorizedHttpClient, output),
-            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
+            ediDriver,
+            wholesaleDriver,
+            output,
+            fixture.BalanceFixingCalculationId,
+            fixture.WholesaleFixingCalculationId);
+        _notifyWholesaleServices = new NotifyWholesaleServicesDsl(fixture, ediDriver, wholesaleDriver);
     }
 
     [Fact]

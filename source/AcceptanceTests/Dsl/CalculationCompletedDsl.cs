@@ -35,10 +35,10 @@ public sealed class CalculationCompletedDsl
     private readonly ITestOutputHelper _logger;
     private readonly EdiDriver _ediDriver;
 
-    internal CalculationCompletedDsl(AcceptanceTestFixture fixture, EdiDriver ediDriver, WholesaleDriver wholesaleDriver, ITestOutputHelper logger)
+    internal CalculationCompletedDsl(EdiDriver ediDriver, WholesaleDriver wholesaleDriver, ITestOutputHelper logger, Guid balanceFixingCalculationId, Guid wholesaleFixingCalculationId)
     {
-        _balanceFixingCalculationId = fixture.BalanceFixingCalculationId;
-        _wholesaleFixingCalculationId = fixture.WholesaleFixingCalculationId;
+        _balanceFixingCalculationId = balanceFixingCalculationId;
+        _wholesaleFixingCalculationId = wholesaleFixingCalculationId;
         _wholesaleDriver = wholesaleDriver;
         _logger = logger;
         _ediDriver = ediDriver;

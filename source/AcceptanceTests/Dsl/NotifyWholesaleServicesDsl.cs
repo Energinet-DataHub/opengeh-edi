@@ -25,7 +25,7 @@ internal sealed class NotifyWholesaleServicesDsl
     private readonly WholesaleDriver _wholesaleDriver;
     private readonly EdiDriver _ediDriver;
 
-#pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
+    #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
 
     internal NotifyWholesaleServicesDsl(AcceptanceTestFixture fixture, EdiDriver ediDriverDriver, WholesaleDriver wholesaleDriverDriver)
     {
@@ -38,19 +38,6 @@ internal sealed class NotifyWholesaleServicesDsl
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
         await _wholesaleDriver.PublishMonthlyAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId).ConfigureAwait(false);
-    }
-
-    internal async Task PublishCalculationCompletedForWholesaleFixing()
-    {
-        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
-
-        var calculationCompletedAt = SystemClock.Instance.GetCurrentInstant();
-        await _wholesaleDriver.PublishCalculationCompletedAsync(
-            _wholesaleFixingCalculationId,
-            CalculationCompletedV1.Types.CalculationType.WholesaleFixing);
-
-        var orchestration = await _ediDriver.WaitForOrchestrationStartedAsync(calculationCompletedAt);
-        await _ediDriver.WaitForOrchestrationCompletedAsync(orchestration.InstanceId);
     }
 
     internal async Task PublishAmountPerChargeResult(

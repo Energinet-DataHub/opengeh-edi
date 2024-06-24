@@ -31,13 +31,14 @@ public class WhenCalculationCompletedIsPublishedTests : BaseTestClass
         ArgumentNullException.ThrowIfNull(fixture);
 
         _calculationCompleted = new CalculationCompletedDsl(
-            fixture,
             new EdiDriver(
                 fixture.DurableClient,
                 fixture.B2BMeteredDataResponsibleAuthorizedHttpClient,
                 output),
             new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient),
-            output);
+            output,
+            fixture.BalanceFixingCalculationId,
+            fixture.WholesaleFixingCalculationId);
     }
 
     [Fact]
