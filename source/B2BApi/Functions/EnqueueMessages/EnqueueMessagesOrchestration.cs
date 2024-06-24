@@ -33,29 +33,30 @@ internal class EnqueueMessagesOrchestration
             return "Error: No input specified.";
         }
 
-        var retryOptions = CreateRetryOptions();
+        var defaultRetryOptions = CreateDefaultRetryOptions();
+        var enqueueRetryOptions = CreateEnqueueRetryOptions();
 
         // Fan-out/fan-in => https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-cloud-backup?tabs=csharp
         var tasks = new Task<int>[4];
         tasks[0] = context.CallActivityAsync<int>(
             nameof(EnqueueEnergyResultsForGridAreaOwnersActivity),
             new EnqueueMessagesInput(input.CalculationId, input.EventId),
-            options: retryOptions);
+            options: enqueueRetryOptions);
 
         tasks[1] = context.CallActivityAsync<int>(
             nameof(EnqueueEnergyResultsForBalanceResponsiblesActivity),
             new EnqueueMessagesInput(input.CalculationId, input.EventId),
-            options: retryOptions);
+            options: enqueueRetryOptions);
 
         tasks[2] = context.CallActivityAsync<int>(
             nameof(EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity),
             new EnqueueMessagesInput(input.CalculationId, input.EventId),
-            options: retryOptions);
+            options: enqueueRetryOptions);
 
         tasks[3] = context.CallActivityAsync<int>(
             nameof(EnqueueWholesaleResultsForAmountPerChargesActivity),
             new EnqueueMessagesInput(input.CalculationId, input.EventId),
-            options: retryOptions);
+            options: enqueueRetryOptions);
 
         await Task.WhenAll(tasks);
 
@@ -66,18 +67,27 @@ internal class EnqueueMessagesOrchestration
                 context.InstanceId,
                 input.CalculationOrchestrationId,
                 input.CalculationId,
-                resultsWasSuccessfullyHandled));
+                resultsWasSuccessfullyHandled),
+            defaultRetryOptions);
 
         return "Success";
     }
 
-    private static TaskOptions CreateRetryOptions()
+    private static TaskOptions CreateEnqueueRetryOptions()
     {
         return TaskOptions.FromRetryPolicy(new RetryPolicy(
             maxNumberOfAttempts: int.MaxValue,
             firstRetryInterval: TimeSpan.FromSeconds(2),
             backoffCoefficient: 2.0,
             maxRetryInterval: TimeSpan.FromHours(1)));
+    }
+
+    private static TaskOptions CreateDefaultRetryOptions()
+    {
+        return TaskOptions.FromRetryPolicy(new RetryPolicy(
+            maxNumberOfAttempts: 5,
+            firstRetryInterval: TimeSpan.FromSeconds(30),
+            backoffCoefficient: 2.0));
     }
 
     private static bool ResultsWasSuccessfullyHandled(IEnumerable<int> numberOfHandledResults)
