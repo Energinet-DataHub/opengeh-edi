@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Dapper;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -166,8 +167,8 @@ public class OutgoingMessagesClientTests : TestBase, IAsyncLifetime
 
     private async Task SeedDatabricksWithDataAsync(TestDataDescription testDataDescription, IDeltaTableSchemaDescription schemaInfomation)
     {
-        await Fixture.DatabricksSchemaManager.CreateTableAsync(schemaInfomation);
-        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(schemaInfomation, testDataDescription.TestFilePath);
+        await Fixture.DatabricksSchemaManager.CreateTableAsync(schemaInfomation.DataObjectName, schemaInfomation.SchemaDefinition);
+        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(schemaInfomation.DataObjectName, schemaInfomation.SchemaDefinition, testDataDescription.TestFilePath);
     }
 
     private async Task HavingReceivedAndHandledGridAreaOwnershipAssignedEventAsync(string gridAreaCode)

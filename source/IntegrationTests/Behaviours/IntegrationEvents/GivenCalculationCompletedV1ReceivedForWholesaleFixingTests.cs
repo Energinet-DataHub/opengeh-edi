@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
@@ -192,8 +193,8 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         var wholesaleResultForAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
         var wholesaleAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(_ediDatabricksOptions.Value,  GetService<IMasterDataClient>(), EventId.From(Guid.NewGuid()), wholesaleResultForAmountPerChargeDescription.CalculationId);
 
-        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleAmountPerChargeQuery);
-        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleAmountPerChargeQuery, wholesaleResultForAmountPerChargeDescription.TestFilePath);
+        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition);
+        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition, wholesaleResultForAmountPerChargeDescription.TestFilePath);
         return wholesaleResultForAmountPerChargeDescription;
     }
 
