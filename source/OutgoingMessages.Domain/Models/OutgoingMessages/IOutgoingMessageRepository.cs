@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
@@ -32,4 +31,9 @@ public interface IOutgoingMessageRepository
     /// Get all messages assigned to a bundle by id
     /// </summary>
     Task<OutgoingMessageBundle> GetAsync(PeekResult peekResult);
+
+    /// <summary>
+    /// Checks if a message exists in the database for the designated receiver and the external id.
+    /// </summary>
+    Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId);
 }

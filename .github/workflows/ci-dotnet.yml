@@ -20,13 +20,13 @@ on:
 jobs:
   # Build all projects within solution
   dotnet_ci_build:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v13
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v14
     with:
       solution_file_path: source/EDI.sln
 
   # Run all tests in 'IntegrationTests.dll'
   integration_tests:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v13
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
     with:
       job_name: Integration tests
       tests_dll_file_path: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
@@ -41,7 +41,7 @@ jobs:
 
   # Run all tests in 'ArchitectureTests.dll'
   architecture_tests:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v13
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
     with:
       job_name: Architecture tests
       tests_dll_file_path: \source\ArchitectureTests\bin\Release\net8.0\Energinet.DataHub.EDI.ArchitectureTests.dll
@@ -49,7 +49,7 @@ jobs:
 
   # Run all tests in 'Tests.dll'
   tests:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v13
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
     with:
       job_name: Tests
       tests_dll_file_path: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.Tests.dll
@@ -57,7 +57,7 @@ jobs:
 
   # Run all tests in 'Tests.dll'
   b2bapi_apptests:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v13
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
     with:
       job_name: B2BApi AppTests
       tests_dll_file_path: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.B2BApi.AppTests.dll

@@ -405,7 +405,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var perBrpAndESGridAreaQuery = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(ediDatabricksOptions.Value, null!, perGridAreaDataDescription.CalculationId);
         var perBrpAndESGridAreTask = SeedDatabricksWithDataAsync(perBrpAndEsGridAreaDataDescription, perBrpAndESGridAreaQuery);
 
-        var forAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(ediDatabricksOptions.Value, forAmountPerChargeDescription.CalculationId);
+        var forAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(ediDatabricksOptions.Value, null!, null!, forAmountPerChargeDescription.CalculationId);
         var forAmountPerChargeTask = SeedDatabricksWithDataAsync(forAmountPerChargeDescription, forAmountPerChargeQuery);
 
         await Task.WhenAll(perGridAreTask, perBrpGriaAreaTask, perBrpAndESGridAreTask, forAmountPerChargeTask);

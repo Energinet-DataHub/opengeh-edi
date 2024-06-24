@@ -18,7 +18,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Delta
 
 public static class MeasurementUnitMapper
 {
-    public static MeasurementUnit Map(string? measurementUnit)
+    public static MeasurementUnit FromDeltaTableValue(string? measurementUnit)
     {
         return measurementUnit switch
         {

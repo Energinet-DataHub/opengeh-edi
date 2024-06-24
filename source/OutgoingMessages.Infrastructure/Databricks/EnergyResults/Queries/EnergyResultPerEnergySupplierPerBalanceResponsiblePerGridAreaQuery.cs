@@ -77,7 +77,7 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(
             gridArea: databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.GridAreaCode),
             meteringPointType: MeteringPointTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.MeteringPointType)),
             settlementMethod: SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)),
-            measurementUnit: MeasurementUnitMapper.Map(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)),
+            measurementUnit: MeasurementUnitMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)),
             resolution: resolution,
             period: EnergyResultPerGridAreaFactory.GetPeriod(timeSeriesPoints, resolution),
             balanceResponsibleNumber: ActorNumber.Create(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.BalanceResponsiblePartyId)),
