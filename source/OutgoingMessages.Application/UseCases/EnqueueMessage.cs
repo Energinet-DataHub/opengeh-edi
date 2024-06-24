@@ -64,6 +64,10 @@ public class EnqueueMessage
                 .ConfigureAwait(false);
         }
 
+        var messageExists = await _outgoingMessageRepository.GetAsync(messageToEnqueue.Receiver, messageToEnqueue.ExternalId).ConfigureAwait(false);
+        if (messageExists != null)
+            return messageExists.Id;
+
         await AddToActorMessageQueueAsync(messageToEnqueue).ConfigureAwait(false);
 
         // Add to outgoing message repository (and upload to file storage) after adding actor message queue,
