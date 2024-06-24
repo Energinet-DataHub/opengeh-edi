@@ -229,7 +229,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
                 case var first when first == BuildingBlocks.Domain.Models.SettlementVersion.FirstCorrection:
                     series.SettlementVersion = SettlementVersion.FirstCorrection;
                     break;
-                case var second when second == BuildingBlocks.Domain.Models.SettlementVersion.FirstCorrection:
+                case var second when second == BuildingBlocks.Domain.Models.SettlementVersion.SecondCorrection:
                     series.SettlementVersion = SettlementVersion.SecondCorrection;
                     break;
                 default:
