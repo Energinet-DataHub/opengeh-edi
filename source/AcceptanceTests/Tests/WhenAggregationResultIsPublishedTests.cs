@@ -35,7 +35,9 @@ public sealed class WhenAggregationResultIsPublishedTests : BaseTestClass
 
         _notifyAggregatedMeasureDataResult = new NotifyAggregatedMeasureDataResultDsl(
             new EdiDriver(
-                fixture.B2BMeteredDataResponsibleAuthorizedHttpClient, output),
+                fixture.DurableClient,
+                fixture.B2BMeteredDataResponsibleAuthorizedHttpClient,
+                output),
             new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
     }
 

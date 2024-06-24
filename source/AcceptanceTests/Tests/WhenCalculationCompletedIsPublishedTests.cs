@@ -33,7 +33,9 @@ public class WhenCalculationCompletedIsPublishedTests : BaseTestClass
         _calculationCompleted = new CalculationCompletedDsl(
             fixture,
             new EdiDriver(
-                fixture.B2BMeteredDataResponsibleAuthorizedHttpClient, output),
+                fixture.DurableClient,
+                fixture.B2BMeteredDataResponsibleAuthorizedHttpClient,
+                output),
             new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
     }
 

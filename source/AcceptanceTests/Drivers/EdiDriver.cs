@@ -19,19 +19,24 @@ using System.Text;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
 using Energinet.DataHub.EDI.AcceptanceTests.Logging;
+using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Nito.AsyncEx;
+using NodaTime;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 internal sealed class EdiDriver : IDisposable
 {
+    private readonly IDurableClient _durableClient;
     private readonly AsyncLazy<HttpClient> _httpClient;
     private readonly ITestOutputHelper _logger;
 
-    public EdiDriver(AsyncLazy<HttpClient> b2bHttpClient, ITestOutputHelper logger)
+    public EdiDriver(IDurableClient durableClient, AsyncLazy<HttpClient> b2bHttpClient, ITestOutputHelper logger)
     {
+        _durableClient = durableClient;
         _httpClient = b2bHttpClient;
         _logger = logger;
     }
@@ -176,6 +181,18 @@ internal sealed class EdiDriver : IDisposable
 
         await aggregatedMeasureDataResponse.EnsureSuccessStatusCodeWithLogAsync(_logger);
         return requestContent.MessageId;
+    }
+
+    internal async Task<DurableOrchestrationStatus> WaitForOrchestrationStartedAtAsync(Instant calculationCompletedAt)
+    {
+        var orchestration = await _durableClient.WaitForOrchestationStatusAsync(calculationCompletedAt.ToDateTimeUtc());
+
+        return orchestration;
+    }
+
+    internal async Task WaitForOrchestratonCompletedAtAsync(string orchestrationInstanceId)
+    {
+        await _durableClient.WaitForInstanceCompletedAsync(orchestrationInstanceId, TimeSpan.FromMinutes(10));
     }
 
     private static async Task<(Guid MessageId, string Content)> GetRequestWholesaleSettlementContentAsync(

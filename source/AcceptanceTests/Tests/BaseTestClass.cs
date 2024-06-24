@@ -41,6 +41,7 @@ public class BaseTestClass
     {
         return new AggregatedMeasureDataRequestDsl(
             new EdiDriver(
+                _fixture.DurableClient,
                 _fixture.B2BEnergySupplierAuthorizedHttpClient,
                 Output),
             new EdiProcessesDriver(_fixture.ConnectionString),

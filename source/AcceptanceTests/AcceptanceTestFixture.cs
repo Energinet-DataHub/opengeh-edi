@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration; // DO NOT REMOVE THIS! use in debug mode
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Configuration;
 using Nito.AsyncEx;
 using Xunit.Abstractions;
@@ -39,6 +42,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
     private readonly string _azureEntraBackendBffScope;
     private readonly string _b2cUsername;
     private readonly string _b2cPassword;
+    private readonly string _orchestrationTaskHubName;
 
     public AcceptanceTestFixture()
     {
@@ -98,6 +102,13 @@ public class AcceptanceTestFixture : IAsyncLifetime
         EventPublisher = new IntegrationEventPublisher(serviceBusConnectionString, topicName, dbConnectionString);
         EdiInboxClient = new EdiInboxClient(ediInboxQueueName, serviceBusConnectionString);
         B2CAuthorizedHttpClient = new AsyncLazy<HttpClient>(CreateB2CAuthorizedHttpClientAsync);
+
+        _orchestrationTaskHubName = root.GetValue<string>("OrchestrationsTaskHubName") ?? throw new InvalidOperationException("OrchestrationsTaskHubName is not set in configuration");
+        var storageProviderConnectionStringName = "AzureWebJobsStorage";
+        var storageProviderConnectionString = root.GetValue<string>(storageProviderConnectionStringName) ?? throw new InvalidOperationException("AzureWebJobsStorage is not set in configuration");
+        DurableTaskManager = new DurableTaskManager(
+            storageProviderConnectionStringName,
+            storageProviderConnectionString);
     }
 
     public Guid BalanceFixingCalculationId { get; }
@@ -105,6 +116,11 @@ public class AcceptanceTestFixture : IAsyncLifetime
     public Guid WholesaleFixingCalculationId { get; }
 
     public ITestOutputHelper? Logger { get; set; }
+
+    public DurableTaskManager DurableTaskManager { get; }
+
+    [NotNull]
+    public IDurableClient? DurableClient { get; set; }
 
     internal Uri MarketParticipantUri { get; }
 
@@ -134,6 +150,8 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
     public Task InitializeAsync()
     {
+        DurableClient = DurableTaskManager.CreateClient(_orchestrationTaskHubName);
+
         return Task.CompletedTask;
     }
 

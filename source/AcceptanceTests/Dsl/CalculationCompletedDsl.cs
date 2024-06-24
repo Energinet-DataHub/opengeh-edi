@@ -16,6 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using FluentAssertions;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
@@ -43,24 +44,30 @@ public sealed class CalculationCompletedDsl
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
 
+        var calculationCompletedAt = SystemClock.Instance.GetCurrentInstant();
         await _wholesaleDriver.PublishCalculationCompletedAsync(
             _balanceFixingCalculationId,
             CalculationCompletedV1.Types.CalculationType.BalanceFixing);
+
+        var orchestration = await _ediDriver.WaitForOrchestrationStartedAtAsync(calculationCompletedAt);
+        await _ediDriver.WaitForOrchestratonCompletedAtAsync(orchestration.InstanceId);
     }
 
     internal async Task PublishForWholesaleFixingCalculation()
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
 
+        var calculationCompletedAt = SystemClock.Instance.GetCurrentInstant();
         await _wholesaleDriver.PublishCalculationCompletedAsync(
             _wholesaleFixingCalculationId,
             CalculationCompletedV1.Types.CalculationType.WholesaleFixing);
+
+        var orchestration = await _ediDriver.WaitForOrchestrationStartedAtAsync(calculationCompletedAt);
+        await _ediDriver.WaitForOrchestratonCompletedAtAsync(orchestration.InstanceId);
     }
 
     internal async Task ConfirmEnergyResultIsAvailable()
     {
-        // TODO: Wait for orchestration to complete
-
         var peekResponse = await _ediDriver.PeekMessageAsync().ConfigureAwait(false);
         var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
         var contentString = await peekResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -74,8 +81,6 @@ public sealed class CalculationCompletedDsl
 
     internal async Task ConfirmWholesaleResultsAndEnergyResultsAreAvailable()
     {
-        // TODO: Wait for orchestration to complete
-
         var peekResponses = await _ediDriver.PeekAllMessagesAsync()
             .ConfigureAwait(false);
 

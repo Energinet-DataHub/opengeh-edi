@@ -37,7 +37,7 @@ public sealed class WhenAmountPerChargeResultResultIsPublishedTests : BaseTestCl
 
         _notifyWholesaleServices = new NotifyWholesaleServicesDsl(
             fixture,
-            new EdiDriver(fixture.B2BEnergySupplierAuthorizedHttpClient, output),
+            new EdiDriver(fixture.DurableClient, fixture.B2BEnergySupplierAuthorizedHttpClient, output),
             new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
     }
 

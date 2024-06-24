@@ -36,7 +36,7 @@ public sealed class WhenEnergyResultRequestedTests : BaseTestClass
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
-        var ediDriver = new EdiDriver(fixture.B2BEnergySupplierAuthorizedHttpClient, output);
+        var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BEnergySupplierAuthorizedHttpClient, output);
         var ediProcessesDriver = new EdiProcessesDriver(fixture.ConnectionString);
         var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
 
