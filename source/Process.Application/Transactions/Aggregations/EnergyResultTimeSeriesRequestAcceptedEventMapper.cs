@@ -12,14 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
@@ -28,20 +22,13 @@ using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
 using MediatR;
 using NodaTime.Serialization.Protobuf;
-using GridAreaDetails = Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.GridAreaDetails;
 using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
+using SettlementVersion = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.SettlementVersion;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Aggregations;
 
 public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMapper
 {
-    private readonly IMasterDataClient _masterDataClient;
-
-    public EnergyResultTimeSeriesRequestAcceptedEventMapper(IMasterDataClient masterDataClient)
-    {
-        _masterDataClient = masterDataClient;
-    }
-
     public Task<INotification> MapFromAsync(byte[] payload, EventId eventId, Guid referenceId, CancellationToken cancellationToken)
     {
         var aggregations =
@@ -61,7 +48,8 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
                 aggregation.GridArea,
                 aggregation.CalculationResultVersion,
                 aggregation.Period.StartOfPeriod.ToInstant(),
-                aggregation.Period.EndOfPeriod.ToInstant()));
+                aggregation.Period.EndOfPeriod.ToInstant(),
+                MapSettlementVersion(aggregation.SettlementVersion)));
         }
 
         return Task.FromResult<INotification>(new AggregatedTimeSeriesRequestWasAccepted(
@@ -151,6 +139,18 @@ public class EnergyResultTimeSeriesRequestAcceptedEventMapper : IInboxEventMappe
     private static CalculatedQuantityQuality MapQuality(ICollection<QuantityQuality> quantityQualities)
     {
         return CalculatedQuantityQualityMapper.MapForEnergyResults(quantityQualities);
+    }
+
+    private static SettlementVersion? MapSettlementVersion(Edi.Responses.SettlementVersion aggregationSettlementVersion)
+    {
+        return aggregationSettlementVersion switch
+        {
+            Edi.Responses.SettlementVersion.FirstCorrection => SettlementVersion.FirstCorrection,
+            Edi.Responses.SettlementVersion.SecondCorrection => SettlementVersion.SecondCorrection,
+            Edi.Responses.SettlementVersion.ThirdCorrection => SettlementVersion.ThirdCorrection,
+            Edi.Responses.SettlementVersion.Unspecified => null,
+            _ => throw new InvalidOperationException("Unknown settlement version"),
+        };
     }
 
     private static decimal? Parse(DecimalValue? input)
