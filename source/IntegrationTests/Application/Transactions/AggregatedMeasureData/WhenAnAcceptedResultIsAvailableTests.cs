@@ -12,10 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
@@ -43,6 +39,7 @@ using Period = Energinet.DataHub.Edi.Responses.Period;
 using QuantityQuality = Energinet.DataHub.Edi.Responses.QuantityQuality;
 using QuantityUnit = Energinet.DataHub.Edi.Responses.QuantityUnit;
 using Resolution = Energinet.DataHub.Edi.Responses.Resolution;
+using SettlementVersion = Energinet.DataHub.Edi.Responses.SettlementVersion;
 using TimeSeriesPoint = Energinet.DataHub.Edi.Responses.TimeSeriesPoint;
 using TimeSeriesType = Energinet.DataHub.Edi.Responses.TimeSeriesType;
 
@@ -69,14 +66,14 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .WithGridAreaCode(SampleData.GridAreaCode)
             .StoreAsync(GetService<IMasterDataClient>());
 
-        var process = await BuildProcess();
+        var process = await BuildProcess(businessReason: BusinessReason.Correction);
         var acceptedEvent = GetAcceptedEvent(process);
 
         // Act
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id, expectedEventId);
 
         // Assert
-        var outgoingMessage = await OutgoingMessageAsync(ActorRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
+        var outgoingMessage = await OutgoingMessageAsync(ActorRole.BalanceResponsibleParty, BusinessReason.Correction);
 
         outgoingMessage
             .HasProcessId(process.ProcessId)
@@ -89,13 +86,12 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasProcessType(ProcessType.RequestEnergyResults)
             .HasRelationTo(process.InitiatedByMessageId)
             .HasGridAreaCode(acceptedEvent.Series.Single().GridArea)
-            .HasPointsInCorrectOrder<AcceptedEnergyResultMessageTimeSeries, decimal?>(timeSerie => timeSerie.Point.Select(x => x.Quantity).ToList(), acceptedEvent.Series.SelectMany(x => x.TimeSeriesPoints).OrderBy(x => x.Time).ToList())
-            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.BalanceResponsibleNumber, process.BalanceResponsibleId)
-            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.EnergySupplierNumber, process.EnergySupplierId)
-            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1)
-            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(
-                timeSerie => timeSerie.OriginalTransactionIdReference,
-                process.BusinessTransactionId);
+            .HasPointsInCorrectOrder<AcceptedEnergyResultMessageTimeSeries, decimal?>(timeSeries => timeSeries.Point.Select(x => x.Quantity).ToList(), acceptedEvent.Series.SelectMany(x => x.TimeSeriesPoints).OrderBy(x => x.Time).ToList())
+            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSeries => timeSeries.BalanceResponsibleNumber, process.BalanceResponsibleId)
+            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSeries => timeSeries.EnergySupplierNumber, process.EnergySupplierId)
+            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSeries => timeSeries.CalculationResultVersion, 1)
+            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSeries => timeSeries.OriginalTransactionIdReference, process.BusinessTransactionId)
+            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSeries => timeSeries.SettlementVersion, BuildingBlocks.Domain.Models.SettlementVersion.ThirdCorrection.Name);
     }
 
     [Fact]
@@ -122,7 +118,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasReceiverRole(process.RequestedByActor.ActorRole.Code)
             .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
             .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
-            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
+            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1)
+            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.SettlementVersion, null);
     }
 
     [Fact]
@@ -224,10 +221,27 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             },
         };
         series.TimeSeriesPoints.AddRange(timeSeriesPoints.OrderBy(_ => Guid.NewGuid()));
-        var aggregatedTimeSerie = new AggregatedTimeSeriesRequestAccepted();
-        aggregatedTimeSerie.Series.Add(series);
 
-        return aggregatedTimeSerie;
+        if (aggregatedMeasureDataProcess.BusinessReason.Name == DataHubNames.BusinessReason.Correction)
+        {
+            switch (aggregatedMeasureDataProcess.SettlementVersion)
+            {
+                case var first when first == BuildingBlocks.Domain.Models.SettlementVersion.FirstCorrection:
+                    series.SettlementVersion = SettlementVersion.FirstCorrection;
+                    break;
+                case var second when second == BuildingBlocks.Domain.Models.SettlementVersion.SecondCorrection:
+                    series.SettlementVersion = SettlementVersion.SecondCorrection;
+                    break;
+                default:
+                    series.SettlementVersion = SettlementVersion.ThirdCorrection;
+                    break;
+            }
+        }
+
+        var aggregatedTimeSeries = new AggregatedTimeSeriesRequestAccepted();
+        aggregatedTimeSeries.Series.Add(series);
+
+        return aggregatedTimeSeries;
     }
 
     private async Task AddInboxEvent(
@@ -266,7 +280,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             GetService<IFileStorageClient>());
     }
 
-    private async Task<AggregatedMeasureDataProcess> BuildProcess(ActorRole? receiverRole = null)
+    private async Task<AggregatedMeasureDataProcess> BuildProcess(ActorRole? receiverRole = null, BusinessReason? businessReason = null)
     {
         receiverRole ??= SampleData.BalanceResponsibleParty;
 
@@ -277,7 +291,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
           requestedByActor,
           OriginalActor.From(requestedByActor),
           TransactionId.New(),
-          BusinessReason.BalanceFixing,
+          businessReason ?? BusinessReason.BalanceFixing,
           MessageId.New(),
           MeteringPointType.Consumption.Code,
           SettlementMethod.Flex.Code,
