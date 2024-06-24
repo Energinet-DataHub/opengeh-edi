@@ -66,14 +66,14 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .WithGridAreaCode(SampleData.GridAreaCode)
             .StoreAsync(GetService<IMasterDataClient>());
 
-        var process = await BuildProcess();
+        var process = await BuildProcess(businessReason: BusinessReason.Correction);
         var acceptedEvent = GetAcceptedEvent(process);
 
         // Act
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id, expectedEventId);
 
         // Assert
-        var outgoingMessage = await OutgoingMessageAsync(ActorRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
+        var outgoingMessage = await OutgoingMessageAsync(ActorRole.BalanceResponsibleParty, BusinessReason.Correction);
 
         outgoingMessage
             .HasProcessId(process.ProcessId)
@@ -280,7 +280,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             GetService<IFileStorageClient>());
     }
 
-    private async Task<AggregatedMeasureDataProcess> BuildProcess(ActorRole? receiverRole = null)
+    private async Task<AggregatedMeasureDataProcess> BuildProcess(ActorRole? receiverRole = null, BusinessReason? businessReason = null)
     {
         receiverRole ??= SampleData.BalanceResponsibleParty;
 
@@ -291,7 +291,7 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
           requestedByActor,
           OriginalActor.From(requestedByActor),
           TransactionId.New(),
-          BusinessReason.BalanceFixing,
+          businessReason ?? BusinessReason.BalanceFixing,
           MessageId.New(),
           MeteringPointType.Consumption.Code,
           SettlementMethod.Flex.Code,
