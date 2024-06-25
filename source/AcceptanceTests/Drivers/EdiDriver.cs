@@ -49,7 +49,8 @@ internal sealed class EdiDriver : IDisposable
     {
         var stopWatch = Stopwatch.StartNew();
 
-        var timeoutAfter = TimeSpan.FromSeconds(10);
+        // Set timeout to above 20 seconds since internal commands must be handled (twice) before accepted/rejected messages are available
+        var timeoutAfter = TimeSpan.FromMinutes(1);
         while (stopWatch.ElapsedMilliseconds < timeoutAfter.TotalMilliseconds)
         {
             var peekResponse = await PeekAsync(documentFormat)
