@@ -110,47 +110,9 @@ public class WholesaleAmountPerChargeQuery(
                         p.Quantity,
                         p.Price,
                         p.Amount,
-                        GetQuantityQuality(p.Price, p.Qualities, chargeType)))
+                        QuantityQualitiesFactor.CreateQuantityQuality(p.Price, p.Qualities, chargeType)))
                 .ToList()
                 .AsReadOnly());
-    }
-
-    /// <summary>
-    /// Quantity quality mappings is defined by the business.
-    /// See "https://energinet.atlassian.net/wiki/spaces/D3/pages/529989633/QuantityQuality" for more information.
-    /// </summary>
-    private static CalculatedQuantityQuality GetQuantityQuality(decimal? price, IReadOnlyCollection<QuantityQuality> qualities, ChargeType? chargeType)
-    {
-        if (price == null)
-        {
-            return CalculatedQuantityQuality.Missing;
-        }
-
-        if (chargeType == ChargeType.Subscription || chargeType == ChargeType.Fee)
-        {
-            return CalculatedQuantityQuality.Calculated;
-        }
-
-        return MapQuantityQualitiesToQuality(qualities);
-    }
-
-    private static CalculatedQuantityQuality MapQuantityQualitiesToQuality(
-        IReadOnlyCollection<QuantityQuality> qualities)
-    {
-        ArgumentNullException.ThrowIfNull(qualities);
-
-        return (missing: qualities.Contains(QuantityQuality.Missing),
-                estimated: qualities.Contains(QuantityQuality.Estimated),
-                measured: qualities.Contains(QuantityQuality.Measured),
-                calculated: qualities.Contains(QuantityQuality.Calculated)) switch
-            {
-                (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality.Missing,
-                (missing: true, _, _, _) => CalculatedQuantityQuality.Incomplete,
-                (_, estimated: true, _, _) => CalculatedQuantityQuality.Calculated,
-                (_, _, measured: true, _) => CalculatedQuantityQuality.Calculated,
-                (_, _, _, calculated: true) => CalculatedQuantityQuality.Calculated,
-                _ => CalculatedQuantityQuality.NotAvailable,
-            };
     }
 
     private async Task<ActorNumber> GetChargeOwnerReceiverAsync(string gridAreaCode, ActorNumber chargeOwnerId, bool isTax)

@@ -19,25 +19,64 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 public class WholesaleMontlyAmountPerChargeDto : OutgoingMessageDto
 {
     public WholesaleMontlyAmountPerChargeDto(
-        DocumentType documentType,
-        ActorNumber receiverNumber,
-        Guid? processId,
         EventId eventId,
-        string businessReasonName,
-        ActorRole receiverRole,
-        ActorNumber senderId,
-        ActorRole senderRole,
-        MessageId? relatedToMessageId = null)
+        Guid calculationResultId,
+        long calculationResultVersion,
+        ActorNumber energySupplierReceiverId,
+        ActorNumber chargeOwnerReceiverId,
+        ActorNumber chargeOwnerId,
+        string businessReason,
+        string gridAreaCode,
+        bool isTax,
+        Period period,
+        MeasurementUnit quantityUnit,
+        Currency currency,
+        ChargeType? chargeType,
+        SettlementVersion? settlementVersion,
+        string? chargeCode,
+        IReadOnlyCollection<WholesaleServicesPoint> points)
         : base(
-            documentType,
-            receiverNumber,
-            processId,
+            documentType: DocumentType.NotifyWholesaleServices,
+            null!,
+            null,
             eventId,
-            businessReasonName,
-            receiverRole,
-            senderId,
-            senderRole,
-            relatedToMessageId)
+            businessReason,
+            receiverRole: null!,
+            null!,
+            null!,
+            null)
     {
+        CalculationResultId = calculationResultId;
+        EnergySupplierReceiverId = energySupplierReceiverId;
+        ChargeOwnerReceiverId = chargeOwnerReceiverId;
+
+        Series = new WholesaleServicesSeries(
+            TransactionId: TransactionId.New(),
+            CalculationVersion: calculationResultVersion,
+            GridAreaCode: gridAreaCode,
+            ChargeCode: chargeCode,
+            IsTax: isTax,
+            Points: points,
+            EnergySupplier: energySupplierReceiverId,
+            chargeOwnerId,
+            Period: period,
+            SettlementVersion: settlementVersion,
+            quantityUnit,
+            null,
+            PriceMeasureUnit: MeasurementUnit.Kwh,
+            Currency: currency,
+            ChargeType: chargeType,
+            Resolution: Resolution.Monthly,
+            MeteringPointType: null,
+            null,
+            SettlementMethod: null);
     }
+
+    public Guid CalculationResultId { get; }
+
+    public ActorNumber EnergySupplierReceiverId { get; }
+
+    public ActorNumber ChargeOwnerReceiverId { get; }
+
+    public WholesaleServicesSeries Series { get; init; }
 }

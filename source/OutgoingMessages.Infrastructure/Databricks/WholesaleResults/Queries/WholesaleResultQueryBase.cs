@@ -59,9 +59,17 @@ public abstract class WholesaleResultQueryBase<TResult>(
             .FromRawSql(BuildSqlQuery())
             .Build();
 
+        var listAsync = await ToListAsync<DatabricksSqlRow>(databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement)).ConfigureAwait(false);
         await foreach (var nextRow in databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement).ConfigureAwait(false))
         {
             var timeSeriesPoint = WholesaleTimeSeriesPointFactory.Create(nextRow);
+            var currentResult = Guid.Empty;
+            var nextRowResult = Guid.Empty;
+            if (currentRow != null)
+            {
+                currentResult = currentRow!.ToGuid(WholesaleResultColumnNames.ResultId);
+                nextRowResult = nextRow.ToGuid(WholesaleResultColumnNames.ResultId);
+            }
 
             if (currentRow != null && BelongsToDifferentResults(currentRow, nextRow))
             {
@@ -86,6 +94,20 @@ public abstract class WholesaleResultQueryBase<TResult>(
     private static bool BelongsToDifferentResults(DatabricksSqlRow row, DatabricksSqlRow otherRow)
     {
         return !row.ToGuid(WholesaleResultColumnNames.ResultId).Equals(otherRow.ToGuid(WholesaleResultColumnNames.ResultId));
+    }
+
+    private static async Task<List<T>> ToListAsync<T>(
+        IAsyncEnumerable<T> items,
+        CancellationToken cancellationToken = default)
+    {
+        var results = new List<T>();
+        await foreach (var item in items.WithCancellation(cancellationToken)
+                           .ConfigureAwait(false))
+        {
+            results.Add(item);
+        }
+
+        return results;
     }
 
     private string BuildSqlQuery()

@@ -82,6 +82,11 @@ public interface IOutgoingMessagesClient
     Task EnqueueAndCommitAsync(WholesaleServicesMessageDto wholesaleServicesMessage, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Enqueue wholesale monthly amount per charge messages, handles enqueuing messages to all appropriate parties (Receiver, ChargeOwner) in a single transaction.
+    /// </summary>
+    Task EnqueueAndCommitAsync(WholesaleMontlyAmountPerChargeDto wholesaleAmountPerChargeDto, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Enqueue an accepted wholesale services message, no commit. Currently ONLY used by the Process module which handles the commit itself.
     /// </summary>
     Task<OutgoingMessageId> EnqueueAsync(AcceptedWholesaleServicesMessageDto acceptedWholesaleServicesMessage, CancellationToken cancellationToken);

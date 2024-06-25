@@ -207,6 +207,22 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
+    public async Task EnqueueAndCommitAsync(
+        WholesaleMontlyAmountPerChargeDto wholesaleMonthlyAmountPerChargeDto,
+        CancellationToken cancellationToken)
+    {
+        var messages = OutgoingMessage.CreateMessages(
+            wholesaleMonthlyAmountPerChargeDto,
+            _serializer,
+            _systemDateTimeProvider.Now());
+        foreach (var message in messages)
+        {
+            await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        }
+
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
     public async Task<OutgoingMessageId> EnqueueAsync(
         AcceptedWholesaleServicesMessageDto acceptedWholesaleServicesMessage,
         CancellationToken cancellationToken)
@@ -282,7 +298,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     {
         var numberOfEnqueuedMessages = 0;
 
-        var query = new WholesaleAmountPerChargeQuery(_energyResultEnumerator.EdiDatabricksOptions, _masterDataClient, input.EventId, input.CalculationId);
+        var query = new WholesaleAmountPerChargeQuery(_wholesaleResultEnumerator.EdiDatabricksOptions, _masterDataClient, input.EventId, input.CalculationId);
         await foreach (var wholesaleResult in _wholesaleResultEnumerator.GetAsync(query))
         {
             await EnqueueAndCommitAsync(wholesaleResult, CancellationToken.None).ConfigureAwait(false);
@@ -296,10 +312,10 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     {
         var numberOfEnqueuedMessages = 0;
 
-        var query = new WholesaleMonthlyAmountPerChargeQuery(_energyResultEnumerator.EdiDatabricksOptions, input.CalculationId);
-        await foreach (var wholesaleResult in _wholesaleResultEnumerator.GetAsync(query))
+        var query = new WholesaleMonthlyAmountPerChargeQuery(_wholesaleResultEnumerator.EdiDatabricksOptions, _masterDataClient, input.EventId, input.CalculationId);
+        await foreach (var wholesaleResultMessage in _wholesaleResultEnumerator.GetAsync(query))
         {
-            //await EnqueueAndCommitAsync(wholesaleResultMessage, CancellationToken.None).ConfigureAwait(false);
+            await EnqueueAndCommitAsync(wholesaleResultMessage, CancellationToken.None).ConfigureAwait(false);
             numberOfEnqueuedMessages += 2;
         }
 
