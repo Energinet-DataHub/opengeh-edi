@@ -117,7 +117,7 @@ public class OutgoingMessage
         Instant createdAt,
         string? gridAreaCode,
         ExternalId externalId,
-        Guid calculationId)
+        Guid? calculationId)
     {
         Id = OutgoingMessageId.New();
         DocumentType = documentType;
