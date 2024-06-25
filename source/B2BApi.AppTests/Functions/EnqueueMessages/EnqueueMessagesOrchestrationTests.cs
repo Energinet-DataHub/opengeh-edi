@@ -320,6 +320,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             ("EnqueueEnergyResultsForBalanceResponsiblesActivity", null),
             ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", null),
             ("EnqueueWholesaleResultsForAmountPerChargesActivity", null),
+            ("EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity", null),
         };
 
         // Act
