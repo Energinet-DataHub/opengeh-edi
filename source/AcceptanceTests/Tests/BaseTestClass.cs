@@ -44,7 +44,7 @@ public class BaseTestClass
                 _fixture.DurableClient,
                 _fixture.B2BEnergySupplierAuthorizedHttpClient,
                 Output),
-            new EdiProcessesDriver(_fixture.ConnectionString),
+            new EdiDatabaseDriver(_fixture.ConnectionString),
             new WholesaleDriver(_fixture.EventPublisher, _fixture.EdiInboxClient));
     }
 }

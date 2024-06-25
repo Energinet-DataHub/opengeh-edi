@@ -37,7 +37,6 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
         ArgumentNullException.ThrowIfNull(fixture);
 
         var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BSystemOperatorAuthorizedHttpClient, output);
-        var ediProcessesDriver = new EdiProcessesDriver(fixture.ConnectionString);
         var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
 
         _notifyWholesaleServices = new NotifyWholesaleServicesDsl(
@@ -45,7 +44,7 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
             wholesaleDriver);
 
         _wholesaleSettlementRequest =
-            new WholesaleSettlementRequestDsl(ediProcessesDriver, ediDriver, wholesaleDriver);
+            new WholesaleSettlementRequestDsl(new EdiDatabaseDriver(fixture.ConnectionString), ediDriver, wholesaleDriver);
     }
 
     [Fact]

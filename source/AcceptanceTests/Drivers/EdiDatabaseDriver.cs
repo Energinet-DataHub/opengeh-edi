@@ -17,11 +17,11 @@ using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
-internal sealed class EdiProcessesDriver
+internal sealed class EdiDatabaseDriver
 {
     private readonly string _connectionString;
 
-    internal EdiProcessesDriver(string connectionString)
+    internal EdiDatabaseDriver(string connectionString)
     {
         _connectionString = connectionString;
     }
@@ -167,5 +167,31 @@ internal sealed class EdiProcessesDriver
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Delete outgoing messages for a calculation, since if outgoing messages already exists they won't be sent again,
+    /// and the acceptance tests will fail
+    /// </summary>
+    internal async Task DeleteOutgoingMessagesForCalculationAsync(Guid calculationId)
+    {
+        using var connection = new SqlConnection(_connectionString);
+
+        await connection.OpenAsync().ConfigureAwait(false);
+        using (var deleteOutgoingMessagesCommand = new SqlCommand())
+        {
+            // Delete outgoing messages (OutgoingMessages table) and their bundles (Bundles table)
+            // where EventId = @CalculationId in the OutgoingMessages table and outgoingmessages
+            // has a foreign key to the Bundles table
+            deleteOutgoingMessagesCommand.CommandText = @"
+                DELETE FROM [OutgoingMessages] WHERE CalculationId = '@CalculationId';
+                DELETE FROM [MarketDocuments] WHERE BundleId IN (SELECT Id FROM [Bundles] WHERE Id IN (SELECT AssignedBundleId FROM [OutgoingMessages] WHERE CalculationId = '@CalculationId'));
+                DELETE FROM [Bundles] WHERE Id IN (SELECT AssignedBundleId FROM [OutgoingMessages] WHERE CalculationId = '@CalculationId');";
+
+            deleteOutgoingMessagesCommand.Parameters.AddWithValue("@CalculationId", calculationId);
+
+            deleteOutgoingMessagesCommand.Connection = connection;
+            await deleteOutgoingMessagesCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
+        }
     }
 }

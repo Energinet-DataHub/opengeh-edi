@@ -41,6 +41,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
         _calculationCompleted = new CalculationCompletedDsl(
             ediDriver,
+            new EdiDatabaseDriver(fixture.ConnectionString),
             wholesaleDriver,
             output,
             fixture.BalanceFixingCalculationId,

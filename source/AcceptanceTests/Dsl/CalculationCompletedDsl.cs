@@ -34,19 +34,22 @@ public sealed class CalculationCompletedDsl
     private readonly WholesaleDriver _wholesaleDriver;
     private readonly ITestOutputHelper _logger;
     private readonly EdiDriver _ediDriver;
+    private readonly EdiDatabaseDriver _ediDatabaseDriver;
 
-    internal CalculationCompletedDsl(EdiDriver ediDriver, WholesaleDriver wholesaleDriver, ITestOutputHelper logger, Guid balanceFixingCalculationId, Guid wholesaleFixingCalculationId)
+    internal CalculationCompletedDsl(EdiDriver ediDriver, EdiDatabaseDriver ediDatabaseDriver, WholesaleDriver wholesaleDriver, ITestOutputHelper logger, Guid balanceFixingCalculationId, Guid wholesaleFixingCalculationId)
     {
         _balanceFixingCalculationId = balanceFixingCalculationId;
         _wholesaleFixingCalculationId = wholesaleFixingCalculationId;
         _wholesaleDriver = wholesaleDriver;
         _logger = logger;
         _ediDriver = ediDriver;
+        _ediDatabaseDriver = ediDatabaseDriver;
     }
 
     internal async Task PublishForBalanceFixingCalculation()
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+        await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(_balanceFixingCalculationId);
 
         await StartAndWaitForOrchestrationToComplete(
             CalculationCompletedV1.Types.CalculationType.BalanceFixing,
@@ -56,6 +59,7 @@ public sealed class CalculationCompletedDsl
     internal async Task PublishForWholesaleFixingCalculation()
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+        await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(_wholesaleFixingCalculationId);
 
         await StartAndWaitForOrchestrationToComplete(
             CalculationCompletedV1.Types.CalculationType.WholesaleFixing,
