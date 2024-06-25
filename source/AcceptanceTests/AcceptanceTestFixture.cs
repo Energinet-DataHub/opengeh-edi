@@ -42,7 +42,6 @@ public class AcceptanceTestFixture : IAsyncLifetime
     private readonly string _azureEntraBackendBffScope;
     private readonly string _b2cUsername;
     private readonly string _b2cPassword;
-    private readonly string _orchestrationTaskHubName;
 
     public AcceptanceTestFixture()
     {
@@ -109,7 +108,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
         EdiInboxClient = new EdiInboxClient(ediInboxQueueName, serviceBusConnectionString);
         B2CAuthorizedHttpClient = new AsyncLazy<HttpClient>(CreateB2CAuthorizedHttpClientAsync);
 
-        _orchestrationTaskHubName = root.GetValue<string>("OrchestrationsTaskHubName") ?? throw new InvalidOperationException("OrchestrationsTaskHubName is not set in configuration");
+        // AzureWebJobsStorage connection string name/value is set implicitly from terraform as an application setting in Azure
         var storageProviderConnectionStringName = "AzureWebJobsStorage";
         var storageProviderConnectionString = root.GetValue<string>(storageProviderConnectionStringName) ?? throw new InvalidOperationException("AzureWebJobsStorage is not set in configuration");
         DurableTaskManager = new DurableTaskManager(
@@ -156,7 +155,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
     public Task InitializeAsync()
     {
-        DurableClient = DurableTaskManager.CreateClient(_orchestrationTaskHubName);
+        DurableClient = DurableTaskManager.CreateClient("Edi01"); // Must be the same task hub name as used in B2BApi
 
         return Task.CompletedTask;
     }

@@ -28,5 +28,4 @@
 
   // Durable Functions Task Hub Name as set in the B2BApi
   "AzureWebJobsStorage": "<AzureWebJobsStorage connection string (used for Azure Function func-api state storage, where the durable function state is saved)>",
-  "OrchestrationsTaskHubName": "Edi01"
 }
