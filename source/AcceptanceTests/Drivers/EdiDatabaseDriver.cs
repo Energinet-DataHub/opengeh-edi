@@ -184,9 +184,10 @@ internal sealed class EdiDatabaseDriver
             // where EventId = @CalculationId in the OutgoingMessages table and outgoingmessages
             // has a foreign key to the Bundles table
             deleteOutgoingMessagesCommand.CommandText = @"
-                DELETE FROM [OutgoingMessages] WHERE CalculationId = @CalculationId;
                 DELETE FROM [MarketDocuments] WHERE BundleId IN (SELECT Id FROM [Bundles] WHERE Id IN (SELECT AssignedBundleId FROM [OutgoingMessages] WHERE CalculationId = @CalculationId));
-                DELETE FROM [Bundles] WHERE Id IN (SELECT AssignedBundleId FROM [OutgoingMessages] WHERE CalculationId = @CalculationId);";
+                DELETE FROM [Bundles] WHERE Id IN (SELECT AssignedBundleId FROM [OutgoingMessages] WHERE CalculationId = @CalculationId);
+                DELETE FROM [OutgoingMessages] WHERE CalculationId = @CalculationId;
+                ";
 
             deleteOutgoingMessagesCommand.Parameters.AddWithValue("@CalculationId", calculationId);
 
