@@ -69,7 +69,7 @@ public sealed class CalculationCompletedDsl
     /// <summary>
     /// Asserts that 5 energy results are available for the actor 5790000392551 as MDR when
     /// the calculation is a balance fixing in the period 1/2/2023 - 3/2/2023 for grid area 804 and 543
-    /// Calculation on d002: https://dev002.datahub3.dk/wholesale/calculations?id=05018715-70cb-4ef4-bfa0-5f75e9f4622e
+    /// Calculation on d002: 92af2ff8-53f9-4242-b066-009c05195007
     /// TODO: Verify that the above is the correct number of energy results for actor 5790000392551 as MDR
     /// </summary>
     internal async Task ConfirmEnergyResultsAreAvailable()
