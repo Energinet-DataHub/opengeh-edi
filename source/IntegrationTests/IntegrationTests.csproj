@@ -124,13 +124,13 @@ limitations under the License.
       <EmbeddedResource Include="Infrastructure.CimMessageAdapter\Messages\xml\RequestAggregatedMeasureData.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
-      <None Update="Application\OutgoingMessages\TestData\balance_fixing_01-11-2022_01-12-2022_ga_543_per_brp_ga_v1.csv">
+      <None Update="Behaviours\IntegrationEvents\TestData\balance_fixing_01-11-2022_01-12-2022_ga_543_per_brp_ga_v1.csv">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="Application\OutgoingMessages\TestData\balance_fixing_01-11-2022_01-12-2022_ga_543_per_es_brp_ga_v1.csv">
+      <None Update="Behaviours\IntegrationEvents\TestData\balance_fixing_01-11-2022_01-12-2022_ga_543_per_es_brp_ga_v1.csv">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="Application\OutgoingMessages\TestData\balance_fixing_01-11-2022_01-12-2022_ga_543_per_ga_v1.csv">
+      <None Update="Behaviours\IntegrationEvents\TestData\balance_fixing_01-11-2022_01-12-2022_ga_543_per_ga_v1.csv">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="appsettings.local.json">
@@ -139,7 +139,7 @@ limitations under the License.
       <None Update="integrationtest.local.settings.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="Application\OutgoingMessages\TestData\wholesale_fixing_01-02-2023_28-02-2023_ga_804_amount_per_charge_v1.csv">
+      <None Update="Behaviours\IntegrationEvents\TestData\wholesale_fixing_01-02-2023_28-02-2023_ga_804_amount_per_charge_v1.csv">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Application\OutgoingMessages\TestData\wholesale_fixing_01-02-2023_28-02-2023_ga_804_monthly_amount_per_charge_v1.csv">

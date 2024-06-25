@@ -44,7 +44,7 @@ public class WholesaleMontlyAmountPerChargeDto : OutgoingMessageDto
             receiverRole: null!,
             null!,
             null!,
-            null)
+            new ExternalId(calculationResultId))
     {
         CalculationResultId = calculationResultId;
         EnergySupplierReceiverId = energySupplierReceiverId;

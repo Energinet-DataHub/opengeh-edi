@@ -40,6 +40,7 @@ public sealed class RejectedWholesaleServicesMessageDto : OutgoingMessageDto
             receiverRole,
             DataHubDetails.DataHubActorNumber,
             ActorRole.MeteredDataAdministrator,
+            new ExternalId(Guid.NewGuid()),
             relatedToMessageId)
     {
         Series = series;

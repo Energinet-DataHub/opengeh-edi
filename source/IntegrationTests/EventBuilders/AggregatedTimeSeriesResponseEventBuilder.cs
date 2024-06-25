@@ -12,14 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
-using Google.Protobuf.WellKnownTypes;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using NodaTime.Text;
@@ -53,7 +49,7 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
                 var resolution = Resolution.Pt1H;
                 var points = CreatePoints(resolution, periodStart, periodEnd);
 
-                return new Series
+                var series = new Series
                 {
                     GridArea = gridArea,
                     QuantityUnit = QuantityUnit.Kwh,
@@ -67,6 +63,19 @@ internal static class AggregatedTimeSeriesResponseEventBuilder
                     },
                     TimeSeriesPoints = { points },
                 };
+
+                if (request.BusinessReason == DataHubNames.BusinessReason.Correction)
+                {
+                    series.SettlementVersion = request.SettlementVersion switch
+                    {
+                        DataHubNames.SettlementVersion.FirstCorrection => SettlementVersion.FirstCorrection,
+                        DataHubNames.SettlementVersion.SecondCorrection => SettlementVersion.SecondCorrection,
+                        DataHubNames.SettlementVersion.ThirdCorrection => SettlementVersion.ThirdCorrection,
+                        _ => SettlementVersion.ThirdCorrection,
+                    };
+                }
+
+                return series;
             });
 
         var acceptedResponse = new AggregatedTimeSeriesRequestAccepted

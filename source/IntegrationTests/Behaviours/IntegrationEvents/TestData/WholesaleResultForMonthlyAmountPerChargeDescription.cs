@@ -15,12 +15,11 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
-using Energinet.DataHub.Edi.Responses;
 using NodaTime;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
 
 public class WholesaleResultForMonthlyAmountPerChargeDescription
     : TestDataDescription
@@ -47,13 +46,13 @@ public class WholesaleResultForMonthlyAmountPerChargeDescription
 
     public override string GridAreaCode => "804";
 
-    public override int ExpectedOutgoingMessagesCount => 14;
+    public override int ExpectedCalculationResultsCount => 7;
 
     public int ExpectedOutgoingMessagesForSystemOperatorCount => 3;
 
     public int ExpectedOutgoingMessagesForGridOwnerCount => 4;
 
-    public int ExpectedOutgoingMessagesForEnergySupplierCount => 7;
+    public int ExpectedOutgoingMessagesForEnergySupplierCount => ExpectedCalculationResultsCount;
 
     public override Period Period => new(
         Instant.FromUtc(2023, 1, 31, 23, 0, 0),

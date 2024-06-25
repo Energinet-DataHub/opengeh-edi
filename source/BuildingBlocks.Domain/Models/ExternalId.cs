@@ -12,14 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
-using MediatR;
+using System.Text.Json.Serialization;
 
-namespace Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public record AggregatedTimeSeriesRequestWasAccepted(
-    EventId EventId,
-    Guid ProcessId,
-    IReadOnlyCollection<AcceptedEnergyResultTimeSeries> AggregatedTimeSeries)
-    : INotification;
+/// <summary>
+/// An ExternalId to represent what the systems external source uses as an identifier
+/// </summary>
+[Serializable]
+public record ExternalId
+{
+    [JsonConstructor]
+    public ExternalId(Guid value)
+    {
+        Value = value;
+    }
+
+    public Guid Value { get; }
+}

@@ -201,6 +201,7 @@ public class ActorMessageQueueTests
             Instant.FromUtc(2024, 1, 1, 0, 0),
             processType ?? ProcessType.ReceiveEnergyResults,
             null,
-            null);
+            null,
+            new ExternalId(Guid.NewGuid()));
     }
 }
