@@ -59,6 +59,8 @@ public class OutgoingMessageEntityConfiguration : IEntityTypeConfiguration<Outgo
                 externalId => externalId.Value,
                 dbValue => new ExternalId(dbValue));
 
+        builder.Property(x => x.CalculationId);
+
         builder.Property(x => x.SenderId)
             .HasConversion(
                 toDbValue => toDbValue.Value,
