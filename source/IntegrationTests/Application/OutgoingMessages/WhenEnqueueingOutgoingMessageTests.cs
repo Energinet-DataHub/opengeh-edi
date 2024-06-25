@@ -114,6 +114,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.Null(result!.ModifiedAt),
             () => Assert.Null(result!.ModifiedBy),
             () => Assert.Equal(message.ExternalId.Value, result!.ExternalId),
+            () => Assert.Equal(message.CalculationId, result!.CalculationId),
         };
 
         Assert.Multiple(propertyAssertions);
