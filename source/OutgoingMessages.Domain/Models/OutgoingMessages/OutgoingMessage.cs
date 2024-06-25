@@ -106,6 +106,7 @@ public class OutgoingMessage
     // ReSharper disable once UnusedMember.Local -- Used by Entity Framework
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     private OutgoingMessage(
+        OutgoingMessageId id,
         DocumentType documentType,
         EventId eventId,
         Guid? processId,
@@ -119,7 +120,7 @@ public class OutgoingMessage
         ExternalId externalId,
         Guid? calculationId)
     {
-        Id = OutgoingMessageId.New();
+        Id = id;
         DocumentType = documentType;
         EventId = eventId;
         ProcessId = processId;
