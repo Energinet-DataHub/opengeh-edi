@@ -35,7 +35,7 @@ public class WholesaleAmountPerChargeDto : OutgoingMessageDto
         Period period,
         MeasurementUnit quantityUnit,
         Currency currency,
-        ChargeType? chargeType,
+        ChargeType chargeType,
         Resolution resolution,
         SettlementVersion? settlementVersion,
         MeteringPointType? meteringPointType,

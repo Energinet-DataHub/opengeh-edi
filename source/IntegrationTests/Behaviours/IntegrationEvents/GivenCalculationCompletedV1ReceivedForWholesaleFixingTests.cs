@@ -169,20 +169,20 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             Period: testDataDescription.Period,
             Points: testMessageData.Points);
 
-        // await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
-        //     peekResultsForSystemOperatorOperator,
-        //     documentFormat,
-        //     expectedDocumentToSystemOperator);
+        await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
+            peekResultsForSystemOperatorOperator,
+            documentFormat,
+            expectedDocumentToSystemOperator);
 
         await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
             peekResultsForGridOperator,
             documentFormat,
             expectedDocumentToChargeOwner);
 
-        // await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
-        //     peekResultsForEnergySupplier,
-        //     documentFormat,
-        //     expectedDocumentToEnergySupplier);
+        await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
+            peekResultsForEnergySupplier,
+            documentFormat,
+            expectedDocumentToEnergySupplier);
     }
 
     [Theory]

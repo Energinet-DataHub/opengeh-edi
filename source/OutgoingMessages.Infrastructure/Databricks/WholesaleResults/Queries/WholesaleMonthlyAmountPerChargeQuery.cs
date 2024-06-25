@@ -70,7 +70,7 @@ public class WholesaleMonthlyAmountPerChargeQuery(
         var (businessReason, settlementVersion) = BusinessReasonAndSettlementVersionMapper.FromDeltaTableValue(
             databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.CalculationType));
 
-        var chargeType = ChargeTypeMapper.FromDeltaTableValueAsNullable(databricksSqlRow.ToNullableString(WholesaleResultColumnNames.ChargeType));
+        var chargeType = ChargeTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.ChargeType));
         return new WholesaleMontlyAmountPerChargeDto(
             eventId: _eventId,
             calculationResultId: databricksSqlRow.ToGuid(WholesaleResultColumnNames.ResultId),

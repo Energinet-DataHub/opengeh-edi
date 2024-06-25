@@ -31,7 +31,7 @@ public class WholesaleMontlyAmountPerChargeDto : OutgoingMessageDto
         Period period,
         MeasurementUnit quantityUnit,
         Currency currency,
-        ChargeType? chargeType,
+        ChargeType chargeType,
         SettlementVersion? settlementVersion,
         string? chargeCode,
         IReadOnlyCollection<WholesaleServicesPoint> points)

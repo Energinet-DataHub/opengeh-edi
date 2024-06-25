@@ -81,7 +81,7 @@ public class WholesaleAmountPerChargeQuery(
             ResolutionMapper.FromDeltaTableValue(
                 databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.Resolution));
 
-        var chargeType = ChargeTypeMapper.FromDeltaTableValueAsNullable(databricksSqlRow.ToNullableString(WholesaleResultColumnNames.ChargeType));
+        var chargeType = ChargeTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.ChargeType));
         return new WholesaleAmountPerChargeDto(
             eventId: _eventId,
             calculationResultId: databricksSqlRow.ToGuid(WholesaleResultColumnNames.ResultId),
