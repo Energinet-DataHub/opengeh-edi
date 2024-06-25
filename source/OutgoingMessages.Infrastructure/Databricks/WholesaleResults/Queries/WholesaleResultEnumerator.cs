@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
@@ -27,10 +26,9 @@ public class WholesaleResultEnumerator(
     ILogger<WholesaleResultEnumerator> logger)
 {
     private readonly DatabricksSqlWarehouseQueryExecutor _databricksSqlWarehouseQueryExecutor = databricksSqlWarehouseQueryExecutor;
-    private readonly EdiDatabricksOptions _ediDatabricksOptions = ediDatabricksOptions.Value;
     private readonly ILogger<WholesaleResultEnumerator> _logger = logger;
 
-    public EdiDatabricksOptions EdiDatabricksOptions => _ediDatabricksOptions;
+    public EdiDatabricksOptions EdiDatabricksOptions { get; } = ediDatabricksOptions.Value;
 
     public async IAsyncEnumerable<TResult> GetAsync<TResult>(WholesaleResultQueryBase<TResult> query)
         where TResult : OutgoingMessageDto

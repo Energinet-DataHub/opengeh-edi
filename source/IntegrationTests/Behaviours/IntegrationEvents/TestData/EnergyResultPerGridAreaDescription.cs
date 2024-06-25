@@ -19,16 +19,16 @@ using NodaTime;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
 
 /// <summary>
-/// Test data description for scenario using the view described by <see cref="EnergyResultPerBalanceResponsiblePerGridAreaQuery"/>.
+/// Test data description for scenario using the view described by <see cref="EnergyResultPerGridAreaQuery"/>.
 /// </summary>
-public class EnergyResultPerBrpGridAreaDescription
+public class EnergyResultPerGridAreaDescription
     : TestDataDescription
 {
-    public EnergyResultPerBrpGridAreaDescription()
-        : base("balance_fixing_01-11-2022_01-12-2022_ga_543_per_brp_ga_v1.csv")
+    public EnergyResultPerGridAreaDescription()
+        : base("balance_fixing_01-11-2022_01-12-2022_ga_543_per_ga_v1.csv")
     {
     }
 
@@ -36,24 +36,23 @@ public class EnergyResultPerBrpGridAreaDescription
 
     public override string GridAreaCode => "543";
 
-    public override int ExpectedOutgoingMessagesCount => 20;
+    public override int ExpectedCalculationResultsCount => 5;
+
+    public int ExpectedOutgoingMessagesForGridOwnerCount => ExpectedCalculationResultsCount;
 
     public override Period Period => new(
         Instant.FromUtc(2022, 1, 11, 23, 0, 0),
         Instant.FromUtc(2022, 1, 12, 23, 0, 0));
 
-    public ExampleDataForActor<ExampleEnergyResultMessageForActor> ExampleBalanceResponsible => new(
-        ActorNumber: ActorNumber.Create("7080000729821"),
-        ExpectedOutgoingMessagesCount: 3,
-        ExampleMessageData: new ExampleEnergyResultMessageForActor(
-            GridArea: "543",
-            MeteringPointType.Consumption,
-            SettlementMethod.Flex,
-            Resolution.Hourly,
-            null,
-            111,
-            TimeSeriesPointsFactory.CreatePointsForDay(
-                Period.Start,
-                1211.912m,
-                CalculatedQuantityQuality.Measured)));
+    public ExampleEnergyResultMessageForActor ExampleEnergyResultMessageData => new(
+        GridArea: GridAreaCode,
+        MeteringPointType.Consumption,
+        SettlementMethod.Flex,
+        Resolution.Hourly,
+        null,
+        111,
+        TimeSeriesPointsFactory.CreatePointsForDay(
+            Period.Start,
+            1928898.153m,
+            CalculatedQuantityQuality.Incomplete));
 }

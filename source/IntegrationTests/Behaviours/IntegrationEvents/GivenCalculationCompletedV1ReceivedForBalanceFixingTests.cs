@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
+using Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
 using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Xunit;
@@ -33,7 +32,6 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents;
 
-[SuppressMessage("Usage", "VSTHRD101:Avoid unsupported async delegates", Justification = "Test method")]
 public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : AggregatedMeasureDataBehaviourTestBase, IAsyncLifetime
 {
     private readonly IntegrationTestFixture _fixture;
@@ -79,7 +77,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             documentFormat);
 
         // Then (assert)
-        peekResultsForMeteredDataResponsible.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesCount);
+        peekResultsForMeteredDataResponsible.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForGridOwnerCount);
 
         var assertionInput = new NotifyAggregatedMeasureDataDocumentAssertionInput(
             Timestamp: "2022-09-07T13:37:05Z",
@@ -89,7 +87,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             ReceiverId: meteredDataResponsible.ActorNumber,
             // ReceiverRole: originalActor.ActorRole,
             SenderId: ActorNumber.Create("5790001330552"), // Sender is always DataHub
-            // SenderRole: ActorRole.MeteredDataAdministrator,
+                                                           // SenderRole: ActorRole.MeteredDataAdministrator,
             EnergySupplierNumber: null,
             BalanceResponsibleNumber: null,
             SettlementMethod: testMessageData.SettlementMethod,
@@ -142,7 +140,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             ReceiverId: balanceResponsible.ActorNumber,
             // ReceiverRole: originalActor.ActorRole,
             SenderId: ActorNumber.Create("5790001330552"), // Sender is always DataHub
-            // SenderRole: ActorRole.MeteredDataAdministrator,
+                                                           // SenderRole: ActorRole.MeteredDataAdministrator,
             EnergySupplierNumber: null,
             BalanceResponsibleNumber: balanceResponsible.ActorNumber,
             SettlementMethod: testMessageData.SettlementMethod,
@@ -204,7 +202,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             ReceiverId: energySupplier.ActorNumber,
             // ReceiverRole: originalActor.ActorRole,
             SenderId: ActorNumber.Create("5790001330552"), // Sender is always DataHub
-            // SenderRole: ActorRole.MeteredDataAdministrator,
+                                                           // SenderRole: ActorRole.MeteredDataAdministrator,
             EnergySupplierNumber: energySupplier.ActorNumber,
             BalanceResponsibleNumber: null,
             SettlementMethod: energySupplierTestMessageData.SettlementMethod,
@@ -236,7 +234,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             ReceiverId: balanceResponsible.ActorNumber,
             // ReceiverRole: originalActor.ActorRole,
             SenderId: ActorNumber.Create("5790001330552"), // Sender is always DataHub
-            // SenderRole: ActorRole.MeteredDataAdministrator,
+                                                           // SenderRole: ActorRole.MeteredDataAdministrator,
             EnergySupplierNumber: balanceResponsibleTestMessageData.EnergySupplier,
             BalanceResponsibleNumber: balanceResponsible.ActorNumber,
             SettlementMethod: balanceResponsibleTestMessageData.SettlementMethod,
@@ -259,7 +257,9 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
     private Task GivenEnqueueEnergyResultsPerGridAreaAsync(Guid calculationId)
     {
         var activity = new EnqueueEnergyResultsForGridAreaOwnersActivity(
-            GetService<IOutgoingMessagesClient>());
+            GetService<IServiceScopeFactory>(),
+            GetService<IMasterDataClient>(),
+            GetService<EnergyResultEnumerator>());
 
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
     }
@@ -267,7 +267,8 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
     private Task GivenEnqueueEnergyResultsPerBalanceResponsible(Guid calculationId)
     {
         var activity = new EnqueueEnergyResultsForBalanceResponsiblesActivity(
-            GetService<IOutgoingMessagesClient>());
+            GetService<IServiceScopeFactory>(),
+            GetService<EnergyResultEnumerator>());
 
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
     }
@@ -275,7 +276,8 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
     private Task GivenEnqueueEnergyResultsPerEnergySuppliersPerBalanceResponsible(Guid calculationId)
     {
         var activity = new EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity(
-            GetService<IOutgoingMessagesClient>());
+            GetService<IServiceScopeFactory>(),
+            GetService<EnergyResultEnumerator>());
 
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
     }

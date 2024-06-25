@@ -21,8 +21,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
 public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
 {
-    private EventId _eventId = EventId.From(Guid.NewGuid());
-    private BusinessReason _businessReason = BusinessReason.WholesaleFixing;
+    private readonly EventId _eventId = EventId.From(Guid.NewGuid());
+    private readonly BusinessReason _businessReason = BusinessReason.WholesaleFixing;
+
     private ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private ActorNumber _balanceResponsibleNumber = ActorNumber.Create("1234567891911");
     private Guid _calculationResultId;
