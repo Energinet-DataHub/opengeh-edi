@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories.Mappers;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
@@ -46,6 +43,7 @@ public class EnergyResultMessageResultFactory
 
         return EnergyResultMessageDto.Create(
             eventId,
+            calculationId: Guid.Parse(integrationEvent.CalculationId),
             receiverNumber: aggregationData.ReceiverNumber,
             receiverRole: aggregationData.ReceiverRole,
             gridAreaCode: aggregationData.GridAreaCode,

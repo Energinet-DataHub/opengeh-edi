@@ -189,19 +189,20 @@ public class ActorMessageQueueTests
             ActorRole.EnergySupplier);
 
         return new OutgoingMessage(
-            EventId.From(Guid.NewGuid()),
-            messageType ?? DocumentType.NotifyAggregatedMeasureData,
-            receiver.Number,
-            ProcessId.New().Id,
-            businessReason?.Name ?? BusinessReason.BalanceFixing.Name,
-            receiver.ActorRole,
-            ActorNumber.Create("1234567890987"),
-            ActorRole.MeteringPointAdministrator,
-            string.Empty,
-            Instant.FromUtc(2024, 1, 1, 0, 0),
-            processType ?? ProcessType.ReceiveEnergyResults,
-            null,
-            null,
-            new ExternalId(Guid.NewGuid()));
+            eventId: EventId.From(Guid.NewGuid()),
+            documentType: messageType ?? DocumentType.NotifyAggregatedMeasureData,
+            receiverId: receiver.Number,
+            processId: ProcessId.New().Id,
+            businessReason: businessReason?.Name ?? BusinessReason.BalanceFixing.Name,
+            receiverRole: receiver.ActorRole,
+            senderId: ActorNumber.Create("1234567890987"),
+            senderRole: ActorRole.MeteringPointAdministrator,
+            serializedContent: string.Empty,
+            createdAt: Instant.FromUtc(2024, 1, 1, 0, 0),
+            messageCreatedFromProcess: processType ?? ProcessType.ReceiveEnergyResults,
+            relatedToMessageId: null,
+            gridAreaCode: null,
+            externalId: new ExternalId(Guid.NewGuid()),
+            calculationId: Guid.NewGuid());
     }
 }

@@ -21,10 +21,11 @@ namespace Energinet.DataHub.EDI.Tests.Factories;
 
 public class WholesaleServicesMessageDtoBuilder
 {
-    private static readonly ActorNumber _receiverNumber = ActorNumber.Create("1234567890123");
-    private static readonly ActorNumber _chargeOwner = DataHubDetails.DataHubActorNumber;
-    private static readonly BusinessReason _businessReason = BusinessReason.BalanceFixing;
-    private static readonly EventId _eventId = EventId.From(Guid.NewGuid());
+    private readonly ActorNumber _receiverNumber = ActorNumber.Create("1234567890123");
+    private readonly ActorNumber _chargeOwner = DataHubDetails.DataHubActorNumber;
+    private readonly BusinessReason _businessReason = BusinessReason.BalanceFixing;
+    private readonly EventId _eventId = EventId.From(Guid.NewGuid());
+    private readonly Guid _calculationId = Guid.NewGuid();
 
     private ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
 
@@ -34,6 +35,7 @@ public class WholesaleServicesMessageDtoBuilder
 
         return WholesaleServicesMessageDto.Create(
             _eventId,
+            _calculationId,
             _receiverNumber,
             _receiverRole,
             _chargeOwner,
