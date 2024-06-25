@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
+using Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
 using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
@@ -27,6 +27,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Xunit;
@@ -182,7 +183,9 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
     private Task GivenEnqueueWholesaleResultsForAmountPerChargesAsync(Guid calculationId)
     {
         var activity = new EnqueueWholesaleResultsForAmountPerChargesActivity(
-            GetService<IOutgoingMessagesClient>());
+            GetService<IServiceScopeFactory>(),
+            GetService<IMasterDataClient>(),
+            GetService<WholesaleResultEnumerator>());
 
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
     }
