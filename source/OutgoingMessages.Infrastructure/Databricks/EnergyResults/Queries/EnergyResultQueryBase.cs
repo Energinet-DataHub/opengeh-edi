@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
@@ -53,12 +52,12 @@ public abstract class EnergyResultQueryBase<TResult>(
     {
         ArgumentNullException.ThrowIfNull(databricksSqlWarehouseQueryExecutor);
 
-        DatabricksSqlRow? currentRow = null;
-        var timeSeriesPoints = new List<EnergyTimeSeriesPoint>();
-
         var statement = DatabricksStatement
             .FromRawSql(BuildSqlQuery())
             .Build();
+
+        DatabricksSqlRow? currentRow = null;
+        var timeSeriesPoints = new List<EnergyTimeSeriesPoint>();
 
         await foreach (var nextRow in databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement).ConfigureAwait(false))
         {
@@ -66,7 +65,9 @@ public abstract class EnergyResultQueryBase<TResult>(
 
             if (currentRow != null && BelongsToDifferentResults(currentRow, nextRow))
             {
-                yield return await CreateEnergyResultAsync(currentRow!, timeSeriesPoints).ConfigureAwait(false);
+                var result = await CreateEnergyResultAsync(currentRow!, timeSeriesPoints).ConfigureAwait(false);
+                yield return result;
+
                 timeSeriesPoints = [];
             }
 
@@ -76,7 +77,8 @@ public abstract class EnergyResultQueryBase<TResult>(
 
         if (currentRow != null)
         {
-            yield return await CreateEnergyResultAsync(currentRow, timeSeriesPoints).ConfigureAwait(false);
+            var result = await CreateEnergyResultAsync(currentRow!, timeSeriesPoints).ConfigureAwait(false);
+            yield return result;
         }
     }
 
