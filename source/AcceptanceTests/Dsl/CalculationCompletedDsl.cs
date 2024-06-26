@@ -141,10 +141,10 @@ public sealed class CalculationCompletedDsl
         CalculationCompletedV1.Types.CalculationType calculationType,
         Guid calculationId)
     {
-        // Get current instant and subtract 1 second to ensure that the orchestration is started after the instant
+        // Get current instant and subtract 10 second to ensure that the orchestration is started after the instant
         // In some cases the orchestration can be started before a second has passed which meant that the orchestration
         // would not be retrieved by the durable client
-        var orchestrationStartedAfter = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromSeconds(1));
+        var orchestrationStartedAfter = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromSeconds(10));
 
         _logger.WriteLine("Publish calculation completed for calculation with id {0}", _balanceFixingCalculationId);
         await _wholesaleDriver.PublishCalculationCompletedAsync(
