@@ -56,38 +56,35 @@ public abstract class EnergyResultQueryBase<TResult>(
             .FromRawSql(BuildSqlQuery())
             .Build();
 
-        DatabricksSqlRow? currentRow = null;
-        var timeSeriesPoints = new List<EnergyTimeSeriesPoint>();
+        Guid? currentResultId = null;
+        var currentResultRows = new List<DatabricksSqlRow>();
 
-        await foreach (var nextRow in databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement).ConfigureAwait(false))
+        await foreach (var row in databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement).ConfigureAwait(false))
         {
-            var timeSeriesPoint = CreateTimeSeriesPoint(nextRow);
+            var rowResultId = row.ToGuid(EnergyResultColumnNames.ResultId);
 
-            if (currentRow != null && BelongsToDifferentResults(currentRow, nextRow))
+            if (IsFirstRow(currentResultId))
             {
-                var result = await CreateEnergyResultAsync(currentRow!, timeSeriesPoints).ConfigureAwait(false);
-                yield return result;
-
-                timeSeriesPoints = [];
+                currentResultId = rowResultId;
             }
 
-            timeSeriesPoints.Add(timeSeriesPoint);
-            currentRow = nextRow;
-        }
+            if (IsSameResult(currentResultId, rowResultId))
+            {
+                currentResultRows.Add(row);
+                continue;
+            }
 
-        if (currentRow != null)
-        {
-            var result = await CreateEnergyResultAsync(currentRow!, timeSeriesPoints).ConfigureAwait(false);
+            var result = await CreateResultAsync(currentResultRows).ConfigureAwait(false);
             yield return result;
+
+            // Next result
+            currentResultRows = [];
+            currentResultId = rowResultId;
+            currentResultRows.Add(row);
         }
     }
 
     protected abstract Task<TResult> CreateEnergyResultAsync(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints);
-
-    private static bool BelongsToDifferentResults(DatabricksSqlRow row, DatabricksSqlRow otherRow)
-    {
-        return !row.ToGuid(EnergyResultColumnNames.ResultId).Equals(otherRow.ToGuid(EnergyResultColumnNames.ResultId));
-    }
 
     private static EnergyTimeSeriesPoint CreateTimeSeriesPoint(DatabricksSqlRow databricksSqlRow)
     {
@@ -95,6 +92,29 @@ public abstract class EnergyResultQueryBase<TResult>(
             databricksSqlRow.ToInstant(EnergyResultColumnNames.Time),
             databricksSqlRow.ToDecimal(EnergyResultColumnNames.Quantity),
             QuantityQualitiesMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.QuantityQualities)));
+    }
+
+    private static bool IsFirstRow(Guid? currentResultId)
+    {
+        return currentResultId == null;
+    }
+
+    private static bool IsSameResult(Guid? currentResultId, Guid rowResultId)
+    {
+        return currentResultId == rowResultId;
+    }
+
+    private Task<TResult> CreateResultAsync(IReadOnlyCollection<DatabricksSqlRow> resultRows)
+    {
+        var timeSeriesPoints = new List<EnergyTimeSeriesPoint>();
+
+        foreach (var row in resultRows)
+        {
+            var timeSeriesPoint = CreateTimeSeriesPoint(row);
+            timeSeriesPoints.Add(timeSeriesPoint);
+        }
+
+        return CreateEnergyResultAsync(resultRows.First(), timeSeriesPoints);
     }
 
     private string BuildSqlQuery()
