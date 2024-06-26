@@ -42,6 +42,7 @@ public class EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivit
         var numberOfFailedResults = 0;
 
         var query = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(
+            _logger,
             _energyResultEnumerator.EdiDatabricksOptions,
             EventId.From(input.EventId),
             input.CalculationId);

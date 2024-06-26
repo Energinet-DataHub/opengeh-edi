@@ -18,15 +18,18 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyRes
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 
 public abstract class EnergyResultQueryBase<TResult>(
+        ILogger logger,
         EdiDatabricksOptions ediDatabricksOptions,
         Guid calculationId)
     : IDeltaTableSchemaDescription
     where TResult : OutgoingMessageDto
 {
+    private readonly ILogger _logger = logger;
     private readonly EdiDatabricksOptions _ediDatabricksOptions = ediDatabricksOptions;
 
     /// <summary>

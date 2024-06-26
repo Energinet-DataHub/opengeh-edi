@@ -45,6 +45,7 @@ public class EnqueueEnergyResultsForGridAreaOwnersActivity(
         var numberOfFailedResults = 0;
 
         var query = new EnergyResultPerGridAreaQuery(
+            _logger,
             _energyResultEnumerator.EdiDatabricksOptions,
             _masterDataClient,
             EventId.From(input.EventId),

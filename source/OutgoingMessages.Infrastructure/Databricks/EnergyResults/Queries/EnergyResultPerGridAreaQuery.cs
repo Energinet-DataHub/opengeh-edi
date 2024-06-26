@@ -21,6 +21,8 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyRes
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Microsoft.Extensions.Logging;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 
@@ -32,11 +34,13 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Energ
 /// See confluence: https://energinet.atlassian.net/wiki/spaces/D3/pages/849805314/Calculation+Result+Model#Energy-Result-Points-Per-Grid-Area
 /// </summary>
 public class EnergyResultPerGridAreaQuery(
+        ILogger logger,
         EdiDatabricksOptions ediDatabricksOptions,
         IMasterDataClient masterDataClient,
         EventId eventId,
         Guid calculationId)
     : EnergyResultQueryBase<EnergyResultPerGridAreaMessageDto>(
+        logger,
         ediDatabricksOptions,
         calculationId)
 {
