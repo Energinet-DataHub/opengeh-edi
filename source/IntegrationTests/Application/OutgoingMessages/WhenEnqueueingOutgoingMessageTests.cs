@@ -504,16 +504,14 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
 
         await connection.ExecuteAsync(
-            @"INSERT INTO [dbo].[Bundles] (Id, MessageId, ActorMessageQueueId, DocumentTypeInBundle, IsDequeued, IsClosed, MessageCount, MaxMessageCount, BusinessReason, Created, RelatedToMessageId)
-                    VALUES (@Id, @MessageId, @ActorMessageQueueId, @DocumentTypeInBundle, @IsDequeued, @IsClosed, @MessageCount, @MaxMessageCount, @BusinessReason, @Created, @RelatedToMessageId)",
+            @"INSERT INTO [dbo].[Bundles] (Id, MessageId, ActorMessageQueueId, DocumentTypeInBundle, MessageCount, MaxMessageCount, BusinessReason, Created, RelatedToMessageId)
+                    VALUES (@Id, @MessageId, @ActorMessageQueueId, @DocumentTypeInBundle, @MessageCount, @MaxMessageCount, @BusinessReason, @Created, @RelatedToMessageId)",
             new
             {
                 Id = id,
                 MessageId = id.ToString("N"),
                 ActorMessageQueueId = actorMessageQueueId,
                 DocumentTypeInBundle = documentType.Name,
-                IsDequeued = false,
-                IsClosed = false,
                 MessageCount = 0,
                 MaxMessageCount = maxMessageCount ?? 1,
                 BusinessReason = businessReason,
