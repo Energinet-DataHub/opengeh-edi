@@ -108,12 +108,12 @@ public class AcceptanceTestFixture : IAsyncLifetime
         EdiInboxClient = new EdiInboxClient(ediInboxQueueName, serviceBusConnectionString);
         B2CAuthorizedHttpClient = new AsyncLazy<HttpClient>(CreateB2CAuthorizedHttpClientAsync);
 
-        // AzureWebJobsStorage connection string name/value is set implicitly from terraform as an application setting in Azure
-        var storageProviderConnectionStringName = "AzureWebJobsStorage";
-        var storageProviderConnectionString = root.GetValue<string>(storageProviderConnectionStringName) ?? throw new InvalidOperationException("AzureWebJobsStorage is not set in configuration");
+        // AzureWebJobsStorage connection string name/value is set implicitly from terraform as an application setting in Azure,
+        // and added to the keyvault as "func-edi-api-web-jobs-storage-connection-string"
+        var apiWebJobsStorageConnectionString = root.GetValue<string>("func-edi-api-web-jobs-storage-connection-string") ?? throw new InvalidOperationException("func-edi-api-web-jobs-storage-connection-string is not set in configuration");
         DurableTaskManager = new DurableTaskManager(
-            storageProviderConnectionStringName,
-            storageProviderConnectionString);
+            "AzureWebJobsStorage",
+            apiWebJobsStorageConnectionString);
     }
 
     public Guid BalanceFixingCalculationId { get; }

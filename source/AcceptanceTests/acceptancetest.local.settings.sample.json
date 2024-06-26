@@ -24,8 +24,5 @@
   "BALANCE_FIXING_CALCULATION_ID": "<balance fixing calculation id that has results in databrick views>",
 
   // The chosen wholesale fixing calculation should be in the period 1/2/2023 to 28/2/2023 with grid area 804
-  "WHOLESALE_FIXING_CALCULATION_ID": "<wholesale fixing calculation id that has results in databrick views>",
-
-  // Durable Functions Task Hub Name as set in the B2BApi
-  "AzureWebJobsStorage": "<AzureWebJobsStorage connection string (used for Azure Function func-api state storage, where the durable function state is saved)>",
+  "WHOLESALE_FIXING_CALCULATION_ID": "<wholesale fixing calculation id that has results in databrick views>"
 }
