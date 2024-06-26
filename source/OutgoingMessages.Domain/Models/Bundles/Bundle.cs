@@ -48,6 +48,8 @@ public sealed class Bundle
 
     public Instant? DequeuedAt { get; private set; }
 
+    public Instant? PeekedAt { get; private set; }
+
     public Instant Created { get; private set; }
 
     /// <summary>
@@ -66,9 +68,10 @@ public sealed class Bundle
 
     internal Instant? ClosedAt { get; private set; }
 
-    public void CloseBundle()
+    public void PeekBundle()
     {
         ClosedAt = SystemClock.Instance.GetCurrentInstant();
+        PeekedAt = SystemClock.Instance.GetCurrentInstant();
     }
 
     internal void Add(OutgoingMessage outgoingMessage)
