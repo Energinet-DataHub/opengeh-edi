@@ -46,7 +46,7 @@ public sealed class Bundle
     {
     }
 
-    public Instant? IsDequeued { get; private set; }
+    public Instant? DequeuedAt { get; private set; }
 
     public Instant Created { get; private set; }
 
@@ -64,16 +64,16 @@ public sealed class Bundle
 
     internal BusinessReason BusinessReason { get; }
 
-    internal Instant? IsClosed { get; private set; }
+    internal Instant? ClosedAt { get; private set; }
 
     public void CloseBundle()
     {
-        IsClosed = SystemClock.Instance.GetCurrentInstant();
+        ClosedAt = SystemClock.Instance.GetCurrentInstant();
     }
 
     internal void Add(OutgoingMessage outgoingMessage)
     {
-        if (IsClosed is not null)
+        if (ClosedAt is not null)
             return;
 
         outgoingMessage.AssignToBundle(Id);
@@ -83,12 +83,12 @@ public sealed class Bundle
 
     internal void Dequeue()
     {
-        IsDequeued = SystemClock.Instance.GetCurrentInstant();
+        DequeuedAt = SystemClock.Instance.GetCurrentInstant();
     }
 
     private void CloseBundleIfFull(Instant messageCreatedAt)
     {
         if (_maxNumberOfMessagesInABundle == _messageCount)
-           IsClosed = messageCreatedAt;
+           ClosedAt = messageCreatedAt;
     }
 }

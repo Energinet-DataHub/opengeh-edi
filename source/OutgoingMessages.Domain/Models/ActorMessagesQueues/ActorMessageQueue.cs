@@ -83,7 +83,7 @@ public class ActorMessageQueue
 
     public bool Dequeue(MessageId messageId)
     {
-        var bundle = _bundles.FirstOrDefault(bundle => bundle.MessageId.Value == messageId.Value && bundle.IsDequeued is null);
+        var bundle = _bundles.FirstOrDefault(bundle => bundle.MessageId.Value == messageId.Value && bundle.DequeuedAt is null);
         if (bundle == null)
         {
             return false;
@@ -104,7 +104,7 @@ public class ActorMessageQueue
     private Bundle? CurrentBundleOf(BusinessReason businessReason, DocumentType messageType, MessageId? relatedToMessageId = null)
     {
         return _bundles.FirstOrDefault(bundle =>
-            bundle.IsClosed is null
+            bundle.ClosedAt is null
             && bundle.DocumentTypeInBundle == messageType
             && bundle.BusinessReason == businessReason
             && bundle.RelatedToMessageId?.Value == relatedToMessageId?.Value);
@@ -121,9 +121,9 @@ public class ActorMessageQueue
     {
         var nextBundleToPeek = category is not null
             ? _bundles
-                .Where(bundle => bundle.IsDequeued is null && bundle.DocumentTypeInBundle.Category.Equals(category))
+                .Where(bundle => bundle.DequeuedAt is null && bundle.DocumentTypeInBundle.Category.Equals(category))
                 .MinBy(bundle => bundle.Created)
-            : _bundles.Where(bundle => bundle.IsDequeued is null).MinBy(bundle => bundle.Created);
+            : _bundles.Where(bundle => bundle.DequeuedAt is null).MinBy(bundle => bundle.Created);
 
         nextBundleToPeek?.CloseBundle();
 
