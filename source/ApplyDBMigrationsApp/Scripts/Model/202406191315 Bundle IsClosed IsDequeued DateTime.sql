@@ -10,7 +10,7 @@ GO
 ALTER TABLE [dbo].[Bundles] DROP COLUMN IsDequeued;
 ALTER TABLE [dbo].[Bundles] DROP COLUMN IsClosed;
 GO
--- Rename the new datetime column (optional)
+-- Rename the new datetime column
 EXEC sp_rename '[dbo].[Bundles].[IsDequeuedTemp]', 'IsDequeued', 'COLUMN';
 EXEC sp_rename '[dbo].[Bundles].[IsClosedTemp]', 'IsClosed', 'COLUMN';
 GO
