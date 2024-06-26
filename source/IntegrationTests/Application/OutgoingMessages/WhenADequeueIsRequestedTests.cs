@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
+using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -82,10 +83,10 @@ public class WhenADequeueIsRequestedTests : TestBase
         var dequeueResult = await _outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(peekResult!.MessageId.Value, ActorRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)), CancellationToken.None);
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var found = await connection
-            .QuerySingleOrDefaultAsync<bool>("SELECT IsDequeued FROM [dbo].Bundles");
+            .QuerySingleOrDefaultAsync<Instant?>("SELECT DequeuedAt FROM [dbo].Bundles");
 
         Assert.True(dequeueResult.Success);
-        Assert.True(found);
+        Assert.NotNull(found);
     }
 
     /// <summary>
