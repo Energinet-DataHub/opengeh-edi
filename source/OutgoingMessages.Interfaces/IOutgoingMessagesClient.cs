@@ -82,6 +82,11 @@ public interface IOutgoingMessagesClient
     Task EnqueueAndCommitAsync(WholesaleServicesMessageDto wholesaleServicesMessage, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Enqueue wholesale messages, handles enqueuing messages to all appropriate parties (Receiver, ChargeOwner) in a single transaction.
+    /// </summary>
+    Task EnqueueAndCommitAsync(WholesaleAmountPerChargeDto wholesaleAmountPerChargeDto, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Enqueue an accepted wholesale services message, no commit. Currently ONLY used by the Process module which handles the commit itself.
     /// </summary>
     Task<OutgoingMessageId> EnqueueAsync(AcceptedWholesaleServicesMessageDto acceptedWholesaleServicesMessage, CancellationToken cancellationToken);
@@ -90,24 +95,4 @@ public interface IOutgoingMessagesClient
     /// Enqueue a wholesale services total sum message, WITH commit. Currently ONLY used by the integration event.
     /// </summary>
     Task<OutgoingMessageId> EnqueueAndCommitAsync(WholesaleServicesTotalSumMessageDto wholesaleServicesTotalSumMessage, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Enqueue energy results for Grid Area Owners as outgoing messages for the given calculation id.
-    /// </summary>
-    Task<int> EnqueueEnergyResultsPerGridAreaAsync(EnqueueMessagesInputDto input);
-
-    /// <summary>
-    /// Enqueue energy results for Balance Responsibles as outgoing messages for the given calculation id.
-    /// </summary>
-    Task<int> EnqueueEnergyResultsPerBalanceResponsibleAsync(EnqueueMessagesInputDto input);
-
-    /// <summary>
-    /// Enqueue energy results for Balance Responsibles and Energy Suppliers as outgoing messages for the given calculation id.
-    /// </summary>
-    Task<int> EnqueueEnergyResultsPerEnergySupplierPerBalanceResponsibleAsync(EnqueueMessagesInputDto input);
-
-    /// <summary>
-    /// Enqueue wholesale results for Amount Per Charge to Energy Supplier and ChargeOwner as outgoing messages for the given calculation id.
-    /// </summary>
-    Task<int> EnqueueWholesaleResultsForAmountPerChargeAsync(EnqueueMessagesInputDto input);
 }

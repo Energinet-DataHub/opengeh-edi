@@ -16,10 +16,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -126,12 +124,9 @@ public class WholesaleAmountPerChargeQuery(
             return CalculatedQuantityQuality.Missing;
         }
 
-        if (chargeType == ChargeType.Subscription || chargeType == ChargeType.Fee)
-        {
-            return CalculatedQuantityQuality.Calculated;
-        }
-
-        return MapQuantityQualitiesToQuality(qualities);
+        return chargeType == ChargeType.Subscription || chargeType == ChargeType.Fee
+            ? CalculatedQuantityQuality.Calculated
+            : MapQuantityQualitiesToQuality(qualities);
     }
 
     private static CalculatedQuantityQuality MapQuantityQualitiesToQuality(
@@ -143,14 +138,14 @@ public class WholesaleAmountPerChargeQuery(
                 estimated: qualities.Contains(QuantityQuality.Estimated),
                 measured: qualities.Contains(QuantityQuality.Measured),
                 calculated: qualities.Contains(QuantityQuality.Calculated)) switch
-            {
-                (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality.Missing,
-                (missing: true, _, _, _) => CalculatedQuantityQuality.Incomplete,
-                (_, estimated: true, _, _) => CalculatedQuantityQuality.Calculated,
-                (_, _, measured: true, _) => CalculatedQuantityQuality.Calculated,
-                (_, _, _, calculated: true) => CalculatedQuantityQuality.Calculated,
-                _ => CalculatedQuantityQuality.NotAvailable,
-            };
+        {
+            (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality.Missing,
+            (missing: true, _, _, _) => CalculatedQuantityQuality.Incomplete,
+            (_, estimated: true, _, _) => CalculatedQuantityQuality.Calculated,
+            (_, _, measured: true, _) => CalculatedQuantityQuality.Calculated,
+            (_, _, _, calculated: true) => CalculatedQuantityQuality.Calculated,
+            _ => CalculatedQuantityQuality.NotAvailable,
+        };
     }
 
     private async Task<ActorNumber> GetChargeOwnerReceiverAsync(string gridAreaCode, ActorNumber chargeOwnerId, bool isTax)

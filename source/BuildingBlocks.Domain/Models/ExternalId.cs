@@ -12,18 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.Edi.Responses;
-using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
+using System.Text.Json.Serialization;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.TestData;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public record ExampleWholesaleResultMessageForActor(
-    string GridArea,
-    Currency Currency,
-    ActorNumber EnergySupplier,
-    MeteringPointType MeteringPointType,
-    SettlementMethod? SettlementMethod,
-    Resolution Resolution,
-    int Version,
-    IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> Points);
+/// <summary>
+/// An ExternalId to represent what the systems external source uses as an identifier
+/// </summary>
+[Serializable]
+public record ExternalId
+{
+    [JsonConstructor]
+    public ExternalId(Guid value)
+    {
+        Value = value;
+    }
+
+    public Guid Value { get; }
+}

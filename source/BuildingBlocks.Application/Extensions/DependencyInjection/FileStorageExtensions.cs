@@ -34,7 +34,7 @@ public static class FileStorageExtensions
             .Bind(configuration)
             .Validate(o => !string.IsNullOrEmpty(o.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING) || !string.IsNullOrEmpty(o.AZURE_STORAGE_ACCOUNT_URL), $"{nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING)} or {nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_URL)} (if using Default Azure Credentials) must be set in configuration");
 
-        services.AddTransient<BlobServiceClient>(
+        services.AddSingleton<BlobServiceClient>(
             x =>
             {
                 var options = x.GetRequiredService<IOptions<BlobServiceClientConnectionOptions>>();

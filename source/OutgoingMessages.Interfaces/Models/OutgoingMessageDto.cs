@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -31,6 +30,7 @@ public abstract class OutgoingMessageDto
         ActorRole receiverRole,
         ActorNumber senderId,
         ActorRole senderRole,
+        ExternalId externalId,
         MessageId? relatedToMessageId = null)
     {
         DocumentType = documentType;
@@ -41,6 +41,7 @@ public abstract class OutgoingMessageDto
         ReceiverRole = receiverRole;
         SenderId = senderId;
         SenderRole = senderRole;
+        ExternalId = externalId;
         RelatedToMessageId = relatedToMessageId;
     }
 
@@ -63,6 +64,8 @@ public abstract class OutgoingMessageDto
     public ActorNumber SenderId { get; }
 
     public ActorRole SenderRole { get; }
+
+    public ExternalId ExternalId { get; }
 
     /// <summary>
     /// If this attribute has a value, then it is used to store the message id of a request from an actor.

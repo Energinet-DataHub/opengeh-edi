@@ -37,6 +37,7 @@ public class EnergyResultMessageDto : OutgoingMessageDto
             receiverRole,
             DataHubDetails.DataHubActorNumber,
             ActorRole.MeteredDataAdministrator,
+            new ExternalId(Guid.NewGuid()),
             null)
     {
         Series = series;

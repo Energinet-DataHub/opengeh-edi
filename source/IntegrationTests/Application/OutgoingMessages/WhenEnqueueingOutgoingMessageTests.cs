@@ -48,6 +48,8 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ActorMessageQueueContext _context;
     private readonly IFileStorageClient _fileStorageClient;
+    private readonly WholesaleAmountPerChargeDtoBuilder _wholesaleAmountPerChargeDtoBuilder;
+    private readonly EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder;
 
     public WhenEnqueueingOutgoingMessageTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
@@ -58,6 +60,8 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         _fileStorageClient = GetService<IFileStorageClient>();
         _systemDateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
         _context = GetService<ActorMessageQueueContext>();
+        _wholesaleAmountPerChargeDtoBuilder = new WholesaleAmountPerChargeDtoBuilder();
+        _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
     }
 
     [Fact]
@@ -109,6 +113,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.NotNull(result!.CreatedBy),
             () => Assert.Null(result!.ModifiedAt),
             () => Assert.Null(result!.ModifiedBy),
+            () => Assert.Equal(message.ExternalId.Value, result!.ExternalId),
         };
 
         Assert.Multiple(propertyAssertions);
@@ -360,6 +365,61 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         fromDb.OutgoingMessageReceiverRole.Should().Be(ActorRole.MeteredDataResponsible.Code);
     }
 
+    [Fact]
+    public async Task Outgoing_message_must_only_be_enqueued_once_to_an_receiver_with_same_externalId()
+    {
+        // Arrange
+        var receiverId = ActorNumber.Create("1234567891912");
+        var externalId = Guid.NewGuid();
+
+        var message = _wholesaleAmountPerChargeDtoBuilder
+            .WithReceiverNumber(receiverId.Value)
+            .WithCalculationResultId(externalId)
+            .Build();
+
+        var countBeforeEnqueue = await GetCountOfOutgoingMessagesFromDatabase();
+
+        // Act
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+
+        // Assert
+        var countAfterEnqueue = await GetCountOfOutgoingMessagesFromDatabase();
+
+        // No messages are in the database before enqueue is called
+        countBeforeEnqueue.Should().Be(0);
+        // Only two message should be in the database after enqueue is called twice one for the energy supplier and one for the charge owner
+        countAfterEnqueue.Should().Be(2);
+    }
+
+    [Fact]
+    public async Task Outgoing_message_can_be_enqueued_multiple_times_to_same_receiver_with_different_roles_and_same_externalId()
+    {
+        // Arrange
+        var receiverId = ActorNumber.Create("1234567891912");
+        var externalId = Guid.NewGuid();
+
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithEnergySupplierReceiverNumber(receiverId.Value)
+            .WithBalanceResponsiblePartyReceiverNumber(receiverId.Value)
+            .WithCalculationResultId(externalId)
+            .Build();
+
+        var countBeforeEnqueue = await GetCountOfOutgoingMessagesFromDatabase();
+
+        // Act
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+
+        // Assert
+        var countAfterEnqueue = await GetCountOfOutgoingMessagesFromDatabase();
+
+        // No messages are in the database before enqueue is called
+        countBeforeEnqueue.Should().Be(0);
+        // Only two message should be in the database after enqueue is called twice, one message for the energy supplier and one for the balance responsible.
+        countAfterEnqueue.Should().Be(2);
+    }
+
     protected override void Dispose(bool disposing)
     {
         _context.Dispose();
@@ -398,6 +458,14 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var assignedBundleId = await connection.ExecuteScalarAsync<Guid>($"SELECT AssignedBundleId FROM [dbo].[OutgoingMessages] WHERE Id = '{id.Value}'");
 
         return assignedBundleId;
+    }
+
+    private async Task<int> GetCountOfOutgoingMessagesFromDatabase()
+    {
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        var numberOfMessages = await connection
+            .ExecuteScalarAsync<int>("SELECT COUNT(*) FROM dbo.OutgoingMessages");
+        return numberOfMessages;
     }
 
     private async Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultMessageDto message)

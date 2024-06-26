@@ -14,34 +14,58 @@
 
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
+/// <summary>
+/// Enqueue wholesale results for Amount Per Charge to Energy Supplier and ChargeOwner as outgoing messages for the given calculation id.
+/// </summary>
 public class EnqueueWholesaleResultsForAmountPerChargesActivity(
-    IOutgoingMessagesClient outgoingMessagesClient)
+    IServiceScopeFactory serviceScopeFactory,
+    IMasterDataClient masterDataClient,
+    WholesaleResultEnumerator wholesaleResultEnumerator)
 {
-    private readonly IOutgoingMessagesClient _outgoingMessagesClient = outgoingMessagesClient;
+    private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
+    private readonly IMasterDataClient _masterDataClient = masterDataClient;
+    private readonly WholesaleResultEnumerator _wholesaleResultEnumerator = wholesaleResultEnumerator;
 
     [Function(nameof(EnqueueWholesaleResultsForAmountPerChargesActivity))]
     public async Task<int> Run(
-        [ActivityTrigger] EnqueueMessagesInput inputDto)
+    [ActivityTrigger] EnqueueMessagesInput input)
     {
-        try
-        {
-            var numberOfEnqueuedMessages = await _outgoingMessagesClient.EnqueueWholesaleResultsForAmountPerChargeAsync(
-                    new EnqueueMessagesInputDto(
-                        inputDto.CalculationId,
-                        EventId.From(inputDto.EventId)))
-                .ConfigureAwait(false);
+        var numberOfHandledResults = 0;
+        var numberOfFailedResults = 0;
 
-            return numberOfEnqueuedMessages;
-        }
-        catch (Exception)
+        var query = new WholesaleAmountPerChargeQuery(
+            _wholesaleResultEnumerator.EdiDatabricksOptions,
+            _masterDataClient,
+            EventId.From(input.EventId),
+            input.CalculationId);
+        await foreach (var wholesaleResult in _wholesaleResultEnumerator.GetAsync(query))
         {
-            return 0;
+            using (var scope = _serviceScopeFactory.CreateScope())
+            {
+                try
+                {
+                    var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+                    await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(wholesaleResult, CancellationToken.None).ConfigureAwait(false);
+
+                    numberOfHandledResults++;
+                }
+                catch
+                {
+                    numberOfFailedResults++;
+                }
+            }
         }
+
+        return numberOfFailedResults > 0
+            ? throw new Exception($"Enqueue messages activity failed. CalculationId='{input.CalculationId}' EventId='{input.EventId}' NumberOfFailedResults='{numberOfFailedResults}'")
+            : numberOfHandledResults;
     }
 }
