@@ -13,11 +13,12 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
@@ -25,9 +26,11 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 /// Enqueue energy results for Balance Responsibles as outgoing messages for the given calculation id.
 /// </summary>
 public class EnqueueEnergyResultsForBalanceResponsiblesActivity(
+    ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity> logger,
     IServiceScopeFactory serviceScopeFactory,
     EnergyResultEnumerator energyResultEnumerator)
 {
+    private readonly ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity> _logger = logger;
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
     private readonly EnergyResultEnumerator _energyResultEnumerator = energyResultEnumerator;
 
@@ -57,6 +60,7 @@ public class EnqueueEnergyResultsForBalanceResponsiblesActivity(
                 catch
                 {
                     numberOfFailedResults++;
+                    _logger.LogWarning("Enqueue and commit of energy result failed.");
                 }
             }
         }

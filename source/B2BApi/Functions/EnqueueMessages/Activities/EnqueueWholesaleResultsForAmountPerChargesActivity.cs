@@ -13,12 +13,13 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
@@ -26,10 +27,12 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 /// Enqueue wholesale results for Amount Per Charge to Energy Supplier and ChargeOwner as outgoing messages for the given calculation id.
 /// </summary>
 public class EnqueueWholesaleResultsForAmountPerChargesActivity(
+    ILogger<EnqueueWholesaleResultsForAmountPerChargesActivity> logger,
     IServiceScopeFactory serviceScopeFactory,
     IMasterDataClient masterDataClient,
     WholesaleResultEnumerator wholesaleResultEnumerator)
 {
+    private readonly ILogger<EnqueueWholesaleResultsForAmountPerChargesActivity> _logger = logger;
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
     private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly WholesaleResultEnumerator _wholesaleResultEnumerator = wholesaleResultEnumerator;
@@ -60,6 +63,7 @@ public class EnqueueWholesaleResultsForAmountPerChargesActivity(
                 catch
                 {
                     numberOfFailedResults++;
+                    _logger.LogWarning("Enqueue and commit of energy result failed.");
                 }
             }
         }
