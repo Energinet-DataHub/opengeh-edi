@@ -58,6 +58,7 @@ public abstract class EnergyResultQueryBase<TResult>(
 
         Guid? currentResultId = null;
         var currentResultRows = new List<DatabricksSqlRow>();
+        TResult? result = null;
 
         await foreach (var row in databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement).ConfigureAwait(false))
         {
@@ -74,13 +75,26 @@ public abstract class EnergyResultQueryBase<TResult>(
                 continue;
             }
 
-            var result = await CreateResultAsync(currentResultRows).ConfigureAwait(false);
-            yield return result;
+            result = await CreateResultAsync(currentResultRows).ConfigureAwait(false);
+            if (result != null)
+            {
+                yield return result;
+            }
 
             // Next result
             currentResultRows = [];
             currentResultId = rowResultId;
             currentResultRows.Add(row);
+        }
+
+        // Last result (if any)
+        if (currentResultRows.Count != 0)
+        {
+            result = await CreateResultAsync(currentResultRows).ConfigureAwait(false);
+            if (result != null)
+            {
+                yield return result;
+            }
         }
     }
 
