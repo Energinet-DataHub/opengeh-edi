@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
@@ -334,8 +335,8 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         var wholesaleResultForAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
         var wholesaleAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(_ediDatabricksOptions.Value,  GetService<IMasterDataClient>(), EventId.From(Guid.NewGuid()), wholesaleResultForAmountPerChargeDescription.CalculationId);
 
-        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleAmountPerChargeQuery);
-        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleAmountPerChargeQuery, wholesaleResultForAmountPerChargeDescription.TestFilePath);
+        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition);
+        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition, wholesaleResultForAmountPerChargeDescription.TestFilePath);
         return wholesaleResultForAmountPerChargeDescription;
     }
 
@@ -344,8 +345,8 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         var wholesaleResultForMonthlyAmountPerChargeDescription = new WholesaleResultForMonthlyAmountPerChargeDescription();
         var wholesaleMonthlyAmountPerChargeQuery = new WholesaleMonthlyAmountPerChargeQuery(_ediDatabricksOptions.Value,  GetService<IMasterDataClient>(), EventId.From(Guid.NewGuid()), wholesaleResultForMonthlyAmountPerChargeDescription.CalculationId);
 
-        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleMonthlyAmountPerChargeQuery);
-        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleMonthlyAmountPerChargeQuery, wholesaleResultForMonthlyAmountPerChargeDescription.TestFilePath);
+        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleMonthlyAmountPerChargeQuery.DataObjectName, wholesaleMonthlyAmountPerChargeQuery.SchemaDefinition);
+        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleMonthlyAmountPerChargeQuery.DataObjectName, wholesaleMonthlyAmountPerChargeQuery.SchemaDefinition, wholesaleResultForMonthlyAmountPerChargeDescription.TestFilePath);
         return wholesaleResultForMonthlyAmountPerChargeDescription;
     }
 
