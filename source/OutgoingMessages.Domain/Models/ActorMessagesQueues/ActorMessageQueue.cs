@@ -105,7 +105,6 @@ public class ActorMessageQueue
     {
         return _bundles.FirstOrDefault(bundle =>
             bundle.ClosedAt is null
-            && bundle.PeekedAt is null
             && bundle.DocumentTypeInBundle == messageType
             && bundle.BusinessReason == businessReason
             && bundle.RelatedToMessageId?.Value == relatedToMessageId?.Value);

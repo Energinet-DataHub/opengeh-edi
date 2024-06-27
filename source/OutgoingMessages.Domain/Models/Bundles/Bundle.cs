@@ -70,7 +70,8 @@ public sealed class Bundle
 
     public void PeekBundle()
     {
-        ClosedAt = SystemClock.Instance.GetCurrentInstant();
+        // If the bundle is closed, because it was full. Then we should not update it at the peeked time.
+        ClosedAt ??= SystemClock.Instance.GetCurrentInstant();
         PeekedAt = SystemClock.Instance.GetCurrentInstant();
     }
 
