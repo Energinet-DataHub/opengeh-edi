@@ -22,9 +22,10 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 /// </summary>
 public class WholesaleServicesTotalSumMessageDto : OutgoingMessageDto
 {
-    protected WholesaleServicesTotalSumMessageDto(
+    private WholesaleServicesTotalSumMessageDto(
         Guid? processId,
         EventId eventId,
+        Guid calculationId,
         BusinessReason businessReason,
         ActorNumber receiverNumber,
         ActorRole receiverRole,
@@ -44,13 +45,17 @@ public class WholesaleServicesTotalSumMessageDto : OutgoingMessageDto
             new ExternalId(Guid.NewGuid()),
             relatedToMessageId)
     {
+        CalculationId = calculationId;
         Series = series;
     }
+
+    public Guid CalculationId { get; }
 
     public WholesaleServicesTotalSumSeries Series { get; }
 
     public static WholesaleServicesTotalSumMessageDto Create(
         EventId eventId,
+        Guid calculationId,
         ActorNumber receiverNumber,
         ActorRole receiverRole,
         BusinessReason businessReason,
@@ -64,6 +69,7 @@ public class WholesaleServicesTotalSumMessageDto : OutgoingMessageDto
             receiverRole: receiverRole,
             processId: null,
             eventId: eventId,
+            calculationId: calculationId,
             businessReason: businessReason,
             series: wholesaleSeries);
     }
