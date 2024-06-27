@@ -123,6 +123,9 @@ public abstract class EnergyResultQueryBase<TResult>(
 
     private async Task<TResult?> CreateResultAsync(IReadOnlyCollection<DatabricksSqlRow> resultRows)
     {
+        var firstRow = resultRows.First();
+        var resultId = firstRow.ToGuid(EnergyResultColumnNames.ResultId);
+
         try
         {
             var timeSeriesPoints = new List<EnergyTimeSeriesPoint>();
@@ -133,11 +136,11 @@ public abstract class EnergyResultQueryBase<TResult>(
                 timeSeriesPoints.Add(timeSeriesPoint);
             }
 
-            return await CreateEnergyResultAsync(resultRows.First(), timeSeriesPoints).ConfigureAwait(false);
+            return await CreateEnergyResultAsync(, timeSeriesPoints).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Creating energy result failed for CalculationId='{CalculationId}'.", CalculationId);
+            _logger.LogWarning(ex, "Creating energy result failed for CalculationId='{CalculationId}', ResultId='{ResultId}'.", CalculationId, resultId);
         }
 
         return null;
