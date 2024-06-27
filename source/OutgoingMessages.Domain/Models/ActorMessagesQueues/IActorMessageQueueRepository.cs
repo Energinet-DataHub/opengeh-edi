@@ -36,5 +36,5 @@ public interface IActorMessageQueueRepository
     /// <summary>
     /// Get all actor message queues.
     /// </summary>
-    Task<ReadOnlyCollection<ActorMessageQueue>> GetAlleActorMessageQueuesAsync();
+    Task<ReadOnlyCollection<ActorMessageQueue>> GetActorMessageQueuesAsync(int skip, int take);
 }

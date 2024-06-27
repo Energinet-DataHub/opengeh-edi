@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
@@ -50,5 +49,12 @@ public class MarketDocumentRepository : IMarketDocumentRepository
     public void Add(MarketDocument marketDocument)
     {
         _actorMessageQueueContext.Add(marketDocument);
+    }
+
+    public async Task DeleteMarketIfExistsDocumentAsync(BundleId bundleMessageId)
+    {
+        var marketDocument = await _actorMessageQueueContext.MarketDocuments.FirstOrDefaultAsync(x => x.BundleId == bundleMessageId).ConfigureAwait(false);
+        if (marketDocument is not null)
+            _actorMessageQueueContext.Remove(marketDocument);
     }
 }

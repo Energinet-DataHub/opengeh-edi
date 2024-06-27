@@ -134,4 +134,9 @@ public class ActorMessageQueue
 
         return nextBundleToPeek;
     }
+
+    public void RemoveBundle(Bundle bundle)
+    {
+        _bundles.Remove(bundle);
+    }
 }

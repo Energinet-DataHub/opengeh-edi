@@ -49,9 +49,9 @@ public class ActorMessageQueueRepository : IActorMessageQueueRepository
         return actorMessageQueue;
     }
 
-    public async Task<ReadOnlyCollection<ActorMessageQueue>> GetAlleActorMessageQueuesAsync()
+    public async Task<ReadOnlyCollection<ActorMessageQueue>> GetActorMessageQueuesAsync(int skip, int take)
     {
-        return new ReadOnlyCollection<ActorMessageQueue>(await _actorMessageQueueContext.ActorMessageQueues.ToListAsync().ConfigureAwait(false));
+        return new ReadOnlyCollection<ActorMessageQueue>(await _actorMessageQueueContext.ActorMessageQueues.Skip(skip).Take(take).ToListAsync().ConfigureAwait(false));
     }
 
     public void Add(ActorMessageQueue actorMessageQueue)
@@ -59,4 +59,3 @@ public class ActorMessageQueueRepository : IActorMessageQueueRepository
         _actorMessageQueueContext.ActorMessageQueues.Add(actorMessageQueue);
     }
 }
-

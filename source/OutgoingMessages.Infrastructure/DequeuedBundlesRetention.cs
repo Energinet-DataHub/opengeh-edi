@@ -12,80 +12,70 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Data.Common;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
-using Microsoft.Data.SqlClient;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 
 public class DequeuedBundlesRetention : IDataRetention
 {
-    private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
     private readonly IMarketDocumentRepository _marketDocumentRepository;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
+    private readonly ActorMessageQueueContext _actorMessageQueueContext;
 
     public DequeuedBundlesRetention(
-        IDatabaseConnectionFactory databaseConnectionFactory,
+        ISystemDateTimeProvider systemDateTimeProvider,
         IActorMessageQueueRepository actorMessageQueueRepository,
         IMarketDocumentRepository marketDocumentRepository,
-        IOutgoingMessageRepository outgoingMessageRepository)
+        IOutgoingMessageRepository outgoingMessageRepository,
+        ActorMessageQueueContext actorMessageQueueContext)
     {
-        _databaseConnectionFactory = databaseConnectionFactory;
+        _systemDateTimeProvider = systemDateTimeProvider;
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _marketDocumentRepository = marketDocumentRepository;
         _outgoingMessageRepository = outgoingMessageRepository;
+        _actorMessageQueueContext = actorMessageQueueContext;
     }
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
     {
-        var actorMessageQueues =
-            await _actorMessageQueueRepository.GetAlleActorMessageQueuesAsync().ConfigureAwait(false);
-        foreach (var amq in actorMessageQueues)
+        const int incrementer = 10;
+        var skip = 0;
+        var take = 10;
+        var monthAgo = _systemDateTimeProvider.Now().Plus(-Duration.FromDays(30));
+        while (true)
         {
-           var bundles = amq.GetDequeuedBundles();
-           foreach (var bundle in bundles)
-           {
-               _actorMessageQueueRepository.DeleteMarketDocument(bundle.MessageId);
-           }
-        }
-        
-        const string deleteStmt = @"
-            DELETE FROM [dbo].[MarketDocuments]
-            WHERE [BundleId] IN (SELECT [Id]
-            FROM [dbo].[Bundles]
-            WHERE [IsDequeued] = 1)
+            var actorMessageQueues =
+                await _actorMessageQueueRepository.GetActorMessageQueuesAsync(skip, take).ConfigureAwait(false);
 
-            DELETE FROM [dbo].[OutgoingMessages]
-            WHERE [AssignedBundleId] IN (SELECT [Id]
-            FROM [dbo].[Bundles]
-            WHERE [IsDequeued] = 1)
+            if (actorMessageQueues.Count == 0)
+            {
+                break;
+            }
 
-            DELETE FROM [dbo].[Bundles]
-            WHERE [IsDequeued] = 1";
+            foreach (var actorMessageQueue in actorMessageQueues)
+            {
+                var dequeuedBundles = actorMessageQueue.GetDequeuedBundles();
+                foreach (var bundle in dequeuedBundles)
+                {
+                    if (bundle.DequeuedAt < monthAgo)
+                    {
+                        await _marketDocumentRepository.DeleteMarketIfExistsDocumentAsync(bundle.Id).ConfigureAwait(false);
+                        await _outgoingMessageRepository.DeleteOutgoingMessageIfExistsAsync(bundle.Id).ConfigureAwait(false);
+                        actorMessageQueue.RemoveBundle(bundle);
+                        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                    }
+                }
+            }
 
-        using var connection =
-            (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        using var transaction =
-            (SqlTransaction)await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
-        using var command = connection.CreateCommand();
-        command.Transaction = transaction;
-        command.CommandText = deleteStmt;
-
-        try
-        {
-            await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
-            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-        }
-        catch (DbException)
-        {
-            // Add exception logging
-            await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-            throw; // re-throw exception
+            skip += incrementer;
+            take += incrementer;
         }
     }
 }
