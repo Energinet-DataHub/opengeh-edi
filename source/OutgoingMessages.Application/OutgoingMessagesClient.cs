@@ -195,6 +195,22 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
+    public async Task EnqueueAndCommitAsync(
+        WholesaleMontlyAmountPerChargeDto wholesaleMonthlyAmountPerChargeDto,
+        CancellationToken cancellationToken)
+    {
+        var messages = OutgoingMessage.CreateMessages(
+            wholesaleMonthlyAmountPerChargeDto,
+            _serializer,
+            _systemDateTimeProvider.Now());
+        foreach (var message in messages)
+        {
+            await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        }
+
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
     public async Task<OutgoingMessageId> EnqueueAsync(
         AcceptedWholesaleServicesMessageDto acceptedWholesaleServicesMessage,
         CancellationToken cancellationToken)

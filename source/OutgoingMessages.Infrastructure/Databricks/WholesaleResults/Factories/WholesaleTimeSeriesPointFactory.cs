@@ -25,7 +25,7 @@ public static class WholesaleTimeSeriesPointFactory
     {
         return new WholesaleTimeSeriesPoint(
             databricksSqlRow.ToInstant(WholesaleResultColumnNames.Time),
-            databricksSqlRow.ToDecimal(WholesaleResultColumnNames.Quantity),
+            databricksSqlRow.ToNullableDecimal(WholesaleResultColumnNames.Quantity),
             QuantityQualitiesMapper.TryFromDeltaTableValue(databricksSqlRow.ToNullableString(WholesaleResultColumnNames.QuantityQualities)),
             databricksSqlRow.ToNullableDecimal(WholesaleResultColumnNames.Price),
             databricksSqlRow.ToNullableDecimal(WholesaleResultColumnNames.Amount));
