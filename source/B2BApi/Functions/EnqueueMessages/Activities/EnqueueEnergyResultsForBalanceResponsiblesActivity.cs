@@ -58,10 +58,10 @@ public class EnqueueEnergyResultsForBalanceResponsiblesActivity(
 
                     numberOfHandledResults++;
                 }
-                catch
+                catch (Exception ex)
                 {
                     numberOfFailedResults++;
-                    _logger.LogWarning("Enqueue and commit of energy result failed.");
+                    _logger.LogWarning(ex, "Enqueue and commit of energy result failed for CalculationId='{CalculationId}'.", input.CalculationId);
                 }
             }
         }
