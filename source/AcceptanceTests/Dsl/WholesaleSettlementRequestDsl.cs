@@ -20,17 +20,17 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
 public sealed class WholesaleSettlementRequestDsl
 {
-    private readonly EdiProcessesDriver _ediProcessesDriver;
+    private readonly EdiDatabaseDriver _ediDatabaseDriver;
     private readonly EdiDriver _ediDriver;
     private readonly WholesaleDriver _wholesaleDriver;
 
 #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
     internal WholesaleSettlementRequestDsl(
-        EdiProcessesDriver ediProcessesDriver,
+        EdiDatabaseDriver ediDatabaseDriver,
         EdiDriver ediDriver,
         WholesaleDriver wholesaleDriver)
     {
-        _ediProcessesDriver = ediProcessesDriver;
+        _ediDatabaseDriver = ediDatabaseDriver;
         _ediDriver = ediDriver;
         _wholesaleDriver = wholesaleDriver;
     }
@@ -62,7 +62,7 @@ public sealed class WholesaleSettlementRequestDsl
         Guid requestMessageId,
         CancellationToken cancellationToken)
     {
-        var processId = await _ediProcessesDriver
+        var processId = await _ediDatabaseDriver
             .GetWholesaleServiceProcessIdAsync(requestMessageId, cancellationToken)
             .ConfigureAwait(false);
 
@@ -77,7 +77,7 @@ public sealed class WholesaleSettlementRequestDsl
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
 
-        var processId = await _ediProcessesDriver
+        var processId = await _ediDatabaseDriver
             .CreateWholesaleServiceProcessAsync(gridAreaCode, chargeOwnerNumber, cancellationToken)
             .ConfigureAwait(false);
 
@@ -96,7 +96,7 @@ public sealed class WholesaleSettlementRequestDsl
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
 
-        var processId = await _ediProcessesDriver
+        var processId = await _ediDatabaseDriver
             .CreateWholesaleServiceProcessAsync(gridAreaCode, actorNumber, cancellationToken)
             .ConfigureAwait(false);
 
