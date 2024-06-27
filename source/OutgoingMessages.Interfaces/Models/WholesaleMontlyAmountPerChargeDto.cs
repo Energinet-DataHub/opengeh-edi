@@ -20,6 +20,7 @@ public class WholesaleMontlyAmountPerChargeDto : OutgoingMessageDto
 {
     public WholesaleMontlyAmountPerChargeDto(
         EventId eventId,
+        Guid calculationId,
         Guid calculationResultId,
         long calculationResultVersion,
         ActorNumber energySupplierReceiverId,
@@ -46,6 +47,7 @@ public class WholesaleMontlyAmountPerChargeDto : OutgoingMessageDto
             null!,
             new ExternalId(calculationResultId))
     {
+        CalculationId = calculationId;
         CalculationResultId = calculationResultId;
         EnergySupplierReceiverId = energySupplierReceiverId;
         ChargeOwnerReceiverId = chargeOwnerReceiverId;
@@ -71,6 +73,8 @@ public class WholesaleMontlyAmountPerChargeDto : OutgoingMessageDto
             null,
             SettlementMethod: null);
     }
+
+    public Guid CalculationId { get; }
 
     public Guid CalculationResultId { get; }
 

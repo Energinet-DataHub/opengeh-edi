@@ -501,7 +501,8 @@ public class OutgoingMessage
                 ProcessType.ReceiveWholesaleResults,
                 wholesaleAmountPerChargeDto.RelatedToMessageId,
                 wholesaleAmountPerChargeDto.Series.GridAreaCode,
-                wholesaleAmountPerChargeDto.ExternalId),
+                wholesaleAmountPerChargeDto.ExternalId,
+                wholesaleAmountPerChargeDto.CalculationId),
             new(
                 wholesaleAmountPerChargeDto.EventId,
                 wholesaleAmountPerChargeDto.DocumentType,
@@ -516,7 +517,8 @@ public class OutgoingMessage
                 ProcessType.ReceiveWholesaleResults,
                 wholesaleAmountPerChargeDto.RelatedToMessageId,
                 wholesaleAmountPerChargeDto.Series.GridAreaCode,
-                wholesaleAmountPerChargeDto.ExternalId),
+                wholesaleAmountPerChargeDto.ExternalId,
+                wholesaleAmountPerChargeDto.CalculationId),
         };
     }
 
