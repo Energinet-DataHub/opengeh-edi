@@ -93,6 +93,11 @@ public class ActorMessageQueue
         return true;
     }
 
+    public IReadOnlyCollection<Bundle> GetDequeuedBundles()
+    {
+        return _bundles.Where(x => x.DequeuedAt is not null).ToList();
+    }
+
     private void EnsureApplicable(OutgoingMessage outgoingMessage)
     {
         if (outgoingMessage.GetActorMessageQueueMetadata().Equals(Receiver) == false)

@@ -13,10 +13,11 @@
 // limitations under the License.
 
 using System.Data.Common;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
@@ -24,14 +25,35 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 public class DequeuedBundlesRetention : IDataRetention
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
+    private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
+    private readonly IMarketDocumentRepository _marketDocumentRepository;
+    private readonly IOutgoingMessageRepository _outgoingMessageRepository;
 
-    public DequeuedBundlesRetention(IDatabaseConnectionFactory databaseConnectionFactory)
+    public DequeuedBundlesRetention(
+        IDatabaseConnectionFactory databaseConnectionFactory,
+        IActorMessageQueueRepository actorMessageQueueRepository,
+        IMarketDocumentRepository marketDocumentRepository,
+        IOutgoingMessageRepository outgoingMessageRepository)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
+        _actorMessageQueueRepository = actorMessageQueueRepository;
+        _marketDocumentRepository = marketDocumentRepository;
+        _outgoingMessageRepository = outgoingMessageRepository;
     }
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
     {
+        var actorMessageQueues =
+            await _actorMessageQueueRepository.GetAlleActorMessageQueuesAsync().ConfigureAwait(false);
+        foreach (var amq in actorMessageQueues)
+        {
+           var bundles = amq.GetDequeuedBundles();
+           foreach (var bundle in bundles)
+           {
+               _actorMessageQueueRepository.DeleteMarketDocument(bundle.MessageId);
+           }
+        }
+        
         const string deleteStmt = @"
             DELETE FROM [dbo].[MarketDocuments]
             WHERE [BundleId] IN (SELECT [Id]

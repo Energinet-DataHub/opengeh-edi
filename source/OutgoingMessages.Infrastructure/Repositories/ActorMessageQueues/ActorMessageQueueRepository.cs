@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -48,8 +49,14 @@ public class ActorMessageQueueRepository : IActorMessageQueueRepository
         return actorMessageQueue;
     }
 
+    public async Task<ReadOnlyCollection<ActorMessageQueue>> GetAlleActorMessageQueuesAsync()
+    {
+        return new ReadOnlyCollection<ActorMessageQueue>(await _actorMessageQueueContext.ActorMessageQueues.ToListAsync().ConfigureAwait(false));
+    }
+
     public void Add(ActorMessageQueue actorMessageQueue)
     {
         _actorMessageQueueContext.ActorMessageQueues.Add(actorMessageQueue);
     }
 }
+
