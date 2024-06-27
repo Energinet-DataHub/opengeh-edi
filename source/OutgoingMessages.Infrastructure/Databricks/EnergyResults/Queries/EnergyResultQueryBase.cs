@@ -136,7 +136,7 @@ public abstract class EnergyResultQueryBase<TResult>(
                 timeSeriesPoints.Add(timeSeriesPoint);
             }
 
-            return await CreateEnergyResultAsync(, timeSeriesPoints).ConfigureAwait(false);
+            return await CreateEnergyResultAsync(firstRow, timeSeriesPoints).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
