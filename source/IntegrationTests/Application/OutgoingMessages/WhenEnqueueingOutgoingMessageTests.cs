@@ -83,45 +83,47 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
 
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = "SELECT * FROM [dbo].[OutgoingMessages]";
-        var result = await
-            connection
-                .QuerySingleOrDefaultAsync(sql);
+        var nullableMessageFromDatabase = await connection.QuerySingleOrDefaultAsync(sql);
 
-        Assert.NotNull(result);
+        Assert.NotNull(nullableMessageFromDatabase);
+        var messageFromDatabase = nullableMessageFromDatabase!;
 
         var propertyAssertions = new Action[]
         {
-            () => Assert.Equal(createdOutgoingMessageId.Value, result!.Id),
-            () => Assert.NotNull(result!.RecordId),
-            () => Assert.Equal(message.ProcessId, result!.ProcessId),
-            () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Name, result!.DocumentType),
-            () => Assert.Equal(message.ReceiverNumber.Value, result!.ReceiverNumber),
-            () => Assert.Equal(message.ReceiverRole.Code, result!.ReceiverRole),
-            () => Assert.Equal(message.ReceiverNumber.Value, result!.DocumentReceiverNumber),
-            () => Assert.Equal(message.ReceiverRole.Code, result!.DocumentReceiverRole),
-            () => Assert.Equal(message.SenderId.Value, result!.SenderId),
-            () => Assert.Equal(message.SenderRole.Code, result!.SenderRole),
-            () => Assert.Equal(message.BusinessReason, result!.BusinessReason),
-            () => Assert.Equal(message.Series.GridAreaCode, result!.GridAreaCode),
-            () => Assert.Equal(ProcessType.ReceiveEnergyResults.Name, result!.MessageCreatedFromProcess),
-            () => Assert.Equal(expectedFileStorageReference, result!.FileStorageReference),
-            () => Assert.Equal("OutgoingMessage", result!.Discriminator),
-            () => Assert.Equal(message.RelatedToMessageId?.Value, result!.RelatedToMessageId),
-            () => Assert.Equal(message.EventId.Value, result!.EventId),
-            () => Assert.NotNull(result!.AssignedBundleId),
-            () => Assert.NotNull(result!.CreatedAt),
-            () => Assert.NotNull(result!.CreatedBy),
-            () => Assert.Null(result!.ModifiedAt),
-            () => Assert.Null(result!.ModifiedBy),
-            () => Assert.Equal(message.ExternalId.Value, result!.ExternalId),
+            () => Assert.Equal(createdOutgoingMessageId.Value, messageFromDatabase.Id),
+            () => Assert.NotNull(messageFromDatabase.RecordId),
+            () => Assert.Equal(message.ProcessId, messageFromDatabase.ProcessId),
+            () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Name, messageFromDatabase.DocumentType),
+            () => Assert.Equal(message.ReceiverNumber.Value, messageFromDatabase.ReceiverNumber),
+            () => Assert.Equal(message.ReceiverRole.Code, messageFromDatabase.ReceiverRole),
+            () => Assert.Equal(message.ReceiverNumber.Value, messageFromDatabase.DocumentReceiverNumber),
+            () => Assert.Equal(message.ReceiverRole.Code, messageFromDatabase.DocumentReceiverRole),
+            () => Assert.Equal(message.SenderId.Value, messageFromDatabase.SenderId),
+            () => Assert.Equal(message.SenderRole.Code, messageFromDatabase.SenderRole),
+            () => Assert.Equal(message.BusinessReason, messageFromDatabase.BusinessReason),
+            () => Assert.Equal(message.Series.GridAreaCode, messageFromDatabase.GridAreaCode),
+            () => Assert.Equal(ProcessType.ReceiveEnergyResults.Name, messageFromDatabase.MessageCreatedFromProcess),
+            () => Assert.Equal(expectedFileStorageReference, messageFromDatabase.FileStorageReference),
+            () => Assert.Equal("OutgoingMessage", messageFromDatabase.Discriminator),
+            () => Assert.Equal(message.RelatedToMessageId?.Value, messageFromDatabase.RelatedToMessageId),
+            () => Assert.Equal(message.EventId.Value, messageFromDatabase.EventId),
+            () => Assert.NotNull(messageFromDatabase.AssignedBundleId),
+            () => Assert.NotNull(messageFromDatabase.CreatedAt),
+            () => Assert.NotNull(messageFromDatabase.CreatedBy),
+            () => Assert.Null(messageFromDatabase.ModifiedAt),
+            () => Assert.Null(messageFromDatabase.ModifiedBy),
+            () => Assert.Equal(message.ExternalId.Value, messageFromDatabase.ExternalId),
+            () => Assert.Equal(message.CalculationId, messageFromDatabase.CalculationId),
         };
 
         Assert.Multiple(propertyAssertions);
 
         // Confirm that all database columns are asserted
-        var databaseColumnsCount = ((IDictionary<string, object>)result!).Count;
+        var databaseColumnsCount = ((IDictionary<string, object>)messageFromDatabase).Count;
         var propertiesAssertedCount = propertyAssertions.Length;
-        propertiesAssertedCount.Should().Be(databaseColumnsCount, "asserted properties count should be equal to OutgoingMessage database columns count");
+        propertiesAssertedCount
+            .Should()
+            .Be(databaseColumnsCount, "asserted properties count should be equal to OutgoingMessage database columns count");
     }
 
     [Fact]
@@ -345,6 +347,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     /// The actor uses the MDR (MeteredDataResponsible) role when making request (RequestAggregatedMeasureData)
     /// but uses the DDM (GridOperator) role when peeking.
     /// This means that a NotifyAggregatedMeasureData document with a MDR receiver should be added to the DDM ActorMessageQueue
+    /// TODO: This test should be updated to use our new energy results dto's (EnergyResultPerGridAreaMessageDto etc.)
     /// </summary>
     [Fact]
     public async Task Given_EnqueuingNotifyAggregatedMeasureData_When_ReceiverActorRoleIsMDR_Then_MessageShouldBeEnqueuedAsDDM()

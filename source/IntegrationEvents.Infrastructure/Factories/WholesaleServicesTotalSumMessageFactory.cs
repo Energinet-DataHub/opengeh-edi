@@ -32,12 +32,14 @@ public static class WholesaleServicesTotalSumMessageFactory
         ArgumentNullException.ThrowIfNull(totalMonthlyAmountResultProducedV1);
         var message = CreateWholesaleResultSeries(totalMonthlyAmountResultProducedV1);
         var receiver = GetReceiver(totalMonthlyAmountResultProducedV1);
+
         return WholesaleServicesTotalSumMessageDto.Create(
-            eventId,
-            receiver.ActorNumber,
-            receiver.ActorRole,
-            BusinessReasonMapper.Map(totalMonthlyAmountResultProducedV1.CalculationType),
-            message);
+            eventId: eventId,
+            calculationId: Guid.Parse(totalMonthlyAmountResultProducedV1.CalculationId),
+            receiverNumber: receiver.ActorNumber,
+            receiverRole: receiver.ActorRole,
+            businessReason: BusinessReasonMapper.Map(totalMonthlyAmountResultProducedV1.CalculationType),
+            wholesaleSeries: message);
     }
 
     private static (ActorNumber ActorNumber, ActorRole ActorRole) GetReceiver(

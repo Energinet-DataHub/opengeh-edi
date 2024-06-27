@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
 
-public abstract class AcceptedWholesaleServicesMessageDtoBuilder
+public static class AcceptedWholesaleServicesMessageDtoBuilder
 {
     private static readonly ActorNumber _receiverNumber = ActorNumber.Create("1234567890123");
     private static readonly ActorNumber _chargeOwner = DataHubDetails.DataHubActorNumber;

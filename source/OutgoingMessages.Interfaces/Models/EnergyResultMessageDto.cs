@@ -27,6 +27,7 @@ public class EnergyResultMessageDto : OutgoingMessageDto
         EventId eventId,
         string businessReasonName,
         ActorRole receiverRole,
+        Guid calculationId,
         EnergyResultMessageTimeSeries series)
         : base(
             DocumentType.NotifyAggregatedMeasureData,
@@ -40,13 +41,17 @@ public class EnergyResultMessageDto : OutgoingMessageDto
             new ExternalId(Guid.NewGuid()),
             null)
     {
+        CalculationId = calculationId;
         Series = series;
     }
+
+    public Guid CalculationId { get; }
 
     public EnergyResultMessageTimeSeries Series { get; }
 
     public static EnergyResultMessageDto Create(
         EventId eventId,
+        Guid calculationId,
         ActorNumber receiverNumber,
         ActorRole receiverRole,
         string gridAreaCode,
@@ -82,6 +87,7 @@ public class EnergyResultMessageDto : OutgoingMessageDto
             eventId,
             businessReasonName,
             receiverRole,
+            calculationId,
             series);
     }
 }

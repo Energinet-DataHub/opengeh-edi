@@ -29,6 +29,7 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
         ActorRole receiverRole,
         ActorNumber chargeOwnerId,
         WholesaleServicesSeries series,
+        Guid? calculationId,
         MessageId? relatedToMessageId = null)
         : base(
             DocumentType.NotifyWholesaleServices,
@@ -43,15 +44,19 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
             relatedToMessageId)
     {
         ChargeOwnerId = chargeOwnerId;
+        CalculationId = calculationId;
         Series = series;
     }
 
     public ActorNumber ChargeOwnerId { get; }
 
+    public Guid? CalculationId { get; }
+
     public WholesaleServicesSeries Series { get; }
 
     public static WholesaleServicesMessageDto Create(
         EventId eventId,
+        Guid calculationId,
         ActorNumber receiverNumber,
         ActorRole receiverRole,
         ActorNumber chargeOwnerId,
@@ -68,7 +73,8 @@ public class WholesaleServicesMessageDto : OutgoingMessageDto
             eventId: eventId,
             businessReason: businessReason,
             series: wholesaleSeries,
-            chargeOwnerId: chargeOwnerId);
+            chargeOwnerId: chargeOwnerId,
+            calculationId: calculationId);
     }
 }
 

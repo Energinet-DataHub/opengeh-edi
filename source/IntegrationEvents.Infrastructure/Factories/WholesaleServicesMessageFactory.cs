@@ -47,6 +47,7 @@ public sealed class WholesaleServicesMessageFactory
 
         return WholesaleServicesMessageDto.Create(
             eventId,
+            Guid.Parse(monthlyAmountPerChargeResultProducedV1.CalculationId),
             message.EnergySupplier,
             ActorRole.EnergySupplier,
             chargeOwner,
@@ -69,7 +70,8 @@ public sealed class WholesaleServicesMessageFactory
             .ConfigureAwait(false);
 
         return WholesaleServicesMessageDto.Create(
-            eventId,
+            eventId: eventId,
+            calculationId: Guid.Parse(amountPerChargeResultProducedV1.CalculationId),
             receiverNumber: message.EnergySupplier,
             receiverRole: ActorRole.EnergySupplier,
             chargeOwnerId: chargeOwner,

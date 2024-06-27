@@ -37,7 +37,8 @@ public class AcceptedWholesaleServicesMessageDto : WholesaleServicesMessageDto
         receiverRole,
         chargeOwnerId,
         series,
-        relatedToMessageId)
+        relatedToMessageId: relatedToMessageId,
+        calculationId: null)
     {
         DocumentReceiverNumber = documentReceiverNumber;
         DocumentReceiverRole = documentReceiverRole;
