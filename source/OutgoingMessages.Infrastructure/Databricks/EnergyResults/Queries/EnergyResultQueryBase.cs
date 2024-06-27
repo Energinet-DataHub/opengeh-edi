@@ -121,17 +121,26 @@ public abstract class EnergyResultQueryBase<TResult>(
         return currentResultId == rowResultId;
     }
 
-    private Task<TResult> CreateResultAsync(IReadOnlyCollection<DatabricksSqlRow> resultRows)
+    private async Task<TResult?> CreateResultAsync(IReadOnlyCollection<DatabricksSqlRow> resultRows)
     {
-        var timeSeriesPoints = new List<EnergyTimeSeriesPoint>();
-
-        foreach (var row in resultRows)
+        try
         {
-            var timeSeriesPoint = CreateTimeSeriesPoint(row);
-            timeSeriesPoints.Add(timeSeriesPoint);
+            var timeSeriesPoints = new List<EnergyTimeSeriesPoint>();
+
+            foreach (var row in resultRows)
+            {
+                var timeSeriesPoint = CreateTimeSeriesPoint(row);
+                timeSeriesPoints.Add(timeSeriesPoint);
+            }
+
+            return await CreateEnergyResultAsync(resultRows.First(), timeSeriesPoints).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Creating energy result failed for CalculationId='{CalculationId}'.", CalculationId);
         }
 
-        return CreateEnergyResultAsync(resultRows.First(), timeSeriesPoints);
+        return null;
     }
 
     private string BuildSqlQuery()
