@@ -142,6 +142,12 @@ limitations under the License.
       <None Update="Behaviours\IntegrationEvents\TestData\wholesale_fixing_01-02-2023_28-02-2023_ga_804_amount_per_charge_v1.csv">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="Behaviours\IntegrationEvents\TestData\wholesale_fixing_01-02-2023_28-02-2023_ga_804_monthly_amount_per_charge_v1.csv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Behaviours\IntegrationEvents\TestData\wholesale_fixing_01-02-2023_28-02-2023_ga_804_total_amount_v1.csv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

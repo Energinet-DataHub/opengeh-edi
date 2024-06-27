@@ -410,46 +410,117 @@ public class OutgoingMessage
     /// This method creates two outgoing messages, one for the receiver and one for the charge owner, based on the wholesaleResultMessage.
     /// </summary>
     public static IReadOnlyCollection<OutgoingMessage> CreateMessages(
-        WholesaleAmountPerChargeDto wholesaleAmountPerChargeDto,
+        WholesaleAmountPerChargeMessageDto wholesaleAmountPerChargeMessageDto,
         ISerializer serializer,
         Instant timestamp)
     {
         ArgumentNullException.ThrowIfNull(serializer);
-        ArgumentNullException.ThrowIfNull(wholesaleAmountPerChargeDto);
+        ArgumentNullException.ThrowIfNull(wholesaleAmountPerChargeMessageDto);
 
         return new List<OutgoingMessage>()
         {
             new(
-                wholesaleAmountPerChargeDto.EventId,
-                wholesaleAmountPerChargeDto.DocumentType,
-                wholesaleAmountPerChargeDto.EnergySupplierReceiverId,
-                wholesaleAmountPerChargeDto.ProcessId,
-                wholesaleAmountPerChargeDto.BusinessReason,
+                wholesaleAmountPerChargeMessageDto.EventId,
+                wholesaleAmountPerChargeMessageDto.DocumentType,
+                wholesaleAmountPerChargeMessageDto.EnergySupplierReceiverId,
+                wholesaleAmountPerChargeMessageDto.ProcessId,
+                wholesaleAmountPerChargeMessageDto.BusinessReason,
                 ActorRole.EnergySupplier,
-                senderId: DataHubDetails.DataHubActorNumber,
-                senderRole: ActorRole.MeteredDataAdministrator,
-                serializer.Serialize(wholesaleAmountPerChargeDto.Series),
+                senderId: wholesaleAmountPerChargeMessageDto.SenderId,
+                senderRole: wholesaleAmountPerChargeMessageDto.SenderRole,
+                serializer.Serialize(wholesaleAmountPerChargeMessageDto.Series),
                 timestamp,
                 ProcessType.ReceiveWholesaleResults,
-                wholesaleAmountPerChargeDto.RelatedToMessageId,
-                wholesaleAmountPerChargeDto.Series.GridAreaCode,
-                wholesaleAmountPerChargeDto.ExternalId),
+                wholesaleAmountPerChargeMessageDto.RelatedToMessageId,
+                wholesaleAmountPerChargeMessageDto.Series.GridAreaCode,
+                wholesaleAmountPerChargeMessageDto.ExternalId),
             new(
-                wholesaleAmountPerChargeDto.EventId,
-                wholesaleAmountPerChargeDto.DocumentType,
-                wholesaleAmountPerChargeDto.ChargeOwnerReceiverId,
-                wholesaleAmountPerChargeDto.ProcessId,
-                wholesaleAmountPerChargeDto.BusinessReason,
-                GetChargeOwnerRole(wholesaleAmountPerChargeDto.ChargeOwnerReceiverId),
-                senderId: DataHubDetails.DataHubActorNumber,
-                senderRole: ActorRole.MeteredDataAdministrator,
-                serializer.Serialize(wholesaleAmountPerChargeDto.Series),
+                wholesaleAmountPerChargeMessageDto.EventId,
+                wholesaleAmountPerChargeMessageDto.DocumentType,
+                wholesaleAmountPerChargeMessageDto.ChargeOwnerReceiverId,
+                wholesaleAmountPerChargeMessageDto.ProcessId,
+                wholesaleAmountPerChargeMessageDto.BusinessReason,
+                GetChargeOwnerRole(wholesaleAmountPerChargeMessageDto.ChargeOwnerReceiverId),
+                senderId: wholesaleAmountPerChargeMessageDto.SenderId,
+                senderRole: wholesaleAmountPerChargeMessageDto.SenderRole,
+                serializer.Serialize(wholesaleAmountPerChargeMessageDto.Series),
                 timestamp,
                 ProcessType.ReceiveWholesaleResults,
-                wholesaleAmountPerChargeDto.RelatedToMessageId,
-                wholesaleAmountPerChargeDto.Series.GridAreaCode,
-                wholesaleAmountPerChargeDto.ExternalId),
+                wholesaleAmountPerChargeMessageDto.RelatedToMessageId,
+                wholesaleAmountPerChargeMessageDto.Series.GridAreaCode,
+                wholesaleAmountPerChargeMessageDto.ExternalId),
         };
+    }
+
+    /// <summary>
+    /// This method creates two outgoing messages, one for the receiver and one for the charge owner, based on the wholesaleResultMessage.
+    /// </summary>
+    public static IReadOnlyCollection<OutgoingMessage> CreateMessages(
+        WholesaleMontlyAmountPerChargeMessageDto wholesaleMontlyAmountPerChargeMessageDto,
+        ISerializer serializer,
+        Instant timestamp)
+    {
+        ArgumentNullException.ThrowIfNull(serializer);
+        ArgumentNullException.ThrowIfNull(wholesaleMontlyAmountPerChargeMessageDto);
+
+        return new List<OutgoingMessage>()
+        {
+            new(
+                wholesaleMontlyAmountPerChargeMessageDto.EventId,
+                wholesaleMontlyAmountPerChargeMessageDto.DocumentType,
+                wholesaleMontlyAmountPerChargeMessageDto.EnergySupplierReceiverId,
+                wholesaleMontlyAmountPerChargeMessageDto.ProcessId,
+                wholesaleMontlyAmountPerChargeMessageDto.BusinessReason,
+                ActorRole.EnergySupplier,
+                senderId: wholesaleMontlyAmountPerChargeMessageDto.SenderId,
+                senderRole: wholesaleMontlyAmountPerChargeMessageDto.SenderRole,
+                serializer.Serialize(wholesaleMontlyAmountPerChargeMessageDto.Series),
+                timestamp,
+                ProcessType.ReceiveWholesaleResults,
+                wholesaleMontlyAmountPerChargeMessageDto.RelatedToMessageId,
+                wholesaleMontlyAmountPerChargeMessageDto.Series.GridAreaCode,
+                wholesaleMontlyAmountPerChargeMessageDto.ExternalId),
+            new(
+                wholesaleMontlyAmountPerChargeMessageDto.EventId,
+                wholesaleMontlyAmountPerChargeMessageDto.DocumentType,
+                wholesaleMontlyAmountPerChargeMessageDto.ChargeOwnerReceiverId,
+                wholesaleMontlyAmountPerChargeMessageDto.ProcessId,
+                wholesaleMontlyAmountPerChargeMessageDto.BusinessReason,
+                GetChargeOwnerRole(wholesaleMontlyAmountPerChargeMessageDto.ChargeOwnerReceiverId),
+                senderId: wholesaleMontlyAmountPerChargeMessageDto.SenderId,
+                senderRole: wholesaleMontlyAmountPerChargeMessageDto.SenderRole,
+                serializer.Serialize(wholesaleMontlyAmountPerChargeMessageDto.Series),
+                timestamp,
+                ProcessType.ReceiveWholesaleResults,
+                wholesaleMontlyAmountPerChargeMessageDto.RelatedToMessageId,
+                wholesaleMontlyAmountPerChargeMessageDto.Series.GridAreaCode,
+                wholesaleMontlyAmountPerChargeMessageDto.ExternalId),
+        };
+    }
+
+    /// <summary>
+    /// This method creates an outgoing message, one for the receiver based on the WholesaleTotalAmountMessageDto.
+    /// </summary>
+    public static OutgoingMessage CreateMessage(WholesaleTotalAmountMessageDto wholesaleTotalAmountMessageDto, ISerializer serializer, Instant timestamp)
+    {
+        ArgumentNullException.ThrowIfNull(serializer);
+        ArgumentNullException.ThrowIfNull(wholesaleTotalAmountMessageDto);
+
+        return new(
+            wholesaleTotalAmountMessageDto.EventId,
+            wholesaleTotalAmountMessageDto.DocumentType,
+            wholesaleTotalAmountMessageDto.ReceiverNumber,
+            wholesaleTotalAmountMessageDto.ProcessId,
+            wholesaleTotalAmountMessageDto.BusinessReason,
+            wholesaleTotalAmountMessageDto.ReceiverRole,
+            senderId: wholesaleTotalAmountMessageDto.SenderId,
+            senderRole: wholesaleTotalAmountMessageDto.SenderRole,
+            serializer.Serialize(wholesaleTotalAmountMessageDto.Series),
+            timestamp,
+            ProcessType.ReceiveWholesaleResults,
+            wholesaleTotalAmountMessageDto.RelatedToMessageId,
+            wholesaleTotalAmountMessageDto.Series.GridAreaCode,
+            wholesaleTotalAmountMessageDto.ExternalId);
     }
 
     /// <summary>

@@ -24,19 +24,19 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 
-public class WholesaleAmountPerChargeQuery(
+public class WholesaleMonthlyAmountPerChargeQuery(
     EdiDatabricksOptions ediDatabricksOptions,
     IMasterDataClient masterDataClient,
     EventId eventId,
     Guid calculationId)
-    : WholesaleResultQueryBase<WholesaleAmountPerChargeMessageDto>(
+    : WholesaleResultQueryBase<WholesaleMontlyAmountPerChargeMessageDto>(
         ediDatabricksOptions,
         calculationId)
 {
     private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly EventId _eventId = eventId;
 
-    public override string DataObjectName => "amounts_per_charge_v1";
+    public override string DataObjectName => "monthly_amounts_per_charge_v1";
 
     public override Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition => new()
     {
@@ -49,22 +49,14 @@ public class WholesaleAmountPerChargeQuery(
         { WholesaleResultColumnNames.ChargeCode,                (DeltaTableCommonTypes.String,              false) },
         { WholesaleResultColumnNames.ChargeType,                (DeltaTableCommonTypes.String,              false) },
         { WholesaleResultColumnNames.ChargeOwnerId,             (DeltaTableCommonTypes.String,              false) },
-        { WholesaleResultColumnNames.Resolution,                (DeltaTableCommonTypes.String,              false) },
         { WholesaleResultColumnNames.QuantityUnit,              (DeltaTableCommonTypes.String,              false) },
-        { WholesaleResultColumnNames.MeteringPointType,         (DeltaTableCommonTypes.String,              false) },
-        { WholesaleResultColumnNames.SettlementMethod,          (DeltaTableCommonTypes.String,              true) },
         { WholesaleResultColumnNames.IsTax,                     (DeltaTableCommonTypes.String,              false) },
         { WholesaleResultColumnNames.Currency,                  (DeltaTableCommonTypes.String,              false) },
         { WholesaleResultColumnNames.Time,                      (DeltaTableCommonTypes.Timestamp,           false) },
-        { WholesaleResultColumnNames.Quantity,                  (DeltaTableCommonTypes.Decimal18x3,         false) },
-        { WholesaleResultColumnNames.QuantityQualities,         (DeltaTableCommonTypes.ArrayOfStrings,      true) },
-        { WholesaleResultColumnNames.Price,                     (DeltaTableCommonTypes.Decimal18x3,         true) },
         { WholesaleResultColumnNames.Amount,                    (DeltaTableCommonTypes.Decimal18x3,         true) },
     };
 
-    protected override async Task<WholesaleAmountPerChargeMessageDto> CreateWholesaleResultAsync(
-        DatabricksSqlRow databricksSqlRow,
-        IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
+    protected override async Task<WholesaleMontlyAmountPerChargeMessageDto> CreateWholesaleResultAsync(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
         var gridAreaCode = databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.GridAreaCode);
         var chargeOwnerId = ActorNumber.Create(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.ChargeOwnerId));
@@ -76,12 +68,9 @@ public class WholesaleAmountPerChargeQuery(
             isTax).ConfigureAwait(false);
         var (businessReason, settlementVersion) = BusinessReasonAndSettlementVersionMapper.FromDeltaTableValue(
             databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.CalculationType));
-        var resolution =
-            ResolutionMapper.FromDeltaTableValue(
-                databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.Resolution));
 
-        var chargeType = ChargeTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(WholesaleResultColumnNames.ChargeType));
-        return new WholesaleAmountPerChargeMessageDto(
+        var chargeType = ChargeTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.ChargeType));
+        return new WholesaleMontlyAmountPerChargeMessageDto(
             eventId: _eventId,
             calculationResultId: databricksSqlRow.ToGuid(WholesaleResultColumnNames.ResultId),
             calculationResultVersion: databricksSqlRow.ToLong(WholesaleResultColumnNames.CalculationVersion),
@@ -92,14 +81,11 @@ public class WholesaleAmountPerChargeQuery(
             businessReason: businessReason.Name,
             gridAreaCode: gridAreaCode,
             isTax: isTax,
-            period: PeriodFactory.GetPeriod(timeSeriesPoints, resolution),
+            period: PeriodFactory.GetPeriod(timeSeriesPoints, Resolution.Monthly),
             quantityUnit: MeasurementUnitMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(WholesaleResultColumnNames.QuantityUnit)),
             currency: CurrencyMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.Currency)),
             chargeType: chargeType,
-            resolution: resolution,
             settlementVersion: settlementVersion,
-            meteringPointType: MeteringPointTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.MeteringPointType)),
-            settlementMethod: SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(WholesaleResultColumnNames.SettlementMethod)),
             chargeCode: databricksSqlRow.ToNullableString(WholesaleResultColumnNames.ChargeCode),
             points: timeSeriesPoints
                 .Select(
@@ -108,44 +94,9 @@ public class WholesaleAmountPerChargeQuery(
                         p.Quantity,
                         p.Price,
                         p.Amount,
-                        GetQuantityQuality(p.Price, p.Qualities, chargeType)))
+                        p.Amount != null ? CalculatedQuantityQuality.Calculated : CalculatedQuantityQuality.Missing))
                 .ToList()
                 .AsReadOnly());
-    }
-
-    /// <summary>
-    /// Quantity quality mappings is defined by the business.
-    /// See "https://energinet.atlassian.net/wiki/spaces/D3/pages/529989633/QuantityQuality" for more information.
-    /// </summary>
-    private static CalculatedQuantityQuality GetQuantityQuality(decimal? price, IReadOnlyCollection<QuantityQuality> qualities, ChargeType? chargeType)
-    {
-        if (price == null)
-        {
-            return CalculatedQuantityQuality.Missing;
-        }
-
-        return chargeType == ChargeType.Subscription || chargeType == ChargeType.Fee
-            ? CalculatedQuantityQuality.Calculated
-            : MapQuantityQualitiesToQuality(qualities);
-    }
-
-    private static CalculatedQuantityQuality MapQuantityQualitiesToQuality(
-        IReadOnlyCollection<QuantityQuality> qualities)
-    {
-        ArgumentNullException.ThrowIfNull(qualities);
-
-        return (missing: qualities.Contains(QuantityQuality.Missing),
-                estimated: qualities.Contains(QuantityQuality.Estimated),
-                measured: qualities.Contains(QuantityQuality.Measured),
-                calculated: qualities.Contains(QuantityQuality.Calculated)) switch
-        {
-            (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality.Missing,
-            (missing: true, _, _, _) => CalculatedQuantityQuality.Incomplete,
-            (_, estimated: true, _, _) => CalculatedQuantityQuality.Calculated,
-            (_, _, measured: true, _) => CalculatedQuantityQuality.Calculated,
-            (_, _, _, calculated: true) => CalculatedQuantityQuality.Calculated,
-            _ => CalculatedQuantityQuality.NotAvailable,
-        };
     }
 
     private async Task<ActorNumber> GetChargeOwnerReceiverAsync(string gridAreaCode, ActorNumber chargeOwnerId, bool isTax)
