@@ -187,7 +187,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             wholesaleTotalAmountMessageDto,
             _serializer,
             _systemDateTimeProvider.Now());
-        _ = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
