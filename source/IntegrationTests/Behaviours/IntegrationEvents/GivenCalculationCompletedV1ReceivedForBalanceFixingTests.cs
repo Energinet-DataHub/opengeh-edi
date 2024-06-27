@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -297,8 +299,8 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             EventId.From(Guid.NewGuid()),
             energyResultPerGridAreaTestDataDescription.CalculationId);
 
-        await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerGridAreaQuery);
-        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerGridAreaQuery, energyResultPerGridAreaTestDataDescription.TestFilePath);
+        await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerGridAreaQuery.DataObjectName, energyResultPerGridAreaQuery.SchemaDefinition);
+        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerGridAreaQuery.DataObjectName, energyResultPerGridAreaQuery.SchemaDefinition, energyResultPerGridAreaTestDataDescription.TestFilePath);
         return energyResultPerGridAreaTestDataDescription;
     }
 
@@ -311,8 +313,8 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             EventId.From(Guid.NewGuid()),
             energyResultPerBrpDescription.CalculationId);
 
-        await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerBrpQuery);
-        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerBrpQuery, energyResultPerBrpDescription.TestFilePath);
+        await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerBrpQuery.DataObjectName, energyResultPerBrpQuery.SchemaDefinition);
+        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerBrpQuery.DataObjectName, energyResultPerBrpQuery.SchemaDefinition, energyResultPerBrpDescription.TestFilePath);
         return energyResultPerBrpDescription;
     }
 
@@ -325,8 +327,8 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             EventId.From(Guid.NewGuid()),
             energyResultPerEnergySupplierDescription.CalculationId);
 
-        await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerEnergySupplierQuery);
-        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerEnergySupplierQuery, energyResultPerEnergySupplierDescription.TestFilePath);
+        await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerEnergySupplierQuery.DataObjectName, energyResultPerEnergySupplierQuery.SchemaDefinition);
+        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerEnergySupplierQuery.DataObjectName, energyResultPerEnergySupplierQuery.SchemaDefinition, energyResultPerEnergySupplierDescription.TestFilePath);
         return energyResultPerEnergySupplierDescription;
     }
 

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
@@ -426,7 +427,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
     private async Task SeedDatabricksWithDataAsync(TestDataDescription testDataDescription, IDeltaTableSchemaDescription schemaInfomation)
     {
-        await Fixture.DatabricksSchemaManager.CreateTableAsync(schemaInfomation);
-        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(schemaInfomation, testDataDescription.TestFilePath);
+        await Fixture.DatabricksSchemaManager.CreateTableAsync(schemaInfomation.DataObjectName, schemaInfomation.SchemaDefinition);
+        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(schemaInfomation.DataObjectName, schemaInfomation.SchemaDefinition, testDataDescription.TestFilePath);
     }
 }
