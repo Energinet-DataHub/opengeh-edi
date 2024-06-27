@@ -49,6 +49,7 @@ public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<Act
                 .HasConversion(toDbValue => toDbValue.Id, fromDbValue => BundleId.Create(fromDbValue));
             navigationBuilder.Property<Instant?>("ClosedAt").HasColumnName("ClosedAt");
             navigationBuilder.Property<Instant?>("DequeuedAt").HasColumnName("DequeuedAt");
+            navigationBuilder.Property<Instant?>("PeekedAt").HasColumnName("PeekedAt");
             navigationBuilder.Property<MessageId>("MessageId").HasColumnName("MessageId")
                 .HasConversion(toDb => toDb.Value, fromDb => MessageId.Create(fromDb));
             navigationBuilder.Property<DocumentType>("DocumentTypeInBundle").HasColumnName("DocumentTypeInBundle")
