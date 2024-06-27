@@ -77,7 +77,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         await GivenEnqueueWholesaleResultsForAmountPerChargesAsync(testDataDescription.CalculationId);
 
         // When (act)
-        var peekResultsForSystemOperatorOperator = await WhenActorPeeksAllMessages(
+        var peekResultsForSystemOperator = await WhenActorPeeksAllMessages(
             systemOperator.ActorNumber,
             systemOperator.ActorRole,
             documentFormat);
@@ -93,7 +93,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             documentFormat);
 
         // Then (assert)
-        peekResultsForSystemOperatorOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForSystemOperatorCount);
+        peekResultsForSystemOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForSystemOperatorCount);
         peekResultsForGridOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForGridOwnerCount);
         peekResultsForEnergySupplier.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForEnergySupplierCount);
 
@@ -170,7 +170,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             Points: testMessageData.Points);
 
         await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
-            peekResultsForSystemOperatorOperator,
+            peekResultsForSystemOperator,
             documentFormat,
             expectedDocumentToSystemOperator);
 
@@ -201,7 +201,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         await GivenEnqueueWholesaleResultsForMonthlyAmountPerChargesAsync(testDataDescription.CalculationId);
 
         // When (act)
-        var peekResultsForSystemOperatorOperator = await WhenActorPeeksAllMessages(
+        var peekResultsForSystemOperator = await WhenActorPeeksAllMessages(
             systemOperator.ActorNumber,
             systemOperator.ActorRole,
             documentFormat);
@@ -217,7 +217,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             documentFormat);
 
         // Then (assert)
-        peekResultsForSystemOperatorOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForSystemOperatorCount);
+        peekResultsForSystemOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForSystemOperatorCount);
         peekResultsForGridOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForGridOwnerCount);
         peekResultsForEnergySupplier.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForEnergySupplierCount);
 
@@ -294,7 +294,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             Points: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier.Points);
 
         await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
-            peekResultsForSystemOperatorOperator,
+            peekResultsForSystemOperator,
             documentFormat,
             expectedDocumentToSystemOperator);
 
@@ -325,7 +325,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         await GivenEnqueueWholesaleResultsForTotalAmountAsync(testDataDescription.CalculationId);
 
         // When (act)
-        var peekResultsForSystemOperatorOperator = await WhenActorPeeksAllMessages(
+        var peekResultsForSystemOperator = await WhenActorPeeksAllMessages(
             systemOperator.ActorNumber,
             systemOperator.ActorRole,
             documentFormat);
@@ -341,7 +341,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             documentFormat);
 
         // Then (assert)
-        peekResultsForSystemOperatorOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForSystemOperatorCount);
+        peekResultsForSystemOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForSystemOperatorCount);
         peekResultsForGridOperator.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForGridOwnerCount);
         peekResultsForEnergySupplier.Should().HaveCount(testDataDescription.ExpectedOutgoingMessagesForEnergySupplierCount);
 
@@ -418,7 +418,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             Points: testDataDescription.ExampleWholesaleResultMessageDataForEnergySupplier.Points);
 
         await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
-            peekResultsForSystemOperatorOperator,
+            peekResultsForSystemOperator,
             documentFormat,
             expectedDocumentToSystemOperator);
 
