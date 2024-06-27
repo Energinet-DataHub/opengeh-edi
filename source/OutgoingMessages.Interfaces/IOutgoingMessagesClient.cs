@@ -92,7 +92,7 @@ public interface IOutgoingMessagesClient
     Task EnqueueAndCommitAsync(WholesaleMonthlyAmountPerChargeMessageDto wholesaleMonthlyAmountPerChargeMessageDto, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Enqueue monthly amount per charge messages, handles enqueuing messages to all appropriate parties (Receiver, ChargeOwner) in a single transaction.
+    /// Enqueue amount per charge messages, handles enqueuing messages to all appropriate parties (Receiver, ChargeOwner) in a single transaction.
     /// </summary>
     Task EnqueueAndCommitAsync(WholesaleAmountPerChargeMessageDto wholesaleAmountPerChargeMessageDto, CancellationToken cancellationToken);
 

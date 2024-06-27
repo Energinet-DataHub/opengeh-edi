@@ -22,9 +22,9 @@ public static class ChargeTypeMapper
     public static ChargeType FromDeltaTableValue(string chargeType) =>
         chargeType switch
         {
-            "subscription" => ChargeType.Subscription,
-            "fee" => ChargeType.Fee,
-            "tariff" => ChargeType.Tariff,
+            DeltaTableChargeType.Subscription => ChargeType.Subscription,
+            DeltaTableChargeType.Fee => ChargeType.Fee,
+            DeltaTableChargeType.Tariff => ChargeType.Tariff,
 
             _ => throw new ArgumentOutOfRangeException(
                 nameof(chargeType),
