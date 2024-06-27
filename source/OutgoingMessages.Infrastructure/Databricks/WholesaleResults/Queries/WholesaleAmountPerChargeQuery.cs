@@ -30,7 +30,7 @@ public class WholesaleAmountPerChargeQuery(
     IMasterDataClient masterDataClient,
     EventId eventId,
     Guid calculationId)
-    : WholesaleResultQueryBase<WholesaleAmountPerChargeDto>(
+    : WholesaleResultQueryBase<WholesaleAmountPerChargeMessageDto>(
         ediDatabricksOptions,
         calculationId)
 {
@@ -63,7 +63,7 @@ public class WholesaleAmountPerChargeQuery(
         { WholesaleResultColumnNames.Amount,                    (DeltaTableCommonTypes.Decimal18x3,         true) },
     };
 
-    protected override async Task<WholesaleAmountPerChargeDto> CreateWholesaleResultAsync(
+    protected override async Task<WholesaleAmountPerChargeMessageDto> CreateWholesaleResultAsync(
         DatabricksSqlRow databricksSqlRow,
         IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
@@ -82,7 +82,7 @@ public class WholesaleAmountPerChargeQuery(
                 databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.Resolution));
 
         var chargeType = ChargeTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.ChargeType));
-        return new WholesaleAmountPerChargeDto(
+        return new WholesaleAmountPerChargeMessageDto(
             eventId: _eventId,
             calculationId: databricksSqlRow.ToGuid(WholesaleResultColumnNames.CalculationId),
             calculationResultId: databricksSqlRow.ToGuid(WholesaleResultColumnNames.ResultId),
@@ -92,7 +92,7 @@ public class WholesaleAmountPerChargeQuery(
             chargeOwnerReceiverId: chargeOwnerReceiverId,
             chargeOwnerId: chargeOwnerId,
             businessReason: businessReason.Name,
-            gridAreaCode: databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.GridAreaCode),
+            gridAreaCode: gridAreaCode,
             isTax: isTax,
             period: PeriodFactory.GetPeriod(timeSeriesPoints, resolution),
             quantityUnit: MeasurementUnitMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(WholesaleResultColumnNames.QuantityUnit)),

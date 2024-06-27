@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -20,9 +21,9 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 /// An outgoing message dto with a wholesale result with amount per charge
 /// for an energy supplier and grid owner in a grid area
 /// </summary>
-public class WholesaleAmountPerChargeDto : OutgoingMessageDto
+public class WholesaleAmountPerChargeMessageDto : OutgoingMessageDto
 {
-    public WholesaleAmountPerChargeDto(
+    public WholesaleAmountPerChargeMessageDto(
         EventId eventId,
         Guid calculationId,
         Guid calculationResultId,
@@ -50,8 +51,8 @@ public class WholesaleAmountPerChargeDto : OutgoingMessageDto
             eventId,
             businessReason,
             receiverRole: null!,
-            null!,
-            null!,
+            senderId: DataHubDetails.DataHubActorNumber,
+            senderRole: ActorRole.MeteredDataAdministrator,
             new ExternalId(calculationResultId))
     {
         CalculationId = calculationId;
