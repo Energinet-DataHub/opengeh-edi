@@ -345,8 +345,8 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         var wholesaleResultForMonthlyAmountPerChargeDescription = new WholesaleResultForMonthlyAmountPerChargeDescription();
         var wholesaleMonthlyAmountPerChargeQuery = new WholesaleMonthlyAmountPerChargeQuery(_ediDatabricksOptions.Value,  GetService<IMasterDataClient>(), EventId.From(Guid.NewGuid()), wholesaleResultForMonthlyAmountPerChargeDescription.CalculationId);
 
-        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleMonthlyAmountPerChargeQuery);
-        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleMonthlyAmountPerChargeQuery, wholesaleResultForMonthlyAmountPerChargeDescription.TestFilePath);
+        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleMonthlyAmountPerChargeQuery.DataObjectName, wholesaleMonthlyAmountPerChargeQuery.SchemaDefinition);
+        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleMonthlyAmountPerChargeQuery.DataObjectName, wholesaleMonthlyAmountPerChargeQuery.SchemaDefinition, wholesaleResultForMonthlyAmountPerChargeDescription.TestFilePath);
         return wholesaleResultForMonthlyAmountPerChargeDescription;
     }
 
