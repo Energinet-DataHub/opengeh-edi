@@ -61,7 +61,6 @@ public abstract class EnergyResultQueryBase<TResult>(
 
         Guid? currentResultId = null;
         var currentResultRows = new List<DatabricksSqlRow>();
-        TResult? result = null;
 
         await foreach (var row in databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement).ConfigureAwait(false))
         {
@@ -78,10 +77,7 @@ public abstract class EnergyResultQueryBase<TResult>(
                 continue;
             }
 
-            result = await CreateResultAsync(currentResultRows).ConfigureAwait(false);
-            yield return result == null
-                ? QueryResult<TResult>.Error()
-                : QueryResult<TResult>.Success(result);
+            yield return await CreateResultAsync(currentResultRows).ConfigureAwait(false);
 
             // Next result
             currentResultRows = [];
@@ -92,10 +88,7 @@ public abstract class EnergyResultQueryBase<TResult>(
         // Last result (if any)
         if (currentResultRows.Count != 0)
         {
-            result = await CreateResultAsync(currentResultRows).ConfigureAwait(false);
-            yield return result == null
-                ? QueryResult<TResult>.Error()
-                : QueryResult<TResult>.Success(result);
+            yield return await CreateResultAsync(currentResultRows).ConfigureAwait(false);
         }
     }
 
@@ -119,7 +112,7 @@ public abstract class EnergyResultQueryBase<TResult>(
         return currentResultId == rowResultId;
     }
 
-    private async Task<TResult?> CreateResultAsync(IReadOnlyCollection<DatabricksSqlRow> resultRows)
+    private async Task<QueryResult<TResult>> CreateResultAsync(IReadOnlyCollection<DatabricksSqlRow> resultRows)
     {
         var firstRow = resultRows.First();
         var resultId = firstRow.ToGuid(EnergyResultColumnNames.ResultId);
@@ -134,14 +127,15 @@ public abstract class EnergyResultQueryBase<TResult>(
                 timeSeriesPoints.Add(timeSeriesPoint);
             }
 
-            return await CreateEnergyResultAsync(firstRow, timeSeriesPoints).ConfigureAwait(false);
+            var result = await CreateEnergyResultAsync(firstRow, timeSeriesPoints).ConfigureAwait(false);
+            return QueryResult<TResult>.Success(result);
         }
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Creating energy result failed for CalculationId='{CalculationId}', ResultId='{ResultId}'.", CalculationId, resultId);
         }
 
-        return null;
+        return QueryResult<TResult>.Error();
     }
 
     private string BuildSqlQuery()

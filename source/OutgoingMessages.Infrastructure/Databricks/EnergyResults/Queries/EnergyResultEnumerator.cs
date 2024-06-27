@@ -35,9 +35,9 @@ public class EnergyResultEnumerator(
     {
         var resultCount = 0;
 
-        await foreach (var energyResult in query.GetAsync(_databricksSqlWarehouseQueryExecutor).ConfigureAwait(false))
+        await foreach (var queryResult in query.GetAsync(_databricksSqlWarehouseQueryExecutor).ConfigureAwait(false))
         {
-            yield return energyResult;
+            yield return queryResult;
             resultCount++;
         }
 

@@ -46,16 +46,16 @@ public class EnqueueEnergyResultsForBalanceResponsiblesActivity(
             _energyResultEnumerator.EdiDatabricksOptions,
             EventId.From(input.EventId),
             input.CalculationId);
-        await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
+        await foreach (var queryResult in _energyResultEnumerator.GetAsync(query))
         {
-            if (energyResult.IsSuccess)
+            if (queryResult.IsSuccess)
             {
                 using (var scope = _serviceScopeFactory.CreateScope())
                 {
                     try
                     {
                         var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-                        await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResult.Result!, CancellationToken.None).ConfigureAwait(false);
+                        await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(queryResult.Result!, CancellationToken.None).ConfigureAwait(false);
 
                         numberOfHandledResults++;
                     }
