@@ -13,17 +13,31 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 
 public static class ChargeTypeMapper
 {
-    public static ChargeType? FromDeltaTableValue(string? chargeType) =>
+    public static ChargeType FromDeltaTableValue(string chargeType) =>
         chargeType switch
         {
             "subscription" => ChargeType.Subscription,
             "fee" => ChargeType.Fee,
             "tariff" => ChargeType.Tariff,
+
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(chargeType),
+                actualValue: chargeType,
+                "Value does not contain a valid string representation of a settlement method."),
+        };
+
+    public static ChargeType? FromDeltaTableValueAsNullable(string? chargeType) =>
+        chargeType switch
+        {
+            DeltaTableChargeType.Subscription => ChargeType.Subscription,
+            DeltaTableChargeType.Fee => ChargeType.Fee,
+            DeltaTableChargeType.Tariff => ChargeType.Tariff,
             null => null,
 
             _ => throw new ArgumentOutOfRangeException(

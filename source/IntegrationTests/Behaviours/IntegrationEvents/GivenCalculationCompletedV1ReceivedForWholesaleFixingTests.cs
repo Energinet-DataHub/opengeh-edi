@@ -61,7 +61,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
 
     [Theory]
     [MemberData(nameof(DocumentFormats.AllDocumentFormats), MemberType = typeof(DocumentFormats))]
-    public async Task AndGiven_EnqueueWholesaleResultsForAmountPerCharges_When_GridOperatorAndEnergySupplierPeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
+    public async Task AndGiven_EnqueueWholesaleResultsForAmountPerCharges_When_SystemOperatorAndGridOperatorAndEnergySupplierPeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments(DocumentFormat documentFormat)
     {
         // Given (arrange)
         var testDataDescription = await GivenDatabricksResultDataForWholesaleResultAmountPerCharge();
@@ -104,21 +104,21 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             SenderId: DataHubDetails.DataHubActorNumber.Value,
             SenderRole: ActorRole.MeteredDataAdministrator,
             ChargeTypeOwner: systemOperator.ActorNumber.Value,
-            ChargeCode: "Sub-804",
-            ChargeType: ChargeType.Subscription,
-            Currency: testMessageData.Currency,
-            EnergySupplierNumber: testMessageData.EnergySupplier.Value,
-            SettlementMethod: testMessageData.SettlementMethod,
-            MeteringPointType: testMessageData.MeteringPointType,
-            GridArea: testMessageData.GridArea,
+            ChargeCode: "41000",
+            ChargeType: ChargeType.Tariff,
+            Currency: testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator.Currency,
+            EnergySupplierNumber: testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator.EnergySupplier.Value,
+            SettlementMethod: testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator.SettlementMethod,
+            MeteringPointType: testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator.MeteringPointType,
+            GridArea: testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator.GridArea,
             OriginalTransactionIdReference: null,
             PriceMeasurementUnit: MeasurementUnit.Kwh,
             ProductCode: "5790001330590",
-            QuantityMeasurementUnit: MeasurementUnit.Pieces,
-            CalculationVersion: testMessageData.Version,
-            Resolution: testMessageData.Resolution,
+            QuantityMeasurementUnit: MeasurementUnit.Kwh,
+            CalculationVersion: testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator.Version,
+            Resolution: testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator.Resolution,
             Period: testDataDescription.Period,
-            Points: testMessageData.Points);
+            Points: testDataDescription.ExampleWholesaleResultMessageDataForSystemOperator.Points);
 
         var expectedDocumentToChargeOwner = new NotifyWholesaleServicesDocumentAssertionInput(
             Timestamp: "2023-09-07T13:37:05Z",
@@ -167,6 +167,11 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             Resolution: testMessageData.Resolution,
             Period: testDataDescription.Period,
             Points: testMessageData.Points);
+
+        await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
+            peekResultsForSystemOperatorOperator,
+            documentFormat,
+            expectedDocumentToSystemOperator);
 
         await ThenOneOfNotifyAggregatedMeasureDataDocumentsAreCorrect(
             peekResultsForGridOperator,

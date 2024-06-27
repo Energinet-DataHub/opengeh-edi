@@ -12,18 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-/// <summary>
-/// An outgoing message dto with a wholesale result with amount per charge
-/// for an energy supplier and grid owner in a grid area
-/// </summary>
-public class WholesaleAmountPerChargeMessageDto : OutgoingMessageDto
+public class WholesaleMontlyAmountPerChargeDto : OutgoingMessageDto
 {
-    public WholesaleAmountPerChargeMessageDto(
+    public WholesaleMontlyAmountPerChargeDto(
         EventId eventId,
         Guid calculationId,
         Guid calculationResultId,
@@ -38,10 +33,7 @@ public class WholesaleAmountPerChargeMessageDto : OutgoingMessageDto
         MeasurementUnit quantityUnit,
         Currency currency,
         ChargeType chargeType,
-        Resolution resolution,
         SettlementVersion? settlementVersion,
-        MeteringPointType? meteringPointType,
-        SettlementMethod? settlementMethod,
         string? chargeCode,
         IReadOnlyCollection<WholesaleServicesPoint> points)
         : base(
@@ -51,11 +43,12 @@ public class WholesaleAmountPerChargeMessageDto : OutgoingMessageDto
             eventId,
             businessReason,
             receiverRole: null!,
-            senderId: DataHubDetails.DataHubActorNumber,
-            senderRole: ActorRole.MeteredDataAdministrator,
+            null!,
+            null!,
             new ExternalId(calculationResultId))
     {
         CalculationId = calculationId;
+        CalculationResultId = calculationResultId;
         EnergySupplierReceiverId = energySupplierReceiverId;
         ChargeOwnerReceiverId = chargeOwnerReceiverId;
 
@@ -75,13 +68,15 @@ public class WholesaleAmountPerChargeMessageDto : OutgoingMessageDto
             PriceMeasureUnit: MeasurementUnit.Kwh,
             Currency: currency,
             ChargeType: chargeType,
-            Resolution: resolution,
-            MeteringPointType: meteringPointType,
+            Resolution: Resolution.Monthly,
+            MeteringPointType: null,
             null,
-            SettlementMethod: settlementMethod);
+            SettlementMethod: null);
     }
 
     public Guid CalculationId { get; }
+
+    public Guid CalculationResultId { get; }
 
     public ActorNumber EnergySupplierReceiverId { get; }
 

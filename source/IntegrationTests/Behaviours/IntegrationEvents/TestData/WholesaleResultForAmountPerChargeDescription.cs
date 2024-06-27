@@ -69,4 +69,44 @@ public class WholesaleResultForAmountPerChargeDescription
         65,
         Points: TimeSeriesPointsFactory
             .CreatePointsForPeriod(Period, Resolution.Daily, 0.348m, 2, 0.697M, QuantityQuality.Calculated));
+
+    public ExampleWholesaleResultMessageForActor ExampleWholesaleResultMessageDataForSystemOperator => new(
+        GridArea: GridAreaCode,
+        Currency.DanishCrowns,
+        ActorNumber.Create("5790001662233"),
+        MeteringPointType.Consumption,
+        SettlementMethod.Flex,
+        Resolution.Daily,
+        65,
+        Points: new List<WholesaleServicesRequestSeries.Types.Point>()
+        {
+            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1117.728m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1963.846m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(0.000m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(0.000m), QuantityQualities = { QuantityQuality.Missing } },
+            new() { Quantity = DecimalValue.FromDecimal(0.000m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(0.000m), QuantityQualities = { QuantityQuality.Missing } },
+            new() { Quantity = DecimalValue.FromDecimal(0.000m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(0.000m), QuantityQualities = { QuantityQuality.Missing } },
+            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
+            new() { Quantity = DecimalValue.FromDecimal(1002.720m), Price = DecimalValue.FromDecimal(1.757m), Amount = DecimalValue.FromDecimal(1761.777m), QuantityQualities = { QuantityQuality.Calculated } },
+        });
 }

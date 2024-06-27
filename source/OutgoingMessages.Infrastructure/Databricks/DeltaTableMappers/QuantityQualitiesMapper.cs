@@ -28,7 +28,7 @@ public static class QuantityQualitiesMapper
 
     public static IReadOnlyCollection<QuantityQuality> TryFromDeltaTableValue(string? value)
     {
-        if (value is null)
+        if (string.IsNullOrWhiteSpace(value))
             return new List<QuantityQuality>();
 
         var qualities = JsonSerializer.Deserialize<string[]>(value)!;
