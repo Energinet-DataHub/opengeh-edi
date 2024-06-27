@@ -16,13 +16,9 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-/// <summary>
-/// An outgoing message dto with a wholesale result with amount per charge
-/// for an energy supplier and grid owner in a grid area
-/// </summary>
-public class WholesaleAmountPerChargeDto : OutgoingMessageDto
+public class WholesaleMontlyAmountPerChargeDto : OutgoingMessageDto
 {
-    public WholesaleAmountPerChargeDto(
+    public WholesaleMontlyAmountPerChargeDto(
         EventId eventId,
         Guid calculationId,
         Guid calculationResultId,
@@ -37,10 +33,7 @@ public class WholesaleAmountPerChargeDto : OutgoingMessageDto
         MeasurementUnit quantityUnit,
         Currency currency,
         ChargeType chargeType,
-        Resolution resolution,
         SettlementVersion? settlementVersion,
-        MeteringPointType? meteringPointType,
-        SettlementMethod? settlementMethod,
         string? chargeCode,
         IReadOnlyCollection<WholesaleServicesPoint> points)
         : base(
@@ -55,6 +48,7 @@ public class WholesaleAmountPerChargeDto : OutgoingMessageDto
             new ExternalId(calculationResultId))
     {
         CalculationId = calculationId;
+        CalculationResultId = calculationResultId;
         EnergySupplierReceiverId = energySupplierReceiverId;
         ChargeOwnerReceiverId = chargeOwnerReceiverId;
 
@@ -74,13 +68,15 @@ public class WholesaleAmountPerChargeDto : OutgoingMessageDto
             PriceMeasureUnit: MeasurementUnit.Kwh,
             Currency: currency,
             ChargeType: chargeType,
-            Resolution: resolution,
-            MeteringPointType: meteringPointType,
+            Resolution: Resolution.Monthly,
+            MeteringPointType: null,
             null,
-            SettlementMethod: settlementMethod);
+            SettlementMethod: null);
     }
 
     public Guid CalculationId { get; }
+
+    public Guid CalculationResultId { get; }
 
     public ActorNumber EnergySupplierReceiverId { get; }
 

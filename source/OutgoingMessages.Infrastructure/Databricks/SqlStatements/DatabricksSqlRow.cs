@@ -32,10 +32,9 @@ public class DatabricksSqlRow(IDictionary<string, object?> columns)
 
     public string? ToNullableString(string columnName)
     {
-        var value = _columns[columnName];
-        return value == null
-            ? null
-            : Convert.ToString(value);
+        return _columns.TryGetValue(columnName, out var value) && value != null
+            ? Convert.ToString(value)
+            : null;
     }
 
     public string ToNonEmptyString(string columnName)
@@ -65,9 +64,9 @@ public class DatabricksSqlRow(IDictionary<string, object?> columns)
     {
         var value = ToNullableString(columnName);
 
-        return value is not null ?
-            decimal.Parse(value, CultureInfo.InvariantCulture)
-            : null;
+        return string.IsNullOrWhiteSpace(value)
+            ? null
+            : decimal.Parse(value, CultureInfo.InvariantCulture);
     }
 
     /// <summary>

@@ -22,7 +22,7 @@ public record ExampleWholesaleResultMessageForActor(
     string GridArea,
     Currency Currency,
     ActorNumber EnergySupplier,
-    MeteringPointType MeteringPointType,
+    MeteringPointType? MeteringPointType,
     SettlementMethod? SettlementMethod,
     Resolution Resolution,
     int Version,
