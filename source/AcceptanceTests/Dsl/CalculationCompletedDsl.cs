@@ -48,7 +48,7 @@ public sealed class CalculationCompletedDsl
 
     internal async Task PublishForBalanceFixingCalculation()
     {
-        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+        await _ediDriver.EmptyQueueAsync();
         await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(_balanceFixingCalculationId);
 
         await StartAndWaitForOrchestrationToComplete(
@@ -58,7 +58,7 @@ public sealed class CalculationCompletedDsl
 
     internal async Task PublishForWholesaleFixingCalculation()
     {
-        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
+        await _ediDriver.EmptyQueueAsync();
         await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(_wholesaleFixingCalculationId);
 
         await StartAndWaitForOrchestrationToComplete(
@@ -101,7 +101,7 @@ public sealed class CalculationCompletedDsl
     }
 
     /// <summary>
-    /// Asserts that 19 wholesale results and 5 energy results are available for the actor 5790000392551 as MDR when
+    /// Asserts that 28 wholesale results and 5 energy results are available for the actor 5790000392551 as MDR when
     /// the calculation is a wholesale fixing in the period 1/2/2023 - 28/2/2023 for grid area 804
     /// Calculation on d002: https://dev002.datahub3.dk/wholesale/calculations?id=13d57d2d-7e97-410e-9856-85554281770e
     /// TODO: Verify that the above is the correct number of energy/wholesale results for actor 5790000392551 as MDR
@@ -127,7 +127,7 @@ public sealed class CalculationCompletedDsl
         var notifyWholesaleServicesDocuments = responseDocuments
             .Where(document => document.Contains("NotifyWholesaleServices_MarketDocument"))
             .ToList();
-        notifyWholesaleServicesDocuments.Should().HaveCount(19, $"because there should be 19 wholesale results for actor 5790000392551 as MDR in the calculation {_wholesaleFixingCalculationId}");
+        notifyWholesaleServicesDocuments.Should().HaveCount(28, $"because there should be 28 wholesale results for actor 5790000392551 as MDR in the calculation {_wholesaleFixingCalculationId}");
 
         var notifyAggregatedMeasureDataDocuments = responseDocuments
             .Where(document => document.Contains("NotifyAggregatedMeasureData_MarketDocument"))
