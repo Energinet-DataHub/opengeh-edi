@@ -82,14 +82,19 @@ public interface IOutgoingMessagesClient
     Task EnqueueAndCommitAsync(WholesaleServicesMessageDto wholesaleServicesMessage, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Enqueue wholesale monthly amount per charge messages, handles enqueuing messages to all appropriate parties (Receiver, ChargeOwner) in a single transaction.
+    /// Enqueue wholesale total amount messages, handles enqueuing messages to receiver in a single transaction.
     /// </summary>
-    Task EnqueueAndCommitAsync(WholesaleMontlyAmountPerChargeDto wholesaleAmountPerChargeDto, CancellationToken cancellationToken);
+    Task EnqueueAndCommitAsync(WholesaleTotalAmountMessageDto wholesaleTotalAmountMessageDto, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Enqueue monthly amount per charge messages, handles enqueuing messages to all appropriate parties (Receiver, ChargeOwner) in a single transaction.
+    /// Enqueue wholesale monthly amount per charge messages, handles enqueuing messages to all appropriate parties (Receiver, ChargeOwner) in a single transaction.
     /// </summary>
-    Task EnqueueAndCommitAsync(WholesaleAmountPerChargeDto wholesaleAmountPerChargeDto, CancellationToken cancellationToken);
+    Task EnqueueAndCommitAsync(WholesaleMonthlyAmountPerChargeMessageDto wholesaleMonthlyAmountPerChargeMessageDto, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Enqueue amount per charge messages, handles enqueuing messages to all appropriate parties (Receiver, ChargeOwner) in a single transaction.
+    /// </summary>
+    Task EnqueueAndCommitAsync(WholesaleAmountPerChargeMessageDto wholesaleAmountPerChargeMessageDto, CancellationToken cancellationToken);
 
     /// <summary>
     /// Enqueue an accepted wholesale services message, no commit. Currently ONLY used by the Process module which handles the commit itself.

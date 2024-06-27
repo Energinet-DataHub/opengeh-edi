@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Microsoft.Azure.Functions.Worker;
@@ -22,24 +21,21 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
-public class EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
+public class EnqueueWholesaleResultsForTotalAmountsActivity(
     IServiceScopeFactory serviceScopeFactory,
-    IMasterDataClient masterDataClient,
     WholesaleResultEnumerator wholesaleResultEnumerator)
 {
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
-    private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly WholesaleResultEnumerator _wholesaleResultEnumerator = wholesaleResultEnumerator;
 
-    [Function(nameof(EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity))]
+    [Function(nameof(EnqueueWholesaleResultsForTotalAmountsActivity))]
     public async Task<int> Run([ActivityTrigger] EnqueueMessagesInput input)
     {
         var numberOfHandledResults = 0;
         var numberOfFailedResults = 0;
 
-        var query = new WholesaleMonthlyAmountPerChargeQuery(
+        var query = new WholesaleTotalAmountQuery(
             _wholesaleResultEnumerator.EdiDatabricksOptions,
-            _masterDataClient,
             EventId.From(input.EventId),
             input.CalculationId);
         await foreach (var wholesaleResult in _wholesaleResultEnumerator.GetAsync(query))

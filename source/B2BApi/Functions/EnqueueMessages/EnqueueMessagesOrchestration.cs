@@ -37,7 +37,7 @@ internal class EnqueueMessagesOrchestration
         var enqueueRetryOptions = CreateEnqueueRetryOptions();
 
         // Fan-out/fan-in => https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-cloud-backup?tabs=csharp
-        var tasks = new Task<int>[5];
+        var tasks = new Task<int>[6];
         tasks[0] = context.CallActivityAsync<int>(
             nameof(EnqueueEnergyResultsForGridAreaOwnersActivity),
             new EnqueueMessagesInput(input.CalculationId, input.EventId),
@@ -60,6 +60,11 @@ internal class EnqueueMessagesOrchestration
 
         tasks[4] = context.CallActivityAsync<int>(
             nameof(EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity),
+            new EnqueueMessagesInput(input.CalculationId, input.EventId),
+            options: enqueueRetryOptions);
+
+        tasks[5] = context.CallActivityAsync<int>(
+            nameof(EnqueueWholesaleResultsForTotalAmountsActivity),
             new EnqueueMessagesInput(input.CalculationId, input.EventId),
             options: enqueueRetryOptions);
 

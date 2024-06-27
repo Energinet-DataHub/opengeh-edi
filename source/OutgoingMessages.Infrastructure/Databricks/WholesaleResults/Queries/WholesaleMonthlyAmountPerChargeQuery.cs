@@ -30,7 +30,7 @@ public class WholesaleMonthlyAmountPerChargeQuery(
     IMasterDataClient masterDataClient,
     EventId eventId,
     Guid calculationId)
-    : WholesaleResultQueryBase<WholesaleMontlyAmountPerChargeDto>(
+    : WholesaleResultQueryBase<WholesaleMonthlyAmountPerChargeMessageDto>(
         ediDatabricksOptions,
         calculationId)
 {
@@ -57,7 +57,7 @@ public class WholesaleMonthlyAmountPerChargeQuery(
         { WholesaleResultColumnNames.Amount,                    (DeltaTableCommonTypes.Decimal18x3,         true) },
     };
 
-    protected override async Task<WholesaleMontlyAmountPerChargeDto> CreateWholesaleResultAsync(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
+    protected override async Task<WholesaleMonthlyAmountPerChargeMessageDto> CreateWholesaleResultAsync(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
         var gridAreaCode = databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.GridAreaCode);
         var chargeOwnerId = ActorNumber.Create(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.ChargeOwnerId));
@@ -71,7 +71,7 @@ public class WholesaleMonthlyAmountPerChargeQuery(
             databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.CalculationType));
 
         var chargeType = ChargeTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.ChargeType));
-        return new WholesaleMontlyAmountPerChargeDto(
+        return new WholesaleMonthlyAmountPerChargeMessageDto(
             eventId: _eventId,
             calculationId: databricksSqlRow.ToGuid(WholesaleResultColumnNames.CalculationId),
             calculationResultId: databricksSqlRow.ToGuid(WholesaleResultColumnNames.ResultId),
@@ -81,7 +81,7 @@ public class WholesaleMonthlyAmountPerChargeQuery(
             chargeOwnerReceiverId: chargeOwnerReceiverId,
             chargeOwnerId: chargeOwnerId,
             businessReason: businessReason.Name,
-            gridAreaCode: databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.GridAreaCode),
+            gridAreaCode: gridAreaCode,
             isTax: isTax,
             period: PeriodFactory.GetPeriod(timeSeriesPoints, Resolution.Monthly),
             quantityUnit: MeasurementUnitMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(WholesaleResultColumnNames.QuantityUnit)),

@@ -29,9 +29,9 @@ public class WholesaleAmountPerChargeDtoBuilder
     private ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private Guid _calculationResultId;
 
-    public WholesaleAmountPerChargeDto Build()
+    public WholesaleAmountPerChargeMessageDto Build()
     {
-        return new WholesaleAmountPerChargeDto(
+        return new WholesaleAmountPerChargeMessageDto(
             eventId: _eventId,
             calculationId: _calculationId,
             calculationResultId: _calculationResultId,

@@ -17,14 +17,15 @@ using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using NodaTime;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
 
-public class WholesaleResultForMonthlyAmountPerChargeDescription
+public class WholesaleResultForTotalAmountDescription
     : TestDataDescription
 {
     /// <summary>
-    /// Test data description for scenario using the view described by <see cref="WholesaleMonthlyAmountPerChargeQuery"/>.
+    /// Test data description for scenario using the view described by <see cref="WholesaleTotalAmountQuery"/>.
     /// </summary>
     /// <remarks>
     /// Test data is exported from Databricks using the view 'wholesale_results_amount_per_charge'
@@ -36,8 +37,8 @@ public class WholesaleResultForMonthlyAmountPerChargeDescription
     ///    and calculation_version  = 65
     /// Environment: Dev002.
     /// </remarks>
-    public WholesaleResultForMonthlyAmountPerChargeDescription()
-        : base("wholesale_fixing_01-02-2023_28-02-2023_ga_804_monthly_amount_per_charge_v1.csv")
+    public WholesaleResultForTotalAmountDescription()
+        : base("wholesale_fixing_01-02-2023_28-02-2023_ga_804_total_amount_v1.csv")
     {
     }
 
@@ -45,13 +46,13 @@ public class WholesaleResultForMonthlyAmountPerChargeDescription
 
     public override string GridAreaCode => "804";
 
-    public override int ExpectedCalculationResultsCount => 7;
+    public override int ExpectedCalculationResultsCount => 3;
 
-    public int ExpectedOutgoingMessagesForSystemOperatorCount => 3;
+    public int ExpectedOutgoingMessagesForSystemOperatorCount => 1;
 
-    public int ExpectedOutgoingMessagesForGridOwnerCount => 4;
+    public int ExpectedOutgoingMessagesForGridOwnerCount => 1;
 
-    public int ExpectedOutgoingMessagesForEnergySupplierCount => ExpectedCalculationResultsCount;
+    public int ExpectedOutgoingMessagesForEnergySupplierCount => 1;
 
     public override Period Period => new(
         Instant.FromUtc(2023, 1, 31, 23, 0, 0),
@@ -66,7 +67,7 @@ public class WholesaleResultForMonthlyAmountPerChargeDescription
         Resolution.Monthly,
         65,
         Points: TimeSeriesPointsFactory
-            .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 61754.247M, null));
+            .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 128533.784M, null));
 
     public ExampleWholesaleResultMessageForActor ExampleWholesaleResultMessageDataForChargeOwner => new(
         GridArea: GridAreaCode,
@@ -77,7 +78,7 @@ public class WholesaleResultForMonthlyAmountPerChargeDescription
         Resolution.Monthly,
         65,
         Points: TimeSeriesPointsFactory
-            .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 19.514m, null));
+            .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 220886.159m, null));
 
     public ExampleWholesaleResultMessageForActor ExampleWholesaleResultMessageDataForEnergySupplier => new(
         GridArea: GridAreaCode,
@@ -88,5 +89,5 @@ public class WholesaleResultForMonthlyAmountPerChargeDescription
         Resolution.Monthly,
         65,
         Points: TimeSeriesPointsFactory
-            .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 19.514m, null));
+            .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 349419.943m, null));
 }

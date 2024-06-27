@@ -121,12 +121,14 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var perBrpAndEsGridAreaDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
         var forAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
         var forMonthlyAmountPerChargeDescription = new WholesaleResultForMonthlyAmountPerChargeDescription();
+        var forTotalAmountDescription = new WholesaleResultForTotalAmountDescription();
         var calculationId = await ClearAndAddDatabricksData(
             perGridAreaDataDescription,
             perBrpGridAreaDataDescription,
             perBrpAndEsGridAreaDataDescription,
             forAmountPerChargeDescription,
-            forMonthlyAmountPerChargeDescription);
+            forMonthlyAmountPerChargeDescription,
+            forTotalAmountDescription);
 
         var calculationOrchestrationId = Guid.NewGuid().ToString();
         var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
@@ -163,6 +165,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", perBrpAndEsGridAreaDataDescription.ExpectedCalculationResultsCount.ToString()),
             ("EnqueueWholesaleResultsForAmountPerChargesActivity", "0"),
             ("EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity", "0"),
+            ("EnqueueWholesaleResultsForTotalAmountsActivity", "0"),
             ("SendActorMessagesEnqueuedActivity", null),
             (null, "Success"),
         ]);
@@ -218,12 +221,14 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var perBrpAndEsGridAreaDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
         var forAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
         var forMonthlyAmountPerChargeDescription = new WholesaleResultForMonthlyAmountPerChargeDescription();
+        var forTotalAmountDescription = new WholesaleResultForTotalAmountDescription();
         await ClearAndAddDatabricksData(
             perGridAreaDataDescription,
             perBrpGridAreaDataDescription,
             perBrpAndEsGridAreaDataDescription,
             forAmountPerChargeDescription,
-            forMonthlyAmountPerChargeDescription);
+            forMonthlyAmountPerChargeDescription,
+            forTotalAmountDescription);
         var calculationId = forAmountPerChargeDescription.CalculationId;
 
         var calculationOrchestrationId = Guid.NewGuid().ToString();
@@ -261,6 +266,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", "0"),
             ("EnqueueWholesaleResultsForAmountPerChargesActivity", forAmountPerChargeDescription.ExpectedCalculationResultsCount.ToString()),
             ("EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity", forMonthlyAmountPerChargeDescription.ExpectedCalculationResultsCount.ToString()),
+            ("EnqueueWholesaleResultsForTotalAmountsActivity", forTotalAmountDescription.ExpectedCalculationResultsCount.ToString()),
             ("SendActorMessagesEnqueuedActivity", null),
             (null, "Success"),
         ]);
@@ -322,6 +328,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", null),
             ("EnqueueWholesaleResultsForAmountPerChargesActivity", null),
             ("EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity", null),
+            ("EnqueueWholesaleResultsForTotalAmountsActivity", null),
         };
 
         // Act
@@ -395,7 +402,8 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         EnergyResultPerBrpGridAreaDescription perBrpGridAreaDataDescription,
         EnergyResultPerEnergySupplierBrpGridAreaDescription perBrpAndEsGridAreaDataDescription,
         WholesaleResultForAmountPerChargeDescription forAmountPerChargeDescription,
-        WholesaleResultForMonthlyAmountPerChargeDescription forMonthlyAmountPerChargeDescription)
+        WholesaleResultForMonthlyAmountPerChargeDescription forMonthlyAmountPerChargeDescription,
+        WholesaleResultForTotalAmountDescription forTotalAmountDescription)
     {
         // Ensure that databricks does not contain data, unless the test explicit adds it
         if (Fixture.DatabricksSchemaManager.SchemaExists)
@@ -420,7 +428,10 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var forMonthlyAmountPerChargeQuery = new WholesaleMonthlyAmountPerChargeQuery(ediDatabricksOptions.Value, null!, null!, forMonthlyAmountPerChargeDescription.CalculationId);
         var forMonthlyAmountPerChargeTask = SeedDatabricksWithDataAsync(forMonthlyAmountPerChargeDescription, forMonthlyAmountPerChargeQuery);
 
-        await Task.WhenAll(perGridAreTask, perBrpGriaAreaTask, perBrpAndESGridAreTask, forAmountPerChargeTask, forMonthlyAmountPerChargeTask);
+        var forTotalAmountQuery = new WholesaleTotalAmountQuery(ediDatabricksOptions.Value, null!, forTotalAmountDescription.CalculationId);
+        var forTotalAmountTask = SeedDatabricksWithDataAsync(forTotalAmountDescription, forTotalAmountQuery);
+
+        await Task.WhenAll(perGridAreTask, perBrpGriaAreaTask, perBrpAndESGridAreTask, forAmountPerChargeTask, forMonthlyAmountPerChargeTask, forTotalAmountTask);
 
         return perGridAreaDataDescription.CalculationId;
     }
