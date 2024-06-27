@@ -22,7 +22,7 @@ limitations under the License.
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="dbup-sqlserver" Version="5.0.8" />
+    <PackageReference Include="dbup-sqlserver" Version="5.0.40" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.10.48">
@@ -187,6 +187,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202406191315 Add ExternalId to OutgoingMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202406260914 Undo bundle column updates for d002.sql" />
     <EmbeddedResource Include="Scripts\Model\202406260915 Bundle IsClosed IsDequeued DateTime.sql" />
+    <EmbeddedResource Include="Scripts\Model\202406261000 Bundle PeekedAt.sql" />
     <EmbeddedResource Include="Scripts\Model\202406251107 Add CalculationId to OutgoingMessages.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />

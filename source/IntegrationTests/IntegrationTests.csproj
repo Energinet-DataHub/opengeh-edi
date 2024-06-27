@@ -22,8 +22,8 @@ limitations under the License.
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CsvHelper" Version="32.0.3" />
-        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="5.1.2" />
+        <PackageReference Include="CsvHelper" Version="33.0.1" />
+        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="5.3.0" />
         <PackageReference Include="FluentAssertions" Version="6.12.0" />
         <PackageReference Include="FluentAssertions.Analyzers" Version="0.32.0">
           <PrivateAssets>all</PrivateAssets>
@@ -31,19 +31,19 @@ limitations under the License.
         </PackageReference>
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Core" Version="1.18.0" />
         <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
         <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.10.48">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
-        <PackageReference Include="xunit" Version="2.7.1" />
+        <PackageReference Include="xunit" Version="2.8.1" />
         <PackageReference Include="xunit.categories" Version="2.0.8" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.8.1">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="coverlet.collector" Version="6.0.0">
+        <PackageReference Include="coverlet.collector" Version="6.0.2">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
@@ -140,6 +140,9 @@ limitations under the License.
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Behaviours\IntegrationEvents\TestData\wholesale_fixing_01-02-2023_28-02-2023_ga_804_amount_per_charge_v1.csv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Behaviours\IntegrationEvents\TestData\wholesale_fixing_01-02-2023_28-02-2023_ga_804_monthly_amount_per_charge_v1.csv">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
