@@ -53,7 +53,6 @@ public class EnqueueEnergyResultsForBalanceResponsiblesActivity(
                 try
                 {
                     var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-                    // TODO: Did not use returned "numberOfEnqueuedMessages", let's talk
                     await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResult, CancellationToken.None).ConfigureAwait(false);
 
                     numberOfHandledResults++;
