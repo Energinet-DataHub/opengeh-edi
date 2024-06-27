@@ -34,6 +34,7 @@ public class WhenCalculationCompletedIsPublishedTests : BaseTestClass
             fixture,
             new EdiDriver(
                 fixture.B2BMeteredDataResponsibleAuthorizedHttpClient, output),
+            new EdiDatabaseDriver(fixture.ConnectionString),
             new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
     }
 

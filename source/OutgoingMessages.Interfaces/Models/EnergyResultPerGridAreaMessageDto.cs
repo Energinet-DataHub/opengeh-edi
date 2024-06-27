@@ -36,7 +36,8 @@ public class EnergyResultPerGridAreaMessageDto
         IReadOnlyCollection<EnergyResultMessagePoint> points,
         long calculationResultVersion,
         SettlementVersion? settlementVersion,
-        Guid calculationResultId)
+        Guid calculationResultId,
+        Guid calculationId)
             : base(
             documentType: DocumentType.NotifyAggregatedMeasureData,
             processId: null,
@@ -49,6 +50,8 @@ public class EnergyResultPerGridAreaMessageDto
             externalId: new ExternalId(calculationResultId),
             relatedToMessageId: null)
     {
+        CalculationId = calculationId;
+
         Series = new EnergyResultMessageTimeSeries(
             TransactionId.New(),
             gridArea,
@@ -67,4 +70,6 @@ public class EnergyResultPerGridAreaMessageDto
     }
 
     public EnergyResultMessageTimeSeries Series { get; }
+
+    public Guid CalculationId { get; }
 }

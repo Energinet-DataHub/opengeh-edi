@@ -80,6 +80,7 @@ public class EnergyResultPerGridAreaQuery(
 
         var messageDto = new EnergyResultPerGridAreaMessageDto(
             eventId: _eventId,
+            calculationId: databricksSqlRow.ToGuid(EnergyResultColumnNames.CalculationId),
             calculationResultId: databricksSqlRow.ToGuid(EnergyResultColumnNames.ResultId),
             calculationResultVersion: databricksSqlRow.ToLong(EnergyResultColumnNames.CalculationVersion),
             businessReason: businessReason,

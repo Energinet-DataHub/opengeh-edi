@@ -22,18 +22,18 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 public sealed class AggregatedMeasureDataRequestDsl
 {
     private readonly EdiDriver _ediDriver;
-    private readonly EdiProcessesDriver _ediProcessesDriver;
+    private readonly EdiDatabaseDriver _ediDatabaseDriver;
     private readonly WholesaleDriver _wholesaleDriver;
 
 #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
 
     internal AggregatedMeasureDataRequestDsl(
         EdiDriver ediDriver,
-        EdiProcessesDriver ediProcessesDriver,
+        EdiDatabaseDriver ediDatabaseDriver,
         WholesaleDriver wholesaleDriver)
     {
         _ediDriver = ediDriver;
-        _ediProcessesDriver = ediProcessesDriver;
+        _ediDatabaseDriver = ediDatabaseDriver;
         _wholesaleDriver = wholesaleDriver;
     }
 
@@ -67,7 +67,7 @@ public sealed class AggregatedMeasureDataRequestDsl
         Guid requestMessageId,
         CancellationToken cancellationToken)
     {
-        var processId = await _ediProcessesDriver
+        var processId = await _ediDatabaseDriver
             .GetAggregatedMeasureDataProcessIdAsync(requestMessageId, cancellationToken)
             .ConfigureAwait(false);
 
@@ -81,7 +81,7 @@ public sealed class AggregatedMeasureDataRequestDsl
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
 
-        var processId = await _ediProcessesDriver
+        var processId = await _ediDatabaseDriver
             .CreateAggregatedMeasureDataProcessAsync(gridAreaCode, actorNumber, cancellationToken)
             .ConfigureAwait(false);
 
@@ -98,7 +98,7 @@ public sealed class AggregatedMeasureDataRequestDsl
     {
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
 
-        var processId = await _ediProcessesDriver
+        var processId = await _ediDatabaseDriver
             .CreateAggregatedMeasureDataProcessAsync(gridAreaCode, actorNumber, cancellationToken)
             .ConfigureAwait(false);
 
