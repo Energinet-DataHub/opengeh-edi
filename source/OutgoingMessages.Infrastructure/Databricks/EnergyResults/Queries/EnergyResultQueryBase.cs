@@ -51,7 +51,7 @@ public abstract class EnergyResultQueryBase<TResult>(
     /// </summary>
     public abstract Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition { get; }
 
-    internal async IAsyncEnumerable<TResult> GetAsync(DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor)
+    internal async IAsyncEnumerable<QueryResult<TResult>> GetAsync(DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor)
     {
         ArgumentNullException.ThrowIfNull(databricksSqlWarehouseQueryExecutor);
 
@@ -79,10 +79,9 @@ public abstract class EnergyResultQueryBase<TResult>(
             }
 
             result = await CreateResultAsync(currentResultRows).ConfigureAwait(false);
-            if (result != null)
-            {
-                yield return result;
-            }
+            yield return result == null
+                ? QueryResult<TResult>.Error()
+                : QueryResult<TResult>.Success(result);
 
             // Next result
             currentResultRows = [];
@@ -94,10 +93,9 @@ public abstract class EnergyResultQueryBase<TResult>(
         if (currentResultRows.Count != 0)
         {
             result = await CreateResultAsync(currentResultRows).ConfigureAwait(false);
-            if (result != null)
-            {
-                yield return result;
-            }
+            yield return result == null
+                ? QueryResult<TResult>.Error()
+                : QueryResult<TResult>.Success(result);
         }
     }
 

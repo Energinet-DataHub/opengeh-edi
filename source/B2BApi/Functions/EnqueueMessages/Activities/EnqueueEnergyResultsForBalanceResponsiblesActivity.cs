@@ -48,20 +48,27 @@ public class EnqueueEnergyResultsForBalanceResponsiblesActivity(
             input.CalculationId);
         await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
         {
-            using (var scope = _serviceScopeFactory.CreateScope())
+            if (energyResult.IsSuccess)
             {
-                try
+                using (var scope = _serviceScopeFactory.CreateScope())
                 {
-                    var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-                    await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResult, CancellationToken.None).ConfigureAwait(false);
+                    try
+                    {
+                        var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+                        await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResult.Result!, CancellationToken.None).ConfigureAwait(false);
 
-                    numberOfHandledResults++;
+                        numberOfHandledResults++;
+                    }
+                    catch (Exception ex)
+                    {
+                        numberOfFailedResults++;
+                        _logger.LogWarning(ex, "Enqueue and commit of energy result failed for CalculationId='{CalculationId}'.", input.CalculationId);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    numberOfFailedResults++;
-                    _logger.LogWarning(ex, "Enqueue and commit of energy result failed for CalculationId='{CalculationId}'.", input.CalculationId);
-                }
+            }
+            else
+            {
+                numberOfFailedResults++;
             }
         }
 
