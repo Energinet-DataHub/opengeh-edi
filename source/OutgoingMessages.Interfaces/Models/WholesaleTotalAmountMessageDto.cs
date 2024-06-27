@@ -21,6 +21,7 @@ public class WholesaleTotalAmountMessageDto : OutgoingMessageDto
 {
     public WholesaleTotalAmountMessageDto(
         EventId eventId,
+        Guid calculationId,
         Guid calculationResultId,
         long calculationResultVersion,
         ActorNumber receiverNumber,
@@ -43,6 +44,7 @@ public class WholesaleTotalAmountMessageDto : OutgoingMessageDto
             senderRole: ActorRole.MeteredDataAdministrator,
             new ExternalId(calculationResultId))
     {
+        CalculationId = calculationId;
         CalculationResultId = calculationResultId;
 
         Series = new WholesaleServicesSeries(
@@ -66,6 +68,8 @@ public class WholesaleTotalAmountMessageDto : OutgoingMessageDto
             SettlementType: null,
             SettlementMethod: null);
     }
+
+    public Guid CalculationId { get; }
 
     public Guid CalculationResultId { get; }
 

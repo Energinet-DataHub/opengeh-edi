@@ -25,6 +25,7 @@ public class WholesaleAmountPerChargeMessageDto : OutgoingMessageDto
 {
     public WholesaleAmountPerChargeMessageDto(
         EventId eventId,
+        Guid calculationId,
         Guid calculationResultId,
         long calculationResultVersion,
         ActorNumber energySupplierReceiverId,
@@ -54,6 +55,7 @@ public class WholesaleAmountPerChargeMessageDto : OutgoingMessageDto
             senderRole: ActorRole.MeteredDataAdministrator,
             new ExternalId(calculationResultId))
     {
+        CalculationId = calculationId;
         EnergySupplierReceiverId = energySupplierReceiverId;
         ChargeOwnerReceiverId = chargeOwnerReceiverId;
 
@@ -78,6 +80,8 @@ public class WholesaleAmountPerChargeMessageDto : OutgoingMessageDto
             null,
             SettlementMethod: settlementMethod);
     }
+
+    public Guid CalculationId { get; }
 
     public ActorNumber EnergySupplierReceiverId { get; }
 

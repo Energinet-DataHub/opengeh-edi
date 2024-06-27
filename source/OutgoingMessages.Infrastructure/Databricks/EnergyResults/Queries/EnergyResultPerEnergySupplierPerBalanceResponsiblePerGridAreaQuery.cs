@@ -70,6 +70,7 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(
 
         var messageDto = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto(
             eventId: _eventId,
+            calculationId: databricksSqlRow.ToGuid(EnergyResultColumnNames.CalculationId),
             calculationResultId: databricksSqlRow.ToGuid(EnergyResultColumnNames.ResultId),
             calculationResultVersion: databricksSqlRow.ToLong(EnergyResultColumnNames.CalculationVersion),
             businessReason: businessReason,

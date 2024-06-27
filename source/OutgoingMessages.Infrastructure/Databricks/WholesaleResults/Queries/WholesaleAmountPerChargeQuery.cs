@@ -83,6 +83,7 @@ public class WholesaleAmountPerChargeQuery(
         var chargeType = ChargeTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(WholesaleResultColumnNames.ChargeType));
         return new WholesaleAmountPerChargeMessageDto(
             eventId: _eventId,
+            calculationId: databricksSqlRow.ToGuid(WholesaleResultColumnNames.CalculationId),
             calculationResultId: databricksSqlRow.ToGuid(WholesaleResultColumnNames.ResultId),
             calculationResultVersion: databricksSqlRow.ToLong(WholesaleResultColumnNames.CalculationVersion),
             energySupplierReceiverId: ActorNumber.Create(

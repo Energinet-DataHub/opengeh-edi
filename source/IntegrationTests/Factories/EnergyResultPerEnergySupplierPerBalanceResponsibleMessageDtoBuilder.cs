@@ -23,6 +23,7 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
 {
     private readonly EventId _eventId = EventId.From(Guid.NewGuid());
     private readonly BusinessReason _businessReason = BusinessReason.WholesaleFixing;
+    private readonly Guid _calculationId = Guid.NewGuid();
 
     private ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private ActorNumber _balanceResponsibleNumber = ActorNumber.Create("1234567891911");
@@ -31,23 +32,24 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
     public EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto Build()
     {
         return new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto(
-            _eventId,
-            _businessReason,
-            "805",
-            MeteringPointType.Consumption,
-            SettlementMethod.NonProfiled,
-            MeasurementUnit.Pieces,
-            Resolution.Hourly,
-            _receiverNumber,
-            _balanceResponsibleNumber,
-            new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
-            new List<EnergyResultMessagePoint>
+            eventId: _eventId,
+            businessReason: _businessReason,
+            gridArea: "805",
+            meteringPointType: MeteringPointType.Consumption,
+            settlementMethod: SettlementMethod.NonProfiled,
+            measurementUnit: MeasurementUnit.Pieces,
+            resolution: Resolution.Hourly,
+            energySupplierNumber: _receiverNumber,
+            balanceResponsibleNumber: _balanceResponsibleNumber,
+            period: new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
+            points: new List<EnergyResultMessagePoint>
             {
                 new(1, 1, CalculatedQuantityQuality.Calculated, DateTimeOffset.UtcNow.ToInstant().ToString()),
             },
-            1,
-            null,
-            _calculationResultId);
+            calculationResultVersion: 1,
+            settlementVersion: null,
+            calculationResultId: _calculationResultId,
+            calculationId: _calculationId);
     }
 
     public EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder WithCalculationResultId(Guid calculationResultId)

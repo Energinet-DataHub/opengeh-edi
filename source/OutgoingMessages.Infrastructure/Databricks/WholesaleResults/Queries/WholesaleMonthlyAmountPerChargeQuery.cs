@@ -29,7 +29,7 @@ public class WholesaleMonthlyAmountPerChargeQuery(
     IMasterDataClient masterDataClient,
     EventId eventId,
     Guid calculationId)
-    : WholesaleResultQueryBase<WholesaleMontlyAmountPerChargeMessageDto>(
+    : WholesaleResultQueryBase<WholesaleMonthlyAmountPerChargeMessageDto>(
         ediDatabricksOptions,
         calculationId)
 {
@@ -56,7 +56,7 @@ public class WholesaleMonthlyAmountPerChargeQuery(
         { WholesaleResultColumnNames.Amount,                    (DeltaTableCommonTypes.Decimal18x3,         true) },
     };
 
-    protected override async Task<WholesaleMontlyAmountPerChargeMessageDto> CreateWholesaleResultAsync(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
+    protected override async Task<WholesaleMonthlyAmountPerChargeMessageDto> CreateWholesaleResultAsync(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
         var gridAreaCode = databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.GridAreaCode);
         var chargeOwnerId = ActorNumber.Create(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.ChargeOwnerId));
@@ -70,8 +70,9 @@ public class WholesaleMonthlyAmountPerChargeQuery(
             databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.CalculationType));
 
         var chargeType = ChargeTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.ChargeType));
-        return new WholesaleMontlyAmountPerChargeMessageDto(
+        return new WholesaleMonthlyAmountPerChargeMessageDto(
             eventId: _eventId,
+            calculationId: databricksSqlRow.ToGuid(WholesaleResultColumnNames.CalculationId),
             calculationResultId: databricksSqlRow.ToGuid(WholesaleResultColumnNames.ResultId),
             calculationResultVersion: databricksSqlRow.ToLong(WholesaleResultColumnNames.CalculationVersion),
             energySupplierReceiverId: ActorNumber.Create(

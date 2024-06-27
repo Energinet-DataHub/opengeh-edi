@@ -43,7 +43,8 @@ public class OutgoingMessage
         ProcessType messageCreatedFromProcess,
         MessageId? relatedToMessageId,
         string? gridAreaCode,
-        ExternalId externalId)
+        ExternalId externalId,
+        Guid? calculationId)
         : this(
             eventId,
             documentType,
@@ -58,11 +59,12 @@ public class OutgoingMessage
             messageCreatedFromProcess,
             relatedToMessageId,
             gridAreaCode,
-            externalId)
+            externalId,
+            calculationId)
     {
     }
 
-    public OutgoingMessage(
+    private OutgoingMessage(
         EventId eventId,
         DocumentType documentType,
         Receiver receiver,
@@ -76,7 +78,8 @@ public class OutgoingMessage
         ProcessType messageCreatedFromProcess,
         MessageId? relatedToMessageId,
         string? gridAreaCode,
-        ExternalId externalId)
+        ExternalId externalId,
+        Guid? calculationId)
     {
         Id = OutgoingMessageId.New();
         EventId = eventId;
@@ -94,6 +97,7 @@ public class OutgoingMessage
         CreatedAt = createdAt;
         FileStorageReference = CreateFileStorageReference(Receiver.Number, createdAt, Id);
         ExternalId = externalId;
+        CalculationId = calculationId;
     }
 
     /// <summary>
@@ -102,6 +106,7 @@ public class OutgoingMessage
     // ReSharper disable once UnusedMember.Local -- Used by Entity Framework
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     private OutgoingMessage(
+        OutgoingMessageId id,
         DocumentType documentType,
         EventId eventId,
         Guid? processId,
@@ -111,9 +116,11 @@ public class OutgoingMessage
         FileStorageReference fileStorageReference,
         ProcessType messageCreatedFromProcess,
         Instant createdAt,
-        string? gridAreaCode)
+        string? gridAreaCode,
+        ExternalId externalId,
+        Guid? calculationId)
     {
-        Id = OutgoingMessageId.New();
+        Id = id;
         DocumentType = documentType;
         EventId = eventId;
         ProcessId = processId;
@@ -124,6 +131,8 @@ public class OutgoingMessage
         MessageCreatedFromProcess = messageCreatedFromProcess;
         GridAreaCode = gridAreaCode;
         CreatedAt = createdAt;
+        ExternalId = externalId;
+        CalculationId = calculationId;
         // DocumentReceiver, EF will set this after the constructor
         // Receiver, EF will set this after the constructor
         // _serializedContent is set later in OutgoingMessageRepository, by getting the message from File Storage
@@ -172,6 +181,8 @@ public class OutgoingMessage
 
     public ExternalId ExternalId { get; }
 
+    public Guid? CalculationId { get; }
+
     /// <summary>
     /// This method create a single outgoing message, for the receiver, based on the accepted energyResultMessage.
     /// </summary>
@@ -197,7 +208,8 @@ public class OutgoingMessage
             messageCreatedFromProcess: ProcessType.RequestEnergyResults,
             relatedToMessageId: acceptedMessage.RelatedToMessageId,
             gridAreaCode: acceptedMessage.Series.GridAreaCode,
-            externalId: acceptedMessage.ExternalId);
+            externalId: acceptedMessage.ExternalId,
+            calculationId: null);
     }
 
     /// <summary>
@@ -225,7 +237,8 @@ public class OutgoingMessage
             messageCreatedFromProcess: ProcessType.RequestEnergyResults,
             relatedToMessageId: rejectedMessage.RelatedToMessageId,
             gridAreaCode: null,
-            externalId: rejectedMessage.ExternalId);
+            externalId: rejectedMessage.ExternalId,
+            calculationId: null);
     }
 
     /// <summary>
@@ -253,7 +266,8 @@ public class OutgoingMessage
             ProcessType.ReceiveEnergyResults,
             energyResultMessage.RelatedToMessageId,
             energyResultMessage.Series.GridAreaCode,
-            energyResultMessage.ExternalId);
+            energyResultMessage.ExternalId,
+            calculationId: energyResultMessage.CalculationId);
     }
 
     /// <summary>
@@ -281,7 +295,8 @@ public class OutgoingMessage
             ProcessType.ReceiveEnergyResults,
             messageDto.RelatedToMessageId,
             messageDto.Series.GridAreaCode,
-            messageDto.ExternalId);
+            messageDto.ExternalId,
+            messageDto.CalculationId);
     }
 
     /// <summary>
@@ -309,7 +324,8 @@ public class OutgoingMessage
             ProcessType.ReceiveEnergyResults,
             messageDto.RelatedToMessageId,
             messageDto.Series.GridAreaCode,
-            messageDto.ExternalId);
+            messageDto.ExternalId,
+            messageDto.CalculationId);
     }
 
     /// <summary>
@@ -340,7 +356,8 @@ public class OutgoingMessage
                 messageCreatedFromProcess: ProcessType.ReceiveEnergyResults,
                 relatedToMessageId: messageDto.RelatedToMessageId,
                 gridAreaCode: messageDto.GridArea,
-                externalId: messageDto.ExternalId),
+                externalId: messageDto.ExternalId,
+                calculationId: messageDto.CalculationId),
 
             new OutgoingMessage(
                 eventId: messageDto.EventId,
@@ -356,7 +373,8 @@ public class OutgoingMessage
                 messageCreatedFromProcess: ProcessType.ReceiveEnergyResults,
                 relatedToMessageId: messageDto.RelatedToMessageId,
                 gridAreaCode: messageDto.GridArea,
-                externalId: messageDto.ExternalId),
+                externalId: messageDto.ExternalId,
+                calculationId: messageDto.CalculationId),
         ];
     }
 
@@ -387,7 +405,8 @@ public class OutgoingMessage
                 ProcessType.ReceiveWholesaleResults,
                 wholesaleServicesMessageDto.RelatedToMessageId,
                 wholesaleServicesMessageDto.Series.GridAreaCode,
-                wholesaleServicesMessageDto.ExternalId),
+                wholesaleServicesMessageDto.ExternalId,
+                calculationId: wholesaleServicesMessageDto.CalculationId),
             new(
                 wholesaleServicesMessageDto.EventId,
                 wholesaleServicesMessageDto.DocumentType,
@@ -402,7 +421,8 @@ public class OutgoingMessage
                 ProcessType.ReceiveWholesaleResults,
                 wholesaleServicesMessageDto.RelatedToMessageId,
                 wholesaleServicesMessageDto.Series.GridAreaCode,
-                wholesaleServicesMessageDto.ExternalId),
+                wholesaleServicesMessageDto.ExternalId,
+                calculationId: wholesaleServicesMessageDto.CalculationId),
         };
     }
 
@@ -433,7 +453,8 @@ public class OutgoingMessage
                 ProcessType.ReceiveWholesaleResults,
                 wholesaleAmountPerChargeMessageDto.RelatedToMessageId,
                 wholesaleAmountPerChargeMessageDto.Series.GridAreaCode,
-                wholesaleAmountPerChargeMessageDto.ExternalId),
+                wholesaleAmountPerChargeMessageDto.ExternalId,
+                wholesaleAmountPerChargeMessageDto.CalculationId),
             new(
                 wholesaleAmountPerChargeMessageDto.EventId,
                 wholesaleAmountPerChargeMessageDto.DocumentType,
@@ -448,7 +469,8 @@ public class OutgoingMessage
                 ProcessType.ReceiveWholesaleResults,
                 wholesaleAmountPerChargeMessageDto.RelatedToMessageId,
                 wholesaleAmountPerChargeMessageDto.Series.GridAreaCode,
-                wholesaleAmountPerChargeMessageDto.ExternalId),
+                wholesaleAmountPerChargeMessageDto.ExternalId,
+                wholesaleAmountPerChargeMessageDto.CalculationId),
         };
     }
 
@@ -456,45 +478,47 @@ public class OutgoingMessage
     /// This method creates two outgoing messages, one for the receiver and one for the charge owner, based on the wholesaleResultMessage.
     /// </summary>
     public static IReadOnlyCollection<OutgoingMessage> CreateMessages(
-        WholesaleMontlyAmountPerChargeMessageDto wholesaleMontlyAmountPerChargeMessageDto,
+        WholesaleMonthlyAmountPerChargeMessageDto wholesaleMonthlyAmountPerChargeMessageDto,
         ISerializer serializer,
         Instant timestamp)
     {
         ArgumentNullException.ThrowIfNull(serializer);
-        ArgumentNullException.ThrowIfNull(wholesaleMontlyAmountPerChargeMessageDto);
+        ArgumentNullException.ThrowIfNull(wholesaleMonthlyAmountPerChargeMessageDto);
 
         return new List<OutgoingMessage>()
         {
             new(
-                wholesaleMontlyAmountPerChargeMessageDto.EventId,
-                wholesaleMontlyAmountPerChargeMessageDto.DocumentType,
-                wholesaleMontlyAmountPerChargeMessageDto.EnergySupplierReceiverId,
-                wholesaleMontlyAmountPerChargeMessageDto.ProcessId,
-                wholesaleMontlyAmountPerChargeMessageDto.BusinessReason,
+                wholesaleMonthlyAmountPerChargeMessageDto.EventId,
+                wholesaleMonthlyAmountPerChargeMessageDto.DocumentType,
+                wholesaleMonthlyAmountPerChargeMessageDto.EnergySupplierReceiverId,
+                wholesaleMonthlyAmountPerChargeMessageDto.ProcessId,
+                wholesaleMonthlyAmountPerChargeMessageDto.BusinessReason,
                 ActorRole.EnergySupplier,
-                senderId: wholesaleMontlyAmountPerChargeMessageDto.SenderId,
-                senderRole: wholesaleMontlyAmountPerChargeMessageDto.SenderRole,
-                serializer.Serialize(wholesaleMontlyAmountPerChargeMessageDto.Series),
+                senderId: wholesaleMonthlyAmountPerChargeMessageDto.SenderId,
+                senderRole: wholesaleMonthlyAmountPerChargeMessageDto.SenderRole,
+                serializer.Serialize(wholesaleMonthlyAmountPerChargeMessageDto.Series),
                 timestamp,
                 ProcessType.ReceiveWholesaleResults,
-                wholesaleMontlyAmountPerChargeMessageDto.RelatedToMessageId,
-                wholesaleMontlyAmountPerChargeMessageDto.Series.GridAreaCode,
-                wholesaleMontlyAmountPerChargeMessageDto.ExternalId),
+                wholesaleMonthlyAmountPerChargeMessageDto.RelatedToMessageId,
+                wholesaleMonthlyAmountPerChargeMessageDto.Series.GridAreaCode,
+                wholesaleMonthlyAmountPerChargeMessageDto.ExternalId,
+                wholesaleMonthlyAmountPerChargeMessageDto.CalculationId),
             new(
-                wholesaleMontlyAmountPerChargeMessageDto.EventId,
-                wholesaleMontlyAmountPerChargeMessageDto.DocumentType,
-                wholesaleMontlyAmountPerChargeMessageDto.ChargeOwnerReceiverId,
-                wholesaleMontlyAmountPerChargeMessageDto.ProcessId,
-                wholesaleMontlyAmountPerChargeMessageDto.BusinessReason,
-                GetChargeOwnerRole(wholesaleMontlyAmountPerChargeMessageDto.ChargeOwnerReceiverId),
-                senderId: wholesaleMontlyAmountPerChargeMessageDto.SenderId,
-                senderRole: wholesaleMontlyAmountPerChargeMessageDto.SenderRole,
-                serializer.Serialize(wholesaleMontlyAmountPerChargeMessageDto.Series),
+                wholesaleMonthlyAmountPerChargeMessageDto.EventId,
+                wholesaleMonthlyAmountPerChargeMessageDto.DocumentType,
+                wholesaleMonthlyAmountPerChargeMessageDto.ChargeOwnerReceiverId,
+                wholesaleMonthlyAmountPerChargeMessageDto.ProcessId,
+                wholesaleMonthlyAmountPerChargeMessageDto.BusinessReason,
+                GetChargeOwnerRole(wholesaleMonthlyAmountPerChargeMessageDto.ChargeOwnerReceiverId),
+                senderId: wholesaleMonthlyAmountPerChargeMessageDto.SenderId,
+                senderRole: wholesaleMonthlyAmountPerChargeMessageDto.SenderRole,
+                serializer.Serialize(wholesaleMonthlyAmountPerChargeMessageDto.Series),
                 timestamp,
                 ProcessType.ReceiveWholesaleResults,
-                wholesaleMontlyAmountPerChargeMessageDto.RelatedToMessageId,
-                wholesaleMontlyAmountPerChargeMessageDto.Series.GridAreaCode,
-                wholesaleMontlyAmountPerChargeMessageDto.ExternalId),
+                wholesaleMonthlyAmountPerChargeMessageDto.RelatedToMessageId,
+                wholesaleMonthlyAmountPerChargeMessageDto.Series.GridAreaCode,
+                wholesaleMonthlyAmountPerChargeMessageDto.ExternalId,
+                wholesaleMonthlyAmountPerChargeMessageDto.CalculationId),
         };
     }
 
@@ -520,7 +544,8 @@ public class OutgoingMessage
             ProcessType.ReceiveWholesaleResults,
             wholesaleTotalAmountMessageDto.RelatedToMessageId,
             wholesaleTotalAmountMessageDto.Series.GridAreaCode,
-            wholesaleTotalAmountMessageDto.ExternalId);
+            wholesaleTotalAmountMessageDto.ExternalId,
+            wholesaleTotalAmountMessageDto.CalculationId);
     }
 
     /// <summary>
@@ -548,7 +573,8 @@ public class OutgoingMessage
             messageCreatedFromProcess: ProcessType.RequestWholesaleResults,
             relatedToMessageId: message.RelatedToMessageId,
             gridAreaCode: null,
-            externalId: message.ExternalId);
+            externalId: message.ExternalId,
+            calculationId: null);
     }
 
     /// <summary>
@@ -576,7 +602,8 @@ public class OutgoingMessage
             messageCreatedFromProcess: ProcessType.RequestWholesaleResults,
             relatedToMessageId: message.RelatedToMessageId,
             gridAreaCode: message.Series.GridAreaCode,
-            externalId: message.ExternalId);
+            externalId: message.ExternalId,
+            calculationId: null);
     }
 
     /// <summary>
@@ -604,7 +631,8 @@ public class OutgoingMessage
             ProcessType.ReceiveWholesaleResults,
             wholesaleServicesTotalSumMessage.RelatedToMessageId,
             wholesaleServicesTotalSumMessage.Series.GridAreaCode,
-            wholesaleServicesTotalSumMessage.ExternalId);
+            wholesaleServicesTotalSumMessage.ExternalId,
+            calculationId: wholesaleServicesTotalSumMessage.CalculationId);
     }
 
     public void AssignToBundle(BundleId bundleId)

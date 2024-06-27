@@ -61,6 +61,7 @@ public class WholesaleTotalAmountQuery(
 
         return Task.FromResult(new WholesaleTotalAmountMessageDto(
             eventId: _eventId,
+            calculationId: databricksSqlRow.ToGuid(WholesaleResultColumnNames.CalculationId),
             calculationResultId: databricksSqlRow.ToGuid(WholesaleResultColumnNames.ResultId),
             calculationResultVersion: databricksSqlRow.ToLong(WholesaleResultColumnNames.CalculationVersion),
             receiverNumber: receiver.ActorNumber,

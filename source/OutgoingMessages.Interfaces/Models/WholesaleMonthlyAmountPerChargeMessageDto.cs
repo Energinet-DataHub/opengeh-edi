@@ -17,10 +17,11 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-public class WholesaleMontlyAmountPerChargeMessageDto : OutgoingMessageDto
+public class WholesaleMonthlyAmountPerChargeMessageDto : OutgoingMessageDto
 {
-    public WholesaleMontlyAmountPerChargeMessageDto(
+    public WholesaleMonthlyAmountPerChargeMessageDto(
         EventId eventId,
+        Guid calculationId,
         Guid calculationResultId,
         long calculationResultVersion,
         ActorNumber energySupplierReceiverId,
@@ -47,6 +48,7 @@ public class WholesaleMontlyAmountPerChargeMessageDto : OutgoingMessageDto
             senderRole: ActorRole.MeteredDataAdministrator,
             new ExternalId(calculationResultId))
     {
+        CalculationId = calculationId;
         CalculationResultId = calculationResultId;
         EnergySupplierReceiverId = energySupplierReceiverId;
         ChargeOwnerReceiverId = chargeOwnerReceiverId;
@@ -72,6 +74,8 @@ public class WholesaleMontlyAmountPerChargeMessageDto : OutgoingMessageDto
             null,
             SettlementMethod: null);
     }
+
+    public Guid CalculationId { get; }
 
     public Guid CalculationResultId { get; }
 

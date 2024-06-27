@@ -208,7 +208,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     }
 
     public async Task EnqueueAndCommitAsync(
-        WholesaleMontlyAmountPerChargeMessageDto wholesaleMonthlyAmountPerChargeMessageDto,
+        WholesaleMonthlyAmountPerChargeMessageDto wholesaleMonthlyAmountPerChargeMessageDto,
         CancellationToken cancellationToken)
     {
         var messages = OutgoingMessage.CreateMessages(
