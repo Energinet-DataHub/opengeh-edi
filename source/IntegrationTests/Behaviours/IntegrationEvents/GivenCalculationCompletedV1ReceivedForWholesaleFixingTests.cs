@@ -487,8 +487,8 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         var resultDataForWholesaleResultTotalAmount = new WholesaleResultForTotalAmountDescription();
         var wholesaleTotalAmountQuery = new WholesaleTotalAmountQuery(_ediDatabricksOptions.Value, EventId.From(Guid.NewGuid()), resultDataForWholesaleResultTotalAmount.CalculationId);
 
-        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleTotalAmountQuery);
-        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleTotalAmountQuery, resultDataForWholesaleResultTotalAmount.TestFilePath);
+        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleTotalAmountQuery.DataObjectName, wholesaleTotalAmountQuery.SchemaDefinition);
+        await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleTotalAmountQuery.DataObjectName, wholesaleTotalAmountQuery.SchemaDefinition, resultDataForWholesaleResultTotalAmount.TestFilePath);
         return resultDataForWholesaleResultTotalAmount;
     }
 
