@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
@@ -28,19 +29,22 @@ public class DequeuedBundlesRetention : IDataRetention
     private readonly IMarketDocumentRepository _marketDocumentRepository;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
+    private readonly ILogger<DequeuedBundlesRetention> _logger;
 
     public DequeuedBundlesRetention(
         ISystemDateTimeProvider systemDateTimeProvider,
         IActorMessageQueueRepository actorMessageQueueRepository,
         IMarketDocumentRepository marketDocumentRepository,
         IOutgoingMessageRepository outgoingMessageRepository,
-        ActorMessageQueueContext actorMessageQueueContext)
+        ActorMessageQueueContext actorMessageQueueContext,
+        ILogger<DequeuedBundlesRetention> logger)
     {
         _systemDateTimeProvider = systemDateTimeProvider;
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _marketDocumentRepository = marketDocumentRepository;
         _outgoingMessageRepository = outgoingMessageRepository;
         _actorMessageQueueContext = actorMessageQueueContext;
+        _logger = logger;
     }
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
@@ -66,10 +70,17 @@ public class DequeuedBundlesRetention : IDataRetention
                 {
                     if (bundle.DequeuedAt < monthAgo)
                     {
-                        await _marketDocumentRepository.DeleteMarketIfExistsDocumentAsync(bundle.Id).ConfigureAwait(false);
-                        await _outgoingMessageRepository.DeleteOutgoingMessageIfExistsAsync(bundle.Id).ConfigureAwait(false);
-                        actorMessageQueue.RemoveBundle(bundle);
-                        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                        try
+                        {
+                            await _marketDocumentRepository.DeleteMarketIfExistsDocumentAsync(bundle.Id).ConfigureAwait(false);
+                            await _outgoingMessageRepository.DeleteOutgoingMessageIfExistsAsync(bundle.Id).ConfigureAwait(false);
+                            actorMessageQueue.RemoveBundle(bundle);
+                            await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogWarning(e, "Failed to remove bundle with id {BundleId}", bundle.Id);
+                        }
                     }
                 }
             }

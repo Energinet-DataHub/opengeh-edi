@@ -25,6 +25,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
+using Microsoft.Extensions.Logging;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -45,7 +46,7 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
     }
 
     [Fact]
-    public async Task Clean_up_dequeued_bundles_when_they_are_over_a_month_old()
+    public async Task Clean_up_dequeued_bundles_when_they_are_more_than_a_month_old()
     {
         // Arrange
         var receiverId = ActorNumber.Create("1234567891912");
@@ -62,7 +63,8 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
             actorMessageQueueRepository,
             GetService<IMarketDocumentRepository>(),
             GetService<IOutgoingMessageRepository>(),
-            actorMessageQueueContext);
+            actorMessageQueueContext,
+            GetService<ILogger<DequeuedBundlesRetention>>());
 
         var message = _wholesaleAmountPerChargeDtoBuilder
             .WithReceiverNumber(receiverId)
