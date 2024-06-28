@@ -36,8 +36,7 @@ public sealed class WhenEnergyResultRequestedTests : BaseTestClass
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
-        var ediDriver = new EdiDriver(fixture.B2BEnergySupplierAuthorizedHttpClient, output);
-        var ediProcessesDriver = new EdiDatabaseDriver(fixture.ConnectionString);
+        var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BEnergySupplierAuthorizedHttpClient, output);
         var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
 
         _notifyAggregatedMeasureDataResult = new NotifyAggregatedMeasureDataResultDsl(
@@ -45,7 +44,7 @@ public sealed class WhenEnergyResultRequestedTests : BaseTestClass
             wholesaleDriver);
 
         _aggregatedMeasureDataRequest =
-            new AggregatedMeasureDataRequestDsl(ediDriver, ediProcessesDriver, wholesaleDriver);
+            new AggregatedMeasureDataRequestDsl(ediDriver, new EdiDatabaseDriver(fixture.ConnectionString), wholesaleDriver);
     }
 
     [Fact]
