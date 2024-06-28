@@ -13,9 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
-using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using FluentAssertions;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
