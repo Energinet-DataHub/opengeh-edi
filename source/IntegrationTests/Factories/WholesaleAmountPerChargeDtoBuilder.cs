@@ -23,8 +23,8 @@ public class WholesaleAmountPerChargeDtoBuilder
 {
     private readonly EventId _eventId = EventId.From(Guid.NewGuid());
     private readonly BusinessReason _businessReason = BusinessReason.WholesaleFixing;
-    private readonly ActorNumber _chargeOwnerId = ActorNumber.Create("1234567891911");
 
+    private ActorNumber _chargeOwnerId = ActorNumber.Create("1234567891911");
     private ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private Guid _calculationResultId;
 
@@ -61,9 +61,15 @@ public class WholesaleAmountPerChargeDtoBuilder
         return this;
     }
 
-    public WholesaleAmountPerChargeDtoBuilder WithReceiverNumber(string receiverIdValue)
+    public WholesaleAmountPerChargeDtoBuilder WithReceiverNumber(ActorNumber receiverIdValue)
     {
-        _receiverNumber = ActorNumber.Create(receiverIdValue);
+        _receiverNumber = receiverIdValue;
+        return this;
+    }
+
+    public WholesaleAmountPerChargeDtoBuilder WithChargeOwnerNumber(ActorNumber receiverIdValue)
+    {
+        _chargeOwnerId = receiverIdValue;
         return this;
     }
 }
