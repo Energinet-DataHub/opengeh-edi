@@ -22,37 +22,39 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 public class WholesaleAmountPerChargeDtoBuilder
 {
     private readonly EventId _eventId = EventId.From(Guid.NewGuid());
+    private readonly Guid _calculationId = Guid.NewGuid();
     private readonly BusinessReason _businessReason = BusinessReason.WholesaleFixing;
 
     private ActorNumber _chargeOwnerId = ActorNumber.Create("1234567891911");
     private ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private Guid _calculationResultId;
 
-    public WholesaleAmountPerChargeDto Build()
+    public WholesaleAmountPerChargeMessageDto Build()
     {
-        return new WholesaleAmountPerChargeDto(
-            _eventId,
-            _calculationResultId,
-            1,
-            _receiverNumber,
-            _chargeOwnerId,
-            _chargeOwnerId,
-            _businessReason.ToString(),
-            "805",
-            false,
-            new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
-            MeasurementUnit.Pieces,
-            Currency.DanishCrowns,
-            ChargeType.Tariff,
-            Resolution.Hourly,
-            null,
-            MeteringPointType.Consumption,
-            SettlementMethod.NonProfiled,
-            "1234567891911",
-            new List<WholesaleServicesPoint>
-            {
+        return new WholesaleAmountPerChargeMessageDto(
+            eventId: _eventId,
+            calculationId: _calculationId,
+            calculationResultId: _calculationResultId,
+            calculationResultVersion: 1,
+            energySupplierReceiverId: _receiverNumber,
+            chargeOwnerReceiverId: _chargeOwnerId,
+            chargeOwnerId: _chargeOwnerId,
+            businessReason: _businessReason.ToString(),
+            gridAreaCode: "805",
+            isTax: false,
+            period: new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
+            quantityUnit: MeasurementUnit.Pieces,
+            currency: Currency.DanishCrowns,
+            chargeType: ChargeType.Tariff,
+            resolution: Resolution.Hourly,
+            settlementVersion: null,
+            meteringPointType: MeteringPointType.Consumption,
+            settlementMethod: SettlementMethod.NonProfiled,
+            chargeCode: "1234567891911",
+            points:
+            [
                 new(1, 10, 100, 5, CalculatedQuantityQuality.Estimated),
-            });
+            ]);
     }
 
     public WholesaleAmountPerChargeDtoBuilder WithCalculationResultId(Guid calculationResultId)

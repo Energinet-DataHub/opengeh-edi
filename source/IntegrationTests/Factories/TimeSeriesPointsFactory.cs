@@ -43,23 +43,37 @@ internal static class TimeSeriesPointsFactory
     public static IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> CreatePointsForPeriod(
         Period period,
         Resolution resolution,
-        decimal price,
-        decimal quantity,
+        decimal? price,
+        decimal? quantity,
         decimal amount,
-        QuantityQuality calculatedQuality)
+        QuantityQuality? calculatedQuality)
     {
         var points = new List<WholesaleServicesRequestSeries.Types.Point>();
 
         var currentTime = period.Start.ToDateTimeOffset();
         while (currentTime < period.End.ToDateTimeOffset())
         {
-            points.Add(new WholesaleServicesRequestSeries.Types.Point
+            var point = new WholesaleServicesRequestSeries.Types.Point
             {
-                Price = DecimalValue.FromDecimal(price),
-                Quantity = DecimalValue.FromDecimal(quantity),
                 Amount = DecimalValue.FromDecimal(amount),
-                QuantityQualities = { calculatedQuality },
-            });
+            };
+
+            if (price is not null)
+            {
+                point.Price = DecimalValue.FromDecimal(price.Value);
+            }
+
+            if (quantity is not null)
+            {
+                point.Quantity = DecimalValue.FromDecimal(quantity.Value);
+            }
+
+            if (calculatedQuality is not null)
+            {
+                point.QuantityQualities.Add(calculatedQuality.Value);
+            }
+
+            points.Add(point);
             currentTime = GetDateTimeWithResolutionOffset(resolution, currentTime);
         }
 

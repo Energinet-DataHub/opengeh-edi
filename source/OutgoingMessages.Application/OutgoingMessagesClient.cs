@@ -180,11 +180,39 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     }
 
     public async Task EnqueueAndCommitAsync(
-        WholesaleAmountPerChargeDto wholesaleAmountPerChargeDto,
+        WholesaleTotalAmountMessageDto wholesaleTotalAmountMessageDto,
+        CancellationToken cancellationToken)
+    {
+        var message = OutgoingMessage.CreateMessage(
+            wholesaleTotalAmountMessageDto,
+            _serializer,
+            _systemDateTimeProvider.Now());
+        await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task EnqueueAndCommitAsync(
+        WholesaleAmountPerChargeMessageDto wholesaleAmountPerChargeMessageDto,
         CancellationToken cancellationToken)
     {
         var messages = OutgoingMessage.CreateMessages(
-            wholesaleAmountPerChargeDto,
+            wholesaleAmountPerChargeMessageDto,
+            _serializer,
+            _systemDateTimeProvider.Now());
+        foreach (var message in messages)
+        {
+            await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        }
+
+        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task EnqueueAndCommitAsync(
+        WholesaleMonthlyAmountPerChargeMessageDto wholesaleMonthlyAmountPerChargeMessageDto,
+        CancellationToken cancellationToken)
+    {
+        var messages = OutgoingMessage.CreateMessages(
+            wholesaleMonthlyAmountPerChargeMessageDto,
             _serializer,
             _systemDateTimeProvider.Now());
         foreach (var message in messages)

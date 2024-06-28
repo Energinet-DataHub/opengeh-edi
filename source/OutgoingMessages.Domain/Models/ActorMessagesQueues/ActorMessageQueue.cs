@@ -130,7 +130,7 @@ public class ActorMessageQueue
                 .MinBy(bundle => bundle.Created)
             : _bundles.Where(bundle => bundle.DequeuedAt is null).MinBy(bundle => bundle.Created);
 
-        nextBundleToPeek?.CloseBundle();
+        nextBundleToPeek?.PeekBundle();
 
         return nextBundleToPeek;
     }
