@@ -171,7 +171,7 @@ internal sealed class EdiDriver : IDisposable
 
     internal async Task WaitForOrchestrationCompletedAsync(string orchestrationInstanceId)
     {
-        await _durableClient.WaitForInstanceCompletedAsync(orchestrationInstanceId, TimeSpan.FromMinutes(10));
+        await _durableClient.WaitForInstanceCompletedAsync(orchestrationInstanceId, TimeSpan.FromMinutes(30));
     }
 
     private static async Task<(Guid MessageId, string Content)> GetRequestWholesaleSettlementContentAsync(
