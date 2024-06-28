@@ -17,20 +17,20 @@ using System.ServiceModel.Security;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
+using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
 internal sealed class EbixRequestDsl
 {
-    private readonly WholesaleDriver _wholesale;
     private readonly EbixDriver _ebix;
 
 #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
-    public EbixRequestDsl(WholesaleDriver wholesale, EbixDriver ebix)
+    public EbixRequestDsl(EbixDriver ebix)
     {
-        _wholesale = wholesale;
         _ebix = ebix;
     }
 
@@ -39,16 +39,6 @@ internal sealed class EbixRequestDsl
     internal async Task EmptyQueueForActor()
     {
         await _ebix.EmptyQueueAsync().ConfigureAwait(false);
-    }
-
-    internal Task PublishAggregationResult(string gridArea)
-    {
-        return _wholesale.PublishAggregationResultAsync(gridArea);
-    }
-
-    internal Task PublishMonthlySumPrCharge(string gridArea, string energySupplierId, string chargeOwnerId)
-    {
-        return _wholesale.PublishMonthlyAmountPerChargeResultAsync(gridArea, energySupplierId, chargeOwnerId);
     }
 
     internal async Task ConfirmEnergyResultIsAvailable()
@@ -119,11 +109,6 @@ internal sealed class EbixRequestDsl
         Assert.Multiple(
              () => Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode),
              () => Assert.Contains("Certificate rejected", response.ReasonPhrase, StringComparison.InvariantCultureIgnoreCase));
-    }
-
-    internal Task PublishAmountPerChargeResult(string gridArea, string energySupplierId, string chargeOwnerId)
-    {
-        return _wholesale.PublishAmountPerChargeResultAsync(gridArea, energySupplierId, chargeOwnerId);
     }
 
     internal async Task ConfirmDequeueWithRemovedCertificateIsNotAllowed()

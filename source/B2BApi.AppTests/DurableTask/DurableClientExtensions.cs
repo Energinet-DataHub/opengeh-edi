@@ -42,6 +42,7 @@ public static class DurableClientExtensions
             CreatedTimeFrom = createdTimeFrom,
             RuntimeStatus =
             [
+                OrchestrationRuntimeStatus.Pending,
                 OrchestrationRuntimeStatus.Running,
                 OrchestrationRuntimeStatus.Completed,
             ],

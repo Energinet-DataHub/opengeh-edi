@@ -26,7 +26,8 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.ArchivedMessages;
 public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 {
     private readonly ArchivedMessageDsl _archivedMessage;
-    private readonly NotifyWholesaleServicesDsl _notifyWholesaleServices;
+    private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureData;
+    private readonly CalculationCompletedDsl _calculationCompleted;
 
     public WhenArchivedMessageIsRequestedTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
         : base(output, fixture)
@@ -36,20 +37,24 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         _archivedMessage = new ArchivedMessageDsl(
             new EdiB2CDriver(fixture.B2CAuthorizedHttpClient, fixture.ApiManagementUri));
 
-        _notifyWholesaleServices = new NotifyWholesaleServicesDsl(
-            new EdiDriver(fixture.B2BEnergySupplierAuthorizedHttpClient, output),
-            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
+        var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BMeteredDataResponsibleAuthorizedHttpClient, output);
+        var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
+        _calculationCompleted = new CalculationCompletedDsl(
+            ediDriver,
+            new EdiDatabaseDriver(fixture.ConnectionString),
+            wholesaleDriver,
+            output,
+            fixture.BalanceFixingCalculationId,
+            fixture.WholesaleFixingCalculationId);
+        _notifyAggregatedMeasureData = new NotifyAggregatedMeasureDataResultDsl(ediDriver, wholesaleDriver);
     }
 
     [Fact]
     public async Task B2C_actor_can_get_the_archived_message_after_peeking_the_message()
     {
-        await _notifyWholesaleServices.PublishMonthlyAmountPerChargeResult(
-            AcceptanceTestFixture.CimActorGridArea,
-            AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
-            AcceptanceTestFixture.ActorNumber);
+        await _calculationCompleted.PublishForBalanceFixingCalculation();
 
-        var messageId = await _notifyWholesaleServices.ConfirmResultIsAvailable();
+        var messageId = await _notifyAggregatedMeasureData.ConfirmResultIsAvailable();
 
         await _archivedMessage.ConfirmMessageIsArchived(messageId);
     }

@@ -1,0 +1,20 @@
+-- -- Undo bundle column updates for d002 - DO NOT COMMIT TO D001
+-- DECLARE @ColumnType NVARCHAR(50);
+--
+-- SELECT @ColumnType = [DATA_TYPE] FROM [INFORMATION_SCHEMA].[COLUMNS] WHERE TABLE_NAME = 'Bundles' AND COLUMN_NAME = 'IsDequeued'
+--
+-- DELETE FROM MarketDocuments
+-- DELETE FROM OutgoingMessages
+-- DELETE FROM Bundles
+--
+-- IF @ColumnType = 'datetime2'
+-- BEGIN
+--     ALTER TABLE [dbo].[Bundles] DROP COLUMN IsDequeued;
+--     ALTER TABLE [dbo].[Bundles] DROP COLUMN IsClosed;
+-- END
+--
+-- IF @ColumnType = 'datetime2'
+-- BEGIN
+--     ALTER TABLE [dbo].[Bundles] ADD IsDequeued BIT NULL;
+--     ALTER TABLE [dbo].[Bundles] ADD IsClosed BIT NULL;
+-- END

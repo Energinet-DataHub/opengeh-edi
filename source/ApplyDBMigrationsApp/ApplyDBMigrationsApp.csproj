@@ -185,6 +185,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202405031407 Update AggregatedMeasureDataProcesses columns.sql" />
     <EmbeddedResource Include="Scripts\Model\202406071044 Lowercase MessageId for old bundles.sql" />
     <EmbeddedResource Include="Scripts\Model\202406191315 Add ExternalId to OutgoingMessages.sql" />
+    <EmbeddedResource Include="Scripts\Model\202406260914 Undo bundle column updates for d002.sql" />
     <EmbeddedResource Include="Scripts\Model\202406260915 Bundle IsClosed IsDequeued DateTime.sql" />
     <EmbeddedResource Include="Scripts\Model\202406261000 Bundle PeekedAt.sql" />
     <EmbeddedResource Include="Scripts\Model\202406251107 Add CalculationId to OutgoingMessages.sql" />
