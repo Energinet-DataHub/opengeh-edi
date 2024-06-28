@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using FluentAssertions;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Xunit;
 using Xunit.Abstractions;
@@ -80,5 +81,9 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         var actorMessageQueueRepositoryRead = GetService<IActorMessageQueueRepository>();
         var actorMessageQueueForEs = await actorMessageQueueRepositoryRead.ActorMessageQueueForAsync(receiverId, ActorRole.EnergySupplier);
         var actorMessageQueueForGo = await actorMessageQueueRepositoryRead.ActorMessageQueueForAsync(chargeOwnerId, ActorRole.GridOperator);
+
+        // The bundle should be removed from the queue for the energy supplier, but not for the grid operator.
+        actorMessageQueueForEs!.GetDequeuedBundles().Should().BeEmpty();
+        actorMessageQueueForGo!.GetDequeuedBundles().Should().NotBeEmpty();
     }
 }
