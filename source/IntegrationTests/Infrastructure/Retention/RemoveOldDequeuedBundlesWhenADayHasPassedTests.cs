@@ -85,7 +85,7 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         actorMessageQueueForEs!.GetDequeuedBundles().Should().BeEmpty();
 
         // We are still able to peek the message for the grid operator.
-        var peekResultForGo = await PeekMessageAsync(MessageCategory.Aggregations, receiverId, ActorRole.GridOperator);
+        var peekResultForGo = await PeekMessageAsync(MessageCategory.Aggregations, chargeOwnerId, ActorRole.GridOperator);
         peekResultForGo.Should().NotBeNull();
     }
 }
