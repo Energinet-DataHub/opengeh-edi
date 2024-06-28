@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-public class WholesaleMontlyAmountPerChargeDto : OutgoingMessageDto
+public class WholesaleMonthlyAmountPerChargeMessageDto : OutgoingMessageDto
 {
-    public WholesaleMontlyAmountPerChargeDto(
+    public WholesaleMonthlyAmountPerChargeMessageDto(
         EventId eventId,
         Guid calculationId,
         Guid calculationResultId,
@@ -32,7 +33,7 @@ public class WholesaleMontlyAmountPerChargeDto : OutgoingMessageDto
         Period period,
         MeasurementUnit quantityUnit,
         Currency currency,
-        ChargeType chargeType,
+        ChargeType? chargeType,
         SettlementVersion? settlementVersion,
         string? chargeCode,
         IReadOnlyCollection<WholesaleServicesPoint> points)
@@ -43,8 +44,8 @@ public class WholesaleMontlyAmountPerChargeDto : OutgoingMessageDto
             eventId,
             businessReason,
             receiverRole: null!,
-            null!,
-            null!,
+            senderId: DataHubDetails.DataHubActorNumber,
+            senderRole: ActorRole.MeteredDataAdministrator,
             new ExternalId(calculationResultId))
     {
         CalculationId = calculationId;
