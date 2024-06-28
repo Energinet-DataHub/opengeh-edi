@@ -80,10 +80,12 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         // Assert
         var actorMessageQueueRepositoryRead = GetService<IActorMessageQueueRepository>();
         var actorMessageQueueForEs = await actorMessageQueueRepositoryRead.ActorMessageQueueForAsync(receiverId, ActorRole.EnergySupplier);
-        var actorMessageQueueForGo = await actorMessageQueueRepositoryRead.ActorMessageQueueForAsync(chargeOwnerId, ActorRole.GridOperator);
 
         // The bundle should be removed from the queue for the energy supplier, but not for the grid operator.
         actorMessageQueueForEs!.GetDequeuedBundles().Should().BeEmpty();
-        actorMessageQueueForGo!.GetDequeuedBundles().Should().NotBeEmpty();
+
+        // We are still able to peek the message for the grid operator.
+        var peekResultForGo = await PeekMessageAsync(MessageCategory.Aggregations, receiverId, ActorRole.GridOperator);
+        peekResultForGo.Should().NotBeNull();
     }
 }
