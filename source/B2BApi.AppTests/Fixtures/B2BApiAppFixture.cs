@@ -113,7 +113,7 @@ public class B2BApiAppFixture : IAsyncLifetime
     {
         // Storage emulator
         AzuriteManager.StartAzurite();
-        await CreateRequiredContainersAsync();
+        CreateRequiredContainers();
 
         // Database
         await DatabaseManager.CreateDatabaseAsync();
@@ -193,24 +193,6 @@ public class B2BApiAppFixture : IAsyncLifetime
         });
     }
 
-    public async Task CreateRequiredContainersAsync()
-    {
-        List<FileStorageCategory> containerCategories = [
-            FileStorageCategory.ArchivedMessage(),
-            FileStorageCategory.OutgoingMessage(),
-        ];
-
-        var blobServiceClient = new BlobServiceClient(AzuriteManager.BlobStorageConnectionString);
-        foreach (var fileStorageCategory in containerCategories)
-        {
-            var container = blobServiceClient.GetBlobContainerClient(fileStorageCategory.Value);
-            var containerExists = await container.ExistsAsync().ConfigureAwait(false);
-
-            if (!containerExists)
-                await container.CreateAsync().ConfigureAwait(false);
-        }
-    }
-
     private static void StartHost(FunctionAppHostManager hostManager)
     {
         IEnumerable<string> hostStartupLog;
@@ -250,7 +232,7 @@ public class B2BApiAppFixture : IAsyncLifetime
     /// would otherwise continue working on old orchestrations that e.g. failed in
     /// previous runs.
     /// </summary>
-    private static void CleanupAzuriteStorage()
+    private void CleanupAzuriteStorage()
     {
         if (Directory.Exists("__blobstorage__"))
             Directory.Delete("__blobstorage__", true);
@@ -278,6 +260,24 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         if (File.Exists("__azurite_db_table_extent__.json"))
             File.Delete("__azurite_db_table_extent__.json");
+    }
+
+    private void CreateRequiredContainers()
+    {
+        List<FileStorageCategory> containerCategories = [
+            FileStorageCategory.ArchivedMessage(),
+            FileStorageCategory.OutgoingMessage(),
+        ];
+
+        var blobServiceClient = new BlobServiceClient(AzuriteManager.BlobStorageConnectionString);
+        foreach (var fileStorageCategory in containerCategories)
+        {
+            var container = blobServiceClient.GetBlobContainerClient(fileStorageCategory.Value);
+            var containerExists = container.Exists();
+
+            if (!containerExists)
+                container.Create();
+        }
     }
 
     private FunctionAppHostSettings CreateAppHostSettings(string csprojName, ref int port)

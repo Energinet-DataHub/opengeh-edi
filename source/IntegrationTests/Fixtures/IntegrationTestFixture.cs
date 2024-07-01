@@ -110,14 +110,15 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
         connection.Close();
     }
 
-    public async Task InitializeAsync()
+    public Task InitializeAsync()
     {
         CreateSchema();
         CleanupDatabase();
 
         AzuriteManager.StartAzurite();
         CleanupFileStorage();
-        await CreateRequiredContainersAsync();
+
+        return Task.CompletedTask;
     }
 
     public Task DisposeAsync()
@@ -165,23 +166,9 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
             if (File.Exists("__azurite_db_table_extent__.json"))
                 File.Delete("__azurite_db_table_extent__.json");
         }
-    }
-
-    public async Task CreateRequiredContainersAsync()
-    {
-        List<FileStorageCategory> containerCategories = [
-            FileStorageCategory.ArchivedMessage(),
-            FileStorageCategory.OutgoingMessage(),
-        ];
-
-        var blobServiceClient = new BlobServiceClient(AzuriteManager.BlobStorageConnectionString);
-        foreach (var fileStorageCategory in containerCategories)
+        else
         {
-            var container = blobServiceClient.GetBlobContainerClient(fileStorageCategory.Value);
-            var containerExists = await container.ExistsAsync().ConfigureAwait(false);
-
-            if (!containerExists)
-                await container.CreateAsync().ConfigureAwait(false);
+            CreateRequiredContainers();
         }
     }
 
@@ -213,5 +200,23 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
         var upgradeResult = DbUpgradeRunner.RunDbUpgrade(DatabaseConnectionString);
         if (!upgradeResult.Successful)
             throw new InvalidOperationException("Database upgrade failed", upgradeResult.Error);
+    }
+
+    private void CreateRequiredContainers()
+    {
+        List<FileStorageCategory> containerCategories = [
+            FileStorageCategory.ArchivedMessage(),
+            FileStorageCategory.OutgoingMessage(),
+        ];
+
+        var blobServiceClient = new BlobServiceClient(AzuriteManager.BlobStorageConnectionString);
+        foreach (var fileStorageCategory in containerCategories)
+        {
+            var container = blobServiceClient.GetBlobContainerClient(fileStorageCategory.Value);
+            var containerExists = container.Exists();
+
+            if (!containerExists)
+                container.Create();
+        }
     }
 }
