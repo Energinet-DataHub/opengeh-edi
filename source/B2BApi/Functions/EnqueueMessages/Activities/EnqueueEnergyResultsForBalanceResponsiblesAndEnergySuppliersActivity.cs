@@ -66,6 +66,7 @@ public class EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivit
                 input.CalculationId);
 
             var enqueueStopwatch = Stopwatch.StartNew();
+            var wasSuccess = false;
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 try
@@ -74,6 +75,7 @@ public class EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivit
                     await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResult, CancellationToken.None).ConfigureAwait(false);
 
                     numberOfHandledResults++;
+                    wasSuccess = true;
                 }
                 catch
                 {
@@ -82,12 +84,16 @@ public class EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivit
             }
 
             enqueueStopwatch.Stop();
+            var logStatusText = wasSuccess ? "Successfully enqueued" : "Failed enqueuing";
             _logger.LogInformation(
-                "Enqueued energy result in database, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}",
+                logStatusText + " energy result in database, elapsed time: {ElapsedTime}, successful results: {SuccessfulResultsCount}, failed results: {FailedResultsCount}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
                 enqueueStopwatch.Elapsed.ToString(),
+                numberOfHandledResults,
+                numberOfFailedResults,
                 query.GetType().Name,
                 energyResult.ExternalId.Value,
-                input.CalculationId);
+                input.CalculationId,
+                input.EventId);
             databricksStopwatch.Restart();
         }
 
