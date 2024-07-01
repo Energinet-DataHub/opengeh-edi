@@ -82,7 +82,6 @@ public class EnqueueEnergyResultsForBalanceResponsiblesActivity(
 
                         numberOfHandledResults++;
                         enqueueWasSuccess = true;
-                        numberOfHandledResults++;
                     }
                     catch (Exception ex)
                     {
