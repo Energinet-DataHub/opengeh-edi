@@ -86,8 +86,8 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
         var outgoingMessage = await _context.OutgoingMessages.FirstOrDefaultAsync(x => x.AssignedBundleId == bundleMessageId).ConfigureAwait(false);
         if (outgoingMessage is not null)
         {
-            _context.Remove(outgoingMessage);
             await _fileStorageClient.DeleteIfExistsAsync(outgoingMessage.FileStorageReference).ConfigureAwait(false);
+            _context.Remove(outgoingMessage);
         }
     }
 
