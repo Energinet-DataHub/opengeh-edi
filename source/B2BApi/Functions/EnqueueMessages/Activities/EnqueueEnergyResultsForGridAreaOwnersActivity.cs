@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
@@ -50,23 +51,49 @@ public class EnqueueEnergyResultsForGridAreaOwnersActivity(
             _masterDataClient,
             EventId.From(input.EventId),
             input.CalculationId);
+
+        _logger.LogInformation(
+            "Starting enqueuing messages for energy query, type: {QueryType}, calculation id: {CalculationId}, event id: {EventId}",
+            query.GetType().Name,
+            input.CalculationId,
+            input.EventId);
+
+        var activityStopwatch = Stopwatch.StartNew();
+        var databricksStopwatch = Stopwatch.StartNew();
         await foreach (var queryResult in _energyResultEnumerator.GetAsync(query))
         {
+            databricksStopwatch.Stop();
+            _logger.LogInformation(
+                "Retrieved energy result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}",
+                databricksStopwatch.Elapsed,
+                query.GetType().Name,
+                queryResult.Result!.ExternalId.Value,
+                input.CalculationId);
+
+            var enqueueStopwatch = Stopwatch.StartNew();
+            var enqueueWasSuccess = false;
             if (queryResult.IsSuccess)
             {
                 using (var scope = _serviceScopeFactory.CreateScope())
                 {
                     try
                     {
-                        var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-                        await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(queryResult.Result!, CancellationToken.None).ConfigureAwait(false);
+                        var scopedOutgoingMessagesClient =
+                            scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+                        await scopedOutgoingMessagesClient
+                            .EnqueueAndCommitAsync(queryResult.Result!, CancellationToken.None)
+                            .ConfigureAwait(false);
 
                         numberOfHandledResults++;
+                        enqueueWasSuccess = true;
                     }
                     catch (Exception ex)
                     {
                         numberOfFailedResults++;
-                        _logger.LogWarning(ex, "Enqueue and commit of energy result failed for CalculationId='{CalculationId}'.", input.CalculationId);
+                        _logger.LogWarning(
+                            ex,
+                            "Enqueue and commit of energy result failed for CalculationId='{CalculationId}'.",
+                            input.CalculationId);
                     }
                 }
             }
@@ -74,7 +101,29 @@ public class EnqueueEnergyResultsForGridAreaOwnersActivity(
             {
                 numberOfFailedResults++;
             }
+
+            enqueueStopwatch.Stop();
+            var logStatusText = enqueueWasSuccess ? "Successfully enqueued" : "Failed enqueuing";
+            _logger.LogInformation(
+                logStatusText + " energy result in database, elapsed time: {ElapsedTime}, successful results: {SuccessfulResultsCount}, failed results: {FailedResultsCount}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
+                enqueueStopwatch.Elapsed.ToString(),
+                numberOfHandledResults,
+                numberOfFailedResults,
+                query.GetType().Name,
+                queryResult.Result!.ExternalId.Value,
+                input.CalculationId,
+                input.EventId);
+            databricksStopwatch.Restart();
         }
+
+        _logger.LogInformation(
+            "Finished enqueuing messages for energy query, elapsed time: {ElapsedTime}, successful results: {SuccessfulResultsCount}, failed results: {FailedResultsCount}, type: {QueryType}, calculation id: {CalculationId}, event id: {EventId}",
+            activityStopwatch.Elapsed,
+            numberOfHandledResults,
+            numberOfFailedResults,
+            query.GetType().Name,
+            input.CalculationId,
+            input.EventId);
 
         return numberOfFailedResults > 0
             ? throw new Exception($"Enqueue messages activity failed. CalculationId='{input.CalculationId}' EventId='{input.EventId}' NumberOfFailedResults='{numberOfFailedResults}'")

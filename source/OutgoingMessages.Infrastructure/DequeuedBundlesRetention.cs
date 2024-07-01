@@ -12,58 +12,80 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Data.Common;
-using System.Threading;
-using System.Threading.Tasks;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Microsoft.Data.SqlClient;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
+using Microsoft.Extensions.Logging;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 
 public class DequeuedBundlesRetention : IDataRetention
 {
-    private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
+    private readonly IMarketDocumentRepository _marketDocumentRepository;
+    private readonly IOutgoingMessageRepository _outgoingMessageRepository;
+    private readonly ActorMessageQueueContext _actorMessageQueueContext;
+    private readonly ILogger<DequeuedBundlesRetention> _logger;
 
-    public DequeuedBundlesRetention(IDatabaseConnectionFactory databaseConnectionFactory)
+    public DequeuedBundlesRetention(
+        ISystemDateTimeProvider systemDateTimeProvider,
+        IActorMessageQueueRepository actorMessageQueueRepository,
+        IMarketDocumentRepository marketDocumentRepository,
+        IOutgoingMessageRepository outgoingMessageRepository,
+        ActorMessageQueueContext actorMessageQueueContext,
+        ILogger<DequeuedBundlesRetention> logger)
     {
-        _databaseConnectionFactory = databaseConnectionFactory;
+        _systemDateTimeProvider = systemDateTimeProvider;
+        _actorMessageQueueRepository = actorMessageQueueRepository;
+        _marketDocumentRepository = marketDocumentRepository;
+        _outgoingMessageRepository = outgoingMessageRepository;
+        _actorMessageQueueContext = actorMessageQueueContext;
+        _logger = logger;
     }
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
     {
-        const string deleteStmt = @"
-            DELETE FROM [dbo].[MarketDocuments]
-            WHERE [BundleId] IN (SELECT [Id]
-            FROM [dbo].[Bundles]
-            WHERE [IsDequeued] = 1)
-
-            DELETE FROM [dbo].[OutgoingMessages]
-            WHERE [AssignedBundleId] IN (SELECT [Id]
-            FROM [dbo].[Bundles]
-            WHERE [IsDequeued] = 1)
-
-            DELETE FROM [dbo].[Bundles]
-            WHERE [IsDequeued] = 1";
-
-        using var connection =
-            (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        using var transaction =
-            (SqlTransaction)await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
-        using var command = connection.CreateCommand();
-        command.Transaction = transaction;
-        command.CommandText = deleteStmt;
-
-        try
+        const int incrementer = 10;
+        const int take = 10;
+        var skip = 0;
+        var monthAgo = _systemDateTimeProvider.Now().Plus(-Duration.FromDays(30));
+        while (true)
         {
-            await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
-            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-        }
-        catch (DbException)
-        {
-            // Add exception logging
-            await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-            throw; // re-throw exception
+            var actorMessageQueues =
+                await _actorMessageQueueRepository.GetActorMessageQueuesAsync(skip, take).ConfigureAwait(false);
+
+            if (actorMessageQueues.Count == 0)
+            {
+                break;
+            }
+
+            foreach (var actorMessageQueue in actorMessageQueues)
+            {
+                var dequeuedBundles = actorMessageQueue.GetDequeuedBundles();
+                foreach (var bundle in dequeuedBundles)
+                {
+                    if (bundle.DequeuedAt < monthAgo)
+                    {
+                        try
+                        {
+                            await _marketDocumentRepository.DeleteMarketDocumentIfExistsAsync(bundle.Id).ConfigureAwait(false);
+                            await _outgoingMessageRepository.DeleteOutgoingMessageIfExistsAsync(bundle.Id).ConfigureAwait(false);
+                            actorMessageQueue.RemoveBundle(bundle);
+                            await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogWarning(e, "Failed to remove bundle with id {BundleId}", bundle.Id);
+                        }
+                    }
+                }
+            }
+
+            skip += incrementer;
         }
     }
 }

@@ -100,7 +100,7 @@ internal sealed class EbixDriver : IDisposable
         using var operationScope = new OperationContextScope(_ebixServiceClient.InnerChannel);
 
         var stopWatch = Stopwatch.StartNew();
-        var timeBeforeTimeout = new TimeSpan(0, 10, 0);
+        var timeBeforeTimeout = TimeSpan.FromSeconds(10);
         do
         {
             var peekResult = await _ebixServiceClient.peekMessageAsync().ConfigureAwait(false);

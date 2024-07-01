@@ -19,19 +19,24 @@ using System.Text;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
 using Energinet.DataHub.EDI.AcceptanceTests.Logging;
+using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Nito.AsyncEx;
+using NodaTime;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 internal sealed class EdiDriver : IDisposable
 {
+    private readonly IDurableClient _durableClient;
     private readonly AsyncLazy<HttpClient> _httpClient;
     private readonly ITestOutputHelper _logger;
 
-    public EdiDriver(AsyncLazy<HttpClient> b2bHttpClient, ITestOutputHelper logger)
+    public EdiDriver(IDurableClient durableClient, AsyncLazy<HttpClient> b2bHttpClient, ITestOutputHelper logger)
     {
+        _durableClient = durableClient;
         _httpClient = b2bHttpClient;
         _logger = logger;
     }
@@ -43,7 +48,10 @@ internal sealed class EdiDriver : IDisposable
     internal async Task<HttpResponseMessage> PeekMessageAsync(DocumentFormat? documentFormat = null)
     {
         var stopWatch = Stopwatch.StartNew();
-        while (stopWatch.ElapsedMilliseconds < 600000)
+
+        // Set timeout to above 20 seconds since internal commands must be handled (twice) before accepted/rejected messages are available
+        var timeoutAfter = TimeSpan.FromMinutes(1);
+        while (stopWatch.ElapsedMilliseconds < timeoutAfter.TotalMilliseconds)
         {
             var peekResponse = await PeekAsync(documentFormat)
                 .ConfigureAwait(false);
@@ -62,6 +70,29 @@ internal sealed class EdiDriver : IDisposable
         }
 
         throw new TimeoutException("Unable to retrieve peek result within time limit");
+    }
+
+    internal async Task<IReadOnlyCollection<HttpResponseMessage>> PeekAllMessagesAsync(DocumentFormat? documentFormat = null)
+    {
+        // We use PeekAsync() directly since we don't want to wait for messages to become available (which PeekMessageAsync does)
+        var peekResponse = await PeekAsync(documentFormat);
+
+        if (peekResponse.StatusCode == HttpStatusCode.NoContent)
+        {
+            // Received no content - break out of recursive loop and return the found results
+            return [];
+        }
+
+        if (peekResponse.StatusCode != HttpStatusCode.OK)
+            throw new InvalidOperationException($"Unknown http status code while peeking messages: {peekResponse.StatusCode}");
+
+        var results = new List<HttpResponseMessage> { peekResponse };
+
+        await DequeueAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
+
+        results.AddRange(await PeekAllMessagesAsync(documentFormat).ConfigureAwait(false));
+
+        return results;
     }
 
     internal async Task EmptyQueueAsync()
@@ -129,6 +160,18 @@ internal sealed class EdiDriver : IDisposable
 
         await aggregatedMeasureDataResponse.EnsureSuccessStatusCodeWithLogAsync(_logger);
         return requestContent.MessageId;
+    }
+
+    internal async Task<DurableOrchestrationStatus> WaitForOrchestrationStartedAsync(Instant calculationCompletedAt)
+    {
+        var orchestration = await _durableClient.WaitForOrchestationStatusAsync(calculationCompletedAt.ToDateTimeUtc());
+
+        return orchestration;
+    }
+
+    internal async Task WaitForOrchestrationCompletedAsync(string orchestrationInstanceId)
+    {
+        await _durableClient.WaitForInstanceCompletedAsync(orchestrationInstanceId, TimeSpan.FromMinutes(30));
     }
 
     private static async Task<(Guid MessageId, string Content)> GetRequestWholesaleSettlementContentAsync(

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
@@ -31,4 +30,9 @@ public interface IMarketDocumentRepository
     /// Add document to repository
     /// </summary>
     void Add(MarketDocument marketDocument);
+
+    /// <summary>
+    /// Delete market document if it exists
+    /// </summary>
+    Task DeleteMarketDocumentIfExistsAsync(BundleId bundleMessageId);
 }

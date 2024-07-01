@@ -376,7 +376,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var externalId = Guid.NewGuid();
 
         var message = _wholesaleAmountPerChargeDtoBuilder
-            .WithReceiverNumber(receiverId.Value)
+            .WithReceiverNumber(receiverId)
             .WithCalculationResultId(externalId)
             .Build();
 

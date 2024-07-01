@@ -449,6 +449,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
     private Task GivenEnqueueWholesaleResultsForTotalAmountAsync(Guid calculationId)
     {
         var activity = new EnqueueWholesaleResultsForTotalAmountsActivity(
+            GetService<ILogger<EnqueueWholesaleResultsForTotalAmountsActivity>>(),
             GetService<IServiceScopeFactory>(),
             GetService<WholesaleResultEnumerator>());
 
@@ -458,6 +459,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
     private Task GivenEnqueueWholesaleResultsForMonthlyAmountPerChargesAsync(Guid calculationId)
     {
         var activity = new EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
+            GetService<ILogger<EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity>>(),
             GetService<IServiceScopeFactory>(),
             GetService<IMasterDataClient>(),
             GetService<WholesaleResultEnumerator>());

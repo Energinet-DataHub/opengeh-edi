@@ -24,9 +24,9 @@ public class WholesaleAmountPerChargeDtoBuilder
     private readonly EventId _eventId = EventId.From(Guid.NewGuid());
     private readonly Guid _calculationId = Guid.NewGuid();
     private readonly BusinessReason _businessReason = BusinessReason.WholesaleFixing;
-    private readonly ActorNumber _chargeOwnerId = ActorNumber.Create("1234567891911");
 
-    private ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
+    private ActorNumber _chargeOwnerActorNumber = ActorNumber.Create("1234567891911");
+    private ActorNumber _receiverActorNumber = ActorNumber.Create("1234567891912");
     private Guid _calculationResultId;
 
     public WholesaleAmountPerChargeMessageDto Build()
@@ -36,9 +36,9 @@ public class WholesaleAmountPerChargeDtoBuilder
             calculationId: _calculationId,
             calculationResultId: _calculationResultId,
             calculationResultVersion: 1,
-            energySupplierReceiverId: _receiverNumber,
-            chargeOwnerReceiverId: _chargeOwnerId,
-            chargeOwnerId: _chargeOwnerId,
+            energySupplierReceiverId: _receiverActorNumber,
+            chargeOwnerReceiverId: _chargeOwnerActorNumber,
+            chargeOwnerId: _chargeOwnerActorNumber,
             businessReason: _businessReason.ToString(),
             gridAreaCode: "805",
             isTax: false,
@@ -63,9 +63,15 @@ public class WholesaleAmountPerChargeDtoBuilder
         return this;
     }
 
-    public WholesaleAmountPerChargeDtoBuilder WithReceiverNumber(string receiverIdValue)
+    public WholesaleAmountPerChargeDtoBuilder WithReceiverNumber(ActorNumber receiverActorNumber)
     {
-        _receiverNumber = ActorNumber.Create(receiverIdValue);
+        _receiverActorNumber = receiverActorNumber;
+        return this;
+    }
+
+    public WholesaleAmountPerChargeDtoBuilder WithChargeOwnerNumber(ActorNumber chargeOwnerActorNumber)
+    {
+        _chargeOwnerActorNumber = chargeOwnerActorNumber;
         return this;
     }
 }

@@ -31,11 +31,15 @@ public class WhenCalculationCompletedIsPublishedTests : BaseTestClass
         ArgumentNullException.ThrowIfNull(fixture);
 
         _calculationCompleted = new CalculationCompletedDsl(
-            fixture,
             new EdiDriver(
-                fixture.B2BMeteredDataResponsibleAuthorizedHttpClient, output),
+                fixture.DurableClient,
+                fixture.B2BMeteredDataResponsibleAuthorizedHttpClient,
+                output),
             new EdiDatabaseDriver(fixture.ConnectionString),
-            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient));
+            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient),
+            output,
+            fixture.BalanceFixingCalculationId,
+            fixture.WholesaleFixingCalculationId);
     }
 
     [Fact]
@@ -43,6 +47,14 @@ public class WhenCalculationCompletedIsPublishedTests : BaseTestClass
     {
         await _calculationCompleted.PublishForBalanceFixingCalculation();
 
-        await _calculationCompleted.ConfirmEnergyResultIsAvailable();
+        await _calculationCompleted.ConfirmEnergyResultsAreAvailable();
+    }
+
+    [Fact]
+    public async Task Actor_can_peek_and_dequeue_wholesale_and_energy_result_from_wholesale_fixing()
+    {
+        await _calculationCompleted.PublishForWholesaleFixingCalculation();
+
+        await _calculationCompleted.ConfirmWholesaleResultsAndEnergyResultsAreAvailable();
     }
 }

@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
@@ -36,4 +37,9 @@ public interface IOutgoingMessageRepository
     /// Checks if a message exists in the database for the designated receiver and the external id.
     /// </summary>
     Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId);
+
+    /// <summary>
+    /// Delete outgoing message if it exists
+    /// </summary>
+    Task DeleteOutgoingMessageIfExistsAsync(BundleId bundleMessageId);
 }
