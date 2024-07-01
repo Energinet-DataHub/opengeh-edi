@@ -14,6 +14,7 @@
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Azure.Storage.Blobs;
 using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
@@ -25,6 +26,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Database;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.Options;
@@ -111,6 +113,7 @@ public class B2BApiAppFixture : IAsyncLifetime
     {
         // Storage emulator
         AzuriteManager.StartAzurite();
+        CreateRequiredContainers();
 
         // Database
         await DatabaseManager.CreateDatabaseAsync();
@@ -229,7 +232,7 @@ public class B2BApiAppFixture : IAsyncLifetime
     /// would otherwise continue working on old orchestrations that e.g. failed in
     /// previous runs.
     /// </summary>
-    private static void CleanupAzuriteStorage()
+    private void CleanupAzuriteStorage()
     {
         if (Directory.Exists("__blobstorage__"))
             Directory.Delete("__blobstorage__", true);
@@ -257,6 +260,24 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         if (File.Exists("__azurite_db_table_extent__.json"))
             File.Delete("__azurite_db_table_extent__.json");
+    }
+
+    private void CreateRequiredContainers()
+    {
+        List<FileStorageCategory> containerCategories = [
+            FileStorageCategory.ArchivedMessage(),
+            FileStorageCategory.OutgoingMessage(),
+        ];
+
+        var blobServiceClient = new BlobServiceClient(AzuriteManager.BlobStorageConnectionString);
+        foreach (var fileStorageCategory in containerCategories)
+        {
+            var container = blobServiceClient.GetBlobContainerClient(fileStorageCategory.Value);
+            var containerExists = container.Exists();
+
+            if (!containerExists)
+                container.Create();
+        }
     }
 
     private FunctionAppHostSettings CreateAppHostSettings(string csprojName, ref int port)

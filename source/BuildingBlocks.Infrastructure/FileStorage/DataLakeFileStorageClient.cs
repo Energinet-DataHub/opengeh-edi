@@ -38,10 +38,11 @@ public class DataLakeFileStorageClient : IFileStorageClient
 
         var container = _blobServiceClient.GetBlobContainerClient(reference.Category.Value);
 
-        var containerExists = await container.ExistsAsync().ConfigureAwait(false);
-
-        if (!containerExists)
-            await container.CreateAsync().ConfigureAwait(false);
+        // TODO: Check if container exists and create it if it does not in infrastructure or somewhere else
+        // var containerExists = await container.ExistsAsync().ConfigureAwait(false);
+        //
+        // if (!containerExists)
+        //     await container.CreateAsync().ConfigureAwait(false);
 
         stream.Position = 0; // Make sure we read the entire stream
         await container.UploadBlobAsync(reference.Path, stream).ConfigureAwait(false);
