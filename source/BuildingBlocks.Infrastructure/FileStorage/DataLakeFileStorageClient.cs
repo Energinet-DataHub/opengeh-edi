@@ -83,6 +83,6 @@ public class DataLakeFileStorageClient : IFileStorageClient
 
         var blob = container.GetBlobClient(reference.Path);
 
-        await blob.DeleteAsync(DeleteSnapshotsOption.IncludeSnapshots).ConfigureAwait(false);
+        await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots).ConfigureAwait(false);
     }
 }

@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
@@ -49,7 +46,7 @@ public class ActorMessageQueueRepository : IActorMessageQueueRepository
         return actorMessageQueue;
     }
 
-    public async Task<ReadOnlyCollection<ActorMessageQueue>> GetActorMessageQueuesAsync(int skip, int take)
+    public async Task<IReadOnlyCollection<ActorMessageQueue>> GetActorMessageQueuesAsync(int skip, int take)
     {
         return new ReadOnlyCollection<ActorMessageQueue>(await _actorMessageQueueContext.ActorMessageQueues.Skip(skip).Take(take).ToListAsync().ConfigureAwait(false));
     }

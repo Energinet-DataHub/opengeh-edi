@@ -34,5 +34,5 @@ public interface IMarketDocumentRepository
     /// <summary>
     /// Delete market document if it exists
     /// </summary>
-    Task DeleteMarketIfExistsDocumentAsync(BundleId bundleMessageId);
+    Task DeleteMarketDocumentIfExistsAsync(BundleId bundleMessageId);
 }

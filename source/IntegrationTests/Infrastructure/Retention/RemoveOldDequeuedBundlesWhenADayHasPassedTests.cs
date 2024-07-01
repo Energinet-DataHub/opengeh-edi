@@ -80,8 +80,8 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         await sut.CleanupAsync(CancellationToken.None);
 
         // Assert
-        var actorMessageQueueRepositoryRead = GetService<IActorMessageQueueRepository>();
-        var actorMessageQueueForEs = await actorMessageQueueRepositoryRead.ActorMessageQueueForAsync(receiverId, ActorRole.EnergySupplier);
+        ClearDbContextCaches();
+        var actorMessageQueueForEs = await actorMessageQueueRepository.ActorMessageQueueForAsync(receiverId, ActorRole.EnergySupplier);
 
         // The bundle should be removed from the queue for the energy supplier, but not for the grid operator.
         actorMessageQueueForEs!.GetDequeuedBundles().Should().BeEmpty();

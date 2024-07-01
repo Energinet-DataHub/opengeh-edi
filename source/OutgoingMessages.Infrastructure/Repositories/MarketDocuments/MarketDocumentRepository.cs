@@ -51,7 +51,7 @@ public class MarketDocumentRepository : IMarketDocumentRepository
         _actorMessageQueueContext.Add(marketDocument);
     }
 
-    public async Task DeleteMarketIfExistsDocumentAsync(BundleId bundleMessageId)
+    public async Task DeleteMarketDocumentIfExistsAsync(BundleId bundleMessageId)
     {
         var marketDocument = await _actorMessageQueueContext.MarketDocuments.FirstOrDefaultAsync(x => x.BundleId == bundleMessageId).ConfigureAwait(false);
         if (marketDocument is not null)

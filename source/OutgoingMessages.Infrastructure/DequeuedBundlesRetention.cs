@@ -50,8 +50,8 @@ public class DequeuedBundlesRetention : IDataRetention
     public async Task CleanupAsync(CancellationToken cancellationToken)
     {
         const int incrementer = 10;
+        const int take = 10;
         var skip = 0;
-        var take = 10;
         var monthAgo = _systemDateTimeProvider.Now().Plus(-Duration.FromDays(30));
         while (true)
         {
@@ -72,7 +72,7 @@ public class DequeuedBundlesRetention : IDataRetention
                     {
                         try
                         {
-                            await _marketDocumentRepository.DeleteMarketIfExistsDocumentAsync(bundle.Id).ConfigureAwait(false);
+                            await _marketDocumentRepository.DeleteMarketDocumentIfExistsAsync(bundle.Id).ConfigureAwait(false);
                             await _outgoingMessageRepository.DeleteOutgoingMessageIfExistsAsync(bundle.Id).ConfigureAwait(false);
                             actorMessageQueue.RemoveBundle(bundle);
                             await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -86,7 +86,6 @@ public class DequeuedBundlesRetention : IDataRetention
             }
 
             skip += incrementer;
-            take += incrementer;
         }
     }
 }
