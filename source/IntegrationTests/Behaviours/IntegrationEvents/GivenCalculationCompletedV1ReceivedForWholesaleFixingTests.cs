@@ -28,10 +28,12 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents;
 
@@ -436,6 +438,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
     private Task GivenEnqueueWholesaleResultsForAmountPerChargesAsync(Guid calculationId)
     {
         var activity = new EnqueueWholesaleResultsForAmountPerChargesActivity(
+            GetService<ILogger<EnqueueWholesaleResultsForAmountPerChargesActivity>>(),
             GetService<IServiceScopeFactory>(),
             GetService<IMasterDataClient>(),
             GetService<WholesaleResultEnumerator>());
@@ -446,6 +449,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
     private Task GivenEnqueueWholesaleResultsForTotalAmountAsync(Guid calculationId)
     {
         var activity = new EnqueueWholesaleResultsForTotalAmountsActivity(
+            GetService<ILogger<EnqueueWholesaleResultsForTotalAmountsActivity>>(),
             GetService<IServiceScopeFactory>(),
             GetService<WholesaleResultEnumerator>());
 
@@ -455,6 +459,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
     private Task GivenEnqueueWholesaleResultsForMonthlyAmountPerChargesAsync(Guid calculationId)
     {
         var activity = new EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
+            GetService<ILogger<EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity>>(),
             GetService<IServiceScopeFactory>(),
             GetService<IMasterDataClient>(),
             GetService<WholesaleResultEnumerator>());
