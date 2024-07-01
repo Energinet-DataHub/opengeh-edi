@@ -340,8 +340,7 @@ public class OutgoingMessage
         ArgumentNullException.ThrowIfNull(serializer);
         ArgumentNullException.ThrowIfNull(messageDto);
 
-        return
-        [
+        List<OutgoingMessage> outgoingMessages = [
             new OutgoingMessage(
                 eventId: messageDto.EventId,
                 documentType: messageDto.DocumentType,
@@ -358,8 +357,13 @@ public class OutgoingMessage
                 gridAreaCode: messageDto.GridArea,
                 externalId: messageDto.ExternalId,
                 calculationId: messageDto.CalculationId),
+        ];
 
-            new OutgoingMessage(
+        // Only create a message for the balance responsible if the business reason is BalanceFixing or PreliminaryAggregation
+        if (messageDto.BusinessReason is not DataHubNames.BusinessReason.WholesaleFixing &&
+            messageDto.BusinessReason is not DataHubNames.BusinessReason.Correction)
+        {
+            var outgoingMessageToBalanceResponsible = new OutgoingMessage(
                 eventId: messageDto.EventId,
                 documentType: messageDto.DocumentType,
                 processId: messageDto.ProcessId,
@@ -374,8 +378,12 @@ public class OutgoingMessage
                 relatedToMessageId: messageDto.RelatedToMessageId,
                 gridAreaCode: messageDto.GridArea,
                 externalId: messageDto.ExternalId,
-                calculationId: messageDto.CalculationId),
-        ];
+                calculationId: messageDto.CalculationId);
+
+            outgoingMessages.Add(outgoingMessageToBalanceResponsible);
+        }
+
+        return outgoingMessages;
     }
 
     /// <summary>
