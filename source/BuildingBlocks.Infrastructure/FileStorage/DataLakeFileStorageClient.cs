@@ -76,4 +76,13 @@ public class DataLakeFileStorageClient : IFileStorageClient
 
         return new FileStorageFile(downloadStream);
     }
+
+    public async Task DeleteIfExistsAsync(FileStorageReference reference)
+    {
+        var container = _blobServiceClient.GetBlobContainerClient(reference.Category.Value);
+
+        var blob = container.GetBlobClient(reference.Path);
+
+        await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots).ConfigureAwait(false);
+    }
 }
