@@ -22,14 +22,18 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatem
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Microsoft.Extensions.Logging;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 
 public class WholesaleTotalAmountQuery(
+    ILogger logger,
     EdiDatabricksOptions ediDatabricksOptions,
     EventId eventId,
     Guid calculationId)
     : WholesaleResultQueryBase<WholesaleTotalAmountMessageDto>(
+        logger,
         ediDatabricksOptions,
         calculationId)
 {

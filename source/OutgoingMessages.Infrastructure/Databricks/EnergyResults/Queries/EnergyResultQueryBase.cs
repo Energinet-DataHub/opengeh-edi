@@ -92,7 +92,9 @@ public abstract class EnergyResultQueryBase<TResult>(
         }
     }
 
-    protected abstract Task<TResult> CreateEnergyResultAsync(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints);
+    protected abstract Task<TResult> CreateEnergyResultAsync(
+        DatabricksSqlRow databricksSqlRow,
+        IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints);
 
     private static EnergyTimeSeriesPoint CreateTimeSeriesPoint(DatabricksSqlRow databricksSqlRow)
     {
