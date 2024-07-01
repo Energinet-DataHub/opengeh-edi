@@ -86,9 +86,10 @@ public class EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
                         numberOfHandledResults++;
                         enqueueWasSuccess = true;
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         numberOfFailedResults++;
+                        _logger.LogWarning(ex, "Enqueue and commit of wholesale result failed for CalculationId='{CalculationId}'.", input.CalculationId);
                     }
                 }
             }
