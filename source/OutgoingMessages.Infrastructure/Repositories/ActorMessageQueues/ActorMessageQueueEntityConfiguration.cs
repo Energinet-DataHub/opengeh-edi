@@ -31,7 +31,8 @@ public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<Act
         builder.ToTable("ActorMessageQueues", "dbo");
 
         builder.HasKey(amq => amq.Id);
-        builder.Property(amq => amq.Id);
+        builder.Property(amq => amq.Id)
+            .HasConversion(toDbValue => toDbValue.Id, fromDbValue => ActorMessageQueueId.CreateExisting(fromDbValue));
 
         builder.OwnsOne<Receiver>("Receiver", entityBuilder =>
         {

@@ -30,7 +30,6 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 /// </summary>
 public class EnqueueMessage
 {
-    private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly ILogger<EnqueueMessage> _logger;
@@ -47,7 +46,6 @@ public class EnqueueMessage
         IFeatureFlagManager featureFlagManager,
         EnqueueMessageService enqueueMessageService)
     {
-        _actorMessageQueueRepository = actorMessageQueueRepository;
         _outgoingMessageRepository = outgoingMessageRepository;
         _systemDateTimeProvider = systemDateTimeProvider;
         _logger = logger;
