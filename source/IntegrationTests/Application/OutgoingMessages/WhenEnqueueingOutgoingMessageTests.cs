@@ -12,11 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Azure;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -368,6 +363,30 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         fromDb.OutgoingMessageReceiverRole.Should().Be(ActorRole.MeteredDataResponsible.Code);
     }
 
+    [Theory]
+    [InlineData("WholesaleFixing")]
+    [InlineData("Correction")]
+    public async Task Given_EnqueuingEnergyResultsFromWholesaleFixingAndCorrections_When_ReceiverActorRoleIsDDK_Then_MessageShouldBeEmpty(string businessReasonName)
+    {
+        // Arrange
+        var receiverId = ActorNumber.Create("1234567891912");
+        var externalId = Guid.NewGuid();
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithEnergySupplierReceiverNumber(receiverId.Value)
+            .WithBalanceResponsiblePartyReceiverNumber(receiverId.Value)
+            .WithBusinessReason(BusinessReason.FromName(businessReasonName))
+            .WithCalculationResultId(externalId)
+            .Build();
+
+        // Act
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+
+        // Assert
+        var messages = await GetOutgoingMessagesFor(receiverId, ActorRole.BalanceResponsibleParty);
+
+        messages.Should().BeEmpty();
+    }
+
     [Fact]
     public async Task Outgoing_message_must_only_be_enqueued_once_to_an_receiver_with_same_externalId()
     {
@@ -443,6 +462,22 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
                 });
 
         return (ActorMessageQueueNumber: result.ActorNumber, ActorMessageQueueRole: result.ActorRole, OutgoingMessageReceiverRole: result.ReceiverRole);
+    }
+
+    private async Task<List<dynamic>> GetOutgoingMessagesFor(ActorNumber actorNumber, ActorRole actorRole)
+    {
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+
+        var messages = await connection.QueryAsync(
+            @"SELECT outgoing.Id FROM [dbo].[OutgoingMessages] AS outgoing
+                        WHERE outgoing.ReceiverNumber = @ReceiverNumber AND outgoing.ReceiverRole = @ReceiverRole",
+            new
+                {
+                    ReceiverNumber = actorNumber.Value,
+                    ReceiverRole = actorRole.Code,
+                });
+
+        return messages.ToList();
     }
 
     private async Task<string?> GetOutgoingMessageFileStorageReferenceFromDatabase(OutgoingMessageId id)

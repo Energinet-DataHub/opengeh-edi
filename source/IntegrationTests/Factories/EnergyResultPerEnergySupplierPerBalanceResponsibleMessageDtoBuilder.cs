@@ -22,9 +22,9 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
 {
     private readonly EventId _eventId = EventId.From(Guid.NewGuid());
-    private readonly BusinessReason _businessReason = BusinessReason.WholesaleFixing;
     private readonly Guid _calculationId = Guid.NewGuid();
 
+    private BusinessReason _businessReason = BusinessReason.BalanceFixing;
     private ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private ActorNumber _balanceResponsibleNumber = ActorNumber.Create("1234567891911");
     private Guid _calculationResultId;
@@ -67,6 +67,12 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
     public EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder WithBalanceResponsiblePartyReceiverNumber(string receiverIdValue)
     {
         _balanceResponsibleNumber = ActorNumber.Create(receiverIdValue);
+        return this;
+    }
+
+    public EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder WithBusinessReason(BusinessReason businessReason)
+    {
+        _businessReason = businessReason;
         return this;
     }
 }
