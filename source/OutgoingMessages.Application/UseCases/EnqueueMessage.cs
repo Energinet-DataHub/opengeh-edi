@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -35,6 +36,7 @@ public class EnqueueMessage
     private readonly ILogger<EnqueueMessage> _logger;
     private readonly DelegateMessage _delegateMessage;
     private readonly IFeatureFlagManager _featureFlagManager;
+    private readonly EnqueueMessageService _enqueueMessageService;
 
     public EnqueueMessage(
         IActorMessageQueueRepository actorMessageQueueRepository,
@@ -42,7 +44,8 @@ public class EnqueueMessage
         ISystemDateTimeProvider systemDateTimeProvider,
         ILogger<EnqueueMessage> logger,
         DelegateMessage delegateMessage,
-        IFeatureFlagManager featureFlagManager)
+        IFeatureFlagManager featureFlagManager,
+        EnqueueMessageService enqueueMessageService)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _outgoingMessageRepository = outgoingMessageRepository;
@@ -50,6 +53,7 @@ public class EnqueueMessage
         _logger = logger;
         _delegateMessage = delegateMessage;
         _featureFlagManager = featureFlagManager;
+        _enqueueMessageService = enqueueMessageService;
     }
 
     public async Task<OutgoingMessageId> EnqueueAsync(
@@ -68,7 +72,8 @@ public class EnqueueMessage
         if (messageExists != null)
             return messageExists.Id;
 
-        await AddToActorMessageQueueAsync(messageToEnqueue).ConfigureAwait(false);
+        await _enqueueMessageService.EnqueueAsync(messageToEnqueue, _systemDateTimeProvider.Now())
+            .ConfigureAwait(false);
 
         // Add to outgoing message repository (and upload to file storage) after adding actor message queue,
         // to minimize the cases where a message is uploaded to file storage but adding actor message queue fails
@@ -81,27 +86,5 @@ public class EnqueueMessage
             messageToEnqueue.EventId);
 
         return messageToEnqueue.Id;
-    }
-
-    private async Task AddToActorMessageQueueAsync(OutgoingMessage outgoingMessage)
-    {
-        var actorMessageQueue = await GetMessageQueueForReceiverAsync(outgoingMessage.GetActorMessageQueueMetadata()).ConfigureAwait(false);
-        actorMessageQueue.Enqueue(outgoingMessage, _systemDateTimeProvider.Now());
-    }
-
-    private async Task<ActorMessageQueue> GetMessageQueueForReceiverAsync(Receiver receiver)
-    {
-        var messageQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(
-            receiver.Number,
-            receiver.ActorRole).ConfigureAwait(false);
-
-        if (messageQueue == null)
-        {
-            _logger.LogInformation("Creating new message queue for Actor: {ActorNumber}, MarketRole: {MarketRole}", receiver.Number.Value, receiver.ActorRole.Name);
-            messageQueue = ActorMessageQueue.CreateFor(receiver);
-            _actorMessageQueueRepository.Add(messageQueue);
-        }
-
-        return messageQueue;
     }
 }

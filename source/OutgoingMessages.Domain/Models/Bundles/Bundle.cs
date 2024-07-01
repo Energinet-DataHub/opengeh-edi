@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using NodaTime;
 
@@ -26,7 +27,11 @@ public sealed class Bundle
     private readonly int _maxNumberOfMessagesInABundle;
     private int _messageCount;
 
+    /// <summary>
+    /// Create new bundle in the given actor message queue
+    /// </summary>
     internal Bundle(
+        ActorMessageQueueId actorMessageQueueId,
         BusinessReason businessReason,
         DocumentType documentTypeInBundle,
         int maxNumberOfMessagesInABundle,
@@ -35,6 +40,7 @@ public sealed class Bundle
     {
         _maxNumberOfMessagesInABundle = maxNumberOfMessagesInABundle;
         Id = BundleId.New();
+        ActorMessageQueueId = actorMessageQueueId;
         MessageId = MessageId.New();
         BusinessReason = businessReason;
         DocumentTypeInBundle = documentTypeInBundle;
@@ -45,6 +51,10 @@ public sealed class Bundle
     private Bundle()
     {
     }
+
+    public BundleId Id { get; }
+
+    public ActorMessageQueueId ActorMessageQueueId { get; }
 
     public Instant? DequeuedAt { get; private set; }
 
@@ -59,8 +69,6 @@ public sealed class Bundle
     public MessageId? RelatedToMessageId { get; private set; }
 
     public MessageId MessageId { get; private set; }
-
-    public BundleId Id { get; }
 
     internal DocumentType DocumentTypeInBundle { get; }
 

@@ -23,14 +23,19 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueu
 public class ActorMessageQueue
 {
     // Used for persistent actor message queue entity.
-    private readonly Guid _id;
+    // private readonly Guid _id;
     private readonly List<Bundle> _bundles = new();
 
+    /// <summary>
+    /// Create new actor message queue for the given <paramref name="receiver"/>
+    /// </summary>
     private ActorMessageQueue(Receiver receiver)
     {
         Receiver = receiver;
-        _id = Guid.NewGuid();
+        Id = ActorMessageQueueId.New();
     }
+
+    public ActorMessageQueueId Id { get; private set; }
 
     public Receiver Receiver { get; set; }
 
@@ -44,24 +49,24 @@ public class ActorMessageQueue
         return new ActorMessageQueue(receiver);
     }
 
-    public void Enqueue(OutgoingMessage outgoingMessage, Instant timeStamp, int? maxNumberOfMessagesInABundle = null)
-    {
-        ArgumentNullException.ThrowIfNull(outgoingMessage);
-        EnsureApplicable(outgoingMessage);
+    // public void Enqueue(OutgoingMessage outgoingMessage, Instant timeStamp, int? maxNumberOfMessagesInABundle = null)
+    // {
+    //     ArgumentNullException.ThrowIfNull(outgoingMessage);
+    //     EnsureApplicable(outgoingMessage);
+    //
+    //     var currentBundle = CurrentBundleOf(BusinessReason.FromName(outgoingMessage.BusinessReason), outgoingMessage.DocumentType, outgoingMessage.RelatedToMessageId) ??
+    //                         CreateBundleOf(BusinessReason.FromName(outgoingMessage.BusinessReason), outgoingMessage.DocumentType, GetMaxNumberOfMessagesInABundle(maxNumberOfMessagesInABundle, outgoingMessage.DocumentType), timeStamp, outgoingMessage.RelatedToMessageId);
+    //
+    //     currentBundle.Add(outgoingMessage);
+    // }
 
-        var currentBundle = CurrentBundleOf(BusinessReason.FromName(outgoingMessage.BusinessReason), outgoingMessage.DocumentType, outgoingMessage.RelatedToMessageId) ??
-                            CreateBundleOf(BusinessReason.FromName(outgoingMessage.BusinessReason), outgoingMessage.DocumentType, GetMaxNumberOfMessagesInABundle(maxNumberOfMessagesInABundle, outgoingMessage.DocumentType), timeStamp, outgoingMessage.RelatedToMessageId);
-
-        currentBundle.Add(outgoingMessage);
-    }
-
-    private int GetMaxNumberOfMessagesInABundle(int? maxNumberOfMessagesInABundle, DocumentType documentType)
-    {
-        if (maxNumberOfMessagesInABundle != null)
-            return maxNumberOfMessagesInABundle.Value;
-
-        return documentType.Category == MessageCategory.Aggregations ? 1 : 10000;
-    }
+    // private int GetMaxNumberOfMessagesInABundle(int? maxNumberOfMessagesInABundle, DocumentType documentType)
+    // {
+    //     if (maxNumberOfMessagesInABundle != null)
+    //         return maxNumberOfMessagesInABundle.Value;
+    //
+    //     return documentType.Category == MessageCategory.Aggregations ? 1 : 10000;
+    // }
 
     public PeekResult? Peek()
     {
@@ -106,21 +111,21 @@ public class ActorMessageQueue
         }
     }
 
-    private Bundle? CurrentBundleOf(BusinessReason businessReason, DocumentType messageType, MessageId? relatedToMessageId = null)
-    {
-        return _bundles.FirstOrDefault(bundle =>
-            bundle.ClosedAt is null
-            && bundle.DocumentTypeInBundle == messageType
-            && bundle.BusinessReason == businessReason
-            && bundle.RelatedToMessageId?.Value == relatedToMessageId?.Value);
-    }
-
-    private Bundle CreateBundleOf(BusinessReason businessReason, DocumentType messageType, int maxNumberOfMessagesInABundle, Instant created, MessageId? relatedToMessageId = null)
-    {
-        var bundle = new Bundle(businessReason, messageType, maxNumberOfMessagesInABundle, created, relatedToMessageId);
-        _bundles.Add(bundle);
-        return bundle;
-    }
+    // private Bundle? CurrentBundleOf(BusinessReason businessReason, DocumentType messageType, MessageId? relatedToMessageId = null)
+    // {
+    //     return _bundles.FirstOrDefault(bundle =>
+    //         bundle.ClosedAt is null
+    //         && bundle.DocumentTypeInBundle == messageType
+    //         && bundle.BusinessReason == businessReason
+    //         && bundle.RelatedToMessageId?.Value == relatedToMessageId?.Value);
+    // }
+    //
+    // private Bundle CreateBundleOf(BusinessReason businessReason, DocumentType messageType, int maxNumberOfMessagesInABundle, Instant created, MessageId? relatedToMessageId = null)
+    // {
+    //     var bundle = new Bundle(businessReason, messageType, maxNumberOfMessagesInABundle, created, relatedToMessageId);
+    //     _bundles.Add(bundle);
+    //     return bundle;
+    // }
 
     private Bundle? NextBundleToPeek(MessageCategory? category = null)
     {

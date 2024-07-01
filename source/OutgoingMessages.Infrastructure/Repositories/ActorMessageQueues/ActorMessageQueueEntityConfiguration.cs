@@ -29,8 +29,10 @@ public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<Act
     {
         ArgumentNullException.ThrowIfNull(builder);
         builder.ToTable("ActorMessageQueues", "dbo");
-        builder.HasKey("_id");
-        builder.Property<Guid>("_id").HasColumnName("Id");
+
+        builder.HasKey(amq => amq.Id);
+        builder.Property(amq => amq.Id);
+
         builder.OwnsOne<Receiver>("Receiver", entityBuilder =>
         {
             entityBuilder.Property(receiver => receiver.Number).HasColumnName("ActorNumber")
@@ -41,12 +43,15 @@ public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<Act
                     fromDbValue => ActorRole.FromCode(fromDbValue));
             entityBuilder.WithOwner();
         });
+
         builder.OwnsMany<Bundle>("_bundles", navigationBuilder =>
         {
             navigationBuilder.ToTable("Bundles", "dbo");
             navigationBuilder.HasKey("Id");
             navigationBuilder.Property<BundleId>("Id").HasColumnName("Id")
                 .HasConversion(toDbValue => toDbValue.Id, fromDbValue => BundleId.Create(fromDbValue));
+            navigationBuilder.Property<ActorMessageQueueId>(b => b.ActorMessageQueueId)
+                .HasConversion(toDbValue => toDbValue.Id, fromDbValue => ActorMessageQueueId.CreateExisting(fromDbValue));
             navigationBuilder.Property<Instant?>("ClosedAt").HasColumnName("ClosedAt");
             navigationBuilder.Property<Instant?>("DequeuedAt").HasColumnName("DequeuedAt");
             navigationBuilder.Property<Instant?>("PeekedAt").HasColumnName("PeekedAt");
