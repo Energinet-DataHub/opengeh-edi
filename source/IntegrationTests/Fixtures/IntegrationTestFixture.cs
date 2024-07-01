@@ -18,6 +18,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.Extensions.Configuration;
 using Xunit;
 using HttpClientFactory = Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks.HttpClientFactory;
@@ -165,6 +166,10 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
             if (File.Exists("__azurite_db_table_extent__.json"))
                 File.Delete("__azurite_db_table_extent__.json");
         }
+        else
+        {
+            CreateRequiredContainers();
+        }
     }
 
     public void Dispose()
@@ -195,5 +200,23 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
         var upgradeResult = DbUpgradeRunner.RunDbUpgrade(DatabaseConnectionString);
         if (!upgradeResult.Successful)
             throw new InvalidOperationException("Database upgrade failed", upgradeResult.Error);
+    }
+
+    private void CreateRequiredContainers()
+    {
+        List<FileStorageCategory> containerCategories = [
+            FileStorageCategory.ArchivedMessage(),
+            FileStorageCategory.OutgoingMessage(),
+        ];
+
+        var blobServiceClient = new BlobServiceClient(AzuriteManager.BlobStorageConnectionString);
+        foreach (var fileStorageCategory in containerCategories)
+        {
+            var container = blobServiceClient.GetBlobContainerClient(fileStorageCategory.Value);
+            var containerExists = container.Exists();
+
+            if (!containerExists)
+                container.Create();
+        }
     }
 }
