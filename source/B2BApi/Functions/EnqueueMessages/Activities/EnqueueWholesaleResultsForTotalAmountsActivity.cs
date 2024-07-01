@@ -63,6 +63,7 @@ public class EnqueueWholesaleResultsForTotalAmountsActivity(
                 input.EventId);
 
             var enqueueStopwatch = Stopwatch.StartNew();
+            var wasSuccess = false;
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 try
@@ -71,6 +72,7 @@ public class EnqueueWholesaleResultsForTotalAmountsActivity(
                     await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(wholesaleResult, CancellationToken.None).ConfigureAwait(false);
 
                     numberOfHandledResults++;
+                    wasSuccess = true;
                 }
                 catch
                 {
@@ -79,9 +81,12 @@ public class EnqueueWholesaleResultsForTotalAmountsActivity(
             }
 
             enqueueStopwatch.Stop();
+            var logStatusText = wasSuccess ? "Successfully enqueued" : "Failed enqueuing";
             _logger.LogInformation(
-                "Enqueued wholesale result in database, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
+                logStatusText + " wholesale result in database, elapsed time: {ElapsedTime}, successful results: {SuccessfulResultsCount}, failed results: {FailedResultsCount}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
                 enqueueStopwatch.Elapsed.ToString(),
+                numberOfHandledResults,
+                numberOfFailedResults,
                 query.GetType().Name,
                 wholesaleResult.ExternalId.Value,
                 input.CalculationId,
