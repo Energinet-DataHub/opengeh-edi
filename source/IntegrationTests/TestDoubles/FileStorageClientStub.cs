@@ -41,4 +41,9 @@ public class FileStorageClientStub : IFileStorageClient
     {
         throw new NotImplementedException();
     }
+
+    public Task DeleteIfExistsAsync(FileStorageReference outgoingMessageFileStorageReference)
+    {
+        throw new NotImplementedException();
+    }
 }

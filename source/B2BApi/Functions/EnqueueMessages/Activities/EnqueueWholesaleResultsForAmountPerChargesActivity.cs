@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
@@ -26,10 +28,12 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 /// Enqueue wholesale results for Amount Per Charge to Energy Supplier and ChargeOwner as outgoing messages for the given calculation id.
 /// </summary>
 public class EnqueueWholesaleResultsForAmountPerChargesActivity(
+    ILogger<EnqueueWholesaleResultsForAmountPerChargesActivity> logger,
     IServiceScopeFactory serviceScopeFactory,
     IMasterDataClient masterDataClient,
     WholesaleResultEnumerator wholesaleResultEnumerator)
 {
+    private readonly ILogger<EnqueueWholesaleResultsForAmountPerChargesActivity> _logger = logger;
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
     private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly WholesaleResultEnumerator _wholesaleResultEnumerator = wholesaleResultEnumerator;
@@ -46,8 +50,27 @@ public class EnqueueWholesaleResultsForAmountPerChargesActivity(
             _masterDataClient,
             EventId.From(input.EventId),
             input.CalculationId);
+
+        _logger.LogInformation(
+            "Starting enqueuing messages for wholesale query, type: {QueryType}, calculation id: {CalculationId}, event id: {EventId}",
+            query.GetType().Name,
+            input.CalculationId,
+            input.EventId);
+        var activityStopwatch = Stopwatch.StartNew();
+
+        var databricksStopwatch = Stopwatch.StartNew();
         await foreach (var wholesaleResult in _wholesaleResultEnumerator.GetAsync(query))
         {
+            databricksStopwatch.Stop();
+            _logger.LogInformation(
+                "Retrieved wholesale result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
+                databricksStopwatch.Elapsed,
+                query.GetType().Name,
+                wholesaleResult.ExternalId.Value,
+                input.CalculationId,
+                input.EventId);
+
+            var enqueueStopwatch = Stopwatch.StartNew();
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 try
@@ -62,7 +85,26 @@ public class EnqueueWholesaleResultsForAmountPerChargesActivity(
                     numberOfFailedResults++;
                 }
             }
+
+            enqueueStopwatch.Stop();
+            _logger.LogInformation(
+                "Enqueued wholesale result in database, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
+                enqueueStopwatch.Elapsed.ToString(),
+                query.GetType().Name,
+                wholesaleResult.ExternalId.Value,
+                input.CalculationId,
+                input.EventId);
+            databricksStopwatch.Restart();
         }
+
+        _logger.LogInformation(
+            "Finished enqueuing messages for wholesale query, elapsed time: {ElapsedTime}, successful results: {SuccessfulResultsCount}, failed results: {FailedResultsCount}, type: {QueryType}, calculation id: {CalculationId}, event id: {EventId}",
+            activityStopwatch.Elapsed,
+            numberOfHandledResults,
+            numberOfFailedResults,
+            query.GetType().Name,
+            input.CalculationId,
+            input.EventId);
 
         return numberOfFailedResults > 0
             ? throw new Exception($"Enqueue messages activity failed. CalculationId='{input.CalculationId}' EventId='{input.EventId}' NumberOfFailedResults='{numberOfFailedResults}'")

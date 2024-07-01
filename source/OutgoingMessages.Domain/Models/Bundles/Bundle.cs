@@ -60,9 +60,9 @@ public sealed class Bundle
 
     public MessageId MessageId { get; private set; }
 
-    internal DocumentType DocumentTypeInBundle { get; }
+    public BundleId Id { get; }
 
-    internal BundleId Id { get; }
+    internal DocumentType DocumentTypeInBundle { get; }
 
     internal BusinessReason BusinessReason { get; }
 

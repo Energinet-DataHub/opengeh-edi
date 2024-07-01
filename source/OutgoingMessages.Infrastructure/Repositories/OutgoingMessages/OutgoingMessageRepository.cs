@@ -16,6 +16,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -78,6 +79,16 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
         return await _context.OutgoingMessages.FirstOrDefaultAsync(x => x.Receiver.Number == receiver.Number &&
                                                                         x.Receiver.ActorRole == receiver.ActorRole &&
                                                                         x.ExternalId == externalId).ConfigureAwait(false);
+    }
+
+    public async Task DeleteOutgoingMessageIfExistsAsync(BundleId bundleMessageId)
+    {
+        var outgoingMessage = await _context.OutgoingMessages.FirstOrDefaultAsync(x => x.AssignedBundleId == bundleMessageId).ConfigureAwait(false);
+        if (outgoingMessage is not null)
+        {
+            await _fileStorageClient.DeleteIfExistsAsync(outgoingMessage.FileStorageReference).ConfigureAwait(false);
+            _context.Remove(outgoingMessage);
+        }
     }
 
     private async Task DownloadAndSetMessageRecordAsync(OutgoingMessage outgoingMessage)

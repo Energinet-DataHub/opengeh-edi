@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
-using System.Threading.Tasks;
 using Azure;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -43,4 +41,10 @@ public interface IFileStorageClient
     /// </summary>
     /// <param name="reference">The reference string is used to determine which file to download</param>
     Task<FileStorageFile> DownloadAsync(FileStorageReference reference);
+
+    /// <summary>
+    /// Deletes a file from the file storage
+    /// </summary>
+    /// <param name="outgoingMessageFileStorageReference"></param>
+    Task DeleteIfExistsAsync(FileStorageReference outgoingMessageFileStorageReference);
 }
