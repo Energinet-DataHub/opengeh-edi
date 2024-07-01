@@ -46,6 +46,7 @@ public class EnqueueEnergyResultsForGridAreaOwnersActivity(
         var numberOfFailedResults = 0;
 
         var query = new EnergyResultPerGridAreaQuery(
+            _logger,
             _energyResultEnumerator.EdiDatabricksOptions,
             _masterDataClient,
             EventId.From(input.EventId),
@@ -56,46 +57,60 @@ public class EnqueueEnergyResultsForGridAreaOwnersActivity(
             query.GetType().Name,
             input.CalculationId,
             input.EventId);
-        var activityStopwatch = Stopwatch.StartNew();
 
+        var activityStopwatch = Stopwatch.StartNew();
         var databricksStopwatch = Stopwatch.StartNew();
-        await foreach (var energyResult in _energyResultEnumerator.GetAsync(query))
+        await foreach (var queryResult in _energyResultEnumerator.GetAsync(query))
         {
             databricksStopwatch.Stop();
             _logger.LogInformation(
                 "Retrieved energy result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}",
                 databricksStopwatch.Elapsed,
                 query.GetType().Name,
-                energyResult.ExternalId.Value,
+                queryResult.Result!.ExternalId.Value,
                 input.CalculationId);
 
             var enqueueStopwatch = Stopwatch.StartNew();
-            var wasSuccess = false;
-            using (var scope = _serviceScopeFactory.CreateScope())
+            var enqueueWasSuccess = false;
+            if (queryResult.IsSuccess)
             {
-                try
+                using (var scope = _serviceScopeFactory.CreateScope())
                 {
-                    var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-                    await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(energyResult, CancellationToken.None).ConfigureAwait(false);
+                    try
+                    {
+                        var scopedOutgoingMessagesClient =
+                            scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+                        await scopedOutgoingMessagesClient
+                            .EnqueueAndCommitAsync(queryResult.Result!, CancellationToken.None)
+                            .ConfigureAwait(false);
 
-                    numberOfHandledResults++;
-                    wasSuccess = true;
+                        numberOfHandledResults++;
+                        enqueueWasSuccess = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        numberOfFailedResults++;
+                        _logger.LogWarning(
+                            ex,
+                            "Enqueue and commit of energy result failed for CalculationId='{CalculationId}'.",
+                            input.CalculationId);
+                    }
                 }
-                catch
-                {
-                    numberOfFailedResults++;
-                }
+            }
+            else
+            {
+                numberOfFailedResults++;
             }
 
             enqueueStopwatch.Stop();
-            var logStatusText = wasSuccess ? "Successfully enqueued" : "Failed enqueuing";
+            var logStatusText = enqueueWasSuccess ? "Successfully enqueued" : "Failed enqueuing";
             _logger.LogInformation(
                 logStatusText + " energy result in database, elapsed time: {ElapsedTime}, successful results: {SuccessfulResultsCount}, failed results: {FailedResultsCount}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
                 enqueueStopwatch.Elapsed.ToString(),
                 numberOfHandledResults,
                 numberOfFailedResults,
                 query.GetType().Name,
-                energyResult.ExternalId.Value,
+                queryResult.Result!.ExternalId.Value,
                 input.CalculationId,
                 input.EventId);
             databricksStopwatch.Restart();
