@@ -14,6 +14,7 @@
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Azure.Storage.Blobs;
 using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
@@ -25,6 +26,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Database;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.Options;
@@ -111,6 +113,7 @@ public class B2BApiAppFixture : IAsyncLifetime
     {
         // Storage emulator
         AzuriteManager.StartAzurite();
+        await CreateRequiredContainersAsync();
 
         // Database
         await DatabaseManager.CreateDatabaseAsync();
@@ -188,6 +191,24 @@ public class B2BApiAppFixture : IAsyncLifetime
             { "FeatureManagement__UseCalculationCompletedEventForBalanceFixing", enableCalculationCompletedEventForBalanceFixing.ToString().ToLower() },
             { "FeatureManagement__UseCalculationCompletedEventForWholesaleFixing", enableCalculationCompletedEventForWholesaleFixing.ToString().ToLower() },
         });
+    }
+
+    public async Task CreateRequiredContainersAsync()
+    {
+        List<FileStorageCategory> containerCategories = [
+            FileStorageCategory.ArchivedMessage(),
+            FileStorageCategory.OutgoingMessage(),
+        ];
+
+        var blobServiceClient = new BlobServiceClient(AzuriteManager.BlobStorageConnectionString);
+        foreach (var fileStorageCategory in containerCategories)
+        {
+            var container = blobServiceClient.GetBlobContainerClient(fileStorageCategory.Value);
+            var containerExists = await container.ExistsAsync().ConfigureAwait(false);
+
+            if (!containerExists)
+                await container.CreateAsync().ConfigureAwait(false);
+        }
     }
 
     private static void StartHost(FunctionAppHostManager hostManager)
