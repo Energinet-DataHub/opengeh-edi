@@ -189,6 +189,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202406260915 Bundle IsClosed IsDequeued DateTime.sql" />
     <EmbeddedResource Include="Scripts\Model\202406261000 Bundle PeekedAt.sql" />
     <EmbeddedResource Include="Scripts\Model\202406251107 Add CalculationId to OutgoingMessages.sql" />
+    <EmbeddedResource Include="Scripts\Model\202407011049 Create index for Bundle ActorMessageQueueId.sql" />
+    <EmbeddedResource Include="Scripts\Model\202407011050 Create index for OutgoingMessages AssignedBundleId.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <None Remove="Scripts\Model\202310231329 Alter Bundles1.sql" />
