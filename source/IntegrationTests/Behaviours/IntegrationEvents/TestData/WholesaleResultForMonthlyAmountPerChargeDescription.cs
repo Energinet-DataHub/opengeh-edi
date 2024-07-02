@@ -37,7 +37,10 @@ public class WholesaleResultForMonthlyAmountPerChargeDescription
     /// Environment: Dev002.
     /// </remarks>
     public WholesaleResultForMonthlyAmountPerChargeDescription()
-        : base("wholesale_fixing_01-02-2023_28-02-2023_ga_804_monthly_amount_per_charge_v1.csv")
+        : base(
+            "wholesale_fixing_01-02-2023_28-02-2023_ga_804_monthly_amount_per_charge_v1.csv",
+            //Charge type on row 5 is invalid (first row on a result set)
+            "wholesale_fixing_01-02-2023_28-02-2023_ga_804_monthly_amount_per_charge_v1_with_invalid_row.csv")
     {
     }
 

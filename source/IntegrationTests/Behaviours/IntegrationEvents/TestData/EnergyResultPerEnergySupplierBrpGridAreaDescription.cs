@@ -27,7 +27,10 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
     : TestDataDescription
 {
     public EnergyResultPerEnergySupplierBrpGridAreaDescription()
-        : base("balance_fixing_01-11-2022_01-12-2022_ga_543_per_es_brp_ga_v1.csv")
+        : base(
+            "balance_fixing_01-11-2022_01-12-2022_ga_543_per_es_brp_ga_v1.csv",
+            //Metering point type on row 146 is invalid (first row on a result set)
+            "balance_fixing_01-11-2022_01-12-2022_ga_543_per_es_brp_ga_v1_with_invalid_row.csv")
     {
     }
 

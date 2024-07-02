@@ -1,0 +1,4 @@
+calculation_id,calculation_type,calculation_version,result_id,grid_area_code,energy_supplier_id,charge_owner_id,currency,time,amount
+44a9e9fd-01a9-4c37-bb09-fca2d456a414,wholesale_fixing,65,6fe6ce4e-1368-4999-86d1-5e4ee47aff5e,804,5790001662233,5790000432752,DKK,2023-01-31 23:00:00.000000,128533.784163
+44a9e9fd-01a9-4c37-bb09-fca2d456a414,wholesale_fixing,65,0d766303-7805-43d2-a27f-1e305d8c67fa,804,5790001662233,8500000000502,invalid,2023-01-31 23:00:00.000000,220886.159249
+44a9e9fd-01a9-4c37-bb09-fca2d456a414,wholesale_fixing,65,d3261aa1-e98f-41f2-96e4-bfbdb2a00fbf,804,5790001662233,"",DKK,2023-01-31 23:00:00.000000,349419.943412
