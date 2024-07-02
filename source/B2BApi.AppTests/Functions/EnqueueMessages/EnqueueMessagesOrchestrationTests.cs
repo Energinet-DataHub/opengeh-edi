@@ -31,6 +31,7 @@ using FluentAssertions.Execution;
 using Google.Protobuf;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -253,7 +254,10 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         // => Expect history
         using var assertionScope = new AssertionScope();
 
+        Fixture.TestLogger.WriteLine($"Orchestration history:{Environment.NewLine}{completeOrchestrationStatus.History.ToString()}");
         var activities = completeOrchestrationStatus.GetOrderedHistory();
+        Fixture.TestLogger.WriteLine($"Ordered history items:{Environment.NewLine}{JsonConvert.ToString(activities)}");
+
         // var activities = completeOrchestrationStatus.History
         //     .OrderBy(item => item["Timestamp"])
         //     .Select(item =>
