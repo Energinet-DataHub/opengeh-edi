@@ -60,28 +60,31 @@ public class EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
         {
             databricksStopwatch.Stop();
 
-            // Only log databricks query time if it took more than 1 second
-            if (databricksStopwatch.Elapsed > TimeSpan.FromSeconds(1))
-            {
-                _logger.LogInformation(
-                    "Retrieved wholesale result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
-                    databricksStopwatch.Elapsed,
-                    query.GetType().Name,
-                    queryResult.Result!.ExternalId.Value,
-                    input.CalculationId,
-                    input.EventId);
-            }
-
-            var enqueueStopwatch = Stopwatch.StartNew();
-            var enqueueWasSuccess = false;
             if (queryResult.IsSuccess)
             {
+                // Only log databricks query time if it took more than 1 second
+                if (databricksStopwatch.Elapsed > TimeSpan.FromSeconds(1))
+                {
+                    _logger.LogInformation(
+                        "Retrieved wholesale result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
+                        databricksStopwatch.Elapsed,
+                        query.GetType().Name,
+                        queryResult.Result!.ExternalId.Value,
+                        input.CalculationId,
+                        input.EventId);
+                }
+
+                var enqueueStopwatch = Stopwatch.StartNew();
+                var enqueueWasSuccess = false;
                 using (var scope = _serviceScopeFactory.CreateScope())
                 {
                     try
                     {
-                        var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-                        await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(queryResult.Result!, CancellationToken.None).ConfigureAwait(false);
+                        var scopedOutgoingMessagesClient =
+                            scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+                        await scopedOutgoingMessagesClient
+                            .EnqueueAndCommitAsync(queryResult.Result!, CancellationToken.None)
+                            .ConfigureAwait(false);
 
                         numberOfHandledResults++;
                         enqueueWasSuccess = true;
@@ -91,12 +94,26 @@ public class EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
                         numberOfFailedResults++;
                         _logger.LogWarning(
                             ex,
-                            "Enqueue and commit failed for wholesale result, query type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
+                            "Enqueue and commit failed for calculation result, query type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
                             query.GetType().Name,
                             queryResult.Result?.ExternalId.Value,
                             input.CalculationId,
                             input.EventId);
                     }
+
+                    enqueueStopwatch.Stop();
+
+                    var logStatusText = enqueueWasSuccess ? "Successfully enqueued" : "Failed enqueuing";
+                    _logger.LogInformation(
+                        logStatusText
+                        + " wholesale result in database, elapsed time: {ElapsedTime}, successful results: {SuccessfulResultsCount}, failed results: {FailedResultsCount}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
+                        enqueueStopwatch.Elapsed.ToString(),
+                        numberOfHandledResults,
+                        numberOfFailedResults,
+                        query.GetType().Name,
+                        queryResult.Result?.ExternalId.Value,
+                        input.CalculationId,
+                        input.EventId);
                 }
             }
             else
@@ -104,17 +121,6 @@ public class EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
                 numberOfFailedResults++;
             }
 
-            enqueueStopwatch.Stop();
-            var logStatusText = enqueueWasSuccess ? "Successfully enqueued" : "Failed enqueuing";
-            _logger.LogInformation(
-                logStatusText + " wholesale result in database, elapsed time: {ElapsedTime}, successful results: {SuccessfulResultsCount}, failed results: {FailedResultsCount}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
-                enqueueStopwatch.Elapsed.ToString(),
-                numberOfHandledResults,
-                numberOfFailedResults,
-                query.GetType().Name,
-                queryResult.Result?.ExternalId.Value,
-                input.CalculationId,
-                input.EventId);
             databricksStopwatch.Restart();
         }
 
@@ -128,7 +134,7 @@ public class EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
             input.EventId);
 
         return numberOfFailedResults > 0
-            ? throw new Exception($"Enqueue messages activity failed. CalculationId='{input.CalculationId}' EventId='{input.EventId}' NumberOfFailedResults='{numberOfFailedResults}'")
+            ? throw new Exception($"Enqueue messages activity failed. CalculationId='{input.CalculationId}' EventId='{input.EventId}' NumberOfFailedResults='{numberOfFailedResults}' NumberOfHandledResults='{numberOfHandledResults}'")
             : numberOfHandledResults;
     }
 }
