@@ -34,7 +34,7 @@ public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<Act
         builder.Property(amq => amq.Id)
             .HasConversion(toDbValue => toDbValue.Id, fromDbValue => ActorMessageQueueId.CreateExisting(fromDbValue));
 
-        builder.OwnsOne<Receiver>("Receiver", entityBuilder =>
+        builder.OwnsOne(amq => amq.Receiver, entityBuilder =>
         {
             entityBuilder.Property(receiver => receiver.Number).HasColumnName("ActorNumber")
                 .HasConversion(toDbValue => toDbValue.Value, fromDbValue => ActorNumber.Create(fromDbValue));
@@ -45,32 +45,33 @@ public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<Act
             entityBuilder.WithOwner();
         });
 
-        builder.OwnsMany<Bundle>("_bundles", navigationBuilder =>
-        {
-            navigationBuilder.ToTable("Bundles", "dbo");
-            navigationBuilder.HasKey("Id");
-            navigationBuilder.Property<BundleId>("Id").HasColumnName("Id")
-                .HasConversion(toDbValue => toDbValue.Id, fromDbValue => BundleId.Create(fromDbValue));
-            navigationBuilder.Property<ActorMessageQueueId>(b => b.ActorMessageQueueId)
-                .HasConversion(toDbValue => toDbValue.Id, fromDbValue => ActorMessageQueueId.CreateExisting(fromDbValue));
-            navigationBuilder.Property<Instant?>("ClosedAt").HasColumnName("ClosedAt");
-            navigationBuilder.Property<Instant?>("DequeuedAt").HasColumnName("DequeuedAt");
-            navigationBuilder.Property<Instant?>("PeekedAt").HasColumnName("PeekedAt");
-            navigationBuilder.Property<MessageId>("MessageId").HasColumnName("MessageId")
-                .HasConversion(toDb => toDb.Value, fromDb => MessageId.Create(fromDb));
-            navigationBuilder.Property<DocumentType>("DocumentTypeInBundle").HasColumnName("DocumentTypeInBundle")
-                .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<DocumentType>(fromDbValue));
-            navigationBuilder.Property<BusinessReason>("BusinessReason").HasColumnName("BusinessReason")
-                .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<BusinessReason>(fromDbValue));
-            navigationBuilder.Property<int>("_messageCount").HasColumnName("MessageCount");
-            navigationBuilder.Property<int>("_maxNumberOfMessagesInABundle").HasColumnName("MaxMessageCount");
-            navigationBuilder.Property<Instant>("Created").HasColumnName("Created");
-            navigationBuilder.Property<MessageId?>("RelatedToMessageId").HasColumnName("RelatedToMessageId")
-                .HasConversion(
-                    toDbValue => toDbValue != null ? toDbValue.Value.Value : null,
-                    fromDbValue => fromDbValue != null ? MessageId.Create(fromDbValue) : null);
-            navigationBuilder.WithOwner().HasForeignKey("ActorMessageQueueId");
-        });
+        builder.HasMany<Bundle>("_bundles").WithOne().HasForeignKey(b => b.ActorMessageQueueId);
+        // builder.HasMany<Bundle>("_bundles", navigationBuilder =>
+        // {
+        //     navigationBuilder.ToTable("Bundles", "dbo");
+        //     navigationBuilder.HasKey("Id");
+        //     navigationBuilder.Property<BundleId>("Id").HasColumnName("Id")
+        //         .HasConversion(toDbValue => toDbValue.Id, fromDbValue => BundleId.Create(fromDbValue));
+        //     navigationBuilder.Property<ActorMessageQueueId>(b => b.ActorMessageQueueId)
+        //         .HasConversion(toDbValue => toDbValue.Id, fromDbValue => ActorMessageQueueId.CreateExisting(fromDbValue));
+        //     navigationBuilder.Property<Instant?>("ClosedAt").HasColumnName("ClosedAt");
+        //     navigationBuilder.Property<Instant?>("DequeuedAt").HasColumnName("DequeuedAt");
+        //     navigationBuilder.Property<Instant?>("PeekedAt").HasColumnName("PeekedAt");
+        //     navigationBuilder.Property<MessageId>("MessageId").HasColumnName("MessageId")
+        //         .HasConversion(toDb => toDb.Value, fromDb => MessageId.Create(fromDb));
+        //     navigationBuilder.Property<DocumentType>("DocumentTypeInBundle").HasColumnName("DocumentTypeInBundle")
+        //         .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<DocumentType>(fromDbValue));
+        //     navigationBuilder.Property<BusinessReason>("BusinessReason").HasColumnName("BusinessReason")
+        //         .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<BusinessReason>(fromDbValue));
+        //     navigationBuilder.Property<int>("_messageCount").HasColumnName("MessageCount");
+        //     navigationBuilder.Property<int>("_maxNumberOfMessagesInABundle").HasColumnName("MaxMessageCount");
+        //     navigationBuilder.Property<Instant>("Created").HasColumnName("Created");
+        //     navigationBuilder.Property<MessageId?>("RelatedToMessageId").HasColumnName("RelatedToMessageId")
+        //         .HasConversion(
+        //             toDbValue => toDbValue != null ? toDbValue.Value.Value : null,
+        //             fromDbValue => fromDbValue != null ? MessageId.Create(fromDbValue) : null);
+        //     navigationBuilder.WithOwner().HasForeignKey("ActorMessageQueueId");
+        // });
 
         builder.Property<string>("CreatedBy");
         builder.Property<Instant>("CreatedAt");

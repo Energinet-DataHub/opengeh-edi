@@ -122,6 +122,55 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     }
 
     [Fact]
+    public async Task Bundle_is_added_to_database_with_correct_values()
+    {
+        // Arrange
+        var message = _energyResultMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .Build();
+
+        var createdAtTimestamp = Instant.FromUtc(2024, 1, 1, 0, 0);
+        _systemDateTimeProvider.SetNow(createdAtTimestamp);
+
+        // Act
+        await EnqueueAndCommitAsync(message);
+
+        // Assert
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        var sql = "SELECT * FROM [dbo].[Bundles]";
+        var nullableBundleFromDatabase = await connection.QuerySingleOrDefaultAsync(sql);
+
+        Assert.NotNull(nullableBundleFromDatabase);
+        var bundleFromDatabase = nullableBundleFromDatabase!;
+
+        var propertyAssertions = new Action[]
+        {
+            () => Assert.NotNull(bundleFromDatabase.RecordId),
+            () => Assert.NotNull(bundleFromDatabase.Id),
+            () => Assert.NotNull(bundleFromDatabase.ActorMessageQueueId),
+            () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Name, bundleFromDatabase.DocumentTypeInBundle),
+            () => Assert.Equal(1, bundleFromDatabase.MessageCount),
+            () => Assert.Equal(1, bundleFromDatabase.MaxMessageCount),
+            () => Assert.Equal(message.BusinessReason, bundleFromDatabase.BusinessReason),
+            () => Assert.NotNull(bundleFromDatabase.Created),
+            () => Assert.Null(bundleFromDatabase.RelatedToMessageId),
+            () => Assert.NotNull(bundleFromDatabase.MessageId),
+            () => Assert.Null(bundleFromDatabase.DequeuedAt),
+            () => Assert.NotNull(bundleFromDatabase.ClosedAt),
+            () => Assert.Null(bundleFromDatabase.PeekedAt),
+        };
+
+        Assert.Multiple(propertyAssertions);
+
+        // Confirm that all database columns are asserted
+        var databaseColumnsCount = ((IDictionary<string, object>)bundleFromDatabase).Count;
+        var propertiesAssertedCount = propertyAssertions.Length;
+        propertiesAssertedCount
+            .Should()
+            .Be(databaseColumnsCount, "asserted properties count should be equal to Bundle database columns count");
+    }
+
+    [Fact]
     public async Task Can_peek_message()
     {
         var message = _energyResultMessageDtoBuilder.Build();

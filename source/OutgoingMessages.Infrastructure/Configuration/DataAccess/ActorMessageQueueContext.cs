@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.ActorMessageQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.OutgoingMessages;
 using Microsoft.EntityFrameworkCore;
@@ -84,6 +85,7 @@ public class ActorMessageQueueContext : DbContext
 
         modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorMessageQueueEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new BundleEntityConfiguration());
         modelBuilder.ApplyConfiguration(new MarketDocumentEntityConfiguration());
     }
 }

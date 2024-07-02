@@ -69,10 +69,6 @@ public class EnqueueMessage
         await _enqueueMessageService.EnqueueAsync(messageToEnqueue, _systemDateTimeProvider.Now())
             .ConfigureAwait(false);
 
-        // Add to outgoing message repository (and upload to file storage) after adding actor message queue,
-        // to minimize the cases where a message is uploaded to file storage but adding actor message queue fails
-        await _outgoingMessageRepository.AddAsync(messageToEnqueue).ConfigureAwait(false);
-
         _logger.LogInformation(
             "Enqueued message for OutgoingMessageId: {OutgoingMessageId} for ActorNumber: {ActorNumber} for Received Event id: {EventId}",
             messageToEnqueue.Id,

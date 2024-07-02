@@ -21,9 +21,14 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain;
 
-public class EnqueueMessageService(IActorMessageQueueRepository actorMessageQueueRepository, IBundleRepository bundleRepository, ILogger<EnqueueMessageService> logger)
+public class EnqueueMessageService(
+    IActorMessageQueueRepository actorMessageQueueRepository,
+    IOutgoingMessageRepository outgoingMessageRepository,
+    IBundleRepository bundleRepository,
+    ILogger<EnqueueMessageService> logger)
 {
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository = actorMessageQueueRepository;
+    private readonly IOutgoingMessageRepository _outgoingMessageRepository = outgoingMessageRepository;
     private readonly IBundleRepository _bundleRepository = bundleRepository;
     private readonly ILogger<EnqueueMessageService> _logger = logger;
 
@@ -35,21 +40,25 @@ public class EnqueueMessageService(IActorMessageQueueRepository actorMessageQueu
             await GetMessageQueueIdForReceiverAsync(outgoingMessage.GetActorMessageQueueMetadata())
                 .ConfigureAwait(false);
 
-        var bundleToCreate = CreateBundle(
+        var newBundle = CreateBundle(
             actorMessageQueueId,
             BusinessReason.FromName(outgoingMessage.BusinessReason),
             outgoingMessage.DocumentType,
             timeStamp,
             outgoingMessage.RelatedToMessageId);
-        _bundleRepository.Add(bundleToCreate);
 
-        bundleToCreate.Add(outgoingMessage);
+        newBundle.Add(outgoingMessage);
+
+        _bundleRepository.Add(newBundle);
+
+        // Add to outgoing message repository (and upload to file storage) after adding actor message queue and bundle,
+        // to minimize the cases where a message is uploaded to file storage but adding actor message queue fails
+        await _outgoingMessageRepository.AddAsync(outgoingMessage).ConfigureAwait(false);
     }
 
     private Bundle CreateBundle(ActorMessageQueueId actorMessageQueueId, BusinessReason businessReason, DocumentType messageType, Instant created, MessageId? relatedToMessageId = null)
     {
-        var bundle = new Bundle(actorMessageQueueId, businessReason, messageType, 1, created, relatedToMessageId);
-        return bundle;
+        return new Bundle(actorMessageQueueId, businessReason, messageType, 1, created, relatedToMessageId);
     }
 
     private async Task<ActorMessageQueueId> GetMessageQueueIdForReceiverAsync(Receiver receiver)

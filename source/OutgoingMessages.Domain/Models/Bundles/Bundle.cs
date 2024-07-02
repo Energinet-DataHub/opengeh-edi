@@ -70,11 +70,11 @@ public sealed class Bundle
 
     public MessageId MessageId { get; private set; }
 
-    internal DocumentType DocumentTypeInBundle { get; }
+    public DocumentType DocumentTypeInBundle { get; }
 
-    internal BusinessReason BusinessReason { get; }
+    public BusinessReason BusinessReason { get; }
 
-    internal Instant? ClosedAt { get; private set; }
+    public Instant? ClosedAt { get; private set; }
 
     public void PeekBundle()
     {
