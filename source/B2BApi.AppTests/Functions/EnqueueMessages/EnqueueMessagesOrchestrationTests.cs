@@ -253,23 +253,30 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         // => Expect history
         using var assertionScope = new AssertionScope();
 
-        var activities = completeOrchestrationStatus.History
-            .OrderBy(item => item["Timestamp"])
-            .Select(item =>
-                (item.Value<string>("FunctionName"), item.Value<string>("Result")));
+        var activities = completeOrchestrationStatus.GetOrderedHistory();
+        // var activities = completeOrchestrationStatus.History
+        //     .OrderBy(item => item["Timestamp"])
+        //     .Select(item =>
+        //         (item.Value<string>("FunctionName"), item.Value<string>("Result")));
 
-        activities.Should().NotBeNull().And.Contain(
-        [
-            ("EnqueueMessagesOrchestration", null),
-            ("EnqueueEnergyResultsForGridAreaOwnersActivity", "0"),
-            ("EnqueueEnergyResultsForBalanceResponsiblesActivity", "0"),
-            ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", "0"),
-            ("EnqueueWholesaleResultsForAmountPerChargesActivity", forAmountPerChargeDescription.ExpectedCalculationResultsCount.ToString()),
-            ("EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity", forMonthlyAmountPerChargeDescription.ExpectedCalculationResultsCount.ToString()),
-            ("EnqueueWholesaleResultsForTotalAmountsActivity", forTotalAmountDescription.ExpectedCalculationResultsCount.ToString()),
-            ("SendActorMessagesEnqueuedActivity", null),
-            (null, "Success"),
-        ]);
+        activities.Should()
+            .NotBeNull()
+            .And
+            .Subject
+            .Select(i => (i.FunctionName, i.Result))
+            .Should()
+            .Contain(
+            [
+                ("EnqueueMessagesOrchestration", null),
+                ("EnqueueEnergyResultsForGridAreaOwnersActivity", "0"),
+                ("EnqueueEnergyResultsForBalanceResponsiblesActivity", "0"),
+                ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", "0"),
+                ("EnqueueWholesaleResultsForAmountPerChargesActivity", forAmountPerChargeDescription.ExpectedCalculationResultsCount.ToString()),
+                ("EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity", forMonthlyAmountPerChargeDescription.ExpectedCalculationResultsCount.ToString()),
+                ("EnqueueWholesaleResultsForTotalAmountsActivity", forTotalAmountDescription.ExpectedCalculationResultsCount.ToString()),
+                ("SendActorMessagesEnqueuedActivity", null),
+                (null, "Success"),
+            ]);
 
         // => Verify that the durable function completed successfully
         var last = completeOrchestrationStatus.History.Last();
