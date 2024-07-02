@@ -89,7 +89,13 @@ public class EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
                     catch (Exception ex)
                     {
                         numberOfFailedResults++;
-                        _logger.LogWarning(ex, "Enqueue and commit of wholesale result failed for CalculationId='{CalculationId}'.", input.CalculationId);
+                        _logger.LogWarning(
+                            ex,
+                            "Enqueue and commit failed for wholesale result, query type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
+                            query.GetType().Name,
+                            queryResult.Result?.ExternalId.Value,
+                            input.CalculationId,
+                            input.EventId);
                     }
                 }
             }
@@ -106,7 +112,7 @@ public class EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
                 numberOfHandledResults,
                 numberOfFailedResults,
                 query.GetType().Name,
-                queryResult.Result!.ExternalId.Value,
+                queryResult.Result?.ExternalId.Value,
                 input.CalculationId,
                 input.EventId);
             databricksStopwatch.Restart();
