@@ -19,9 +19,11 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DbContext;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.ActorMessageQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.OutgoingMessages;
 using Microsoft.EntityFrameworkCore;
@@ -53,6 +55,8 @@ public class ActorMessageQueueContext : DbContext
 
     public DbSet<MarketDocument> MarketDocuments { get; private set; }
 
+    public DbSet<Bundle> Bundles { get; private set; }
+
     public override int SaveChanges()
     {
         throw new NotSupportedException("Use the async version instead");
@@ -81,6 +85,7 @@ public class ActorMessageQueueContext : DbContext
 
         modelBuilder.ApplyConfiguration(new OutgoingMessageEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorMessageQueueEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new BundleEntityConfiguration());
         modelBuilder.ApplyConfiguration(new MarketDocumentEntityConfiguration());
     }
 }

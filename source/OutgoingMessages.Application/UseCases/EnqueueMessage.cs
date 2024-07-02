@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using BuildingBlocks.Application.FeatureFlag;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 
@@ -29,23 +29,26 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 /// </summary>
 public class EnqueueMessage
 {
-    private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
+    private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
+    private readonly IBundleRepository _bundleRepository;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly ILogger<EnqueueMessage> _logger;
     private readonly DelegateMessage _delegateMessage;
     private readonly IFeatureFlagManager _featureFlagManager;
 
     public EnqueueMessage(
-        IActorMessageQueueRepository actorMessageQueueRepository,
         IOutgoingMessageRepository outgoingMessageRepository,
+        IActorMessageQueueRepository actorMessageQueueRepository,
+        IBundleRepository bundleRepository,
         ISystemDateTimeProvider systemDateTimeProvider,
         ILogger<EnqueueMessage> logger,
         DelegateMessage delegateMessage,
         IFeatureFlagManager featureFlagManager)
     {
-        _actorMessageQueueRepository = actorMessageQueueRepository;
         _outgoingMessageRepository = outgoingMessageRepository;
+        _actorMessageQueueRepository = actorMessageQueueRepository;
+        _bundleRepository = bundleRepository;
         _systemDateTimeProvider = systemDateTimeProvider;
         _logger = logger;
         _delegateMessage = delegateMessage;
@@ -64,13 +67,17 @@ public class EnqueueMessage
                 .ConfigureAwait(false);
         }
 
-        var messageExists = await _outgoingMessageRepository.GetAsync(messageToEnqueue.Receiver, messageToEnqueue.ExternalId).ConfigureAwait(false);
-        if (messageExists != null)
-            return messageExists.Id;
+        var existingMessage = await _outgoingMessageRepository.GetAsync(messageToEnqueue.Receiver, messageToEnqueue.ExternalId).ConfigureAwait(false);
+        if (existingMessage != null) // Message is already enqueued, do nothing (idempotency check)
+            return existingMessage.Id;
 
-        await AddToActorMessageQueueAsync(messageToEnqueue).ConfigureAwait(false);
+        var actorMessageQueueId = await GetMessageQueueIdForReceiverAsync(messageToEnqueue.GetActorMessageQueueMetadata())
+                .ConfigureAwait(false);
 
-        // Add to outgoing message repository (and upload to file storage) after adding actor message queue,
+        var newBundle = CreateBundle(messageToEnqueue, actorMessageQueueId);
+        newBundle.Add(messageToEnqueue);
+
+        // Add to outgoing message repository (and upload to file storage) after adding actor message queue and bundle,
         // to minimize the cases where a message is uploaded to file storage but adding actor message queue fails
         await _outgoingMessageRepository.AddAsync(messageToEnqueue).ConfigureAwait(false);
 
@@ -83,25 +90,38 @@ public class EnqueueMessage
         return messageToEnqueue.Id;
     }
 
-    private async Task AddToActorMessageQueueAsync(OutgoingMessage outgoingMessage)
+    private Bundle CreateBundle(OutgoingMessage messageToEnqueue, ActorMessageQueueId actorMessageQueueId)
     {
-        var actorMessageQueue = await GetMessageQueueForReceiverAsync(outgoingMessage.GetActorMessageQueueMetadata()).ConfigureAwait(false);
-        actorMessageQueue.Enqueue(outgoingMessage, _systemDateTimeProvider.Now());
+        var newBundle = CreateBundle(
+            actorMessageQueueId,
+            BusinessReason.FromName(messageToEnqueue.BusinessReason),
+            messageToEnqueue.DocumentType,
+            _systemDateTimeProvider.Now(),
+            messageToEnqueue.RelatedToMessageId);
+        _bundleRepository.Add(newBundle);
+
+        return newBundle;
     }
 
-    private async Task<ActorMessageQueue> GetMessageQueueForReceiverAsync(Receiver receiver)
+    private async Task<ActorMessageQueueId> GetMessageQueueIdForReceiverAsync(Receiver receiver)
     {
-        var messageQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(
+        var actorMessageQueueId = await _actorMessageQueueRepository.ActorMessageQueueIdForAsync(
             receiver.Number,
             receiver.ActorRole).ConfigureAwait(false);
 
-        if (messageQueue == null)
+        if (actorMessageQueueId == null)
         {
             _logger.LogInformation("Creating new message queue for Actor: {ActorNumber}, MarketRole: {MarketRole}", receiver.Number.Value, receiver.ActorRole.Name);
-            messageQueue = ActorMessageQueue.CreateFor(receiver);
-            _actorMessageQueueRepository.Add(messageQueue);
+            var actorMessageQueueToCreate = ActorMessageQueue.CreateFor(receiver);
+            _actorMessageQueueRepository.Add(actorMessageQueueToCreate);
+            actorMessageQueueId = actorMessageQueueToCreate.Id;
         }
 
-        return messageQueue;
+        return actorMessageQueueId;
+    }
+
+    private Bundle CreateBundle(ActorMessageQueueId actorMessageQueueId, BusinessReason businessReason, DocumentType messageType, Instant created, MessageId? relatedToMessageId = null)
+    {
+        return new Bundle(actorMessageQueueId, businessReason, messageType, 1, created, relatedToMessageId);
     }
 }

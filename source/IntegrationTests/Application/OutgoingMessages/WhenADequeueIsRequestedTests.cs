@@ -58,6 +58,8 @@ public class WhenADequeueIsRequestedTests : TestBase
             .WithReceiverRole(ActorRole.EnergySupplier)
             .Build();
         await EnqueueMessage(enqueueMessageEvent);
+
+        ClearDbContextCaches();
         var dequeueResult = await _outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(unknownMessageId, ActorRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)), CancellationToken.None);
 
         Assert.False(dequeueResult.Success);
@@ -72,6 +74,7 @@ public class WhenADequeueIsRequestedTests : TestBase
             .Build();
         await EnqueueMessage(enqueueMessageEvent);
 
+        ClearDbContextCaches();
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(
             new PeekRequestDto(
             ActorNumber.Create(SampleData.NewEnergySupplierNumber),
@@ -80,6 +83,7 @@ public class WhenADequeueIsRequestedTests : TestBase
             DocumentFormat.Xml),
             CancellationToken.None);
 
+        ClearDbContextCaches();
         var dequeueResult = await _outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(peekResult!.MessageId.Value, ActorRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)), CancellationToken.None);
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var found = await connection
@@ -106,6 +110,7 @@ public class WhenADequeueIsRequestedTests : TestBase
             .Build();
         await EnqueueMessage(message);
 
+        ClearDbContextCaches();
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(
             new PeekRequestDto(
                 actorNumber,
@@ -115,6 +120,7 @@ public class WhenADequeueIsRequestedTests : TestBase
             CancellationToken.None);
 
         // Act
+        ClearDbContextCaches();
         var dequeueResult = await _outgoingMessagesClient.DequeueAndCommitAsync(
             new DequeueRequestDto(
                 peekResult!.MessageId.Value,
