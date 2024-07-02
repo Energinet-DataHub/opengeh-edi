@@ -42,6 +42,7 @@ public class EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
         var numberOfFailedResults = 0;
 
         var query = new WholesaleMonthlyAmountPerChargeQuery(
+            _logger,
             _wholesaleResultEnumerator.EdiDatabricksOptions,
             _masterDataClient,
             EventId.From(input.EventId),
@@ -52,10 +53,10 @@ public class EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
             query.GetType().Name,
             input.CalculationId,
             input.EventId);
-        var activityStopwatch = Stopwatch.StartNew();
 
+        var activityStopwatch = Stopwatch.StartNew();
         var databricksStopwatch = Stopwatch.StartNew();
-        await foreach (var wholesaleResult in _wholesaleResultEnumerator.GetAsync(query))
+        await foreach (var queryResult in _wholesaleResultEnumerator.GetAsync(query))
         {
             databricksStopwatch.Stop();
 
@@ -66,38 +67,46 @@ public class EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
                     "Retrieved wholesale result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
                     databricksStopwatch.Elapsed,
                     query.GetType().Name,
-                    wholesaleResult.ExternalId.Value,
+                    queryResult.Result!.ExternalId.Value,
                     input.CalculationId,
                     input.EventId);
             }
 
             var enqueueStopwatch = Stopwatch.StartNew();
-            var wasSuccess = false;
-            using (var scope = _serviceScopeFactory.CreateScope())
+            var enqueueWasSuccess = false;
+            if (queryResult.IsSuccess)
             {
-                try
+                using (var scope = _serviceScopeFactory.CreateScope())
                 {
-                    var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-                    await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(wholesaleResult, CancellationToken.None).ConfigureAwait(false);
+                    try
+                    {
+                        var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+                        await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(queryResult.Result!, CancellationToken.None).ConfigureAwait(false);
 
-                    numberOfHandledResults++;
-                    wasSuccess = true;
+                        numberOfHandledResults++;
+                        enqueueWasSuccess = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        numberOfFailedResults++;
+                        _logger.LogWarning(ex, "Enqueue and commit of wholesale result failed for CalculationId='{CalculationId}'.", input.CalculationId);
+                    }
                 }
-                catch
-                {
-                    numberOfFailedResults++;
-                }
+            }
+            else
+            {
+                numberOfFailedResults++;
             }
 
             enqueueStopwatch.Stop();
-            var logStatusText = wasSuccess ? "Successfully enqueued" : "Failed enqueuing";
+            var logStatusText = enqueueWasSuccess ? "Successfully enqueued" : "Failed enqueuing";
             _logger.LogInformation(
                 logStatusText + " wholesale result in database, elapsed time: {ElapsedTime}, successful results: {SuccessfulResultsCount}, failed results: {FailedResultsCount}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
                 enqueueStopwatch.Elapsed.ToString(),
                 numberOfHandledResults,
                 numberOfFailedResults,
                 query.GetType().Name,
-                wholesaleResult.ExternalId.Value,
+                queryResult.Result!.ExternalId.Value,
                 input.CalculationId,
                 input.EventId);
             databricksStopwatch.Restart();
