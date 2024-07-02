@@ -24,6 +24,7 @@ public static class DurableOrchestrationStatusExtensions
             .OrderBy(item => item["Timestamp"])
             .Select(item =>
             {
+                // ReSharper disable once SuggestVarOrType_BuiltInTypes -- Must be explicit dynamic else it won't work
                 dynamic? historyItem = item.ToObject<dynamic>();
 
                 return new HistoryItem(
