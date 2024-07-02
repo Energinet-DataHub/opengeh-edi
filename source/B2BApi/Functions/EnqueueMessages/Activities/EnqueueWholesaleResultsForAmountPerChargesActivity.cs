@@ -63,13 +63,18 @@ public class EnqueueWholesaleResultsForAmountPerChargesActivity(
         await foreach (var queryResult in _wholesaleResultEnumerator.GetAsync(query))
         {
             databricksStopwatch.Stop();
-            _logger.LogInformation(
-                "Retrieved wholesale result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
-                databricksStopwatch.Elapsed,
-                query.GetType().Name,
-                queryResult.Result!.ExternalId.Value,
-                input.CalculationId,
-                input.EventId);
+
+            // Only log databricks query time if it took more than 1 second
+            if (databricksStopwatch.Elapsed > TimeSpan.FromSeconds(1))
+            {
+                _logger.LogInformation(
+                    "Retrieved wholesale result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
+                    databricksStopwatch.Elapsed,
+                    query.GetType().Name,
+                    queryResult.Result!.ExternalId.Value,
+                    input.CalculationId,
+                    input.EventId);
+            }
 
             var enqueueStopwatch = Stopwatch.StartNew();
             var enqueueWasSuccess = false;
@@ -80,7 +85,7 @@ public class EnqueueWholesaleResultsForAmountPerChargesActivity(
                     try
                     {
                         var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-                        await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(queryResult.Result, CancellationToken.None).ConfigureAwait(false);
+                        await scopedOutgoingMessagesClient.EnqueueAndCommitAsync(queryResult.Result!, CancellationToken.None).ConfigureAwait(false);
 
                         enqueueWasSuccess = true;
                         numberOfHandledResults++;
@@ -88,7 +93,13 @@ public class EnqueueWholesaleResultsForAmountPerChargesActivity(
                     catch (Exception ex)
                     {
                         numberOfFailedResults++;
-                        _logger.LogWarning(ex, "Enqueue and commit of wholesale result failed for CalculationId='{CalculationId}'.", input.CalculationId);
+                        _logger.LogWarning(
+                            ex,
+                            "Enqueue and commit failed for wholesale result, query type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
+                            query.GetType().Name,
+                            queryResult.Result?.ExternalId.Value,
+                            input.CalculationId,
+                            input.EventId);
                     }
                 }
             }
@@ -105,7 +116,7 @@ public class EnqueueWholesaleResultsForAmountPerChargesActivity(
                 numberOfHandledResults,
                 numberOfFailedResults,
                 query.GetType().Name,
-                queryResult.Result.ExternalId.Value,
+                queryResult.Result?.ExternalId.Value,
                 input.CalculationId,
                 input.EventId);
             databricksStopwatch.Restart();
