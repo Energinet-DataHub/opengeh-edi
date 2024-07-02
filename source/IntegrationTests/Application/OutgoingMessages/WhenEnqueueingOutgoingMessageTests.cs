@@ -182,6 +182,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var message = _energyResultMessageDtoBuilder.Build();
         await EnqueueAndCommitAsync(message);
 
+        ClearDbContextCaches();
         var result = await _outgoingMessagesClient.PeekAndCommitAsync(
             new PeekRequestDto(
                 message.ReceiverNumber,
@@ -202,7 +203,9 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var message2 = _energyResultMessageDtoBuilder.Build();
         await EnqueueAndCommitAsync(message2);
 
+        ClearDbContextCaches();
         var result = await _outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(message.ReceiverNumber, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Ebix), CancellationToken.None);
+
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = "SELECT top 1 MessageId FROM [dbo].[Bundles] order by created";
         var id = await
@@ -217,17 +220,21 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     {
         var message = _energyResultMessageDtoBuilder.Build();
         await EnqueueAndCommitAsync(message);
+
+        ClearDbContextCaches();
         var peekRequestDto = new PeekRequestDto(
             message.ReceiverNumber,
             MessageCategory.Aggregations,
             message.ReceiverRole,
             DocumentFormat.Xml);
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(peekRequestDto, CancellationToken.None);
+
         var dequeueCommand = new DequeueRequestDto(
             peekResult!.MessageId.Value,
             message.ReceiverRole,
             message.ReceiverNumber);
 
+        ClearDbContextCaches();
         var result = await _outgoingMessagesClient.DequeueAndCommitAsync(dequeueCommand, CancellationToken.None);
 
         Assert.True(result.Success);
@@ -287,10 +294,11 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
 
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
+
+        // Assert
         var fileStorageReference = await GetOutgoingMessageFileStorageReferenceFromDatabase(createdId);
         var uploadDuplicateFile = async () => await _fileStorageClient.UploadAsync(new FileStorageReference(OutgoingMessage.FileStorageCategory, fileStorageReference!), new MemoryStream(new byte[] { 0x20 }));
 
-        // Assert
         (await uploadDuplicateFile.Should().ThrowAsync<RequestFailedException>())
             .And.ErrorCode.Should().Be("BlobAlreadyExists");
     }

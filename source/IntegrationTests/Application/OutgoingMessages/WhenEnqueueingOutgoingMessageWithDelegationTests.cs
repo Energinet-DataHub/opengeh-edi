@@ -75,7 +75,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
 
         // Act
-        var createdId = await EnqueueAndCommitAsync(message);
+        ClearDbContextCaches();
+        await EnqueueAndCommitAsync(message);
 
         // Assert
         await AssertEnqueuedOutgoingMessage(_delegatedTo, outgoingEnergyResultMessageReceiver);
@@ -93,7 +94,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
 
         // Act
-        var createdId = await EnqueueAndCommitAsync(message);
+        ClearDbContextCaches();
+        await EnqueueAndCommitAsync(message);
 
         // Assert
         await AssertEnqueuedOutgoingMessage(_delegatedTo, _delegatedBy);
@@ -112,7 +114,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
 
         // Act
-        var createdId = await EnqueueAndCommitAsync(message);
+        ClearDbContextCaches();
+        await EnqueueAndCommitAsync(message);
 
         // Assert
         await AssertEnqueuedOutgoingMessage(_delegatedTo, _delegatedBy);
@@ -132,7 +135,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
 
         // Act
-        var createdId = await EnqueueAndCommitAsync(message);
+        ClearDbContextCaches();
+        await EnqueueAndCommitAsync(message);
 
         // Assert
         await AssertEnqueuedOutgoingMessage(_delegatedTo, _delegatedBy);
@@ -156,7 +160,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             stopsAt: endsAtInThePast);
 
         // Act
-        var createdId = await EnqueueAndCommitAsync(message);
+        ClearDbContextCaches();
+        await EnqueueAndCommitAsync(message);
 
         // Assert
         await AssertEnqueuedOutgoingMessage(_delegatedBy, _delegatedBy);
@@ -180,7 +185,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             stopsAt: SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(10)));
 
         // Act
-        var createdId = await EnqueueAndCommitAsync(message);
+        ClearDbContextCaches();
+        await EnqueueAndCommitAsync(message);
 
         // Assert
         await AssertEnqueuedOutgoingMessage(_delegatedBy, _delegatedBy);
@@ -204,7 +210,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: now, sequenceNumber: 1);
 
         // Act
-        var createdId = await EnqueueAndCommitAsync(message);
+        ClearDbContextCaches();
+        await EnqueueAndCommitAsync(message);
 
         // Assert
         await AssertEnqueuedOutgoingMessage(_delegatedBy, _delegatedBy);
@@ -231,7 +238,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: stopsAt, sequenceNumber: 2);
 
         // Act
-        var createdId = await EnqueueAndCommitAsync(message);
+        ClearDbContextCaches();
+        await EnqueueAndCommitAsync(message);
 
         // Assert
         await AssertEnqueuedOutgoingMessage(_delegatedTo, _delegatedBy);
@@ -251,7 +259,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: startsAt.Plus(Duration.FromDays(5)));
 
         // Act
-        var createdId = await EnqueueAndCommitAsync(message);
+        ClearDbContextCaches();
+        await EnqueueAndCommitAsync(message);
 
         // Assert
         await AssertEnqueuedOutgoingMessage(_delegatedTo, _delegatedBy);
@@ -271,7 +280,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: stopsAt.Minus(Duration.FromDays(5)), stopsAt: stopsAt);
 
         // Act
-        var createdId = await EnqueueAndCommitAsync(message);
+        ClearDbContextCaches();
+        await EnqueueAndCommitAsync(message);
 
         // Assert
         await AssertEnqueuedOutgoingMessage(_delegatedBy, _delegatedBy);
@@ -289,7 +299,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, processType: ProcessType.ReceiveWholesaleResults);
 
         // Act
-        var createdId = await EnqueueAndCommitAsync(message);
+        ClearDbContextCaches();
+        await EnqueueAndCommitAsync(message);
 
         // Assert
         await AssertEnqueuedOutgoingMessage(_delegatedBy, _delegatedBy);
@@ -370,6 +381,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             .HasDocumentReceiverId(receiverDocument.ActorNumber.Value)
             .HasDocumentReceiverRole(receiverDocument.ActorRole.Code);
 
+        ClearDbContextCaches();
         var result = await PeekMessageAsync(
             MessageCategory.Aggregations,
             actorNumber: receiverQueue.ActorNumber,

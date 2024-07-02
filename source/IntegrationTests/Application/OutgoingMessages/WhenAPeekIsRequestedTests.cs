@@ -75,6 +75,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         var message = _energyResultMessageDtoBuilder.Build();
         await EnqueueMessage(message);
 
+        ClearDbContextCaches();
         var result = await PeekMessageAsync(MessageCategory.None);
 
         Assert.Null(result);
@@ -90,6 +91,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             .Build();
         await EnqueueMessage(message);
 
+        ClearDbContextCaches();
         var result = await PeekMessageAsync(MessageCategory.Aggregations);
 
         AssertXmlMessage.Document(XDocument.Load(result!.Bundle))
@@ -107,6 +109,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             .Build();
         await EnqueueMessage(message);
 
+        ClearDbContextCaches(); // Else the message is cached in Entity Framework
         var firstPeekResult = await PeekMessageAsync(MessageCategory.Aggregations);
 
         ClearDbContextCaches(); // Else the MarketDocument is cached in Entity Framework
@@ -131,6 +134,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         await EnqueueMessage(message);
 
         // Act
+        ClearDbContextCaches();
         var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);
 
         // Assert
@@ -164,6 +168,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         await EnqueueMessage(message);
 
         // Act
+        ClearDbContextCaches();
         var result = await PeekMessageAsync(MessageCategory.Aggregations);
 
         // Assert
@@ -183,6 +188,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             .Build();
         await EnqueueMessage(message);
 
+        ClearDbContextCaches();
         var result = await PeekMessageAsync(MessageCategory.Aggregations);
 
         result.Should().NotBeNull();
@@ -200,6 +206,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             .Build();
         await EnqueueMessage(message);
 
+        ClearDbContextCaches();
         var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);
 
         var marketDocumentFileStorageReference = await GetMarketDocumentFileStorageReferenceFromDatabaseAsync(peekResult!.MessageId);
@@ -226,6 +233,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         await EnqueueMessage(message);
 
         // Act
+        ClearDbContextCaches();
         var peekResult = await PeekMessageAsync(MessageCategory.Aggregations, actorNumber: actorNumber, actorRole: ActorRole.MeteredDataResponsible);
 
         // Assert
@@ -265,6 +273,8 @@ public class WhenAPeekIsRequestedTests : TestBase
         var act = async () =>
         {
             await EnqueueMessage(message);
+
+            ClearDbContextCaches();
             var result = await PeekMessageAsync(MessageCategory.Aggregations, message.ReceiverNumber, message.ReceiverRole, documentFormat: documentFormat);
             return result;
         };
@@ -296,6 +306,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         _dateTimeProvider.SetNow(expectedTimestamp.ToInstant());
 
         // Act / When
+        ClearDbContextCaches();
         var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);
 
         // Assert / Then
