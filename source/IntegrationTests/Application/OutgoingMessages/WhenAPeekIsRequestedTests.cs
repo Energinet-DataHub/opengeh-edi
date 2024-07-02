@@ -109,7 +109,6 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         var firstPeekResult = await PeekMessageAsync(MessageCategory.Aggregations);
 
-        ClearDbContextCaches(); // Else the MarketDocument is cached in Entity Framework
         var secondPeekResult = await PeekMessageAsync(MessageCategory.Aggregations);
 
         Assert.NotNull(firstPeekResult);
@@ -265,6 +264,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         var act = async () =>
         {
             await EnqueueMessage(message);
+
             var result = await PeekMessageAsync(MessageCategory.Aggregations, message.ReceiverNumber, message.ReceiverRole, documentFormat: documentFormat);
             return result;
         };

@@ -34,25 +34,64 @@ public class ActorMessageQueueRepository : IActorMessageQueueRepository
         ArgumentNullException.ThrowIfNull(actorNumber);
         ArgumentNullException.ThrowIfNull(actorRole);
 
-        var actorMessageQueue = await _actorMessageQueueContext.ActorMessageQueues.FirstOrDefaultAsync(queue =>
-            queue.Receiver.Number.Equals(actorNumber) && queue.Receiver.ActorRole.Equals(actorRole)).ConfigureAwait(false);
+        var actorMessageQueue = await ActorMessageQueuesIncludingBundlesQuery()
+            .FirstOrDefaultAsync(queue =>
+                queue.Receiver.Number.Equals(actorNumber) &&
+                queue.Receiver.ActorRole.Equals(actorRole))
+            .ConfigureAwait(false);
 
         if (actorMessageQueue is null)
         {
-            actorMessageQueue = _actorMessageQueueContext.ActorMessageQueues.Local.FirstOrDefault(queue =>
-                queue.Receiver.Number.Equals(actorNumber) && queue.Receiver.ActorRole.Equals(actorRole));
+            actorMessageQueue = _actorMessageQueueContext.ActorMessageQueues.Local
+                .FirstOrDefault(queue =>
+                    queue.Receiver.Number.Equals(actorNumber) &&
+                    queue.Receiver.ActorRole.Equals(actorRole));
         }
 
         return actorMessageQueue;
     }
 
+    public async Task<ActorMessageQueueId?> ActorMessageQueueIdForAsync(ActorNumber actorNumber, ActorRole actorRole)
+    {
+        ArgumentNullException.ThrowIfNull(actorNumber);
+        ArgumentNullException.ThrowIfNull(actorRole);
+
+        var actorMessageQueueId = await _actorMessageQueueContext.ActorMessageQueues
+            .Where(queue =>
+                queue.Receiver.Number.Equals(actorNumber) &&
+                queue.Receiver.ActorRole.Equals(actorRole))
+            .Select(queue => queue.Id)
+            .SingleOrDefaultAsync()
+            .ConfigureAwait(false);
+
+        if (actorMessageQueueId is null)
+        {
+            actorMessageQueueId = _actorMessageQueueContext.ActorMessageQueues.Local
+                .Where(queue =>
+                    queue.Receiver.Number.Equals(actorNumber) &&
+                    queue.Receiver.ActorRole.Equals(actorRole))
+                .Select(queue => queue.Id)
+                .SingleOrDefault();
+        }
+
+        return actorMessageQueueId;
+    }
+
     public async Task<IReadOnlyCollection<ActorMessageQueue>> GetActorMessageQueuesAsync(int skip, int take)
     {
-        return new ReadOnlyCollection<ActorMessageQueue>(await _actorMessageQueueContext.ActorMessageQueues.Skip(skip).Take(take).ToListAsync().ConfigureAwait(false));
+        return await ActorMessageQueuesIncludingBundlesQuery()
+            .Skip(skip)
+            .Take(take)
+            .ToListAsync()
+            .ConfigureAwait(false);
     }
 
     public void Add(ActorMessageQueue actorMessageQueue)
     {
         _actorMessageQueueContext.ActorMessageQueues.Add(actorMessageQueue);
     }
+
+    private IQueryable<ActorMessageQueue> ActorMessageQueuesIncludingBundlesQuery() =>
+        _actorMessageQueueContext.ActorMessageQueues
+        .Include("_bundles");
 }

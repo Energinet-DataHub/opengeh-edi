@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using NodaTime;
 
@@ -26,7 +27,11 @@ public sealed class Bundle
     private readonly int _maxNumberOfMessagesInABundle;
     private int _messageCount;
 
-    internal Bundle(
+    /// <summary>
+    /// Create new bundle in the given actor message queue
+    /// </summary>
+    public Bundle(
+        ActorMessageQueueId actorMessageQueueId,
         BusinessReason businessReason,
         DocumentType documentTypeInBundle,
         int maxNumberOfMessagesInABundle,
@@ -35,6 +40,7 @@ public sealed class Bundle
     {
         _maxNumberOfMessagesInABundle = maxNumberOfMessagesInABundle;
         Id = BundleId.New();
+        ActorMessageQueueId = actorMessageQueueId;
         MessageId = MessageId.New();
         BusinessReason = businessReason;
         DocumentTypeInBundle = documentTypeInBundle;
@@ -45,6 +51,10 @@ public sealed class Bundle
     private Bundle()
     {
     }
+
+    public BundleId Id { get; }
+
+    public ActorMessageQueueId ActorMessageQueueId { get; }
 
     public Instant? DequeuedAt { get; private set; }
 
@@ -60,13 +70,11 @@ public sealed class Bundle
 
     public MessageId MessageId { get; private set; }
 
-    public BundleId Id { get; }
+    public DocumentType DocumentTypeInBundle { get; }
 
-    internal DocumentType DocumentTypeInBundle { get; }
+    public BusinessReason BusinessReason { get; }
 
-    internal BusinessReason BusinessReason { get; }
-
-    internal Instant? ClosedAt { get; private set; }
+    public Instant? ClosedAt { get; private set; }
 
     public void PeekBundle()
     {
@@ -75,10 +83,10 @@ public sealed class Bundle
         PeekedAt = SystemClock.Instance.GetCurrentInstant();
     }
 
-    internal void Add(OutgoingMessage outgoingMessage)
+    public void Add(OutgoingMessage outgoingMessage)
     {
         if (ClosedAt is not null)
-            return;
+            throw new InvalidOperationException($"Cannot add message to a closed bundle (bundle id: {Id.Id}, message id: {outgoingMessage.Id}, external id: {outgoingMessage.ExternalId})");
 
         outgoingMessage.AssignToBundle(Id);
         _messageCount++;

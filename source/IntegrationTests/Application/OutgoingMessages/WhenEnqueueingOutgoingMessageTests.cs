@@ -67,14 +67,14 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
 
-        var createdAtTimestamp = Instant.FromUtc(2024, 1, 1, 0, 0);
-        _systemDateTimeProvider.SetNow(createdAtTimestamp);
+        var now = Instant.FromUtc(2024, 1, 1, 0, 0);
+        _systemDateTimeProvider.SetNow(now);
 
         // Act
         var createdOutgoingMessageId = await EnqueueAndCommitAsync(message);
 
         // Assert
-        var expectedFileStorageReference = $"{SampleData.NewEnergySupplierNumber}/{createdAtTimestamp.Year():0000}/{createdAtTimestamp.Month():00}/{createdAtTimestamp.Day():00}/{createdOutgoingMessageId.Value:N}";
+        var expectedFileStorageReference = $"{SampleData.NewEnergySupplierNumber}/{now.Year():0000}/{now.Month():00}/{now.Day():00}/{createdOutgoingMessageId.Value:N}";
 
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = "SELECT * FROM [dbo].[OutgoingMessages]";
@@ -82,6 +82,9 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
 
         Assert.NotNull(nullableMessageFromDatabase);
         var messageFromDatabase = nullableMessageFromDatabase!;
+
+        var expectedBundleId = await connection.QuerySingleOrDefaultAsync<Guid?>("SELECT Id FROM [dbo].Bundles");
+        Assert.NotNull(expectedBundleId);
 
         var propertyAssertions = new Action[]
         {
@@ -102,8 +105,8 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.Equal("OutgoingMessage", messageFromDatabase.Discriminator),
             () => Assert.Equal(message.RelatedToMessageId?.Value, messageFromDatabase.RelatedToMessageId),
             () => Assert.Equal(message.EventId.Value, messageFromDatabase.EventId),
-            () => Assert.NotNull(messageFromDatabase.AssignedBundleId),
-            () => Assert.NotNull(messageFromDatabase.CreatedAt),
+            () => Assert.Equal(messageFromDatabase.AssignedBundleId, expectedBundleId!),
+            () => Assert.Equal(messageFromDatabase.CreatedAt, now.ToDateTimeUtc()),
             () => Assert.NotNull(messageFromDatabase.CreatedBy),
             () => Assert.Null(messageFromDatabase.ModifiedAt),
             () => Assert.Null(messageFromDatabase.ModifiedBy),
@@ -122,11 +125,64 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     }
 
     [Fact]
+    public async Task Bundle_is_added_to_database_with_correct_values()
+    {
+        // Arrange
+        var message = _energyResultMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .Build();
+
+        var now = Instant.FromUtc(2024, 1, 1, 0, 0);
+        _systemDateTimeProvider.SetNow(now);
+
+        // Act
+        await EnqueueAndCommitAsync(message);
+
+        // Assert
+        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        var sql = "SELECT * FROM [dbo].[Bundles]";
+        var nullableBundleFromDatabase = await connection.QuerySingleOrDefaultAsync(sql);
+
+        Assert.NotNull(nullableBundleFromDatabase);
+        var bundleFromDatabase = nullableBundleFromDatabase!;
+
+        var expectedActorMessageQueueId = await connection.QuerySingleOrDefaultAsync<Guid?>("SELECT Id FROM [dbo].ActorMessageQueues");
+        Assert.NotNull(expectedActorMessageQueueId);
+
+        var propertyAssertions = new Action[]
+        {
+            () => Assert.NotNull(bundleFromDatabase.RecordId),
+            () => Assert.NotNull(bundleFromDatabase.Id),
+            () => Assert.Equal(bundleFromDatabase.ActorMessageQueueId, expectedActorMessageQueueId),
+            () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Name, bundleFromDatabase.DocumentTypeInBundle),
+            () => Assert.Equal(1, bundleFromDatabase.MessageCount),
+            () => Assert.Equal(1, bundleFromDatabase.MaxMessageCount),
+            () => Assert.Equal(message.BusinessReason, bundleFromDatabase.BusinessReason),
+            () => Assert.Equal(bundleFromDatabase.Created, now.ToDateTimeUtc()),
+            () => Assert.Null(bundleFromDatabase.RelatedToMessageId),
+            () => Assert.NotNull(bundleFromDatabase.MessageId),
+            () => Assert.Null(bundleFromDatabase.DequeuedAt),
+            () => Assert.Equal(bundleFromDatabase.ClosedAt, now.ToDateTimeUtc()),
+            () => Assert.Null(bundleFromDatabase.PeekedAt),
+        };
+
+        Assert.Multiple(propertyAssertions);
+
+        // Confirm that all database columns are asserted
+        var databaseColumnsCount = ((IDictionary<string, object>)bundleFromDatabase).Count;
+        var propertiesAssertedCount = propertyAssertions.Length;
+        propertiesAssertedCount
+            .Should()
+            .Be(databaseColumnsCount, "asserted properties count should be equal to Bundle database columns count");
+    }
+
+    [Fact]
     public async Task Can_peek_message()
     {
         var message = _energyResultMessageDtoBuilder.Build();
         await EnqueueAndCommitAsync(message);
 
+        ClearDbContextCaches();
         var result = await _outgoingMessagesClient.PeekAndCommitAsync(
             new PeekRequestDto(
                 message.ReceiverNumber,
@@ -147,7 +203,9 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var message2 = _energyResultMessageDtoBuilder.Build();
         await EnqueueAndCommitAsync(message2);
 
+        ClearDbContextCaches();
         var result = await _outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(message.ReceiverNumber, message.DocumentType.Category, message.ReceiverRole, DocumentFormat.Ebix), CancellationToken.None);
+
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = "SELECT top 1 MessageId FROM [dbo].[Bundles] order by created";
         var id = await
@@ -162,23 +220,27 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     {
         var message = _energyResultMessageDtoBuilder.Build();
         await EnqueueAndCommitAsync(message);
+
+        ClearDbContextCaches();
         var peekRequestDto = new PeekRequestDto(
             message.ReceiverNumber,
             MessageCategory.Aggregations,
             message.ReceiverRole,
             DocumentFormat.Xml);
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(peekRequestDto, CancellationToken.None);
+
         var dequeueCommand = new DequeueRequestDto(
             peekResult!.MessageId.Value,
             message.ReceiverRole,
             message.ReceiverNumber);
 
+        ClearDbContextCaches();
         var result = await _outgoingMessagesClient.DequeueAndCommitAsync(dequeueCommand, CancellationToken.None);
 
         Assert.True(result.Success);
     }
 
-    [Fact]
+    [Fact(Skip = "Bundling is deactivated")]
     public async Task Outgoing_messages_for_same_actor_is_added_to_existing_bundle()
     {
         // Arrange
@@ -232,15 +294,42 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
 
         // Act
         var createdId = await EnqueueAndCommitAsync(message);
+
+        // Assert
         var fileStorageReference = await GetOutgoingMessageFileStorageReferenceFromDatabase(createdId);
         var uploadDuplicateFile = async () => await _fileStorageClient.UploadAsync(new FileStorageReference(OutgoingMessage.FileStorageCategory, fileStorageReference!), new MemoryStream(new byte[] { 0x20 }));
 
-        // Assert
         (await uploadDuplicateFile.Should().ThrowAsync<RequestFailedException>())
             .And.ErrorCode.Should().Be("BlobAlreadyExists");
     }
 
     [Fact]
+    public async Task Enqueuing_multiple_outgoing_messages_assigns_them_to_different_bundles()
+    {
+        // Arrange
+        var message1 = _rejectedEnergyResultMessageDtoBuilder
+            .Build();
+        var message2 = _rejectedEnergyResultMessageDtoBuilder
+            .Build();
+        var message3 = _rejectedEnergyResultMessageDtoBuilder
+            .Build();
+
+        // Act
+        var createdIdMessage1 = await EnqueueAndCommitAsync(message1);
+        var createdIdMessage2 = await EnqueueAndCommitAsync(message2);
+        var createdIdMessage3 = await EnqueueAndCommitAsync(message3);
+
+        // Assert
+        var bundleIdForMessage1 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage1);
+        var bundleIdForMessage2 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage2);
+        var bundleIdForMessage3 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage3);
+
+        Assert.NotEqual(bundleIdForMessage1, bundleIdForMessage2);
+        Assert.NotEqual(bundleIdForMessage1, bundleIdForMessage3);
+        Assert.NotEqual(bundleIdForMessage2, bundleIdForMessage3);
+    }
+
+    [Fact(Skip = "Bundling is deactivated")]
     public async Task Outgoing_messages_with_different_relatedTo_ids_are_assigned_to_different_bundles()
     {
         // Arrange
@@ -290,14 +379,14 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var bundleIdForMessage2 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage2);
         var bundleIdForMessage3 = await GetOutgoingMessageBundleIdFromDatabase(createdIdMessage3);
 
-        Assert.Equal(existingBundleId, bundleIdForMessage1);
+        Assert.Equal(existingBundleId, bundleIdForMessage1); // This is not correct as long as bundling is disabled
         Assert.NotEqual(existingBundleId, bundleIdForMessage2);
         Assert.NotEqual(existingBundleId, bundleIdForMessage3);
 
         Assert.NotEqual(bundleIdForMessage2, bundleIdForMessage3);
     }
 
-    [Fact]
+    [Fact(Skip = "Bundling is deactivated")]
     public async Task Outgoing_messages_with_same_relatedTo_ids_are_assigned_to_same_bundles()
     {
         // Arrange
