@@ -59,12 +59,18 @@ public class EnqueueEnergyResultsForBalanceResponsiblesActivity(
         await foreach (var queryResult in _energyResultEnumerator.GetAsync(query))
         {
             databricksStopwatch.Stop();
-            _logger.LogInformation(
-                "Retrieved energy result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}",
-                databricksStopwatch.Elapsed,
-                query.GetType().Name,
-                queryResult.Result!.ExternalId.Value,
-                input.CalculationId);
+
+            // Only log databricks query time if it took more than 1 second
+            if (databricksStopwatch.Elapsed > TimeSpan.FromSeconds(1))
+            {
+                _logger.LogInformation(
+                    "Retrieved energy result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
+                    databricksStopwatch.Elapsed,
+                    query.GetType().Name,
+                    queryResult.Result!.ExternalId.Value,
+                    input.CalculationId,
+                    input.EventId);
+            }
 
             var enqueueStopwatch = Stopwatch.StartNew();
             var enqueueWasSuccess = false;
@@ -86,7 +92,13 @@ public class EnqueueEnergyResultsForBalanceResponsiblesActivity(
                     catch (Exception ex)
                     {
                         numberOfFailedResults++;
-                        _logger.LogWarning(ex, "Enqueue and commit of energy result failed for CalculationId='{CalculationId}'.", input.CalculationId);
+                        _logger.LogWarning(
+                            ex,
+                            "Enqueue and commit failed for energy result, query type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
+                            query.GetType().Name,
+                            queryResult.Result?.ExternalId.Value,
+                            input.CalculationId,
+                            input.EventId);
                     }
                 }
             }
@@ -103,7 +115,7 @@ public class EnqueueEnergyResultsForBalanceResponsiblesActivity(
                 numberOfHandledResults,
                 numberOfFailedResults,
                 query.GetType().Name,
-                queryResult.Result.ExternalId.Value,
+                queryResult.Result?.ExternalId.Value,
                 input.CalculationId,
                 input.EventId);
             databricksStopwatch.Restart();
