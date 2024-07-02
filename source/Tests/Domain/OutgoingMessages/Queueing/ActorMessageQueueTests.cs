@@ -15,6 +15,7 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using FluentAssertions;
@@ -26,27 +27,6 @@ namespace Energinet.DataHub.EDI.Tests.Domain.OutgoingMessages.Queueing;
 
 public class ActorMessageQueueTests
 {
-    // [Fact]
-    // public void Receiver_of_the_message_must_match_message_queue()
-    // {
-    //     var actorMessageQueue = ActorMessageQueue.CreateFor(Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier));
-    //     var outgoingMessage = CreateOutgoingMessage(Receiver.Create(ActorNumber.Create("1234567890124"), ActorRole.EnergySupplier), BusinessReason.BalanceFixing);
-    //
-    //     Assert.Throws<ReceiverMismatchException>(() => actorMessageQueue.Enqueue(outgoingMessage, SystemClock.Instance.GetCurrentInstant()));
-    // }
-
-    // [Fact]
-    // public void Outgoing_message_is_assigned_to_a_bundle_when_enqueued()
-    // {
-    //     var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
-    //     var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
-    //     var outgoingMessage = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
-    //
-    //     actorMessageQueue.Enqueue(outgoingMessage, SystemClock.Instance.GetCurrentInstant());
-    //
-    //     Assert.NotNull(outgoingMessage.AssignedBundleId);
-    // }
-
     [Fact]
     public void When_no_message_has_been_enqueued_peek_returns_no_bundle_id()
     {
@@ -57,128 +37,177 @@ public class ActorMessageQueueTests
         result.Should().BeNull();
     }
 
-    // [Fact]
-    // public void Return_bundle_id_when_messages_are_enqueued()
-    // {
-    //     var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
-    //     var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
-    //     var outgoingMessage = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
-    //     actorMessageQueue.Enqueue(outgoingMessage, SystemClock.Instance.GetCurrentInstant());
-    //
-    //     var result = actorMessageQueue.Peek();
-    //
-    //     result.Should()
-    //         .NotBeNull()
-    //         .And.BeOfType<PeekResult>()
-    //         .Subject.BundleId
-    //         .Should()
-    //         .Be(outgoingMessage.AssignedBundleId);
-    // }
+    [Fact]
+    public void Return_bundle_id_when_messages_are_enqueued()
+    {
+        var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
+        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
+        var (bundle, outgoingMessage) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
+        AddBundleToQueue(actorMessageQueue, bundle);
 
-    // [Fact]
-    // public void Peek_returns_empty_bundle_if_bundle_has_been_dequeued()
-    // {
-    //     var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
-    //     var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
-    //     var outgoingMessage = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
-    //     actorMessageQueue.Enqueue(outgoingMessage, SystemClock.Instance.GetCurrentInstant());
-    //
-    //     var peekResult = actorMessageQueue.Peek();
-    //     peekResult.Should().NotBeNull();
-    //
-    //     var dequeueResult = actorMessageQueue.Dequeue(peekResult!.MessageId);
-    //     dequeueResult.Should().BeTrue("we should be able to dequeue what we just peeked");
-    //
-    //     var newPeekResult = actorMessageQueue.Peek();
-    //     newPeekResult.Should().BeNull();
-    // }
+        var result = actorMessageQueue.Peek();
 
-    // [Fact]
-    // public void If_current_bundle_is_full_the_message_is_assigned_to_a_new_bundle()
-    // {
-    //     var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
-    //     var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
-    //     actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing), SystemClock.Instance.GetCurrentInstant(), maxNumberOfMessagesInABundle: 1);
-    //     actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing), SystemClock.Instance.GetCurrentInstant(), maxNumberOfMessagesInABundle: 1);
-    //
-    //     var firstBundle = actorMessageQueue.Peek();
-    //     firstBundle.Should().NotBeNull();
-    //
-    //     var dequeueResult = actorMessageQueue.Dequeue(firstBundle!.MessageId);
-    //     dequeueResult.Should().BeTrue("we should be able to dequeue what we just peeked");
-    //
-    //     var secondBundle = actorMessageQueue.Peek();
-    //     secondBundle.Should().NotBeNull();
-    //
-    //     firstBundle.BundleId.Should().NotBe(secondBundle!.BundleId);
-    // }
-    //
-    // [Fact]
-    // public void Messages_are_bundled_by_message_type_and_process_type()
-    // {
-    //     var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
-    //     var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
-    //     actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.MoveIn, DocumentType.NotifyAggregatedMeasureData), SystemClock.Instance.GetCurrentInstant(), maxNumberOfMessagesInABundle: 2);
-    //     actorMessageQueue.Enqueue(CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing, DocumentType.RejectRequestAggregatedMeasureData), SystemClock.Instance.GetCurrentInstant(), maxNumberOfMessagesInABundle: 2);
-    //
-    //     var firstBundle = actorMessageQueue.Peek();
-    //     firstBundle.Should().NotBeNull();
-    //
-    //     var dequeueResult = actorMessageQueue.Dequeue(firstBundle!.MessageId);
-    //     dequeueResult.Should().BeTrue("we should be able to dequeue what we just peeked");
-    //
-    //     var secondBundle = actorMessageQueue.Peek();
-    //     secondBundle.Should().NotBeNull();
-    //
-    //     firstBundle.BundleId.Should().NotBe(secondBundle!.BundleId);
-    // }
+        result.Should()
+            .NotBeNull()
+            .And.BeOfType<PeekResult>()
+            .Subject.BundleId
+            .Should()
+            .Be(outgoingMessage.AssignedBundleId);
+    }
 
-    // [Fact]
-    // public void Peek_returns_the_oldest_bundle()
-    // {
-    //     var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
-    //     var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
-    //     var messageAssignedToFirstBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
-    //     var messageAssignedToSecondBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
-    //     actorMessageQueue.Enqueue(messageAssignedToFirstBundle, SystemClock.Instance.GetCurrentInstant(), 1);
-    //     actorMessageQueue.Enqueue(messageAssignedToSecondBundle, SystemClock.Instance.GetCurrentInstant(), 1);
-    //
-    //     var result = actorMessageQueue.Peek();
-    //     result.Should().NotBeNull();
-    //     result!.BundleId.Should().Be(messageAssignedToFirstBundle.AssignedBundleId);
-    // }
+    [Fact]
+    public void Peek_returns_null_if_bundle_has_been_dequeued()
+    {
+        var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
+        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
+        var (bundle, outgoingMessage) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
+        AddBundleToQueue(actorMessageQueue, bundle);
 
-    // [Fact]
-    // public void Peek_closes_the_bundle_that_is_peeked()
-    // {
-    //     var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
-    //     var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
-    //     var messageAssignedToFirstBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
-    //     var messageAssignedToSecondBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
-    //     actorMessageQueue.Enqueue(messageAssignedToFirstBundle, SystemClock.Instance.GetCurrentInstant(), 1);
-    //
-    //     actorMessageQueue.Peek();
-    //     actorMessageQueue.Enqueue(messageAssignedToSecondBundle, SystemClock.Instance.GetCurrentInstant(), 1);
-    //
-    //     Assert.NotEqual(messageAssignedToFirstBundle.AssignedBundleId, messageAssignedToSecondBundle.AssignedBundleId);
-    // }
+        var peekResult = actorMessageQueue.Peek();
+        peekResult.Should().NotBeNull();
 
-    // [Fact]
-    // public void Bundle_size_is_1_for_aggregations_message_category()
-    // {
-    //     var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
-    //     var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
-    //
-    //     var messageAssignedToFirstBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing, DocumentType.NotifyAggregatedMeasureData);
-    //     actorMessageQueue.Enqueue(messageAssignedToFirstBundle, SystemClock.Instance.GetCurrentInstant());
-    //
-    //     var messageAssignedToSecondBundle = CreateOutgoingMessage(receiver, BusinessReason.BalanceFixing);
-    //     actorMessageQueue.Enqueue(messageAssignedToSecondBundle, SystemClock.Instance.GetCurrentInstant());
-    //
-    //     Assert.NotEqual(messageAssignedToFirstBundle.AssignedBundleId, messageAssignedToSecondBundle.AssignedBundleId);
-    // }
+        var dequeueResult = actorMessageQueue.Dequeue(peekResult!.MessageId);
+        dequeueResult.Should().BeTrue("we should be able to dequeue what we just peeked");
 
-    private static OutgoingMessage CreateOutgoingMessage(
+        var newPeekResult = actorMessageQueue.Peek();
+        newPeekResult.Should().BeNull();
+    }
+
+    [Fact]
+    public void Peek_returns_new_bundle_when_old_bundle_is_dequeued()
+    {
+        var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
+        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
+        var (bundle1, message1) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
+        var (bundle2, message2) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
+        AddBundleToQueue(actorMessageQueue, bundle1);
+        AddBundleToQueue(actorMessageQueue, bundle2);
+
+        // Peek and dequeue bundle 1
+        var bundle1PeekResult = actorMessageQueue.Peek();
+        bundle1PeekResult.Should().NotBeNull();
+        bundle1PeekResult!.BundleId.Should().Be(bundle1.Id);
+        bundle1PeekResult!.MessageId.Should().Be(bundle1.MessageId);
+
+        var bundle1DequeueResult = actorMessageQueue.Dequeue(bundle1PeekResult.MessageId);
+        bundle1DequeueResult.Should().BeTrue("we should be able to dequeue what we just peeked");
+
+        // Peek bundle 2
+        var bundle2PeekResult = actorMessageQueue.Peek();
+        bundle2PeekResult.Should().NotBeNull();
+        bundle2PeekResult!.BundleId.Should().Be(bundle2.Id);
+        bundle2PeekResult!.MessageId.Should().Be(bundle2.MessageId);
+    }
+
+    [Fact(Skip = "Skipped because bundling is disabled")] //TODO: Refactor (to use case test?) if bundling is re-enabled
+    public void If_current_bundle_is_full_the_message_is_assigned_to_a_new_bundle()
+    {
+        var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
+        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
+        var (bundle1, message1) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
+        var (bundle2, message2) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
+        AddBundleToQueue(actorMessageQueue, bundle1);
+        AddBundleToQueue(actorMessageQueue, bundle2);
+
+        var firstBundle = actorMessageQueue.Peek();
+        firstBundle.Should().NotBeNull();
+
+        var dequeueResult = actorMessageQueue.Dequeue(firstBundle!.MessageId);
+        dequeueResult.Should().BeTrue("we should be able to dequeue what we just peeked");
+
+        var secondBundle = actorMessageQueue.Peek();
+        secondBundle.Should().NotBeNull();
+
+        firstBundle.BundleId.Should().NotBe(secondBundle!.BundleId);
+    }
+
+    [Fact(Skip = "Skipped because bundling is disabled")] //TODO: Refactor (to use case test?) if bundling is re-enabled
+    public void Messages_are_bundled_by_message_type_and_process_type()
+    {
+        var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
+        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
+        var (bundle1, message1) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.MoveIn, DocumentType.NotifyAggregatedMeasureData);
+        var (bundle2, message2) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing, DocumentType.RejectRequestAggregatedMeasureData);
+        AddBundleToQueue(actorMessageQueue, bundle1);
+        AddBundleToQueue(actorMessageQueue, bundle2);
+
+        var firstBundle = actorMessageQueue.Peek();
+        firstBundle.Should().NotBeNull();
+
+        var dequeueResult = actorMessageQueue.Dequeue(firstBundle!.MessageId);
+        dequeueResult.Should().BeTrue("we should be able to dequeue what we just peeked");
+
+        var secondBundle = actorMessageQueue.Peek();
+        secondBundle.Should().NotBeNull();
+
+        firstBundle.BundleId.Should().NotBe(secondBundle!.BundleId);
+    }
+
+    [Fact]
+    public void Peek_returns_the_oldest_bundle()
+    {
+        var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
+        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
+
+        var (bundle1, message1) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
+        var (bundle2, message2) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
+
+        AddBundleToQueue(actorMessageQueue, bundle1);
+        AddBundleToQueue(actorMessageQueue, bundle2);
+
+        // Act
+        var result = actorMessageQueue.Peek();
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.BundleId.Should().Be(message1.AssignedBundleId);
+    }
+
+    [Fact(Skip = "Skipped because bundling is disabled")] //TODO: Refactor (to use case test?) if bundling is re-enabled
+    public void Peek_closes_the_bundle_that_is_peeked_and_new_messages_are_added_to_new_bundles()
+    {
+        var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
+        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
+        var (bundle1, message1) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
+        var (bundle2, message2) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
+        AddBundleToQueue(actorMessageQueue, bundle1);
+
+        actorMessageQueue.Peek();
+        AddBundleToQueue(actorMessageQueue, bundle2);
+
+        Assert.NotEqual(message1.AssignedBundleId, message2.AssignedBundleId);
+    }
+
+    [Fact(Skip = "Skipped because bundling is disabled")] //TODO: Refactor (to use case test?) if bundling is re-enabled
+    public void Bundle_size_is_1_for_aggregations_message_category()
+    {
+        var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
+        var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
+
+        var (bundle1, message1) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing, DocumentType.NotifyAggregatedMeasureData);
+        AddBundleToQueue(actorMessageQueue, bundle1);
+
+        var (bundle2, message2) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
+        AddBundleToQueue(actorMessageQueue, bundle2);
+
+        Assert.NotEqual(message1.AssignedBundleId, message2.AssignedBundleId);
+    }
+
+    private static void AddBundleToQueue(ActorMessageQueue actorMessageQueue, Bundle bundle)
+    {
+        // Add bundle to private field "_bundles" on ActorMessageQueue
+        var bundlesField = actorMessageQueue
+            .GetType()
+            .GetField("_bundles", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        var bundles = bundlesField!.GetValue(actorMessageQueue) as List<Bundle>;
+        bundles!.Add(bundle);
+
+        bundlesField!.SetValue(actorMessageQueue, bundles);
+    }
+
+    private static (Bundle Bundle, OutgoingMessage OutgoingMessage) CreateBundleWithOutgoingMessage(
+        ActorMessageQueueId actorMessageQueueId,
         Receiver? receiver = null,
         BusinessReason? businessReason = null,
         DocumentType? messageType = null,
@@ -188,7 +217,7 @@ public class ActorMessageQueueTests
             ActorNumber.Create("1234567890124"),
             ActorRole.EnergySupplier);
 
-        return new OutgoingMessage(
+        var outgoingMessage = new OutgoingMessage(
             eventId: EventId.From(Guid.NewGuid()),
             documentType: messageType ?? DocumentType.NotifyAggregatedMeasureData,
             receiverId: receiver.Number,
@@ -204,5 +233,17 @@ public class ActorMessageQueueTests
             gridAreaCode: null,
             externalId: new ExternalId(Guid.NewGuid()),
             calculationId: Guid.NewGuid());
+
+        var bundle = new Bundle(
+            actorMessageQueueId,
+            BusinessReason.FromName(outgoingMessage.BusinessReason),
+            outgoingMessage.DocumentType,
+            1,
+            SystemClock.Instance.GetCurrentInstant(),
+            outgoingMessage.RelatedToMessageId);
+
+        bundle.Add(outgoingMessage);
+
+        return (bundle, outgoingMessage);
     }
 }

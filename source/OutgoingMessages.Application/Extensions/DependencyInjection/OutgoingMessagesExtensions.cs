@@ -74,7 +74,6 @@ public static class OutgoingMessagesExtensions
         // MessageEnqueueingConfiguration
         services.AddTransient<EnqueueMessage>()
             .AddTransient<DelegateMessage>()
-            .AddTransient<EnqueueMessageService>()
             .AddTransient<IBundleRepository, BundleRepository>()
             .AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>()
             .AddTransient<IOutgoingMessagesClient, OutgoingMessagesClient>();

@@ -30,7 +30,7 @@ public sealed class Bundle
     /// <summary>
     /// Create new bundle in the given actor message queue
     /// </summary>
-    internal Bundle(
+    public Bundle(
         ActorMessageQueueId actorMessageQueueId,
         BusinessReason businessReason,
         DocumentType documentTypeInBundle,
@@ -83,7 +83,7 @@ public sealed class Bundle
         PeekedAt = SystemClock.Instance.GetCurrentInstant();
     }
 
-    internal void Add(OutgoingMessage outgoingMessage)
+    public void Add(OutgoingMessage outgoingMessage)
     {
         if (ClosedAt is not null)
             throw new InvalidOperationException($"Cannot add message to a closed bundle (bundle id: {Id.Id}, message id: {outgoingMessage.Id}, external id: {outgoingMessage.ExternalId})");
