@@ -181,6 +181,8 @@ public class TestBase : IDisposable
 
     protected Task<PeekResultDto?> PeekMessageAsync(MessageCategory category, ActorNumber? actorNumber = null, ActorRole? actorRole = null, DocumentFormat? documentFormat = null)
     {
+        ClearDbContextCaches();
+
         var outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         return outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, actorRole ?? ActorRole.EnergySupplier, documentFormat ?? DocumentFormat.Xml), CancellationToken.None);
     }

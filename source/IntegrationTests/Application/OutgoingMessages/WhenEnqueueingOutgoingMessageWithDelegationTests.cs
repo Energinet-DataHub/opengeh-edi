@@ -75,7 +75,6 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
 
         // Act
-        ClearDbContextCaches();
         await EnqueueAndCommitAsync(message);
 
         // Assert
@@ -94,7 +93,6 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
 
         // Act
-        ClearDbContextCaches();
         await EnqueueAndCommitAsync(message);
 
         // Assert
@@ -114,7 +112,6 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
 
         // Act
-        ClearDbContextCaches();
         await EnqueueAndCommitAsync(message);
 
         // Assert
@@ -135,7 +132,6 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
 
         // Act
-        ClearDbContextCaches();
         await EnqueueAndCommitAsync(message);
 
         // Assert
@@ -160,7 +156,6 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             stopsAt: endsAtInThePast);
 
         // Act
-        ClearDbContextCaches();
         await EnqueueAndCommitAsync(message);
 
         // Assert
@@ -185,7 +180,6 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             stopsAt: SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(10)));
 
         // Act
-        ClearDbContextCaches();
         await EnqueueAndCommitAsync(message);
 
         // Assert
@@ -210,7 +204,6 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: now, sequenceNumber: 1);
 
         // Act
-        ClearDbContextCaches();
         await EnqueueAndCommitAsync(message);
 
         // Assert
@@ -238,7 +231,6 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: stopsAt, sequenceNumber: 2);
 
         // Act
-        ClearDbContextCaches();
         await EnqueueAndCommitAsync(message);
 
         // Assert
@@ -259,7 +251,6 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: startsAt.Plus(Duration.FromDays(5)));
 
         // Act
-        ClearDbContextCaches();
         await EnqueueAndCommitAsync(message);
 
         // Assert
@@ -280,7 +271,6 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: stopsAt.Minus(Duration.FromDays(5)), stopsAt: stopsAt);
 
         // Act
-        ClearDbContextCaches();
         await EnqueueAndCommitAsync(message);
 
         // Assert
@@ -299,7 +289,6 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, processType: ProcessType.ReceiveWholesaleResults);
 
         // Act
-        ClearDbContextCaches();
         await EnqueueAndCommitAsync(message);
 
         // Assert
@@ -369,6 +358,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         Actor receiverQueue,
         Actor receiverDocument)
     {
+        ClearDbContextCaches();
+
         var outgoingMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
             DocumentType.NotifyAggregatedMeasureData.Name,
             BusinessReason.BalanceFixing.Name,
@@ -381,7 +372,6 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             .HasDocumentReceiverId(receiverDocument.ActorNumber.Value)
             .HasDocumentReceiverRole(receiverDocument.ActorRole.Code);
 
-        ClearDbContextCaches();
         var result = await PeekMessageAsync(
             MessageCategory.Aggregations,
             actorNumber: receiverQueue.ActorNumber,
@@ -397,6 +387,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
 
     private async Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultMessageDto message)
     {
+        ClearDbContextCaches();
         return await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
     }
 }
