@@ -59,21 +59,20 @@ public class EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
         await foreach (var queryResult in _wholesaleResultEnumerator.GetAsync(query))
         {
             databricksStopwatch.Stop();
+            // Only log databricks query time if it took more than 1 second
+            if (databricksStopwatch.Elapsed > TimeSpan.FromSeconds(1))
+            {
+                _logger.LogInformation(
+                    "Retrieved wholesale result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
+                    databricksStopwatch.Elapsed,
+                    query.GetType().Name,
+                    queryResult.Result?.ExternalId.Value,
+                    input.CalculationId,
+                    input.EventId);
+            }
 
             if (queryResult.IsSuccess)
             {
-                // Only log databricks query time if it took more than 1 second
-                if (databricksStopwatch.Elapsed > TimeSpan.FromSeconds(1))
-                {
-                    _logger.LogInformation(
-                        "Retrieved wholesale result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
-                        databricksStopwatch.Elapsed,
-                        query.GetType().Name,
-                        queryResult.Result!.ExternalId.Value,
-                        input.CalculationId,
-                        input.EventId);
-                }
-
                 var enqueueStopwatch = Stopwatch.StartNew();
                 var enqueueWasSuccess = false;
                 using (var scope = _serviceScopeFactory.CreateScope())

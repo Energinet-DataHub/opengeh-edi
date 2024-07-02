@@ -354,7 +354,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_CalculationCompletedEvent_When_WholesaleResultsContainsASingleInvalidRowEach_Then_EnqueueAllValidMessages()
+    public async Task Given_WholesaleResultsContainsAnInvalidRow_When_CalculationCompletedEventForWholesaleFixing_Then_EnqueueAllValidMessages()
     {
         // Arrange
         EnableCalculationCompletedEvent();
@@ -416,7 +416,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_CalculationCompletedEvent_When_EnergyResultsContainsASingleInvalidRowEach_Then_EnqueueAllValidMessages()
+    public async Task Given_EnergyResultsContainsAnInvalidRow_When_CalculationCompletedEventForBalanceFixing_Then_EnqueueAllValidMessages()
     {
         // Arrange
         EnableCalculationCompletedEvent();
