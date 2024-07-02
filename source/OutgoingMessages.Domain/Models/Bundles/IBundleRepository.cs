@@ -15,12 +15,12 @@
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 
 /// <summary>
-/// The repository for the actor message queue.
+/// The repository for bundles
 /// </summary>
 public interface IBundleRepository
 {
     /// <summary>
-    /// Add a new Bundle.
+    /// Add a new Bundle
     /// </summary>
     void Add(Bundle bundle);
 }

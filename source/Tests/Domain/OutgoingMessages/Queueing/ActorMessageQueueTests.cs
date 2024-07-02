@@ -25,6 +25,10 @@ using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.Tests.Domain.OutgoingMessages.Queueing;
 
+/// <summary>
+/// Tests for the <see cref="ActorMessageQueue"/> class.
+/// TODO: We probably need to refactor these tests when we decide on our approach for bundling / the ActorMessageQueue concept
+/// </summary>
 public class ActorMessageQueueTests
 {
     [Fact]
@@ -193,6 +197,10 @@ public class ActorMessageQueueTests
         Assert.NotEqual(message1.AssignedBundleId, message2.AssignedBundleId);
     }
 
+    /// <summary>
+    /// Add bundle to the queue using reflection, since the "_bundles" field is private and only meant to be
+    /// populated by entity framework
+    /// </summary>
     private static void AddBundleToQueue(ActorMessageQueue actorMessageQueue, Bundle bundle)
     {
         // Add bundle to private field "_bundles" on ActorMessageQueue
