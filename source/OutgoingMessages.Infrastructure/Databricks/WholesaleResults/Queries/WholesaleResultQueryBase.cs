@@ -13,20 +13,23 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 
 public abstract class WholesaleResultQueryBase<TResult>(
+        ILogger logger,
         EdiDatabricksOptions ediDatabricksOptions,
         Guid calculationId)
     : IDeltaTableSchemaDescription
     where TResult : OutgoingMessageDto
 {
+    private readonly ILogger _logger = logger;
     private readonly EdiDatabricksOptions _ediDatabricksOptions = ediDatabricksOptions;
 
     /// <summary>
@@ -48,34 +51,44 @@ public abstract class WholesaleResultQueryBase<TResult>(
     /// </summary>
     public abstract Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition { get; }
 
-    internal async IAsyncEnumerable<TResult> GetAsync(DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor)
+    internal async IAsyncEnumerable<QueryResult<TResult>> GetAsync(DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor)
     {
         ArgumentNullException.ThrowIfNull(databricksSqlWarehouseQueryExecutor);
-
-        DatabricksSqlRow? currentRow = null;
-        var timeSeriesPoints = new List<WholesaleTimeSeriesPoint>();
 
         var statement = DatabricksStatement
             .FromRawSql(BuildSqlQuery())
             .Build();
 
-        await foreach (var nextRow in databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement).ConfigureAwait(false))
-        {
-            var timeSeriesPoint = WholesaleTimeSeriesPointFactory.Create(nextRow);
+        Guid? currentResultId = null;
+        var currentResultRows = new List<DatabricksSqlRow>();
 
-            if (currentRow != null && BelongsToDifferentResults(currentRow, nextRow))
+        await foreach (var row in databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement).ConfigureAwait(false))
+        {
+            var rowResultId = row.ToGuid(WholesaleResultColumnNames.ResultId);
+
+            if (IsFirstRow(currentResultId))
             {
-                yield return await CreateWholesaleResultAsync(currentRow!, timeSeriesPoints).ConfigureAwait(false);
-                timeSeriesPoints = [];
+                currentResultId = rowResultId;
             }
 
-            timeSeriesPoints.Add(timeSeriesPoint);
-            currentRow = nextRow;
+            if (IsSameResult(currentResultId, rowResultId))
+            {
+                currentResultRows.Add(row);
+                continue;
+            }
+
+            yield return await CreateResultAsync(currentResultRows).ConfigureAwait(false);
+
+            // Next result
+            currentResultRows = [];
+            currentResultId = rowResultId;
+            currentResultRows.Add(row);
         }
 
-        if (currentRow != null)
+        // Last result (if any)
+        if (currentResultRows.Count != 0)
         {
-            yield return await CreateWholesaleResultAsync(currentRow, timeSeriesPoints).ConfigureAwait(false);
+            yield return await CreateResultAsync(currentResultRows).ConfigureAwait(false);
         }
     }
 
@@ -83,9 +96,50 @@ public abstract class WholesaleResultQueryBase<TResult>(
         DatabricksSqlRow databricksSqlRow,
         IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints);
 
-    private static bool BelongsToDifferentResults(DatabricksSqlRow row, DatabricksSqlRow otherRow)
+    private static WholesaleTimeSeriesPoint CreateTimeSeriesPoint(DatabricksSqlRow databricksSqlRow)
     {
-        return !row.ToGuid(WholesaleResultColumnNames.ResultId).Equals(otherRow.ToGuid(WholesaleResultColumnNames.ResultId));
+        return new WholesaleTimeSeriesPoint(
+            databricksSqlRow.ToInstant(WholesaleResultColumnNames.Time),
+            databricksSqlRow.ToNullableDecimal(WholesaleResultColumnNames.Quantity),
+            QuantityQualitiesMapper.TryFromDeltaTableValue(databricksSqlRow.ToNullableString(WholesaleResultColumnNames.QuantityQualities)),
+            databricksSqlRow.ToNullableDecimal(WholesaleResultColumnNames.Price),
+            databricksSqlRow.ToNullableDecimal(WholesaleResultColumnNames.Amount));
+    }
+
+    private static bool IsFirstRow(Guid? currentResultId)
+    {
+        return currentResultId == null;
+    }
+
+    private static bool IsSameResult(Guid? currentResultId, Guid rowResultId)
+    {
+        return currentResultId == rowResultId;
+    }
+
+    private async Task<QueryResult<TResult>> CreateResultAsync(IReadOnlyCollection<DatabricksSqlRow> resultRows)
+    {
+        var firstRow = resultRows.First();
+        var resultId = firstRow.ToGuid(WholesaleResultColumnNames.ResultId);
+
+        try
+        {
+            var timeSeriesPoints = new List<WholesaleTimeSeriesPoint>();
+
+            foreach (var row in resultRows)
+            {
+                var timeSeriesPoint = CreateTimeSeriesPoint(row);
+                timeSeriesPoints.Add(timeSeriesPoint);
+            }
+
+            var result = await CreateWholesaleResultAsync(firstRow, timeSeriesPoints).ConfigureAwait(false);
+            return QueryResult<TResult>.Success(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Creating energy result failed for CalculationId='{CalculationId}', ResultId='{ResultId}'.", CalculationId, resultId);
+        }
+
+        return QueryResult<TResult>.Error();
     }
 
     private string BuildSqlQuery()

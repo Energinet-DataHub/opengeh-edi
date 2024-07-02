@@ -30,7 +30,7 @@ public class WholesaleResultEnumerator(
 
     public EdiDatabricksOptions EdiDatabricksOptions { get; } = ediDatabricksOptions.Value;
 
-    public async IAsyncEnumerable<TResult> GetAsync<TResult>(WholesaleResultQueryBase<TResult> query)
+    public async IAsyncEnumerable<QueryResult<TResult>> GetAsync<TResult>(WholesaleResultQueryBase<TResult> query)
         where TResult : OutgoingMessageDto
     {
         var resultCount = 0;

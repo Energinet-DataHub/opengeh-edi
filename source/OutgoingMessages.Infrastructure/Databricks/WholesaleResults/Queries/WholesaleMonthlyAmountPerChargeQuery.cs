@@ -22,15 +22,19 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Wholesale
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Microsoft.Extensions.Logging;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 
 public class WholesaleMonthlyAmountPerChargeQuery(
+    ILogger logger,
     EdiDatabricksOptions ediDatabricksOptions,
     IMasterDataClient masterDataClient,
     EventId eventId,
     Guid calculationId)
     : WholesaleResultQueryBase<WholesaleMonthlyAmountPerChargeMessageDto>(
+        logger,
         ediDatabricksOptions,
         calculationId)
 {
