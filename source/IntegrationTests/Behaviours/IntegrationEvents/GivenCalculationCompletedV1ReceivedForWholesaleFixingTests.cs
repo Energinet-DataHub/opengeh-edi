@@ -443,7 +443,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             GetService<IMasterDataClient>(),
             GetService<WholesaleResultEnumerator>());
 
-        return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
+        return activity.Run(new EnqueueMessagesForActorInput(calculationId, Guid.NewGuid(), "dummy-actor"));
     }
 
     private Task GivenEnqueueWholesaleResultsForTotalAmountAsync(Guid calculationId)

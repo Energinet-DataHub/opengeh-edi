@@ -42,6 +42,11 @@ public abstract class WholesaleResultQueryBase<TResult>(
     /// </summary>
     public abstract string DataObjectName { get; }
 
+    /// <summary>
+    /// Name of view or table column that holds the actor for the query.
+    /// </summary>
+    public abstract string ActorColumnName { get; }
+
     public Guid CalculationId { get; } = calculationId;
 
     /// <summary>
@@ -89,6 +94,22 @@ public abstract class WholesaleResultQueryBase<TResult>(
         if (currentResultRows.Count != 0)
         {
             yield return await CreateResultAsync(currentResultRows).ConfigureAwait(false);
+        }
+    }
+
+    internal async IAsyncEnumerable<string> GetActorsAsync(DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor)
+    {
+        ArgumentNullException.ThrowIfNull(databricksSqlWarehouseQueryExecutor);
+
+        var selectActorsStatement = DatabricksStatement
+            .FromRawSql(BuildActorsSqlQuery())
+            .Build();
+
+        await foreach (var row in databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(selectActorsStatement).ConfigureAwait(false))
+        {
+            var actorNumber = row.ToNonEmptyString(ActorColumnName);
+
+            yield return actorNumber;
         }
     }
 
@@ -152,5 +173,14 @@ public abstract class WholesaleResultQueryBase<TResult>(
             WHERE {WholesaleResultColumnNames.CalculationId} = '{CalculationId}'
             ORDER BY {WholesaleResultColumnNames.ResultId}, {WholesaleResultColumnNames.Time}
             """;
+    }
+
+    private string BuildActorsSqlQuery()
+    {
+        return $"""
+                SELECT DISTINCT {ActorColumnName}
+                FROM {DatabaseName}.{DataObjectName}
+                WHERE {WholesaleResultColumnNames.CalculationId} = '{CalculationId}'
+                """;
     }
 }

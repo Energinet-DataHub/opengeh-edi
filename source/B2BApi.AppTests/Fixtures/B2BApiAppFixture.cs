@@ -55,7 +55,7 @@ public class B2BApiAppFixture : IAsyncLifetime
         TestLogger = new TestDiagnosticsLogger();
         IntegrationTestConfiguration = new IntegrationTestConfiguration();
 
-        AzuriteManager = new AzuriteManager(useOAuth: true);
+        AzuriteManager = new AzuriteManager(useOAuth: false);
         CleanupAzuriteStorage();
         DurableTaskManager = new DurableTaskManager(
             "AzureWebJobsStorage",
@@ -308,8 +308,8 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // Document storage
         appHostSettings.ProcessEnvironmentVariables.Add(
-            nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_URL),
-            AzuriteManager.BlobStorageServiceUri.ToString());
+            nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING),
+            AzuriteManager.FullConnectionString);
 
         // Database
         appHostSettings.ProcessEnvironmentVariables.Add(

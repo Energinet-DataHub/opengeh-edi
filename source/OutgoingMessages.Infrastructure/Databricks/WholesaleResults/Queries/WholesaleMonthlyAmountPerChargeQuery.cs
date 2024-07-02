@@ -43,6 +43,8 @@ public class WholesaleMonthlyAmountPerChargeQuery(
 
     public override string DataObjectName => "monthly_amounts_per_charge_v1";
 
+    public override string ActorColumnName => WholesaleResultColumnNames.EnergySupplierId;
+
     public override Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition => new()
     {
         { WholesaleResultColumnNames.CalculationId,             (DeltaTableCommonTypes.String,              false) },

@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.DurableTask;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
@@ -38,9 +39,21 @@ public class EnqueueWholesaleResultsForAmountPerChargesActivity(
     private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly WholesaleResultEnumerator _wholesaleResultEnumerator = wholesaleResultEnumerator;
 
+    /// <summary>
+    /// Start an EnqueueWholesaleResultsForAmountPerCharges activity.
+    /// <remarks>The <paramref name="input"/> type and return type must be that same as the <see cref="Run"/> method</remarks>
+    /// <remarks>Changing the <paramref name="input"/> or return type might break the Durable Function's deserialization</remarks>
+    /// </summary>
+    public static Task<int> StartActivityAsync(EnqueueMessagesForActorInput input, TaskOrchestrationContext context, TaskOptions? options)
+    {
+        return context.CallActivityAsync<int>(
+            nameof(EnqueueWholesaleResultsForAmountPerChargesActivity),
+            input,
+            options: options);
+    }
+
     [Function(nameof(EnqueueWholesaleResultsForAmountPerChargesActivity))]
-    public async Task<int> Run(
-    [ActivityTrigger] EnqueueMessagesInput input)
+    public async Task<int> Run([ActivityTrigger] EnqueueMessagesForActorInput input)
     {
         var numberOfHandledResults = 0;
         var numberOfFailedResults = 0;
@@ -53,8 +66,9 @@ public class EnqueueWholesaleResultsForAmountPerChargesActivity(
             input.CalculationId);
 
         _logger.LogInformation(
-            "Starting enqueuing messages for wholesale query, type: {QueryType}, calculation id: {CalculationId}, event id: {EventId}",
+            "Starting enqueuing messages for wholesale query, type: {QueryType}, actor: {Actor}, calculation id: {CalculationId}, event id: {EventId}",
             query.GetType().Name,
+            input.Actor,
             input.CalculationId,
             input.EventId);
 

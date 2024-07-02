@@ -36,36 +36,35 @@ internal class EnqueueMessagesOrchestration
         var defaultRetryOptions = CreateDefaultRetryOptions();
         var enqueueRetryOptions = CreateEnqueueRetryOptions();
 
+        var enqueueMessagesInput = new EnqueueMessagesInput(input.CalculationId, input.EventId);
+
         // Fan-out/fan-in => https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-cloud-backup?tabs=csharp
         var tasks = new Task<int>[6];
         tasks[0] = context.CallActivityAsync<int>(
             nameof(EnqueueEnergyResultsForGridAreaOwnersActivity),
-            new EnqueueMessagesInput(input.CalculationId, input.EventId),
+            enqueueMessagesInput,
             options: enqueueRetryOptions);
 
         tasks[1] = context.CallActivityAsync<int>(
             nameof(EnqueueEnergyResultsForBalanceResponsiblesActivity),
-            new EnqueueMessagesInput(input.CalculationId, input.EventId),
+            enqueueMessagesInput,
             options: enqueueRetryOptions);
 
         tasks[2] = context.CallActivityAsync<int>(
             nameof(EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity),
-            new EnqueueMessagesInput(input.CalculationId, input.EventId),
+            enqueueMessagesInput,
             options: enqueueRetryOptions);
 
-        tasks[3] = context.CallActivityAsync<int>(
-            nameof(EnqueueWholesaleResultsForAmountPerChargesActivity),
-            new EnqueueMessagesInput(input.CalculationId, input.EventId),
-            options: enqueueRetryOptions);
+        tasks[3] = EnqueueWholesaleResultsForAmountPerCharges(context, enqueueMessagesInput, enqueueRetryOptions);
 
         tasks[4] = context.CallActivityAsync<int>(
             nameof(EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity),
-            new EnqueueMessagesInput(input.CalculationId, input.EventId),
+            enqueueMessagesInput,
             options: enqueueRetryOptions);
 
         tasks[5] = context.CallActivityAsync<int>(
             nameof(EnqueueWholesaleResultsForTotalAmountsActivity),
-            new EnqueueMessagesInput(input.CalculationId, input.EventId),
+            enqueueMessagesInput,
             options: enqueueRetryOptions);
 
         await Task.WhenAll(tasks);
@@ -81,6 +80,30 @@ internal class EnqueueMessagesOrchestration
             defaultRetryOptions);
 
         return "Success";
+    }
+
+    private static async Task<int> EnqueueWholesaleResultsForAmountPerCharges(TaskOrchestrationContext context, EnqueueMessagesInput input, TaskOptions options)
+    {
+        var actors = await GetActorsForWholesaleResultsForAmountPerChargesActivity.StartActivityAsync(
+            input,
+            context,
+            options);
+
+        var tasks = new Task<int>[actors.Count];
+        for (var i = 0; i < actors.Count; i++)
+        {
+            var actor = actors.ElementAt(i);
+            tasks[i] = EnqueueWholesaleResultsForAmountPerChargesActivity.StartActivityAsync(
+                new EnqueueMessagesForActorInput(input.CalculationId, input.EventId, actor),
+                context,
+                options);
+        }
+
+        await Task.WhenAll(tasks);
+
+        var messagesEnqueued = tasks.Sum(t => t.Result);
+
+        return messagesEnqueued;
     }
 
     private static TaskOptions CreateEnqueueRetryOptions()

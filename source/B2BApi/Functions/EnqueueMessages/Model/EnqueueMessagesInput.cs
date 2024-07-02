@@ -20,3 +20,12 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 public sealed record EnqueueMessagesInput(
     Guid CalculationId,
     Guid EventId);
+
+public sealed record EnqueueMessagesForActorInput(
+    Guid CalculationId,
+    Guid EventId,
+    string Actor);
+
+public sealed record EnqueueMessagesForActorResult(
+    int ResultsCount,
+    string Actor);
