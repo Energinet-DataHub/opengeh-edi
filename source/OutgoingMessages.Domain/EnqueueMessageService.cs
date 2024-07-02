@@ -21,9 +21,10 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain;
 
-public class EnqueueMessageService(IActorMessageQueueRepository actorMessageQueueRepository, ILogger<EnqueueMessageService> logger)
+public class EnqueueMessageService(IActorMessageQueueRepository actorMessageQueueRepository, IBundleRepository bundleRepository, ILogger<EnqueueMessageService> logger)
 {
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository = actorMessageQueueRepository;
+    private readonly IBundleRepository _bundleRepository = bundleRepository;
     private readonly ILogger<EnqueueMessageService> _logger = logger;
 
     public async Task EnqueueAsync(OutgoingMessage outgoingMessage, Instant timeStamp)
@@ -34,14 +35,15 @@ public class EnqueueMessageService(IActorMessageQueueRepository actorMessageQueu
             await GetMessageQueueIdForReceiverAsync(outgoingMessage.GetActorMessageQueueMetadata())
                 .ConfigureAwait(false);
 
-        var currentBundle = CreateBundle(
+        var bundleToCreate = CreateBundle(
             actorMessageQueueId,
             BusinessReason.FromName(outgoingMessage.BusinessReason),
             outgoingMessage.DocumentType,
             timeStamp,
             outgoingMessage.RelatedToMessageId);
+        _bundleRepository.Add(bundleToCreate);
 
-        currentBundle.Add(outgoingMessage);
+        bundleToCreate.Add(outgoingMessage);
     }
 
     private Bundle CreateBundle(ActorMessageQueueId actorMessageQueueId, BusinessReason businessReason, DocumentType messageType, Instant created, MessageId? relatedToMessageId = null)

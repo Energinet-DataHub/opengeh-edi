@@ -26,6 +26,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholes
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestWholesaleSettlement;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
@@ -34,6 +35,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyRes
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.ActorMessageQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -73,6 +75,7 @@ public static class OutgoingMessagesExtensions
         services.AddTransient<EnqueueMessage>()
             .AddTransient<DelegateMessage>()
             .AddTransient<EnqueueMessageService>()
+            .AddTransient<IBundleRepository, BundleRepository>()
             .AddScoped<IOutgoingMessageRepository, OutgoingMessageRepository>()
             .AddTransient<IOutgoingMessagesClient, OutgoingMessagesClient>();
 

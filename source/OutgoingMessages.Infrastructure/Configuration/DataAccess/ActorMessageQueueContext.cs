@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DbContext;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.ActorMessageQueues;
@@ -52,6 +53,8 @@ public class ActorMessageQueueContext : DbContext
     public DbSet<ActorMessageQueue> ActorMessageQueues { get; private set; }
 
     public DbSet<MarketDocument> MarketDocuments { get; private set; }
+
+    public DbSet<Bundle> Bundles { get; private set; }
 
     public override int SaveChanges()
     {

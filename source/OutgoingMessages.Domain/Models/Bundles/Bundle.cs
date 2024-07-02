@@ -86,7 +86,7 @@ public sealed class Bundle
     internal void Add(OutgoingMessage outgoingMessage)
     {
         if (ClosedAt is not null)
-            return;
+            throw new InvalidOperationException($"Cannot add message to a closed bundle (bundle id: {Id.Id}, message id: {outgoingMessage.Id}, external id: {outgoingMessage.ExternalId})");
 
         outgoingMessage.AssignToBundle(Id);
         _messageCount++;
