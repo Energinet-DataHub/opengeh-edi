@@ -111,7 +111,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventForBalanceFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
-        EnableCalculationCompletedEvent();
+        EnableEnqueueMessagesOrchestration();
 
         var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
         var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
@@ -208,7 +208,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventForWholesaleFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
-        EnableCalculationCompletedEvent();
+        EnableEnqueueMessagesOrchestration();
 
         var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
         var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
@@ -303,7 +303,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_DatabricksHasNoData_When_CalculationCompletedEventIsHandled_Then_OrchestrationIsStartedButActivitiesWillFailAndBeRetriedForever(CalculationCompletedV1.Types.CalculationType calculationTypeToTest)
     {
         // Arrange
-        EnableCalculationCompletedEvent();
+        EnableEnqueueMessagesOrchestration();
 
         var calculationId = Guid.NewGuid().ToString();
         var calculationOrchestrationId = Guid.NewGuid().ToString();
@@ -357,7 +357,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_WholesaleResultsContainsAnInvalidRow_When_CalculationCompletedEventForWholesaleFixing_Then_EnqueueAllValidMessages()
     {
         // Arrange
-        EnableCalculationCompletedEvent();
+        EnableEnqueueMessagesOrchestration();
 
         var forAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
         var forMonthlyAmountPerChargeDescription = new WholesaleResultForMonthlyAmountPerChargeDescription();
@@ -419,7 +419,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_EnergyResultsContainsAnInvalidRow_When_CalculationCompletedEventForBalanceFixing_Then_EnqueueAllValidMessages()
     {
         // Arrange
-        EnableCalculationCompletedEvent();
+        EnableEnqueueMessagesOrchestration();
 
         var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
         var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
@@ -607,7 +607,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(schemaInformation.DataObjectName, schemaInformation.SchemaDefinition, testFilePath);
     }
 
-    private void EnableCalculationCompletedEvent()
+    private void EnableEnqueueMessagesOrchestration()
     {
         Fixture.EnsureAppHostUsesFeatureFlagValue(
             enableCalculationCompletedEvent: true,

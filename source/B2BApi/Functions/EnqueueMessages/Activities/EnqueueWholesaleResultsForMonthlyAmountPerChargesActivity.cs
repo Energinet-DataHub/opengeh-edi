@@ -93,7 +93,7 @@ public class EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
                         numberOfFailedResults++;
                         _logger.LogWarning(
                             ex,
-                            "Enqueue and commit failed for calculation result, query type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
+                            "Enqueue and commit failed for wholesale result, query type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
                             query.GetType().Name,
                             queryResult.Result?.ExternalId.Value,
                             input.CalculationId,

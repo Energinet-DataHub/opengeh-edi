@@ -30,7 +30,7 @@ public class EnergyResultPerGridAreaDescription
     public EnergyResultPerGridAreaDescription()
         : base(
             "balance_fixing_01-11-2022_01-12-2022_ga_543_per_ga_v1.csv",
-            //Metering point type on row 74 is invalid (first row on a result set)
+            //Metering point type on row 74 contains an invalid value (="invalid") (row on a result set)
             "balance_fixing_01-11-2022_01-12-2022_ga_543_per_ga_v1_with_invalid_row.csv")
     {
     }
