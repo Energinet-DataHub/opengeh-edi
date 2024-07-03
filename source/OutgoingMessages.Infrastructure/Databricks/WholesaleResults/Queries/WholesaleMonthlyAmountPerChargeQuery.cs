@@ -36,7 +36,8 @@ public class WholesaleMonthlyAmountPerChargeQuery(
     : WholesaleResultQueryBase<WholesaleMonthlyAmountPerChargeMessageDto>(
         logger,
         ediDatabricksOptions,
-        calculationId)
+        calculationId,
+        null)
 {
     private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly EventId _eventId = eventId;

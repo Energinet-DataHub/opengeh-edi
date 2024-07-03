@@ -60,7 +60,8 @@ public class GetActorsForWholesaleResultsForAmountPerChargesActivity(
             _wholesaleResultActorsEnumerator.EdiDatabricksOptions,
             _masterDataClient,
             EventId.From(input.EventId),
-            input.CalculationId);
+            input.CalculationId,
+            null);
 
         var actors = await _wholesaleResultActorsEnumerator
             .GetActorsAsync(query)

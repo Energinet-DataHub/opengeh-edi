@@ -63,7 +63,8 @@ public class EnqueueWholesaleResultsForAmountPerChargesActivity(
             _wholesaleResultEnumerator.EdiDatabricksOptions,
             _masterDataClient,
             EventId.From(input.EventId),
-            input.CalculationId);
+            input.CalculationId,
+            input.Actor);
 
         _logger.LogInformation(
             "Starting enqueuing messages for wholesale query, type: {QueryType}, actor: {Actor}, calculation id: {CalculationId}, event id: {EventId}",

@@ -25,12 +25,14 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Whole
 public abstract class WholesaleResultQueryBase<TResult>(
         ILogger logger,
         EdiDatabricksOptions ediDatabricksOptions,
-        Guid calculationId)
+        Guid calculationId,
+        string? energySupplier)
     : IDeltaTableSchemaDescription
     where TResult : OutgoingMessageDto
 {
     private readonly ILogger _logger = logger;
     private readonly EdiDatabricksOptions _ediDatabricksOptions = ediDatabricksOptions;
+    private readonly string? _energySupplier = energySupplier;
 
     /// <summary>
     /// Name of database to query in.
@@ -167,10 +169,14 @@ public abstract class WholesaleResultQueryBase<TResult>(
     {
         var columnNames = SchemaDefinition.Keys.ToArray();
 
+        var whereStatement = $"WHERE {WholesaleResultColumnNames.CalculationId} = '{CalculationId}'";
+        if (!string.IsNullOrEmpty(_energySupplier))
+            whereStatement += $" AND {WholesaleResultColumnNames.EnergySupplierId} = '{_energySupplier}'";
+
         return $"""
             SELECT {string.Join(", ", columnNames)}
             FROM {DatabaseName}.{DataObjectName}
-            WHERE {WholesaleResultColumnNames.CalculationId} = '{CalculationId}'
+            {whereStatement}
             ORDER BY {WholesaleResultColumnNames.ResultId}, {WholesaleResultColumnNames.Time}
             """;
     }

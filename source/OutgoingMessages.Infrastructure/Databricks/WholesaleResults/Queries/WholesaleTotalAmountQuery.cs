@@ -35,7 +35,8 @@ public class WholesaleTotalAmountQuery(
     : WholesaleResultQueryBase<WholesaleTotalAmountMessageDto>(
         logger,
         ediDatabricksOptions,
-        calculationId)
+        calculationId,
+        null)
 {
     private readonly EventId _eventId = eventId;
 

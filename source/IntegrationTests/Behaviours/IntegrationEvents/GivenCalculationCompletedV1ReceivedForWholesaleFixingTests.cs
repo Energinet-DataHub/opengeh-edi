@@ -475,7 +475,8 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             _ediDatabricksOptions.Value,
             GetService<IMasterDataClient>(),
             EventId.From(Guid.NewGuid()),
-            wholesaleResultForAmountPerChargeDescription.CalculationId);
+            wholesaleResultForAmountPerChargeDescription.CalculationId,
+            null);
 
         await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition);
         await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition, wholesaleResultForAmountPerChargeDescription.TestFilePath);
