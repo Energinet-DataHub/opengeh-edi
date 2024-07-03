@@ -77,7 +77,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
 
         await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCode, gridOperator.ActorNumber);
 
-        // TODO: SHould we enqueue wholesale results for all actors in the dataset?
+        // TODO: Should we enqueue wholesale results for all actors in the dataset?
         await GivenEnqueueWholesaleResultsForAmountPerChargesAsync(testDataDescription.CalculationId, energySupplier);
 
         // When (act)

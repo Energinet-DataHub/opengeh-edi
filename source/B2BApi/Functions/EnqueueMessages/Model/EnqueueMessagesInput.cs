@@ -25,7 +25,3 @@ public sealed record EnqueueMessagesForActorInput(
     Guid CalculationId,
     Guid EventId,
     string Actor);
-
-public sealed record EnqueueMessagesForActorResult(
-    int ResultsCount,
-    string Actor);
