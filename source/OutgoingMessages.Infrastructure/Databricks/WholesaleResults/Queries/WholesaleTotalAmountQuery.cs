@@ -31,12 +31,13 @@ public class WholesaleTotalAmountQuery(
     ILogger logger,
     EdiDatabricksOptions ediDatabricksOptions,
     EventId eventId,
-    Guid calculationId)
+    Guid calculationId,
+    string? energySupplier)
     : WholesaleResultQueryBase<WholesaleTotalAmountMessageDto>(
         logger,
         ediDatabricksOptions,
         calculationId,
-        null)
+        energySupplier)
 {
     private readonly EventId _eventId = eventId;
 

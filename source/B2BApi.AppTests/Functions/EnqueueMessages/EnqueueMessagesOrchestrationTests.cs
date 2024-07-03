@@ -541,7 +541,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             }
             else if (testDataDescription is WholesaleResultForTotalAmountDescription)
             {
-                schemaDescription = new WholesaleTotalAmountQuery(null!, ediDatabricksOptions.Value, null!, testDataDescription.CalculationId);
+                schemaDescription = new WholesaleTotalAmountQuery(null!, ediDatabricksOptions.Value, null!, testDataDescription.CalculationId, null);
             }
             else
             {
@@ -587,7 +587,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var forMonthlyAmountPerChargeQuery = new WholesaleMonthlyAmountPerChargeQuery(null!, ediDatabricksOptions.Value, null!, null!, forMonthlyAmountPerChargeDescription.CalculationId, null);
         var forMonthlyAmountPerChargeTask = SeedDatabricksWithDataAsync(forMonthlyAmountPerChargeDescription.TestFilePath, forMonthlyAmountPerChargeQuery);
 
-        var forTotalAmountQuery = new WholesaleTotalAmountQuery(null!, ediDatabricksOptions.Value, null!, forTotalAmountDescription.CalculationId);
+        var forTotalAmountQuery = new WholesaleTotalAmountQuery(null!, ediDatabricksOptions.Value, null!, forTotalAmountDescription.CalculationId, null);
         var forTotalAmountTask = SeedDatabricksWithDataAsync(forTotalAmountDescription.TestFilePath, forTotalAmountQuery);
 
         await Task.WhenAll(perGridAreTask, perBrpGriaAreaTask, perBrpAndESGridAreTask, forAmountPerChargeTask, forMonthlyAmountPerChargeTask, forTotalAmountTask);

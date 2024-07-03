@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
@@ -26,15 +25,13 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 /// <summary>
 /// Enqueue wholesale results for Amount Per Charge to Energy Supplier and ChargeOwner as outgoing messages for the given calculation id.
 /// </summary>
-public class GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity(
-    ILogger<GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity> logger,
+public class GetActorsForWholesaleResultsForTotalAmountPerChargesActivity(
+    ILogger<GetActorsForWholesaleResultsForTotalAmountPerChargesActivity> logger,
     IServiceScopeFactory serviceScopeFactory,
-    IMasterDataClient masterDataClient,
     WholesaleResultActorsEnumerator wholesaleResultActorsEnumerator)
 {
-    private readonly ILogger<GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity> _logger = logger;
+    private readonly ILogger<GetActorsForWholesaleResultsForTotalAmountPerChargesActivity> _logger = logger;
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
-    private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly WholesaleResultActorsEnumerator _wholesaleResultActorsEnumerator = wholesaleResultActorsEnumerator;
 
     /// <summary>
@@ -45,18 +42,17 @@ public class GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity(
     public static Task<IReadOnlyCollection<string>> StartActivityAsync(EnqueueMessagesInput input, TaskOrchestrationContext context, TaskOptions? options)
     {
         return context.CallActivityAsync<IReadOnlyCollection<string>>(
-            nameof(GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity),
+            nameof(GetActorsForWholesaleResultsForTotalAmountPerChargesActivity),
             new EnqueueMessagesInput(input.CalculationId, input.EventId),
             options: options);
     }
 
-    [Function(nameof(GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity))]
+    [Function(nameof(GetActorsForWholesaleResultsForTotalAmountPerChargesActivity))]
     public async Task<IReadOnlyCollection<string>> Run([ActivityTrigger] EnqueueMessagesInput input)
     {
-        var query = new WholesaleMonthlyAmountPerChargeQuery(
+        var query = new WholesaleTotalAmountQuery(
             _logger,
             _wholesaleResultActorsEnumerator.EdiDatabricksOptions,
-            _masterDataClient,
             EventId.From(input.EventId),
             input.CalculationId,
             null);

@@ -114,7 +114,31 @@ internal class EnqueueMessagesOrchestration
         for (var i = 0; i < actors.Count; i++)
         {
             var actor = actors.ElementAt(i);
-            tasks[i] = EnqueueWholesaleResultsForAmountPerChargesActivity.StartActivityAsync(
+            tasks[i] = EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity.StartActivityAsync(
+                new EnqueueMessagesForActorInput(input.CalculationId, input.EventId, actor),
+                context,
+                options);
+        }
+
+        await Task.WhenAll(tasks);
+
+        var messagesEnqueued = tasks.Sum(t => t.Result);
+
+        return messagesEnqueued;
+    }
+
+    private static async Task<int> EnqueueWholesaleResultsForTotalAmountPerCharges(TaskOrchestrationContext context, EnqueueMessagesInput input, TaskOptions options)
+    {
+        var actors = await GetActorsForWholesaleResultsForTotalAmountPerChargesActivity.StartActivityAsync(
+            input,
+            context,
+            options);
+
+        var tasks = new Task<int>[actors.Count];
+        for (var i = 0; i < actors.Count; i++)
+        {
+            var actor = actors.ElementAt(i);
+            tasks[i] = EnqueueWholesaleResultsForTotalAmountsActivity.StartActivityAsync(
                 new EnqueueMessagesForActorInput(input.CalculationId, input.EventId, actor),
                 context,
                 options);

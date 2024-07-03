@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.DurableTask;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
@@ -34,6 +35,19 @@ public class EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
     private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly WholesaleResultEnumerator _wholesaleResultEnumerator = wholesaleResultEnumerator;
+
+    /// <summary>
+    /// Start an EnqueueWholesaleResultsForMonthlyAmountPerCharges activity.
+    /// <remarks>The <paramref name="input"/> type and return type must be that same as the <see cref="Run"/> method</remarks>
+    /// <remarks>Changing the <paramref name="input"/> or return type might break the Durable Function's deserialization</remarks>
+    /// </summary>
+    public static Task<int> StartActivityAsync(EnqueueMessagesForActorInput input, TaskOrchestrationContext context, TaskOptions? options)
+    {
+        return context.CallActivityAsync<int>(
+            nameof(EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity),
+            input,
+            options: options);
+    }
 
     [Function(nameof(EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity))]
     public async Task<int> Run([ActivityTrigger] EnqueueMessagesForActorInput input)
