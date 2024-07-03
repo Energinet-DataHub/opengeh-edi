@@ -59,10 +59,7 @@ internal class EnqueueMessagesOrchestration
 
         tasks[4] = EnqueueWholesaleResultsForMonthlyAmountPerCharges(context, enqueueMessagesInput, enqueueRetryOptions);
 
-        tasks[5] = context.CallActivityAsync<int>(
-            nameof(EnqueueWholesaleResultsForTotalAmountsActivity),
-            enqueueMessagesInput,
-            options: enqueueRetryOptions);
+        tasks[5] = EnqueueWholesaleResultsForTotalAmountPerCharges(context, enqueueMessagesInput, enqueueRetryOptions);
 
         await Task.WhenAll(tasks);
 
