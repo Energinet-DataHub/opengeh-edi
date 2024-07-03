@@ -537,11 +537,11 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             }
             else if (testDataDescription is WholesaleResultForMonthlyAmountPerChargeDescription)
             {
-                schemaDescription = new WholesaleMonthlyAmountPerChargeQuery(null!, ediDatabricksOptions.Value, null!, null!, testDataDescription.CalculationId);
+                schemaDescription = new WholesaleMonthlyAmountPerChargeQuery(null!, ediDatabricksOptions.Value, null!, null!, testDataDescription.CalculationId, null);
             }
             else if (testDataDescription is WholesaleResultForTotalAmountDescription)
             {
-                schemaDescription = new WholesaleTotalAmountQuery(null!, ediDatabricksOptions.Value, null!, testDataDescription.CalculationId);
+                schemaDescription = new WholesaleTotalAmountQuery(null!, ediDatabricksOptions.Value, null!, testDataDescription.CalculationId, null);
             }
             else
             {
@@ -584,10 +584,10 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var forAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(null!, ediDatabricksOptions.Value, null!, null!, forAmountPerChargeDescription.CalculationId, null);
         var forAmountPerChargeTask = SeedDatabricksWithDataAsync(forAmountPerChargeDescription.TestFilePath, forAmountPerChargeQuery);
 
-        var forMonthlyAmountPerChargeQuery = new WholesaleMonthlyAmountPerChargeQuery(null!, ediDatabricksOptions.Value, null!, null!, forMonthlyAmountPerChargeDescription.CalculationId);
+        var forMonthlyAmountPerChargeQuery = new WholesaleMonthlyAmountPerChargeQuery(null!, ediDatabricksOptions.Value, null!, null!, forMonthlyAmountPerChargeDescription.CalculationId, null);
         var forMonthlyAmountPerChargeTask = SeedDatabricksWithDataAsync(forMonthlyAmountPerChargeDescription.TestFilePath, forMonthlyAmountPerChargeQuery);
 
-        var forTotalAmountQuery = new WholesaleTotalAmountQuery(null!, ediDatabricksOptions.Value, null!, forTotalAmountDescription.CalculationId);
+        var forTotalAmountQuery = new WholesaleTotalAmountQuery(null!, ediDatabricksOptions.Value, null!, forTotalAmountDescription.CalculationId, null);
         var forTotalAmountTask = SeedDatabricksWithDataAsync(forTotalAmountDescription.TestFilePath, forTotalAmountQuery);
 
         await Task.WhenAll(perGridAreTask, perBrpGriaAreaTask, perBrpAndESGridAreTask, forAmountPerChargeTask, forMonthlyAmountPerChargeTask, forTotalAmountTask);

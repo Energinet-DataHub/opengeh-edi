@@ -202,7 +202,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
 
         await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCode, gridOperator.ActorNumber);
-        await GivenEnqueueWholesaleResultsForMonthlyAmountPerChargesAsync(testDataDescription.CalculationId);
+        await GivenEnqueueWholesaleResultsForMonthlyAmountPerChargesAsync(testDataDescription.CalculationId, energySupplier);
 
         // When (act)
         var peekResultsForSystemOperator = await WhenActorPeeksAllMessages(
@@ -326,7 +326,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
 
         await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCode, gridOperator.ActorNumber);
-        await GivenEnqueueWholesaleResultsForTotalAmountAsync(testDataDescription.CalculationId);
+        await GivenEnqueueWholesaleResultsForTotalAmountAsync(testDataDescription.CalculationId, energySupplier);
 
         // When (act)
         var peekResultsForSystemOperator = await WhenActorPeeksAllMessages(
@@ -448,17 +448,17 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         return activity.Run(new EnqueueMessagesForActorInput(calculationId, Guid.NewGuid(), energySupplier.ActorNumber.Value));
     }
 
-    private Task GivenEnqueueWholesaleResultsForTotalAmountAsync(Guid calculationId)
+    private Task GivenEnqueueWholesaleResultsForTotalAmountAsync(Guid calculationId, Actor energySupplier)
     {
         var activity = new EnqueueWholesaleResultsForTotalAmountsActivity(
             GetService<ILogger<EnqueueWholesaleResultsForTotalAmountsActivity>>(),
             GetService<IServiceScopeFactory>(),
             GetService<WholesaleResultEnumerator>());
 
-        return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
+        return activity.Run(new EnqueueMessagesForActorInput(calculationId, Guid.NewGuid(), energySupplier.ActorNumber.Value));
     }
 
-    private Task GivenEnqueueWholesaleResultsForMonthlyAmountPerChargesAsync(Guid calculationId)
+    private Task GivenEnqueueWholesaleResultsForMonthlyAmountPerChargesAsync(Guid calculationId, Actor energySupplier)
     {
         var activity = new EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
             GetService<ILogger<EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity>>(),
@@ -466,7 +466,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             GetService<IMasterDataClient>(),
             GetService<WholesaleResultEnumerator>());
 
-        return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
+        return activity.Run(new EnqueueMessagesForActorInput(calculationId, Guid.NewGuid(), energySupplier.ActorNumber.Value));
     }
 
     private async Task<WholesaleResultForAmountPerChargeDescription> GivenDatabricksResultDataForWholesaleResultAmountPerCharge()
@@ -493,7 +493,8 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             _ediDatabricksOptions.Value,
             GetService<IMasterDataClient>(),
             EventId.From(Guid.NewGuid()),
-            wholesaleResultForMonthlyAmountPerChargeDescription.CalculationId);
+            wholesaleResultForMonthlyAmountPerChargeDescription.CalculationId,
+            null);
 
         await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleMonthlyAmountPerChargeQuery.DataObjectName, wholesaleMonthlyAmountPerChargeQuery.SchemaDefinition);
         await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleMonthlyAmountPerChargeQuery.DataObjectName, wholesaleMonthlyAmountPerChargeQuery.SchemaDefinition, wholesaleResultForMonthlyAmountPerChargeDescription.TestFilePath);
@@ -507,7 +508,8 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity>>(),
             _ediDatabricksOptions.Value,
             EventId.From(Guid.NewGuid()),
-            resultDataForWholesaleResultTotalAmount.CalculationId);
+            resultDataForWholesaleResultTotalAmount.CalculationId,
+            null);
 
         await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleTotalAmountQuery.DataObjectName, wholesaleTotalAmountQuery.SchemaDefinition);
         await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleTotalAmountQuery.DataObjectName, wholesaleTotalAmountQuery.SchemaDefinition, resultDataForWholesaleResultTotalAmount.TestFilePath);

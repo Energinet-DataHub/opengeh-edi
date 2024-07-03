@@ -57,15 +57,9 @@ internal class EnqueueMessagesOrchestration
 
         tasks[3] = EnqueueWholesaleResultsForAmountPerCharges(context, enqueueMessagesInput, enqueueRetryOptions);
 
-        tasks[4] = context.CallActivityAsync<int>(
-            nameof(EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity),
-            enqueueMessagesInput,
-            options: enqueueRetryOptions);
+        tasks[4] = EnqueueWholesaleResultsForMonthlyAmountPerCharges(context, enqueueMessagesInput, enqueueRetryOptions);
 
-        tasks[5] = context.CallActivityAsync<int>(
-            nameof(EnqueueWholesaleResultsForTotalAmountsActivity),
-            enqueueMessagesInput,
-            options: enqueueRetryOptions);
+        tasks[5] = EnqueueWholesaleResultsForTotalAmountPerCharges(context, enqueueMessagesInput, enqueueRetryOptions);
 
         await Task.WhenAll(tasks);
 
@@ -94,6 +88,54 @@ internal class EnqueueMessagesOrchestration
         {
             var actor = actors.ElementAt(i);
             tasks[i] = EnqueueWholesaleResultsForAmountPerChargesActivity.StartActivityAsync(
+                new EnqueueMessagesForActorInput(input.CalculationId, input.EventId, actor),
+                context,
+                options);
+        }
+
+        await Task.WhenAll(tasks);
+
+        var messagesEnqueued = tasks.Sum(t => t.Result);
+
+        return messagesEnqueued;
+    }
+
+    private static async Task<int> EnqueueWholesaleResultsForMonthlyAmountPerCharges(TaskOrchestrationContext context, EnqueueMessagesInput input, TaskOptions options)
+    {
+        var actors = await GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity.StartActivityAsync(
+            input,
+            context,
+            options);
+
+        var tasks = new Task<int>[actors.Count];
+        for (var i = 0; i < actors.Count; i++)
+        {
+            var actor = actors.ElementAt(i);
+            tasks[i] = EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity.StartActivityAsync(
+                new EnqueueMessagesForActorInput(input.CalculationId, input.EventId, actor),
+                context,
+                options);
+        }
+
+        await Task.WhenAll(tasks);
+
+        var messagesEnqueued = tasks.Sum(t => t.Result);
+
+        return messagesEnqueued;
+    }
+
+    private static async Task<int> EnqueueWholesaleResultsForTotalAmountPerCharges(TaskOrchestrationContext context, EnqueueMessagesInput input, TaskOptions options)
+    {
+        var actors = await GetActorsForWholesaleResultsForTotalAmountPerChargesActivity.StartActivityAsync(
+            input,
+            context,
+            options);
+
+        var tasks = new Task<int>[actors.Count];
+        for (var i = 0; i < actors.Count; i++)
+        {
+            var actor = actors.ElementAt(i);
+            tasks[i] = EnqueueWholesaleResultsForTotalAmountsActivity.StartActivityAsync(
                 new EnqueueMessagesForActorInput(input.CalculationId, input.EventId, actor),
                 context,
                 options);

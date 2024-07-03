@@ -32,12 +32,13 @@ public class WholesaleMonthlyAmountPerChargeQuery(
     EdiDatabricksOptions ediDatabricksOptions,
     IMasterDataClient masterDataClient,
     EventId eventId,
-    Guid calculationId)
+    Guid calculationId,
+    string? energySupplier)
     : WholesaleResultQueryBase<WholesaleMonthlyAmountPerChargeMessageDto>(
         logger,
         ediDatabricksOptions,
         calculationId,
-        null)
+        energySupplier)
 {
     private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly EventId _eventId = eventId;
