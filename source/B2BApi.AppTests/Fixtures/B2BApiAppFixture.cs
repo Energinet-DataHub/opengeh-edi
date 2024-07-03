@@ -224,15 +224,11 @@ public class B2BApiAppFixture : IAsyncLifetime
     }
 
     public void EnsureAppHostUsesFeatureFlagValue(
-        bool enableCalculationCompletedEvent,
-        bool enableCalculationCompletedEventForBalanceFixing,
-        bool enableCalculationCompletedEventForWholesaleFixing)
+        bool enableCalculationCompletedEvent)
     {
         AppHostManager.RestartHostIfChanges(new Dictionary<string, string>
         {
             { "FeatureManagement__UseCalculationCompletedEvent", enableCalculationCompletedEvent.ToString().ToLower() },
-            { "FeatureManagement__UseCalculationCompletedEventForBalanceFixing", enableCalculationCompletedEventForBalanceFixing.ToString().ToLower() },
-            { "FeatureManagement__UseCalculationCompletedEventForWholesaleFixing", enableCalculationCompletedEventForWholesaleFixing.ToString().ToLower() },
         });
     }
 

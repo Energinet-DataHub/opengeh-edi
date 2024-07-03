@@ -28,7 +28,10 @@ public class EnergyResultPerGridAreaDescription
     : TestDataDescription
 {
     public EnergyResultPerGridAreaDescription()
-        : base("balance_fixing_01-11-2022_01-12-2022_ga_543_per_ga_v1.csv")
+        : base(
+            "balance_fixing_01-11-2022_01-12-2022_ga_543_per_ga_v1.csv",
+            //Metering point type on row 74 contains an invalid value (="invalid") (row on a result set)
+            "balance_fixing_01-11-2022_01-12-2022_ga_543_per_ga_v1_with_invalid_row.csv")
     {
     }
 
