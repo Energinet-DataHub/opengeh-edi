@@ -24,7 +24,7 @@ using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
 /// <summary>
-/// Enqueue wholesale results for Amount Per Charge to Energy Supplier and ChargeOwner as outgoing messages for the given calculation id.
+/// Enqueue wholesale results for Monthly Amount Per Charge to Energy Supplier and ChargeOwner as outgoing messages for the given calculation id.
 /// </summary>
 public class GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity(
     ILogger<GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity> logger,
