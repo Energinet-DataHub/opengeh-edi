@@ -35,7 +35,7 @@ public class GetActorsForWholesaleResultsForTotalAmountPerChargesActivity(
     private readonly WholesaleResultActorsEnumerator _wholesaleResultActorsEnumerator = wholesaleResultActorsEnumerator;
 
     /// <summary>
-    /// Start an EnqueueWholesaleResultsForTotalAmountPerCharges activity.
+    /// Start an GetActorsForWholesaleResultsForTotalAmountPerCharges activity.
     /// <remarks>The <paramref name="input"/> type and return type must be that same as the <see cref="Run"/> method</remarks>
     /// <remarks>Changing the <paramref name="input"/> or return type might break the Durable Function's deserialization</remarks>
     /// </summary>
