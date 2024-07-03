@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using Newtonsoft.Json;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 
@@ -25,7 +26,7 @@ public static class DurableOrchestrationStatusExtensions
             .Select(item => new HistoryItem(
                 item.Value<string>("Timestamp"),
                 item.Value<string>("FunctionName"),
-                item.Value<dynamic>("Result")))
+                item["Result"] != null ? JsonConvert.DeserializeObject<dynamic?>(item["Result"]!.ToString()) : null))
             .ToList();
 
         return history;

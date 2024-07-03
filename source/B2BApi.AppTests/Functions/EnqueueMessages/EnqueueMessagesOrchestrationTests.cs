@@ -256,7 +256,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
         Fixture.TestLogger.WriteLine($"Orchestration history:{Environment.NewLine}{completeOrchestrationStatus.History.ToString()}");
         var activities = completeOrchestrationStatus.GetOrderedHistory();
-        Fixture.TestLogger.WriteLine($"Ordered history items:{Environment.NewLine}{JsonConvert.ToString(activities)}");
+        Fixture.TestLogger.WriteLine($"Ordered history items:{Environment.NewLine}{JsonConvert.SerializeObject(activities)}");
 
         // var activities = completeOrchestrationStatus.History
         //     .OrderBy(item => item["Timestamp"])
