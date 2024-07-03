@@ -14,7 +14,6 @@
 
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Extensions;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
@@ -51,8 +50,7 @@ public class MonthlyAmountPerChargeResultProducedV1Processor : IIntegrationEvent
 
         var monthlyAmountPerChargeResultProducedV1 = (MonthlyAmountPerChargeResultProducedV1)integrationEvent.Message;
 
-        var isHandledByCalculationCompletedEvent = await monthlyAmountPerChargeResultProducedV1.CalculationType
-            .IsHandledByCalculationCompletedEventAsync(_featureManager)
+        var isHandledByCalculationCompletedEvent = await _featureManager.UseCalculationCompletedEventAsync()
             .ConfigureAwait(false);
 
         if (isHandledByCalculationCompletedEvent)

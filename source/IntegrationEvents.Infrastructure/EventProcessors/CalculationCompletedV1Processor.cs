@@ -14,7 +14,6 @@
 
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.Core.Messaging.Communication;
-using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Extensions;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Model;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
@@ -54,8 +53,7 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
 
         var message = (CalculationCompletedV1)integrationEvent.Message;
 
-        var isFeatureEnabledForCalculationType = await message.CalculationType
-            .IsHandledByCalculationCompletedEventAsync(_featureManager)
+        var isFeatureEnabledForCalculationType = await _featureManager.UseCalculationCompletedEventAsync()
             .ConfigureAwait(false);
 
         if (!isFeatureEnabledForCalculationType)

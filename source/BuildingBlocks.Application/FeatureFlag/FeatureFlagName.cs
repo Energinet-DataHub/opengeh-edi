@@ -29,6 +29,4 @@ public enum FeatureFlagName
     UseEnergyResultProduced,
     UseTotalMonthlyAmountResultProduced,
     UseCalculationCompletedEvent,
-    UseCalculationCompletedEventForBalanceFixing,
-    UseCalculationCompletedEventForWholesaleFixing,
 }
