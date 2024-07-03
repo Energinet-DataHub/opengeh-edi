@@ -22,17 +22,23 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.Te
 /// </summary>
 public abstract class TestDataDescription
 {
-    protected TestDataDescription(string testFilename)
+    protected TestDataDescription(string testFilename, string testFilenameWithAInvalidRow)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(testFilename);
 
         TestFilePath = Path.Combine("Behaviours", "IntegrationEvents", "TestData", testFilename);
+        TestFilePathWithAInvalidRow = Path.Combine("Behaviours", "IntegrationEvents", "TestData", testFilenameWithAInvalidRow);
     }
 
     /// <summary>
     /// Relative path to test file.
     /// </summary>
     public string TestFilePath { get; }
+
+    /// <summary>
+    /// Relative path to test file with an invalid row.
+    /// </summary>
+    public string TestFilePathWithAInvalidRow { get; }
 
     /// <summary>
     /// Calculation id matching test file content.

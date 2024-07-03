@@ -38,7 +38,10 @@ public class WholesaleResultForTotalAmountDescription
     /// Environment: Dev002.
     /// </remarks>
     public WholesaleResultForTotalAmountDescription()
-        : base("wholesale_fixing_01-02-2023_28-02-2023_ga_804_total_amount_v1.csv")
+        : base(
+            "wholesale_fixing_01-02-2023_28-02-2023_ga_804_total_amount_v1.csv",
+            //Currency on row 3 contains an invalid value (="invalid") (row on a result set)
+            "wholesale_fixing_01-02-2023_28-02-2023_ga_804_total_amount_v1_with_invalid_row.csv")
     {
     }
 

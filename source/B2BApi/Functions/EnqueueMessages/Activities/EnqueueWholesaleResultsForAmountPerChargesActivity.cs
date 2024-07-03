@@ -63,23 +63,22 @@ public class EnqueueWholesaleResultsForAmountPerChargesActivity(
         await foreach (var queryResult in _wholesaleResultEnumerator.GetAsync(query))
         {
             databricksStopwatch.Stop();
-
             // Only log databricks query time if it took more than 1 second
             if (databricksStopwatch.Elapsed > TimeSpan.FromSeconds(1))
             {
                 _logger.LogInformation(
-                    "Retrieved wholesale result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
+                    "Retrieved energy result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
                     databricksStopwatch.Elapsed,
                     query.GetType().Name,
-                    queryResult.Result!.ExternalId.Value,
+                    queryResult.Result?.ExternalId.Value,
                     input.CalculationId,
                     input.EventId);
             }
 
-            var enqueueStopwatch = Stopwatch.StartNew();
-            var enqueueWasSuccess = false;
             if (queryResult.IsSuccess)
             {
+                var enqueueStopwatch = Stopwatch.StartNew();
+                var enqueueWasSuccess = false;
                 using (var scope = _serviceScopeFactory.CreateScope())
                 {
                     try
@@ -101,6 +100,19 @@ public class EnqueueWholesaleResultsForAmountPerChargesActivity(
                             input.CalculationId,
                             input.EventId);
                     }
+
+                    enqueueStopwatch.Stop();
+
+                    var logStatusText = enqueueWasSuccess ? "Successfully enqueued" : "Failed enqueuing";
+                    _logger.LogInformation(
+                        logStatusText + " wholesale result in database, elapsed time: {ElapsedTime}, successful results: {SuccessfulResultsCount}, failed results: {FailedResultsCount}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
+                        enqueueStopwatch.Elapsed.ToString(),
+                        numberOfHandledResults,
+                        numberOfFailedResults,
+                        query.GetType().Name,
+                        queryResult.Result?.ExternalId.Value,
+                        input.CalculationId,
+                        input.EventId);
                 }
             }
             else
@@ -108,17 +120,6 @@ public class EnqueueWholesaleResultsForAmountPerChargesActivity(
                 numberOfFailedResults++;
             }
 
-            enqueueStopwatch.Stop();
-            var logStatusText = enqueueWasSuccess ? "Successfully enqueued" : "Failed enqueuing";
-            _logger.LogInformation(
-                logStatusText + " wholesale result in database, elapsed time: {ElapsedTime}, successful results: {SuccessfulResultsCount}, failed results: {FailedResultsCount}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
-                enqueueStopwatch.Elapsed.ToString(),
-                numberOfHandledResults,
-                numberOfFailedResults,
-                query.GetType().Name,
-                queryResult.Result?.ExternalId.Value,
-                input.CalculationId,
-                input.EventId);
             databricksStopwatch.Restart();
         }
 
@@ -132,7 +133,7 @@ public class EnqueueWholesaleResultsForAmountPerChargesActivity(
             input.EventId);
 
         return numberOfFailedResults > 0
-            ? throw new Exception($"Enqueue messages activity failed. CalculationId='{input.CalculationId}' EventId='{input.EventId}' NumberOfFailedResults='{numberOfFailedResults}'")
+            ? throw new Exception($"Enqueue messages activity failed. CalculationId='{input.CalculationId}' EventId='{input.EventId}' NumberOfFailedResults='{numberOfFailedResults}' NumberOfHandledResults='{numberOfHandledResults}'")
             : numberOfHandledResults;
     }
 }

@@ -111,10 +111,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventForBalanceFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
-        Fixture.EnsureAppHostUsesFeatureFlagValue(
-            enableCalculationCompletedEvent: true,
-            enableCalculationCompletedEventForBalanceFixing: true,
-            enableCalculationCompletedEventForWholesaleFixing: true);
+        EnableEnqueueMessagesOrchestration();
 
         var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
         var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
@@ -211,10 +208,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventForWholesaleFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
-        Fixture.EnsureAppHostUsesFeatureFlagValue(
-            enableCalculationCompletedEvent: true,
-            enableCalculationCompletedEventForBalanceFixing: true,
-            enableCalculationCompletedEventForWholesaleFixing: true);
+        EnableEnqueueMessagesOrchestration();
 
         var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
         var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
@@ -309,10 +303,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_DatabricksHasNoData_When_CalculationCompletedEventIsHandled_Then_OrchestrationIsStartedButActivitiesWillFailAndBeRetriedForever(CalculationCompletedV1.Types.CalculationType calculationTypeToTest)
     {
         // Arrange
-        Fixture.EnsureAppHostUsesFeatureFlagValue(
-            enableCalculationCompletedEvent: true,
-            enableCalculationCompletedEventForBalanceFixing: true,
-            enableCalculationCompletedEventForWholesaleFixing: true);
+        EnableEnqueueMessagesOrchestration();
 
         var calculationId = Guid.NewGuid().ToString();
         var calculationOrchestrationId = Guid.NewGuid().ToString();
@@ -362,6 +353,130 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         isExpected.Should().BeTrue("because we expect the actual history to contain the expected history");
     }
 
+    [Fact]
+    public async Task Given_WholesaleResultsContainsAnInvalidRow_When_CalculationCompletedEventForWholesaleFixing_Then_EnqueueAllValidMessages()
+    {
+        // Arrange
+        EnableEnqueueMessagesOrchestration();
+
+        var forAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
+        var forMonthlyAmountPerChargeDescription = new WholesaleResultForMonthlyAmountPerChargeDescription();
+        var forTotalAmountDescription = new WholesaleResultForTotalAmountDescription();
+        await ClearAndAddInvalidDatabricksData(
+            forAmountPerChargeDescription,
+            forMonthlyAmountPerChargeDescription,
+            forTotalAmountDescription);
+        var wholesaleCalculationId = forAmountPerChargeDescription.CalculationId;
+
+        var wholesaleCalculationOrchestrationId = Guid.NewGuid().ToString();
+        var wholesaleCalculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
+            wholesaleCalculationOrchestrationId,
+            CalculationCompletedV1.Types.CalculationType.WholesaleFixing,
+            wholesaleCalculationId.ToString());
+
+        // Act
+        var beforeOrchestrationCreated = DateTime.UtcNow;
+        await Fixture.TopicResource.SenderClient.SendMessageAsync(wholesaleCalculationCompletedEventMessage);
+        var actualWholesaleOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
+
+        // Assert
+        using var assertionScope = new AssertionScope();
+        var wholesaleEventId = actualWholesaleOrchestrationStatus.Input["EventId"];
+
+        var expectedHistory = new List<(string?, string?)>
+        {
+            ("EnqueueWholesaleResultsForAmountPerChargesActivity", $"Enqueue messages activity failed. CalculationId='{wholesaleCalculationId}' EventId='{wholesaleEventId}' NumberOfFailedResults='1' NumberOfHandledResults='{forAmountPerChargeDescription.ExpectedCalculationResultsCount - 1}'"),
+            ("EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity", $"Enqueue messages activity failed. CalculationId='{wholesaleCalculationId}' EventId='{wholesaleEventId}' NumberOfFailedResults='1' NumberOfHandledResults='{forMonthlyAmountPerChargeDescription.ExpectedCalculationResultsCount - 1}'"),
+            ("EnqueueWholesaleResultsForTotalAmountsActivity", $"Enqueue messages activity failed. CalculationId='{wholesaleCalculationId}' EventId='{wholesaleEventId}' NumberOfFailedResults='1' NumberOfHandledResults='{forTotalAmountDescription.ExpectedCalculationResultsCount - 1}'"),
+        };
+
+        // => Wait for running and expected history
+        var isExpected = await Awaiter.TryWaitUntilConditionAsync(
+            async () =>
+            {
+                var orchestrationStatus = await Fixture.DurableClient.GetStatusAsync(actualWholesaleOrchestrationStatus.InstanceId, showHistory: true);
+
+                if (orchestrationStatus.RuntimeStatus != OrchestrationRuntimeStatus.Running)
+                    return false;
+
+                var activities = orchestrationStatus.History
+                    .OrderBy(item => item["Timestamp"])
+                    .Where(item => item.HasValues)
+                    .Select(item =>
+                        (item.Value<string>("FunctionName"), (string?)item.Value<dynamic>("FailureDetails")?.ErrorMessage))
+                    .ToList();
+
+                var containsExpectedHistory = expectedHistory.Intersect(activities).Count() == expectedHistory.Count();
+                return containsExpectedHistory;
+            },
+            TimeSpan.FromSeconds(30),
+            delay: TimeSpan.FromSeconds(5));
+
+        isExpected.Should().BeTrue("because we expect the actual history to contain the expected history");
+    }
+
+    [Fact]
+    public async Task Given_EnergyResultsContainsAnInvalidRow_When_CalculationCompletedEventForBalanceFixing_Then_EnqueueAllValidMessages()
+    {
+        // Arrange
+        EnableEnqueueMessagesOrchestration();
+
+        var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
+        var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
+        var perBrpAndEsGridAreaDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
+        await ClearAndAddInvalidDatabricksData(
+            perGridAreaDataDescription,
+            perBrpGridAreaDataDescription,
+            perBrpAndEsGridAreaDataDescription);
+        var energyCalculationId = perBrpAndEsGridAreaDataDescription.CalculationId;
+
+        var energyCalculationOrchestrationId = Guid.NewGuid().ToString();
+        var energyCalculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
+            energyCalculationOrchestrationId,
+            CalculationCompletedV1.Types.CalculationType.BalanceFixing,
+            energyCalculationId.ToString());
+
+        // Act
+        var beforeOrchestrationCreated = DateTime.UtcNow;
+        await Fixture.TopicResource.SenderClient.SendMessageAsync(energyCalculationCompletedEventMessage);
+        var actualEnergyOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
+
+        // Assert
+        using var assertionScope = new AssertionScope();
+        var energyEventId = actualEnergyOrchestrationStatus.Input["EventId"];
+
+        var expectedHistory = new List<(string?, string?)>
+        {
+            ("EnqueueEnergyResultsForGridAreaOwnersActivity", $"Enqueue messages activity failed. CalculationId='{energyCalculationId}' EventId='{energyEventId}' NumberOfFailedResults='1' NumberOfHandledResults='{perGridAreaDataDescription.ExpectedCalculationResultsCount - 1}'"),
+            ("EnqueueEnergyResultsForBalanceResponsiblesActivity", $"Enqueue messages activity failed. CalculationId='{energyCalculationId}' EventId='{energyEventId}' NumberOfFailedResults='1' NumberOfHandledResults='{perBrpGridAreaDataDescription.ExpectedCalculationResultsCount - 1}'"),
+            ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", $"Enqueue messages activity failed. CalculationId='{energyCalculationId}' EventId='{energyEventId}' NumberOfFailedResults='1' NumberOfHandledResults='{perBrpAndEsGridAreaDataDescription.ExpectedCalculationResultsCount - 1}'"),
+        };
+
+        // => Wait for running and expected history
+        var isExpected = await Awaiter.TryWaitUntilConditionAsync(
+            async () =>
+            {
+                var orchestrationStatus = await Fixture.DurableClient.GetStatusAsync(actualEnergyOrchestrationStatus.InstanceId, showHistory: true);
+
+                if (orchestrationStatus.RuntimeStatus != OrchestrationRuntimeStatus.Running)
+                    return false;
+
+                var activities = orchestrationStatus.History
+                    .OrderBy(item => item["Timestamp"])
+                    .Where(item => item.HasValues)
+                    .Select(item =>
+                        (item.Value<string>("FunctionName"), (string?)item.Value<dynamic>("FailureDetails")?.ErrorMessage))
+                    .ToList();
+
+                var containsExpectedHistory = expectedHistory.Intersect(activities).Count() == expectedHistory.Count();
+                return containsExpectedHistory;
+            },
+            TimeSpan.FromSeconds(30),
+            delay: TimeSpan.FromSeconds(5));
+
+        isExpected.Should().BeTrue("because we expect the actual history to contain the expected history");
+    }
+
     private static ServiceBusMessage CreateCalculationCompletedEventMessage(
         string calculationOrchestrationId,
         CalculationCompletedV1.Types.CalculationType? calculationType = null,
@@ -392,6 +507,51 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         return serviceBusMessage;
     }
 
+    private async Task ClearAndAddInvalidDatabricksData(
+        params TestDataDescription[] testDataDescriptions)
+    {
+        await ResetDatabricks();
+        var ediDatabricksOptions = Options.Create(new EdiDatabricksOptions { DatabaseName = Fixture.DatabricksSchemaManager.SchemaName });
+
+        var tasks = new List<Task>();
+        foreach (var testDataDescription in testDataDescriptions)
+        {
+            IDeltaTableSchemaDescription schemaDescription;
+            if (testDataDescription is EnergyResultPerGridAreaDescription)
+            {
+                schemaDescription = new EnergyResultPerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, null!, testDataDescription.CalculationId);
+            }
+            else if (testDataDescription is EnergyResultPerBrpGridAreaDescription)
+            {
+                schemaDescription = new EnergyResultPerBalanceResponsiblePerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, testDataDescription.CalculationId);
+            }
+            else if (testDataDescription is EnergyResultPerEnergySupplierBrpGridAreaDescription)
+            {
+                schemaDescription = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, testDataDescription.CalculationId);
+            }
+            else if (testDataDescription is WholesaleResultForAmountPerChargeDescription)
+            {
+                schemaDescription = new WholesaleAmountPerChargeQuery(null!, ediDatabricksOptions.Value, null!, null!, testDataDescription.CalculationId);
+            }
+            else if (testDataDescription is WholesaleResultForMonthlyAmountPerChargeDescription)
+            {
+                schemaDescription = new WholesaleMonthlyAmountPerChargeQuery(null!, ediDatabricksOptions.Value, null!, null!, testDataDescription.CalculationId);
+            }
+            else if (testDataDescription is WholesaleResultForTotalAmountDescription)
+            {
+                schemaDescription = new WholesaleTotalAmountQuery(null!, ediDatabricksOptions.Value, null!, testDataDescription.CalculationId);
+            }
+            else
+            {
+                throw new NotSupportedException($"Test data description of type '{testDataDescription.GetType()}' is not supported.");
+            }
+
+            tasks.Add(SeedDatabricksWithDataAsync(testDataDescription.TestFilePathWithAInvalidRow, schemaDescription));
+        }
+
+        await Task.WhenAll(tasks);
+    }
+
     /// <summary>
     /// Adds hardcoded data to databricks.
     /// Notice we reuse test data from the `OutgoingMessagesClientTests`
@@ -406,39 +566,52 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         WholesaleResultForTotalAmountDescription forTotalAmountDescription)
     {
         // Ensure that databricks does not contain data, unless the test explicit adds it
-        if (Fixture.DatabricksSchemaManager.SchemaExists)
-            await Fixture.DatabricksSchemaManager.DropSchemaAsync();
-
-        await Fixture.DatabricksSchemaManager.CreateSchemaAsync();
+        await ResetDatabricks();
         var ediDatabricksOptions = Options.Create(new EdiDatabricksOptions { DatabaseName = Fixture.DatabricksSchemaManager.SchemaName });
 
         // TODO: Seperate schema information from query
         var perGridAreaQuery = new EnergyResultPerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, null!, perGridAreaDataDescription.CalculationId);
-        var perGridAreTask = SeedDatabricksWithDataAsync(perGridAreaDataDescription, perGridAreaQuery);
+        var perGridAreTask = SeedDatabricksWithDataAsync(perGridAreaDataDescription.TestFilePath, perGridAreaQuery);
 
         var perBrpGridAreaQuery = new EnergyResultPerBalanceResponsiblePerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, perGridAreaDataDescription.CalculationId);
-        var perBrpGriaAreaTask = SeedDatabricksWithDataAsync(perBrpGridAreaDataDescription, perBrpGridAreaQuery);
+        var perBrpGriaAreaTask = SeedDatabricksWithDataAsync(perBrpGridAreaDataDescription.TestFilePath, perBrpGridAreaQuery);
 
         var perBrpAndESGridAreaQuery = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, perGridAreaDataDescription.CalculationId);
-        var perBrpAndESGridAreTask = SeedDatabricksWithDataAsync(perBrpAndEsGridAreaDataDescription, perBrpAndESGridAreaQuery);
+        var perBrpAndESGridAreTask = SeedDatabricksWithDataAsync(perBrpAndEsGridAreaDataDescription.TestFilePath, perBrpAndESGridAreaQuery);
 
         var forAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(null!, ediDatabricksOptions.Value, null!, null!, forAmountPerChargeDescription.CalculationId);
-        var forAmountPerChargeTask = SeedDatabricksWithDataAsync(forAmountPerChargeDescription, forAmountPerChargeQuery);
+        var forAmountPerChargeTask = SeedDatabricksWithDataAsync(forAmountPerChargeDescription.TestFilePath, forAmountPerChargeQuery);
 
         var forMonthlyAmountPerChargeQuery = new WholesaleMonthlyAmountPerChargeQuery(null!, ediDatabricksOptions.Value, null!, null!, forMonthlyAmountPerChargeDescription.CalculationId);
-        var forMonthlyAmountPerChargeTask = SeedDatabricksWithDataAsync(forMonthlyAmountPerChargeDescription, forMonthlyAmountPerChargeQuery);
+        var forMonthlyAmountPerChargeTask = SeedDatabricksWithDataAsync(forMonthlyAmountPerChargeDescription.TestFilePath, forMonthlyAmountPerChargeQuery);
 
         var forTotalAmountQuery = new WholesaleTotalAmountQuery(null!, ediDatabricksOptions.Value, null!, forTotalAmountDescription.CalculationId);
-        var forTotalAmountTask = SeedDatabricksWithDataAsync(forTotalAmountDescription, forTotalAmountQuery);
+        var forTotalAmountTask = SeedDatabricksWithDataAsync(forTotalAmountDescription.TestFilePath, forTotalAmountQuery);
 
         await Task.WhenAll(perGridAreTask, perBrpGriaAreaTask, perBrpAndESGridAreTask, forAmountPerChargeTask, forMonthlyAmountPerChargeTask, forTotalAmountTask);
 
         return perGridAreaDataDescription.CalculationId;
     }
 
-    private async Task SeedDatabricksWithDataAsync(TestDataDescription testDataDescription, IDeltaTableSchemaDescription schemaInfomation)
+    private async Task ResetDatabricks()
     {
-        await Fixture.DatabricksSchemaManager.CreateTableAsync(schemaInfomation.DataObjectName, schemaInfomation.SchemaDefinition);
-        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(schemaInfomation.DataObjectName, schemaInfomation.SchemaDefinition, testDataDescription.TestFilePath);
+        if (Fixture.DatabricksSchemaManager.SchemaExists)
+            await Fixture.DatabricksSchemaManager.DropSchemaAsync();
+
+        await Fixture.DatabricksSchemaManager.CreateSchemaAsync();
+    }
+
+    private async Task SeedDatabricksWithDataAsync(string testFilePath, IDeltaTableSchemaDescription schemaInformation)
+    {
+        await Fixture.DatabricksSchemaManager.CreateTableAsync(schemaInformation.DataObjectName, schemaInformation.SchemaDefinition);
+        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(schemaInformation.DataObjectName, schemaInformation.SchemaDefinition, testFilePath);
+    }
+
+    private void EnableEnqueueMessagesOrchestration()
+    {
+        Fixture.EnsureAppHostUsesFeatureFlagValue(
+            enableCalculationCompletedEvent: true,
+            enableCalculationCompletedEventForBalanceFixing: true,
+            enableCalculationCompletedEventForWholesaleFixing: true);
     }
 }
