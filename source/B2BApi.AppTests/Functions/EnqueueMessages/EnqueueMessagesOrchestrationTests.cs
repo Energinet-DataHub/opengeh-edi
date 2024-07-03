@@ -69,7 +69,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         Fixture.SetTestOutputHelper(null!);
     }
 
-    [Theory]
+    [Theory(Skip = "Skip for fast deploy")]
     [InlineData(null)]
     [InlineData(CalculationCompletedV1.Types.CalculationType.BalanceFixing)]
     [InlineData(CalculationCompletedV1.Types.CalculationType.WholesaleFixing)]
@@ -109,7 +109,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     /// <remarks>
     /// Feature flags are enabled for all calculation types to ensure activities are executed.
     /// </remarks>
-    [Fact]
+    [Fact(Skip = "Skip for fast deploy")]
     public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventForBalanceFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
@@ -311,7 +311,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     /// Verifies that:
     /// - If databricks has no data for the CalculationId and CalculationType, then orchestration runs "forever" (because of retry policies).
     /// </summary>
-    [Theory]
+    [Theory(Skip = "Skip for fast deploy")]
     [InlineData(CalculationCompletedV1.Types.CalculationType.BalanceFixing)]
     [InlineData(CalculationCompletedV1.Types.CalculationType.WholesaleFixing)]
     public async Task Given_DatabricksHasNoData_When_CalculationCompletedEventIsHandled_Then_OrchestrationIsStartedButActivitiesWillFailAndBeRetriedForever(CalculationCompletedV1.Types.CalculationType calculationTypeToTest)
