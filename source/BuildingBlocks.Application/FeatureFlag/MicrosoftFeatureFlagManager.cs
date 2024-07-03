@@ -46,9 +46,5 @@ public class MicrosoftFeatureFlagManager : IFeatureFlagManager
 
     public Task<bool> UseCalculationCompletedEventAsync() => IsEnabledAsync(FeatureFlagName.UseCalculationCompletedEvent);
 
-    public Task<bool> UseCalculationCompletedEventForBalanceFixingAsync() => IsEnabledAsync(FeatureFlagName.UseCalculationCompletedEventForBalanceFixing);
-
-    public Task<bool> UseCalculationCompletedEventForWholesaleFixingAsync() => IsEnabledAsync(FeatureFlagName.UseCalculationCompletedEventForWholesaleFixing);
-
     private Task<bool> IsEnabledAsync(FeatureFlagName featureFlagName) => _featureManager.IsEnabledAsync(featureFlagName.ToString());
 }

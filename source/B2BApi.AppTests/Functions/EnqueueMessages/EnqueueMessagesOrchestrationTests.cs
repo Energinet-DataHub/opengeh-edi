@@ -74,13 +74,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_FeatureFlagIsDisabledForCalculationType_When_CalculationCompletedEventIsSent_Then_OrchestrationIsNeverStarted(CalculationCompletedV1.Types.CalculationType? calculationTypeToTest)
     {
         // Arrange
-        // => If calculationTypeToTest is null, then we test disabling the UseCalculationCompletedEvent feature flag
-        // => If calculationTypeToTest is BalanceFixing, then we test disabling the balance fixing feature flag
-        // => If calculationTypeToTest is WholesaleFixing, then we test disabling the wholesale fixing feature flag
-        Fixture.EnsureAppHostUsesFeatureFlagValue(
-            enableCalculationCompletedEvent: calculationTypeToTest != null,
-            enableCalculationCompletedEventForBalanceFixing: calculationTypeToTest != CalculationCompletedV1.Types.CalculationType.BalanceFixing,
-            enableCalculationCompletedEventForWholesaleFixing: calculationTypeToTest != CalculationCompletedV1.Types.CalculationType.WholesaleFixing);
+        Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: false);
 
         var calculationOrchestrationId = Guid.NewGuid().ToString();
         var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
@@ -609,9 +603,6 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
     private void EnableEnqueueMessagesOrchestration()
     {
-        Fixture.EnsureAppHostUsesFeatureFlagValue(
-            enableCalculationCompletedEvent: true,
-            enableCalculationCompletedEventForBalanceFixing: true,
-            enableCalculationCompletedEventForWholesaleFixing: true);
+        Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: true);
     }
 }

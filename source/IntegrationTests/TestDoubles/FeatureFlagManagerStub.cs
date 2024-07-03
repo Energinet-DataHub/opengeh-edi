@@ -50,8 +50,4 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
     public Task<bool> UseTotalMonthlyAmountResultProducedAsync() => Task.FromResult(true);
 
     public Task<bool> UseCalculationCompletedEventAsync() => Task.FromResult(_useCalculationCompletedEvent);
-
-    public Task<bool> UseCalculationCompletedEventForBalanceFixingAsync() => Task.FromResult(_useCalculationCompletedEvent);
-
-    public Task<bool> UseCalculationCompletedEventForWholesaleFixingAsync() => Task.FromResult(_useCalculationCompletedEvent);
 }
