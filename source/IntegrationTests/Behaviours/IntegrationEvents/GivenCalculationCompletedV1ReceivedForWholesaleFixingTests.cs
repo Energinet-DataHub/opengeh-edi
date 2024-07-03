@@ -202,7 +202,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
 
         await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCode, gridOperator.ActorNumber);
-        await GivenEnqueueWholesaleResultsForMonthlyAmountPerChargesAsync(testDataDescription.CalculationId);
+        await GivenEnqueueWholesaleResultsForMonthlyAmountPerChargesAsync(testDataDescription.CalculationId, energySupplier);
 
         // When (act)
         var peekResultsForSystemOperator = await WhenActorPeeksAllMessages(
@@ -458,7 +458,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
     }
 
-    private Task GivenEnqueueWholesaleResultsForMonthlyAmountPerChargesAsync(Guid calculationId)
+    private Task GivenEnqueueWholesaleResultsForMonthlyAmountPerChargesAsync(Guid calculationId, Actor energySupplier)
     {
         var activity = new EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
             GetService<ILogger<EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity>>(),
@@ -466,7 +466,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             GetService<IMasterDataClient>(),
             GetService<WholesaleResultEnumerator>());
 
-        return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
+        return activity.Run(new EnqueueMessagesForActorInput(calculationId, Guid.NewGuid(), energySupplier.ActorNumber.Value));
     }
 
     private async Task<WholesaleResultForAmountPerChargeDescription> GivenDatabricksResultDataForWholesaleResultAmountPerCharge()
@@ -493,7 +493,8 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             _ediDatabricksOptions.Value,
             GetService<IMasterDataClient>(),
             EventId.From(Guid.NewGuid()),
-            wholesaleResultForMonthlyAmountPerChargeDescription.CalculationId);
+            wholesaleResultForMonthlyAmountPerChargeDescription.CalculationId,
+            null);
 
         await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleMonthlyAmountPerChargeQuery.DataObjectName, wholesaleMonthlyAmountPerChargeQuery.SchemaDefinition);
         await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleMonthlyAmountPerChargeQuery.DataObjectName, wholesaleMonthlyAmountPerChargeQuery.SchemaDefinition, wholesaleResultForMonthlyAmountPerChargeDescription.TestFilePath);

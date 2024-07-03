@@ -36,7 +36,7 @@ public class EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
     private readonly WholesaleResultEnumerator _wholesaleResultEnumerator = wholesaleResultEnumerator;
 
     [Function(nameof(EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity))]
-    public async Task<int> Run([ActivityTrigger] EnqueueMessagesInput input)
+    public async Task<int> Run([ActivityTrigger] EnqueueMessagesForActorInput input)
     {
         var numberOfHandledResults = 0;
         var numberOfFailedResults = 0;
@@ -46,7 +46,8 @@ public class EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
             _wholesaleResultEnumerator.EdiDatabricksOptions,
             _masterDataClient,
             EventId.From(input.EventId),
-            input.CalculationId);
+            input.CalculationId,
+            input.Actor);
 
         _logger.LogInformation(
             "Starting enqueuing messages for wholesale query, type: {QueryType}, calculation id: {CalculationId}, event id: {EventId}",
