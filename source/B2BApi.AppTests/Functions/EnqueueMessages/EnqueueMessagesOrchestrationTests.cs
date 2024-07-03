@@ -255,20 +255,15 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         using var assertionScope = new AssertionScope();
 
         Fixture.TestLogger.WriteLine($"Orchestration history:{Environment.NewLine}{completeOrchestrationStatus.History.ToString()}");
-        var activities = completeOrchestrationStatus.GetOrderedHistory();
-        Fixture.TestLogger.WriteLine($"Ordered history items:{Environment.NewLine}{JsonConvert.SerializeObject(activities)}");
 
-        // var activities = completeOrchestrationStatus.History
-        //     .OrderBy(item => item["Timestamp"])
-        //     .Select(item =>
-        //         (item.Value<string>("FunctionName"), item.Value<string>("Result")));
+        var activities = completeOrchestrationStatus.History
+            .OrderBy(item => item["Timestamp"])
+            .Select(item =>
+                (item.Value<string>("FunctionName"), item.Value<dynamic>("Result")));
 
         activities.Should()
             .NotBeNull()
             .And
-            .Subject
-            .Select(i => (i.FunctionName, i.Result))
-            .Should()
             .Contain(
             [
                 ("EnqueueMessagesOrchestration", null),
