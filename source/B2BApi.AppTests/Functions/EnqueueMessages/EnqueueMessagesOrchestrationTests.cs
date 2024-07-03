@@ -32,6 +32,7 @@ using Google.Protobuf;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -259,7 +260,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var activities = completeOrchestrationStatus.History
             .OrderBy(item => item["Timestamp"])
             .Select(item =>
-                (item.Value<string>("FunctionName"), item.Value<dynamic>("Result")));
+                (item.Value<string>("FunctionName"), item["Result"]?.ToString()));
 
         activities.Should()
             .NotBeNull()
