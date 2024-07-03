@@ -22,16 +22,10 @@ public static class DurableOrchestrationStatusExtensions
     {
         var history = orchestrationStatus.History
             .OrderBy(item => item["Timestamp"])
-            .Select(item =>
-            {
-                // ReSharper disable once SuggestVarOrType_BuiltInTypes -- Must be explicit dynamic else it won't work
-                dynamic? historyItem = item.ToObject<dynamic>();
-
-                return new HistoryItem(
-                    historyItem!.Timestamp as string,
-                    historyItem.FunctionName as string,
-                    historyItem.Result);
-            })
+            .Select(item => new HistoryItem(
+                item.Value<string>("Timestamp"),
+                item.Value<string>("FunctionName"),
+                item.Value<dynamic>("Result")))
             .ToList();
 
         return history;
