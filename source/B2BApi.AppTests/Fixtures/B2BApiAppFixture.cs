@@ -52,31 +52,52 @@ public class B2BApiAppFixture : IAsyncLifetime
 
     public B2BApiAppFixture()
     {
-        TestLogger = new TestDiagnosticsLogger();
-        IntegrationTestConfiguration = new IntegrationTestConfiguration();
+        var constructorStopwatch = new Stopwatch();
+        var stopwatch = new Stopwatch();
 
-        AzuriteManager = new AzuriteManager(useOAuth: true);
+        constructorStopwatch.Start();
+        stopwatch.Start();
+
+        TestLogger = new TestDiagnosticsLogger();
+        LogStopwatch(stopwatch, nameof(TestLogger));
+
+        IntegrationTestConfiguration = new IntegrationTestConfiguration();
+        LogStopwatch(stopwatch, nameof(IntegrationTestConfiguration));
+
+        AzuriteManager = new AzuriteManager(useOAuth: false);
+        LogStopwatch(stopwatch, nameof(AzuriteManager));
+
         CleanupAzuriteStorage();
+        LogStopwatch(stopwatch, nameof(CleanupAzuriteStorage));
+
         DurableTaskManager = new DurableTaskManager(
             "AzureWebJobsStorage",
             AzuriteManager.FullConnectionString);
+        LogStopwatch(stopwatch, nameof(DurableTaskManager));
 
         DatabaseManager = new EdiDatabaseManager();
+        LogStopwatch(stopwatch, nameof(DatabaseManager));
 
         ServiceBusResourceProvider = new ServiceBusResourceProvider(
             IntegrationTestConfiguration.ServiceBusConnectionString,
             TestLogger);
+        LogStopwatch(stopwatch, nameof(ServiceBusResourceProvider));
 
         ServiceBusListenerMock = new ServiceBusListenerMock(
             IntegrationTestConfiguration.ServiceBusConnectionString,
             TestLogger);
+        LogStopwatch(stopwatch, nameof(ServiceBusListenerMock));
 
         HostConfigurationBuilder = new FunctionAppHostConfigurationBuilder();
+        LogStopwatch(stopwatch, nameof(HostConfigurationBuilder));
 
         DatabricksSchemaManager = new DatabricksSchemaManager(
             new HttpClientFactory(),
             IntegrationTestConfiguration.DatabricksSettings,
             "edi_B2BApi_tests");
+
+        LogStopwatch(stopwatch, nameof(DatabricksSchemaManager));
+        LogStopwatch(constructorStopwatch, "B2BApiAppFixture constructor");
     }
 
     public ITestDiagnosticsLogger TestLogger { get; }
@@ -111,16 +132,24 @@ public class B2BApiAppFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
+        var initializeStopwatch = new Stopwatch();
+        var stopwatch = new Stopwatch();
+
         // Storage emulator
         AzuriteManager.StartAzurite();
+        LogStopwatch(stopwatch, nameof(AzuriteManager.StartAzurite));
+
         CreateRequiredContainers();
+        LogStopwatch(stopwatch, nameof(CreateRequiredContainers));
 
         // Database
         await DatabaseManager.CreateDatabaseAsync();
+        LogStopwatch(stopwatch, nameof(DatabaseManager.CreateDatabaseAsync));
 
         // Prepare host settings
         var port = 8000;
         var appHostSettings = CreateAppHostSettings("B2BApi", ref port);
+        LogStopwatch(stopwatch, nameof(CreateAppHostSettings));
 
         // ServiceBus entities
         TopicResource = await ServiceBusResourceProvider
@@ -131,31 +160,45 @@ public class B2BApiAppFixture : IAsyncLifetime
             .Do(subscription => appHostSettings.ProcessEnvironmentVariables
                 .Add($"{IntegrationEventsOptions.SectionName}__{nameof(IntegrationEventsOptions.SubscriptionName)}", subscription.SubscriptionName))
             .CreateAsync();
+        LogStopwatch(stopwatch, nameof(TopicResource));
+
         await ServiceBusResourceProvider
             .BuildQueue("edi-inbox")
             .Do(queue => appHostSettings.ProcessEnvironmentVariables
                 .Add($"{EdiInboxOptions.SectionName}__{nameof(EdiInboxOptions.QueueName)}", queue.Name))
             .CreateAsync();
+        LogStopwatch(stopwatch, "ServiceBusQueue (edi-inbox)");
+
         var wholesaleInboxQueueResource = await ServiceBusResourceProvider
             .BuildQueue("wholesale-inbox")
             .Do(queue => appHostSettings.ProcessEnvironmentVariables
                 .Add($"{WholesaleInboxOptions.SectionName}__{nameof(WholesaleInboxOptions.QueueName)}", queue.Name))
             .CreateAsync();
+        LogStopwatch(stopwatch, "ServiceBusQueue (wholesale-inbox)");
+
         await ServiceBusResourceProvider
             .BuildQueue("incoming-messages")
             .Do(queue => appHostSettings.ProcessEnvironmentVariables
                 .Add($"{IncomingMessagesQueueOptions.SectionName}__{nameof(IncomingMessagesQueueOptions.QueueName)}", queue.Name))
             .CreateAsync();
+        LogStopwatch(stopwatch, "ServiceBusQueue (incoming-messages)");
 
         // => Receive messages on Wholesale Inbox Queue
         await ServiceBusListenerMock.AddQueueListenerAsync(wholesaleInboxQueueResource.Name);
+        LogStopwatch(stopwatch, nameof(ServiceBusListenerMock.AddQueueListenerAsync));
 
         // Create and start host
         AppHostManager = new FunctionAppHostManager(appHostSettings, TestLogger);
+        LogStopwatch(stopwatch, nameof(AppHostManager));
+
         StartHost(AppHostManager);
+        LogStopwatch(stopwatch, nameof(StartHost));
 
         // Create durable client when TaskHub has been created
         DurableClient = DurableTaskManager.CreateClient(taskHubName: TaskHubName);
+        LogStopwatch(stopwatch, nameof(DurableTaskManager.CreateClient));
+
+        LogStopwatch(initializeStopwatch, nameof(InitializeAsync));
     }
 
     public async Task DisposeAsync()
@@ -304,13 +347,16 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // Document storage
         appHostSettings.ProcessEnvironmentVariables.Add(
-            nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_URL),
-            AzuriteManager.BlobStorageServiceUri.ToString());
+            nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING),
+            AzuriteManager.FullConnectionString);
 
         // Database
+        var dbConnectionString = DatabaseManager.ConnectionString;
+        if (!dbConnectionString.Contains("Trust")) // Trust Server Certificate might be required for some
+            dbConnectionString = $"{dbConnectionString};Trust Server Certificate=True;";
         appHostSettings.ProcessEnvironmentVariables.Add(
             "DB_CONNECTION_STRING",
-            DatabaseManager.ConnectionString);
+            dbConnectionString);
 
         // Databricks
         appHostSettings.ProcessEnvironmentVariables.Add(
@@ -343,5 +389,12 @@ public class B2BApiAppFixture : IAsyncLifetime
             true.ToString().ToLower());
 
         return appHostSettings;
+    }
+
+    private void LogStopwatch(Stopwatch stopwatch, string tag)
+    {
+        var elapsedSeconds = stopwatch.Elapsed.TotalSeconds;
+        TestLogger.WriteLine($"[PERFORMANCE][{elapsedSeconds:##.##}s] {tag} took {elapsedSeconds:##.##} seconds");
+        stopwatch.Restart();
     }
 }

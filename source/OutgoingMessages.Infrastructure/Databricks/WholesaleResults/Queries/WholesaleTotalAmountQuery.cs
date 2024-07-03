@@ -35,11 +35,14 @@ public class WholesaleTotalAmountQuery(
     : WholesaleResultQueryBase<WholesaleTotalAmountMessageDto>(
         logger,
         ediDatabricksOptions,
-        calculationId)
+        calculationId,
+        null)
 {
     private readonly EventId _eventId = eventId;
 
     public override string DataObjectName => "total_monthly_amounts_v1";
+
+    public override string ActorColumnName => WholesaleResultColumnNames.EnergySupplierId;
 
     public override Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition => new()
     {

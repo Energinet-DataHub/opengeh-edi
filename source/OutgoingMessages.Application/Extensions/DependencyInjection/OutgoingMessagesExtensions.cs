@@ -98,6 +98,7 @@ public static class OutgoingMessagesExtensions
             .AddNodaTimeForApplication()
             .AddScoped<EnergyResultEnumerator>()
             .AddScoped<WholesaleResultEnumerator>()
+            .AddScoped<WholesaleResultActorsEnumerator>()
             .AddDatabricksSqlStatementExecution(configuration)
             .AddHealthChecks()
                 .AddDatabricksSqlStatementApiHealthCheck(name: "DatabricksSqlStatementApi");

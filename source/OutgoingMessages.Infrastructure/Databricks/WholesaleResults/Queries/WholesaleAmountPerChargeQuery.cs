@@ -32,16 +32,20 @@ public class WholesaleAmountPerChargeQuery(
     EdiDatabricksOptions ediDatabricksOptions,
     IMasterDataClient masterDataClient,
     EventId eventId,
-    Guid calculationId)
+    Guid calculationId,
+    string? energySupplier)
     : WholesaleResultQueryBase<WholesaleAmountPerChargeMessageDto>(
         logger,
         ediDatabricksOptions,
-        calculationId)
+        calculationId,
+        energySupplier)
 {
     private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly EventId _eventId = eventId;
 
     public override string DataObjectName => "amounts_per_charge_v1";
+
+    public override string ActorColumnName => WholesaleResultColumnNames.EnergySupplierId;
 
     public override Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition => new()
     {
