@@ -31,7 +31,6 @@ using FluentAssertions.Execution;
 using Google.Protobuf;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
 using Xunit.Abstractions;
@@ -69,7 +68,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         Fixture.SetTestOutputHelper(null!);
     }
 
-    [Theory(Skip = "Skip for fast deploy")]
+    [Theory]
     [InlineData(null)]
     [InlineData(CalculationCompletedV1.Types.CalculationType.BalanceFixing)]
     [InlineData(CalculationCompletedV1.Types.CalculationType.WholesaleFixing)]
@@ -103,7 +102,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     /// <remarks>
     /// Feature flags are enabled for all calculation types to ensure activities are executed.
     /// </remarks>
-    [Fact(Skip = "Skip for fast deploy")]
+    [Fact]
     public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventForBalanceFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
@@ -148,7 +147,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var activities = completeOrchestrationStatus.History
             .OrderBy(item => item["Timestamp"])
             .Select(item =>
-                (item.Value<string>("FunctionName"), item.Value<string>("Result")));
+                (item.Value<string>("FunctionName"), ValueIsArray(item) ? string.Join(',', item.Value<JArray>("Result")!.Select(x => x.ToString())) : item.Value<JToken>("Result")?.ToString()));
 
         activities.Should().NotBeNull().And.Contain(
         [
@@ -156,10 +155,10 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             ("EnqueueEnergyResultsForGridAreaOwnersActivity", perGridAreaDataDescription.ExpectedCalculationResultsCount.ToString()),
             ("EnqueueEnergyResultsForBalanceResponsiblesActivity", perBrpGridAreaDataDescription.ExpectedCalculationResultsCount.ToString()),
             ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", perBrpAndEsGridAreaDataDescription.ExpectedCalculationResultsCount.ToString()),
-            ("EnqueueWholesaleResultsForAmountPerChargesActivity", "0"),
-            ("EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity", "0"),
-            ("EnqueueWholesaleResultsForTotalAmountsActivity", "0"),
-            ("SendActorMessagesEnqueuedActivity", null),
+            ("GetActorsForWholesaleResultsForAmountPerChargesActivity", string.Empty),
+            ("GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity", string.Empty),
+            ("GetActorsForWholesaleResultsForTotalAmountPerChargesActivity", string.Empty),
+            ("SendActorMessagesEnqueuedActivity", string.Empty),
             (null, "Success"),
         ]);
 
@@ -200,7 +199,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     /// <remarks>
     /// Feature flags are enabled for all calculation types to ensure activities are executed.
     /// </remarks>
-    [Fact(Skip = "Skip for fast deploy")]
+    [Fact]
     public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventForWholesaleFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
@@ -241,14 +240,14 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             TimeSpan.FromMinutes(5));
 
         // => Expect history
-        using var assertionScope = new AssertionScope();
+        // using var assertionScope = new AssertionScope();
 
         Fixture.TestLogger.WriteLine($"Orchestration history:{Environment.NewLine}{completeOrchestrationStatus.History.ToString()}");
 
         var activities = completeOrchestrationStatus.History
             .OrderBy(item => item["Timestamp"])
             .Select(item =>
-                (item.Value<string>("FunctionName"), item["Result"]?.ToString()));
+                (item.Value<string>("FunctionName"), ValueIsArray(item) ? string.Join(',', item.Value<JArray>("Result")!.Select(x => x.ToString())) : item.Value<JToken>("Result")?.ToString()));
 
         activities.Should()
             .NotBeNull()
@@ -259,11 +258,13 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
                 ("EnqueueEnergyResultsForGridAreaOwnersActivity", "0"),
                 ("EnqueueEnergyResultsForBalanceResponsiblesActivity", "0"),
                 ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", "0"),
-                ("GetActorsForWholesaleResultsForAmountPerChargesActivity", "[\n  \"5790001662233\"\n]"),
+                ("GetActorsForWholesaleResultsForAmountPerChargesActivity", "5790001662233"),
+                ("GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity", "5790001662233"),
+                ("GetActorsForWholesaleResultsForTotalAmountPerChargesActivity", "5790001662233"),
                 ("EnqueueWholesaleResultsForAmountPerChargesActivity", forAmountPerChargeDescription.ExpectedCalculationResultsCount.ToString()),
                 ("EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity", forMonthlyAmountPerChargeDescription.ExpectedCalculationResultsCount.ToString()),
                 ("EnqueueWholesaleResultsForTotalAmountsActivity", forTotalAmountDescription.ExpectedCalculationResultsCount.ToString()),
-                ("SendActorMessagesEnqueuedActivity", null),
+                ("SendActorMessagesEnqueuedActivity", string.Empty),
                 (null, "Success"),
             ]);
 
@@ -299,7 +300,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     /// Verifies that:
     /// - If databricks has no data for the CalculationId and CalculationType, then orchestration runs "forever" (because of retry policies).
     /// </summary>
-    [Theory(Skip = "Skip for fast deploy")]
+    [Theory]
     [InlineData(CalculationCompletedV1.Types.CalculationType.BalanceFixing)]
     [InlineData(CalculationCompletedV1.Types.CalculationType.WholesaleFixing)]
     public async Task Given_DatabricksHasNoData_When_CalculationCompletedEventIsHandled_Then_OrchestrationIsStartedButActivitiesWillFailAndBeRetriedForever(CalculationCompletedV1.Types.CalculationType calculationTypeToTest)
@@ -319,9 +320,9 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             ("EnqueueEnergyResultsForGridAreaOwnersActivity", null),
             ("EnqueueEnergyResultsForBalanceResponsiblesActivity", null),
             ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", null),
-            ("EnqueueWholesaleResultsForAmountPerChargesActivity", null),
-            ("EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity", null),
-            ("EnqueueWholesaleResultsForTotalAmountsActivity", null),
+            ("GetActorsForWholesaleResultsForAmountPerChargesActivity", null),
+            ("GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity", null),
+            ("GetActorsForWholesaleResultsForTotalAmountPerChargesActivity", null),
         };
 
         // Act
@@ -344,7 +345,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
                 var activities = orchestrationStatus.History
                     .OrderBy(item => item["Timestamp"])
                     .Select(item =>
-                        (item.Value<string>("FunctionName"), item.Value<string>("Result")));
+                        (item.Value<string>("Name"), item.Value<string>("Input")));
 
                 var containsExpectedHistory = expectedHistory.Intersect(activities).Count() == expectedHistory.Count();
                 return containsExpectedHistory;
@@ -355,7 +356,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         isExpected.Should().BeTrue("because we expect the actual history to contain the expected history");
     }
 
-    [Fact(Skip = "Skip for fast deploy")]
+    [Fact]
     public async Task Given_WholesaleResultsContainsAnInvalidRow_When_CalculationCompletedEventForWholesaleFixing_Then_EnqueueAllValidMessages()
     {
         // Arrange
@@ -417,7 +418,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         isExpected.Should().BeTrue("because we expect the actual history to contain the expected history");
     }
 
-    [Fact(Skip = "Skip for fast deploy")]
+    [Fact]
     public async Task Given_EnergyResultsContainsAnInvalidRow_When_CalculationCompletedEventForBalanceFixing_Then_EnqueueAllValidMessages()
     {
         // Arrange
@@ -477,6 +478,11 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             delay: TimeSpan.FromSeconds(5));
 
         isExpected.Should().BeTrue("because we expect the actual history to contain the expected history");
+    }
+
+    private static bool ValueIsArray(JToken item)
+    {
+        return item.Value<JToken>("Result")?.Type == JTokenType.Array;
     }
 
     private static ServiceBusMessage CreateCalculationCompletedEventMessage(
