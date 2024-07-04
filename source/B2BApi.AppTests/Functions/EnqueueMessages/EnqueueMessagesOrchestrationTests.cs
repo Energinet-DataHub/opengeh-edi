@@ -240,7 +240,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             TimeSpan.FromMinutes(5));
 
         // => Expect history
-        // using var assertionScope = new AssertionScope();
+        using var assertionScope = new AssertionScope();
 
         Fixture.TestLogger.WriteLine($"Orchestration history:{Environment.NewLine}{completeOrchestrationStatus.History.ToString()}");
 
