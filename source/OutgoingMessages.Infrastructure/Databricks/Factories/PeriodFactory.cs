@@ -14,7 +14,11 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
+using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
+using NodaTime;
 using NodaTime.Extensions;
+using NodaTime.Text;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 
@@ -25,20 +29,25 @@ public static class PeriodFactory
         var start = timeSeriesPoints.Min(x => x.TimeUtc);
         var end = timeSeriesPoints.Max(x => x.TimeUtc);
         // The end date is the start of the next period.
-        var endWithResolutionOffset = GetDateTimeWithResolutionOffset(resolution, end.ToDateTimeOffset());
-        return new Period(start, endWithResolutionOffset.ToInstant());
+        var endWithResolutionOffset = GetDateTimeWithResolutionOffset(resolution, end);
+        return new Period(start, endWithResolutionOffset);
     }
 
-    private static DateTimeOffset GetDateTimeWithResolutionOffset(Resolution resolution, DateTimeOffset dateTime)
+    private static Instant GetDateTimeWithResolutionOffset(Resolution resolution, Instant instant)
     {
         switch (resolution)
         {
             case var res when res == Resolution.Hourly:
-                return dateTime.AddMinutes(60);
+                return instant.Plus(Duration.FromHours(1));
             case var res when res == Resolution.Daily:
-                return dateTime.AddDays(1);
+                return instant.Plus(Duration.FromDays(1));
             case var res when res == Resolution.Monthly:
-                return dateTime.AddMonths(1);
+                {
+                    var instantInNextMonth = instant.Plus(Duration.FromDays(1));
+                    var days = CalendarSystem.Gregorian.GetDaysInMonth(instantInNextMonth.Year(), instantInNextMonth.Month());
+                    return instant.Plus(Duration.FromDays(days));
+                }
+
             default:
                 throw new ArgumentOutOfRangeException(
                     nameof(resolution),
