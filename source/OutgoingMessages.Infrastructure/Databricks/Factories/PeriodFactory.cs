@@ -33,27 +33,32 @@ public static class PeriodFactory
     public static Period GetPeriod(IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints, Resolution resolution)
     {
         var timeForOldestPoint = timeSeriesPoints.Min(x => x.TimeUtc);
-        var timeForNewestPoint = timeSeriesPoints.Max(x => x.TimeUtc);
+        var timeForLatestPoint = timeSeriesPoints.Max(x => x.TimeUtc);
 
         // A point represents a measurement in a period { start: point.time, end: point.time + resolution }
         // Since the time is the start of the measured period, we need to add the resolution to get the end of the calculation period.
-        var endDateWithResolutionOffset = GetEndDateWithResolutionOffset(resolution, timeForNewestPoint);
+        var endDateWithResolutionOffset = GetEndDateWithResolutionOffset(resolution, timeForLatestPoint);
         return new Period(timeForOldestPoint, endDateWithResolutionOffset);
     }
 
-    private static Instant GetEndDateWithResolutionOffset(Resolution resolution, Instant instant)
+    private static Instant GetEndDateWithResolutionOffset(Resolution resolution, Instant timeForLatestPoint)
     {
         switch (resolution)
         {
             case var res when res == Resolution.Hourly:
-                return instant.Plus(Duration.FromHours(1));
+                return timeForLatestPoint.Plus(Duration.FromHours(1));
             case var res when res == Resolution.Daily:
-                return instant.Plus(Duration.FromDays(1));
+                return timeForLatestPoint.Plus(Duration.FromDays(1));
             case var res when res == Resolution.Monthly:
                 {
-                    var instantInNextMonth = instant.Plus(Duration.FromDays(1));
+                    // A monthly calculation is executed for a month represented in danish time
+                    //  E.g. Calculation start: 2023-02-01T00:00:00Z (danish time)
+                    // When this is converted to UTC, it will be the last day of the previous month.
+                    // E.g. Calculation start: 2023-01-31T22:00:00Z (utc time)
+                    // By adding a day, we get the next month, which is the calculated month.
+                    var instantInNextMonth = timeForLatestPoint.Plus(Duration.FromDays(1));
                     var days = CalendarSystem.Gregorian.GetDaysInMonth(instantInNextMonth.Year(), instantInNextMonth.Month());
-                    return instant.Plus(Duration.FromDays(days));
+                    return timeForLatestPoint.Plus(Duration.FromDays(days));
                 }
 
             default:
