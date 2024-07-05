@@ -37,11 +37,11 @@ public static class PeriodFactory
         var timeForNewestPoint = timeSeriesPoints.Max(x => x.TimeUtc);
 
         // A period is described by { start: latestPoint.time, end: newestPoint.time + resolution }
-        var calculationEnd = GetEndDateWithResolutionOffset(resolution, timeForNewestPoint);
+        var calculationEnd = GetEndDateWithResolutionOffset(resolution, timeForNewestPoint, DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
         return new Period(calculationStart, calculationEnd);
     }
 
-    private static Instant GetEndDateWithResolutionOffset(Resolution resolution, Instant timeForLatestPoint)
+    private static Instant GetEndDateWithResolutionOffset(Resolution resolution, Instant timeForLatestPoint, DateTimeZone dateTimeZone)
     {
         switch (resolution)
         {
@@ -51,14 +51,10 @@ public static class PeriodFactory
                 return timeForLatestPoint.Plus(Duration.FromDays(1));
             case var res when res == Resolution.Monthly:
                 {
-                    // A monthly calculation is executed for a month represented in danish time
-                    //  E.g. started: 2023-02-01T00:00:00Z (danish time)
-                    // When this is converted to UTC, it will be the last day of the previous month.
-                    //  E.g. Calculation start: 2023-01-31T22:00:00Z (utc time)
-                    // By adding a day, we get the next month, which is the calculated month.
-                    var instantInNextMonth = timeForLatestPoint.Plus(Duration.FromDays(1));
-                    var days = CalendarSystem.Gregorian.GetDaysInMonth(instantInNextMonth.Year(), instantInNextMonth.Month());
-                    return timeForLatestPoint.Plus(Duration.FromDays(days));
+                    var timeForLatestPointInLocalTime = timeForLatestPoint.InZone(dateTimeZone).LocalDateTime;
+                    var endAtMidnightInLocalTime = timeForLatestPointInLocalTime.PlusMonths(1).Date.AtMidnight();
+                    var endAtMidnightInUtc = endAtMidnightInLocalTime.InZoneStrictly(dateTimeZone);
+                    return endAtMidnightInUtc.ToInstant();
                 }
 
             default:

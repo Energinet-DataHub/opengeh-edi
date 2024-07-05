@@ -29,12 +29,54 @@ public class PeriodFactoryTests
     public void Given_TimeSeriesPoint_WhenResolutionIsMonthly_Then_PeriodIsCorrect()
     {
         // Arrange
-        var expectedStartDate = InstantPattern.General.Parse("2023-01-31T22:00:00Z").Value;
-        var expectedEndDate = InstantPattern.General.Parse("2023-02-28T22:00:00Z").Value;
+        var expectedStartDate = InstantPattern.General.Parse("2023-01-31T23:00:00Z").Value;
+        var expectedEndDate = InstantPattern.General.Parse("2023-02-28T23:00:00Z").Value;
 
         var pointForAMonthlyResolution = new List<WholesaleTimeSeriesPoint>
         {
-            new(InstantPattern.General.Parse("2023-01-31T22:00:00Z").Value, null, new[] { QuantityQuality.Missing }, null, null),
+            new(InstantPattern.General.Parse("2023-01-31T23:00:00Z").Value, null, new[] { QuantityQuality.Missing }, null, null),
+        };
+
+        // Act
+        var period = PeriodFactory.GetPeriod(pointForAMonthlyResolution, Resolution.Monthly);
+
+        // Assert
+        period.Should().NotBeNull();
+        period.Start.Should().Be(expectedStartDate);
+        period.End.Should().Be(expectedEndDate);
+    }
+
+    [Fact]
+    public void Given_TimeSeriesPoint_WhenResolutionIsMonthlyAndMonthIsToDaylightSwitchMonth_Then_PeriodIsCorrect()
+    {
+        // Arrange
+        var expectedStartDate = InstantPattern.General.Parse("2023-02-28T23:00:00Z").Value;
+        var expectedEndDate = InstantPattern.General.Parse("2023-03-31T22:00:00Z").Value;
+
+        var pointForAMonthlyResolution = new List<WholesaleTimeSeriesPoint>
+        {
+            new(InstantPattern.General.Parse("2023-02-28T23:00:00Z").Value, null, new[] { QuantityQuality.Missing }, null, null),
+        };
+
+        // Act
+        var period = PeriodFactory.GetPeriod(pointForAMonthlyResolution, Resolution.Monthly);
+
+        // Assert
+        period.Should().NotBeNull();
+        period.Start.Should().Be(expectedStartDate);
+        period.End.Should().Be(expectedEndDate);
+    }
+
+    [Fact]
+    public void Given_TimeSeriesPoint_WhenResolutionIsMonthlyAndMonthIsFromDaylightSwitchMonth_Then_PeriodIsCorrect()
+    {
+        // Arrange
+        var expectedStartDate = InstantPattern.General.Parse("2023-09-30T22:00:00Z").Value;
+        var expectedEndDate = InstantPattern.General.Parse("2023-10-31T23:00:00Z").Value;
+
+        var pointForAMonthlyResolution = new List<WholesaleTimeSeriesPoint>
+        {
+            new(InstantPattern.General.Parse("2023-09-30T22:00:00Z").Value, null, new[] { QuantityQuality.Missing }, null, null),
         };
 
         // Act
@@ -50,11 +92,11 @@ public class PeriodFactoryTests
     public void Given_TimeSeriesPoint_WhenResolutionIsDaily_Then_PeriodIsCorrect()
     {
         // Arrange
-        var expectedStartDate = InstantPattern.General.Parse("2023-01-31T22:00:00Z").Value;
-        var expectedEndDate = InstantPattern.General.Parse("2023-02-28T22:00:00Z").Value;
+        var expectedStartDate = InstantPattern.General.Parse("2023-01-31T23:00:00Z").Value;
+        var expectedEndDate = InstantPattern.General.Parse("2023-02-28T23:00:00Z").Value;
 
         var points = new List<WholesaleTimeSeriesPoint>();
-        var currentTime = InstantPattern.General.Parse("2023-01-31T22:00:00Z").Value;
+        var currentTime = InstantPattern.General.Parse("2023-01-31T23:00:00Z").Value;
         // 28 days in February
         while (points.Count < 28)
         {
@@ -75,11 +117,11 @@ public class PeriodFactoryTests
     public void Given_TimeSeriesPoint_WhenResolutionIsHourly_Then_PeriodIsCorrect()
     {
         // Arrange
-        var expectedStartDate = InstantPattern.General.Parse("2023-01-31T22:00:00Z").Value;
-        var expectedEndDate = InstantPattern.General.Parse("2023-02-01T22:00:00Z").Value;
+        var expectedStartDate = InstantPattern.General.Parse("2023-01-31T23:00:00Z").Value;
+        var expectedEndDate = InstantPattern.General.Parse("2023-02-01T23:00:00Z").Value;
 
         var points = new List<WholesaleTimeSeriesPoint>();
-        var currentTime = InstantPattern.General.Parse("2023-01-31T22:00:00Z").Value;
+        var currentTime = InstantPattern.General.Parse("2023-01-31T23:00:00Z").Value;
         // 24 hours in a day
         while (points.Count < 24)
         {
