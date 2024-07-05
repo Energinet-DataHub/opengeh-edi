@@ -103,7 +103,8 @@ public class PeriodFactoryTests
     [InlineData("2023-02-28T13:00:00Z")]
     [InlineData("2023-07-01T13:00:00Z")]
     [InlineData("2023-12-31T22:00:00Z")]
-    [InlineData("2023-03-26T00:00:00Z")] //to daylightsavings time
+    [InlineData("2024-03-31T01:00:00Z")] //to daylightsavings time
+    [InlineData("2024-10-27T00:00:00Z")] //from daylightsavings time
     public void Given_TimeSeriesPoint_WhenResolutionIsHourly_Then_PeriodIsCorrect(string date)
     {
         // Arrange
