@@ -14,31 +14,49 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
+using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
+using NodaTime;
 using NodaTime.Extensions;
+using NodaTime.Text;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 
 public static class PeriodFactory
 {
+    /// <summary>
+    /// In order get the full calculate period, we need to find the oldest and newest point including resolution.
+    /// The oldest point is the start of the calculation period.
+    /// The newest point plus the resolution is the end of the calculation period.
+    /// </summary>
+    /// <param name="timeSeriesPoints"></param>
+    /// <param name="resolution"></param>
     public static Period GetPeriod(IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints, Resolution resolution)
     {
-        var start = timeSeriesPoints.Min(x => x.TimeUtc);
-        var end = timeSeriesPoints.Max(x => x.TimeUtc);
-        // The end date is the start of the next period.
-        var endWithResolutionOffset = GetDateTimeWithResolutionOffset(resolution, end.ToDateTimeOffset());
-        return new Period(start, endWithResolutionOffset.ToInstant());
+        var calculationStart = timeSeriesPoints.Min(x => x.TimeUtc);
+        var timeForNewestPoint = timeSeriesPoints.Max(x => x.TimeUtc);
+
+        // A period is described by { start: latestPoint.time, end: newestPoint.time + resolution }
+        var calculationEnd = GetEndDateWithResolutionOffset(resolution, timeForNewestPoint, DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
+        return new Period(calculationStart, calculationEnd);
     }
 
-    private static DateTimeOffset GetDateTimeWithResolutionOffset(Resolution resolution, DateTimeOffset dateTime)
+    private static Instant GetEndDateWithResolutionOffset(Resolution resolution, Instant timeForLatestPoint, DateTimeZone dateTimeZone)
     {
         switch (resolution)
         {
             case var res when res == Resolution.Hourly:
-                return dateTime.AddMinutes(60);
+                return timeForLatestPoint.Plus(Duration.FromHours(1));
             case var res when res == Resolution.Daily:
-                return dateTime.AddDays(1);
+                return timeForLatestPoint.Plus(Duration.FromDays(1));
             case var res when res == Resolution.Monthly:
-                return dateTime.AddMonths(1);
+                {
+                    var timeForLatestPointInLocalTime = timeForLatestPoint.InZone(dateTimeZone).LocalDateTime;
+                    var endAtMidnightInLocalTime = timeForLatestPointInLocalTime.PlusMonths(1).Date.AtMidnight();
+                    var endAtMidnightInUtc = endAtMidnightInLocalTime.InZoneStrictly(dateTimeZone);
+                    return endAtMidnightInUtc.ToInstant();
+                }
+
             default:
                 throw new ArgumentOutOfRangeException(
                     nameof(resolution),
