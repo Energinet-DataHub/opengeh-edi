@@ -26,19 +26,19 @@ public static class PeriodFactory
 {
     /// <summary>
     /// In order get the full calculate period, we need to find the oldest and newest point including resolution.
-    /// Since timeSeriesPoints measurements period is represented by the start time and a resolution.
+    /// The oldest point is the start of the calculation period.
+    /// The newest point plus the resolution is the end of the calculation period.
     /// </summary>
     /// <param name="timeSeriesPoints"></param>
     /// <param name="resolution"></param>
     public static Period GetPeriod(IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints, Resolution resolution)
     {
-        var timeForOldestPoint = timeSeriesPoints.Min(x => x.TimeUtc);
-        var timeForLatestPoint = timeSeriesPoints.Max(x => x.TimeUtc);
+        var calculationStart = timeSeriesPoints.Min(x => x.TimeUtc);
+        var timeForNewestPoint = timeSeriesPoints.Max(x => x.TimeUtc);
 
-        // A point represents a measurement in a period { start: point.time, end: point.time + resolution }
-        // Since the time is the start of the measured period, we need to add the resolution to get the end of the calculation period.
-        var endDateWithResolutionOffset = GetEndDateWithResolutionOffset(resolution, timeForLatestPoint);
-        return new Period(timeForOldestPoint, endDateWithResolutionOffset);
+        // A period is described by { start: latestPoint.time, end: newestPoint.time + resolution }
+        var calculationEnd = GetEndDateWithResolutionOffset(resolution, timeForNewestPoint);
+        return new Period(calculationStart, calculationEnd);
     }
 
     private static Instant GetEndDateWithResolutionOffset(Resolution resolution, Instant timeForLatestPoint)
@@ -52,9 +52,9 @@ public static class PeriodFactory
             case var res when res == Resolution.Monthly:
                 {
                     // A monthly calculation is executed for a month represented in danish time
-                    //  E.g. Calculation start: 2023-02-01T00:00:00Z (danish time)
+                    //  E.g. started: 2023-02-01T00:00:00Z (danish time)
                     // When this is converted to UTC, it will be the last day of the previous month.
-                    // E.g. Calculation start: 2023-01-31T22:00:00Z (utc time)
+                    //  E.g. Calculation start: 2023-01-31T22:00:00Z (utc time)
                     // By adding a day, we get the next month, which is the calculated month.
                     var instantInNextMonth = timeForLatestPoint.Plus(Duration.FromDays(1));
                     var days = CalendarSystem.Gregorian.GetDaysInMonth(instantInNextMonth.Year(), instantInNextMonth.Month());
