@@ -29,11 +29,11 @@ public static class PeriodFactory
         var start = timeSeriesPoints.Min(x => x.TimeUtc);
         var end = timeSeriesPoints.Max(x => x.TimeUtc);
         // The end date is the start of the next period.
-        var endWithResolutionOffset = GetDateTimeWithResolutionOffset(resolution, end);
-        return new Period(start, endWithResolutionOffset);
+        var endDateWithResolutionOffset = GetEndDateWithResolutionOffset(resolution, end);
+        return new Period(start, endDateWithResolutionOffset);
     }
 
-    private static Instant GetDateTimeWithResolutionOffset(Resolution resolution, Instant instant)
+    private static Instant GetEndDateWithResolutionOffset(Resolution resolution, Instant instant)
     {
         switch (resolution)
         {

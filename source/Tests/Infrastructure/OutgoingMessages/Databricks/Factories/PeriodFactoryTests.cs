@@ -43,10 +43,10 @@ public class PeriodFactoryTests
     public void Given_TimeSeriesPoint_WhenResolutionIsMonthly_Then_PeriodIsCorrect(string date)
     {
         // Arrange
-        var expectedStart = InstantPattern.General.Parse(date).Value;
-        var instantInNextMonth = expectedStart.Plus(Duration.FromDays(1));
-        var days = CalendarSystem.Gregorian.GetDaysInMonth(instantInNextMonth.Year(), instantInNextMonth.Month());
-        var expectedEnd = InstantPattern.General.Parse(date).Value.Plus(Duration.FromDays(days));
+        var expectedStartDate = InstantPattern.General.Parse(date).Value;
+        var instantInNextMonth = expectedStartDate.Plus(Duration.FromDays(1));
+        var amountOfDaysInMonth = CalendarSystem.Gregorian.GetDaysInMonth(instantInNextMonth.Year(), instantInNextMonth.Month());
+        var expectedEndDate = InstantPattern.General.Parse(date).Value.Plus(Duration.FromDays(amountOfDaysInMonth));
 
         var points = new List<WholesaleTimeSeriesPoint>
         {
@@ -58,8 +58,8 @@ public class PeriodFactoryTests
 
         // Assert
         period.Should().NotBeNull();
-        period.Start.Should().Be(expectedStart);
-        period.End.Should().Be(expectedEnd);
+        period.Start.Should().Be(expectedStartDate);
+        period.End.Should().Be(expectedEndDate);
     }
 
     [Theory]
@@ -79,8 +79,8 @@ public class PeriodFactoryTests
     public void Given_TimeSeriesPoint_WhenResolutionIsDaily_Then_PeriodIsCorrect(string date)
     {
         // Arrange
-        var expectedStart = InstantPattern.General.Parse(date).Value;
-        var expectedEnd = expectedStart.Plus(Duration.FromDays(1));
+        var expectedStartDate = InstantPattern.General.Parse(date).Value;
+        var expectedEndDate = expectedStartDate.Plus(Duration.FromDays(1));
 
         var points = new List<WholesaleTimeSeriesPoint>
         {
@@ -92,8 +92,8 @@ public class PeriodFactoryTests
 
         // Assert
         period.Should().NotBeNull();
-        period.Start.Should().Be(expectedStart);
-        period.End.Should().Be(expectedEnd);
+        period.Start.Should().Be(expectedStartDate);
+        period.End.Should().Be(expectedEndDate);
     }
 
     [Theory]
@@ -103,11 +103,12 @@ public class PeriodFactoryTests
     [InlineData("2023-02-28T13:00:00Z")]
     [InlineData("2023-07-01T13:00:00Z")]
     [InlineData("2023-12-31T22:00:00Z")]
+    [InlineData("2023-03-26T00:00:00Z")] //to daylightsavings time
     public void Given_TimeSeriesPoint_WhenResolutionIsHourly_Then_PeriodIsCorrect(string date)
     {
         // Arrange
-        var expectedStart = InstantPattern.General.Parse(date).Value;
-        var expectedEnd = expectedStart.Plus(Duration.FromHours(1));
+        var expectedStartDate = InstantPattern.General.Parse(date).Value;
+        var expectedEndDate = expectedStartDate.Plus(Duration.FromHours(1));
 
         var points = new List<WholesaleTimeSeriesPoint>
         {
@@ -119,7 +120,7 @@ public class PeriodFactoryTests
 
         // Assert
         period.Should().NotBeNull();
-        period.Start.Should().Be(expectedStart);
-        period.End.Should().Be(expectedEnd);
+        period.Start.Should().Be(expectedStartDate);
+        period.End.Should().Be(expectedEndDate);
     }
 }
