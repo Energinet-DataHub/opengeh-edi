@@ -24,13 +24,21 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Facto
 
 public static class PeriodFactory
 {
+    /// <summary>
+    /// In order get the full calculate period, we need to find the oldest and newest point including resolution.
+    /// Since timeSeriesPoints measurements period is represented by the start time and a resolution.
+    /// </summary>
+    /// <param name="timeSeriesPoints"></param>
+    /// <param name="resolution"></param>
     public static Period GetPeriod(IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints, Resolution resolution)
     {
-        var start = timeSeriesPoints.Min(x => x.TimeUtc);
-        var end = timeSeriesPoints.Max(x => x.TimeUtc);
-        // The end date is the start of the next period.
-        var endDateWithResolutionOffset = GetEndDateWithResolutionOffset(resolution, end);
-        return new Period(start, endDateWithResolutionOffset);
+        var timeForOldestPoint = timeSeriesPoints.Min(x => x.TimeUtc);
+        var timeForNewestPoint = timeSeriesPoints.Max(x => x.TimeUtc);
+
+        // A point represents a measurement in a period { start: point.time, end: point.time + resolution }
+        // Since the time is the start of the measured period, we need to add the resolution to get the end of the calculation period.
+        var endDateWithResolutionOffset = GetEndDateWithResolutionOffset(resolution, timeForNewestPoint);
+        return new Period(timeForOldestPoint, endDateWithResolutionOffset);
     }
 
     private static Instant GetEndDateWithResolutionOffset(Resolution resolution, Instant instant)

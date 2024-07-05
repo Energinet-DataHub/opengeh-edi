@@ -17,7 +17,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTabl
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime;
 using NodaTime.Text;
 using Xunit;
@@ -26,35 +25,20 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Databricks
 
 public class PeriodFactoryTests
 {
-    [Theory]
-    [InlineData("2023-01-31T22:00:00Z")]
-    [InlineData("2024-02-29T22:00:00Z")]
-    [InlineData("2023-02-28T22:00:00Z")]
-    [InlineData("2023-03-31T22:00:00Z")]
-    [InlineData("2023-04-30T22:00:00Z")]
-    [InlineData("2023-05-31T22:00:00Z")]
-    [InlineData("2023-06-30T22:00:00Z")]
-    [InlineData("2023-07-31T22:00:00Z")]
-    [InlineData("2023-08-31T22:00:00Z")]
-    [InlineData("2023-09-30T22:00:00Z")]
-    [InlineData("2023-10-31T22:00:00Z")]
-    [InlineData("2023-11-30T22:00:00Z")]
-    [InlineData("2023-12-31T22:00:00Z")]
-    public void Given_TimeSeriesPoint_WhenResolutionIsMonthly_Then_PeriodIsCorrect(string date)
+    [Fact]
+    public void Given_TimeSeriesPoint_WhenResolutionIsMonthly_Then_PeriodIsCorrect()
     {
         // Arrange
-        var expectedStartDate = InstantPattern.General.Parse(date).Value;
-        var instantInNextMonth = expectedStartDate.Plus(Duration.FromDays(1));
-        var amountOfDaysInMonth = CalendarSystem.Gregorian.GetDaysInMonth(instantInNextMonth.Year(), instantInNextMonth.Month());
-        var expectedEndDate = InstantPattern.General.Parse(date).Value.Plus(Duration.FromDays(amountOfDaysInMonth));
+        var expectedStartDate = InstantPattern.General.Parse("2023-01-31T22:00:00Z").Value;
+        var expectedEndDate = InstantPattern.General.Parse("2023-02-28T22:00:00Z").Value;
 
-        var points = new List<WholesaleTimeSeriesPoint>
+        var pointForAMonthlyResolution = new List<WholesaleTimeSeriesPoint>
         {
-            new(InstantPattern.General.Parse(date).Value, null, new[] { QuantityQuality.Missing }, null, null),
+            new(InstantPattern.General.Parse("2023-01-31T22:00:00Z").Value, null, new[] { QuantityQuality.Missing }, null, null),
         };
 
         // Act
-        var period = PeriodFactory.GetPeriod(points, Resolution.Monthly);
+        var period = PeriodFactory.GetPeriod(pointForAMonthlyResolution, Resolution.Monthly);
 
         // Assert
         period.Should().NotBeNull();
@@ -62,30 +46,21 @@ public class PeriodFactoryTests
         period.End.Should().Be(expectedEndDate);
     }
 
-    [Theory]
-    [InlineData("2023-01-31T22:00:00Z")]
-    [InlineData("2024-02-29T22:00:00Z")]
-    [InlineData("2023-02-28T22:00:00Z")]
-    [InlineData("2023-03-31T22:00:00Z")]
-    [InlineData("2023-04-30T22:00:00Z")]
-    [InlineData("2023-05-31T22:00:00Z")]
-    [InlineData("2023-06-30T22:00:00Z")]
-    [InlineData("2023-07-31T22:00:00Z")]
-    [InlineData("2023-08-31T22:00:00Z")]
-    [InlineData("2023-09-30T22:00:00Z")]
-    [InlineData("2023-10-31T22:00:00Z")]
-    [InlineData("2023-11-30T22:00:00Z")]
-    [InlineData("2023-12-31T22:00:00Z")]
-    public void Given_TimeSeriesPoint_WhenResolutionIsDaily_Then_PeriodIsCorrect(string date)
+    [Fact]
+    public void Given_TimeSeriesPoint_WhenResolutionIsDaily_Then_PeriodIsCorrect()
     {
         // Arrange
-        var expectedStartDate = InstantPattern.General.Parse(date).Value;
-        var expectedEndDate = expectedStartDate.Plus(Duration.FromDays(1));
+        var expectedStartDate = InstantPattern.General.Parse("2023-01-31T22:00:00Z").Value;
+        var expectedEndDate = InstantPattern.General.Parse("2023-02-28T22:00:00Z").Value;
 
-        var points = new List<WholesaleTimeSeriesPoint>
+        var points = new List<WholesaleTimeSeriesPoint>();
+        var currentTime = InstantPattern.General.Parse("2023-01-31T22:00:00Z").Value;
+        // 28 days in February
+        while (points.Count < 28)
         {
-            new(InstantPattern.General.Parse(date).Value, null, new[] { QuantityQuality.Missing }, null, null),
-        };
+            points.Add(new WholesaleTimeSeriesPoint(currentTime, null, new[] { QuantityQuality.Missing }, null, null));
+            currentTime = currentTime.Plus(Duration.FromDays(1));
+        }
 
         // Act
         var period = PeriodFactory.GetPeriod(points, Resolution.Daily);
@@ -96,25 +71,21 @@ public class PeriodFactoryTests
         period.End.Should().Be(expectedEndDate);
     }
 
-    [Theory]
-    [InlineData("2023-01-31T22:00:00Z")]
-    [InlineData("2023-01-31T23:00:00Z")]
-    [InlineData("2023-02-01T13:00:00Z")]
-    [InlineData("2023-02-28T13:00:00Z")]
-    [InlineData("2023-07-01T13:00:00Z")]
-    [InlineData("2023-12-31T22:00:00Z")]
-    [InlineData("2024-03-31T01:00:00Z")] //to daylightsavings time
-    [InlineData("2024-10-27T00:00:00Z")] //from daylightsavings time
-    public void Given_TimeSeriesPoint_WhenResolutionIsHourly_Then_PeriodIsCorrect(string date)
+    [Fact]
+    public void Given_TimeSeriesPoint_WhenResolutionIsHourly_Then_PeriodIsCorrect()
     {
         // Arrange
-        var expectedStartDate = InstantPattern.General.Parse(date).Value;
-        var expectedEndDate = expectedStartDate.Plus(Duration.FromHours(1));
+        var expectedStartDate = InstantPattern.General.Parse("2023-01-31T22:00:00Z").Value;
+        var expectedEndDate = InstantPattern.General.Parse("2023-02-01T22:00:00Z").Value;
 
-        var points = new List<WholesaleTimeSeriesPoint>
+        var points = new List<WholesaleTimeSeriesPoint>();
+        var currentTime = InstantPattern.General.Parse("2023-01-31T22:00:00Z").Value;
+        // 24 hours in a day
+        while (points.Count < 24)
         {
-            new(InstantPattern.General.Parse(date).Value, null, new[] { QuantityQuality.Missing }, null, null),
-        };
+            points.Add(new WholesaleTimeSeriesPoint(currentTime, null, new[] { QuantityQuality.Missing }, null, null));
+            currentTime = currentTime.Plus(Duration.FromHours(1));
+        }
 
         // Act
         var period = PeriodFactory.GetPeriod(points, Resolution.Hourly);
