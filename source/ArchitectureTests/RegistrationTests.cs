@@ -64,7 +64,7 @@ public class RegistrationTests
         Environment.SetEnvironmentVariable(nameof(DatabricksSqlStatementOptions.WorkspaceToken), "FakeToken");
         Environment.SetEnvironmentVariable(nameof(DatabricksSqlStatementOptions.WarehouseId), Guid.NewGuid().ToString());
 
-        _host = HostFactory.CreateHost(Program.TokenValidationParameters);
+        _host = HostFactory.CreateHost(Program.TokenValidationParameters, true);
     }
 
     #region Member data providers
