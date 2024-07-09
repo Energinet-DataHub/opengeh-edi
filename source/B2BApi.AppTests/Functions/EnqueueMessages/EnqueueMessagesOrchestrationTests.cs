@@ -317,12 +317,12 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
         var expectedHistory = new List<(string?, string?)>
         {
-            ("EnqueueEnergyResultsForGridAreaOwnersActivity", null),
-            ("EnqueueEnergyResultsForBalanceResponsiblesActivity", null),
-            ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", null),
-            ("GetActorsForWholesaleResultsForAmountPerChargesActivity", null),
-            ("GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity", null),
-            ("GetActorsForWholesaleResultsForTotalAmountPerChargesActivity", null),
+            ("EnqueueEnergyResultsForGridAreaOwnersActivity", "TaskFailed"),
+            ("EnqueueEnergyResultsForBalanceResponsiblesActivity", "TaskFailed"),
+            ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", "TaskFailed"),
+            ("GetActorsForWholesaleResultsForAmountPerChargesActivity", "TaskFailed"),
+            ("GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity", "TaskFailed"),
+            ("GetActorsForWholesaleResultsForTotalAmountPerChargesActivity", "TaskFailed"),
         };
 
         // Act
@@ -343,15 +343,20 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
                 if (orchestrationStatus.RuntimeStatus != OrchestrationRuntimeStatus.Running)
                     return false;
 
-                var activities = orchestrationStatus.History
+                var actualHistory = orchestrationStatus.History
                     .OrderBy(item => item["Timestamp"])
-                    .Select(item => (item.Value<string>("Name"), item.Value<string>("EventType")))
+                    .Select(item => new
+                    {
+                        Name = item.Value<string>("FunctionName"),
+                        EventType = item.Value<string>("EventType"),
+                    })
                     .ToList();
 
-                actualHistory = orchestrationStatus.History;
+                var containsExpectedHistoryAtleastTwice = expectedHistory
+                    .All(expected => actualHistory
+                        .Count(actual => actual.Name == expected.Item1 && actual.EventType == expected.Item2) > 1);
 
-                var containsExpectedHistory = expectedHistory.Intersect(activities).Count() == expectedHistory.Count();
-                return containsExpectedHistory;
+                return containsExpectedHistoryAtleastTwice;
             },
             TimeSpan.FromSeconds(60),
             delay: TimeSpan.FromSeconds(5));
