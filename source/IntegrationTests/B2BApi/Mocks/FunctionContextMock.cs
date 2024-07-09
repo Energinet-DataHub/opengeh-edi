@@ -192,7 +192,7 @@ internal sealed class FunctionContextMock : FunctionContext
 
         public override string Name { get; }
 
-        public override string PathToAssembly => null!;
+        public override string PathToAssembly => "mock-function-context.dll";
 
         public override string EntryPoint => null!;
 
