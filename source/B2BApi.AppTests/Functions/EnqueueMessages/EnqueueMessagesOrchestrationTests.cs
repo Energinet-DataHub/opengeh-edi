@@ -315,7 +315,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             calculationTypeToTest,
             calculationId);
 
-        var expectedHistory = new List<(string?, string?)>
+        var expectedHistory = new List<(string? Name, string? EventType)>
         {
             ("EnqueueEnergyResultsForGridAreaOwnersActivity", "TaskFailed"),
             ("EnqueueEnergyResultsForBalanceResponsiblesActivity", "TaskFailed"),
@@ -355,7 +355,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
                 var containsExpectedHistoryAtleastTwice = expectedHistory
                     .All(expected => history
-                        .Count(actual => actual.Name == expected.Item1 && actual.EventType == expected.Item2) > 1);
+                        .Count(actual => actual.Name == expected.Name && actual.EventType == expected.EventType) > 1);
 
                 return containsExpectedHistoryAtleastTwice;
             },
