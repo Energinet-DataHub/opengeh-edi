@@ -19,6 +19,7 @@ using System.Linq;
 using System.Reflection;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
@@ -50,14 +51,13 @@ public class RequestWholesaleSettlementFactoryTests
     {
         var validActorRoles = GetValidActorRoles().SelectMany(a => a);
 
-        return typeof(MarketRole).GetNestedTypes(BindingFlags.Public | BindingFlags.Static)
-            .SelectMany(t => t.GetFields(BindingFlags.Public | BindingFlags.Static))
-            .Where(f => f.FieldType == typeof(string) && f.Name == "Name")
-            .Select(f => f.GetValue(null))
-            .Where(v => v is string)
+        var invalidActorRoles = EnumerationType.GetAll<MarketRole>()
+            .Select(r => r.Name)
             .Where(v => !validActorRoles.Contains(v!))
             .Select(v => new[] { v! })
             .ToList();
+
+        return invalidActorRoles;
     }
 
     [Theory]
