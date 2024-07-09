@@ -15,6 +15,7 @@
 using System.Security.Claims;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.EDI.B2CWebApi.Exceptions;
+using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -22,10 +23,12 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Security;
 
 public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
 {
+    private readonly ILogger<FrontendUserProvider> _logger;
     private readonly AuthenticatedActor _authenticatedActor;
 
-    public FrontendUserProvider(AuthenticatedActor authenticatedActor)
+    public FrontendUserProvider(ILogger<FrontendUserProvider> logger, AuthenticatedActor authenticatedActor)
     {
+        _logger = logger;
         _authenticatedActor = authenticatedActor;
     }
 
@@ -68,43 +71,62 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
         if (azp is null)
             throw new MissingAzpException();
 
-        SetAuthenticatedActor(ActorNumber.Create(actorNumber), accessAllData: multiTenancy, role: TryGetMarketRole(role));
-        return Task.FromResult<FrontendUser?>(new FrontendUser(
+        var frontendUser = new FrontendUser(
             userId,
             actorId,
             multiTenancy,
             actorNumber,
             role,
-            azp));
+            azp);
+
+        _logger.LogInformation(
+            "Provide front-end user, user id: {UserId}, actor id: {ActorId}, is Fas: {IsFas}, actor number: {ActorNumber}, role: {Role}, azp: {Azp}",
+            frontendUser.UserId,
+            frontendUser.ActorId,
+            frontendUser.IsFas,
+            frontendUser.ActorNumber,
+            frontendUser.Role,
+            frontendUser.Azp);
+
+        SetAuthenticatedActor(ActorNumber.Create(actorNumber), accessAllData: multiTenancy, role: TryGetActorRole(role));
+
+        return Task.FromResult<FrontendUser?>(frontendUser);
     }
 
-    private static ActorRole? TryGetMarketRole(string role)
+    private ActorRole? TryGetActorRole(string role)
     {
         try
         {
-            return EnumerationType.FromName<ActorRole>(role);
+            var marketRole = MarketRole.FromName(role);
+
+            var actorRole = ActorRole.FromCode(marketRole.Code);
+
+            return actorRole;
         }
-        catch (InvalidOperationException)
+        catch (Exception e)
         {
+            _logger.LogWarning(
+                e,
+                "Failed to parse front-end user's market role to actor role (market role: {Role})",
+                role);
+
             return null;
         }
     }
 
     private void SetAuthenticatedActor(ActorNumber actorNumber, bool accessAllData, ActorRole? role)
     {
-        if (accessAllData)
-        {
-            _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
-                actorNumber,
-                restriction: Restriction.None,
-                marketRole: role));
-        }
-        else
-        {
-            _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
-                actorNumber,
-                restriction: Restriction.Owned,
-                marketRole: role));
-        }
+        var restriction = accessAllData ? Restriction.None : Restriction.Owned;
+
+        _logger.LogInformation(
+            "Set authenticated actor, actor number: {ActorNumber}, role: {ActorRole}, restriction: {Restriction})",
+            actorNumber.Value,
+            role,
+            restriction);
+
+        _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
+            actorNumber: actorNumber,
+            restriction: restriction,
+            marketRole: role));
     }
 }
