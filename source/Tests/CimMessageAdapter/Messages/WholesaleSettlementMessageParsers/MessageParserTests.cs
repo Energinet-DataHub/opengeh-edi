@@ -30,7 +30,6 @@ using FluentAssertions.Execution;
 using NodaTime;
 using NodaTime.Extensions;
 using Xunit;
-using RequestWholesaleSettlementChargeType = Energinet.DataHub.EDI.B2CWebApi.Models.RequestWholesaleSettlementChargeType;
 
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.WholesaleSettlementMessageParsers;
 
@@ -240,13 +239,9 @@ public class MessageParserTests
             "2022-08-31T22:00:00Z",
             "804",
             "5799999933318",
-            "PT1H",
-            "570001110111",
-            new List<RequestWholesaleSettlementChargeType>
-            {
-                new("EA-001", "D03"),
-                new("EA-002", "D02"),
-            });
+            null,
+            PriceType.MonthlySubscription);
+
         var message = RequestWholesaleSettlementDtoFactory.Create(
             b2CRequest,
             "5799999933318",
