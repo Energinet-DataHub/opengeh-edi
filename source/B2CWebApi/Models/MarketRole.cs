@@ -13,45 +13,22 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
 [SuppressMessage("Usage", "CA1034", Justification = "Nested types should not be visible")]
-public static class MarketRole
+public class MarketRole : DataHubType<MarketRole>
 {
-    public static class CalculationResponsibleRole
-    {
-        public const string Code = "DGL";
-        public const string Name = "CalculationResponsible";
-    }
+    public static readonly MarketRole CalculationResponsibleRole = new("DGL", "CalculationResponsible");
+    public static readonly MarketRole EnergySupplier = new("DDQ", "EnergySupplier");
+    public static readonly MarketRole MeteredDataResponsible = new("MDR", "MeteredDataResponsible");
+    public static readonly MarketRole BalanceResponsibleParty = new("DDK", "BalanceResponsibleParty");
+    public static readonly MarketRole GridAccessProvider = new("DDM", "GridAccessProvider");
+    public static readonly MarketRole SystemOperator = new("EZ", "SystemOperator");
 
-    public static class EnergySupplier
+    private MarketRole(string code, string name)
+        : base(name, code)
     {
-        public const string Code = "DDQ";
-        public const string Name = "EnergySupplier";
-    }
-
-    public static class MeteredDataResponsible
-    {
-        public const string Code = "MDR";
-        public const string Name = "MeteredDataResponsible";
-    }
-
-    public static class BalanceResponsibleParty
-    {
-        public const string Code = "DDK";
-        public const string Name = "BalanceResponsibleParty";
-    }
-
-    public static class GridAccessProvider
-    {
-        public const string Code = "DDM";
-        public const string Name = "GridAccessProvider";
-    }
-
-    public static class SystemOperator
-    {
-        public const string Code = "EZ";
-        public const string Name = "SystemOperator";
     }
 }
