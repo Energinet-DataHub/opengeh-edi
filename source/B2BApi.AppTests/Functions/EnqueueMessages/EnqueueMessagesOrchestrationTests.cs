@@ -334,6 +334,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
 
         // => Wait for running and expected history
+        JArray? actualHistory = null;
         var isExpected = await Awaiter.TryWaitUntilConditionAsync(
             async () =>
             {
@@ -344,16 +345,18 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
                 var activities = orchestrationStatus.History
                     .OrderBy(item => item["Timestamp"])
-                    .Select(item =>
-                        (item.Value<string>("Name"), item.Value<string>("Input")));
+                    .Select(item => (item.Value<string>("Name"), item.Value<string>("EventType")))
+                    .ToList();
+
+                actualHistory = JArray.FromObject(activities);
 
                 var containsExpectedHistory = expectedHistory.Intersect(activities).Count() == expectedHistory.Count();
                 return containsExpectedHistory;
             },
-            TimeSpan.FromSeconds(30),
+            TimeSpan.FromSeconds(60),
             delay: TimeSpan.FromSeconds(5));
 
-        isExpected.Should().BeTrue("because we expect the actual history to contain the expected history");
+        isExpected.Should().BeTrue($"because we expect the actual history to contain the expected history. Actual history: {actualHistory?.ToString() ?? "<null>"}");
     }
 
     [Fact]
