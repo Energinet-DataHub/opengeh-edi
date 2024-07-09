@@ -348,7 +348,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
                     .Select(item => (item.Value<string>("Name"), item.Value<string>("EventType")))
                     .ToList();
 
-                actualHistory = JArray.FromObject(activities);
+                actualHistory = orchestrationStatus.History;
 
                 var containsExpectedHistory = expectedHistory.Intersect(activities).Count() == expectedHistory.Count();
                 return containsExpectedHistory;
