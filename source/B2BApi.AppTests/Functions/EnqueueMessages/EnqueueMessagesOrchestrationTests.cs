@@ -317,12 +317,12 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
         var expectedHistory = new List<(string?, string?)>
         {
-            ("EnqueueEnergyResultsForGridAreaOwnersActivity", null),
-            ("EnqueueEnergyResultsForBalanceResponsiblesActivity", null),
-            ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", null),
-            ("GetActorsForWholesaleResultsForAmountPerChargesActivity", null),
-            ("GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity", null),
-            ("GetActorsForWholesaleResultsForTotalAmountPerChargesActivity", null),
+            ("EnqueueEnergyResultsForGridAreaOwnersActivity", "TaskFailed"),
+            ("EnqueueEnergyResultsForBalanceResponsiblesActivity", "TaskFailed"),
+            ("EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity", "TaskFailed"),
+            ("GetActorsForWholesaleResultsForAmountPerChargesActivity", "TaskFailed"),
+            ("GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity", "TaskFailed"),
+            ("GetActorsForWholesaleResultsForTotalAmountPerChargesActivity", "TaskFailed"),
         };
 
         // Act
@@ -334,26 +334,35 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
 
         // => Wait for running and expected history
+        JArray? actualHistory = null;
         var isExpected = await Awaiter.TryWaitUntilConditionAsync(
             async () =>
             {
                 var orchestrationStatus = await Fixture.DurableClient.GetStatusAsync(actualOrchestrationStatus.InstanceId, showHistory: true);
+                actualHistory = orchestrationStatus.History;
 
                 if (orchestrationStatus.RuntimeStatus != OrchestrationRuntimeStatus.Running)
                     return false;
 
-                var activities = orchestrationStatus.History
+                var history = orchestrationStatus.History
                     .OrderBy(item => item["Timestamp"])
-                    .Select(item =>
-                        (item.Value<string>("Name"), item.Value<string>("Input")));
+                    .Select(item => new
+                    {
+                        Name = item.Value<string>("FunctionName"),
+                        EventType = item.Value<string>("EventType"),
+                    })
+                    .ToList();
 
-                var containsExpectedHistory = expectedHistory.Intersect(activities).Count() == expectedHistory.Count();
-                return containsExpectedHistory;
+                var containsExpectedHistoryAtleastTwice = expectedHistory
+                    .All(expected => history
+                        .Count(actual => actual.Name == expected.Item1 && actual.EventType == expected.Item2) > 1);
+
+                return containsExpectedHistoryAtleastTwice;
             },
             TimeSpan.FromSeconds(30),
             delay: TimeSpan.FromSeconds(5));
 
-        isExpected.Should().BeTrue("because we expect the actual history to contain the expected history");
+        isExpected.Should().BeTrue($"because we expect the actual history to contain the expected history. Actual history: {actualHistory?.ToString() ?? "<null>"}");
     }
 
     [Fact]
