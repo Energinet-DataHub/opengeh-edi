@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using BuildingBlocks.Application.Extensions.DependencyInjection;
+using DurableFunctionsMonitor.DotNetIsolated;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
@@ -34,7 +35,7 @@ public static class HostFactory
 {
     private const string DomainName = "EDI";
 
-    public static IHost CreateHost(TokenValidationParameters tokenValidationParameters)
+    public static IHost CreateHost(TokenValidationParameters tokenValidationParameters, bool isRunningLocally)
     {
         ArgumentNullException.ThrowIfNull(tokenValidationParameters);
 
@@ -45,6 +46,17 @@ public static class HostFactory
                     worker.UseMiddleware<UnHandledExceptionMiddleware>();
                     worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
                     worker.UseMiddleware<ExecutionContextMiddleware>();
+
+                    worker.UseDurableFunctionsMonitor(
+                        (settings, extensionPoints) =>
+                        {
+                            // settings.Mode = DfmMode.ReadOnly;
+                            if (isRunningLocally)
+                                settings.DisableAuthentication = true;
+
+                            settings.AllowedReadOnlyAppRoles = ["SEC-A-Datahub-Dev-001-Contributor"];
+                            settings.AllowedAppRoles = ["SEC-A-Datahub-Dev-001-Reader"];
+                        });
                 },
                 option =>
                 {
