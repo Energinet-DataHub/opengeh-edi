@@ -472,6 +472,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             async () =>
             {
                 var orchestrationStatus = await Fixture.DurableClient.GetStatusAsync(actualEnergyOrchestrationStatus.InstanceId, showHistory: true);
+                actualHistory = orchestrationStatus.History;
 
                 if (orchestrationStatus.RuntimeStatus != OrchestrationRuntimeStatus.Running)
                     return false;
