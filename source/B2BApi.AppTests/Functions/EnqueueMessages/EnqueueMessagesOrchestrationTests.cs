@@ -362,7 +362,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             TimeSpan.FromSeconds(30),
             delay: TimeSpan.FromSeconds(5));
 
-        isExpected.Should().BeTrue($"because we expect the actual history to contain the expected history. Actual history: {actualHistory?.ToString() ?? "<null>"}");
+        isExpected.Should().BeTrue($"because the history should contain the expected 6 failed activities atleast twice. Actual history: {actualHistory?.ToString() ?? "<null>"}");
     }
 
     [Fact]
@@ -426,7 +426,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             TimeSpan.FromSeconds(30),
             delay: TimeSpan.FromSeconds(5));
 
-        isExpected.Should().BeTrue($"because we expect the actual history to contain the expected history. Actual history: {actualHistory?.ToString() ?? "<null>"}");
+        isExpected.Should().BeTrue($"because the history should contain the expected 3 failed wholesale result activities. Actual history: {actualHistory?.ToString() ?? "<null>"}");
     }
 
     [Fact]
@@ -467,6 +467,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         };
 
         // => Wait for running and expected history
+        JArray? actualHistory = null;
         var isExpected = await Awaiter.TryWaitUntilConditionAsync(
             async () =>
             {
@@ -488,7 +489,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             TimeSpan.FromSeconds(30),
             delay: TimeSpan.FromSeconds(5));
 
-        isExpected.Should().BeTrue("because we expect the actual history to contain the expected history");
+        isExpected.Should().BeTrue($"because the history should contain the expected 3 failed energy result activities. Actual history: {actualHistory?.ToString() ?? "<null>"}");
     }
 
     private static bool ValueIsArray(JToken item)
