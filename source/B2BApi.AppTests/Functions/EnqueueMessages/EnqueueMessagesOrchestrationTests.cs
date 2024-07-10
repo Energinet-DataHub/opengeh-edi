@@ -403,10 +403,12 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         };
 
         // => Wait for running and expected history
+        JArray? actualHistory = null;
         var isExpected = await Awaiter.TryWaitUntilConditionAsync(
             async () =>
             {
                 var orchestrationStatus = await Fixture.DurableClient.GetStatusAsync(actualWholesaleOrchestrationStatus.InstanceId, showHistory: true);
+                actualHistory = orchestrationStatus.History;
 
                 if (orchestrationStatus.RuntimeStatus != OrchestrationRuntimeStatus.Running)
                     return false;
@@ -424,7 +426,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             TimeSpan.FromSeconds(30),
             delay: TimeSpan.FromSeconds(5));
 
-        isExpected.Should().BeTrue("because we expect the actual history to contain the expected history");
+        isExpected.Should().BeTrue($"because we expect the actual history to contain the expected history. Actual history: {actualHistory?.ToString() ?? "<null>"}");
     }
 
     [Fact]
