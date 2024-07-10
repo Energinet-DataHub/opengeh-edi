@@ -106,7 +106,7 @@ public class OrchestrationsController(
         var currentUser = _userContext.CurrentUser;
         _logger.LogWarning(
             "Terminating orchestration \"{OrchestrationId}\" with reason \"{Reason}\". Terminated by user id: {UserId}, actor number: {ActorNumber}, azp: {Azp}",
-            id,
+            id.Replace(Environment.NewLine, string.Empty), // Replace new lines to avoid log injection
             reason,
             currentUser.UserId,
             currentUser.ActorNumber,
