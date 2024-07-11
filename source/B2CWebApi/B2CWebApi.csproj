@@ -11,6 +11,7 @@
         <PackageReference Include="Energinet.DataHub.Core.App.WebApp" Version="12.2.1" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.6" />
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
+        <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="2.13.4" />
         <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
         <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.10.48">
           <PrivateAssets>all</PrivateAssets>

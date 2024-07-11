@@ -49,6 +49,9 @@ builder.Services
     .AddNodaTimeForApplication()
     .AddSystemTimer()
 
+    // Durable client (orchestration)
+    .AddDurableClient(builder.Configuration)
+
     // Modules
     .AddIncomingMessagesModule(builder.Configuration)
     .AddArchivedMessagesModule(builder.Configuration)

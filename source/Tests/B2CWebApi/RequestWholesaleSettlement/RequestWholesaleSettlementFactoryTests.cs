@@ -60,8 +60,17 @@ public class RequestWholesaleSettlementFactoryTests
         return invalidActorRoles;
     }
 
-    [Fact]
-    public void Given_ValidRequest_When_DtoFactoryInvoked_Then_CorrectDtoProduced()
+    [Theory]
+    [InlineData(null, null, null)]
+    [InlineData(PriceType.TariffSubscriptionAndFee, null, null)]
+    [InlineData(PriceType.Tariff, null, "D03")]
+    [InlineData(PriceType.Subscription, null, "D01")]
+    [InlineData(PriceType.Fee, null, "D02")]
+    [InlineData(PriceType.MonthlyTariff, "P1M", "D03")]
+    [InlineData(PriceType.MonthlySubscription, "P1M", "D01")]
+    [InlineData(PriceType.MonthlyFee, "P1M", "D02")]
+    [InlineData(PriceType.MonthlyTariffSubscriptionAndFee, "P1M", null)]
+    public void Given_ValidRequestWithGivenPricetype_When_DtoFactoryInvoked_Then_CorrectDtoProduced(PriceType? priceType, string? expectedResolution, string? expectedChargeType)
     {
         var senderId = "9876543210987";
         var startDay = 10;
@@ -73,12 +82,8 @@ public class RequestWholesaleSettlementFactoryTests
             $"2023-10-{endDay}T21:59:59.999Z",
             "803",
             "579000000003042",
-            "PT15M",
-            "889400000000312",
-            [
-                new RequestWholesaleSettlementChargeType("1024", "SomeType1"),
-                new RequestWholesaleSettlementChargeType("512", "SomeType2"),
-            ]);
+            null,
+            priceType);
 
         var result = RequestWholesaleSettlementDtoFactory.Create(
             request,
@@ -97,25 +102,31 @@ public class RequestWholesaleSettlementFactoryTests
             .AllSatisfy(
                 s =>
                 {
-                    s.Resolution.Should().Be("PT15M");
-                    s.ChargeOwner.Should().Be("889400000000312");
+                    s.Resolution.Should().Be(expectedResolution);
+                    s.ChargeOwner.Should().BeNull();
                     s.SettlementVersion.Should().BeNull();
 
                     s.StartDateAndOrTimeDateTime.Should().Be("2023-10-10T22:00:00Z");
                     s.EndDateAndOrTimeDateTime.Should().Be("2023-10-12T22:00:00Z");
 
-                    s.ChargeTypes.Should()
-                        .SatisfyRespectively(
-                            ct =>
-                            {
-                                ct.Id.Should().Be("1024");
-                                ct.Type.Should().Be("SomeType1");
-                            },
-                            ct =>
-                            {
-                                ct.Id.Should().Be("512");
-                                ct.Type.Should().Be("SomeType2");
-                            });
+                    if (string.IsNullOrEmpty(expectedChargeType))
+                    {
+                        s.ChargeTypes.Should()
+                            .BeEmpty();
+                    }
+                    else
+                    {
+                        s.ChargeTypes
+                            .Should()
+                            .ContainSingle()
+                            .And
+                            .AllSatisfy(
+                                (c) =>
+                                {
+                                    c.Id.Should().BeNull();
+                                    c.Type.Should().Be(expectedChargeType);
+                                });
+                    }
                 });
     }
 
@@ -128,9 +139,8 @@ public class RequestWholesaleSettlementFactoryTests
             "2023-10-12T21:59:59.998Z",
             "803",
             "579000000003042",
-            "PT15M",
-            "889400000000312",
-            []);
+            null,
+            null);
 
         var result = RequestWholesaleSettlementDtoFactory.Create(
             request,
@@ -203,11 +213,7 @@ public class RequestWholesaleSettlementFactoryTests
             "2023-10-12T21:59:59.999Z",
             "803",
             "579000000003042",
-            "PT15M",
-            "889400000000312",
-            [
-                new RequestWholesaleSettlementChargeType("1024", "SomeType1"),
-                new RequestWholesaleSettlementChargeType("512", "SomeType2"),
-            ]);
+            null,
+            null);
     }
 }
