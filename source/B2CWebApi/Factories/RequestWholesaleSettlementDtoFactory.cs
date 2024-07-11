@@ -38,6 +38,15 @@ public static class RequestWholesaleSettlementDtoFactory
 
         var senderRoleCode = MapRoleNameToCode(senderRole);
 
+        // TODO: Remove request.Resolution when PriceType is fully implemented in the UI
+        #pragma warning disable CS0618 // Type or member is obsolete
+        var (resolution, chargeType) = MapToResolutionAndChargeType(request.PriceType, request.Resolution);
+        #pragma warning restore CS0618 // Type or member is obsolete
+
+        List<RequestWholesaleSettlementChargeType> chargeTypes = chargeType is not null
+            ? [new(null, chargeType.Code)]
+            : [];
+
         var series = new RequestWholesaleSettlementSeries(
             TransactionId.New().Value,
             InstantFormatFactory.SetInstantToMidnight(request.StartDate, dateTimeZone).ToString(),
@@ -45,9 +54,9 @@ public static class RequestWholesaleSettlementDtoFactory
             request.GridArea,
             request.EnergySupplierId,
             MapToSettlementVersion(request.CalculationType),
-            request.Resolution,
-            request.ChargeOwner,
-            request.ChargeTypes.Select(ct => new RequestWholesaleSettlementChargeType(ct.Id, ct.Type)).ToList());
+            resolution,
+            null,
+            chargeTypes);
 
         return new RequestWholesaleSettlementDto(
             senderNumber,
@@ -60,6 +69,30 @@ public static class RequestWholesaleSettlementDtoFactory
             now.ToString(),
             Electricity,
             new[] { series });
+    }
+
+    private static (string? Resolution, ChargeType? ChargeType) MapToResolutionAndChargeType(PriceType? priceType, string? resolution)
+    {
+        if (priceType is null && resolution is null)
+            return (null, null);
+
+        if (priceType is not null)
+        {
+            return priceType switch
+            {
+                PriceType.TariffSubscriptionAndFee => (null, null),
+                PriceType.Tariff => (null, ChargeType.Tariff),
+                PriceType.Subscription => (null, ChargeType.Subscription),
+                PriceType.Fee => (null, ChargeType.Fee),
+                PriceType.MonthlyTariff => (Resolution.Monthly.Code, ChargeType.Tariff),
+                PriceType.MonthlySubscription => (Resolution.Monthly.Code, ChargeType.Subscription),
+                PriceType.MonthlyFee => (Resolution.Monthly.Code, ChargeType.Fee),
+                PriceType.MonthlyTariffSubscriptionAndFee => (Resolution.Monthly.Code, null),
+                _ => throw new ArgumentOutOfRangeException(nameof(priceType), priceType, "Unknown PriceType"),
+            };
+        }
+
+        return (resolution, null);
     }
 
     private static string? MapToSettlementVersion(CalculationType calculationType)

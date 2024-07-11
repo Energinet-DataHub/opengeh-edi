@@ -15,7 +15,7 @@
 namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
 /// <summary>
-///     Responsible for carrying the market message data from the incoming message before any data validation.
+/// Responsible for carrying the market message data from the incoming message before any data validation.
 /// </summary>
 public sealed record RequestWholesaleSettlementMarketRequest(
     CalculationType CalculationType,
@@ -23,8 +23,9 @@ public sealed record RequestWholesaleSettlementMarketRequest(
     string EndDate,
     string? GridArea,
     string? EnergySupplierId,
-    string? Resolution,
-    string? ChargeOwner,
-    IReadOnlyCollection<RequestWholesaleSettlementChargeType> ChargeTypes);
 
-public sealed record RequestWholesaleSettlementChargeType(string? Id, string? Type);
+    // TODO: Remove Resolution when PriceType is fully implemented in the UI
+    [property: Obsolete("Use 'PriceType' instead")]
+    string? Resolution,
+
+    PriceType? PriceType);
