@@ -315,7 +315,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             calculationTypeToTest,
             calculationId);
 
-        var expectedHistory = new List<(string?, string?)>
+        var expectedHistory = new List<(string? Name, string? EventType)>
         {
             ("EnqueueEnergyResultsForGridAreaOwnersActivity", "TaskFailed"),
             ("EnqueueEnergyResultsForBalanceResponsiblesActivity", "TaskFailed"),
@@ -339,11 +339,12 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             async () =>
             {
                 var orchestrationStatus = await Fixture.DurableClient.GetStatusAsync(actualOrchestrationStatus.InstanceId, showHistory: true);
+                actualHistory = orchestrationStatus.History;
 
                 if (orchestrationStatus.RuntimeStatus != OrchestrationRuntimeStatus.Running)
                     return false;
 
-                var actualHistory = orchestrationStatus.History
+                var history = orchestrationStatus.History
                     .OrderBy(item => item["Timestamp"])
                     .Select(item => new
                     {
@@ -353,15 +354,15 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
                     .ToList();
 
                 var containsExpectedHistoryAtleastTwice = expectedHistory
-                    .All(expected => actualHistory
-                        .Count(actual => actual.Name == expected.Item1 && actual.EventType == expected.Item2) > 1);
+                    .All(expected => history
+                        .Count(actual => actual.Name == expected.Name && actual.EventType == expected.EventType) > 1);
 
                 return containsExpectedHistoryAtleastTwice;
             },
-            TimeSpan.FromSeconds(60),
+            TimeSpan.FromSeconds(30),
             delay: TimeSpan.FromSeconds(5));
 
-        isExpected.Should().BeTrue($"because we expect the actual history to contain the expected history. Actual history: {actualHistory?.ToString() ?? "<null>"}");
+        isExpected.Should().BeTrue($"because the history should contain the expected 6 failed activities atleast twice. Actual history: {actualHistory?.ToString() ?? "<null>"}");
     }
 
     [Fact]
@@ -402,10 +403,12 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         };
 
         // => Wait for running and expected history
+        JArray? actualHistory = null;
         var isExpected = await Awaiter.TryWaitUntilConditionAsync(
             async () =>
             {
                 var orchestrationStatus = await Fixture.DurableClient.GetStatusAsync(actualWholesaleOrchestrationStatus.InstanceId, showHistory: true);
+                actualHistory = orchestrationStatus.History;
 
                 if (orchestrationStatus.RuntimeStatus != OrchestrationRuntimeStatus.Running)
                     return false;
@@ -423,7 +426,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             TimeSpan.FromSeconds(30),
             delay: TimeSpan.FromSeconds(5));
 
-        isExpected.Should().BeTrue("because we expect the actual history to contain the expected history");
+        isExpected.Should().BeTrue($"because the history should contain the expected 3 failed wholesale result activities. Actual history: {actualHistory?.ToString() ?? "<null>"}");
     }
 
     [Fact]
@@ -464,10 +467,12 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         };
 
         // => Wait for running and expected history
+        JArray? actualHistory = null;
         var isExpected = await Awaiter.TryWaitUntilConditionAsync(
             async () =>
             {
                 var orchestrationStatus = await Fixture.DurableClient.GetStatusAsync(actualEnergyOrchestrationStatus.InstanceId, showHistory: true);
+                actualHistory = orchestrationStatus.History;
 
                 if (orchestrationStatus.RuntimeStatus != OrchestrationRuntimeStatus.Running)
                     return false;
@@ -485,7 +490,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             TimeSpan.FromSeconds(30),
             delay: TimeSpan.FromSeconds(5));
 
-        isExpected.Should().BeTrue("because we expect the actual history to contain the expected history");
+        isExpected.Should().BeTrue($"because the history should contain the expected 3 failed energy result activities. Actual history: {actualHistory?.ToString() ?? "<null>"}");
     }
 
     private static bool ValueIsArray(JToken item)
