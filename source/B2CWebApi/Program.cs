@@ -42,6 +42,7 @@ builder.Services
     // Logging
     .AddApplicationInsightsForWebApp(subsystemName)
     .AddApplicationInsightsTelemetry()
+    .AddScoped<FrontendUserLogScopeMiddleware>()
 
     // Health checks
     .AddHealthChecksForWebApp()

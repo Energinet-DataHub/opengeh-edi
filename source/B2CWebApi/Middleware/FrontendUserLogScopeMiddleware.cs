@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Users;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Middleware;
 
-public class FrontendUserLogScopeMiddleware(UserContext<FrontendUser> userContext, ILogger logger) : IMiddleware
+public class FrontendUserLogScopeMiddleware(UserContext<FrontendUser> userContext, ILogger<FrontendUserLogScopeMiddleware> logger) : IMiddleware
 {
     private readonly UserContext<FrontendUser> _userContext = userContext;
     private readonly ILogger _logger = logger;
@@ -40,26 +39,37 @@ public class FrontendUserLogScopeMiddleware(UserContext<FrontendUser> userContex
             using (_logger.BeginScope(GetLogScopeProperties(user)))
             {
                 await next(context).ConfigureAwait(false);
-                _logger.LogInformation("Closing FrontendUser.Scope");
             }
         }
         else
         {
-            await next(context).ConfigureAwait(false);
+            using (_logger.BeginScope(GetNoUserLogScopeProperties()))
+            {
+                await next(context).ConfigureAwait(false);
+            }
         }
     }
 
-    private IDictionary<string, object> GetLogScopeProperties(FrontendUser user)
+    private List<KeyValuePair<string, object>> GetLogScopeProperties(FrontendUser user)
     {
-        return new Dictionary<string, object>
-        {
-            { "FrontendUser.Scope", Guid.NewGuid().ToString() },
-            { "UserId", user.UserId.ToString() },
-            { "UserRole", user.Role },
-            { "ActorId", user.ActorId.ToString() },
-            { "IsFas", user.IsFas },
-            { "Azp", user.Azp },
-            { "ActorNumber", user.ActorNumber },
-        };
+        return
+        [
+            new("FrontendUser.Scope", Guid.NewGuid().ToString()),
+            new("UserId", user.UserId.ToString()),
+            new("UserRole", user.Role),
+            new("ActorId", user.ActorId.ToString()),
+            new("IsFas", user.IsFas),
+            new("Azp", user.Azp),
+            new("ActorNumber", user.ActorNumber),
+        ];
+    }
+
+    private List<KeyValuePair<string, object>> GetNoUserLogScopeProperties()
+    {
+        return
+        [
+            new("FrontendUser.Scope", Guid.NewGuid().ToString()),
+            new("UserId", "<no user>"),
+        ];
     }
 }
