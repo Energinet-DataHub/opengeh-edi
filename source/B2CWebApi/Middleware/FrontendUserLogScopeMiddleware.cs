@@ -34,19 +34,9 @@ public class FrontendUserLogScopeMiddleware(UserContext<FrontendUser> userContex
             // No user found, don't add it to logging scope
         }
 
-        if (user != null)
+        using (_logger.BeginScope(user != null ? GetLogScopeProperties(user) : GetNoUserLogScopeProperties()))
         {
-            using (_logger.BeginScope(GetLogScopeProperties(user)))
-            {
-                await next(context).ConfigureAwait(false);
-            }
-        }
-        else
-        {
-            using (_logger.BeginScope(GetNoUserLogScopeProperties()))
-            {
-                await next(context).ConfigureAwait(false);
-            }
+            await next(context).ConfigureAwait(false);
         }
     }
 
