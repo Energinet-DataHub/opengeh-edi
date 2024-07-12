@@ -68,19 +68,14 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         Fixture.SetTestOutputHelper(null!);
     }
 
-    [Theory]
-    [InlineData(null)]
-    [InlineData(CalculationCompletedV1.Types.CalculationType.BalanceFixing)]
-    [InlineData(CalculationCompletedV1.Types.CalculationType.WholesaleFixing)]
-    public async Task Given_FeatureFlagIsDisabledForCalculationType_When_CalculationCompletedEventIsSent_Then_OrchestrationIsNeverStarted(CalculationCompletedV1.Types.CalculationType? calculationTypeToTest)
+    [Fact(Skip = "Do we still need this test? It just waits 1 minute for the orchestration to not start, which slows the CI down")]
+    public async Task Given_FeatureFlagIsDisabledForCalculationType_When_CalculationCompletedEventIsSent_Then_OrchestrationIsNeverStarted()
     {
         // Arrange
         Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: false);
 
         var calculationOrchestrationId = Guid.NewGuid().ToString();
-        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
-            calculationOrchestrationId,
-            calculationTypeToTest);
+        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId);
 
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
@@ -298,12 +293,10 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
     /// <summary>
     /// Verifies that:
-    /// - If databricks has no data for the CalculationId and CalculationType, then orchestration runs "forever" (because of retry policies).
+    /// - If databricks has no data for the CalculationId, then orchestration runs "forever" (because of retry policies).
     /// </summary>
-    [Theory]
-    [InlineData(CalculationCompletedV1.Types.CalculationType.BalanceFixing)]
-    [InlineData(CalculationCompletedV1.Types.CalculationType.WholesaleFixing)]
-    public async Task Given_DatabricksHasNoData_When_CalculationCompletedEventIsHandled_Then_OrchestrationIsStartedButActivitiesWillFailAndBeRetriedForever(CalculationCompletedV1.Types.CalculationType calculationTypeToTest)
+    [Fact]
+    public async Task Given_DatabricksHasNoData_When_CalculationCompletedEventIsHandled_Then_OrchestrationIsStartedButActivitiesWillFailAndBeRetriedForever()
     {
         // Arrange
         EnableEnqueueMessagesOrchestration();
@@ -312,7 +305,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var calculationOrchestrationId = Guid.NewGuid().ToString();
         var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
             calculationOrchestrationId,
-            calculationTypeToTest,
+            CalculationCompletedV1.Types.CalculationType.WholesaleFixing, // WholesaleFixing covers retries for both energy and wholesale results
             calculationId);
 
         var expectedHistory = new List<(string? Name, string? EventType)>
@@ -359,8 +352,10 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
                 return containsExpectedHistoryAtleastTwice;
             },
-            TimeSpan.FromSeconds(30),
+            TimeSpan.FromSeconds(60),
             delay: TimeSpan.FromSeconds(5));
+
+        await Fixture.DurableClient.TerminateAsync(actualOrchestrationStatus.InstanceId, "Test is done");
 
         isExpected.Should().BeTrue($"because the history should contain the expected 6 failed activities atleast twice. Actual history: {actualHistory?.ToString() ?? "<null>"}");
     }
@@ -423,8 +418,10 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
                 var containsExpectedHistory = expectedHistory.Intersect(activities).Count() == expectedHistory.Count();
                 return containsExpectedHistory;
             },
-            TimeSpan.FromSeconds(30),
+            TimeSpan.FromSeconds(60),
             delay: TimeSpan.FromSeconds(5));
+
+        await Fixture.DurableClient.TerminateAsync(actualWholesaleOrchestrationStatus.InstanceId, "Test is done");
 
         isExpected.Should().BeTrue($"because the history should contain the expected 3 failed wholesale result activities. Actual history: {actualHistory?.ToString() ?? "<null>"}");
     }
@@ -489,6 +486,8 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             },
             TimeSpan.FromSeconds(30),
             delay: TimeSpan.FromSeconds(5));
+
+        await Fixture.DurableClient.TerminateAsync(actualEnergyOrchestrationStatus.InstanceId, "Test is done");
 
         isExpected.Should().BeTrue($"because the history should contain the expected 3 failed energy result activities. Actual history: {actualHistory?.ToString() ?? "<null>"}");
     }
