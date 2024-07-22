@@ -31,11 +31,16 @@ public class GetActorsForWholesaleResultsForTotalAmountPerChargesActivity(
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
     private readonly WholesaleResultActorsEnumerator _wholesaleResultActorsEnumerator = wholesaleResultActorsEnumerator;
 
+    /// <summary>
+    /// Start an GetActorsForWholesaleResultsForTotalAmountPerCharges activity.
+    /// <remarks>The <paramref name="input"/> type and return type must be that same as the <see cref="Run"/> method</remarks>
+    /// <remarks>Changing the <paramref name="input"/> or return type might break the Durable Function's deserialization</remarks>
+    /// </summary>
     public static Task<IReadOnlyCollection<string>> StartActivityAsync(EnqueueMessagesInput input, TaskOrchestrationContext context, TaskOptions? options)
     {
         return context.CallActivityAsync<IReadOnlyCollection<string>>(
             nameof(GetActorsForWholesaleResultsForTotalAmountPerChargesActivity),
-            new EnqueueMessagesInput(input.CalculationId, input.EventId),
+            input,
             options: options);
     }
 
