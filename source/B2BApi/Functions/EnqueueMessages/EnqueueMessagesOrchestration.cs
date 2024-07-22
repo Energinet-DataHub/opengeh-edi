@@ -55,11 +55,11 @@ internal class EnqueueMessagesOrchestration
             enqueueMessagesInput,
             options: enqueueRetryOptions);
 
-        tasks[3] = EnqueueWholesaleResultsForAmountPerCharges(context, enqueueMessagesInput, enqueueRetryOptions);
+        tasks[3] = EnqueueWholesaleResultsForAmountPerChargesAsync(context, enqueueMessagesInput, enqueueRetryOptions);
 
-        tasks[4] = EnqueueWholesaleResultsForMonthlyAmountPerCharges(context, enqueueMessagesInput, enqueueRetryOptions);
+        tasks[4] = EnqueueWholesaleResultsForMonthlyAmountPerChargesAsync(context, enqueueMessagesInput, enqueueRetryOptions);
 
-        tasks[5] = EnqueueWholesaleResultsForTotalAmountPerCharges(context, enqueueMessagesInput, enqueueRetryOptions);
+        tasks[5] = EnqueueWholesaleResultsForTotalAmountPerChargesAsync(context, enqueueMessagesInput, enqueueRetryOptions);
 
         await Task.WhenAll(tasks);
 
@@ -76,7 +76,7 @@ internal class EnqueueMessagesOrchestration
         return "Success";
     }
 
-    private static async Task<int> EnqueueWholesaleResultsForAmountPerCharges(TaskOrchestrationContext context, EnqueueMessagesInput input, TaskOptions options)
+    private static async Task<int> EnqueueWholesaleResultsForAmountPerChargesAsync(TaskOrchestrationContext context, EnqueueMessagesInput input, TaskOptions options)
     {
         var actors = await GetActorsForWholesaleResultsForAmountPerChargesActivity.StartActivityAsync(
             input,
@@ -100,7 +100,7 @@ internal class EnqueueMessagesOrchestration
         return messagesEnqueued;
     }
 
-    private static async Task<int> EnqueueWholesaleResultsForMonthlyAmountPerCharges(TaskOrchestrationContext context, EnqueueMessagesInput input, TaskOptions options)
+    private static async Task<int> EnqueueWholesaleResultsForMonthlyAmountPerChargesAsync(TaskOrchestrationContext context, EnqueueMessagesInput input, TaskOptions options)
     {
         var actors = await GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity.StartActivityAsync(
             input,
@@ -124,7 +124,7 @@ internal class EnqueueMessagesOrchestration
         return messagesEnqueued;
     }
 
-    private static async Task<int> EnqueueWholesaleResultsForTotalAmountPerCharges(TaskOrchestrationContext context, EnqueueMessagesInput input, TaskOptions options)
+    private static async Task<int> EnqueueWholesaleResultsForTotalAmountPerChargesAsync(TaskOrchestrationContext context, EnqueueMessagesInput input, TaskOptions options)
     {
         var actors = await GetActorsForWholesaleResultsForTotalAmountPerChargesActivity.StartActivityAsync(
             input,
