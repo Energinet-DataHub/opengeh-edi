@@ -12,11 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
@@ -52,6 +47,7 @@ public class InboxEventsProcessor
     {
         var inboxEvents = await FindPendingMessagesAsync(cancellationToken).ConfigureAwait(false);
 
+        _logger.LogInformation("Processing {Count} inbox events", inboxEvents.Count);
         foreach (var inboxEvent in inboxEvents)
         {
             try
