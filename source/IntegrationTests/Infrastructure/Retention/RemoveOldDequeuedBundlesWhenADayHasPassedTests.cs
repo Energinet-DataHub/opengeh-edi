@@ -17,10 +17,12 @@ using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.ActorMessageQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using FluentAssertions;
@@ -51,19 +53,20 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         // Arrange
         var receiverId = ActorNumber.Create("1234567891912");
         var chargeOwnerId = ActorNumber.Create("1234567891911");
-        var actorMessageQueueRepository = GetService<IActorMessageQueueRepository>();
+        var bundleRepository = GetService<IBundleRepository>();
         var actorMessageQueueContext = GetService<ActorMessageQueueContext>();
         var systemDateTimeProviderStub = new SystemDateTimeProviderStub();
+        var actorMessageQueueRepository = GetService<IActorMessageQueueRepository>();
 
         // When we set the current date to 31 days in the future, any bundles dequeued now should then be removed.
         systemDateTimeProviderStub.SetNow(systemDateTimeProviderStub.Now().PlusDays(31));
 
         var sut = new DequeuedBundlesRetention(
             systemDateTimeProviderStub,
-            actorMessageQueueRepository,
             GetService<IMarketDocumentRepository>(),
             GetService<IOutgoingMessageRepository>(),
             actorMessageQueueContext,
+            bundleRepository,
             GetService<ILogger<DequeuedBundlesRetention>>());
 
         var message = _wholesaleAmountPerChargeDtoBuilder

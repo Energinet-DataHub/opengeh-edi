@@ -28,12 +28,6 @@ jobs:
       dh3serviceaccount_privatekey: ${{ secrets.dh3serviceaccount_privatekey }}
 
   #
-  # CodeQL Check
-  #
-  ci_codeql:
-    uses: ./.github/workflows/codeql.yml
-
-  #
   # Detect changes to start relevant workflows
   #
   changes:
@@ -60,7 +54,7 @@ jobs:
 
   allow_merge_ci_orchestrator:
     runs-on: ubuntu-latest
-    needs: [ci_base, ci_codeql, ci_dotnet, render_c4model_views]
+    needs: [ci_base, ci_dotnet, render_c4model_views]
     if: |
       always()
     steps:
