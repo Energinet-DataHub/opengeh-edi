@@ -81,14 +81,18 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
                                                                         x.ExternalId == externalId).ConfigureAwait(false);
     }
 
-    public async Task DeleteOutgoingMessageIfExistsAsync(BundleId bundleMessageId)
+    public async Task DeleteOutgoingMessagesIfExistsAsync(IReadOnlyCollection<BundleId> bundleMessageIds)
     {
-        var outgoingMessage = await _context.OutgoingMessages.FirstOrDefaultAsync(x => x.AssignedBundleId == bundleMessageId).ConfigureAwait(false);
-        if (outgoingMessage is not null)
-        {
-            await _fileStorageClient.DeleteIfExistsAsync(outgoingMessage.FileStorageReference).ConfigureAwait(false);
-            _context.Remove(outgoingMessage);
-        }
+        var outgoingMessagesToBeRemoved = await _context.OutgoingMessages
+            .Where(x => bundleMessageIds.Contains(x.AssignedBundleId))
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        _context.RemoveRange(outgoingMessagesToBeRemoved);
+
+        var fileStorageReferences = outgoingMessagesToBeRemoved
+            .Select(x => x.FileStorageReference).ToList();
+        await _fileStorageClient.DeleteIfExistsAsync(fileStorageReferences).ConfigureAwait(false);
     }
 
     private async Task DownloadAndSetMessageRecordAsync(OutgoingMessage outgoingMessage)

@@ -52,27 +52,39 @@ public class DequeuedBundlesRetention : IDataRetention
         while (true)
         {
             var monthAgo = _systemDateTimeProvider.Now().Plus(-Duration.FromDays(30));
-            var dequeuedBundles = await _bundleRepository.GetDequeuedBundlesOlderThanAsync(monthAgo, 500).ConfigureAwait(false);
+            var dequeuedBundles = await _bundleRepository
+                .GetDequeuedBundlesOlderThanAsync(monthAgo, 500)
+                .ConfigureAwait(false);
 
             if (dequeuedBundles.Count == 0)
             {
                 break;
             }
 
-            foreach (var bundleId in dequeuedBundles)
+            var dequeuedBundleIds = dequeuedBundles.Select(x => x.Id)
+                .ToList();
+
+            try
             {
-                        try
-                        {
-                            ArgumentNullException.ThrowIfNull(bundleId);
-                            await _marketDocumentRepository.DeleteMarketDocumentIfExistsAsync(bundleId.Id).ConfigureAwait(false);
-                            await _outgoingMessageRepository.DeleteOutgoingMessageIfExistsAsync(bundleId.Id).ConfigureAwait(false);
-                            _bundleRepository.Delete(bundleId);
-                            await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-                        }
-                        catch (Exception e)
-                        {
-                            _logger.LogWarning(e, "Failed to remove bundle with id {BundleId}", bundleId!.Id);
-                        }
+                await _outgoingMessageRepository
+                    .DeleteOutgoingMessagesIfExistsAsync(dequeuedBundleIds)
+                    .ConfigureAwait(false);
+
+                await _marketDocumentRepository
+                    .DeleteMarketDocumentsIfExistsAsync(dequeuedBundleIds)
+                    .ConfigureAwait(false);
+
+                _bundleRepository.Delete(dequeuedBundles);
+
+                await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                _logger
+                    .LogWarning(
+                        e,
+                        "Failed to remove bundles with ids {BundleIds}",
+                        string.Join(',', dequeuedBundles.Select(x => x.Id)));
             }
         }
     }

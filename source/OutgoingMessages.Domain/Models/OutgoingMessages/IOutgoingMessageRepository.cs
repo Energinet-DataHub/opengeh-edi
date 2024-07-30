@@ -39,7 +39,7 @@ public interface IOutgoingMessageRepository
     Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId);
 
     /// <summary>
-    /// Delete outgoing message if it exists
+    /// Delete outgoing messages if it exists
     /// </summary>
-    Task DeleteOutgoingMessageIfExistsAsync(BundleId bundleMessageId);
+    Task DeleteOutgoingMessagesIfExistsAsync(IReadOnlyCollection<BundleId> bundleMessageIds);
 }

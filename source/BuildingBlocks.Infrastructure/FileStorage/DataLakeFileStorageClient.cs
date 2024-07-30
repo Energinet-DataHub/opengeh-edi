@@ -12,12 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
@@ -78,12 +75,13 @@ public class DataLakeFileStorageClient : IFileStorageClient
         return new FileStorageFile(downloadStream);
     }
 
-    public async Task DeleteIfExistsAsync(FileStorageReference reference)
+    public async Task DeleteIfExistsAsync(IReadOnlyList<FileStorageReference> fileStorageReferences)
     {
-        var container = _blobServiceClient.GetBlobContainerClient(reference.Category.Value);
-
-        var blob = container.GetBlobClient(reference.Path);
-
-        await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots).ConfigureAwait(false);
+        var container = _blobServiceClient.GetBlobContainerClient(fileStorageReferences.First().Category.Value);
+        var blobBatchClient = _blobServiceClient.GetBlobBatchClient();
+        var blobUris = fileStorageReferences
+            .Select(reference => container.GetBlobClient(reference.Path).Uri)
+            .ToList();
+        await blobBatchClient.DeleteBlobsAsync(blobUris, DeleteSnapshotsOption.IncludeSnapshots).ConfigureAwait(false);
     }
 }

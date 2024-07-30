@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
@@ -57,6 +59,8 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         var actorMessageQueueContext = GetService<ActorMessageQueueContext>();
         var systemDateTimeProviderStub = new SystemDateTimeProviderStub();
         var actorMessageQueueRepository = GetService<IActorMessageQueueRepository>();
+        var outgoingMessageRepository = GetService<IOutgoingMessageRepository>();
+        var fileStorageClient = GetService<IFileStorageClient>();
 
         // When we set the current date to 31 days in the future, any bundles dequeued now should then be removed.
         systemDateTimeProviderStub.SetNow(systemDateTimeProviderStub.Now().PlusDays(31));
@@ -64,7 +68,7 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         var sut = new DequeuedBundlesRetention(
             systemDateTimeProviderStub,
             GetService<IMarketDocumentRepository>(),
-            GetService<IOutgoingMessageRepository>(),
+            outgoingMessageRepository,
             actorMessageQueueContext,
             bundleRepository,
             GetService<ILogger<DequeuedBundlesRetention>>());
@@ -79,6 +83,8 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         var peekResult = await PeekMessageAsync(MessageCategory.Aggregations, receiverId, ActorRole.EnergySupplier);
         await _outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(peekResult!.MessageId.Value, ActorRole.EnergySupplier, receiverId), CancellationToken.None);
 
+        var outgoingMessageForReceivingActor = await outgoingMessageRepository.GetAsync(Receiver.Create(receiverId, ActorRole.EnergySupplier), message.ExternalId);
+
         // Act
         await sut.CleanupAsync(CancellationToken.None);
 
@@ -92,5 +98,9 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         // We are still able to peek the message for the grid operator.
         var peekResultForGo = await PeekMessageAsync(MessageCategory.Aggregations, chargeOwnerId, ActorRole.GridOperator);
         peekResultForGo.Should().NotBeNull();
+
+        // blob should be cleaned up
+        var downloadBlob = () => fileStorageClient.DownloadAsync(outgoingMessageForReceivingActor!.FileStorageReference);
+        await downloadBlob.Should().ThrowAsync<RequestFailedException>();
     }
 }
