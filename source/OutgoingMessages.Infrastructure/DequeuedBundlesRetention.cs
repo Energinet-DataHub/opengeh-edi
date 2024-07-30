@@ -49,8 +49,8 @@ public class DequeuedBundlesRetention : IDataRetention
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
     {
-        const int incrementer = 10;
-        const int take = 10;
+        const int incrementer = 1;
+        const int take = 1;
         var skip = 0;
         var monthAgo = _systemDateTimeProvider.Now().Plus(-Duration.FromDays(30));
         while (true)
