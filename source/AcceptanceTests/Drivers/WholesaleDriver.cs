@@ -33,57 +33,6 @@ internal sealed class WholesaleDriver
         _inboxEdiClient = inboxEdiClient;
     }
 
-    internal Task PublishAggregationResultAsync(string gridAreaCode, ActorRole? marketRole = null, string? actorNumber = null)
-    {
-        var aggregation = marketRole?.Code switch
-        {
-            BalanceResponsiblePartyMarketRoleCode => EnergyResultProducedV2Factory
-                .CreateAggregationResultAvailableEventForBalanceResponsible(
-                    gridAreaCode,
-                    actorNumber ?? throw new ArgumentNullException(nameof(actorNumber))),
-            _ => EnergyResultProducedV2Factory.CreateAggregationResultAvailableEventFor(gridAreaCode),
-        };
-
-        return _integrationEventPublisher.PublishAsync(
-            EnergyResultProducedV2.EventName,
-            aggregation.ToByteArray(),
-            waitForHandled: true);
-    }
-
-    internal Task PublishMonthlyAmountPerChargeResultAsync(
-        string gridAreaCode,
-        string energySupplierId,
-        string chargeOwnerId)
-    {
-        var monthlyAmountPerChargeResultProduced =
-            MonthlyAmountPerChargeResultProducedV1Factory.CreateMonthlyAmountPerChargeResultProduced(
-                gridAreaCode,
-                energySupplierId,
-                chargeOwnerId);
-
-        return _integrationEventPublisher.PublishAsync(
-            MonthlyAmountPerChargeResultProducedV1.EventName,
-            monthlyAmountPerChargeResultProduced.ToByteArray(),
-            waitForHandled: true);
-    }
-
-    internal Task PublishAmountPerChargeResultAsync(
-        string gridAreaCode,
-        string energySupplierId,
-        string chargeOwnerId)
-    {
-        var amountPerChargeResultProduced =
-            AmountPerChargeResultProducedV1Factory.CreateAmountPerChargeResultProduced(
-                gridAreaCode,
-                energySupplierId,
-                chargeOwnerId);
-
-        return _integrationEventPublisher.PublishAsync(
-            AmountPerChargeResultProducedV1.EventName,
-            amountPerChargeResultProduced.ToByteArray(),
-            waitForHandled: true);
-    }
-
     internal async Task PublishWholesaleServicesRequestAcceptedResponseAsync(
         Guid processId,
         string gridAreaCode,

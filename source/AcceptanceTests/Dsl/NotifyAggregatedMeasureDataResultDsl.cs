@@ -30,12 +30,6 @@ internal sealed class NotifyAggregatedMeasureDataResultDsl
         _wholesaleDriver = wholesaleDriverDriver;
     }
 
-    internal async Task PublishResult(string gridAreaCode)
-    {
-        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
-        await _wholesaleDriver.PublishAggregationResultAsync(gridAreaCode).ConfigureAwait(false);
-    }
-
     internal async Task<string> ConfirmResultIsAvailable()
     {
         var peekResponse = await _ediDriver.PeekMessageAsync().ConfigureAwait(false);

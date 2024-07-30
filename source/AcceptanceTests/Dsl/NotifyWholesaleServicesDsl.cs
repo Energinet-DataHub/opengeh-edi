@@ -30,21 +30,6 @@ internal sealed class NotifyWholesaleServicesDsl
         _wholesaleDriver = wholesaleDriverDriver;
     }
 
-    internal async Task PublishMonthlyAmountPerChargeResult(string gridAreaCode, string energySupplierId, string chargeOwnerId)
-    {
-        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
-        await _wholesaleDriver.PublishMonthlyAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId).ConfigureAwait(false);
-    }
-
-    internal async Task PublishAmountPerChargeResult(
-        string gridAreaCode,
-        string energySupplierId,
-        string chargeOwnerId)
-    {
-        await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
-        await _wholesaleDriver.PublishAmountPerChargeResultAsync(gridAreaCode, energySupplierId, chargeOwnerId).ConfigureAwait(false);
-    }
-
     internal async Task<string> ConfirmResultIsAvailable()
     {
         var peekResponse = await _ediDriver.PeekMessageAsync().ConfigureAwait(false);
