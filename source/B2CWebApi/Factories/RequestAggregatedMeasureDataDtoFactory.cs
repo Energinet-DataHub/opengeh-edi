@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Globalization;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using NodaTime;
 using MeteringPointType = Energinet.DataHub.EDI.B2CWebApi.Models.MeteringPointType;
@@ -54,7 +52,7 @@ public static class RequestAggregatedMeasureDataDtoFactory
             senderNumber,
             senderRoleCode,
             DataHubDetails.DataHubActorNumber.Value,
-            MarketRole.CalculationResponsibleRole.Code,
+            ActorRole.MeteredDataAdministrator.Code,
             MapToBusinessReasonCode(request.CalculationType),
             AggregatedMeasureDataMessageType,
             Guid.NewGuid().ToString(),
@@ -130,22 +128,16 @@ public static class RequestAggregatedMeasureDataDtoFactory
     private static string MapRoleNameToCode(string roleName)
     {
         ArgumentException.ThrowIfNullOrEmpty(roleName);
+        var marketRole = MarketRole.FromName(roleName);
 
-        if (roleName.Equals(MarketRole.MeteredDataResponsible.Name, StringComparison.OrdinalIgnoreCase))
+        if ((marketRole == MarketRole.MeteredDataResponsible
+           || marketRole == MarketRole.EnergySupplier
+           || marketRole == MarketRole.BalanceResponsibleParty)
+            && marketRole.Code != null)
         {
-            return MarketRole.MeteredDataResponsible.Code;
+            return marketRole.Code;
         }
 
-        if (roleName.Equals(MarketRole.EnergySupplier.Name, StringComparison.OrdinalIgnoreCase))
-        {
-            return MarketRole.EnergySupplier.Code;
-        }
-
-        if (roleName.Equals(MarketRole.BalanceResponsibleParty.Name, StringComparison.OrdinalIgnoreCase))
-        {
-            return MarketRole.BalanceResponsibleParty.Code;
-        }
-
-        throw new ArgumentException($"roleName: {roleName}. is unsupported to map to a role name");
+        throw new ArgumentException($"Market Role: {marketRole}, is not allowed to request aggregated measure data.");
     }
 }
