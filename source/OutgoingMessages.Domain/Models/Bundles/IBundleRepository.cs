@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using NodaTime;
+
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 
 /// <summary>
@@ -23,4 +25,17 @@ public interface IBundleRepository
     /// Add a new Bundle
     /// </summary>
     void Add(Bundle bundle);
+
+    /// <summary>
+    ///  Get dequeued bundles older than a specific time.
+    /// </summary>
+    /// <param name="olderThan"></param>
+    /// <param name="take"></param>
+    Task<IReadOnlyCollection<Bundle?>> GetDequeuedBundlesOlderThanAsync(Instant olderThan, int take);
+
+    /// <summary>
+    ///  Delete a bundle.
+    /// </summary>
+    /// <param name="bundle"></param>
+    void Delete(Bundle bundle);
 }

@@ -14,6 +14,8 @@
 
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
+using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.Bundles;
 
@@ -24,5 +26,15 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
     public void Add(Bundle bundle)
     {
         _dbContext.Bundles.Add(bundle);
+    }
+
+    public void Delete(Bundle bundle)
+    {
+        _dbContext.Bundles.Remove(bundle);
+    }
+
+    public async Task<IReadOnlyCollection<Bundle?>> GetDequeuedBundlesOlderThanAsync(Instant olderThan, int take)
+    {
+        return await _dbContext.Bundles.Where(x => x.DequeuedAt < olderThan).Take(take).ToListAsync().ConfigureAwait(false);
     }
 }
