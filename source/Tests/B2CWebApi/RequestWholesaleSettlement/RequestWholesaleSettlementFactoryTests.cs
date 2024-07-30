@@ -202,7 +202,7 @@ public class RequestWholesaleSettlementFactoryTests
             _dateTimeZone,
             SystemClock.Instance.GetCurrentInstant());
 
-        act.Should().ThrowExactly<ArgumentException>().WithMessage("roleName: *. is unsupported to map to a role name");
+        act.Should().ThrowExactly<ArgumentException>().WithMessage($"Market Role: *, is not allowed to request wholesale settlement.");
     }
 
     private RequestWholesaleSettlementMarketRequest GetRequestWithCalculationType(CalculationType calculationType)

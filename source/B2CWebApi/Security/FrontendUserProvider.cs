@@ -97,10 +97,16 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
     {
         try
         {
-            var marketRole = MarketRole.FromName(role);
+            var marketRole = EnumerationType.FromName<MarketRole>(role);
+
+            // DataHubAdministrator does not have a corresponding actor role
+            if (marketRole == MarketRole.DataHubAdministrator)
+                return null;
+
+            if (marketRole.Code == null)
+                throw new InvalidOperationException("Market role code is null");
 
             var actorRole = ActorRole.FromCode(marketRole.Code);
-
             return actorRole;
         }
         catch (Exception e)

@@ -15,7 +15,6 @@
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using NodaTime;
 using RequestWholesaleSettlementChargeType = Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models.RequestWholesaleSettlementChargeType;
@@ -62,7 +61,7 @@ public static class RequestWholesaleSettlementDtoFactory
             senderNumber,
             senderRoleCode,
             DataHubDetails.DataHubActorNumber.Value,
-            MarketRole.CalculationResponsibleRole.Code,
+            ActorRole.MeteredDataAdministrator.Code,
             MapToBusinessReasonCode(request.CalculationType),
             WholesaleSettlementMessageType,
             Guid.NewGuid().ToString(),
@@ -126,22 +125,16 @@ public static class RequestWholesaleSettlementDtoFactory
     private static string MapRoleNameToCode(string roleName)
     {
         ArgumentException.ThrowIfNullOrEmpty(roleName);
+        var marketRole = MarketRole.FromName(roleName);
 
-        if (roleName.Equals(MarketRole.SystemOperator.Name, StringComparison.OrdinalIgnoreCase))
+        if ((marketRole == MarketRole.SystemOperator
+             || marketRole == MarketRole.EnergySupplier
+             || marketRole == MarketRole.GridAccessProvider)
+            && marketRole.Code != null)
         {
-            return MarketRole.SystemOperator.Code;
+            return marketRole.Code;
         }
 
-        if (roleName.Equals(MarketRole.EnergySupplier.Name, StringComparison.OrdinalIgnoreCase))
-        {
-            return MarketRole.EnergySupplier.Code;
-        }
-
-        if (roleName.Equals(MarketRole.GridAccessProvider.Name, StringComparison.OrdinalIgnoreCase))
-        {
-            return MarketRole.GridAccessProvider.Code;
-        }
-
-        throw new ArgumentException($"roleName: {roleName}. is unsupported to map to a role name");
+        throw new ArgumentException($"Market Role: {marketRole}, is not allowed to request wholesale settlement.");
     }
 }
