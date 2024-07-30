@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
@@ -25,67 +25,55 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 public class DequeuedBundlesRetention : IDataRetention
 {
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-    private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
     private readonly IMarketDocumentRepository _marketDocumentRepository;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
+    private readonly IBundleRepository _bundleRepository;
     private readonly ILogger<DequeuedBundlesRetention> _logger;
 
     public DequeuedBundlesRetention(
         ISystemDateTimeProvider systemDateTimeProvider,
-        IActorMessageQueueRepository actorMessageQueueRepository,
         IMarketDocumentRepository marketDocumentRepository,
         IOutgoingMessageRepository outgoingMessageRepository,
         ActorMessageQueueContext actorMessageQueueContext,
+        IBundleRepository bundleRepository,
         ILogger<DequeuedBundlesRetention> logger)
     {
         _systemDateTimeProvider = systemDateTimeProvider;
-        _actorMessageQueueRepository = actorMessageQueueRepository;
         _marketDocumentRepository = marketDocumentRepository;
         _outgoingMessageRepository = outgoingMessageRepository;
         _actorMessageQueueContext = actorMessageQueueContext;
+        _bundleRepository = bundleRepository;
         _logger = logger;
     }
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
     {
-        const int incrementer = 10;
-        const int take = 10;
-        var skip = 0;
-        var monthAgo = _systemDateTimeProvider.Now().Plus(-Duration.FromDays(30));
         while (true)
         {
-            var actorMessageQueues =
-                await _actorMessageQueueRepository.GetActorMessageQueuesAsync(skip, take).ConfigureAwait(false);
+            var monthAgo = _systemDateTimeProvider.Now().Plus(-Duration.FromDays(30));
+            var dequeuedBundles = await _bundleRepository.GetDequeuedBundlesOlderThanAsync(monthAgo, 500).ConfigureAwait(false);
 
-            if (actorMessageQueues.Count == 0)
+            if (dequeuedBundles.Count == 0)
             {
                 break;
             }
 
-            foreach (var actorMessageQueue in actorMessageQueues)
+            foreach (var bundleId in dequeuedBundles)
             {
-                var dequeuedBundles = actorMessageQueue.GetDequeuedBundles();
-                foreach (var bundle in dequeuedBundles)
-                {
-                    if (bundle.DequeuedAt < monthAgo)
-                    {
                         try
                         {
-                            await _marketDocumentRepository.DeleteMarketDocumentIfExistsAsync(bundle.Id).ConfigureAwait(false);
-                            await _outgoingMessageRepository.DeleteOutgoingMessageIfExistsAsync(bundle.Id).ConfigureAwait(false);
-                            actorMessageQueue.RemoveBundle(bundle);
+                            ArgumentNullException.ThrowIfNull(bundleId);
+                            await _marketDocumentRepository.DeleteMarketDocumentIfExistsAsync(bundleId.Id).ConfigureAwait(false);
+                            await _outgoingMessageRepository.DeleteOutgoingMessageIfExistsAsync(bundleId.Id).ConfigureAwait(false);
+                            _bundleRepository.Delete(bundleId);
                             await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
                         }
                         catch (Exception e)
                         {
-                            _logger.LogWarning(e, "Failed to remove bundle with id {BundleId}", bundle.Id);
+                            _logger.LogWarning(e, "Failed to remove bundle with id {BundleId}", bundleId!.Id);
                         }
-                    }
-                }
             }
-
-            skip += incrementer;
         }
     }
 }
