@@ -28,12 +28,12 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
         _dbContext.Bundles.Add(bundle);
     }
 
-    public void Delete(Bundle bundle)
+    public void Delete(IReadOnlyCollection<Bundle> bundles)
     {
-        _dbContext.Bundles.Remove(bundle);
+        _dbContext.Bundles.RemoveRange(bundles);
     }
 
-    public async Task<IReadOnlyCollection<Bundle?>> GetDequeuedBundlesOlderThanAsync(Instant olderThan, int take)
+    public async Task<IReadOnlyCollection<Bundle>> GetDequeuedBundlesOlderThanAsync(Instant olderThan, int take)
     {
         return await _dbContext.Bundles.Where(x => x.DequeuedAt < olderThan).Take(take).ToListAsync().ConfigureAwait(false);
     }

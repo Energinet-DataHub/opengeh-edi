@@ -51,10 +51,11 @@ public class MarketDocumentRepository : IMarketDocumentRepository
         _actorMessageQueueContext.Add(marketDocument);
     }
 
-    public async Task DeleteMarketDocumentIfExistsAsync(BundleId bundleMessageId)
+    public async Task DeleteMarketDocumentsIfExistsAsync(IReadOnlyCollection<BundleId> bundleMessageIds)
     {
-        var marketDocument = await _actorMessageQueueContext.MarketDocuments.FirstOrDefaultAsync(x => x.BundleId == bundleMessageId).ConfigureAwait(false);
-        if (marketDocument is not null)
-            _actorMessageQueueContext.Remove(marketDocument);
+        var marketDocuments = await _actorMessageQueueContext.MarketDocuments.Where(x => bundleMessageIds.Contains(x.BundleId))
+            .ToListAsync()
+            .ConfigureAwait(false);
+        _actorMessageQueueContext.RemoveRange(marketDocuments);
     }
 }
