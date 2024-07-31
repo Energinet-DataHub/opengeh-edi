@@ -21,13 +21,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
 public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
 {
-    private readonly EventId _eventId = EventId.From(Guid.NewGuid());
     private readonly Guid _calculationId = Guid.NewGuid();
 
+    private EventId _eventId = EventId.From(Guid.NewGuid());
     private BusinessReason _businessReason = BusinessReason.BalanceFixing;
     private ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private ActorNumber _balanceResponsibleNumber = ActorNumber.Create("1234567891911");
     private Guid _calculationResultId;
+    private SettlementVersion? _settlementSeriesVersion = null;
 
     public EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto Build()
     {
@@ -47,7 +48,7 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
                 new(1, 1, CalculatedQuantityQuality.Calculated, DateTimeOffset.UtcNow.ToInstant().ToString()),
             },
             calculationResultVersion: 1,
-            settlementVersion: null,
+            settlementVersion: _settlementSeriesVersion,
             calculationResultId: _calculationResultId,
             calculationId: _calculationId);
     }
@@ -74,5 +75,16 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
     {
         _businessReason = businessReason;
         return this;
+    }
+
+    public EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder WithEventId(EventId expectedEventId)
+    {
+        _eventId = expectedEventId;
+        return this;
+    }
+
+    public void WithSettlementVersion(SettlementVersion settlementVersion)
+    {
+        _settlementSeriesVersion = settlementVersion;
     }
 }

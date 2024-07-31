@@ -40,14 +40,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenAPeekIsRequestedTests : TestBase
 {
-    private readonly EnergyResultMessageDtoBuilder _energyResultMessageDtoBuilder;
+    private readonly EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly SystemDateTimeProviderStub _dateTimeProvider;
 
     public WhenAPeekIsRequestedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
-        _energyResultMessageDtoBuilder = new EnergyResultMessageDtoBuilder();
+        _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         _dateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
     }
@@ -72,7 +72,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task When_no_messages_are_available_return_empty_result()
     {
-        var message = _energyResultMessageDtoBuilder.Build();
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder.Build();
         await EnqueueMessage(message);
 
         var result = await PeekMessageAsync(MessageCategory.None);
@@ -84,9 +84,8 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task A_message_bundle_is_returned()
     {
-        var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
-            .WithReceiverRole(ActorRole.EnergySupplier)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithEnergySupplierReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
         await EnqueueMessage(message);
 
@@ -101,9 +100,8 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task Ensure_same_bundle_is_returned_if_not_dequeued()
     {
-        var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
-            .WithReceiverRole(ActorRole.EnergySupplier)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithEnergySupplierReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
         await EnqueueMessage(message);
 
@@ -123,9 +121,8 @@ public class WhenAPeekIsRequestedTests : TestBase
     public async Task A_market_document_is_archived_with_correct_content()
     {
         // Arrange
-        var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
-            .WithReceiverRole(ActorRole.EnergySupplier)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithEnergySupplierReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
         await EnqueueMessage(message);
 
@@ -156,9 +153,8 @@ public class WhenAPeekIsRequestedTests : TestBase
             date = 02;
         _dateTimeProvider.SetNow(Instant.FromUtc(year, month, date, 11, 07));
         var receiverNumber = SampleData.NewEnergySupplierNumber;
-        var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(receiverNumber)
-            .WithReceiverRole(ActorRole.EnergySupplier)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithEnergySupplierReceiverNumber(receiverNumber)
             .Build();
         await EnqueueMessage(message);
 
@@ -176,9 +172,8 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task A_market_document_is_added_to_database()
     {
-        var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
-            .WithReceiverRole(ActorRole.EnergySupplier)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithEnergySupplierReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
         await EnqueueMessage(message);
 
@@ -193,9 +188,8 @@ public class WhenAPeekIsRequestedTests : TestBase
     [Fact]
     public async Task The_created_market_document_uses_the_archived_message_file_reference()
     {
-        var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
-            .WithReceiverRole(ActorRole.EnergySupplier)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithEnergySupplierReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
         await EnqueueMessage(message);
 
@@ -218,9 +212,8 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         // Arrange
         var actorNumber = ActorNumber.Create("1234567890123");
-        var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(actorNumber.Value)
-            .WithReceiverRole(ActorRole.GridOperator)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithEnergySupplierReceiverNumber(actorNumber.Value)
             .Build();
         await EnqueueMessage(message);
 
@@ -240,9 +233,8 @@ public class WhenAPeekIsRequestedTests : TestBase
 
         string unusedCode;
 
-        var builder = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
-            .WithReceiverRole(ActorRole.EnergySupplier);
+        var builder = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithEnergySupplierReceiverNumber(SampleData.NewEnergySupplierNumber);
 
         if (dataHubTypeWithUnused == typeof(BusinessReason))
         {
@@ -259,7 +251,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             throw new NotImplementedException($"Type {dataHubTypeWithUnused.Name} is not implemented yet");
         }
 
-        var message = _energyResultMessageDtoBuilder.Build();
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder.Build();
 
         var act = async () =>
         {
@@ -279,9 +271,8 @@ public class WhenAPeekIsRequestedTests : TestBase
         // Arrange / Given
         var expectedEventId = EventId.From(Guid.NewGuid());
         var receiverNumber = SampleData.NewEnergySupplierNumber;
-        var outgoingMessage = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(receiverNumber)
-            .WithReceiverRole(ActorRole.EnergySupplier)
+        var outgoingMessage = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithEnergySupplierReceiverNumber(receiverNumber)
             .WithEventId(expectedEventId)
             .Build();
 
@@ -356,7 +347,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         return exists;
     }
 
-    private async Task EnqueueMessage(EnergyResultMessageDto message)
+    private async Task EnqueueMessage(EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto message)
     {
         await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
     }

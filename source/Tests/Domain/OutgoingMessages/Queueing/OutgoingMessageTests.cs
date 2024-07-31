@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
+using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
@@ -108,7 +109,7 @@ public class OutgoingMessageTests
     {
         // Arrange
         var serializer = new Serializer();
-        var energyResultMessageDto = new EnergyResultMessageDtoBuilder()
+        var energyResultMessageDto = new EnergyResultPerGridAreaMessageDtoBuilder()
             .Build();
 
         // Act
@@ -132,7 +133,8 @@ public class OutgoingMessageTests
     {
         // Arrange
         var serializer = new Serializer();
-        var acceptedEnergyResultMessageDto = AcceptedEnergyResultMessageDtoBuilder.Build();
+        var acceptedEnergyResultMessageDtoBuilder = new AcceptedEnergyResultMessageDtoBuilder();
+        var acceptedEnergyResultMessageDto = acceptedEnergyResultMessageDtoBuilder.Build();
 
         // Act
         var outgoingMessage = OutgoingMessage.CreateMessage(
@@ -278,7 +280,7 @@ public class OutgoingMessageTests
     public void ActorMessageQueueMetadata_is_DDM_when_document_is_NotifyAggregatedMeasureData_and_role_is_MDR()
     {
         // Arrange
-        var energyResultMessageDto = new EnergyResultMessageDtoBuilder()
+        var energyResultMessageDto = new AcceptedEnergyResultMessageDtoBuilder()
             .WithReceiverRole(ActorRole.MeteredDataResponsible)
             .Build();
 

@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.Tests.Factories;
 using FluentAssertions;
 using NodaTime;
 using Xunit;
@@ -31,13 +30,15 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenADequeueIsRequestedTests : TestBase
 {
-    private readonly EnergyResultMessageDtoBuilder _energyResultMessageDtoBuilder;
+    private readonly EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
+    private readonly AcceptedEnergyResultMessageDtoBuilder _energyResultPerGridAreaMessageDtoBuilder;
 
     public WhenADequeueIsRequestedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
-        _energyResultMessageDtoBuilder = new EnergyResultMessageDtoBuilder();
+        _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
+        _energyResultPerGridAreaMessageDtoBuilder = new AcceptedEnergyResultMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
     }
 
@@ -53,11 +54,10 @@ public class WhenADequeueIsRequestedTests : TestBase
     public async Task Dequeue_unknown_message_id_is_unsuccessful_when_actor_has_a_queue()
     {
         var unknownMessageId = Guid.NewGuid().ToString();
-        var enqueueMessageEvent = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
-            .WithReceiverRole(ActorRole.EnergySupplier)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithEnergySupplierReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
-        await EnqueueMessage(enqueueMessageEvent);
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
 
         ClearDbContextCaches();
         var dequeueResult = await _outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(unknownMessageId, ActorRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)), CancellationToken.None);
@@ -68,11 +68,10 @@ public class WhenADequeueIsRequestedTests : TestBase
     [Fact]
     public async Task Dequeue_is_Successful()
     {
-        var enqueueMessageEvent = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
-            .WithReceiverRole(ActorRole.EnergySupplier)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithEnergySupplierReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
-        await EnqueueMessage(enqueueMessageEvent);
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
 
         ClearDbContextCaches();
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(
@@ -104,11 +103,14 @@ public class WhenADequeueIsRequestedTests : TestBase
     {
         // Arrange
         var actorNumber = ActorNumber.Create(SampleData.SenderId);
-        var message = _energyResultMessageDtoBuilder
+        var message = _energyResultPerGridAreaMessageDtoBuilder
             .WithReceiverNumber(actorNumber.Value)
             .WithReceiverRole(ActorRole.GridOperator)
             .Build();
-        await EnqueueMessage(message);
+
+        await _outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
+        var context = GetService<ActorMessageQueueContext>();
+        await context.SaveChangesAsync();
 
         ClearDbContextCaches();
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(
@@ -130,10 +132,5 @@ public class WhenADequeueIsRequestedTests : TestBase
 
         // Assert
         dequeueResult.Success.Should().BeTrue();
-    }
-
-    private async Task EnqueueMessage(EnergyResultMessageDto message)
-    {
-        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
     }
 }

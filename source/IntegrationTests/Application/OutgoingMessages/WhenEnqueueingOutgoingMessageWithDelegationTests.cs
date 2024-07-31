@@ -30,6 +30,7 @@ using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.Tests.Factories;
 using FluentAssertions;
 using NodaTime;
 using Xunit;
@@ -39,7 +40,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
 {
-    private readonly EnergyResultMessageDtoBuilder _energyResultMessageDtoBuilder;
+    private readonly EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ActorMessageQueueContext _context;
     private readonly SystemDateTimeProviderStub _dateTimeProvider;
@@ -50,7 +51,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public WhenEnqueueingOutgoingMessageWithDelegationTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
-        _energyResultMessageDtoBuilder = new EnergyResultMessageDtoBuilder();
+        _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         _context = GetService<ActorMessageQueueContext>();
         _dateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
@@ -66,13 +67,12 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     {
         // Arrange
         var outgoingEnergyResultMessageReceiver = CreateActor(ActorNumber.Create("1234567891234"), actorRole: ActorRole.MeteredDataResponsible);
-        var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(outgoingEnergyResultMessageReceiver.ActorNumber.Value)
-            .WithReceiverRole(outgoingEnergyResultMessageReceiver.ActorRole)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithBalanceResponsiblePartyReceiverNumber(outgoingEnergyResultMessageReceiver.ActorNumber.Value)
             .Build();
 
         _delegatedBy = CreateActor(outgoingEnergyResultMessageReceiver.ActorNumber, actorRole: ActorRole.GridOperator);
-        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.SeriesForBalanceResponsible.GridAreaCode);
 
         // Act
         await EnqueueAndCommitAsync(message);
@@ -85,12 +85,11 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_delegated()
     {
         // Arrange
-        var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(_delegatedBy.ActorNumber.Value)
-            .WithReceiverRole(_delegatedBy.ActorRole)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithBalanceResponsiblePartyReceiverNumber(_delegatedBy.ActorNumber.Value)
             .Build();
 
-        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.SeriesForBalanceResponsible.GridAreaCode);
 
         // Act
         await EnqueueAndCommitAsync(message);
@@ -103,13 +102,12 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_delegated_with_multiple_delegations()
     {
         // Arrange
-        var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(_delegatedBy.ActorNumber.Value)
-            .WithReceiverRole(_delegatedBy.ActorRole)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithBalanceResponsiblePartyReceiverNumber(_delegatedBy.ActorNumber.Value)
             .Build();
 
         await AddMockDelegationsForActorAsync(_delegatedBy);
-        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.SeriesForBalanceResponsible.GridAreaCode);
 
         // Act
         await EnqueueAndCommitAsync(message);
@@ -124,12 +122,11 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         // Arrange
         _delegatedBy = CreateActor(ActorNumber.Create("1234567891234"), actorRole: ActorRole.GridOperator);
         _delegatedTo = CreateActor(ActorNumber.Create("1234567891235"), actorRole: ActorRole.GridOperator);
-        var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(_delegatedBy.ActorNumber.Value)
-            .WithReceiverRole(_delegatedTo.ActorRole)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithBalanceResponsiblePartyReceiverNumber(_delegatedBy.ActorNumber.Value)
             .Build();
 
-        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.SeriesForBalanceResponsible.GridAreaCode);
 
         // Act
         await EnqueueAndCommitAsync(message);
@@ -142,16 +139,15 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_original_receiver_when_delegation_has_expired()
     {
         // Arrange
-        var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(_delegatedBy.ActorNumber.Value)
-            .WithReceiverRole(_delegatedBy.ActorRole)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithBalanceResponsiblePartyReceiverNumber(_delegatedBy.ActorNumber.Value)
             .Build();
 
         var endsAtInThePast = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(1));
         await AddDelegationAsync(
             _delegatedBy,
             _delegatedTo,
-            message.Series.GridAreaCode,
+            message.SeriesForBalanceResponsible.GridAreaCode,
             startsAt: SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(10)),
             stopsAt: endsAtInThePast);
 
@@ -166,16 +162,15 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_original_receiver_when_delegation_is_in_future()
     {
         // Arrange
-        var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(_delegatedBy.ActorNumber.Value)
-            .WithReceiverRole(_delegatedBy.ActorRole)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithBalanceResponsiblePartyReceiverNumber(_delegatedBy.ActorNumber.Value)
             .Build();
 
         var startsAtInTheFuture = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5));
         await AddDelegationAsync(
             _delegatedBy,
             _delegatedTo,
-            message.Series.GridAreaCode,
+            message.SeriesForBalanceResponsible.GridAreaCode,
             startsAt: startsAtInTheFuture,
             stopsAt: SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(10)));
 
@@ -190,18 +185,17 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_original_receiver_when_delegation_has_stopped()
     {
         // Arrange
-        var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(_delegatedBy.ActorNumber.Value)
-            .WithReceiverRole(_delegatedBy.ActorRole)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithBalanceResponsiblePartyReceiverNumber(_delegatedBy.ActorNumber.Value)
             .Build();
 
         var startsAt = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(10));
         var now = SystemClock.Instance.GetCurrentInstant();
         _dateTimeProvider.SetNow(now);
-        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: now.Plus(Duration.FromDays(30)), sequenceNumber: 0);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.SeriesForBalanceResponsible.GridAreaCode, startsAt: startsAt, stopsAt: now.Plus(Duration.FromDays(30)), sequenceNumber: 0);
 
         // Cancel a delegation by adding a newer (higher sequence number) delegation to same receiver, with startsAt == stopsAt
-        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: now, sequenceNumber: 1);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.SeriesForBalanceResponsible.GridAreaCode, startsAt: startsAt, stopsAt: now, sequenceNumber: 1);
 
         // Act
         await EnqueueAndCommitAsync(message);
@@ -214,21 +208,20 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_delegated_with_new_delegation_after_a_stopped_delegation()
     {
         // Arrange
-        var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(_delegatedBy.ActorNumber.Value)
-            .WithReceiverRole(_delegatedBy.ActorRole)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithBalanceResponsiblePartyReceiverNumber(_delegatedBy.ActorNumber.Value)
             .Build();
 
         var startsAtForStoppedDelegation = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(10));
-        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAtForStoppedDelegation, sequenceNumber: 0);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.SeriesForBalanceResponsible.GridAreaCode, startsAt: startsAtForStoppedDelegation, sequenceNumber: 0);
 
         // delegation, which stops previous delegation
-        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAtForStoppedDelegation, stopsAt: startsAtForStoppedDelegation, sequenceNumber: 1);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.SeriesForBalanceResponsible.GridAreaCode, startsAt: startsAtForStoppedDelegation, stopsAt: startsAtForStoppedDelegation, sequenceNumber: 1);
 
         // new delegation, which starts delegation to _delegatedTo
         var startsAt = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5));
         var stopsAt = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5));
-        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: stopsAt, sequenceNumber: 2);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.SeriesForBalanceResponsible.GridAreaCode, startsAt: startsAt, stopsAt: stopsAt, sequenceNumber: 2);
 
         // Act
         await EnqueueAndCommitAsync(message);
@@ -241,14 +234,13 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_delegated_on_delegation_starts_date()
     {
         // Arrange
-        var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(_delegatedBy.ActorNumber.Value)
-            .WithReceiverRole(_delegatedBy.ActorRole)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithBalanceResponsiblePartyReceiverNumber(_delegatedBy.ActorNumber.Value)
             .Build();
 
         var startsAt = Instant.FromUtc(2024, 10, 1, 0, 0);
         _dateTimeProvider.SetNow(startsAt);
-        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: startsAt, stopsAt: startsAt.Plus(Duration.FromDays(5)));
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.SeriesForBalanceResponsible.GridAreaCode, startsAt: startsAt, stopsAt: startsAt.Plus(Duration.FromDays(5)));
 
         // Act
         await EnqueueAndCommitAsync(message);
@@ -261,14 +253,13 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_original_receiver_on_delegation_stops_date()
     {
         // Arrange
-        var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(_delegatedBy.ActorNumber.Value)
-            .WithReceiverRole(_delegatedBy.ActorRole)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithBalanceResponsiblePartyReceiverNumber(_delegatedBy.ActorNumber.Value)
             .Build();
 
         var stopsAt = Instant.FromUtc(2024, 10, 1, 0, 0);
         _dateTimeProvider.SetNow(stopsAt);
-        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, startsAt: stopsAt.Minus(Duration.FromDays(5)), stopsAt: stopsAt);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.SeriesForBalanceResponsible.GridAreaCode, startsAt: stopsAt.Minus(Duration.FromDays(5)), stopsAt: stopsAt);
 
         // Act
         await EnqueueAndCommitAsync(message);
@@ -281,12 +272,11 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_original_receiver_when_delegated_for_another_process_type()
     {
         // Arrange
-        var message = _energyResultMessageDtoBuilder
-            .WithReceiverNumber(_delegatedBy.ActorNumber.Value)
-            .WithReceiverRole(_delegatedBy.ActorRole)
+        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+            .WithBalanceResponsiblePartyReceiverNumber(_delegatedBy.ActorNumber.Value)
             .Build();
 
-        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode, processType: ProcessType.ReceiveWholesaleResults);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.SeriesForBalanceResponsible.GridAreaCode, processType: ProcessType.ReceiveWholesaleResults);
 
         // Act
         await EnqueueAndCommitAsync(message);
@@ -385,7 +375,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             .HasSerieRecordCount(1);
     }
 
-    private async Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultMessageDto message)
+    private async Task<IEnumerable<OutgoingMessageId>> EnqueueAndCommitAsync(EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto message)
     {
         ClearDbContextCaches();
         return await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);

@@ -21,7 +21,7 @@ using Xunit;
 
 #pragma warning disable CS8604 // Possible null reference argument.
 
-namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.Aggregations;
+namespace Energinet.DataHub.EDI.Tests.Domain.Transactions.Mappers;
 
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Test class")]
 public sealed class CalculatedQuantityQualityMapperTests
