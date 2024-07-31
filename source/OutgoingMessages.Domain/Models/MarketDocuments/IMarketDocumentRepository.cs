@@ -32,7 +32,7 @@ public interface IMarketDocumentRepository
     void Add(MarketDocument marketDocument);
 
     /// <summary>
-    /// Delete market documents if it exists
+    /// Delete market documents if they exists
     /// </summary>
     Task DeleteMarketDocumentsIfExistsAsync(IReadOnlyCollection<BundleId> bundleMessageIds);
 }

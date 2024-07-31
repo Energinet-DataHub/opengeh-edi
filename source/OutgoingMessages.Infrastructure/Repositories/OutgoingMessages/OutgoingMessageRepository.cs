@@ -92,7 +92,7 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
 
         var fileStorageReferences = outgoingMessagesToBeRemoved
             .Select(x => x.FileStorageReference).ToList();
-        await _fileStorageClient.DeleteIfExistsAsync(fileStorageReferences).ConfigureAwait(false);
+        await _fileStorageClient.DeleteIfExistsAsync(fileStorageReferences, FileStorageCategory.OutgoingMessage()).ConfigureAwait(false);
     }
 
     private async Task DownloadAndSetMessageRecordAsync(OutgoingMessage outgoingMessage)

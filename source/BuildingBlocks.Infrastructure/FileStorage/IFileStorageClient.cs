@@ -46,5 +46,6 @@ public interface IFileStorageClient
     /// Deletes files from the file storage
     /// </summary>
     /// <param name="fileStorageReferences"></param>
-    Task DeleteIfExistsAsync(IReadOnlyList<FileStorageReference> fileStorageReferences);
+    /// <param name="fileStorageCategory"></param>
+    Task DeleteIfExistsAsync(IReadOnlyList<FileStorageReference> fileStorageReferences, FileStorageCategory fileStorageCategory);
 }

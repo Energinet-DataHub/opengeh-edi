@@ -42,7 +42,7 @@ public class FileStorageClientStub : IFileStorageClient
         throw new NotImplementedException();
     }
 
-    public Task DeleteIfExistsAsync(IReadOnlyList<FileStorageReference> fileStorageReferences)
+    public Task DeleteIfExistsAsync(IReadOnlyList<FileStorageReference> fileStorageReferences, FileStorageCategory fileStorageCategory)
     {
         throw new NotImplementedException();
     }

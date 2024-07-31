@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
@@ -75,13 +76,23 @@ public class DataLakeFileStorageClient : IFileStorageClient
         return new FileStorageFile(downloadStream);
     }
 
-    public async Task DeleteIfExistsAsync(IReadOnlyList<FileStorageReference> fileStorageReferences)
+    public async Task DeleteIfExistsAsync(IReadOnlyList<FileStorageReference> fileStorageReferences, FileStorageCategory fileStorageCategory)
     {
-        var container = _blobServiceClient.GetBlobContainerClient(fileStorageReferences.First().Category.Value);
+        var container = _blobServiceClient.GetBlobContainerClient(fileStorageCategory.Value);
         var blobBatchClient = _blobServiceClient.GetBlobBatchClient();
         var blobUris = fileStorageReferences
+            .Where(x => x.Category == fileStorageCategory)
             .Select(reference => container.GetBlobClient(reference.Path).Uri)
             .ToList();
-        await blobBatchClient.DeleteBlobsAsync(blobUris, DeleteSnapshotsOption.IncludeSnapshots).ConfigureAwait(false);
+
+        try
+        {
+            await blobBatchClient.DeleteBlobsAsync(blobUris, DeleteSnapshotsOption.IncludeSnapshots).ConfigureAwait(false);
+        }
+        catch (AggregateException e) when (e.InnerExceptions.Any(x => x is RequestFailedException && x.Message.Contains("BlobNotFound")))
+        {
+            // One or more Blobs did not exist, no need to delete.
+            return;
+        }
     }
 }
