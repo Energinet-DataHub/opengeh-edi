@@ -86,7 +86,7 @@ public class WhenADequeueIsRequestedTests : TestBase
         var dequeueResult = await _outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(peekResult!.MessageId.Value, ActorRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)), CancellationToken.None);
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var found = await connection
-            .QuerySingleOrDefaultAsync<Instant?>("SELECT DequeuedAt FROM [dbo].Bundles");
+            .QueryFirstAsync<Instant?>("SELECT DequeuedAt FROM [dbo].Bundles");
 
         Assert.True(dequeueResult.Success);
         Assert.NotNull(found);

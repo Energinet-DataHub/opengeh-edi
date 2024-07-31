@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using NodaTime.Extensions;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
+namespace Energinet.DataHub.EDI.Tests.Factories;
 
 public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
 {

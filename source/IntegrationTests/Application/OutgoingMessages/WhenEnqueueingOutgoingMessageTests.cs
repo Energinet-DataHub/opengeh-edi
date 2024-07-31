@@ -47,6 +47,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     private readonly IFileStorageClient _fileStorageClient;
     private readonly WholesaleAmountPerChargeDtoBuilder _wholesaleAmountPerChargeDtoBuilder;
     private readonly EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder;
+    private readonly EnergyResultPerGridAreaMessageDtoBuilder _energyResultPerGridAreaMessageDtoBuilder;
 
     public WhenEnqueueingOutgoingMessageTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
@@ -59,15 +60,15 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         _context = GetService<ActorMessageQueueContext>();
         _wholesaleAmountPerChargeDtoBuilder = new WholesaleAmountPerChargeDtoBuilder();
         _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
+        _energyResultPerGridAreaMessageDtoBuilder = new EnergyResultPerGridAreaMessageDtoBuilder();
     }
 
     [Fact]
     public async Task Outgoing_message_is_added_to_database_with_correct_values()
     {
         // Arrange
-        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
-            .WithEnergySupplierReceiverNumber(SampleData.NewEnergySupplierNumber)
-            .WithBusinessReason(BusinessReason.WholesaleFixing) // To ensure a message is only created for the energy supplier
+        var message = _energyResultPerGridAreaMessageDtoBuilder
+            .WithMeteredDataResponsibleNumber(SampleData.GridOperatorNumber)
             .Build();
 
         var now = Instant.FromUtc(2024, 1, 1, 0, 0);
@@ -77,7 +78,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var createdOutgoingMessageId = await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
 
         // Assert
-        var expectedFileStorageReference = $"{SampleData.NewEnergySupplierNumber}/{now.Year():0000}/{now.Month():00}/{now.Day():00}/{createdOutgoingMessageId.First().Value:N}";
+        var expectedFileStorageReference = $"{SampleData.GridOperatorNumber}/{now.Year():0000}/{now.Month():00}/{now.Day():00}/{createdOutgoingMessageId.Value:N}";
 
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = "SELECT * FROM [dbo].[OutgoingMessages]";
@@ -91,7 +92,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
 
         var propertyAssertions = new Action[]
         {
-            () => Assert.Equal(createdOutgoingMessageId.First().Value, messageFromDatabase.Id),
+            () => Assert.Equal(createdOutgoingMessageId.Value, messageFromDatabase.Id),
             () => Assert.NotNull(messageFromDatabase.RecordId),
             () => Assert.Equal(message.ProcessId, messageFromDatabase.ProcessId),
             () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Name, messageFromDatabase.DocumentType),
@@ -102,7 +103,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.Equal(message.SenderId.Value, messageFromDatabase.SenderId),
             () => Assert.Equal(message.SenderRole.Code, messageFromDatabase.SenderRole),
             () => Assert.Equal(message.BusinessReason, messageFromDatabase.BusinessReason),
-            () => Assert.Equal(message.SeriesForEnergySupplier.GridAreaCode, messageFromDatabase.GridAreaCode),
+            () => Assert.Equal(message.Series.GridAreaCode, messageFromDatabase.GridAreaCode),
             () => Assert.Equal(ProcessType.ReceiveEnergyResults.Name, messageFromDatabase.MessageCreatedFromProcess),
             () => Assert.Equal(expectedFileStorageReference, messageFromDatabase.FileStorageReference),
             () => Assert.Equal("OutgoingMessage", messageFromDatabase.Discriminator),

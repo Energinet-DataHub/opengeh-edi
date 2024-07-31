@@ -35,12 +35,15 @@ using FluentAssertions;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 
 public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
 {
     private readonly EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder;
+    private readonly AcceptedEnergyResultMessageDtoBuilder _acceptedEnergyResultMessageDtoBuilder;
+    private readonly EnergyResultPerGridAreaMessageDtoBuilder _energyResultPerGridAreaMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ActorMessageQueueContext _context;
     private readonly SystemDateTimeProviderStub _dateTimeProvider;
@@ -55,6 +58,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         _context = GetService<ActorMessageQueueContext>();
         _dateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
+        _acceptedEnergyResultMessageDtoBuilder = new AcceptedEnergyResultMessageDtoBuilder();
+        _energyResultPerGridAreaMessageDtoBuilder = new EnergyResultPerGridAreaMessageDtoBuilder();
     }
 
     /// <summary>
@@ -67,15 +72,16 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     {
         // Arrange
         var outgoingEnergyResultMessageReceiver = CreateActor(ActorNumber.Create("1234567891234"), actorRole: ActorRole.MeteredDataResponsible);
-        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
-            .WithBalanceResponsiblePartyReceiverNumber(outgoingEnergyResultMessageReceiver.ActorNumber.Value)
+        var message = _energyResultPerGridAreaMessageDtoBuilder
+            .WithMeteredDataResponsibleNumber(outgoingEnergyResultMessageReceiver.ActorNumber.Value)
             .Build();
 
         _delegatedBy = CreateActor(outgoingEnergyResultMessageReceiver.ActorNumber, actorRole: ActorRole.GridOperator);
-        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.SeriesForBalanceResponsible.GridAreaCode);
+        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
 
         // Act
-        await EnqueueAndCommitAsync(message);
+        ClearDbContextCaches();
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
 
         // Assert
         await AssertEnqueuedOutgoingMessage(_delegatedTo, outgoingEnergyResultMessageReceiver);
@@ -120,19 +126,21 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_delegated_as_grid_operator()
     {
         // Arrange
-        _delegatedBy = CreateActor(ActorNumber.Create("1234567891234"), actorRole: ActorRole.GridOperator);
-        _delegatedTo = CreateActor(ActorNumber.Create("1234567891235"), actorRole: ActorRole.GridOperator);
-        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
-            .WithBalanceResponsiblePartyReceiverNumber(_delegatedBy.ActorNumber.Value)
+        var delegatedBy = CreateActor(ActorNumber.Create("1234567891234"), actorRole: ActorRole.GridOperator);
+        var delegatedByMdr = CreateActor(ActorNumber.Create("1234567891234"), actorRole: ActorRole.MeteredDataResponsible);
+        // LRN: There is a hack that dictates that MeteredDataResponsible is working as GridOperator for delegations.
+        var delegatedTo = CreateActor(ActorNumber.Create("1234567891235"), actorRole: ActorRole.GridOperator);
+        var message = _energyResultPerGridAreaMessageDtoBuilder
+            .WithMeteredDataResponsibleNumber(delegatedBy.ActorNumber.Value)
             .Build();
-
-        await AddDelegationAsync(_delegatedBy, _delegatedTo, message.SeriesForBalanceResponsible.GridAreaCode);
+        await AddDelegationAsync(delegatedBy, delegatedTo, message.Series.GridAreaCode);
 
         // Act
-        await EnqueueAndCommitAsync(message);
+        ClearDbContextCaches();
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
 
         // Assert
-        await AssertEnqueuedOutgoingMessage(_delegatedTo, _delegatedBy);
+        await AssertEnqueuedOutgoingMessage(delegatedTo, delegatedByMdr);
     }
 
     [Fact]

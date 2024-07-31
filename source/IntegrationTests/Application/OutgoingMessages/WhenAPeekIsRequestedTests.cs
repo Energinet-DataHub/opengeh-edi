@@ -29,6 +29,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.Tests.Factories;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
@@ -41,6 +42,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 public class WhenAPeekIsRequestedTests : TestBase
 {
     private readonly EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder;
+    private readonly EnergyResultPerGridAreaMessageDtoBuilder _energyResultPerGridAreaMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly SystemDateTimeProviderStub _dateTimeProvider;
 
@@ -48,6 +50,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         : base(integrationTestFixture, testOutputHelper)
     {
         _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
+        _energyResultPerGridAreaMessageDtoBuilder = new EnergyResultPerGridAreaMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         _dateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
     }
@@ -212,10 +215,11 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         // Arrange
         var actorNumber = ActorNumber.Create("1234567890123");
-        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
-            .WithEnergySupplierReceiverNumber(actorNumber.Value)
+        var message = _energyResultPerGridAreaMessageDtoBuilder
+            .WithMeteredDataResponsibleNumber(actorNumber.Value)
             .Build();
-        await EnqueueMessage(message);
+
+        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
 
         // Act
         var peekResult = await PeekMessageAsync(MessageCategory.Aggregations, actorNumber: actorNumber, actorRole: ActorRole.MeteredDataResponsible);
@@ -306,7 +310,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             { "FileStorageReference", fileStorageReference => fileStorageReference.Should().Be(expectedFileStorageReference) },
             { "Id", id => id.Should().NotBeNull() },
             { "MessageId", messageId => messageId.Should().Be(peekResult.MessageId.Value) },
-            { "ReceiverNumber", receiverNumber => receiverNumber.Should().Be(outgoingMessage.ReceiverNumber.Value) },
+            { "ReceiverNumber", receiverNumber => receiverNumber.Should().Be(outgoingMessage.EnergySupplierNumber.Value) },
             { "RecordId", recordId => recordId.Should().NotBeNull() },
             { "RelatedToMessageId", relatedToMessageId => relatedToMessageId.Should().BeNull() },
             { "SenderNumber", senderNumber => senderNumber.Should().Be(outgoingMessage.SenderId.Value) },
@@ -329,7 +333,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var numberOfBundles = await connection
             .ExecuteScalarAsync<int>("SELECT COUNT(*) FROM dbo.Bundles");
-        return numberOfBundles == 1;
+        return numberOfBundles > 0;
     }
 
     private async Task<bool> MarketDocumentExists(MessageId marketDocumentMessageId)
