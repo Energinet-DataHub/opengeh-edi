@@ -57,11 +57,6 @@ public interface IOutgoingMessagesClient
         CancellationToken cancellationToken);
 
     /// <summary>
-    /// Enqueue a energy result message, WITH commit. Currently ONLY used by the integration event.
-    /// </summary>
-    Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultMessageDto energyResultMessage, CancellationToken cancellationToken);
-
-    /// <summary>
     /// Enqueue an energy result message for a metered data responsible in a grid area, WITH commit.
     /// </summary>
     Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultPerGridAreaMessageDto messageDto, CancellationToken cancellationToken);
@@ -75,11 +70,6 @@ public interface IOutgoingMessagesClient
     /// Enqueue energy result messages for an energy supplier and a balance responsible in a grid area, WITH commit.
     /// </summary>
     Task<IReadOnlyCollection<OutgoingMessageId>> EnqueueAndCommitAsync(EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto messageDto, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Enqueue wholesale messages, handles enqueuing messages to all appropriate parties (Receiver, ChargeOwner) in a single transaction.
-    /// </summary>
-    Task EnqueueAndCommitAsync(WholesaleServicesMessageDto wholesaleServicesMessage, CancellationToken cancellationToken);
 
     /// <summary>
     /// Enqueue wholesale total amount messages, handles enqueuing messages to receiver in a single transaction.
@@ -100,9 +90,4 @@ public interface IOutgoingMessagesClient
     /// Enqueue an accepted wholesale services message, no commit. Currently ONLY used by the Process module which handles the commit itself.
     /// </summary>
     Task<OutgoingMessageId> EnqueueAsync(AcceptedWholesaleServicesMessageDto acceptedWholesaleServicesMessage, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Enqueue a wholesale services total sum message, WITH commit. Currently ONLY used by the integration event.
-    /// </summary>
-    Task<OutgoingMessageId> EnqueueAndCommitAsync(WholesaleServicesTotalSumMessageDto wholesaleServicesTotalSumMessage, CancellationToken cancellationToken);
 }
