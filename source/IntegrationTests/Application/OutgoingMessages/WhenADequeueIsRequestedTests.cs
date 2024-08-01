@@ -68,10 +68,13 @@ public class WhenADequeueIsRequestedTests : TestBase
     [Fact]
     public async Task Dequeue_is_Successful()
     {
-        var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
-            .WithEnergySupplierReceiverNumber(SampleData.NewEnergySupplierNumber)
+        var message = _energyResultPerGridAreaMessageDtoBuilder
+            .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
+            .WithReceiverRole(ActorRole.EnergySupplier)
             .Build();
-        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+        await _outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
+        var context = GetService<ActorMessageQueueContext>();
+        await context.SaveChangesAsync();
 
         ClearDbContextCaches();
         var peekResult = await _outgoingMessagesClient.PeekAndCommitAsync(
@@ -86,7 +89,7 @@ public class WhenADequeueIsRequestedTests : TestBase
         var dequeueResult = await _outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(peekResult!.MessageId.Value, ActorRole.EnergySupplier, ActorNumber.Create(SampleData.SenderId)), CancellationToken.None);
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var found = await connection
-            .QueryFirstAsync<Instant?>("SELECT DequeuedAt FROM [dbo].Bundles");
+            .QuerySingleOrDefaultAsync<Instant?>("SELECT DequeuedAt FROM [dbo].Bundles");
 
         Assert.True(dequeueResult.Success);
         Assert.NotNull(found);
