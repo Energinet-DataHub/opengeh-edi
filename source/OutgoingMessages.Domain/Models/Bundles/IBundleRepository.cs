@@ -31,11 +31,11 @@ public interface IBundleRepository
     /// </summary>
     /// <param name="olderThan"></param>
     /// <param name="take"></param>
-    Task<IReadOnlyCollection<Bundle?>> GetDequeuedBundlesOlderThanAsync(Instant olderThan, int take);
+    Task<IReadOnlyCollection<Bundle>> GetDequeuedBundlesOlderThanAsync(Instant olderThan, int take);
 
     /// <summary>
-    ///  Delete a bundle.
+    ///  Delete bundles.
     /// </summary>
-    /// <param name="bundle"></param>
-    void Delete(Bundle bundle);
+    /// <param name="bundles"></param>
+    void Delete(IReadOnlyCollection<Bundle> bundles);
 }
