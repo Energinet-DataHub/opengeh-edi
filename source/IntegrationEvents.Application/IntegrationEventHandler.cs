@@ -52,9 +52,9 @@ public sealed class IntegrationEventHandler : IIntegrationEventHandler
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
         var stopWatch = Stopwatch.StartNew();
-        _integrationEventProcessors.TryGetValue(integrationEvent.EventName, out var integrationEventMapper);
+        _integrationEventProcessors.TryGetValue(integrationEvent.EventName, out var integrationEventProcessor);
 
-        if (integrationEventMapper is null)
+        if (integrationEventProcessor is null)
         {
             return;
         }
@@ -80,7 +80,7 @@ public sealed class IntegrationEventHandler : IIntegrationEventHandler
                 return;
             }
 
-            await integrationEventMapper
+            await integrationEventProcessor
                 .ProcessAsync(integrationEvent, CancellationToken.None)
                 .ConfigureAwait(false);
 
