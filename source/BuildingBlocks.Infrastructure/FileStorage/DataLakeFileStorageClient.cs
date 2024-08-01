@@ -85,14 +85,25 @@ public class DataLakeFileStorageClient : IFileStorageClient
             .Select(reference => container.GetBlobClient(reference.Path).Uri)
             .ToList();
 
-        try
+        // Each batch request supports a maximum of 256 blobs.
+        var take = 256;
+        var skip = 0;
+        while (true)
         {
-            await blobBatchClient.DeleteBlobsAsync(blobUris, DeleteSnapshotsOption.IncludeSnapshots).ConfigureAwait(false);
-        }
-        catch (AggregateException e) when (e.InnerExceptions.Any(x => x is RequestFailedException && x.Message.Contains("BlobNotFound")))
-        {
-            // One or more Blobs did not exist, no need to delete.
-            return;
+            var batch = blobUris.Skip(skip).Take(take).ToList();
+            skip += take;
+            if (batch.Count == 0)
+                break;
+
+            try
+            {
+                await blobBatchClient.DeleteBlobsAsync(batch, DeleteSnapshotsOption.IncludeSnapshots).ConfigureAwait(false);
+            }
+            catch (AggregateException e) when (e.InnerExceptions.Any(x => x is RequestFailedException && x.Message.Contains("BlobNotFound")))
+            {
+                // One or more Blobs did not exist, no need to delete.
+                return;
+            }
         }
     }
 }
