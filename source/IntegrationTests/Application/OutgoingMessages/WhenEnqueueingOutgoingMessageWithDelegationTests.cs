@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Dapper;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
@@ -127,20 +128,18 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     {
         // Arrange
         var delegatedBy = CreateActor(ActorNumber.Create("1234567891234"), actorRole: ActorRole.GridOperator);
-        var delegatedByMdr = CreateActor(ActorNumber.Create("1234567891234"), actorRole: ActorRole.MeteredDataResponsible);
-        // LRN: There is a hack that dictates that MeteredDataResponsible is working as GridOperator for delegations.
         var delegatedTo = CreateActor(ActorNumber.Create("1234567891235"), actorRole: ActorRole.GridOperator);
-        var message = _energyResultPerGridAreaMessageDtoBuilder
-            .WithMeteredDataResponsibleNumber(delegatedBy.ActorNumber.Value)
-            .Build();
-        await AddDelegationAsync(delegatedBy, delegatedTo, message.Series.GridAreaCode);
+        var builder = new WholesaleTotalAmountMessageDtoBuilder();
+        var message = builder.WithReceiverNumber(delegatedBy.ActorNumber)
+            .WithReceiverRole(ActorRole.GridOperator).Build();
+        await AddDelegationAsync(delegatedBy, delegatedTo, message.Series.GridAreaCode!, ProcessType.ReceiveWholesaleResults);
 
         // Act
         ClearDbContextCaches();
         await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
 
         // Assert
-        await AssertEnqueuedOutgoingMessage(delegatedTo, delegatedByMdr);
+        await AssertEnqueuedOutgoingMessage(delegatedTo, delegatedBy, DocumentType.NotifyWholesaleServices, BusinessReason.WholesaleFixing);
     }
 
     [Fact]
@@ -354,13 +353,15 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
 
     private async Task AssertEnqueuedOutgoingMessage(
         Actor receiverQueue,
-        Actor receiverDocument)
+        Actor receiverDocument,
+        DocumentType? documentType = null,
+        BusinessReason? businessReason = null)
     {
         ClearDbContextCaches();
 
         var outgoingMessage = await AssertOutgoingMessage.OutgoingMessageAsync(
-            DocumentType.NotifyAggregatedMeasureData.Name,
-            BusinessReason.BalanceFixing.Name,
+            documentType != null ? documentType.Name : DocumentType.NotifyAggregatedMeasureData.Name,
+            businessReason != null ? businessReason.Name : BusinessReason.BalanceFixing.Name,
             receiverQueue.ActorRole,
             GetService<IDatabaseConnectionFactory>(),
             GetService<IFileStorageClient>());
@@ -376,8 +377,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             actorRole: receiverQueue.ActorRole);
 
         AssertXmlMessage.Document(XDocument.Load(result!.Bundle))
-            .IsDocumentType(DocumentType.NotifyAggregatedMeasureData)
-            .IsBusinessReason(BusinessReason.BalanceFixing)
+            .IsDocumentType(documentType != null ? documentType : DocumentType.NotifyAggregatedMeasureData)
+            .IsBusinessReason(businessReason != null ? businessReason : BusinessReason.BalanceFixing)
             .HasReceiverRole(receiverDocument.ActorRole)
             .HasReceiver(receiverQueue.ActorNumber)
             .HasSerieRecordCount(1);
