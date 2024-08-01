@@ -46,7 +46,7 @@ internal sealed class RequestAggregatedMeasureXmlBuilder
         string xmlNamespace = "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1";
 
         // BUILD XML HEADER
-        var cimNamespaceUri = cimXmlNamespaceUri.IsNullOrEmpty()
+        var cimNamespaceUri = string.IsNullOrEmpty(cimXmlNamespaceUri)
             ? "urn:ediel.org:measure:requestaggregatedmeasuredata:0:1"
             : cimXmlNamespaceUri;
         XmlElement meteredDataRequest = xmlPayload.CreateElement("cim", "RequestAggregatedMeasureData_MarketDocument", cimNamespaceUri);
