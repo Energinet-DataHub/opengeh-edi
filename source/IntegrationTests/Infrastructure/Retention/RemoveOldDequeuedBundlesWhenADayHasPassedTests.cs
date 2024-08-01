@@ -157,4 +157,72 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         var peekResultForGo = await PeekMessageAsync(MessageCategory.Aggregations, chargeOwnerId, ActorRole.GridOperator);
         peekResultForGo.Should().NotBeNull();
     }
+
+    [Fact]
+    public async Task Clean_up_501_dequeued_bundles_when_they_are_more_than_a_month_old()
+    {
+        // Arrange
+        var receiverId = ActorNumber.Create("1234567891912");
+        var chargeOwnerId = ActorNumber.Create("1234567891911");
+        var bundleRepository = GetService<IBundleRepository>();
+        var actorMessageQueueContext = GetService<ActorMessageQueueContext>();
+        var systemDateTimeProviderStub = new SystemDateTimeProviderStub();
+        var actorMessageQueueRepository = GetService<IActorMessageQueueRepository>();
+        var outgoingMessageRepository = GetService<IOutgoingMessageRepository>();
+        var fileStorageClient = GetService<IFileStorageClient>();
+
+        // When we set the current date to 31 days in the future, any bundles dequeued now should then be removed.
+        systemDateTimeProviderStub.SetNow(systemDateTimeProviderStub.Now().PlusDays(31));
+
+        var sut = new DequeuedBundlesRetention(
+            systemDateTimeProviderStub,
+            GetService<IMarketDocumentRepository>(),
+            outgoingMessageRepository,
+            actorMessageQueueContext,
+            bundleRepository,
+            GetService<ILogger<DequeuedBundlesRetention>>());
+
+        var outgoingMessages = new List<OutgoingMessage>();
+        var numberOfMessageToCreate = 501;
+        while (numberOfMessageToCreate > 0)
+        {
+            var message = _wholesaleAmountPerChargeDtoBuilder
+                .WithReceiverNumber(receiverId)
+                .WithChargeOwnerNumber(chargeOwnerId)
+                .WithCalculationResultId(Guid.NewGuid())
+                .Build();
+
+            // We enqueue a message where the receiver is both a energy supplier and a grid operator. and then dequeue it only for the energy supplier.
+            await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+            var peekResult = await PeekMessageAsync(MessageCategory.Aggregations, receiverId, ActorRole.EnergySupplier);
+            await _outgoingMessagesClient.DequeueAndCommitAsync(
+                new DequeueRequestDto(peekResult!.MessageId.Value, ActorRole.EnergySupplier, receiverId),
+                CancellationToken.None);
+
+            numberOfMessageToCreate--;
+            var outgoingMessageForReceivingActor = await outgoingMessageRepository.GetAsync(Receiver.Create(receiverId, ActorRole.EnergySupplier), message.ExternalId);
+            outgoingMessages.Add(outgoingMessageForReceivingActor!);
+        }
+
+        // Act
+        await sut.CleanupAsync(CancellationToken.None);
+
+        // Assert
+        ClearDbContextCaches();
+        var actorMessageQueueForEs = await actorMessageQueueRepository.ActorMessageQueueForAsync(receiverId, ActorRole.EnergySupplier);
+
+        // The bundle should be removed from the queue for the energy supplier, but not for the grid operator.
+        actorMessageQueueForEs!.GetDequeuedBundles().Should().BeEmpty();
+
+        // We are still able to peek the message for the grid operator.
+        var peekResultForGo = await PeekMessageAsync(MessageCategory.Aggregations, chargeOwnerId, ActorRole.GridOperator);
+        peekResultForGo.Should().NotBeNull();
+
+        // blob should be cleaned up
+        foreach (var outgoingMessage in outgoingMessages)
+        {
+            var downloadBlob = () => fileStorageClient.DownloadAsync(outgoingMessage!.FileStorageReference);
+            await downloadBlob.Should().ThrowAsync<RequestFailedException>();
+        }
+    }
 }
