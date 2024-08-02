@@ -68,31 +68,6 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         Fixture.SetTestOutputHelper(null!);
     }
 
-    [Theory]
-    [InlineData(null)]
-    [InlineData(CalculationCompletedV1.Types.CalculationType.BalanceFixing)]
-    [InlineData(CalculationCompletedV1.Types.CalculationType.WholesaleFixing)]
-    public async Task Given_FeatureFlagIsDisabledForCalculationType_When_CalculationCompletedEventIsSent_Then_OrchestrationIsNeverStarted(CalculationCompletedV1.Types.CalculationType? calculationTypeToTest)
-    {
-        // Arrange
-        Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: false);
-
-        var calculationOrchestrationId = Guid.NewGuid().ToString();
-        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
-            calculationOrchestrationId,
-            calculationTypeToTest);
-
-        // Act
-        var beforeOrchestrationCreated = DateTime.UtcNow;
-        await Fixture.TopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
-
-        // Assert
-        var act = async () => await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
-        await act.Should()
-            .ThrowAsync<Exception>()
-            .WithMessage("Orchestration did not start within configured wait time*");
-    }
-
     /// <summary>
     /// Verifies that:
     ///  - The orchestration can complete a full run.

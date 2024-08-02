@@ -20,13 +20,4 @@ namespace BuildingBlocks.Application.FeatureFlag;
 /// </summary>
 public enum FeatureFlagName
 {
-    UseMonthlyAmountPerChargeResultProduced,
-    UseAmountPerChargeResultProduced,
-    UseRequestWholesaleSettlementReceiver,
-    UseMessageDelegation,
-    UsePeekMessages,
-    UseRequestMessages,
-    UseEnergyResultProduced,
-    UseTotalMonthlyAmountResultProduced,
-    UseCalculationCompletedEvent,
 }

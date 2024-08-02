@@ -28,18 +28,13 @@ namespace Energinet.DataHub.EDI.B2BApi.IncomingMessages;
 
 public class IncomingMessageReceiver
 {
-    private readonly IFeatureFlagManager _featureFlagManager;
     private readonly IIncomingMessageClient _incomingMessageClient;
     private readonly ILogger<IncomingMessageReceiver> _logger;
 
-    public IncomingMessageReceiver(
-        ILogger<IncomingMessageReceiver> logger,
-        IIncomingMessageClient incomingMessageClient,
-        IFeatureFlagManager featureFlagManager)
+    public IncomingMessageReceiver(ILogger<IncomingMessageReceiver> logger, IIncomingMessageClient incomingMessageClient)
     {
         _logger = logger;
         _incomingMessageClient = incomingMessageClient;
-        _featureFlagManager = featureFlagManager;
     }
 
     [Function(nameof(IncomingMessageReceiver))]
@@ -51,12 +46,6 @@ public class IncomingMessageReceiver
         CancellationToken hostCancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        if (!await _featureFlagManager.UseRequestMessagesAsync().ConfigureAwait(false))
-        {
-            var response = HttpResponseData.CreateResponse(request);
-            response.StatusCode = HttpStatusCode.NotFound;
-            return response;
-        }
 
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
         var contentType = request.Headers.TryGetContentType();
@@ -78,12 +67,6 @@ public class IncomingMessageReceiver
 
         var incomingDocumentType = IncomingDocumentType.FromName(incomingDocumentTypeName);
         if (incomingDocumentType == null) return request.CreateResponse(HttpStatusCode.NotFound);
-
-        if (incomingDocumentType == IncomingDocumentType.RequestWholesaleSettlement
-            && !await _featureFlagManager.UseRequestWholesaleSettlementReceiverAsync().ConfigureAwait(false))
-        {
-            return request.CreateResponse(HttpStatusCode.NotFound);
-        }
 
         var responseMessage = await _incomingMessageClient
             .ReceiveIncomingMarketMessageAsync(
