@@ -131,17 +131,21 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
     {
         // Arrange
         // This is the wholesale series with most nullable fields.
-        var series = new WholesaleServicesTotalSumSeries(
-            TransactionId: SampleData.TransactionId,
-            CalculationVersion: 1,
-            GridAreaCode: SampleData.GridAreaCode,
-            EnergySupplier: SampleData.EnergySupplier,
-            Period: new Period(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc),
-            SettlementVersion: null,
-            QuantityMeasureUnit: MeasurementUnit.Kwh,
-            Currency: Currency.DanishCrowns,
-            Resolution: Resolution.Monthly,
-            Amount: 100);
+        var wholesaleTotalAmountMessageDto = new WholesaleTotalAmountMessageDto(
+            EventId.From(Guid.NewGuid()),
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            1,
+            SampleData.ReceiverId,
+            ActorRole.EnergySupplier,
+            SampleData.EnergySupplier,
+            SampleData.BusinessReason.Code,
+            SampleData.GridAreaCode,
+            new Period(SampleData.PeriodStartUtc, SampleData.PeriodEndUtc),
+            Currency.DanishCrowns,
+            null,
+            new Collection<WholesaleServicesPoint>() { new(1, 1, 1, 100, CalculatedQuantityQuality.Calculated) });
+
         var header = new OutgoingMessageHeader(
             DataHubNames.BusinessReason.WholesaleFixing,
             SampleData.SenderId.Value,
@@ -154,7 +158,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
         // Act
         var document = await WriteDocument(
             header,
-            series,
+            wholesaleTotalAmountMessageDto.Series,
             DocumentFormat.FromName(documentFormat));
 
         // Assert

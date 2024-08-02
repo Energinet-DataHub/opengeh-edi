@@ -541,35 +541,6 @@ public class OutgoingMessage
             calculationId: null);
     }
 
-    /// <summary>
-    ///     This method create a single outgoing message, for the receiver, based on the WholesaleServicesTotalSumMessage.
-    /// </summary>
-    public static OutgoingMessage CreateMessage(
-        WholesaleServicesTotalSumMessageDto wholesaleServicesTotalSumMessage,
-        ISerializer serializer,
-        Instant timestamp)
-    {
-        ArgumentNullException.ThrowIfNull(serializer);
-        ArgumentNullException.ThrowIfNull(wholesaleServicesTotalSumMessage);
-
-        return new(
-            wholesaleServicesTotalSumMessage.EventId,
-            wholesaleServicesTotalSumMessage.DocumentType,
-            wholesaleServicesTotalSumMessage.ReceiverNumber,
-            wholesaleServicesTotalSumMessage.ProcessId,
-            wholesaleServicesTotalSumMessage.BusinessReason,
-            wholesaleServicesTotalSumMessage.ReceiverRole,
-            wholesaleServicesTotalSumMessage.SenderId,
-            wholesaleServicesTotalSumMessage.SenderRole,
-            serializer.Serialize(wholesaleServicesTotalSumMessage.Series),
-            timestamp,
-            ProcessType.ReceiveWholesaleResults,
-            wholesaleServicesTotalSumMessage.RelatedToMessageId,
-            wholesaleServicesTotalSumMessage.Series.GridAreaCode,
-            wholesaleServicesTotalSumMessage.ExternalId,
-            calculationId: wholesaleServicesTotalSumMessage.CalculationId);
-    }
-
     public void AssignToBundle(BundleId bundleId)
     {
         AssignedBundleId = bundleId;
