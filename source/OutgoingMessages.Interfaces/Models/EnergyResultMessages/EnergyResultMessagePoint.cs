@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
 
-public record PeekRequestDto(ActorNumber ActorNumber, MessageCategory MessageCategory, ActorRole ActorRole,
-    DocumentFormat DocumentFormat);
+public record EnergyResultMessagePoint(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);

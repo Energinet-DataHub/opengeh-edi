@@ -15,6 +15,7 @@
 using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Mappers;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 
