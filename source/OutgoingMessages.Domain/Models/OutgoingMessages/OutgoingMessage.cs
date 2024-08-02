@@ -361,54 +361,6 @@ public class OutgoingMessage
     /// This method creates two outgoing messages, one for the receiver and one for the charge owner, based on the wholesaleResultMessage.
     /// </summary>
     public static IReadOnlyCollection<OutgoingMessage> CreateMessages(
-        WholesaleServicesMessageDto wholesaleServicesMessageDto,
-        ISerializer serializer,
-        Instant timestamp)
-    {
-        ArgumentNullException.ThrowIfNull(serializer);
-        ArgumentNullException.ThrowIfNull(wholesaleServicesMessageDto);
-
-        return new List<OutgoingMessage>()
-        {
-            new(
-                wholesaleServicesMessageDto.EventId,
-                wholesaleServicesMessageDto.DocumentType,
-                wholesaleServicesMessageDto.ReceiverNumber,
-                wholesaleServicesMessageDto.ProcessId,
-                wholesaleServicesMessageDto.BusinessReason,
-                wholesaleServicesMessageDto.ReceiverRole,
-                wholesaleServicesMessageDto.SenderId,
-                wholesaleServicesMessageDto.SenderRole,
-                serializer.Serialize(wholesaleServicesMessageDto.Series),
-                timestamp,
-                ProcessType.ReceiveWholesaleResults,
-                wholesaleServicesMessageDto.RelatedToMessageId,
-                wholesaleServicesMessageDto.Series.GridAreaCode,
-                wholesaleServicesMessageDto.ExternalId,
-                calculationId: wholesaleServicesMessageDto.CalculationId),
-            new(
-                wholesaleServicesMessageDto.EventId,
-                wholesaleServicesMessageDto.DocumentType,
-                wholesaleServicesMessageDto.ChargeOwnerId,
-                wholesaleServicesMessageDto.ProcessId,
-                wholesaleServicesMessageDto.BusinessReason,
-                GetChargeOwnerRole(wholesaleServicesMessageDto.ChargeOwnerId),
-                wholesaleServicesMessageDto.SenderId,
-                wholesaleServicesMessageDto.SenderRole,
-                serializer.Serialize(wholesaleServicesMessageDto.Series),
-                timestamp,
-                ProcessType.ReceiveWholesaleResults,
-                wholesaleServicesMessageDto.RelatedToMessageId,
-                wholesaleServicesMessageDto.Series.GridAreaCode,
-                wholesaleServicesMessageDto.ExternalId,
-                calculationId: wholesaleServicesMessageDto.CalculationId),
-        };
-    }
-
-    /// <summary>
-    /// This method creates two outgoing messages, one for the receiver and one for the charge owner, based on the wholesaleResultMessage.
-    /// </summary>
-    public static IReadOnlyCollection<OutgoingMessage> CreateMessages(
         WholesaleAmountPerChargeMessageDto wholesaleAmountPerChargeMessageDto,
         ISerializer serializer,
         Instant timestamp)
