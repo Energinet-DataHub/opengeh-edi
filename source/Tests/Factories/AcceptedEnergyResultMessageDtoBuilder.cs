@@ -12,70 +12,78 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
-using NodaTime;
+using NodaTime.Extensions;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
 
-public static class AcceptedEnergyResultMessageDtoBuilder
+public class AcceptedEnergyResultMessageDtoBuilder
 {
-    private const long CalculationResultVersion = 1;
-    private const string GridAreaCode = "804";
-    private static readonly ActorNumber _receiverNumber = ActorNumber.Create("1234567890123");
-    private static readonly ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
-    private static readonly Guid _processId = Guid.NewGuid();
-    private static readonly string _meteringPointType = MeteringPointType.Consumption.Code;
-    private static readonly string? _settlementMethod = SettlementMethod.Flex.Code;
-    private static readonly string _measureUnitType = MeasurementUnit.Kwh.Code;
-    private static readonly string _resolution = Resolution.QuarterHourly.Code;
-    private static readonly ActorNumber? _energySupplierNumber = ActorNumber.Create("1234567890123");
-    private static readonly ActorNumber? _balanceResponsibleNumber = ActorNumber.Create("1234567890124");
-    private static readonly Period _period = new(
-        Instant.FromUtc(2024, 02, 02, 02, 02, 02),
-        Instant.FromUtc(2024, 02, 02, 02, 02, 02));
+    private const string GridAreaCode = "805";
+    private readonly IReadOnlyCollection<AcceptedEnergyResultMessagePoint> _points = [];
+    private readonly Guid _processId = Guid.NewGuid();
+    private EventId _eventId = EventId.From(Guid.NewGuid());
+    private BusinessReason _businessReason = BusinessReason.BalanceFixing;
+    private SettlementVersion? _settlementVersion;
+    private ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
+    private ActorRole _receiverRole = ActorRole.MeteredDataAdministrator;
+    private ActorRole _documentReceiverRole = ActorRole.MeteredDataResponsible;
+    private ActorNumber _documentReceiverNumber = ActorNumber.Create("1234567891913");
 
-    private static readonly IReadOnlyCollection<AcceptedEnergyResultMessagePoint> _points =
-        new List<AcceptedEnergyResultMessagePoint>()
-        {
-            new(
-                1,
-                2,
-                CalculatedQuantityQuality.Calculated,
-                Instant.FromUtc(2024, 02, 02, 02, 02, 02).ToString()),
-        };
-
-    private static readonly string _businessReasonName = BusinessReason.BalanceFixing.Code;
-    private static readonly TransactionId? _originalTransactionIdReference = TransactionId.New();
-    private static readonly string? _settlementVersion = SettlementVersion.FirstCorrection.Code;
-    private static readonly MessageId? _relatedToMessageId = MessageId.New();
-    private static readonly EventId _eventId = EventId.From(Guid.NewGuid());
-
-    public static AcceptedEnergyResultMessageDto Build()
+    public AcceptedEnergyResultMessageDto Build()
     {
         return AcceptedEnergyResultMessageDto.Create(
-            receiverNumber: _receiverNumber,
-            receiverRole: _receiverRole,
-            documentReceiverNumber: _receiverNumber,
-            documentReceiverRole: _receiverRole,
-            processId: _processId,
-            eventId: _eventId,
-            gridAreaCode: GridAreaCode,
-            meteringPointType: _meteringPointType,
-            settlementMethod: _settlementMethod,
-            measureUnitType: _measureUnitType,
-            resolution: _resolution,
-            energySupplierNumber: _energySupplierNumber?.Value,
-            balanceResponsibleNumber: _balanceResponsibleNumber?.Value,
-            period: _period,
-            points: _points,
-            businessReasonName: _businessReasonName,
-            calculationResultVersion: CalculationResultVersion,
-            originalTransactionIdReference: _originalTransactionIdReference,
-            settlementVersion: _settlementVersion,
-            relatedToMessageId: _relatedToMessageId);
+            _receiverNumber,
+            _receiverRole,
+            _documentReceiverNumber,
+            _documentReceiverRole,
+            _processId,
+            _eventId,
+            GridAreaCode,
+            MeteringPointType.Consumption.Name,
+            SettlementMethod.NonProfiled.Name,
+            MeasurementUnit.Kwh.Name,
+            Resolution.Hourly.Name,
+            _receiverNumber.Value,
+            null,
+            new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
+            _points,
+            _businessReason.Name,
+            1,
+            TransactionId.From("1234567891912"),
+            _settlementVersion?.Name,
+            null);
+    }
+
+    public AcceptedEnergyResultMessageDtoBuilder WithReceiverNumber(string receiverNumber)
+    {
+        _receiverNumber = ActorNumber.Create(receiverNumber);
+        return this;
+    }
+
+    public AcceptedEnergyResultMessageDtoBuilder WithReceiverRole(ActorRole actorRole)
+    {
+        _receiverRole = actorRole;
+        return this;
+    }
+
+    public AcceptedEnergyResultMessageDtoBuilder WithBusinessReason(BusinessReason businessReason)
+    {
+        _businessReason = businessReason;
+        return this;
+    }
+
+    public AcceptedEnergyResultMessageDtoBuilder WithSettlementVersion(SettlementVersion settlementVersion)
+    {
+        _settlementVersion = settlementVersion;
+        return this;
+    }
+
+    public AcceptedEnergyResultMessageDtoBuilder WithEventId(EventId eventId)
+    {
+        _eventId = eventId;
+        return this;
     }
 }

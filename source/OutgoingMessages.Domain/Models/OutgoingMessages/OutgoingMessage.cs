@@ -242,35 +242,6 @@ public class OutgoingMessage
     }
 
     /// <summary>
-    /// This method create a single outgoing message, for the receiver, based on the energyResultMessage.
-    /// </summary>
-    public static OutgoingMessage CreateMessage(
-        EnergyResultMessageDto energyResultMessage,
-        ISerializer serializer,
-        Instant timestamp)
-    {
-        ArgumentNullException.ThrowIfNull(serializer);
-        ArgumentNullException.ThrowIfNull(energyResultMessage);
-
-        return new OutgoingMessage(
-            energyResultMessage.EventId,
-            energyResultMessage.DocumentType,
-            energyResultMessage.ReceiverNumber,
-            energyResultMessage.ProcessId,
-            energyResultMessage.BusinessReason,
-            energyResultMessage.ReceiverRole,
-            energyResultMessage.SenderId,
-            energyResultMessage.SenderRole,
-            serializer.Serialize(energyResultMessage.Series),
-            timestamp,
-            ProcessType.ReceiveEnergyResults,
-            energyResultMessage.RelatedToMessageId,
-            energyResultMessage.Series.GridAreaCode,
-            energyResultMessage.ExternalId,
-            calculationId: energyResultMessage.CalculationId);
-    }
-
-    /// <summary>
     /// Create one outgoing message for the metered data responsible, based on the <paramref name="messageDto"/>.
     /// </summary>
     public static OutgoingMessage CreateMessage(

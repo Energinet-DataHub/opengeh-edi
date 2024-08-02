@@ -108,7 +108,7 @@ public class OutgoingMessageTests
     {
         // Arrange
         var serializer = new Serializer();
-        var energyResultMessageDto = new EnergyResultMessageDtoBuilder()
+        var energyResultMessageDto = new EnergyResultPerGridAreaMessageDtoBuilder()
             .Build();
 
         // Act
@@ -132,7 +132,8 @@ public class OutgoingMessageTests
     {
         // Arrange
         var serializer = new Serializer();
-        var acceptedEnergyResultMessageDto = AcceptedEnergyResultMessageDtoBuilder.Build();
+        var acceptedEnergyResultMessageDtoBuilder = new AcceptedEnergyResultMessageDtoBuilder();
+        var acceptedEnergyResultMessageDto = acceptedEnergyResultMessageDtoBuilder.Build();
 
         // Act
         var outgoingMessage = OutgoingMessage.CreateMessage(
@@ -278,7 +279,7 @@ public class OutgoingMessageTests
     public void ActorMessageQueueMetadata_is_DDM_when_document_is_NotifyAggregatedMeasureData_and_role_is_MDR()
     {
         // Arrange
-        var energyResultMessageDto = new EnergyResultMessageDtoBuilder()
+        var energyResultMessageDto = new AcceptedEnergyResultMessageDtoBuilder()
             .WithReceiverRole(ActorRole.MeteredDataResponsible)
             .Build();
 
