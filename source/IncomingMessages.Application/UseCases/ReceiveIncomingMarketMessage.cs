@@ -36,7 +36,6 @@ public class ReceiveIncomingMarketMessage
        private readonly IIncomingMessageReceiver _incomingMessageReceiver;
        private readonly DelegateIncomingMessage _delegateIncomingMessage;
        private readonly ISystemDateTimeProvider _systemDateTimeProvider;
-       private readonly IFeatureFlagManager _featureFlagManager;
 
        public ReceiveIncomingMarketMessage(
         MarketMessageParser marketMessageParser,
@@ -46,8 +45,7 @@ public class ReceiveIncomingMarketMessage
         ILogger<IncomingMessageClient> logger,
         IIncomingMessageReceiver incomingMessageReceiver,
         DelegateIncomingMessage delegateIncomingMessage,
-        ISystemDateTimeProvider systemDateTimeProvider,
-        IFeatureFlagManager featureFlagManager)
+        ISystemDateTimeProvider systemDateTimeProvider)
     {
         _marketMessageParser = marketMessageParser;
         _validateIncomingMessage = validateIncomingMessage;
@@ -57,7 +55,6 @@ public class ReceiveIncomingMarketMessage
         _incomingMessageReceiver = incomingMessageReceiver;
         _delegateIncomingMessage = delegateIncomingMessage;
         _systemDateTimeProvider = systemDateTimeProvider;
-        _featureFlagManager = featureFlagManager;
     }
 
        public async Task<ResponseMessage> ReceiveIncomingMarketMessageAsync(
@@ -94,12 +91,9 @@ public class ReceiveIncomingMarketMessage
                 cancellationToken)
             .ConfigureAwait(false);
 
-        if (await _featureFlagManager.UseMessageDelegationAsync().ConfigureAwait(false))
-        {
-            await _delegateIncomingMessage
+        await _delegateIncomingMessage
                 .DelegateAsync(incomingMarketMessageParserResult.IncomingMessage, documentType, cancellationToken)
                 .ConfigureAwait(false);
-        }
 
         var validationResult = await _validateIncomingMessage
             .ValidateAsync(incomingMarketMessageParserResult.IncomingMessage, cancellationToken)

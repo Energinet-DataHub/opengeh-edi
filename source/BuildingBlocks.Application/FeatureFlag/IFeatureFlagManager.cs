@@ -24,49 +24,4 @@ namespace BuildingBlocks.Application.FeatureFlag;
 /// </summary>
 public interface IFeatureFlagManager
 {
-    /// <summary>
-    /// Whether to allow handling MonthlyAmountPerChargeResultProduced events
-    /// </summary>
-    Task<bool> UseMonthlyAmountPerChargeResultProducedAsync();
-
-    /// <summary>
-    /// Whether to allow handling AmountPerChargeResultProduced events
-    /// </summary>
-    Task<bool> UseAmountPerChargeResultProducedAsync();
-
-    /// <summary>
-    /// Whether to allow handling WholesaleSettlement Request
-    /// </summary>
-    Task<bool> UseRequestWholesaleSettlementReceiverAsync();
-
-    /// <summary>
-    /// Whether to allow message delegation for actors.
-    /// </summary>
-    Task<bool> UseMessageDelegationAsync();
-
-    /// <summary>
-    /// Whether to allow actors to peek messages.
-    /// </summary>
-    Task<bool> UsePeekMessagesAsync();
-
-    /// <summary>
-    /// Whether to allow actors to request messages.
-    /// </summary>
-    Task<bool> UseRequestMessagesAsync();
-
-    /// <summary>
-    /// Whether to allow handling EnergyResultProducedV2 events.
-    /// </summary>
-    Task<bool> UseEnergyResultProducedAsync();
-
-    /// <summary>
-    /// Whether to allow handling TotalMonthlyAmountResultProduced events.
-    /// </summary>
-    Task<bool> UseTotalMonthlyAmountResultProducedAsync();
-
-    /// <summary>
-    /// When true we use the 'EnqueueMessagesOrchestration' to prepare messages;
-    /// otherwise we prepare messages based on the old implementation.
-    /// </summary>
-    Task<bool> UseCalculationCompletedEventAsync();
 }

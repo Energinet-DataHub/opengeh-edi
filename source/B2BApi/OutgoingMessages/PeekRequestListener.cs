@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
-using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.B2BApi.Common;
 using Energinet.DataHub.EDI.B2BApi.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
@@ -35,18 +31,15 @@ public class PeekRequestListener
     private readonly AuthenticatedActor _authenticatedActor;
     private readonly ILogger<PeekRequestListener> _logger;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
-    private readonly IFeatureFlagManager _featureFlagManager;
 
     public PeekRequestListener(
         AuthenticatedActor authenticatedActor,
         ILogger<PeekRequestListener> logger,
-        IOutgoingMessagesClient outgoingMessagesClient,
-        IFeatureFlagManager featureFlagManager)
+        IOutgoingMessagesClient outgoingMessagesClient)
     {
         _authenticatedActor = authenticatedActor;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _outgoingMessagesClient = outgoingMessagesClient;
-        _featureFlagManager = featureFlagManager;
     }
 
     [Function("PeekRequestListener")]
@@ -62,12 +55,6 @@ public class PeekRequestListener
     {
         ArgumentNullException.ThrowIfNull(request);
         var response = HttpResponseData.CreateResponse(request);
-        if (!await _featureFlagManager.UsePeekMessagesAsync().ConfigureAwait(false))
-        {
-            response.StatusCode = HttpStatusCode.NotFound;
-            return response;
-        }
-
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
         var contentType = request.Headers.TryGetContentType();
         if (contentType is null)
