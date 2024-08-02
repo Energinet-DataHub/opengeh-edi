@@ -35,7 +35,6 @@ public class EnqueueMessage
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly ILogger<EnqueueMessage> _logger;
     private readonly DelegateMessage _delegateMessage;
-    private readonly IFeatureFlagManager _featureFlagManager;
 
     public EnqueueMessage(
         IOutgoingMessageRepository outgoingMessageRepository,
@@ -43,8 +42,7 @@ public class EnqueueMessage
         IBundleRepository bundleRepository,
         ISystemDateTimeProvider systemDateTimeProvider,
         ILogger<EnqueueMessage> logger,
-        DelegateMessage delegateMessage,
-        IFeatureFlagManager featureFlagManager)
+        DelegateMessage delegateMessage)
     {
         _outgoingMessageRepository = outgoingMessageRepository;
         _actorMessageQueueRepository = actorMessageQueueRepository;
@@ -52,7 +50,6 @@ public class EnqueueMessage
         _systemDateTimeProvider = systemDateTimeProvider;
         _logger = logger;
         _delegateMessage = delegateMessage;
-        _featureFlagManager = featureFlagManager;
     }
 
     public async Task<OutgoingMessageId> EnqueueAsync(
@@ -61,11 +58,8 @@ public class EnqueueMessage
     {
         ArgumentNullException.ThrowIfNull(messageToEnqueue);
 
-        if (await _featureFlagManager.UseMessageDelegationAsync().ConfigureAwait(false))
-        {
-            messageToEnqueue = await _delegateMessage.DelegateAsync(messageToEnqueue, cancellationToken)
+        messageToEnqueue = await _delegateMessage.DelegateAsync(messageToEnqueue, cancellationToken)
                 .ConfigureAwait(false);
-        }
 
         var existingMessage = await _outgoingMessageRepository.GetAsync(messageToEnqueue.Receiver, messageToEnqueue.ExternalId).ConfigureAwait(false);
         if (existingMessage != null) // Message is already enqueued, do nothing (idempotency check)
