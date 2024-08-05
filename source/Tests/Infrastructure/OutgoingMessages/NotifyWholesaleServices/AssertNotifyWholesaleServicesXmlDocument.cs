@@ -431,6 +431,10 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
 
         AssertQuantityQuality(pointsInDocument, 0, quantityQualities);
 
+        _documentAsserter.IsNotPresent("Series[1]/Period/Point[1]/energy_Quantity.quantity");
+
+        _documentAsserter.IsNotPresent("Series[1]/Period/Point[1]/price.amount");
+
         return this;
     }
 

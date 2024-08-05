@@ -464,6 +464,10 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
 
         AssertQuantityQuality(pointsInDocument, 0, quantityQualities);
 
+        _documentAsserter.IsNotPresent($"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[1]/EnergyQuantity");
+
+        _documentAsserter.IsNotPresent("PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[1]/EnergyPrice");
+
         return this;
     }
 
