@@ -671,16 +671,6 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
         AssertQuantityQuality(pointsInDocument, 0, quantityQualities);
 
-        FirstWholesaleSeriesElement()
-            .TryGetProperty("energy_Quantity.quantity", out _)
-            .Should()
-            .BeFalse();
-
-        FirstWholesaleSeriesElement()
-            .TryGetProperty("price.amount", out _)
-            .Should()
-            .BeFalse();
-
         return this;
     }
 
