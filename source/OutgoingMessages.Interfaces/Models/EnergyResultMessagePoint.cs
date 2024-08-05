@@ -12,20 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.Common;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Protobuf;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-/// <summary>
-/// This implementation is taken from https://learn.microsoft.com/en-us/dotnet/architecture/grpc-for-wcf-developers/protobuf-data-types#decimals
-/// </summary>
-public static class DecimalParser
-{
-    public static decimal Parse(DecimalValue input)
-    {
-        ArgumentNullException.ThrowIfNull(input);
-        const decimal nanoFactor = 1_000_000_000;
-        return input.Units + (input.Nanos / nanoFactor);
-    }
-}
+public record EnergyResultMessagePoint(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);

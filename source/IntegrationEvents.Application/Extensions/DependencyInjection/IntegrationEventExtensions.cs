@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Linq;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
@@ -21,7 +19,6 @@ using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.Options;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
-using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Factories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf.Reflection;
@@ -38,10 +35,6 @@ public static class IntegrationEventExtensions
         IConfiguration configuration)
     {
         services
-            .AddTransient<IIntegrationEventProcessor, EnergyResultProducedV2Processor>()
-            .AddTransient<IIntegrationEventProcessor, MonthlyAmountPerChargeResultProducedV1Processor>()
-            .AddTransient<IIntegrationEventProcessor, TotalMonthlyAmountResultProducedV1Processor>()
-            .AddTransient<IIntegrationEventProcessor, AmountPerChargeResultProducedV1Processor>()
             .AddTransient<IIntegrationEventProcessor, ActorActivatedIntegrationEventProcessor>()
             .AddTransient<IIntegrationEventProcessor, GridAreaOwnershipAssignedIntegrationEventProcessor>()
             .AddTransient<IIntegrationEventProcessor, ActorCertificateCredentialsRemovedEventProcessor>()
@@ -54,10 +47,6 @@ public static class IntegrationEventExtensions
 
         var integrationEventDescriptors = new List<MessageDescriptor>
         {
-            EnergyResultProducedV2.Descriptor,
-            MonthlyAmountPerChargeResultProducedV1.Descriptor,
-            TotalMonthlyAmountResultProducedV1.Descriptor,
-            AmountPerChargeResultProducedV1.Descriptor,
             ActorActivated.Descriptor,
             GridAreaOwnershipAssigned.Descriptor,
             ActorCertificateCredentialsRemoved.Descriptor,
@@ -69,10 +58,7 @@ public static class IntegrationEventExtensions
         services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);
         services.AddTransient<IDataRetention, ReceivedIntegrationEventsRetention>()
             .AddTransient<IReceivedIntegrationEventRepository, ReceivedIntegrationEventRepository>()
-            .AddTransient<EnergyResultMessageResultFactory>()
             .AddTransient<IIntegrationEventHandler, IntegrationEventHandler>();
-
-        services.AddTransient<WholesaleServicesMessageFactory>();
 
         services.AddOptions<IntegrationEventsOptions>()
             .BindConfiguration(IntegrationEventsOptions.SectionName)

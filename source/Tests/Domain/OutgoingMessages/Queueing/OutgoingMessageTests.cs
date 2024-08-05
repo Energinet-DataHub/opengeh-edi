@@ -108,7 +108,7 @@ public class OutgoingMessageTests
     {
         // Arrange
         var serializer = new Serializer();
-        var energyResultMessageDto = new EnergyResultMessageDtoBuilder()
+        var energyResultMessageDto = new EnergyResultPerGridAreaMessageDtoBuilder()
             .Build();
 
         // Act
@@ -132,7 +132,8 @@ public class OutgoingMessageTests
     {
         // Arrange
         var serializer = new Serializer();
-        var acceptedEnergyResultMessageDto = AcceptedEnergyResultMessageDtoBuilder.Build();
+        var acceptedEnergyResultMessageDtoBuilder = new AcceptedEnergyResultMessageDtoBuilder();
+        var acceptedEnergyResultMessageDto = acceptedEnergyResultMessageDtoBuilder.Build();
 
         // Act
         var outgoingMessage = OutgoingMessage.CreateMessage(
@@ -178,7 +179,7 @@ public class OutgoingMessageTests
     {
         // Arrange
         var serializer = new Serializer();
-        var wholesaleServicesMessageDto = new WholesaleServicesMessageDtoBuilder()
+        var wholesaleServicesMessageDto = new WholesaleAmountPrChargeMessageDtoBuilder()
             .Build();
 
         // Act
@@ -255,7 +256,7 @@ public class OutgoingMessageTests
     {
         // Arrange
         var serializer = new Serializer();
-        var wholesaleServicesMessageDto = new WholesaleServicesMessageDtoBuilder()
+        var wholesaleServicesMessageDto = new WholesaleAmountPrChargeMessageDtoBuilder()
             .Build();
 
         // Act
@@ -278,7 +279,7 @@ public class OutgoingMessageTests
     public void ActorMessageQueueMetadata_is_DDM_when_document_is_NotifyAggregatedMeasureData_and_role_is_MDR()
     {
         // Arrange
-        var energyResultMessageDto = new EnergyResultMessageDtoBuilder()
+        var energyResultMessageDto = new AcceptedEnergyResultMessageDtoBuilder()
             .WithReceiverRole(ActorRole.MeteredDataResponsible)
             .Build();
 
@@ -292,30 +293,6 @@ public class OutgoingMessageTests
         using var scope = new AssertionScope();
         outgoingMessage.Receiver.ActorRole.Should().Be(ActorRole.MeteredDataResponsible);
         outgoingMessage.GetActorMessageQueueMetadata().ActorRole.Should().Be(ActorRole.GridOperator);
-    }
-
-    /// <summary>
-    /// This test verifies the "hack" for a MDR/GridOperator actor which is the same Actor but with two distinct roles MDR and GridOperator
-    /// doesn't apply for NotifyWholesaleServices (it should only apply for NotifyAggregatedMeasureData)
-    /// </summary>
-    [Fact]
-    public void ActorMessageQueueMetadata_is_MDR_when_document_is_NotifyWholesaleServices_and_role_is_MDR()
-    {
-        // Arrange
-        var energyResultMessageDto = new WholesaleServicesMessageDtoBuilder()
-            .WithReceiverRole(ActorRole.MeteredDataResponsible)
-            .Build();
-
-        // Act
-        var outgoingMessages = OutgoingMessage.CreateMessages(
-            energyResultMessageDto,
-            new Serializer(),
-            SystemClock.Instance.GetCurrentInstant());
-
-        // Assert
-        using var scope = new AssertionScope();
-        outgoingMessages.Should().ContainSingle(m => m.Receiver.ActorRole == ActorRole.MeteredDataResponsible);
-        outgoingMessages.Should().ContainSingle(m => m.GetActorMessageQueueMetadata().ActorRole == ActorRole.MeteredDataResponsible);
     }
 
     private static OutgoingMessageHeader GetHeader()

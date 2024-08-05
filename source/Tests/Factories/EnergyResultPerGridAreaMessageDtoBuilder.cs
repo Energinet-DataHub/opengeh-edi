@@ -17,21 +17,20 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using NodaTime.Extensions;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
+namespace Energinet.DataHub.EDI.Tests.Factories;
 
-public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
+public class EnergyResultPerGridAreaMessageDtoBuilder
 {
     private readonly EventId _eventId = EventId.From(Guid.NewGuid());
     private readonly Guid _calculationId = Guid.NewGuid();
+    private readonly Guid _calculationResultId = Guid.NewGuid();
 
     private BusinessReason _businessReason = BusinessReason.BalanceFixing;
-    private ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
-    private ActorNumber _balanceResponsibleNumber = ActorNumber.Create("1234567891911");
-    private Guid _calculationResultId;
+    private ActorNumber _meteredDataResponsibleNumber = ActorNumber.Create("1234567891912");
 
-    public EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto Build()
+    public EnergyResultPerGridAreaMessageDto Build()
     {
-        return new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto(
+        return new EnergyResultPerGridAreaMessageDto(
             eventId: _eventId,
             businessReason: _businessReason,
             gridArea: "805",
@@ -39,8 +38,6 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
             settlementMethod: SettlementMethod.NonProfiled,
             measurementUnit: MeasurementUnit.Pieces,
             resolution: Resolution.Hourly,
-            energySupplierNumber: _receiverNumber,
-            balanceResponsibleNumber: _balanceResponsibleNumber,
             period: new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
             points: new List<EnergyResultMessagePoint>
             {
@@ -49,30 +46,13 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
             calculationResultVersion: 1,
             settlementVersion: null,
             calculationResultId: _calculationResultId,
-            calculationId: _calculationId);
+            calculationId: _calculationId,
+            meteredDataResponsibleNumber: _meteredDataResponsibleNumber);
     }
 
-    public EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder WithCalculationResultId(Guid calculationResultId)
+    public EnergyResultPerGridAreaMessageDtoBuilder WithMeteredDataResponsibleNumber(string receiverIdValue)
     {
-        _calculationResultId = calculationResultId;
-        return this;
-    }
-
-    public EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder WithEnergySupplierReceiverNumber(string receiverIdValue)
-    {
-        _receiverNumber = ActorNumber.Create(receiverIdValue);
-        return this;
-    }
-
-    public EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder WithBalanceResponsiblePartyReceiverNumber(string receiverIdValue)
-    {
-        _balanceResponsibleNumber = ActorNumber.Create(receiverIdValue);
-        return this;
-    }
-
-    public EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder WithBusinessReason(BusinessReason businessReason)
-    {
-        _businessReason = businessReason;
+        _meteredDataResponsibleNumber = ActorNumber.Create(receiverIdValue);
         return this;
     }
 }

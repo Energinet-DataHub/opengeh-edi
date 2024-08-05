@@ -12,19 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.FeatureManagement;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace BuildingBlocks.Application.FeatureFlag;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-/// <summary>
-/// A <see cref="IFeatureFlagManager"/> implementation using the Microsoft.FeatureManagement package
-/// </summary>
-public class MicrosoftFeatureFlagManager : IFeatureFlagManager
-{
-    private readonly IFeatureManager _featureManager;
-
-    public MicrosoftFeatureFlagManager(IFeatureManager featureManager)
-    {
-        _featureManager = featureManager;
-    }
-}
+public record WholesaleServicesPoint(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality QuantityQuality);

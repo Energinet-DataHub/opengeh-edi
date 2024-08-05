@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
 [SuppressMessage("Usage", "CA1034", Justification = "Nested types should not be visible")]
-public class MarketRole : DataHubType<MarketRole>
+public class MarketRole : EnumerationType
 {
     public static readonly MarketRole CalculationResponsibleRole = new("DGL", "CalculationResponsible");
     public static readonly MarketRole EnergySupplier = new("DDQ", "EnergySupplier");
@@ -26,9 +26,20 @@ public class MarketRole : DataHubType<MarketRole>
     public static readonly MarketRole BalanceResponsibleParty = new("DDK", "BalanceResponsibleParty");
     public static readonly MarketRole GridAccessProvider = new("DDM", "GridAccessProvider");
     public static readonly MarketRole SystemOperator = new("EZ", "SystemOperator");
+    public static readonly MarketRole DataHubAdministrator = new(null, "DataHubAdministrator");
 
-    private MarketRole(string code, string name)
-        : base(name, code)
+    private MarketRole(string? code, string name)
+        : base(name)
     {
+        Code = code;
+    }
+
+    public string? Code { get; }
+
+    public static MarketRole FromName(string name)
+    {
+        return GetAll<MarketRole>().FirstOrDefault(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+               ?? throw new InvalidOperationException(
+                   $"{name} is not a valid {nameof(MarketRole)} {nameof(name)}");
     }
 }

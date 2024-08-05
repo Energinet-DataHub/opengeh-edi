@@ -242,35 +242,6 @@ public class OutgoingMessage
     }
 
     /// <summary>
-    /// This method create a single outgoing message, for the receiver, based on the energyResultMessage.
-    /// </summary>
-    public static OutgoingMessage CreateMessage(
-        EnergyResultMessageDto energyResultMessage,
-        ISerializer serializer,
-        Instant timestamp)
-    {
-        ArgumentNullException.ThrowIfNull(serializer);
-        ArgumentNullException.ThrowIfNull(energyResultMessage);
-
-        return new OutgoingMessage(
-            energyResultMessage.EventId,
-            energyResultMessage.DocumentType,
-            energyResultMessage.ReceiverNumber,
-            energyResultMessage.ProcessId,
-            energyResultMessage.BusinessReason,
-            energyResultMessage.ReceiverRole,
-            energyResultMessage.SenderId,
-            energyResultMessage.SenderRole,
-            serializer.Serialize(energyResultMessage.Series),
-            timestamp,
-            ProcessType.ReceiveEnergyResults,
-            energyResultMessage.RelatedToMessageId,
-            energyResultMessage.Series.GridAreaCode,
-            energyResultMessage.ExternalId,
-            calculationId: energyResultMessage.CalculationId);
-    }
-
-    /// <summary>
     /// Create one outgoing message for the metered data responsible, based on the <paramref name="messageDto"/>.
     /// </summary>
     public static OutgoingMessage CreateMessage(
@@ -384,54 +355,6 @@ public class OutgoingMessage
         }
 
         return outgoingMessages;
-    }
-
-    /// <summary>
-    /// This method creates two outgoing messages, one for the receiver and one for the charge owner, based on the wholesaleResultMessage.
-    /// </summary>
-    public static IReadOnlyCollection<OutgoingMessage> CreateMessages(
-        WholesaleServicesMessageDto wholesaleServicesMessageDto,
-        ISerializer serializer,
-        Instant timestamp)
-    {
-        ArgumentNullException.ThrowIfNull(serializer);
-        ArgumentNullException.ThrowIfNull(wholesaleServicesMessageDto);
-
-        return new List<OutgoingMessage>()
-        {
-            new(
-                wholesaleServicesMessageDto.EventId,
-                wholesaleServicesMessageDto.DocumentType,
-                wholesaleServicesMessageDto.ReceiverNumber,
-                wholesaleServicesMessageDto.ProcessId,
-                wholesaleServicesMessageDto.BusinessReason,
-                wholesaleServicesMessageDto.ReceiverRole,
-                wholesaleServicesMessageDto.SenderId,
-                wholesaleServicesMessageDto.SenderRole,
-                serializer.Serialize(wholesaleServicesMessageDto.Series),
-                timestamp,
-                ProcessType.ReceiveWholesaleResults,
-                wholesaleServicesMessageDto.RelatedToMessageId,
-                wholesaleServicesMessageDto.Series.GridAreaCode,
-                wholesaleServicesMessageDto.ExternalId,
-                calculationId: wholesaleServicesMessageDto.CalculationId),
-            new(
-                wholesaleServicesMessageDto.EventId,
-                wholesaleServicesMessageDto.DocumentType,
-                wholesaleServicesMessageDto.ChargeOwnerId,
-                wholesaleServicesMessageDto.ProcessId,
-                wholesaleServicesMessageDto.BusinessReason,
-                GetChargeOwnerRole(wholesaleServicesMessageDto.ChargeOwnerId),
-                wholesaleServicesMessageDto.SenderId,
-                wholesaleServicesMessageDto.SenderRole,
-                serializer.Serialize(wholesaleServicesMessageDto.Series),
-                timestamp,
-                ProcessType.ReceiveWholesaleResults,
-                wholesaleServicesMessageDto.RelatedToMessageId,
-                wholesaleServicesMessageDto.Series.GridAreaCode,
-                wholesaleServicesMessageDto.ExternalId,
-                calculationId: wholesaleServicesMessageDto.CalculationId),
-        };
     }
 
     /// <summary>

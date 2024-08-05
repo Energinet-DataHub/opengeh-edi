@@ -23,9 +23,6 @@ using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
-/// <summary>
-/// Enqueue wholesale results for Monthly Amount Per Charge to Energy Supplier and ChargeOwner as outgoing messages for the given calculation id.
-/// </summary>
 public class GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity(
     ILogger<GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity> logger,
     IServiceScopeFactory serviceScopeFactory,
@@ -38,7 +35,7 @@ public class GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity(
     private readonly WholesaleResultActorsEnumerator _wholesaleResultActorsEnumerator = wholesaleResultActorsEnumerator;
 
     /// <summary>
-    /// Start an EnqueueWholesaleResultsForMonthlyAmountPerCharges activity.
+    /// Start an GetActorsForWholesaleResultsForMonthlyAmountPerCharges activity.
     /// <remarks>The <paramref name="input"/> type and return type must be that same as the <see cref="Run"/> method</remarks>
     /// <remarks>Changing the <paramref name="input"/> or return type might break the Durable Function's deserialization</remarks>
     /// </summary>
@@ -46,7 +43,7 @@ public class GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity(
     {
         return context.CallActivityAsync<IReadOnlyCollection<string>>(
             nameof(GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity),
-            new EnqueueMessagesInput(input.CalculationId, input.EventId),
+            input,
             options: options);
     }
 

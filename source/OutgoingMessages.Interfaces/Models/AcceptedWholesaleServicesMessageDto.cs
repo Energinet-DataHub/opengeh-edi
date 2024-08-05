@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-public class AcceptedWholesaleServicesMessageDto : WholesaleServicesMessageDto
+public class AcceptedWholesaleServicesMessageDto : OutgoingMessageDto
 {
     private AcceptedWholesaleServicesMessageDto(
         ActorNumber receiverNumber,
@@ -30,19 +31,26 @@ public class AcceptedWholesaleServicesMessageDto : WholesaleServicesMessageDto
         ActorNumber documentReceiverNumber,
         ActorRole documentReceiverRole)
         : base(
-        receiverNumber,
-        processId,
-        eventId,
-        businessReason,
-        receiverRole,
-        chargeOwnerId,
-        series,
-        relatedToMessageId: relatedToMessageId,
-        calculationId: null)
+            DocumentType.NotifyWholesaleServices,
+            receiverNumber,
+            processId,
+            eventId,
+            businessReason,
+            receiverRole,
+            DataHubDetails.DataHubActorNumber,
+            ActorRole.MeteredDataAdministrator,
+            new ExternalId(Guid.NewGuid()),
+            relatedToMessageId)
     {
+        ChargeOwnerId = chargeOwnerId;
         DocumentReceiverNumber = documentReceiverNumber;
         DocumentReceiverRole = documentReceiverRole;
+        Series = series;
     }
+
+    public AcceptedWholesaleServicesSeries Series { get; }
+
+    public ActorNumber ChargeOwnerId { get; }
 
     public ActorNumber DocumentReceiverNumber { get; }
 

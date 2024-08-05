@@ -43,8 +43,9 @@ public interface IFileStorageClient
     Task<FileStorageFile> DownloadAsync(FileStorageReference reference);
 
     /// <summary>
-    /// Deletes a file from the file storage
+    /// Deletes files from the file storage
     /// </summary>
-    /// <param name="outgoingMessageFileStorageReference"></param>
-    Task DeleteIfExistsAsync(FileStorageReference outgoingMessageFileStorageReference);
+    /// <param name="fileStorageReferences"></param>
+    /// <param name="fileStorageCategory"></param>
+    Task DeleteIfExistsAsync(IReadOnlyList<FileStorageReference> fileStorageReferences, FileStorageCategory fileStorageCategory);
 }

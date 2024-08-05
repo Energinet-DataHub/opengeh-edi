@@ -366,15 +366,6 @@ public class BehavioursTestBase : IDisposable
         return peekResults;
     }
 
-    protected AmountPerChargeResultProducedV1 GivenAmountPerChargeResultProducedV1Event(Action<AmountPerChargeResultProducedV1EventBuilder> builder)
-    {
-        var eventBuilder = new AmountPerChargeResultProducedV1EventBuilder();
-
-        builder(eventBuilder);
-
-        return eventBuilder.Build();
-    }
-
     protected T GetService<T>()
         where T : notnull
     {

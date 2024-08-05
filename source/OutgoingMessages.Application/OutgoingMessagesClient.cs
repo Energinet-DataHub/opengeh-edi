@@ -98,21 +98,6 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
     }
 
     public async Task<OutgoingMessageId> EnqueueAndCommitAsync(
-        EnergyResultMessageDto energyResultMessage,
-        CancellationToken cancellationToken)
-    {
-        var message = OutgoingMessage.CreateMessage(
-            energyResultMessage,
-            _serializer,
-            _systemDateTimeProvider.Now());
-
-        var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
-        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-
-        return messageId;
-    }
-
-    public async Task<OutgoingMessageId> EnqueueAndCommitAsync(
         EnergyResultPerGridAreaMessageDto messageDto,
         CancellationToken cancellationToken)
     {
@@ -161,22 +146,6 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return messageIds;
-    }
-
-    public virtual async Task EnqueueAndCommitAsync(
-        WholesaleServicesMessageDto wholesaleServicesMessage,
-        CancellationToken cancellationToken)
-    {
-        var messages = OutgoingMessage.CreateMessages(
-            wholesaleServicesMessage,
-            _serializer,
-            _systemDateTimeProvider.Now());
-        foreach (var message in messages)
-        {
-            await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
-        }
-
-        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task EnqueueAndCommitAsync(
@@ -232,19 +201,6 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             _serializer,
             _systemDateTimeProvider.Now());
         var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
-        return messageId;
-    }
-
-    public async Task<OutgoingMessageId> EnqueueAndCommitAsync(
-        WholesaleServicesTotalSumMessageDto wholesaleServicesTotalSumMessage,
-        CancellationToken cancellationToken)
-    {
-        var message = OutgoingMessage.CreateMessage(
-            wholesaleServicesTotalSumMessage,
-            _serializer,
-            _systemDateTimeProvider.Now());
-        var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
-        await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return messageId;
     }
 }

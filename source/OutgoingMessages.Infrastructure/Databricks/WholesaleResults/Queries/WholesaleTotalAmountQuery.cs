@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
@@ -110,7 +109,7 @@ public class WholesaleTotalAmountQuery(
             ActorNumber.Create(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.EnergySupplierId));
         if (chargeOwnerNumber is not null)
         {
-            //ChargeOwner can either be grid operator or system operator.
+            // ChargeOwner can either be grid operator or system operator.
             return (
                 chargeOwnerNumber,
                 GetChargeOwnerRole(chargeOwnerNumber));

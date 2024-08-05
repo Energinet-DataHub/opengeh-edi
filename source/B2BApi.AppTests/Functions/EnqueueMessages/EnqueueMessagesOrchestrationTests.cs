@@ -68,26 +68,6 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         Fixture.SetTestOutputHelper(null!);
     }
 
-    [Fact(Skip = "Do we still need this test? It just waits 1 minute for the orchestration to not start, which slows the CI down")]
-    public async Task Given_FeatureFlagIsDisabledForCalculationType_When_CalculationCompletedEventIsSent_Then_OrchestrationIsNeverStarted()
-    {
-        // Arrange
-        Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: false);
-
-        var calculationOrchestrationId = Guid.NewGuid().ToString();
-        var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(calculationOrchestrationId);
-
-        // Act
-        var beforeOrchestrationCreated = DateTime.UtcNow;
-        await Fixture.TopicResource.SenderClient.SendMessageAsync(calculationCompletedEventMessage);
-
-        // Assert
-        var act = async () => await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
-        await act.Should()
-            .ThrowAsync<Exception>()
-            .WithMessage("Orchestration did not start within configured wait time*");
-    }
-
     /// <summary>
     /// Verifies that:
     ///  - The orchestration can complete a full run.
