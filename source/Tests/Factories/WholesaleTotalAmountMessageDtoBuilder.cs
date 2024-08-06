@@ -25,9 +25,9 @@ public class WholesaleTotalAmountMessageDtoBuilder
     private readonly BusinessReason _businessReason = BusinessReason.WholesaleFixing;
     private readonly EventId _eventId = EventId.From(Guid.NewGuid());
     private readonly Guid _calculationId = Guid.NewGuid();
+    private readonly ActorNumber _energySupplierId = ActorNumber.Create("1234567890125");
     private ActorNumber _receiverNumber = ActorNumber.Create("1234567890123");
     private ActorRole _receiverRole = ActorRole.EnergySupplier;
-    private ActorNumber _energySupplierId = ActorNumber.Create("1234567890125");
 
     public WholesaleTotalAmountMessageDto Build()
     {

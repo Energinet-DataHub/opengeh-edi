@@ -3,9 +3,6 @@
   "extensions": {
     "durableTask": {
       "hubName": "%OrchestrationsTaskHubName%",
-      "storageProvider": {
-        "maxQueuePollingInterval": "00:00:30"
-      },
       "tracing": {
         "traceInputsAndOutputs": true
       },
