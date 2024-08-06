@@ -87,13 +87,12 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
         GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
         GivenAuthenticatedActorIs(currentActor.ActorNumber, currentActor.ActorRole);
 
-        await GivenReceivedAggregatedMeasureDataRequest(
+        var transactionId = await GivenReceivedAggregatedMeasureDataRequest(
             senderActorNumber: currentActor.ActorNumber,
             senderActorRole: marketRole,
             energySupplier: energySupplierNumber,
             balanceResponsibleParty: balanceResponsibleParty,
-            "512",
-            "12356478912356478912356478912356478");
+            "512");
 
         // Act
         await WhenAggregatedMeasureDataProcessIsInitialized(senderSpy.LatestMessage!);
@@ -164,7 +163,7 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
                 SettlementMethod: null,
                 MeteringPointType: MeteringPointType.Production,
                 GridAreaCode: "512",
-                OriginalTransactionIdReference: TransactionId.From("12356478912356478912356478912356478"),
+                OriginalTransactionIdReference: TransactionId.From(transactionId),
                 ProductCode: ProductType.EnergyActive.Code,
                 QuantityMeasurementUnit: MeasurementUnit.Kwh,
                 CalculationVersion: GetNow().ToUnixTimeTicks(),
@@ -183,13 +182,12 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
         return new IncomingMarketMessageStream(memoryStream);
     }
 
-    private async Task GivenReceivedAggregatedMeasureDataRequest(
+    private async Task<string> GivenReceivedAggregatedMeasureDataRequest(
         ActorNumber senderActorNumber,
         MarketRole senderActorRole,
         ActorNumber energySupplier,
         ActorNumber balanceResponsibleParty,
-        string gridArea,
-        string originalTransactionId)
+        string gridArea)
     {
         var incomingMessageClient = GetService<IIncomingMessageClient>();
         var dateTimeZone = GetService<DateTimeZone>();
@@ -210,8 +208,7 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
                 senderActorNumber.Value,
                 senderActorRole.Name,
                 dateTimeZone,
-                systemDateTimeProvider.Now(),
-                originalTransactionId);
+                systemDateTimeProvider.Now());
 
         var incomingMessageStream = GenerateStreamFromString(new Serializer().Serialize(requestMessage));
 
@@ -226,5 +223,7 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
         using var scope = new AssertionScope();
         response.IsErrorResponse.Should().BeFalse();
         response.MessageBody.Should().BeEmpty();
+
+        return requestMessage.Serie.First().Id;
     }
 }

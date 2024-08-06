@@ -91,12 +91,11 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
         GivenAuthenticatedActorIs(actor.ActorNumber, actorRole);
         await GivenGridAreaOwnershipAsync("512", gridOperatorNumber);
 
-        await GivenReceivedB2CWholesaleServicesRequest(
+        var transactionId = await GivenReceivedB2CWholesaleServicesRequest(
             senderActorNumber: actor.ActorNumber,
             senderActorRole: marketRole,
             energySupplier: energySupplierNumber,
-            gridArea: "512",
-            originalTransactionId: "12356478912356478912356478912356478");
+            gridArea: "512");
 
         // Act
         await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
@@ -170,7 +169,7 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
                 SettlementMethod: SettlementMethod.Flex,
                 MeteringPointType: MeteringPointType.Consumption,
                 GridArea: "512",
-                TransactionId.From("12356478912356478912356478912356478"),
+                OriginalTransactionIdReference: TransactionId.From(transactionId),
                 PriceMeasurementUnit: MeasurementUnit.Kwh,
                 ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
                 QuantityMeasurementUnit: MeasurementUnit.Kwh,
@@ -190,12 +189,11 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
         return new IncomingMarketMessageStream(memoryStream);
     }
 
-    private async Task GivenReceivedB2CWholesaleServicesRequest(
+    private async Task<string> GivenReceivedB2CWholesaleServicesRequest(
         ActorNumber senderActorNumber,
         MarketRole senderActorRole,
         ActorNumber? energySupplier,
         string gridArea,
-        string? originalTransactionId,
         bool assertRequestWasSuccessful = true)
     {
         var incomingMessageClient = GetService<IIncomingMessageClient>();
@@ -214,8 +212,7 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
             senderActorNumber.Value,
             senderActorRole.Name,
             DateTimeZoneProviders.Tzdb["Europe/Copenhagen"],
-            DateTime.Now.ToUniversalTime().ToInstant(),
-            originalTransactionId);
+            DateTime.Now.ToUniversalTime().ToInstant());
 
         var incomingMessageStream = GenerateStreamFromString(new Serializer().Serialize(requestMessage));
 
@@ -233,5 +230,7 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
             response.IsErrorResponse.Should().BeFalse();
             response.MessageBody.Should().BeEmpty();
         }
+
+        return requestMessage.Series.First().Id;
     }
 }
