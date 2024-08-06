@@ -23,7 +23,6 @@ using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -214,7 +213,7 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
             b2CRequest,
             senderActorNumber.Value,
             senderActorRole.Name,
-            DateTimeZoneProviders.Tzdb.GetSystemDefault(),
+            DateTimeZoneProviders.Tzdb["Europe/Copenhagen"],
             DateTime.Now.ToUniversalTime().ToInstant(),
             originalTransactionId);
 
