@@ -58,7 +58,7 @@ public class OutgoingMessage
         RelatedToMessageId = relatedToMessageId;
         Receiver = receiver;
         // We only cases when requesting making sure the receiver written in the document is not the same as the receiver of the message.
-        DocumentReceiver = documentReceiver == null ? receiver : documentReceiver;
+        DocumentReceiver = documentReceiver;
         CreatedAt = createdAt;
         FileStorageReference = CreateFileStorageReference(Receiver.Number, createdAt, Id);
         ExternalId = externalId;
