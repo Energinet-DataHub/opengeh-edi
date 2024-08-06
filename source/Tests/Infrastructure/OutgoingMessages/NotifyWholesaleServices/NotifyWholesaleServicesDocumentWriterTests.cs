@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholes
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
@@ -130,7 +131,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
     {
         // Arrange
         // This is the wholesale series with most nullable fields.
-        var series = new WholesaleServicesTotalSumSeries(
+        var series = new WholesaleServicesSeries(
             TransactionId: SampleData.TransactionId,
             CalculationVersion: 1,
             GridAreaCode: SampleData.GridAreaCode,
@@ -140,7 +141,17 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             QuantityMeasureUnit: MeasurementUnit.Kwh,
             Currency: Currency.DanishCrowns,
             Resolution: Resolution.Monthly,
-            Amount: 100);
+            Points: new Collection<WholesaleServicesPoint> { new(1, null, null, 100, CalculatedQuantityQuality.Calculated) },
+            ChargeCode: null,
+            IsTax: false,
+            ChargeOwner: null,
+            QuantityUnit: MeasurementUnit.Kwh,
+            PriceMeasureUnit: null,
+            ChargeType: null,
+            MeteringPointType: MeteringPointType.Consumption,
+            SettlementMethod: null,
+            SettlementType: null,
+            OriginalTransactionIdReference: null);
         var header = new OutgoingMessageHeader(
             DataHubNames.BusinessReason.WholesaleFixing,
             SampleData.SenderId.Value,

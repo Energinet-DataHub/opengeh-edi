@@ -15,15 +15,15 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
 
-/// <summary>
-/// An outgoing message dto with an energy result for a balance responsible in a grid area
+/// /// <summary>
+/// An outgoing message dto with an energy result for a metered data responsible in a grid area
 /// </summary>
-public class EnergyResultPerBalanceResponsibleMessageDto
+public class EnergyResultPerGridAreaMessageDto
     : OutgoingMessageDto
 {
-    public EnergyResultPerBalanceResponsibleMessageDto(
+    public EnergyResultPerGridAreaMessageDto(
         EventId eventId,
         BusinessReason businessReason,
         string gridArea,
@@ -31,7 +31,7 @@ public class EnergyResultPerBalanceResponsibleMessageDto
         SettlementMethod? settlementMethod,
         MeasurementUnit measurementUnit,
         Resolution resolution,
-        ActorNumber balanceResponsibleNumber,
+        ActorNumber meteredDataResponsibleNumber,
         Period period,
         IReadOnlyCollection<EnergyResultMessagePoint> points,
         long calculationResultVersion,
@@ -43,8 +43,8 @@ public class EnergyResultPerBalanceResponsibleMessageDto
             processId: null,
             eventId: eventId,
             businessReasonName: businessReason.Name,
-            receiverNumber: balanceResponsibleNumber,
-            receiverRole: ActorRole.BalanceResponsibleParty,
+            receiverNumber: meteredDataResponsibleNumber,
+            receiverRole: ActorRole.MeteredDataResponsible,
             senderId: DataHubDetails.DataHubActorNumber,
             senderRole: ActorRole.MeteredDataAdministrator,
             externalId: new ExternalId(calculationResultId),
@@ -61,7 +61,7 @@ public class EnergyResultPerBalanceResponsibleMessageDto
             measurementUnit.Name,
             resolution.Name,
             null,
-            balanceResponsibleNumber.Value,
+            null,
             period,
             points,
             calculationResultVersion,
@@ -69,7 +69,7 @@ public class EnergyResultPerBalanceResponsibleMessageDto
             settlementVersion?.Name);
     }
 
-    public Guid CalculationId { get; }
-
     public EnergyResultMessageTimeSeries Series { get; }
+
+    public Guid CalculationId { get; }
 }

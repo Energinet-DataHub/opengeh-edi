@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 
-public record DequeueRequestDto(string MessageId, ActorRole ActorRole, ActorNumber ActorNumber);
+public record PeekRequestDto(ActorNumber ActorNumber, MessageCategory MessageCategory, ActorRole ActorRole,
+    DocumentFormat DocumentFormat);
