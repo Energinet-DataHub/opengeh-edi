@@ -31,7 +31,8 @@ public static class RequestWholesaleSettlementDtoFactory
         string senderNumber,
         string senderRole,
         DateTimeZone dateTimeZone,
-        Instant now)
+        Instant now,
+        string? originalTransactionIdReference = null)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -47,7 +48,7 @@ public static class RequestWholesaleSettlementDtoFactory
             : [];
 
         var series = new RequestWholesaleSettlementSeries(
-            TransactionId.New().Value,
+            originalTransactionIdReference ?? TransactionId.New().Value,
             InstantFormatFactory.SetInstantToMidnight(request.StartDate, dateTimeZone).ToString(),
             string.IsNullOrWhiteSpace(request.EndDate) ? null : InstantFormatFactory.SetInstantToMidnight(request.EndDate, dateTimeZone, Duration.FromMilliseconds(1)).ToString(),
             request.GridArea,

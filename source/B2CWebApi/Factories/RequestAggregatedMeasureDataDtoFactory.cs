@@ -31,14 +31,15 @@ public static class RequestAggregatedMeasureDataDtoFactory
         string senderNumber,
         string senderRole,
         DateTimeZone dateTimeZone,
-        Instant now)
+        Instant now,
+        string? originalTransactionIdReference = null)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         var senderRoleCode = MapRoleNameToCode(senderRole);
 
         var series = new RequestAggregatedMeasureDataSeries(
-            TransactionId.New().Value,
+            originalTransactionIdReference ?? TransactionId.New().Value,
             MapEvaluationPointType(request),
             MapSettlementMethod(request),
             InstantFormatFactory.SetInstantToMidnight(request.StartDate, dateTimeZone).ToString(),
