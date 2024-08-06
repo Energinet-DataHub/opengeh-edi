@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
 
 public record EnergyResultMessageTimeSeries(
     TransactionId TransactionId,

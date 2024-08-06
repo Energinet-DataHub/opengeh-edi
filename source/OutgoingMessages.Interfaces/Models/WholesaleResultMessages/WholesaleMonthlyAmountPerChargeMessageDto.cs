@@ -15,63 +15,73 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 
-public class WholesaleTotalAmountMessageDto : OutgoingMessageDto
+public class WholesaleMonthlyAmountPerChargeMessageDto : OutgoingMessageDto
 {
-    public WholesaleTotalAmountMessageDto(
+    public WholesaleMonthlyAmountPerChargeMessageDto(
         EventId eventId,
         Guid calculationId,
         Guid calculationResultId,
         long calculationResultVersion,
-        ActorNumber receiverNumber,
-        ActorRole receiverRole,
-        ActorNumber energySupplierId,
+        ActorNumber energySupplierReceiverId,
+        ActorNumber chargeOwnerReceiverId,
+        ActorNumber chargeOwnerId,
         string businessReason,
         string gridAreaCode,
+        bool isTax,
         Period period,
+        MeasurementUnit quantityUnit,
         Currency currency,
+        ChargeType? chargeType,
         SettlementVersion? settlementVersion,
+        string? chargeCode,
         IReadOnlyCollection<WholesaleServicesPoint> points)
         : base(
             documentType: DocumentType.NotifyWholesaleServices,
-            receiverNumber: receiverNumber,
+            null!,
             null,
             eventId,
             businessReason,
-            receiverRole: receiverRole,
+            receiverRole: null!,
             senderId: DataHubDetails.DataHubActorNumber,
             senderRole: ActorRole.MeteredDataAdministrator,
             new ExternalId(calculationResultId))
     {
         CalculationId = calculationId;
         CalculationResultId = calculationResultId;
+        EnergySupplierReceiverId = energySupplierReceiverId;
+        ChargeOwnerReceiverId = chargeOwnerReceiverId;
 
         Series = new WholesaleServicesSeries(
             TransactionId: TransactionId.New(),
             CalculationVersion: calculationResultVersion,
             GridAreaCode: gridAreaCode,
-            ChargeCode: null,
-            IsTax: false,
+            ChargeCode: chargeCode,
+            IsTax: isTax,
             Points: points,
-            EnergySupplier: energySupplierId,
-            ChargeOwner: null,
+            EnergySupplier: energySupplierReceiverId,
+            chargeOwnerId,
             Period: period,
             SettlementVersion: settlementVersion,
-            QuantityMeasureUnit: MeasurementUnit.Kwh,
+            quantityUnit,
             null,
-            PriceMeasureUnit: null,
+            PriceMeasureUnit: MeasurementUnit.Kwh,
             Currency: currency,
-            ChargeType: null,
+            ChargeType: chargeType,
             Resolution: Resolution.Monthly,
             MeteringPointType: null,
-            SettlementType: null,
+            null,
             SettlementMethod: null);
     }
 
     public Guid CalculationId { get; }
 
     public Guid CalculationResultId { get; }
+
+    public ActorNumber EnergySupplierReceiverId { get; }
+
+    public ActorNumber ChargeOwnerReceiverId { get; }
 
     public WholesaleServicesSeries Series { get; init; }
 }

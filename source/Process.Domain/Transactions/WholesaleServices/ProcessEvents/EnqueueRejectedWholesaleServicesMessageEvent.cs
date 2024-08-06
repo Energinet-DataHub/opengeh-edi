@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ProcessEvents;
 

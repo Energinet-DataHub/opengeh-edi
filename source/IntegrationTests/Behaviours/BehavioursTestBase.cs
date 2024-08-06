@@ -47,6 +47,8 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyIn
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Dequeue;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;

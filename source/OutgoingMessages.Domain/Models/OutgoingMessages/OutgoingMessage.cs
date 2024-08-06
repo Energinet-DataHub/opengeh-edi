@@ -19,6 +19,10 @@ using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
@@ -535,35 +539,6 @@ public class OutgoingMessage
             gridAreaCode: message.Series.GridAreaCode,
             externalId: message.ExternalId,
             calculationId: null);
-    }
-
-    /// <summary>
-    ///     This method create a single outgoing message, for the receiver, based on the WholesaleServicesTotalSumMessage.
-    /// </summary>
-    public static OutgoingMessage CreateMessage(
-        WholesaleServicesTotalSumMessageDto wholesaleServicesTotalSumMessage,
-        ISerializer serializer,
-        Instant timestamp)
-    {
-        ArgumentNullException.ThrowIfNull(serializer);
-        ArgumentNullException.ThrowIfNull(wholesaleServicesTotalSumMessage);
-
-        return new(
-            wholesaleServicesTotalSumMessage.EventId,
-            wholesaleServicesTotalSumMessage.DocumentType,
-            wholesaleServicesTotalSumMessage.ReceiverNumber,
-            wholesaleServicesTotalSumMessage.ProcessId,
-            wholesaleServicesTotalSumMessage.BusinessReason,
-            wholesaleServicesTotalSumMessage.ReceiverRole,
-            wholesaleServicesTotalSumMessage.SenderId,
-            wholesaleServicesTotalSumMessage.SenderRole,
-            serializer.Serialize(wholesaleServicesTotalSumMessage.Series),
-            timestamp,
-            ProcessType.ReceiveWholesaleResults,
-            wholesaleServicesTotalSumMessage.RelatedToMessageId,
-            wholesaleServicesTotalSumMessage.Series.GridAreaCode,
-            wholesaleServicesTotalSumMessage.ExternalId,
-            calculationId: wholesaleServicesTotalSumMessage.CalculationId);
     }
 
     public void AssignToBundle(BundleId bundleId)

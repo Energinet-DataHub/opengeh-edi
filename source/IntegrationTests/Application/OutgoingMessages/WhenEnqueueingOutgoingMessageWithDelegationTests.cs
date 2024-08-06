@@ -31,6 +31,7 @@ using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
 using Energinet.DataHub.EDI.Tests.Factories;
 using FluentAssertions;
 using NodaTime;
