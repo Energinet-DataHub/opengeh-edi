@@ -335,7 +335,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             TimeSpan.FromSeconds(60),
             delay: TimeSpan.FromSeconds(5));
 
-        await Fixture.DurableClient.TerminateAsync(actualOrchestrationStatus.InstanceId,  reason: "Test is done");
+        await Fixture.DurableClient.TerminateAsync(actualOrchestrationStatus.InstanceId,  reason: "Test is completed");
 
         isExpected.Should().BeTrue($"because the history should contain the expected 6 failed activities atleast twice. Actual history: {actualHistory?.ToString() ?? "<null>"}");
     }
@@ -401,7 +401,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             TimeSpan.FromSeconds(60),
             delay: TimeSpan.FromSeconds(5));
 
-        await Fixture.DurableClient.TerminateAsync(actualWholesaleOrchestrationStatus.InstanceId, reason: "Test is done");
+        await Fixture.DurableClient.TerminateAsync(actualWholesaleOrchestrationStatus.InstanceId, reason: "Test is completed");
 
         isExpected.Should().BeTrue($"because the history should contain the expected 3 failed wholesale result activities. Actual history: {actualHistory?.ToString() ?? "<null>"}");
     }
@@ -467,7 +467,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             TimeSpan.FromSeconds(30),
             delay: TimeSpan.FromSeconds(5));
 
-        await Fixture.DurableClient.TerminateAsync(actualEnergyOrchestrationStatus.InstanceId, reason: "Test is done");
+        await Fixture.DurableClient.TerminateAsync(actualEnergyOrchestrationStatus.InstanceId, reason: "Test is completed");
 
         isExpected.Should().BeTrue($"because the history should contain the expected 3 failed energy result activities. Actual history: {actualHistory?.ToString() ?? "<null>"}");
     }
