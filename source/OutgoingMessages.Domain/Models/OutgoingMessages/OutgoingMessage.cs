@@ -57,7 +57,6 @@ public class OutgoingMessage
         _serializedContent = serializedContent;
         RelatedToMessageId = relatedToMessageId;
         Receiver = receiver;
-        // We only cases when requesting making sure the receiver written in the document is not the same as the receiver of the message.
         DocumentReceiver = documentReceiver;
         CreatedAt = createdAt;
         FileStorageReference = CreateFileStorageReference(Receiver.Number, createdAt, Id);
@@ -121,6 +120,7 @@ public class OutgoingMessage
 
     /// <summary>
     /// Is the Receiver of the message.
+    /// The message will be place into the ActorMessageQueue of the Receiver.
     /// </summary>
     public Receiver Receiver { get; private set; }
 
