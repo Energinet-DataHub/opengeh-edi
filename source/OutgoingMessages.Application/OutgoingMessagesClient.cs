@@ -70,7 +70,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         AcceptedEnergyResultMessageDto acceptedEnergyResultMessage,
         CancellationToken cancellationToken)
     {
-        var message = OutgoingMessage.CreateMessage(
+        var message = OutgoingMessageFactory.CreateMessage(
             acceptedEnergyResultMessage,
             _serializer,
             _systemDateTimeProvider.Now());
@@ -82,7 +82,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         RejectedEnergyResultMessageDto rejectedEnergyResultMessage,
         CancellationToken cancellationToken)
     {
-        var message = OutgoingMessage.CreateMessage(
+        var message = OutgoingMessageFactory.CreateMessage(
             rejectedEnergyResultMessage,
             _serializer,
             _systemDateTimeProvider.Now());
@@ -94,7 +94,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         RejectedWholesaleServicesMessageDto rejectedWholesaleServicesMessage,
         CancellationToken cancellationToken)
     {
-        var message = OutgoingMessage.CreateMessage(
+        var message = OutgoingMessageFactory.CreateMessage(
             rejectedWholesaleServicesMessage,
             _serializer,
             _systemDateTimeProvider.Now());
@@ -107,7 +107,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         EnergyResultPerGridAreaMessageDto messageDto,
         CancellationToken cancellationToken)
     {
-        var message = OutgoingMessage.CreateMessage(
+        var message = OutgoingMessageFactory.CreateMessage(
             messageDto,
             _serializer,
             _systemDateTimeProvider.Now());
@@ -122,7 +122,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         EnergyResultPerBalanceResponsibleMessageDto messageDto,
         CancellationToken cancellationToken)
     {
-        var message = OutgoingMessage.CreateMessage(
+        var message = OutgoingMessageFactory.CreateMessage(
             messageDto,
             _serializer,
             _systemDateTimeProvider.Now());
@@ -137,7 +137,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto messageDto,
         CancellationToken cancellationToken)
     {
-        var messages = OutgoingMessage.CreateMessages(
+        var messages = OutgoingMessageFactory.CreateMessages(
             messageDto,
             _serializer,
             _systemDateTimeProvider.Now());
@@ -158,7 +158,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         WholesaleTotalAmountMessageDto wholesaleTotalAmountMessageDto,
         CancellationToken cancellationToken)
     {
-        var message = OutgoingMessage.CreateMessage(
+        var message = OutgoingMessageFactory.CreateMessage(
             wholesaleTotalAmountMessageDto,
             _serializer,
             _systemDateTimeProvider.Now());
@@ -170,7 +170,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         WholesaleAmountPerChargeMessageDto wholesaleAmountPerChargeMessageDto,
         CancellationToken cancellationToken)
     {
-        var messages = OutgoingMessage.CreateMessages(
+        var messages = OutgoingMessageFactory.CreateMessages(
             wholesaleAmountPerChargeMessageDto,
             _serializer,
             _systemDateTimeProvider.Now());
@@ -186,7 +186,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         WholesaleMonthlyAmountPerChargeMessageDto wholesaleMonthlyAmountPerChargeMessageDto,
         CancellationToken cancellationToken)
     {
-        var messages = OutgoingMessage.CreateMessages(
+        var messages = OutgoingMessageFactory.CreateMessages(
             wholesaleMonthlyAmountPerChargeMessageDto,
             _serializer,
             _systemDateTimeProvider.Now());
@@ -202,7 +202,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         AcceptedWholesaleServicesMessageDto acceptedWholesaleServicesMessage,
         CancellationToken cancellationToken)
     {
-        var message = OutgoingMessage.CreateMessage(
+        var message = OutgoingMessageFactory.CreateMessage(
             acceptedWholesaleServicesMessage,
             _serializer,
             _systemDateTimeProvider.Now());

@@ -228,10 +228,10 @@ public class ActorMessageQueueTests
         var outgoingMessage = new OutgoingMessage(
             eventId: EventId.From(Guid.NewGuid()),
             documentType: messageType ?? DocumentType.NotifyAggregatedMeasureData,
-            receiverId: receiver.Number,
+            receiver: Receiver.Create(receiver.Number, receiver.ActorRole),
+            documentReceiver: Receiver.Create(receiver.Number, receiver.ActorRole),
             processId: ProcessId.New().Id,
             businessReason: businessReason?.Name ?? BusinessReason.BalanceFixing.Name,
-            receiverRole: receiver.ActorRole,
             senderId: ActorNumber.Create("1234567890987"),
             senderRole: ActorRole.MeteringPointAdministrator,
             serializedContent: string.Empty,
