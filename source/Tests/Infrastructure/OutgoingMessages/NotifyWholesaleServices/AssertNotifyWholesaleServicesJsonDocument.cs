@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Json;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Json.Schema;
@@ -670,12 +671,12 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
         AssertQuantityQuality(pointsInDocument, 0, quantityQualities);
 
-        FirstWholesaleSeriesElement()
+        pointInDocument
             .TryGetProperty("energy_Quantity.quantity", out _)
             .Should()
             .BeFalse();
 
-        FirstWholesaleSeriesElement()
+        pointInDocument
             .TryGetProperty("price.amount", out _)
             .Should()
             .BeFalse();

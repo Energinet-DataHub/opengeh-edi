@@ -14,6 +14,6 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Dequeue;
 
-public record EnergyResultMessagePoint(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, string SampleTime);
+public record DequeueRequestDto(string MessageId, ActorRole ActorRole, ActorNumber ActorNumber);

@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
 using NodaTime.Extensions;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
