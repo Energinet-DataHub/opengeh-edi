@@ -345,6 +345,12 @@ public class B2BApiAppFixture : IAsyncLifetime
             "OrchestrationsTaskHubName",
             TaskHubName);
 
+        // Make Orchestrator poll for updates every second (default is every 30 seconds) by overriding maxQueuePollingInterval
+        // (ref: https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-bindings?tabs=python-v2%2Cisolated-process%2C2x-durable-functions&pivots=programming-language-csharp#hostjson-settings)
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            "AzureFunctionsJobHost__extensions__durableTask__storageProvider__maxQueuePollingInterval",
+            "00:00:01");
+
         // Document storage
         appHostSettings.ProcessEnvironmentVariables.Add(
             nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING),
@@ -394,7 +400,7 @@ public class B2BApiAppFixture : IAsyncLifetime
     private void LogStopwatch(Stopwatch stopwatch, string tag)
     {
         var elapsedSeconds = stopwatch.Elapsed.TotalSeconds;
-        TestLogger.WriteLine($"[PERFORMANCE][{elapsedSeconds:##.##}s] {tag} took {elapsedSeconds:##.##} seconds");
+        TestLogger.WriteLine($"[PERFORMANCE][{elapsedSeconds:00.00}s] {tag} took {elapsedSeconds:N1} seconds");
         stopwatch.Restart();
     }
 }
