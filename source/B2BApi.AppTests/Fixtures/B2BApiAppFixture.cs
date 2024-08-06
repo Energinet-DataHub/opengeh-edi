@@ -400,7 +400,7 @@ public class B2BApiAppFixture : IAsyncLifetime
     private void LogStopwatch(Stopwatch stopwatch, string tag)
     {
         var elapsedSeconds = stopwatch.Elapsed.TotalSeconds;
-        TestLogger.WriteLine($"[PERFORMANCE][{elapsedSeconds:00.00}s] {tag} took {elapsedSeconds:N} seconds");
+        TestLogger.WriteLine($"[PERFORMANCE][{elapsedSeconds:00.00}s] {tag} took {elapsedSeconds:N1} seconds");
         stopwatch.Restart();
     }
 }
