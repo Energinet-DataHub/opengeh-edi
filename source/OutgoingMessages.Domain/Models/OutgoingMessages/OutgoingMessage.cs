@@ -120,10 +120,15 @@ public class OutgoingMessage
     public string? GridAreaCode { get; }
 
     /// <summary>
-    /// Reference the actor queue that should receive the message.
+    /// Is the Receiver of the message.
     /// </summary>
     public Receiver Receiver { get; private set; }
 
+    /// <summary>
+    /// Is the Receiver written within the document.
+    /// This will differ from the 'Receiver' if the message is delegated to another actor.
+    /// Or when requesting energy or wholesale data, where the receiver is always the party who requested the data.
+    /// </summary>
     public Receiver DocumentReceiver { get; }
 
     public BundleId? AssignedBundleId { get; private set; }
