@@ -25,13 +25,13 @@ public class AcceptedEnergyResultMessageDtoBuilder
     private const string GridAreaCode = "805";
     private readonly IReadOnlyCollection<AcceptedEnergyResultMessagePoint> _points = [];
     private readonly Guid _processId = Guid.NewGuid();
+    private readonly ActorRole _documentReceiverRole = ActorRole.MeteredDataResponsible;
+    private readonly ActorNumber _documentReceiverNumber = ActorNumber.Create("1234567891913");
     private EventId _eventId = EventId.From(Guid.NewGuid());
     private BusinessReason _businessReason = BusinessReason.BalanceFixing;
     private SettlementVersion? _settlementVersion;
     private ActorNumber _receiverNumber = ActorNumber.Create("1234567891912");
     private ActorRole _receiverRole = ActorRole.MeteredDataAdministrator;
-    private ActorRole _documentReceiverRole = ActorRole.MeteredDataResponsible;
-    private ActorNumber _documentReceiverNumber = ActorNumber.Create("1234567891913");
 
     public AcceptedEnergyResultMessageDto Build()
     {

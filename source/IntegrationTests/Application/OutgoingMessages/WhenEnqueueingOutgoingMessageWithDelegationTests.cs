@@ -49,9 +49,9 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ActorMessageQueueContext _context;
     private readonly SystemDateTimeProviderStub _dateTimeProvider;
+    private readonly Actor _delegatedTo = CreateActor(ActorNumber.Create("1234567891235"), actorRole: ActorRole.Delegated);
 
     private Actor _delegatedBy = CreateActor(ActorNumber.Create("1234567891234"));
-    private Actor _delegatedTo = CreateActor(ActorNumber.Create("1234567891235"), actorRole: ActorRole.Delegated);
 
     public WhenEnqueueingOutgoingMessageWithDelegationTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
