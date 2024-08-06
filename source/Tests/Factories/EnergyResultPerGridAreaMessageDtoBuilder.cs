@@ -26,7 +26,6 @@ public class EnergyResultPerGridAreaMessageDtoBuilder
     private readonly Guid _calculationId = Guid.NewGuid();
     private readonly Guid _calculationResultId = Guid.NewGuid();
     private readonly BusinessReason _businessReason = BusinessReason.BalanceFixing;
-
     private ActorNumber _meteredDataResponsibleNumber = ActorNumber.Create("1234567891912");
 
     public EnergyResultPerGridAreaMessageDto Build()
