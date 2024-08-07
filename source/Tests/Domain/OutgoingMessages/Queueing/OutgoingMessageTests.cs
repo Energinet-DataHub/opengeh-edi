@@ -12,14 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
@@ -112,7 +107,7 @@ public class OutgoingMessageTests
             .Build();
 
         // Act
-        var outgoingMessage = OutgoingMessage.CreateMessage(
+        var outgoingMessage = OutgoingMessageFactory.CreateMessage(
             energyResultMessageDto,
             serializer,
             SystemClock.Instance.GetCurrentInstant());
@@ -136,7 +131,7 @@ public class OutgoingMessageTests
         var acceptedEnergyResultMessageDto = acceptedEnergyResultMessageDtoBuilder.Build();
 
         // Act
-        var outgoingMessage = OutgoingMessage.CreateMessage(
+        var outgoingMessage = OutgoingMessageFactory.CreateMessage(
             acceptedEnergyResultMessageDto,
             serializer,
             SystemClock.Instance.GetCurrentInstant());
@@ -159,7 +154,7 @@ public class OutgoingMessageTests
         var rejectedEnergyResultMessageDto = RejectedEnergyResultMessageDtoBuilder.Build();
 
         // Act
-        var outgoingMessage = OutgoingMessage.CreateMessage(
+        var outgoingMessage = OutgoingMessageFactory.CreateMessage(
             rejectedEnergyResultMessageDto,
             serializer,
             SystemClock.Instance.GetCurrentInstant());
@@ -183,7 +178,7 @@ public class OutgoingMessageTests
             .Build();
 
         // Act
-        var outgoingMessages = OutgoingMessage.CreateMessages(
+        var outgoingMessages = OutgoingMessageFactory.CreateMessages(
             wholesaleServicesMessageDto,
             serializer,
             SystemClock.Instance.GetCurrentInstant());
@@ -213,7 +208,7 @@ public class OutgoingMessageTests
         var acceptedWholesaleServicesMessageDto = AcceptedWholesaleServicesMessageDtoBuilder.Build();
 
         // Act
-        var outgoingMessage = OutgoingMessage.CreateMessage(
+        var outgoingMessage = OutgoingMessageFactory.CreateMessage(
             acceptedWholesaleServicesMessageDto,
             serializer,
             SystemClock.Instance.GetCurrentInstant());
@@ -236,7 +231,7 @@ public class OutgoingMessageTests
         var rejectedWholesaleServicesMessageDto = RejectedWholesaleServicesMessageDtoBuilder.Build();
 
         // Act
-        var outgoingMessage = OutgoingMessage.CreateMessage(
+        var outgoingMessage = OutgoingMessageFactory.CreateMessage(
             rejectedWholesaleServicesMessageDto,
             serializer,
             SystemClock.Instance.GetCurrentInstant());
@@ -260,7 +255,7 @@ public class OutgoingMessageTests
             .Build();
 
         // Act
-        var outgoingMessages = OutgoingMessage.CreateMessages(
+        var outgoingMessages = OutgoingMessageFactory.CreateMessages(
             wholesaleServicesMessageDto,
             serializer,
             SystemClock.Instance.GetCurrentInstant());
@@ -284,7 +279,7 @@ public class OutgoingMessageTests
             .Build();
 
         // Act
-        var outgoingMessage = OutgoingMessage.CreateMessage(
+        var outgoingMessage = OutgoingMessageFactory.CreateMessage(
             energyResultMessageDto,
             new Serializer(),
             SystemClock.Instance.GetCurrentInstant());

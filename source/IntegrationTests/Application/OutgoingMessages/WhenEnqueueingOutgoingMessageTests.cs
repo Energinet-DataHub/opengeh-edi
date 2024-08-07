@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
@@ -275,7 +276,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var message = _acceptedEnergyResultMessageDtoBuilder
             .WithReceiverNumber(SampleData.NewEnergySupplierNumber)
             .Build();
-        var outgoingMessage = OutgoingMessage.CreateMessage(
+        var outgoingMessage = OutgoingMessageFactory.CreateMessage(
             message,
             serializer,
             Instant.FromUtc(2024, 1, 1, 0, 0));
