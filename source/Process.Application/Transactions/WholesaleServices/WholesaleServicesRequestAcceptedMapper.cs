@@ -55,11 +55,10 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
                 SettlementVersion: MapSettlementVersion(wholesaleSeries.CalculationType),
                 MapSettlementMethod(wholesaleSeries.SettlementMethod),
                 MapCurrency(wholesaleSeries.Currency),
-                wholesaleSeries.ChargeOwnerId == string.Empty ? null : ActorNumber.Create(wholesaleSeries.ChargeOwnerId),
+                wholesaleSeries.HasChargeOwnerId ? ActorNumber.Create(wholesaleSeries.ChargeOwnerId) : null,
                 ActorNumber.Create(wholesaleSeries.EnergySupplierId),
                 wholesaleSeries.GridArea,
-                // Protocol buffers has no concept of null, so we need to check if the string is empty
-                wholesaleSeries.ChargeCode == string.Empty ? null : wholesaleSeries.ChargeCode,
+                wholesaleSeries.HasChargeCode ? wholesaleSeries.ChargeCode : null,
                 wholesaleSeries.Period.StartOfPeriod.ToInstant(),
                 wholesaleSeries.Period.EndOfPeriod.ToInstant(),
                 wholesaleSeries.CalculationResultVersion));
