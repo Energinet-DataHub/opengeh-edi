@@ -80,7 +80,6 @@ public static class WholesaleServicesResponseEventBuilder
                                 ? WholesaleServicesRequestSeries.Types.CalculationType.WholesaleFixing
                                 : throw new NotImplementedException(
                                     "Builder only supports WholesaleFixing, not corrections"),
-                            ChargeCode = ct.ChargeCode,
                             ChargeType =
                                 Enum.TryParse<WholesaleServicesRequestSeries.Types.ChargeType>(
                                     ct.ChargeType_,
@@ -97,6 +96,8 @@ public static class WholesaleServicesResponseEventBuilder
                             CalculationResultVersion = now.ToUnixTimeTicks(),
                         };
 
+                        if (ct.HasChargeCode)
+                            series.ChargeCode = ct.ChargeCode;
                         series.TimeSeriesPoints.AddRange(points);
 
                         return series;

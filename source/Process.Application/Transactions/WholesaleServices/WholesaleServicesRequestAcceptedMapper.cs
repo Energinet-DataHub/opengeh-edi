@@ -58,7 +58,6 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
                 wholesaleSeries.HasChargeOwnerId ? ActorNumber.Create(wholesaleSeries.ChargeOwnerId) : null,
                 ActorNumber.Create(wholesaleSeries.EnergySupplierId),
                 wholesaleSeries.GridArea,
-                // Protocol buffers has no concept of null, so we need to check if the string is empty
                 wholesaleSeries.HasChargeCode ? wholesaleSeries.ChargeCode : null,
                 wholesaleSeries.Period.StartOfPeriod.ToInstant(),
                 wholesaleSeries.Period.EndOfPeriod.ToInstant(),
