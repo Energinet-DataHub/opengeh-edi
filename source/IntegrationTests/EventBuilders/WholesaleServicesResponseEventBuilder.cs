@@ -175,10 +175,6 @@ public static class WholesaleServicesResponseEventBuilder
 
     private static List<WholesaleServicesRequestSeries.Types.Point> CreatePoints(WholesaleServicesRequestSeries.Types.Resolution resolution, Instant periodStart, Instant periodEnd)
     {
-        // TODO: this look wrong,
-        // if resolution is monthly, we should only have one point = a mount amount
-        // if resolution is day should be one point per day in the calculated month.
-        // Will look at this in a follow-up PR
         var points = new List<WholesaleServicesRequestSeries.Types.Point>();
 
         if (resolution == WholesaleServicesRequestSeries.Types.Resolution.Monthly)
