@@ -35,8 +35,6 @@ public class OutgoingMessage
         Receiver documentReceiver,
         Guid? processId,
         string businessReason,
-        ActorNumber senderId,
-        ActorRole senderRole,
         string serializedContent,
         Instant createdAt,
         ProcessType messageCreatedFromProcess,
@@ -50,8 +48,6 @@ public class OutgoingMessage
         DocumentType = documentType;
         ProcessId = processId;
         BusinessReason = businessReason;
-        SenderId = senderId;
-        SenderRole = senderRole;
         MessageCreatedFromProcess = messageCreatedFromProcess;
         GridAreaCode = gridAreaCode;
         _serializedContent = serializedContent;
@@ -112,9 +108,9 @@ public class OutgoingMessage
 
     public string BusinessReason { get; }
 
-    public ActorNumber SenderId { get; }
+    public ActorNumber SenderId { get; } = DataHubDetails.DataHubActorNumber;
 
-    public ActorRole SenderRole { get; }
+    public ActorRole SenderRole { get; } = ActorRole.MeteredDataAdministrator;
 
     public string? GridAreaCode { get; }
 
