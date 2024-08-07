@@ -46,36 +46,42 @@ public interface IOutgoingMessagesClient
 
     /// <summary>
     /// Enqueue a accepted energy result message, no commit. Currently ONLY used by the Process module which handles the commit itself.
+    /// <returns>The Id for the created OutgoingMessage</returns>
     /// </summary>
-    Task<OutgoingMessageId> EnqueueAsync(AcceptedEnergyResultMessageDto acceptedEnergyResultMessage, CancellationToken cancellationToken);
+    Task<Guid> EnqueueAsync(AcceptedEnergyResultMessageDto acceptedEnergyResultMessage, CancellationToken cancellationToken);
 
     /// <summary>
     /// Enqueue a rejected energy result message, no commit. Currently ONLY used by the Process module which handles the commit itself.
+    /// <returns>The Id for the created OutgoingMessage</returns>
     /// </summary>
-    Task<OutgoingMessageId> EnqueueAsync(RejectedEnergyResultMessageDto rejectedEnergyResultMessage, CancellationToken cancellationToken);
+    Task<Guid> EnqueueAsync(RejectedEnergyResultMessageDto rejectedEnergyResultMessage, CancellationToken cancellationToken);
 
     /// <summary>
     /// Enqueue a rejected wholesale service message, no commit. Currently ONLY used by the Process module which handles the
     /// commit itself.
+    /// <returns>The Id for the created OutgoingMessage</returns>
     /// </summary>
-    Task<OutgoingMessageId> EnqueueAsync(
+    Task<Guid> EnqueueAsync(
         RejectedWholesaleServicesMessageDto rejectedWholesaleServicesMessage,
         CancellationToken cancellationToken);
 
     /// <summary>
     /// Enqueue an energy result message for a metered data responsible in a grid area, WITH commit.
+    /// <returns>The Id for the created OutgoingMessage</returns>
     /// </summary>
-    Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultPerGridAreaMessageDto messageDto, CancellationToken cancellationToken);
+    Task<Guid> EnqueueAndCommitAsync(EnergyResultPerGridAreaMessageDto messageDto, CancellationToken cancellationToken);
 
     /// <summary>
     /// Enqueue an energy result message for a balance responsible in a grid area, WITH commit.
+    /// /// <returns>The Id for the created OutgoingMessage</returns>
     /// </summary>
-    Task<OutgoingMessageId> EnqueueAndCommitAsync(EnergyResultPerBalanceResponsibleMessageDto messageDto, CancellationToken cancellationToken);
+    Task<Guid> EnqueueAndCommitAsync(EnergyResultPerBalanceResponsibleMessageDto messageDto, CancellationToken cancellationToken);
 
     /// <summary>
     /// Enqueue energy result messages for an energy supplier and a balance responsible in a grid area, WITH commit.
     /// </summary>
-    Task<IReadOnlyCollection<OutgoingMessageId>> EnqueueAndCommitAsync(EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto messageDto, CancellationToken cancellationToken);
+    /// <returns>The a list containing the Id's for the created OutgoingMessages</returns>
+    Task<IReadOnlyCollection<Guid>> EnqueueAndCommitAsync(EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto messageDto, CancellationToken cancellationToken);
 
     /// <summary>
     /// Enqueue wholesale total amount messages, handles enqueuing messages to receiver in a single transaction.
@@ -94,6 +100,7 @@ public interface IOutgoingMessagesClient
 
     /// <summary>
     /// Enqueue an accepted wholesale services message, no commit. Currently ONLY used by the Process module which handles the commit itself.
+    /// <returns>The Id for the created OutgoingMessage</returns>
     /// </summary>
-    Task<OutgoingMessageId> EnqueueAsync(AcceptedWholesaleServicesMessageDto acceptedWholesaleServicesMessage, CancellationToken cancellationToken);
+    Task<Guid> EnqueueAsync(AcceptedWholesaleServicesMessageDto acceptedWholesaleServicesMessage, CancellationToken cancellationToken);
 }
