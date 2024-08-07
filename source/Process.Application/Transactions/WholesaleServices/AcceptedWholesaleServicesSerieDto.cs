@@ -24,7 +24,7 @@ public record AcceptedWholesaleServicesSerieDto(
     IReadOnlyCollection<Point> Points,
     MeteringPointType? MeteringPointType,
     Resolution Resolution,
-    ChargeType ChargeType,
+    ChargeType? ChargeType,
     MeasurementUnit MeasurementUnit,
     SettlementVersion? SettlementVersion,
     SettlementMethod? SettlementMethod,
@@ -32,7 +32,7 @@ public record AcceptedWholesaleServicesSerieDto(
     ActorNumber ChargeOwnerId,
     ActorNumber EnergySupplierId,
     string GridArea,
-    string ChargeCode,
+    string? ChargeCode,
     Instant StartOfPeriod,
     Instant EndOfPeriod,
     long CalculationResultVersion);
