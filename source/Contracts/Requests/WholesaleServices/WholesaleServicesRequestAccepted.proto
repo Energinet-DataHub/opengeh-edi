@@ -36,9 +36,9 @@ message WholesaleServicesRequestSeries {
 
   string energy_supplier_id = 3;
 
-  string charge_code = 4;
+  optional string charge_code = 4;
 
-  ChargeType charge_type = 5;
+  optional ChargeType charge_type = 5;
 
   string charge_owner_id = 6;
 

@@ -26,6 +26,6 @@ public record WholesaleServicesMessageAssertionInput(
     string? ChargeOwnerId,
     string? Resolution,
     string BusinessReason,
-    IReadOnlyCollection<(string ChargeType, string ChargeCode)>? ChargeTypes,
+    IReadOnlyCollection<(string ChargeType, string? ChargeCode)>? ChargeTypes,
     Period Period,
     string? SettlementVersion);
