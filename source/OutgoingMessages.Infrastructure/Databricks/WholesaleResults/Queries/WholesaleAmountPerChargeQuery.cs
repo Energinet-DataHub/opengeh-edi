@@ -21,7 +21,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatem
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Microsoft.Extensions.Logging;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
