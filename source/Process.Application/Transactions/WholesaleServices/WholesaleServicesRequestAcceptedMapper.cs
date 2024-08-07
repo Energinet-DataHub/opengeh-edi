@@ -55,7 +55,7 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
                 SettlementVersion: MapSettlementVersion(wholesaleSeries.CalculationType),
                 MapSettlementMethod(wholesaleSeries.SettlementMethod),
                 MapCurrency(wholesaleSeries.Currency),
-                ActorNumber.Create(wholesaleSeries.ChargeOwnerId),
+                wholesaleSeries.ChargeOwnerId == string.Empty ? null : ActorNumber.Create(wholesaleSeries.ChargeOwnerId),
                 ActorNumber.Create(wholesaleSeries.EnergySupplierId),
                 wholesaleSeries.GridArea,
                 // Protocol buffers has no concept of null, so we need to check if the string is empty
@@ -118,13 +118,13 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         };
     }
 
-    private static MeasurementUnit MapMeasurementUnit(WholesaleServicesRequestSeries.Types.QuantityUnit quantityUnit)
+    private static MeasurementUnit? MapMeasurementUnit(WholesaleServicesRequestSeries.Types.QuantityUnit quantityUnit)
     {
         return quantityUnit switch
         {
             WholesaleServicesRequestSeries.Types.QuantityUnit.Kwh => MeasurementUnit.Kwh,
             WholesaleServicesRequestSeries.Types.QuantityUnit.Pieces => MeasurementUnit.Pieces,
-            WholesaleServicesRequestSeries.Types.QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map quantity unit"),
+            WholesaleServicesRequestSeries.Types.QuantityUnit.Unspecified => null,
             _ => throw new InvalidOperationException("Unknown quantity unit"),
         };
     }

@@ -120,7 +120,6 @@ public static class WholesaleServicesResponseEventBuilder
                             : throw new NotImplementedException("Builder only supports WholesaleFixing, not corrections"),
                         ChargeOwnerId = request.HasChargeOwnerId ? request.ChargeOwnerId : defaultChargeOwnerId!,
                         GridArea = ga,
-                        QuantityUnit = WholesaleServicesRequestSeries.Types.QuantityUnit.Kwh,
                         EnergySupplierId = request.HasEnergySupplierId ? request.EnergySupplierId : defaultEnergySupplierId!,
                         CalculationResultVersion = now.ToUnixTimeTicks(),
                     };
