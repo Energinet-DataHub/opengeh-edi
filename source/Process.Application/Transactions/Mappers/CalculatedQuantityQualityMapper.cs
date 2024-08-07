@@ -144,6 +144,9 @@ public static class CalculatedQuantityQualityMapper
 
         if (hasAmount && resolution == WholesaleServicesRequestSeries.Types.Resolution.Monthly)
         {
+            // TODO: how to handle quality for monthly amounts?
+            // according to this article it should never by used: https://energinet.atlassian.net/wiki/spaces/DHDOCS/pages/939950357/RSM-019+Fremsendelse+af+beregnede+engrosydelser
+            // according to this article it should be calculated: https://energinet.atlassian.net/wiki/spaces/D3/pages/529989633/QuantityQuality
             return CalculatedQuantityQuality.Calculated;
         }
 

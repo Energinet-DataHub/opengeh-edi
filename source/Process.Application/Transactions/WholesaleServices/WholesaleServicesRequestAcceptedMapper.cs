@@ -124,7 +124,6 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         {
             WholesaleServicesRequestSeries.Types.QuantityUnit.Kwh => MeasurementUnit.Kwh,
             WholesaleServicesRequestSeries.Types.QuantityUnit.Pieces => MeasurementUnit.Pieces,
-            // TODO: awaiting the business to confirm the correct mapping
             WholesaleServicesRequestSeries.Types.QuantityUnit.Unspecified => MeasurementUnit.Kwh,
             _ => throw new InvalidOperationException("Unknown quantity unit"),
         };
