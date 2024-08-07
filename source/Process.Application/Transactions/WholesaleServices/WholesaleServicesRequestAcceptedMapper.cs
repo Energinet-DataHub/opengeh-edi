@@ -47,7 +47,7 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         foreach (var wholesaleSeries in wholesaleServicesRequestAccepted.Series)
         {
             acceptedWholesaleServicesSeries.Add(new AcceptedWholesaleServicesSerieDto(
-                MapPoints(wholesaleSeries.TimeSeriesPoints),
+                MapPoints(wholesaleSeries.TimeSeriesPoints, wholesaleSeries.Resolution),
                 MapMeteringPointType(wholesaleSeries),
                 MapResolution(wholesaleSeries.Resolution),
                 MapChargeType(wholesaleSeries.ChargeType),
@@ -55,10 +55,11 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
                 SettlementVersion: MapSettlementVersion(wholesaleSeries.CalculationType),
                 MapSettlementMethod(wholesaleSeries.SettlementMethod),
                 MapCurrency(wholesaleSeries.Currency),
-                ActorNumber.Create(wholesaleSeries.ChargeOwnerId),
+                wholesaleSeries.ChargeOwnerId == string.Empty ? null : ActorNumber.Create(wholesaleSeries.ChargeOwnerId),
                 ActorNumber.Create(wholesaleSeries.EnergySupplierId),
                 wholesaleSeries.GridArea,
-                wholesaleSeries.ChargeCode,
+                // Protocol buffers has no concept of null, so we need to check if the string is empty
+                wholesaleSeries.ChargeCode == string.Empty ? null : wholesaleSeries.ChargeCode,
                 wholesaleSeries.Period.StartOfPeriod.ToInstant(),
                 wholesaleSeries.Period.EndOfPeriod.ToInstant(),
                 wholesaleSeries.CalculationResultVersion));
@@ -123,19 +124,19 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         {
             WholesaleServicesRequestSeries.Types.QuantityUnit.Kwh => MeasurementUnit.Kwh,
             WholesaleServicesRequestSeries.Types.QuantityUnit.Pieces => MeasurementUnit.Pieces,
-            WholesaleServicesRequestSeries.Types.QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map quantity unit"),
+            WholesaleServicesRequestSeries.Types.QuantityUnit.Unspecified => MeasurementUnit.Kwh,
             _ => throw new InvalidOperationException("Unknown quantity unit"),
         };
     }
 
-    private static ChargeType MapChargeType(WholesaleServicesRequestSeries.Types.ChargeType chargeType)
+    private static ChargeType? MapChargeType(WholesaleServicesRequestSeries.Types.ChargeType chargeType)
     {
         return chargeType switch
         {
             WholesaleServicesRequestSeries.Types.ChargeType.Fee => ChargeType.Fee,
             WholesaleServicesRequestSeries.Types.ChargeType.Tariff => ChargeType.Tariff,
             WholesaleServicesRequestSeries.Types.ChargeType.Subscription => ChargeType.Subscription,
-            WholesaleServicesRequestSeries.Types.ChargeType.Unspecified => throw new InvalidOperationException("Could not map charge type"),
+            WholesaleServicesRequestSeries.Types.ChargeType.Unspecified => null,
             _ => throw new InvalidOperationException("Unknown charge type"),
         };
     }
@@ -152,7 +153,9 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         };
     }
 
-    private static ReadOnlyCollection<Point> MapPoints(RepeatedField<WholesaleServicesRequestSeries.Types.Point> timeSeriesPoints)
+    private static ReadOnlyCollection<Point> MapPoints(
+        RepeatedField<WholesaleServicesRequestSeries.Types.Point> timeSeriesPoints,
+        WholesaleServicesRequestSeries.Types.Resolution resolution)
     {
         var points = new List<Point>();
 
@@ -162,7 +165,7 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
             points.Add(new Point(
                 pointPosition,
                 Parse(point.Quantity),
-                CalculatedQuantityQualityMapper.MapForWholesaleServices(point.QuantityQualities.ToList().AsReadOnly()),
+                CalculatedQuantityQualityMapper.MapForWholesaleServices(point.QuantityQualities.ToList().AsReadOnly(), resolution, point.Amount != null),
                 Parse(point.Price),
                 Parse(point.Amount)));
 

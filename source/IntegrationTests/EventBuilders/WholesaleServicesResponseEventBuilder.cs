@@ -48,52 +48,92 @@ public static class WholesaleServicesResponseEventBuilder
         if (gridAreas.Count == 0)
             gridAreas.AddRange(defaultGridAreas!);
 
-        var chargeTypes = request.ChargeTypes;
+        // If no charge types are specified, add some default charge types representing the different charges an actor can have.
+        var chargeTypes = request.ChargeTypes.ToList();
         if (chargeTypes.Count == 0)
             chargeTypes.Add(new ChargeType { ChargeCode = "12345678", ChargeType_ = DataHubNames.ChargeType.Tariff });
 
+        var periodStart = InstantPattern.General.Parse(request.PeriodStart).Value;
+        var periodEnd = InstantPattern.General.Parse(request.PeriodEnd).Value;
+
         var series = gridAreas.SelectMany(
-            ga => chargeTypes.Select(ct =>
+            ga =>
             {
-                var resolution = request.Resolution == DataHubNames.Resolution.Monthly
-                    ? WholesaleServicesRequestSeries.Types.Resolution.Monthly
-                    : WholesaleServicesRequestSeries.Types.Resolution.Hour;
-
-                var periodStart = InstantPattern.General.Parse(request.PeriodStart).Value;
-                var periodEnd = InstantPattern.General.Parse(request.PeriodEnd).Value;
-
-                var points = CreatePoints(resolution, periodStart, periodEnd);
-
-                var series = new WholesaleServicesRequestSeries()
-                {
-                    Currency = WholesaleServicesRequestSeries.Types.Currency.Dkk,
-                    Period = new Period
+                var series = chargeTypes.Select(
+                    ct =>
                     {
-                        StartOfPeriod = periodStart.ToTimestamp(),
-                        EndOfPeriod = periodEnd.ToTimestamp(),
-                    },
-                    Resolution = resolution,
-                    CalculationType = request.BusinessReason == DataHubNames.BusinessReason.WholesaleFixing
-                        ? WholesaleServicesRequestSeries.Types.CalculationType.WholesaleFixing
-                        : throw new NotImplementedException("Builder only supports WholesaleFixing, not corrections"),
-                    ChargeCode = ct.ChargeCode,
-                    ChargeType =
-                        Enum.TryParse<WholesaleServicesRequestSeries.Types.ChargeType>(ct.ChargeType_, out var result)
-                            ? result
-                            : throw new NotImplementedException("Unsupported chargetype in request"),
-                    ChargeOwnerId = request.HasChargeOwnerId ? request.ChargeOwnerId : defaultChargeOwnerId!,
-                    GridArea = ga,
-                    QuantityUnit = WholesaleServicesRequestSeries.Types.QuantityUnit.Kwh,
-                    SettlementMethod = WholesaleServicesRequestSeries.Types.SettlementMethod.Flex,
-                    EnergySupplierId = request.HasEnergySupplierId ? request.EnergySupplierId : defaultEnergySupplierId!,
-                    MeteringPointType = WholesaleServicesRequestSeries.Types.MeteringPointType.Consumption,
-                    CalculationResultVersion = now.ToUnixTimeTicks(),
-                };
+                        var resolution = request.Resolution == DataHubNames.Resolution.Monthly
+                            ? WholesaleServicesRequestSeries.Types.Resolution.Monthly
+                            : WholesaleServicesRequestSeries.Types.Resolution.Hour;
 
-                series.TimeSeriesPoints.AddRange(points);
+                        var points = CreatePoints(resolution, periodStart, periodEnd);
+
+                        var series = new WholesaleServicesRequestSeries()
+                        {
+                            Currency = WholesaleServicesRequestSeries.Types.Currency.Dkk,
+                            Period = new Period
+                            {
+                                StartOfPeriod = periodStart.ToTimestamp(), EndOfPeriod = periodEnd.ToTimestamp(),
+                            },
+                            Resolution = resolution,
+                            CalculationType = request.BusinessReason == DataHubNames.BusinessReason.WholesaleFixing
+                                ? WholesaleServicesRequestSeries.Types.CalculationType.WholesaleFixing
+                                : throw new NotImplementedException(
+                                    "Builder only supports WholesaleFixing, not corrections"),
+                            ChargeCode = ct.ChargeCode,
+                            ChargeType =
+                                Enum.TryParse<WholesaleServicesRequestSeries.Types.ChargeType>(
+                                    ct.ChargeType_,
+                                    out var result)
+                                    ? result
+                                    : throw new NotImplementedException("Unsupported chargetype in request"),
+                            ChargeOwnerId = request.HasChargeOwnerId ? request.ChargeOwnerId : defaultChargeOwnerId!,
+                            GridArea = ga,
+                            QuantityUnit = WholesaleServicesRequestSeries.Types.QuantityUnit.Kwh,
+                            SettlementMethod = WholesaleServicesRequestSeries.Types.SettlementMethod.Flex,
+                            EnergySupplierId =
+                                request.HasEnergySupplierId ? request.EnergySupplierId : defaultEnergySupplierId!,
+                            MeteringPointType = WholesaleServicesRequestSeries.Types.MeteringPointType.Consumption,
+                            CalculationResultVersion = now.ToUnixTimeTicks(),
+                        };
+
+                        series.TimeSeriesPoints.AddRange(points);
+
+                        return series;
+                    }).ToList();
+
+                // When the resolution is monthly and no charge types are specified, series should contain a total monthly amount result.
+                if (request.Resolution == DataHubNames.Resolution.Monthly
+                    && request.ChargeTypes.Count == 0)
+                {
+                    var totalMonthlyAmountSeries = new WholesaleServicesRequestSeries()
+                    {
+                        Currency = WholesaleServicesRequestSeries.Types.Currency.Dkk,
+                        Period = new Period
+                        {
+                            StartOfPeriod = periodStart.ToTimestamp(),
+                            EndOfPeriod = periodEnd.ToTimestamp(),
+                        },
+                        Resolution = WholesaleServicesRequestSeries.Types.Resolution.Monthly,
+                        CalculationType = request.BusinessReason == DataHubNames.BusinessReason.WholesaleFixing
+                            ? WholesaleServicesRequestSeries.Types.CalculationType.WholesaleFixing
+                            : throw new NotImplementedException("Builder only supports WholesaleFixing, not corrections"),
+                        ChargeOwnerId = request.HasChargeOwnerId ? request.ChargeOwnerId : defaultChargeOwnerId!,
+                        GridArea = ga,
+                        EnergySupplierId = request.HasEnergySupplierId ? request.EnergySupplierId : defaultEnergySupplierId!,
+                        CalculationResultVersion = now.ToUnixTimeTicks(),
+                    };
+
+                    var totalMonthlyAmountSeriesPoints = new WholesaleServicesRequestSeries.Types.Point
+                    {
+                        Time = periodStart.ToTimestamp(), Amount = DecimalValue.FromDecimal(999),
+                    };
+                    totalMonthlyAmountSeries.TimeSeriesPoints.Add(totalMonthlyAmountSeriesPoints);
+                    series.Add(totalMonthlyAmountSeries);
+                }
 
                 return series;
-            }));
+            });
 
         var requestAcceptedMessage = new WholesaleServicesRequestAccepted();
         requestAcceptedMessage.Series.AddRange(series);
@@ -135,6 +175,10 @@ public static class WholesaleServicesResponseEventBuilder
 
     private static List<WholesaleServicesRequestSeries.Types.Point> CreatePoints(WholesaleServicesRequestSeries.Types.Resolution resolution, Instant periodStart, Instant periodEnd)
     {
+        // TODO: this look wrong,
+        // if resolution is monthly, we should only have one point = a mount amount
+        // if resolution is day should be one point per day in the calculated month.
+        // Will look at this in a follow-up PR
         var points = new List<WholesaleServicesRequestSeries.Types.Point>();
 
         if (resolution == WholesaleServicesRequestSeries.Types.Resolution.Monthly)

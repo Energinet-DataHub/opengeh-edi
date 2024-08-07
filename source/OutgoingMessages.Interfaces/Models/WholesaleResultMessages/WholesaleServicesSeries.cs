@@ -27,7 +27,7 @@ public record WholesaleServicesSeries(
     ActorNumber? ChargeOwner,
     Period Period,
     SettlementVersion? SettlementVersion,
-    MeasurementUnit QuantityMeasureUnit,
+    MeasurementUnit? QuantityMeasureUnit,
     MeasurementUnit? QuantityUnit, // To ensure backwards compatibility, will be remove in another PR.
     MeasurementUnit? PriceMeasureUnit,
     Currency Currency,

@@ -25,7 +25,7 @@ public class AcceptedWholesaleServicesMessageDto : OutgoingMessageDto
         EventId eventId,
         string businessReason,
         ActorRole receiverRole,
-        ActorNumber chargeOwnerId,
+        ActorNumber? chargeOwnerId,
         AcceptedWholesaleServicesSeries series,
         MessageId relatedToMessageId,
         ActorNumber documentReceiverNumber,
@@ -50,7 +50,7 @@ public class AcceptedWholesaleServicesMessageDto : OutgoingMessageDto
 
     public AcceptedWholesaleServicesSeries Series { get; }
 
-    public ActorNumber ChargeOwnerId { get; }
+    public ActorNumber? ChargeOwnerId { get; }
 
     public ActorNumber DocumentReceiverNumber { get; }
 
@@ -61,7 +61,7 @@ public class AcceptedWholesaleServicesMessageDto : OutgoingMessageDto
         ActorRole receiverRole,
         ActorNumber documentReceiverNumber,
         ActorRole documentReceiverRole,
-        ActorNumber chargeOwnerId,
+        ActorNumber? chargeOwnerId,
         Guid processId,
         EventId eventId,
         string businessReason,
@@ -86,17 +86,17 @@ public record AcceptedWholesaleServicesSeries(
     TransactionId TransactionId,
     long CalculationVersion,
     string GridAreaCode,
-    string ChargeCode,
+    string? ChargeCode,
     bool IsTax,
     IReadOnlyCollection<WholesaleServicesPoint> Points,
     ActorNumber EnergySupplier,
-    ActorNumber ChargeOwner,
+    ActorNumber? ChargeOwner,
     Period Period,
     SettlementVersion? SettlementVersion,
     MeasurementUnit QuantityMeasureUnit,
     MeasurementUnit PriceMeasureUnit,
     Currency Currency,
-    ChargeType ChargeType,
+    ChargeType? ChargeType,
     Resolution Resolution,
     MeteringPointType? MeteringPointType,
     SettlementMethod? SettlementMethod,

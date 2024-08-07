@@ -139,9 +139,12 @@ public sealed class CalculatedQuantityQualityMapperTests
             // Example mappings from the documentation at https://energinet.atlassian.net/wiki/spaces/D3/pages/529989633/QuantityQuality.
             // Only available to Energinet employees.
             // Note that this is used for RSM-019
+            // QuantityQuality for monthly amount is always “Calculated”
+            // If QuantityQuality is not monthly amount, the following rules apply:
             /*
              * | Combination QQ from RSM-012       | Calculated quantity quality |
              * |-----------------------------------+-----------------------------|
+             * | Missing + Missing                 | Missing                     |
              * | Missing + Missing                 | Missing                     |
              * | Missing + Estimated               | Incomplete                  |
              * | Missing + Measured                | Incomplete                  |
@@ -155,41 +158,78 @@ public sealed class CalculatedQuantityQualityMapperTests
              * | Measured + Estimated + Calculated | Calculated                  |
              */
 
-            // The following test cases are defined as an input array of quantity qualities and a singular expected output.
-            yield return new object[] { new[] { QuantityQuality.Missing }, CalculatedQuantityQuality.Missing };
-
+            //QuantityQuality for monthly amount is always “Calculated”
             yield return new object[]
             {
-                new[] { QuantityQuality.Missing, QuantityQuality.Estimated }, CalculatedQuantityQuality.Incomplete,
+                new[] { QuantityQuality.Missing },
+                WholesaleServicesRequestSeries.Types.Resolution.Monthly,
+                true,
+                CalculatedQuantityQuality.Calculated,
+            };
+
+            // The following test cases are defined as an input array of quantity qualities and a singular expected output.
+            yield return new object[]
+            {
+                new[] { QuantityQuality.Missing },
+                WholesaleServicesRequestSeries.Types.Resolution.Day,
+                false,
+                CalculatedQuantityQuality.Missing,
             };
 
             yield return new object[]
             {
-                new[] { QuantityQuality.Missing, QuantityQuality.Measured }, CalculatedQuantityQuality.Incomplete,
+                new[] { QuantityQuality.Missing, QuantityQuality.Estimated },
+                WholesaleServicesRequestSeries.Types.Resolution.Day,
+                false,
+                CalculatedQuantityQuality.Incomplete,
+            };
+
+            yield return new object[]
+            {
+                new[] { QuantityQuality.Missing, QuantityQuality.Measured },
+                WholesaleServicesRequestSeries.Types.Resolution.Day,
+                false,
+                CalculatedQuantityQuality.Incomplete,
             };
 
             yield return new object[]
             {
                 new[] { QuantityQuality.Missing, QuantityQuality.Estimated, QuantityQuality.Measured },
+                WholesaleServicesRequestSeries.Types.Resolution.Day,
+                false,
                 CalculatedQuantityQuality.Incomplete,
             };
 
             yield return new object[]
             {
                 new[] { QuantityQuality.Estimated, QuantityQuality.Measured },
+                WholesaleServicesRequestSeries.Types.Resolution.Day,
+                false,
                 CalculatedQuantityQuality.Calculated,
             };
 
-            yield return new object[] { new[] { QuantityQuality.Estimated }, CalculatedQuantityQuality.Calculated };
-
             yield return new object[]
             {
-                new[] { QuantityQuality.Measured }, CalculatedQuantityQuality.Calculated,
+                new[] { QuantityQuality.Estimated },
+                WholesaleServicesRequestSeries.Types.Resolution.Day,
+                false,
+                CalculatedQuantityQuality.Calculated,
             };
 
             yield return new object[]
             {
-                new[] { QuantityQuality.Calculated }, CalculatedQuantityQuality.Calculated,
+                new[] { QuantityQuality.Measured },
+                WholesaleServicesRequestSeries.Types.Resolution.Day,
+                false,
+                CalculatedQuantityQuality.Calculated,
+            };
+
+            yield return new object[]
+            {
+                new[] { QuantityQuality.Calculated },
+                WholesaleServicesRequestSeries.Types.Resolution.Day,
+                false,
+                CalculatedQuantityQuality.Calculated,
             };
 
             yield return new object[]
@@ -199,6 +239,8 @@ public sealed class CalculatedQuantityQualityMapperTests
                     QuantityQuality.Missing,
                     QuantityQuality.Calculated,
                 },
+                WholesaleServicesRequestSeries.Types.Resolution.Day,
+                false,
                 CalculatedQuantityQuality.Incomplete,
             };
 
@@ -209,6 +251,8 @@ public sealed class CalculatedQuantityQualityMapperTests
                     QuantityQuality.Estimated,
                     QuantityQuality.Calculated,
                 },
+                WholesaleServicesRequestSeries.Types.Resolution.Day,
+                false,
                 CalculatedQuantityQuality.Calculated,
             };
 
@@ -220,13 +264,18 @@ public sealed class CalculatedQuantityQualityMapperTests
                     QuantityQuality.Calculated,
                     QuantityQuality.Measured,
                 },
+                WholesaleServicesRequestSeries.Types.Resolution.Day,
+                false,
                 CalculatedQuantityQuality.Calculated,
             };
 
             // The empty set is undefined.
             yield return new object[]
             {
-                new List<QuantityQuality>(), CalculatedQuantityQuality.NotAvailable,
+                new List<QuantityQuality>(),
+                WholesaleServicesRequestSeries.Types.Resolution.Day,
+                false,
+                CalculatedQuantityQuality.NotAvailable,
             };
 
             // Additional test cases not based on examples from the documentation.
@@ -238,6 +287,7 @@ public sealed class CalculatedQuantityQualityMapperTests
                     QuantityQuality.Measured,
                     QuantityQuality.Calculated,
                 },
+                WholesaleServicesRequestSeries.Types.Resolution.Day, false,
                 CalculatedQuantityQuality.Calculated,
             };
         }
@@ -265,7 +315,7 @@ public sealed class CalculatedQuantityQualityMapperTests
             ICollection<QuantityQuality>? quality = null;
 
             // Act & Assert
-            var act = () => CalculatedQuantityQualityMapper.MapForWholesaleServices(quality);
+            var act = () => CalculatedQuantityQualityMapper.MapForWholesaleServices(quality, WholesaleServicesRequestSeries.Types.Resolution.Day, false);
             act.Should().ThrowExactly<ArgumentNullException>();
         }
 
@@ -286,10 +336,15 @@ public sealed class CalculatedQuantityQualityMapperTests
         [MemberData(nameof(QuantityQualityWholesaleServiceMappingData))]
         public void Maps_wholesale_services_quantity_quality_to_edi_quality_in_accordance_with_the_rules(
             ICollection<QuantityQuality> qualitySetFromWholesale,
+            WholesaleServicesRequestSeries.Types.Resolution resolution,
+            bool hasAmount,
             CalculatedQuantityQuality expectedCalculatedQuantityQuality)
         {
             // Act
-            var actual = CalculatedQuantityQualityMapper.MapForWholesaleServices(qualitySetFromWholesale);
+            var actual = CalculatedQuantityQualityMapper.MapForWholesaleServices(
+                qualitySetFromWholesale,
+                resolution,
+                hasAmount);
 
             // Assert
             actual.Should().Be(expectedCalculatedQuantityQuality);
@@ -301,7 +356,10 @@ public sealed class CalculatedQuantityQualityMapperTests
         {
             // Act
             CalculatedQuantityQualityMapper.MapForEnergyResults(new[] { quantityQuality });
-            CalculatedQuantityQualityMapper.MapForWholesaleServices(new[] { quantityQuality });
+            CalculatedQuantityQualityMapper.MapForWholesaleServices(
+                new[] { quantityQuality },
+                WholesaleServicesRequestSeries.Types.Resolution.Day,
+                false);
         }
     }
 }

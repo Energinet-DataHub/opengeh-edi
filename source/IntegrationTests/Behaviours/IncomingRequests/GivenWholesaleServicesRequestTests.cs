@@ -13,13 +13,14 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
+using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
@@ -27,6 +28,7 @@ using NodaTime.Text;
 using Xunit;
 using Xunit.Abstractions;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
+using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
@@ -47,11 +49,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
     public static object[][] DocumentFormatsWithActorRoleCombinations(bool nullGridArea)
     {
         // The actor roles who can perform WholesaleServicesRequest's
-        var actorRoles = new List<ActorRole>
-        {
-            ActorRole.EnergySupplier,
-            ActorRole.SystemOperator,
-        };
+        var actorRoles = new List<ActorRole> { ActorRole.EnergySupplier, ActorRole.SystemOperator, };
 
         if (!nullGridArea)
         {
@@ -59,29 +57,33 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
         }
 
         var incomingDocumentFormats = DocumentFormats
-            .GetAllDocumentFormats(except: new[]
-            {
-                DocumentFormat.Ebix.Name, // ebIX is not supported for requests
-            })
+            .GetAllDocumentFormats(
+                except: new[]
+                {
+                    DocumentFormat.Ebix.Name, // ebIX is not supported for requests
+                })
             .ToArray();
 
         var peekDocumentFormats = DocumentFormats.GetAllDocumentFormats();
 
         return actorRoles
-            .SelectMany(actorRole => incomingDocumentFormats
-                .SelectMany(incomingDocumentFormat => peekDocumentFormats
-                    .Select(peekDocumentFormat => new object[]
-                    {
-                        actorRole,
-                        incomingDocumentFormat,
-                        peekDocumentFormat,
-                    })))
+            .SelectMany(
+                actorRole => incomingDocumentFormats
+                    .SelectMany(
+                        incomingDocumentFormat => peekDocumentFormats
+                            .Select(
+                                peekDocumentFormat =>
+                                    new object[] { actorRole, incomingDocumentFormat, peekDocumentFormat, })))
             .ToArray();
     }
 
     [Theory]
     [MemberData(nameof(DocumentFormatsWithAllActorRoleCombinations))]
-    public async Task AndGiven_DataInOneGridArea_When_ActorPeeksAllMessages_Then_ReceivesOneNotifyWholesaleServicesDocumentWithCorrectContent(ActorRole actorRole, DocumentFormat incomingDocumentFormat, DocumentFormat peekDocumentFormat)
+    public async Task
+        AndGiven_DataInOneGridArea_When_ActorPeeksAllMessages_Then_ReceivesOneNotifyWholesaleServicesDocumentWithCorrectContent(
+            ActorRole actorRole,
+            DocumentFormat incomingDocumentFormat,
+            DocumentFormat peekDocumentFormat)
     {
         /*
          *  --- PART 1: Receive request, create process and send message to Wholesale ---
@@ -134,7 +136,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                 chargeOwnerNumber.Value,
                 null,
                 DataHubNames.BusinessReason.WholesaleFixing,
-                new List<(string ChargeType, string ChargeCode)> { (DataHubNames.ChargeType.Tariff, "25361478"), },
+                new List<(string ChargeType, string? ChargeCode)> { (DataHubNames.ChargeType.Tariff, "25361478"), },
                 new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
                 null));
 
@@ -182,7 +184,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                     null),
                 ReceiverId: actor.ActorNumber.Value,
                 ReceiverRole: actor.ActorRole,
-                SenderId: "5790001330552",  // Sender is always DataHub
+                SenderId: "5790001330552", // Sender is always DataHub
                 SenderRole: ActorRole.MeteredDataAdministrator,
                 ChargeTypeOwner: chargeOwnerNumber.Value,
                 ChargeCode: "25361478",
@@ -260,7 +262,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                 ChargeOwnerId: chargeOwnerNumber.Value,
                 Resolution: null,
                 BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
-                ChargeTypes: new List<(string ChargeType, string ChargeCode)>
+                ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                 {
                     (DataHubNames.ChargeType.Tariff, "25361478"),
                 },
@@ -320,7 +322,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                         null),
                     ReceiverId: actor.ActorNumber.Value,
                     ReceiverRole: actor.ActorRole,
-                    SenderId: "5790001330552",  // Sender is always DataHub
+                    SenderId: "5790001330552", // Sender is always DataHub
                     SenderRole: ActorRole.MeteredDataAdministrator,
                     ChargeTypeOwner: chargeOwnerNumber.Value,
                     ChargeCode: "25361478",
@@ -452,7 +454,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                     null),
                 ReceiverId: actor.ActorNumber.Value,
                 ReceiverRole: actor.ActorRole,
-                SenderId: "5790001330552",  // Sender is always DataHub
+                SenderId: "5790001330552", // Sender is always DataHub
                 SenderRole: ActorRole.MeteredDataAdministrator,
                 ChargeTypeOwner: chargeOwnerOrNull?.Value ?? "5799999933444",
                 ChargeCode: "12345678",
@@ -537,7 +539,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                     ChargeOwnerId: chargeOwnerNumber.Value,
                     Resolution: null,
                     BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
-                    ChargeTypes: new List<(string ChargeType, string ChargeCode)>
+                    ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                     {
                         (DataHubNames.ChargeType.Tariff, "25361478"),
                     },
@@ -553,7 +555,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                     ChargeOwnerId: chargeOwnerNumber.Value,
                     Resolution: null,
                     BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
-                    ChargeTypes: new List<(string ChargeType, string ChargeCode)>
+                    ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                     {
                         (DataHubNames.ChargeType.Tariff, "25361478"),
                     },
@@ -569,7 +571,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                     ChargeOwnerId: chargeOwnerNumber.Value,
                     Resolution: null,
                     BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
-                    ChargeTypes: new List<(string ChargeType, string ChargeCode)>
+                    ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                     {
                         (DataHubNames.ChargeType.Tariff, "25361478"),
                     },
@@ -648,7 +650,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                         null),
                     ReceiverId: actor.ActorNumber.Value,
                     ReceiverRole: actor.ActorRole,
-                    SenderId: "5790001330552",  // Sender is always DataHub
+                    SenderId: "5790001330552", // Sender is always DataHub
                     SenderRole: ActorRole.MeteredDataAdministrator,
                     ChargeTypeOwner: chargeOwnerNumber.Value,
                     ChargeCode: "25361478",
@@ -718,7 +720,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                 chargeOwnerNumber.Value,
                 null,
                 DataHubNames.BusinessReason.WholesaleFixing,
-                new List<(string ChargeType, string ChargeCode)> { (DataHubNames.ChargeType.Tariff, "25361478"), },
+                new List<(string ChargeType, string? ChargeCode)> { (DataHubNames.ChargeType.Tariff, "25361478"), },
                 new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
                 null));
 
@@ -771,5 +773,209 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                 TransactionId.From("123564789123564789123564789123564787"),
                 "E16",
                 expectedReasonMessage));
+    }
+
+    /// <summary>
+    /// Request All monthly amounts including total monthly amount
+    /// </summary>
+    /// <param name="actorRole"></param>
+    /// <param name="incomingDocumentFormat"></param>
+    /// <param name="peekDocumentFormat"></param>
+    [Theory]
+    [MemberData(nameof(DocumentFormatsWithAllActorRoleCombinations))]
+    public async Task
+        AndGiven_ResolutionIsMonthlyAndDataInOneGridAreaAndNoChargeTypes_When_ActorPeeksAllMessages_Then_ReceivesTwoNotifyWholesaleServicesDocumentWithCorrectContent(
+            ActorRole actorRole,
+            DocumentFormat incomingDocumentFormat,
+            DocumentFormat peekDocumentFormat)
+    {
+        /*
+         *  --- PART 1: Receive request, create process and send message to Wholesale ---
+         */
+
+        // Arrange
+        var senderSpy = CreateServiceBusSenderSpy();
+        var actor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: actorRole);
+        var energySupplierNumber = actor.ActorRole == ActorRole.EnergySupplier
+            ? actor.ActorNumber
+            : ActorNumber.Create("3333333333333");
+        var chargeOwnerNumber = actor.ActorRole == ActorRole.SystemOperator
+            ? actor.ActorNumber
+            : ActorNumber.Create("5799999933444");
+        var gridOperatorNumber = actor.ActorRole == ActorRole.GridOperator
+            ? actor.ActorNumber
+            : ActorNumber.Create("4444444444444");
+
+        GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
+        GivenAuthenticatedActorIs(actor.ActorNumber, actor.ActorRole);
+        await GivenGridAreaOwnershipAsync("512", gridOperatorNumber);
+
+        await GivenReceivedWholesaleServicesRequest(
+            documentFormat: incomingDocumentFormat,
+            senderActorNumber: actor.ActorNumber,
+            senderActorRole: actor.ActorRole,
+            periodStart: (2024, 1, 1),
+            periodEnd: (2024, 1, 31),
+            energySupplier: energySupplierNumber,
+            chargeOwner: chargeOwnerNumber,
+            chargeCode: null,
+            // when chargeType is null, all charge types are requested + the total amount if resolution is monthly
+            chargeType: null,
+            isMonthly: true,
+            new (string? GridArea, TransactionId TransactionId)[]
+            {
+                ("512", TransactionId.From("12356478912356478912356478912356478")),
+            });
+
+        // Act
+        await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
+
+        // Assert
+        var message = await ThenWholesaleServicesRequestServiceBusMessageIsCorrect(
+            senderSpy,
+            new WholesaleServicesMessageAssertionInput(
+                new List<string> { "512" },
+                actor.ActorNumber.Value,
+                actor.ActorRole.Name,
+                energySupplierNumber.Value,
+                chargeOwnerNumber.Value,
+                Resolution.Monthly.Name,
+                DataHubNames.BusinessReason.WholesaleFixing,
+                null,
+                new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
+                null));
+
+        /*
+         *  --- PART 2: Receive data from Wholesale and create RSM document ---
+         */
+
+        // Arrange
+
+        // Generate a mock WholesaleServicesRequestAccepted response from Wholesale, based on the WholesaleServicesRequest
+        // It is very important that the generated data is correct,
+        // since (almost) all assertion after this point is based on this data
+        var acceptedResponse = WholesaleServicesResponseEventBuilder
+            .GenerateAcceptedFrom(message.WholesaleServicesRequest, GetNow());
+
+        await GivenWholesaleServicesRequestAcceptedIsReceived(message.ProcessId, acceptedResponse);
+
+        // Act
+        var peekResults = await WhenActorPeeksAllMessages(
+            actor.ActorNumber,
+            actor.ActorRole,
+            peekDocumentFormat);
+
+        // Assert
+        using (new AssertionScope())
+        {
+           peekResults
+                .Should()
+                .HaveCount(
+                    2,
+                    "because there should be one message when requesting for one grid area per the monthly charge type summary and one total amount");
+        }
+
+        var monthlyAmountPeekResult = await GetMonthlyAmountPeekResult(peekResults, peekDocumentFormat);
+        monthlyAmountPeekResult.Should().NotBeNull();
+        var monthlyAmountWholesaleServicesDocumentAssertionInput = new NotifyWholesaleServicesDocumentAssertionInput(
+            Timestamp: "2024-07-01T14:57:09Z",
+            BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
+                BusinessReason.WholesaleFixing,
+                null),
+            ReceiverId: actor.ActorNumber.Value,
+            ReceiverRole: actor.ActorRole,
+            SenderId: "5790001330552", // Sender is always DataHub
+            SenderRole: ActorRole.MeteredDataAdministrator,
+            ChargeTypeOwner: chargeOwnerNumber.Value,
+            ChargeCode: "12345678",
+            ChargeType: ChargeType.Tariff,
+            Currency: Currency.DanishCrowns,
+            EnergySupplierNumber: energySupplierNumber.Value,
+            SettlementMethod: SettlementMethod.Flex,
+            MeteringPointType: MeteringPointType.Consumption,
+            GridArea: "512",
+            TransactionId.From("12356478912356478912356478912356478"),
+            PriceMeasurementUnit: MeasurementUnit.Kwh,
+            ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
+            QuantityMeasurementUnit: MeasurementUnit.Kwh,
+            CalculationVersion: GetNow().ToUnixTimeTicks(),
+            Resolution: Resolution.Monthly,
+            Period: new Period(
+                CreateDateInstant(2024, 1, 1),
+                CreateDateInstant(2024, 1, 31)),
+            Points: acceptedResponse.Series.Single(x => x.ChargeType != WholesaleServicesRequestSeries.Types.ChargeType.Unspecified).TimeSeriesPoints);
+
+        var totalMonthlyAmountPeekResult = peekResults.Single(r => r.MessageId != monthlyAmountPeekResult!.MessageId);
+        var totalMonthlyAmountWholesaleServicesDocumentAssertionInput = new NotifyWholesaleServicesDocumentAssertionInput(
+            Timestamp: "2024-07-01T14:57:09Z",
+            BusinessReasonWithSettlementVersion: new BusinessReasonWithSettlementVersion(
+                BusinessReason.WholesaleFixing,
+                null),
+            ReceiverId: actor.ActorNumber.Value,
+            ReceiverRole: actor.ActorRole,
+            SenderId: "5790001330552", // Sender is always DataHub
+            SenderRole: ActorRole.MeteredDataAdministrator,
+            ChargeTypeOwner: chargeOwnerNumber.Value,
+            ChargeCode: null,
+            ChargeType: null,
+            Currency: Currency.DanishCrowns,
+            EnergySupplierNumber: energySupplierNumber.Value,
+            SettlementMethod: null,
+            MeteringPointType: null,
+            GridArea: "512",
+            TransactionId.From("12356478912356478912356478912356478"),
+            PriceMeasurementUnit: MeasurementUnit.Kwh,
+            ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
+            QuantityMeasurementUnit: MeasurementUnit.Kwh,
+            CalculationVersion: GetNow().ToUnixTimeTicks(),
+            Resolution: Resolution.Monthly,
+            Period: new Period(
+                CreateDateInstant(2024, 1, 1),
+                CreateDateInstant(2024, 1, 31)),
+            Points: acceptedResponse.Series.Single(x => x.ChargeType == WholesaleServicesRequestSeries.Types.ChargeType.Unspecified).TimeSeriesPoints);
+
+        await ThenNotifyWholesaleServicesDocumentIsCorrect(
+            monthlyAmountPeekResult!.Bundle,
+            peekDocumentFormat,
+            monthlyAmountWholesaleServicesDocumentAssertionInput);
+
+        await ThenNotifyWholesaleServicesDocumentIsCorrect(
+            totalMonthlyAmountPeekResult.Bundle,
+            peekDocumentFormat,
+            totalMonthlyAmountWholesaleServicesDocumentAssertionInput);
+    }
+
+    private async Task<PeekResultDto?> GetMonthlyAmountPeekResult(List<PeekResultDto> peekResults, DocumentFormat peekDocumentFormat)
+    {
+        foreach (var peekResult in peekResults)
+        {
+            // We cannot dispose the stream reader, disposing a stream reader disposes the underlying stream, which means we can't read it again
+            var streamReader = new StreamReader(peekResult.Bundle, Encoding.UTF8);
+            var stringContent = await streamReader.ReadToEndAsync();
+            peekResult.Bundle.Position = 0;
+            streamReader.DiscardBufferedData();
+            // If the document is CIM xml and contains the charge type, it is the monthly amount document
+            if (peekDocumentFormat == DocumentFormat.Xml
+                && stringContent.Contains("<cim:chargeType.type>", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return peekResult;
+            }
+
+            // If the document is CIM json and contains the charge type, it is the monthly amount document
+            if (peekDocumentFormat == DocumentFormat.Json
+                && stringContent.Contains("chargeType.type", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return peekResult;
+            }
+
+            // If the document is Ebix and contains the charge type, it is the monthly amount document
+            if (peekDocumentFormat == DocumentFormat.Ebix
+                && stringContent.Contains("ns0:ChargeType listAgencyIdentifier", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return peekResult;
+            }
+        }
+
+        return null;
     }
 }
