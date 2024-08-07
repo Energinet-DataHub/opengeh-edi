@@ -118,13 +118,14 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         };
     }
 
-    private static MeasurementUnit? MapMeasurementUnit(WholesaleServicesRequestSeries.Types.QuantityUnit quantityUnit)
+    private static MeasurementUnit MapMeasurementUnit(WholesaleServicesRequestSeries.Types.QuantityUnit quantityUnit)
     {
         return quantityUnit switch
         {
             WholesaleServicesRequestSeries.Types.QuantityUnit.Kwh => MeasurementUnit.Kwh,
             WholesaleServicesRequestSeries.Types.QuantityUnit.Pieces => MeasurementUnit.Pieces,
-            WholesaleServicesRequestSeries.Types.QuantityUnit.Unspecified => null,
+            // TODO: awaiting the business to confirm the correct mapping
+            WholesaleServicesRequestSeries.Types.QuantityUnit.Unspecified => MeasurementUnit.Kwh,
             _ => throw new InvalidOperationException("Unknown quantity unit"),
         };
     }

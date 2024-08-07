@@ -25,7 +25,7 @@ public record AcceptedWholesaleServicesSerieDto(
     MeteringPointType? MeteringPointType,
     Resolution Resolution,
     ChargeType? ChargeType,
-    MeasurementUnit? MeasurementUnit,
+    MeasurementUnit MeasurementUnit,
     SettlementVersion? SettlementVersion,
     SettlementMethod? SettlementMethod,
     Currency Currency,

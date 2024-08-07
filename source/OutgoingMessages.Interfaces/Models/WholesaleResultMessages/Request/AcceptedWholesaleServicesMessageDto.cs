@@ -93,7 +93,7 @@ public record AcceptedWholesaleServicesSeries(
     ActorNumber? ChargeOwner,
     Period Period,
     SettlementVersion? SettlementVersion,
-    MeasurementUnit? QuantityMeasureUnit,
+    MeasurementUnit QuantityMeasureUnit,
     MeasurementUnit PriceMeasureUnit,
     Currency Currency,
     ChargeType? ChargeType,
