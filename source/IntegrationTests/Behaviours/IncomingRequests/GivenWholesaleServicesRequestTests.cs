@@ -136,7 +136,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                 chargeOwnerNumber.Value,
                 null,
                 DataHubNames.BusinessReason.WholesaleFixing,
-                new List<(string ChargeType, string ChargeCode)> { (DataHubNames.ChargeType.Tariff, "25361478"), },
+                new List<(string ChargeType, string? ChargeCode)> { (DataHubNames.ChargeType.Tariff, "25361478"), },
                 new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
                 null));
 
@@ -262,7 +262,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                 ChargeOwnerId: chargeOwnerNumber.Value,
                 Resolution: null,
                 BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
-                ChargeTypes: new List<(string ChargeType, string ChargeCode)>
+                ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                 {
                     (DataHubNames.ChargeType.Tariff, "25361478"),
                 },
@@ -539,7 +539,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                     ChargeOwnerId: chargeOwnerNumber.Value,
                     Resolution: null,
                     BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
-                    ChargeTypes: new List<(string ChargeType, string ChargeCode)>
+                    ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                     {
                         (DataHubNames.ChargeType.Tariff, "25361478"),
                     },
@@ -555,7 +555,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                     ChargeOwnerId: chargeOwnerNumber.Value,
                     Resolution: null,
                     BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
-                    ChargeTypes: new List<(string ChargeType, string ChargeCode)>
+                    ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                     {
                         (DataHubNames.ChargeType.Tariff, "25361478"),
                     },
@@ -571,7 +571,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                     ChargeOwnerId: chargeOwnerNumber.Value,
                     Resolution: null,
                     BusinessReason: DataHubNames.BusinessReason.WholesaleFixing,
-                    ChargeTypes: new List<(string ChargeType, string ChargeCode)>
+                    ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
                     {
                         (DataHubNames.ChargeType.Tariff, "25361478"),
                     },
@@ -720,7 +720,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                 chargeOwnerNumber.Value,
                 null,
                 DataHubNames.BusinessReason.WholesaleFixing,
-                new List<(string ChargeType, string ChargeCode)> { (DataHubNames.ChargeType.Tariff, "25361478"), },
+                new List<(string ChargeType, string? ChargeCode)> { (DataHubNames.ChargeType.Tariff, "25361478"), },
                 new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
                 null));
 

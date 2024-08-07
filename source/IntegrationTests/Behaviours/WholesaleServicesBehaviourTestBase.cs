@@ -263,7 +263,7 @@ public abstract class WholesaleServicesBehaviourTestBase : BehavioursTestBase
                         input.ChargeTypes.Select(
                             ct => new Edi.Requests.ChargeType
                             {
-                                ChargeType_ = ct.ChargeType, ChargeCode = ct.ChargeCode,
+                                ChargeType_ = ct.ChargeType, ChargeCode = ct.ChargeCode ?? string.Empty,
                             }));
             }
 

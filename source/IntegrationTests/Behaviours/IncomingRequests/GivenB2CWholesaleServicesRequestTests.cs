@@ -111,7 +111,10 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
                 null,
                 Resolution.Monthly.Name,
                 DataHubNames.BusinessReason.WholesaleFixing,
-                null,
+                ChargeTypes: new List<(string ChargeType, string? ChargeCode)>
+                {
+                    (DataHubNames.ChargeType.Tariff, null),
+                },
                 new Period(CreateDateInstant(2024, 1, 1), CreateDateInstant(2024, 1, 31)),
                 null));
 
@@ -162,7 +165,7 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
                 SenderId: "5790001330552",  // Sender is always DataHub
                 SenderRole: ActorRole.MeteredDataAdministrator,
                 ChargeTypeOwner: chargeOwnerNumber.Value,
-                ChargeCode: "12345678",
+                ChargeCode: null,
                 ChargeType: ChargeType.Tariff,
                 Currency: Currency.DanishCrowns,
                 EnergySupplierNumber: energySupplierNumber.Value,
@@ -205,7 +208,7 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
             gridArea,
             energySupplier?.Value,
             Resolution.Monthly.Name,
-            null);
+            PriceType.MonthlyTariff);
 
         var requestMessage = RequestWholesaleSettlementDtoFactory.Create(
             b2CRequest,
