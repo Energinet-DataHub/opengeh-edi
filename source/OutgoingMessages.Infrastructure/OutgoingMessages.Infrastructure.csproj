@@ -22,6 +22,7 @@
     <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
     <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
     <ProjectReference Include="..\OutgoingMessages.Domain\OutgoingMessages.Domain.csproj" />
+    <ProjectReference Include="..\OutgoingMessages.Interfaces\OutgoingMessages.Interfaces.csproj" />
   </ItemGroup>
 
 </Project>

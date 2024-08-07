@@ -27,7 +27,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Dequeue;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
@@ -83,7 +82,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var createdOutgoingMessageId = await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
 
         // Assert
-        var expectedFileStorageReference = $"{SampleData.GridOperatorNumber}/{now.Year():0000}/{now.Month():00}/{now.Day():00}/{createdOutgoingMessageId.Value:N}";
+        var expectedFileStorageReference = $"{SampleData.GridOperatorNumber}/{now.Year():0000}/{now.Month():00}/{now.Day():00}/{createdOutgoingMessageId:N}";
 
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = "SELECT * FROM [dbo].[OutgoingMessages]";
@@ -97,7 +96,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
 
         var propertyAssertions = new Action[]
         {
-            () => Assert.Equal(createdOutgoingMessageId.Value, messageFromDatabase.Id),
+            () => Assert.Equal(createdOutgoingMessageId, messageFromDatabase.Id),
             () => Assert.NotNull(messageFromDatabase.RecordId),
             () => Assert.Equal(message.ProcessId, messageFromDatabase.ProcessId),
             () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Name, messageFromDatabase.DocumentType),
@@ -546,7 +545,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         base.Dispose(disposing);
     }
 
-    private async Task<(string ActorMessageQueueNumber, string ActorMessageQueueRole, string OutgoingMessageReceiverRole)> GetOutgoingMessageWithActorMessageQueueFromDatabase(OutgoingMessageId createdId)
+    private async Task<(string ActorMessageQueueNumber, string ActorMessageQueueRole, string OutgoingMessageReceiverRole)> GetOutgoingMessageWithActorMessageQueueFromDatabase(Guid createdId)
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
 
@@ -556,7 +555,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
                     INNER JOIN [dbo].ActorMessageQueues as tQueue on tBundle.ActorMessageQueueId = tQueue.Id",
             new
                 {
-                    Id = createdId.Value.ToString(),
+                    Id = createdId.ToString(),
                 });
 
         return (ActorMessageQueueNumber: result.ActorNumber, ActorMessageQueueRole: result.ActorRole, OutgoingMessageReceiverRole: result.ReceiverRole);
@@ -578,20 +577,20 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         return messages.ToList();
     }
 
-    private async Task<string?> GetOutgoingMessageFileStorageReferenceFromDatabase(OutgoingMessageId id)
+    private async Task<string?> GetOutgoingMessageFileStorageReferenceFromDatabase(Guid id)
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
 
-        var fileStorageReference = await connection.ExecuteScalarAsync<string>($"SELECT FileStorageReference FROM [dbo].[OutgoingMessages] WHERE Id = '{id.Value}'");
+        var fileStorageReference = await connection.ExecuteScalarAsync<string>($"SELECT FileStorageReference FROM [dbo].[OutgoingMessages] WHERE Id = '{id}'");
 
         return fileStorageReference;
     }
 
-    private async Task<Guid> GetOutgoingMessageBundleIdFromDatabase(OutgoingMessageId id)
+    private async Task<Guid> GetOutgoingMessageBundleIdFromDatabase(Guid id)
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
 
-        var assignedBundleId = await connection.ExecuteScalarAsync<Guid>($"SELECT AssignedBundleId FROM [dbo].[OutgoingMessages] WHERE Id = '{id.Value}'");
+        var assignedBundleId = await connection.ExecuteScalarAsync<Guid>($"SELECT AssignedBundleId FROM [dbo].[OutgoingMessages] WHERE Id = '{id}'");
 
         return assignedBundleId;
     }
@@ -604,7 +603,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         return numberOfMessages;
     }
 
-    private async Task<OutgoingMessageId> EnqueueAndCommitAsync(AcceptedEnergyResultMessageDto message)
+    private async Task<Guid> EnqueueAndCommitAsync(AcceptedEnergyResultMessageDto message)
     {
         var outgoingMessageId = await _outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
         var actorMessageQueueContext = GetService<ActorMessageQueueContext>();
@@ -612,7 +611,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         return outgoingMessageId;
     }
 
-    private async Task<OutgoingMessageId> EnqueueAndCommitAsync(RejectedEnergyResultMessageDto message)
+    private async Task<Guid> EnqueueAndCommitAsync(RejectedEnergyResultMessageDto message)
     {
         var outgoingMessageId = await _outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);
         var actorMessageQueueContext = GetService<ActorMessageQueueContext>();
