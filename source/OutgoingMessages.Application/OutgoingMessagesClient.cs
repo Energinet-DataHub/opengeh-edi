@@ -66,7 +66,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         return peekResult;
     }
 
-    public async Task<OutgoingMessageId> EnqueueAsync(
+    public async Task<Guid> EnqueueAsync(
         AcceptedEnergyResultMessageDto acceptedEnergyResultMessage,
         CancellationToken cancellationToken)
     {
@@ -75,10 +75,10 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             _serializer,
             _systemDateTimeProvider.Now());
         var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
-        return messageId;
+        return messageId.Value;
     }
 
-    public async Task<OutgoingMessageId> EnqueueAsync(
+    public async Task<Guid> EnqueueAsync(
         RejectedEnergyResultMessageDto rejectedEnergyResultMessage,
         CancellationToken cancellationToken)
     {
@@ -87,10 +87,10 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             _serializer,
             _systemDateTimeProvider.Now());
         var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
-        return messageId;
+        return messageId.Value;
     }
 
-    public async Task<OutgoingMessageId> EnqueueAsync(
+    public async Task<Guid> EnqueueAsync(
         RejectedWholesaleServicesMessageDto rejectedWholesaleServicesMessage,
         CancellationToken cancellationToken)
     {
@@ -100,10 +100,10 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             _systemDateTimeProvider.Now());
 
         var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
-        return messageId;
+        return messageId.Value;
     }
 
-    public async Task<OutgoingMessageId> EnqueueAndCommitAsync(
+    public async Task<Guid> EnqueueAndCommitAsync(
         EnergyResultPerGridAreaMessageDto messageDto,
         CancellationToken cancellationToken)
     {
@@ -115,10 +115,10 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        return messageId;
+        return messageId.Value;
     }
 
-    public async Task<OutgoingMessageId> EnqueueAndCommitAsync(
+    public async Task<Guid> EnqueueAndCommitAsync(
         EnergyResultPerBalanceResponsibleMessageDto messageDto,
         CancellationToken cancellationToken)
     {
@@ -130,10 +130,10 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        return messageId;
+        return messageId.Value;
     }
 
-    public async Task<IReadOnlyCollection<OutgoingMessageId>> EnqueueAndCommitAsync(
+    public async Task<IReadOnlyCollection<Guid>> EnqueueAndCommitAsync(
         EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto messageDto,
         CancellationToken cancellationToken)
     {
@@ -142,11 +142,11 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             _serializer,
             _systemDateTimeProvider.Now());
 
-        List<OutgoingMessageId> messageIds = [];
+        List<Guid> messageIds = [];
         foreach (var message in messages)
         {
             var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
-            messageIds.Add(messageId);
+            messageIds.Add(messageId.Value);
         }
 
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -198,7 +198,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<OutgoingMessageId> EnqueueAsync(
+    public async Task<Guid> EnqueueAsync(
         AcceptedWholesaleServicesMessageDto acceptedWholesaleServicesMessage,
         CancellationToken cancellationToken)
     {
@@ -207,6 +207,6 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             _serializer,
             _systemDateTimeProvider.Now());
         var messageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
-        return messageId;
+        return messageId.Value;
     }
 }
