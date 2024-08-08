@@ -217,13 +217,11 @@ public class WholesaleServicesSeriesBuilder
             Period: _period,
             SettlementVersion: _settlementVersion,
             _measurementUnit,
-            null,
             PriceMeasureUnit: _priceMeasureUnit,
             Currency: _currency,
             ChargeType: _chargeType,
             Resolution: _resolution,
             MeteringPointType: _meteringPointType,
-            null,
             _settlementMethod,
             _originalTransactionIdReference);
     }
