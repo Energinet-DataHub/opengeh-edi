@@ -92,8 +92,8 @@ public static class CalculatedQuantityQualityMapper
     ///     <list type="number">
     ///         <item>
     ///             <description>
-    ///                 If the point is a monthly amount and has an amount, it
-    ///                 returns CalculatedQuantityQuality.Calculated.
+    ///                 If the point is a monthly amount, it
+    ///                 returns null.
     ///             </description>
     ///         </item>
     ///         <item>
@@ -133,21 +133,16 @@ public static class CalculatedQuantityQualityMapper
     /// </summary>
     /// <param name="quantityQualities">The collection of quantity qualities to convert.</param>
     /// <param name="resolution"></param>
-    /// <param name="hasAmount"></param>
     /// <returns>The calculated quantity quality based on the input collection.</returns>
-    public static CalculatedQuantityQuality MapForWholesaleServices(
+    public static CalculatedQuantityQuality? MapForWholesaleServices(
         ICollection<QuantityQuality> quantityQualities,
-        WholesaleServicesRequestSeries.Types.Resolution resolution,
-        bool hasAmount)
+        WholesaleServicesRequestSeries.Types.Resolution resolution)
     {
         ArgumentNullException.ThrowIfNull(quantityQualities);
 
-        if (hasAmount && resolution == WholesaleServicesRequestSeries.Types.Resolution.Monthly)
+        if (resolution == WholesaleServicesRequestSeries.Types.Resolution.Monthly)
         {
-            // TODO: how to handle quality for monthly amounts?
-            // according to this article it should never by used: https://energinet.atlassian.net/wiki/spaces/DHDOCS/pages/939950357/RSM-019+Fremsendelse+af+beregnede+engrosydelser
-            // according to this article it should be calculated: https://energinet.atlassian.net/wiki/spaces/D3/pages/529989633/QuantityQuality
-            return CalculatedQuantityQuality.Calculated;
+            return null;
         }
 
         return (missing: quantityQualities.Contains(QuantityQuality.Missing),

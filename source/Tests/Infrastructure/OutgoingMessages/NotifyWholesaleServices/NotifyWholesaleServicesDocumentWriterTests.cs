@@ -195,7 +195,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
                         Nanos = 0,
                         Units = 100,
                     },
-                QuantityQuality.Calculated)
+                null)
             .HasProductCode(ProductType.Tariff.Code)
             .OriginalTransactionIdReferenceDoesNotExist()
             .SettlementVersionDoesNotExist()
