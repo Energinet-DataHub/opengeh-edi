@@ -141,7 +141,7 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             QuantityMeasureUnit: MeasurementUnit.Kwh,
             Currency: Currency.DanishCrowns,
             Resolution: Resolution.Monthly,
-            Points: new Collection<WholesaleServicesPoint> { new(1, null, null, 100, CalculatedQuantityQuality.Calculated) },
+            Points: new Collection<WholesaleServicesPoint> { new(1, null, null, 100, null) },
             ChargeCode: null,
             IsTax: false,
             ChargeOwner: null,
