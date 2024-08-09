@@ -46,8 +46,6 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto
             businessReasonName: businessReason.Name,
             receiverNumber: balanceResponsibleNumber,
             receiverRole: ActorRole.BalanceResponsibleParty,
-            senderId: DataHubDetails.DataHubActorNumber,
-            senderRole: ActorRole.MeteredDataAdministrator,
             externalId: new ExternalId(calculationResultId),
             relatedToMessageId: null)
     {

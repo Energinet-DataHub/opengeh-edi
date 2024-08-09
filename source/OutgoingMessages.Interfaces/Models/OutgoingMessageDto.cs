@@ -28,8 +28,6 @@ public abstract class OutgoingMessageDto
         EventId eventId,
         string businessReasonName,
         ActorRole receiverRole,
-        ActorNumber senderId,
-        ActorRole senderRole,
         ExternalId externalId,
         MessageId? relatedToMessageId = null)
     {
@@ -39,8 +37,6 @@ public abstract class OutgoingMessageDto
         EventId = eventId;
         BusinessReason = businessReasonName;
         ReceiverRole = receiverRole;
-        SenderId = senderId;
-        SenderRole = senderRole;
         ExternalId = externalId;
         RelatedToMessageId = relatedToMessageId;
     }
@@ -60,10 +56,6 @@ public abstract class OutgoingMessageDto
     public string BusinessReason { get; }
 
     public ActorRole ReceiverRole { get; }
-
-    public ActorNumber SenderId { get; }
-
-    public ActorRole SenderRole { get; }
 
     public ExternalId ExternalId { get; }
 

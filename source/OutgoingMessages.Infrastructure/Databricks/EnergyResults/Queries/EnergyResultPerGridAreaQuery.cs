@@ -71,7 +71,6 @@ public class EnergyResultPerGridAreaQuery(
     {
         var gridArea = databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.GridAreaCode);
 
-        // TODO: Should we implement caching of the grid area owner for each grid area?
         var gridAreaOwnerNumber = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(gridArea, CancellationToken.None).ConfigureAwait(false);
 
         var resolution = ResolutionMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.Resolution));
