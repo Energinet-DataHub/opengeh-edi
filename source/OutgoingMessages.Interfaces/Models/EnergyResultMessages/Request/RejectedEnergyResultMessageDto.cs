@@ -36,8 +36,6 @@ public class RejectedEnergyResultMessageDto : OutgoingMessageDto
             eventId,
             businessReason,
             receiverRole,
-            DataHubDetails.DataHubActorNumber,
-            ActorRole.MeteredDataAdministrator,
             new ExternalId(Guid.NewGuid()),
             relatedToMessageId)
     {

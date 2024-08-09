@@ -45,8 +45,6 @@ public class EnergyResultPerGridAreaMessageDto
             businessReasonName: businessReason.Name,
             receiverNumber: meteredDataResponsibleNumber,
             receiverRole: ActorRole.MeteredDataResponsible,
-            senderId: DataHubDetails.DataHubActorNumber,
-            senderRole: ActorRole.MeteredDataAdministrator,
             externalId: new ExternalId(calculationResultId),
             relatedToMessageId: null)
     {
