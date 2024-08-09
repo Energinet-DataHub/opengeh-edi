@@ -20,6 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Dapper;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
@@ -314,7 +315,7 @@ public class WhenAPeekIsRequestedTests : TestBase
             { "ReceiverNumber", receiverNumber => receiverNumber.Should().Be(outgoingMessage.EnergySupplierNumber.Value) },
             { "RecordId", recordId => recordId.Should().NotBeNull() },
             { "RelatedToMessageId", relatedToMessageId => relatedToMessageId.Should().BeNull() },
-            { "SenderNumber", senderNumber => senderNumber.Should().Be(outgoingMessage.SenderId.Value) },
+            { "SenderNumber", senderNumber => senderNumber.Should().Be(DataHubDetails.DataHubActorNumber.Value) },
         };
 
         using var assertionScope = new AssertionScope();

@@ -40,8 +40,6 @@ public class WholesaleTotalAmountMessageDto : OutgoingMessageDto
             eventId,
             businessReason,
             receiverRole: receiverRole,
-            senderId: DataHubDetails.DataHubActorNumber,
-            senderRole: ActorRole.MeteredDataAdministrator,
             new ExternalId(calculationResultId))
     {
         CalculationId = calculationId;

@@ -14,6 +14,7 @@
 
 using Azure;
 using Dapper;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
@@ -103,8 +104,8 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.Equal(message.ReceiverRole.Code, messageFromDatabase.ReceiverRole),
             () => Assert.Equal(message.ReceiverNumber.Value, messageFromDatabase.DocumentReceiverNumber),
             () => Assert.Equal(message.ReceiverRole.Code, messageFromDatabase.DocumentReceiverRole),
-            () => Assert.Equal(message.SenderId.Value, messageFromDatabase.SenderId),
-            () => Assert.Equal(message.SenderRole.Code, messageFromDatabase.SenderRole),
+            () => Assert.Equal(DataHubDetails.DataHubActorNumber.Value, messageFromDatabase.SenderId),
+            () => Assert.Equal(ActorRole.MeteredDataAdministrator.Code, messageFromDatabase.SenderRole),
             () => Assert.Equal(message.BusinessReason, messageFromDatabase.BusinessReason),
             () => Assert.Equal(message.Series.GridAreaCode, messageFromDatabase.GridAreaCode),
             () => Assert.Equal(ProcessType.ReceiveEnergyResults.Name, messageFromDatabase.MessageCreatedFromProcess),
