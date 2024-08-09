@@ -50,7 +50,7 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
                 MapPoints(wholesaleSeries.TimeSeriesPoints, wholesaleSeries.Resolution),
                 MapMeteringPointType(wholesaleSeries),
                 MapResolution(wholesaleSeries.Resolution),
-                wholesaleSeries.HasChargeCode ? MapChargeType(wholesaleSeries.ChargeType) : null,
+                wholesaleSeries.HasChargeType ? MapChargeType(wholesaleSeries.ChargeType) : null,
                 MapMeasurementUnit(wholesaleSeries),
                 SettlementVersion: MapSettlementVersion(wholesaleSeries.CalculationType),
                 MapSettlementMethod(wholesaleSeries.SettlementMethod),
