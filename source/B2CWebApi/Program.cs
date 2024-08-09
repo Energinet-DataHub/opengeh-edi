@@ -21,6 +21,7 @@ using Energinet.DataHub.Core.App.WebApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.WebApp.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.B2CWebApi.Middleware;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
@@ -41,6 +42,7 @@ builder.Services
     // Logging
     .AddApplicationInsightsForWebApp(subsystemName)
     .AddApplicationInsightsTelemetry()
+    .AddScoped<FrontendUserLogScopeMiddleware>()
 
     // Health checks
     .AddHealthChecksForWebApp()
@@ -91,7 +93,8 @@ app
     .UseHttpsRedirection()
     .UseAuthentication()
     .UseAuthorization()
-    .UseUserMiddlewareForWebApp<FrontendUser>();
+    .UseUserMiddlewareForWebApp<FrontendUser>()
+    .UseMiddleware<FrontendUserLogScopeMiddleware>();
 
 app.MapControllers().RequireAuthorization();
 
