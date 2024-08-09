@@ -24,7 +24,7 @@ Energinet.DataHub.EDI.B2BApi.Program.TokenValidationParameters =
         ? Energinet.DataHub.EDI.B2BApi.Program.TokenValidationParameters
         : await TokenConfiguration.GetTokenValidationParametersAsync(runtime).ConfigureAwait(false);
 
-using var host = HostFactory.CreateHost(Energinet.DataHub.EDI.B2BApi.Program.TokenValidationParameters);
+using var host = HostFactory.CreateHost(Energinet.DataHub.EDI.B2BApi.Program.TokenValidationParameters, runtime.IsRunningLocally());
 
 await host.RunAsync().ConfigureAwait(false);
 

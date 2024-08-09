@@ -49,8 +49,9 @@ public static class FunctionContextExtensions
 
         var isHealthCheckRequest = context.FunctionDefinition.Name == "HealthCheck";
         var isNotHttpTrigger = !context.Is(TriggerType.HttpTrigger);
+        var isDurableFunctionMonitor = context.FunctionDefinition.PathToAssembly.EndsWith("durablefunctionsmonitor.dotnetisolated.core.dll");
 
-        var endpointIsOmittedFromAuth = isHealthCheckRequest || isNotHttpTrigger;
+        var endpointIsOmittedFromAuth = isHealthCheckRequest || isNotHttpTrigger || isDurableFunctionMonitor;
         return endpointIsOmittedFromAuth;
     }
 
