@@ -145,12 +145,10 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
             ChargeCode: null,
             IsTax: false,
             ChargeOwner: null,
-            QuantityUnit: MeasurementUnit.Kwh,
             PriceMeasureUnit: null,
             ChargeType: null,
             MeteringPointType: MeteringPointType.Consumption,
             SettlementMethod: null,
-            SettlementType: null,
             OriginalTransactionIdReference: null);
         var header = new OutgoingMessageHeader(
             DataHubNames.BusinessReason.WholesaleFixing,

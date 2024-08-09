@@ -54,7 +54,6 @@ public class EnergyResultPerBalanceResponsibleMessageDto
             TransactionId.New(),
             gridArea,
             meteringPointType.Name,
-            null,
             settlementMethod?.Name,
             measurementUnit.Name,
             resolution.Name,

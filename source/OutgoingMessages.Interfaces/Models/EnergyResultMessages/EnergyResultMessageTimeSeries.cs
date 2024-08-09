@@ -20,7 +20,6 @@ public record EnergyResultMessageTimeSeries(
     TransactionId TransactionId,
     string GridAreaCode,
     string MeteringPointType,
-    string? SettlementType, // TODO: To ensure backwards compatibility, will be remove in another PR.
     string? SettlementMethod,
     string MeasureUnitType,
     string Resolution,
