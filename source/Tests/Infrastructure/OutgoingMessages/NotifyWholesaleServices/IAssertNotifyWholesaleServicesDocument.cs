@@ -278,7 +278,9 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// <summary>
     /// Asserts the list of points exists exactly as given in the first series element
     /// </summary>
-    IAssertNotifyWholesaleServicesDocument HasPoints(IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points);
+    IAssertNotifyWholesaleServicesDocument HasPoints(
+        IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points,
+        Resolution resolution);
 
     /// <summary>
     /// Asserts the list of points exists exactly as given in the first series element
@@ -292,5 +294,5 @@ public interface IAssertNotifyWholesaleServicesDocument
     /// </summary>
     IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndQuality(
         DecimalValue expectedAmount,
-        QuantityQuality quantityQualities);
+        QuantityQuality? expectedQuantityQuality);
 }

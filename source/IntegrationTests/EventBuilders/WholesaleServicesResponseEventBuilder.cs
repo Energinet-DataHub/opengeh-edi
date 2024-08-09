@@ -180,7 +180,7 @@ public static class WholesaleServicesResponseEventBuilder
 
         if (resolution == WholesaleServicesRequestSeries.Types.Resolution.Monthly)
         {
-            points.Add(CreatePoint(periodEnd, quantityFactor: 30 * 24));
+            points.Add(CreatePoint(periodEnd, resolution,  quantityFactor: 30 * 24));
         }
         else
         {
@@ -194,7 +194,7 @@ public static class WholesaleServicesResponseEventBuilder
             var currentTime = periodStart;
             while (currentTime < periodEnd)
             {
-                points.Add(CreatePoint(currentTime));
+                points.Add(CreatePoint(currentTime, resolution));
                 currentTime = currentTime.Plus(resolutionDuration);
             }
         }
@@ -203,7 +203,7 @@ public static class WholesaleServicesResponseEventBuilder
     }
 
     [SuppressMessage("Security", "CA5394:Do not use insecure randomness", Justification = "Random not used for security")]
-    private static WholesaleServicesRequestSeries.Types.Point CreatePoint(Instant currentTime, int quantityFactor = 1)
+    private static WholesaleServicesRequestSeries.Types.Point CreatePoint(Instant currentTime, WholesaleServicesRequestSeries.Types.Resolution resolution, int quantityFactor = 1)
     {
         // Create random price between 0.99 and 5.99
         var price = new DecimalValue { Units = Random.Shared.Next(0, 4), Nanos = Random.Shared.Next(1, 99) };
@@ -214,13 +214,17 @@ public static class WholesaleServicesResponseEventBuilder
         // Calculate the total amount (price * quantity)
         var totalAmount = price.ToDecimal() * quantity.ToDecimal();
 
-        return new WholesaleServicesRequestSeries.Types.Point
+        var point = new WholesaleServicesRequestSeries.Types.Point
         {
             Time = currentTime.ToTimestamp(),
             Price = price,
             Quantity = quantity,
             Amount = DecimalValue.FromDecimal(totalAmount),
-            QuantityQualities = { QuantityQuality.Calculated },
         };
+
+        if (resolution != WholesaleServicesRequestSeries.Types.Resolution.Monthly)
+            point.QuantityQualities.Add(QuantityQuality.Calculated);
+
+        return point;
     }
 }

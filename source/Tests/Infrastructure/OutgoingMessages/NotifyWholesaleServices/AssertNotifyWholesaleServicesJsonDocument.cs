@@ -575,7 +575,8 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
     }
 
     public IAssertNotifyWholesaleServicesDocument HasPoints(
-        IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points)
+        IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points,
+        Resolution resolution)
     {
         var pointsInDocument = FirstWholesaleSeriesElement()
             .GetProperty("Period")
@@ -601,7 +602,10 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
             AssertPrice(pointsInDocument, i, expectedPoints[i].Price.ToDecimal());
 
-            AssertQuantityQuality(pointsInDocument, i, expectedPoints[i].QuantityQualities.Single());
+            // QuantityQuality should not be present in the document if resolution is monthly
+            QuantityQuality? expectedQuantityQuality = resolution == Resolution.Monthly
+                ? null : expectedPoints[i].QuantityQualities.SingleOrDefault();
+            AssertQuantityQuality(pointsInDocument, i, expectedQuantityQuality);
         }
 
         return this;
@@ -642,7 +646,7 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
 
     public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndQuality(
         DecimalValue expectedAmount,
-        QuantityQuality quantityQualities)
+        QuantityQuality? expectedQuantityQuality)
     {
         ArgumentNullException.ThrowIfNull(expectedAmount);
         var pointsInDocument = FirstWholesaleSeriesElement()
@@ -669,7 +673,7 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
             .Should()
             .Be(1);
 
-        AssertQuantityQuality(pointsInDocument, 0, quantityQualities);
+        AssertQuantityQuality(pointsInDocument, 0, expectedQuantityQuality);
 
         pointInDocument
             .TryGetProperty("energy_Quantity.quantity", out _)
@@ -734,7 +738,7 @@ public sealed class AssertNotifyWholesaleServicesJsonDocument : IAssertNotifyWho
     private static void AssertQuantityQuality(
         List<JsonElement> pointsInDocument,
         int i,
-        CalculatedQuantityQuality expectedQuantityQuality)
+        CalculatedQuantityQuality? expectedQuantityQuality)
     {
         var translatedQuantityQuality = expectedQuantityQuality switch
         {
