@@ -50,8 +50,8 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
                 MapPoints(wholesaleSeries.TimeSeriesPoints, wholesaleSeries.Resolution),
                 MapMeteringPointType(wholesaleSeries),
                 MapResolution(wholesaleSeries.Resolution),
-                MapChargeType(wholesaleSeries.ChargeType),
-                MapMeasurementUnit(wholesaleSeries.QuantityUnit),
+                wholesaleSeries.HasChargeType ? MapChargeType(wholesaleSeries.ChargeType) : null,
+                MapMeasurementUnit(wholesaleSeries),
                 SettlementVersion: MapSettlementVersion(wholesaleSeries.CalculationType),
                 MapSettlementMethod(wholesaleSeries.SettlementMethod),
                 MapCurrency(wholesaleSeries.Currency),
@@ -117,25 +117,31 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         };
     }
 
-    private static MeasurementUnit MapMeasurementUnit(WholesaleServicesRequestSeries.Types.QuantityUnit quantityUnit)
+    private static MeasurementUnit MapMeasurementUnit(WholesaleServicesRequestSeries wholesaleServicesRequest)
     {
-        return quantityUnit switch
+        if (wholesaleServicesRequest is
+            { HasQuantityUnit: false, Resolution: WholesaleServicesRequestSeries.Types.Resolution.Monthly })
+        {
+            return MeasurementUnit.Kwh;
+        }
+
+        return wholesaleServicesRequest.QuantityUnit switch
         {
             WholesaleServicesRequestSeries.Types.QuantityUnit.Kwh => MeasurementUnit.Kwh,
             WholesaleServicesRequestSeries.Types.QuantityUnit.Pieces => MeasurementUnit.Pieces,
-            WholesaleServicesRequestSeries.Types.QuantityUnit.Unspecified => MeasurementUnit.Kwh,
+            WholesaleServicesRequestSeries.Types.QuantityUnit.Unspecified => throw new InvalidOperationException("Could not map quantity unit"),
             _ => throw new InvalidOperationException("Unknown quantity unit"),
         };
     }
 
-    private static ChargeType? MapChargeType(WholesaleServicesRequestSeries.Types.ChargeType chargeType)
+    private static ChargeType MapChargeType(WholesaleServicesRequestSeries.Types.ChargeType chargeType)
     {
         return chargeType switch
         {
             WholesaleServicesRequestSeries.Types.ChargeType.Fee => ChargeType.Fee,
             WholesaleServicesRequestSeries.Types.ChargeType.Tariff => ChargeType.Tariff,
             WholesaleServicesRequestSeries.Types.ChargeType.Subscription => ChargeType.Subscription,
-            WholesaleServicesRequestSeries.Types.ChargeType.Unspecified => null,
+            WholesaleServicesRequestSeries.Types.ChargeType.Unspecified => throw new InvalidOperationException("Could not map charge type"),
             _ => throw new InvalidOperationException("Unknown charge type"),
         };
     }
