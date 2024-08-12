@@ -141,7 +141,7 @@ public sealed class CalculatedQuantityQualityMapperTests
             // Only available to Energinet employees.
             // Note that this is used for RSM-019
             // QuantityQuality for monthly amount is always “null”
-            // QuantityQuality when price is missing is always “Incomplete”
+            // QuantityQuality when price is missing is always “Missing”
             // If Price is present, the QuantityQuality is “Calculated” if the CalculationType is “Subscription” and “Fee”.
             // The following rules applies when calculation type is “Tariff”, has a price and is not monthly:
             /*
@@ -178,7 +178,7 @@ public sealed class CalculatedQuantityQualityMapperTests
                 WholesaleServicesRequestSeries.Types.Resolution.Day,
                 false,
                 WholesaleServicesRequestSeries.Types.ChargeType.Subscription,
-                CalculatedQuantityQuality.Incomplete,
+                CalculatedQuantityQuality.Missing,
             };
 
             // If Price is present, the QuantityQuality is “Calculated” if the CalculationType is “Subscription”.
@@ -345,7 +345,7 @@ public sealed class CalculatedQuantityQualityMapperTests
             // Example mappings from the documentation at https://energinet.atlassian.net/wiki/spaces/D3/pages/529989633/QuantityQuality.
             // Only available to Energinet employees.
             // Note that this is used for RSM-019
-            // QuantityQuality when price is missing is always “Incomplete”
+            // QuantityQuality when price is missing is always “Missing”
             // If Price is present, the QuantityQuality is “Calculated” if the CalculationType is “Subscription” and “Fee”.
             // The following rules applies when calculation type is “Tariff”, has a price:
             /*
@@ -371,7 +371,7 @@ public sealed class CalculatedQuantityQualityMapperTests
                 null,
                 new[] { Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Missing },
                 ChargeType.Subscription,
-                CalculatedQuantityQuality.Incomplete,
+                CalculatedQuantityQuality.Missing,
             };
 
             // If Price is present, the QuantityQuality is “Calculated” if the CalculationType is “Subscription”.

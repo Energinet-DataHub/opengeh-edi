@@ -99,7 +99,7 @@ public static class CalculatedQuantityQualityMapper
     ///         <item>
     ///             <description>
     ///                 If the price is missing, it
-    ///                 returns CalculatedQuantityQuality.Incomplete.
+    ///                 returns CalculatedQuantityQuality.Missing.
     ///             </description>
     ///         </item>
     ///         <item>
@@ -163,7 +163,7 @@ public static class CalculatedQuantityQualityMapper
 
         if (!hasPrice)
         {
-            return CalculatedQuantityQuality.Incomplete;
+            return CalculatedQuantityQuality.Missing;
         }
 
         if (chargeType is WholesaleServicesRequestSeries.Types.ChargeType.Subscription or WholesaleServicesRequestSeries.Types.ChargeType.Fee)
