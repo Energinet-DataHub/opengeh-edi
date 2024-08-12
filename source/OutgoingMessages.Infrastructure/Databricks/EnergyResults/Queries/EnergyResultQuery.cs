@@ -22,7 +22,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 
-public abstract class EnergyResultQueryBase<TResult>(
+public abstract class EnergyResultQuery<TResult>(
         ILogger logger,
         EdiDatabricksOptions ediDatabricksOptions,
         Guid calculationId)
@@ -51,7 +51,7 @@ public abstract class EnergyResultQueryBase<TResult>(
     /// </summary>
     public abstract Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition { get; }
 
-    internal async IAsyncEnumerable<QueryResult<TResult>> GetAsync(DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor)
+    public async IAsyncEnumerable<QueryResult<TResult>> GetAsync(DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor)
     {
         ArgumentNullException.ThrowIfNull(databricksSqlWarehouseQueryExecutor);
 

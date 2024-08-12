@@ -37,7 +37,7 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(
         EdiDatabricksOptions ediDatabricksOptions,
         EventId eventId,
         Guid calculationId)
-    : EnergyResultQueryBase<EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto>(
+    : EnergyResultQuery<EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto>(
         logger,
         ediDatabricksOptions,
         calculationId)

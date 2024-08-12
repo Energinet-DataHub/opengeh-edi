@@ -39,7 +39,7 @@ public class EnergyResultPerGridAreaQuery(
         IMasterDataClient masterDataClient,
         EventId eventId,
         Guid calculationId)
-    : EnergyResultQueryBase<EnergyResultPerGridAreaMessageDto>(
+    : EnergyResultQuery<EnergyResultPerGridAreaMessageDto>(
         logger,
         ediDatabricksOptions,
         calculationId)
