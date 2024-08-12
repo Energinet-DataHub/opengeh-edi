@@ -27,7 +27,7 @@ public class QuantityQualitiesFactor
     {
         if (price == null)
         {
-            return CalculatedQuantityQuality.Missing;
+            return CalculatedQuantityQuality.Incomplete;
         }
 
         if (chargeType == ChargeType.Subscription || chargeType == ChargeType.Fee)
