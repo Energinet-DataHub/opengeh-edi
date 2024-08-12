@@ -22,7 +22,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 
-public abstract class EnergyResultQuery<TResult>(
+public abstract class EnergyResultQueryBase<TResult>(
         ILogger logger,
         EdiDatabricksOptions ediDatabricksOptions,
         Guid calculationId)

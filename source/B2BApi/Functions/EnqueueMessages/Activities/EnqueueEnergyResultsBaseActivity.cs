@@ -31,7 +31,7 @@ public abstract class EnqueueEnergyResultsBaseActivity(
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
     private readonly EnergyResultEnumerator _energyResultEnumerator = energyResultEnumerator;
 
-    protected async Task<int> EnqueueEnergyResults<TQueryResult>(EnqueueMessagesInput input, EnergyResultQuery<TQueryResult> query)
+    protected async Task<int> EnqueueEnergyResults<TQueryResult>(EnqueueMessagesInput input, EnergyResultQueryBase<TQueryResult> query)
         where TQueryResult : OutgoingMessageDto
     {
         var numberOfHandledResults = 0;

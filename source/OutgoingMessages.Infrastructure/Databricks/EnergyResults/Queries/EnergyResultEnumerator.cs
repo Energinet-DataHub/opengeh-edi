@@ -31,7 +31,7 @@ public class EnergyResultEnumerator(
 
     public EdiDatabricksOptions EdiDatabricksOptions { get; } = ediDatabricksOptions.Value;
 
-    public async IAsyncEnumerable<QueryResult<TResult>> GetAsync<TResult>(EnergyResultQuery<TResult> query)
+    public async IAsyncEnumerable<QueryResult<TResult>> GetAsync<TResult>(EnergyResultQueryBase<TResult> query)
         where TResult : OutgoingMessageDto
     {
         var resultCount = 0;
