@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Mappers;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
@@ -62,7 +60,7 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
             Period: new Period(acceptedWholesaleServices.StartOfPeriod, acceptedWholesaleServices.EndOfPeriod),
             acceptedWholesaleServices.SettlementVersion,
             acceptedWholesaleServices.MeasurementUnit,
-            PriceMeasureUnit: MeasurementUnit.Kwh,
+            PriceMeasureUnit: IsTotalSum(acceptedWholesaleServices) ? null : MeasurementUnit.TryFromChargeType(acceptedWholesaleServices.ChargeType),
             acceptedWholesaleServices.Currency,
             acceptedWholesaleServices.ChargeType,
             acceptedWholesaleServices.Resolution,
@@ -71,5 +69,12 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
             OriginalTransactionIdReference: process.BusinessTransactionId);
 
         return acceptedWholesaleCalculationSeries;
+    }
+
+    private static bool IsTotalSum(AcceptedWholesaleServicesSerieDto acceptedWholesaleServices)
+    {
+        return acceptedWholesaleServices.Points.Count == 1
+               && acceptedWholesaleServices.Points.First().Price == null
+               && acceptedWholesaleServices.Resolution == Resolution.Monthly;
     }
 }

@@ -14,6 +14,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Factories;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
@@ -32,9 +33,9 @@ public sealed class CalculatedQuantityQualityMapperTests
         {
             // Example mappings from the documentation at https://energinet.atlassian.net/wiki/spaces/D3/pages/529989633/QuantityQuality.
             // Only available to Energinet employees.
-            // Note that this is used for RSM-014
+            // Note that this is used for RSM-014 in the CIM format
             /*
-             * | Combination QQ from RSM-012       | Calculated quantity quality |
+             * | Combination QQ from RSM-014       | Calculated quantity quality |
              * |-----------------------------------+-----------------------------|
              * | Missing + Missing                 | Missing                     |
              * | Missing + Estimated               | Incomplete                  |
@@ -134,15 +135,17 @@ public sealed class CalculatedQuantityQualityMapperTests
             };
         }
 
-        public static IEnumerable<object?[]> QuantityQualityWholesaleServiceMappingData()
+        public static IEnumerable<object?[]> QuantityQualityWholesaleServiceRequestMappingData()
         {
             // Example mappings from the documentation at https://energinet.atlassian.net/wiki/spaces/D3/pages/529989633/QuantityQuality.
             // Only available to Energinet employees.
-            // Note that this is used for RSM-019
+            // Note that this is used for RSM-019 in the CIM format
             // QuantityQuality for monthly amount is always “null”
-            // If QuantityQuality is not monthly amount, the following rules apply:
+            // QuantityQuality when price is missing is always “Missing”
+            // If Price is present, the QuantityQuality is “Calculated” if the CalculationType is “Subscription” and “Fee”.
+            // The following rules applies when calculation type is “Tariff”, has a price and is not monthly:
             /*
-             * | Combination QQ from RSM-012       | Calculated quantity quality |
+             * | Combination QQ from RSM-014       | Calculated quantity quality |
              * |-----------------------------------+-----------------------------|
              * | Missing + Missing                 | Missing                     |
              * | Missing + Missing                 | Missing                     |
@@ -163,7 +166,39 @@ public sealed class CalculatedQuantityQualityMapperTests
             {
                 new[] { QuantityQuality.Missing },
                 WholesaleServicesRequestSeries.Types.Resolution.Monthly,
+                true,
+                WholesaleServicesRequestSeries.Types.ChargeType.Subscription,
                 null,
+            };
+
+            //QuantityQuality when price is missing is always “Incomplete”
+            yield return new object?[]
+            {
+                new[] { QuantityQuality.Missing },
+                WholesaleServicesRequestSeries.Types.Resolution.Day,
+                false,
+                WholesaleServicesRequestSeries.Types.ChargeType.Subscription,
+                CalculatedQuantityQuality.Missing,
+            };
+
+            // If Price is present, the QuantityQuality is “Calculated” if the CalculationType is “Subscription”.
+            yield return new object?[]
+            {
+                new[] { QuantityQuality.Missing },
+                WholesaleServicesRequestSeries.Types.Resolution.Day,
+                true,
+                WholesaleServicesRequestSeries.Types.ChargeType.Subscription,
+                CalculatedQuantityQuality.Calculated,
+            };
+
+            // If Price is present, the QuantityQuality is “Calculated” if the CalculationType is “Fee”.
+            yield return new object?[]
+            {
+                new[] { QuantityQuality.Missing },
+                WholesaleServicesRequestSeries.Types.Resolution.Day,
+                true,
+                WholesaleServicesRequestSeries.Types.ChargeType.Fee,
+                CalculatedQuantityQuality.Calculated,
             };
 
             // The following test cases are defined as an input array of quantity qualities and a singular expected output.
@@ -171,6 +206,8 @@ public sealed class CalculatedQuantityQualityMapperTests
             {
                 new[] { QuantityQuality.Missing },
                 WholesaleServicesRequestSeries.Types.Resolution.Day,
+                true,
+                WholesaleServicesRequestSeries.Types.ChargeType.Tariff,
                 CalculatedQuantityQuality.Missing,
             };
 
@@ -178,6 +215,8 @@ public sealed class CalculatedQuantityQualityMapperTests
             {
                 new[] { QuantityQuality.Missing, QuantityQuality.Estimated },
                 WholesaleServicesRequestSeries.Types.Resolution.Day,
+                true,
+                WholesaleServicesRequestSeries.Types.ChargeType.Tariff,
                 CalculatedQuantityQuality.Incomplete,
             };
 
@@ -185,6 +224,8 @@ public sealed class CalculatedQuantityQualityMapperTests
             {
                 new[] { QuantityQuality.Missing, QuantityQuality.Measured },
                 WholesaleServicesRequestSeries.Types.Resolution.Day,
+                true,
+                WholesaleServicesRequestSeries.Types.ChargeType.Tariff,
                 CalculatedQuantityQuality.Incomplete,
             };
 
@@ -192,6 +233,8 @@ public sealed class CalculatedQuantityQualityMapperTests
             {
                 new[] { QuantityQuality.Missing, QuantityQuality.Estimated, QuantityQuality.Measured },
                 WholesaleServicesRequestSeries.Types.Resolution.Day,
+                true,
+                WholesaleServicesRequestSeries.Types.ChargeType.Tariff,
                 CalculatedQuantityQuality.Incomplete,
             };
 
@@ -199,6 +242,8 @@ public sealed class CalculatedQuantityQualityMapperTests
             {
                 new[] { QuantityQuality.Estimated, QuantityQuality.Measured },
                 WholesaleServicesRequestSeries.Types.Resolution.Day,
+                true,
+                WholesaleServicesRequestSeries.Types.ChargeType.Tariff,
                 CalculatedQuantityQuality.Calculated,
             };
 
@@ -206,6 +251,8 @@ public sealed class CalculatedQuantityQualityMapperTests
             {
                 new[] { QuantityQuality.Estimated },
                 WholesaleServicesRequestSeries.Types.Resolution.Day,
+                true,
+                WholesaleServicesRequestSeries.Types.ChargeType.Tariff,
                 CalculatedQuantityQuality.Calculated,
             };
 
@@ -213,6 +260,8 @@ public sealed class CalculatedQuantityQualityMapperTests
             {
                 new[] { QuantityQuality.Measured },
                 WholesaleServicesRequestSeries.Types.Resolution.Day,
+                true,
+                WholesaleServicesRequestSeries.Types.ChargeType.Tariff,
                 CalculatedQuantityQuality.Calculated,
             };
 
@@ -220,6 +269,8 @@ public sealed class CalculatedQuantityQualityMapperTests
             {
                 new[] { QuantityQuality.Calculated },
                 WholesaleServicesRequestSeries.Types.Resolution.Day,
+                true,
+                WholesaleServicesRequestSeries.Types.ChargeType.Tariff,
                 CalculatedQuantityQuality.Calculated,
             };
 
@@ -231,6 +282,8 @@ public sealed class CalculatedQuantityQualityMapperTests
                     QuantityQuality.Calculated,
                 },
                 WholesaleServicesRequestSeries.Types.Resolution.Day,
+                true,
+                WholesaleServicesRequestSeries.Types.ChargeType.Tariff,
                 CalculatedQuantityQuality.Incomplete,
             };
 
@@ -242,6 +295,8 @@ public sealed class CalculatedQuantityQualityMapperTests
                     QuantityQuality.Calculated,
                 },
                 WholesaleServicesRequestSeries.Types.Resolution.Day,
+                true,
+                WholesaleServicesRequestSeries.Types.ChargeType.Tariff,
                 CalculatedQuantityQuality.Calculated,
             };
 
@@ -254,6 +309,8 @@ public sealed class CalculatedQuantityQualityMapperTests
                     QuantityQuality.Measured,
                 },
                 WholesaleServicesRequestSeries.Types.Resolution.Day,
+                true,
+                WholesaleServicesRequestSeries.Types.ChargeType.Tariff,
                 CalculatedQuantityQuality.Calculated,
             };
 
@@ -262,6 +319,8 @@ public sealed class CalculatedQuantityQualityMapperTests
             {
                 new List<QuantityQuality>(),
                 WholesaleServicesRequestSeries.Types.Resolution.Day,
+                true,
+                WholesaleServicesRequestSeries.Types.ChargeType.Tariff,
                 CalculatedQuantityQuality.NotAvailable,
             };
 
@@ -275,6 +334,203 @@ public sealed class CalculatedQuantityQualityMapperTests
                     QuantityQuality.Calculated,
                 },
                 WholesaleServicesRequestSeries.Types.Resolution.Day,
+                true,
+                WholesaleServicesRequestSeries.Types.ChargeType.Tariff,
+                CalculatedQuantityQuality.Calculated,
+            };
+        }
+
+        public static IEnumerable<object?[]> QuantityQualityWholesaleServiceMappingData()
+        {
+            // Example mappings from the documentation at https://energinet.atlassian.net/wiki/spaces/D3/pages/529989633/QuantityQuality.
+            // Only available to Energinet employees.
+            // Note that this is used for RSM-019 in the CIM format
+            // QuantityQuality when price is missing is always “Missing”
+            // If Price is present, the QuantityQuality is “Calculated” if the CalculationType is “Subscription” and “Fee”.
+            // The following rules applies when calculation type is “Tariff”, has a price:
+            /*
+             * | Combination QQ from RSM-014       | Calculated quantity quality |
+             * |-----------------------------------+-----------------------------|
+             * | Missing + Missing                 | Missing                     |
+             * | Missing + Missing                 | Missing                     |
+             * | Missing + Estimated               | Incomplete                  |
+             * | Missing + Measured                | Incomplete                  |
+             * | Missing + Estimated + Measured    | Incomplete                  |
+             * | Missing + Calculated              | Incomplete                  |
+             * | Estimated + Measured              | Calculated                  |
+             * | Estimated + Estimated             | Calculated                  |
+             * | Estimated + Calculated            | Calculated                  |
+             * | Measured + Measured               | Calculated                  |
+             * | Calculated + Calculated           | Calculated                  |
+             * | Measured + Estimated + Calculated | Calculated                  |
+             */
+
+            //QuantityQuality when price is missing is always “Incomplete”
+            yield return new object?[]
+            {
+                null,
+                new[] { Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Missing },
+                ChargeType.Subscription,
+                CalculatedQuantityQuality.Missing,
+            };
+
+            // If Price is present, the QuantityQuality is “Calculated” if the CalculationType is “Subscription”.
+            yield return new object?[]
+            {
+                99m,
+                new[] { Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Missing },
+                ChargeType.Subscription,
+                CalculatedQuantityQuality.Calculated,
+            };
+
+            // If Price is present, the QuantityQuality is “Calculated” if the CalculationType is “Fee”.
+            yield return new object?[]
+            {
+                99m,
+                new[] { Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Missing },
+                ChargeType.Fee,
+                CalculatedQuantityQuality.Calculated,
+            };
+
+            // The following test cases are defined as an input array of quantity qualities and a singular expected output.
+            yield return new object?[]
+            {
+                99m,
+                new[] { Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Missing },
+                ChargeType.Tariff,
+                CalculatedQuantityQuality.Missing,
+            };
+
+            yield return new object?[]
+            {
+                99m,
+                new[]
+                {
+                    Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Missing,
+                    Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Estimated,
+                },
+                ChargeType.Tariff,
+                CalculatedQuantityQuality.Incomplete,
+            };
+
+            yield return new object?[]
+            {
+                99m,
+                new[]
+                {
+                    Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Missing,
+                    Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Measured,
+                },
+                ChargeType.Tariff,
+                CalculatedQuantityQuality.Incomplete,
+            };
+
+            yield return new object?[]
+            {
+                99m,
+                new[]
+                {
+                    Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Missing,
+                    Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Estimated,
+                    Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Measured,
+                },
+                ChargeType.Tariff,
+                CalculatedQuantityQuality.Incomplete,
+            };
+
+            yield return new object?[]
+            {
+                99m,
+                new[]
+                {
+                    Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Estimated,
+                    Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Measured,
+                },
+                ChargeType.Tariff,
+                CalculatedQuantityQuality.Calculated,
+            };
+
+            yield return new object?[]
+            {
+                99m,
+                new[] { Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Estimated },
+                ChargeType.Tariff,
+                CalculatedQuantityQuality.Calculated,
+            };
+
+            yield return new object?[]
+            {
+                99m,
+                new[] { Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Measured },
+                ChargeType.Tariff,
+                CalculatedQuantityQuality.Calculated,
+            };
+
+            yield return new object?[]
+            {
+                99m,
+                new[] { Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Calculated },
+                ChargeType.Tariff,
+                CalculatedQuantityQuality.Calculated,
+            };
+
+            yield return new object?[]
+            {
+                99m,
+                new[]
+                {
+                    Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Missing,
+                    Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Calculated,
+                },
+                ChargeType.Tariff,
+                CalculatedQuantityQuality.Incomplete,
+            };
+
+            yield return new object?[]
+            {
+                99m,
+                new[]
+                {
+                    Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Estimated,
+                    Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Calculated,
+                },
+                ChargeType.Tariff,
+                CalculatedQuantityQuality.Calculated,
+            };
+
+            yield return new object?[]
+            {
+                99m,
+                new[]
+                {
+                    Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Estimated,
+                    Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Calculated,
+                    Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Measured,
+                },
+                ChargeType.Tariff,
+                CalculatedQuantityQuality.Calculated,
+            };
+
+            // The empty set is undefined.
+            yield return new object?[]
+            {
+                99m,
+                new List<Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality>(),
+                ChargeType.Tariff,
+                CalculatedQuantityQuality.NotAvailable,
+            };
+
+            // Additional test cases not based on examples from the documentation.
+            yield return new object?[]
+            {
+                99m,
+                new[]
+                {
+                    Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Measured,
+                    Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Measured,
+                    Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality.Calculated,
+                },
+                ChargeType.Tariff,
                 CalculatedQuantityQuality.Calculated,
             };
         }
@@ -302,7 +558,7 @@ public sealed class CalculatedQuantityQualityMapperTests
             ICollection<QuantityQuality>? quality = null;
 
             // Act & Assert
-            var act = () => CalculatedQuantityQualityMapper.MapForWholesaleServices(quality, WholesaleServicesRequestSeries.Types.Resolution.Day);
+            var act = () => CalculatedQuantityQualityMapper.MapForWholesaleServices(quality, WholesaleServicesRequestSeries.Types.Resolution.Day, true, WholesaleServicesRequestSeries.Types.ChargeType.Tariff);
             act.Should().ThrowExactly<ArgumentNullException>();
         }
 
@@ -320,16 +576,20 @@ public sealed class CalculatedQuantityQualityMapperTests
         }
 
         [Theory]
-        [MemberData(nameof(QuantityQualityWholesaleServiceMappingData))]
-        public void Maps_wholesale_services_quantity_quality_to_edi_quality_in_accordance_with_the_rules(
+        [MemberData(nameof(QuantityQualityWholesaleServiceRequestMappingData))]
+        public void Maps_wholesale_services_request_quantity_quality_to_edi_quality_in_accordance_with_the_rules(
             ICollection<QuantityQuality> qualitySetFromWholesale,
             WholesaleServicesRequestSeries.Types.Resolution resolution,
+            bool hasPrice,
+            WholesaleServicesRequestSeries.Types.ChargeType chargeType,
             CalculatedQuantityQuality? expectedCalculatedQuantityQuality)
         {
             // Act
             var actual = CalculatedQuantityQualityMapper.MapForWholesaleServices(
                 qualitySetFromWholesale,
-                resolution);
+                resolution,
+                hasPrice,
+                chargeType);
 
             // Assert
             actual.Should().Be(expectedCalculatedQuantityQuality);
@@ -343,7 +603,27 @@ public sealed class CalculatedQuantityQualityMapperTests
             CalculatedQuantityQualityMapper.MapForEnergyResults(new[] { quantityQuality });
             CalculatedQuantityQualityMapper.MapForWholesaleServices(
                 new[] { quantityQuality },
-                WholesaleServicesRequestSeries.Types.Resolution.Day);
+                WholesaleServicesRequestSeries.Types.Resolution.Day,
+                true,
+                WholesaleServicesRequestSeries.Types.ChargeType.Tariff);
+        }
+
+        [Theory]
+        [MemberData(nameof(QuantityQualityWholesaleServiceMappingData))]
+        public void Maps_wholesale_services_quantity_quality_to_edi_quality_in_accordance_with_the_rules(
+            decimal? price,
+            IReadOnlyCollection<Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants.QuantityQuality> qualities,
+            ChargeType? chargeType,
+            CalculatedQuantityQuality expectedCalculatedQuantityQuality)
+        {
+            // Act
+            var actual = QuantityQualitiesFactor.CreateQuantityQuality(
+                price,
+                qualities,
+                chargeType);
+
+            // Assert
+            actual.Should().Be(expectedCalculatedQuantityQuality);
         }
     }
 }
