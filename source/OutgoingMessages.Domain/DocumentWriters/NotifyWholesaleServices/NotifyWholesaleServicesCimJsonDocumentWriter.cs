@@ -66,18 +66,6 @@ public sealed class NotifyWholesaleServicesCimJsonDocumentWriter : IDocumentWrit
         return new MarketDocumentStream(stream);
     }
 
-    private static void WriteQualityIfSpecified(Utf8JsonWriter writer, Point point)
-    {
-        if (point.QuantityQuality != null)
-        {
-            writer.WriteObject(
-                "quality",
-                KeyValuePair.Create(
-                    "value",
-                    CimCode.ForWholesaleServicesOf(point.QuantityQuality!.Value)));
-        }
-    }
-
     private void WriteSeries(IReadOnlyCollection<string> marketActivityRecords, Utf8JsonWriter writer)
     {
         ArgumentNullException.ThrowIfNull(marketActivityRecords);
@@ -112,14 +100,13 @@ public sealed class NotifyWholesaleServicesCimJsonDocumentWriter : IDocumentWrit
                             KeyValuePair.Create("value", series.MeteringPointType.Code));
                     }
 
-#pragma warning disable CS0618 // Type or member is obsolete
-                    if (series.SettlementMethod is not null || series.SettlementType is not null)
+                    if (series.SettlementMethod is not null)
                     {
                         writer.WriteObject(
                             "marketEvaluationPoint.settlementMethod",
-                            KeyValuePair.Create("value", series.SettlementType?.Code ?? series.SettlementMethod!.Code));
+                            KeyValuePair.Create("value", series.SettlementMethod?.Code ?? series.SettlementMethod!.Code));
                     }
-#pragma warning restore CS0618 // Type or member is obsolete
+
                     if (series.ChargeCode is not null)
                     {
                         writer.WriteProperty("chargeType.mRID", series.ChargeCode);
@@ -154,11 +141,9 @@ public sealed class NotifyWholesaleServicesCimJsonDocumentWriter : IDocumentWrit
 
                     writer.WriteProperty("product", ProductType.Tariff.Code);
 
-#pragma warning disable CS0618 // Type or member is obsolete
                     writer.WriteObject(
                         "quantity_Measure_Unit.name",
-                        KeyValuePair.Create("value", series.QuantityUnit?.Code ?? series.QuantityMeasureUnit.Code));
-#pragma warning restore CS0618 // Type or member is obsolete
+                        KeyValuePair.Create("value", series.QuantityMeasureUnit.Code));
 
                     if (series.PriceMeasureUnit is not null)
                     {
@@ -218,7 +203,14 @@ public sealed class NotifyWholesaleServicesCimJsonDocumentWriter : IDocumentWrit
                                                     point.Price.GetValueOrDefault()));
                                     }
 
-                                    WriteQualityIfSpecified(writer, point);
+                                    if (point.QuantityQuality != null)
+                                    {
+                                        writer.WriteObject(
+                                            "quality",
+                                            KeyValuePair.Create(
+                                                "value",
+                                                CimCode.ForWholesaleServicesOf(point.QuantityQuality.Value)));
+                                    }
                                 }
 
                                 writer.WriteEndObject();

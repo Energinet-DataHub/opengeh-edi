@@ -129,15 +129,14 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
             await WriteCodeWithCodeListReferenceAttributesAsync("TypeOfMeteringPoint", EbixCode.Of(MeteringPointType.FromName(timeSeries.MeteringPointType)), writer).ConfigureAwait(false);
 
 #pragma warning disable CS0618 // Type or member is obsolete
-            if (timeSeries.SettlementType != null || timeSeries.SettlementMethod != null)
+            if (timeSeries.SettlementMethod != null)
             {
-                if (timeSeries.SettlementType != null && timeSeries.SettlementType.Length == 3)
+                if (timeSeries.SettlementMethod.Length == 3)
                 {
-                    // TODO: This is keep for backward compatibility. Remove this in next pull request
                     // only codes has length 3
                     await WriteCodeWithCodeListReferenceAttributesAsync(
                             "SettlementMethod",
-                            EbixCode.Of(SettlementMethod.FromCode(timeSeries.SettlementType)),
+                            EbixCode.Of(SettlementMethod.FromCode(timeSeries.SettlementMethod)),
                             writer)
                         .ConfigureAwait(false);
                 }
@@ -145,7 +144,7 @@ public class NotifyAggregatedMeasureDataEbixDocumentWriter : EbixDocumentWriter
                 {
                     await WriteCodeWithCodeListReferenceAttributesAsync(
                             "SettlementMethod",
-                            EbixCode.Of(SettlementMethod.FromName(timeSeries.SettlementType ?? timeSeries.SettlementMethod!)),
+                            EbixCode.Of(SettlementMethod.FromName(timeSeries.SettlementMethod!)),
                             writer)
                         .ConfigureAwait(false);
                 }
