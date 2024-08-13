@@ -55,50 +55,34 @@ public abstract class EnqueueWholesaleResultsBaseActivity(
             if (databricksStopwatch.Elapsed > TimeSpan.FromSeconds(1))
             {
                 _logger.LogInformation(
-                    "Retrieved energy result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
+                    "Retrieved energy result from databricks, elapsed time: {ElapsedTime}, type: {QueryType}, external id: {ExternalId}, actor: {Actor}, calculation id: {CalculationId}, event id: {EventId}",
                     databricksStopwatch.Elapsed,
                     query.GetType().Name,
                     queryResult.Result?.ExternalId.Value,
+                    input.Actor,
                     input.CalculationId,
                     input.EventId);
             }
 
             if (queryResult.IsSuccess)
             {
-                var enqueueStopwatch = Stopwatch.StartNew();
-                var enqueueWasSuccess = false;
-                using (var scope = _serviceScopeFactory.CreateScope())
+                using var scope = _serviceScopeFactory.CreateScope();
+                try
                 {
-                    try
-                    {
-                        var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
-                        await EnqueueAndCommitWholesaleResult(scopedOutgoingMessagesClient, queryResult.Result!).ConfigureAwait(false);
+                    var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+                    await EnqueueAndCommitWholesaleResult(scopedOutgoingMessagesClient, queryResult.Result!).ConfigureAwait(false);
 
-                        enqueueWasSuccess = true;
-                        numberOfHandledResults++;
-                    }
-                    catch (Exception ex)
-                    {
-                        numberOfFailedResults++;
-                        _logger.LogWarning(
-                            ex,
-                            "Enqueue and commit failed for wholesale result, query type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
-                            query.GetType().Name,
-                            queryResult.Result?.ExternalId.Value,
-                            input.CalculationId,
-                            input.EventId);
-                    }
-
-                    enqueueStopwatch.Stop();
-
-                    var logStatusText = enqueueWasSuccess ? "Successfully enqueued" : "Failed enqueuing";
-                    _logger.LogInformation(
-                        logStatusText + " wholesale result in database, elapsed time: {ElapsedTime}, successful results: {SuccessfulResultsCount}, failed results: {FailedResultsCount}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
-                        enqueueStopwatch.Elapsed.ToString(),
-                        numberOfHandledResults,
-                        numberOfFailedResults,
+                    numberOfHandledResults++;
+                }
+                catch (Exception ex)
+                {
+                    numberOfFailedResults++;
+                    _logger.LogWarning(
+                        ex,
+                        "Enqueue and commit threw exception for wholesale result, query type: {QueryType}, external id: {ExternalId}, actor: {Actor}, calculation id: {CalculationId}, event id: {EventId}",
                         query.GetType().Name,
                         queryResult.Result?.ExternalId.Value,
+                        input.Actor,
                         input.CalculationId,
                         input.EventId);
                 }
@@ -112,16 +96,17 @@ public abstract class EnqueueWholesaleResultsBaseActivity(
         }
 
         _logger.LogInformation(
-            "Finished enqueuing messages for wholesale query, elapsed time: {ElapsedTime}, successful results: {SuccessfulResultsCount}, failed results: {FailedResultsCount}, type: {QueryType}, calculation id: {CalculationId}, event id: {EventId}",
+            "Finished enqueuing messages for wholesale query, elapsed time: {ElapsedTime}, successful results: {SuccessfulResultsCount}, failed results: {FailedResultsCount}, type: {QueryType}, actor: {Actor}, calculation id: {CalculationId}, event id: {EventId}",
             activityStopwatch.Elapsed,
             numberOfHandledResults,
             numberOfFailedResults,
             query.GetType().Name,
+            input.Actor,
             input.CalculationId,
             input.EventId);
 
         return numberOfFailedResults > 0
-            ? throw new Exception($"Enqueue messages activity failed. CalculationId='{input.CalculationId}' EventId='{input.EventId}' NumberOfFailedResults='{numberOfFailedResults}' NumberOfHandledResults='{numberOfHandledResults}'")
+            ? throw new Exception($"Enqueue messages activity failed. Actor='{input.Actor}' CalculationId='{input.CalculationId}' EventId='{input.EventId}' NumberOfFailedResults='{numberOfFailedResults}' NumberOfHandledResults='{numberOfHandledResults}'")
             : numberOfHandledResults;
     }
 

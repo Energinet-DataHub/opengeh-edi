@@ -62,40 +62,21 @@ public abstract class EnqueueEnergyResultsBaseActivity(
 
             if (queryResult.IsSuccess)
             {
-                var enqueueStopwatch = Stopwatch.StartNew();
-                var enqueueWasSuccess = false;
-                using (var scope = _serviceScopeFactory.CreateScope())
+                using var scope = _serviceScopeFactory.CreateScope();
+                try
                 {
-                    try
-                    {
-                        var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+                    var scopedOutgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
 
-                        await EnqueueAndCommitEnergyResult(scopedOutgoingMessagesClient, queryResult.Result!).ConfigureAwait(false);
+                    await EnqueueAndCommitEnergyResult(scopedOutgoingMessagesClient, queryResult.Result!).ConfigureAwait(false);
 
-                        numberOfHandledResults++;
-                        enqueueWasSuccess = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        numberOfFailedResults++;
-                        _logger.LogWarning(
-                            ex,
-                            "Enqueue and commit failed for energy result, query type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
-                            query.GetType().Name,
-                            queryResult.Result?.ExternalId.Value,
-                            input.CalculationId,
-                            input.EventId);
-                    }
-
-                    enqueueStopwatch.Stop();
-
-                    var logStatusText = enqueueWasSuccess ? "Successfully enqueued" : "Failed enqueuing";
-                    _logger.LogInformation(
-                        logStatusText
-                        + " energy result in database, elapsed time: {ElapsedTime}, successful results: {SuccessfulResultsCount}, failed results: {FailedResultsCount}, type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
-                        enqueueStopwatch.Elapsed.ToString(),
-                        numberOfHandledResults,
-                        numberOfFailedResults,
+                    numberOfHandledResults++;
+                }
+                catch (Exception ex)
+                {
+                    numberOfFailedResults++;
+                    _logger.LogWarning(
+                        ex,
+                        "Enqueue and commit threw exception for energy result, query type: {QueryType}, external id: {ExternalId}, calculation id: {CalculationId}, event id: {EventId}",
                         query.GetType().Name,
                         queryResult.Result?.ExternalId.Value,
                         input.CalculationId,
