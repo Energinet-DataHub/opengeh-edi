@@ -70,7 +70,7 @@ public class WholesaleAmountPerChargeMessageDto : OutgoingMessageDto
             SettlementVersion: settlementVersion,
             quantityUnit,
             null,
-            PriceMeasureUnit: MeasurementUnit.Kwh,
+            PriceMeasureUnit: MeasurementUnit.TryFromChargeType(chargeType),
             Currency: currency,
             ChargeType: chargeType,
             Resolution: resolution,

@@ -924,7 +924,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
             MeteringPointType: null,
             GridArea: "512",
             TransactionId.From("12356478912356478912356478912356478"),
-            PriceMeasurementUnit: MeasurementUnit.Kwh,
+            PriceMeasurementUnit: null,
             ProductCode: "5790001330590", // Example says "8716867000030", but document writes as "5790001330590"?
             QuantityMeasurementUnit: MeasurementUnit.Kwh,
             CalculationVersion: GetNow().ToUnixTimeTicks(),
