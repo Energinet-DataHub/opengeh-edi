@@ -384,7 +384,8 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
     }
 
     public IAssertNotifyWholesaleServicesDocument HasPoints(
-        IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points)
+        IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points,
+        Resolution resolution)
     {
         var pointsInDocument = _documentAsserter
             .GetElements($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation")!;
@@ -403,7 +404,10 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
 
             AssertPrice(pointsInDocument, i, expectedPoints[i].Price.ToDecimal());
 
-            AssertQuantityQuality(pointsInDocument, i, expectedPoints[i].QuantityQualities.Single());
+            // QuantityQuality should not be present in the document if resolution is monthly
+            QuantityQuality? expectedQuantityQuality = resolution == Resolution.Monthly
+                ? null : expectedPoints[i].QuantityQualities.SingleOrDefault();
+            AssertQuantityQuality(pointsInDocument, i, expectedQuantityQuality);
         }
 
         return this;
@@ -437,7 +441,7 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
 
     public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndQuality(
         DecimalValue expectedAmount,
-        QuantityQuality quantityQualities)
+        QuantityQuality? expectedQuantityQuality)
     {
         var pointsInDocument = _documentAsserter
             .GetElements($"{PayloadEnergyTimeSeries}[1]/IntervalEnergyObservation")!;
@@ -462,7 +466,7 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
             .Should()
             .Be(1);
 
-        AssertQuantityQuality(pointsInDocument, 0, quantityQualities);
+        AssertQuantityQuality(pointsInDocument, 0, expectedQuantityQuality);
 
         _documentAsserter.IsNotPresent($"PayloadEnergyTimeSeries[1]/IntervalEnergyObservation[1]/EnergyQuantity");
 
@@ -606,7 +610,7 @@ public sealed class AssertNotifyWholesaleServicesEbixDocument : IAssertNotifyWho
     private void AssertQuantityQuality(
         IList<XElement> pointsInDocument,
         int i,
-        CalculatedQuantityQuality expectedQuantityQuality)
+        CalculatedQuantityQuality? expectedQuantityQuality)
     {
         var translatedQuantityQuality = expectedQuantityQuality switch
         {

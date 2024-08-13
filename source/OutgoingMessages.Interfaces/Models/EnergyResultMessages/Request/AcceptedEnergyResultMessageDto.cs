@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
@@ -36,8 +35,6 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
             eventId,
             businessReason,
             receiverRole,
-            DataHubDetails.DataHubActorNumber,
-            ActorRole.MeteredDataAdministrator,
             new ExternalId(Guid.NewGuid()),
             relatedToMessageId)
     {

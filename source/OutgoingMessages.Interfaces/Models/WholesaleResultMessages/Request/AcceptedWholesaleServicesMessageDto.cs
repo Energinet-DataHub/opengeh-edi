@@ -37,8 +37,6 @@ public class AcceptedWholesaleServicesMessageDto : OutgoingMessageDto
             eventId,
             businessReason,
             receiverRole,
-            DataHubDetails.DataHubActorNumber,
-            ActorRole.MeteredDataAdministrator,
             new ExternalId(Guid.NewGuid()),
             relatedToMessageId)
     {

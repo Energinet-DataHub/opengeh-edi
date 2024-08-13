@@ -38,4 +38,4 @@ public record AcceptedWholesaleServicesSerieDto(
     long CalculationResultVersion);
 
 [Serializable]
-public record Point(int Position, decimal? Quantity, CalculatedQuantityQuality QuantityQuality, decimal? Price, decimal? Amount);
+public record Point(int Position, decimal? Quantity, CalculatedQuantityQuality? QuantityQuality, decimal? Price, decimal? Amount);

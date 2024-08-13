@@ -44,8 +44,6 @@ public class WholesaleMonthlyAmountPerChargeMessageDto : OutgoingMessageDto
             eventId,
             businessReason,
             receiverRole: null!,
-            senderId: DataHubDetails.DataHubActorNumber,
-            senderRole: ActorRole.MeteredDataAdministrator,
             new ExternalId(calculationResultId))
     {
         CalculationId = calculationId;

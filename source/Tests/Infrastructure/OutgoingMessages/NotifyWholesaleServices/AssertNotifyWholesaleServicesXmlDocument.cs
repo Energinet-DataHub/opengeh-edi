@@ -351,7 +351,8 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
     }
 
     public IAssertNotifyWholesaleServicesDocument HasPoints(
-        IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points)
+        IReadOnlyCollection<WholesaleServicesRequestSeries.Types.Point> points,
+        Resolution resolution)
     {
         var pointsInDocument = _documentAsserter
             .GetElements("Series[1]/Period/Point")!;
@@ -370,7 +371,10 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
 
             AssertPrice(pointsInDocument, i, expectedPoints[i].Price.ToDecimal());
 
-            AssertQuantityQuality(pointsInDocument, i, expectedPoints[i].QuantityQualities.Single());
+            // QuantityQuality should not be present in the document if resolution is monthly
+            QuantityQuality? expectedQuantityQuality = resolution == Resolution.Monthly
+                ? null : expectedPoints[i].QuantityQualities.SingleOrDefault();
+            AssertQuantityQuality(pointsInDocument, i, expectedQuantityQuality);
         }
 
         return this;
@@ -404,7 +408,7 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
 
     public IAssertNotifyWholesaleServicesDocument HasSinglePointWithAmountAndQuality(
         DecimalValue expectedAmount,
-        QuantityQuality quantityQualities)
+        QuantityQuality? expectedQuantityQuality)
     {
         ArgumentNullException.ThrowIfNull(expectedAmount);
         var pointsInDocument = _documentAsserter
@@ -429,7 +433,7 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
             .Should()
             .Be(1);
 
-        AssertQuantityQuality(pointsInDocument, 0, quantityQualities);
+        AssertQuantityQuality(pointsInDocument, 0, expectedQuantityQuality);
 
         _documentAsserter.IsNotPresent("Series[1]/Period/Point[1]/energy_Quantity.quantity");
 
@@ -495,7 +499,7 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
     private void AssertQuantityQuality(
         IList<XElement> pointsInDocument,
         int i,
-        CalculatedQuantityQuality expectedQuantityQuality)
+        CalculatedQuantityQuality? expectedQuantityQuality)
     {
         var translatedQuantityQuality = expectedQuantityQuality switch
         {
@@ -547,7 +551,7 @@ public class AssertNotifyWholesaleServicesXmlDocument : IAssertNotifyWholesaleSe
         }
         else
         {
-            _documentAsserter.IsNotPresent(_documentAsserter.EnsureXPathHasPrefix("quality"));
+            _documentAsserter.IsNotPresent("quality");
         }
     }
 }

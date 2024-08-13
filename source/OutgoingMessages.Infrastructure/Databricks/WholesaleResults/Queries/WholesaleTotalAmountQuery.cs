@@ -88,7 +88,8 @@ public class WholesaleTotalAmountQuery(
                         p.Quantity,
                         p.Price,
                         p.Amount,
-                        p.Amount != null ? CalculatedQuantityQuality.Calculated : CalculatedQuantityQuality.Missing))
+                        // Quantity quality is not relevant for total amounts
+                        null))
                 .ToList()
                 .AsReadOnly()));
     }
