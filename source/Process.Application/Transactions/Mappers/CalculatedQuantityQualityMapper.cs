@@ -98,6 +98,18 @@ public static class CalculatedQuantityQualityMapper
     ///         </item>
     ///         <item>
     ///             <description>
+    ///                 If the price is missing, it
+    ///                 returns CalculatedQuantityQuality.Missing.
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 If the chargeType is Subscription or Fee, it
+    ///                 returns CalculatedQuantityQuality.Calculated.
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
     ///                 If the collection contains Missing and doesn't contain Estimated, Measured, or Calculated, it
     ///                 returns CalculatedQuantityQuality.Missing.
     ///             </description>
@@ -131,18 +143,28 @@ public static class CalculatedQuantityQualityMapper
     ///         </item>
     ///     </list>
     /// </summary>
-    /// <param name="quantityQualities">The collection of quantity qualities to convert.</param>
-    /// <param name="resolution"></param>
     /// <returns>The calculated quantity quality based on the input collection.</returns>
     public static CalculatedQuantityQuality? MapForWholesaleServices(
         ICollection<QuantityQuality> quantityQualities,
-        WholesaleServicesRequestSeries.Types.Resolution resolution)
+        WholesaleServicesRequestSeries.Types.Resolution resolution,
+        bool hasPrice,
+        WholesaleServicesRequestSeries.Types.ChargeType? chargeType)
     {
         ArgumentNullException.ThrowIfNull(quantityQualities);
 
         if (resolution == WholesaleServicesRequestSeries.Types.Resolution.Monthly)
         {
             return null;
+        }
+
+        if (!hasPrice)
+        {
+            return CalculatedQuantityQuality.Missing;
+        }
+
+        if (chargeType is WholesaleServicesRequestSeries.Types.ChargeType.Subscription or WholesaleServicesRequestSeries.Types.ChargeType.Fee)
+        {
+            return CalculatedQuantityQuality.Calculated;
         }
 
         return (missing: quantityQualities.Contains(QuantityQuality.Missing),
