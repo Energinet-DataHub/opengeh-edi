@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
@@ -31,5 +30,24 @@ public class MeasurementUnit : DataHubType<MeasurementUnit>
     private MeasurementUnit(string name, string code)
         : base(name, code)
     {
+    }
+
+    public static MeasurementUnit? TryFromChargeType(ChargeType? chargeType)
+    {
+        if (chargeType is null) return null;
+
+        var chargeTypeToMeasurementUnitMap = new Dictionary<ChargeType, MeasurementUnit>
+        {
+            { ChargeType.Tariff, Kwh },
+            { ChargeType.Subscription, Pieces },
+            { ChargeType.Fee, Pieces },
+        };
+
+        if (chargeTypeToMeasurementUnitMap.TryGetValue(chargeType, out var measurementUnit))
+        {
+            return measurementUnit;
+        }
+
+        throw new InvalidOperationException("Unknown charge type");
     }
 }

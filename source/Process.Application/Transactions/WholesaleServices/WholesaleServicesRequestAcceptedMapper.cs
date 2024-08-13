@@ -47,7 +47,7 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
         foreach (var wholesaleSeries in wholesaleServicesRequestAccepted.Series)
         {
             acceptedWholesaleServicesSeries.Add(new AcceptedWholesaleServicesSerieDto(
-                MapPoints(wholesaleSeries.TimeSeriesPoints, wholesaleSeries.Resolution),
+                MapPoints(wholesaleSeries.TimeSeriesPoints, wholesaleSeries.Resolution, wholesaleSeries.HasChargeType ? wholesaleSeries.ChargeType : null),
                 MapMeteringPointType(wholesaleSeries),
                 MapResolution(wholesaleSeries.Resolution),
                 wholesaleSeries.HasChargeType ? MapChargeType(wholesaleSeries.ChargeType) : null,
@@ -160,18 +160,24 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
 
     private static ReadOnlyCollection<Point> MapPoints(
         RepeatedField<WholesaleServicesRequestSeries.Types.Point> timeSeriesPoints,
-        WholesaleServicesRequestSeries.Types.Resolution resolution)
+        WholesaleServicesRequestSeries.Types.Resolution resolution,
+        WholesaleServicesRequestSeries.Types.ChargeType? chargeType)
     {
         var points = new List<Point>();
 
         var pointPosition = 1;
         foreach (var point in timeSeriesPoints.OrderBy(x => x.Time))
         {
+            var price = Parse(point.Price);
             points.Add(new Point(
                 pointPosition,
                 Parse(point.Quantity),
-                CalculatedQuantityQualityMapper.MapForWholesaleServices(point.QuantityQualities.ToList().AsReadOnly(), resolution),
-                Parse(point.Price),
+                CalculatedQuantityQualityMapper.MapForWholesaleServices(
+                    point.QuantityQualities.ToList().AsReadOnly(),
+                    resolution,
+                    price != null,
+                    chargeType),
+                price,
                 Parse(point.Amount)));
 
             pointPosition++;
