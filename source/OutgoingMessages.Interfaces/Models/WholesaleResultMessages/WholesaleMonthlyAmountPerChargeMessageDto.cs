@@ -63,7 +63,7 @@ public class WholesaleMonthlyAmountPerChargeMessageDto : OutgoingMessageDto
             Period: period,
             SettlementVersion: settlementVersion,
             quantityUnit,
-            PriceMeasureUnit: MeasurementUnit.Kwh,
+            PriceMeasureUnit: MeasurementUnit.TryFromChargeType(chargeType),
             Currency: currency,
             ChargeType: chargeType,
             Resolution: Resolution.Monthly,

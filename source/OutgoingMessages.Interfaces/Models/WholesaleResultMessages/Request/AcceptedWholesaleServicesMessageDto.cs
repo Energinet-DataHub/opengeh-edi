@@ -92,7 +92,7 @@ public record AcceptedWholesaleServicesSeries(
     Period Period,
     SettlementVersion? SettlementVersion,
     MeasurementUnit QuantityMeasureUnit,
-    MeasurementUnit PriceMeasureUnit,
+    MeasurementUnit? PriceMeasureUnit,
     Currency Currency,
     ChargeType? ChargeType,
     Resolution Resolution,
