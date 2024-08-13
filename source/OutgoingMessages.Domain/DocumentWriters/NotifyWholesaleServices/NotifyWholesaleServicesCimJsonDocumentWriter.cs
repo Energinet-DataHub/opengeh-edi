@@ -102,9 +102,7 @@ public sealed class NotifyWholesaleServicesCimJsonDocumentWriter : IDocumentWrit
 
                     if (series.SettlementMethod is not null)
                     {
-                        writer.WriteObject(
-                            "marketEvaluationPoint.settlementMethod",
-                            KeyValuePair.Create("value", series.SettlementMethod?.Code ?? series.SettlementMethod!.Code));
+                        writer.WriteObject("marketEvaluationPoint.settlementMethod", KeyValuePair.Create("value", series.SettlementMethod.Code));
                     }
 
                     if (series.ChargeCode is not null)
