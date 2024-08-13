@@ -33,9 +33,9 @@ public sealed class CalculatedQuantityQualityMapperTests
         {
             // Example mappings from the documentation at https://energinet.atlassian.net/wiki/spaces/D3/pages/529989633/QuantityQuality.
             // Only available to Energinet employees.
-            // Note that this is used for RSM-014
+            // Note that this is used for RSM-014 in the CIM format
             /*
-             * | Combination QQ from RSM-012       | Calculated quantity quality |
+             * | Combination QQ from RSM-014       | Calculated quantity quality |
              * |-----------------------------------+-----------------------------|
              * | Missing + Missing                 | Missing                     |
              * | Missing + Estimated               | Incomplete                  |
@@ -139,13 +139,13 @@ public sealed class CalculatedQuantityQualityMapperTests
         {
             // Example mappings from the documentation at https://energinet.atlassian.net/wiki/spaces/D3/pages/529989633/QuantityQuality.
             // Only available to Energinet employees.
-            // Note that this is used for RSM-019
+            // Note that this is used for RSM-019 in the CIM format
             // QuantityQuality for monthly amount is always “null”
             // QuantityQuality when price is missing is always “Missing”
             // If Price is present, the QuantityQuality is “Calculated” if the CalculationType is “Subscription” and “Fee”.
             // The following rules applies when calculation type is “Tariff”, has a price and is not monthly:
             /*
-             * | Combination QQ from RSM-012       | Calculated quantity quality |
+             * | Combination QQ from RSM-014       | Calculated quantity quality |
              * |-----------------------------------+-----------------------------|
              * | Missing + Missing                 | Missing                     |
              * | Missing + Missing                 | Missing                     |
@@ -344,12 +344,12 @@ public sealed class CalculatedQuantityQualityMapperTests
         {
             // Example mappings from the documentation at https://energinet.atlassian.net/wiki/spaces/D3/pages/529989633/QuantityQuality.
             // Only available to Energinet employees.
-            // Note that this is used for RSM-019
+            // Note that this is used for RSM-019 in the CIM format
             // QuantityQuality when price is missing is always “Missing”
             // If Price is present, the QuantityQuality is “Calculated” if the CalculationType is “Subscription” and “Fee”.
             // The following rules applies when calculation type is “Tariff”, has a price:
             /*
-             * | Combination QQ from RSM-012       | Calculated quantity quality |
+             * | Combination QQ from RSM-014       | Calculated quantity quality |
              * |-----------------------------------+-----------------------------|
              * | Missing + Missing                 | Missing                     |
              * | Missing + Missing                 | Missing                     |

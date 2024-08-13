@@ -143,10 +143,6 @@ public static class CalculatedQuantityQualityMapper
     ///         </item>
     ///     </list>
     /// </summary>
-    /// <param name="quantityQualities">The collection of quantity qualities to convert.</param>
-    /// <param name="resolution">The resolution for the calculation.</param>
-    /// <param name="hasPrice">Does the calculation result have a price.</param>
-    /// <param name="chargeType">calculation result charge type</param>
     /// <returns>The calculated quantity quality based on the input collection.</returns>
     public static CalculatedQuantityQuality? MapForWholesaleServices(
         ICollection<QuantityQuality> quantityQualities,
