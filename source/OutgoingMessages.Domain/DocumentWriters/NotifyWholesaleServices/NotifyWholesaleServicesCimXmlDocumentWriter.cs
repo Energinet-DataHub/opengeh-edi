@@ -55,9 +55,7 @@ public class NotifyWholesaleServicesCimXmlDocumentWriter : CimXmlDocumentWriter
             // These are there for later use, but are not used as of right now
             await WriteElementIfHasValueAsync("originalTransactionIDReference_Series.mRID", wholesaleCalculationSeries.OriginalTransactionIdReference?.Value, writer).ConfigureAwait(false);
             await WriteElementIfHasValueAsync("marketEvaluationPoint.type", wholesaleCalculationSeries.MeteringPointType?.Code, writer).ConfigureAwait(false);
-#pragma warning disable CS0618 // Type or member is obsolete
-            await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", wholesaleCalculationSeries.SettlementType?.Code ?? wholesaleCalculationSeries.SettlementMethod?.Code, writer).ConfigureAwait(false);
-#pragma warning restore CS0618 // Type or member is obsolete
+            await WriteElementIfHasValueAsync("marketEvaluationPoint.settlementMethod", wholesaleCalculationSeries.SettlementMethod?.Code, writer).ConfigureAwait(false);
 
             await WriteElementIfHasValueAsync("chargeType.mRID", wholesaleCalculationSeries.ChargeCode, writer).ConfigureAwait(false);
             await WriteElementIfHasValueAsync("chargeType.type", wholesaleCalculationSeries.ChargeType?.Code, writer).ConfigureAwait(false);
@@ -82,9 +80,7 @@ public class NotifyWholesaleServicesCimXmlDocumentWriter : CimXmlDocumentWriter
 
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "product", null, ProductType.Tariff.Code).ConfigureAwait(false);
 
-#pragma warning disable CS0618 // Type or member is obsolete
-            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, wholesaleCalculationSeries.QuantityUnit?.Code ?? wholesaleCalculationSeries.QuantityMeasureUnit.Code).ConfigureAwait(false);
-#pragma warning restore CS0618 // Type or member is obsolete
+            await writer.WriteElementStringAsync(DocumentDetails.Prefix, "quantity_Measure_Unit.name", null, wholesaleCalculationSeries.QuantityMeasureUnit.Code).ConfigureAwait(false);
 
             await WriteElementIfHasValueAsync("price_Measure_Unit.name", wholesaleCalculationSeries.PriceMeasureUnit?.Code, writer).ConfigureAwait(false);
             await writer.WriteElementStringAsync(DocumentDetails.Prefix, "currency_Unit.name", null, wholesaleCalculationSeries.Currency.Code).ConfigureAwait(false);

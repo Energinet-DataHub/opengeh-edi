@@ -69,13 +69,11 @@ public class WholesaleAmountPerChargeMessageDto : OutgoingMessageDto
             Period: period,
             SettlementVersion: settlementVersion,
             quantityUnit,
-            null,
             PriceMeasureUnit: MeasurementUnit.TryFromChargeType(chargeType),
             Currency: currency,
             ChargeType: chargeType,
             Resolution: resolution,
             MeteringPointType: meteringPointType,
-            null,
             SettlementMethod: settlementMethod);
     }
 
