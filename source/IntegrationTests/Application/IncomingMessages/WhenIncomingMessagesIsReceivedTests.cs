@@ -232,11 +232,12 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var exceptedDuplicateMessageIdDetectedErrorCode = "00101";
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
+        var authenticatedActorRole = incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData ? ActorRole.BalanceResponsibleParty : ActorRole.EnergySupplier;
         authenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(
                 senderActorNumber,
                 Restriction.Owned,
-                incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData ? ActorRole.BalanceResponsibleParty : ActorRole.EnergySupplier));
+                authenticatedActorRole));
 
         // new scope to simulate a race condition.
         var sessionProvider = GetService<IServiceProvider>();
@@ -244,7 +245,10 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var authenticatedActorInSecondScope = secondScope.ServiceProvider.GetService<AuthenticatedActor>();
         var secondParser = secondScope.ServiceProvider.GetRequiredService<IIncomingMessageClient>();
 
-        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, restriction: Restriction.None, ActorRole.BalanceResponsibleParty));
+        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(
+            senderActorNumber,
+            restriction: Restriction.None,
+            authenticatedActorRole));
 
         var task01 = _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
             incomingMarketMessageStream,
