@@ -23,6 +23,8 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMe
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using MediatR;
+using NodaTime;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Commands.Handlers;
 
@@ -74,6 +76,7 @@ public sealed class
             relatedToMessageId: process.InitiatedByMessageId,
             series: rejectedWholesaleServices,
             documentReceiverNumber: process.OriginalActor.ActorNumber,
-            documentReceiverRole: process.OriginalActor.ActorRole);
+            documentReceiverRole: process.OriginalActor.ActorRole,
+            new Period(Instant.FromUtc(2024, 1, 1, 1, 1), Instant.FromUtc(2024, 2, 1, 1, 1))); //TODO
     }
 }

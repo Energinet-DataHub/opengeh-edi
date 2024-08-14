@@ -34,9 +34,14 @@ public interface IOutgoingMessageRepository
     Task<OutgoingMessageBundle> GetAsync(PeekResult peekResult);
 
     /// <summary>
-    /// Checks if a message exists in the database for the designated receiver and the external id.
+    /// Get messsage in the database for the designated receiver and the external id.
     /// </summary>
     Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId);
+
+    /// <summary>
+    /// Get message in the database for the idempotency id.
+    /// </summary>
+    Task<OutgoingMessage?> GetAsync(OutgoingMessageIdempotencyId idempotencyId);
 
     /// <summary>
     /// Delete outgoing messages if they exists

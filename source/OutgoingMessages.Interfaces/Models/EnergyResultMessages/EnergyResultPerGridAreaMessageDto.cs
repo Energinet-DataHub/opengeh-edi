@@ -40,12 +40,13 @@ public class EnergyResultPerGridAreaMessageDto
         Guid calculationId)
             : base(
             documentType: DocumentType.NotifyAggregatedMeasureData,
+            receiverNumber: meteredDataResponsibleNumber,
             processId: null,
             eventId: eventId,
             businessReasonName: businessReason.Name,
-            receiverNumber: meteredDataResponsibleNumber,
             receiverRole: ActorRole.MeteredDataResponsible,
             externalId: new ExternalId(calculationResultId),
+            period,
             relatedToMessageId: null)
     {
         CalculationId = calculationId;

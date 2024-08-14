@@ -192,6 +192,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202407011049 Create index for Bundles ActorMessageQueueId.sql" />
     <EmbeddedResource Include="Scripts\Model\202407011050 Create index for OutgoingMessages AssignedBundleId.sql" />
     <EmbeddedResource Include="Scripts\Model\202407311435 Create index for ReceivedIntegrationEvents OccurredOn.sql" />
+    <EmbeddedResource Include="Scripts\Model\202408141235 Rename OutgoingMessageIdempotent index to Unique_ExternalId_ReceiverNumber_ReceiverRole.sql" />
+    <EmbeddedResource Include="Scripts\Model\202408141237 Add IdempotentId to OutgoingMessages.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <None Remove="Scripts\Model\202310231329 Alter Bundles1.sql" />

@@ -18,6 +18,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
+using NodaTime;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
 
@@ -33,6 +35,10 @@ public static class RejectedWholesaleServicesMessageDtoBuilder
         new List<RejectedWholesaleServicesMessageRejectReason> { new(SampleData.SerieReasonCode, SampleData.SerieReasonMessage) },
         SampleData.OriginalTransactionId);
 
+    private static readonly Period _period = new(
+        Instant.FromUtc(2024, 9, 1, 0, 0),
+        Instant.FromUtc(2024, 10, 1, 0, 0));
+
     private static readonly EventId _eventId = EventId.From(Guid.NewGuid());
 
     public static RejectedWholesaleServicesMessageDto Build()
@@ -46,6 +52,7 @@ public static class RejectedWholesaleServicesMessageDtoBuilder
             _relatedToMessageId,
             _series,
             _receiverNumber,
-            _receiverRole);
+            _receiverRole,
+            _period);
     }
 }

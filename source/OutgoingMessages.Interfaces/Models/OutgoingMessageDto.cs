@@ -29,6 +29,7 @@ public abstract class OutgoingMessageDto
         string businessReasonName,
         ActorRole receiverRole,
         ExternalId externalId,
+        Period period,
         MessageId? relatedToMessageId = null)
     {
         DocumentType = documentType;
@@ -38,6 +39,7 @@ public abstract class OutgoingMessageDto
         BusinessReason = businessReasonName;
         ReceiverRole = receiverRole;
         ExternalId = externalId;
+        Period = period;
         RelatedToMessageId = relatedToMessageId;
     }
 
@@ -58,6 +60,8 @@ public abstract class OutgoingMessageDto
     public ActorRole ReceiverRole { get; }
 
     public ExternalId ExternalId { get; }
+
+    public Period Period { get; }
 
     /// <summary>
     /// If this attribute has a value, then it is used to store the message id of a request from an actor.

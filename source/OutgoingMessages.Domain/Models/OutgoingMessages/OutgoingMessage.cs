@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using NodaTime;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
@@ -40,7 +41,8 @@ public class OutgoingMessage
         MessageId? relatedToMessageId,
         string? gridAreaCode,
         ExternalId externalId,
-        Guid? calculationId)
+        Guid? calculationId,
+        Period period)
     {
         Id = OutgoingMessageId.New();
         EventId = eventId;
@@ -55,6 +57,7 @@ public class OutgoingMessage
         DocumentReceiver = documentReceiver;
         CreatedAt = createdAt;
         FileStorageReference = CreateFileStorageReference(Receiver.Number, createdAt, Id);
+        IdempotentId = OutgoingMessageIdempotencyId.New(receiver.ActorRole, externalId, period);
         ExternalId = externalId;
         CalculationId = calculationId;
     }
@@ -77,7 +80,8 @@ public class OutgoingMessage
         Instant createdAt,
         string? gridAreaCode,
         ExternalId externalId,
-        Guid? calculationId)
+        Guid? calculationId,
+        OutgoingMessageIdempotencyId idempotentId)
     {
         Id = id;
         DocumentType = documentType;
@@ -92,6 +96,7 @@ public class OutgoingMessage
         CreatedAt = createdAt;
         ExternalId = externalId;
         CalculationId = calculationId;
+        IdempotentId = idempotentId;
         // DocumentReceiver, EF will set this after the constructor
         // Receiver, EF will set this after the constructor
         // _serializedContent is set later in OutgoingMessageRepository, by getting the message from File Storage
@@ -146,6 +151,8 @@ public class OutgoingMessage
     public ExternalId ExternalId { get; }
 
     public Guid? CalculationId { get; }
+
+    public OutgoingMessageIdempotencyId IdempotentId { get; set; }
 
     public void AssignToBundle(BundleId bundleId)
     {

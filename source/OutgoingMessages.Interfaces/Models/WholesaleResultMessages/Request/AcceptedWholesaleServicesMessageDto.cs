@@ -21,15 +21,16 @@ public class AcceptedWholesaleServicesMessageDto : OutgoingMessageDto
 {
     private AcceptedWholesaleServicesMessageDto(
         ActorNumber receiverNumber,
+        ActorRole receiverRole,
+        ActorNumber documentReceiverNumber,
+        ActorRole documentReceiverRole,
         Guid processId,
         EventId eventId,
         string businessReason,
-        ActorRole receiverRole,
-        ActorNumber? chargeOwnerId,
         AcceptedWholesaleServicesSeries series,
+        ActorNumber? chargeOwnerId,
         MessageId relatedToMessageId,
-        ActorNumber documentReceiverNumber,
-        ActorRole documentReceiverRole)
+        Period period)
         : base(
             DocumentType.NotifyWholesaleServices,
             receiverNumber,
@@ -38,6 +39,7 @@ public class AcceptedWholesaleServicesMessageDto : OutgoingMessageDto
             businessReason,
             receiverRole,
             new ExternalId(Guid.NewGuid()),
+            period,
             relatedToMessageId)
     {
         ChargeOwnerId = chargeOwnerId;
@@ -64,7 +66,8 @@ public class AcceptedWholesaleServicesMessageDto : OutgoingMessageDto
         EventId eventId,
         string businessReason,
         AcceptedWholesaleServicesSeries wholesaleSeries,
-        MessageId relatedToMessageId)
+        MessageId relatedToMessageId,
+        Period period)
     {
         return new AcceptedWholesaleServicesMessageDto(
             receiverNumber: receiverNumber,
@@ -76,7 +79,8 @@ public class AcceptedWholesaleServicesMessageDto : OutgoingMessageDto
             businessReason: businessReason,
             series: wholesaleSeries,
             chargeOwnerId: chargeOwnerId,
-            relatedToMessageId: relatedToMessageId);
+            relatedToMessageId: relatedToMessageId,
+            period);
     }
 }
 

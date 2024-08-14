@@ -28,7 +28,8 @@ public sealed class RejectedWholesaleServicesMessageDto : OutgoingMessageDto
         MessageId relatedToMessageId,
         RejectedWholesaleServicesMessageSeries series,
         ActorNumber documentReceiverNumber,
-        ActorRole documentReceiverRole)
+        ActorRole documentReceiverRole,
+        Period period)
         : base(
             DocumentType.RejectRequestWholesaleSettlement,
             receiverNumber,
@@ -37,6 +38,7 @@ public sealed class RejectedWholesaleServicesMessageDto : OutgoingMessageDto
             businessReason,
             receiverRole,
             new ExternalId(Guid.NewGuid()),
+            period,
             relatedToMessageId)
     {
         Series = series;

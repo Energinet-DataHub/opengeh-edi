@@ -28,7 +28,8 @@ public class RejectedEnergyResultMessageDto : OutgoingMessageDto
         MessageId relatedToMessageId,
         RejectedEnergyResultMessageSerie series,
         ActorNumber documentReceiverNumber,
-        ActorRole documentReceiverRole)
+        ActorRole documentReceiverRole,
+        Period period)
         : base(
             DocumentType.RejectRequestAggregatedMeasureData,
             receiverNumber,
@@ -37,6 +38,7 @@ public class RejectedEnergyResultMessageDto : OutgoingMessageDto
             businessReason,
             receiverRole,
             new ExternalId(Guid.NewGuid()),
+            period,
             relatedToMessageId)
     {
         Series = series;

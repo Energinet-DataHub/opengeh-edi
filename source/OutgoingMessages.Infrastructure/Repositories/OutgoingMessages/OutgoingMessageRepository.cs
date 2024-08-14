@@ -81,6 +81,11 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
                                                                         x.ExternalId == externalId).ConfigureAwait(false);
     }
 
+    public async Task<OutgoingMessage?> GetAsync(OutgoingMessageIdempotencyId idempotencyId)
+    {
+        return await _context.OutgoingMessages.FirstOrDefaultAsync(x => x.IdempotentId == idempotencyId).ConfigureAwait(false);
+    }
+
     public async Task DeleteOutgoingMessagesIfExistsAsync(IReadOnlyCollection<BundleId> bundleMessageIds)
     {
         var outgoingMessagesToBeRemoved = await _context.OutgoingMessages

@@ -40,12 +40,13 @@ public class EnergyResultPerBalanceResponsibleMessageDto
         Guid calculationId)
             : base(
             documentType: DocumentType.NotifyAggregatedMeasureData,
+            receiverNumber: balanceResponsibleNumber,
             processId: null,
             eventId: eventId,
             businessReasonName: businessReason.Name,
-            receiverNumber: balanceResponsibleNumber,
             receiverRole: ActorRole.BalanceResponsibleParty,
             externalId: new ExternalId(calculationResultId),
+            period,
             relatedToMessageId: null)
     {
         CalculationId = calculationId;

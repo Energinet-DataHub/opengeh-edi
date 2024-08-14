@@ -17,6 +17,8 @@ using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
+using NodaTime;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
@@ -29,6 +31,10 @@ public class RejectedEnergyResultMessageDtoBuilder
         TransactionId.From("4E85A732-85FD-4D92-8FF3-72C052802716"),
         new List<RejectedEnergyResultMessageRejectReason> { new("E18", "Det virker ikke!") },
         TransactionId.From("4E85A732-85FD-4D92-8FF3-72C052802717"));
+
+    private static readonly Period _period = new(
+        Instant.FromUtc(2024, 9, 1, 0, 0),
+        Instant.FromUtc(2024, 10, 1, 0, 0));
 
     private static MessageId _relatedToMessageId = MessageId.Create(Guid.NewGuid().ToString());
     private static ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
@@ -47,7 +53,8 @@ public class RejectedEnergyResultMessageDtoBuilder
             _relatedToMessageId,
             _series,
             _receiverNumber,
-            _receiverRole);
+            _receiverRole,
+            _period);
     }
 
     public RejectedEnergyResultMessageDtoBuilder WithRelationTo(MessageId relatedToMessageId)
