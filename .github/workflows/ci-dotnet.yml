@@ -52,26 +52,26 @@ jobs:
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
-          - name: Integration tests
+          - name: Integration tests - split 1
             paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
-            filter: empty # Means skip
+            filter: DisplayName~Behaviours.IncomingRequests
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
-          # - name: Calculation Results - AggregatedTimeSeriesQueriesCsvTests split 1
-          #   paths: \source\dotnet\wholesale-api\CalculationResults\CalculationResults.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.Wholesale.CalculationResults.IntegrationTests.dll
-          #   filter: (DisplayName~AggregatedTimeSeriesQueriesCsvTests)&(DisplayName~BalanceResponsible)
-          #   use_azure_functions_tools: true
-          #   contentroot_variable_name: empty # Means skip
-          # - name: Calculation Results - AggregatedTimeSeriesQueriesCsvTests split 2
-          #   paths: \source\dotnet\wholesale-api\CalculationResults\CalculationResults.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.Wholesale.CalculationResults.IntegrationTests.dll
-          #   filter: (DisplayName~AggregatedTimeSeriesQueriesCsvTests)&(DisplayName!~BalanceResponsible)
-          #   use_azure_functions_tools: true
-          #   contentroot_variable_name: empty # Means skip
-          # - name: Calculation Results - Not AggregatedTimeSeriesQueriesCsvTests
-          #   paths: \source\dotnet\wholesale-api\CalculationResults\CalculationResults.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.Wholesale.CalculationResults.IntegrationTests.dll
-          #   filter: DisplayName!~AggregatedTimeSeriesQueriesCsvTests
-          #   use_azure_functions_tools: true
-          #   contentroot_variable_name: empty # Means skip
+          - name: Integration tests - split 2
+            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            filter: DisplayName~Behaviours.IntegrationEvents
+            use_azure_functions_tools: true
+            contentroot_variable_name: empty # Means skip
+          - name: Integration tests - split 3
+            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            filter: DisplayName~Infrastructure.Retention
+            use_azure_functions_tools: true
+            contentroot_variable_name: empty # Means skip
+          - name: Integration tests - split 4
+            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            filter: (DisplayName!~Behaviours.IncomingRequests)&(DisplayName!~Behaviours.IntegrationEvents)&(DisplayName!~Infrastructure.Retention)
+            use_azure_functions_tools: true
+            contentroot_variable_name: empty # Means skip
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
     with:
       download_attempt_limit: 20
