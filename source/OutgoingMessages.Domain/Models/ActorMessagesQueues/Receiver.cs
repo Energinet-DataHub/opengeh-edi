@@ -38,4 +38,9 @@ public class Receiver : ValueObject
     {
         return new Receiver(actorNumber, actorRole);
     }
+
+    public override string ToString()
+    {
+        return $"{Number} ({ActorRole})";
+    }
 }

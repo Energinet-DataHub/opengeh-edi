@@ -74,6 +74,13 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
             firstMessage.RelatedToMessageId);
     }
 
+    public async Task<OutgoingMessage?> GetAsync(IdempotentId idempotentId)
+    {
+        return await _context.OutgoingMessages
+            .FirstOrDefaultAsync(x => x.IdempotentId == idempotentId)
+            .ConfigureAwait(false);
+    }
+
     public async Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId)
     {
         return await _context.OutgoingMessages.FirstOrDefaultAsync(x => x.Receiver.Number == receiver.Number &&

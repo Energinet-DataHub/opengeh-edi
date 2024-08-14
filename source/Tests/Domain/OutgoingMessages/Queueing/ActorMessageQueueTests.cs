@@ -225,20 +225,24 @@ public class ActorMessageQueueTests
             ActorNumber.Create("1234567890124"),
             ActorRole.EnergySupplier);
 
+        var serializedContent = string.Empty;
+        var externalId = new ExternalId(Guid.NewGuid());
         var outgoingMessage = new OutgoingMessage(
             eventId: EventId.From(Guid.NewGuid()),
             documentType: messageType ?? DocumentType.NotifyAggregatedMeasureData,
-            receiver: Receiver.Create(receiver.Number, receiver.ActorRole),
-            documentReceiver: Receiver.Create(receiver.Number, receiver.ActorRole),
+            receiver: receiver,
+            documentReceiver: receiver,
             processId: ProcessId.New().Id,
             businessReason: businessReason?.Name ?? BusinessReason.BalanceFixing.Name,
-            serializedContent: string.Empty,
+            serializedContent: serializedContent,
             createdAt: Instant.FromUtc(2024, 1, 1, 0, 0),
             messageCreatedFromProcess: processType ?? ProcessType.ReceiveEnergyResults,
             relatedToMessageId: null,
             gridAreaCode: null,
-            externalId: new ExternalId(Guid.NewGuid()),
-            calculationId: Guid.NewGuid());
+            externalId: externalId,
+            calculationId: Guid.NewGuid(),
+            idempotentId: IdempotentId.From(
+                $"{receiver}-{externalId}-{serializedContent.GetHashCode()}"));
 
         var bundle = new Bundle(
             actorMessageQueueId,

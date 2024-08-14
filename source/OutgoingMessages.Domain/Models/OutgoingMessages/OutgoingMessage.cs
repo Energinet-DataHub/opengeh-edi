@@ -40,7 +40,8 @@ public class OutgoingMessage
         MessageId? relatedToMessageId,
         string? gridAreaCode,
         ExternalId externalId,
-        Guid? calculationId)
+        Guid? calculationId,
+        IdempotentId idempotentId)
     {
         Id = OutgoingMessageId.New();
         EventId = eventId;
@@ -57,6 +58,7 @@ public class OutgoingMessage
         FileStorageReference = CreateFileStorageReference(Receiver.Number, createdAt, Id);
         ExternalId = externalId;
         CalculationId = calculationId;
+        IdempotentId = idempotentId;
     }
 
     /// <summary>
@@ -146,6 +148,8 @@ public class OutgoingMessage
     public ExternalId ExternalId { get; }
 
     public Guid? CalculationId { get; }
+
+    public IdempotentId IdempotentId { get; }
 
     public void AssignToBundle(BundleId bundleId)
     {
