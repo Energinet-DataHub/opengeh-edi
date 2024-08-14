@@ -1,0 +1,1 @@
+EXEC sp_rename N'[dbo].[OutgoingMessages].IDX_OutgoingMessageIdempotency', N'Unique_ExternalId_ReceiverNumber_ReceiverRole', N'INDEX';   
