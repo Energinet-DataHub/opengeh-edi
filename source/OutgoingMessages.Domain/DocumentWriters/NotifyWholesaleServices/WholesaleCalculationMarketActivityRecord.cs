@@ -29,25 +29,12 @@ public record WholesaleCalculationMarketActivityRecord(
     Period Period,
     SettlementVersion? SettlementVersion,
     MeasurementUnit QuantityMeasureUnit,
-
-    // TODO: Should be removed at a later time, when all old outgoing messages are peeked
-    [property: Obsolete("Only kept for backwards compatibility, use QuantityMeasureUnit instead")]
-    MeasurementUnit? QuantityUnit,
-
     MeasurementUnit? PriceMeasureUnit,
     Currency Currency,
     ChargeType? ChargeType,
     Resolution Resolution,
     MeteringPointType? MeteringPointType,
-
-    // TODO: Should be removed at a later time, when all old outgoing messages are peeked
-    [property: Obsolete("Only kept for backwards compatibility, use SettlementMethod instead")]
-    SettlementMethod? SettlementType,
-
     SettlementMethod? SettlementMethod,
     TransactionId? OriginalTransactionIdReference);
 
-// TODO: CalculatedQuantityQuality is not nullable for "WholesaleServicesPoint".
-// But it is kept nullable, since we might have outgoing messages in the blob storage where CalculatedQuantityQuality is null.
-// Kept for backwards compatibility
 public record Point(int Position, decimal? Quantity, decimal? Price, decimal? Amount, CalculatedQuantityQuality? QuantityQuality);

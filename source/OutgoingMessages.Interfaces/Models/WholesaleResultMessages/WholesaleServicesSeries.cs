@@ -28,12 +28,10 @@ public record WholesaleServicesSeries(
     Period Period,
     SettlementVersion? SettlementVersion,
     MeasurementUnit? QuantityMeasureUnit,
-    MeasurementUnit? QuantityUnit, // To ensure backwards compatibility, will be remove in another PR.
     MeasurementUnit? PriceMeasureUnit,
     Currency Currency,
     ChargeType? ChargeType,
     Resolution Resolution,
     MeteringPointType? MeteringPointType,
-    SettlementMethod? SettlementType, // TODO: To ensure backwards compatibility, will be removed in another PR.
     SettlementMethod? SettlementMethod,
     TransactionId? OriginalTransactionIdReference = null);

@@ -187,7 +187,6 @@ public class EnergyResultMessageTimeSeriesBuilder
             TransactionId.From(_transactionId.Value),
             _gridAreaCode,
             _meteringPointType.Name,
-            null,
             _settlementMethod?.Name,
             _measurementUnit.Name,
             _resolution.Name,

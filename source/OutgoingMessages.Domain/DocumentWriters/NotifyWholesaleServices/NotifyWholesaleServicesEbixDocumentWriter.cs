@@ -123,22 +123,22 @@ public class NotifyWholesaleServicesEbixDocumentWriter : EbixDocumentWriter
 
 #pragma warning disable CS0618 // Type or member is obsolete
                     // <UnitType />
-                    await WriteCodeWithCodeListReferenceAttributesAsync("UnitType", EbixCode.Of(series.QuantityUnit ?? series.QuantityMeasureUnit), writer).ConfigureAwait(false);
+                    await WriteCodeWithCodeListReferenceAttributesAsync("UnitType", EbixCode.Of(series.QuantityMeasureUnit), writer).ConfigureAwait(false);
 #pragma warning restore CS0618 // Type or member is obsolete
 
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
                 } // End </IncludedProductCharacteristic>
 
 #pragma warning disable CS0618 // Type or member is obsolete
-                if (series.MeteringPointType != null || series.SettlementType != null || series.SettlementMethod != null)
+                if (series.MeteringPointType != null || series.SettlementMethod != null)
                 {
                     // Begin DetailMeasurementMeteringPointCharacteristic
                     await writer.WriteStartElementAsync(DocumentDetails.Prefix, "DetailMeasurementMeteringPointCharacteristic", null).ConfigureAwait(false);
                     if (series.MeteringPointType != null)
                         await WriteCodeWithCodeListReferenceAttributesAsync("TypeOfMeteringPoint", series.MeteringPointType.Code, writer).ConfigureAwait(false);
 
-                    if (series.SettlementType != null || series.SettlementMethod != null)
-                        await WriteCodeWithCodeListReferenceAttributesAsync("SettlementMethod", series.SettlementType?.Code ?? series.SettlementMethod!.Code, writer).ConfigureAwait(false);
+                    if (series.SettlementMethod != null)
+                        await WriteCodeWithCodeListReferenceAttributesAsync("SettlementMethod", series.SettlementMethod!.Code, writer).ConfigureAwait(false);
 
                     await writer.WriteEndElementAsync().ConfigureAwait(false);
                 }

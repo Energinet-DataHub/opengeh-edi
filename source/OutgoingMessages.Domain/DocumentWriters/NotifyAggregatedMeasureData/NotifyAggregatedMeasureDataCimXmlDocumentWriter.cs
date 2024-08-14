@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Threading.Tasks;
 using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats;
@@ -63,28 +60,11 @@ public class NotifyAggregatedMeasureDataCimXmlDocumentWriter : CimXmlDocumentWri
                     MeteringPointType.FromName(timeSeries.MeteringPointType).Code)
                 .ConfigureAwait(false);
 
-#pragma warning disable CS0618 // Type or member is obsolete
-            // TODO: This is keep for backward compatibility. Remove this in next pull request
-            // only codes has length 3
-            if (timeSeries.SettlementType is not null && timeSeries.SettlementType.Length == 3)
-            {
-                await WriteElementIfHasValueAsync(
+            await WriteElementIfHasValueAsync(
                         "marketEvaluationPoint.settlementMethod",
-                        SettlementMethod.FromCode(timeSeries.SettlementType).Code,
+                        timeSeries.SettlementMethod is not null ? SettlementMethod.FromName(timeSeries.SettlementMethod).Code : null,
                         writer)
                     .ConfigureAwait(false);
-            }
-            else
-            {
-                var settlementMethodName = timeSeries.SettlementType ?? timeSeries.SettlementMethod;
-
-                await WriteElementIfHasValueAsync(
-                        "marketEvaluationPoint.settlementMethod",
-                        settlementMethodName != null ? SettlementMethod.FromName(settlementMethodName).Code : null,
-                        writer)
-                    .ConfigureAwait(false);
-            }
-#pragma warning restore CS0618 // Type or member is obsolete
 
             await writer.WriteStartElementAsync(DocumentDetails.Prefix, "meteringGridArea_Domain.mRID", null).ConfigureAwait(false);
             await writer.WriteAttributeStringAsync(null, "codingScheme", null, "NDK").ConfigureAwait(false);

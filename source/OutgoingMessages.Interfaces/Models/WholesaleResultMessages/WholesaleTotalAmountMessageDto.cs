@@ -57,13 +57,11 @@ public class WholesaleTotalAmountMessageDto : OutgoingMessageDto
             Period: period,
             SettlementVersion: settlementVersion,
             QuantityMeasureUnit: MeasurementUnit.Kwh,
-            null,
             PriceMeasureUnit: null,
             Currency: currency,
             ChargeType: null,
             Resolution: Resolution.Monthly,
             MeteringPointType: null,
-            SettlementType: null,
             SettlementMethod: null);
     }
 
