@@ -24,6 +24,25 @@ jobs:
     with:
       solution_file_path: source/EDI.sln
 
+  # Tests that do not require the integration test environment
+  tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        tests_filter_expression:
+          - name: Architecture Tests
+            paths: \source\ArchitectureTests\bin\Release\net8.0\Energinet.DataHub.EDI.ArchitectureTests.dll
+          - name: Tests
+            paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.Tests.dll
+          - name: B2BApi AppTests
+            paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.B2BApi.AppTests.dll
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
+    with:
+      download_attempt_limit: 30
+      # Matrix parameters
+      job_name: ${{ matrix.tests_filter_expression.name }}
+      tests_dll_file_path: ${{ matrix.tests_filter_expression.paths }}
+
   # Run all tests in 'IntegrationTests.dll'
   integration_tests:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
@@ -37,28 +56,4 @@ jobs:
       azure_keyvault_url: ${{ vars.integration_test_azure_keyvault_url }}
       environment: AzureAuth
       run_integration_tests: true
-      download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
-
-  # Run all tests in 'ArchitectureTests.dll'
-  architecture_tests:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
-    with:
-      job_name: Architecture tests
-      tests_dll_file_path: \source\ArchitectureTests\bin\Release\net8.0\Energinet.DataHub.EDI.ArchitectureTests.dll
-      download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
-
-  # Run all tests in 'Tests.dll'
-  tests:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
-    with:
-      job_name: Tests
-      tests_dll_file_path: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.Tests.dll
-      download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
-
-  # Run all tests in 'Tests.dll'
-  b2bapi_apptests:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
-    with:
-      job_name: B2BApi AppTests
-      tests_dll_file_path: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.B2BApi.AppTests.dll
       download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
