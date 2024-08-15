@@ -18,6 +18,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
@@ -25,11 +26,13 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 public class GetActorsForWholesaleResultsForTotalAmountPerChargesActivity(
     ILogger<GetActorsForWholesaleResultsForTotalAmountPerChargesActivity> logger,
     IServiceScopeFactory serviceScopeFactory,
-    WholesaleResultActorsEnumerator wholesaleResultActorsEnumerator)
+    WholesaleResultActorsEnumerator wholesaleResultActorsEnumerator,
+    DateTimeZone dateTimeZone)
 {
     private readonly ILogger<GetActorsForWholesaleResultsForTotalAmountPerChargesActivity> _logger = logger;
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
     private readonly WholesaleResultActorsEnumerator _wholesaleResultActorsEnumerator = wholesaleResultActorsEnumerator;
+    private readonly DateTimeZone _dateTimeZone = dateTimeZone;
 
     /// <summary>
     /// Start an GetActorsForWholesaleResultsForTotalAmountPerCharges activity.
@@ -52,7 +55,8 @@ public class GetActorsForWholesaleResultsForTotalAmountPerChargesActivity(
             _wholesaleResultActorsEnumerator.EdiDatabricksOptions,
             EventId.From(input.EventId),
             input.CalculationId,
-            null);
+            null,
+            _dateTimeZone);
 
         var actors = await _wholesaleResultActorsEnumerator
             .GetActorsAsync(query)

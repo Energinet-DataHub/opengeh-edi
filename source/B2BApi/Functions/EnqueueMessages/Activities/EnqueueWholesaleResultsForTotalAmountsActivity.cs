@@ -20,6 +20,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
@@ -27,12 +28,14 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 public class EnqueueWholesaleResultsForTotalAmountsActivity(
     ILogger<EnqueueWholesaleResultsForTotalAmountsActivity> logger,
     IServiceScopeFactory serviceScopeFactory,
-    WholesaleResultEnumerator wholesaleResultEnumerator)
+    WholesaleResultEnumerator wholesaleResultEnumerator,
+    DateTimeZone dateTimeZone)
     : EnqueueWholesaleResultsBaseActivity(logger, serviceScopeFactory, wholesaleResultEnumerator)
 {
     private readonly ILogger<EnqueueWholesaleResultsForTotalAmountsActivity> _logger = logger;
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
     private readonly WholesaleResultEnumerator _wholesaleResultEnumerator = wholesaleResultEnumerator;
+    private readonly DateTimeZone _dateTimeZone = dateTimeZone;
 
     /// <summary>
     /// Start an EnqueueWholesaleResultsForTotalAmountPerCharges activity.
@@ -55,7 +58,8 @@ public class EnqueueWholesaleResultsForTotalAmountsActivity(
             _wholesaleResultEnumerator.EdiDatabricksOptions,
             EventId.From(input.EventId),
             input.CalculationId,
-            input.Actor);
+            input.Actor,
+            _dateTimeZone);
 
         return EnqueueWholesaleResults(input, query);
     }

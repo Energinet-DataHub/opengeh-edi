@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Wholesale
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
@@ -32,12 +33,14 @@ public class WholesaleMonthlyAmountPerChargeQuery(
     IMasterDataClient masterDataClient,
     EventId eventId,
     Guid calculationId,
-    string? energySupplier)
+    string? energySupplier,
+    DateTimeZone dateTimeZone)
     : WholesaleResultQueryBase<WholesaleMonthlyAmountPerChargeMessageDto>(
         logger,
         ediDatabricksOptions,
         calculationId,
-        energySupplier)
+        energySupplier,
+        dateTimeZone)
 {
     private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly EventId _eventId = eventId;
@@ -90,7 +93,7 @@ public class WholesaleMonthlyAmountPerChargeQuery(
             businessReason: businessReason.Name,
             gridAreaCode: gridAreaCode,
             isTax: isTax,
-            period: PeriodFactory.GetPeriod(timeSeriesPoints, Resolution.Monthly),
+            period: PeriodFactory.GetPeriod(timeSeriesPoints, Resolution.Monthly, DateTimeZone),
             quantityUnit: MeasurementUnitMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(WholesaleResultColumnNames.QuantityUnit)),
             currency: CurrencyMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.Currency)),
             chargeType: chargeType,

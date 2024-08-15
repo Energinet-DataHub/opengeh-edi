@@ -29,19 +29,23 @@ public static class PeriodFactory
     /// The oldest point is the start of the calculation period.
     /// The newest point plus the resolution is the end of the calculation period.
     /// </summary>
-    /// <param name="timeSeriesPoints"></param>
-    /// <param name="resolution"></param>
-    public static Period GetPeriod(IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints, Resolution resolution)
+    public static Period GetPeriod(
+        IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints,
+        Resolution resolution,
+        DateTimeZone dateTimeZone)
     {
         var calculationStart = timeSeriesPoints.Min(x => x.TimeUtc);
         var timeForNewestPoint = timeSeriesPoints.Max(x => x.TimeUtc);
 
         // A period is described by { start: latestPoint.time, end: newestPoint.time + resolution }
-        var calculationEnd = GetEndDateWithResolutionOffset(resolution, timeForNewestPoint, DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
+        var calculationEnd = GetEndDateWithResolutionOffset(resolution, timeForNewestPoint, dateTimeZone);
         return new Period(calculationStart, calculationEnd);
     }
 
-    private static Instant GetEndDateWithResolutionOffset(Resolution resolution, Instant timeForLatestPoint, DateTimeZone dateTimeZone)
+    public static Instant GetEndDateWithResolutionOffset(
+        Resolution resolution,
+        Instant timeForLatestPoint,
+        DateTimeZone dateTimeZone)
     {
         switch (resolution)
         {

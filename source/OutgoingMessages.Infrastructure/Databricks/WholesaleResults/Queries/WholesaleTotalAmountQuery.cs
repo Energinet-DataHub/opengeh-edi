@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Wholesale
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
@@ -31,12 +32,14 @@ public class WholesaleTotalAmountQuery(
     EdiDatabricksOptions ediDatabricksOptions,
     EventId eventId,
     Guid calculationId,
-    string? energySupplier)
+    string? energySupplier,
+    DateTimeZone dateTimeZone)
     : WholesaleResultQueryBase<WholesaleTotalAmountMessageDto>(
         logger,
         ediDatabricksOptions,
         calculationId,
-        energySupplier)
+        energySupplier,
+        dateTimeZone)
 {
     private readonly EventId _eventId = eventId;
 
@@ -77,7 +80,7 @@ public class WholesaleTotalAmountQuery(
                 databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.EnergySupplierId)),
             businessReason: businessReason.Name,
             gridAreaCode: databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.GridAreaCode),
-            period: PeriodFactory.GetPeriod(timeSeriesPoints, Resolution.Monthly),
+            period: PeriodFactory.GetPeriod(timeSeriesPoints, Resolution.Monthly, DateTimeZone),
             currency: CurrencyMapper.FromDeltaTableValue(
                 databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.Currency)),
             settlementVersion: settlementVersion,

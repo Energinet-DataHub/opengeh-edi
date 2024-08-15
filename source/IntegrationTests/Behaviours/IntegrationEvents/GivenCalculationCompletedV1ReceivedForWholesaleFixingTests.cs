@@ -444,7 +444,8 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             GetService<ILogger<EnqueueWholesaleResultsForAmountPerChargesActivity>>(),
             GetService<IServiceScopeFactory>(),
             GetService<IMasterDataClient>(),
-            GetService<WholesaleResultEnumerator>());
+            GetService<WholesaleResultEnumerator>(),
+            DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
 
         return activity.Run(new EnqueueMessagesForActorInput(calculationId, Guid.NewGuid(), energySupplier.ActorNumber.Value));
     }
@@ -454,7 +455,8 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         var activity = new EnqueueWholesaleResultsForTotalAmountsActivity(
             GetService<ILogger<EnqueueWholesaleResultsForTotalAmountsActivity>>(),
             GetService<IServiceScopeFactory>(),
-            GetService<WholesaleResultEnumerator>());
+            GetService<WholesaleResultEnumerator>(),
+            DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
 
         return activity.Run(new EnqueueMessagesForActorInput(calculationId, Guid.NewGuid(), energySupplier.ActorNumber.Value));
     }
@@ -465,7 +467,8 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             GetService<ILogger<EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity>>(),
             GetService<IServiceScopeFactory>(),
             GetService<IMasterDataClient>(),
-            GetService<WholesaleResultEnumerator>());
+            GetService<WholesaleResultEnumerator>(),
+            DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
 
         return activity.Run(new EnqueueMessagesForActorInput(calculationId, Guid.NewGuid(), energySupplier.ActorNumber.Value));
     }
@@ -479,7 +482,8 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             GetService<IMasterDataClient>(),
             EventId.From(Guid.NewGuid()),
             wholesaleResultForAmountPerChargeDescription.CalculationId,
-            null);
+            null,
+            DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
 
         await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition);
         await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleAmountPerChargeQuery.DataObjectName, wholesaleAmountPerChargeQuery.SchemaDefinition, wholesaleResultForAmountPerChargeDescription.TestFilePath);
@@ -495,7 +499,8 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             GetService<IMasterDataClient>(),
             EventId.From(Guid.NewGuid()),
             wholesaleResultForMonthlyAmountPerChargeDescription.CalculationId,
-            null);
+            null,
+            DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
 
         await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleMonthlyAmountPerChargeQuery.DataObjectName, wholesaleMonthlyAmountPerChargeQuery.SchemaDefinition);
         await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleMonthlyAmountPerChargeQuery.DataObjectName, wholesaleMonthlyAmountPerChargeQuery.SchemaDefinition, wholesaleResultForMonthlyAmountPerChargeDescription.TestFilePath);
@@ -510,7 +515,8 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             _ediDatabricksOptions.Value,
             EventId.From(Guid.NewGuid()),
             resultDataForWholesaleResultTotalAmount.CalculationId,
-            null);
+            null,
+            DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
 
         await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleTotalAmountQuery.DataObjectName, wholesaleTotalAmountQuery.SchemaDefinition);
         await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(wholesaleTotalAmountQuery.DataObjectName, wholesaleTotalAmountQuery.SchemaDefinition, resultDataForWholesaleResultTotalAmount.TestFilePath);
