@@ -85,7 +85,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         // Assert
         var expectedFileStorageReference = $"{SampleData.GridOperatorNumber}/{now.Year():0000}/{now.Month():00}/{now.Day():00}/{createdOutgoingMessageId:N}";
         var expectedOutgoingMessageIdempotentId = OutgoingMessageIdempotentId
-            .New(message.ReceiverRole.Code, message.EventId.Value, message.Series.Period.ToString())
+            .New(message.ReceiverRole.Code, message.ExternalId.Value.ToString(), message.Series.Period.ToString())
             .Value;
 
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
