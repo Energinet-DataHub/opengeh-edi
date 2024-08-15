@@ -33,7 +33,8 @@ public record OutgoingMessageIdempotentId
             throw new ArgumentException("At least one value must be provided", nameof(values));
         }
 
-        return new OutgoingMessageIdempotentId(values.GetHashCode());
+        var concatenatedValues = string.Join(string.Empty, values);
+        return new OutgoingMessageIdempotentId(concatenatedValues.GetHashCode());
     }
 
     public static OutgoingMessageIdempotentId CreateFromExisting(int existingOutgoingMessageIdempotencyId)

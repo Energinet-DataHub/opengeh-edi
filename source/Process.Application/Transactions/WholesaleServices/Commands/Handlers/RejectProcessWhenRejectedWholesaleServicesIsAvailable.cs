@@ -32,14 +32,11 @@ public sealed class
     RejectProcessWhenRejectedWholesaleServicesIsAvailable : IRequestHandler<RejectedWholesaleServices, Unit>
 {
     private readonly IWholesaleServicesProcessRepository _wholesaleServicesProcessRepository;
-    private readonly IClock _clock;
 
     public RejectProcessWhenRejectedWholesaleServicesIsAvailable(
-        IWholesaleServicesProcessRepository wholesaleServicesProcessRepository,
-        IClock clock)
+        IWholesaleServicesProcessRepository wholesaleServicesProcessRepository)
     {
         _wholesaleServicesProcessRepository = wholesaleServicesProcessRepository;
-        _clock = clock;
     }
 
     public async Task<Unit> Handle(RejectedWholesaleServices request, CancellationToken cancellationToken)
