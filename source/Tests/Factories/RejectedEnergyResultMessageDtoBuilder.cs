@@ -40,9 +40,6 @@ public static class RejectedEnergyResultMessageDtoBuilder
         SampleData.OriginalTransactionId);
 
     private static readonly EventId _eventId = EventId.From(Guid.NewGuid().ToString());
-    private static readonly Period _period = new(
-        Instant.FromUtc(2024, 9, 1, 0, 0),
-        Instant.FromUtc(2024, 10, 1, 0, 0));
 
     public static RejectedEnergyResultMessageDto Build()
     {
@@ -55,7 +52,6 @@ public static class RejectedEnergyResultMessageDtoBuilder
             _relatedToMessageId,
             _series,
             _receiverNumber,
-            _receiverRole,
-            _period);
+            _receiverRole);
     }
 }

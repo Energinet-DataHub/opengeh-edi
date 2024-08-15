@@ -16,22 +16,22 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
-public record OutgoingMessageIdempotencyId
+public record OutgoingMessageIdempotentId
 {
-    private OutgoingMessageIdempotencyId(string value)
+    private OutgoingMessageIdempotentId(string value)
     {
         Value = value;
     }
 
     public string Value { get; }
 
-    public static OutgoingMessageIdempotencyId New(ActorRole receiverRole, ExternalId externalId, Period period)
+    public static OutgoingMessageIdempotentId New(ActorRole receiverRole, ExternalId externalId, Period period)
     {
-        return new OutgoingMessageIdempotencyId($"{receiverRole}_{externalId.Value}_{period.Start}_{period.End}");
+        return new OutgoingMessageIdempotentId($"{receiverRole}_{externalId.Value}_{period.Start}_{period.End}");
     }
 
-    public static OutgoingMessageIdempotencyId CreateFromExisting(string existingOutgoingMessageIdempotencyId)
+    public static OutgoingMessageIdempotentId CreateFromExisting(string existingOutgoingMessageIdempotencyId)
     {
-        return new OutgoingMessageIdempotencyId(existingOutgoingMessageIdempotencyId);
+        return new OutgoingMessageIdempotentId(existingOutgoingMessageIdempotencyId);
     }
 }

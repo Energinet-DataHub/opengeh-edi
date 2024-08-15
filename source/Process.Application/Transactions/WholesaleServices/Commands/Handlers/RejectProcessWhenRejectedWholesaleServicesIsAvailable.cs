@@ -32,11 +32,14 @@ public sealed class
     RejectProcessWhenRejectedWholesaleServicesIsAvailable : IRequestHandler<RejectedWholesaleServices, Unit>
 {
     private readonly IWholesaleServicesProcessRepository _wholesaleServicesProcessRepository;
+    private readonly IClock _clock;
 
     public RejectProcessWhenRejectedWholesaleServicesIsAvailable(
-        IWholesaleServicesProcessRepository wholesaleServicesProcessRepository)
+        IWholesaleServicesProcessRepository wholesaleServicesProcessRepository,
+        IClock clock)
     {
         _wholesaleServicesProcessRepository = wholesaleServicesProcessRepository;
+        _clock = clock;
     }
 
     public async Task<Unit> Handle(RejectedWholesaleServices request, CancellationToken cancellationToken)
@@ -52,7 +55,7 @@ public sealed class
         return Unit.Value;
     }
 
-    private static RejectedWholesaleServicesMessageDto CreateRejectedWholesaleServicesResultMessage(
+    private RejectedWholesaleServicesMessageDto CreateRejectedWholesaleServicesResultMessage(
         EventId eventId,
         WholesaleServicesProcess process,
         IReadOnlyCollection<RejectReasonDto> rejectReasons)
@@ -76,7 +79,6 @@ public sealed class
             relatedToMessageId: process.InitiatedByMessageId,
             series: rejectedWholesaleServices,
             documentReceiverNumber: process.OriginalActor.ActorNumber,
-            documentReceiverRole: process.OriginalActor.ActorRole,
-            new Period(Instant.FromUtc(2024, 1, 1, 1, 1), Instant.FromUtc(2024, 2, 1, 1, 1))); //TODO
+            documentReceiverRole: process.OriginalActor.ActorRole);
     }
 }

@@ -81,9 +81,9 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
                                                                         x.ExternalId == externalId).ConfigureAwait(false);
     }
 
-    public async Task<OutgoingMessage?> GetAsync(OutgoingMessageIdempotencyId idempotencyId)
+    public async Task<OutgoingMessage?> GetAsync(OutgoingMessageIdempotentId idempotentId)
     {
-        return await _context.OutgoingMessages.FirstOrDefaultAsync(x => x.IdempotentId == idempotencyId).ConfigureAwait(false);
+        return await _context.OutgoingMessages.FirstOrDefaultAsync(x => x.IdempotentId == idempotentId).ConfigureAwait(false);
     }
 
     public async Task DeleteOutgoingMessagesIfExistsAsync(IReadOnlyCollection<BundleId> bundleMessageIds)

@@ -120,7 +120,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.Null(messageFromDatabase.ModifiedBy),
             () => Assert.Equal(message.ExternalId.Value, messageFromDatabase.ExternalId),
             () => Assert.Equal(message.CalculationId, messageFromDatabase.CalculationId),
-            () => Assert.Equal(messageFromDatabase.IdempotentId, OutgoingMessageIdempotencyId.New(message.ReceiverRole, message.ExternalId, message.Period).Value),
+            () => Assert.Equal(messageFromDatabase.IdempotentId, OutgoingMessageIdempotentId.New(message.ReceiverRole, message.ExternalId, message.Period).Value),
         };
 
         Assert.Multiple(propertyAssertions);

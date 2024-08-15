@@ -229,7 +229,6 @@ public sealed class AggregatedMeasureDataProcess : Entity
             relatedToMessageId: InitiatedByMessageId,
             series: rejectedTimeSerie,
             documentReceiverNumber: OriginalActor.ActorNumber,
-            documentReceiverRole: OriginalActor.ActorRole,
-            new Period(Instant.FromUtc(2024, 1, 1, 1, 1), Instant.FromUtc(2024, 2, 1, 1, 1))); //TODO
+            documentReceiverRole: OriginalActor.ActorRole);
     }
 }

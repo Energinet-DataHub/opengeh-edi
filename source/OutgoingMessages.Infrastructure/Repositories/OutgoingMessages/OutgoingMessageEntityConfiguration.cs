@@ -60,8 +60,8 @@ public class OutgoingMessageEntityConfiguration : IEntityTypeConfiguration<Outgo
 
         builder.Property(x => x.IdempotentId)
             .HasConversion(
-                idempotencyId => idempotencyId.Value,
-                dbValue => OutgoingMessageIdempotencyId.CreateFromExisting(dbValue));
+                idempotentId => idempotentId.Value,
+                dbValue => OutgoingMessageIdempotentId.CreateFromExisting(dbValue));
 
         builder.Property(x => x.CalculationId);
 

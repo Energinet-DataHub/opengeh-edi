@@ -14,6 +14,8 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using NodaTime;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
 
@@ -28,8 +30,7 @@ public class RejectedEnergyResultMessageDto : OutgoingMessageDto
         MessageId relatedToMessageId,
         RejectedEnergyResultMessageSerie series,
         ActorNumber documentReceiverNumber,
-        ActorRole documentReceiverRole,
-        Period period)
+        ActorRole documentReceiverRole)
         : base(
             DocumentType.RejectRequestAggregatedMeasureData,
             receiverNumber,
@@ -38,7 +39,8 @@ public class RejectedEnergyResultMessageDto : OutgoingMessageDto
             businessReason,
             receiverRole,
             new ExternalId(Guid.NewGuid()),
-            period,
+            // Period is not important for this message
+            new Period(SystemClock.Instance.GetCurrentInstant(), SystemClock.Instance.GetCurrentInstant()),
             relatedToMessageId)
     {
         Series = series;

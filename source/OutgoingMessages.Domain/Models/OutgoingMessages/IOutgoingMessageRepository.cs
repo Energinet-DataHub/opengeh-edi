@@ -41,7 +41,7 @@ public interface IOutgoingMessageRepository
     /// <summary>
     /// Get message in the database for the idempotency id.
     /// </summary>
-    Task<OutgoingMessage?> GetAsync(OutgoingMessageIdempotencyId idempotencyId);
+    Task<OutgoingMessage?> GetAsync(OutgoingMessageIdempotentId idempotentId);
 
     /// <summary>
     /// Delete outgoing messages if they exists

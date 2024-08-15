@@ -57,7 +57,7 @@ public class OutgoingMessage
         DocumentReceiver = documentReceiver;
         CreatedAt = createdAt;
         FileStorageReference = CreateFileStorageReference(Receiver.Number, createdAt, Id);
-        IdempotentId = OutgoingMessageIdempotencyId.New(receiver.ActorRole, externalId, period);
+        IdempotentId = OutgoingMessageIdempotentId.New(receiver.ActorRole, externalId, period);
         ExternalId = externalId;
         CalculationId = calculationId;
     }
@@ -81,7 +81,7 @@ public class OutgoingMessage
         string? gridAreaCode,
         ExternalId externalId,
         Guid? calculationId,
-        OutgoingMessageIdempotencyId idempotentId)
+        OutgoingMessageIdempotentId idempotentId)
     {
         Id = id;
         DocumentType = documentType;
@@ -152,7 +152,7 @@ public class OutgoingMessage
 
     public Guid? CalculationId { get; }
 
-    public OutgoingMessageIdempotencyId IdempotentId { get; set; }
+    public OutgoingMessageIdempotentId IdempotentId { get; set; }
 
     public void AssignToBundle(BundleId bundleId)
     {
