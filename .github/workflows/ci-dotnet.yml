@@ -24,48 +24,52 @@ jobs:
     with:
       solution_file_path: source/EDI.sln
 
-  # Run all tests in 'IntegrationTests.dll'
-  integration_tests:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
-    with:
-      job_name: Integration tests
-      tests_dll_file_path: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
-      use_azure_functions_tools: true
-      azure_integrationtest_tenant_id: ${{ vars.integration_test_azure_tenant_id }}
-      azure_integrationtest_subscription_id: ${{ vars.integration_test_azure_subscription_id }}
-      azure_integrationtest_spn_id: ${{ vars.integration_test_azure_spn_id_oidc }}
-      azure_keyvault_url: ${{ vars.integration_test_azure_keyvault_url }}
-      environment: AzureAuth
-      run_integration_tests: true
-      download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
-
-  # Run all tests in 'ArchitectureTests.dll'
-  architecture_tests:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
-    with:
-      job_name: Architecture tests
-      tests_dll_file_path: \source\ArchitectureTests\bin\Release\net8.0\Energinet.DataHub.EDI.ArchitectureTests.dll
-      download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
-
-  # Run all tests in 'Tests.dll'
+  # Tests that do not require the integration test environment
   tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        tests_filter_expression:
+          - name: Architecture Tests
+            paths: \source\ArchitectureTests\bin\Release\net8.0\Energinet.DataHub.EDI.ArchitectureTests.dll
+          - name: Tests
+            paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.Tests.dll
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
     with:
-      job_name: Tests
-      tests_dll_file_path: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.Tests.dll
-      download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
+      download_attempt_limit: 30
+      # Matrix parameters
+      job_name: ${{ matrix.tests_filter_expression.name }}
+      tests_dll_file_path: ${{ matrix.tests_filter_expression.paths }}
 
-  # Run all tests in 'Tests.dll'
-  b2bapi_apptests:
+  # Tests that require the integration test environment
+  integration_tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        tests_filter_expression:
+          - name: B2BApi AppTests
+            paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.B2BApi.AppTests.dll
+            filter: empty # Means skip
+            use_azure_functions_tools: true
+            contentroot_variable_name: empty # Means skip
+          - name: Integration tests
+            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            filter: empty # Means skip
+            use_azure_functions_tools: true
+            contentroot_variable_name: empty # Means skip
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
     with:
-      job_name: B2BApi AppTests
-      tests_dll_file_path: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.B2BApi.AppTests.dll
-      use_azure_functions_tools: true
+      download_attempt_limit: 20
       azure_integrationtest_tenant_id: ${{ vars.integration_test_azure_tenant_id }}
       azure_integrationtest_subscription_id: ${{ vars.integration_test_azure_subscription_id }}
       azure_integrationtest_spn_id: ${{ vars.integration_test_azure_spn_id_oidc }}
       azure_keyvault_url: ${{ vars.integration_test_azure_keyvault_url }}
       environment: AzureAuth
       run_integration_tests: true
-      download_attempt_limit: 20 # 20 retries with 15 seconds delay = 5 minutes wait before timeout
+      # Matrix parameters
+      job_name: ${{ matrix.tests_filter_expression.name }}
+      tests_dll_file_path: ${{ matrix.tests_filter_expression.paths }}
+      tests_filter_expression: ${{ matrix.tests_filter_expression.filter }}
+      use_azure_functions_tools: ${{ matrix.tests_filter_expression.use_azure_functions_tools }}
+      aspnetcore_test_contentroot_variable_name: ${{ matrix.tests_filter_expression.contentroot_variable_name }}
+      aspnetcore_test_contentroot_variable_value: ${{ matrix.tests_filter_expression.contentroot_variable_value }}
