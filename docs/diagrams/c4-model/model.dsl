@@ -1,6 +1,6 @@
 # Read description in the 'views.dsl' file.
 
-ediDomain = group "EDI" {
+ediSubsystem = group "EDI" {
     ediDb = container "EDI Database" {
         description "Stores information related to EDI operations"
         technology "SQL Server"
@@ -11,20 +11,23 @@ ediDomain = group "EDI" {
         technology "Azure Blob Storage"
         tags "Data Storage, Microsoft Azure - Storage Accounts" "Mosaic"
     }
-    edi = container "EDI" {
-        description "Backend server providing API for EDI operations"
+    ediB2b = container "EDI B2B" {
+        description "Backend for EDI B2B operations"
         technology "Azure function, C#"
         tags "Microsoft Azure - Function Apps" "Mosaic"
-        
-        # Domain relationships        
-        this -> ediDb "Used by EDI azure functions to store state"
-        this -> dh3.sharedServiceBus "Subscribes to integration events"
-        this -> ediStorageAccount "Stores state"
 
         # Base model relationships
         actorB2BSystem -> this "Requests" {
             tags "Simple View"
         }
+
+        # Subsystem relationships
+        this -> ediDb "Uses"
+        this -> dh3.sharedServiceBus "Subscribes to Integration Events and EDI Inbox"
+        this -> ediStorageAccount "Stores state"
+
+        # Subsystem-to-Subsystem relationships
+        this -> wholesaleRuntimeWarehouse "Retrieves results from"
     }
     ediApi = container "EDI API" {
         description "API Gateway policies for EDI Web API"
@@ -34,22 +37,20 @@ ediDomain = group "EDI" {
         # Base model relationships
         actorB2BSystem -> this "Requests eg. Peek and Dequeue"
 
-        # Domain relationships
-        this -> edi "Forwards request to backend"
+        # Subsystem relationships
+        this -> ediB2b "Forwards request to backend"
 
-        # Domain-to-domain relationships
+        # Subsystem-to-Subsystem relationships
         this -> dh3.sharedB2C "Validate credentials" "https" {
         }
     }
     ediB2cWebApi = container "EDI B2C WEB API" {
-        description "An Web API for EDI B2C operations"
+        description "A Web API for EDI B2C operations"
         technology "Asp.Net Core Web API"
         tags "Microsoft Azure - App Services" "Mosaic"
 
-        # Base model relationships
-        dh3User -> this "Requests eg. Aggregated Measure data"
-
-        # Domain relationships
-        this -> edi "Forwards request to backend"
+        # Subsystem relationships
+        this -> ediDb "Uses"
+        this -> ediB2b "Forwards request to backend (using ServiceBus)"
     }
 }
