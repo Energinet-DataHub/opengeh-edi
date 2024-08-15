@@ -165,7 +165,8 @@ public static class OutgoingMessageFactory
                 eventId: messageDto.EventId,
                 documentType: messageDto.DocumentType,
                 receiver: Receiver.Create(messageDto.EnergySupplierNumber, ActorRole.EnergySupplier),
-                documentReceiver: Receiver.Create(messageDto.BalanceResponsibleNumber, ActorRole.EnergySupplier), // TODO: Should energy supplier be the document receiver?
+                // TODO: This should to the messageDto.EnergySupplierNumber will fix in a separate PR
+                documentReceiver: Receiver.Create(messageDto.BalanceResponsibleNumber, ActorRole.EnergySupplier),
                 processId: messageDto.ProcessId,
                 businessReason: messageDto.BusinessReason,
                 serializedContent: serializer.Serialize(messageDto.SeriesForEnergySupplier),
