@@ -12,25 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
+/// <summary>
+/// A hashed value for an outgoing message to ensure idempotency
+/// </summary>
 public record OutgoingMessageIdempotentId
 {
-    private OutgoingMessageIdempotentId(string value)
+    private OutgoingMessageIdempotentId(int value)
     {
         Value = value;
     }
 
-    public string Value { get; }
+    public int Value { get; }
 
-    public static OutgoingMessageIdempotentId New(ActorRole receiverRole, ExternalId externalId, Period period)
+    public static OutgoingMessageIdempotentId New(params string[] values)
     {
-        return new OutgoingMessageIdempotentId($"{receiverRole}_{externalId.Value}_{period.Start}_{period.End}");
+        if (values.Length == 0)
+        {
+            throw new ArgumentException("At least one value must be provided", nameof(values));
+        }
+
+        return new OutgoingMessageIdempotentId(values.GetHashCode());
     }
 
-    public static OutgoingMessageIdempotentId CreateFromExisting(string existingOutgoingMessageIdempotencyId)
+    public static OutgoingMessageIdempotentId CreateFromExisting(int existingOutgoingMessageIdempotencyId)
     {
         return new OutgoingMessageIdempotentId(existingOutgoingMessageIdempotencyId);
     }

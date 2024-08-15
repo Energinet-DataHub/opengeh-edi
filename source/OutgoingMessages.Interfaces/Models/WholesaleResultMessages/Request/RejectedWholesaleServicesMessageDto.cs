@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using NodaTime;
-using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 
@@ -39,8 +36,6 @@ public sealed class RejectedWholesaleServicesMessageDto : OutgoingMessageDto
             businessReason,
             receiverRole,
             new ExternalId(Guid.NewGuid()),
-            // Period is not important for this message
-            new Period(SystemClock.Instance.GetCurrentInstant(), SystemClock.Instance.GetCurrentInstant()),
             relatedToMessageId)
     {
         Series = series;

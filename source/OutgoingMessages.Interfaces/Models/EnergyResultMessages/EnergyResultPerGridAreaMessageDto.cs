@@ -46,7 +46,6 @@ public class EnergyResultPerGridAreaMessageDto
             businessReasonName: businessReason.Name,
             receiverRole: ActorRole.MeteredDataResponsible,
             externalId: new ExternalId(calculationResultId),
-            period,
             relatedToMessageId: null)
     {
         CalculationId = calculationId;

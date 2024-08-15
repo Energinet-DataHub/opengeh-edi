@@ -44,8 +44,7 @@ public class WholesaleMonthlyAmountPerChargeMessageDto : OutgoingMessageDto
             eventId,
             businessReason,
             receiverRole: null!,
-            new ExternalId(calculationResultId),
-            period)
+            new ExternalId(calculationResultId))
     {
         CalculationId = calculationId;
         CalculationResultId = calculationResultId;

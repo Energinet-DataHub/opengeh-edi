@@ -41,8 +41,7 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
             eventId: eventId,
             businessReason: process.BusinessReason.Name,
             wholesaleSeries: message,
-            relatedToMessageId: process.InitiatedByMessageId,
-            new Period(acceptedWholesaleServices.StartOfPeriod, acceptedWholesaleServices.EndOfPeriod));
+            relatedToMessageId: process.InitiatedByMessageId);
     }
 
     private static AcceptedWholesaleServicesSeries CreateWholesaleResultSeries(

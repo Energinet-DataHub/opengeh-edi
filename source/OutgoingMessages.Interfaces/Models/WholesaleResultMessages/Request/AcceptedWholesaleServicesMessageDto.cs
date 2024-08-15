@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
@@ -29,8 +28,7 @@ public class AcceptedWholesaleServicesMessageDto : OutgoingMessageDto
         string businessReason,
         AcceptedWholesaleServicesSeries series,
         ActorNumber? chargeOwnerId,
-        MessageId relatedToMessageId,
-        Period period)
+        MessageId relatedToMessageId)
         : base(
             DocumentType.NotifyWholesaleServices,
             receiverNumber,
@@ -39,7 +37,6 @@ public class AcceptedWholesaleServicesMessageDto : OutgoingMessageDto
             businessReason,
             receiverRole,
             new ExternalId(Guid.NewGuid()),
-            period,
             relatedToMessageId)
     {
         ChargeOwnerId = chargeOwnerId;
@@ -66,8 +63,7 @@ public class AcceptedWholesaleServicesMessageDto : OutgoingMessageDto
         EventId eventId,
         string businessReason,
         AcceptedWholesaleServicesSeries wholesaleSeries,
-        MessageId relatedToMessageId,
-        Period period)
+        MessageId relatedToMessageId)
     {
         return new AcceptedWholesaleServicesMessageDto(
             receiverNumber: receiverNumber,
@@ -79,8 +75,7 @@ public class AcceptedWholesaleServicesMessageDto : OutgoingMessageDto
             businessReason: businessReason,
             series: wholesaleSeries,
             chargeOwnerId: chargeOwnerId,
-            relatedToMessageId: relatedToMessageId,
-            period);
+            relatedToMessageId: relatedToMessageId);
     }
 }
 

@@ -30,9 +30,6 @@ public static class AcceptedWholesaleServicesMessageDtoBuilder
     private static readonly BusinessReason _businessReason = BusinessReason.BalanceFixing;
     private static readonly ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
     private static readonly EventId _eventId = EventId.From(Guid.NewGuid());
-    private static readonly Period _period = new(
-        Instant.FromUtc(2024, 9, 1, 0, 0),
-        Instant.FromUtc(2024, 10, 1, 0, 0));
 
     public static AcceptedWholesaleServicesMessageDto Build()
     {
@@ -48,7 +45,6 @@ public static class AcceptedWholesaleServicesMessageDtoBuilder
             _eventId,
             _businessReason.Name,
             series,
-            MessageId.New(),
-            _period);
+            MessageId.New());
     }
 }

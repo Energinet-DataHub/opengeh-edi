@@ -37,7 +37,6 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
             businessReason,
             receiverRole,
             new ExternalId(Guid.NewGuid()),
-            period,
             relatedToMessageId)
     {
         Series = series;

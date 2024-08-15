@@ -46,7 +46,6 @@ public class EnergyResultPerBalanceResponsibleMessageDto
             businessReasonName: businessReason.Name,
             receiverRole: ActorRole.BalanceResponsibleParty,
             externalId: new ExternalId(calculationResultId),
-            period,
             relatedToMessageId: null)
     {
         CalculationId = calculationId;

@@ -40,8 +40,7 @@ public class WholesaleTotalAmountMessageDto : OutgoingMessageDto
             eventId,
             businessReason,
             receiverRole: receiverRole,
-            new ExternalId(calculationResultId),
-            period)
+            new ExternalId(calculationResultId))
     {
         CalculationId = calculationId;
         CalculationResultId = calculationResultId;

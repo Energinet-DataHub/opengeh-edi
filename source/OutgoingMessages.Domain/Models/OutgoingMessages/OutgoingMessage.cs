@@ -18,7 +18,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using NodaTime;
-using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
@@ -42,7 +41,7 @@ public class OutgoingMessage
         string? gridAreaCode,
         ExternalId externalId,
         Guid? calculationId,
-        Period period)
+        OutgoingMessageIdempotentId idempotentId)
     {
         Id = OutgoingMessageId.New();
         EventId = eventId;
@@ -57,7 +56,7 @@ public class OutgoingMessage
         DocumentReceiver = documentReceiver;
         CreatedAt = createdAt;
         FileStorageReference = CreateFileStorageReference(Receiver.Number, createdAt, Id);
-        IdempotentId = OutgoingMessageIdempotentId.New(receiver.ActorRole, externalId, period);
+        IdempotentId = idempotentId;
         ExternalId = externalId;
         CalculationId = calculationId;
     }
