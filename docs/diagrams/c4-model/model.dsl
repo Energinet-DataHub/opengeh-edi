@@ -6,6 +6,7 @@ ediSubsystem = group "EDI" {
         technology "SQL Server"
         tags "Data Storage, Microsoft Azure - SQL Database" "Mosaic"
     }
+
     ediStorageAccount = container "EDI Storage Account" {
         description "Used by EDI azure functions to store state"
         technology "Azure Blob Storage"
