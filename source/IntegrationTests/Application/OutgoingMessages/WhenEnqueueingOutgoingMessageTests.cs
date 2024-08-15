@@ -83,6 +83,9 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
 
         // Assert
         var expectedFileStorageReference = $"{SampleData.GridOperatorNumber}/{now.Year():0000}/{now.Month():00}/{now.Day():00}/{createdOutgoingMessageId:N}";
+        var expectedOutgoingMessageIdempotentId = OutgoingMessageIdempotentId
+            .New(message.ReceiverRole, message.ExternalId, message.Period)
+            .Value;
 
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = "SELECT * FROM [dbo].[OutgoingMessages]";
@@ -120,7 +123,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.Null(messageFromDatabase.ModifiedBy),
             () => Assert.Equal(message.ExternalId.Value, messageFromDatabase.ExternalId),
             () => Assert.Equal(message.CalculationId, messageFromDatabase.CalculationId),
-            () => Assert.Equal(messageFromDatabase.IdempotentId, OutgoingMessageIdempotentId.New(message.ReceiverRole, message.ExternalId, message.Period).Value),
+            () => Assert.Equal(messageFromDatabase.IdempotentId, expectedOutgoingMessageIdempotentId),
         };
 
         Assert.Multiple(propertyAssertions);
