@@ -26,7 +26,7 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
             # Include EDI model
             !include model.dsl
 
-            # Include frontend model - placeholders
+            # Include Frontend model - placeholders
             frontendSubsystem = group "Frontend" {
                 frontendBff = container "BFF" {
                     description "Backend for Frontend"
