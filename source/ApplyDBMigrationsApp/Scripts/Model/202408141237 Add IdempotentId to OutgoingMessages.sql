@@ -8,7 +8,7 @@ WHERE [IdempotentId] IS NULL;
 GO
 
 ALTER TABLE [dbo].[OutgoingMessages]
-ALTER COLUMN [IdempotentId] UNIQUEIDENTIFIER NOT NULL;
+ALTER COLUMN [IdempotentId] VARCHAR(60) NOT NULL;
 GO
 
 -- recreate the index with the new IdempotentId column
