@@ -27,7 +27,8 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
         AcceptedEnergyResultMessageTimeSeries series,
         MessageId? relatedToMessageId,
         ActorNumber documentReceiverNumber,
-        ActorRole documentReceiverRole)
+        ActorRole documentReceiverRole,
+        Period period)
         : base(
             DocumentType.NotifyAggregatedMeasureData,
             receiverNumber,
@@ -95,7 +96,8 @@ public class AcceptedEnergyResultMessageDto : OutgoingMessageDto
             series,
             relatedToMessageId,
             documentReceiverNumber,
-            documentReceiverRole);
+            documentReceiverRole,
+            period);
     }
 }
 

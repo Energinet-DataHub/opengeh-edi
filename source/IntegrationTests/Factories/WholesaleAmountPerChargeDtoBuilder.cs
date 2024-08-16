@@ -22,13 +22,14 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
 
 public class WholesaleAmountPerChargeDtoBuilder
 {
-    private readonly EventId _eventId = EventId.From(Guid.NewGuid());
     private readonly Guid _calculationId = Guid.NewGuid();
     private readonly BusinessReason _businessReason = BusinessReason.WholesaleFixing;
 
+    private EventId _eventId = EventId.From(Guid.NewGuid());
     private ActorNumber _chargeOwnerActorNumber = ActorNumber.Create("1234567891911");
     private ActorNumber _receiverActorNumber = ActorNumber.Create("1234567891912");
     private Guid _calculationResultId;
+    private Period _period = new(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant());
 
     public WholesaleAmountPerChargeMessageDto Build()
     {
@@ -43,7 +44,7 @@ public class WholesaleAmountPerChargeDtoBuilder
             businessReason: _businessReason.ToString(),
             gridAreaCode: "805",
             isTax: false,
-            period: new Period(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()),
+            period: _period,
             quantityUnit: MeasurementUnit.Pieces,
             currency: Currency.DanishCrowns,
             chargeType: ChargeType.Tariff,
@@ -67,6 +68,18 @@ public class WholesaleAmountPerChargeDtoBuilder
     public WholesaleAmountPerChargeDtoBuilder WithReceiverNumber(ActorNumber receiverActorNumber)
     {
         _receiverActorNumber = receiverActorNumber;
+        return this;
+    }
+
+    public WholesaleAmountPerChargeDtoBuilder WithEventId(Guid eventId)
+    {
+        _eventId = EventId.From(eventId);
+        return this;
+    }
+
+    public WholesaleAmountPerChargeDtoBuilder WithPeriod(Period period)
+    {
+        _period = period;
         return this;
     }
 

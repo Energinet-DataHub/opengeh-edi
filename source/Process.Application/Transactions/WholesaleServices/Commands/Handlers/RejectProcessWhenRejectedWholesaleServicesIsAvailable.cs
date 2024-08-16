@@ -23,6 +23,8 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMe
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using MediatR;
+using NodaTime;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Commands.Handlers;
 
@@ -50,7 +52,7 @@ public sealed class
         return Unit.Value;
     }
 
-    private static RejectedWholesaleServicesMessageDto CreateRejectedWholesaleServicesResultMessage(
+    private RejectedWholesaleServicesMessageDto CreateRejectedWholesaleServicesResultMessage(
         EventId eventId,
         WholesaleServicesProcess process,
         IReadOnlyCollection<RejectReasonDto> rejectReasons)
