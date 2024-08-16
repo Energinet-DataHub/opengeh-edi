@@ -41,7 +41,7 @@ public class WholesaleResultForAmountPerChargeDescription
     public WholesaleResultForAmountPerChargeDescription()
         : base(
             "wholesale_fixing_01-02-2023_28-02-2023_ga_804_amount_per_charge_v1.csv",
-            //Charge type on row 1457 contains an invalid value (="invalid") (row on a result set)
+            //Charge type on row 1457 contains an invalid value (="invalid") (row on a result set)en
             "wholesale_fixing_01-02-2023_28-02-2023_ga_804_amount_per_charge_v1_with_invalid_row.csv")
     {
     }

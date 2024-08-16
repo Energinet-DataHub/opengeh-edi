@@ -17,10 +17,12 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTabl
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
@@ -36,11 +38,13 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(
         ILogger logger,
         EdiDatabricksOptions ediDatabricksOptions,
         EventId eventId,
-        Guid calculationId)
+        Guid calculationId,
+        DateTimeZone dateTimeZone)
     : EnergyResultQueryBase<EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto>(
         logger,
         ediDatabricksOptions,
-        calculationId)
+        calculationId,
+        dateTimeZone)
 {
     private readonly EventId _eventId = eventId;
 
@@ -84,7 +88,7 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(
             settlementMethod: SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)),
             measurementUnit: MeasurementUnitMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)),
             resolution: resolution,
-            period: EnergyResultPerGridAreaFactory.GetPeriod(timeSeriesPoints, resolution),
+            period: PeriodFactory.GetPeriod(timeSeriesPoints, resolution, DateTimeZone),
             balanceResponsibleNumber: ActorNumber.Create(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.BalanceResponsiblePartyId)),
             energySupplierNumber: ActorNumber.Create(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.EnergySupplierId)),
             points: EnergyResultMessageDtoFactory.CreateEnergyResultMessagePoints(timeSeriesPoints));

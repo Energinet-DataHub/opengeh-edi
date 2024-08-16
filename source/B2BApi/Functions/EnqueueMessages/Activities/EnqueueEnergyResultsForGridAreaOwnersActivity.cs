@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessa
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
@@ -31,7 +32,8 @@ public class EnqueueEnergyResultsForGridAreaOwnersActivity(
     ILogger<EnqueueEnergyResultsForGridAreaOwnersActivity> logger,
     IServiceScopeFactory serviceScopeFactory,
     IMasterDataClient masterDataClient,
-    EnergyResultEnumerator energyResultEnumerator)
+    EnergyResultEnumerator energyResultEnumerator,
+    DateTimeZone dateTimeZone)
     : EnqueueEnergyResultsBaseActivity(logger, serviceScopeFactory, energyResultEnumerator)
 {
     private readonly ILogger<EnqueueEnergyResultsForGridAreaOwnersActivity> _logger = logger;
@@ -47,7 +49,8 @@ public class EnqueueEnergyResultsForGridAreaOwnersActivity(
             _energyResultEnumerator.EdiDatabricksOptions,
             _masterDataClient,
             EventId.From(input.EventId),
-            input.CalculationId);
+            input.CalculationId,
+            dateTimeZone);
 
         return EnqueueEnergyResults(input, query);
     }

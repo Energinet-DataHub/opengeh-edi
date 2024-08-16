@@ -15,17 +15,20 @@
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 
 public abstract class EnergyResultQueryBase<TResult>(
         ILogger logger,
         EdiDatabricksOptions ediDatabricksOptions,
-        Guid calculationId)
+        Guid calculationId,
+        DateTimeZone dateTimeZone)
     : IDeltaTableSchemaDescription
     where TResult : OutgoingMessageDto
 {
@@ -51,6 +54,8 @@ public abstract class EnergyResultQueryBase<TResult>(
     /// </summary>
     public abstract Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition { get; }
 
+    internal DateTimeZone DateTimeZone { get; } = dateTimeZone;
+
     internal async IAsyncEnumerable<QueryResult<TResult>> GetAsync(DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor)
     {
         ArgumentNullException.ThrowIfNull(databricksSqlWarehouseQueryExecutor);
@@ -59,36 +64,29 @@ public abstract class EnergyResultQueryBase<TResult>(
             .FromRawSql(BuildSqlQuery())
             .Build();
 
-        Guid? currentResultId = null;
-        var currentResultRows = new List<DatabricksSqlRow>();
-
-        await foreach (var row in databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement).ConfigureAwait(false))
+        DatabricksSqlRow? previousResult = null;
+        var currentResultSet = new List<DatabricksSqlRow>();
+        await foreach (var currentResult in databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement).ConfigureAwait(false))
         {
-            var rowResultId = row.ToGuid(EnergyResultColumnNames.ResultId);
-
-            if (IsFirstRow(currentResultId))
+            if (previousResult == null || BelongsToSameResultSet(previousResult, currentResult))
             {
-                currentResultId = rowResultId;
-            }
-
-            if (IsSameResult(currentResultId, rowResultId))
-            {
-                currentResultRows.Add(row);
+                previousResult = currentResult;
+                currentResultSet.Add(currentResult);
                 continue;
             }
 
-            yield return await CreateResultAsync(currentResultRows).ConfigureAwait(false);
+            yield return await CreateResultAsync(currentResultSet).ConfigureAwait(false);
 
             // Next result
-            currentResultRows = [];
-            currentResultId = rowResultId;
-            currentResultRows.Add(row);
+            currentResultSet = [];
+            previousResult = currentResult;
+            currentResultSet.Add(currentResult);
         }
 
         // Last result (if any)
-        if (currentResultRows.Count != 0)
+        if (currentResultSet.Count != 0)
         {
-            yield return await CreateResultAsync(currentResultRows).ConfigureAwait(false);
+            yield return await CreateResultAsync(currentResultSet).ConfigureAwait(false);
         }
     }
 
@@ -102,16 +100,6 @@ public abstract class EnergyResultQueryBase<TResult>(
             databricksSqlRow.ToInstant(EnergyResultColumnNames.Time),
             databricksSqlRow.ToDecimal(EnergyResultColumnNames.Quantity),
             QuantityQualitiesMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.QuantityQualities)));
-    }
-
-    private static bool IsFirstRow(Guid? currentResultId)
-    {
-        return currentResultId == null;
-    }
-
-    private static bool IsSameResult(Guid? currentResultId, Guid rowResultId)
-    {
-        return currentResultId == rowResultId;
     }
 
     private async Task<QueryResult<TResult>> CreateResultAsync(IReadOnlyCollection<DatabricksSqlRow> resultRows)
@@ -138,6 +126,23 @@ public abstract class EnergyResultQueryBase<TResult>(
         }
 
         return QueryResult<TResult>.Error();
+    }
+
+    private bool BelongsToSameResultSet(DatabricksSqlRow? previousResult, DatabricksSqlRow currentResult)
+    {
+        return
+            previousResult?.ToGuid(EnergyResultColumnNames.ResultId) == currentResult.ToGuid(EnergyResultColumnNames.ResultId)
+            && IsAFollowingResult(previousResult, currentResult);
+    }
+
+    private bool IsAFollowingResult(DatabricksSqlRow previousResult, DatabricksSqlRow currentResult)
+    {
+        var resolution =
+            ResolutionMapper.FromDeltaTableValue(
+                previousResult.ToNonEmptyString(EnergyResultColumnNames.Resolution));
+        var previousTime = previousResult.ToInstant(EnergyResultColumnNames.Time);
+        var currentExceptedTime = PeriodFactory.GetEndDateWithResolutionOffset(resolution, previousTime, DateTimeZone);
+        return currentExceptedTime == currentResult.ToInstant(EnergyResultColumnNames.Time);
     }
 
     private string BuildSqlQuery()

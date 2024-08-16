@@ -519,15 +519,15 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
             IDeltaTableSchemaDescription schemaDescription;
             if (testDataDescription is EnergyResultPerGridAreaDescription)
             {
-                schemaDescription = new EnergyResultPerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, null!, testDataDescription.CalculationId);
+                schemaDescription = new EnergyResultPerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, null!, testDataDescription.CalculationId, null!);
             }
             else if (testDataDescription is EnergyResultPerBrpGridAreaDescription)
             {
-                schemaDescription = new EnergyResultPerBalanceResponsiblePerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, testDataDescription.CalculationId);
+                schemaDescription = new EnergyResultPerBalanceResponsiblePerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, testDataDescription.CalculationId, null!);
             }
             else if (testDataDescription is EnergyResultPerEnergySupplierBrpGridAreaDescription)
             {
-                schemaDescription = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, testDataDescription.CalculationId);
+                schemaDescription = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, testDataDescription.CalculationId, null!);
             }
             else if (testDataDescription is WholesaleResultForAmountPerChargeDescription)
             {
@@ -570,13 +570,13 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var ediDatabricksOptions = Options.Create(new EdiDatabricksOptions { DatabaseName = Fixture.DatabricksSchemaManager.SchemaName });
 
         // TODO: Seperate schema information from query
-        var perGridAreaQuery = new EnergyResultPerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, null!, perGridAreaDataDescription.CalculationId);
+        var perGridAreaQuery = new EnergyResultPerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, null!, perGridAreaDataDescription.CalculationId, null!);
         var perGridAreTask = SeedDatabricksWithDataAsync(perGridAreaDataDescription.TestFilePath, perGridAreaQuery);
 
-        var perBrpGridAreaQuery = new EnergyResultPerBalanceResponsiblePerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, perGridAreaDataDescription.CalculationId);
+        var perBrpGridAreaQuery = new EnergyResultPerBalanceResponsiblePerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, perGridAreaDataDescription.CalculationId, null!);
         var perBrpGriaAreaTask = SeedDatabricksWithDataAsync(perBrpGridAreaDataDescription.TestFilePath, perBrpGridAreaQuery);
 
-        var perBrpAndESGridAreaQuery = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, perGridAreaDataDescription.CalculationId);
+        var perBrpAndESGridAreaQuery = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, perGridAreaDataDescription.CalculationId, null!);
         var perBrpAndESGridAreTask = SeedDatabricksWithDataAsync(perBrpAndEsGridAreaDataDescription.TestFilePath, perBrpAndESGridAreaQuery);
 
         var forAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(null!, ediDatabricksOptions.Value, null!, null!, forAmountPerChargeDescription.CalculationId, null);

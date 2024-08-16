@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessa
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
@@ -29,11 +30,13 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 public class EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity(
     ILogger<EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity> logger,
     IServiceScopeFactory serviceScopeFactory,
-    EnergyResultEnumerator energyResultEnumerator)
+    EnergyResultEnumerator energyResultEnumerator,
+    DateTimeZone dateTimeZone)
     : EnqueueEnergyResultsBaseActivity(logger, serviceScopeFactory, energyResultEnumerator)
 {
     private readonly ILogger<EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity> _logger = logger;
     private readonly EnergyResultEnumerator _energyResultEnumerator = energyResultEnumerator;
+    private readonly DateTimeZone _dateTimeZone = dateTimeZone;
 
     [Function(nameof(EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity))]
     public Task<int> Run(
@@ -43,7 +46,8 @@ public class EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivit
             _logger,
             _energyResultEnumerator.EdiDatabricksOptions,
             EventId.From(input.EventId),
-            input.CalculationId);
+            input.CalculationId,
+            _dateTimeZone);
 
         return EnqueueEnergyResults(input, query);
     }
