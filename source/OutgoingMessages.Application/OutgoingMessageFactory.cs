@@ -42,6 +42,7 @@ public static class OutgoingMessageFactory
             eventId: acceptedMessage.EventId,
             documentType: acceptedMessage.DocumentType,
             receiver: Receiver.Create(acceptedMessage.ReceiverNumber, acceptedMessage.ReceiverRole),
+            documentReceiver: Receiver.Create(acceptedMessage.DocumentReceiverNumber, acceptedMessage.DocumentReceiverRole),
             processId: acceptedMessage.ProcessId,
             businessReason: acceptedMessage.BusinessReason,
             serializedContent: serializer.Serialize(acceptedMessage.Series),
@@ -51,7 +52,10 @@ public static class OutgoingMessageFactory
             gridAreaCode: acceptedMessage.Series.GridAreaCode,
             externalId: acceptedMessage.ExternalId,
             calculationId: null,
-            documentReceiver: Receiver.Create(acceptedMessage.DocumentReceiverNumber, acceptedMessage.DocumentReceiverRole));
+            OutgoingMessageIdempotentId.New(
+                acceptedMessage.ReceiverRole.Code,
+                acceptedMessage.ExternalId.Value.ToString(),
+                acceptedMessage.Series.Period.ToString()));
     }
 
     /// <summary>
@@ -69,6 +73,7 @@ public static class OutgoingMessageFactory
             eventId: rejectedMessage.EventId,
             documentType: rejectedMessage.DocumentType,
             receiver: Receiver.Create(rejectedMessage.ReceiverNumber, rejectedMessage.ReceiverRole),
+            documentReceiver: Receiver.Create(rejectedMessage.DocumentReceiverNumber, rejectedMessage.DocumentReceiverRole),
             processId: rejectedMessage.ProcessId,
             businessReason: rejectedMessage.BusinessReason,
             serializedContent: serializer.Serialize(rejectedMessage.Series),
@@ -78,7 +83,7 @@ public static class OutgoingMessageFactory
             gridAreaCode: null,
             externalId: rejectedMessage.ExternalId,
             calculationId: null,
-            documentReceiver: Receiver.Create(rejectedMessage.DocumentReceiverNumber, rejectedMessage.DocumentReceiverRole));
+            OutgoingMessageIdempotentId.New(rejectedMessage.ReceiverRole.Code, rejectedMessage.ExternalId.Value.ToString()));
     }
 
     /// <summary>
@@ -105,7 +110,11 @@ public static class OutgoingMessageFactory
             messageDto.RelatedToMessageId,
             messageDto.Series.GridAreaCode,
             messageDto.ExternalId,
-            messageDto.CalculationId);
+            messageDto.CalculationId,
+            OutgoingMessageIdempotentId.New(
+                messageDto.ReceiverRole.Code,
+                messageDto.ExternalId.Value.ToString(),
+                messageDto.Series.Period.ToString()));
     }
 
     /// <summary>
@@ -132,7 +141,11 @@ public static class OutgoingMessageFactory
             messageDto.RelatedToMessageId,
             messageDto.Series.GridAreaCode,
             messageDto.ExternalId,
-            messageDto.CalculationId);
+            messageDto.CalculationId,
+            OutgoingMessageIdempotentId.New(
+                messageDto.ReceiverRole.Code,
+                messageDto.ExternalId.Value.ToString(),
+                messageDto.Series.Period.ToString()));
     }
 
     /// <summary>
@@ -151,17 +164,22 @@ public static class OutgoingMessageFactory
             new OutgoingMessage(
                 eventId: messageDto.EventId,
                 documentType: messageDto.DocumentType,
+                receiver: Receiver.Create(messageDto.EnergySupplierNumber, ActorRole.EnergySupplier),
+                // TODO: This should to the messageDto.EnergySupplierNumber will fix in a separate PR
+                documentReceiver: Receiver.Create(messageDto.BalanceResponsibleNumber, ActorRole.EnergySupplier),
                 processId: messageDto.ProcessId,
                 businessReason: messageDto.BusinessReason,
-                receiver: Receiver.Create(messageDto.EnergySupplierNumber, ActorRole.EnergySupplier),
-                documentReceiver: Receiver.Create(messageDto.BalanceResponsibleNumber, ActorRole.EnergySupplier),
                 serializedContent: serializer.Serialize(messageDto.SeriesForEnergySupplier),
                 createdAt: timestamp,
                 messageCreatedFromProcess: ProcessType.ReceiveEnergyResults,
                 relatedToMessageId: messageDto.RelatedToMessageId,
                 gridAreaCode: messageDto.GridArea,
                 externalId: messageDto.ExternalId,
-                calculationId: messageDto.CalculationId),
+                calculationId: messageDto.CalculationId,
+                OutgoingMessageIdempotentId.New(
+                    ActorRole.EnergySupplier.Code,
+                    messageDto.ExternalId.Value.ToString(),
+                    messageDto.SeriesForEnergySupplier.Period.ToString())),
         ];
 
         // Only create a message for the balance responsible if the business reason is BalanceFixing or PreliminaryAggregation
@@ -171,17 +189,21 @@ public static class OutgoingMessageFactory
             var outgoingMessageToBalanceResponsible = new OutgoingMessage(
                 eventId: messageDto.EventId,
                 documentType: messageDto.DocumentType,
-                processId: messageDto.ProcessId,
-                businessReason: messageDto.BusinessReason,
                 receiver: Receiver.Create(messageDto.BalanceResponsibleNumber, ActorRole.BalanceResponsibleParty),
                 documentReceiver: Receiver.Create(messageDto.BalanceResponsibleNumber, ActorRole.BalanceResponsibleParty),
+                processId: messageDto.ProcessId,
+                businessReason: messageDto.BusinessReason,
                 serializedContent: serializer.Serialize(messageDto.SeriesForBalanceResponsible),
                 createdAt: timestamp,
                 messageCreatedFromProcess: ProcessType.ReceiveEnergyResults,
                 relatedToMessageId: messageDto.RelatedToMessageId,
                 gridAreaCode: messageDto.GridArea,
                 externalId: messageDto.ExternalId,
-                calculationId: messageDto.CalculationId);
+                calculationId: messageDto.CalculationId,
+                OutgoingMessageIdempotentId.New(
+                    ActorRole.BalanceResponsibleParty.Code,
+                    messageDto.ExternalId.Value.ToString(),
+                    messageDto.SeriesForBalanceResponsible.Period.ToString()));
 
             outgoingMessages.Add(outgoingMessageToBalanceResponsible);
         }
@@ -200,6 +222,7 @@ public static class OutgoingMessageFactory
         ArgumentNullException.ThrowIfNull(serializer);
         ArgumentNullException.ThrowIfNull(wholesaleAmountPerChargeMessageDto);
 
+        var chargeOwnerRole = GetChargeOwnerRole(wholesaleAmountPerChargeMessageDto.ChargeOwnerReceiverId);
         return new List<OutgoingMessage>()
         {
             new(
@@ -215,16 +238,20 @@ public static class OutgoingMessageFactory
                 wholesaleAmountPerChargeMessageDto.RelatedToMessageId,
                 wholesaleAmountPerChargeMessageDto.Series.GridAreaCode,
                 wholesaleAmountPerChargeMessageDto.ExternalId,
-                wholesaleAmountPerChargeMessageDto.CalculationId),
+                wholesaleAmountPerChargeMessageDto.CalculationId,
+                OutgoingMessageIdempotentId.New(
+                    ActorRole.EnergySupplier.Code,
+                    wholesaleAmountPerChargeMessageDto.ExternalId.Value.ToString(),
+                    wholesaleAmountPerChargeMessageDto.Series.Period.ToString())),
             new(
                 wholesaleAmountPerChargeMessageDto.EventId,
                 wholesaleAmountPerChargeMessageDto.DocumentType,
                 Receiver.Create(
                     wholesaleAmountPerChargeMessageDto.ChargeOwnerReceiverId,
-                    GetChargeOwnerRole(wholesaleAmountPerChargeMessageDto.ChargeOwnerReceiverId)),
+                    chargeOwnerRole),
                 Receiver.Create(
                     wholesaleAmountPerChargeMessageDto.ChargeOwnerReceiverId,
-                    GetChargeOwnerRole(wholesaleAmountPerChargeMessageDto.ChargeOwnerReceiverId)),
+                    chargeOwnerRole),
                 wholesaleAmountPerChargeMessageDto.ProcessId,
                 wholesaleAmountPerChargeMessageDto.BusinessReason,
                 serializer.Serialize(wholesaleAmountPerChargeMessageDto.Series),
@@ -233,7 +260,11 @@ public static class OutgoingMessageFactory
                 wholesaleAmountPerChargeMessageDto.RelatedToMessageId,
                 wholesaleAmountPerChargeMessageDto.Series.GridAreaCode,
                 wholesaleAmountPerChargeMessageDto.ExternalId,
-                wholesaleAmountPerChargeMessageDto.CalculationId),
+                wholesaleAmountPerChargeMessageDto.CalculationId,
+                OutgoingMessageIdempotentId.New(
+                    chargeOwnerRole.Code,
+                    wholesaleAmountPerChargeMessageDto.ExternalId.Value.ToString(),
+                    wholesaleAmountPerChargeMessageDto.Series.Period.ToString())),
         };
     }
 
@@ -248,6 +279,7 @@ public static class OutgoingMessageFactory
         ArgumentNullException.ThrowIfNull(serializer);
         ArgumentNullException.ThrowIfNull(wholesaleMonthlyAmountPerChargeMessageDto);
 
+        var chargeOwnerRole = GetChargeOwnerRole(wholesaleMonthlyAmountPerChargeMessageDto.ChargeOwnerReceiverId);
         return new List<OutgoingMessage>
         {
             new(
@@ -263,16 +295,20 @@ public static class OutgoingMessageFactory
                 wholesaleMonthlyAmountPerChargeMessageDto.RelatedToMessageId,
                 wholesaleMonthlyAmountPerChargeMessageDto.Series.GridAreaCode,
                 wholesaleMonthlyAmountPerChargeMessageDto.ExternalId,
-                wholesaleMonthlyAmountPerChargeMessageDto.CalculationId),
+                wholesaleMonthlyAmountPerChargeMessageDto.CalculationId,
+                OutgoingMessageIdempotentId.New(
+                    ActorRole.EnergySupplier.Code,
+                    wholesaleMonthlyAmountPerChargeMessageDto.ExternalId.Value.ToString(),
+                    wholesaleMonthlyAmountPerChargeMessageDto.Series.Period.ToString())),
             new(
                 wholesaleMonthlyAmountPerChargeMessageDto.EventId,
                 wholesaleMonthlyAmountPerChargeMessageDto.DocumentType,
                 Receiver.Create(
                     wholesaleMonthlyAmountPerChargeMessageDto.ChargeOwnerReceiverId,
-                    GetChargeOwnerRole(wholesaleMonthlyAmountPerChargeMessageDto.ChargeOwnerReceiverId)),
+                    chargeOwnerRole),
                 Receiver.Create(
                     wholesaleMonthlyAmountPerChargeMessageDto.ChargeOwnerReceiverId,
-                    GetChargeOwnerRole(wholesaleMonthlyAmountPerChargeMessageDto.ChargeOwnerReceiverId)),
+                    chargeOwnerRole),
                 wholesaleMonthlyAmountPerChargeMessageDto.ProcessId,
                 wholesaleMonthlyAmountPerChargeMessageDto.BusinessReason,
                 serializer.Serialize(wholesaleMonthlyAmountPerChargeMessageDto.Series),
@@ -281,7 +317,11 @@ public static class OutgoingMessageFactory
                 wholesaleMonthlyAmountPerChargeMessageDto.RelatedToMessageId,
                 wholesaleMonthlyAmountPerChargeMessageDto.Series.GridAreaCode,
                 wholesaleMonthlyAmountPerChargeMessageDto.ExternalId,
-                wholesaleMonthlyAmountPerChargeMessageDto.CalculationId),
+                wholesaleMonthlyAmountPerChargeMessageDto.CalculationId,
+                OutgoingMessageIdempotentId.New(
+                    chargeOwnerRole.Code,
+                    wholesaleMonthlyAmountPerChargeMessageDto.ExternalId.Value.ToString(),
+                    wholesaleMonthlyAmountPerChargeMessageDto.Series.Period.ToString())),
         };
     }
 
@@ -306,7 +346,11 @@ public static class OutgoingMessageFactory
             wholesaleTotalAmountMessageDto.RelatedToMessageId,
             wholesaleTotalAmountMessageDto.Series.GridAreaCode,
             wholesaleTotalAmountMessageDto.ExternalId,
-            wholesaleTotalAmountMessageDto.CalculationId);
+            wholesaleTotalAmountMessageDto.CalculationId,
+            OutgoingMessageIdempotentId.New(
+                wholesaleTotalAmountMessageDto.ReceiverRole.Code,
+                wholesaleTotalAmountMessageDto.ExternalId.Value.ToString(),
+                wholesaleTotalAmountMessageDto.Series.Period.ToString()));
     }
 
     /// <summary>
@@ -324,6 +368,7 @@ public static class OutgoingMessageFactory
             eventId: message.EventId,
             documentType: message.DocumentType,
             receiver: Receiver.Create(message.ReceiverNumber, message.ReceiverRole),
+            documentReceiver: Receiver.Create(message.DocumentReceiverNumber, message.DocumentReceiverRole),
             processId: message.ProcessId,
             businessReason: message.BusinessReason,
             serializedContent: serializer.Serialize(message.Series),
@@ -333,7 +378,7 @@ public static class OutgoingMessageFactory
             gridAreaCode: null,
             externalId: message.ExternalId,
             calculationId: null,
-            documentReceiver: Receiver.Create(message.DocumentReceiverNumber, message.DocumentReceiverRole));
+            OutgoingMessageIdempotentId.New(message.ReceiverRole.Code, message.ExternalId.Value.ToString()));
     }
 
     /// <summary>
@@ -351,6 +396,7 @@ public static class OutgoingMessageFactory
             eventId: message.EventId,
             documentType: message.DocumentType,
             receiver: Receiver.Create(message.ReceiverNumber, message.ReceiverRole),
+            documentReceiver: Receiver.Create(message.DocumentReceiverNumber, message.DocumentReceiverRole),
             processId: message.ProcessId,
             businessReason: message.BusinessReason,
             serializedContent: serializer.Serialize(message.Series),
@@ -360,7 +406,10 @@ public static class OutgoingMessageFactory
             gridAreaCode: message.Series.GridAreaCode,
             externalId: message.ExternalId,
             calculationId: null,
-            documentReceiver: Receiver.Create(message.DocumentReceiverNumber, message.DocumentReceiverRole));
+            OutgoingMessageIdempotentId.New(
+                message.ReceiverRole.Code,
+                message.ExternalId.Value.ToString(),
+                message.Series.Period.ToString()));
     }
 
     private static ActorRole GetChargeOwnerRole(ActorNumber chargeOwnerId)

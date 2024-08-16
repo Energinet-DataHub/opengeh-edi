@@ -22,6 +22,7 @@ using FluentAssertions;
 using NodaTime;
 using Xunit;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.Tests.Domain.OutgoingMessages.Queueing;
 
@@ -34,7 +35,8 @@ public class ActorMessageQueueTests
     [Fact]
     public void When_no_message_has_been_enqueued_peek_returns_no_bundle_id()
     {
-        var actorMessageQueue = ActorMessageQueue.CreateFor(Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier));
+        var actorMessageQueue = ActorMessageQueue.CreateFor(
+            Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier));
 
         var result = actorMessageQueue.Peek();
 
@@ -46,7 +48,10 @@ public class ActorMessageQueueTests
     {
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
-        var (bundle, outgoingMessage) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
+        var (bundle, outgoingMessage) = CreateBundleWithOutgoingMessage(
+            actorMessageQueue.Id,
+            receiver,
+            BusinessReason.BalanceFixing);
         AddBundleToQueue(actorMessageQueue, bundle);
 
         var result = actorMessageQueue.Peek();
@@ -64,7 +69,10 @@ public class ActorMessageQueueTests
     {
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
-        var (bundle, outgoingMessage) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
+        var (bundle, outgoingMessage) = CreateBundleWithOutgoingMessage(
+            actorMessageQueue.Id,
+            receiver,
+            BusinessReason.BalanceFixing);
         AddBundleToQueue(actorMessageQueue, bundle);
 
         var peekResult = actorMessageQueue.Peek();
@@ -82,8 +90,14 @@ public class ActorMessageQueueTests
     {
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
-        var (bundle1, message1) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
-        var (bundle2, message2) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
+        var (bundle1, message1) = CreateBundleWithOutgoingMessage(
+            actorMessageQueue.Id,
+            receiver,
+            BusinessReason.BalanceFixing);
+        var (bundle2, message2) = CreateBundleWithOutgoingMessage(
+            actorMessageQueue.Id,
+            receiver,
+            BusinessReason.BalanceFixing);
         AddBundleToQueue(actorMessageQueue, bundle1);
         AddBundleToQueue(actorMessageQueue, bundle2);
 
@@ -108,8 +122,14 @@ public class ActorMessageQueueTests
     {
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
-        var (bundle1, message1) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
-        var (bundle2, message2) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
+        var (bundle1, message1) = CreateBundleWithOutgoingMessage(
+            actorMessageQueue.Id,
+            receiver,
+            BusinessReason.BalanceFixing);
+        var (bundle2, message2) = CreateBundleWithOutgoingMessage(
+            actorMessageQueue.Id,
+            receiver,
+            BusinessReason.BalanceFixing);
         AddBundleToQueue(actorMessageQueue, bundle1);
         AddBundleToQueue(actorMessageQueue, bundle2);
 
@@ -130,8 +150,16 @@ public class ActorMessageQueueTests
     {
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
-        var (bundle1, message1) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.MoveIn, DocumentType.NotifyAggregatedMeasureData);
-        var (bundle2, message2) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing, DocumentType.RejectRequestAggregatedMeasureData);
+        var (bundle1, message1) = CreateBundleWithOutgoingMessage(
+            actorMessageQueue.Id,
+            receiver,
+            BusinessReason.MoveIn,
+            DocumentType.NotifyAggregatedMeasureData);
+        var (bundle2, message2) = CreateBundleWithOutgoingMessage(
+            actorMessageQueue.Id,
+            receiver,
+            BusinessReason.BalanceFixing,
+            DocumentType.RejectRequestAggregatedMeasureData);
         AddBundleToQueue(actorMessageQueue, bundle1);
         AddBundleToQueue(actorMessageQueue, bundle2);
 
@@ -153,8 +181,14 @@ public class ActorMessageQueueTests
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
 
-        var (bundle1, message1) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
-        var (bundle2, message2) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
+        var (bundle1, message1) = CreateBundleWithOutgoingMessage(
+            actorMessageQueue.Id,
+            receiver,
+            BusinessReason.BalanceFixing);
+        var (bundle2, message2) = CreateBundleWithOutgoingMessage(
+            actorMessageQueue.Id,
+            receiver,
+            BusinessReason.BalanceFixing);
 
         AddBundleToQueue(actorMessageQueue, bundle1);
         AddBundleToQueue(actorMessageQueue, bundle2);
@@ -172,8 +206,14 @@ public class ActorMessageQueueTests
     {
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
-        var (bundle1, message1) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
-        var (bundle2, message2) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
+        var (bundle1, message1) = CreateBundleWithOutgoingMessage(
+            actorMessageQueue.Id,
+            receiver,
+            BusinessReason.BalanceFixing);
+        var (bundle2, message2) = CreateBundleWithOutgoingMessage(
+            actorMessageQueue.Id,
+            receiver,
+            BusinessReason.BalanceFixing);
         AddBundleToQueue(actorMessageQueue, bundle1);
 
         actorMessageQueue.Peek();
@@ -188,10 +228,17 @@ public class ActorMessageQueueTests
         var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var actorMessageQueue = ActorMessageQueue.CreateFor(receiver);
 
-        var (bundle1, message1) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing, DocumentType.NotifyAggregatedMeasureData);
+        var (bundle1, message1) = CreateBundleWithOutgoingMessage(
+            actorMessageQueue.Id,
+            receiver,
+            BusinessReason.BalanceFixing,
+            DocumentType.NotifyAggregatedMeasureData);
         AddBundleToQueue(actorMessageQueue, bundle1);
 
-        var (bundle2, message2) = CreateBundleWithOutgoingMessage(actorMessageQueue.Id, receiver, BusinessReason.BalanceFixing);
+        var (bundle2, message2) = CreateBundleWithOutgoingMessage(
+            actorMessageQueue.Id,
+            receiver,
+            BusinessReason.BalanceFixing);
         AddBundleToQueue(actorMessageQueue, bundle2);
 
         Assert.NotEqual(message1.AssignedBundleId, message2.AssignedBundleId);
@@ -225,11 +272,12 @@ public class ActorMessageQueueTests
             ActorNumber.Create("1234567890124"),
             ActorRole.EnergySupplier);
 
+        var eventId = EventId.From(Guid.NewGuid());
         var outgoingMessage = new OutgoingMessage(
-            eventId: EventId.From(Guid.NewGuid()),
+            eventId: eventId,
             documentType: messageType ?? DocumentType.NotifyAggregatedMeasureData,
-            receiver: Receiver.Create(receiver.Number, receiver.ActorRole),
-            documentReceiver: Receiver.Create(receiver.Number, receiver.ActorRole),
+            receiver: receiver,
+            documentReceiver: receiver,
             processId: ProcessId.New().Id,
             businessReason: businessReason?.Name ?? BusinessReason.BalanceFixing.Name,
             serializedContent: string.Empty,
@@ -238,7 +286,13 @@ public class ActorMessageQueueTests
             relatedToMessageId: null,
             gridAreaCode: null,
             externalId: new ExternalId(Guid.NewGuid()),
-            calculationId: Guid.NewGuid());
+            calculationId: Guid.NewGuid(),
+            OutgoingMessageIdempotentId.New(
+                receiver.ActorRole.Code,
+                eventId.Value,
+                new Period(
+                Instant.FromUtc(2024, 9, 1, 0, 0),
+                Instant.FromUtc(2024, 10, 1, 0, 0)).ToString()));
 
         var bundle = new Bundle(
             actorMessageQueueId,
