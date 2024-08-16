@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Security.Cryptography;
-using System.Text;
-
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
 /// <summary>
@@ -22,12 +19,12 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 /// </summary>
 public record OutgoingMessageIdempotentId
 {
-    private OutgoingMessageIdempotentId(byte[] value)
+    private OutgoingMessageIdempotentId(string value)
     {
         Value = value;
     }
 
-    public byte[] Value { get; }
+    public string Value { get; }
 
     public static OutgoingMessageIdempotentId New(params string[] values)
     {
@@ -37,13 +34,10 @@ public record OutgoingMessageIdempotentId
         }
 
         var concatenatedValues = string.Join(string.Empty, values);
-        using var hash = SHA256.Create();
-        var hashed = hash.ComputeHash(Encoding.UTF8.GetBytes(concatenatedValues));
-
-        return new OutgoingMessageIdempotentId(hashed);
+        return new OutgoingMessageIdempotentId(concatenatedValues);
     }
 
-    public static OutgoingMessageIdempotentId CreateFromExisting(byte[] existingOutgoingMessageIdempotencyId)
+    public static OutgoingMessageIdempotentId CreateFromExisting(string existingOutgoingMessageIdempotencyId)
     {
         return new OutgoingMessageIdempotentId(existingOutgoingMessageIdempotencyId);
     }

@@ -1,5 +1,14 @@
 ALTER TABLE [dbo].[OutgoingMessages]
-    ADD [IdempotentId] BINARY(32) NOT NULL DEFAULT 0x0000000000000000000000000000000000000000000000000000000000000000;
+    ADD [IdempotentId] VARCHAR(60) NULL;
+GO
+
+UPDATE [dbo].[OutgoingMessages]
+SET [IdempotentId] = [ExternalId]
+WHERE [IdempotentId] IS NULL;
+GO
+
+ALTER TABLE [dbo].[OutgoingMessages]
+ALTER COLUMN [IdempotentId] UNIQUEIDENTIFIER NOT NULL;
 GO
 
 -- recreate the index with the new IdempotentId column
