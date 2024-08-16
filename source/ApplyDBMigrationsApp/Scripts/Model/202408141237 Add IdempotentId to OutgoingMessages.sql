@@ -1,5 +1,5 @@
 ALTER TABLE [dbo].[OutgoingMessages]
-    ADD [IdempotentId] INT NOT NULL DEFAULT(0);
+    ADD [IdempotentId] BINARY(32) NOT NULL DEFAULT 0x0000000000000000000000000000000000000000000000000000000000000000;
 GO
 
 -- recreate the index with the new IdempotentId column
