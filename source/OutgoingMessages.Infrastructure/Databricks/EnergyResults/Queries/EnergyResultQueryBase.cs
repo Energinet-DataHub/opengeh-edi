@@ -66,21 +66,24 @@ public abstract class EnergyResultQueryBase<TResult>(
 
         DatabricksSqlRow? previousResult = null;
         var currentResultSet = new List<DatabricksSqlRow>();
+
         await foreach (var currentResult in databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement).ConfigureAwait(false))
         {
-            if (previousResult == null || BelongsToSameResultSet(previousResult, currentResult))
+            if (previousResult == null || BelongsToSameResultSet(currentResult, previousResult))
             {
-                previousResult = currentResult;
                 currentResultSet.Add(currentResult);
+                previousResult = currentResult;
                 continue;
             }
 
             yield return await CreateResultAsync(currentResultSet).ConfigureAwait(false);
 
             // Next result
-            currentResultSet = [];
+            currentResultSet =
+            [
+                currentResult,
+            ];
             previousResult = currentResult;
-            currentResultSet.Add(currentResult);
         }
 
         // Last result (if any)
@@ -128,21 +131,33 @@ public abstract class EnergyResultQueryBase<TResult>(
         return QueryResult<TResult>.Error();
     }
 
-    private bool BelongsToSameResultSet(DatabricksSqlRow? previousResult, DatabricksSqlRow currentResult)
+    private bool BelongsToSameResultSet(DatabricksSqlRow currentResult, DatabricksSqlRow? previousResult)
     {
         return
             previousResult?.ToGuid(EnergyResultColumnNames.ResultId) == currentResult.ToGuid(EnergyResultColumnNames.ResultId)
-            && IsAFollowingResult(previousResult, currentResult);
+            && IsNextInResultSequence(currentResult, previousResult);
     }
 
-    private bool IsAFollowingResult(DatabricksSqlRow previousResult, DatabricksSqlRow currentResult)
+    /// <summary>
+    /// Checks if the current result follows the previous result based on time and resolution.
+    /// </summary>
+    private bool IsNextInResultSequence(DatabricksSqlRow currentResult, DatabricksSqlRow previousResult)
     {
-        var resolution =
+        var endTimeOfPreviousResult = GetEndTimeOfPreviousResult(previousResult);
+        return endTimeOfPreviousResult == currentResult.ToInstant(EnergyResultColumnNames.Time);
+    }
+
+    private Instant GetEndTimeOfPreviousResult(DatabricksSqlRow previousResult)
+    {
+        var resolutionOfPreviousResult =
             ResolutionMapper.FromDeltaTableValue(
                 previousResult.ToNonEmptyString(EnergyResultColumnNames.Resolution));
-        var previousTime = previousResult.ToInstant(EnergyResultColumnNames.Time);
-        var currentExceptedTime = PeriodFactory.GetEndDateWithResolutionOffset(resolution, previousTime, DateTimeZone);
-        return currentExceptedTime == currentResult.ToInstant(EnergyResultColumnNames.Time);
+        var startTimeOfPreviousResult = previousResult.ToInstant(EnergyResultColumnNames.Time);
+
+        return PeriodFactory.GetEndDateWithResolutionOffset(
+            resolutionOfPreviousResult,
+            startTimeOfPreviousResult,
+            DateTimeZone);
     }
 
     private string BuildSqlQuery()
