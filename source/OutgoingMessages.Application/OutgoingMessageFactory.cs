@@ -187,7 +187,7 @@ public static class OutgoingMessageFactory
                 gridAreaCode: messageDto.GridArea,
                 externalId: messageDto.ExternalId,
                 calculationId: messageDto.CalculationId,
-                messageDto.SeriesForEnergySupplier.Period.Start);
+                messageDto.SeriesForBalanceResponsible.Period.Start);
 
             outgoingMessages.Add(outgoingMessageToBalanceResponsible);
         }
