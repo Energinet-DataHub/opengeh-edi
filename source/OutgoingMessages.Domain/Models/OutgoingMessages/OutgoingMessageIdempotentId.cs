@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using NodaTime;
+
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
 /// <summary>
@@ -26,15 +29,9 @@ public record OutgoingMessageIdempotentId
 
     public string Value { get; }
 
-    public static OutgoingMessageIdempotentId New(params string[] values)
+    public static OutgoingMessageIdempotentId New(ActorRole actorRole, ExternalId externalId, Instant? startedAt)
     {
-        if (values.Length == 0)
-        {
-            throw new ArgumentException("At least one value must be provided", nameof(values));
-        }
-
-        var concatenatedValues = string.Join('_', values);
-        return new OutgoingMessageIdempotentId(concatenatedValues);
+        return new OutgoingMessageIdempotentId($"{actorRole.Code}_{externalId.Value}_{startedAt?.ToUnixTimeSeconds()}");
     }
 
     public static OutgoingMessageIdempotentId CreateFromExisting(string existingOutgoingMessageIdempotencyId)
