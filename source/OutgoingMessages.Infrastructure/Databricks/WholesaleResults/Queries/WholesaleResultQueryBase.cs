@@ -61,7 +61,7 @@ public abstract class WholesaleResultQueryBase<TResult>(
     /// </summary>
     public abstract Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition { get; }
 
-    internal DateTimeZone DateTimeZone => dateTimeZone;
+    protected DateTimeZone DateTimeZone => dateTimeZone;
 
     internal async IAsyncEnumerable<QueryResult<TResult>> GetAsync(DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor)
     {
@@ -72,29 +72,31 @@ public abstract class WholesaleResultQueryBase<TResult>(
             .Build();
 
         DatabricksSqlRow? previousResult = null;
-        var currentResultRows = new List<DatabricksSqlRow>();
+        var currentResultSet = new List<DatabricksSqlRow>();
 
         await foreach (var currentResult in databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement).ConfigureAwait(false))
         {
-            if (previousResult == null || BelongsToSameResultSet(previousResult, currentResult))
+            if (previousResult == null || BelongsToSameResultSet(currentResult, previousResult))
             {
+                currentResultSet.Add(currentResult);
                 previousResult = currentResult;
-                currentResultRows.Add(currentResult);
                 continue;
             }
 
-            yield return await CreateResultAsync(currentResultRows).ConfigureAwait(false);
+            yield return await CreateResultAsync(currentResultSet).ConfigureAwait(false);
 
-            // Next result
-            currentResultRows = [];
+            // Next result serie
+            currentResultSet =
+            [
+                currentResult,
+            ];
             previousResult = currentResult;
-            currentResultRows.Add(currentResult);
         }
 
         // Last result (if any)
-        if (currentResultRows.Count != 0)
+        if (currentResultSet.Count != 0)
         {
-            yield return await CreateResultAsync(currentResultRows).ConfigureAwait(false);
+            yield return await CreateResultAsync(currentResultSet).ConfigureAwait(false);
         }
     }
 
@@ -128,21 +130,30 @@ public abstract class WholesaleResultQueryBase<TResult>(
             databricksSqlRow.ToNullableDecimal(WholesaleResultColumnNames.Amount));
     }
 
-    private bool BelongsToSameResultSet(DatabricksSqlRow? previousResult, DatabricksSqlRow currentResult)
+    private bool BelongsToSameResultSet(DatabricksSqlRow currentResult, DatabricksSqlRow? previousResult)
     {
         return
             previousResult?.ToGuid(WholesaleResultColumnNames.ResultId) == currentResult.ToGuid(WholesaleResultColumnNames.ResultId)
-            && IsAFollowingResult(previousResult, currentResult);
+            && IsNextInResultSequence(currentResult, previousResult);
     }
 
-    private bool IsAFollowingResult(DatabricksSqlRow previousResult, DatabricksSqlRow currentResult)
+    /// <summary>
+    /// Checks if the current result follows the previous result based on time and resolution.
+    /// </summary>
+    private bool IsNextInResultSequence(DatabricksSqlRow currentResult, DatabricksSqlRow previousResult)
     {
-        var resolution =
-            ResolutionMapper.FromDeltaTableValue(
-                previousResult.ToNonEmptyString(WholesaleResultColumnNames.Resolution));
-        var previousTime = previousResult.ToInstant(WholesaleResultColumnNames.Time);
-        var currentExceptedTime = PeriodFactory.GetEndDateWithResolutionOffset(resolution, previousTime, DateTimeZone);
-        return currentExceptedTime == currentResult.ToInstant(WholesaleResultColumnNames.Time);
+        var endTimeOfPreviousResult = GetEndTimeOfPreviousResult(previousResult);
+
+        return endTimeOfPreviousResult == currentResult.ToInstant(WholesaleResultColumnNames.Time);
+    }
+
+    private Instant GetEndTimeOfPreviousResult(DatabricksSqlRow previousResult)
+    {
+        var resolutionOfPreviousResult = ResolutionMapper.FromDeltaTableValue(
+            previousResult.ToNonEmptyString(WholesaleResultColumnNames.Resolution));
+        var startTimeOfPreviousResult = previousResult.ToInstant(WholesaleResultColumnNames.Time);
+
+        return PeriodFactory.GetEndDateWithResolutionOffset(resolutionOfPreviousResult, startTimeOfPreviousResult, DateTimeZone);
     }
 
     private async Task<QueryResult<TResult>> CreateResultAsync(IReadOnlyCollection<DatabricksSqlRow> resultRows)
