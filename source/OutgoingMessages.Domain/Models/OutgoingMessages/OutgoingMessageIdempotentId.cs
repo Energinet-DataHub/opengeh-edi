@@ -33,7 +33,7 @@ public record OutgoingMessageIdempotentId
             throw new ArgumentException("At least one value must be provided", nameof(values));
         }
 
-        var concatenatedValues = string.Join(string.Empty, values);
+        var concatenatedValues = string.Join('_', values);
         return new OutgoingMessageIdempotentId(concatenatedValues);
     }
 

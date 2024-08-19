@@ -39,11 +39,6 @@ public record Period(Instant Start, Instant End)
         return ParsePeriodDateFromToEbix(End);
     }
 
-    public override string ToString()
-    {
-        return $"{StartToString()}_{EndToString()}";
-    }
-
     private static string ParsePeriodDateFromToEbix(Instant instant)
     {
         return instant.ToString("yyyy-MM-ddTHH:mm:ss'Z'", CultureInfo.InvariantCulture);
