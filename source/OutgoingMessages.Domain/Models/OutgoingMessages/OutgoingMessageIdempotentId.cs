@@ -15,7 +15,7 @@
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
 /// <summary>
-/// A hashed value for an outgoing message to ensure idempotency
+/// A value for an outgoing message to ensure idempotency
 /// </summary>
 public record OutgoingMessageIdempotentId
 {
