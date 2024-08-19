@@ -3,7 +3,7 @@ ALTER TABLE [dbo].[OutgoingMessages]
 GO
 
 UPDATE [dbo].[OutgoingMessages]
-SET [IdempotentId] = [ExternalId]
+SET [IdempotentId] = NEWID()
 WHERE [IdempotentId] IS NULL;
 GO
 
