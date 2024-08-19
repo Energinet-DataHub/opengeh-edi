@@ -228,7 +228,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     public async Task Second_request_with_same_transactionId_and_messageId_is_rejected(DocumentFormat format, IncomingDocumentType incomingDocumentType, IncomingMarketMessageStream incomingMarketMessageStream)
     {
         // Arrange
-        var exceptedDuplicateTransactionIdDetectedErrorCode = "00110";
+        var exceptedDuplicateTransactionIdDetectedErrorCode = "00102";
         var exceptedDuplicateMessageIdDetectedErrorCode = "00101";
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
