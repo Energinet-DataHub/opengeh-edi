@@ -25,6 +25,8 @@ using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyI
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 
@@ -39,21 +41,22 @@ public static class HostFactory
         ArgumentNullException.ThrowIfNull(tokenValidationParameters);
 
         return new HostBuilder()
-            .ConfigureFunctionsWorkerDefaults(
-                worker =>
+            .ConfigureFunctionsWebApplication(
+                builder =>
                 {
-                    worker.UseMiddleware<UnHandledExceptionMiddleware>();
-                    worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
-                    worker.UseMiddleware<ExecutionContextMiddleware>();
-                },
-                option =>
-                {
-                    option.EnableUserCodeException = true;
+                    builder.UseMiddleware<UnHandledExceptionMiddleware>();
+                    builder.UseMiddleware<MarketActorAuthenticatorMiddleware>();
+                    builder.UseMiddleware<ExecutionContextMiddleware>();
                 })
             .ConfigureServices(
                 (context, services) =>
                 {
                     services
+                        .Configure<WorkerOptions>(options =>
+                        {
+                            options.EnableUserCodeException = true;
+                        })
+
                         // Logging
                         .AddApplicationInsightsForIsolatedWorker(DomainName)
 
