@@ -287,12 +287,7 @@ public class ActorMessageQueueTests
             gridAreaCode: null,
             externalId: new ExternalId(Guid.NewGuid()),
             calculationId: Guid.NewGuid(),
-            OutgoingMessageIdempotentId.New(
-                receiver.ActorRole.Code,
-                eventId.Value,
-                new Period(
-                Instant.FromUtc(2024, 9, 1, 0, 0),
-                Instant.FromUtc(2024, 10, 1, 0, 0)).ToString()));
+            Instant.FromUtc(2024, 9, 1, 0, 0));
 
         var bundle = new Bundle(
             actorMessageQueueId,
