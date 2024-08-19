@@ -1,5 +1,5 @@
 ALTER TABLE [dbo].[OutgoingMessages]
-    ADD [IdempotentId] VARCHAR(60) NULL;
+    ADD [IdempotentId] VARCHAR(90) NULL;
 GO
 
 UPDATE [dbo].[OutgoingMessages]
@@ -8,7 +8,7 @@ WHERE [IdempotentId] IS NULL;
 GO
 
 ALTER TABLE [dbo].[OutgoingMessages]
-ALTER COLUMN [IdempotentId] VARCHAR(60) NOT NULL;
+ALTER COLUMN [IdempotentId] VARCHAR(90) NOT NULL;
 GO
 
 -- recreate the index with the new IdempotentId column
