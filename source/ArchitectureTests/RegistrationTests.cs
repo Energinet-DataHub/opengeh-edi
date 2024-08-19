@@ -16,7 +16,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 using BuildingBlocks.Application.Extensions.Options;
-using Energinet.DataHub.Core.App.WebApp.Extensions.Options;
+using Energinet.DataHub.Core.App.Common.Extensions.Options;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.EDI.B2BApi;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
