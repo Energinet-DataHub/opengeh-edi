@@ -40,7 +40,8 @@ public class OutgoingMessage
         MessageId? relatedToMessageId,
         string? gridAreaCode,
         ExternalId externalId,
-        Guid? calculationId)
+        Guid? calculationId,
+        Instant? periodStartedAt)
     {
         Id = OutgoingMessageId.New();
         EventId = eventId;
@@ -55,6 +56,10 @@ public class OutgoingMessage
         DocumentReceiver = documentReceiver;
         CreatedAt = createdAt;
         FileStorageReference = CreateFileStorageReference(Receiver.Number, createdAt, Id);
+        IdempotentId = OutgoingMessageIdempotentId.New(
+            receiver.ActorRole,
+            externalId,
+            periodStartedAt);
         ExternalId = externalId;
         CalculationId = calculationId;
     }
@@ -77,7 +82,8 @@ public class OutgoingMessage
         Instant createdAt,
         string? gridAreaCode,
         ExternalId externalId,
-        Guid? calculationId)
+        Guid? calculationId,
+        OutgoingMessageIdempotentId idempotentId)
     {
         Id = id;
         DocumentType = documentType;
@@ -92,6 +98,7 @@ public class OutgoingMessage
         CreatedAt = createdAt;
         ExternalId = externalId;
         CalculationId = calculationId;
+        IdempotentId = idempotentId;
         // DocumentReceiver, EF will set this after the constructor
         // Receiver, EF will set this after the constructor
         // _serializedContent is set later in OutgoingMessageRepository, by getting the message from File Storage
@@ -146,6 +153,8 @@ public class OutgoingMessage
     public ExternalId ExternalId { get; }
 
     public Guid? CalculationId { get; }
+
+    public OutgoingMessageIdempotentId IdempotentId { get; set; }
 
     public void AssignToBundle(BundleId bundleId)
     {

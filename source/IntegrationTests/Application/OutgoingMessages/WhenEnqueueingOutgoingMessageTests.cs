@@ -35,6 +35,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime;
+using NodaTime.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 using RejectedEnergyResultMessageDtoBuilder = Energinet.DataHub.EDI.IntegrationTests.Factories.RejectedEnergyResultMessageDtoBuilder;
@@ -83,6 +84,9 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
 
         // Assert
         var expectedFileStorageReference = $"{SampleData.GridOperatorNumber}/{now.Year():0000}/{now.Month():00}/{now.Day():00}/{createdOutgoingMessageId:N}";
+        var expectedOutgoingMessageIdempotentId = OutgoingMessageIdempotentId
+            .New(message.ReceiverRole, message.ExternalId, message.Series.Period.Start)
+            .Value;
 
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = "SELECT * FROM [dbo].[OutgoingMessages]";
@@ -120,6 +124,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.Null(messageFromDatabase.ModifiedBy),
             () => Assert.Equal(message.ExternalId.Value, messageFromDatabase.ExternalId),
             () => Assert.Equal(message.CalculationId, messageFromDatabase.CalculationId),
+            () => Assert.Equal(messageFromDatabase.IdempotentId, expectedOutgoingMessageIdempotentId),
         };
 
         Assert.Multiple(propertyAssertions);
@@ -485,15 +490,16 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     }
 
     [Fact]
-    public async Task Outgoing_message_must_only_be_enqueued_once_to_an_receiver_with_same_externalId()
+    public async Task Outgoing_message_must_only_be_enqueued_once_to_an_receiver_with_same_event_id_and_period()
     {
         // Arrange
         var receiverId = ActorNumber.Create("1234567891912");
-        var externalId = Guid.NewGuid();
+        var eventId = Guid.NewGuid();
 
         var message = _wholesaleAmountPerChargeDtoBuilder
             .WithReceiverNumber(receiverId)
-            .WithCalculationResultId(externalId)
+            .WithEventId(eventId)
+            .WithPeriod(new(DateTimeOffset.UtcNow.ToInstant(), DateTimeOffset.UtcNow.AddHours(1).ToInstant()))
             .Build();
 
         var countBeforeEnqueue = await GetCountOfOutgoingMessagesFromDatabase();
@@ -512,16 +518,16 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     }
 
     [Fact]
-    public async Task Outgoing_message_can_be_enqueued_multiple_times_to_same_receiver_with_different_roles_and_same_externalId()
+    public async Task Outgoing_message_can_be_enqueued_multiple_times_to_same_receiver_with_different_roles_and_same_eventId()
     {
         // Arrange
         var receiverId = ActorNumber.Create("1234567891912");
-        var externalId = Guid.NewGuid();
+        var eventId = EventId.From(Guid.NewGuid());
 
         var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
             .WithEnergySupplierReceiverNumber(receiverId.Value)
             .WithBalanceResponsiblePartyReceiverNumber(receiverId.Value)
-            .WithCalculationResultId(externalId)
+            .WithEventId(eventId)
             .Build();
 
         var countBeforeEnqueue = await GetCountOfOutgoingMessagesFromDatabase();

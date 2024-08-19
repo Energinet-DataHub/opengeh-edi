@@ -17,6 +17,8 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
+using NodaTime;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 
@@ -72,7 +74,8 @@ public sealed class AggregatedMeasureDataProcess : Entity
         EnergySupplierId = energySupplierId;
         BalanceResponsibleId = balanceResponsibleId;
         SettlementVersion = settlementVersion;
-        _gridAreas = gridAreas.Select(ga => new AggregatedMeasureDataProcessGridArea(Guid.NewGuid(), ProcessId, ga)).ToArray();
+        _gridAreas = gridAreas.Select(ga => new AggregatedMeasureDataProcessGridArea(Guid.NewGuid(), ProcessId, ga))
+            .ToArray();
         AddDomainEvent(new AggregatedMeasureProcessIsInitialized(processId));
     }
 
@@ -182,7 +185,9 @@ public sealed class AggregatedMeasureDataProcess : Entity
         if (_state != State.Sent)
             return;
 
-        AddDomainEvent(new EnqueueRejectedEnergyResultMessageEvent(CreateRejectedAggregationResultMessage(rejectAggregatedMeasureDataRequest)));
+        AddDomainEvent(
+            new EnqueueRejectedEnergyResultMessageEvent(
+                CreateRejectedAggregationResultMessage(rejectAggregatedMeasureDataRequest)));
 
         _state = State.Rejected;
     }
@@ -190,7 +195,9 @@ public sealed class AggregatedMeasureDataProcess : Entity
     /// <summary>
     /// If requested grid are has a value, then grid areas must contain exactly the requested grid area.
     /// </summary>
-    private bool GridAreasAreInSyncWithRequestedGridArea(string? requestedGridArea, IReadOnlyCollection<string> gridAreas)
+    private bool GridAreasAreInSyncWithRequestedGridArea(
+        string? requestedGridArea,
+        IReadOnlyCollection<string> gridAreas)
     {
         // If requested grid area is null, then grid areas can have any value
         if (string.IsNullOrEmpty(requestedGridArea))
@@ -205,10 +212,11 @@ public sealed class AggregatedMeasureDataProcess : Entity
     {
         var rejectedTimeSerie = new RejectedEnergyResultMessageSerie(
             TransactionId.New(),
-            rejectedAggregatedMeasureDataRequest.RejectReasons.Select(reason =>
-                    new RejectedEnergyResultMessageRejectReason(
-                        reason.ErrorCode,
-                        reason.ErrorMessage))
+            rejectedAggregatedMeasureDataRequest.RejectReasons.Select(
+                    reason =>
+                        new RejectedEnergyResultMessageRejectReason(
+                            reason.ErrorCode,
+                            reason.ErrorMessage))
                 .ToList(),
             BusinessTransactionId);
 
