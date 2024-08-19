@@ -228,7 +228,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     public async Task Second_request_with_same_transactionId_and_messageId_is_rejected(DocumentFormat format, IncomingDocumentType incomingDocumentType, IncomingMarketMessageStream incomingMarketMessageStream)
     {
         // Arrange
-        var exceptedDuplicateTransactionIdDetectedErrorCode = "00110";
+        var exceptedDuplicateTransactionIdDetectedErrorCode = "00102";
         var exceptedDuplicateMessageIdDetectedErrorCode = "00101";
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
@@ -267,12 +267,14 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         IEnumerable<ResponseMessage> results = await Task.WhenAll(task01, task02);
 
         // Assert
-        Assert.Multiple(
-            () => Assert.NotNull(results),
-            () => Assert.Single(results.Where(result => result.IsErrorResponse)),
-            () => Assert.Single(results.Where(result =>
-                result.MessageBody.Contains(exceptedDuplicateTransactionIdDetectedErrorCode, StringComparison.OrdinalIgnoreCase)
-                || result.MessageBody.Contains(exceptedDuplicateMessageIdDetectedErrorCode, StringComparison.OrdinalIgnoreCase))));
+        using var assertionScope = new AssertionScope();
+        results.Should().NotBeNullOrEmpty();
+        results.Should().ContainSingle(result => result.IsErrorResponse, because: "we expect the results contains exactly 1 error");
+
+        var errorResult = results.Single(result => result.IsErrorResponse);
+        errorResult.MessageBody.Should().ContainAny([
+            exceptedDuplicateTransactionIdDetectedErrorCode,
+            exceptedDuplicateMessageIdDetectedErrorCode]);
     }
 
     [Theory]

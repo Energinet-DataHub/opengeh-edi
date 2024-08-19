@@ -12,32 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using NodaTime;
+
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
 /// <summary>
-/// A hashed value for an outgoing message to ensure idempotency
+/// A value for an outgoing message to ensure idempotency
 /// </summary>
 public record OutgoingMessageIdempotentId
 {
-    private OutgoingMessageIdempotentId(int value)
+    private OutgoingMessageIdempotentId(string value)
     {
         Value = value;
     }
 
-    public int Value { get; }
+    public string Value { get; }
 
-    public static OutgoingMessageIdempotentId New(params string[] values)
+    public static OutgoingMessageIdempotentId New(ActorRole actorRole, ExternalId externalId, Instant? startedAt)
     {
-        if (values.Length == 0)
-        {
-            throw new ArgumentException("At least one value must be provided", nameof(values));
-        }
-
-        var concatenatedValues = string.Join(string.Empty, values);
-        return new OutgoingMessageIdempotentId(concatenatedValues.GetHashCode());
+        return new OutgoingMessageIdempotentId($"{actorRole.Code}_{externalId.Value}_{startedAt?.ToUnixTimeSeconds()}");
     }
 
-    public static OutgoingMessageIdempotentId CreateFromExisting(int existingOutgoingMessageIdempotencyId)
+    public static OutgoingMessageIdempotentId CreateFromExisting(string existingOutgoingMessageIdempotencyId)
     {
         return new OutgoingMessageIdempotentId(existingOutgoingMessageIdempotencyId);
     }

@@ -41,7 +41,7 @@ public class OutgoingMessage
         string? gridAreaCode,
         ExternalId externalId,
         Guid? calculationId,
-        OutgoingMessageIdempotentId idempotentId)
+        Instant? periodStartedAt)
     {
         Id = OutgoingMessageId.New();
         EventId = eventId;
@@ -56,7 +56,10 @@ public class OutgoingMessage
         DocumentReceiver = documentReceiver;
         CreatedAt = createdAt;
         FileStorageReference = CreateFileStorageReference(Receiver.Number, createdAt, Id);
-        IdempotentId = idempotentId;
+        IdempotentId = OutgoingMessageIdempotentId.New(
+            receiver.ActorRole,
+            externalId,
+            periodStartedAt);
         ExternalId = externalId;
         CalculationId = calculationId;
     }
