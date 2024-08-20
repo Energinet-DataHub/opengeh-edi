@@ -38,7 +38,7 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
 
     public override string GridAreaCode => "543";
 
-    public override int ExpectedCalculationResultsCount => 35;
+    public override int ExpectedCalculationResultsCount => 36;
 
     public override Period Period => new(
         Instant.FromUtc(2022, 1, 11, 23, 0, 0),
@@ -46,7 +46,7 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
 
     public ExampleDataForActor<ExampleEnergyResultMessageForActor> ExampleEnergySupplier => new(
         ActorNumber: ActorNumber.Create("5790002105289"),
-        ExpectedOutgoingMessagesCount: 2,
+        ExpectedOutgoingMessagesCount: 3,
         ExampleMessageData: new ExampleEnergyResultMessageForActor(
             GridArea: "543",
             MeteringPointType.Consumption,
@@ -61,7 +61,7 @@ public class EnergyResultPerEnergySupplierBrpGridAreaDescription
 
     public ExampleDataForActor<ExampleEnergyResultMessageForActor> ExampleBalanceResponsible => new(
         ActorNumber: ActorNumber.Create("7080000729821"),
-        ExpectedOutgoingMessagesCount: 5,
+        ExpectedOutgoingMessagesCount: 6,
         ExampleMessageData: new ExampleEnergyResultMessageForActor(
             GridArea: "543",
             MeteringPointType.Production,
