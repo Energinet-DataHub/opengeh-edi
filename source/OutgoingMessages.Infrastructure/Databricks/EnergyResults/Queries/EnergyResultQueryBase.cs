@@ -27,8 +27,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Energ
 public abstract class EnergyResultQueryBase<TResult>(
         ILogger logger,
         EdiDatabricksOptions ediDatabricksOptions,
-        Guid calculationId,
-        DateTimeZone dateTimeZone)
+        Guid calculationId)
     : IDeltaTableSchemaDescription
     where TResult : OutgoingMessageDto
 {
@@ -53,8 +52,6 @@ public abstract class EnergyResultQueryBase<TResult>(
     /// Can be used in tests to create a matching data object (e.g. table).
     /// </summary>
     public abstract Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition { get; }
-
-    internal DateTimeZone DateTimeZone { get; } = dateTimeZone;
 
     internal async IAsyncEnumerable<QueryResult<TResult>> GetAsync(DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor)
     {
@@ -156,8 +153,7 @@ public abstract class EnergyResultQueryBase<TResult>(
 
         return PeriodFactory.GetEndDateWithResolutionOffset(
             resolutionOfPreviousResult,
-            startTimeOfPreviousResult,
-            DateTimeZone);
+            startTimeOfPreviousResult);
     }
 
     private string BuildSqlQuery()

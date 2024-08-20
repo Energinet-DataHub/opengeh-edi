@@ -38,13 +38,11 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(
         ILogger logger,
         EdiDatabricksOptions ediDatabricksOptions,
         EventId eventId,
-        Guid calculationId,
-        DateTimeZone dateTimeZone)
+        Guid calculationId)
     : EnergyResultQueryBase<EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDto>(
         logger,
         ediDatabricksOptions,
-        calculationId,
-        dateTimeZone)
+        calculationId)
 {
     private readonly EventId _eventId = eventId;
 
@@ -88,7 +86,7 @@ public class EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(
             settlementMethod: SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)),
             measurementUnit: MeasurementUnitMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)),
             resolution: resolution,
-            period: PeriodFactory.GetPeriod(timeSeriesPoints, resolution, DateTimeZone),
+            period: PeriodFactory.GetPeriod(timeSeriesPoints, resolution),
             balanceResponsibleNumber: ActorNumber.Create(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.BalanceResponsiblePartyId)),
             energySupplierNumber: ActorNumber.Create(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.EnergySupplierId)),
             points: EnergyResultMessageDtoFactory.CreateEnergyResultMessagePoints(timeSeriesPoints));

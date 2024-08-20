@@ -30,13 +30,11 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 public class EnqueueEnergyResultsForBalanceResponsiblesActivity(
     ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity> logger,
     IServiceScopeFactory serviceScopeFactory,
-    EnergyResultEnumerator energyResultEnumerator,
-    DateTimeZone dateTimeZone)
+    EnergyResultEnumerator energyResultEnumerator)
     : EnqueueEnergyResultsBaseActivity(logger, serviceScopeFactory, energyResultEnumerator)
 {
     private readonly ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity> _logger = logger;
     private readonly EnergyResultEnumerator _energyResultEnumerator = energyResultEnumerator;
-    private readonly DateTimeZone _dateTimeZone = dateTimeZone;
 
     [Function(nameof(EnqueueEnergyResultsForBalanceResponsiblesActivity))]
     public Task<int> Run(
@@ -46,8 +44,7 @@ public class EnqueueEnergyResultsForBalanceResponsiblesActivity(
             _logger,
             _energyResultEnumerator.EdiDatabricksOptions,
             EventId.From(input.EventId),
-            input.CalculationId,
-            _dateTimeZone);
+            input.CalculationId);
 
         return EnqueueEnergyResults(input, query);
     }

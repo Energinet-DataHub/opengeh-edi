@@ -265,8 +265,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             GetService<ILogger<EnqueueEnergyResultsForGridAreaOwnersActivity>>(),
             GetService<IServiceScopeFactory>(),
             GetService<IMasterDataClient>(),
-            GetService<EnergyResultEnumerator>(),
-            DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
+            GetService<EnergyResultEnumerator>());
 
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
     }
@@ -276,8 +275,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         var activity = new EnqueueEnergyResultsForBalanceResponsiblesActivity(
             GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity>>(),
             GetService<IServiceScopeFactory>(),
-            GetService<EnergyResultEnumerator>(),
-            DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
+            GetService<EnergyResultEnumerator>());
 
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
     }
@@ -287,8 +285,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         var activity = new EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity(
             GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity>>(),
             GetService<IServiceScopeFactory>(),
-            GetService<EnergyResultEnumerator>(),
-            DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
+            GetService<EnergyResultEnumerator>());
 
         return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
     }
@@ -301,8 +298,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             _ediDatabricksOptions.Value,
             GetService<IMasterDataClient>(),
             EventId.From(Guid.NewGuid()),
-            energyResultPerGridAreaTestDataDescription.CalculationId,
-            DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
+            energyResultPerGridAreaTestDataDescription.CalculationId);
 
         await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerGridAreaQuery.DataObjectName, energyResultPerGridAreaQuery.SchemaDefinition);
         await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerGridAreaQuery.DataObjectName, energyResultPerGridAreaQuery.SchemaDefinition, energyResultPerGridAreaTestDataDescription.TestFilePath);
@@ -316,8 +312,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity>>(),
             _ediDatabricksOptions.Value,
             EventId.From(Guid.NewGuid()),
-            energyResultPerBrpDescription.CalculationId,
-            DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
+            energyResultPerBrpDescription.CalculationId);
 
         await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerBrpQuery.DataObjectName, energyResultPerBrpQuery.SchemaDefinition);
         await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerBrpQuery.DataObjectName, energyResultPerBrpQuery.SchemaDefinition, energyResultPerBrpDescription.TestFilePath);
@@ -331,8 +326,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity>>(),
             _ediDatabricksOptions.Value,
             EventId.From(Guid.NewGuid()),
-            energyResultPerEnergySupplierDescription.CalculationId,
-            DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
+            energyResultPerEnergySupplierDescription.CalculationId);
 
         await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerEnergySupplierQuery.DataObjectName, energyResultPerEnergySupplierQuery.SchemaDefinition);
         await _fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(energyResultPerEnergySupplierQuery.DataObjectName, energyResultPerEnergySupplierQuery.SchemaDefinition, energyResultPerEnergySupplierDescription.TestFilePath);

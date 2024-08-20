@@ -72,7 +72,7 @@ public class EnergyResultPerGridAreaFactoryTests
         }
 
         // Act
-        var actual = CreateEnergyResultPerGridArea(databricksSqlRow, timeSeriesPoints, DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
+        var actual = CreateEnergyResultPerGridArea(databricksSqlRow, timeSeriesPoints);
 
         // Assert
         actual.Id.Should().Be("17582ba4-71db-4ce5-af70-b00a4676e357");
@@ -90,12 +90,11 @@ public class EnergyResultPerGridAreaFactoryTests
 
     private static EnergyResultPerGridArea CreateEnergyResultPerGridArea(
         DatabricksSqlRow databricksSqlRow,
-        IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints,
-        DateTimeZone dateTimeZone)
+        IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
     {
         var resolution = ResolutionMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.Resolution));
 
-        var period = PeriodFactory.GetPeriod(timeSeriesPoints, resolution, dateTimeZone);
+        var period = PeriodFactory.GetPeriod(timeSeriesPoints, resolution);
 
         return new EnergyResultPerGridArea(
             databricksSqlRow.ToGuid(EnergyResultColumnNames.ResultId),

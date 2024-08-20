@@ -40,13 +40,11 @@ public class EnergyResultPerGridAreaQuery(
         EdiDatabricksOptions ediDatabricksOptions,
         IMasterDataClient masterDataClient,
         EventId eventId,
-        Guid calculationId,
-        DateTimeZone dateTimeZone)
+        Guid calculationId)
     : EnergyResultQueryBase<EnergyResultPerGridAreaMessageDto>(
         logger,
         ediDatabricksOptions,
-        calculationId,
-        dateTimeZone)
+        calculationId)
 {
     private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly EventId _eventId = eventId;
@@ -93,7 +91,7 @@ public class EnergyResultPerGridAreaQuery(
             settlementMethod: SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)),
             measurementUnit: MeasurementUnitMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)),
             resolution: resolution,
-            period: PeriodFactory.GetPeriod(timeSeriesPoints, resolution, DateTimeZone),
+            period: PeriodFactory.GetPeriod(timeSeriesPoints, resolution),
             meteredDataResponsibleNumber: gridAreaOwnerNumber,
             points: EnergyResultMessageDtoFactory.CreateEnergyResultMessagePoints(timeSeriesPoints));
 

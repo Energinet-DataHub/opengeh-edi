@@ -32,8 +32,7 @@ public class EnqueueEnergyResultsForGridAreaOwnersActivity(
     ILogger<EnqueueEnergyResultsForGridAreaOwnersActivity> logger,
     IServiceScopeFactory serviceScopeFactory,
     IMasterDataClient masterDataClient,
-    EnergyResultEnumerator energyResultEnumerator,
-    DateTimeZone dateTimeZone)
+    EnergyResultEnumerator energyResultEnumerator)
     : EnqueueEnergyResultsBaseActivity(logger, serviceScopeFactory, energyResultEnumerator)
 {
     private readonly ILogger<EnqueueEnergyResultsForGridAreaOwnersActivity> _logger = logger;
@@ -49,8 +48,7 @@ public class EnqueueEnergyResultsForGridAreaOwnersActivity(
             _energyResultEnumerator.EdiDatabricksOptions,
             _masterDataClient,
             EventId.From(input.EventId),
-            input.CalculationId,
-            dateTimeZone);
+            input.CalculationId);
 
         return EnqueueEnergyResults(input, query);
     }
