@@ -569,7 +569,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         await ResetDatabricks();
         var ediDatabricksOptions = Options.Create(new EdiDatabricksOptions { DatabaseName = Fixture.DatabricksSchemaManager.SchemaName });
 
-        // TODO: Seperate schema information from query
+        // TODO: Separate schema information from query
         var perGridAreaQuery = new EnergyResultPerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, null!, perGridAreaDataDescription.CalculationId);
         var perGridAreTask = SeedDatabricksWithDataAsync(perGridAreaDataDescription.TestFilePath, perGridAreaQuery);
 
