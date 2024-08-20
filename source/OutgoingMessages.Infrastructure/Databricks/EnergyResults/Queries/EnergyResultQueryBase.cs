@@ -132,16 +132,19 @@ public abstract class EnergyResultQueryBase<TResult>(
     {
         return
             previousResult?.ToGuid(EnergyResultColumnNames.ResultId) == currentResult.ToGuid(EnergyResultColumnNames.ResultId)
-            && IsNextInResultSequence(currentResult, previousResult);
+            && ResultStartEqualsPreviousResultEnd(currentResult, previousResult);
     }
 
     /// <summary>
     /// Checks if the current result follows the previous result based on time and resolution.
     /// </summary>
-    private bool IsNextInResultSequence(DatabricksSqlRow currentResult, DatabricksSqlRow previousResult)
+    private bool ResultStartEqualsPreviousResultEnd(DatabricksSqlRow currentResult, DatabricksSqlRow previousResult)
     {
-        var endTimeOfPreviousResult = GetEndTimeOfPreviousResult(previousResult);
-        return endTimeOfPreviousResult == currentResult.ToInstant(EnergyResultColumnNames.Time);
+        var endTimeFromPreviousResult = GetEndTimeOfPreviousResult(previousResult);
+        var startTimeFromCurrentResult = currentResult.ToInstant(EnergyResultColumnNames.Time);
+
+        // The start time of the current result should be the same as the end time of the previous result if the result is in sequence with the previous result.
+        return endTimeFromPreviousResult == startTimeFromCurrentResult;
     }
 
     private Instant GetEndTimeOfPreviousResult(DatabricksSqlRow previousResult)
