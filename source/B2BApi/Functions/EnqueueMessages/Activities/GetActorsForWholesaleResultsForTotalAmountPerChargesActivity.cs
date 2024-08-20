@@ -26,13 +26,11 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 public class GetActorsForWholesaleResultsForTotalAmountPerChargesActivity(
     ILogger<GetActorsForWholesaleResultsForTotalAmountPerChargesActivity> logger,
     IServiceScopeFactory serviceScopeFactory,
-    WholesaleResultActorsEnumerator wholesaleResultActorsEnumerator,
-    DateTimeZone dateTimeZone)
+    WholesaleResultActorsEnumerator wholesaleResultActorsEnumerator)
 {
     private readonly ILogger<GetActorsForWholesaleResultsForTotalAmountPerChargesActivity> _logger = logger;
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
     private readonly WholesaleResultActorsEnumerator _wholesaleResultActorsEnumerator = wholesaleResultActorsEnumerator;
-    private readonly DateTimeZone _dateTimeZone = dateTimeZone;
 
     /// <summary>
     /// Start an GetActorsForWholesaleResultsForTotalAmountPerCharges activity.
@@ -55,8 +53,7 @@ public class GetActorsForWholesaleResultsForTotalAmountPerChargesActivity(
             _wholesaleResultActorsEnumerator.EdiDatabricksOptions,
             EventId.From(input.EventId),
             input.CalculationId,
-            null,
-            _dateTimeZone);
+            null);
 
         var actors = await _wholesaleResultActorsEnumerator
             .GetActorsAsync(query)

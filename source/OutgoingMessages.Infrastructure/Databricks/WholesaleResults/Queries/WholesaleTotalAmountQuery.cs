@@ -32,14 +32,12 @@ public class WholesaleTotalAmountQuery(
     EdiDatabricksOptions ediDatabricksOptions,
     EventId eventId,
     Guid calculationId,
-    string? energySupplier,
-    DateTimeZone dateTimeZone)
+    string? energySupplier)
     : WholesaleResultQueryBase<WholesaleTotalAmountMessageDto>(
         logger,
         ediDatabricksOptions,
         calculationId,
-        energySupplier,
-        dateTimeZone)
+        energySupplier)
 {
     private readonly EventId _eventId = eventId;
 
@@ -80,7 +78,7 @@ public class WholesaleTotalAmountQuery(
                 databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.EnergySupplierId)),
             businessReason: businessReason.Name,
             gridAreaCode: databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.GridAreaCode),
-            period: PeriodFactory.GetPeriod(timeSeriesPoints, Resolution.Monthly, DateTimeZone),
+            period: PeriodFactory.GetPeriod(timeSeriesPoints, Resolution.Monthly),
             currency: CurrencyMapper.FromDeltaTableValue(
                 databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.Currency)),
             settlementVersion: settlementVersion,

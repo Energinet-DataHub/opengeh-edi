@@ -30,14 +30,12 @@ public class EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
     ILogger<EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity> logger,
     IServiceScopeFactory serviceScopeFactory,
     IMasterDataClient masterDataClient,
-    WholesaleResultEnumerator wholesaleResultEnumerator,
-    DateTimeZone dateTimeZone)
+    WholesaleResultEnumerator wholesaleResultEnumerator)
     : EnqueueWholesaleResultsBaseActivity(logger, serviceScopeFactory, wholesaleResultEnumerator)
 {
     private readonly ILogger<EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity> _logger = logger;
     private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly WholesaleResultEnumerator _wholesaleResultEnumerator = wholesaleResultEnumerator;
-    private readonly DateTimeZone _dateTimeZone = dateTimeZone;
 
     /// <summary>
     /// Start an EnqueueWholesaleResultsForMonthlyAmountPerCharges activity.
@@ -61,8 +59,7 @@ public class EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
             _masterDataClient,
             EventId.From(input.EventId),
             input.CalculationId,
-            input.Actor,
-            _dateTimeZone);
+            input.Actor);
 
         return EnqueueWholesaleResults(input, query);
     }

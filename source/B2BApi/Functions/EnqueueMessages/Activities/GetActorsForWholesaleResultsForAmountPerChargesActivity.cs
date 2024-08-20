@@ -28,14 +28,12 @@ public class GetActorsForWholesaleResultsForAmountPerChargesActivity(
     ILogger<GetActorsForWholesaleResultsForAmountPerChargesActivity> logger,
     IServiceScopeFactory serviceScopeFactory,
     IMasterDataClient masterDataClient,
-    WholesaleResultActorsEnumerator wholesaleResultActorsEnumerator,
-    DateTimeZone dateTimeZone)
+    WholesaleResultActorsEnumerator wholesaleResultActorsEnumerator)
 {
     private readonly ILogger<GetActorsForWholesaleResultsForAmountPerChargesActivity> _logger = logger;
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
     private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly WholesaleResultActorsEnumerator _wholesaleResultActorsEnumerator = wholesaleResultActorsEnumerator;
-    private readonly DateTimeZone _dateTimeZone = dateTimeZone;
 
     /// <summary>
     /// Start an GetActorsForWholesaleResultsForAmountPerCharges activity.
@@ -59,8 +57,7 @@ public class GetActorsForWholesaleResultsForAmountPerChargesActivity(
             _masterDataClient,
             EventId.From(input.EventId),
             input.CalculationId,
-            null,
-            _dateTimeZone);
+            null);
 
         var actors = await _wholesaleResultActorsEnumerator
             .GetActorsAsync(query)

@@ -38,7 +38,7 @@ public class PeriodFactoryTests
         };
 
         // Act
-        var period = PeriodFactory.GetPeriod(pointForAMonthlyResolution, Resolution.Monthly, DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
+        var period = PeriodFactory.GetPeriod(pointForAMonthlyResolution, Resolution.Monthly);
 
         // Assert
         period.Should().NotBeNull();
@@ -59,7 +59,7 @@ public class PeriodFactoryTests
         };
 
         // Act
-        var period = PeriodFactory.GetPeriod(pointForAMonthlyResolution, Resolution.Monthly, DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
+        var period = PeriodFactory.GetPeriod(pointForAMonthlyResolution, Resolution.Monthly);
 
         // Assert
         period.Should().NotBeNull();
@@ -80,7 +80,7 @@ public class PeriodFactoryTests
         };
 
         // Act
-        var period = PeriodFactory.GetPeriod(pointForAMonthlyResolution, Resolution.Monthly, DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
+        var period = PeriodFactory.GetPeriod(pointForAMonthlyResolution, Resolution.Monthly);
 
         // Assert
         period.Should().NotBeNull();
@@ -105,7 +105,7 @@ public class PeriodFactoryTests
         }
 
         // Act
-        var period = PeriodFactory.GetPeriod(points, Resolution.Daily, DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
+        var period = PeriodFactory.GetPeriod(points, Resolution.Daily);
 
         // Assert
         period.Should().NotBeNull();
@@ -130,7 +130,7 @@ public class PeriodFactoryTests
         }
 
         // Act
-        var period = PeriodFactory.GetPeriod(points, Resolution.Hourly, DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
+        var period = PeriodFactory.GetPeriod(points, Resolution.Hourly);
 
         // Assert
         period.Should().NotBeNull();

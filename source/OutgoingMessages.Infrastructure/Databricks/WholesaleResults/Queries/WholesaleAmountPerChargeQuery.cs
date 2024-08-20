@@ -34,14 +34,12 @@ public class WholesaleAmountPerChargeQuery(
     IMasterDataClient masterDataClient,
     EventId eventId,
     Guid calculationId,
-    string? energySupplier,
-    DateTimeZone dateTimeZone)
+    string? energySupplier)
     : WholesaleResultQueryBase<WholesaleAmountPerChargeMessageDto>(
         logger,
         ediDatabricksOptions,
         calculationId,
-        energySupplier,
-        dateTimeZone)
+        energySupplier)
 {
     private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly EventId _eventId = eventId;
@@ -105,7 +103,7 @@ public class WholesaleAmountPerChargeQuery(
             businessReason: businessReason.Name,
             gridAreaCode: gridAreaCode,
             isTax: isTax,
-            period: PeriodFactory.GetPeriod(timeSeriesPoints, resolution, DateTimeZone),
+            period: PeriodFactory.GetPeriod(timeSeriesPoints, resolution),
             quantityUnit: MeasurementUnitMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(WholesaleResultColumnNames.QuantityUnit)),
             currency: CurrencyMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.Currency)),
             chargeType: chargeType,

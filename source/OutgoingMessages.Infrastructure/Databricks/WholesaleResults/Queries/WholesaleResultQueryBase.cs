@@ -28,8 +28,7 @@ public abstract class WholesaleResultQueryBase<TResult>(
         ILogger logger,
         EdiDatabricksOptions ediDatabricksOptions,
         Guid calculationId,
-        string? energySupplier,
-        DateTimeZone dateTimeZone)
+        string? energySupplier)
     : IDeltaTableSchemaDescription
     where TResult : OutgoingMessageDto
 {
@@ -60,8 +59,6 @@ public abstract class WholesaleResultQueryBase<TResult>(
     /// Can be used in tests to create a matching data object (e.g. table).
     /// </summary>
     public abstract Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition { get; }
-
-    protected DateTimeZone DateTimeZone => dateTimeZone;
 
     internal async IAsyncEnumerable<QueryResult<TResult>> GetAsync(DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor)
     {
@@ -153,7 +150,7 @@ public abstract class WholesaleResultQueryBase<TResult>(
             previousResult.ToNonEmptyString(WholesaleResultColumnNames.Resolution));
         var startTimeOfPreviousResult = previousResult.ToInstant(WholesaleResultColumnNames.Time);
 
-        return PeriodFactory.GetEndDateWithResolutionOffset(resolutionOfPreviousResult, startTimeOfPreviousResult, DateTimeZone);
+        return PeriodFactory.GetEndDateWithResolutionOffset(resolutionOfPreviousResult, startTimeOfPreviousResult);
     }
 
     private async Task<QueryResult<TResult>> CreateResultAsync(IReadOnlyCollection<DatabricksSqlRow> resultRows)
