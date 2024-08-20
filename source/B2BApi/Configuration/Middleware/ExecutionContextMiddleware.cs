@@ -15,6 +15,7 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.Configuration.Middleware;
@@ -33,7 +34,7 @@ public class ExecutionContextMiddleware : IFunctionsWorkerMiddleware
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
 
-        var executionContext = context.GetService<BuildingBlocks.Domain.ExecutionContext>();
+        var executionContext = context.InstanceServices.GetRequiredService<BuildingBlocks.Domain.ExecutionContext>();
         if (ExecutionType.TryFromName(context.FunctionDefinition.Name, out var executionType))
         {
             executionContext.SetExecutionType(executionType!);

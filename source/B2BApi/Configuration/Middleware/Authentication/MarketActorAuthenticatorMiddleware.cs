@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.Configuration.Middleware.Authentication;
@@ -39,8 +40,8 @@ public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
 
-        var authenticatedActor = context.GetService<AuthenticatedActor>();
-        var authenticationMethods = context.GetServices<IAuthenticationMethod>();
+        var authenticatedActor = context.InstanceServices.GetRequiredService<AuthenticatedActor>();
+        var authenticationMethods = context.InstanceServices.GetServices<IAuthenticationMethod>();
 
         var httpRequestData = await context.GetHttpRequestDataAsync()
             ?? throw new ArgumentException("No HTTP request data was available, even though the function was not omitted from auth");
@@ -56,7 +57,7 @@ public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
             return;
         }
 
-        var serializer = context.GetService<ISerializer>();
+        var serializer = context.InstanceServices.GetRequiredService<ISerializer>();
         WriteAuthenticatedIdentityToLog(authenticatedActor.CurrentActorIdentity, serializer);
         await next(context);
     }
