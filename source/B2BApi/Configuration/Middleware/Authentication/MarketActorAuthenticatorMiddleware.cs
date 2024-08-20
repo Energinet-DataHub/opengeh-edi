@@ -23,9 +23,13 @@ namespace Energinet.DataHub.EDI.B2BApi.Configuration.Middleware.Authentication;
 
 public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
 {
-    private readonly ILogger<MarketActorAuthenticatorMiddleware> _logger;
+    private readonly ILogger _logger;
 
-    public MarketActorAuthenticatorMiddleware(ILogger<MarketActorAuthenticatorMiddleware> logger)
+    // DO NOT inject scoped services in the middleware constructor.
+    // DO use scoped services in middleware by retrieving them from 'FunctionContext.InstanceServices'
+    // DO NOT store scoped services in fields or properties of the middleware object. See https://github.com/Azure/azure-functions-dotnet-worker/issues/1327#issuecomment-1434408603
+    public MarketActorAuthenticatorMiddleware(
+        ILogger<MarketActorAuthenticatorMiddleware> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }

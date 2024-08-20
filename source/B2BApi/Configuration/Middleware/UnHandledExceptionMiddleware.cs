@@ -26,9 +26,13 @@ namespace Energinet.DataHub.EDI.B2BApi.Configuration.Middleware;
 /// <remarks>Inspired by https://github.com/Azure/azure-functions-dotnet-worker/blob/main/samples/CustomMiddleware/ExceptionHandlingMiddleware.cs</remarks>
 public class UnHandledExceptionMiddleware : IFunctionsWorkerMiddleware
 {
-    private readonly ILogger<UnHandledExceptionMiddleware> _logger;
+    private readonly ILogger _logger;
 
-    public UnHandledExceptionMiddleware(ILogger<UnHandledExceptionMiddleware> logger)
+    // DO NOT inject scoped services in the middleware constructor.
+    // DO use scoped services in middleware by retrieving them from 'FunctionContext.InstanceServices'
+    // DO NOT store scoped services in fields or properties of the middleware object. See https://github.com/Azure/azure-functions-dotnet-worker/issues/1327#issuecomment-1434408603
+    public UnHandledExceptionMiddleware(
+        ILogger<UnHandledExceptionMiddleware> logger)
     {
         _logger = logger;
     }
