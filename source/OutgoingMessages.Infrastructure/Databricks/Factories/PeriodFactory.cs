@@ -24,24 +24,28 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Facto
 
 public static class PeriodFactory
 {
+    private static readonly DateTimeZone _dkTimeZone = DateTimeZoneProviders.Tzdb["Europe/Copenhagen"];
+
     /// <summary>
     /// In order get the full calculate period, we need to find the oldest and newest point including resolution.
     /// The oldest point is the start of the calculation period.
     /// The newest point plus the resolution is the end of the calculation period.
     /// </summary>
-    /// <param name="timeSeriesPoints"></param>
-    /// <param name="resolution"></param>
-    public static Period GetPeriod(IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints, Resolution resolution)
+    public static Period GetPeriod(
+        IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints,
+        Resolution resolution)
     {
         var calculationStart = timeSeriesPoints.Min(x => x.TimeUtc);
         var timeForNewestPoint = timeSeriesPoints.Max(x => x.TimeUtc);
 
         // A period is described by { start: latestPoint.time, end: newestPoint.time + resolution }
-        var calculationEnd = GetEndDateWithResolutionOffset(resolution, timeForNewestPoint, DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
+        var calculationEnd = GetEndDateWithResolutionOffset(resolution, timeForNewestPoint);
         return new Period(calculationStart, calculationEnd);
     }
 
-    private static Instant GetEndDateWithResolutionOffset(Resolution resolution, Instant timeForLatestPoint, DateTimeZone dateTimeZone)
+    public static Instant GetEndDateWithResolutionOffset(
+        Resolution resolution,
+        Instant timeForLatestPoint)
     {
         switch (resolution)
         {
@@ -51,9 +55,9 @@ public static class PeriodFactory
                 return timeForLatestPoint.Plus(Duration.FromDays(1));
             case var res when res == Resolution.Monthly:
                 {
-                    var timeForLatestPointInLocalTime = timeForLatestPoint.InZone(dateTimeZone).LocalDateTime;
+                    var timeForLatestPointInLocalTime = timeForLatestPoint.InZone(_dkTimeZone).LocalDateTime;
                     var endAtMidnightInLocalTime = timeForLatestPointInLocalTime.PlusMonths(1).Date.AtMidnight();
-                    var endAtMidnightInUtc = endAtMidnightInLocalTime.InZoneStrictly(dateTimeZone);
+                    var endAtMidnightInUtc = endAtMidnightInLocalTime.InZoneStrictly(_dkTimeZone);
                     return endAtMidnightInUtc.ToInstant();
                 }
 
