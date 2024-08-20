@@ -131,17 +131,19 @@ public abstract class WholesaleResultQueryBase<TResult>(
     {
         return
             previousResult?.ToGuid(WholesaleResultColumnNames.ResultId) == currentResult.ToGuid(WholesaleResultColumnNames.ResultId)
-            && IsNextInResultSequence(currentResult, previousResult);
+            && ResultStartEqualsPreviousResultEnd(currentResult, previousResult);
     }
 
     /// <summary>
     /// Checks if the current result follows the previous result based on time and resolution.
     /// </summary>
-    private bool IsNextInResultSequence(DatabricksSqlRow currentResult, DatabricksSqlRow previousResult)
+    private bool ResultStartEqualsPreviousResultEnd(DatabricksSqlRow currentResult, DatabricksSqlRow previousResult)
     {
-        var endTimeOfPreviousResult = GetEndTimeOfPreviousResult(previousResult);
+        var endTimeFromPreviousResult = GetEndTimeOfPreviousResult(previousResult);
+        var startTimeFromCurrentResult = currentResult.ToInstant(WholesaleResultColumnNames.Time);
 
-        return endTimeOfPreviousResult == currentResult.ToInstant(WholesaleResultColumnNames.Time);
+        // The start time of the current result should be the same as the end time of the previous result if the result is in sequence with the previous result.
+        return endTimeFromPreviousResult == startTimeFromCurrentResult;
     }
 
     private Instant GetEndTimeOfPreviousResult(DatabricksSqlRow previousResult)
