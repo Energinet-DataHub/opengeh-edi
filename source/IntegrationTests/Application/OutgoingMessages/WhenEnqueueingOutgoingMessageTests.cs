@@ -125,6 +125,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.Equal(message.ExternalId.Value, messageFromDatabase.ExternalId),
             () => Assert.Equal(message.CalculationId, messageFromDatabase.CalculationId),
             () => Assert.Equal(messageFromDatabase.IdempotentId, expectedOutgoingMessageIdempotentId),
+            () => Assert.NotNull(messageFromDatabase.PeriodStartedAt),
         };
 
         Assert.Multiple(propertyAssertions);

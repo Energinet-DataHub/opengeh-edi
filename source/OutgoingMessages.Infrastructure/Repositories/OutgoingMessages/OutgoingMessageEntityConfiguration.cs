@@ -126,6 +126,7 @@ public class OutgoingMessageEntityConfiguration : IEntityTypeConfiguration<Outgo
                     .HasColumnName("ReceiverRole");
             });
 
+        builder.Property(x => x.PeriodStartedAt);
         builder.Property(x => x.CreatedAt);
 
         builder.Property<string>("CreatedBy");

@@ -62,6 +62,7 @@ public class OutgoingMessage
             periodStartedAt);
         ExternalId = externalId;
         CalculationId = calculationId;
+        PeriodStartedAt = periodStartedAt;
     }
 
     /// <summary>
@@ -83,7 +84,8 @@ public class OutgoingMessage
         string? gridAreaCode,
         ExternalId externalId,
         Guid? calculationId,
-        OutgoingMessageIdempotentId idempotentId)
+        OutgoingMessageIdempotentId idempotentId,
+        Instant? periodStartedAt)
     {
         Id = id;
         DocumentType = documentType;
@@ -99,6 +101,7 @@ public class OutgoingMessage
         ExternalId = externalId;
         CalculationId = calculationId;
         IdempotentId = idempotentId;
+        PeriodStartedAt = periodStartedAt;
         // DocumentReceiver, EF will set this after the constructor
         // Receiver, EF will set this after the constructor
         // _serializedContent is set later in OutgoingMessageRepository, by getting the message from File Storage
@@ -153,6 +156,8 @@ public class OutgoingMessage
     public ExternalId ExternalId { get; }
 
     public Guid? CalculationId { get; }
+
+    public Instant? PeriodStartedAt { get; }
 
     public OutgoingMessageIdempotentId IdempotentId { get; set; }
 
