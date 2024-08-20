@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.OutgoingMessages;
 
@@ -84,6 +85,14 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
     public async Task<OutgoingMessage?> GetAsync(OutgoingMessageIdempotentId idempotentId)
     {
         return await _context.OutgoingMessages.FirstOrDefaultAsync(x => x.IdempotentId == idempotentId).ConfigureAwait(false);
+    }
+
+    public async Task<OutgoingMessage?> GetAsync(ActorRole receiverRole, ExternalId externalId, Instant? periodStartedAt)
+    {
+        return await _context.OutgoingMessages
+            .FirstOrDefaultAsync(x => x.Receiver.ActorRole == receiverRole &&
+                                                    x.ExternalId == externalId &&
+                                                    x.PeriodStartedAt == periodStartedAt).ConfigureAwait(false);
     }
 
     public async Task DeleteOutgoingMessagesIfExistsAsync(IReadOnlyCollection<BundleId> bundleMessageIds)
