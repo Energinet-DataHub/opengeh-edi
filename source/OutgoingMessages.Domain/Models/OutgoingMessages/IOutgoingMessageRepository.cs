@@ -15,6 +15,7 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
@@ -42,6 +43,11 @@ public interface IOutgoingMessageRepository
     /// Get message in the database for the idempotency id.
     /// </summary>
     Task<OutgoingMessage?> GetAsync(OutgoingMessageIdempotentId idempotentId);
+
+    /// <summary>
+    /// Get message in the database for the designated receiver role and the external id and period started at.
+    /// </summary>
+    Task<OutgoingMessage?> GetAsync(ActorRole receiverRole, ExternalId externalId, Instant? periodStartedAt);
 
     /// <summary>
     /// Delete outgoing messages if they exists

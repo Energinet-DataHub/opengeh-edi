@@ -61,7 +61,11 @@ public class EnqueueMessage
         messageToEnqueue = await _delegateMessage.DelegateAsync(messageToEnqueue, cancellationToken)
                 .ConfigureAwait(false);
 
-        var existingMessage = await _outgoingMessageRepository.GetAsync(messageToEnqueue.IdempotentId).ConfigureAwait(false);
+        var existingMessage = await _outgoingMessageRepository.GetAsync(
+                messageToEnqueue.Receiver.ActorRole,
+                messageToEnqueue.ExternalId,
+                messageToEnqueue.PeriodStartedAt)
+            .ConfigureAwait(false);
         if (existingMessage != null) // Message is already enqueued, do nothing (idempotency check)
             return existingMessage.Id;
 
