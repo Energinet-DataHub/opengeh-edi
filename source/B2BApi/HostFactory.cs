@@ -34,7 +34,7 @@ namespace Energinet.DataHub.EDI.B2BApi;
 
 public static class HostFactory
 {
-    private const string DomainName = "EDI";
+    private const string SubsystemName = "EDI";
 
     public static IHost CreateHost(TokenValidationParameters tokenValidationParameters)
     {
@@ -58,7 +58,7 @@ public static class HostFactory
                         })
 
                         // Logging
-                        .AddApplicationInsightsForIsolatedWorker(DomainName)
+                        .AddApplicationInsightsForIsolatedWorker(SubsystemName)
 
                         // Health checks
                         .AddHealthChecksForIsolatedWorker()
