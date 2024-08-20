@@ -44,18 +44,19 @@ public static class HostFactory
             .ConfigureFunctionsWebApplication(
                 builder =>
                 {
-                    builder.UseMiddleware<UnHandledExceptionMiddleware>();
-                    builder.UseMiddleware<MarketActorAuthenticatorMiddleware>();
+                    // If the endpoint is omitted from auth, we dont want to intercept exceptions.
+                    builder.UseWhen<UnHandledExceptionMiddleware>(NonHealthCheckHttpTrigger);
+                    builder.UseWhen<MarketActorAuthenticatorMiddleware>(NonHealthCheckHttpTrigger);
                     builder.UseMiddleware<ExecutionContextMiddleware>();
                 })
             .ConfigureServices(
                 (context, services) =>
                 {
                     services
-                        .Configure<WorkerOptions>(options =>
+                        .Configure((Action<WorkerOptions>)(options =>
                         {
                             options.EnableUserCodeException = true;
-                        })
+                        }))
 
                         // Logging
                         .AddApplicationInsightsForIsolatedWorker(SubsystemName)
@@ -93,5 +94,16 @@ public static class HostFactory
                     logging.AddLoggingConfigurationForIsolatedWorker(hostingContext);
                 })
             .Build();
+    }
+
+    private static bool NonHealthCheckHttpTrigger(FunctionContext context)
+    {
+        var isHttpTrigger = context.FunctionDefinition.InputBindings.Values
+            .First(metadata => metadata.Type.EndsWith("Trigger"))
+            .Type == "httpTrigger";
+
+        var isHealthCheckEndpoint = context.FunctionDefinition.Name == "HealthCheck";
+
+        return isHttpTrigger && !isHealthCheckEndpoint;
     }
 }
