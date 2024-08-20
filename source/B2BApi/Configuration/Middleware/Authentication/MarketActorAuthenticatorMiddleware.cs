@@ -38,15 +38,9 @@ public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
+
         var authenticatedActor = context.GetService<AuthenticatedActor>();
         var authenticationMethods = context.GetServices<IAuthenticationMethod>();
-
-        if (context.EndpointIsOmittedFromAuth())
-        {
-            _logger.LogInformation("Functions is omitted from auth, skipping authentication");
-            await next(context);
-            return;
-        }
 
         var httpRequestData = await context.GetHttpRequestDataAsync()
             ?? throw new ArgumentException("No HTTP request data was available, even though the function was not omitted from auth");
