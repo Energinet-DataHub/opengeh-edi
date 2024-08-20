@@ -50,11 +50,11 @@ public class WholesaleResultForAmountPerChargeDescription
 
     public override string GridAreaCode => "804";
 
-    public override int ExpectedCalculationResultsCount => 7;
+    public override int ExpectedCalculationResultsCount => 8;
 
     public int ExpectedOutgoingMessagesForSystemOperatorCount => 3;
 
-    public int ExpectedOutgoingMessagesForGridOwnerCount => 4;
+    public int ExpectedOutgoingMessagesForGridOwnerCount => 5;
 
     public int ExpectedOutgoingMessagesForEnergySupplierCount => ExpectedCalculationResultsCount;
 
