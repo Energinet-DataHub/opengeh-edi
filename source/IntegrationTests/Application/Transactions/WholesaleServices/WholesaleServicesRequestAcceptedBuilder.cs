@@ -81,47 +81,66 @@ public class WholesaleServicesRequestAcceptedBuilder
 
     public WholesaleServicesRequestAccepted BuildMonthlySum()
     {
-        List<WholesaleServicesRequestSeries.Types.Point> timeSeriesPoints = new();
-        var currentTime = InstantPattern.General.Parse(_process.StartOfPeriod).Value;
-        while (currentTime < InstantPattern.General.Parse(_process.EndOfPeriod!).Value)
-        {
-            var amount = new DecimalValue() { Units = currentTime.ToUnixTimeSeconds(), Nanos = 123450000, };
-            timeSeriesPoints.Add(new WholesaleServicesRequestSeries.Types.Point()
-            {
-                Time = currentTime.ToTimestamp(),
-                Amount = amount,
-            });
-            currentTime = currentTime.Plus(NodaTime.Duration.FromMinutes(15));
-        }
-
-        // TO SPECIFIED ON MONTHLY SUM
-        // MeteringPointType;
-        // SettlementMethod;
-        // TimeSeriesPoints[x].Quantity
-        // TimeSeriesPoints[x].QuantityQualities
-        // TimeSeriesPoints[x].Price
-        var wholesaleServicesRequestSeries = new WholesaleServicesRequestSeries()
+        var wholesaleServicesRequestSeries = new WholesaleServicesRequestSeries
         {
             Resolution = WholesaleServicesRequestSeries.Types.Resolution.Monthly,
             ChargeType = WholesaleServicesRequestSeries.Types.ChargeType.Tariff,
             QuantityUnit = WholesaleServicesRequestSeries.Types.QuantityUnit.Kwh,
-            CalculationType = WholesaleServicesRequestSeries.Types.CalculationType.WholesaleFixing,
+            CalculationType = WholesaleServicesRequestSeries.Types.CalculationType.ThirdCorrectionSettlement,
             Currency = WholesaleServicesRequestSeries.Types.Currency.Dkk,
             ChargeOwnerId = _process.ChargeOwner,
             EnergySupplierId = _process.EnergySupplierId,
             GridArea = _process.RequestedGridArea,
-            ChargeCode = "EA-001",
-            Period = new Period()
+            ChargeCode = "EA-003",
+            Period = new Period
             {
                 StartOfPeriod = InstantPattern.General.Parse(_process.StartOfPeriod).Value.ToTimestamp(),
                 EndOfPeriod = InstantPattern.General.Parse(_process.EndOfPeriod!).Value.ToTimestamp(),
             },
-            CalculationResultVersion = 1,
+            CalculationResultVersion = 2,
         };
 
-        wholesaleServicesRequestSeries.TimeSeriesPoints.AddRange(timeSeriesPoints.OrderBy(_ => Guid.NewGuid()));
+        wholesaleServicesRequestSeries.TimeSeriesPoints.Add(
+            new WholesaleServicesRequestSeries.Types.Point
+            {
+                Time = InstantPattern.General.Parse(_process.StartOfPeriod).Value.ToTimestamp(),
+                Amount = new DecimalValue { Units = -412, Nanos = 770735 },
+            });
+
         var wholesaleServicesRequestAccepted = new WholesaleServicesRequestAccepted();
         wholesaleServicesRequestAccepted.Series.Add(wholesaleServicesRequestSeries);
+
+        return wholesaleServicesRequestAccepted;
+    }
+
+    public WholesaleServicesRequestAccepted BuildTotalSum()
+    {
+        var wholesaleServicesRequestSeries = new WholesaleServicesRequestSeries
+        {
+            Resolution = WholesaleServicesRequestSeries.Types.Resolution.Monthly,
+            CalculationType = WholesaleServicesRequestSeries.Types.CalculationType.SecondCorrectionSettlement,
+            Currency = WholesaleServicesRequestSeries.Types.Currency.Dkk,
+            ChargeOwnerId = _process.ChargeOwner,
+            EnergySupplierId = _process.EnergySupplierId,
+            GridArea = _process.RequestedGridArea,
+            Period = new Period
+            {
+                StartOfPeriod = InstantPattern.General.Parse(_process.StartOfPeriod).Value.ToTimestamp(),
+                EndOfPeriod = InstantPattern.General.Parse(_process.EndOfPeriod!).Value.ToTimestamp(),
+            },
+            CalculationResultVersion = 2,
+        };
+
+        wholesaleServicesRequestSeries.TimeSeriesPoints.Add(
+            new WholesaleServicesRequestSeries.Types.Point
+            {
+                Time = InstantPattern.General.Parse(_process.StartOfPeriod).Value.ToTimestamp(),
+                Amount = new DecimalValue { Units = 9857, Nanos = 916610 },
+            });
+
+        var wholesaleServicesRequestAccepted = new WholesaleServicesRequestAccepted();
+        wholesaleServicesRequestAccepted.Series.Add(wholesaleServicesRequestSeries);
+
         return wholesaleServicesRequestAccepted;
     }
 }
