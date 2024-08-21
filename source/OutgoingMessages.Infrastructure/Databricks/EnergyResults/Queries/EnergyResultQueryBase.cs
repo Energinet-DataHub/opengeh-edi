@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
@@ -28,90 +28,25 @@ public abstract class EnergyResultQueryBase<TResult>(
         ILogger logger,
         EdiDatabricksOptions ediDatabricksOptions,
         Guid calculationId)
-    : IDeltaTableSchemaDescription
+    : ResultQueryBase<TResult>(ediDatabricksOptions, calculationId)
     where TResult : OutgoingMessageDto
 {
     private readonly ILogger _logger = logger;
-    private readonly EdiDatabricksOptions _ediDatabricksOptions = ediDatabricksOptions;
-
-    /// <summary>
-    /// Name of database to query in.
-    /// </summary>
-    public string DatabaseName => _ediDatabricksOptions.DatabaseName;
-
-    /// <summary>
-    /// Name of view or table to query in.
-    /// </summary>
-    public abstract string DataObjectName { get; }
-
-    public Guid CalculationId { get; } = calculationId;
-
-    /// <summary>
-    /// The schema definition of the view expressed as (Column name, Data type, Is nullable).
-    ///
-    /// Can be used in tests to create a matching data object (e.g. table).
-    /// </summary>
-    public abstract Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition { get; }
-
-    internal async IAsyncEnumerable<QueryResult<TResult>> GetAsync(DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor)
-    {
-        ArgumentNullException.ThrowIfNull(databricksSqlWarehouseQueryExecutor);
-
-        var statement = DatabricksStatement
-            .FromRawSql(BuildSqlQuery())
-            .Build();
-
-        DatabricksSqlRow? previousResult = null;
-        var currentResultSet = new List<DatabricksSqlRow>();
-
-        await foreach (var currentResult in databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement).ConfigureAwait(false))
-        {
-            if (previousResult == null || BelongsToSameResultSet(currentResult, previousResult))
-            {
-                currentResultSet.Add(currentResult);
-                previousResult = currentResult;
-                continue;
-            }
-
-            yield return await CreateResultAsync(currentResultSet).ConfigureAwait(false);
-
-            // Next result
-            currentResultSet =
-            [
-                currentResult,
-            ];
-            previousResult = currentResult;
-        }
-
-        // Last result (if any)
-        if (currentResultSet.Count != 0)
-        {
-            yield return await CreateResultAsync(currentResultSet).ConfigureAwait(false);
-        }
-    }
 
     protected abstract Task<TResult> CreateEnergyResultAsync(
         DatabricksSqlRow databricksSqlRow,
         IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints);
 
-    private static EnergyTimeSeriesPoint CreateTimeSeriesPoint(DatabricksSqlRow databricksSqlRow)
+    protected override async Task<QueryResult<TResult>> CreateResultAsync(List<DatabricksSqlRow> currentResultSet)
     {
-        return new EnergyTimeSeriesPoint(
-            databricksSqlRow.ToInstant(EnergyResultColumnNames.Time),
-            databricksSqlRow.ToDecimal(EnergyResultColumnNames.Quantity),
-            QuantityQualitiesMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.QuantityQualities)));
-    }
-
-    private async Task<QueryResult<TResult>> CreateResultAsync(IReadOnlyCollection<DatabricksSqlRow> resultRows)
-    {
-        var firstRow = resultRows.First();
+        var firstRow = currentResultSet.First();
         var resultId = firstRow.ToGuid(EnergyResultColumnNames.ResultId);
 
         try
         {
             var timeSeriesPoints = new List<EnergyTimeSeriesPoint>();
 
-            foreach (var row in resultRows)
+            foreach (var row in currentResultSet)
             {
                 var timeSeriesPoint = CreateTimeSeriesPoint(row);
                 timeSeriesPoints.Add(timeSeriesPoint);
@@ -128,11 +63,31 @@ public abstract class EnergyResultQueryBase<TResult>(
         return QueryResult<TResult>.Error();
     }
 
-    private bool BelongsToSameResultSet(DatabricksSqlRow currentResult, DatabricksSqlRow? previousResult)
+    protected override bool BelongsToSameResultSet(DatabricksSqlRow currentResult, DatabricksSqlRow? previousResult)
     {
         return
             previousResult?.ToGuid(EnergyResultColumnNames.ResultId) == currentResult.ToGuid(EnergyResultColumnNames.ResultId)
             && ResultStartEqualsPreviousResultEnd(currentResult, previousResult);
+    }
+
+    protected override string BuildSqlQuery()
+    {
+        var columnNames = SchemaDefinition.Keys.ToArray();
+
+        return $"""
+                SELECT {string.Join(", ", columnNames)}
+                FROM {DatabaseName}.{DataObjectName}
+                WHERE {EnergyResultColumnNames.CalculationId} = '{CalculationId}'
+                ORDER BY {EnergyResultColumnNames.ResultId}, {EnergyResultColumnNames.Time}
+                """;
+    }
+
+    private static EnergyTimeSeriesPoint CreateTimeSeriesPoint(DatabricksSqlRow databricksSqlRow)
+    {
+        return new EnergyTimeSeriesPoint(
+            databricksSqlRow.ToInstant(EnergyResultColumnNames.Time),
+            databricksSqlRow.ToDecimal(EnergyResultColumnNames.Quantity),
+            QuantityQualitiesMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.QuantityQualities)));
     }
 
     /// <summary>
@@ -157,17 +112,5 @@ public abstract class EnergyResultQueryBase<TResult>(
         return PeriodFactory.GetEndDateWithResolutionOffset(
             resolutionOfPreviousResult,
             startTimeOfPreviousResult);
-    }
-
-    private string BuildSqlQuery()
-    {
-        var columnNames = SchemaDefinition.Keys.ToArray();
-
-        return $"""
-            SELECT {string.Join(", ", columnNames)}
-            FROM {DatabaseName}.{DataObjectName}
-            WHERE {EnergyResultColumnNames.CalculationId} = '{CalculationId}'
-            ORDER BY {EnergyResultColumnNames.ResultId}, {EnergyResultColumnNames.Time}
-            """;
     }
 }

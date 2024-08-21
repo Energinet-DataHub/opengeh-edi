@@ -29,73 +29,16 @@ public abstract class WholesaleResultQueryBase<TResult>(
         EdiDatabricksOptions ediDatabricksOptions,
         Guid calculationId,
         string? energySupplier)
-    : IDeltaTableSchemaDescription
+    : ResultQueryBase<TResult>(ediDatabricksOptions, calculationId)
     where TResult : OutgoingMessageDto
 {
     private readonly ILogger _logger = logger;
-    private readonly EdiDatabricksOptions _ediDatabricksOptions = ediDatabricksOptions;
     private readonly string? _energySupplier = energySupplier;
-
-    /// <summary>
-    /// Name of database to query in.
-    /// </summary>
-    public string DatabaseName => _ediDatabricksOptions.DatabaseName;
-
-    /// <summary>
-    /// Name of view or table to query in.
-    /// </summary>
-    public abstract string DataObjectName { get; }
 
     /// <summary>
     /// Name of view or table column that holds the actor for the query.
     /// </summary>
-    public abstract string ActorColumnName { get; }
-
-    public Guid CalculationId { get; } = calculationId;
-
-    /// <summary>
-    /// The schema definition of the view expressed as (Column name, Data type, Is nullable).
-    ///
-    /// Can be used in tests to create a matching data object (e.g. table).
-    /// </summary>
-    public abstract Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition { get; }
-
-    internal async IAsyncEnumerable<QueryResult<TResult>> GetAsync(DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor)
-    {
-        ArgumentNullException.ThrowIfNull(databricksSqlWarehouseQueryExecutor);
-
-        var statement = DatabricksStatement
-            .FromRawSql(BuildSqlQuery())
-            .Build();
-
-        DatabricksSqlRow? previousResult = null;
-        var currentResultSet = new List<DatabricksSqlRow>();
-
-        await foreach (var currentResult in databricksSqlWarehouseQueryExecutor.ExecuteQueryAsync(statement).ConfigureAwait(false))
-        {
-            if (previousResult == null || BelongsToSameResultSet(currentResult, previousResult))
-            {
-                currentResultSet.Add(currentResult);
-                previousResult = currentResult;
-                continue;
-            }
-
-            yield return await CreateResultAsync(currentResultSet).ConfigureAwait(false);
-
-            // Next result serie
-            currentResultSet =
-            [
-                currentResult,
-            ];
-            previousResult = currentResult;
-        }
-
-        // Last result (if any)
-        if (currentResultSet.Count != 0)
-        {
-            yield return await CreateResultAsync(currentResultSet).ConfigureAwait(false);
-        }
-    }
+    protected abstract string ActorColumnName { get; }
 
     internal async IAsyncEnumerable<string> GetActorsAsync(DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor)
     {
@@ -117,6 +60,55 @@ public abstract class WholesaleResultQueryBase<TResult>(
         DatabricksSqlRow databricksSqlRow,
         IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints);
 
+    protected override async Task<QueryResult<TResult>> CreateResultAsync(List<DatabricksSqlRow> currentResultSet)
+    {
+        var firstRow = currentResultSet.First();
+        var resultId = firstRow.ToGuid(WholesaleResultColumnNames.ResultId);
+
+        try
+        {
+            var timeSeriesPoints = new List<WholesaleTimeSeriesPoint>();
+
+            foreach (var row in currentResultSet)
+            {
+                var timeSeriesPoint = CreateTimeSeriesPoint(row);
+                timeSeriesPoints.Add(timeSeriesPoint);
+            }
+
+            var result = await CreateWholesaleResultAsync(firstRow, timeSeriesPoints).ConfigureAwait(false);
+            return QueryResult<TResult>.Success(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Creating energy result failed for CalculationId='{CalculationId}', ResultId='{ResultId}'.", CalculationId, resultId);
+        }
+
+        return QueryResult<TResult>.Error();
+    }
+
+    protected override bool BelongsToSameResultSet(DatabricksSqlRow currentResult, DatabricksSqlRow? previousResult)
+    {
+        return
+            previousResult?.ToGuid(WholesaleResultColumnNames.ResultId) == currentResult.ToGuid(WholesaleResultColumnNames.ResultId)
+            && ResultStartEqualsPreviousResultEnd(currentResult, previousResult);
+    }
+
+    protected override string BuildSqlQuery()
+    {
+        var columnNames = SchemaDefinition.Keys.ToArray();
+
+        var whereStatement = $"WHERE {WholesaleResultColumnNames.CalculationId} = '{CalculationId}'";
+        if (!string.IsNullOrEmpty(_energySupplier))
+            whereStatement += $" AND {WholesaleResultColumnNames.EnergySupplierId} = '{_energySupplier}'";
+
+        return $"""
+                SELECT {string.Join(", ", columnNames)}
+                FROM {DatabaseName}.{DataObjectName}
+                {whereStatement}
+                ORDER BY {WholesaleResultColumnNames.ResultId}, {WholesaleResultColumnNames.Time}
+                """;
+    }
+
     private static WholesaleTimeSeriesPoint CreateTimeSeriesPoint(DatabricksSqlRow databricksSqlRow)
     {
         return new WholesaleTimeSeriesPoint(
@@ -125,13 +117,6 @@ public abstract class WholesaleResultQueryBase<TResult>(
             QuantityQualitiesMapper.TryFromDeltaTableValue(databricksSqlRow.ToNullableString(WholesaleResultColumnNames.QuantityQualities)),
             databricksSqlRow.ToNullableDecimal(WholesaleResultColumnNames.Price),
             databricksSqlRow.ToNullableDecimal(WholesaleResultColumnNames.Amount));
-    }
-
-    private bool BelongsToSameResultSet(DatabricksSqlRow currentResult, DatabricksSqlRow? previousResult)
-    {
-        return
-            previousResult?.ToGuid(WholesaleResultColumnNames.ResultId) == currentResult.ToGuid(WholesaleResultColumnNames.ResultId)
-            && ResultStartEqualsPreviousResultEnd(currentResult, previousResult);
     }
 
     /// <summary>
@@ -153,48 +138,6 @@ public abstract class WholesaleResultQueryBase<TResult>(
         var startTimeOfPreviousResult = previousResult.ToInstant(WholesaleResultColumnNames.Time);
 
         return PeriodFactory.GetEndDateWithResolutionOffset(resolutionOfPreviousResult, startTimeOfPreviousResult);
-    }
-
-    private async Task<QueryResult<TResult>> CreateResultAsync(IReadOnlyCollection<DatabricksSqlRow> resultRows)
-    {
-        var firstRow = resultRows.First();
-        var resultId = firstRow.ToGuid(WholesaleResultColumnNames.ResultId);
-
-        try
-        {
-            var timeSeriesPoints = new List<WholesaleTimeSeriesPoint>();
-
-            foreach (var row in resultRows)
-            {
-                var timeSeriesPoint = CreateTimeSeriesPoint(row);
-                timeSeriesPoints.Add(timeSeriesPoint);
-            }
-
-            var result = await CreateWholesaleResultAsync(firstRow, timeSeriesPoints).ConfigureAwait(false);
-            return QueryResult<TResult>.Success(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Creating energy result failed for CalculationId='{CalculationId}', ResultId='{ResultId}'.", CalculationId, resultId);
-        }
-
-        return QueryResult<TResult>.Error();
-    }
-
-    private string BuildSqlQuery()
-    {
-        var columnNames = SchemaDefinition.Keys.ToArray();
-
-        var whereStatement = $"WHERE {WholesaleResultColumnNames.CalculationId} = '{CalculationId}'";
-        if (!string.IsNullOrEmpty(_energySupplier))
-            whereStatement += $" AND {WholesaleResultColumnNames.EnergySupplierId} = '{_energySupplier}'";
-
-        return $"""
-            SELECT {string.Join(", ", columnNames)}
-            FROM {DatabaseName}.{DataObjectName}
-            {whereStatement}
-            ORDER BY {WholesaleResultColumnNames.ResultId}, {WholesaleResultColumnNames.Time}
-            """;
     }
 
     private string BuildActorsSqlQuery()
