@@ -12,16 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Data.SqlClient;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
+using AutoFixture;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Database;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.B2BApi.IncomingMessages;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using FluentAssertions;
-using FluentAssertions.Execution;
+using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
@@ -57,22 +61,40 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task FunctionApp_WhenCallingIncomingMessages_ReturnOK()
+    public async Task FunctionApp_WhenCallingIncomingMessages_ReturnAccepted()
     {
+        // The following must match with the JSON document content
+        var incomingDocumentTypeName = IncomingDocumentType.RequestAggregatedMeasureData.Name;
+        var actorNumber = ActorNumber.Create("5790000392551");
+        var actorRole = ActorRole.EnergySupplier;
+        var jsonDocument = await File.ReadAllTextAsync("TestData/Messages/json/RequestAggregatedMeasureData.json");
+
+        await using var fileStream = File.OpenRead("TestData/Messages/json/RequestAggregatedMeasureData.json");
+        var jsonDocumentX = await JsonDocument.ParseAsync(fileStream);
+
+        // The actor must exist in the database and have the matching external id
         var externalId = "external-id";
-        // TODO: Insert actor in database
+        await using var sqlConnection = new Microsoft.Data.SqlClient.SqlConnection(Fixture.DatabaseManager.ConnectionString);
+        {
+            await using var sqlCommand = sqlConnection.CreateCommand();
+            sqlCommand.CommandText = "INSERT INTO [dbo].[Actor] VALUES (@id, @actorNumber, @externalId)";
+            sqlCommand.Parameters.AddWithValue("@id", Guid.NewGuid());
+            sqlCommand.Parameters.AddWithValue("@actorNumber", actorNumber.Value);
+            sqlCommand.Parameters.AddWithValue("@externalId", externalId);
+
+            await sqlConnection.OpenAsync();
+            await sqlCommand.ExecuteNonQueryAsync();
+        }
+
+        // Finally the token must contain the actor role and the external id
         var b2bToken = new JwtBuilder()
-            .WithRole("energysupplier")
+            .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
             .WithClaim(ClaimsMap.UserId, externalId)
             .CreateToken();
 
-        // TODO: Help !!!
-        var incomingDocumentTypeName = "not sure what this should be";
-        var jsonDocument = "{id: \"1\"}";
-
         using var request = new HttpRequestMessage(HttpMethod.Post, $"api/incomingMessages/{incomingDocumentTypeName}");
         request.Content = new StringContent(
-            JsonConvert.SerializeObject(jsonDocument),
+            jsonDocument,
             Encoding.UTF8,
             "application/json");
         request.Headers.Authorization = new AuthenticationHeaderValue("bearer", b2bToken);
@@ -81,6 +103,6 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
         using var actualResponse = await Fixture.AppHostManager.HttpClient.SendAsync(request);
 
         // Assert
-        actualResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        actualResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
     }
 }

@@ -38,6 +38,7 @@
     <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
     <ProjectReference Include="..\IntegrationEvents.Application\IntegrationEvents.Application.csproj" />
     <ProjectReference Include="..\IntegrationTests\IntegrationTests.csproj" />
+    <ProjectReference Include="..\MasterData.Domain\MasterData.Domain.csproj" />
     <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
     <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
   </ItemGroup>
@@ -47,6 +48,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="integrationtest.local.settings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\Messages\json\RequestAggregatedMeasureData.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
