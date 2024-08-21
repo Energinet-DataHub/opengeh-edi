@@ -11,6 +11,7 @@ Prefix with one of these:
 - perf: Performance improvements
 - test: Add missing tests
 - build: Changes to the build process
+- chore: updating dependencies
 
 Read more at https://github.com/Mech0z/GitHubGuidelines
 
