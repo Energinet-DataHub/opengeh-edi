@@ -44,8 +44,6 @@ public class WholesaleMonthlyAmountPerChargeQuery(
 
     public override string DataObjectName => "monthly_amounts_per_charge_v1";
 
-    protected override string ActorColumnName => WholesaleResultColumnNames.EnergySupplierId;
-
     public override Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition => new()
     {
         { WholesaleResultColumnNames.CalculationId,             (DeltaTableCommonTypes.String,              false) },
@@ -63,6 +61,8 @@ public class WholesaleMonthlyAmountPerChargeQuery(
         { WholesaleResultColumnNames.Time,                      (DeltaTableCommonTypes.Timestamp,           false) },
         { WholesaleResultColumnNames.Amount,                    (DeltaTableCommonTypes.Decimal18x3,         true) },
     };
+
+    protected override string ActorColumnName => WholesaleResultColumnNames.EnergySupplierId;
 
     protected override async Task<WholesaleMonthlyAmountPerChargeMessageDto> CreateWholesaleResultAsync(DatabricksSqlRow databricksSqlRow, IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
