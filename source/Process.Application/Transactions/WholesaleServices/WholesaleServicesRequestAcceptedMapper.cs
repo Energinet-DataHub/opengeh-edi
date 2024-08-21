@@ -55,7 +55,7 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
                 SettlementVersion: MapSettlementVersion(wholesaleSeries.CalculationType),
                 MapSettlementMethod(wholesaleSeries.SettlementMethod),
                 MapCurrency(wholesaleSeries.Currency),
-                wholesaleSeries.HasChargeOwnerId ? ActorNumber.Create(wholesaleSeries.ChargeOwnerId) : null,
+                wholesaleSeries is { HasChargeOwnerId: true, HasQuantityUnit: true } ? ActorNumber.Create(wholesaleSeries.ChargeOwnerId) : null,
                 ActorNumber.Create(wholesaleSeries.EnergySupplierId),
                 wholesaleSeries.GridArea,
                 wholesaleSeries.HasChargeCode ? wholesaleSeries.ChargeCode : null,
