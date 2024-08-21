@@ -60,7 +60,7 @@ public class PeekRequestListenerTests : IAsyncLifetime
         var messageCategory = "aggregations";
         // The actor must exist in the database
         var actorNumber = ActorNumber.Create("5790000392551");
-        var actorRole = ActorRole.EnergySupplier;
+        var actorRole = ActorRole.MeteredDataResponsible;
         var externalId = Guid.NewGuid().ToString();
         await using var sqlConnection = new Microsoft.Data.SqlClient.SqlConnection(Fixture.DatabaseManager.ConnectionString);
         {
@@ -75,7 +75,7 @@ public class PeekRequestListenerTests : IAsyncLifetime
         }
 
         // The bearer token must contain:
-        //  * the actor role matching the document content
+        //  * the actor role matching any valid/known role in the ClaimsMap
         //  * the external id matching the actor in the database
         var b2bToken = new JwtBuilder()
             .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
