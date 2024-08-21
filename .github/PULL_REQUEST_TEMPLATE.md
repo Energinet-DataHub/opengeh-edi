@@ -19,3 +19,11 @@ Read more at https://github.com/Mech0z/GitHubGuidelines
 ## Description
 
 ## References
+
+## Checklist
+- [ ] Should the change be behind a feature flag?
+- [ ] Can the feature be meaningfully rolled back or disabled if there are issues (e.g., database-breaking changes)?
+- [ ] Has it been considered whether data is being delivered to the wrong actor?
+- [ ] Subsystem test executed (dev_002/dev_003)
+- [ ] Is there time to monitor state of the release to Production?
+- [ ] Reference to the task
