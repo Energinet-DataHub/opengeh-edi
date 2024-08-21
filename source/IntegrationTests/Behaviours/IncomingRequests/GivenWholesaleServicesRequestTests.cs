@@ -915,7 +915,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
             ReceiverRole: actor.ActorRole,
             SenderId: "5790001330552", // Sender is always DataHub
             SenderRole: ActorRole.MeteredDataAdministrator,
-            ChargeTypeOwner: chargeOwnerNumber.Value,
+            ChargeTypeOwner: null,
             ChargeCode: null,
             ChargeType: null,
             Currency: Currency.DanishCrowns,
