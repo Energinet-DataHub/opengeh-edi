@@ -569,12 +569,12 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         await ResetDatabricks();
         var ediDatabricksOptions = Options.Create(new EdiDatabricksOptions { DatabaseName = Fixture.DatabricksSchemaManager.SchemaName });
 
-        // TODO: Seperate schema information from query
+        // TODO: Separate schema information from query
         var perGridAreaQuery = new EnergyResultPerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, null!, perGridAreaDataDescription.CalculationId);
         var perGridAreTask = SeedDatabricksWithDataAsync(perGridAreaDataDescription.TestFilePath, perGridAreaQuery);
 
         var perBrpGridAreaQuery = new EnergyResultPerBalanceResponsiblePerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, perGridAreaDataDescription.CalculationId);
-        var perBrpGriaAreaTask = SeedDatabricksWithDataAsync(perBrpGridAreaDataDescription.TestFilePath, perBrpGridAreaQuery);
+        var perBrpGridAreaTask = SeedDatabricksWithDataAsync(perBrpGridAreaDataDescription.TestFilePath, perBrpGridAreaQuery);
 
         var perBrpAndESGridAreaQuery = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, perGridAreaDataDescription.CalculationId);
         var perBrpAndESGridAreTask = SeedDatabricksWithDataAsync(perBrpAndEsGridAreaDataDescription.TestFilePath, perBrpAndESGridAreaQuery);
@@ -588,7 +588,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         var forTotalAmountQuery = new WholesaleTotalAmountQuery(null!, ediDatabricksOptions.Value, null!, forTotalAmountDescription.CalculationId, null);
         var forTotalAmountTask = SeedDatabricksWithDataAsync(forTotalAmountDescription.TestFilePath, forTotalAmountQuery);
 
-        await Task.WhenAll(perGridAreTask, perBrpGriaAreaTask, perBrpAndESGridAreTask, forAmountPerChargeTask, forMonthlyAmountPerChargeTask, forTotalAmountTask);
+        await Task.WhenAll(perGridAreTask, perBrpGridAreaTask, perBrpAndESGridAreTask, forAmountPerChargeTask, forMonthlyAmountPerChargeTask, forTotalAmountTask);
 
         return perGridAreaDataDescription.CalculationId;
     }

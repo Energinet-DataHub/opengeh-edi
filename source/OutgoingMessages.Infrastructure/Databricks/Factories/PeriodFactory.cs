@@ -13,17 +13,17 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Models;
-using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime;
-using NodaTime.Extensions;
-using NodaTime.Text;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 
 public static class PeriodFactory
 {
+    private static readonly DateTimeZone _dkTimeZone = DateTimeZoneProviders.Tzdb["Europe/Copenhagen"];
+
     /// <summary>
     /// In order get the full calculate period, we need to find the oldest and newest point including resolution.
     /// The oldest point is the start of the calculation period.
@@ -37,23 +37,44 @@ public static class PeriodFactory
         var timeForNewestPoint = timeSeriesPoints.Max(x => x.TimeUtc);
 
         // A period is described by { start: latestPoint.time, end: newestPoint.time + resolution }
-        var calculationEnd = GetEndDateWithResolutionOffset(resolution, timeForNewestPoint, DateTimeZoneProviders.Tzdb["Europe/Copenhagen"]);
+        var calculationEnd = GetEndDateWithResolutionOffset(resolution, timeForNewestPoint);
         return new Period(calculationStart, calculationEnd);
     }
 
-    private static Instant GetEndDateWithResolutionOffset(Resolution resolution, Instant timeForLatestPoint, DateTimeZone dateTimeZone)
+    /// <summary>
+    /// In order get the full calculate period, we need to find the oldest and newest point including resolution.
+    /// The oldest point is the start of the calculation period.
+    /// The newest point plus the resolution is the end of the calculation period.
+    /// </summary>
+    public static Period GetPeriod(
+        IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints,
+        Resolution resolution)
+    {
+        var calculationStart = timeSeriesPoints.Min(x => x.TimeUtc);
+        var timeForNewestPoint = timeSeriesPoints.Max(x => x.TimeUtc);
+
+        // A period is described by { start: latestPoint.time, end: newestPoint.time + resolution }
+        var calculationEnd = GetEndDateWithResolutionOffset(resolution, timeForNewestPoint);
+        return new Period(calculationStart, calculationEnd);
+    }
+
+    public static Instant GetEndDateWithResolutionOffset(
+        Resolution resolution,
+        Instant timeForLatestPoint)
     {
         switch (resolution)
         {
+            case var res when res == Resolution.QuarterHourly:
+                return timeForLatestPoint.Plus(Duration.FromMinutes(15));
             case var res when res == Resolution.Hourly:
                 return timeForLatestPoint.Plus(Duration.FromHours(1));
             case var res when res == Resolution.Daily:
                 return timeForLatestPoint.Plus(Duration.FromDays(1));
             case var res when res == Resolution.Monthly:
                 {
-                    var timeForLatestPointInLocalTime = timeForLatestPoint.InZone(dateTimeZone).LocalDateTime;
+                    var timeForLatestPointInLocalTime = timeForLatestPoint.InZone(_dkTimeZone).LocalDateTime;
                     var endAtMidnightInLocalTime = timeForLatestPointInLocalTime.PlusMonths(1).Date.AtMidnight();
-                    var endAtMidnightInUtc = endAtMidnightInLocalTime.InZoneStrictly(dateTimeZone);
+                    var endAtMidnightInUtc = endAtMidnightInLocalTime.InZoneStrictly(_dkTimeZone);
                     return endAtMidnightInUtc.ToInstant();
                 }
 
