@@ -45,8 +45,8 @@ public static class HostFactory
                 builder =>
                 {
                     // If the endpoint is omitted from auth, we dont want to intercept exceptions.
-                    builder.UseWhen<UnHandledExceptionMiddleware>(NonHealthCheckHttpTrigger);
-                    builder.UseWhen<MarketActorAuthenticatorMiddleware>(NonHealthCheckHttpTrigger);
+                    builder.UseWhen<UnHandledExceptionMiddleware>(IsHttpTriggerAndNotHealthCheck);
+                    builder.UseWhen<MarketActorAuthenticatorMiddleware>(IsHttpTriggerAndNotHealthCheck);
                     builder.UseMiddleware<ExecutionContextMiddleware>();
                 })
             .ConfigureServices(
@@ -96,7 +96,7 @@ public static class HostFactory
             .Build();
     }
 
-    private static bool NonHealthCheckHttpTrigger(FunctionContext context)
+    private static bool IsHttpTriggerAndNotHealthCheck(FunctionContext context)
     {
         var isHttpTrigger = context.FunctionDefinition.InputBindings.Values
             .First(metadata => metadata.Type.EndsWith("Trigger"))
