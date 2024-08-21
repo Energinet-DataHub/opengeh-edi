@@ -19,6 +19,9 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 
+/// <summary>
+/// Common base class for querying calculation results from Databricks.
+/// </summary>
 public abstract class ResultQueryBase<TResult>(
     EdiDatabricksOptions ediDatabricksOptions,
     Guid calculationId)
