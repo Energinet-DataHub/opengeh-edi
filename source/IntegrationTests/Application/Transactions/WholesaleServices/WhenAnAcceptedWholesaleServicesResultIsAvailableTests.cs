@@ -34,6 +34,7 @@ using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
+using ChargeType = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ChargeType;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Application.Transactions.WholesaleServices;
 
@@ -97,7 +98,9 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
         var process = WholesaleServicesProcessBuilder()
             .SetState(WholesaleServicesProcess.State.Sent)
             .Build();
+
         await Store(process);
+
         var acceptedEvent = WholesaleServicesRequestAcceptedBuilder(process)
             .BuildMonthlySum();
 
@@ -117,14 +120,103 @@ public class WhenAnAcceptedWholesaleServicesResultIsAvailableTests : TestBase
             .HasRelationTo(process.InitiatedByMessageId)
             .HasGridAreaCode(acceptedEvent.Series.Single().GridArea)
             .HasBusinessReason(process.BusinessReason)
-            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.Start.ToString(), process.StartOfPeriod)
-            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.Period.End.ToString(), process.EndOfPeriod)
-            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.GridAreaCode, process.RequestedGridArea)
-            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.ChargeOwner!.Value, process.ChargeOwner)
-            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(timeSeries => timeSeries.EnergySupplier.Value, process.EnergySupplierId)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.Period.Start.ToString(),
+                process.StartOfPeriod)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.Period.End.ToString(),
+                process.EndOfPeriod)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.GridAreaCode,
+                process.RequestedGridArea)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.ChargeOwner!.Value,
+                process.ChargeOwner)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.EnergySupplier.Value,
+                process.EnergySupplierId)
             .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
                 timeSeries => timeSeries.OriginalTransactionIdReference,
-                process.BusinessTransactionId);
+                process.BusinessTransactionId)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.ChargeCode,
+                "EA-003")
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.ChargeType,
+                ChargeType.Tariff)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.QuantityMeasureUnit,
+                MeasurementUnit.Kwh)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.MeteringPointType,
+                null)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.SettlementMethod,
+                null);
+    }
+
+    [Fact]
+    public async Task Received_accepted_wholesale_total_event_enqueues_message_without_charge_owner()
+    {
+        // Arrange
+        var process = WholesaleServicesProcessBuilder()
+            .SetState(WholesaleServicesProcess.State.Sent)
+            .Build();
+
+        await Store(process);
+
+        var acceptedEvent = WholesaleServicesRequestAcceptedBuilder(process)
+            .BuildTotalSum();
+
+        // Act
+        await HavingReceivedInboxEventAsync(nameof(WholesaleServicesRequestAccepted), acceptedEvent, process.ProcessId.Id);
+
+        // Assert
+        var outgoingMessage = await OutgoingMessageAsync(ActorRole.EnergySupplier, BusinessReason.WholesaleFixing);
+        outgoingMessage.Should().NotBeNull();
+        outgoingMessage
+            .HasReceiverId(process.RequestedByActor.ActorNumber.Value)
+            .HasDocumentReceiverId(process.OriginalActor.ActorNumber.Value)
+            .HasReceiverRole(process.RequestedByActor.ActorRole.Code)
+            .HasDocumentReceiverRole(process.OriginalActor.ActorRole.Code)
+            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
+            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
+            .HasRelationTo(process.InitiatedByMessageId)
+            .HasGridAreaCode(acceptedEvent.Series.Single().GridArea)
+            .HasBusinessReason(process.BusinessReason)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.Period.Start.ToString(),
+                process.StartOfPeriod)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.Period.End.ToString(),
+                process.EndOfPeriod)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.GridAreaCode,
+                process.RequestedGridArea)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.ChargeOwner,
+                null)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.EnergySupplier.Value,
+                process.EnergySupplierId)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.OriginalTransactionIdReference,
+                process.BusinessTransactionId)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.ChargeCode,
+                null)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.ChargeType,
+                null)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.QuantityMeasureUnit,
+                MeasurementUnit.Kwh) // The unit is always Kwh for total sums
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.MeteringPointType,
+                null)
+            .HasMessageRecordValue<AcceptedWholesaleServicesSeries>(
+                timeSeries => timeSeries.SettlementMethod,
+                null);
     }
 
     [Fact]

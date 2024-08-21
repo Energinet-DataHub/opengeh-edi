@@ -55,7 +55,7 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
                 SettlementVersion: MapSettlementVersion(wholesaleSeries.CalculationType),
                 MapSettlementMethod(wholesaleSeries.SettlementMethod),
                 MapCurrency(wholesaleSeries.Currency),
-                wholesaleSeries.HasChargeOwnerId ? ActorNumber.Create(wholesaleSeries.ChargeOwnerId) : null,
+                ShouldHaveChargeOwner(wholesaleSeries) ? ActorNumber.Create(wholesaleSeries.ChargeOwnerId) : null,
                 ActorNumber.Create(wholesaleSeries.EnergySupplierId),
                 wholesaleSeries.GridArea,
                 wholesaleSeries.HasChargeCode ? wholesaleSeries.ChargeCode : null,
@@ -68,6 +68,20 @@ public class WholesaleServicesRequestAcceptedMapper : IInboxEventMapper
             eventId,
             referenceId,
             acceptedWholesaleServicesSeries));
+    }
+
+    private static bool ShouldHaveChargeOwner(WholesaleServicesRequestSeries wholesaleSeries)
+    {
+        /*
+         * The charge owner should be present on the outgoing message
+         * if there is a charge owner and the message is not a total sum.
+         * Note that some total sums do have a charge owner (the sums for a specific charge owner) while others do not
+         * (those for an energy supplier).
+         * However, no total sum has a quantity unit as this is absent from the underlying data source
+         * and can thus be used to determine if the message is a total sum.
+         * In other words: if the message has a quantity unit, it is not a total sum.
+         */
+        return wholesaleSeries is { HasChargeOwnerId: true, HasQuantityUnit: true };
     }
 
     private static MeteringPointType? MapMeteringPointType(WholesaleServicesRequestSeries wholesaleSeries)
