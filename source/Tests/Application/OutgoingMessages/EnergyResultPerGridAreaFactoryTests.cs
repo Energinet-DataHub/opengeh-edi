@@ -14,9 +14,12 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using FluentAssertions;
 using NodaTime;
@@ -69,7 +72,7 @@ public class EnergyResultPerGridAreaFactoryTests
         }
 
         // Act
-        var actual = EnergyResultPerGridAreaFactory.CreateEnergyResultPerGridArea(databricksSqlRow, timeSeriesPoints);
+        var actual = CreateEnergyResultPerGridArea(databricksSqlRow, timeSeriesPoints);
 
         // Assert
         actual.Id.Should().Be("17582ba4-71db-4ce5-af70-b00a4676e357");
@@ -83,5 +86,28 @@ public class EnergyResultPerGridAreaFactoryTests
         actual.CalculationVersion.Should().Be(63);
         actual.SettlementMethod.Should().BeNull();
         actual.MeasureUnitType.Should().Be(MeasurementUnit.Kwh);
+    }
+
+    private static EnergyResultPerGridArea CreateEnergyResultPerGridArea(
+        DatabricksSqlRow databricksSqlRow,
+        IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints)
+    {
+        var resolution = ResolutionMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.Resolution));
+
+        var period = PeriodFactory.GetPeriod(timeSeriesPoints, resolution);
+
+        return new EnergyResultPerGridArea(
+            databricksSqlRow.ToGuid(EnergyResultColumnNames.ResultId),
+            databricksSqlRow.ToGuid(EnergyResultColumnNames.CalculationId),
+            databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.GridAreaCode),
+            MeteringPointTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.MeteringPointType)),
+            timeSeriesPoints,
+            CalculationTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.CalculationType)),
+            period.Start,
+            period.End,
+            resolution,
+            databricksSqlRow.ToLong(EnergyResultColumnNames.CalculationVersion),
+            SettlementMethodMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.SettlementMethod)),
+            MeasurementUnitMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)));
     }
 }
