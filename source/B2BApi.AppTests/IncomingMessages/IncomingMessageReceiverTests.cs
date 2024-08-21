@@ -61,7 +61,7 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task FunctionApp_WhenCallingIncomingMessages_ReturnAccepted()
+    public async Task Given_RequestWithValidDocumentAndBearerTokenMatchingPersistedActor_When_CallingIncomingMessages_Then_ResponseShouldBeAccepted()
     {
         // The following must match with the JSON document content
         var incomingDocumentTypeName = IncomingDocumentType.RequestAggregatedMeasureData.Name;
