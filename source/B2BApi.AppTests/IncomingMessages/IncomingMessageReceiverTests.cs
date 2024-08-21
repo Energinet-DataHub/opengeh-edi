@@ -13,9 +13,13 @@
 // limitations under the License.
 
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
+using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.B2BApi.IncomingMessages;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Newtonsoft.Json;
@@ -53,8 +57,15 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task FunctionApp_WhenCallingHealthCheck_ReturnOKAndExpectedContent()
+    public async Task FunctionApp_WhenCallingIncomingMessages_ReturnOK()
     {
+        var externalId = "external-id";
+        // TODO: Insert actor in database
+        var b2bToken = new JwtBuilder()
+            .WithRole("energysupplier")
+            .WithClaim(ClaimsMap.UserId, externalId)
+            .CreateToken();
+
         // TODO: Help !!!
         var incomingDocumentTypeName = "not sure what this should be";
         var jsonDocument = "{id: \"1\"}";
@@ -64,6 +75,7 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
             JsonConvert.SerializeObject(jsonDocument),
             Encoding.UTF8,
             "application/json");
+        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", b2bToken);
 
         // Act
         using var actualResponse = await Fixture.AppHostManager.HttpClient.SendAsync(request);
