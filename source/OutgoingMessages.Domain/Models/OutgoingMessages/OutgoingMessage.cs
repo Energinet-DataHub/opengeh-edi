@@ -56,10 +56,6 @@ public class OutgoingMessage
         DocumentReceiver = documentReceiver;
         CreatedAt = createdAt;
         FileStorageReference = CreateFileStorageReference(Receiver.Number, createdAt, Id);
-        IdempotentId = OutgoingMessageIdempotentId.New(
-            receiver.ActorRole,
-            externalId,
-            periodStartedAt);
         ExternalId = externalId;
         CalculationId = calculationId;
         PeriodStartedAt = periodStartedAt;
@@ -84,7 +80,6 @@ public class OutgoingMessage
         string? gridAreaCode,
         ExternalId externalId,
         Guid? calculationId,
-        OutgoingMessageIdempotentId idempotentId,
         Instant? periodStartedAt)
     {
         Id = id;
@@ -100,7 +95,6 @@ public class OutgoingMessage
         CreatedAt = createdAt;
         ExternalId = externalId;
         CalculationId = calculationId;
-        IdempotentId = idempotentId;
         PeriodStartedAt = periodStartedAt;
         // DocumentReceiver, EF will set this after the constructor
         // Receiver, EF will set this after the constructor
@@ -158,8 +152,6 @@ public class OutgoingMessage
     public Guid? CalculationId { get; }
 
     public Instant? PeriodStartedAt { get; }
-
-    public OutgoingMessageIdempotentId IdempotentId { get; set; }
 
     public void AssignToBundle(BundleId bundleId)
     {

@@ -40,11 +40,6 @@ public interface IOutgoingMessageRepository
     Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId);
 
     /// <summary>
-    /// Get message in the database for the idempotency id.
-    /// </summary>
-    Task<OutgoingMessage?> GetAsync(OutgoingMessageIdempotentId idempotentId);
-
-    /// <summary>
     /// Get message in the database for the designated receiver role and the external id and period started at.
     /// </summary>
     Task<OutgoingMessage?> GetAsync(ActorRole receiverRole, ExternalId externalId, Instant? periodStartedAt);
