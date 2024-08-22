@@ -35,6 +35,7 @@
     "WorkspaceToken": "<Databricks workspace token>",
     "WorkspaceUrl": "<Databricks workspace url>",
     "WarehouseId": "<Databricks warehouse id>",
+    "EdiDatabricks__CatalogName": "<Databricks unity catalog name>",
 
     // Durable Functions Task Hub Name
     // See naming constraints: https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-task-hubs?tabs=csharp#task-hub-names

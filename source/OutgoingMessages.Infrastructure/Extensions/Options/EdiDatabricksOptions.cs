@@ -27,5 +27,12 @@ public class EdiDatabricksOptions
     /// Name of the database in which the views for EDI are located.
     /// </summary>
     [Required]
-    public string DatabaseName { get; set; } = "wholesale_calculation_results";
+    public string DatabaseName { get; set; } = "wholesale_results";
+
+    /// <summary>
+    /// Name of the catalog in which the views for EDI are located.
+    /// Should point at the unity catalog when running in Azure, and use hive_metastore when running in tests
+    /// </summary>
+    [Required]
+    public string CatalogName { get; set; } = null!;
 }

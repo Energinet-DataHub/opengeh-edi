@@ -443,6 +443,7 @@ public class BehavioursTestBase : IDisposable
 
                     // => EDI views
                     [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.DatabaseName)}"] = _integrationTestFixture.DatabricksSchemaManager.SchemaName,
+                    [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.CatalogName)}"] = "hive_metastore",
                 })
             .Build();
 
