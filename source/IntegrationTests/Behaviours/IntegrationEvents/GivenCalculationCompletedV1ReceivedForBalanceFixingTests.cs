@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
@@ -23,12 +22,9 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.DependencyInjection;
