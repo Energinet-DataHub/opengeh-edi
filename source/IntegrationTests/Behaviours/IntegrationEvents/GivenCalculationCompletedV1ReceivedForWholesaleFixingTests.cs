@@ -24,8 +24,9 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyWholesaleServices;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,6 +36,7 @@ using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents;
 
@@ -436,6 +438,138 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
             peekResultsForEnergySupplier,
             documentFormat,
             expectedDocumentToEnergySupplier);
+    }
+
+    [Fact]
+    public async Task AndGiven_EnqueueWholesaleResultsForAmountPerChargesWithAGapInFees_When_EnergySupplierPeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments()
+    {
+        // Given (arrange)
+        var expectedNumberOfPeekResults = 2;
+        var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
+        await GivenGridAreaOwnershipAsync("804", ActorNumber.Create("8500000000502"));
+        var calculationId = Guid.Parse("61d60f89-bbc5-4f7a-be98-6139aab1c1b2");
+        var wholesaleAmountPerChargeSchemaDefinition = GetWholesaleAmountPerChargeSchemaDefinition();
+        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleAmountPerChargeSchemaDefinition.DataObjectName, wholesaleAmountPerChargeSchemaDefinition.SchemaDefinition);
+        await _fixture.DatabricksSchemaManager.InsertAsync(
+            wholesaleAmountPerChargeSchemaDefinition.DataObjectName,
+            [
+            ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'wholesale_fixing'", "'65'", "'3efb1187-f25f-4233-bce6-7e1eaf8f7f68'", "'804'", "'5790001662233'", "'Fee-804'", "'fee'", "'8500000000502'", "'P1D'", "'pcs'", "'consumption'", "'flex'", "'false'", "'DKK'", "'2023-02-01T23:00:00.000+00:00'", "2.000", "NULL", "12.756998", "25.513996"],
+            ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'wholesale_fixing'", "'65'", "'3efb1187-f25f-4233-bce6-7e1eaf8f7f68'", "'804'", "'5790001662233'", "'Fee-804'", "'fee'", "'8500000000502'", "'P1D'", "'pcs'", "'consumption'", "'flex'", "'false'", "'DKK'", "'2023-02-02T23:00:00.000+00:00'", "3.000",  "NULL", "12.756998", "38.270994"],
+            // "2023-02-03 23:00:00.000000" is missing
+            // "2023-02-04 23:00:00.000000" is missing
+            ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'wholesale_fixing'", "'65'", "'3efb1187-f25f-4233-bce6-7e1eaf8f7f68'", "'804'", "'5790001662233'", "'Fee-804'", "'fee'", "'8500000000502'", "'P1D'", "'pcs'", "'consumption'", "'flex'", "'false'", "'DKK'", "'2023-02-05T23:00:00.000+00:00'", "1.000", "NULL", "12.756998", "12.756998"],
+        ]);
+
+        await GivenEnqueueWholesaleResultsForAmountPerChargesAsync(calculationId, energySupplier);
+
+        // When (act)
+        var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(
+            energySupplier.ActorNumber,
+            energySupplier.ActorRole,
+            DocumentFormat.Json);
+
+        // Then (assert)
+        peekResultsForEnergySupplier.Should().HaveCount(expectedNumberOfPeekResults, "Fee result contains a single gap, which should result in two messages");
+
+        // Assert first fee is correct and within expected period
+        var assertForFirstBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[0].Bundle);
+        assertForFirstBundle.HasPeriod(
+            new Period(
+                Instant.FromUtc(2023, 2, 1, 23, 0, 0),
+                Instant.FromUtc(2023, 2, 3, 23, 0, 0)));
+        assertForFirstBundle.HasPoints(
+            [
+                new WholesaleServicesPoint(1, 2, 12.757m, 25.514m, CalculatedQuantityQuality.Calculated),
+                new WholesaleServicesPoint(1, 3, 12.757m, 38.271m, CalculatedQuantityQuality.Calculated),
+            ]);
+
+        // Assert second fee is correct and within expected period
+        var assertForSecondBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[1].Bundle);
+        assertForSecondBundle.HasPeriod(
+            new Period(
+                Instant.FromUtc(2023, 2, 5, 23, 0, 0),
+                Instant.FromUtc(2023, 2, 6, 23, 0, 0)));
+        assertForSecondBundle.HasPoints(
+            [
+                new WholesaleServicesPoint(1, 1, 12.757m, 12.757m, CalculatedQuantityQuality.Calculated),
+            ]);
+    }
+
+    [Fact]
+    public async Task AndGiven_EnqueueWholesaleResultsForAmountPerChargesWithMultipleGapsInFees_When_EnergySupplierPeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments()
+    {
+        // Given (arrange)
+        var expectedNumberOfPeekResults = 3;
+        var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
+        await GivenGridAreaOwnershipAsync("804", ActorNumber.Create("8500000000502"));
+        var calculationId = Guid.Parse("61d60f89-bbc5-4f7a-be98-6139aab1c1b2");
+        var wholesaleAmountPerChargeSchemaDefinition = GetWholesaleAmountPerChargeSchemaDefinition();
+        await _fixture.DatabricksSchemaManager.CreateTableAsync(wholesaleAmountPerChargeSchemaDefinition.DataObjectName, wholesaleAmountPerChargeSchemaDefinition.SchemaDefinition);
+        await _fixture.DatabricksSchemaManager.InsertAsync(
+            wholesaleAmountPerChargeSchemaDefinition.DataObjectName,
+            [
+            ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'wholesale_fixing'", "'65'", "'3efb1187-f25f-4233-bce6-7e1eaf8f7f68'", "'804'", "'5790001662233'", "'Fee-804'", "'fee'", "'8500000000502'", "'P1D'", "'pcs'", "'consumption'", "'flex'", "'false'", "'DKK'", "'2023-02-01T23:00:00.000+00:00'", "2.000", "NULL", "12.756998", "25.513996"],
+            // "2023-02-02 23:00:00.000000" is missing
+            ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'wholesale_fixing'", "'65'", "'3efb1187-f25f-4233-bce6-7e1eaf8f7f68'", "'804'", "'5790001662233'", "'Fee-804'", "'fee'", "'8500000000502'", "'P1D'", "'pcs'", "'consumption'", "'flex'", "'false'", "'DKK'", "'2023-02-03T23:00:00.000+00:00'", "3.000",  "NULL", "12.756998", "38.270994"],
+            // "2023-02-04 23:00:00.000000" is missing
+            ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'wholesale_fixing'", "'65'", "'3efb1187-f25f-4233-bce6-7e1eaf8f7f68'", "'804'", "'5790001662233'", "'Fee-804'", "'fee'", "'8500000000502'", "'P1D'", "'pcs'", "'consumption'", "'flex'", "'false'", "'DKK'", "'2023-02-05T23:00:00.000+00:00'", "1.000", "NULL", "12.756998", "12.756998"],
+        ]);
+
+        await GivenEnqueueWholesaleResultsForAmountPerChargesAsync(calculationId, energySupplier);
+
+        // When (act)
+        var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(
+            energySupplier.ActorNumber,
+            energySupplier.ActorRole,
+            DocumentFormat.Json);
+
+        // Then (assert)
+        peekResultsForEnergySupplier.Should().HaveCount(expectedNumberOfPeekResults, "Each fee should be sent as a separate message");
+
+        // Assert first fee is correct and within expected period
+        var assertForFirstBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[0].Bundle);
+        assertForFirstBundle.HasPeriod(
+            new Period(
+                Instant.FromUtc(2023, 2, 1, 23, 0, 0),
+                Instant.FromUtc(2023, 2, 2, 23, 0, 0)));
+        assertForFirstBundle.HasPoints(
+            [
+                new WholesaleServicesPoint(1, 2, 12.757m, 25.514m, CalculatedQuantityQuality.Calculated),
+            ]);
+
+        // Assert second fee is correct and within expected period
+        var assertForSecondBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[1].Bundle);
+        assertForSecondBundle.HasPeriod(
+            new Period(
+                Instant.FromUtc(2023, 2, 3, 23, 0, 0),
+                Instant.FromUtc(2023, 2, 4, 23, 0, 0)));
+        assertForSecondBundle.HasPoints(
+            [
+                new WholesaleServicesPoint(1, 3, 12.757m, 38.271m, CalculatedQuantityQuality.Calculated),
+            ]);
+
+        // Assert third fee is correct and within expected period
+        var assertForThirdBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[2].Bundle);
+        assertForThirdBundle.HasPeriod(
+            new Period(
+                Instant.FromUtc(2023, 2, 5, 23, 0, 0),
+                Instant.FromUtc(2023, 2, 6, 23, 0, 0)));
+        assertForThirdBundle.HasPoints(
+            [
+                new WholesaleServicesPoint(1, 1, 12.757m, 12.757m, CalculatedQuantityQuality.Calculated),
+            ]);
+    }
+
+    private (string DataObjectName,  Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition) GetWholesaleAmountPerChargeSchemaDefinition()
+    {
+        var query = new WholesaleAmountPerChargeQuery(
+            GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity>>(),
+            _ediDatabricksOptions.Value,
+            GetService<IMasterDataClient>(),
+            EventId.From(Guid.NewGuid()),
+            Guid.NewGuid(),
+            null);
+        return new(query.DataObjectName, query.SchemaDefinition);
     }
 
     private Task GivenEnqueueWholesaleResultsForAmountPerChargesAsync(Guid calculationId, Actor energySupplier)

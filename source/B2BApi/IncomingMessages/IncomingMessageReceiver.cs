@@ -14,7 +14,6 @@
 
 using System.Net;
 using System.Text;
-using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.B2BApi.Common;
 using Energinet.DataHub.EDI.B2BApi.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -66,7 +65,8 @@ public class IncomingMessageReceiver
         }
 
         var incomingDocumentType = IncomingDocumentType.FromName(incomingDocumentTypeName);
-        if (incomingDocumentType == null) return request.CreateResponse(HttpStatusCode.NotFound);
+        if (incomingDocumentType == null)
+            return request.CreateResponse(HttpStatusCode.NotFound);
 
         var responseMessage = await _incomingMessageClient
             .ReceiveIncomingMarketMessageAsync(
