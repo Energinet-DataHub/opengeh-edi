@@ -65,17 +65,7 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
 
         // The actor must exist in the database
         var externalId = Guid.NewGuid().ToString();
-        await using var sqlConnection = new Microsoft.Data.SqlClient.SqlConnection(Fixture.DatabaseManager.ConnectionString);
-        {
-            await using var sqlCommand = sqlConnection.CreateCommand();
-            sqlCommand.CommandText = "INSERT INTO [dbo].[Actor] VALUES (@id, @actorNumber, @externalId)";
-            sqlCommand.Parameters.AddWithValue("@id", Guid.NewGuid());
-            sqlCommand.Parameters.AddWithValue("@actorNumber", actorNumber.Value);
-            sqlCommand.Parameters.AddWithValue("@externalId", externalId);
-
-            await sqlConnection.OpenAsync();
-            await sqlCommand.ExecuteNonQueryAsync();
-        }
+        await Fixture.DatabaseManager.AddActorAsync(actorNumber, externalId);
 
         // The bearer token must contain:
         //  * the actor role matching the document content

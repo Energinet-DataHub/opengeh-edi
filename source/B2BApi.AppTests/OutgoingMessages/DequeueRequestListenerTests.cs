@@ -14,6 +14,7 @@
 
 using System.Net;
 using System.Net.Http.Headers;
+using AutoFixture;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.B2BApi.OutgoingMessages;
@@ -57,25 +58,16 @@ public class DequeueRequestListenerTests : IAsyncLifetime
     public async Task Given_PersistedActor_When_CallingDequeueWithUnknownMessageIdAndBearerToken_Then_ResponseShouldBeBadRequest()
     {
         var messageId = Guid.NewGuid().ToString();
-        // The actor must exist in the database
-        var actorNumber = ActorNumber.Create("5790000392551");
-        var actorRole = ActorRole.BalanceResponsibleParty;
-        var externalId = Guid.NewGuid().ToString();
-        await using var sqlConnection = new Microsoft.Data.SqlClient.SqlConnection(Fixture.DatabaseManager.ConnectionString);
-        {
-            await using var sqlCommand = sqlConnection.CreateCommand();
-            sqlCommand.CommandText = "INSERT INTO [dbo].[Actor] VALUES (@id, @actorNumber, @externalId)";
-            sqlCommand.Parameters.AddWithValue("@id", Guid.NewGuid());
-            sqlCommand.Parameters.AddWithValue("@actorNumber", actorNumber.Value);
-            sqlCommand.Parameters.AddWithValue("@externalId", externalId);
 
-            await sqlConnection.OpenAsync();
-            await sqlCommand.ExecuteNonQueryAsync();
-        }
+        // The actor must exist in the database
+        var actorNumber = ActorNumber.Create("1234567890123");
+        var externalId = Guid.NewGuid().ToString();
+        await Fixture.DatabaseManager.AddActorAsync(actorNumber, externalId);
 
         // The bearer token must contain:
         //  * the actor role matching any valid/known role in the ClaimsMap
         //  * the external id matching the actor in the database
+        var actorRole = ActorRole.BalanceResponsibleParty;
         var b2bToken = new JwtBuilder()
             .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
             .WithClaim(ClaimsMap.UserId, externalId)
