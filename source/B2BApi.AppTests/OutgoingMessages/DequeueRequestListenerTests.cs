@@ -14,7 +14,6 @@
 
 using System.Net;
 using System.Net.Http.Headers;
-using System.Text;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.B2BApi.OutgoingMessages;
@@ -27,12 +26,12 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.OutgoingMessages;
 
 /// <summary>
-/// Tests verifying the configuration and behaviour of the <see cref="PeekRequestListener"/> http endpoint.
+/// Tests verifying the configuration and behaviour of the <see cref="DequeueRequestListener"/> http endpoint.
 /// </summary>
 [Collection(nameof(B2BApiAppCollectionFixture))]
-public class PeekRequestListenerTests : IAsyncLifetime
+public class DequeueRequestListenerTests : IAsyncLifetime
 {
-    public PeekRequestListenerTests(B2BApiAppFixture fixture, ITestOutputHelper testOutputHelper)
+    public DequeueRequestListenerTests(B2BApiAppFixture fixture, ITestOutputHelper testOutputHelper)
     {
         Fixture = fixture;
         Fixture.SetTestOutputHelper(testOutputHelper);
@@ -55,12 +54,12 @@ public class PeekRequestListenerTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_PersistedActor_When_CallingPeekAggregationsWithValidContentTypeAndBearerToken_Then_ResponseShouldBeNoContent()
+    public async Task Given_PersistedActor_When_CallingDequeueWithUnknownMessageIdAndBearerToken_Then_ResponseShouldBeBadRequest()
     {
-        var messageCategory = "aggregations";
+        var messageId = Guid.NewGuid().ToString();
         // The actor must exist in the database
         var actorNumber = ActorNumber.Create("5790000392551");
-        var actorRole = ActorRole.MeteredDataResponsible;
+        var actorRole = ActorRole.BalanceResponsibleParty;
         var externalId = Guid.NewGuid().ToString();
         await using var sqlConnection = new Microsoft.Data.SqlClient.SqlConnection(Fixture.DatabaseManager.ConnectionString);
         {
@@ -82,17 +81,13 @@ public class PeekRequestListenerTests : IAsyncLifetime
             .WithClaim(ClaimsMap.UserId, externalId)
             .CreateToken();
 
-        using var request = new HttpRequestMessage(HttpMethod.Get, $"api/peek/{messageCategory}");
-        request.Content = new StringContent(
-            string.Empty,
-            Encoding.UTF8,
-            "application/json");
+        using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/dequeue/{messageId}");
         request.Headers.Authorization = new AuthenticationHeaderValue("bearer", b2bToken);
 
         // Act
         using var actualResponse = await Fixture.AppHostManager.HttpClient.SendAsync(request);
 
         // Assert
-        actualResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        actualResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 }
