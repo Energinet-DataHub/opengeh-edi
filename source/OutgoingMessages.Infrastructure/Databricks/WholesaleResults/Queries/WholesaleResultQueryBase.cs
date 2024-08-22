@@ -29,7 +29,7 @@ public abstract class WholesaleResultQueryBase<TResult>(
         EdiDatabricksOptions ediDatabricksOptions,
         Guid calculationId,
         string? energySupplier)
-    : ResultQueryBase<TResult>(ediDatabricksOptions, calculationId)
+    : CalculationResultQueryBase<TResult>(ediDatabricksOptions, calculationId)
     where TResult : OutgoingMessageDto
 {
     private readonly ILogger _logger = logger;

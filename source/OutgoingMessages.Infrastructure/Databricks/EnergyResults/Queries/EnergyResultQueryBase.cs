@@ -28,7 +28,7 @@ public abstract class EnergyResultQueryBase<TResult>(
         ILogger logger,
         EdiDatabricksOptions ediDatabricksOptions,
         Guid calculationId)
-    : ResultQueryBase<TResult>(ediDatabricksOptions, calculationId)
+    : CalculationResultQueryBase<TResult>(ediDatabricksOptions, calculationId)
     where TResult : OutgoingMessageDto
 {
     private readonly ILogger _logger = logger;

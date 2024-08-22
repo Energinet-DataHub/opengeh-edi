@@ -17,12 +17,12 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatem
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 
-namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
+namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks;
 
 /// <summary>
 /// Common base class for querying calculation results from Databricks.
 /// </summary>
-public abstract class ResultQueryBase<TResult>(
+public abstract class CalculationResultQueryBase<TResult>(
     EdiDatabricksOptions ediDatabricksOptions,
     Guid calculationId)
     : IDeltaTableSchemaDescription
