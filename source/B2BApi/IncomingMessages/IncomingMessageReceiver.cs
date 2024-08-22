@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.IO;
 using System.Net;
 using System.Text;
 using Energinet.DataHub.EDI.B2BApi.Common;
@@ -68,27 +69,40 @@ public class IncomingMessageReceiver
         if (incomingDocumentType == null)
             return request.CreateResponse(HttpStatusCode.NotFound);
 
+        using var seekingStreamFromBody = await CreateSeekingStreamFromBodyAsync(request).ConfigureAwait(false);
         var responseMessage = await _incomingMessageClient
             .ReceiveIncomingMarketMessageAsync(
-                new IncomingMarketMessageStream(request.Body),
+                new IncomingMarketMessageStream(seekingStreamFromBody),
                 incomingDocumentFormat: documentFormat,
                 incomingDocumentType,
                 responseDocumentFormat: documentFormat,
                 cancellationToken)
             .ConfigureAwait(false);
 
-        var httpStatusCode = responseMessage.IsErrorResponse ? HttpStatusCode.BadRequest : HttpStatusCode.Accepted;
+        var httpStatusCode = responseMessage.IsErrorResponse
+            ? HttpStatusCode.BadRequest
+            : HttpStatusCode.Accepted;
 
-        return CreateResponse(request, httpStatusCode, responseMessage);
+        return await CreateResponseAsync(request, httpStatusCode, responseMessage).ConfigureAwait(false);
     }
 
-    private static HttpResponseData CreateResponse(
-        HttpRequestData request,
-        HttpStatusCode statusCode,
-        ResponseMessage responseMessage)
+    private static async Task<HttpResponseData> CreateResponseAsync(
+    HttpRequestData request,
+    HttpStatusCode statusCode,
+    ResponseMessage responseMessage)
     {
         var response = request.CreateResponse(statusCode);
-        response.WriteString(responseMessage.MessageBody, Encoding.UTF8);
+        await response.WriteStringAsync(responseMessage.MessageBody, Encoding.UTF8).ConfigureAwait(false);
         return response;
+    }
+
+    private static async Task<MemoryStream> CreateSeekingStreamFromBodyAsync(HttpRequestData request)
+    {
+        using StreamReader reader = new(request.Body);
+        var bodyAsString = await reader.ReadToEndAsync().ConfigureAwait(false);
+
+        var encoding = Encoding.UTF8;
+        var byteArray = encoding.GetBytes(bodyAsString);
+        return new MemoryStream(byteArray);
     }
 }
