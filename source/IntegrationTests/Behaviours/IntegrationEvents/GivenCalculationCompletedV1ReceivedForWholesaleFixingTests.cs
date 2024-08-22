@@ -471,7 +471,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         // Then (assert)
         peekResultsForEnergySupplier.Should().HaveCount(expectedNumberOfPeekResults, "Fee result contains a single gap, which should result in two messages");
 
-        // Assert first fee is correct and withing expected period
+        // Assert first fee is correct and within expected period
         var assertForFirstBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[0].Bundle);
         assertForFirstBundle.HasPeriod(
             new Period(
