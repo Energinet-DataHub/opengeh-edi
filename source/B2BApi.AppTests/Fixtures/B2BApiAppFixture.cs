@@ -118,13 +118,13 @@ public class B2BApiAppFixture : IAsyncLifetime
 
     public DatabricksSchemaManager DatabricksSchemaManager { get; }
 
+    public EdiDatabaseManager DatabaseManager { get; }
+
     private IntegrationTestConfiguration IntegrationTestConfiguration { get; }
 
     private AzuriteManager AzuriteManager { get; }
 
     private DurableTaskManager DurableTaskManager { get; }
-
-    private EdiDatabaseManager DatabaseManager { get; }
 
     private ServiceBusResourceProvider ServiceBusResourceProvider { get; }
 
