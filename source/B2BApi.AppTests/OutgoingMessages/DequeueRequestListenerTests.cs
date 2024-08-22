@@ -55,7 +55,7 @@ public class DequeueRequestListenerTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_PersistedActor_When_CallingDequeueWithUnknownMessageIdAndBearerToken_Then_ResponseShouldBeBadRequest()
+    public async Task Given_PersistedActorAndNoQeueue_When_CallingDequeueWithUnknownMessageIdAndBearerToken_Then_ResponseShouldBeBadRequest()
     {
         var messageId = Guid.NewGuid().ToString();
 

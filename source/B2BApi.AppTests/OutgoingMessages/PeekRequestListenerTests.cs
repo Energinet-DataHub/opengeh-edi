@@ -55,7 +55,7 @@ public class PeekRequestListenerTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_PersistedActor_When_CallingPeekAggregationsWithValidContentTypeAndBearerToken_Then_ResponseShouldBeNoContent()
+    public async Task Given_PersistedActorAndNoQeueue_When_CallingPeekAggregationsWithValidContentTypeAndBearerToken_Then_ResponseShouldBeNoContent()
     {
         var messageCategory = "aggregations";
 
