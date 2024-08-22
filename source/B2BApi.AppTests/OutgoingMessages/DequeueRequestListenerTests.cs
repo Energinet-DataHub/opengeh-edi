@@ -14,7 +14,6 @@
 
 using System.Net;
 using System.Net.Http.Headers;
-using AutoFixture;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.B2BApi.OutgoingMessages;

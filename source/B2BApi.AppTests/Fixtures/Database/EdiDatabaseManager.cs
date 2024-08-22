@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using AutoFixture;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Database;
 using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
