@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Database;
 using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Database;
@@ -38,6 +39,20 @@ public class EdiDatabaseManager : SqlServerDatabaseManager<DbContext>
         return (DbContext)Activator.CreateInstance(typeof(DbContext), optionsBuilder.Options)!;
     }
 
+    public async Task AddActorAsync(ActorNumber actorNumber, string externalId)
+    {
+        await using var sqlConnection = new Microsoft.Data.SqlClient.SqlConnection(ConnectionString);
+
+        await using var sqlCommand = sqlConnection.CreateCommand();
+        sqlCommand.CommandText = "INSERT INTO [dbo].[Actor] VALUES (@id, @actorNumber, @externalId)";
+        sqlCommand.Parameters.AddWithValue("@id", Guid.NewGuid());
+        sqlCommand.Parameters.AddWithValue("@actorNumber", actorNumber.Value);
+        sqlCommand.Parameters.AddWithValue("@externalId", externalId);
+
+        await sqlConnection.OpenAsync();
+        await sqlCommand.ExecuteNonQueryAsync();
+    }
+
     /// <summary>
     /// Creates the database schema using DbUp instead of a database context.
     /// </summary>
@@ -52,9 +67,6 @@ public class EdiDatabaseManager : SqlServerDatabaseManager<DbContext>
     protected override bool CreateDatabaseSchema(DbContext context)
     {
         var result = DbUpgradeRunner.RunDbUpgrade(ConnectionString);
-        if (!result.Successful)
-            throw new Exception("Database migration failed", result.Error);
-
-        return true;
+        return !result.Successful ? throw new Exception("Database migration failed", result.Error) : true;
     }
 }
