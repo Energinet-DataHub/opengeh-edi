@@ -47,7 +47,7 @@ public class EnergyResultPerGridAreaQuery(
     private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly EventId _eventId = eventId;
 
-    public override string DataObjectName => "energy_per_ga_v1";
+    public override string DataObjectName => "energy_v1";
 
     public override Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition => new()
     {

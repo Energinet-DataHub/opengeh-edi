@@ -377,6 +377,9 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.DatabaseName)}",
             DatabricksSchemaManager.SchemaName);
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.CatalogName)}",
+            "hive_metastore");
 
         // ServiceBus connection strings
         appHostSettings.ProcessEnvironmentVariables.Add(

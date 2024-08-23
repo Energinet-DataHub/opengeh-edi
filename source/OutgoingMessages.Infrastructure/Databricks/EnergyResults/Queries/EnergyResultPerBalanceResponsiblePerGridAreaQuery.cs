@@ -45,7 +45,7 @@ public class EnergyResultPerBalanceResponsiblePerGridAreaQuery(
 {
     private readonly EventId _eventId = eventId;
 
-    public override string DataObjectName => "energy_per_brp_ga_v1";
+    public override string DataObjectName => "energy_per_brp_v1";
 
     public override Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition => new()
     {
