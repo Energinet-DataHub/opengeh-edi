@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
@@ -23,8 +22,9 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.NotifyAggregatedMeasureData;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,6 +34,7 @@ using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents;
 
@@ -257,6 +258,138 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             peekResultsForBalanceResponsible,
             documentFormat,
             balanceResponsibleAssertionInput);
+    }
+
+    [Fact]
+    public async Task AndGiven_EnqueueEnergyResultsPerEnergySuppliersPerBalanceResponsibleWithAGapInPoints_When_EnergySupplierPeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments()
+    {
+        // Given (arrange)
+        var expectedNumberOfPeekResults = 2;
+        var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
+        var calculationId = Guid.Parse("61d60f89-bbc5-4f7a-be98-6139aab1c1b2");
+        var energyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaSchemaDefinition = GetEnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaSchemaDefinition();
+        await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaSchemaDefinition.DataObjectName, energyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaSchemaDefinition.SchemaDefinition);
+        await _fixture.DatabricksSchemaManager.InsertAsync(
+            energyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaSchemaDefinition.DataObjectName,
+            [
+                ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'balance_fixing'", "'2023-02-01 23:00:00.000000'", "'2023-02-12 23:00:00.000000'", "'111'", "'10e4e982-91dc-4e1c-9079-514ed45a64a7'", "'543'", "'5790001662233'", "'7080000729821'", "'production'", "NULL", "'PT1H'", "'2023-02-01 23:00:00.000000'", "'39471.336'", "'kWh'", "Array('measured')"],
+                ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'balance_fixing'", "'2023-02-01 23:00:00.000000'", "'2023-02-12 23:00:00.000000'", "'111'", "'10e4e982-91dc-4e1c-9079-514ed45a64a7'", "'543'", "'5790001662233'", "'7080000729821'", "'production'", "NULL", "'PT1H'", "'2023-02-02 00:00:00.000000'", "'39472.336'", "'kWh'", "Array('measured')"],
+                // "2022-02-02 01:00:00.000000" is missing
+                // "2022-02-02 02:00:00.000000" is missing
+                // "2022-02-02 03:00:00.000000" is missing
+                // "2022-02-02 04:00:00.000000" is missing
+                ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'balance_fixing'", "'2023-02-01 23:00:00.000000'", "'2023-02-12 23:00:00.000000'", "'111'", "'10e4e982-91dc-4e1c-9079-514ed45a64a7'", "'543'", "'5790001662233'", "'7080000729821'", "'production'", "NULL", "'PT1H'", "'2023-02-02 05:00:00.000000'", "'39473.336'", "'kWh'", "Array('measured')"],
+            ]);
+
+        await GivenEnqueueEnergyResultsPerEnergySuppliersPerBalanceResponsible(calculationId);
+
+        // When (act)
+        var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(
+            energySupplier.ActorNumber,
+            energySupplier.ActorRole,
+            DocumentFormat.Json);
+
+        // Then (assert)
+        peekResultsForEnergySupplier.Should().HaveCount(expectedNumberOfPeekResults, "Fee result contains a single gap, which should result in two messages");
+
+        // Assert first fee is correct and within expected period
+        var assertForFirstBundle = new AssertNotifyAggregatedMeasureDataJsonDocument(peekResultsForEnergySupplier[0].Bundle);
+        assertForFirstBundle.HasPeriod(
+            new Period(
+                Instant.FromUtc(2023, 2, 1, 23, 0, 0),
+                Instant.FromUtc(2023, 2, 2, 01, 0, 0)));
+        assertForFirstBundle.HasPoints(
+            [
+                new TimeSeriesPointAssertionInput(Instant.FromUtc(2023, 2, 1, 23, 0, 0), 39471.336m, CalculatedQuantityQuality.Measured),
+                new TimeSeriesPointAssertionInput(Instant.FromUtc(2023, 2, 2, 00, 0, 0),  39472.336m, CalculatedQuantityQuality.Measured),
+            ]);
+
+        // Assert second fee is correct and within expected period
+        var assertForSecondBundle = new AssertNotifyAggregatedMeasureDataJsonDocument(peekResultsForEnergySupplier[1].Bundle);
+        assertForSecondBundle.HasPeriod(
+            new Period(
+                Instant.FromUtc(2023, 2, 2, 05, 0, 0),
+                Instant.FromUtc(2023, 2, 2, 06, 0, 0)));
+        assertForSecondBundle.HasPoints(
+            [
+                new TimeSeriesPointAssertionInput(Instant.FromUtc(2023, 2, 2, 05, 0, 0), 39473.336m, CalculatedQuantityQuality.Measured),
+            ]);
+    }
+
+    [Fact]
+    public async Task AndGiven_EnqueueWholesaleResultsForAmountPerChargesWithMultipleGapsInFees_When_EnergySupplierPeeksMessages_Then_ReceivesCorrectNotifyAggregatedMeasureDataDocuments()
+    {
+        // Given (arrange)
+        var expectedNumberOfPeekResults = 3;
+        var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
+        var calculationId = Guid.Parse("61d60f89-bbc5-4f7a-be98-6139aab1c1b2");
+        var energyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaSchemaDefinition = GetEnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaSchemaDefinition();
+        await _fixture.DatabricksSchemaManager.CreateTableAsync(energyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaSchemaDefinition.DataObjectName, energyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaSchemaDefinition.SchemaDefinition);
+        await _fixture.DatabricksSchemaManager.InsertAsync(
+            energyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaSchemaDefinition.DataObjectName,
+            [
+                ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'balance_fixing'", "'2023-02-01 23:00:00.000000'", "'2023-02-12 23:00:00.000000'", "'111'", "'10e4e982-91dc-4e1c-9079-514ed45a64a7'", "'543'", "'5790001662233'", "'7080000729821'", "'production'", "NULL", "'PT1H'", "'2023-02-01 23:00:00.000000'", "'39471.336'", "'kWh'", "Array('measured')"],
+                // "2022-02-02 00:00:00.000000" is missing
+                // "2022-02-02 01:00:00.000000" is missing
+                ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'balance_fixing'", "'2023-02-01 23:00:00.000000'", "'2023-02-12 23:00:00.000000'", "'111'", "'10e4e982-91dc-4e1c-9079-514ed45a64a7'", "'543'", "'5790001662233'", "'7080000729821'", "'production'", "NULL", "'PT1H'", "'2023-02-02 02:00:00.000000'", "'39472.336'", "'kWh'", "Array('measured')"],
+                // "2022-02-02 03:00:00.000000" is missing
+                // "2022-02-02 04:00:00.000000" is missing
+                ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'balance_fixing'", "'2023-02-01 23:00:00.000000'", "'2023-02-12 23:00:00.000000'", "'111'", "'10e4e982-91dc-4e1c-9079-514ed45a64a7'", "'543'", "'5790001662233'", "'7080000729821'", "'production'", "NULL", "'PT1H'", "'2023-02-02 05:00:00.000000'", "'39473.336'", "'kWh'", "Array('measured')"],
+            ]);
+
+        await GivenEnqueueEnergyResultsPerEnergySuppliersPerBalanceResponsible(calculationId);
+
+        // When (act)
+        var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(
+            energySupplier.ActorNumber,
+            energySupplier.ActorRole,
+            DocumentFormat.Json);
+
+        // Then (assert)
+        peekResultsForEnergySupplier.Should().HaveCount(expectedNumberOfPeekResults, "Fee result contains a single gap, which should result in two messages");
+
+        // Assert first fee is correct and within expected period
+        var assertForFirstBundle = new AssertNotifyAggregatedMeasureDataJsonDocument(peekResultsForEnergySupplier[0].Bundle);
+        assertForFirstBundle.HasPeriod(
+            new Period(
+                Instant.FromUtc(2023, 2, 1, 23, 0, 0),
+                Instant.FromUtc(2023, 2, 2, 00, 0, 0)));
+        assertForFirstBundle.HasPoints(
+            [
+                new TimeSeriesPointAssertionInput(Instant.FromUtc(2023, 2, 1, 23, 0, 0), 39471.336m, CalculatedQuantityQuality.Measured),
+            ]);
+
+        // Assert second fee is correct and within expected period
+        var assertForSecondBundle = new AssertNotifyAggregatedMeasureDataJsonDocument(peekResultsForEnergySupplier[1].Bundle);
+        assertForSecondBundle.HasPeriod(
+            new Period(
+                Instant.FromUtc(2023, 2, 2, 02, 0, 0),
+                Instant.FromUtc(2023, 2, 2, 03, 0, 0)));
+        assertForSecondBundle.HasPoints(
+            [
+                new TimeSeriesPointAssertionInput(Instant.FromUtc(2023, 2, 2, 02, 0, 0),  39472.336m, CalculatedQuantityQuality.Measured),
+            ]);
+
+        // Assert second fee is correct and within expected period
+        var assertForThirdBundle = new AssertNotifyAggregatedMeasureDataJsonDocument(peekResultsForEnergySupplier[2].Bundle);
+        assertForThirdBundle.HasPeriod(
+            new Period(
+                Instant.FromUtc(2023, 2, 2, 05, 0, 0),
+                Instant.FromUtc(2023, 2, 2, 06, 0, 0)));
+        assertForThirdBundle.HasPoints(
+            [
+                new TimeSeriesPointAssertionInput(Instant.FromUtc(2023, 2, 2, 05, 0, 0), 39473.336m, CalculatedQuantityQuality.Measured),
+            ]);
+    }
+
+    private (string DataObjectName,  Dictionary<string, (string DataType, bool IsNullable)> SchemaDefinition) GetEnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaSchemaDefinition()
+    {
+        var query = new EnergyResultPerEnergySupplierPerBalanceResponsiblePerGridAreaQuery(
+            GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity>>(),
+            _ediDatabricksOptions.Value,
+            EventId.From(Guid.NewGuid()),
+            Guid.NewGuid());
+        return new(query.DataObjectName, query.SchemaDefinition);
     }
 
     private Task GivenEnqueueEnergyResultsPerGridAreaAsync(Guid calculationId)

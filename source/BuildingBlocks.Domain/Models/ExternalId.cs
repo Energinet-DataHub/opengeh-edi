@@ -18,6 +18,9 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 /// <summary>
 /// An ExternalId to represent what the systems external source uses as an identifier
+/// The value provided must not change even if operation fails.
+/// This is to ensure that the same external id is used for the same operation.
+/// So a message can only be delivered once for a given external id. (Unless additional logic is provided to check for idempotency)
 /// </summary>
 [Serializable]
 public record ExternalId
