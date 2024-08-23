@@ -483,7 +483,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
                 new WholesaleServicesPoint(1, 3, 12.757m, 38.271m, CalculatedQuantityQuality.Calculated),
             ]);
 
-        // Assert second fee is correct and withing expected period
+        // Assert second fee is correct and within expected period
         var assertForSecondBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[1].Bundle);
         assertForSecondBundle.HasPeriod(
             new Period(
@@ -526,7 +526,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         // Then (assert)
         peekResultsForEnergySupplier.Should().HaveCount(expectedNumberOfPeekResults, "Each fee should be sent as a separate message");
 
-        // Assert first fee is correct and withing expected period
+        // Assert first fee is correct and within expected period
         var assertForFirstBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[0].Bundle);
         assertForFirstBundle.HasPeriod(
             new Period(
@@ -537,7 +537,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
                 new WholesaleServicesPoint(1, 2, 12.757m, 25.514m, CalculatedQuantityQuality.Calculated),
             ]);
 
-        // Assert second fee is correct and withing expected period
+        // Assert second fee is correct and within expected period
         var assertForSecondBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[1].Bundle);
         assertForSecondBundle.HasPeriod(
             new Period(
@@ -548,7 +548,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
                 new WholesaleServicesPoint(1, 3, 12.757m, 38.271m, CalculatedQuantityQuality.Calculated),
             ]);
 
-        // Assert third fee is correct and withing expected period
+        // Assert third fee is correct and within expected period
         var assertForThirdBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[2].Bundle);
         assertForThirdBundle.HasPeriod(
             new Period(
