@@ -12,18 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.B2BApi.Configuration.Middleware;
 
 public static class FunctionContextExtensions
 {
+    internal static bool IsHttpTriggerAndNotHealthCheck(this FunctionContext context)
+    {
+        var isHttpTrigger = context.FunctionDefinition.InputBindings.Values
+            .First(metadata => metadata.Type.EndsWith("Trigger"))
+            .Type == "httpTrigger";
+
+        var isHealthCheckEndpoint = context.FunctionDefinition.Name == "HealthCheck";
+
+        return isHttpTrigger && !isHealthCheckEndpoint;
+    }
+
     /// <summary>
     /// Sets the FunctionContext IFunctionBindingsFeature InvocationResult with a HttpResponseData.
     /// </summary>
