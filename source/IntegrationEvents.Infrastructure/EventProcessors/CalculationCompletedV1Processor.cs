@@ -46,11 +46,13 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
         var instanceId = await durableClient.StartNewAsync("EnqueueMessagesOrchestration", orchestrationInput).ConfigureAwait(false);
 
         _logger.LogInformation(
-            "Started 'EnqueueMessagesOrchestration' (id '{OrchestrationInstanceId}', calculation id: {CalculationId}, calculation type: {CalculationType}, calculation orchestration id: {CalculationOrchestrationId}.",
+            "Started 'EnqueueMessagesOrchestration' (id '{OrchestrationInstanceId}', calculation id: {CalculationId}, calculation type: {CalculationType}, calculation orchestration id: {CalculationOrchestrationId}. is calculation internal: {IsInternalCalculation})",
             instanceId,
             message.CalculationId,
             message.CalculationType,
-            message.InstanceId);
+            message.InstanceId,
+            false);
+            //TODO: message.IsInternalCalculation);
     }
 
     private static EnqueueMessagesOrchestrationInput CreateOrchestrationInput(CalculationCompletedV1 message, Guid eventIdentification)
@@ -58,6 +60,8 @@ public sealed class CalculationCompletedV1Processor : IIntegrationEventProcessor
         return new EnqueueMessagesOrchestrationInput(
             CalculationOrchestrationId: message.InstanceId,
             CalculationId: Guid.Parse(message.CalculationId),
-            EventId: eventIdentification);
+            EventId: eventIdentification,
+            IsInternalCalculation: false);
+            //TODO: IsInternalCalculation: message.IsInternalCalculation);
     }
 }
