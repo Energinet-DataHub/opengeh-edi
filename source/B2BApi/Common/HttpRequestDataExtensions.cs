@@ -12,16 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Text;
 using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Energinet.DataHub.EDI.B2BApi.Common;
 
 public static class HttpRequestDataExtensions
 {
+    public static async Task<MemoryStream> CreateSeekingStreamFromBodyAsync(this HttpRequestData request)
+    {
+        using StreamReader reader = new(request.Body);
+        var bodyAsString = await reader.ReadToEndAsync().ConfigureAwait(false);
+
+        var encoding = Encoding.UTF8;
+        var byteArray = encoding.GetBytes(bodyAsString);
+        return new MemoryStream(byteArray);
+    }
+
     public static CancellationToken GetCancellationToken(this HttpRequestData request, CancellationToken hostCancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -35,7 +43,7 @@ public static class HttpRequestDataExtensions
         return cancellationToken;
     }
 
-    public static async Task<HttpResponseData> CreateMissingContentTypeResponseAsync(this HttpRequestData request,  CancellationToken cancellationToken)
+    public static async Task<HttpResponseData> CreateMissingContentTypeResponseAsync(this HttpRequestData request, CancellationToken cancellationToken)
     {
         return await GetContentTypeErrorResponseAsync(
             request,
@@ -43,7 +51,7 @@ public static class HttpRequestDataExtensions
             cancellationToken).ConfigureAwait(false);
     }
 
-    public static async Task<HttpResponseData> CreateInvalidContentTypeResponseAsync(this HttpRequestData request,  CancellationToken cancellationToken)
+    public static async Task<HttpResponseData> CreateInvalidContentTypeResponseAsync(this HttpRequestData request, CancellationToken cancellationToken)
     {
         return await GetContentTypeErrorResponseAsync(
             request,

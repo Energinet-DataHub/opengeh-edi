@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
 using System.Net;
 using System.Text;
 using Energinet.DataHub.EDI.B2BApi.Common;
@@ -69,7 +68,7 @@ public class IncomingMessageReceiver
         if (incomingDocumentType == null)
             return request.CreateResponse(HttpStatusCode.NotFound);
 
-        using var seekingStreamFromBody = await CreateSeekingStreamFromBodyAsync(request).ConfigureAwait(false);
+        using var seekingStreamFromBody = await request.CreateSeekingStreamFromBodyAsync().ConfigureAwait(false);
         var responseMessage = await _incomingMessageClient
             .ReceiveIncomingMarketMessageAsync(
                 new IncomingMarketMessageStream(seekingStreamFromBody),
@@ -94,15 +93,5 @@ public class IncomingMessageReceiver
         var response = request.CreateResponse(statusCode);
         await response.WriteStringAsync(responseMessage.MessageBody, Encoding.UTF8).ConfigureAwait(false);
         return response;
-    }
-
-    private static async Task<MemoryStream> CreateSeekingStreamFromBodyAsync(HttpRequestData request)
-    {
-        using StreamReader reader = new(request.Body);
-        var bodyAsString = await reader.ReadToEndAsync().ConfigureAwait(false);
-
-        var encoding = Encoding.UTF8;
-        var byteArray = encoding.GetBytes(bodyAsString);
-        return new MemoryStream(byteArray);
     }
 }
