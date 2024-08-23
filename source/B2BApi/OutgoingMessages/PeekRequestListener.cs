@@ -92,10 +92,13 @@ public class PeekRequestListener
             return response;
         }
 
-        await peekResult.Bundle.CopyToAsync(response.Body).ConfigureAwait(false);
+        // Must set status code before writing to body
+        response.StatusCode = HttpStatusCode.OK;
         response.Headers.Add("content-type", contentType);
         response.Headers.Add("MessageId", peekResult.MessageId.Value);
-        response.StatusCode = HttpStatusCode.OK;
+
+        await peekResult.Bundle.CopyToAsync(response.Body).ConfigureAwait(false);
+
         return response;
     }
 }
