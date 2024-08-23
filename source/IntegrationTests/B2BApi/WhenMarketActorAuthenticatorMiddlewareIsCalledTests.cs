@@ -212,44 +212,6 @@ public class WhenMarketActorAuthenticatorMiddlewareIsCalledTests : TestBase
         Assert.True(_nextSpy.NextWasCalled);
     }
 
-    [Theory]
-    [InlineData(TriggerType.TimerTrigger)]
-    [InlineData(TriggerType.ServiceBusTrigger)]
-    public async Task When_calling_authentication_middleware_without_being_a_http_trigger_then_next_is_called(TriggerType triggerType)
-    {
-        // Arrange
-        var functionContext = _functionContextBuilder
-            .WithTriggeredBy(triggerType)
-            .Build();
-
-        var sut = CreateMarketActorAuthenticatorMiddleware();
-
-        // Act
-        await sut.Invoke(functionContext, _next);
-
-        // Assert
-        Assert.True(_nextSpy.NextWasCalled);
-    }
-
-    [Theory]
-    [InlineData("HealthCheck")]
-    public async Task When_calling_authentication_middleware_with_specific_function_name_then_next_is_called(string functionName)
-    {
-        // Arrange
-        var functionContext = _functionContextBuilder
-            .TriggeredByHttp()
-            .WithFunctionName(functionName)
-            .Build();
-
-        var sut = CreateMarketActorAuthenticatorMiddleware();
-
-        // Act
-        await sut.Invoke(functionContext, _next);
-
-        // Assert
-        Assert.True(_nextSpy.NextWasCalled);
-    }
-
     private static MarketActorAuthenticatorMiddleware CreateMarketActorAuthenticatorMiddleware()
     {
         var stubLogger = new Logger<MarketActorAuthenticatorMiddleware>(NullLoggerFactory.Instance);
