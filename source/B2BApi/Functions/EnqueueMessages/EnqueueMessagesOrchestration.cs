@@ -34,8 +34,23 @@ internal class EnqueueMessagesOrchestration
         }
 
         var defaultRetryOptions = CreateDefaultRetryOptions();
-        var enqueueRetryOptions = CreateEnqueueRetryOptions();
 
+        // If the calculation is internal, we should not enqueue messages to the actors
+        if (input.IsInternalCalculation)
+        {
+            await context.CallActivityAsync(
+                nameof(SendActorMessagesEnqueuedActivity),
+                new SendMessagesEnqueuedInput(
+                    context.InstanceId,
+                    input.CalculationOrchestrationId,
+                    input.CalculationId,
+                    true),
+                defaultRetryOptions);
+
+            return "Success";
+        }
+
+        var enqueueRetryOptions = CreateEnqueueRetryOptions();
         var enqueueMessagesInput = new EnqueueMessagesInput(input.CalculationId, input.EventId);
 
         // Fan-out/fan-in => https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-cloud-backup?tabs=csharp
