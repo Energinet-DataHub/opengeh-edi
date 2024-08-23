@@ -53,7 +53,7 @@ public class PeekRequestListener
         CancellationToken hostCancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var response = HttpResponseData.CreateResponse(request);
+
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
         var contentType = request.Headers.TryGetContentType();
         if (contentType is null)
@@ -85,13 +85,14 @@ public class PeekRequestListener
                 cancellationToken)
             .ConfigureAwait(false);
 
+        var response = HttpResponseData.CreateResponse(request);
         if (peekResult is null)
         {
             response.StatusCode = HttpStatusCode.NoContent;
             return response;
         }
 
-        response.Body = peekResult.Bundle;
+        await peekResult.Bundle.CopyToAsync(response.Body).ConfigureAwait(false);
         response.Headers.Add("content-type", contentType);
         response.Headers.Add("MessageId", peekResult.MessageId.Value);
         response.StatusCode = HttpStatusCode.OK;
