@@ -151,6 +151,10 @@ public class OutgoingMessage
 
     public Guid? CalculationId { get; }
 
+    /// <summary>
+    /// In case a series is provided for the outgoing message, the start of the series period should be provided.
+    /// It is used to determine if a actor already have received the message.
+    /// </summary>
     public Instant? PeriodStartedAt { get; }
 
     public void AssignToBundle(BundleId bundleId)
