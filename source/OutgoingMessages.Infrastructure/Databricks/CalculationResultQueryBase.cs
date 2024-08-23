@@ -31,7 +31,7 @@ public abstract class CalculationResultQueryBase<TResult>(
     /// <summary>
     /// Name of database to query in.
     /// </summary>
-    public string DatabaseName => ediDatabricksOptions.DatabaseName;
+    public string DatabaseName => $"{ediDatabricksOptions.CatalogName}.{ediDatabricksOptions.DatabaseName}";
 
     /// <summary>
     /// Name of view or table to query in.
