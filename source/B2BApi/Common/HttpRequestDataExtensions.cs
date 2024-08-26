@@ -22,12 +22,9 @@ public static class HttpRequestDataExtensions
 {
     public static async Task<MemoryStream> CreateSeekingStreamFromBodyAsync(this HttpRequestData request)
     {
-        using StreamReader reader = new(request.Body);
-        var bodyAsString = await reader.ReadToEndAsync().ConfigureAwait(false);
-
-        var encoding = Encoding.UTF8;
-        var byteArray = encoding.GetBytes(bodyAsString);
-        return new MemoryStream(byteArray);
+        var memoryStream = new MemoryStream();
+        await request.Body.CopyToAsync(memoryStream).ConfigureAwait(false);
+        return memoryStream;
     }
 
     public static CancellationToken GetCancellationToken(this HttpRequestData request, CancellationToken hostCancellationToken)
