@@ -26,9 +26,13 @@ namespace Energinet.DataHub.EDI.B2BApi.Configuration.Middleware;
 /// <remarks>Inspired by https://github.com/Azure/azure-functions-dotnet-worker/blob/main/samples/CustomMiddleware/ExceptionHandlingMiddleware.cs</remarks>
 public class UnHandledExceptionMiddleware : IFunctionsWorkerMiddleware
 {
-    private readonly ILogger<UnHandledExceptionMiddleware> _logger;
+    private readonly ILogger _logger;
 
-    public UnHandledExceptionMiddleware(ILogger<UnHandledExceptionMiddleware> logger)
+    // DO NOT inject scoped services in the middleware constructor.
+    // DO use scoped services in middleware by retrieving them from 'FunctionContext.InstanceServices'
+    // DO NOT store scoped services in fields or properties of the middleware object. See https://github.com/Azure/azure-functions-dotnet-worker/issues/1327#issuecomment-1434408603
+    public UnHandledExceptionMiddleware(
+        ILogger<UnHandledExceptionMiddleware> logger)
     {
         _logger = logger;
     }
@@ -38,44 +42,36 @@ public class UnHandledExceptionMiddleware : IFunctionsWorkerMiddleware
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
 
-        // If the endpoint is omitted from auth, we dont want to intercept exceptions.
-        if (context.EndpointIsOmittedFromAuth())
+        try
         {
             await next(context);
         }
-        else
+        catch (Exception ex)
         {
-            try
-            {
-                await next(context);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error processing invocation: {Ex}", ex.Message);
+            _logger.LogError(ex, "Error processing invocation: {Ex}", ex.Message);
 
-                var httpReqData = await context.GetHttpRequestDataAsync();
+            var httpReqData = await context.GetHttpRequestDataAsync();
 
-                if (httpReqData != null)
+            if (httpReqData != null)
+            {
+                // Create an instance of HttpResponseData with 500 status code.
+                var newHttpResponse = httpReqData.CreateResponse(HttpStatusCode.InternalServerError);
+                // You need to explicitly pass the status code in WriteAsJsonAsync method.
+                // https://github.com/Azure/azure-functions-dotnet-worker/issues/776
+                await newHttpResponse.WriteAsJsonAsync(
+                    new { Message = "An unexpected error occurred! Please try later." },
+                    newHttpResponse.StatusCode);
+
+                var invocationResult = context.GetInvocationResult();
+
+                var httpOutputBindingFromMultipleOutputBindings = GetHttpOutputBindingFromMultipleOutputBinding(context);
+                if (httpOutputBindingFromMultipleOutputBindings is not null)
                 {
-                    // Create an instance of HttpResponseData with 500 status code.
-                    var newHttpResponse = httpReqData.CreateResponse(HttpStatusCode.InternalServerError);
-                    // You need to explicitly pass the status code in WriteAsJsonAsync method.
-                    // https://github.com/Azure/azure-functions-dotnet-worker/issues/776
-                    await newHttpResponse.WriteAsJsonAsync(
-                        new { Message = "An unexpected error occurred! Please try later." },
-                        newHttpResponse.StatusCode);
-
-                    var invocationResult = context.GetInvocationResult();
-
-                    var httpOutputBindingFromMultipleOutputBindings = GetHttpOutputBindingFromMultipleOutputBinding(context);
-                    if (httpOutputBindingFromMultipleOutputBindings is not null)
-                    {
-                        httpOutputBindingFromMultipleOutputBindings.Value = newHttpResponse;
-                    }
-                    else
-                    {
-                        invocationResult.Value = newHttpResponse;
-                    }
+                    httpOutputBindingFromMultipleOutputBindings.Value = newHttpResponse;
+                }
+                else
+                {
+                    invocationResult.Value = newHttpResponse;
                 }
             }
         }

@@ -24,6 +24,9 @@ public abstract record StreamValueObject
     protected StreamValueObject(Stream? stream)
     {
         ArgumentNullException.ThrowIfNull(stream);
+        if (!stream.CanSeek)
+            throw new ArgumentException("Stream must support seeking because we reset its position.", nameof(stream));
+
         _stream = stream;
     }
 

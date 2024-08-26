@@ -68,27 +68,30 @@ public class IncomingMessageReceiver
         if (incomingDocumentType == null)
             return request.CreateResponse(HttpStatusCode.NotFound);
 
+        using var seekingStreamFromBody = await request.CreateSeekingStreamFromBodyAsync().ConfigureAwait(false);
         var responseMessage = await _incomingMessageClient
             .ReceiveIncomingMarketMessageAsync(
-                new IncomingMarketMessageStream(request.Body),
+                new IncomingMarketMessageStream(seekingStreamFromBody),
                 incomingDocumentFormat: documentFormat,
                 incomingDocumentType,
                 responseDocumentFormat: documentFormat,
                 cancellationToken)
             .ConfigureAwait(false);
 
-        var httpStatusCode = responseMessage.IsErrorResponse ? HttpStatusCode.BadRequest : HttpStatusCode.Accepted;
+        var httpStatusCode = responseMessage.IsErrorResponse
+            ? HttpStatusCode.BadRequest
+            : HttpStatusCode.Accepted;
 
-        return CreateResponse(request, httpStatusCode, responseMessage);
+        return await CreateResponseAsync(request, httpStatusCode, responseMessage).ConfigureAwait(false);
     }
 
-    private static HttpResponseData CreateResponse(
-        HttpRequestData request,
-        HttpStatusCode statusCode,
-        ResponseMessage responseMessage)
+    private static async Task<HttpResponseData> CreateResponseAsync(
+    HttpRequestData request,
+    HttpStatusCode statusCode,
+    ResponseMessage responseMessage)
     {
         var response = request.CreateResponse(statusCode);
-        response.WriteString(responseMessage.MessageBody, Encoding.UTF8);
+        await response.WriteStringAsync(responseMessage.MessageBody, Encoding.UTF8).ConfigureAwait(false);
         return response;
     }
 }

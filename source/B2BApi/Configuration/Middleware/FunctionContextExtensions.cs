@@ -12,46 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.B2BApi.Configuration.Middleware;
 
 public static class FunctionContextExtensions
 {
-    public enum TriggerType
+    internal static bool IsHttpTriggerAndNotHealthCheck(this FunctionContext context)
     {
-        HttpTrigger,
-        TimerTrigger,
-        ServiceBusTrigger,
-    }
+        var isHttpTrigger = context.FunctionDefinition.InputBindings.Values
+            .First(metadata => metadata.Type.EndsWith("Trigger"))
+            .Type == "httpTrigger";
 
-    /// <summary>
-    /// Returns whether or not the <paramref name="triggerType"></paramref> is a input binding on the current context.
-    /// </summary>
-    internal static bool Is(this FunctionContext context, TriggerType triggerType)
-    {
-        ArgumentNullException.ThrowIfNull(context);
-        return context.FunctionDefinition.InputBindings.Any(input => input.Value.Type.Equals(triggerType.ToString(), StringComparison.OrdinalIgnoreCase));
-    }
+        var isHealthCheckEndpoint = context.FunctionDefinition.Name == "HealthCheck";
 
-    /// <summary>
-    /// Is used to determine if the current request is omitted from authorization.
-    /// </summary>
-    internal static bool EndpointIsOmittedFromAuth(this FunctionContext context)
-    {
-        ArgumentNullException.ThrowIfNull(context);
-
-        var isHealthCheckRequest = context.FunctionDefinition.Name == "HealthCheck";
-        var isNotHttpTrigger = !context.Is(TriggerType.HttpTrigger);
-
-        var endpointIsOmittedFromAuth = isHealthCheckRequest || isNotHttpTrigger;
-        return endpointIsOmittedFromAuth;
+        return isHttpTrigger && !isHealthCheckEndpoint;
     }
 
     /// <summary>
@@ -76,33 +53,6 @@ public static class FunctionContextExtensions
     {
         var httpResponseData = httpRequestData.CreateResponse(HttpStatusCode.Unauthorized);
         context.SetHttpResponseData(httpResponseData);
-    }
-
-    internal static T GetService<T>(this FunctionContext functionContext)
-        where T : notnull
-    {
-        return functionContext.InstanceServices.GetRequiredService<T>();
-    }
-
-    internal static IEnumerable<T> GetServices<T>(this FunctionContext functionContext)
-        where T : notnull
-    {
-        return functionContext.InstanceServices.GetServices<T>();
-    }
-
-    /// <summary>
-    /// Parses correlation id from service bus message
-    /// </summary>
-    /// <param name="context"></param>
-    internal static string ParseCorrelationIdFromMessage(this FunctionContext context)
-    {
-        context.BindingContext.BindingData.TryGetValue("CorrelationId", out var correlationIdValue);
-        if (correlationIdValue is string correlationId)
-        {
-            return correlationId;
-        }
-
-        throw new InvalidOperationException("Correlation id is not set on customer master data request message.");
     }
 
     /// <summary>

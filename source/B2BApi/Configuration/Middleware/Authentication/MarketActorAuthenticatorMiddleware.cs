@@ -17,15 +17,20 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.Configuration.Middleware.Authentication;
 
 public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
 {
-    private readonly ILogger<MarketActorAuthenticatorMiddleware> _logger;
+    private readonly ILogger _logger;
 
-    public MarketActorAuthenticatorMiddleware(ILogger<MarketActorAuthenticatorMiddleware> logger)
+    // DO NOT inject scoped services in the middleware constructor.
+    // DO use scoped services in middleware by retrieving them from 'FunctionContext.InstanceServices'
+    // DO NOT store scoped services in fields or properties of the middleware object. See https://github.com/Azure/azure-functions-dotnet-worker/issues/1327#issuecomment-1434408603
+    public MarketActorAuthenticatorMiddleware(
+        ILogger<MarketActorAuthenticatorMiddleware> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -34,15 +39,9 @@ public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
-        var authenticatedActor = context.GetService<AuthenticatedActor>();
-        var authenticationMethods = context.GetServices<IAuthenticationMethod>();
 
-        if (context.EndpointIsOmittedFromAuth())
-        {
-            _logger.LogInformation("Functions is omitted from auth, skipping authentication");
-            await next(context);
-            return;
-        }
+        var authenticatedActor = context.InstanceServices.GetRequiredService<AuthenticatedActor>();
+        var authenticationMethods = context.InstanceServices.GetServices<IAuthenticationMethod>();
 
         var httpRequestData = await context.GetHttpRequestDataAsync()
             ?? throw new ArgumentException("No HTTP request data was available, even though the function was not omitted from auth");
@@ -58,7 +57,7 @@ public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
             return;
         }
 
-        var serializer = context.GetService<ISerializer>();
+        var serializer = context.InstanceServices.GetRequiredService<ISerializer>();
         WriteAuthenticatedIdentityToLog(authenticatedActor.CurrentActorIdentity, serializer);
         await next(context);
     }

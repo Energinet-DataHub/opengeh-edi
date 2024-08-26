@@ -25,6 +25,8 @@ using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyI
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 
@@ -32,30 +34,34 @@ namespace Energinet.DataHub.EDI.B2BApi;
 
 public static class HostFactory
 {
-    private const string DomainName = "EDI";
+    private const string SubsystemName = "EDI";
 
     public static IHost CreateHost(TokenValidationParameters tokenValidationParameters)
     {
         ArgumentNullException.ThrowIfNull(tokenValidationParameters);
 
         return new HostBuilder()
-            .ConfigureFunctionsWorkerDefaults(
-                worker =>
+            .ConfigureFunctionsWebApplication(
+                builder =>
                 {
-                    worker.UseMiddleware<UnHandledExceptionMiddleware>();
-                    worker.UseMiddleware<MarketActorAuthenticatorMiddleware>();
-                    worker.UseMiddleware<ExecutionContextMiddleware>();
-                },
-                option =>
-                {
-                    option.EnableUserCodeException = true;
+                    // If the endpoint is omitted from auth, we dont want to intercept exceptions.
+                    builder.UseWhen<UnHandledExceptionMiddleware>(
+                        functionContext => functionContext.IsHttpTriggerAndNotHealthCheck());
+                    builder.UseWhen<MarketActorAuthenticatorMiddleware>(
+                        functionContext => functionContext.IsHttpTriggerAndNotHealthCheck());
+                    builder.UseMiddleware<ExecutionContextMiddleware>();
                 })
             .ConfigureServices(
                 (context, services) =>
                 {
                     services
+                        .Configure((Action<WorkerOptions>)(options =>
+                        {
+                            options.EnableUserCodeException = true;
+                        }))
+
                         // Logging
-                        .AddApplicationInsightsForIsolatedWorker(DomainName)
+                        .AddApplicationInsightsForIsolatedWorker(SubsystemName)
 
                         // Health checks
                         .AddHealthChecksForIsolatedWorker()
