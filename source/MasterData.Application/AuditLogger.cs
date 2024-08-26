@@ -61,10 +61,13 @@ public class AuditLogger(IAuditUserContext auditUserContext) : IAuditLogger
 
     private string EncodeObjectAsBase64String(object objectToEncode)
     {
-        var jsonString = JsonSerializer.Serialize(objectToEncode);
+        var objectAsJson = JsonSerializer.Serialize(objectToEncode, new JsonSerializerOptions
+        {
+            IncludeFields = true, // TODO: Serialize fields?
+        });
 
-        var byteArray = Encoding.UTF8.GetBytes(jsonString);
+        var jsonAsByteArray = Encoding.UTF8.GetBytes(objectAsJson);
 
-        return Convert.ToBase64String(byteArray);
+        return Convert.ToBase64String(jsonAsByteArray);
     }
 }
