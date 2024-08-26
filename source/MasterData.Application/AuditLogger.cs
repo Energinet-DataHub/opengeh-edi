@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Buffers.Text;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
+using System.Text.Json;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 
@@ -35,7 +39,34 @@ public class AuditLogger(IAuditUserContext auditUserContext) : IAuditLogger
         var actorId = currentUser?.ActorId ?? Guid.Empty;
         var permissions = currentUser?.Permissions;
 
-        Console.WriteLine("Audit log");
+        var payloadAsString = activityPayload switch
+        {
+            null => string.Empty,
+            string payload => payload,
+            _ => EncodeObjectAsBase64String(activityPayload),
+        };
+
+        Console.WriteLine(
+            $"Audit log entry:\n"
+            + $"\t{id.Id}, "
+            + $"\t{userId}, "
+            + $"\t{actorId}, "
+            + $"\t{permissions}, "
+            + $"\t{activity}, "
+            + $"\t{activityOrigin}, "
+            + $"\t{payloadAsString}, "
+            + $"\t{affectedEntityType}, "
+            + $"\t{affectedEntityKey}");
+
         return Task.CompletedTask;
+    }
+
+    private string EncodeObjectAsBase64String(object objectToEncode)
+    {
+        var jsonString = JsonSerializer.Serialize(objectToEncode);
+
+        var byteArray = Encoding.UTF8.GetBytes(jsonString);
+
+        return Convert.ToBase64String(byteArray);
     }
 }
