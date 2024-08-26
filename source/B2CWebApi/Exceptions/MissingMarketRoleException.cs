@@ -14,18 +14,18 @@
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Exceptions;
 
-public class MissingRoleException : Exception
+public class MissingMarketRoleException : Exception
 {
-    public MissingRoleException()
+    public MissingMarketRoleException()
     {
     }
 
-    public MissingRoleException(string message)
+    public MissingMarketRoleException(string message)
         : base(message)
     {
     }
 
-    public MissingRoleException(string message, Exception innerException)
+    public MissingMarketRoleException(string message, Exception innerException)
         : base(message, innerException)
     {
     }
