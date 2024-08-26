@@ -13,6 +13,9 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
@@ -22,10 +25,12 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 public class ArchivedMessageGetDocumentController : ControllerBase
 {
     private readonly IArchivedMessagesClient _archivedMessagesClient;
+    private readonly IAuditLogger _auditLogger;
 
-    public ArchivedMessageGetDocumentController(IArchivedMessagesClient archivedMessagesClient)
+    public ArchivedMessageGetDocumentController(IArchivedMessagesClient archivedMessagesClient, IAuditLogger auditLogger)
     {
         _archivedMessagesClient = archivedMessagesClient;
+        _auditLogger = auditLogger;
     }
 
     [HttpPost]
@@ -34,6 +39,15 @@ public class ArchivedMessageGetDocumentController : ControllerBase
     public async Task<ActionResult> RequestAsync(Guid id, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(id);
+
+        await _auditLogger.LogAsync(
+                AuditLogId.New(),
+                AuditLogActivity.ArchivedMessagesGet,
+                HttpContext.Request.GetDisplayUrl(),
+                id.ToString(),
+                AuditLogEntityType.ArchivedMessage,
+                id.ToString())
+            .ConfigureAwait(false);
 
         var archivedMessageId = new ArchivedMessageId(id);
         var archivedMessageStream = await _archivedMessagesClient.GetAsync(archivedMessageId, cancellationToken).ConfigureAwait(false);

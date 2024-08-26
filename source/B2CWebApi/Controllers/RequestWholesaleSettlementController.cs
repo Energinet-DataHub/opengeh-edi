@@ -21,7 +21,10 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime;
 
@@ -36,19 +39,22 @@ public class RequestWholesaleSettlementController : ControllerBase
     private readonly IIncomingMessageClient _incomingMessageClient;
     private readonly ISerializer _serializer;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IAuditLogger _auditLogger;
 
     public RequestWholesaleSettlementController(
         UserContext<FrontendUser> userContext,
         DateTimeZone dateTimeZone,
         IIncomingMessageClient incomingMessageClient,
         ISerializer serializer,
-        ISystemDateTimeProvider systemDateTimeProvider)
+        ISystemDateTimeProvider systemDateTimeProvider,
+        IAuditLogger auditLogger)
     {
         _userContext = userContext;
         _dateTimeZone = dateTimeZone;
         _incomingMessageClient = incomingMessageClient;
         _serializer = serializer;
         _systemDateTimeProvider = systemDateTimeProvider;
+        _auditLogger = auditLogger;
     }
 
     [HttpPost]
@@ -57,13 +63,22 @@ public class RequestWholesaleSettlementController : ControllerBase
         RequestWholesaleSettlementMarketRequest request,
         CancellationToken cancellationToken)
     {
+        await _auditLogger.LogAsync(
+                id: AuditLogId.New(),
+                activity: AuditLogActivity.RequestWholesaleResults,
+                activityOrigin: HttpContext.Request.GetDisplayUrl(),
+                activityPayload: request,
+                affectedEntityType: AuditLogEntityType.RequestWholesaleServicesProcess,
+                affectedEntityKey: string.Empty)
+            .ConfigureAwait(false);
+
         var currentUser = _userContext.CurrentUser;
 
         var message =
             RequestWholesaleSettlementDtoFactory.Create(
                 request,
                 currentUser.ActorNumber,
-                currentUser.Role,
+                currentUser.MarketRole,
                 _dateTimeZone,
                 _systemDateTimeProvider.Now());
 
