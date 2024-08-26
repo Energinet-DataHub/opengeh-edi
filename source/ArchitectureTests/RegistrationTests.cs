@@ -27,6 +27,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using FluentAssertions;
@@ -63,6 +64,7 @@ public class RegistrationTests
         Environment.SetEnvironmentVariable(nameof(DatabricksSqlStatementOptions.WorkspaceUrl), "https://adb-1000.azuredatabricks.net/");
         Environment.SetEnvironmentVariable(nameof(DatabricksSqlStatementOptions.WorkspaceToken), "FakeToken");
         Environment.SetEnvironmentVariable(nameof(DatabricksSqlStatementOptions.WarehouseId), Guid.NewGuid().ToString());
+        Environment.SetEnvironmentVariable($"{EdiDatabricksOptions.SectionName}__{nameof(EdiDatabricksOptions.CatalogName)}", "FakeCatalogName");
 
         _host = HostFactory.CreateHost(Program.TokenValidationParameters);
     }

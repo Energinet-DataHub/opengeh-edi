@@ -307,6 +307,7 @@ public class TestBase : IDisposable
                     [nameof(DatabricksSqlStatementOptions.WarehouseId)] = Fixture.IntegrationTestConfiguration.DatabricksSettings.WarehouseId,
                     // => EDI views
                     [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.DatabaseName)}"] = Fixture.DatabricksSchemaManager.SchemaName,
+                    [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.CatalogName)}"] = "hive_metastore",
                 })
             .Build();
 
