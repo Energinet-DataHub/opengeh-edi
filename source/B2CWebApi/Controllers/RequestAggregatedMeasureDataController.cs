@@ -22,8 +22,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
-using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;

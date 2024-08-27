@@ -14,8 +14,6 @@
 
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.AuditLog;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
-using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 

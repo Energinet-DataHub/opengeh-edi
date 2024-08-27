@@ -15,8 +15,6 @@
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
-using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;

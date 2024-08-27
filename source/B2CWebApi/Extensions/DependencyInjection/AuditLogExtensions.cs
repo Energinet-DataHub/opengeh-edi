@@ -15,7 +15,6 @@
 using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.AuditLog.AuditUser;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 
