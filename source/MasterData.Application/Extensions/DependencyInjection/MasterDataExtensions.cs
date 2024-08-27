@@ -49,8 +49,6 @@ public static class MasterDataExtensions
         services
             .AddTransient<IProcessDelegationRepository, ProcessDelegationRepository>();
 
-        services.AddTransient<IAuditLogger, AuditLogger>();
-
         services.AddTransient<IMasterDataClient, MasterDataClient>();
         return services;
     }

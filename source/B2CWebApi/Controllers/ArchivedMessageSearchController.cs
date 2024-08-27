@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
@@ -44,12 +45,12 @@ public class ArchivedMessageSearchController : ControllerBase
         ArgumentNullException.ThrowIfNull(request);
 
         await _auditLogger.LogAsync(
-                id: AuditLogId.New(),
+                logId: AuditLogId.New(),
                 activity: AuditLogActivity.ArchivedMessagesSearch,
                 activityOrigin: HttpContext.Request.GetDisplayUrl(),
                 activityPayload: request,
                 affectedEntityType: AuditLogEntityType.ArchivedMessage,
-                affectedEntityKey: "archived-message-search")
+                affectedEntityKey: null)
             .ConfigureAwait(false);
 
         var query = new GetMessagesQuery

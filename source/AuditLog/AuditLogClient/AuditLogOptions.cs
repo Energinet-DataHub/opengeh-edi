@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
+using System.ComponentModel.DataAnnotations;
 
-public record AuditLogId(Guid Id)
+namespace Energinet.DataHub.EDI.AuditLog.AuditLogClient;
+
+public class AuditLogOptions
 {
-    /// <summary>
-    /// Create a new AuditLogId with a random unique value
-    /// </summary>
-    public static AuditLogId New() => new AuditLogId(Guid.NewGuid());
+    public const string SectionName = "AuditLog";
 
     /// <summary>
-    /// Create a new AuditLogId from an existing guid
+    /// The URL of the endpoint to which the audit log should be sent.
     /// </summary>
-    public static AuditLogId From(Guid from) => new AuditLogId(from);
+    [Required]
+    public string IngestionUrl { get; set; } = null!;
 }

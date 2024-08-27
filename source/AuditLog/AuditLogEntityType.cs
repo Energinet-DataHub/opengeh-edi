@@ -12,35 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
+namespace Energinet.DataHub.EDI.AuditLog;
 
 /// <summary>
-/// The activity which an audit log entry is related to, used to categorize the log entry.
+/// The entity type which an audit log entry is related to, used to categorize the log entry.
 /// </summary>
-public enum AuditLogEntityType
+public record AuditLogEntityType(string Identifier)
 {
     /// <summary>
     /// Used when searching for archived messages or getting a specific archived message
     /// </summary>
-    ArchivedMessage,
+    public static readonly AuditLogEntityType ArchivedMessage = new("ArchivedMessage");
 
     /// <summary>
     /// Used when peeking and dequeueing a bundle from the actor message queue.
     /// </summary>
-    Bundle,
+    public static readonly AuditLogEntityType Bundle = new("Bundle");
 
     /// <summary>
     /// Used when creating a new energy result request process.
     /// </summary>
-    RequestAggregatedMeasureDataProcess,
+    public static readonly AuditLogEntityType RequestAggregatedMeasureDataProcess = new("RequestAggregatedMeasureDataProcess");
 
     /// <summary>
     /// Used when creating a new wholesale services request process.
     /// </summary>
-    RequestWholesaleServicesProcess,
+    public static readonly AuditLogEntityType RequestWholesaleServicesProcess = new("RequestWholesaleServicesProcess");
 
     /// <summary>
     /// Used when searching for orchestrations or getting status of a specific orchestration.
     /// </summary>
-    Orchestration,
+    public static readonly AuditLogEntityType Orchestration = new("Orchestration");
 }

@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
-
-namespace Energinet.DataHub.EDI.MasterData.Interfaces;
+namespace Energinet.DataHub.EDI.AuditLog.AuditUser;
 
 /// <summary>
 /// Get the current user for audit logging

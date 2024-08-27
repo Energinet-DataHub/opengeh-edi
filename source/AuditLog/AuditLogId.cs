@@ -12,9 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
+namespace Energinet.DataHub.EDI.AuditLog;
 
-public record AuditUser(
-    Guid? UserId,
-    Guid? ActorId,
-    string? Permissions);
+public record AuditLogId(Guid Id)
+{
+    /// <summary>
+    /// Create a new AuditLogId with a random unique value
+    /// </summary>
+    public static AuditLogId New() => new AuditLogId(Guid.NewGuid());
+
+    /// <summary>
+    /// Create a new AuditLogId from an existing guid
+    /// </summary>
+    public static AuditLogId From(Guid from) => new AuditLogId(from);
+}

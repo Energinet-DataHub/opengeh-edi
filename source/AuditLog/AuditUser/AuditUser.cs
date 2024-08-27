@@ -12,20 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.AuditLog;
-using Energinet.DataHub.EDI.AuditLog.AuditUser;
-using Energinet.DataHub.EDI.B2CWebApi.Security;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
+namespace Energinet.DataHub.EDI.AuditLog.AuditUser;
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
-
-public static class AuditLogExtensions
-{
-    public static IServiceCollection AddAuditLog(this IServiceCollection services)
-    {
-        services.AddScoped<IAuditUserContext, AuditUserContext>();
-        services.AddAuditLogger();
-
-        return services;
-    }
-}
+public record AuditUser(
+    Guid? UserId,
+    Guid? ActorId,
+    string? Permissions);

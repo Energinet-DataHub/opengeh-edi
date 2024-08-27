@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
+using Energinet.DataHub.EDI.AuditLog.AuditLogClient;
+using Microsoft.Extensions.DependencyInjection;
 
-/// <summary>
-/// An activity which an audit log entry is related to, used as AffectedEntityType when publishing the audit log.
-/// </summary>
-public enum AuditLogActivity
+namespace Energinet.DataHub.EDI.AuditLog;
+
+public static class AuditLogDependencyInjection
 {
-    RequestEnergyResults,
-    RequestWholesaleResults,
-    ArchivedMessagesSearch,
-    ArchivedMessagesGet,
-    OrchestrationsSearch,
-    OrchestrationsGet,
-    OrchestrationsTerminate,
+    public static IServiceCollection AddAuditLogger(this IServiceCollection services)
+    {
+        services.AddAuditLogClient();
+        services.AddTransient<IAuditLogger, AuditLogger>();
+
+        return services;
+    }
 }

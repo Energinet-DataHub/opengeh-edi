@@ -14,6 +14,7 @@
 
 using System.Text;
 using Energinet.DataHub.Core.App.Common.Users;
+using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
@@ -62,7 +63,7 @@ public class RequestAggregatedMeasureDataController : ControllerBase
     public async Task<ActionResult> RequestAsync(RequestAggregatedMeasureDataMarketRequest request, CancellationToken cancellationToken)
     {
         await _auditLogger.LogAsync(
-                id: AuditLogId.New(),
+                logId: AuditLogId.New(),
                 activity: AuditLogActivity.RequestEnergyResults,
                 activityOrigin: HttpContext.Request.GetDisplayUrl(),
                 activityPayload: request,

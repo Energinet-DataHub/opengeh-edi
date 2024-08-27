@@ -12,20 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
-
-namespace Energinet.DataHub.EDI.MasterData.Interfaces;
+namespace Energinet.DataHub.EDI.AuditLog;
 
 /// <summary>
 /// Audit logger for logging audit logs according to the documentation found in:
-/// https://github.com/Energinet-DataHub/opengeh-revision-log/blob/916fad3a9230be5dc070051c86e51408118734c2/docs/Documentation%20for%20submitting%20Audit%20Logs.md
+/// https://github.com/Energinet-DataHub/opengeh-revision-log/blob/main/docs/documentation-for-submitting-audit-logs.md
 /// </summary>
 public interface IAuditLogger
 {
     /// <summary>
     /// Log an audit log entry asynchronously.
     /// </summary>
-    /// <param name="id">Globally unique audit log id, used for idempotency.</param>
+    /// <param name="logId">Globally unique audit log id, used for idempotency.</param>
     /// <param name="activity">The performed activity</param>
     /// <param name="activityOrigin">
     /// Source of the activity. An example in case of a HTTP request could be the route (including query parameters)
@@ -38,10 +36,10 @@ public interface IAuditLogger
     /// <param name="affectedEntityType">Primary type of the entity affected. If multiple entities are effected, consider whether it warrants an audit log per entity or not.</param>
     /// <param name="affectedEntityKey">Key (preferably natural key) of the affected entity.</param>
     Task LogAsync(
-        AuditLogId id,
+        AuditLogId logId,
         AuditLogActivity activity,
         string activityOrigin,
         object? activityPayload,
-        AuditLogEntityType affectedEntityType,
-        string affectedEntityKey);
+        AuditLogEntityType? affectedEntityType,
+        string? affectedEntityKey);
 }
