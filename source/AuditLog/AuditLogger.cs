@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.AuditLog;
 
 public class AuditLogger(IClock clock, IAuditUserContext auditUserContext, IAuditLogClient auditLogClient) : IAuditLogger
 {
-    private static readonly Guid _ediSystemId = new("edi06cd7-61ae-4943-a684-ac2f2681a3b1");
+    private static readonly Guid _ediSystemId = Guid.Parse("edi06cd7-61ae-4943-a684-ac2f2681a3b1");
 
     private readonly IClock _clock = clock;
     private readonly IAuditUserContext _auditUserContext = auditUserContext;
