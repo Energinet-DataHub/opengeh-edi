@@ -65,8 +65,10 @@ internal class AuditLogHttpClient(IHttpClientFactory httpClientFactory, IOptions
         using var jsonContent = JsonContent.Create(requestContent);
         request.Content = jsonContent;
 
-        await httpClient.SendAsync(request)
+        var response = await httpClient.SendAsync(request)
             .ConfigureAwait(false);
+
+        response.EnsureSuccessStatusCode();
     }
 
     private string EncodeObjectAsBase64String(object objectToEncode)
