@@ -63,7 +63,11 @@ internal class AuditLogHttpClient(IHttpClientFactory httpClientFactory, IOptions
         var httpClient = _httpClientFactory.CreateClient();
 
         using var request = new HttpRequestMessage(HttpMethod.Post, _auditLogOptions.IngestionUrl);
-        request.Content = JsonContent.Create(requestContent);
+        // request.Content = JsonContent.Create(requestContent);
+        request.Content = new StringContent(
+            JsonSerializer.Serialize(requestContent),
+            Encoding.UTF8,
+            "application/json");
 
         var response = await httpClient.SendAsync(request)
             .ConfigureAwait(false);
