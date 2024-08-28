@@ -82,7 +82,7 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
             JsonSerializer.Deserialize<AuditLogRequestBody>(auditLogCall.Request.Body ?? string.Empty);
 
         deserializeBody.Should().NotThrow()
-            .And.Subject().Should().NotBeNull();
+            .Subject.Should().NotBeNull();
     }
 
     private HttpRequestMessage CreateArchivedMessageSearchRequest()
