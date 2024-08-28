@@ -12,21 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.AppTests;
 
 public static class HttpResponseMessageExtensions
 {
-    public static async Task EnsureSuccessStatusCodeWithLogAsync(this HttpResponseMessage response, ITestOutputHelper logger)
+    public static async Task EnsureSuccessStatusCodeWithLogAsync(this HttpResponseMessage response, ITestDiagnosticsLogger logger)
     {
         if (!response.IsSuccessStatusCode)
         {
-            logger.WriteLine("Error response status code: {0}", (int)response.StatusCode);
-            logger.WriteLine("Error response reason phrase: {0}", response.ReasonPhrase);
+            logger.WriteLine($"Error response status code: {(int)response.StatusCode}");
+            logger.WriteLine($"Error response reason phrase: {response.ReasonPhrase}");
 
             var content = await response.Content.ReadAsStringAsync();
-            logger.WriteLine($"Error response content:{Environment.NewLine}{{0}}", content);
+            logger.WriteLine($"Error response content:{Environment.NewLine}{content}");
         }
 
         response.EnsureSuccessStatusCode();

@@ -29,23 +29,22 @@ namespace Energinet.DataHub.EDI.B2CWebApi.AppTests.Tests;
 public class B2CWebApiAuditLogTests : IAsyncLifetime
 {
     private readonly B2CWebApiFixture _fixture;
-    private readonly ITestOutputHelper _logger;
 
     public B2CWebApiAuditLogTests(B2CWebApiFixture fixture, ITestOutputHelper logger)
     {
         _fixture = fixture;
-        _logger = logger;
+        _fixture.SetTestOutputHelper(logger);
     }
 
     public async Task InitializeAsync()
     {
-        // Delete (if exists) and recreate the database to ensure a clean state
         await _fixture.DatabaseManager.CreateDatabaseAsync();
     }
 
     public async Task DisposeAsync()
     {
         await _fixture.DatabaseManager.DeleteDatabaseAsync();
+        _fixture.SetTestOutputHelper(null);
     }
 
     [Fact]
@@ -62,7 +61,7 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
         var response = await _fixture.WebApiClient.SendAsync(request);
 
         // Assert
-        await response.EnsureSuccessStatusCodeWithLogAsync(_logger);
+        await response.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
         var auditLogCalls = _fixture.AuditLogMockServer.GetAuditLogIngestionCalls();
 
         var auditLogCall = auditLogCalls.Should()

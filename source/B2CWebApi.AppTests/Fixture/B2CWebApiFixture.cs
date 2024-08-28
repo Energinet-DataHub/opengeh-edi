@@ -23,6 +23,7 @@ using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Database;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.AppTests.Fixture;
 
@@ -60,7 +61,7 @@ public class B2CWebApiFixture : IAsyncLifetime
     [NotNull]
     public HttpClient? WebApiClient { get; private set; }
 
-    private TestDiagnosticsLogger TestLogger { get; }
+    public TestDiagnosticsLogger TestLogger { get; }
 
     private ServiceBusResourceProvider ServiceBusResourceProvider { get; }
 
@@ -98,6 +99,18 @@ public class B2CWebApiFixture : IAsyncLifetime
         AuditLogMockServer.Dispose();
         await B2CWebApiApplicationFactory.DisposeAsync();
         WebApiClient.Dispose();
+    }
+
+    /// <summary>
+    /// Set test output helper to enable logging to xUnit test output.
+    /// <remarks>
+    /// Should be set in a test's constructor (by injecting <see cref="ITestOutputHelper"/>) and MUST then be set back
+    /// to null when disposing the test.
+    /// </remarks>
+    /// </summary>
+    public void SetTestOutputHelper(ITestOutputHelper? testOutputHelper)
+    {
+        TestLogger.TestOutputHelper = testOutputHelper;
     }
 
     private Dictionary<string, string?> GetWebApiAppSettings(string incomingMessagesQueueName)

@@ -27,25 +27,24 @@ namespace Energinet.DataHub.EDI.B2CWebApi.AppTests.Tests;
 public class B2CWebApiAuthTests : IAsyncLifetime
 {
     private readonly B2CWebApiFixture _fixture;
-    private readonly ITestOutputHelper _logger;
 
     public B2CWebApiAuthTests(B2CWebApiFixture fixture, ITestOutputHelper logger)
     {
         _fixture = fixture;
-        _logger = logger;
+        _fixture.SetTestOutputHelper(logger);
     }
 
     private string[] RequiredRoles => ["request-wholesale-settlement:view"];
 
     public async Task InitializeAsync()
     {
-        // Delete (if exists) and recreate the database to ensure a clean state
         await _fixture.DatabaseManager.CreateDatabaseAsync();
     }
 
     public async Task DisposeAsync()
     {
         await _fixture.DatabaseManager.DeleteDatabaseAsync();
+        _fixture.SetTestOutputHelper(null);
     }
 
     [Fact]
@@ -121,7 +120,7 @@ public class B2CWebApiAuthTests : IAsyncLifetime
         using var assertionScope = new AssertionScope();
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var ensureSuccess = () => response.EnsureSuccessStatusCodeWithLogAsync(_logger);
+        var ensureSuccess = () => response.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
         await ensureSuccess.Should().NotThrowAsync();
     }
 
