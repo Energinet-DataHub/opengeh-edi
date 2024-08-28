@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System.Net;
-using System.Net.Http.Json;
+using System.Security.Claims;
 using Energinet.DataHub.EDI.B2CWebApi.AppTests.Fixture;
-using Energinet.DataHub.EDI.B2CWebApi.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
@@ -34,24 +34,33 @@ public class B2CWebApiAuthTests : IAsyncLifetime
         _fixture.SetTestOutputHelper(logger);
     }
 
-    private string[] RequiredRoles => ["request-wholesale-settlement:view"];
+    private Claim[] RequiredActorClaims =>
+    [
+        new("actornumber", "1234567890123"),
+        new("marketroles", ActorRole.EnergySupplier.Name),
+    ];
 
-    public async Task InitializeAsync()
+    private string[] RequiredRoles => [
+        "request-wholesale-settlement:view",
+    ];
+
+    public Task InitializeAsync()
     {
-        await _fixture.DatabaseManager.CreateDatabaseAsync();
+        return Task.CompletedTask;
     }
 
-    public async Task DisposeAsync()
+    public Task DisposeAsync()
     {
-        await _fixture.DatabaseManager.DeleteDatabaseAsync();
         _fixture.SetTestOutputHelper(null);
+
+        return Task.CompletedTask;
     }
 
     [Fact]
     public async Task RequestWholesaleSettlement_WhenNoToken_ReturnsUnauthorizedStatusCode()
     {
         // Arrange
-        using var request = CreateWholesaleSettlementRequest();
+        using var request = B2CWebApiRequests.CreateRequestWholesaleSettlementRequest();
 
         // => Use no token
         request.Headers.Authorization = null;
@@ -67,13 +76,13 @@ public class B2CWebApiAuthTests : IAsyncLifetime
     public async Task RequestWholesaleSettlement_WhenFakeToken_ReturnsUnauthorizedStatusCode()
     {
         // Arrange
-        using var request = CreateWholesaleSettlementRequest();
+        using var request = B2CWebApiRequests.CreateRequestWholesaleSettlementRequest();
 
         // => Use a fake token with the required roles and claims
         request.Headers.Authorization = _fixture.OpenIdJwtManager.JwtProvider
             .CreateFakeTokenAuthenticationHeader(
                 roles: RequiredRoles,
-                extraClaims: _fixture.RequiredActorClaims);
+                extraClaims: RequiredActorClaims);
 
         // Act
         var response = await _fixture.WebApiClient.SendAsync(request);
@@ -86,13 +95,13 @@ public class B2CWebApiAuthTests : IAsyncLifetime
     public async Task RequestWholesaleSettlement_WhenValidTokenButMissingRole_ReturnsForbiddenStatusCode()
     {
         // Arrange
-        using var request = CreateWholesaleSettlementRequest();
+        using var request = B2CWebApiRequests.CreateRequestWholesaleSettlementRequest();
 
         // => Use a valid token with the required claims but missing the required roles
         request.Headers.Authorization = await _fixture.OpenIdJwtManager.JwtProvider
             .CreateInternalTokenAuthenticationHeaderAsync(
                 roles: [],
-                extraClaims: _fixture.RequiredActorClaims);
+                extraClaims: RequiredActorClaims);
 
         // Act
         var response = await _fixture.WebApiClient.SendAsync(request);
@@ -105,13 +114,13 @@ public class B2CWebApiAuthTests : IAsyncLifetime
     public async Task RequestWholesaleSettlement_WhenValidTokenWithRequiredRole_ReturnsOkStatusCode()
     {
         // Arrange
-        using var request = CreateWholesaleSettlementRequest();
+        using var request = B2CWebApiRequests.CreateRequestWholesaleSettlementRequest();
 
         // => Use a valid token with the required roles and claims
         request.Headers.Authorization = await _fixture.OpenIdJwtManager.JwtProvider
             .CreateInternalTokenAuthenticationHeaderAsync(
                 roles: RequiredRoles,
-                extraClaims: _fixture.RequiredActorClaims);
+                extraClaims: RequiredActorClaims);
 
         // Act
         var response = await _fixture.WebApiClient.SendAsync(request);
@@ -122,23 +131,5 @@ public class B2CWebApiAuthTests : IAsyncLifetime
 
         var ensureSuccess = () => response.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
         await ensureSuccess.Should().NotThrowAsync();
-    }
-
-    private HttpRequestMessage CreateWholesaleSettlementRequest()
-    {
-        var request = new HttpRequestMessage(HttpMethod.Post, "/RequestWholesaleSettlement")
-        {
-            Content = JsonContent.Create(
-                new RequestWholesaleSettlementMarketRequest(
-                    CalculationType: CalculationType.WholesaleFixing,
-                    StartDate: "2024-08-27T00:00:00Z",
-                    EndDate: "2024-08-29T00:00:00Z",
-                    GridArea: null,
-                    EnergySupplierId: null,
-                    Resolution: null,
-                    PriceType: null)),
-        };
-
-        return request;
     }
 }

@@ -54,6 +54,11 @@ public sealed class AuditLogMockServer : IDisposable
         _server?.Dispose();
     }
 
+    public void ResetCallLogs()
+    {
+        _server?.ResetLogEntries();
+    }
+
     public IReadOnlyCollection<(IRequestMessage Request, IResponseMessage Response)> GetAuditLogIngestionCalls()
     {
         var logEntries = _server?

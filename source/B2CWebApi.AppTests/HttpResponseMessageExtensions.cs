@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
-using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.AppTests;
 

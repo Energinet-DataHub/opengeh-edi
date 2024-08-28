@@ -13,11 +13,10 @@
 // limitations under the License.
 
 using System.Net;
-using System.Net.Http.Json;
 using System.Text.Json;
 using Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 using Energinet.DataHub.EDI.B2CWebApi.AppTests.Fixture;
-using Energinet.DataHub.EDI.B2CWebApi.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
@@ -36,32 +35,55 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
         _fixture.SetTestOutputHelper(logger);
     }
 
-    public async Task InitializeAsync()
+    public static IEnumerable<object[]> GetB2CWebApiRequests()
     {
-        await _fixture.DatabaseManager.CreateDatabaseAsync();
+        return
+        [
+            [B2CWebApiRequests.CreateArchivedMessageGetDocumentRequest(), "DataHubAdministrator"],
+            [B2CWebApiRequests.CreateArchivedMessageSearchRequest(), "DataHubAdministrator"],
+            [B2CWebApiRequests.CreateOrchestrationsRequest(), "DataHubAdministrator"],
+            [B2CWebApiRequests.CreateOrchestrationRequest(), "DataHubAdministrator"],
+            [B2CWebApiRequests.CreateOrchestrationTerminateRequest(), "DataHubAdministrator"],
+            [B2CWebApiRequests.CreateRequestAggregatedMeasureDataRequest(), ActorRole.EnergySupplier.Name],
+            [B2CWebApiRequests.CreateRequestWholesaleSettlementRequest(), ActorRole.EnergySupplier.Name],
+        ];
     }
 
-    public async Task DisposeAsync()
+    public Task InitializeAsync()
     {
-        await _fixture.DatabaseManager.DeleteDatabaseAsync();
+        _fixture.AuditLogMockServer.ResetCallLogs();
+        return Task.CompletedTask;
+    }
+
+    public Task DisposeAsync()
+    {
         _fixture.SetTestOutputHelper(null);
+        return Task.CompletedTask;
     }
 
-    [Fact]
-    public async Task ArchivedMessageSearchRequest_WhenEndpointCalled_SendsAuditLogRequest()
+    [Theory]
+    [MemberData(nameof(GetB2CWebApiRequests))]
+    public async Task B2CWebApiRequest_WhenRequestPerformed_AuditLogRequestIsSent(HttpRequestMessage request, string actorRole)
     {
         // Arrange
-        using var request = CreateArchivedMessageSearchRequest();
         request.Headers.Authorization = await _fixture
             .OpenIdJwtManager
             .JwtProvider
-            .CreateInternalTokenAuthenticationHeaderAsync(extraClaims: _fixture.RequiredActorClaims);
+            .CreateInternalTokenAuthenticationHeaderAsync(
+                roles: [
+                    "request-wholesale-settlement:view",
+                    "request-aggregated-measured-data:view",
+                    "calculations:manage",
+                ],
+                extraClaims: [
+                    new("actornumber", "1234567890123"),
+                    new("marketroles", actorRole),
+                ]);
 
         // Act
-        var response = await _fixture.WebApiClient.SendAsync(request);
+        await _fixture.WebApiClient.SendAsync(request);
 
         // Assert
-        await response.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
         var auditLogCalls = _fixture.AuditLogMockServer.GetAuditLogIngestionCalls();
 
         var auditLogCall = auditLogCalls.Should()
@@ -82,21 +104,5 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
 
         deserializeBody.Should().NotThrow()
             .Subject.Should().NotBeNull();
-    }
-
-    private HttpRequestMessage CreateArchivedMessageSearchRequest()
-    {
-        var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMessageSearch")
-        {
-            Content = JsonContent.Create(
-                new SearchArchivedMessagesCriteria(
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null)),
-        };
-        return request;
     }
 }

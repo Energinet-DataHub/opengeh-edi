@@ -46,12 +46,6 @@ public class B2CWebApiFixture : IAsyncLifetime
         B2CWebApiApplicationFactory = new B2CWebApiApplicationFactory();
     }
 
-    public Claim[] RequiredActorClaims =>
-    [
-        new("actornumber", "1234567890123"),
-        new("marketroles", ActorRole.EnergySupplier.Name),
-    ];
-
     public EdiDatabaseManager DatabaseManager { get; }
 
     public OpenIdJwtManager OpenIdJwtManager { get; }
@@ -80,6 +74,8 @@ public class B2CWebApiFixture : IAsyncLifetime
 
         AuditLogMockServer.StartServer();
 
+        await DatabaseManager.CreateDatabaseAsync();
+
         var incomingMessagesQueue = await ServiceBusResourceProvider.BuildQueue(IncomingMessagesQueueName)
             .CreateAsync();
 
@@ -95,6 +91,7 @@ public class B2CWebApiFixture : IAsyncLifetime
     {
         AzuriteManager.Dispose();
         OpenIdJwtManager.Dispose();
+        await DatabaseManager.DeleteDatabaseAsync();
         await ServiceBusResourceProvider.DisposeAsync();
         AuditLogMockServer.Dispose();
         await B2CWebApiApplicationFactory.DisposeAsync();
