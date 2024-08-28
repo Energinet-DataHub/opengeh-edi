@@ -57,7 +57,7 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
             if (claim.Type.Equals("marketroles", StringComparison.OrdinalIgnoreCase))
                 marketRole = claim.Value;
 
-            if (claim.Type.Equals("role", StringComparison.OrdinalIgnoreCase))
+            if (claim.Type.Equals(ClaimTypes.Role, StringComparison.OrdinalIgnoreCase))
                 roles.Add(claim.Value);
         }
 
