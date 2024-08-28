@@ -55,6 +55,7 @@ public class HealthCheckEndpointTests : IAsyncLifetime
     [Theory]
     [InlineData("live")]
     [InlineData("ready")]
+    [InlineData("status")]
     public async Task FunctionApp_WhenCallingHealthCheck_ReturnOKAndExpectedContent(string healthCheckEndpoint)
     {
         // Act
