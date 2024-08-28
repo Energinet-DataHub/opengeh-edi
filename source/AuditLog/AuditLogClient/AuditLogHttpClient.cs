@@ -47,10 +47,11 @@ internal class AuditLogHttpClient(IHttpClientFactory httpClientFactory, IOptions
             _ => EncodeObjectAsBase64String(payload),
         };
 
-        var requestContent = new LogRequestContent(
+        var requestContent = new AuditLogRequestBody(
             logId,
             userId,
             actorId,
+            systemId,
             permissions,
             InstantPattern.General.Format(occuredOn),
             activity,
@@ -62,8 +63,7 @@ internal class AuditLogHttpClient(IHttpClientFactory httpClientFactory, IOptions
         var httpClient = _httpClientFactory.CreateClient();
 
         using var request = new HttpRequestMessage(HttpMethod.Post, _auditLogOptions.IngestionUrl);
-        using var jsonContent = JsonContent.Create(requestContent);
-        request.Content = jsonContent;
+        request.Content = JsonContent.Create(requestContent);
 
         var response = await httpClient.SendAsync(request)
             .ConfigureAwait(false);
@@ -75,24 +75,11 @@ internal class AuditLogHttpClient(IHttpClientFactory httpClientFactory, IOptions
     {
         var objectAsJson = JsonSerializer.Serialize(objectToEncode, new JsonSerializerOptions
         {
-            IncludeFields = true, // TODO: Serialize fields?
+            IncludeFields = true, // TODO: Do we need to include fields?
         });
 
         var jsonAsByteArray = Encoding.UTF8.GetBytes(objectAsJson);
 
         return Convert.ToBase64String(jsonAsByteArray);
     }
-
-    [Serializable]
-    private record LogRequestContent(
-        Guid LogId,
-        Guid UserId,
-        Guid ActorId,
-        string? Permissions,
-        string OccuredOn,
-        string Activity,
-        string Origin,
-        string Payload,
-        string AffectedEntityType,
-        string AffectedEntityKey);
 }

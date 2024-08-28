@@ -14,9 +14,12 @@
 
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
+using Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 using Energinet.DataHub.EDI.B2CWebApi.AppTests.Fixture;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -62,8 +65,24 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
         await response.EnsureSuccessStatusCodeWithLogAsync(_logger);
         var auditLogCalls = _fixture.AuditLogMockServer.GetAuditLogIngestionCalls();
 
-        auditLogCalls.Should().HaveCount(1);
-        auditLogCalls.Single().Response.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        var auditLogCall = auditLogCalls.Should()
+            .ContainSingle()
+            .Subject;
+
+        using var assertionScope = new AssertionScope();
+
+        // => Ensure that the audit log request was successful
+        auditLogCall.Response.StatusCode.Should().Be((int)HttpStatusCode.OK);
+
+        // => Ensure that the audit log request contains a body
+        auditLogCall.Request.Body.Should().NotBeNull();
+
+        // => Ensure that the audit log request body can be deserialized to an instance of AuditLogRequestBody
+        var deserializeBody = () =>
+            JsonSerializer.Deserialize<AuditLogRequestBody>(auditLogCall.Request.Body ?? string.Empty);
+
+        deserializeBody.Should().NotThrow()
+            .And.Subject().Should().NotBeNull();
     }
 
     private HttpRequestMessage CreateArchivedMessageSearchRequest()

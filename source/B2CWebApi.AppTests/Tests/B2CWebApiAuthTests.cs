@@ -87,7 +87,6 @@ public class B2CWebApiAuthTests : IAsyncLifetime
     public async Task RequestWholesaleSettlement_WhenValidTokenButMissingRole_ReturnsForbiddenStatusCode()
     {
         // Arrange
-
         using var request = CreateWholesaleSettlementRequest();
 
         // => Use a valid token with the required claims but missing the required roles

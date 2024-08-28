@@ -38,6 +38,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\AuditLog\AuditLog.csproj" />
       <ProjectReference Include="..\B2BApi.AppTests\B2BApi.AppTests.csproj" />
       <ProjectReference Include="..\B2CWebApi\B2CWebApi.csproj" />
       <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
