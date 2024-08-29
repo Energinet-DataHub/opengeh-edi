@@ -68,11 +68,10 @@ internal class AuditLogHttpClient(
         var httpClient = _httpClientFactory.CreateClient();
 
         using var request = new HttpRequestMessage(HttpMethod.Post, _auditLogOptions.IngestionUrl);
-        // var requestStringContent = new StringContent(
-        //     JsonSerializer.Serialize(requestContent),
-        //     Encoding.UTF8,
-        //     "application/json");
-        var requestStringContent = JsonContent.Create(requestContent);
+        var requestStringContent = new StringContent(
+            JsonSerializer.Serialize(requestContent),
+            Encoding.UTF8,
+            "application/json");
         request.Content = requestStringContent;
 
         var response = await httpClient.SendAsync(request)
@@ -91,12 +90,18 @@ internal class AuditLogHttpClient(
                 stringContentToLog = $"<Failed to read request content as string with exception message: {e.Message}>";
             }
 
+            var headersToLog = string.Join(
+                ", ",
+                request.Content.Headers
+                    .Select(h =>
+                        $"{h.Key}: {string.Join(", ", h.Value.Select(value => $"\"{value}\""))}"));
+
             _logger.LogWarning(
                 "Failed to log audit log entry. Response status code: {StatusCode}."
                 + " Request headers: {RequestHeaders}"
                 + " Request content as string:\n{RequestContent}",
                 response.StatusCode,
-                string.Join(", ", request.Content.Headers.Select(h => $"{h.Key}: {string.Join(", ", $"\"{h.Value}\"")}")),
+                headersToLog,
                 stringContentToLog);
         }
 
