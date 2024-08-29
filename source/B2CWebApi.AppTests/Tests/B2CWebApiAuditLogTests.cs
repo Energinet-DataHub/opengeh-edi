@@ -119,7 +119,10 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
 
             // => Ensure that the audit log request body can be deserialized to an instance of AuditLogRequestBody
             var deserializeBody = () =>
-                JsonSerializer.Deserialize<AuditLogRequestBody>(auditLogCall.Request.Body ?? string.Empty);
+                JsonSerializer.Deserialize<AuditLogRequestBody>(auditLogCall.Request.Body ?? string.Empty, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                });
 
             deserializedBody = deserializeBody.Should().NotThrow().Subject;
             deserializedBody.Should().NotBeNull();
