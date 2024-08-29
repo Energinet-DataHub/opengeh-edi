@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace BuildingBlocks.Application.FeatureFlag;
+namespace Energinet.DataHub.EDI.AuditLog.AuditUser;
 
 /// <summary>
-/// List of all Feature Flags that exists in the system. A Feature Flag name must
-/// correspond to a value found in the app configuration as "FeatureManagement__NameOfFeatureFlag"
+/// Get the current user for audit logging
 /// </summary>
-public enum FeatureFlagName
+public interface IAuditUserContext
 {
     /// <summary>
-    /// Whether to send audit logs to the audit log service
+    /// Get the current user for audit logging. This is typically the user that is currently logged in, and thus can
+    /// be null if no user currently exists.
     /// </summary>
-    UseAuditLog,
+    AuditUser? CurrentUser { get; }
 }

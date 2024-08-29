@@ -12,21 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Exceptions;
+using Energinet.DataHub.EDI.AuditLog.AuditLogClient;
+using Microsoft.Extensions.DependencyInjection;
 
-public class MissingAzpException : Exception
+namespace Energinet.DataHub.EDI.AuditLog;
+
+public static class AuditLogDependencyInjection
 {
-    public MissingAzpException()
+    public static IServiceCollection AddAuditLogger(this IServiceCollection services)
     {
-    }
+        services.AddAuditLogClient();
+        services.AddTransient<IAuditLogger, AuditLogger>();
 
-    public MissingAzpException(string message)
-        : base(message)
-    {
-    }
-
-    public MissingAzpException(string message, Exception innerException)
-        : base(message, innerException)
-    {
+        return services;
     }
 }

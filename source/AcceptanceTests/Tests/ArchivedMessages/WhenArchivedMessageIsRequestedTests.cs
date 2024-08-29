@@ -35,7 +35,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         ArgumentNullException.ThrowIfNull(fixture);
 
         _archivedMessage = new ArchivedMessageDsl(
-            new EdiB2CDriver(fixture.B2CAuthorizedHttpClient, fixture.ApiManagementUri));
+            new EdiB2CDriver(fixture.B2CAuthorizedHttpClient, fixture.ApiManagementUri, output));
 
         var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BMeteredDataResponsibleAuthorizedHttpClient, output);
         var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);

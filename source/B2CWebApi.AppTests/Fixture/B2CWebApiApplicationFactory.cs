@@ -12,16 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace BuildingBlocks.Application.FeatureFlag;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 
-/// <summary>
-/// List of all Feature Flags that exists in the system. A Feature Flag name must
-/// correspond to a value found in the app configuration as "FeatureManagement__NameOfFeatureFlag"
-/// </summary>
-public enum FeatureFlagName
+namespace Energinet.DataHub.EDI.B2CWebApi.AppTests.Fixture;
+
+public class B2CWebApiApplicationFactory : WebApplicationFactory<Program>
 {
-    /// <summary>
-    /// Whether to send audit logs to the audit log service
-    /// </summary>
-    UseAuditLog,
+    public Dictionary<string, string?> AppSettings { get; set; } = [];
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(AppSettings)
+            .Build();
+
+        builder.UseConfiguration(configuration);
+    }
 }

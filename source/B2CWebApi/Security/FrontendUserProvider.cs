@@ -41,13 +41,12 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
         ArgumentNullException.ThrowIfNull(claims);
 
         string? actorNumber = null;
-        string? role = null;
-        string? azp = null;
+        string? marketRole = null;
+        List<string> roles = [];
         foreach (var claim in claims)
         {
             if (actorNumber is not null
-                && role is not null
-                && azp is not null)
+                && marketRole is not null)
             {
                 break;
             }
@@ -56,39 +55,34 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
                 actorNumber = claim.Value;
 
             if (claim.Type.Equals("marketroles", StringComparison.OrdinalIgnoreCase))
-                role = claim.Value;
+                marketRole = claim.Value;
 
-            if (claim.Type.Equals("azp", StringComparison.OrdinalIgnoreCase))
-                azp = claim.Value;
+            if (claim.Type.Equals(ClaimTypes.Role, StringComparison.OrdinalIgnoreCase))
+                roles.Add(claim.Value);
         }
 
         if (actorNumber is null)
             throw new MissingActorNumberException();
 
-        if (role is null)
-            throw new MissingRoleException();
-
-        if (azp is null)
-            throw new MissingAzpException();
+        if (marketRole is null)
+            throw new MissingMarketRoleException();
 
         var frontendUser = new FrontendUser(
             userId,
             actorId,
-            multiTenancy,
             actorNumber,
-            role,
-            azp);
+            marketRole,
+            roles.ToArray());
 
         _logger.LogInformation(
-            "Provide front-end user, user id: {UserId}, actor id: {ActorId}, is Fas: {IsFas}, actor number: {ActorNumber}, role: {Role}, azp: {Azp}",
+            "Provide front-end user, user id: {UserId}, actor id: {ActorId}, actor number: {ActorNumber}, market role: {MarketRole}, roles: {Roles}",
             frontendUser.UserId,
             frontendUser.ActorId,
-            frontendUser.IsFas,
             frontendUser.ActorNumber,
-            frontendUser.Role,
-            frontendUser.Azp);
+            frontendUser.MarketRole,
+            string.Join(", ", frontendUser.Roles));
 
-        SetAuthenticatedActor(ActorNumber.Create(actorNumber), accessAllData: multiTenancy, role: TryGetActorRole(role));
+        SetAuthenticatedActor(ActorNumber.Create(actorNumber), accessAllData: multiTenancy, role: TryGetActorRole(marketRole));
 
         return Task.FromResult<FrontendUser?>(frontendUser);
     }

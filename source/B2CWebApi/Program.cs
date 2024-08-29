@@ -52,6 +52,9 @@ builder.Services
     // Durable client (orchestration)
     .AddDurableClient(builder.Configuration)
 
+    // Audit logging
+    .AddAuditLog()
+
     // Modules
     .AddIncomingMessagesModule(builder.Configuration)
     .AddArchivedMessagesModule(builder.Configuration)

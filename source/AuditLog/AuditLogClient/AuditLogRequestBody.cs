@@ -12,21 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Exceptions;
+namespace Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 
-public class MissingRoleException : Exception
-{
-    public MissingRoleException()
-    {
-    }
-
-    public MissingRoleException(string message)
-        : base(message)
-    {
-    }
-
-    public MissingRoleException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
-}
+[Serializable]
+public record AuditLogRequestBody(
+    Guid LogId,
+    Guid UserId,
+    Guid ActorId,
+    Guid SystemId,
+    string? Permissions,
+    string OccurredOn,
+    string Activity,
+    string Origin,
+    string Payload,
+    string AffectedEntityType,
+    string AffectedEntityKey);

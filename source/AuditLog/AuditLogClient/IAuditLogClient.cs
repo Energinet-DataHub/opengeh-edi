@@ -12,16 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace BuildingBlocks.Application.FeatureFlag;
+using NodaTime;
+
+namespace Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 
 /// <summary>
-/// List of all Feature Flags that exists in the system. A Feature Flag name must
-/// correspond to a value found in the app configuration as "FeatureManagement__NameOfFeatureFlag"
+/// Client for saving audit logs. Documentation for the audit logs can be found at:
+/// https://github.com/Energinet-DataHub/opengeh-revision-log/blob/main/docs/documentation-for-submitting-audit-logs.md
 /// </summary>
-public enum FeatureFlagName
+public interface IAuditLogClient
 {
     /// <summary>
-    /// Whether to send audit logs to the audit log service
+    /// Persist the audit log
     /// </summary>
-    UseAuditLog,
+    Task LogAsync(
+        Guid logId,
+        Guid userId,
+        Guid actorId,
+        Guid systemId,
+        string? permissions,
+        Instant occuredOn,
+        string activity,
+        string origin,
+        object? payload,
+        string? affectedEntityType,
+        string? affectedEntityKey);
 }

@@ -23,31 +23,5 @@ namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Tests")]
 public class FeatureFlagManagerStub : IFeatureFlagManager
 {
-    private bool _useAmountPerChargeResultProduced = true;
-    private bool _useMonthlyAmountPerChargeResultProducedAsync = true;
-    private bool _useCalculationCompletedEvent;
-
-    public void EnableAmountPerChargeResultProduced(bool enable) => _useAmountPerChargeResultProduced = enable;
-
-    public void EnableMonthlyAmountPerChargeResultProduced(bool enable) => _useMonthlyAmountPerChargeResultProducedAsync = enable;
-
-    public void EnableCalculationCompletedEvent(bool enable) => _useCalculationCompletedEvent = enable;
-
-    public Task<bool> UseMonthlyAmountPerChargeResultProducedAsync() => Task.FromResult(_useMonthlyAmountPerChargeResultProducedAsync);
-
-    public Task<bool> UseAmountPerChargeResultProducedAsync() => Task.FromResult(_useAmountPerChargeResultProduced);
-
-    public Task<bool> UseRequestWholesaleSettlementReceiverAsync() => Task.FromResult(true);
-
-    public Task<bool> UseMessageDelegationAsync() => Task.FromResult(true);
-
-    public Task<bool> UsePeekMessagesAsync() => Task.FromResult(true);
-
-    public Task<bool> UseRequestMessagesAsync() => Task.FromResult(true);
-
-    public Task<bool> UseEnergyResultProducedAsync() => Task.FromResult(true);
-
-    public Task<bool> UseTotalMonthlyAmountResultProducedAsync() => Task.FromResult(true);
-
-    public Task<bool> UseCalculationCompletedEventAsync() => Task.FromResult(_useCalculationCompletedEvent);
+    public Task<bool> UseAuditLogAsync() => Task.FromResult(true);
 }
