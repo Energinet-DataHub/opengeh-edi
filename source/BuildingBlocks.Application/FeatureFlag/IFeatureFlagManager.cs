@@ -24,4 +24,8 @@ namespace BuildingBlocks.Application.FeatureFlag;
 /// </summary>
 public interface IFeatureFlagManager
 {
+    /// <summary>
+    /// Whether to send audit logs to the audit log service
+    /// </summary>
+    Task<bool> UseAuditLogAsync();
 }

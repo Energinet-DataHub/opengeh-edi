@@ -27,4 +27,8 @@ public class MicrosoftFeatureFlagManager : IFeatureFlagManager
     {
         _featureManager = featureManager;
     }
+
+    public Task<bool> UseAuditLogAsync() => IsEnabledAsync(FeatureFlagName.UseAuditLog);
+
+    private Task<bool> IsEnabledAsync(FeatureFlagName featureFlagName) => _featureManager.IsEnabledAsync(featureFlagName.ToString());
 }

@@ -12,6 +12,9 @@
     </PackageReference>
     <PackageReference Include="NodaTime" Version="3.1.11" />
 </ItemGroup>
+<ItemGroup>
+  <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+</ItemGroup>
 <ItemDefinitionGroup>
     <ProjectReference>
         <PrivateAssets>all</PrivateAssets>

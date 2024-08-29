@@ -20,4 +20,8 @@ namespace BuildingBlocks.Application.FeatureFlag;
 /// </summary>
 public enum FeatureFlagName
 {
+    /// <summary>
+    /// Whether to send audit logs to the audit log service
+    /// </summary>
+    UseAuditLog,
 }
