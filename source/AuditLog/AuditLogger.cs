@@ -43,13 +43,14 @@ public class AuditLogger(
         AuditLogEntityType? affectedEntityType,
         string? affectedEntityKey)
     {
-        // var useAuditLog = await _featureFlagManager.UseAuditLogAsync()
-        //     .ConfigureAwait(false);
-        // if (!useAuditLog)
-        // {
-        //     _logger.LogInformation("Skipping audit log since the feature flag UseAuditLog has value \"{UseAuditLog}\".", useAuditLog);
-        //     return;
-        // }
+        var useAuditLog = await _featureFlagManager.UseAuditLogAsync()
+            .ConfigureAwait(false);
+        if (!useAuditLog)
+        {
+            _logger.LogInformation("Skipping audit log since the feature flag UseAuditLog has value \"{UseAuditLog}\".", useAuditLog);
+            return;
+        }
+
         var currentUser = _auditUserContext.CurrentUser;
 
         var userId = currentUser?.UserId ?? Guid.Empty;

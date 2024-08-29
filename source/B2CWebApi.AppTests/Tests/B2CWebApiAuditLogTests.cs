@@ -68,7 +68,7 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
     /// Validate that the correct audit log request is sent when a B2C Web API request is performed, according to
     /// the audit log documentation at: https://github.com/Energinet-DataHub/opengeh-revision-log/blob/main/docs/documentation-for-submitting-audit-logs.md
     /// </summary>
-    [Theory(Skip = "Doesn't work because trying to reproduce error")]
+    [Theory]
     [MemberData(nameof(GetB2CWebApiRequests))]
     public async Task B2CWebApiRequest_WhenRequestPerformed_CorrectAuditLogRequestIsSent(
         HttpRequestMessage request,
