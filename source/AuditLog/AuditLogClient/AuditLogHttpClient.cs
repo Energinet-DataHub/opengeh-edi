@@ -15,6 +15,7 @@
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using NodaTime.Text;
@@ -22,9 +23,13 @@ using NodaTime.Text;
 namespace Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 
 // ReSharper disable once ClassNeverInstantiated.Global - Instantiated by DI
-internal class AuditLogHttpClient(IHttpClientFactory httpClientFactory, IOptions<AuditLogOptions> auditLogOptions) : IAuditLogClient
+internal class AuditLogHttpClient(
+    IHttpClientFactory httpClientFactory,
+    IOptions<AuditLogOptions> auditLogOptions,
+    ILogger<AuditLogHttpClient> logger) : IAuditLogClient
 {
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+    private readonly ILogger _logger = logger;
     private readonly AuditLogOptions _auditLogOptions = auditLogOptions.Value;
 
     public async Task LogAsync(
@@ -63,13 +68,36 @@ internal class AuditLogHttpClient(IHttpClientFactory httpClientFactory, IOptions
         var httpClient = _httpClientFactory.CreateClient();
 
         using var request = new HttpRequestMessage(HttpMethod.Post, _auditLogOptions.IngestionUrl);
-        request.Content = new StringContent(
+        var requestStringContent = new StringContent(
             JsonSerializer.Serialize(requestContent),
             Encoding.UTF8,
             "application/json");
+        request.Content = requestStringContent;
 
         var response = await httpClient.SendAsync(request)
             .ConfigureAwait(false);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            string stringContentToLog;
+            try
+            {
+                stringContentToLog = await requestStringContent.ReadAsStringAsync()
+                    .ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                stringContentToLog = $"<Failed to read request content as string with exception message: {e.Message}>";
+            }
+
+            _logger.LogWarning(
+                "Failed to log audit log entry. Response status code: {StatusCode}."
+                + " Request headers: {RequestHeaders}"
+                + " Request content as string:\n{RequestContent}",
+                response.StatusCode,
+                string.Join(", ", request.Headers.Select(h => $"{h.Key}: {string.Join(", ", h.Value)}")),
+                stringContentToLog);
+        }
 
         response.EnsureSuccessStatusCode();
     }
