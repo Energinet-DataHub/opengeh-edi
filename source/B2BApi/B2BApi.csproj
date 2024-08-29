@@ -23,7 +23,7 @@ limitations under the License.
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Energinet.DataHub.Core.Databricks.SqlStatementExecution" Version="11.0.2" />
+        <PackageReference Include="Energinet.DataHub.Core.Databricks.SqlStatementExecution" Version="11.1.0-alpha-72" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.DurableTask" Version="1.1.5" />
         <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.1" />
         <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="13.1.0" />

@@ -6,7 +6,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Energinet.DataHub.Core.Databricks.SqlStatementExecution" Version="11.0.2" />
+    <PackageReference Include="Energinet.DataHub.Core.Databricks.SqlStatementExecution" Version="11.1.0-alpha-72" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
