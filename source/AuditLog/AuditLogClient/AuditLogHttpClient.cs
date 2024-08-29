@@ -40,11 +40,11 @@ internal class AuditLogHttpClient(IHttpClientFactory httpClientFactory, IOptions
         string? affectedEntityType,
         string? affectedEntityKey)
     {
-        var payloadAsString = payload switch
+        var payloadAsJson = payload switch
         {
             null => string.Empty,
             string p => p,
-            _ => EncodeObjectAsBase64String(payload),
+            _ => JsonSerializer.Serialize(payload),
         };
 
         var requestContent = new AuditLogRequestBody(
@@ -56,14 +56,13 @@ internal class AuditLogHttpClient(IHttpClientFactory httpClientFactory, IOptions
             InstantPattern.General.Format(occuredOn),
             activity,
             origin,
-            payloadAsString,
+            payloadAsJson,
             affectedEntityType ?? string.Empty,
             affectedEntityKey ?? string.Empty);
 
         var httpClient = _httpClientFactory.CreateClient();
 
         using var request = new HttpRequestMessage(HttpMethod.Post, _auditLogOptions.IngestionUrl);
-        // request.Content = JsonContent.Create(requestContent);
         request.Content = new StringContent(
             JsonSerializer.Serialize(requestContent),
             Encoding.UTF8,
@@ -73,17 +72,5 @@ internal class AuditLogHttpClient(IHttpClientFactory httpClientFactory, IOptions
             .ConfigureAwait(false);
 
         response.EnsureSuccessStatusCode();
-    }
-
-    private string EncodeObjectAsBase64String(object objectToEncode)
-    {
-        var objectAsJson = JsonSerializer.Serialize(objectToEncode, new JsonSerializerOptions
-        {
-            IncludeFields = true, // TODO: Do we need to include fields?
-        });
-
-        var jsonAsByteArray = Encoding.UTF8.GetBytes(objectAsJson);
-
-        return Convert.ToBase64String(jsonAsByteArray);
     }
 }
