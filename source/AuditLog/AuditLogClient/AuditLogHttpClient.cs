@@ -91,7 +91,11 @@ internal class AuditLogHttpClient(
             }
             catch (Exception e)
             {
-                _logger.LogWarning(e, "Failed to read request content as string after audit log failed.");
+                _logger.LogWarning(
+                    e,
+                    "Failed to read request content as string after audit log failed. Attempted request content: {RequestContent}",
+                    requestContent);
+
                 stringContentToLog = $"<Failed to read request content as string with exception message: {e.Message}>";
             }
 
