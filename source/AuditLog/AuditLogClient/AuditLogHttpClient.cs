@@ -34,7 +34,8 @@ internal class AuditLogHttpClient(
 
     /// <inheritdoc />
     /// <exception cref="HttpRequestException">
-    /// Thrown if performing the audit log HTTP request failed. The request will also be logged as a warning</exception>
+    /// Thrown if performing the audit log HTTP request failed. The request will also be logged as a warning
+    /// </exception>
     public async Task LogAsync(
         Guid logId,
         Guid userId,
