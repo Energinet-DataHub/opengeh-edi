@@ -12,12 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 
 public static class AuditLogClientDependencyInjectionExtensions
 {
+    /// <summary>
+    /// Register the <see cref="IAuditLogClient"/>, which requires an <see cref="AuditLogOptions"/> section to be present in the <see cref="IConfiguration"/>.
+    /// <remarks>See <see cref="AuditLogOptions"/> for information about the required <see cref="IConfiguration"/> section.</remarks>
+    /// </summary>
     public static IServiceCollection AddAuditLogClient(this IServiceCollection services)
     {
         services.AddOptions<AuditLogOptions>()

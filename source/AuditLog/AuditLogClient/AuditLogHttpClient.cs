@@ -22,7 +22,7 @@ using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 
-// ReSharper disable once ClassNeverInstantiated.Global - Instantiated by DI
+/// <inheritdoc />
 internal class AuditLogHttpClient(
     IHttpClientFactory httpClientFactory,
     IOptions<AuditLogOptions> auditLogOptions,
@@ -32,6 +32,9 @@ internal class AuditLogHttpClient(
     private readonly ILogger _logger = logger;
     private readonly AuditLogOptions _auditLogOptions = auditLogOptions.Value;
 
+    /// <inheritdoc />
+    /// <exception cref="HttpRequestException">
+    /// Thrown if performing the audit log HTTP request failed. The request will also be logged as a warning</exception>
     public async Task LogAsync(
         Guid logId,
         Guid userId,
@@ -68,13 +71,13 @@ internal class AuditLogHttpClient(
         var httpClient = _httpClientFactory.CreateClient();
 
         using var request = new HttpRequestMessage(HttpMethod.Post, _auditLogOptions.IngestionUrl);
-        var requestStringContent = new StringContent(
+        using var requestStringContent = new StringContent(
             JsonSerializer.Serialize(requestContent),
             Encoding.UTF8,
             "application/json");
         request.Content = requestStringContent;
 
-        var response = await httpClient.SendAsync(request)
+        using var response = await httpClient.SendAsync(request)
             .ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
@@ -87,6 +90,7 @@ internal class AuditLogHttpClient(
             }
             catch (Exception e)
             {
+                _logger.LogWarning(e, "Failed to read request content as string after audit log failed.");
                 stringContentToLog = $"<Failed to read request content as string with exception message: {e.Message}>";
             }
 

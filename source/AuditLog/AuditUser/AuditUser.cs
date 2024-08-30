@@ -14,6 +14,12 @@
 
 namespace Energinet.DataHub.EDI.AuditLog.AuditUser;
 
+/// <summary>
+/// The user required for submitting audit logs.
+/// </summary>
+/// <param name="UserId">The user id, typically found in a 'sub' claim.</param>
+/// <param name="ActorId">The user id, typically found in an 'azp' claim.</param>
+/// <param name="Permissions">The user's permission, typically found in 'role' claims</param>
 public record AuditUser(
     Guid? UserId,
     Guid? ActorId,
