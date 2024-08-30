@@ -397,6 +397,10 @@ public class B2BApiAppFixture : IAsyncLifetime
             "FeatureManagement__UseCalculationCompletedEvent",
             true.ToString().ToLower());
 
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            "FeatureManagement__UsePeekMessages",
+            true.ToString().ToLower());
+
         return appHostSettings;
     }
 

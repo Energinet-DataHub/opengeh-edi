@@ -32,5 +32,5 @@ public interface IFeatureFlagManager
     /// <summary>
     /// Whether to disallow actors to peek messages.
     /// </summary>
-    Task<bool> PeekMessagesDisabledAsync();
+    Task<bool> UsePeekMessagesAsync();
 }

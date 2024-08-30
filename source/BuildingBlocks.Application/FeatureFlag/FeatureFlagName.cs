@@ -28,5 +28,5 @@ public enum FeatureFlagName
     /// <summary>
     /// Whether to disable peek messages
     /// </summary>
-    PeekMessagesDisabled,
+    UsePeekMessages,
 }

@@ -57,7 +57,7 @@ public class PeekRequestListener
         CancellationToken hostCancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        if (!await _featureFlagManager.PeekMessagesDisabledAsync().ConfigureAwait(false))
+        if (!await _featureFlagManager.UsePeekMessagesAsync().ConfigureAwait(false))
         {
             var notFoundResponse = HttpResponseData.CreateResponse(request);
             notFoundResponse.StatusCode = HttpStatusCode.NotFound;

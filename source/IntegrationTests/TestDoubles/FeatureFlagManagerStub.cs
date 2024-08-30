@@ -25,5 +25,5 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
 {
     public Task<bool> UseAuditLogAsync() => Task.FromResult(true);
 
-    public Task<bool> PeekMessagesDisabledAsync() => Task.FromResult(false);
+    public Task<bool> UsePeekMessagesAsync() => Task.FromResult(true);
 }
