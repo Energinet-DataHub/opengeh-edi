@@ -24,4 +24,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 public class FeatureFlagManagerStub : IFeatureFlagManager
 {
     public Task<bool> UseAuditLogAsync() => Task.FromResult(true);
+
+    public Task<bool> PeekMessagesDisabledAsync() => Task.FromResult(false);
 }

@@ -30,5 +30,7 @@ public class MicrosoftFeatureFlagManager : IFeatureFlagManager
 
     public Task<bool> UseAuditLogAsync() => IsEnabledAsync(FeatureFlagName.UseAuditLog);
 
+    public Task<bool> PeekMessagesDisabledAsync() => IsEnabledAsync(FeatureFlagName.PeekMessagesDisabled);
+
     private Task<bool> IsEnabledAsync(FeatureFlagName featureFlagName) => _featureManager.IsEnabledAsync(featureFlagName.ToString());
 }
