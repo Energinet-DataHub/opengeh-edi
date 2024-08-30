@@ -69,7 +69,7 @@ internal class AuditLogHttpClient(
             affectedEntityType ?? string.Empty,
             affectedEntityKey ?? string.Empty);
 
-        var httpClient = _httpClientFactory.CreateClient();
+        using var httpClient = _httpClientFactory.CreateClient();
 
         using var request = new HttpRequestMessage(HttpMethod.Post, _auditLogOptions.IngestionUrl);
         using var requestStringContent = new StringContent(
