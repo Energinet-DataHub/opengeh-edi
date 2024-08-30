@@ -14,10 +14,12 @@
 
 using System.Net.Http.Headers;
 using System.Text;
+using Energinet.DataHub.EDI.AcceptanceTests.Logging;
 using Energinet.DataHub.EDI.AcceptanceTests.Responses.Json;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Nito.AsyncEx;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
@@ -25,11 +27,13 @@ public sealed class EdiB2CDriver : IDisposable
 {
     private readonly AsyncLazy<HttpClient> _httpClient;
     private readonly Uri _apiManagementUri;
+    private readonly ITestOutputHelper _logger;
 
-    public EdiB2CDriver(AsyncLazy<HttpClient> b2CHttpClient, Uri apiManagementUri)
+    public EdiB2CDriver(AsyncLazy<HttpClient> b2CHttpClient, Uri apiManagementUri, ITestOutputHelper logger)
     {
         _httpClient = b2CHttpClient;
         _apiManagementUri = apiManagementUri;
+        _logger = logger;
     }
 
     public void Dispose()
@@ -44,6 +48,8 @@ public sealed class EdiB2CDriver : IDisposable
         request.Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         var response = await b2cClient.SendAsync(request).ConfigureAwait(false);
+        await response.EnsureSuccessStatusCodeWithLogAsync(_logger);
+
         var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         var archivedMessageResponse = JsonConvert.DeserializeObject<List<ArchivedMessageSearchResponse>>(responseString) ?? throw new InvalidOperationException("Did not receive valid response");

@@ -13,8 +13,10 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
@@ -27,11 +29,15 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 public class OrchestrationsController(
     ILogger<OrchestrationsController> logger,
     IDurableClientFactory durableClientFactory,
-    IUserContext<FrontendUser> userContext) : ControllerBase
+    IUserContext<FrontendUser> userContext,
+    IAuditLogger auditLogger) : ControllerBase
 {
+    private const string CalculationManageRole = "calculations:manage";
+
     private readonly ILogger<OrchestrationsController> _logger = logger;
     private readonly IDurableClientFactory _durableClientFactory = durableClientFactory;
     private readonly IUserContext<FrontendUser> _userContext = userContext;
+    private readonly IAuditLogger _auditLogger = auditLogger;
 
     /// <summary>
     /// Get orchestrations
@@ -44,9 +50,18 @@ public class OrchestrationsController(
     /// </returns>
     [HttpGet]
     [ProducesResponseType<OrchestrationStatusQueryResult>(200, "application/json")]
-    [Authorize(Roles = "calculations:manage")]
+    [Authorize(Roles = CalculationManageRole)]
     public async Task<IActionResult> IndexAsync(DateTime? from)
     {
+        await _auditLogger.LogAsync(
+                AuditLogId.New(),
+                AuditLogActivity.OrchestrationsSearch,
+                HttpContext.Request.GetDisplayUrl(),
+                from?.ToString("O"),
+                AuditLogEntityType.Orchestration,
+                "orchestrations-search")
+            .ConfigureAwait(false);
+
         AdminUserGuard();
 
         var durableClient = _durableClientFactory.CreateClient();
@@ -79,9 +94,18 @@ public class OrchestrationsController(
     /// <param name="id">The instance id of the orchestration to get status for</param>
     [HttpGet("{id}")]
     [ProducesResponseType<DurableOrchestrationStatus>(200, "application/json")]
-    [Authorize(Roles = "calculations:manage")]
+    [Authorize(Roles = CalculationManageRole)]
     public async Task<IActionResult> IndexAsync(string id)
     {
+        await _auditLogger.LogAsync(
+                AuditLogId.New(),
+                AuditLogActivity.OrchestrationsGet,
+                HttpContext.Request.GetDisplayUrl(),
+                id,
+                AuditLogEntityType.Orchestration,
+                id)
+            .ConfigureAwait(false);
+
         AdminUserGuard();
 
         var durableClient = _durableClientFactory.CreateClient();
@@ -98,19 +122,28 @@ public class OrchestrationsController(
     /// <param name="id">The instance id of the orchestration to terminate</param>
     /// <param name="reason">The reasons for the termination</param>
     [HttpPost("{id}/terminate")]
-    [Authorize(Roles = "calculations:manage")]
+    [Authorize(Roles = CalculationManageRole)]
     public async Task<IActionResult> TerminateAsync(string id, string reason)
     {
+        await _auditLogger.LogAsync(
+                AuditLogId.New(),
+                AuditLogActivity.OrchestrationsTerminate,
+                HttpContext.Request.GetDisplayUrl(),
+                new { id, reason },
+                AuditLogEntityType.Orchestration,
+                id)
+            .ConfigureAwait(false);
+
         AdminUserGuard();
 
         var currentUser = _userContext.CurrentUser;
         _logger.LogWarning(
-            "Terminating orchestration \"{OrchestrationId}\" with reason \"{Reason}\". Terminated by user id: {UserId}, actor number: {ActorNumber}, azp: {Azp}",
+            "Terminating orchestration \"{OrchestrationId}\" with reason \"{Reason}\". Terminated by user id: {UserId}, actor number: {ActorNumber}, actor id: {ActorId}",
             id.Replace(Environment.NewLine, string.Empty), // Replace new lines to avoid log injection
             reason.Replace(Environment.NewLine, string.Empty), // Replace new lines to avoid log injection,
             currentUser.UserId,
             currentUser.ActorNumber,
-            currentUser.Azp);
+            currentUser.ActorId);
 
         var durableClient = _durableClientFactory.CreateClient();
         await durableClient
@@ -124,13 +157,16 @@ public class OrchestrationsController(
     {
         var user = _userContext.CurrentUser;
 
-        if (user.Azp != "00000000-0000-0000-0000-000000000001")
-            throw new UnauthorizedAccessException($"User azp ({user.Azp}) is invalid for this action");
+        if (user.ActorId.ToString() != "00000000-0000-0000-0000-000000000001")
+            throw new UnauthorizedAccessException($"User actor id ({user.ActorId}) is invalid for this action");
 
         if (user.ActorNumber != "5790001330583")
             throw new UnauthorizedAccessException($"User actor number ({user.ActorNumber}) is invalid for this action");
 
-        if (user.Role != "DataHubAdministrator")
-            throw new UnauthorizedAccessException($"User role ({user.Role}) is invalid for this action");
+        if (user.MarketRole != "DataHubAdministrator")
+            throw new UnauthorizedAccessException($"User market role ({user.MarketRole}) is invalid for this action");
+
+        if (user.Roles.Contains(CalculationManageRole))
+            throw new UnauthorizedAccessException($"User roles ({string.Join(", ", user.Roles)}) are invalid for this action");
     }
 }

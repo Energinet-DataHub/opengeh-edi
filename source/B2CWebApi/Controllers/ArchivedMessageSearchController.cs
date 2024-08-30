@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime.Extensions;
 
@@ -24,11 +26,14 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 public class ArchivedMessageSearchController : ControllerBase
 {
     private readonly IArchivedMessagesClient _archivedMessagesClient;
+    private readonly IAuditLogger _auditLogger;
 
     public ArchivedMessageSearchController(
-        IArchivedMessagesClient archivedMessagesClient)
+        IArchivedMessagesClient archivedMessagesClient,
+        IAuditLogger auditLogger)
     {
         _archivedMessagesClient = archivedMessagesClient;
+        _auditLogger = auditLogger;
     }
 
     [HttpPost]
@@ -36,6 +41,15 @@ public class ArchivedMessageSearchController : ControllerBase
     public async Task<ActionResult> RequestAsync(SearchArchivedMessagesCriteria request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
+
+        await _auditLogger.LogAsync(
+                logId: AuditLogId.New(),
+                activity: AuditLogActivity.ArchivedMessagesSearch,
+                activityOrigin: HttpContext.Request.GetDisplayUrl(),
+                activityPayload: request,
+                affectedEntityType: AuditLogEntityType.ArchivedMessage,
+                affectedEntityKey: null)
+            .ConfigureAwait(false);
 
         var query = new GetMessagesQuery
         {
@@ -51,6 +65,7 @@ public class ArchivedMessageSearchController : ControllerBase
             BusinessReasons = request.BusinessReasons,
             IncludeRelatedMessages = request.IncludeRelatedMessages,
         };
+
         var result = await _archivedMessagesClient.SearchAsync(query, cancellationToken).ConfigureAwait(false);
 
         return Ok(result.Messages.Select(x => new ArchivedMessageResult(

@@ -12,16 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace BuildingBlocks.Application.FeatureFlag;
+namespace Energinet.DataHub.EDI.B2CWebApi.Exceptions;
 
-/// <summary>
-/// List of all Feature Flags that exists in the system. A Feature Flag name must
-/// correspond to a value found in the app configuration as "FeatureManagement__NameOfFeatureFlag"
-/// </summary>
-public enum FeatureFlagName
+public class MissingMarketRoleException : Exception
 {
-    /// <summary>
-    /// Whether to send audit logs to the audit log service
-    /// </summary>
-    UseAuditLog,
+    public MissingMarketRoleException()
+    {
+    }
+
+    public MissingMarketRoleException(string message)
+        : base(message)
+    {
+    }
+
+    public MissingMarketRoleException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
 }

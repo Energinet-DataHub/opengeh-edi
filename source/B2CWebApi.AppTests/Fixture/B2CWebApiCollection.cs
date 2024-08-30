@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace BuildingBlocks.Application.FeatureFlag;
+using Xunit;
+
+namespace Energinet.DataHub.EDI.B2CWebApi.AppTests.Fixture;
 
 /// <summary>
-/// List of all Feature Flags that exists in the system. A Feature Flag name must
-/// correspond to a value found in the app configuration as "FeatureManagement__NameOfFeatureFlag"
+/// A xUnit collection fixture for ensuring tests don't run in parallel.
+///
+/// xUnit documentation of collection fixtures:
+///  * https://xunit.net/docs/shared-context#collection-fixture
 /// </summary>
-public enum FeatureFlagName
+[CollectionDefinition(nameof(B2CWebApiCollectionFixture))]
+public class B2CWebApiCollectionFixture : ICollectionFixture<B2CWebApiFixture>
 {
-    /// <summary>
-    /// Whether to send audit logs to the audit log service
-    /// </summary>
-    UseAuditLog,
 }

@@ -16,25 +16,37 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Security;
 
 public sealed class FrontendUser
 {
-    public FrontendUser(Guid userId, Guid actorId, bool isFas, string actorNumber, string role, string azp)
+    public FrontendUser(Guid userId, Guid actorId, string actorNumber, string marketRole, string[] roles)
     {
         UserId = userId;
         ActorId = actorId;
-        IsFas = isFas;
         ActorNumber = actorNumber;
-        Role = role;
-        Azp = azp;
+        MarketRole = marketRole;
+        Roles = roles;
     }
 
+    /// <summary>
+    /// The user id in market participant found in the "sub" claim.
+    /// </summary>
     public Guid UserId { get; }
 
+    /// <summary>
+    /// The actor id in market participant found in the "azp" claim.
+    /// </summary>
     public Guid ActorId { get; }
 
-    public bool IsFas { get; }
-
+    /// <summary>
+    /// The actor number of the corresponding actor id found in the "actornumber" claim.
+    /// </summary>
     public string ActorNumber { get; }
 
-    public string Role { get; }
+    /// <summary>
+    /// The market role ("EnergySupplier" etc.) found in the "marketroles" claim.
+    /// </summary>
+    public string MarketRole { get; }
 
-    public string Azp { get; }
+    /// <summary>
+    /// The user roles (permissions) found in the "roles" claim.
+    /// </summary>
+    public string[] Roles { get; }
 }
