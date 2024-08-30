@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace BuildingBlocks.Application.FeatureFlag;
+using System.ComponentModel.DataAnnotations;
 
-/// <summary>
-/// List of all Feature Flags that exists in the system. A Feature Flag name must
-/// correspond to a value found in the app configuration as "FeatureManagement__NameOfFeatureFlag"
-/// </summary>
-public enum FeatureFlagName
+namespace Energinet.DataHub.EDI.AuditLog.AuditLogClient;
+
+public class AuditLogOptions
 {
+    public const string SectionName = "AuditLog";
+
     /// <summary>
-    /// Whether to send audit logs to the audit log service
+    /// The URL of the endpoint to which the audit log should be sent.
     /// </summary>
-    UseAuditLog,
+    [Required]
+    public string IngestionUrl { get; set; } = null!;
 }
