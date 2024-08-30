@@ -138,6 +138,13 @@ public static class RequestAggregatedMeasureDataDtoFactory
             return marketRole.Code;
         }
 
+        if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack
+            && marketRole == MarketRole.GridAccessProvider
+            && marketRole.Code != null)
+        {
+            return marketRole.Code;
+        }
+
         throw new ArgumentException($"Market Role: {marketRole}, is not allowed to request aggregated measure data.");
     }
 }
