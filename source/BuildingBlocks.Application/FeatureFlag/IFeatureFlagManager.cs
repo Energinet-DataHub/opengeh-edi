@@ -28,4 +28,9 @@ public interface IFeatureFlagManager
     /// Whether to send audit logs to the audit log service
     /// </summary>
     Task<bool> UseAuditLogAsync();
+
+    /// <summary>
+    /// Whether to disallow actors to peek messages.
+    /// </summary>
+    Task<bool> UsePeekMessagesAsync();
 }
