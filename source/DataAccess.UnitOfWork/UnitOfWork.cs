@@ -26,9 +26,9 @@ public sealed class UnitOfWork : IUnitOfWork
     // private readonly IncomingMessagesContext _incomingMessagesContext;
 
     public UnitOfWork(
-        IEnumerable<DbContext> dbContexts)
+        IEnumerable<IEdiDbContext> dbContexts)
     {
-        _contexts = dbContexts.ToArray();
+        _contexts = dbContexts.Cast<DbContext>().ToArray();
     }
 
     public async Task CommitTransactionAsync()
