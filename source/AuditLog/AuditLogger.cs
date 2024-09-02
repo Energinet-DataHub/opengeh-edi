@@ -15,6 +15,8 @@
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 using Energinet.DataHub.EDI.AuditLog.AuditUser;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.Outbox.Interfaces;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 
@@ -25,7 +27,9 @@ public class AuditLogger(
     IAuditUserContext auditUserContext,
     IAuditLogClient auditLogClient,
     IFeatureFlagManager featureFlagManager,
-    ILogger<AuditLogger> logger) : IAuditLogger
+    ILogger<AuditLogger> logger,
+    IOutboxClient outbox,
+    IUnitOfWork unitOfWork) : IAuditLogger
 {
     private static readonly Guid _ediSystemId = Guid.Parse("688b2dca-7231-490f-a731-d7869d33fe5e");
 
@@ -34,6 +38,8 @@ public class AuditLogger(
     private readonly IAuditLogClient _auditLogClient = auditLogClient;
     private readonly IFeatureFlagManager _featureFlagManager = featureFlagManager;
     private readonly ILogger _logger = logger;
+    private readonly IOutboxClient _outbox = outbox;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task LogAsync(
         AuditLogId logId,
@@ -57,7 +63,8 @@ public class AuditLogger(
         var actorId = currentUser?.ActorId ?? Guid.Empty;
         var permissions = currentUser?.Permissions;
 
-        await _auditLogClient.LogAsync(
+        var outboxMessage = new AuditLogOutboxMessageV1(
+            new AuditLogPayload(
                 logId.Id,
                 userId,
                 actorId,
@@ -68,7 +75,43 @@ public class AuditLogger(
                 activityOrigin,
                 activityPayload,
                 affectedEntityType?.Identifier,
-                affectedEntityKey)
+                affectedEntityKey));
+
+        await _outbox.CreateWithoutCommitAsync(outboxMessage)
+            .ConfigureAwait(false);
+        // await _auditLogClient.LogAsync(
+        //         logId.Id,
+        //         userId,
+        //         actorId,
+        //         _ediSystemId,
+        //         permissions,
+        //         _clock.GetCurrentInstant(),
+        //         activity.Identifier,
+        //         activityOrigin,
+        //         activityPayload,
+        //         affectedEntityType?.Identifier,
+        //         affectedEntityKey)
+        //     .ConfigureAwait(false);
+    }
+
+    public async Task LogWithCommitAsync(
+        AuditLogId logId,
+        AuditLogActivity activity,
+        string activityOrigin,
+        object? activityPayload,
+        AuditLogEntityType? affectedEntityType,
+        string? affectedEntityKey)
+    {
+        await LogAsync(
+            logId,
+            activity,
+            activityOrigin,
+            activityPayload,
+            affectedEntityType,
+            affectedEntityKey)
+            .ConfigureAwait(false);
+
+        await _unitOfWork.CommitTransactionAsync()
             .ConfigureAwait(false);
     }
 }

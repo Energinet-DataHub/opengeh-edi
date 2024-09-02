@@ -24,7 +24,7 @@ public static class DataAccessExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddScoped<IUnitOfWork, UnitOfWorkImpl>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
     }

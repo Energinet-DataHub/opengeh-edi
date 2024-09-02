@@ -128,6 +128,10 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
             deserializedBody.Should().NotBeNull();
         }
 
+        if (deserializedBody != null)
+            deserializedBody = deserializedBody with { OccurredOn = "452", };
+
+        using var assertionScope = new AssertionScope();
         deserializedBody!.LogId.Should().NotBeEmpty();
         deserializedBody.UserId.Should().Be(expectedUserId);
         deserializedBody.ActorId.Should().Be(expectedActorId);

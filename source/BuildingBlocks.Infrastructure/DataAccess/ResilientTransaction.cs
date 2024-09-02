@@ -27,16 +27,14 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 /// </summary>
 public class ResilientTransaction
 {
-    private readonly DbContext _context;
     private readonly Func<Task>? _action;
 
-    private ResilientTransaction(DbContext context, Func<Task>? action)
+    private ResilientTransaction(Func<Task>? action)
     {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
         _action = action;
     }
 
-    public static ResilientTransaction New(DbContext context, Func<Task>? action = null) => new(context, action);
+    public static ResilientTransaction New(Func<Task>? action = null) => new(action);
 
     /// <summary>
     /// This method initiates a transaction across multiple DbContext instances,
@@ -44,12 +42,16 @@ public class ResilientTransaction
     /// If any operation fails, the transaction is rolled back and retried according to the execution strategy.
     /// </summary>
     /// <param name="contexts"></param>
-    public async Task SaveChangesAsync(DbContext[] contexts)
+    public async Task SaveChangesAsync(IReadOnlyCollection<DbContext> contexts)
     {
-        var strategy = _context.Database.CreateExecutionStrategy();
+        if (contexts.Count == 0)
+            throw new InvalidOperationException("Cannot save changed for empty DbContext collection");
+
+        var firstContext = contexts.First();
+        var strategy = firstContext.Database.CreateExecutionStrategy();
         await strategy.ExecuteAsync(async () =>
         {
-            using var transaction = await _context.Database.BeginTransactionAsync().ConfigureAwait(false);
+            using var transaction = await firstContext.Database.BeginTransactionAsync().ConfigureAwait(false);
             if (_action != null) await _action().ConfigureAwait(false);
             foreach (var dbContext in contexts)
             {
