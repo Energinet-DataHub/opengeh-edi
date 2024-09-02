@@ -24,4 +24,9 @@ public enum FeatureFlagName
     /// Whether to send audit logs to the audit log service
     /// </summary>
     UseAuditLog,
+
+    /// <summary>
+    /// Whether to disable peek messages
+    /// </summary>
+    UsePeekMessages,
 }
