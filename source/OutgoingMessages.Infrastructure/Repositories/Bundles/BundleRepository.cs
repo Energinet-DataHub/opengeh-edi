@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -36,5 +38,21 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
     public async Task<IReadOnlyCollection<Bundle>> GetDequeuedBundlesOlderThanAsync(Instant olderThan, int take)
     {
         return await _dbContext.Bundles.Where(x => x.DequeuedAt < olderThan).Take(take).ToListAsync().ConfigureAwait(false);
+    }
+
+    public async Task<Bundle?> GetBundleAsync(MessageId messageId)
+    {
+        return await _dbContext.Bundles.FirstOrDefaultAsync(x => x.MessageId == messageId).ConfigureAwait(false);
+    }
+
+    public Bundle? GetOldestBundle(ActorMessageQueueId id, MessageCategory? messageCategory)
+    {
+        if (messageCategory == null)
+        {
+            var bundleAsync = _dbContext.Bundles.Where(b => b.ActorMessageQueueId == id && b.DequeuedAt == null).MinBy(b => b.Created);
+            return bundleAsync;
+        }
+
+        return _dbContext.Bundles.Where(b => b.ActorMessageQueueId == id && b.DocumentTypeInBundle.Category == messageCategory && b.DequeuedAt == null).MinBy(b => b.Created);
     }
 }

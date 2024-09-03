@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
@@ -38,4 +40,17 @@ public interface IBundleRepository
     /// </summary>
     /// <param name="bundles"></param>
     void Delete(IReadOnlyCollection<Bundle> bundles);
+
+    /// <summary>
+    /// Get bundle
+    /// </summary>
+    /// <param name="messageId"></param>
+    Task<Bundle?> GetBundleAsync(MessageId messageId);
+
+    /// <summary>
+    /// Gets the oldest bundle
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="messageCategory"></param>
+    Bundle? GetOldestBundle(ActorMessageQueueId id, MessageCategory? messageCategory);
 }

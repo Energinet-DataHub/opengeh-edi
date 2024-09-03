@@ -93,9 +93,13 @@ public sealed class Bundle
         CloseBundleIfFull(outgoingMessage.CreatedAt);
     }
 
-    internal void Dequeue()
+    public bool TryDequeue()
     {
+        if (ClosedAt is not null && PeekedAt is not null)
+            return false;
+
         DequeuedAt = SystemClock.Instance.GetCurrentInstant();
+        return true;
     }
 
     private void CloseBundleIfFull(Instant messageCreatedAt)
