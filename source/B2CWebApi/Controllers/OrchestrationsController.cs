@@ -166,7 +166,7 @@ public class OrchestrationsController(
         if (user.MarketRole != "DataHubAdministrator")
             throw new UnauthorizedAccessException($"User market role ({user.MarketRole}) is invalid for this action");
 
-        if (user.Roles.Contains(CalculationManageRole))
+        if (!user.Roles.Contains(CalculationManageRole))
             throw new UnauthorizedAccessException($"User roles ({string.Join(", ", user.Roles)}) are invalid for this action");
     }
 }
