@@ -139,8 +139,8 @@ public class BehavioursTestBase : IDisposable
 
         _integrationTestFixture = integrationTestFixture;
 
-        IntegrationTestFixture.CleanupDatabase();
-        integrationTestFixture.CleanupFileStorage();
+        _integrationTestFixture.CleanupDatabase();
+        _integrationTestFixture.CleanupFileStorage();
         _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
         TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
         InboxEventNotificationHandler = new TestNotificationHandlerSpy();
@@ -419,7 +419,7 @@ public class BehavioursTestBase : IDisposable
     private ServiceProvider BuildServices(ITestOutputHelper testOutputHelper)
     {
         Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
-        Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", IntegrationTestFixture.DatabaseConnectionString);
+        Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", _integrationTestFixture.DatabaseConnectionString);
         Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", _integrationTestFixture.AzuriteManager.BlobStorageConnectionString);
 
         var config = new ConfigurationBuilder()
