@@ -17,9 +17,7 @@ using Azure.Storage.Blobs;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
-using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Microsoft.Extensions.Configuration;
 using Xunit;
 using HttpClientFactory = Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks.HttpClientFactory;
 
@@ -110,7 +108,6 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        // await DatabaseManager.DeleteDatabaseAsync();
         Dispose();
         await Task.CompletedTask;
     }
