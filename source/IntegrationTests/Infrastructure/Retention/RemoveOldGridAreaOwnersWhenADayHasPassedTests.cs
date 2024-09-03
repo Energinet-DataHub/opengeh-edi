@@ -183,7 +183,8 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 
     private async Task<ActorNumber> GetGridAreaOwnersForGridArea(string gridAreaCode)
     {
-        return await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(gridAreaCode, CancellationToken.None);
+        var gridAreaOwner = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(gridAreaCode, CancellationToken.None);
+        return gridAreaOwner.ActorNumber;
     }
 
     private sealed class SystemProviderMock : ISystemDateTimeProvider

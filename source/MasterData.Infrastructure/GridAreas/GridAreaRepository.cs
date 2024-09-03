@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DateTime;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
@@ -48,13 +44,12 @@ public class GridAreaRepository : IGridAreaRepository
             .ConfigureAwait(false);
     }
 
-    public async Task<ActorNumber?> GetGridOwnerForAsync(string gridAreaCode, CancellationToken cancellationToken)
+    public async Task<GridAreaOwner?> GetGridOwnerAsync(string gridAreaCode, CancellationToken cancellationToken)
     {
         var now = _systemDateTimeProvider.Now();
-        var gridAreaOwner = await _masterDataContext.GridAreaOwners
+        return await _masterDataContext.GridAreaOwners
             .Where(gridArea => gridArea.GridAreaCode == gridAreaCode && gridArea.ValidFrom <= now)
             .OrderByDescending(gridArea => gridArea.SequenceNumber)
             .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
-        return gridAreaOwner?.GridAreaOwnerActorNumber;
     }
 }

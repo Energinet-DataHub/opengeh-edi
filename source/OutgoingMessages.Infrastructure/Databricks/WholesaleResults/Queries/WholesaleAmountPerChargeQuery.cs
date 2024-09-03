@@ -125,10 +125,14 @@ public class WholesaleAmountPerChargeQuery(
 
     private async Task<ActorNumber> GetChargeOwnerReceiverAsync(string gridAreaCode, ActorNumber chargeOwnerId, bool isTax)
     {
-        return isTax
-            ? await _masterDataClient
+        if (isTax)
+        {
+            var gridAreaOwner = await _masterDataClient
                 .GetGridOwnerForGridAreaCodeAsync(gridAreaCode, CancellationToken.None)
-                .ConfigureAwait(false)
-            : chargeOwnerId;
+                .ConfigureAwait(false);
+            return gridAreaOwner.ActorNumber;
+        }
+
+        return chargeOwnerId;
     }
 }

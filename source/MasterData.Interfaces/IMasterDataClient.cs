@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 
@@ -45,12 +42,12 @@ public interface IMasterDataClient
     /// <summary>
     ///     Get the <see cref="ActorNumber"/> of the grid operator for a given grid area.
     /// </summary>
-    Task<ActorNumber> GetGridOwnerForGridAreaCodeAsync(string gridAreaCode, CancellationToken cancellationToken);
+    Task<GridAreaOwnerDto> GetGridOwnerForGridAreaCodeAsync(string gridAreaCode, CancellationToken cancellationToken);
 
     /// <summary>
     /// Try to get the owner for a given grid area, returning null if none was found.
     /// </summary>
-    Task<ActorNumber?> TryGetGridOwnerForGridAreaCodeAsync(string gridAreaCode, CancellationToken cancellationToken);
+    Task<GridAreaOwnerDto?> TryGetGridOwnerForGridAreaCodeAsync(string gridAreaCode, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Create or update the actor certificate for a given actor.

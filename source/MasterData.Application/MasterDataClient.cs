@@ -12,11 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Domain.ActorCertificates;
 using Energinet.DataHub.EDI.MasterData.Domain.Actors;
@@ -92,18 +87,26 @@ internal sealed class MasterDataClient : IMasterDataClient
         await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<ActorNumber> GetGridOwnerForGridAreaCodeAsync(string gridAreaCode, CancellationToken cancellationToken)
+    public async Task<GridAreaOwnerDto> GetGridOwnerForGridAreaCodeAsync(string gridAreaCode, CancellationToken cancellationToken)
     {
         var owner = await _gridAreaRepository
-            .GetGridOwnerForAsync(gridAreaCode, cancellationToken)
+            .GetGridOwnerAsync(gridAreaCode, cancellationToken)
             .ConfigureAwait(false);
 
-        return owner ?? throw new InvalidOperationException($"No owner found for grid area code: {gridAreaCode}");
+        if (owner == null)
+            throw new InvalidOperationException($"No owner found for grid area code: {gridAreaCode}");
+
+        return new GridAreaOwnerDto(owner.GridAreaCode, owner.ValidFrom, owner.GridAreaOwnerActorNumber, owner.SequenceNumber);
     }
 
-    public Task<ActorNumber?> TryGetGridOwnerForGridAreaCodeAsync(string gridAreaCode, CancellationToken cancellationToken)
+    public async Task<GridAreaOwnerDto?> TryGetGridOwnerForGridAreaCodeAsync(string gridAreaCode, CancellationToken cancellationToken)
     {
-        return _gridAreaRepository.GetGridOwnerForAsync(gridAreaCode, cancellationToken);
+        var gridAreaOwner = await _gridAreaRepository.GetGridOwnerAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
+
+        if (gridAreaOwner == null)
+            return null;
+
+        return new GridAreaOwnerDto(gridAreaOwner.GridAreaCode, gridAreaOwner.ValidFrom, gridAreaOwner.GridAreaOwnerActorNumber, gridAreaOwner.SequenceNumber);
     }
 
     public async Task CreateOrUpdateActorCertificateAsync(
