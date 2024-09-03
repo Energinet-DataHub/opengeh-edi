@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 
@@ -28,10 +26,12 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 public class DelegateMessage
 {
     private readonly IMasterDataClient _masterDataClient;
+    private readonly ILogger<DelegateMessage> _logger;
 
-    public DelegateMessage(IMasterDataClient masterDataClient)
+    public DelegateMessage(IMasterDataClient masterDataClient, ILogger<DelegateMessage> logger)
     {
         _masterDataClient = masterDataClient;
+        _logger = logger;
     }
 
     /// <summary>
@@ -82,6 +82,16 @@ public class DelegateMessage
             messageCreatedFromProcess,
             cancellationToken)
             .ConfigureAwait(false);
+
+        if (messageDelegation != null)
+        {
+            _logger.LogInformation(
+                "Message was delegated from {FromActorNumber} to {ToActorNumber}, with role {ActorRole} based on delegation with sequence number {SequenceNumber}",
+                delegatedByActorNumber.Value,
+                messageDelegation.DelegatedTo.ActorNumber.Value,
+                delegatedByActorRole.Code,
+                messageDelegation.SequenceNumber);
+        }
 
         return messageDelegation is not null
             ? Receiver.Create(messageDelegation.DelegatedTo.ActorNumber, messageDelegation.DelegatedTo.ActorRole)
