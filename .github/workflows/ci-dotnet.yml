@@ -87,7 +87,7 @@ jobs:
             filter: (DisplayName!~IntegrationTests.Behaviours)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
-            
+
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
     with:
       download_attempt_limit: 20
