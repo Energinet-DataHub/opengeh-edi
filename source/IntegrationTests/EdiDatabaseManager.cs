@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Database;
 using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.IntegrationTests;
@@ -27,16 +26,19 @@ public class EdiDatabaseManager : SqlServerDatabaseManager<DbContext>
     }
 
     /// <inheritdoc/>
-    public override DbContext CreateDbContext()
+    public override DbContext CreateDbContext() => CreateDbContext<DbContext>();
+
+    public TDatabaseContext CreateDbContext<TDatabaseContext>()
+        where TDatabaseContext : DbContext
     {
-        var optionsBuilder = new DbContextOptionsBuilder<DbContext>()
+        var optionsBuilder = new DbContextOptionsBuilder<TDatabaseContext>()
             .UseSqlServer(ConnectionString, options =>
             {
                 options.UseNodaTime();
                 options.EnableRetryOnFailure();
             });
 
-        return (DbContext)Activator.CreateInstance(typeof(DbContext), optionsBuilder.Options)!;
+        return (TDatabaseContext)Activator.CreateInstance(typeof(TDatabaseContext), optionsBuilder.Options)!;
     }
 
     /// <summary>

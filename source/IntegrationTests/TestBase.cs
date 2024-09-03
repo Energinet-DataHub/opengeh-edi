@@ -332,7 +332,7 @@ public class TestBase : IDisposable
             .AddArchivedMessagesModule(config)
             .AddIncomingMessagesModule(config)
             .AddMasterDataModule(config)
-            .AddDataAccessUnitOfWorkModule(config);
+            .AddDataAccessUnitOfWorkModule();
 
         // Replace the services with stub implementations.
         // - Building blocks

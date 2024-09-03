@@ -31,16 +31,6 @@ public class AuditLogOutboxMessageV1 : IOutboxMessage<AuditLogPayload>
 
     public AuditLogPayload Payload { get; }
 
-    public static AuditLogPayload Deserialize(string payload)
-    {
-        var deserialized = JsonSerializer.Deserialize<AuditLogPayload>(payload);
-
-        if (deserialized is null)
-            throw new InvalidOperationException($"Failed to deserialize payload of type {OutboxMessageType}");
-
-        return deserialized;
-    }
-
     public Task<string> SerializeAsync()
     {
         var serializedPayload = JsonSerializer.Serialize(Payload);

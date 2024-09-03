@@ -88,7 +88,7 @@ public static class HostFactory
                         .AddOutgoingMessagesModule(context.Configuration)
                         .AddProcessModule(context.Configuration)
                         .AddMasterDataModule(context.Configuration)
-                        .AddDataAccessUnitOfWorkModule(context.Configuration);
+                        .AddDataAccessUnitOfWorkModule();
                 })
             .ConfigureLogging(
                 (hostingContext, logging) =>

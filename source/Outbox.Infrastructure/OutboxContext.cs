@@ -13,25 +13,27 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DateTime;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.DataAccess;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DbContext;
 using Energinet.DataHub.EDI.Outbox.Domain;
 using Microsoft.EntityFrameworkCore;
+using ExecutionContext = Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext;
 
 namespace Energinet.DataHub.EDI.Outbox.Infrastructure;
 
 public class OutboxContext : DbContext, IEdiDbContext
 {
-    private readonly Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext _executionContext;
+    private readonly ExecutionContext _executionContext;
     private readonly AuthenticatedActor _authenticatedActor;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-#nullable disable
     public OutboxContext(
         DbContextOptions<OutboxContext> options,
-        Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext executionContext,
+        ExecutionContext executionContext,
         AuthenticatedActor authenticatedActor,
         ISystemDateTimeProvider systemDateTimeProvider)
         : base(options)
@@ -39,6 +41,18 @@ public class OutboxContext : DbContext, IEdiDbContext
         _executionContext = executionContext;
         _authenticatedActor = authenticatedActor;
         _systemDateTimeProvider = systemDateTimeProvider;
+    }
+
+    /// <summary>
+    /// Used to supports tests
+    /// </summary>
+    public OutboxContext(DbContextOptions<OutboxContext> options)
+        : base(options)
+    {
+        _executionContext = new ExecutionContext();
+        _executionContext.SetExecutionType(ExecutionType.Test);
+        _authenticatedActor = new AuthenticatedActor();
+        _systemDateTimeProvider = new SystemDateTimeProvider();
     }
 
     // ReSharper disable once UnusedAutoPropertyAccessor.Local -- Used by EF
