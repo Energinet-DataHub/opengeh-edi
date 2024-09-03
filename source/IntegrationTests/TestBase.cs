@@ -82,7 +82,7 @@ public class TestBase : IDisposable
     {
         Fixture = integrationTestFixture;
 
-        IntegrationTestFixture.CleanupDatabase();
+        Fixture.CleanupDatabase();
         Fixture.CleanupFileStorage();
         _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
         TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
@@ -282,7 +282,7 @@ public class TestBase : IDisposable
     private void BuildServices(ITestOutputHelper testOutputHelper)
     {
         Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
-        Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", IntegrationTestFixture.DatabaseConnectionString);
+        Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", Fixture.DatabaseConnectionString);
         Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", Fixture.AzuriteManager.BlobStorageConnectionString);
 
         var config = new ConfigurationBuilder()

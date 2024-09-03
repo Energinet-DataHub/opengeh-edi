@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Database;
 using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.IntegrationTests;
