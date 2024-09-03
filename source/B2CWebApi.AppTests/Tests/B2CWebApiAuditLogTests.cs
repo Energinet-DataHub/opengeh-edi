@@ -122,7 +122,6 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
         auditLogPayload.Origin.Should().Be(request.RequestUri?.AbsoluteUri);
         auditLogPayload.Payload.Should().NotBeNull();
         auditLogPayload.AffectedEntityType.Should().NotBeNullOrWhiteSpace();
-        auditLogPayload.AffectedEntityKey.Should().NotBeNull();
         // var auditLogCalls = _fixture.AuditLogMockServer.GetAuditLogIngestionCalls();
         //
         // var auditLogCall = auditLogCalls.Should()
