@@ -62,9 +62,14 @@ jobs:
             filter: (DisplayName!~IntegrationTests.Behaviours)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
-          - name: Integration tests - Behaviour tests
+          - name: Integration tests - Behaviour tests - IncomingRequests
             paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
-            filter: (DisplayName~IntegrationTests.Behaviours)
+            filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName~Behaviours.IncomingRequests)
+            use_azure_functions_tools: true
+            contentroot_variable_name: empty # Means skip
+          - name: Integration tests - Behaviour tests - Not IncomingRequests
+            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            filter: (DisplayName~IntegrationTests.Behaviours)&(DisplayName!~Behaviours.IncomingRequests)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14

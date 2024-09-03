@@ -103,11 +103,7 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        CreateSchema();
-
         await DatabaseManager.CreateDatabaseAsync();
-        CleanupDatabase();
-
         AzuriteManager.StartAzurite();
         CleanupFileStorage();
     }
@@ -179,20 +175,12 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
 
         if (disposing)
         {
-            CleanupDatabase();
             CleanupFileStorage(true);
             DatabaseManager.DeleteDatabase();
             AzuriteManager.Dispose();
         }
 
         _disposed = true;
-    }
-
-    private void CreateSchema()
-    {
-        var upgradeResult = DbUpgradeRunner.RunDbUpgrade(DatabaseConnectionString);
-        if (!upgradeResult.Successful)
-            throw new InvalidOperationException("Database upgrade failed", upgradeResult.Error);
     }
 
     private void CreateRequiredContainers()
