@@ -36,38 +36,10 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
     public OutboxProcessorTests(OutboxTestFixture fixture)
     {
         Fixture = fixture;
-
-        var dbConnectionString = Fixture.DatabaseManager.ConnectionString;
-        if (!dbConnectionString.Contains("Trust")) // Trust Server Certificate might be required for some
-            dbConnectionString = $"{dbConnectionString};Trust Server Certificate=True;";
-        Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", Fixture.DatabaseManager.ConnectionString);
-
-        var config = new ConfigurationBuilder()
-            .AddEnvironmentVariables()
-            .AddInMemoryCollection(
-                new Dictionary<string, string?>
-                {
-                    { "DB_CONNECTION_STRING", dbConnectionString },
-                })
-            .Build();
-
-        ServiceCollection = [];
-
-        ServiceCollection
-            .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
-            .AddSystemTimer()
-            .AddOutboxModule(config)
-            .AddOutboxProcessor();
-
-        ServiceCollection.AddScoped<ExecutionContext>((x) =>
-        {
-            var executionContext = new ExecutionContext();
-            executionContext.SetExecutionType(ExecutionType.Test);
-            return executionContext;
-        });
+        SetupServiceCollection();
     }
 
-    public ServiceCollection ServiceCollection { get; set; }
+    private ServiceCollection ServiceCollection { get; } = [];
 
     private OutboxTestFixture Fixture { get; }
 
@@ -86,9 +58,9 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
     {
         // Arrange
         var clock = new Mock<IClock>();
-        var outboxMessagePublisher = new Mock<IOutboxMessagePublisher>();
+        var outboxMessagePublisher = new Mock<IOutboxPublisher>();
         var serviceProvider = ServiceCollection
-            .AddTransient<IOutboxMessagePublisher>(_ => outboxMessagePublisher.Object)
+            .AddTransient<IOutboxPublisher>(_ => outboxMessagePublisher.Object)
             .AddTransient<IClock>(_ => clock.Object)
             .BuildServiceProvider();
         var now = Instant.FromUtc(2024, 09, 02, 13, 37);
@@ -134,10 +106,10 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
     public async Task Given_OutboxMessagePublisherThrowsException_When_ProcessingOutboxMessage_Then_MessageIsSetAsFailed()
     {
         // Arrange
-        var outboxMessagePublisher = new Mock<IOutboxMessagePublisher>();
+        var outboxMessagePublisher = new Mock<IOutboxPublisher>();
         var clock = new Mock<IClock>();
         var serviceProvider = ServiceCollection
-            .AddTransient<IOutboxMessagePublisher>(_ => outboxMessagePublisher.Object)
+            .AddTransient<IOutboxPublisher>(_ => outboxMessagePublisher.Object)
             .AddTransient<IClock>(_ => clock.Object)
             .BuildServiceProvider();
         var now = Instant.FromUtc(2024, 09, 02, 13, 37);
@@ -189,7 +161,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
     {
         // Arrange
         var outboxMessageType = "message-type-1";
-        var outboxMessagePublisher = new Mock<IOutboxMessagePublisher>();
+        var outboxMessagePublisher = new Mock<IOutboxPublisher>();
         outboxMessagePublisher
             .Setup(omp => omp.CanProcess(outboxMessageType))
             .Returns(true);
@@ -200,7 +172,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
             .Returns(failedAt);
 
         var serviceProvider = ServiceCollection
-            .AddTransient<IOutboxMessagePublisher>(_ => outboxMessagePublisher.Object)
+            .AddTransient<IOutboxPublisher>(_ => outboxMessagePublisher.Object)
             .AddTransient<IClock>(_ => clock.Object)
             .BuildServiceProvider();
 
@@ -248,7 +220,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
     {
         // Arrange
         var outboxMessageType = "message-type-1";
-        var outboxMessagePublisher = new Mock<IOutboxMessagePublisher>();
+        var outboxMessagePublisher = new Mock<IOutboxPublisher>();
         outboxMessagePublisher
             .Setup(omp => omp.CanProcess(outboxMessageType))
             .Returns(true);
@@ -259,7 +231,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
         var clock = new Mock<IClock>();
 
         var serviceProvider = ServiceCollection
-            .AddTransient<IOutboxMessagePublisher>(_ => outboxMessagePublisher.Object)
+            .AddTransient<IOutboxPublisher>(_ => outboxMessagePublisher.Object)
             .AddTransient<IClock>(_ => clock.Object)
             .BuildServiceProvider();
 
@@ -307,5 +279,33 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
             .Verify(
                 omp => omp.PublishAsync(It.IsAny<string>()),
                 Times.Once);
+    }
+
+    private void SetupServiceCollection()
+    {
+        var dbConnectionString = Fixture.DatabaseManager.ConnectionString;
+        if (!dbConnectionString.Contains("Trust")) // Trust Server Certificate might be required for some
+            dbConnectionString = $"{dbConnectionString};Trust Server Certificate=True;";
+
+        var config = new ConfigurationBuilder()
+            .AddInMemoryCollection(
+                new Dictionary<string, string?>
+                {
+                    { "DB_CONNECTION_STRING", dbConnectionString },
+                })
+            .Build();
+
+        ServiceCollection
+            .AddSingleton<IConfiguration>(config)
+            .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
+            .AddSystemTimer()
+            .AddOutboxModule(config)
+            .AddOutboxProcessor()
+            .AddScoped<ExecutionContext>((x) =>
+            {
+                var executionContext = new ExecutionContext();
+                executionContext.SetExecutionType(ExecutionType.Test);
+                return executionContext;
+            });
     }
 }

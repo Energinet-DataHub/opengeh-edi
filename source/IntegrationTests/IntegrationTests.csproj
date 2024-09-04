@@ -50,6 +50,7 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\AuditLog\AuditLog.csproj" />
       <ProjectReference Include="..\B2BApi\B2BApi.csproj" />
       <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />
       <ProjectReference Include="..\ArchivedMessages.Interfaces\ArchivedMessages.Interfaces.csproj" />

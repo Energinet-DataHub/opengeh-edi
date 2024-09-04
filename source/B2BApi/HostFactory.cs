@@ -16,6 +16,7 @@ using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware;
 using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
@@ -88,7 +89,8 @@ public static class HostFactory
                         .AddOutgoingMessagesModule(context.Configuration)
                         .AddProcessModule(context.Configuration)
                         .AddMasterDataModule(context.Configuration)
-                        .AddDataAccessUnitOfWorkModule();
+                        .AddDataAccessUnitOfWorkModule()
+                        .AddAuditLogOutboxPublisher();
                 })
             .ConfigureLogging(
                 (hostingContext, logging) =>

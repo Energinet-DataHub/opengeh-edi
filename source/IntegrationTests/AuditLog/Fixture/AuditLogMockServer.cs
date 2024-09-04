@@ -14,7 +14,6 @@
 
 using System.Net;
 using WireMock;
-using WireMock.Logging;
 using WireMock.Matchers;
 using WireMock.Matchers.Request;
 using WireMock.RequestBuilders;
@@ -22,7 +21,7 @@ using WireMock.ResponseBuilders;
 using WireMock.Server;
 using WireMock.Settings;
 
-namespace Energinet.DataHub.EDI.B2CWebApi.AppTests.Fixture;
+namespace Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
 
 public sealed class AuditLogMockServer : IDisposable
 {

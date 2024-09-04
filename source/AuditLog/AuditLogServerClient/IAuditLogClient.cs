@@ -14,7 +14,7 @@
 
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.AuditLog.AuditLogClient;
+namespace Energinet.DataHub.EDI.AuditLog.AuditLogServerClient;
 
 /// <summary>
 /// Client for submitting audit logs.

@@ -48,6 +48,7 @@ limitations under the License.
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />
+      <ProjectReference Include="..\AuditLog\AuditLog.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
       <ProjectReference Include="..\DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj" />
       <ProjectReference Include="..\DataAccess\DataAccess.csproj" />

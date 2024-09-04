@@ -13,7 +13,8 @@
 // limitations under the License.
 
 using BuildingBlocks.Application.FeatureFlag;
-using Energinet.DataHub.EDI.AuditLog.AuditLogClient;
+using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
+using Energinet.DataHub.EDI.AuditLog.AuditLogServerClient;
 using Energinet.DataHub.EDI.AuditLog.AuditUser;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.Outbox.Interfaces;
@@ -24,8 +25,8 @@ namespace Energinet.DataHub.EDI.AuditLog;
 
 public class AuditLogger(
     IClock clock,
+    ISerializer serializer,
     IAuditUserContext auditUserContext,
-    IAuditLogClient auditLogClient,
     IFeatureFlagManager featureFlagManager,
     ILogger<AuditLogger> logger,
     IOutboxClient outbox,
@@ -34,8 +35,8 @@ public class AuditLogger(
     private static readonly Guid _ediSystemId = Guid.Parse("688b2dca-7231-490f-a731-d7869d33fe5e");
 
     private readonly IClock _clock = clock;
+    private readonly ISerializer _serializer = serializer;
     private readonly IAuditUserContext _auditUserContext = auditUserContext;
-    private readonly IAuditLogClient _auditLogClient = auditLogClient;
     private readonly IFeatureFlagManager _featureFlagManager = featureFlagManager;
     private readonly ILogger _logger = logger;
     private readonly IOutboxClient _outbox = outbox;
@@ -64,6 +65,7 @@ public class AuditLogger(
         var permissions = currentUser?.Permissions;
 
         var outboxMessage = new AuditLogOutboxMessageV1(
+            _serializer,
             new AuditLogPayload(
                 logId.Id,
                 userId,

@@ -13,14 +13,16 @@
 // limitations under the License.
 
 using System.Text.Json;
-using Energinet.DataHub.EDI.AuditLog.AuditLogClient;
+using Energinet.DataHub.EDI.AuditLog.AuditLogServerClient;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.Outbox.Interfaces;
 
-namespace Energinet.DataHub.EDI.AuditLog;
+namespace Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 
-public class AuditLogOutboxMessagePublisher(IAuditLogClient auditLogClient) : IOutboxMessagePublisher
+public class AuditLogOutboxPublisher(IAuditLogClient auditLogClient, ISerializer serializer) : IOutboxPublisher
 {
     private readonly IAuditLogClient _auditLogClient = auditLogClient;
+    private readonly ISerializer _serializer = serializer;
 
     public bool CanProcess(string type) => type.Equals(AuditLogOutboxMessageV1.OutboxMessageType, StringComparison.OrdinalIgnoreCase);
 
@@ -28,7 +30,7 @@ public class AuditLogOutboxMessagePublisher(IAuditLogClient auditLogClient) : IO
     {
         ArgumentException.ThrowIfNullOrEmpty(serializedPayload);
 
-        var payload = JsonSerializer.Deserialize<AuditLogPayload>(serializedPayload)
+        var payload = _serializer.Deserialize<AuditLogPayload>(serializedPayload)
             ?? throw new InvalidOperationException($"Failed to deserialize payload of type {nameof(AuditLogPayload)}");
 
         await _auditLogClient.LogAsync(

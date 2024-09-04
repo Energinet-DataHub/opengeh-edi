@@ -14,7 +14,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Energinet.DataHub.EDI.AuditLog.AuditLogClient;
+namespace Energinet.DataHub.EDI.AuditLog.AuditLogServerClient;
 
 /// <summary>
 /// Required configuration options for the <see cref="AuditLogHttpClient"/>.

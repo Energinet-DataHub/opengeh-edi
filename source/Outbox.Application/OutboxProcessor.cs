@@ -45,7 +45,7 @@ public class OutboxProcessor(
             using var innerScope = _serviceScopeFactory.CreateScope();
             var outboxContext = innerScope.ServiceProvider.GetRequiredService<OutboxContext>();
             var repository = innerScope.ServiceProvider.GetRequiredService<IOutboxRepository>();
-            var outboxMessagePublishers = innerScope.ServiceProvider.GetServices<IOutboxMessagePublisher>();
+            var outboxMessagePublishers = innerScope.ServiceProvider.GetServices<IOutboxPublisher>();
 
             var outboxMessage = await repository.GetAsync(outboxMessageId)
                 .ConfigureAwait(false);

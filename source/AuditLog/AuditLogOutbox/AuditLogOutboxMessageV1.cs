@@ -12,18 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.Outbox.Interfaces;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.AuditLog;
+namespace Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 
 public class AuditLogOutboxMessageV1 : IOutboxMessage<AuditLogPayload>
 {
     public const string OutboxMessageType = "AuditLogOutboxMessageV1";
+    private readonly ISerializer _serializer;
 
-    public AuditLogOutboxMessageV1(AuditLogPayload payload)
+    public AuditLogOutboxMessageV1(
+        ISerializer serializer,
+        AuditLogPayload payload)
     {
+        _serializer = serializer;
         Payload = payload;
     }
 
@@ -33,7 +37,7 @@ public class AuditLogOutboxMessageV1 : IOutboxMessage<AuditLogPayload>
 
     public Task<string> SerializeAsync()
     {
-        var serializedPayload = JsonSerializer.Serialize(Payload);
+        var serializedPayload = _serializer.Serialize(Payload);
         return Task.FromResult(serializedPayload);
     }
 }

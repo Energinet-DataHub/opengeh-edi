@@ -14,8 +14,10 @@
 
 using System.Text.Json;
 using Energinet.DataHub.EDI.AuditLog;
+using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.B2CWebApi.AppTests.Fixture;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -55,8 +57,6 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
     {
         await using var context = _fixture.DatabaseManager.CreateDbContext<OutboxContext>();
         await context.OutboxMessages.ExecuteDeleteAsync();
-
-        _fixture.AuditLogMockServer.ResetCallLogs();
     }
 
     public Task DisposeAsync()
@@ -77,6 +77,7 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
         AuditLogActivity expectedActivity)
     {
         // Arrange
+        var serializer = new Serializer();
         var expectedUserId = Guid.NewGuid();
         var expectedActorId = Guid.NewGuid();
         string[] permissions =
@@ -109,7 +110,7 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
         outboxMessage.Should().NotBeNull();
         outboxMessage!.Type.Should().Be(AuditLogOutboxMessageV1.OutboxMessageType);
         outboxMessage.ShouldProcessNow(SystemClock.Instance).Should().BeTrue();
-        var auditLogPayload = JsonSerializer.Deserialize<AuditLogPayload>(outboxMessage.Payload);
+        var auditLogPayload = serializer.Deserialize<AuditLogPayload>(outboxMessage.Payload);
 
         using var assertionScope = new AssertionScope();
         auditLogPayload!.LogId.Should().NotBeEmpty();
@@ -122,48 +123,7 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
         auditLogPayload.Origin.Should().Be(request.RequestUri?.AbsoluteUri);
         auditLogPayload.Payload.Should().NotBeNull();
         auditLogPayload.AffectedEntityType.Should().NotBeNullOrWhiteSpace();
-        // var auditLogCalls = _fixture.AuditLogMockServer.GetAuditLogIngestionCalls();
-        //
-        // var auditLogCall = auditLogCalls.Should()
-        //     .ContainSingle()
-        //     .Subject;
-        //
-        // AuditLogRequestBody? deserializedBody;
-        // using (new AssertionScope())
-        // {
-        //     // => Ensure that the audit log request was successful
-        //     auditLogCall.Response.StatusCode.Should().Be((int)HttpStatusCode.OK);
-        //
-        //     // => Ensure that the audit log request contains a body
-        //     auditLogCall.Request.Body.Should().NotBeNull();
-        //
-        //     // => Ensure that the audit log request body can be deserialized to an instance of AuditLogRequestBody
-        //     var deserializeBody = () =>
-        //         JsonSerializer.Deserialize<AuditLogRequestBody>(auditLogCall.Request.Body ?? string.Empty, new JsonSerializerOptions
-        //         {
-        //             PropertyNameCaseInsensitive = true,
-        //         });
-        //
-        //     deserializedBody = deserializeBody.Should().NotThrow().Subject;
-        //     deserializedBody.Should().NotBeNull();
-        // }
-        //
-        // if (deserializedBody != null)
-        //     deserializedBody = deserializedBody with { OccurredOn = "452", };
-        //
-        // using var assertionScope = new AssertionScope();
-        // deserializedBody!.LogId.Should().NotBeEmpty();
-        // deserializedBody.UserId.Should().Be(expectedUserId);
-        // deserializedBody.ActorId.Should().Be(expectedActorId);
-        // deserializedBody.SystemId.Should().Be(Guid.Parse("688b2dca-7231-490f-a731-d7869d33fe5e")); // EDI subsystem id
-        // deserializedBody.Permissions.Should().Be(expectedPermissions);
-        // InstantPattern.General.Parse(deserializedBody.OccurredOn).Success.Should().BeTrue($"because {deserializedBody.OccurredOn} should be a valid Instant");
-        // deserializedBody.Activity.Should().Be(expectedActivity.Identifier);
-        // deserializedBody.Origin.Should().Be(request.RequestUri?.AbsoluteUri);
-        // deserializedBody.Payload.Should().NotBeNull();
-        // deserializedBody.AffectedEntityType.Should().NotBeNullOrWhiteSpace();
-        // deserializedBody.AffectedEntityKey.Should().NotBeNull();
-        //
-        // request.Dispose();
+
+        request.Dispose();
     }
 }

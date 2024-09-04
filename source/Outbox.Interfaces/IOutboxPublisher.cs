@@ -19,7 +19,7 @@ namespace Energinet.DataHub.EDI.Outbox.Interfaces;
 /// <summary>
 /// Publisher for individual outbox messages, depending on the type of the message.
 /// </summary>
-public interface IOutboxMessagePublisher
+public interface IOutboxPublisher
 {
     /// <summary>
     /// Whether the publisher can publish the given outbox message type.

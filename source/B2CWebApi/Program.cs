@@ -54,10 +54,8 @@ builder.Services
     // Durable client (orchestration)
     .AddDurableClient(builder.Configuration)
 
-    // Audit logging
-    .AddAuditLog()
-
     // Modules
+    .AddAuditLog()
     .AddDataAccessUnitOfWorkModule()
     .AddOutboxModule(builder.Configuration)
     .AddIncomingMessagesModule(builder.Configuration)

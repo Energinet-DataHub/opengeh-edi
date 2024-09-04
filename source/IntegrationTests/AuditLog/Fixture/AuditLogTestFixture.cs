@@ -15,31 +15,30 @@
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Outbox;
+namespace Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
 
-public class OutboxTestFixture : IAsyncLifetime
+public class AuditLogTestFixture : IAsyncLifetime
 {
-    public OutboxTestFixture()
+    public AuditLogTestFixture()
     {
         DatabaseManager = new EdiDatabaseManager();
+        AuditLogMockServer = new AuditLogMockServer();
     }
 
-    public EdiDatabaseManager DatabaseManager { get; set; }
+    public EdiDatabaseManager DatabaseManager { get; }
+
+    public AuditLogMockServer AuditLogMockServer { get; }
 
     public async Task InitializeAsync()
     {
         await DatabaseManager.CreateDatabaseAsync();
+
+        AuditLogMockServer.StartServer();
     }
 
     public async Task DisposeAsync()
     {
         await DatabaseManager.DeleteDatabaseAsync();
-    }
-
-    public async Task TruncateDatabaseTablesAsync()
-    {
-        using var context = DatabaseManager.CreateDbContext();
-
-        await context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE [Outbox]");
+        AuditLogMockServer.Dispose();
     }
 }
