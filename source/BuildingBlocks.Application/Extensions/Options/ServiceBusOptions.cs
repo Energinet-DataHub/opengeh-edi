@@ -16,9 +16,15 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BuildingBlocks.Application.Extensions.Options;
 
+/// <summary>
+/// Options for the ServiceBus namespace used in the DH3 system.
+/// </summary>
 public class ServiceBusOptions
 {
     public const string SectionName = "ServiceBus";
+
+    [Required]
+    public string FullyQualifiedNamespace { get; set; } = string.Empty;
 
     [Required]
     public string ManageConnectionString { get; set; } = string.Empty;
