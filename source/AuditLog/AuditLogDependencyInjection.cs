@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
-using Energinet.DataHub.EDI.AuditLog.AuditLogServerClient;
 using Energinet.DataHub.EDI.Outbox.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 

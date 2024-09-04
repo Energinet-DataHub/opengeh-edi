@@ -15,7 +15,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.AuditLog.AuditLogServerClient;
+namespace Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 
 public static class AuditLogClientDependencyInjectionExtensions
 {

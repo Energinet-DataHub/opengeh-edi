@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.AuditLog.AuditLogServerClient;
+namespace Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 
 /// <summary>
 /// The HTTP request body for submitting an audit log entry to the shared audit log server.

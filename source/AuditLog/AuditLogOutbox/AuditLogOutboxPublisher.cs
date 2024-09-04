@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Text.Json;
-using Energinet.DataHub.EDI.AuditLog.AuditLogServerClient;
+using Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.Outbox.Interfaces;
 

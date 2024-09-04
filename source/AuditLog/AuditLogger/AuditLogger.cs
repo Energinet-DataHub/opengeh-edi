@@ -14,7 +14,6 @@
 
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
-using Energinet.DataHub.EDI.AuditLog.AuditLogServerClient;
 using Energinet.DataHub.EDI.AuditLog.AuditUser;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.Outbox.Interfaces;

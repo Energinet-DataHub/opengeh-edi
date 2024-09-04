@@ -13,14 +13,13 @@
 // limitations under the License.
 
 using System.Text;
-using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using NodaTime.Text;
 
-namespace Energinet.DataHub.EDI.AuditLog.AuditLogServerClient;
+namespace Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 
 /// <inheritdoc />
 internal class AuditLogHttpClient(
