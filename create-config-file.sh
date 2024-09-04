@@ -23,6 +23,11 @@ fi
 BASE_NAME=$(basename "$CONFIG_FILE_PATH")
 OUTPUT_FILE="${BASE_NAME%.*}-generated.${BASE_NAME##*.}"
 
+# Check if the output file already exists and remove it if it does
+if [ -f "$OUTPUT_FILE" ]; then
+  rm "$OUTPUT_FILE"
+fi
+
 # Rest of your script using $CONFIG_FILE_PATH
 echo "Config file path: $CONFIG_FILE_PATH"
 echo "Vault name: $VAULT_NAME"
