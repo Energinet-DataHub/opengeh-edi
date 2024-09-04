@@ -51,7 +51,7 @@ public static class IncomingMessagesExtensions
 
         services
             .AddFeatureFlags()
-            .AddServiceBus(configuration)
+            .AddServiceBusClientForApplication(configuration)
             .AddDapperConnectionToDatabase(configuration)
             .AddScopedSqlDbContext<IncomingMessagesContext>(configuration)
             .AddScoped<IIncomingMessageClient, IncomingMessageClient>()
