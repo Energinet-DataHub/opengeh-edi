@@ -35,12 +35,11 @@ public static class EntityFrameworkExtensions
             .Validate(o => !string.IsNullOrEmpty(o.DB_CONNECTION_STRING), "DB_CONNECTION_STRING must be set");
 
         services.AddScoped<SqlConnectionSource>()
-            .AddDbContext<TDbContext>(
-                (sp, o) =>
-                {
-                    var source = sp.GetRequiredService<SqlConnectionSource>();
-                    o.UseSqlServer(source.Connection, y => y.UseNodaTime().EnableRetryOnFailure());
-                });
+            .AddDbContext<TDbContext>((sp, o) =>
+            {
+                var source = sp.GetRequiredService<SqlConnectionSource>();
+                o.UseSqlServer(source.Connection, y => y.UseNodaTime().EnableRetryOnFailure());
+            });
 
         // Add as IEdiDbContext to enable UnitOfWork to get all registered DbContexts
         services.AddTransient<IEdiDbContext, TDbContext>(sp => sp.GetRequiredService<TDbContext>());
