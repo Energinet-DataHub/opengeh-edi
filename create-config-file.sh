@@ -32,6 +32,11 @@ fi
 echo "Config file path: $CONFIG_FILE_PATH"
 echo "Vault name: $VAULT_NAME"
 
+# Define color codes
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
 # Read through the input file and find all templates
 while IFS= read -r line; do
   # Check if the line contains a template
@@ -43,8 +48,9 @@ while IFS= read -r line; do
     
     # Check if the secret was found
     if [ -z "$secret" ]; then
-      echo "Secret '$template' not found in Key Vault '$VAULT_NAME'."
+      echo -e "${RED}Secret '$template' not found in Key Vault '$VAULT_NAME'.${NC}"
     else
+      echo -e "${GREEN}Secret '$template' found in Key Vault '$VAULT_NAME'.${NC}"
       # Replace the template with the secret value in the line
       line="${line//\{\{$template\}\}/$secret}"
     fi
