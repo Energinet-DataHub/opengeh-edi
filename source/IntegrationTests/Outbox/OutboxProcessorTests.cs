@@ -183,4 +183,129 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
         actualMessage.PublishedAt.Should().BeNull();
         actualMessage.ProcessingAt.Should().BeNull();
     }
+
+    [Fact]
+    public async Task Given_FailedOutboxMessage_When_ProcessingOutboxMessageBeforeRetryTimeout_Then_MessageIsNotRetried()
+    {
+        // Arrange
+        var outboxMessageType = "message-type-1";
+        var outboxMessagePublisher = new Mock<IOutboxMessagePublisher>();
+        outboxMessagePublisher
+            .Setup(omp => omp.CanProcess(outboxMessageType))
+            .Returns(true);
+
+        var failedAt = Instant.FromUtc(2024, 09, 02, 13, 37);
+        var clock = new Mock<IClock>();
+        clock.Setup(c => c.GetCurrentInstant())
+            .Returns(failedAt);
+
+        var serviceProvider = ServiceCollection
+            .AddTransient<IOutboxMessagePublisher>(_ => outboxMessagePublisher.Object)
+            .AddTransient<IClock>(_ => clock.Object)
+            .BuildServiceProvider();
+
+        var processor = serviceProvider.GetRequiredService<IOutboxProcessor>();
+
+        var outboxMessage = new OutboxMessage(outboxMessageType, "mock-payload");
+        outboxMessage.SetAsFailed(clock.Object, "an-error-message");
+        using (var writeScope = serviceProvider.CreateScope())
+        {
+            var repository = writeScope.ServiceProvider.GetRequiredService<IOutboxRepository>();
+            var writeContext = writeScope.ServiceProvider.GetRequiredService<OutboxContext>();
+
+            repository.Add(outboxMessage);
+            await writeContext.SaveChangesAsync();
+        }
+
+        // Act
+        // => Clock is set to the same time as the message failed, so the message is not ready to be retried yet
+        await processor.ProcessOutboxAsync();
+
+        // Assert
+        using var readScope = serviceProvider.CreateScope();
+        var readContext = readScope.ServiceProvider.GetRequiredService<OutboxContext>();
+
+        var actualMessage = readContext.OutboxMessages.SingleOrDefault(om => om.Id == outboxMessage.Id);
+
+        actualMessage.Should().NotBeNull();
+
+        using var assertionScope = new AssertionScope();
+
+        // => Error count should still be 1, and the message should not be published or processing
+        actualMessage!.ErrorCount.Should().Be(1);
+        actualMessage.PublishedAt.Should().BeNull();
+        actualMessage.ProcessingAt.Should().BeNull();
+
+        // => Publish should not have been called
+        outboxMessagePublisher
+            .Verify(
+                omp => omp.PublishAsync(It.IsAny<string>()),
+                Times.Never);
+    }
+
+    [Fact]
+    public async Task Given_FailedOutboxMessageInThePast_When_ProcessingOutboxMessageAfterRetryTimeout_Then_MessageIsRetriedAndPublished()
+    {
+        // Arrange
+        var outboxMessageType = "message-type-1";
+        var outboxMessagePublisher = new Mock<IOutboxMessagePublisher>();
+        outboxMessagePublisher
+            .Setup(omp => omp.CanProcess(outboxMessageType))
+            .Returns(true);
+
+        var inThePast = Instant.FromUtc(2024, 09, 02, 12, 0);
+        var now = Instant.FromUtc(2024, 09, 02, 13, 37);
+
+        var clock = new Mock<IClock>();
+
+        var serviceProvider = ServiceCollection
+            .AddTransient<IOutboxMessagePublisher>(_ => outboxMessagePublisher.Object)
+            .AddTransient<IClock>(_ => clock.Object)
+            .BuildServiceProvider();
+
+        var processor = serviceProvider.GetRequiredService<IOutboxProcessor>();
+
+        var outboxMessage = new OutboxMessage(outboxMessageType, "mock-payload");
+
+        // => Set clock to a time in the past, so SetAsFailed() sets FailedAt to sometime in the past
+        clock.Setup(c => c.GetCurrentInstant())
+            .Returns(inThePast);
+        outboxMessage.SetAsFailed(clock.Object, "an-error-message");
+
+        using (var writeScope = serviceProvider.CreateScope())
+        {
+            var repository = writeScope.ServiceProvider.GetRequiredService<IOutboxRepository>();
+            var writeContext = writeScope.ServiceProvider.GetRequiredService<OutboxContext>();
+
+            repository.Add(outboxMessage);
+            await writeContext.SaveChangesAsync();
+        }
+
+        // => Change clock to now, so the message is ready to be retried
+        clock.Setup(c => c.GetCurrentInstant())
+            .Returns(now);
+
+        // Act
+        await processor.ProcessOutboxAsync();
+
+        // Assert
+        using var readScope = serviceProvider.CreateScope();
+        var readContext = readScope.ServiceProvider.GetRequiredService<OutboxContext>();
+
+        var actualMessage = readContext.OutboxMessages.SingleOrDefault(om => om.Id == outboxMessage.Id);
+
+        actualMessage.Should().NotBeNull();
+
+        using var assertionScope = new AssertionScope();
+
+        // => The message failed in the past, but should be published now
+        actualMessage!.FailedAt.Should().Be(inThePast);
+        actualMessage.PublishedAt.Should().Be(now);
+
+        // => Publish should have been called once
+        outboxMessagePublisher
+            .Verify(
+                omp => omp.PublishAsync(It.IsAny<string>()),
+                Times.Once);
+    }
 }
