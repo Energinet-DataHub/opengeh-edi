@@ -20,8 +20,8 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Dequeue;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.Tests.Factories;
 using FluentAssertions;
@@ -36,12 +36,14 @@ public class PeekMessageTests
 {
     private readonly SystemDateTimeProviderStub _dateTimeProvider;
     private readonly IDatabaseConnectionFactory _connectionFactory;
+    private readonly Receiver _receiver;
 
     public PeekMessageTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
         _dateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
         _connectionFactory = GetService<IDatabaseConnectionFactory>();
+        _receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
     }
 
     [Fact]
@@ -49,11 +51,10 @@ public class PeekMessageTests
     {
         var sut = GetService<PeekMessage>();
         var outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
-        var receiver = Receiver.Create(ActorNumber.Create("1234567890123"), ActorRole.EnergySupplier);
         var dtoBuilder = new WholesaleTotalAmountMessageDtoBuilder();
 
-        var message1 = dtoBuilder.WithReceiverNumber(receiver.Number).Build();
-        var message2 = dtoBuilder.WithReceiverNumber(receiver.Number).Build();
+        var message1 = dtoBuilder.WithReceiverNumber(_receiver.Number).Build();
+        var message2 = dtoBuilder.WithReceiverNumber(_receiver.Number).Build();
 
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
         _dateTimeProvider.SetNow(now);
@@ -63,15 +64,67 @@ public class PeekMessageTests
 
         var peekResultDto = await sut.PeekAsync(
                 new PeekRequestDto(
-                    receiver.Number,
+                    _receiver.Number,
                     MessageCategory.Aggregations,
-                    receiver.ActorRole,
+                    _receiver.ActorRole,
                     DocumentFormat.Json),
                 CancellationToken.None);
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
-        var sql = $"SELECT MessageId FROM Bundles WHERE Created = (SELECT MAX(Created) FROM Bundles)";
-        var outgoingMessageIdFromOldestBundle = await connection.QuerySingleOrDefaultAsync<string>(sql);
+        const string sql = $"SELECT MessageId FROM Bundles WHERE Created = (SELECT MAX(Created) FROM Bundles)";
+        var messageIdFromOldestBundle = await connection.QuerySingleOrDefaultAsync<string>(sql);
+
         peekResultDto.Should().NotBeNull();
-        peekResultDto!.MessageId.Value.Should().Be(outgoingMessageIdFromOldestBundle);
+        messageIdFromOldestBundle.Should().Be(peekResultDto!.MessageId.Value);
     }
+
+    [Fact]
+    public async Task When_no_message_has_been_enqueued_peek_returns_no_bundle_id()
+     {
+         var sut = GetService<PeekMessage>();
+
+         var result = await sut.PeekAsync(
+             new PeekRequestDto(
+                 _receiver.Number,
+                 MessageCategory.Aggregations,
+                 _receiver.ActorRole,
+                 DocumentFormat.Json),
+             CancellationToken.None);
+
+         result.Should().BeNull();
+     }
+
+    [Fact]
+    public async Task Peek_returns_null_if_bundle_has_been_dequeued()
+     {
+         var sut = GetService<PeekMessage>();
+         var outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
+         var dtoBuilder = new WholesaleTotalAmountMessageDtoBuilder();
+
+         var message = dtoBuilder.WithReceiverNumber(_receiver.Number).Build();
+
+         await outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
+
+         var peekResult = await sut.PeekAsync(
+             new PeekRequestDto(
+                 _receiver.Number,
+                 MessageCategory.Aggregations,
+                 _receiver.ActorRole,
+                 DocumentFormat.Json),
+             CancellationToken.None);
+
+         peekResult.Should().NotBeNull();
+
+         var dequeueResult = await outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(peekResult!.MessageId.Value, _receiver.ActorRole, _receiver.Number), CancellationToken.None);
+         dequeueResult.Success.Should().BeTrue();
+
+         var secondPeekResult = await sut.PeekAsync(
+             new PeekRequestDto(
+                 _receiver.Number,
+                 MessageCategory.Aggregations,
+                 _receiver.ActorRole,
+                 DocumentFormat.Json),
+             CancellationToken.None);
+
+         secondPeekResult.Should().BeNull();
+     }
 }
