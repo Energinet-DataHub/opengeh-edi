@@ -58,6 +58,5 @@ public class BundleEntityConfiguration : IEntityTypeConfiguration<Bundle>
                 fromDbValue => fromDbValue != null ? MessageId.Create(fromDbValue) : null);
 
         builder.HasMany<OutgoingMessage>().WithOne().HasForeignKey(o => o.AssignedBundleId);
-        builder.HasOne<ActorMessageQueue>().WithMany("_bundles").HasForeignKey(b => b.ActorMessageQueueId);
     }
 }

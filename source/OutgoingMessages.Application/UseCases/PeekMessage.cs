@@ -81,12 +81,14 @@ public class PeekMessage
 
         await PeekAndCommitToEnsureBundleIsClosedAsync(request, actorMessageQueue.Id).ConfigureAwait(false);
 
-        var bundle = _bundleRepository.GetOldestBundle(actorMessageQueue.Id, request.MessageCategory); // new context required?
+        var bundle = await _bundleRepository.GetOldestBundleAsync(actorMessageQueue.Id, request.MessageCategory).ConfigureAwait(false); // new context required?
 
         if (bundle is null)
         {
             return null;
         }
+
+        bundle.PeekBundle();
 
         var peekResult = new PeekResult(bundle.Id, bundle.MessageId);
 
@@ -124,7 +126,7 @@ public class PeekMessage
     {
         // Right after we call Peek(), we close the bundle. This is to ensure that the bundle wont be added more messages, after we have peeked.
         // And before we are able to update the bundle to closed in the database.
-        var bundle = _bundleRepository.GetOldestBundle(actorMessageQueueId, request.MessageCategory);
+        var bundle = await _bundleRepository.GetOldestBundleAsync(actorMessageQueueId, request.MessageCategory).ConfigureAwait(false);
         if (bundle != null)
         {
             bundle.PeekBundle();

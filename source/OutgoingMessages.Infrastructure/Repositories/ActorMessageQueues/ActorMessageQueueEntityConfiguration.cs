@@ -12,11 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
-using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NodaTime;
@@ -44,8 +41,6 @@ public class ActorMessageQueueEntityConfiguration : IEntityTypeConfiguration<Act
                     fromDbValue => ActorRole.FromCode(fromDbValue));
             entityBuilder.WithOwner();
         });
-
-        builder.HasMany<Bundle>("_bundles").WithOne().HasForeignKey(b => b.ActorMessageQueueId);
 
         builder.Property<string>("CreatedBy");
         builder.Property<Instant>("CreatedAt");

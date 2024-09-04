@@ -45,14 +45,13 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
         return await _dbContext.Bundles.FirstOrDefaultAsync(x => x.MessageId == messageId).ConfigureAwait(false);
     }
 
-    public Bundle? GetOldestBundle(ActorMessageQueueId id, MessageCategory? messageCategory)
+    public async Task<Bundle?> GetOldestBundleAsync(ActorMessageQueueId id, MessageCategory? messageCategory)
     {
         if (messageCategory == null)
         {
-            var bundleAsync = _dbContext.Bundles.Where(b => b.ActorMessageQueueId == id && b.DequeuedAt == null).MinBy(b => b.Created);
-            return bundleAsync;
+            return await _dbContext.Bundles.Where(b => b.ActorMessageQueueId == id && b.DequeuedAt == null).OrderBy(b => b.Created).FirstOrDefaultAsync().ConfigureAwait(false);
         }
 
-        return _dbContext.Bundles.Where(b => b.ActorMessageQueueId == id && b.DocumentTypeInBundle.Category == messageCategory && b.DequeuedAt == null).MinBy(b => b.Created);
+        return await _dbContext.Bundles.Where(b => b.ActorMessageQueueId == id && b.DequeuedAt == null).OrderBy(b => b.Created).FirstOrDefaultAsync().ConfigureAwait(false); // missing documenttype / messagecategory
     }
 }

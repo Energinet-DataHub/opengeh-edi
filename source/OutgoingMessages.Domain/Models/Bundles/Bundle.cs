@@ -96,10 +96,12 @@ public sealed class Bundle
     public bool TryDequeue()
     {
         if (ClosedAt is not null && PeekedAt is not null)
-            return false;
+        {
+            DequeuedAt = SystemClock.Instance.GetCurrentInstant();
+            return true;
+        }
 
-        DequeuedAt = SystemClock.Instance.GetCurrentInstant();
-        return true;
+        return false;
     }
 
     private void CloseBundleIfFull(Instant messageCreatedAt)
