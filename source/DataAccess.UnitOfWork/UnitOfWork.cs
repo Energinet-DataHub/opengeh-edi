@@ -20,7 +20,7 @@ namespace Energinet.DataHub.EDI.DataAccess.UnitOfWork;
 
 public sealed class UnitOfWork : IUnitOfWork
 {
-    private readonly IReadOnlyCollection<DbContext> _contexts;
+    private readonly IReadOnlyCollection<DbContext> _dbContexts;
     // private readonly ProcessContext _processContext;
     // private readonly ActorMessageQueueContext _actorMessageQueueContext;
     // private readonly IncomingMessagesContext _incomingMessagesContext;
@@ -28,13 +28,12 @@ public sealed class UnitOfWork : IUnitOfWork
     public UnitOfWork(
         IEnumerable<IEdiDbContext> dbContexts)
     {
-        _contexts = dbContexts.Cast<DbContext>().ToArray();
+        _dbContexts = dbContexts.Cast<DbContext>().ToArray();
     }
 
-    public async Task CommitTransactionAsync()
+    public Task CommitTransactionAsync()
     {
-        await ResilientTransaction.New()
-            .SaveChangesAsync(_contexts)
-            .ConfigureAwait(false);
+        return ResilientTransaction.New()
+            .SaveChangesAsync(_dbContexts);
     }
 }

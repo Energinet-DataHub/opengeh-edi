@@ -79,19 +79,6 @@ public class AuditLogger(
 
         await _outbox.CreateWithoutCommitAsync(outboxMessage)
             .ConfigureAwait(false);
-        // await _auditLogClient.LogAsync(
-        //         logId.Id,
-        //         userId,
-        //         actorId,
-        //         _ediSystemId,
-        //         permissions,
-        //         _clock.GetCurrentInstant(),
-        //         activity.Identifier,
-        //         activityOrigin,
-        //         activityPayload,
-        //         affectedEntityType?.Identifier,
-        //         affectedEntityKey)
-        //     .ConfigureAwait(false);
     }
 
     public async Task LogWithCommitAsync(
