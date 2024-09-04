@@ -49,9 +49,9 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
     {
         if (messageCategory == null)
         {
-            return await _dbContext.Bundles.Where(b => b.ActorMessageQueueId == id && b.DequeuedAt == null).OrderBy(b => b.Created).FirstOrDefaultAsync().ConfigureAwait(false);
+            return await _dbContext.Bundles.Where(b => b.ActorMessageQueueId == id && b.DequeuedAt == null).OrderByDescending(b => b.Created).FirstOrDefaultAsync().ConfigureAwait(false);
         }
 
-        return await _dbContext.Bundles.Where(b => b.ActorMessageQueueId == id && b.DequeuedAt == null).OrderBy(b => b.Created).FirstOrDefaultAsync().ConfigureAwait(false); // missing documenttype / messagecategory
+        return await _dbContext.Bundles.Where(b => b.ActorMessageQueueId == id && b.DequeuedAt == null).OrderByDescending(b => b.Created).FirstOrDefaultAsync().ConfigureAwait(false); // missing documenttype / messagecategory
     }
 }
