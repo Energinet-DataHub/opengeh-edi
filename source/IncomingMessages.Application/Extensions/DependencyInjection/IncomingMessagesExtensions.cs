@@ -51,7 +51,7 @@ public static class IncomingMessagesExtensions
 
         services
             .AddFeatureFlags()
-            .AddServiceBus(configuration)
+            .AddServiceBusClientForApplication(configuration)
             .AddDapperConnectionToDatabase(configuration)
             .AddScopedSqlDbContext<IncomingMessagesContext>(configuration)
             .AddScoped<IIncomingMessageClient, IncomingMessageClient>()
@@ -87,7 +87,7 @@ public static class IncomingMessagesExtensions
 
             // Health checks
             .TryAddExternalDomainServiceBusQueuesHealthCheck(
-                configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>()!.ListenConnectionString,
+                configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>()!.FullyQualifiedNamespace,
                 configuration.GetSection(IncomingMessagesQueueOptions.SectionName).Get<IncomingMessagesQueueOptions>()!.QueueName);
 
         return services;

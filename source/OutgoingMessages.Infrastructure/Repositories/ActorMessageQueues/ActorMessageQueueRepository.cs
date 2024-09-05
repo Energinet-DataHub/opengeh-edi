@@ -33,8 +33,7 @@ public class ActorMessageQueueRepository : IActorMessageQueueRepository
         ArgumentNullException.ThrowIfNull(actorNumber);
         ArgumentNullException.ThrowIfNull(actorRole);
 
-        var actorMessageQueue = await ActorMessageQueuesIncludingBundlesQuery()
-            .FirstOrDefaultAsync(queue =>
+        var actorMessageQueue = await _actorMessageQueueContext.ActorMessageQueues.FirstOrDefaultAsync(queue =>
                 queue.Receiver.Number.Equals(actorNumber) &&
                 queue.Receiver.ActorRole.Equals(actorRole))
             .ConfigureAwait(false);
@@ -80,8 +79,4 @@ public class ActorMessageQueueRepository : IActorMessageQueueRepository
     {
         _actorMessageQueueContext.ActorMessageQueues.Add(actorMessageQueue);
     }
-
-    private IQueryable<ActorMessageQueue> ActorMessageQueuesIncludingBundlesQuery() =>
-        _actorMessageQueueContext.ActorMessageQueues
-        .Include("_bundles");
 }

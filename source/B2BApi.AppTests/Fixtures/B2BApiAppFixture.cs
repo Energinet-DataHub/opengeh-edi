@@ -83,13 +83,13 @@ public class B2BApiAppFixture : IAsyncLifetime
         LogStopwatch(stopwatch, nameof(DatabaseManager));
 
         ServiceBusResourceProvider = new ServiceBusResourceProvider(
-            IntegrationTestConfiguration.ServiceBusConnectionString,
-            TestLogger);
+            TestLogger,
+            IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace);
         LogStopwatch(stopwatch, nameof(ServiceBusResourceProvider));
 
         ServiceBusListenerMock = new ServiceBusListenerMock(
-            IntegrationTestConfiguration.ServiceBusConnectionString,
-            TestLogger);
+            TestLogger,
+            IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace);
         LogStopwatch(stopwatch, nameof(ServiceBusListenerMock));
 
         HostConfigurationBuilder = new FunctionAppHostConfigurationBuilder();
@@ -395,14 +395,8 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // ServiceBus connection strings
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ManageConnectionString)}",
-            ServiceBusResourceProvider.ConnectionString);
-        appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}",
-            ServiceBusResourceProvider.ConnectionString);
-        appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.SendConnectionString)}",
-            ServiceBusResourceProvider.ConnectionString);
+            $"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.FullyQualifiedNamespace)}",
+            ServiceBusResourceProvider.FullyQualifiedNamespace);
 
         // Feature Flags: Default values
         appHostSettings.ProcessEnvironmentVariables.Add(

@@ -66,9 +66,7 @@ public class RegistrationTests
         // The following declaration slows down the test execution, since creating a new Uri is a heavy operation
         Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL", TestEnvironment.CreateFakeStorageUrl());
 
-        Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ManageConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
-        Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
-        Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.SendConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
+        Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.FullyQualifiedNamespace)}", TestEnvironment.CreateFakeServiceBusFullyQualifiedNamespace());
 
         Environment.SetEnvironmentVariable(nameof(DatabricksSqlStatementOptions.WorkspaceUrl), "https://adb-1000.azuredatabricks.net/");
         Environment.SetEnvironmentVariable(nameof(DatabricksSqlStatementOptions.WorkspaceToken), "FakeToken");
@@ -206,9 +204,7 @@ public class RegistrationTests
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    [$"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ManageConnectionString)}"] = "Fake",
-                    [$"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}"] = "Fake",
-                    [$"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.SendConnectionString)}"] = "Fake",
+                    [$"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.FullyQualifiedNamespace)}"] = "Fake",
 
                     [$"{UserAuthenticationOptions.SectionName}:{nameof(UserAuthenticationOptions.MitIdExternalMetadataAddress)}"] = "NotEmpty",
                     [$"{UserAuthenticationOptions.SectionName}:{nameof(UserAuthenticationOptions.ExternalMetadataAddress)}"] = "NotEmpty",
@@ -309,10 +305,10 @@ public class RegistrationTests
     private sealed class TestEnvironment : RuntimeEnvironment
     {
         public override string? ServiceBus__SendConnectionString =>
-            CreateFakeServiceBusConnectionString();
+            CreateFakeServiceBusFullyQualifiedNamespace();
 
         public override string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
-            CreateFakeServiceBusConnectionString();
+            CreateFakeServiceBusFullyQualifiedNamespace();
 
         public override string? DB_CONNECTION_STRING =>
             CreateConnectionString();
@@ -321,12 +317,10 @@ public class RegistrationTests
 
         public override string AZURE_FUNCTIONS_ENVIRONMENT => "Development";
 
-        public static string CreateFakeServiceBusConnectionString()
+        public static string CreateFakeServiceBusFullyQualifiedNamespace()
         {
             return new StringBuilder()
-                .Append(CultureInfo.InvariantCulture, $"Endpoint=sb://sb-{Guid.NewGuid():N}.servicebus.windows.net/;")
-                .Append("SharedAccessKeyName=send;")
-                .Append(CultureInfo.InvariantCulture, $"SharedAccessKey={Guid.NewGuid():N}")
+                .Append(CultureInfo.InvariantCulture, $"sb://sb-{Guid.NewGuid():N}.servicebus.windows.net/")
                 .ToString();
         }
 

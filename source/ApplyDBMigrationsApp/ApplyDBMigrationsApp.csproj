@@ -197,6 +197,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202408201253 Add PeriodStartedAt to OutgoingMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202408220811 Remove IdempotentId to OutgoingMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202409021105 Create index on MarketDocuments BundleId.sql" />
+    <EmbeddedResource Include="Scripts\Model\202409041545 Add MessageCategory to Bundles.sql" />
+    <EmbeddedResource Include="Scripts\Model\202409050900 New Index to get oldest Bundle.sql" />
     <EmbeddedResource Include="Scripts\Model\202408301351 Add Outbox table.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />

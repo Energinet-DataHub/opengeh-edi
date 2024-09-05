@@ -15,6 +15,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using Azure.Storage.Blobs;
+using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.OpenIdJwt;
@@ -40,8 +41,8 @@ public class B2CWebApiFixture : IAsyncLifetime
         AzuriteManager = new AzuriteManager();
         OpenIdJwtManager = new OpenIdJwtManager(IntegrationTestConfiguration.B2CSettings);
         ServiceBusResourceProvider = new ServiceBusResourceProvider(
-            IntegrationTestConfiguration.ServiceBusConnectionString,
-            TestLogger);
+            TestLogger,
+            IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace);
 
         B2CWebApiApplicationFactory = new B2CWebApiApplicationFactory();
     }
@@ -119,9 +120,7 @@ public class B2CWebApiFixture : IAsyncLifetime
             { "UserAuthentication:ExternalMetadataAddress", OpenIdJwtManager.ExternalMetadataAddress },
             { "UserAuthentication:InternalMetadataAddress", OpenIdJwtManager.InternalMetadataAddress },
             { "UserAuthentication:BackendBffAppId", OpenIdJwtManager.TestBffAppId },
-            { "ServiceBus:ManageConnectionString", ServiceBusResourceProvider.ConnectionString },
-            { "ServiceBus:ListenConnectionString", ServiceBusResourceProvider.ConnectionString },
-            { "ServiceBus:SendConnectionString", ServiceBusResourceProvider.ConnectionString },
+            { $"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.FullyQualifiedNamespace)}", ServiceBusResourceProvider.FullyQualifiedNamespace },
             { "IncomingMessages:QueueName", incomingMessagesQueueName },
             { "OrchestrationsStorageAccountConnectionString", AzuriteManager.FullConnectionString },
             { "OrchestrationsTaskHubName", "EdiTest01" },
