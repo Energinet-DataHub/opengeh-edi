@@ -65,7 +65,7 @@ public class AuditLogger(
 
         var outboxMessage = new AuditLogOutboxMessageV1(
             _serializer,
-            new AuditLogPayload(
+            new AuditLogOutboxMessageV1Payload(
                 logId.Id,
                 userId,
                 actorId,

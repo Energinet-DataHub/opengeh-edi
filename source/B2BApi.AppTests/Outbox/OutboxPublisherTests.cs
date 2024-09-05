@@ -60,7 +60,7 @@ public class OutboxPublisherTests : IAsyncLifetime
         var expectedLogId = Guid.NewGuid();
         var auditLogOutboxMessageV1 = new AuditLogOutboxMessageV1(
             new Serializer(),
-            new AuditLogPayload(
+            new AuditLogOutboxMessageV1Payload(
                 LogId: expectedLogId,
                 UserId: Guid.NewGuid(),
                 ActorId: Guid.NewGuid(),

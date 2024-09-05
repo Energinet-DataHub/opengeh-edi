@@ -14,18 +14,17 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.Outbox.Interfaces;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 
-public class AuditLogOutboxMessageV1 : IOutboxMessage<AuditLogPayload>
+public class AuditLogOutboxMessageV1 : IOutboxMessage<AuditLogOutboxMessageV1Payload>
 {
     public const string OutboxMessageType = "AuditLogOutboxMessageV1";
     private readonly ISerializer _serializer;
 
     public AuditLogOutboxMessageV1(
         ISerializer serializer,
-        AuditLogPayload payload)
+        AuditLogOutboxMessageV1Payload payload)
     {
         _serializer = serializer;
         Payload = payload;
@@ -33,7 +32,7 @@ public class AuditLogOutboxMessageV1 : IOutboxMessage<AuditLogPayload>
 
     public string Type => OutboxMessageType;
 
-    public AuditLogPayload Payload { get; }
+    public AuditLogOutboxMessageV1Payload Payload { get; }
 
     public Task<string> SerializeAsync()
     {
@@ -41,16 +40,3 @@ public class AuditLogOutboxMessageV1 : IOutboxMessage<AuditLogPayload>
         return Task.FromResult(serializedPayload);
     }
 }
-
-public record AuditLogPayload(
-    Guid LogId,
-    Guid UserId,
-    Guid ActorId,
-    Guid SystemId,
-    string? Permissions,
-    Instant OccuredOn,
-    string Activity,
-    string Origin,
-    object? Payload,
-    string? AffectedEntityType,
-    string? AffectedEntityKey);

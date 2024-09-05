@@ -33,6 +33,20 @@ namespace Energinet.DataHub.EDI.IntegrationTests.AuditLog;
 
 public class AuditLogOutboxPublisherTests : IClassFixture<AuditLogTestFixture>, IAsyncLifetime
 {
+    private const string AuditLogOutboxMessageV1PayloadJson = @"{
+        ""LogId"":""dab87943-9885-4015-90f1-3709ace8ffd3"",
+        ""UserId"":""21fb8ca5-0edb-464e-88a2-8bbabc0bbf1f"",
+        ""ActorId"":""6e64c193-bb0c-4fe0-9eb3-728c8fc90f9e"",
+        ""SystemId"":""9415d80c-7af4-435e-a3b8-9c679783149e"",
+        ""Permissions"":""expected-permissions"",
+        ""OccuredOn"":""2024-09-05T13:37:00Z"",
+        ""Activity"":""expected-activity"",
+        ""Origin"":""expected-origin"",
+        ""Payload"":""expected-payload"",
+        ""AffectedEntityType"":""expected-entity-type"",
+        ""AffectedEntityKey"":""expected-entity-key""
+    }";
+
     public AuditLogOutboxPublisherTests(AuditLogTestFixture fixture)
     {
         Fixture = fixture;
@@ -56,7 +70,7 @@ public class AuditLogOutboxPublisherTests : IClassFixture<AuditLogTestFixture>, 
     }
 
     [Fact]
-    public async Task When_PublishingAuditLogOutboxMessage_Then_MessageCorrectlyProcessed()
+    public async Task Given_AuditLogOutboxMessageV1PayloadJson_When_PublishAuditLogOutboxMessage_Then_MessageIsCorrectlyPublished()
     {
         // Arrange
         var serviceProvider = ServiceCollection.BuildServiceProvider();
@@ -64,34 +78,21 @@ public class AuditLogOutboxPublisherTests : IClassFixture<AuditLogTestFixture>, 
         var serializer = serviceProvider.GetRequiredService<ISerializer>();
         var auditLogOutboxPublisher = serviceProvider.GetRequiredService<AuditLogOutboxPublisher>();
 
-        var expectedLogId = Guid.NewGuid();
-        var expectedUserId = Guid.NewGuid();
-        var expectedActorId = Guid.NewGuid();
-        var expectedSystemId = Guid.NewGuid();
+        // => Expected values taken from AuditLogOutboxMessageV1PayloadJson
+        var expectedLogId = Guid.Parse("dab87943-9885-4015-90f1-3709ace8ffd3");
+        var expectedUserId = Guid.Parse("21fb8ca5-0edb-464e-88a2-8bbabc0bbf1f");
+        var expectedActorId = Guid.Parse("6e64c193-bb0c-4fe0-9eb3-728c8fc90f9e");
+        var expectedSystemId = Guid.Parse("9415d80c-7af4-435e-a3b8-9c679783149e");
         var expectedPermissions = "expected-permissions";
-        var expectedOccuredOn = Instant.FromUtc(2024, 09, 04, 13, 37);
+        var expectedOccuredOn = "2024-09-05T13:37:00Z";
         var expectedActivity = "expected-activity";
         var expectedOrigin = "expected-origin";
         var expectedPayload = "expected-payload";
         var expectedEntityType = "expected-entity-type";
         var expectedEntityKey = "expected-entity-key";
-        var payload = new AuditLogPayload(
-            LogId: expectedLogId,
-            UserId: expectedUserId,
-            ActorId: expectedActorId,
-            SystemId: expectedSystemId,
-            Permissions: expectedPermissions,
-            OccuredOn: expectedOccuredOn,
-            Activity: expectedActivity,
-            Origin: expectedOrigin,
-            Payload: expectedPayload,
-            AffectedEntityType: expectedEntityType,
-            AffectedEntityKey: expectedEntityKey);
-
-        var serializedPayload = serializer.Serialize(payload);
 
         // Act
-        await auditLogOutboxPublisher.PublishAsync(serializedPayload);
+        await auditLogOutboxPublisher.PublishAsync(AuditLogOutboxMessageV1PayloadJson);
 
         // Assert
         var auditLogCalls = Fixture.AuditLogMockServer.GetAuditLogIngestionCalls();
@@ -118,12 +119,12 @@ public class AuditLogOutboxPublisherTests : IClassFixture<AuditLogTestFixture>, 
         }
 
         using var assertionScope = new AssertionScope();
-        deserializedBody!.LogId.Should().NotBeEmpty();
+        deserializedBody!.LogId.Should().Be(expectedLogId);
         deserializedBody.UserId.Should().Be(expectedUserId);
         deserializedBody.ActorId.Should().Be(expectedActorId);
         deserializedBody.SystemId.Should().Be(expectedSystemId); // EDI subsystem id
         deserializedBody.Permissions.Should().Be(expectedPermissions);
-        deserializedBody.OccurredOn.Should().Be(InstantPattern.General.Format(expectedOccuredOn));
+        deserializedBody.OccurredOn.Should().Be(expectedOccuredOn);
         deserializedBody.Activity.Should().Be(expectedActivity);
         deserializedBody.Origin.Should().Be(expectedOrigin);
         deserializedBody.Payload.Should().Be(expectedPayload);

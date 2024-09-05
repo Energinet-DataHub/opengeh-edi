@@ -30,8 +30,8 @@ public class AuditLogOutboxPublisher(IAuditLogClient auditLogClient, ISerializer
     {
         ArgumentException.ThrowIfNullOrEmpty(serializedPayload);
 
-        var payload = _serializer.Deserialize<AuditLogPayload>(serializedPayload)
-            ?? throw new InvalidOperationException($"Failed to deserialize payload of type {nameof(AuditLogPayload)}");
+        var payload = _serializer.Deserialize<AuditLogOutboxMessageV1Payload>(serializedPayload)
+            ?? throw new InvalidOperationException($"Failed to deserialize payload of type {nameof(AuditLogOutboxMessageV1Payload)}");
 
         await _auditLogClient.LogAsync(
             logId: payload.LogId,
