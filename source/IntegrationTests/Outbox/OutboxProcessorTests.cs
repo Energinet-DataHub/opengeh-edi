@@ -78,7 +78,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
         }
 
         outboxMessagePublisher
-            .Setup(omp => omp.CanProcess("mock-type"))
+            .Setup(omp => omp.CanPublish("mock-type"))
             .Returns(true);
 
         clock.Setup(c => c.GetCurrentInstant())
@@ -127,7 +127,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
         }
 
         outboxMessagePublisher
-            .Setup(omp => omp.CanProcess("mock-type"))
+            .Setup(omp => omp.CanPublish("mock-type"))
             .Returns(true);
 
         clock.Setup(c => c.GetCurrentInstant())
@@ -163,7 +163,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
         var outboxMessageType = "message-type-1";
         var outboxMessagePublisher = new Mock<IOutboxPublisher>();
         outboxMessagePublisher
-            .Setup(omp => omp.CanProcess(outboxMessageType))
+            .Setup(omp => omp.CanPublish(outboxMessageType))
             .Returns(true);
 
         var failedAt = Instant.FromUtc(2024, 09, 02, 13, 37);
@@ -222,7 +222,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
         var outboxMessageType = "message-type-1";
         var outboxMessagePublisher = new Mock<IOutboxPublisher>();
         outboxMessagePublisher
-            .Setup(omp => omp.CanProcess(outboxMessageType))
+            .Setup(omp => omp.CanPublish(outboxMessageType))
             .Returns(true);
 
         var inThePast = Instant.FromUtc(2024, 09, 02, 12, 0);

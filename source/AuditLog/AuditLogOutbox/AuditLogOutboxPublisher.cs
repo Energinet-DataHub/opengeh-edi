@@ -24,7 +24,7 @@ public class AuditLogOutboxPublisher(IAuditLogClient auditLogClient, ISerializer
     private readonly IAuditLogClient _auditLogClient = auditLogClient;
     private readonly ISerializer _serializer = serializer;
 
-    public bool CanProcess(string type) => type.Equals(AuditLogOutboxMessageV1.OutboxMessageType, StringComparison.OrdinalIgnoreCase);
+    public bool CanPublish(string type) => type.Equals(AuditLogOutboxMessageV1.OutboxMessageType, StringComparison.OrdinalIgnoreCase);
 
     public async Task PublishAsync(string serializedPayload)
     {

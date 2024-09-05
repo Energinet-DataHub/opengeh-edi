@@ -73,7 +73,7 @@ public class OutboxProcessor(
             {
                 // Process outbox message
                 var outboxMessagePublisher = outboxMessagePublishers
-                    .SingleOrDefault(p => p.CanProcess(outboxMessage.Type));
+                    .SingleOrDefault(p => p.CanPublish(outboxMessage.Type));
 
                 if (outboxMessagePublisher == null)
                     throw new InvalidOperationException($"No processor found for outbox message type {outboxMessage.Type} and id {outboxMessage.Id}");

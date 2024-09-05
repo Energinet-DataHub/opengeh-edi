@@ -24,7 +24,7 @@ public interface IOutboxPublisher
     /// <summary>
     /// Whether the publisher can publish the given outbox message type.
     /// </summary>
-    bool CanProcess(string type);
+    bool CanPublish(string type);
 
     /// <summary>
     /// Publish the outbox message.

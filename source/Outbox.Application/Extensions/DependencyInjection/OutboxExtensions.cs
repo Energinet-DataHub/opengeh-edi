@@ -61,4 +61,16 @@ public static class OutboxExtensions
 
         return services;
     }
+
+    /// <summary>
+    /// Add services required for processing and publishing outbox messages.
+    /// <remarks>Requires <see cref="AddOutboxModule"/> to be registered as well</remarks>
+    /// </summary>
+    public static IServiceCollection AddOutboxRetention(
+        this IServiceCollection services)
+    {
+        services.AddTransient<IDataRetention, OutboxRetention>();
+
+        return services;
+    }
 }

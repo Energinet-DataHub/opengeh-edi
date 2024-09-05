@@ -143,7 +143,7 @@ public class AuditLogOutboxPublisherTests : IClassFixture<AuditLogTestFixture>, 
         var auditLogOutboxPublisher = serviceProvider.GetRequiredService<AuditLogOutboxPublisher>();
 
         // Act
-        var actualResult = auditLogOutboxPublisher.CanProcess("AuditLogOutboxMessageV1");
+        var actualResult = auditLogOutboxPublisher.CanPublish("AuditLogOutboxMessageV1");
 
         // Assert
         actualResult.Should().BeTrue($"because {nameof(AuditLogOutboxPublisher)} should be able to process AuditLogOutboxMessageV1");

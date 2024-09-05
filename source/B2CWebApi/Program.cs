@@ -55,12 +55,12 @@ builder.Services
     .AddDurableClient(builder.Configuration)
 
     // Modules
-    .AddAuditLog()
     .AddDataAccessUnitOfWorkModule()
     .AddOutboxModule(builder.Configuration)
     .AddIncomingMessagesModule(builder.Configuration)
     .AddArchivedMessagesModule(builder.Configuration)
     .AddMasterDataModule(builder.Configuration)
+    .AddAuditLog()
 
     // Security
     // Note that this requires you to have
