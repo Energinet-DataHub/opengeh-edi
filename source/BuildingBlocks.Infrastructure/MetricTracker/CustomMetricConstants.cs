@@ -14,7 +14,9 @@
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MetricTracker;
 
-public class CustomMetricConstants
+public static class CustomMetricConstants
 {
     public const string EnqueueMessagesDuration = nameof(EnqueueMessagesDuration);
+    public const string DequeueMessageDuration = nameof(DequeueMessageDuration);
+    public const string PeekMessageDuration = nameof(PeekMessageDuration);
 }
