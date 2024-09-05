@@ -472,26 +472,27 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         peekResultsForEnergySupplier.Should().HaveCount(expectedNumberOfPeekResults, "Fee result contains a single gap, which should result in two messages");
 
         // Assert first fee is correct and within expected period
-        var assertForFirstBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[1].Bundle);
-        assertForFirstBundle.HasPeriod(
-            new Period(
-                Instant.FromUtc(2023, 2, 1, 23, 0, 0),
-                Instant.FromUtc(2023, 2, 3, 23, 0, 0)));
-        assertForFirstBundle.HasPoints(
-            [
-                new WholesaleServicesPoint(1, 2, 12.757m, 25.514m, CalculatedQuantityQuality.Calculated),
-                new WholesaleServicesPoint(1, 3, 12.757m, 38.271m, CalculatedQuantityQuality.Calculated),
-            ]);
 
-        // Assert second fee is correct and within expected period
-        var assertForSecondBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[0].Bundle);
-        assertForSecondBundle.HasPeriod(
+        var assertForFirstBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[0].Bundle);
+        assertForFirstBundle.HasPeriod(
             new Period(
                 Instant.FromUtc(2023, 2, 5, 23, 0, 0),
                 Instant.FromUtc(2023, 2, 6, 23, 0, 0)));
+        assertForFirstBundle.HasPoints(
+        [
+            new WholesaleServicesPoint(1, 1, 12.757m, 12.757m, CalculatedQuantityQuality.Calculated),
+        ]);
+
+        // Assert second fee is correct and within expected period
+        var assertForSecondBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[1].Bundle);
+        assertForSecondBundle.HasPeriod(
+            new Period(
+                Instant.FromUtc(2023, 2, 1, 23, 0, 0),
+                Instant.FromUtc(2023, 2, 3, 23, 0, 0)));
         assertForSecondBundle.HasPoints(
             [
-                new WholesaleServicesPoint(1, 1, 12.757m, 12.757m, CalculatedQuantityQuality.Calculated),
+                new WholesaleServicesPoint(1, 2, 12.757m, 25.514m, CalculatedQuantityQuality.Calculated),
+                new WholesaleServicesPoint(1, 3, 12.757m, 38.271m, CalculatedQuantityQuality.Calculated),
             ]);
     }
 
@@ -527,34 +528,34 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         peekResultsForEnergySupplier.Should().HaveCount(expectedNumberOfPeekResults, "Each fee should be sent as a separate message");
 
         // Assert first fee is correct and within expected period
-        var assertForSecondBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[0].Bundle);
-        assertForSecondBundle.HasPeriod(
+        var assertForFirstBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[0].Bundle);
+        assertForFirstBundle.HasPeriod(
             new Period(
                 Instant.FromUtc(2023, 2, 3, 23, 0, 0),
                 Instant.FromUtc(2023, 2, 4, 23, 0, 0)));
-        assertForSecondBundle.HasPoints(
+        assertForFirstBundle.HasPoints(
         [
             new WholesaleServicesPoint(1, 3, 12.757m, 38.271m, CalculatedQuantityQuality.Calculated),
         ]);
 
         // Assert second fee is correct and within expected period
-        var assertForThirdBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[1].Bundle);
-        assertForThirdBundle.HasPeriod(
+        var assertForSecondBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[1].Bundle);
+        assertForSecondBundle.HasPeriod(
             new Period(
                 Instant.FromUtc(2023, 2, 5, 23, 0, 0),
                 Instant.FromUtc(2023, 2, 6, 23, 0, 0)));
-        assertForThirdBundle.HasPoints(
+        assertForSecondBundle.HasPoints(
         [
             new WholesaleServicesPoint(1, 1, 12.757m, 12.757m, CalculatedQuantityQuality.Calculated),
         ]);
 
         // Assert third fee is correct and within expected period
-        var assertForFirstBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[2].Bundle);
-        assertForFirstBundle.HasPeriod(
+        var assertForThirdBundle = new AssertNotifyWholesaleServicesJsonDocument(peekResultsForEnergySupplier[2].Bundle);
+        assertForThirdBundle.HasPeriod(
             new Period(
                 Instant.FromUtc(2023, 2, 1, 23, 0, 0),
                 Instant.FromUtc(2023, 2, 2, 23, 0, 0)));
-        assertForFirstBundle.HasPoints(
+        assertForThirdBundle.HasPoints(
             [
                 new WholesaleServicesPoint(1, 2, 12.757m, 25.514m, CalculatedQuantityQuality.Calculated),
             ]);

@@ -107,6 +107,11 @@ public sealed class Bundle
         return false;
     }
 
+    public void Close()
+    {
+        ClosedAt = SystemClock.Instance.GetCurrentInstant();
+    }
+
     private void CloseBundleIfFull(Instant messageCreatedAt)
     {
         if (_maxNumberOfMessagesInABundle == _messageCount)

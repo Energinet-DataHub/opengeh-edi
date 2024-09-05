@@ -158,11 +158,10 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         WholesaleTotalAmountMessageDto wholesaleTotalAmountMessageDto,
         CancellationToken cancellationToken)
     {
-        var timestamp = _systemDateTimeProvider.Now();
         var message = OutgoingMessageFactory.CreateMessage(
             wholesaleTotalAmountMessageDto,
             _serializer,
-            timestamp);
+            _systemDateTimeProvider.Now());
         var outgoingMessageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 

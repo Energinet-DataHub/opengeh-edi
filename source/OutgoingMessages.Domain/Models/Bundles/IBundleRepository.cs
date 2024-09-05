@@ -45,10 +45,11 @@ public interface IBundleRepository
     /// Get bundle
     /// </summary>
     /// <param name="messageId"></param>
-    Task<Bundle?> GetBundleAsync(MessageId messageId);
+    /// <param name="cancellationToken"></param>
+    Task<Bundle?> GetBundleAsync(MessageId messageId, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Gets the oldest bundle
+    /// Gets the oldest bundle for a ActorMessageQueue.
     /// </summary>
     /// <param name="id"></param>
     /// <param name="messageCategory"></param>

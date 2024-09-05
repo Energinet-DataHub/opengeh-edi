@@ -40,9 +40,9 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
         return await _dbContext.Bundles.Where(x => x.DequeuedAt < olderThan).Take(take).ToListAsync().ConfigureAwait(false);
     }
 
-    public async Task<Bundle?> GetBundleAsync(MessageId messageId)
+    public async Task<Bundle?> GetBundleAsync(MessageId messageId, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Bundles.FirstOrDefaultAsync(x => x.MessageId == messageId).ConfigureAwait(false);
+        return await _dbContext.Bundles.FirstOrDefaultAsync(x => x.MessageId == messageId, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<Bundle?> GetOldestBundleAsync(ActorMessageQueueId id, MessageCategory? messageCategory)
