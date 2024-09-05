@@ -45,9 +45,9 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
         return await _dbContext.Bundles.FirstOrDefaultAsync(x => x.MessageId == messageId, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<Bundle?> GetOldestBundleAsync(ActorMessageQueueId id, MessageCategory? messageCategory)
+    public async Task<Bundle?> GetOldestBundleAsync(ActorMessageQueueId id, MessageCategory messageCategory)
     {
-        if (messageCategory == null)
+        if (messageCategory == MessageCategory.None)
         {
             return await _dbContext.Bundles.Where(b =>
                 b.ActorMessageQueueId == id &&

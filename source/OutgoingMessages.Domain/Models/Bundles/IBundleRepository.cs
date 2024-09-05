@@ -53,5 +53,5 @@ public interface IBundleRepository
     /// </summary>
     /// <param name="id"></param>
     /// <param name="messageCategory"></param>
-    Task<Bundle?> GetOldestBundleAsync(ActorMessageQueueId id, MessageCategory? messageCategory);
+    Task<Bundle?> GetOldestBundleAsync(ActorMessageQueueId id, MessageCategory messageCategory);
 }
