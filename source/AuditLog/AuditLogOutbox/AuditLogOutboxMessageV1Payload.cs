@@ -16,6 +16,10 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 
+/// <summary>
+/// The serialized payload of an audit log outbox message. Changes must be backward compatible, or a new version
+/// must be introduced.
+/// </summary>
 public record AuditLogOutboxMessageV1Payload(
     Guid LogId,
     Guid UserId,

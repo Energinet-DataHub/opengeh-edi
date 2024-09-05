@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Net;
-using System.Text.Json;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.AuditLog.AuditLogClient;
@@ -25,14 +24,15 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NodaTime;
-using NodaTime.Text;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.AuditLog;
 
 public class AuditLogOutboxPublisherTests : IClassFixture<AuditLogTestFixture>, IAsyncLifetime
 {
+    /// <summary>
+    /// Serialized instance of <see cref="AuditLogOutboxMessageV1Payload"/>
+    /// </summary>
     private const string AuditLogOutboxMessageV1PayloadJson = @"{
         ""LogId"":""dab87943-9885-4015-90f1-3709ace8ffd3"",
         ""UserId"":""21fb8ca5-0edb-464e-88a2-8bbabc0bbf1f"",
@@ -92,6 +92,8 @@ public class AuditLogOutboxPublisherTests : IClassFixture<AuditLogTestFixture>, 
         var expectedEntityKey = "expected-entity-key";
 
         // Act
+        // => Publish the AuditLogOutboxMessageV1PayloadJson using expected serialized payload, to ensure
+        // the AuditLogOutboxPublisher can (still) deserialize the payload
         await auditLogOutboxPublisher.PublishAsync(AuditLogOutboxMessageV1PayloadJson);
 
         // Assert
