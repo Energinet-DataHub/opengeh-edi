@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.B2BApi;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.DataAccess.DataAccess;
+using Energinet.DataHub.EDI.DataAccess.UnitOfWork;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
@@ -250,21 +251,23 @@ public class RegistrationTests
                     _host.Services.GetService(middleware).Should().NotBeNull());
     }
 
+    /// <summary>
+    /// The <see cref="UnitOfWork"/> uses dependency injection to get a list of generic DbContexts. Those
+    /// must be the same references as the specific DbContexts that are registered in the DI container and used in
+    /// repositories etc., which this test verifies.
+    /// </summary>
     [Fact]
     public void Generic_and_specific_db_contexts_have_same_references()
     {
         using var scope = _host.Services.CreateScope();
 
-        var dbContext1 = scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>();
-        var dbContext2 = scope.ServiceProvider.GetRequiredService<IncomingMessagesContext>();
-        var dbContext3 = scope.ServiceProvider.GetRequiredService<ProcessContext>();
-        var dbContext4 = scope.ServiceProvider.GetRequiredService<MasterDataContext>();
         DbContext[] specificContexts =
         [
-            dbContext1,
-            dbContext2,
-            dbContext3,
-            dbContext4,
+            scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>(),
+            scope.ServiceProvider.GetRequiredService<IncomingMessagesContext>(),
+            scope.ServiceProvider.GetRequiredService<ProcessContext>(),
+            scope.ServiceProvider.GetRequiredService<MasterDataContext>(),
+            scope.ServiceProvider.GetRequiredService<OutboxContext>(),
         ];
 
         var genericDbContexts = scope.ServiceProvider.GetServices<IEdiDbContext>()
