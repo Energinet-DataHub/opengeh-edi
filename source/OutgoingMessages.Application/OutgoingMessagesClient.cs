@@ -154,7 +154,7 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
         return messageIds;
     }
 
-    public async Task EnqueueAndCommitAsync(
+    public async Task<Guid> EnqueueAndCommitAsync(
         WholesaleTotalAmountMessageDto wholesaleTotalAmountMessageDto,
         CancellationToken cancellationToken)
     {
@@ -162,8 +162,10 @@ public class OutgoingMessagesClient : IOutgoingMessagesClient
             wholesaleTotalAmountMessageDto,
             _serializer,
             _systemDateTimeProvider.Now());
-        await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
+        var outgoingMessageId = await _enqueueMessage.EnqueueAsync(message, cancellationToken).ConfigureAwait(false);
         await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        return outgoingMessageId.Value;
     }
 
     public async Task EnqueueAndCommitAsync(

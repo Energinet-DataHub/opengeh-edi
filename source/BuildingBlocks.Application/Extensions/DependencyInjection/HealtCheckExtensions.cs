@@ -23,10 +23,11 @@ public static class HealtCheckExtensions
     /// <summary>
     /// Used for Service Bus queues where the app have peek (receiver) permissions
     /// </summary>
-    public static IServiceCollection TryAddExternalDomainServiceBusQueuesHealthCheck(this IServiceCollection services, string serviceBusConnectionString, params string[] queueNames)
+    public static IServiceCollection TryAddExternalDomainServiceBusQueuesHealthCheck(this IServiceCollection services, string serviceBusFullyQualifiedNamespace, params string[] queueNames)
     {
-        ArgumentNullException.ThrowIfNull(serviceBusConnectionString);
+        ArgumentNullException.ThrowIfNull(serviceBusFullyQualifiedNamespace);
         ArgumentNullException.ThrowIfNull(queueNames);
+
         foreach (var name in queueNames)
         {
             services.TryAddHealthChecks(
@@ -35,8 +36,9 @@ public static class HealtCheckExtensions
                 {
                     builder.AddAzureServiceBusQueue(
                         name: key,
-                        connectionString: serviceBusConnectionString,
-                        queueName: key);
+                        fullyQualifiedNamespace: serviceBusFullyQualifiedNamespace,
+                        queueName: key,
+                        tokenCredential: new DefaultAzureCredential());
                 });
         }
 

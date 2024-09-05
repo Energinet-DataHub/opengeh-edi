@@ -174,6 +174,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.Null(bundleFromDatabase.DequeuedAt),
             () => Assert.Equal(bundleFromDatabase.ClosedAt, now.ToDateTimeUtc()),
             () => Assert.Null(bundleFromDatabase.PeekedAt),
+            () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Category.Name, bundleFromDatabase.MessageCategory),
         };
 
         Assert.Multiple(propertyAssertions);

@@ -21,7 +21,7 @@ public static class BuildingBlockExtensions
 {
     public static IServiceCollection AddBuildingBlocks(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddServiceBus(configuration)
+        services.AddServiceBusClientForApplication(configuration)
             .AddFileStorage(configuration)
             .AddFeatureFlags()
             .AddMetricTracker();
