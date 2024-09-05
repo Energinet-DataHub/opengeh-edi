@@ -56,7 +56,7 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await using var context = _fixture.DatabaseManager.CreateDbContext<OutboxContext>();
-        await context.OutboxMessages.ExecuteDeleteAsync();
+        await context.Outbox.ExecuteDeleteAsync();
     }
 
     public Task DisposeAsync()
@@ -105,7 +105,7 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
 
         // Assert
         await using var outboxContext = _fixture.DatabaseManager.CreateDbContext<OutboxContext>();
-        var outboxMessage = outboxContext.OutboxMessages.SingleOrDefault();
+        var outboxMessage = outboxContext.Outbox.SingleOrDefault();
 
         outboxMessage.Should().NotBeNull();
         outboxMessage!.Type.Should().Be(AuditLogOutboxMessageV1.OutboxMessageType);

@@ -54,7 +54,7 @@ public class OutboxRetention(
 
             try
             {
-                var messagesToDelete = await _outboxContext.OutboxMessages
+                var messagesToDelete = await _outboxContext.Outbox
                     .Where(om => om.PublishedAt != null && om.PublishedAt < oneWeekAgo)
                     .Skip(skip)
                     .Take(batchSize)
@@ -64,7 +64,7 @@ public class OutboxRetention(
                 if (messagesToDelete.Count == 0)
                     break;
 
-                _outboxContext.OutboxMessages.RemoveRange(messagesToDelete);
+                _outboxContext.Outbox.RemoveRange(messagesToDelete);
                 await _outboxContext.SaveChangesAsync(cancellationToken)
                     .ConfigureAwait(false);
 

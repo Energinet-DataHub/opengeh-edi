@@ -16,13 +16,14 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.Database;
 using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Database;
 
 public class EdiDatabaseManager : SqlServerDatabaseManager<DbContext>
 {
     public EdiDatabaseManager()
-        : base("Edi")
+        : base($"Edi_{DateTime.Now:yyyyMMddHHmm}_")
     {
     }
 

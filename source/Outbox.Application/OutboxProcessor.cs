@@ -40,6 +40,9 @@ public class OutboxProcessor(
         var outboxMessageIds = await _outboxRepository.GetUnprocessedOutboxMessageIdsAsync()
             .ConfigureAwait(false);
 
+        if (outboxMessageIds.Count > 0)
+            _logger.LogInformation("Processing {OutboxMessageCount} outbox messages", outboxMessageIds.Count);
+
         foreach (var outboxMessageId in outboxMessageIds)
         {
             using var innerScope = _serviceScopeFactory.CreateScope();

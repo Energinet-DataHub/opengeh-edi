@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.Outbox.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
 using Microsoft.Azure.Functions.Worker;
@@ -90,7 +91,9 @@ public static class HostFactory
                         .AddProcessModule(context.Configuration)
                         .AddMasterDataModule(context.Configuration)
                         .AddDataAccessUnitOfWorkModule()
-                        .AddAuditLogOutboxPublisher();
+                        .AddAuditLogOutboxPublisher()
+                        .AddOutboxModule(context.Configuration)
+                        .AddOutboxProcessor();
                 })
             .ConfigureLogging(
                 (hostingContext, logging) =>

@@ -23,12 +23,12 @@ public class OutboxRepository(OutboxContext outboxContext) : IOutboxRepository
 
     public void Add(OutboxMessage outboxMessage)
     {
-        _outboxContext.OutboxMessages.Add(outboxMessage);
+        _outboxContext.Outbox.Add(outboxMessage);
     }
 
     public async Task<IReadOnlyCollection<OutboxMessageId>> GetUnprocessedOutboxMessageIdsAsync()
     {
-        var outboxMessageIds = await _outboxContext.OutboxMessages
+        var outboxMessageIds = await _outboxContext.Outbox
             .Where(om => om.PublishedAt == null)
             .Select(om => om.Id)
             .ToListAsync()
@@ -39,6 +39,6 @@ public class OutboxRepository(OutboxContext outboxContext) : IOutboxRepository
 
     public Task<OutboxMessage> GetAsync(OutboxMessageId outboxMessageId)
     {
-        return _outboxContext.OutboxMessages.SingleAsync(om => om.Id == outboxMessageId);
+        return _outboxContext.Outbox.SingleAsync(om => om.Id == outboxMessageId);
     }
 }

@@ -52,6 +52,7 @@ public static class OutboxExtensions
 
     /// <summary>
     /// Add services required for processing and publishing outbox messages.
+    /// <remarks>Requires <see cref="AddOutboxModule"/> to be registered as well</remarks>
     /// </summary>
     public static IServiceCollection AddOutboxProcessor(
         this IServiceCollection services)

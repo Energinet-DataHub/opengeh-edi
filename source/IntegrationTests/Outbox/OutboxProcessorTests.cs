@@ -91,7 +91,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
         using var readScope = serviceProvider.CreateScope();
         var readContext = readScope.ServiceProvider.GetRequiredService<OutboxContext>();
 
-        var actualMessage = readContext.OutboxMessages.SingleOrDefault(om => om.Id == outboxMessage.Id);
+        var actualMessage = readContext.Outbox.SingleOrDefault(om => om.Id == outboxMessage.Id);
 
         actualMessage.Should().NotBeNull();
 
@@ -144,7 +144,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
         using var readScope = serviceProvider.CreateScope();
         var readContext = readScope.ServiceProvider.GetRequiredService<OutboxContext>();
 
-        var actualMessage = readContext.OutboxMessages.SingleOrDefault(om => om.Id == outboxMessage.Id);
+        var actualMessage = readContext.Outbox.SingleOrDefault(om => om.Id == outboxMessage.Id);
 
         actualMessage.Should().NotBeNull();
 
@@ -197,7 +197,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
         using var readScope = serviceProvider.CreateScope();
         var readContext = readScope.ServiceProvider.GetRequiredService<OutboxContext>();
 
-        var actualMessage = readContext.OutboxMessages.SingleOrDefault(om => om.Id == outboxMessage.Id);
+        var actualMessage = readContext.Outbox.SingleOrDefault(om => om.Id == outboxMessage.Id);
 
         actualMessage.Should().NotBeNull();
 
@@ -264,7 +264,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
         using var readScope = serviceProvider.CreateScope();
         var readContext = readScope.ServiceProvider.GetRequiredService<OutboxContext>();
 
-        var actualMessage = readContext.OutboxMessages.SingleOrDefault(om => om.Id == outboxMessage.Id);
+        var actualMessage = readContext.Outbox.SingleOrDefault(om => om.Id == outboxMessage.Id);
 
         actualMessage.Should().NotBeNull();
 

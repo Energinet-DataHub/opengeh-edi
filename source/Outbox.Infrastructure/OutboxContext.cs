@@ -56,7 +56,7 @@ public class OutboxContext : DbContext, IEdiDbContext
     }
 
     // ReSharper disable once UnusedAutoPropertyAccessor.Local -- Used by EF
-    public DbSet<OutboxMessage> OutboxMessages { get; private set; }
+    public DbSet<OutboxMessage> Outbox { get; private set; }
 
     public override int SaveChanges()
     {
