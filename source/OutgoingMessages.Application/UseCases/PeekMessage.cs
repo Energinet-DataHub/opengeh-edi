@@ -17,7 +17,9 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
@@ -38,6 +40,7 @@ public class PeekMessage
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
     private readonly IArchivedMessagesClient _archivedMessageClient;
     private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IBundleRepository _bundleRepository;
 
     public PeekMessage(
         IActorMessageQueueRepository actorMessageQueueRepository,
@@ -46,7 +49,8 @@ public class PeekMessage
         IOutgoingMessageRepository outgoingMessageRepository,
         ActorMessageQueueContext actorMessageQueueContext,
         IArchivedMessagesClient archivedMessageClient,
-        ISystemDateTimeProvider systemDateTimeProvider)
+        ISystemDateTimeProvider systemDateTimeProvider,
+        IBundleRepository bundleRepository)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _marketDocumentRepository = marketDocumentRepository;
@@ -55,6 +59,7 @@ public class PeekMessage
         _actorMessageQueueContext = actorMessageQueueContext;
         _archivedMessageClient = archivedMessageClient;
         _systemDateTimeProvider = systemDateTimeProvider;
+        _bundleRepository = bundleRepository;
     }
 
     public async Task<PeekResultDto?> PeekAsync(PeekRequestDto request, CancellationToken cancellationToken)
@@ -66,8 +71,6 @@ public class PeekMessage
             request = request with { ActorRole = request.ActorRole.ForActorMessageQueue(), };
         }
 
-        await PeekAndCommitToEnsureBundleIsClosedAsync(request).ConfigureAwait(false);
-
         var actorMessageQueue = await
             _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.ActorRole).ConfigureAwait(false);
 
@@ -76,51 +79,68 @@ public class PeekMessage
             return null;
         }
 
-        var peekResult = request.DocumentFormat == DocumentFormat.Ebix ? actorMessageQueue.Peek() : actorMessageQueue.Peek(request.MessageCategory);
+        await CloseBundleAndCommitAsync(request, actorMessageQueue.Id).ConfigureAwait(false);
 
-        if (peekResult is null)
+        var bundle = await _bundleRepository.GetOldestBundleAsync(actorMessageQueue.Id, request.MessageCategory).ConfigureAwait(false);
+
+        if (bundle is null)
         {
             return null;
         }
+
+        bundle.PeekBundle();
+
+        var peekResult = new PeekResult(bundle.Id, bundle.MessageId);
 
         var marketDocument = await _marketDocumentRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);
 
         if (marketDocument == null)
         {
-            var timestamp = _systemDateTimeProvider.Now();
-
-            var outgoingMessageBundle = await _outgoingMessageRepository.GetAsync(peekResult).ConfigureAwait(false);
-            var marketDocumentStream = await _documentFactory.CreateFromAsync(outgoingMessageBundle, request.DocumentFormat, timestamp).ConfigureAwait(false);
-
-            var archivedMessageToCreate = new ArchivedMessage(
-                outgoingMessageBundle.MessageId.Value,
-                outgoingMessageBundle.OutgoingMessages.Select(om => om.EventId).ToArray(),
-                outgoingMessageBundle.DocumentType.ToString(),
-                outgoingMessageBundle.SenderId.Value,
-                outgoingMessageBundle.Receiver.Number.Value,
-                timestamp,
-                outgoingMessageBundle.BusinessReason,
-                ArchivedMessageType.OutgoingMessage,
-                marketDocumentStream,
-                outgoingMessageBundle.RelatedToMessageId);
-
-            var archivedFile = await _archivedMessageClient.CreateAsync(archivedMessageToCreate, cancellationToken).ConfigureAwait(false);
-
-            marketDocument = new MarketDocument(peekResult.BundleId, archivedFile);
-            _marketDocumentRepository.Add(marketDocument);
+            marketDocument = await GenerateMarketDocumentAsync(request, cancellationToken, peekResult).ConfigureAwait(false);
         }
 
         return new PeekResultDto(marketDocument.GetMarketDocumentStream().Stream, peekResult.MessageId);
     }
 
-    private async Task PeekAndCommitToEnsureBundleIsClosedAsync(PeekRequestDto request)
+    private async Task<MarketDocument> GenerateMarketDocumentAsync(
+        PeekRequestDto request,
+        CancellationToken cancellationToken,
+        PeekResult peekResult)
     {
-        // Right after we call Peek(), we close the bundle. This is to ensure that the bundle wont be added more messages, after we have peeked.
+        MarketDocument marketDocument;
+        var timestamp = _systemDateTimeProvider.Now();
+
+        var outgoingMessageBundle = await _outgoingMessageRepository.GetAsync(peekResult).ConfigureAwait(false);
+        var marketDocumentStream = await _documentFactory.CreateFromAsync(outgoingMessageBundle, request.DocumentFormat, timestamp).ConfigureAwait(false);
+
+        var archivedMessageToCreate = new ArchivedMessage(
+            outgoingMessageBundle.MessageId.Value,
+            outgoingMessageBundle.OutgoingMessages.Select(om => om.EventId).ToArray(),
+            outgoingMessageBundle.DocumentType.ToString(),
+            outgoingMessageBundle.SenderId.Value,
+            outgoingMessageBundle.Receiver.Number.Value,
+            timestamp,
+            outgoingMessageBundle.BusinessReason,
+            ArchivedMessageType.OutgoingMessage,
+            marketDocumentStream,
+            outgoingMessageBundle.RelatedToMessageId);
+
+        var archivedFile = await _archivedMessageClient.CreateAsync(archivedMessageToCreate, cancellationToken).ConfigureAwait(false);
+
+        marketDocument = new MarketDocument(peekResult.BundleId, archivedFile);
+        _marketDocumentRepository.Add(marketDocument);
+        return marketDocument;
+    }
+
+    private async Task CloseBundleAndCommitAsync(PeekRequestDto request, ActorMessageQueueId actorMessageQueueId)
+    {
+        // Right after we call Close(), we close the bundle. This is to ensure that the bundle wont be added more messages, after we have peeked.
         // And before we are able to update the bundle to closed in the database.
-        var actorMessageQueue = await
-            _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.ActorRole).ConfigureAwait(false);
-        var peekResult = actorMessageQueue?.Peek(request.MessageCategory);
-        if (peekResult != null)
+        var bundle = await _bundleRepository.GetOldestBundleAsync(actorMessageQueueId, request.MessageCategory).ConfigureAwait(false);
+        if (bundle != null)
+        {
+            bundle.Close();
             await _actorMessageQueueContext.SaveChangesAsync().ConfigureAwait(false);
+        }
     }
 }

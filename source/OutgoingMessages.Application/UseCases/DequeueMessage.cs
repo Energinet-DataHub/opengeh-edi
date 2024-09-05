@@ -16,6 +16,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Exceptions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
+using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Dequeue;
 using Microsoft.Extensions.Logging;
 
@@ -27,14 +28,12 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 /// </summary>
 public class DequeueMessage
 {
-    private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
+    private readonly IBundleRepository _bundleRepository;
     private readonly ILogger<DequeueMessage> _logger;
 
-    public DequeueMessage(
-        IActorMessageQueueRepository actorMessageQueueRepository,
-        ILogger<DequeueMessage> logger)
+    public DequeueMessage(IBundleRepository bundleRepository, ILogger<DequeueMessage> logger)
     {
-        _actorMessageQueueRepository = actorMessageQueueRepository;
+        _bundleRepository = bundleRepository;
         _logger = logger;
     }
 
@@ -58,15 +57,14 @@ public class DequeueMessage
             return new DequeueRequestResultDto(false);
         }
 
-        var actorQueue = await _actorMessageQueueRepository.ActorMessageQueueForAsync(request.ActorNumber, request.ActorRole).ConfigureAwait(false);
-        if (actorQueue == null)
-        {
-            _logger.LogWarning("Actor queue not found for actor number: {ActorNumber} and market role: {MarketRole}", request.ActorNumber, request.ActorRole);
-            return new DequeueRequestResultDto(false);
-        }
+        bool dequeueResult = false;
+        var bundle = await _bundleRepository.GetBundleAsync(messageId, cancellationToken).ConfigureAwait(false);
+        if (bundle == null)
+            return new DequeueRequestResultDto(dequeueResult);
 
-        var successful = actorQueue.Dequeue(messageId);
-        _logger.LogInformation("Dequeue request result: {Successful} for messageId: {BundleId}", successful, messageId.Value);
-        return new DequeueRequestResultDto(successful);
+        dequeueResult = bundle.TryDequeue();
+
+        _logger.LogInformation("Dequeue request result: {Successful} for messageId: {BundleId}", dequeueResult, messageId.Value);
+        return new DequeueRequestResultDto(dequeueResult);
     }
 }
