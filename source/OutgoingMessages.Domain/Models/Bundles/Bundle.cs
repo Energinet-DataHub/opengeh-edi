@@ -46,6 +46,7 @@ public sealed class Bundle
         DocumentTypeInBundle = documentTypeInBundle;
         Created = created;
         RelatedToMessageId = relatedToMessageId;
+        MessageCategory = DocumentTypeInBundle.Category;
     }
 
     private Bundle()
@@ -75,6 +76,8 @@ public sealed class Bundle
     public BusinessReason BusinessReason { get; }
 
     public Instant? ClosedAt { get; private set; }
+
+    public MessageCategory MessageCategory { get; set; }
 
     public void PeekBundle()
     {
