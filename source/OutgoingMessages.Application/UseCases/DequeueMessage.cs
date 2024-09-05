@@ -28,16 +28,11 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 /// </summary>
 public class DequeueMessage
 {
-    private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
     private readonly IBundleRepository _bundleRepository;
     private readonly ILogger<DequeueMessage> _logger;
 
-    public DequeueMessage(
-        IActorMessageQueueRepository actorMessageQueueRepository,
-        IBundleRepository bundleRepository,
-        ILogger<DequeueMessage> logger)
+    public DequeueMessage(IBundleRepository bundleRepository, ILogger<DequeueMessage> logger)
     {
-        _actorMessageQueueRepository = actorMessageQueueRepository;
         _bundleRepository = bundleRepository;
         _logger = logger;
     }

@@ -19,7 +19,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 
 public class SystemDateTimeProviderStub : ISystemDateTimeProvider
 {
-    private Instant _now = SystemClock.Instance.GetCurrentInstant();
+    private Instant? _now;
 
     public void SetNow(Instant now)
     {
@@ -28,6 +28,6 @@ public class SystemDateTimeProviderStub : ISystemDateTimeProvider
 
     public Instant Now()
     {
-        return _now;
+        return _now ?? SystemClock.Instance.GetCurrentInstant();
     }
 }
