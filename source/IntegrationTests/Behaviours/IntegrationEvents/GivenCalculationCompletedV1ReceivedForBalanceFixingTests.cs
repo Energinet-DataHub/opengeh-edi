@@ -349,7 +349,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         peekResultsForEnergySupplier.Should().HaveCount(expectedNumberOfPeekResults, "Fee result contains a single gap, which should result in two messages");
 
         // Assert first fee is correct and within expected period
-        var assertForFirstBundle = new AssertNotifyAggregatedMeasureDataJsonDocument(peekResultsForEnergySupplier[0].Bundle);
+        var assertForFirstBundle = new AssertNotifyAggregatedMeasureDataJsonDocument(peekResultsForEnergySupplier[2].Bundle);
         assertForFirstBundle.HasPeriod(
             new Period(
                 Instant.FromUtc(2023, 2, 1, 23, 0, 0),
