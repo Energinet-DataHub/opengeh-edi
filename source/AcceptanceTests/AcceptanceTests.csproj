@@ -18,9 +18,6 @@
       <None Update="Drivers\Ebix\DH3-test-mosaik-energysupplier-private-and-public.pfx">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="acceptancetest.local.settings.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
 
     <ItemGroup>
