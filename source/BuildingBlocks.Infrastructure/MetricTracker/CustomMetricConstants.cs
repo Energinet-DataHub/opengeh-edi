@@ -12,19 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MetricTracker;
 
-namespace BuildingBlocks.Application.Extensions.DependencyInjection;
-
-public static class BuildingBlockExtensions
+public class CustomMetricConstants
 {
-    public static IServiceCollection AddBuildingBlocks(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddServiceBus(configuration)
-            .AddFileStorage(configuration)
-            .AddFeatureFlags()
-            .AddMetricTracker();
-        return services;
-    }
+    public const string EnqueueMessagesDuration = nameof(EnqueueMessagesDuration);
 }

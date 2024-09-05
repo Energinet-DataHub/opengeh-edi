@@ -12,19 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Microsoft.ApplicationInsights;
 
-namespace BuildingBlocks.Application.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MetricTracker;
 
-public static class BuildingBlockExtensions
+public class MetricTracker(TelemetryClient telemetryClient) : IMetricTracker
 {
-    public static IServiceCollection AddBuildingBlocks(this IServiceCollection services, IConfiguration configuration)
+    public void TrackCustomMetric(string name, int value)
     {
-        services.AddServiceBus(configuration)
-            .AddFileStorage(configuration)
-            .AddFeatureFlags()
-            .AddMetricTracker();
-        return services;
+        telemetryClient.GetMetric(name).TrackValue(value);
     }
 }
