@@ -349,36 +349,36 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         peekResultsForEnergySupplier.Should().HaveCount(expectedNumberOfPeekResults, "Fee result contains a single gap, which should result in two messages");
 
         // Assert first fee is correct and within expected period
-        var assertForFirstBundle = new AssertNotifyAggregatedMeasureDataJsonDocument(peekResultsForEnergySupplier[2].Bundle);
+        var assertForFirstBundle = new AssertNotifyAggregatedMeasureDataJsonDocument(peekResultsForEnergySupplier[0].Bundle);
         assertForFirstBundle.HasPeriod(
-            new Period(
-                Instant.FromUtc(2023, 2, 1, 23, 0, 0),
-                Instant.FromUtc(2023, 2, 2, 00, 0, 0)));
-        assertForFirstBundle.HasPoints(
-            [
-                new TimeSeriesPointAssertionInput(Instant.FromUtc(2023, 2, 1, 23, 0, 0), 39471.336m, CalculatedQuantityQuality.Measured),
-            ]);
-
-        // Assert second fee is correct and within expected period
-        var assertForSecondBundle = new AssertNotifyAggregatedMeasureDataJsonDocument(peekResultsForEnergySupplier[1].Bundle);
-        assertForSecondBundle.HasPeriod(
             new Period(
                 Instant.FromUtc(2023, 2, 2, 02, 0, 0),
                 Instant.FromUtc(2023, 2, 2, 03, 0, 0)));
-        assertForSecondBundle.HasPoints(
-            [
-                new TimeSeriesPointAssertionInput(Instant.FromUtc(2023, 2, 2, 02, 0, 0),  39472.336m, CalculatedQuantityQuality.Measured),
-            ]);
+        assertForFirstBundle.HasPoints(
+        [
+            new TimeSeriesPointAssertionInput(Instant.FromUtc(2023, 2, 2, 02, 0, 0),  39472.336m, CalculatedQuantityQuality.Measured),
+        ]);
 
-        // Assert thrid fee is correct and within expected period
-        var assertForThirdBundle = new AssertNotifyAggregatedMeasureDataJsonDocument(peekResultsForEnergySupplier[2].Bundle);
-        assertForThirdBundle.HasPeriod(
+         // Assert second fee is correct and within expected period
+        var assertForSecondBundle = new AssertNotifyAggregatedMeasureDataJsonDocument(peekResultsForEnergySupplier[1].Bundle);
+        assertForSecondBundle.HasPeriod(
             new Period(
                 Instant.FromUtc(2023, 2, 2, 05, 0, 0),
                 Instant.FromUtc(2023, 2, 2, 06, 0, 0)));
+        assertForSecondBundle.HasPoints(
+        [
+            new TimeSeriesPointAssertionInput(Instant.FromUtc(2023, 2, 2, 05, 0, 0), 39473.336m, CalculatedQuantityQuality.Measured),
+        ]);
+
+        // Assert third fee is correct and within expected period
+        var assertForThirdBundle = new AssertNotifyAggregatedMeasureDataJsonDocument(peekResultsForEnergySupplier[2].Bundle);
+        assertForThirdBundle.HasPeriod(
+            new Period(
+                Instant.FromUtc(2023, 2, 1, 23, 0, 0),
+                Instant.FromUtc(2023, 2, 2, 00, 0, 0)));
         assertForThirdBundle.HasPoints(
             [
-                new TimeSeriesPointAssertionInput(Instant.FromUtc(2023, 2, 2, 05, 0, 0), 39473.336m, CalculatedQuantityQuality.Measured),
+                new TimeSeriesPointAssertionInput(Instant.FromUtc(2023, 2, 1, 23, 0, 0), 39471.336m, CalculatedQuantityQuality.Measured),
             ]);
     }
 
