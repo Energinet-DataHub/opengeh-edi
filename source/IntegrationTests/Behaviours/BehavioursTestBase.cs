@@ -407,10 +407,10 @@ public class BehavioursTestBase : IDisposable
     private async Task ProcessBackgroundTasksAsync()
     {
         using var scope = _serviceProvider.CreateScope();
-        var datetimeProvider = scope.ServiceProvider.GetRequiredService<IClock>();
+        var clock = scope.ServiceProvider.GetRequiredService<IClock>();
         await scope.ServiceProvider
             .GetRequiredService<IMediator>()
-            .Publish(new TenSecondsHasHasPassed(datetimeProvider.GetCurrentInstant()));
+            .Publish(new TenSecondsHasHasPassed(clock.GetCurrentInstant()));
     }
 
     private ServiceProvider BuildServices(ITestOutputHelper testOutputHelper)

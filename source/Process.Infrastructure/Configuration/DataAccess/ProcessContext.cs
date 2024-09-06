@@ -42,12 +42,12 @@ public class ProcessContext : DbContext
         DbContextOptions<ProcessContext> options,
         ExecutionContext executionContext,
         AuthenticatedActor authenticatedActor,
-        IClock systemDateTimeProvider)
+        IClock clock)
         : base(options)
     {
         _executionContext = executionContext;
         _authenticatedActor = authenticatedActor;
-        _clock = systemDateTimeProvider;
+        _clock = clock;
     }
 
     public ProcessContext()

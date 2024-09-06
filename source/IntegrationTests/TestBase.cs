@@ -278,8 +278,8 @@ public class TestBase : IDisposable
 
     private Task ProcessBackgroundTasksAsync()
     {
-        var datetimeProvider = GetService<IClock>();
-        return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(datetimeProvider.GetCurrentInstant()));
+        var clock = GetService<IClock>();
+        return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(clock.GetCurrentInstant()));
     }
 
     private void BuildServices(ITestOutputHelper testOutputHelper)

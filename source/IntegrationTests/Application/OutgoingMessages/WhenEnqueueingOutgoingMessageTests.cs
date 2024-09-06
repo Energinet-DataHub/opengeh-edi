@@ -626,7 +626,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     private async Task CreateActorMessageQueueInDatabase(Guid id, ActorNumber actorNumber, ActorRole actorRole)
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var systemDateTimeProvider = GetService<IClock>();
+        var clock = GetService<IClock>();
 
         await connection.ExecuteAsync(
             @"INSERT INTO [dbo].[ActorMessageQueues] (Id, ActorNumber, ActorRole, CreatedBy, CreatedAt)
@@ -637,7 +637,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
                 ActorNumber = actorNumber.Value,
                 ActorRole = actorRole.Code,
                 CreatedBy = "Test",
-                CreatedAt = systemDateTimeProvider.GetCurrentInstant(),
+                CreatedAt = clock.GetCurrentInstant(),
             });
     }
 
