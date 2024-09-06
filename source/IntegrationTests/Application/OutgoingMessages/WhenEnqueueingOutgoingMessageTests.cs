@@ -46,7 +46,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
 {
     private readonly AcceptedEnergyResultMessageDtoBuilder _acceptedEnergyResultMessageDtoBuilder;
     private readonly RejectedEnergyResultMessageDtoBuilder _rejectedEnergyResultMessageDtoBuilder;
-    private readonly ClockStub _systemDateTimeProvider;
+    private readonly ClockStub _clockStub;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ActorMessageQueueContext _context;
     private readonly IFileStorageClient _fileStorageClient;
@@ -61,7 +61,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         _rejectedEnergyResultMessageDtoBuilder = new RejectedEnergyResultMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         _fileStorageClient = GetService<IFileStorageClient>();
-        _systemDateTimeProvider = (ClockStub)GetService<IClock>();
+        _clockStub = (ClockStub)GetService<IClock>();
         _context = GetService<ActorMessageQueueContext>();
         _wholesaleAmountPerChargeDtoBuilder = new WholesaleAmountPerChargeDtoBuilder();
         _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
@@ -77,7 +77,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             .Build();
 
         var now = Instant.FromUtc(2024, 1, 1, 0, 0);
-        _systemDateTimeProvider.SetCurrentInstant(now);
+        _clockStub.SetCurrentInstant(now);
 
         // Act
         var createdOutgoingMessageId = await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
@@ -143,7 +143,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             .Build();
 
         var now = Instant.FromUtc(2024, 1, 1, 0, 0);
-        _systemDateTimeProvider.SetCurrentInstant(now);
+        _clockStub.SetCurrentInstant(now);
 
         // Act
         await EnqueueAndCommitAsync(message);
@@ -210,7 +210,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     {
         var message = _acceptedEnergyResultMessageDtoBuilder.Build();
         await EnqueueAndCommitAsync(message);
-        _systemDateTimeProvider.SetCurrentInstant(_systemDateTimeProvider.GetCurrentInstant().PlusSeconds(1));
+        _clockStub.SetCurrentInstant(_clockStub.GetCurrentInstant().PlusSeconds(1));
         var message2 = _acceptedEnergyResultMessageDtoBuilder.Build();
         await EnqueueAndCommitAsync(message2);
 
