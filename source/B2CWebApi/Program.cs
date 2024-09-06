@@ -22,8 +22,10 @@ using Energinet.DataHub.Core.App.WebApp.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
+using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.Outbox.Application.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,13 +48,13 @@ builder.Services
     // Durable client (orchestration)
     .AddDurableClient(builder.Configuration)
 
-    // Audit logging
-    .AddAuditLog()
-
     // Modules
+    .AddDataAccessUnitOfWorkModule()
+    .AddOutboxModule(builder.Configuration)
     .AddIncomingMessagesModule(builder.Configuration)
     .AddArchivedMessagesModule(builder.Configuration)
     .AddMasterDataModule(builder.Configuration)
+    .AddAuditLog()
 
     // Security
     // Note that this requires you to have

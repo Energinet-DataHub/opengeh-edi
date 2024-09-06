@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Net.Http.Json;
 using System.Text;
-using System.Text.Json;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NodaTime;
@@ -26,9 +25,11 @@ namespace Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 internal class AuditLogHttpClient(
     IHttpClientFactory httpClientFactory,
     IOptions<AuditLogOptions> auditLogOptions,
+    ISerializer serializer,
     ILogger<AuditLogHttpClient> logger) : IAuditLogClient
 {
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+    private readonly ISerializer _serializer = serializer;
     private readonly ILogger _logger = logger;
     private readonly AuditLogOptions _auditLogOptions = auditLogOptions.Value;
 
@@ -53,7 +54,7 @@ internal class AuditLogHttpClient(
         {
             null => string.Empty,
             string p => p,
-            _ => JsonSerializer.Serialize(payload),
+            _ => _serializer.Serialize(payload),
         };
 
         var requestContent = new AuditLogRequestBody(
@@ -73,7 +74,7 @@ internal class AuditLogHttpClient(
 
         using var request = new HttpRequestMessage(HttpMethod.Post, _auditLogOptions.IngestionUrl);
         using var requestStringContent = new StringContent(
-            JsonSerializer.Serialize(requestContent),
+            _serializer.Serialize(requestContent),
             Encoding.UTF8,
             "application/json");
         request.Content = requestStringContent;

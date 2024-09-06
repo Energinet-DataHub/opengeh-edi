@@ -60,7 +60,7 @@ public class RequestAggregatedMeasureDataController : ControllerBase
     [Authorize(Roles = "request-aggregated-measured-data:view")]
     public async Task<ActionResult> RequestAsync(RequestAggregatedMeasureDataMarketRequest request, CancellationToken cancellationToken)
     {
-        await _auditLogger.LogAsync(
+        await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
                 activity: AuditLogActivity.RequestEnergyResults,
                 activityOrigin: HttpContext.Request.GetDisplayUrl(),

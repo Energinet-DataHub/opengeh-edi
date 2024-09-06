@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Net;
 using System.Text.Json;
 using Energinet.DataHub.EDI.AuditLog;
-using Energinet.DataHub.EDI.AuditLog.AuditLogClient;
+using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.B2CWebApi.AppTests.Fixture;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
+using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.EntityFrameworkCore;
 using NodaTime;
-using NodaTime.Text;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -52,10 +53,10 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
         ];
     }
 
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
-        _fixture.AuditLogMockServer.ResetCallLogs();
-        return Task.CompletedTask;
+        await using var context = _fixture.DatabaseManager.CreateDbContext<OutboxContext>();
+        await context.Outbox.ExecuteDeleteAsync();
     }
 
     public Task DisposeAsync()
@@ -70,12 +71,13 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
     /// </summary>
     [Theory]
     [MemberData(nameof(GetB2CWebApiRequests))]
-    public async Task B2CWebApiRequest_WhenRequestPerformed_CorrectAuditLogRequestIsSent(
+    public async Task B2CWebApiRequest_WhenRequestPerformed_CorrectAuditLogRequestAddedToOutbox(
         HttpRequestMessage request,
         string actorRole,
         AuditLogActivity expectedActivity)
     {
         // Arrange
+        var serializer = new Serializer();
         var expectedUserId = Guid.NewGuid();
         var expectedActorId = Guid.NewGuid();
         string[] permissions =
@@ -102,43 +104,25 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
         await _fixture.WebApiClient.SendAsync(request);
 
         // Assert
-        var auditLogCalls = _fixture.AuditLogMockServer.GetAuditLogIngestionCalls();
+        await using var outboxContext = _fixture.DatabaseManager.CreateDbContext<OutboxContext>();
+        var outboxMessage = outboxContext.Outbox.SingleOrDefault();
 
-        var auditLogCall = auditLogCalls.Should()
-            .ContainSingle()
-            .Subject;
+        outboxMessage.Should().NotBeNull();
+        outboxMessage!.Type.Should().Be(AuditLogOutboxMessageV1.OutboxMessageType);
+        outboxMessage.ShouldProcessNow(SystemClock.Instance).Should().BeTrue();
+        var auditLogPayload = serializer.Deserialize<AuditLogOutboxMessageV1Payload>(outboxMessage.Payload);
 
-        AuditLogRequestBody? deserializedBody;
-        using (new AssertionScope())
-        {
-            // => Ensure that the audit log request was successful
-            auditLogCall.Response.StatusCode.Should().Be((int)HttpStatusCode.OK);
-
-            // => Ensure that the audit log request contains a body
-            auditLogCall.Request.Body.Should().NotBeNull();
-
-            // => Ensure that the audit log request body can be deserialized to an instance of AuditLogRequestBody
-            var deserializeBody = () =>
-                JsonSerializer.Deserialize<AuditLogRequestBody>(auditLogCall.Request.Body ?? string.Empty, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                });
-
-            deserializedBody = deserializeBody.Should().NotThrow().Subject;
-            deserializedBody.Should().NotBeNull();
-        }
-
-        deserializedBody!.LogId.Should().NotBeEmpty();
-        deserializedBody.UserId.Should().Be(expectedUserId);
-        deserializedBody.ActorId.Should().Be(expectedActorId);
-        deserializedBody.SystemId.Should().Be(Guid.Parse("688b2dca-7231-490f-a731-d7869d33fe5e")); // EDI subsystem id
-        deserializedBody.Permissions.Should().Be(expectedPermissions);
-        InstantPattern.General.Parse(deserializedBody.OccurredOn).Success.Should().BeTrue($"because {deserializedBody.OccurredOn} should be a valid Instant");
-        deserializedBody.Activity.Should().Be(expectedActivity.Identifier);
-        deserializedBody.Origin.Should().Be(request.RequestUri?.AbsoluteUri);
-        deserializedBody.Payload.Should().NotBeNull();
-        deserializedBody.AffectedEntityType.Should().NotBeNullOrWhiteSpace();
-        deserializedBody.AffectedEntityKey.Should().NotBeNull();
+        using var assertionScope = new AssertionScope();
+        auditLogPayload!.LogId.Should().NotBeEmpty();
+        auditLogPayload.UserId.Should().Be(expectedUserId);
+        auditLogPayload.ActorId.Should().Be(expectedActorId);
+        auditLogPayload.SystemId.Should().Be(Guid.Parse("688b2dca-7231-490f-a731-d7869d33fe5e")); // EDI subsystem id
+        auditLogPayload.Permissions.Should().Be(expectedPermissions);
+        auditLogPayload.OccuredOn.Should().NotBeNull();
+        auditLogPayload.Activity.Should().Be(expectedActivity.Identifier);
+        auditLogPayload.Origin.Should().Be(request.RequestUri?.AbsoluteUri);
+        auditLogPayload.Payload.Should().NotBeNull();
+        auditLogPayload.AffectedEntityType.Should().NotBeNullOrWhiteSpace();
 
         request.Dispose();
     }

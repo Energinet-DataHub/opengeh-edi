@@ -42,7 +42,7 @@ public class ArchivedMessageSearchController : ControllerBase
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        await _auditLogger.LogAsync(
+        await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
                 activity: AuditLogActivity.ArchivedMessagesSearch,
                 activityOrigin: HttpContext.Request.GetDisplayUrl(),

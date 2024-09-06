@@ -62,7 +62,7 @@ public class RequestWholesaleSettlementController : ControllerBase
         RequestWholesaleSettlementMarketRequest request,
         CancellationToken cancellationToken)
     {
-        await _auditLogger.LogAsync(
+        await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
                 activity: AuditLogActivity.RequestWholesaleResults,
                 activityOrigin: HttpContext.Request.GetDisplayUrl(),

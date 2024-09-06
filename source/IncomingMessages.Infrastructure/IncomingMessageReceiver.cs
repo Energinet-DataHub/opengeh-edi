@@ -61,14 +61,14 @@ public class IncomingMessageReceiver : IIncomingMessageReceiver
 
         try
         {
-            await ResilientTransaction.New(_incomingMessagesContext, async () =>
+            await ResilientTransaction.New(async () =>
                 {
                     await _incomingMessagePublisher.PublishAsync(
                             incomingMessage,
                             cancellationToken)
                         .ConfigureAwait(false);
                 })
-                .SaveChangesAsync(new DbContext[] { _incomingMessagesContext, })
+                .SaveChangesAsync([_incomingMessagesContext])
                 .ConfigureAwait(false);
             var transactionIds = string.Join(',', incomingMessage.Series.Select(x => x.TransactionId));
             _logger.LogInformation("Message with id {MessageId} received with transaction ids {TransactionIds}", incomingMessage.MessageId, transactionIds);
