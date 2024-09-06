@@ -86,7 +86,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
             .Returns(now);
 
         // Act
-        await processor.ProcessOutboxAsync();
+        await processor.ProcessOutboxAsync(CancellationToken.None);
 
         // Assert
         using var readScope = serviceProvider.CreateScope();
@@ -139,7 +139,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
             .Throws<Exception>();
 
         // Act
-        await processor.ProcessOutboxAsync();
+        await processor.ProcessOutboxAsync(CancellationToken.None);
 
         // Assert
         using var readScope = serviceProvider.CreateScope();
@@ -192,7 +192,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
 
         // Act
         // => Clock is set to the same time as the message failed, so the message is not ready to be retried yet
-        await processor.ProcessOutboxAsync();
+        await processor.ProcessOutboxAsync(CancellationToken.None);
 
         // Assert
         using var readScope = serviceProvider.CreateScope();
@@ -259,7 +259,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
             .Returns(now);
 
         // Act
-        await processor.ProcessOutboxAsync();
+        await processor.ProcessOutboxAsync(CancellationToken.None);
 
         // Assert
         using var readScope = serviceProvider.CreateScope();

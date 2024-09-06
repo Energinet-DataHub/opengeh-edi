@@ -35,9 +35,9 @@ public class OutboxProcessor(
     private readonly IClock _clock = clock;
     private readonly ILogger<OutboxProcessor> _logger = logger;
 
-    public async Task ProcessOutboxAsync()
+    public async Task ProcessOutboxAsync(CancellationToken cancellationToken)
     {
-        var outboxMessageIds = await _outboxRepository.GetUnprocessedOutboxMessageIdsAsync()
+        var outboxMessageIds = await _outboxRepository.GetUnprocessedOutboxMessageIdsAsync(cancellationToken)
             .ConfigureAwait(false);
 
         if (outboxMessageIds.Count > 0)
@@ -45,44 +45,11 @@ public class OutboxProcessor(
 
         foreach (var outboxMessageId in outboxMessageIds)
         {
-            using var innerScope = _serviceScopeFactory.CreateScope();
-            var outboxContext = innerScope.ServiceProvider.GetRequiredService<OutboxContext>();
-            var repository = innerScope.ServiceProvider.GetRequiredService<IOutboxRepository>();
-            var outboxMessagePublishers = innerScope.ServiceProvider.GetServices<IOutboxPublisher>();
-
-            var outboxMessage = await repository.GetAsync(outboxMessageId)
-                .ConfigureAwait(false);
-
-            if (!outboxMessage.ShouldProcessNow(_clock))
-                continue;
+            cancellationToken.ThrowIfCancellationRequested();
 
             try
             {
-                outboxMessage.SetAsProcessing(_clock);
-                await outboxContext.SaveChangesAsync().ConfigureAwait(false);
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                _logger.LogWarning(
-                    "Outbox message with id {OutboxMessageId} processing was already started",
-                    outboxMessageId);
-                continue;
-            }
-
-            try
-            {
-                // Process outbox message
-                var outboxMessagePublisher = outboxMessagePublishers
-                    .SingleOrDefault(p => p.CanPublish(outboxMessage.Type));
-
-                if (outboxMessagePublisher == null)
-                    throw new InvalidOperationException($"No processor found for outbox message type {outboxMessage.Type} and id {outboxMessage.Id}");
-
-                await outboxMessagePublisher.PublishAsync(outboxMessage.Payload)
-                    .ConfigureAwait(false);
-
-                outboxMessage.SetAsProcessed(_clock);
-                await outboxContext.SaveChangesAsync()
+                await ProcessOutboxMessageAsync(outboxMessageId, cancellationToken)
                     .ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -94,7 +61,61 @@ public class OutboxProcessor(
     }
 
     /// <summary>
+    /// Process outbox message in a new scope, to avoid situations where one message failing stops future messages
+    /// from processing.
+    /// <remarks>
+    /// Uses CancellationToken until the outbox message has begun publishing, after processing
+    /// have begun we want to save the changes before cancelling the task.
+    /// </remarks>
+    /// </summary>
+    private async Task ProcessOutboxMessageAsync(OutboxMessageId outboxMessageId, CancellationToken cancellationToken)
+    {
+        using var innerScope = _serviceScopeFactory.CreateScope();
+        var outboxContext = innerScope.ServiceProvider.GetRequiredService<OutboxContext>();
+        var repository = innerScope.ServiceProvider.GetRequiredService<IOutboxRepository>();
+        var outboxMessagePublishers = innerScope.ServiceProvider.GetServices<IOutboxPublisher>();
+
+        var outboxMessage = await repository.GetAsync(outboxMessageId, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (!outboxMessage.ShouldProcessNow(_clock))
+            return;
+
+        try
+        {
+            outboxMessage.SetAsProcessing(_clock);
+            await outboxContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            _logger.LogWarning(
+                "Outbox message with id {OutboxMessageId} processing was already started",
+                outboxMessageId);
+            return;
+        }
+
+        // Process outbox message
+        var outboxMessagePublisher = outboxMessagePublishers
+            .SingleOrDefault(p => p.CanPublish(outboxMessage.Type));
+
+        if (outboxMessagePublisher == null)
+            throw new InvalidOperationException($"No processor found for outbox message type {outboxMessage.Type} and id {outboxMessage.Id}");
+
+        await outboxMessagePublisher.PublishAsync(outboxMessage.Payload)
+            .ConfigureAwait(false);
+
+        outboxMessage.SetAsProcessed(_clock);
+
+        await outboxContext
+            // ReSharper disable once MethodSupportsCancellation
+            // We want to save the changes before cancelling the task, since the outbox message is already published
+            .SaveChangesAsync()
+            .ConfigureAwait(false);
+    }
+
+    /// <summary>
     /// Set as failed in a new scope, to avoid situations where the exception is cached on the existing db context.
+    /// <remarks>Uses CancellationToken.None since we want to save the error even if cancellation is requested</remarks>
     /// </summary>
     private async Task SetAsFailedAsync(OutboxMessageId outboxMessageId, Exception exception)
     {
@@ -107,12 +128,12 @@ public class OutboxProcessor(
         var outboxContext = errorScope.ServiceProvider.GetRequiredService<OutboxContext>();
         var repository = errorScope.ServiceProvider.GetRequiredService<IOutboxRepository>();
 
-        var outgoingMessage = await repository.GetAsync(outboxMessageId)
+        var outgoingMessage = await repository.GetAsync(outboxMessageId, CancellationToken.None)
             .ConfigureAwait(false);
 
         outgoingMessage.SetAsFailed(_clock, exception.ToString());
 
-        await outboxContext.SaveChangesAsync()
+        await outboxContext.SaveChangesAsync(CancellationToken.None)
             .ConfigureAwait(false);
     }
 }

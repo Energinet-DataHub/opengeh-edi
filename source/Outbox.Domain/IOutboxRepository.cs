@@ -27,10 +27,10 @@ public interface IOutboxRepository
     /// <summary>
     /// Get all unprocessed outbox messages.
     /// </summary>
-    public Task<IReadOnlyCollection<OutboxMessageId>> GetUnprocessedOutboxMessageIdsAsync();
+    public Task<IReadOnlyCollection<OutboxMessageId>> GetUnprocessedOutboxMessageIdsAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Get outbox message by id.
     /// </summary>
-    Task<OutboxMessage> GetAsync(OutboxMessageId outboxMessageId);
+    Task<OutboxMessage> GetAsync(OutboxMessageId outboxMessageId, CancellationToken cancellationToken);
 }

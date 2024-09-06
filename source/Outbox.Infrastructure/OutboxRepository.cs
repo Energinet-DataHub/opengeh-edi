@@ -26,19 +26,19 @@ public class OutboxRepository(OutboxContext outboxContext) : IOutboxRepository
         _outboxContext.Outbox.Add(outboxMessage);
     }
 
-    public async Task<IReadOnlyCollection<OutboxMessageId>> GetUnprocessedOutboxMessageIdsAsync()
+    public async Task<IReadOnlyCollection<OutboxMessageId>> GetUnprocessedOutboxMessageIdsAsync(CancellationToken cancellationToken)
     {
         var outboxMessageIds = await _outboxContext.Outbox
             .Where(om => om.PublishedAt == null)
             .Select(om => om.Id)
-            .ToListAsync()
+            .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
         return outboxMessageIds;
     }
 
-    public Task<OutboxMessage> GetAsync(OutboxMessageId outboxMessageId)
+    public Task<OutboxMessage> GetAsync(OutboxMessageId outboxMessageId, CancellationToken cancellationToken)
     {
-        return _outboxContext.Outbox.SingleAsync(om => om.Id == outboxMessageId);
+        return _outboxContext.Outbox.SingleAsync(om => om.Id == outboxMessageId, cancellationToken);
     }
 }

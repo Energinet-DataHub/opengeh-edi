@@ -22,5 +22,5 @@ public interface IOutboxProcessor
     /// <summary>
     /// Processes the outbox, sending outbox messages that hasn't been processed yet.
     /// </summary>
-    Task ProcessOutboxAsync();
+    Task ProcessOutboxAsync(CancellationToken cancellationToken);
 }

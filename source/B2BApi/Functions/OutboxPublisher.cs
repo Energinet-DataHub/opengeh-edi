@@ -22,8 +22,11 @@ public class OutboxPublisher(IOutboxProcessor outboxProcessor)
     private readonly IOutboxProcessor _outboxProcessor = outboxProcessor;
 
     [Function(nameof(OutboxPublisher))]
-    public Task PublishOutboxAsync([TimerTrigger("*/10 * * * * *")] TimerInfo timerTimerInfo, FunctionContext context)
+    public Task PublishOutboxAsync(
+        [TimerTrigger("*/10 * * * * *")] TimerInfo timerTimerInfo,
+        FunctionContext context,
+        CancellationToken cancellationToken)
     {
-        return _outboxProcessor.ProcessOutboxAsync();
+        return _outboxProcessor.ProcessOutboxAsync(cancellationToken);
     }
 }
