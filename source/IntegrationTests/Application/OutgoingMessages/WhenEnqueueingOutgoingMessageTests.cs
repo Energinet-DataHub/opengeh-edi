@@ -174,6 +174,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.Null(bundleFromDatabase.DequeuedAt),
             () => Assert.Equal(bundleFromDatabase.ClosedAt, now.ToDateTimeUtc()),
             () => Assert.Null(bundleFromDatabase.PeekedAt),
+            () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Category.Name, bundleFromDatabase.MessageCategory),
         };
 
         Assert.Multiple(propertyAssertions);
@@ -557,9 +558,9 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
                     INNER JOIN [dbo].[Bundles] as tBundle ON tOutgoing.AssignedBundleId = tBundle.Id
                     INNER JOIN [dbo].ActorMessageQueues as tQueue on tBundle.ActorMessageQueueId = tQueue.Id",
             new
-                {
-                    Id = createdId.ToString(),
-                });
+            {
+                Id = createdId.ToString(),
+            });
 
         return (ActorMessageQueueNumber: result.ActorNumber, ActorMessageQueueRole: result.ActorRole, OutgoingMessageReceiverRole: result.ReceiverRole);
     }
@@ -572,10 +573,10 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             @"SELECT outgoing.Id FROM [dbo].[OutgoingMessages] AS outgoing
                         WHERE outgoing.ReceiverNumber = @ReceiverNumber AND outgoing.ReceiverRole = @ReceiverRole",
             new
-                {
-                    ReceiverNumber = actorNumber.Value,
-                    ReceiverRole = actorRole.Code,
-                });
+            {
+                ReceiverNumber = actorNumber.Value,
+                ReceiverRole = actorRole.Code,
+            });
 
         return messages.ToList();
     }
