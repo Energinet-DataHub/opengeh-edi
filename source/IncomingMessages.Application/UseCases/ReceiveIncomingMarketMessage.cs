@@ -37,14 +37,14 @@ public class ReceiveIncomingMarketMessage
     private readonly IClock _clock;
 
     public ReceiveIncomingMarketMessage(
-     MarketMessageParser marketMessageParser,
-     ValidateIncomingMessage validateIncomingMessage,
-     ResponseFactory responseFactory,
-     IArchivedMessagesClient archivedMessagesClient,
-     ILogger<IncomingMessageClient> logger,
-     IIncomingMessageReceiver incomingMessageReceiver,
-     DelegateIncomingMessage delegateIncomingMessage,
-     IClock clock)
+        MarketMessageParser marketMessageParser,
+        ValidateIncomingMessage validateIncomingMessage,
+        ResponseFactory responseFactory,
+        IArchivedMessagesClient archivedMessagesClient,
+        ILogger<IncomingMessageClient> logger,
+        IIncomingMessageReceiver incomingMessageReceiver,
+        DelegateIncomingMessage delegateIncomingMessage,
+        IClock clock)
     {
         _marketMessageParser = marketMessageParser;
         _validateIncomingMessage = validateIncomingMessage;
@@ -57,11 +57,11 @@ public class ReceiveIncomingMarketMessage
     }
 
     public async Task<ResponseMessage> ReceiveIncomingMarketMessageAsync(
-     IIncomingMarketMessageStream incomingMarketMessageStream,
-     DocumentFormat incomingDocumentFormat,
-     IncomingDocumentType documentType,
-     DocumentFormat responseDocumentFormat,
-     CancellationToken cancellationToken)
+        IIncomingMarketMessageStream incomingMarketMessageStream,
+        DocumentFormat incomingDocumentFormat,
+        IncomingDocumentType documentType,
+        DocumentFormat responseDocumentFormat,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(documentType);
         ArgumentNullException.ThrowIfNull(incomingMarketMessageStream);
@@ -126,10 +126,10 @@ public class ReceiveIncomingMarketMessage
     }
 
     private async Task ArchiveIncomingMessageAsync(
-     IIncomingMarketMessageStream incomingMarketMessageStream,
-     IIncomingMessage incomingMessage,
-     IncomingDocumentType incomingDocumentType,
-     CancellationToken cancellationToken)
+        IIncomingMarketMessageStream incomingMarketMessageStream,
+        IIncomingMessage incomingMessage,
+        IncomingDocumentType incomingDocumentType,
+        CancellationToken cancellationToken)
     {
         await _archivedMessagesClient.CreateAsync(
             new ArchivedMessage(
