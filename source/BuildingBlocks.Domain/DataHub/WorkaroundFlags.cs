@@ -26,4 +26,15 @@ public static class WorkaroundFlags
     ///     and when peeking as a MDR receiver you should peek into the DDM ActorMessageQueue
     /// </summary>
     public static bool MeteredDataResponsibleToGridOperatorHack => true;
+
+    /// <summary>
+    /// This is a workaround that always returns true, to be able to identify the places where the workaround/"hack"
+    /// for an MDR/GridOperator actor which is the same Actor but with two different roles MDR and GridOperator, is used.
+    /// The hack is:
+    /// To enable a DDM to RequestAggregatedMeasuredData (RSM-016) we change the role the actor is using to MeterDataResponsible (MDR)
+    /// A request will result in a message with the SenderRole being MDR, but the ´MeteredDataResponsibleToGridOperatorHack´ will ensure
+    /// the message will be delivered to the actors DDM ActorMessageQueue. This way when the Actor then Peeks the queue using either
+    /// the DDM or the MDR role they will be able to get the result of the request.
+    /// </summary>
+    public static bool GridOperatorToMeteredDataResponsibleHack => true;
 }
