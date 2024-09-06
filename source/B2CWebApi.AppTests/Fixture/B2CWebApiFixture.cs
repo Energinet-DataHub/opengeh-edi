@@ -23,6 +23,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Database;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -42,7 +43,6 @@ public class B2CWebApiFixture : IAsyncLifetime
         ServiceBusResourceProvider = new ServiceBusResourceProvider(
             TestLogger,
             IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace);
-        AuditLogMockServer = new AuditLogMockServer();
 
         B2CWebApiApplicationFactory = new B2CWebApiApplicationFactory();
     }
@@ -50,8 +50,6 @@ public class B2CWebApiFixture : IAsyncLifetime
     public EdiDatabaseManager DatabaseManager { get; }
 
     public OpenIdJwtManager OpenIdJwtManager { get; }
-
-    public AuditLogMockServer AuditLogMockServer { get; }
 
     [NotNull]
     public HttpClient? WebApiClient { get; private set; }
@@ -73,8 +71,6 @@ public class B2CWebApiFixture : IAsyncLifetime
 
         OpenIdJwtManager.StartServer();
 
-        AuditLogMockServer.StartServer();
-
         await DatabaseManager.CreateDatabaseAsync();
 
         var incomingMessagesQueue = await ServiceBusResourceProvider.BuildQueue(IncomingMessagesQueueName)
@@ -94,7 +90,6 @@ public class B2CWebApiFixture : IAsyncLifetime
         OpenIdJwtManager.Dispose();
         await DatabaseManager.DeleteDatabaseAsync();
         await ServiceBusResourceProvider.DisposeAsync();
-        AuditLogMockServer.Dispose();
         await B2CWebApiApplicationFactory.DisposeAsync();
         WebApiClient.Dispose();
     }
@@ -126,7 +121,6 @@ public class B2CWebApiFixture : IAsyncLifetime
             { "UserAuthentication:InternalMetadataAddress", OpenIdJwtManager.InternalMetadataAddress },
             { "UserAuthentication:BackendBffAppId", OpenIdJwtManager.TestBffAppId },
             { $"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.FullyQualifiedNamespace)}", ServiceBusResourceProvider.FullyQualifiedNamespace },
-            { "AuditLog:IngestionUrl", AuditLogMockServer.IngestionUrl },
             { "IncomingMessages:QueueName", incomingMessagesQueueName },
             { "OrchestrationsStorageAccountConnectionString", AzuriteManager.FullConnectionString },
             { "OrchestrationsTaskHubName", "EdiTest01" },

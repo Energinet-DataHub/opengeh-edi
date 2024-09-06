@@ -49,6 +49,7 @@ limitations under the License.
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />
+      <ProjectReference Include="..\AuditLog\AuditLog.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
       <ProjectReference Include="..\DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj" />
       <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
@@ -59,6 +60,8 @@ limitations under the License.
       <ProjectReference Include="..\IntegrationEvents.Infrastructure\IntegrationEvents.Infrastructure.csproj" />
       <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
       <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
+      <ProjectReference Include="..\Outbox.Application\Outbox.Application.csproj" />
+      <ProjectReference Include="..\Outbox.Interfaces\Outbox.Interfaces.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Application\OutgoingMessages.Application.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Interfaces\OutgoingMessages.Interfaces.csproj" />

@@ -17,7 +17,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.DataAccess.DataAccess;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DbContext;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
@@ -30,7 +32,7 @@ using ExecutionContext = Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionCo
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 
-public class ProcessContext : DbContext
+public class ProcessContext : DbContext, IEdiDbContext
 {
     private readonly ExecutionContext _executionContext;
     private readonly AuthenticatedActor _authenticatedActor;

@@ -468,7 +468,7 @@ public class BehavioursTestBase : IDisposable
             .AddArchivedMessagesModule(config)
             .AddIncomingMessagesModule(config)
             .AddMasterDataModule(config)
-            .AddDataAccessUnitOfWorkModule(config);
+            .AddDataAccessUnitOfWorkModule();
 
         _services.AddScoped<Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext>((x) =>
         {

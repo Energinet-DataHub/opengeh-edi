@@ -16,7 +16,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.DataAccess.DataAccess;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DbContext;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
@@ -30,7 +32,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 
-public class ActorMessageQueueContext : DbContext
+public class ActorMessageQueueContext : DbContext, IEdiDbContext
 {
     private readonly Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext _executionContext;
     private readonly AuthenticatedActor _authenticatedActor;
