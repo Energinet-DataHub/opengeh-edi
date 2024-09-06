@@ -12,15 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics;
 using System.Net;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.B2BApi.Common;
 using Energinet.DataHub.EDI.B2BApi.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MetricTracker;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Microsoft.Azure.Functions.Worker;
@@ -35,20 +32,17 @@ public class PeekRequestListener
     private readonly ILogger<PeekRequestListener> _logger;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly IFeatureFlagManager _featureFlagManager;
-    private readonly IMetricTracker _metricTracker;
 
     public PeekRequestListener(
         AuthenticatedActor authenticatedActor,
         ILogger<PeekRequestListener> logger,
         IOutgoingMessagesClient outgoingMessagesClient,
-        IFeatureFlagManager featureFlagManager,
-        IMetricTracker metricTracker)
+        IFeatureFlagManager featureFlagManager)
     {
         _authenticatedActor = authenticatedActor;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _outgoingMessagesClient = outgoingMessagesClient;
         _featureFlagManager = featureFlagManager;
-        _metricTracker = metricTracker;
     }
 
     [Function("PeekRequestListener")]
@@ -62,7 +56,6 @@ public class PeekRequestListener
         string? messageCategory,
         CancellationToken hostCancellationToken)
     {
-        var startTime = Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(request);
         if (!await _featureFlagManager.UsePeekMessagesAsync().ConfigureAwait(false))
         {
@@ -116,8 +109,6 @@ public class PeekRequestListener
 
         await peekResult.Bundle.CopyToAsync(response.Body).ConfigureAwait(false);
 
-        startTime.Stop();
-        _metricTracker.TrackCustomMetric(CustomMetricConstants.PeekMessageDuration, (int)startTime.ElapsedMilliseconds);
         return response;
     }
 }
