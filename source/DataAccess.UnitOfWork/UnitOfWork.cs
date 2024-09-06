@@ -21,9 +21,6 @@ namespace Energinet.DataHub.EDI.DataAccess.UnitOfWork;
 public sealed class UnitOfWork : IUnitOfWork
 {
     private readonly IReadOnlyCollection<DbContext> _dbContexts;
-    // private readonly ProcessContext _processContext;
-    // private readonly ActorMessageQueueContext _actorMessageQueueContext;
-    // private readonly IncomingMessagesContext _incomingMessagesContext;
 
     public UnitOfWork(
         IEnumerable<IEdiDbContext> dbContexts)
