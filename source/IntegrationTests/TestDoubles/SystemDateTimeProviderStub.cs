@@ -17,17 +17,19 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 
-public class SystemDateTimeProviderStub : ISystemDateTimeProvider
+public class SystemDateTimeProviderStub : IClock
 {
-    private Instant? _now;
+    private Instant? _instant;
 
-    public void SetNow(Instant now)
+    public void SetCurrentInstant(Instant instant)
     {
-        _now = now;
+        _instant = instant;
     }
 
-    public Instant Now()
+    public Instant GetCurrentInstant()
     {
-        return _now ?? SystemClock.Instance.GetCurrentInstant();
+        return
+            _instant
+            ?? SystemClock.Instance.GetCurrentInstant();
     }
 }

@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -44,7 +45,7 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
         _inboxProcessor = new InboxEventsProcessor(
             GetService<IDatabaseConnectionFactory>(),
             GetService<IMediator>(),
-            GetService<ISystemDateTimeProvider>(),
+            GetService<IClock>(),
             new[] { _testInboxEventMapper },
             GetService<ILogger<InboxEventsProcessor>>());
     }
@@ -76,7 +77,7 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
         var inboxProcessor = new InboxEventsProcessor(
             GetService<IDatabaseConnectionFactory>(),
             GetService<IMediator>(),
-            GetService<ISystemDateTimeProvider>(),
+            GetService<IClock>(),
             Array.Empty<IInboxEventMapper>(),
             GetService<ILogger<InboxEventsProcessor>>());
 
@@ -112,7 +113,7 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
             _eventType,
             _referenceId,
             Encoding.ASCII.GetBytes("Event1"),
-            GetService<ISystemDateTimeProvider>().Now()));
+            GetService<IClock>().GetCurrentInstant()));
         await context.SaveChangesAsync();
     }
 }

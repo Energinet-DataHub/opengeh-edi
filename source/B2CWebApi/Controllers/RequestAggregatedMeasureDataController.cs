@@ -37,7 +37,7 @@ public class RequestAggregatedMeasureDataController : ControllerBase
     private readonly DateTimeZone _dateTimeZone;
     private readonly IIncomingMessageClient _incomingMessageClient;
     private readonly ISerializer _serializer;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IClock _clock;
     private readonly IAuditLogger _auditLogger;
 
     public RequestAggregatedMeasureDataController(
@@ -45,14 +45,14 @@ public class RequestAggregatedMeasureDataController : ControllerBase
         DateTimeZone dateTimeZone,
         IIncomingMessageClient incomingMessageClient,
         ISerializer serializer,
-        ISystemDateTimeProvider systemDateTimeProvider,
+        IClock clock,
         IAuditLogger auditLogger)
     {
         _userContext = userContext;
         _dateTimeZone = dateTimeZone;
         _incomingMessageClient = incomingMessageClient;
         _serializer = serializer;
-        _systemDateTimeProvider = systemDateTimeProvider;
+        _clock = clock;
         _auditLogger = auditLogger;
     }
 
@@ -77,7 +77,7 @@ public class RequestAggregatedMeasureDataController : ControllerBase
                 currentUser.ActorNumber,
                 currentUser.MarketRole,
                 _dateTimeZone,
-                _systemDateTimeProvider.Now());
+                _clock.GetCurrentInstant());
 
         var responseMessage = await _incomingMessageClient.ReceiveIncomingMarketMessageAsync(
                 GenerateStreamFromString(_serializer.Serialize(message)),

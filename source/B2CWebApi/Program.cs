@@ -42,7 +42,6 @@ builder.Services
 
     // System timer
     .AddNodaTimeForApplication()
-    .AddSystemTimer()
 
     // Durable client (orchestration)
     .AddDurableClient(builder.Configuration)

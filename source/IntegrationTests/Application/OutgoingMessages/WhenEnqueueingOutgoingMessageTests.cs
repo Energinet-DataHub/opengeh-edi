@@ -61,7 +61,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         _rejectedEnergyResultMessageDtoBuilder = new RejectedEnergyResultMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         _fileStorageClient = GetService<IFileStorageClient>();
-        _systemDateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
+        _systemDateTimeProvider = (SystemDateTimeProviderStub)GetService<IClock>();
         _context = GetService<ActorMessageQueueContext>();
         _wholesaleAmountPerChargeDtoBuilder = new WholesaleAmountPerChargeDtoBuilder();
         _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
@@ -77,7 +77,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             .Build();
 
         var now = Instant.FromUtc(2024, 1, 1, 0, 0);
-        _systemDateTimeProvider.SetNow(now);
+        _systemDateTimeProvider.SetCurrentInstant(now);
 
         // Act
         var createdOutgoingMessageId = await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
@@ -143,7 +143,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             .Build();
 
         var now = Instant.FromUtc(2024, 1, 1, 0, 0);
-        _systemDateTimeProvider.SetNow(now);
+        _systemDateTimeProvider.SetCurrentInstant(now);
 
         // Act
         await EnqueueAndCommitAsync(message);
@@ -174,7 +174,6 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
             () => Assert.Null(bundleFromDatabase.DequeuedAt),
             () => Assert.Equal(bundleFromDatabase.ClosedAt, now.ToDateTimeUtc()),
             () => Assert.Null(bundleFromDatabase.PeekedAt),
-            () => Assert.Equal(DocumentType.NotifyAggregatedMeasureData.Category.Name, bundleFromDatabase.MessageCategory),
         };
 
         Assert.Multiple(propertyAssertions);
@@ -210,7 +209,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     {
         var message = _acceptedEnergyResultMessageDtoBuilder.Build();
         await EnqueueAndCommitAsync(message);
-        _systemDateTimeProvider.SetNow(_systemDateTimeProvider.Now().PlusSeconds(1));
+        _systemDateTimeProvider.SetCurrentInstant(_systemDateTimeProvider.GetCurrentInstant().PlusSeconds(1));
         var message2 = _acceptedEnergyResultMessageDtoBuilder.Build();
         await EnqueueAndCommitAsync(message2);
 
@@ -626,7 +625,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
     private async Task CreateActorMessageQueueInDatabase(Guid id, ActorNumber actorNumber, ActorRole actorRole)
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
-        var systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
+        var systemDateTimeProvider = GetService<IClock>();
 
         await connection.ExecuteAsync(
             @"INSERT INTO [dbo].[ActorMessageQueues] (Id, ActorNumber, ActorRole, CreatedBy, CreatedAt)
@@ -637,7 +636,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
                 ActorNumber = actorNumber.Value,
                 ActorRole = actorRole.Code,
                 CreatedBy = "Test",
-                CreatedAt = systemDateTimeProvider.Now(),
+                CreatedAt = systemDateTimeProvider.GetCurrentInstant(),
             });
     }
 

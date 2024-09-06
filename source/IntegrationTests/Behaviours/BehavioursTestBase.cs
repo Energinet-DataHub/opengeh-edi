@@ -216,7 +216,7 @@ public class BehavioursTestBase : IDisposable
             .UpdateGridAreaOwnershipAsync(
                 new GridAreaOwnershipAssignedDto(
                     gridArea,
-                    _systemDateTimeProviderStub.Now().Minus(Duration.FromDays(100)),
+                    _systemDateTimeProviderStub.GetCurrentInstant().Minus(Duration.FromDays(100)),
                     actorNumber,
                     0),
                 CancellationToken.None);
@@ -252,12 +252,12 @@ public class BehavioursTestBase : IDisposable
 
     protected void GivenNowIs(Instant now)
     {
-        _systemDateTimeProviderStub.SetNow(now);
+        _systemDateTimeProviderStub.SetCurrentInstant(now);
     }
 
     protected Instant GetNow()
     {
-        return _systemDateTimeProviderStub.Now();
+        return _systemDateTimeProviderStub.GetCurrentInstant();
     }
 
     protected Instant CreateDateInstant(int year, int month, int day)
@@ -410,10 +410,10 @@ public class BehavioursTestBase : IDisposable
     private async Task ProcessBackgroundTasksAsync()
     {
         using var scope = _serviceProvider.CreateScope();
-        var datetimeProvider = scope.ServiceProvider.GetRequiredService<ISystemDateTimeProvider>();
+        var datetimeProvider = scope.ServiceProvider.GetRequiredService<IClock>();
         await scope.ServiceProvider
             .GetRequiredService<IMediator>()
-            .Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
+            .Publish(new TenSecondsHasHasPassed(datetimeProvider.GetCurrentInstant()));
     }
 
     private ServiceProvider BuildServices(ITestOutputHelper testOutputHelper)
@@ -459,7 +459,7 @@ public class BehavioursTestBase : IDisposable
             .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
             .AddSerializer()
             .AddLogging()
-            .AddScoped<ISystemDateTimeProvider>(_ => _systemDateTimeProviderStub);
+            .AddScoped<IClock>(_ => _systemDateTimeProviderStub);
 
         _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
             .AddIntegrationEventModule(config)

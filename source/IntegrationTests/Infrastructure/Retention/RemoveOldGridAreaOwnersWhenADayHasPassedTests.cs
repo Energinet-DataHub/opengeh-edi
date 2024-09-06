@@ -66,7 +66,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 
         var scopedServiceCollection = new ServiceCollection();
         scopedServiceCollection.AddMasterDataModule(config);
-        scopedServiceCollection.AddScoped<ISystemDateTimeProvider>(
+        scopedServiceCollection.AddScoped<IClock>(
             _ => new SystemProviderMock(Instant.FromUtc(2023, 11, 3, 0, 0, 0)));
 
         var sut = scopedServiceCollection.BuildServiceProvider().GetService<IDataRetention>()
@@ -107,7 +107,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 
         var scopedServiceCollection = new ServiceCollection();
         scopedServiceCollection.AddMasterDataModule(config);
-        scopedServiceCollection.AddScoped<ISystemDateTimeProvider>(
+        scopedServiceCollection.AddScoped<IClock>(
             _ => new SystemProviderMock(Instant.FromUtc(2023, 11, 3, 0, 0, 0)));
 
         var sut = scopedServiceCollection.BuildServiceProvider().GetService<IDataRetention>()
@@ -161,7 +161,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 
         var scopedServiceCollection = new ServiceCollection();
         scopedServiceCollection.AddMasterDataModule(config);
-        scopedServiceCollection.AddScoped<ISystemDateTimeProvider>(
+        scopedServiceCollection.AddScoped<IClock>(
             _ => new SystemProviderMock(Instant.FromUtc(2023, 11, 3, 0, 0, 0)));
 
         var sut = scopedServiceCollection.BuildServiceProvider().GetService<IDataRetention>()
@@ -186,7 +186,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
         return await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(gridAreaCode, CancellationToken.None);
     }
 
-    private sealed class SystemProviderMock : ISystemDateTimeProvider
+    private sealed class SystemProviderMock : IClock
     {
         private readonly Instant _now;
 
@@ -195,6 +195,6 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
             _now = now;
         }
 
-        public Instant Now() => _now;
+        public Instant GetCurrentInstant() => _now;
     }
 }
