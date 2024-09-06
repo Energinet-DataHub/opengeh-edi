@@ -76,7 +76,7 @@ public class SenderAuthorizer : ISenderAuthorizer
                     case var sc1 when sc1.Equals(ActorRole.EnergySupplier.Code, StringComparison.OrdinalIgnoreCase):
                     case var sc2 when sc2.Equals(ActorRole.MeteredDataResponsible.Code, StringComparison.OrdinalIgnoreCase):
                     case var sc3 when sc3.Equals(ActorRole.BalanceResponsibleParty.Code, StringComparison.OrdinalIgnoreCase):
-                    //case var sc4 when !HackThatAllowDdmToDoRequestsAsMdr(sc4):
+                    case var sc4 when !HackThatAllowDdmToDoRequestsAsMdr(sc4):
                         break;
                     default:
                         _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());

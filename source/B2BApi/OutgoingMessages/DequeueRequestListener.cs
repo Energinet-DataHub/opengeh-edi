@@ -27,9 +27,7 @@ public class DequeueRequestListener
     private readonly AuthenticatedActor _authenticatedActor;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
 
-    public DequeueRequestListener(
-        IOutgoingMessagesClient outgoingMessagesClient,
-        AuthenticatedActor authenticatedActor)
+    public DequeueRequestListener(IOutgoingMessagesClient outgoingMessagesClient, AuthenticatedActor authenticatedActor)
     {
         _outgoingMessagesClient = outgoingMessagesClient;
         _authenticatedActor = authenticatedActor;
@@ -52,10 +50,8 @@ public class DequeueRequestListener
                 cancellationToken)
             .ConfigureAwait(false);
 
-        var response = result.Success
+        return result.Success
             ? request.CreateResponse(HttpStatusCode.OK)
             : request.CreateResponse(HttpStatusCode.BadRequest);
-
-        return response;
     }
 }
