@@ -46,7 +46,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     private readonly EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder;
     private readonly EnergyResultPerGridAreaMessageDtoBuilder _energyResultPerGridAreaMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
-    private readonly ClockStub _dateTimeProvider;
+    private readonly ClockStub _clockStub;
 
     public WhenAPeekIsRequestedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
@@ -54,7 +54,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
         _energyResultPerGridAreaMessageDtoBuilder = new EnergyResultPerGridAreaMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
-        _dateTimeProvider = (ClockStub)GetService<IClock>();
+        _clockStub = (ClockStub)GetService<IClock>();
     }
 
     public static object[][] GetUnusedDataHubTypesWithDocumentFormat()
@@ -156,7 +156,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         int year = 2024,
             month = 01,
             date = 02;
-        _dateTimeProvider.SetCurrentInstant(Instant.FromUtc(year, month, date, 11, 07));
+        _clockStub.SetCurrentInstant(Instant.FromUtc(year, month, date, 11, 07));
         var receiverNumber = SampleData.NewEnergySupplierNumber;
         var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
             .WithEnergySupplierReceiverNumber(receiverNumber)
@@ -290,7 +290,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         var hour = 13;
         var minute = 37;
         var expectedTimestamp = new DateTime(year, month, day, hour, minute, 0, DateTimeKind.Utc);
-        _dateTimeProvider.SetCurrentInstant(expectedTimestamp.ToInstant());
+        _clockStub.SetCurrentInstant(expectedTimestamp.ToInstant());
 
         // Act / When
         var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);

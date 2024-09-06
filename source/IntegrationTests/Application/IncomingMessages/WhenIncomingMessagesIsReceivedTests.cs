@@ -47,7 +47,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
     private readonly ServiceBusSenderSpy _senderSpy;
     private readonly IncomingMessagesContext _incomingMessageContext;
-    private readonly ClockStub _dateTimeProvider;
+    private readonly ClockStub _clockStub;
 
     public WhenIncomingMessagesIsReceivedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
@@ -57,7 +57,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
         _incomingMessagesRequest = GetService<IIncomingMessageClient>();
         _incomingMessageContext = GetService<IncomingMessagesContext>();
-        _dateTimeProvider = (ClockStub)GetService<IClock>();
+        _clockStub = (ClockStub)GetService<IClock>();
     }
 
     public static IEnumerable<object[]> ValidIncomingRequestMessages()
@@ -349,7 +349,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             hour = 04,
             minute = 23;
         var expectedTimestamp = new DateTime(year, month, date, hour, minute, 0, DateTimeKind.Utc);
-        _dateTimeProvider.SetCurrentInstant(expectedTimestamp.ToInstant());
+        _clockStub.SetCurrentInstant(expectedTimestamp.ToInstant());
 
         var senderActorNumber = ActorNumber.Create("5799999933318");
         var authenticatedActor = GetService<AuthenticatedActor>();
