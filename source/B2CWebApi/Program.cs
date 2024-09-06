@@ -29,10 +29,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 const string subsystemName = "EDI";
 
-builder.Logging
-    .ClearProviders()
-    .AddApplicationInsights();
-
 builder.Services
     // Swagger
     .AddSwaggerForWebApp(Assembly.GetExecutingAssembly(), "EDI B2C Web API")
@@ -40,7 +36,6 @@ builder.Services
 
     // Logging
     .AddApplicationInsightsForWebApp(subsystemName)
-    .AddApplicationInsightsTelemetry()
 
     // Health checks
     .AddHealthChecksForWebApp()
