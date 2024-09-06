@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MetricTracker;
+namespace Energinet.DataHub.EDI.B2BApi.MetricTracker;
 
 public static class CustomMetricConstants
 {

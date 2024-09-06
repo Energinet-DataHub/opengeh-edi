@@ -23,8 +23,7 @@ public static class BuildingBlockExtensions
     {
         services.AddServiceBusClientForApplication(configuration)
             .AddFileStorage(configuration)
-            .AddFeatureFlags()
-            .AddMetricTracker();
+            .AddFeatureFlags();
         return services;
     }
 }

@@ -14,15 +14,15 @@
 
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MetricTracker;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.B2BApi.MetricTracker;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.Model;
+using Microsoft.ApplicationInsights;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages;
 
-internal class EnqueueMessagesOrchestration(IMetricTracker metricTracker)
+internal class EnqueueMessagesOrchestration(TelemetryClient telemetryClient)
 {
     [Function(nameof(EnqueueMessagesOrchestration))]
     public async Task<string> Run(
@@ -83,7 +83,7 @@ internal class EnqueueMessagesOrchestration(IMetricTracker metricTracker)
 
         // Calculate the duration
         var duration = endTime - startTime;
-        metricTracker.TrackCustomMetric(CustomMetricConstants.EnqueueMessagesDuration, duration.Milliseconds);
+        telemetryClient.GetMetric(CustomMetricConstants.EnqueueMessagesDuration).TrackValue(duration.Milliseconds);
         return "Success";
     }
 
