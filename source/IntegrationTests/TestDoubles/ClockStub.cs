@@ -20,6 +20,11 @@ public class ClockStub : IClock
 {
     private Instant? _instant;
 
+    public ClockStub(Instant? instant = null)
+    {
+        _instant = instant;
+    }
+
     public void SetCurrentInstant(Instant instant)
     {
         _instant = instant;
