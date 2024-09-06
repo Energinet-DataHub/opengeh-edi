@@ -452,7 +452,7 @@ public class BehavioursTestBase : IDisposable
             .AddArchivedMessagesModule(config)
             .AddIncomingMessagesModule(config)
             .AddMasterDataModule(config)
-            .AddDataAccessUnitOfWorkModule(config);
+            .AddDataAccessUnitOfWorkModule();
 
         _services.AddTransient<InboxEventsProcessor>()
             .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>>(

@@ -300,7 +300,6 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
         ServiceCollection
             .AddSingleton<IConfiguration>(config)
             .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
-            .AddSystemTimer()
             .AddOutboxModule(config)
             .AddOutboxProcessor()
             .AddScoped<ExecutionContext>((x) =>
