@@ -33,7 +33,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 
 public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
 {
-    private readonly SystemDateTimeProviderStub _dateTimeProvider;
+    private readonly ClockStub _dateTimeProvider;
     private readonly IIncomingMessageClient _incomingMessagesRequest;
 
     private readonly Actor _originalActor = new(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
@@ -49,7 +49,7 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
         _senderSpy = new ServiceBusSenderSpy("Fake");
         _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
         _incomingMessagesRequest = GetService<IIncomingMessageClient>();
-        _dateTimeProvider = (SystemDateTimeProviderStub)GetService<IClock>();
+        _dateTimeProvider = (ClockStub)GetService<IClock>();
         _authenticatedActor = GetService<AuthenticatedActor>();
     }
 

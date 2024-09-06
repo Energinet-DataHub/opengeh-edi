@@ -324,7 +324,7 @@ public class TestBase : IDisposable
             .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
             .AddSerializer()
             .AddLogging()
-            .AddScoped<IClock>(_ => new SystemDateTimeProviderStub());
+            .AddScoped<IClock>(_ => new ClockStub());
 
         _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
             .AddIntegrationEventModule(config)

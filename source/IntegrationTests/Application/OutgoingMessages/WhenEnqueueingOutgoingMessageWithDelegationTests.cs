@@ -39,7 +39,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     private readonly EnergyResultPerGridAreaMessageDtoBuilder _energyResultPerGridAreaMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ActorMessageQueueContext _context;
-    private readonly SystemDateTimeProviderStub _dateTimeProvider;
+    private readonly ClockStub _dateTimeProvider;
     private readonly Actor _delegatedTo = CreateActor(ActorNumber.Create("1234567891235"), actorRole: ActorRole.Delegated);
 
     private Actor _delegatedBy = CreateActor(ActorNumber.Create("1234567891234"));
@@ -50,7 +50,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         _context = GetService<ActorMessageQueueContext>();
-        _dateTimeProvider = (SystemDateTimeProviderStub)GetService<IClock>();
+        _dateTimeProvider = (ClockStub)GetService<IClock>();
         _acceptedEnergyResultMessageDtoBuilder = new AcceptedEnergyResultMessageDtoBuilder();
         _energyResultPerGridAreaMessageDtoBuilder = new EnergyResultPerGridAreaMessageDtoBuilder();
     }

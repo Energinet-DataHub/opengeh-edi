@@ -46,7 +46,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
 {
     private readonly AcceptedEnergyResultMessageDtoBuilder _acceptedEnergyResultMessageDtoBuilder;
     private readonly RejectedEnergyResultMessageDtoBuilder _rejectedEnergyResultMessageDtoBuilder;
-    private readonly SystemDateTimeProviderStub _systemDateTimeProvider;
+    private readonly ClockStub _systemDateTimeProvider;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ActorMessageQueueContext _context;
     private readonly IFileStorageClient _fileStorageClient;
@@ -61,7 +61,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         _rejectedEnergyResultMessageDtoBuilder = new RejectedEnergyResultMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         _fileStorageClient = GetService<IFileStorageClient>();
-        _systemDateTimeProvider = (SystemDateTimeProviderStub)GetService<IClock>();
+        _systemDateTimeProvider = (ClockStub)GetService<IClock>();
         _context = GetService<ActorMessageQueueContext>();
         _wholesaleAmountPerChargeDtoBuilder = new WholesaleAmountPerChargeDtoBuilder();
         _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();

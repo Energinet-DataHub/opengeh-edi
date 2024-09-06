@@ -47,7 +47,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
     private readonly ServiceBusSenderSpy _senderSpy;
     private readonly IncomingMessagesContext _incomingMessageContext;
-    private readonly SystemDateTimeProviderStub _dateTimeProvider;
+    private readonly ClockStub _dateTimeProvider;
 
     public WhenIncomingMessagesIsReceivedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
@@ -57,7 +57,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
         _incomingMessagesRequest = GetService<IIncomingMessageClient>();
         _incomingMessageContext = GetService<IncomingMessagesContext>();
-        _dateTimeProvider = (SystemDateTimeProviderStub)GetService<IClock>();
+        _dateTimeProvider = (ClockStub)GetService<IClock>();
     }
 
     public static IEnumerable<object[]> ValidIncomingRequestMessages()

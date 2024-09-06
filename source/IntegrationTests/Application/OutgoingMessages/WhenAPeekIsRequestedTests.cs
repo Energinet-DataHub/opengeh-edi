@@ -46,7 +46,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     private readonly EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder;
     private readonly EnergyResultPerGridAreaMessageDtoBuilder _energyResultPerGridAreaMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
-    private readonly SystemDateTimeProviderStub _dateTimeProvider;
+    private readonly ClockStub _dateTimeProvider;
 
     public WhenAPeekIsRequestedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
@@ -54,7 +54,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
         _energyResultPerGridAreaMessageDtoBuilder = new EnergyResultPerGridAreaMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
-        _dateTimeProvider = (SystemDateTimeProviderStub)GetService<IClock>();
+        _dateTimeProvider = (ClockStub)GetService<IClock>();
     }
 
     public static object[][] GetUnusedDataHubTypesWithDocumentFormat()
