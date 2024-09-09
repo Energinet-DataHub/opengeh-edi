@@ -426,7 +426,7 @@ public class BehavioursTestBase : IDisposable
                 {
                     [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = MockServiceBusName,
                     [$"{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}"] = MockServiceBusName,
-                    [$"{WholesaleInboxOptions.SectionName}:{nameof(WholesaleInboxOptions.QueueName)}"] = MockServiceBusName,
+                    [$"{WholesaleInboxQueueOptions.SectionName}:{nameof(WholesaleInboxQueueOptions.QueueName)}"] = MockServiceBusName,
                     [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = MockServiceBusName,
                     ["IntegrationEvents:TopicName"] = "NotEmpty",
                     ["IntegrationEvents:SubscriptionName"] = "NotEmpty",

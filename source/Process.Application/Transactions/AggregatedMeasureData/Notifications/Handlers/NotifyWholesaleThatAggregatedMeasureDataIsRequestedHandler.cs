@@ -22,10 +22,10 @@ public sealed class
     NotifyWholesaleThatAggregatedMeasureDataIsRequestedHandler : INotificationHandler<
     NotifyWholesaleThatAggregatedMeasureDataIsRequested>
 {
-    private readonly WholesaleInbox _wholesaleInbox;
+    private readonly WholesaleInboxClient _wholesaleInbox;
 
     public NotifyWholesaleThatAggregatedMeasureDataIsRequestedHandler(
-        WholesaleInbox wholesaleInbox)
+        WholesaleInboxClient wholesaleInbox)
     {
         _wholesaleInbox = wholesaleInbox;
     }

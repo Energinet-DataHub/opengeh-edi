@@ -291,7 +291,7 @@ public class TestBase : IDisposable
                 {
                     [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
                     [$"{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}"] = "Fake",
-                    [$"{WholesaleInboxOptions.SectionName}:{nameof(WholesaleInboxOptions.QueueName)}"] = "Fake",
+                    [$"{WholesaleInboxQueueOptions.SectionName}:{nameof(WholesaleInboxQueueOptions.QueueName)}"] = "Fake",
                     [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = "Fake",
                     ["IntegrationEvents:TopicName"] = "NotEmpty",
                     ["IntegrationEvents:SubscriptionName"] = "NotEmpty",

@@ -29,7 +29,7 @@ public class SendActorMessagesEnqueuedActivity
 
     public SendActorMessagesEnqueuedActivity(
         IServiceBusSenderFactory serviceBusSenderFactory,
-        IOptions<WholesaleInboxOptions> options)
+        IOptions<WholesaleInboxQueueOptions> options)
     {
         ArgumentNullException.ThrowIfNull(serviceBusSenderFactory);
         ArgumentNullException.ThrowIfNull(options);

@@ -23,13 +23,13 @@ using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
 
-public class WholesaleInbox : IWholesaleInbox
+public class WholesaleInboxClient : IWholesaleInboxClient
 {
     private readonly IServiceBusSenderAdapter _senderCreator;
 
-    public WholesaleInbox(
+    public WholesaleInboxClient(
         IServiceBusSenderFactory serviceBusSenderFactory,
-        IOptions<WholesaleInboxOptions> options)
+        IOptions<WholesaleInboxQueueOptions> options)
     {
         ArgumentNullException.ThrowIfNull(serviceBusSenderFactory);
         ArgumentNullException.ThrowIfNull(options);

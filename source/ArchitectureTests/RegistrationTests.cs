@@ -58,7 +58,7 @@ public class RegistrationTests
     public RegistrationTests()
     {
         Environment.SetEnvironmentVariable($"{IncomingMessagesQueueOptions.SectionName}__{nameof(IncomingMessagesQueueOptions.QueueName)}", "FakeQueueNameIncoming");
-        Environment.SetEnvironmentVariable($"{WholesaleInboxOptions.SectionName}__{nameof(WholesaleInboxOptions.QueueName)}", "FakeQueueNameWholesale");
+        Environment.SetEnvironmentVariable($"{WholesaleInboxQueueOptions.SectionName}__{nameof(WholesaleInboxQueueOptions.QueueName)}", "FakeQueueNameWholesale");
         Environment.SetEnvironmentVariable($"{EdiInboxOptions.SectionName}__{nameof(EdiInboxOptions.QueueName)}", "FakeQueueNameEdi");
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", TestEnvironment.CreateConnectionString());
         Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", TestEnvironment.CreateDevelopmentStorageConnectionString());

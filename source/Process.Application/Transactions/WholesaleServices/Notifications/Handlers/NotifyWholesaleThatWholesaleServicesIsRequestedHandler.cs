@@ -23,10 +23,10 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServic
 
 public class NotifyWholesaleThatWholesaleServicesIsRequestedHandler : INotificationHandler<NotifyWholesaleThatWholesaleServicesIsRequested>
 {
-    private readonly WholesaleInbox _wholesaleInbox;
+    private readonly WholesaleInboxClient _wholesaleInbox;
 
     public NotifyWholesaleThatWholesaleServicesIsRequestedHandler(
-        WholesaleInbox wholesaleInbox)
+        WholesaleInboxClient wholesaleInbox)
     {
         _wholesaleInbox = wholesaleInbox;
     }

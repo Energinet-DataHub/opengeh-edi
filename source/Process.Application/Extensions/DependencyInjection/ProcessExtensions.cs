@@ -60,8 +60,8 @@ public static class ProcessExtensions
             .ValidateDataAnnotations();
 
         services
-            .AddOptions<WholesaleInboxOptions>()
-            .BindConfiguration(WholesaleInboxOptions.SectionName)
+            .AddOptions<WholesaleInboxQueueOptions>()
+            .BindConfiguration(WholesaleInboxQueueOptions.SectionName)
             .ValidateDataAnnotations();
 
         services
@@ -103,7 +103,7 @@ public static class ProcessExtensions
             .AddTransient<IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Unit>, InitializeAggregatedMeasureDataProcessesHandler>()
             .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>, WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable>()
             .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasRejected>, WhenAnRejectedAggregatedTimeSeriesRequestIsAvailable>()
-            .AddScoped<WholesaleInbox>()
+            .AddScoped<WholesaleInboxClient>()
             .AddScoped<IAggregatedMeasureDataProcessRepository, AggregatedMeasureDataProcessRepository>();
 
         // RequestedWholesaleServicesConfiguration
@@ -124,7 +124,7 @@ public static class ProcessExtensions
             .TryAddExternalDomainServiceBusQueuesHealthCheck(
                 configuration.GetSection(ServiceBusNamespaceOptions.SectionName).Get<ServiceBusNamespaceOptions>()!.FullyQualifiedNamespace,
                 configuration.GetSection(EdiInboxOptions.SectionName).Get<EdiInboxOptions>()!.QueueName,
-                configuration.GetSection(WholesaleInboxOptions.SectionName).Get<WholesaleInboxOptions>()!.QueueName);
+                configuration.GetSection(WholesaleInboxQueueOptions.SectionName).Get<WholesaleInboxQueueOptions>()!.QueueName);
         return services;
     }
 }

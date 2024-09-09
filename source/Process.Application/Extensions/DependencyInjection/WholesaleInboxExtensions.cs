@@ -22,7 +22,7 @@ public static class WholesaleInboxExtensions
 {
     public static IServiceCollection AddWholesaleInbox(this IServiceCollection services)
     {
-       services.AddTransient<IWholesaleInbox, WholesaleInbox>();
+       services.AddTransient<IWholesaleInboxClient, WholesaleInboxClient>();
 
        return services;
     }

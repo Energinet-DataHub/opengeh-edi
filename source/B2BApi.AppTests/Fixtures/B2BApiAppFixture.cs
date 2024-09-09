@@ -180,7 +180,7 @@ public class B2BApiAppFixture : IAsyncLifetime
         var wholesaleInboxQueueResource = await ServiceBusResourceProvider
             .BuildQueue("wholesale-inbox")
             .Do(queue => appHostSettings.ProcessEnvironmentVariables
-                .Add($"{WholesaleInboxOptions.SectionName}__{nameof(WholesaleInboxOptions.QueueName)}", queue.Name))
+                .Add($"{WholesaleInboxQueueOptions.SectionName}__{nameof(WholesaleInboxQueueOptions.QueueName)}", queue.Name))
             .CreateAsync();
         LogStopwatch(stopwatch, "ServiceBusQueue (wholesale-inbox)");
 
