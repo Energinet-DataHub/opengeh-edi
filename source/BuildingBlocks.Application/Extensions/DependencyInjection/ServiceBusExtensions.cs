@@ -46,12 +46,14 @@ public static class ServiceBusExtensions
             builder
                 .UseCredential(new DefaultAzureCredential());
 
-            var serviceBusOptions = configuration
-                .GetRequiredSection(ServiceBusOptions.SectionName)
-                .Get<ServiceBusOptions>();
+            var serviceBusOptions =
+                configuration
+                    .GetRequiredSection(ServiceBusOptions.SectionName)
+                    .Get<ServiceBusOptions>()
+                ?? throw new InvalidOperationException("Missing ServiceBus Namespace configuration.");
 
             builder
-                .AddServiceBusClientWithNamespace(serviceBusOptions!.FullyQualifiedNamespace);
+                .AddServiceBusClientWithNamespace(serviceBusOptions.FullyQualifiedNamespace);
         });
 
         services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactory>();

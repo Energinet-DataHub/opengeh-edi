@@ -12,12 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DateTime;
+namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 
-public class SystemDateTimeProvider : ISystemDateTimeProvider
+public class ClockStub : IClock
 {
-    public Instant Now() => SystemClock.Instance.GetCurrentInstant();
+    private Instant? _instant;
+
+    public ClockStub(Instant? instant = null)
+    {
+        _instant = instant;
+    }
+
+    public void SetCurrentInstant(Instant instant)
+    {
+        _instant = instant;
+    }
+
+    public Instant GetCurrentInstant()
+    {
+        return
+            _instant
+            ?? SystemClock.Instance.GetCurrentInstant();
+    }
 }

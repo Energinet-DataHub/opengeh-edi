@@ -61,6 +61,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
@@ -275,8 +276,8 @@ public class TestBase : IDisposable
 
     private Task ProcessBackgroundTasksAsync()
     {
-        var datetimeProvider = GetService<ISystemDateTimeProvider>();
-        return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
+        var clock = GetService<IClock>();
+        return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(clock.GetCurrentInstant()));
     }
 
     private void BuildServices(ITestOutputHelper testOutputHelper)
@@ -321,7 +322,7 @@ public class TestBase : IDisposable
             .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
             .AddSerializer()
             .AddLogging()
-            .AddScoped<ISystemDateTimeProvider>(_ => new SystemDateTimeProviderStub());
+            .AddScoped<IClock>(_ => new ClockStub());
 
         _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
             .AddIntegrationEventModule(config)
