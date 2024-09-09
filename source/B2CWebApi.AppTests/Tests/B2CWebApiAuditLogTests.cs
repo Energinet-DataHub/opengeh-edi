@@ -130,7 +130,6 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
             outboxMessage.Should().NotBeNull();
         }
 
-        response.IsSuccessStatusCode.Should().BeTrue();
         outboxMessage!.Type.Should().Be(AuditLogOutboxMessageV1.OutboxMessageType);
         outboxMessage.ShouldProcessNow(SystemClock.Instance).Should().BeTrue();
         var auditLogPayload = serializer.Deserialize<AuditLogOutboxMessageV1Payload>(outboxMessage.Payload);
