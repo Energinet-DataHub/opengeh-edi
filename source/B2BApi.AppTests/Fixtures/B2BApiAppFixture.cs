@@ -173,7 +173,7 @@ public class B2BApiAppFixture : IAsyncLifetime
         await ServiceBusResourceProvider
             .BuildQueue("edi-inbox")
             .Do(queue => appHostSettings.ProcessEnvironmentVariables
-                .Add($"{EdiInboxOptions.SectionName}__{nameof(EdiInboxOptions.QueueName)}", queue.Name))
+                .Add($"{EdiInboxQueueOptions.SectionName}__{nameof(EdiInboxQueueOptions.QueueName)}", queue.Name))
             .CreateAsync();
         LogStopwatch(stopwatch, "ServiceBusQueue (edi-inbox)");
 

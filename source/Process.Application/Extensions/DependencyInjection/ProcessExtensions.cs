@@ -55,8 +55,8 @@ public static class ProcessExtensions
             .ValidateDataAnnotations();
 
         services
-            .AddOptionsWithValidateOnStart<EdiInboxOptions>()
-            .BindConfiguration(EdiInboxOptions.SectionName)
+            .AddOptionsWithValidateOnStart<EdiInboxQueueOptions>()
+            .BindConfiguration(EdiInboxQueueOptions.SectionName)
             .ValidateDataAnnotations();
 
         services
@@ -123,7 +123,7 @@ public static class ProcessExtensions
             // health checks
             .TryAddExternalDomainServiceBusQueuesHealthCheck(
                 configuration.GetSection(ServiceBusNamespaceOptions.SectionName).Get<ServiceBusNamespaceOptions>()!.FullyQualifiedNamespace,
-                configuration.GetSection(EdiInboxOptions.SectionName).Get<EdiInboxOptions>()!.QueueName,
+                configuration.GetSection(EdiInboxQueueOptions.SectionName).Get<EdiInboxQueueOptions>()!.QueueName,
                 configuration.GetSection(WholesaleInboxQueueOptions.SectionName).Get<WholesaleInboxQueueOptions>()!.QueueName);
         return services;
     }
