@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Net;
-using System.Text;
 using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Energinet.DataHub.EDI.B2BApi.Common;

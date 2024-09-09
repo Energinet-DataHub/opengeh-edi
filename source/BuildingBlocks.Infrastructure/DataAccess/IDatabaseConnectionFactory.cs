@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System.Data;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 

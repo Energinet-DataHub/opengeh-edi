@@ -15,7 +15,6 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.DataAccess.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,7 +37,7 @@ public static class EntityFrameworkExtensions
             .AddDbContext<TDbContext>((sp, o) =>
             {
                 var source = sp.GetRequiredService<SqlConnectionSource>();
-                o.UseSqlServer(source.Connection, y => y.UseNodaTime().EnableRetryOnFailure());
+                o.UseSqlServer(source.Connection, y => y.UseNodaTime());
             });
 
         // Add as IEdiDbContext to enable UnitOfWork to get all registered DbContexts

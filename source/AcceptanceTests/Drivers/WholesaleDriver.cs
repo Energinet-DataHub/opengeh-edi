@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.MessageFactories;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Google.Protobuf;
 

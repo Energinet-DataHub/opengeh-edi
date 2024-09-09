@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;

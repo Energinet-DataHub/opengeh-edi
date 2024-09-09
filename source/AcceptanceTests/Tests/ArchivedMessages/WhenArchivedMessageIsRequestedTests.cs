@@ -15,7 +15,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
-using FluentAssertions;
 using Xunit.Abstractions;
 #pragma warning disable CS0162 // Unreachable code detected
 

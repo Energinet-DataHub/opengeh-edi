@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
 using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.B2CWebApi.AppTests.Fixture;
@@ -31,6 +30,10 @@ namespace Energinet.DataHub.EDI.B2CWebApi.AppTests.Tests;
 [Collection(nameof(B2CWebApiCollectionFixture))]
 public class B2CWebApiAuditLogTests : IAsyncLifetime
 {
+    private static readonly string _datahubAdministratorRole = "DataHubAdministrator";
+    private static readonly Guid _datahubAdministratorActorId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+    private static readonly string _datahubAdministratorActorNumber = "5790001330583";
+
     private readonly B2CWebApiFixture _fixture;
 
     public B2CWebApiAuditLogTests(B2CWebApiFixture fixture, ITestOutputHelper logger)
@@ -43,11 +46,11 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
     {
         return
         [
-            [B2CWebApiRequests.CreateArchivedMessageGetDocumentRequest(), "DataHubAdministrator", AuditLogActivity.ArchivedMessagesGet],
-            [B2CWebApiRequests.CreateArchivedMessageSearchRequest(), "DataHubAdministrator", AuditLogActivity.ArchivedMessagesSearch],
-            [B2CWebApiRequests.CreateOrchestrationsRequest(), "DataHubAdministrator", AuditLogActivity.OrchestrationsSearch],
-            [B2CWebApiRequests.CreateOrchestrationRequest(), "DataHubAdministrator", AuditLogActivity.OrchestrationsGet],
-            [B2CWebApiRequests.CreateOrchestrationTerminateRequest(), "DataHubAdministrator", AuditLogActivity.OrchestrationsTerminate],
+            [B2CWebApiRequests.CreateArchivedMessageGetDocumentRequest(), _datahubAdministratorRole, AuditLogActivity.ArchivedMessagesGet],
+            [B2CWebApiRequests.CreateArchivedMessageSearchRequest(), _datahubAdministratorRole, AuditLogActivity.ArchivedMessagesSearch],
+            [B2CWebApiRequests.CreateOrchestrationsRequest(), _datahubAdministratorRole, AuditLogActivity.OrchestrationsSearch],
+            [B2CWebApiRequests.CreateOrchestrationRequest(), _datahubAdministratorRole, AuditLogActivity.OrchestrationsGet],
+            [B2CWebApiRequests.CreateOrchestrationTerminateRequest(), _datahubAdministratorRole, AuditLogActivity.OrchestrationsTerminate],
             [B2CWebApiRequests.CreateRequestAggregatedMeasureDataRequest(), ActorRole.EnergySupplier.Name, AuditLogActivity.RequestEnergyResults],
             [B2CWebApiRequests.CreateRequestWholesaleSettlementRequest(), ActorRole.EnergySupplier.Name, AuditLogActivity.RequestWholesaleResults],
         ];
@@ -78,8 +81,16 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
     {
         // Arrange
         var serializer = new Serializer();
+
+        // The OrchestrationsTerminate request will fail since there is no orchestration to terminate
+        var checkRequestSuccess = expectedActivity != AuditLogActivity.OrchestrationsTerminate;
+
+        var isAdministrator = actorRole == _datahubAdministratorRole;
         var expectedUserId = Guid.NewGuid();
-        var expectedActorId = Guid.NewGuid();
+        var expectedActorId = isAdministrator
+            ? _datahubAdministratorActorId
+            : Guid.NewGuid();
+
         string[] permissions =
         [
             "request-wholesale-settlement:view",
@@ -96,18 +107,28 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
                 actorId: expectedActorId.ToString(),
                 roles: permissions,
                 extraClaims: [
-                    new("actornumber", "1234567890123"),
+                    new("actornumber", isAdministrator ? _datahubAdministratorActorNumber : "1234567890123"),
                     new("marketroles", actorRole),
                 ]);
 
         // Act
-        await _fixture.WebApiClient.SendAsync(request);
+        var response = await _fixture.WebApiClient.SendAsync(request);
 
         // Assert
         await using var outboxContext = _fixture.DatabaseManager.CreateDbContext<OutboxContext>();
         var outboxMessage = outboxContext.Outbox.SingleOrDefault();
 
-        outboxMessage.Should().NotBeNull();
+        using (new AssertionScope())
+        {
+            if (checkRequestSuccess)
+            {
+                var ensureSuccess = () => response.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
+                await ensureSuccess.Should().NotThrowAsync();
+            }
+
+            outboxMessage.Should().NotBeNull();
+        }
+
         outboxMessage!.Type.Should().Be(AuditLogOutboxMessageV1.OutboxMessageType);
         outboxMessage.ShouldProcessNow(SystemClock.Instance).Should().BeTrue();
         var auditLogPayload = serializer.Deserialize<AuditLogOutboxMessageV1Payload>(outboxMessage.Payload);

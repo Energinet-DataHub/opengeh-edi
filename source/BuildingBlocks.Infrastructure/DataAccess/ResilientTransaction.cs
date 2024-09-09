@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -44,33 +42,22 @@ public class ResilientTransaction
     public async Task SaveChangesAsync(IReadOnlyCollection<DbContext> dbContexts)
     {
         if (dbContexts.Count == 0)
-            throw new InvalidOperationException("Cannot save changed for empty DbContext collection");
+            throw new InvalidOperationException("Cannot save changes for empty DbContext collection");
 
         var firstDbContext = dbContexts.First();
-        var strategy = firstDbContext.Database.CreateExecutionStrategy();
-
-        await strategy.ExecuteAsync(async () =>
+        using (var transaction = await firstDbContext.Database.BeginTransactionAsync().ConfigureAwait(false))
         {
-            using (var transaction = await firstDbContext.Database.BeginTransactionAsync().ConfigureAwait(false))
+            using var dbTransaction = transaction.GetDbTransaction();
+
+            if (_action != null) await _action().ConfigureAwait(false);
+
+            foreach (var dbContext in dbContexts)
             {
-                using var dbTransaction = transaction.GetDbTransaction();
-
-                if (_action != null) await _action().ConfigureAwait(false);
-
-                foreach (var dbContext in dbContexts)
-                {
-                    await dbContext.Database.UseTransactionAsync(dbTransaction).ConfigureAwait(false);
-                    await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                }
-
-                await transaction.CommitAsync().ConfigureAwait(false);
+                await dbContext.Database.UseTransactionAsync(dbTransaction).ConfigureAwait(false);
+                await dbContext.SaveChangesAsync().ConfigureAwait(false);
             }
 
-            // The transaction is only removed from the "firstDbContext" after it is disposed (????) so we need
-            // to manually remove the disposed transaction from all db contexts, else an exception will be thrown
-            // if one of the dbContexts are used later.
-            foreach (var dbContext in dbContexts)
-                await dbContext.Database.UseTransactionAsync(null).ConfigureAwait(false);
-        }).ConfigureAwait(false);
+            await transaction.CommitAsync().ConfigureAwait(false);
+        }
     }
 }
