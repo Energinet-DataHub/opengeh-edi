@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
 using NodaTime;
 using NodaTime.Extensions;

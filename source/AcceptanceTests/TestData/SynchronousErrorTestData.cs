@@ -12,16 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics.CodeAnalysis;
-
 namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
 
-[SuppressMessage("Security", "CA5394:Do not use insecure randomness", Justification = "Number generator not exposed")]
-    public static class SynchronousErrorTestData
+public static class SynchronousErrorTestData
+{
+    public static Dictionary<string, string> DefaultEnergySupplierTestData()
     {
-        public static Dictionary<string, string> DefaultEnergySupplierTestData()
-        {
-            return new Dictionary<string, string>
+        return new Dictionary<string, string>
             {
                 { "cim:mRID", Guid.NewGuid().ToString() },
                 { "cim:type", "E74" },
@@ -33,11 +30,11 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
                 { "cim:receiver_MarketParticipant.marketRole.type", "DGL" },
                 { "cim:createdDateTime", "2022-12-17T09:30:47Z" },
             };
-        }
+    }
 
-        public static Dictionary<string, string> DefaultEnergySupplierSeriesTestData()
-        {
-            return new Dictionary<string, string>
+    public static Dictionary<string, string> DefaultEnergySupplierSeriesTestData()
+    {
+        return new Dictionary<string, string>
             {
                 { "cim:mRID", Guid.NewGuid().ToString() },
                 { "cim:settlement_Series.version", "D01" },
@@ -48,117 +45,117 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
                 { "cim:meteringGridArea_Domain.mRID", "804" },
                 { "cim:energySupplier_MarketParticipant.mRID", "5790000392551" },
             };
-        }
+    }
 
-        public static Dictionary<string, string> WrongSenderMarketParticipantMrid()
-        {
-            return new Dictionary<string, string>
+    public static Dictionary<string, string> WrongSenderMarketParticipantMrid()
+    {
+        return new Dictionary<string, string>
             {
                 { "cim:sender_MarketParticipant.mRID", "5790000701413" },
             };
-        }
+    }
 
-        public static Dictionary<string, string> SenderRoleTypeNotAuthorized()
-        {
-            return new Dictionary<string, string>
+    public static Dictionary<string, string> SenderRoleTypeNotAuthorized()
+    {
+        return new Dictionary<string, string>
             {
                 { "cim:sender_MarketParticipant.marketRole.type", "DGL" },
             };
-        }
+    }
 
-        public static Dictionary<string, string> MessageIdIsNotUnique()
-        {
-            return new Dictionary<string, string>
+    public static Dictionary<string, string> MessageIdIsNotUnique()
+    {
+        return new Dictionary<string, string>
             {
                 { "cim:mRID", "B6Qhv7Dls6zdnvgna3cQqXu0PAzFqKco8GLc" },
             };
-        }
+    }
 
-        public static Dictionary<string, string> TransactionIdIsNotUnique()
-        {
-            return new Dictionary<string, string>
+    public static Dictionary<string, string> TransactionIdIsNotUnique()
+    {
+        return new Dictionary<string, string>
             {
                 { "cim:mRID", "aX5fNO7st0zVIemSRek4GM1FCSRbQ28PMIZO" },
             };
-        }
+    }
 
-        public static Dictionary<string, string> EmptyMessageId()
-        {
-            return new Dictionary<string, string>
+    public static Dictionary<string, string> EmptyMessageId()
+    {
+        return new Dictionary<string, string>
             {
                 { "cim:mRID", string.Empty },
             };
-        }
+    }
 
-        public static Dictionary<string, string> SchemaValidationErrorOnWrongBusinessSectorType()
-        {
-            return new Dictionary<string, string>
+    public static Dictionary<string, string> SchemaValidationErrorOnWrongBusinessSectorType()
+    {
+        return new Dictionary<string, string>
             {
                 { "cim:businessSector.type", "232" },
             };
-        }
+    }
 
-        public static Dictionary<string, string> InvalidLengthOfMessageId()
-        {
-            return new Dictionary<string, string>
+    public static Dictionary<string, string> InvalidLengthOfMessageId()
+    {
+        return new Dictionary<string, string>
             {
                 { "cim:mRID", Guid.NewGuid() + "1" },
             };
-        }
+    }
 
-        public static Dictionary<string, string> EmptyTransactionId()
-        {
-            return new Dictionary<string, string>
+    public static Dictionary<string, string> EmptyTransactionId()
+    {
+        return new Dictionary<string, string>
             {
                 { "cim:mRID", string.Empty },
             };
-        }
+    }
 
-        public static Dictionary<string, string> InvalidTransactionId()
-        {
-            return new Dictionary<string, string>
+    public static Dictionary<string, string> InvalidTransactionId()
+    {
+        return new Dictionary<string, string>
             {
                 { "cim:mRID", "invalidId" },
             };
-        }
+    }
 
-        public static Dictionary<string, string> TypeIsNotSupported()
-        {
-            return new Dictionary<string, string>
+    public static Dictionary<string, string> TypeIsNotSupported()
+    {
+        return new Dictionary<string, string>
             {
                 { "cim:type", "E73" },
             };
-        }
+    }
 
-        public static Dictionary<string, string> ProcessTypeIsNotSupported()
-        {
-            return new Dictionary<string, string>
+    public static Dictionary<string, string> ProcessTypeIsNotSupported()
+    {
+        return new Dictionary<string, string>
             {
                 { "cim:process.processType", "D09" },
             };
-        }
+    }
 
-        public static Dictionary<string, string> InvalidBusinessType()
-        {
-            return new Dictionary<string, string>
+    public static Dictionary<string, string> InvalidBusinessType()
+    {
+        return new Dictionary<string, string>
             {
                 { "cim:businessSector.type", "27" },
             };
-        }
+    }
 
-        public static Dictionary<string, string> InvalidReceiverId()
-        {
-            return new Dictionary<string, string>
+    public static Dictionary<string, string> InvalidReceiverId()
+    {
+        return new Dictionary<string, string>
             {
                 { "cim:receiver_MarketParticipant.mRID", "5790001330553" },
             };
-        }
+    }
 
-        public static Dictionary<string, string> InvalidReceiverRole()
-        {
-            return new Dictionary<string, string>
+    public static Dictionary<string, string> InvalidReceiverRole()
+    {
+        return new Dictionary<string, string>
             {
                 { "cim:receiver_MarketParticipant.marketRole.type", "DDZ" },
             };
-        }
+    }
 }

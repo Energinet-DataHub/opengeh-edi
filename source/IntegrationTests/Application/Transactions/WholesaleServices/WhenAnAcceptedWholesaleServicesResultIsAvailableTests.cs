@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMe
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;

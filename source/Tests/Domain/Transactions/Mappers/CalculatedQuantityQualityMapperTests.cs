@@ -16,6 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Factories;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
+using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Xunit;
 

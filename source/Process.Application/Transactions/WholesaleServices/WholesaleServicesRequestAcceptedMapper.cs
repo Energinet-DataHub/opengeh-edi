@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Mappers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
+using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf.Collections;
 using MediatR;
 using NodaTime.Serialization.Protobuf;

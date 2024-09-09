@@ -24,6 +24,7 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.Edi.Responses;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;

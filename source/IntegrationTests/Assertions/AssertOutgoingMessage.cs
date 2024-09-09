@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
+using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Xunit;
 
@@ -32,7 +33,8 @@ public class AssertOutgoingMessage
 
     private AssertOutgoingMessage(dynamic message, string messageRecord)
     {
-        if (message == null) throw new ArgumentNullException(nameof(message));
+        if (message == null)
+            throw new ArgumentNullException(nameof(message));
         Assert.NotNull(message);
         _message = message;
         _messageRecord = messageRecord;
