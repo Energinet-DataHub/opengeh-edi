@@ -12,29 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Domain.Wholesale;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.WholesaleServices;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
 
 public class WholesaleInboxClient : IWholesaleInboxClient
 {
-    private readonly IServiceBusSenderAdapter _senderCreator;
+    private readonly ServiceBusSender _sender;
 
     public WholesaleInboxClient(
-        IServiceBusSenderFactory serviceBusSenderFactory,
-        IOptions<WholesaleInboxQueueOptions> options)
+        IOptions<WholesaleInboxQueueOptions> options,
+        IAzureClientFactory<ServiceBusSender> senderFactory)
     {
-        ArgumentNullException.ThrowIfNull(serviceBusSenderFactory);
         ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(senderFactory);
 
-        _senderCreator = serviceBusSenderFactory.GetSender(options.Value.QueueName);
+        _sender = senderFactory.CreateClient(options.Value.QueueName);
     }
 
     public async Task SendProcessAsync(
@@ -43,7 +44,7 @@ public class WholesaleInboxClient : IWholesaleInboxClient
     {
         ArgumentNullException.ThrowIfNull(aggregatedMeasureDataProcess);
         var serviceBusMessage = AggregatedMeasureDataRequestFactory.CreateServiceBusMessage(aggregatedMeasureDataProcess);
-        await _senderCreator.SendAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
+        await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task SendProcessAsync(
@@ -52,6 +53,6 @@ public class WholesaleInboxClient : IWholesaleInboxClient
     {
         ArgumentNullException.ThrowIfNull(wholesaleServicesProcess);
         var serviceBusMessage = WholesaleServicesRequestFactory.CreateServiceBusMessage(wholesaleServicesProcess);
-        await _senderCreator.SendAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
+        await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
     }
 }
