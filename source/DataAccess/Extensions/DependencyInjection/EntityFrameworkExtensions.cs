@@ -37,7 +37,7 @@ public static class EntityFrameworkExtensions
             .AddDbContext<TDbContext>((sp, o) =>
             {
                 var source = sp.GetRequiredService<SqlConnectionSource>();
-                o.UseSqlServer(source.Connection, y => y.UseNodaTime().EnableRetryOnFailure());
+                o.UseSqlServer(source.Connection, y => y.UseNodaTime());
             });
 
         // Add as IEdiDbContext to enable UnitOfWork to get all registered DbContexts
