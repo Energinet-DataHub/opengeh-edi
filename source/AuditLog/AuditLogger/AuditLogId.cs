@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.AuditLog;
+namespace Energinet.DataHub.EDI.AuditLog.AuditLogger;
 
 public record AuditLogId(Guid Id)
 {

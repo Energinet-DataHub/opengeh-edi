@@ -122,7 +122,6 @@ public class B2CWebApiFixture : IAsyncLifetime
             { "IncomingMessages:QueueName", incomingMessagesQueueName },
             { "OrchestrationsStorageAccountConnectionString", AzuriteManager.FullConnectionString },
             { "OrchestrationsTaskHubName", "EdiTest01" },
-            { "FeatureManagement:UseAuditLog", "true" },
         };
 
         return appSettings;
