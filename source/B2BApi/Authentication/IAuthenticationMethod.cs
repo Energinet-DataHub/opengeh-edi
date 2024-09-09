@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Energinet.DataHub.EDI.B2BApi.Authentication;

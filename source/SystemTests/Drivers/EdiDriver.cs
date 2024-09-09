@@ -20,7 +20,6 @@ using Energinet.DataHub.EDI.SystemTests.Exceptions;
 using Energinet.DataHub.EDI.SystemTests.Logging;
 using Energinet.DataHub.EDI.SystemTests.Models;
 using Nito.AsyncEx;
-using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.SystemTests.Drivers;
 
