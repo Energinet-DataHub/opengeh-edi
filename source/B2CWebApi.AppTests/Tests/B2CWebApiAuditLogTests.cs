@@ -14,6 +14,7 @@
 
 using System.Text.Json;
 using Energinet.DataHub.EDI.AuditLog;
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.B2CWebApi.AppTests.Fixture;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;

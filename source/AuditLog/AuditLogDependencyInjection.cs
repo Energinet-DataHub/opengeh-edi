@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.AuditLog.AuditLogClient;
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.Outbox.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +24,7 @@ public static class AuditLogDependencyInjection
 {
     public static IServiceCollection AddAuditLogger(this IServiceCollection services)
     {
-        services.AddTransient<IAuditLogger, AuditLogger>();
+        services.AddTransient<IAuditLogger, AuditLogger.AuditLogger>();
 
         return services;
     }
