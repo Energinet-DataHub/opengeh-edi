@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Azure.Identity;
+using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,10 +48,11 @@ public static class HealthCheckExtensions
                         tokenCredential: defaultAzureCredential);
 
                     builder.AddServiceBusQueueDeadLetter(
-                        name: $"{key}DeadLetter",
                         fullyQualifiedNamespaceFactory: _ => serviceBusFullyQualifiedNamespace,
                         queueNameFactory: _ => key,
-                        tokenCredentialFactory: _ => defaultAzureCredential);
+                        tokenCredentialFactory: _ => defaultAzureCredential,
+                        $"{key}DeadLetter",
+                        [HealthChecksConstants.StatusHealthCheckTag]);
                 });
         }
 
