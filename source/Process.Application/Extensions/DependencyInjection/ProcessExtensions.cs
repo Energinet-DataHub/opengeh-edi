@@ -69,7 +69,7 @@ public static class ProcessExtensions
             .AddMediatR()
             .AddScoped<BuildingBlocks.Domain.ExecutionContext>();
 
-        //ProcessingConfiguration
+        // ProcessingConfiguration
         services.AddScoped<DomainEventsAccessor>()
             .AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>))
             .AddTransient(typeof(IPipelineBehavior<,>), typeof(RaiseDomainEventsBehaviour<,>))
@@ -77,7 +77,7 @@ public static class ProcessExtensions
             .AddInboxEvents()
             .AddWholesaleInbox();
 
-        //EnqueueMessageConfiguration
+        // EnqueueMessageConfiguration
         services.AddTransient<INotificationHandler<EnqueuedAcceptedWholesaleServicesEvent>, EnqueuedWholesaleServicesMessageHandler>();
         services.AddTransient<INotificationHandler<EnqueueAcceptedEnergyResultMessageEvent>, EnqueueAcceptedEnergyResultMessageHandler>();
         services.AddTransient<INotificationHandler<EnqueueRejectedEnergyResultMessageEvent>, EnqueueRejectedEnergyResultMessageHandler>();
@@ -120,7 +120,7 @@ public static class ProcessExtensions
             .AddTransient<INotificationHandler<WholesaleServicesRequestWasRejected>,
                 WhenARejectedWholesaleServicesRequestIsAvailable>()
 
-            // health checks
+            // Health checks
             .TryAddExternalDomainServiceBusQueuesHealthCheck(
                 configuration.GetSection(ServiceBusNamespaceOptions.SectionName).Get<ServiceBusNamespaceOptions>()!.FullyQualifiedNamespace,
                 configuration.GetSection(EdiInboxQueueOptions.SectionName).Get<EdiInboxQueueOptions>()!.QueueName,
