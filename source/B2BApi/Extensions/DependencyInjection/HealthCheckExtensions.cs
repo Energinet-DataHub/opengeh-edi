@@ -34,7 +34,7 @@ public static class HealthCheckExtensions
                 sp => sp.GetRequiredService<IOptions<IntegrationEventsOptions>>().Value.TopicName,
                 sp => sp.GetRequiredService<IOptions<IntegrationEventsOptions>>().Value.SubscriptionName,
                 _ => new DefaultAzureCredential(),
-                "Dead-letter",
+                "Dead-letter (integration events)",
                 [HealthChecksConstants.StatusHealthCheckTag]));
 
         return services;
