@@ -424,7 +424,7 @@ public class BehavioursTestBase : IDisposable
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.FullyQualifiedNamespace)}"] = MockServiceBusName,
+                    [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = MockServiceBusName,
                     [$"{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}"] = MockServiceBusName,
                     [$"{WholesaleInboxOptions.SectionName}:{nameof(WholesaleInboxOptions.QueueName)}"] = MockServiceBusName,
                     [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = MockServiceBusName,

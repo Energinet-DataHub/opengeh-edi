@@ -50,8 +50,8 @@ public static class ProcessExtensions
         ArgumentNullException.ThrowIfNull(configuration);
 
         // Options
-        services.AddOptions<ServiceBusOptions>()
-            .BindConfiguration(ServiceBusOptions.SectionName)
+        services.AddOptions<ServiceBusNamespaceOptions>()
+            .BindConfiguration(ServiceBusNamespaceOptions.SectionName)
             .ValidateDataAnnotations();
 
         services
@@ -122,7 +122,7 @@ public static class ProcessExtensions
 
             // health checks
             .TryAddExternalDomainServiceBusQueuesHealthCheck(
-                configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>()!.FullyQualifiedNamespace,
+                configuration.GetSection(ServiceBusNamespaceOptions.SectionName).Get<ServiceBusNamespaceOptions>()!.FullyQualifiedNamespace,
                 configuration.GetSection(EdiInboxOptions.SectionName).Get<EdiInboxOptions>()!.QueueName,
                 configuration.GetSection(WholesaleInboxOptions.SectionName).Get<WholesaleInboxOptions>()!.QueueName);
         return services;

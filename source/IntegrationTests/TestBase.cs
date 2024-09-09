@@ -289,7 +289,7 @@ public class TestBase : IDisposable
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.FullyQualifiedNamespace)}"] = "Fake",
+                    [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
                     [$"{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}"] = "Fake",
                     [$"{WholesaleInboxOptions.SectionName}:{nameof(WholesaleInboxOptions.QueueName)}"] = "Fake",
                     [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = "Fake",

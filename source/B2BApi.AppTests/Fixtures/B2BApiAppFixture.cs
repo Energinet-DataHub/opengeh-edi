@@ -394,7 +394,7 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // ServiceBus connection strings
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.FullyQualifiedNamespace)}",
+            $"{ServiceBusNamespaceOptions.SectionName}__{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}",
             ServiceBusResourceProvider.FullyQualifiedNamespace);
 
         // Feature Flags: Default values

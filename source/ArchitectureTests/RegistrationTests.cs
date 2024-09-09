@@ -66,7 +66,7 @@ public class RegistrationTests
         // The following declaration slows down the test execution, since creating a new Uri is a heavy operation
         Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL", TestEnvironment.CreateFakeStorageUrl());
 
-        Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.FullyQualifiedNamespace)}", TestEnvironment.CreateFakeServiceBusFullyQualifiedNamespace());
+        Environment.SetEnvironmentVariable($"{ServiceBusNamespaceOptions.SectionName}__{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}", TestEnvironment.CreateFakeServiceBusFullyQualifiedNamespace());
 
         Environment.SetEnvironmentVariable(nameof(DatabricksSqlStatementOptions.WorkspaceUrl), "https://adb-1000.azuredatabricks.net/");
         Environment.SetEnvironmentVariable(nameof(DatabricksSqlStatementOptions.WorkspaceToken), "FakeToken");
@@ -204,7 +204,7 @@ public class RegistrationTests
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    [$"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.FullyQualifiedNamespace)}"] = "Fake",
+                    [$"{ServiceBusNamespaceOptions.SectionName}__{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
 
                     [$"{UserAuthenticationOptions.SectionName}:{nameof(UserAuthenticationOptions.MitIdExternalMetadataAddress)}"] = "NotEmpty",
                     [$"{UserAuthenticationOptions.SectionName}:{nameof(UserAuthenticationOptions.ExternalMetadataAddress)}"] = "NotEmpty",

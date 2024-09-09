@@ -45,8 +45,8 @@ public static class IncomingMessagesExtensions
             .AddOptions<IncomingMessagesQueueOptions>()
             .BindConfiguration(IncomingMessagesQueueOptions.SectionName)
             .ValidateDataAnnotations();
-        services.AddOptions<ServiceBusOptions>()
-            .BindConfiguration(ServiceBusOptions.SectionName)
+        services.AddOptions<ServiceBusNamespaceOptions>()
+            .BindConfiguration(ServiceBusNamespaceOptions.SectionName)
             .ValidateDataAnnotations();
 
         services
@@ -87,7 +87,7 @@ public static class IncomingMessagesExtensions
 
             // Health checks
             .TryAddExternalDomainServiceBusQueuesHealthCheck(
-                configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>()!.FullyQualifiedNamespace,
+                configuration.GetSection(ServiceBusNamespaceOptions.SectionName).Get<ServiceBusNamespaceOptions>()!.FullyQualifiedNamespace,
                 configuration.GetSection(IncomingMessagesQueueOptions.SectionName).Get<IncomingMessagesQueueOptions>()!.QueueName);
 
         return services;
