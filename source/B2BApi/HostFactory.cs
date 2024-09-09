@@ -71,6 +71,7 @@ public static class HostFactory
                         .TryAddBlobStorageHealthCheck(
                             "edi-web-jobs-storage",
                             context.Configuration["AzureWebJobsStorage"]!)
+                        .AddIntegrationEventsHealthChecks()
 
                         // Data retention
                         .AddDataRetention()
@@ -92,9 +93,6 @@ public static class HostFactory
                         .AddProcessModule(context.Configuration)
                         .AddMasterDataModule(context.Configuration)
                         .AddDataAccessUnitOfWorkModule()
-
-                        // Missing dead letter health checks
-                        .AddIntegrationEventsHealthChecks()
 
                         // Audit log (outbox publisher)
                         .AddAuditLogOutboxPublisher()
