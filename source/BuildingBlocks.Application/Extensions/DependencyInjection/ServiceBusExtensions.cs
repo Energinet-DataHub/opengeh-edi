@@ -14,7 +14,6 @@
 
 using Azure.Identity;
 using BuildingBlocks.Application.Extensions.Options;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -53,8 +52,6 @@ public static class ServiceBusExtensions
             builder
                 .AddServiceBusClientWithNamespace(serviceBusOptions.FullyQualifiedNamespace);
         });
-
-        services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactory>();
 
         return services;
     }
