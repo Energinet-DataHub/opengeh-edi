@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.AuditLog;
+namespace Energinet.DataHub.EDI.AuditLog.AuditLogger;
 
 /// <summary>
 /// The entity type which an audit log entry is related to, used to categorize the log entry.
