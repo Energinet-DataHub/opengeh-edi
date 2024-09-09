@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.AuditLog.AuditUser;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
@@ -20,14 +19,12 @@ using Energinet.DataHub.EDI.Outbox.Interfaces;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.AuditLog;
+namespace Energinet.DataHub.EDI.AuditLog.AuditLogger;
 
 public class AuditLogger(
     IClock clock,
     ISerializer serializer,
     IAuditUserContext auditUserContext,
-    IFeatureFlagManager featureFlagManager,
-    ILogger<AuditLogger> logger,
     IOutboxClient outbox,
     IUnitOfWork unitOfWork) : IAuditLogger
 {
@@ -36,8 +33,6 @@ public class AuditLogger(
     private readonly IClock _clock = clock;
     private readonly ISerializer _serializer = serializer;
     private readonly IAuditUserContext _auditUserContext = auditUserContext;
-    private readonly IFeatureFlagManager _featureFlagManager = featureFlagManager;
-    private readonly ILogger _logger = logger;
     private readonly IOutboxClient _outbox = outbox;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
@@ -49,14 +44,6 @@ public class AuditLogger(
         AuditLogEntityType? affectedEntityType,
         string? affectedEntityKey)
     {
-        var useAuditLog = await _featureFlagManager.UseAuditLogAsync()
-            .ConfigureAwait(false);
-        if (!useAuditLog)
-        {
-            _logger.LogInformation("Skipping audit log since the feature flag UseAuditLog has value \"{UseAuditLog}\".", useAuditLog);
-            return;
-        }
-
         var currentUser = _auditUserContext.CurrentUser;
 
         var userId = currentUser?.UserId ?? Guid.Empty;
