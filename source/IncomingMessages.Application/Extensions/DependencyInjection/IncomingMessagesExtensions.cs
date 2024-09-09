@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure.Identity;
+using Azure.Messaging.ServiceBus;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
@@ -29,8 +31,10 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Json;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Xml;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 
@@ -39,12 +43,6 @@ public static class IncomingMessagesExtensions
     public static IServiceCollection AddIncomingMessagesModule(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
-
-        // Options
-        services
-            .AddOptions<IncomingMessagesQueueOptions>()
-            .BindConfiguration(IncomingMessagesQueueOptions.SectionName)
-            .ValidateDataAnnotations();
 
         services
             .AddFeatureFlags()
@@ -64,7 +62,6 @@ public static class IncomingMessagesExtensions
             .AddScoped<IMarketMessageParser, WholesaleSettlementB2CJsonMessageParser>()
             .AddScoped<MarketMessageParser>()
             .AddScoped<ISenderAuthorizer, SenderAuthorizer>()
-            .AddScoped<IncomingMessagePublisher>()
             .AddScoped<ValidateIncomingMessage>()
             .AddSingleton<IProcessTypeValidator, ProcessTypeValidator>()
             .AddSingleton<IMessageTypeValidator, MessageTypeValidator>()
@@ -75,18 +72,50 @@ public static class IncomingMessagesExtensions
             .AddSingleton<IResponseFactory, XmlResponseFactory>()
             .AddSingleton<ResponseFactory>();
 
-        //RegisterSchemaProviders
+        /*
+        // Incomming Messages Publisher
+        */
+        services
+            .AddScoped<IncomingMessagePublisher>();
+
+        // => Service Bus
+        services
+            .AddOptions<IncomingMessagesQueueOptions>()
+            .BindConfiguration(IncomingMessagesQueueOptions.SectionName)
+            .ValidateDataAnnotations();
+
+        var incommingMessagesQueueOptions =
+            configuration
+                .GetRequiredSection(IncomingMessagesQueueOptions.SectionName)
+                .Get<IncomingMessagesQueueOptions>()
+            ?? throw new InvalidOperationException("Missing Incomming Messages configuration.");
+
+        services.AddAzureClients(builder =>
+        {
+            builder
+                .AddClient<ServiceBusSender, ServiceBusClientOptions>((_, _, provider) =>
+                    provider
+                        .GetRequiredService<ServiceBusClient>()
+                        .CreateSender(incommingMessagesQueueOptions.QueueName))
+                .WithName(incommingMessagesQueueOptions.QueueName);
+        });
+
+        // => Health checks
+        services.AddHealthChecks()
+            .AddAzureServiceBusQueue(
+                sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
+                sp => sp.GetRequiredService<IOptions<IncomingMessagesQueueOptions>>().Value.QueueName,
+                _ => new DefaultAzureCredential(),
+                name: incommingMessagesQueueOptions.QueueName);
+
+        /*
+        // RegisterSchemaProviders
+        */
         services
             .AddSingleton<CimJsonSchemas>()
             .AddSingleton<CimXmlSchemas>()
             .AddSingleton<CimXmlSchemaProvider>()
-            .AddSingleton<JsonSchemaProvider>()
-
-            // Health checks
-            .TryAddExternalDomainServiceBusQueuesHealthCheck(
-                configuration.GetSection(ServiceBusNamespaceOptions.SectionName).Get<ServiceBusNamespaceOptions>()!.FullyQualifiedNamespace,
-                configuration.GetSection(IncomingMessagesQueueOptions.SectionName).Get<IncomingMessagesQueueOptions>()!.QueueName);
-
+            .AddSingleton<JsonSchemaProvider>();
         return services;
     }
 }
