@@ -14,7 +14,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Factories;
-using Energinet.DataHub.EDI.AcceptanceTests.TestData;
 using Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors.Asserters;
 using Xunit.Abstractions;
 

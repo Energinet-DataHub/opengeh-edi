@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
 using System.Net.Http.Headers;
 
 namespace Energinet.DataHub.EDI.B2BApi.Common;
