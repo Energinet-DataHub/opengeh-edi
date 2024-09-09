@@ -15,6 +15,7 @@
 using Azure.Identity;
 using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,15 +27,15 @@ public static class HealthCheckExtensions
 {
     public static IServiceCollection AddIntegrationEventsHealthChecks(this IServiceCollection services)
     {
-        services
-            .AddHealthChecks()
-            .AddServiceBusTopicSubscriptionDeadLetter(
+        services.TryAddHealthChecks(
+            "EdiIntegrationEventsDeadLetter",
+            (key, builder) => builder.AddServiceBusTopicSubscriptionDeadLetter(
                 sp => sp.GetRequiredService<IOptions<ServiceBusOptions>>().Value.FullyQualifiedNamespace,
                 sp => sp.GetRequiredService<IOptions<IntegrationEventsOptions>>().Value.TopicName,
                 sp => sp.GetRequiredService<IOptions<IntegrationEventsOptions>>().Value.SubscriptionName,
                 _ => new DefaultAzureCredential(),
-                "EdiIntegrationEventsDeadLetter",
-                [HealthChecksConstants.StatusHealthCheckTag]);
+                key,
+                [HealthChecksConstants.StatusHealthCheckTag]));
 
         return services;
     }
