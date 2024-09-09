@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -79,9 +80,16 @@ public class RequestAggregatedMeasureDataFactoryTests
         Assert.Equal(EndDay - 1, endDate.Day());
     }
 
+    /// <summary>
+    /// This test verifies when requesting aggregated measure data as a DDM the role is switched to MDR.
+    /// Please see this file for reference: Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub.WorkaroundFlags.
+    /// </summary>
     [Fact]
     public void RequestingRequestAggregatedMeasureData_AsGridOperator_RequestingRoleIsChangedToMeteredDataResponsible()
     {
+        if (!WorkaroundFlags.GridOperatorToMeteredDataResponsibleHack)
+            throw new Exception("This test is only relevant as long as GridOperatorToMeteredDataResponsibleHack is implemented.");
+
         var request = RequestAggregatedMeasureDataMarketRequest();
 
         var result = RequestAggregatedMeasureDataDtoFactory.Create(
