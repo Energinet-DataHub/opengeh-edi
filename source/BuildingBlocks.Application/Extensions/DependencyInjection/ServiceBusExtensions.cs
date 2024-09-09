@@ -13,13 +13,11 @@
 // limitations under the License.
 
 using Azure.Identity;
-using Azure.Messaging.ServiceBus;
 using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
