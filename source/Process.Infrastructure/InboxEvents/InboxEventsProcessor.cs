@@ -12,17 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using NodaTime;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
@@ -31,20 +24,20 @@ public class InboxEventsProcessor
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
     private readonly IMediator _mediator;
-    private readonly IClock _clock;
+    private readonly ISystemDateTimeProvider _dateTimeProvider;
     private readonly ILogger<InboxEventsProcessor> _logger;
     private readonly List<IInboxEventMapper> _mappers;
 
     public InboxEventsProcessor(
         IDatabaseConnectionFactory connectionFactory,
         IMediator mediator,
-        IClock clock,
+        ISystemDateTimeProvider dateTimeProvider,
         IEnumerable<IInboxEventMapper> mappers,
         ILogger<InboxEventsProcessor> logger)
     {
         _connectionFactory = connectionFactory;
         _mediator = mediator;
-        _clock = clock;
+        _dateTimeProvider = dateTimeProvider;
         _mappers = mappers.ToList();
         _logger = logger;
     }
@@ -85,7 +78,7 @@ public class InboxEventsProcessor
         _ = await connection.ExecuteAsync(updateStatement, new
         {
             Id = @event.Id,
-            Now = _clock.GetCurrentInstant().ToDateTimeUtc(),
+            Now = _dateTimeProvider.Now().ToDateTimeUtc(),
         }).ConfigureAwait(false);
     }
 
@@ -99,7 +92,7 @@ public class InboxEventsProcessor
         await connection.ExecuteAsync(updateStatement, new
         {
             Id = @event.Id,
-            Now = _clock.GetCurrentInstant().ToDateTimeUtc(),
+            Now = _dateTimeProvider.Now().ToDateTimeUtc(),
             ErrorMessage = exception.ToString(),
         }).ConfigureAwait(false);
     }

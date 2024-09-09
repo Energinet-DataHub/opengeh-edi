@@ -23,12 +23,12 @@ namespace Energinet.DataHub.EDI.MasterData.Infrastructure.GridAreas;
 public class GridAreaRepository : IGridAreaRepository
 {
     private readonly MasterDataContext _masterDataContext;
-    private readonly IClock _clock;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public GridAreaRepository(MasterDataContext masterDataContext, IClock clock)
+    public GridAreaRepository(MasterDataContext masterDataContext, ISystemDateTimeProvider systemDateTimeProvider)
     {
         _masterDataContext = masterDataContext;
-        _clock = clock;
+        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
     public async Task UpdateOwnershipAsync(
@@ -45,7 +45,7 @@ public class GridAreaRepository : IGridAreaRepository
 
     public async Task<ActorNumber?> GetGridOwnerForAsync(string gridAreaCode, CancellationToken cancellationToken)
     {
-        var now = _clock.GetCurrentInstant();
+        var now = _systemDateTimeProvider.Now();
         var gridAreaOwner = await _masterDataContext.GridAreaOwners
             .Where(gridArea => gridArea.GridAreaCode == gridAreaCode && gridArea.ValidFrom <= now)
             .OrderByDescending(gridArea => gridArea.SequenceNumber)

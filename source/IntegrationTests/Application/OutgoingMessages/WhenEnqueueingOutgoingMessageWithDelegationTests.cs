@@ -16,10 +16,8 @@ using System.Xml.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
@@ -39,7 +37,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     private readonly EnergyResultPerGridAreaMessageDtoBuilder _energyResultPerGridAreaMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ActorMessageQueueContext _context;
-    private readonly ClockStub _clockStub;
+    private readonly SystemDateTimeProviderStub _dateTimeProvider;
     private readonly Actor _delegatedTo = CreateActor(ActorNumber.Create("1234567891235"), actorRole: ActorRole.Delegated);
 
     private Actor _delegatedBy = CreateActor(ActorNumber.Create("1234567891234"));
@@ -50,7 +48,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
         _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         _context = GetService<ActorMessageQueueContext>();
-        _clockStub = (ClockStub)GetService<IClock>();
+        _dateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
         _acceptedEnergyResultMessageDtoBuilder = new AcceptedEnergyResultMessageDtoBuilder();
         _energyResultPerGridAreaMessageDtoBuilder = new EnergyResultPerGridAreaMessageDtoBuilder();
     }
@@ -190,7 +188,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
 
         var startsAt = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(10));
         var now = SystemClock.Instance.GetCurrentInstant();
-        _clockStub.SetCurrentInstant(now);
+        _dateTimeProvider.SetNow(now);
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.SeriesForBalanceResponsible.GridAreaCode, startsAt: startsAt, stopsAt: now.Plus(Duration.FromDays(30)), sequenceNumber: 0);
 
         // Cancel a delegation by adding a newer (higher sequence number) delegation to same receiver, with startsAt == stopsAt
@@ -238,7 +236,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             .Build();
 
         var startsAt = Instant.FromUtc(2024, 10, 1, 0, 0);
-        _clockStub.SetCurrentInstant(startsAt);
+        _dateTimeProvider.SetNow(startsAt);
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.SeriesForBalanceResponsible.GridAreaCode, startsAt: startsAt, stopsAt: startsAt.Plus(Duration.FromDays(5)));
 
         // Act
@@ -257,7 +255,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             .Build();
 
         var stopsAt = Instant.FromUtc(2024, 10, 1, 0, 0);
-        _clockStub.SetCurrentInstant(stopsAt);
+        _dateTimeProvider.SetNow(stopsAt);
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.SeriesForBalanceResponsible.GridAreaCode, startsAt: stopsAt.Minus(Duration.FromDays(5)), stopsAt: stopsAt);
 
         // Act

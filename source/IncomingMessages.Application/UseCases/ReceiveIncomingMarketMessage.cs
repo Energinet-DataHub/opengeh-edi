@@ -21,22 +21,21 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
 
 public class ReceiveIncomingMarketMessage
 {
-    private readonly MarketMessageParser _marketMessageParser;
-    private readonly ValidateIncomingMessage _validateIncomingMessage;
-    private readonly ResponseFactory _responseFactory;
-    private readonly IArchivedMessagesClient _archivedMessagesClient;
-    private readonly ILogger<IncomingMessageClient> _logger;
-    private readonly IIncomingMessageReceiver _incomingMessageReceiver;
-    private readonly DelegateIncomingMessage _delegateIncomingMessage;
-    private readonly IClock _clock;
+       private readonly MarketMessageParser _marketMessageParser;
+       private readonly ValidateIncomingMessage _validateIncomingMessage;
+       private readonly ResponseFactory _responseFactory;
+       private readonly IArchivedMessagesClient _archivedMessagesClient;
+       private readonly ILogger<IncomingMessageClient> _logger;
+       private readonly IIncomingMessageReceiver _incomingMessageReceiver;
+       private readonly DelegateIncomingMessage _delegateIncomingMessage;
+       private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public ReceiveIncomingMarketMessage(
+       public ReceiveIncomingMarketMessage(
         MarketMessageParser marketMessageParser,
         ValidateIncomingMessage validateIncomingMessage,
         ResponseFactory responseFactory,
@@ -44,7 +43,7 @@ public class ReceiveIncomingMarketMessage
         ILogger<IncomingMessageClient> logger,
         IIncomingMessageReceiver incomingMessageReceiver,
         DelegateIncomingMessage delegateIncomingMessage,
-        IClock clock)
+        ISystemDateTimeProvider systemDateTimeProvider)
     {
         _marketMessageParser = marketMessageParser;
         _validateIncomingMessage = validateIncomingMessage;
@@ -53,10 +52,10 @@ public class ReceiveIncomingMarketMessage
         _logger = logger;
         _incomingMessageReceiver = incomingMessageReceiver;
         _delegateIncomingMessage = delegateIncomingMessage;
-        _clock = clock;
+        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
-    public async Task<ResponseMessage> ReceiveIncomingMarketMessageAsync(
+       public async Task<ResponseMessage> ReceiveIncomingMarketMessageAsync(
         IIncomingMarketMessageStream incomingMarketMessageStream,
         DocumentFormat incomingDocumentFormat,
         IncomingDocumentType documentType,
@@ -125,7 +124,7 @@ public class ReceiveIncomingMarketMessage
         return _responseFactory.From(result, responseDocumentFormat);
     }
 
-    private async Task ArchiveIncomingMessageAsync(
+       private async Task ArchiveIncomingMessageAsync(
         IIncomingMarketMessageStream incomingMarketMessageStream,
         IIncomingMessage incomingMessage,
         IncomingDocumentType incomingDocumentType,
@@ -137,7 +136,7 @@ public class ReceiveIncomingMarketMessage
                 incomingDocumentType.Name,
                 incomingMessage.SenderNumber,
                 incomingMessage.ReceiverNumber,
-                _clock.GetCurrentInstant(),
+                _systemDateTimeProvider.Now(),
                 incomingMessage.BusinessReason,
                 ArchivedMessageType.IncomingMessage,
                 incomingMarketMessageStream),

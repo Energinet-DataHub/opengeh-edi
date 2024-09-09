@@ -15,12 +15,9 @@
 using System.Net;
 using System.ServiceModel.Security;
 using System.Xml;
-using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
-using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 

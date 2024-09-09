@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.B2BApi.Mocks;

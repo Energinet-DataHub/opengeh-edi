@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 
 public record AggregatedMeasureDataProcessGridArea(Guid Id, ProcessId AggregatedMeasureDataProcessId, string GridArea);

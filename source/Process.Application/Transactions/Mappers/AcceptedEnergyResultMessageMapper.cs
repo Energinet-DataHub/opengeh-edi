@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Collections.ObjectModel;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;

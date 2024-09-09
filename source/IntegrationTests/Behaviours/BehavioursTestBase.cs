@@ -113,6 +113,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 ///
 /// </summary>
 [Collection("IntegrationTest")]
+[SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "This is a test class")]
 [SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Test class")]
 public class BehavioursTestBase : IDisposable
 {
@@ -120,7 +121,7 @@ public class BehavioursTestBase : IDisposable
     private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
     private readonly ProcessContext _processContext;
     private readonly IncomingMessagesContext _incomingMessagesContext;
-    private readonly ClockStub _clockStub;
+    private readonly SystemDateTimeProviderStub _systemDateTimeProviderStub;
     private readonly AuthenticatedActor _authenticatedActor;
     private readonly DateTimeZone _dateTimeZone;
     private readonly ServiceProvider _serviceProvider;
@@ -139,10 +140,9 @@ public class BehavioursTestBase : IDisposable
         _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
         TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
         InboxEventNotificationHandler = new TestNotificationHandlerSpy();
-        _clockStub = new ClockStub();
+        _systemDateTimeProviderStub = new SystemDateTimeProviderStub();
+        _dateTimeZone = DateTimeZoneProviders.Tzdb["Europe/Copenhagen"];
         _serviceProvider = BuildServices(testOutputHelper);
-
-        _dateTimeZone = GetService<DateTimeZone>();
         _processContext = GetService<ProcessContext>();
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         _authenticatedActor = GetService<AuthenticatedActor>();
@@ -182,8 +182,7 @@ public class BehavioursTestBase : IDisposable
 
     protected void ClearDbContextCaches()
     {
-        if (_services == null)
-            throw new InvalidOperationException("ServiceCollection is not yet initialized");
+        if (_services == null) throw new InvalidOperationException("ServiceCollection is not yet initialized");
 
         var dbContextServices = _services
             .Where(s => s.ServiceType.IsSubclassOf(typeof(DbContext)) || s.ServiceType == typeof(DbContext))
@@ -213,7 +212,7 @@ public class BehavioursTestBase : IDisposable
             .UpdateGridAreaOwnershipAsync(
                 new GridAreaOwnershipAssignedDto(
                     gridArea,
-                    _clockStub.GetCurrentInstant().Minus(Duration.FromDays(100)),
+                    _systemDateTimeProviderStub.Now().Minus(Duration.FromDays(100)),
                     actorNumber,
                     0),
                 CancellationToken.None);
@@ -249,12 +248,12 @@ public class BehavioursTestBase : IDisposable
 
     protected void GivenNowIs(Instant now)
     {
-        _clockStub.SetCurrentInstant(now);
+        _systemDateTimeProviderStub.SetNow(now);
     }
 
     protected Instant GetNow()
     {
-        return _clockStub.GetCurrentInstant();
+        return _systemDateTimeProviderStub.Now();
     }
 
     protected Instant CreateDateInstant(int year, int month, int day)
@@ -311,7 +310,7 @@ public class BehavioursTestBase : IDisposable
 
         sentMessages.Should().HaveCount(expectedCount);
 
-        List<(TServiceBusMessage Message, Guid ProcessId)> messages = [];
+        List<(TServiceBusMessage Message, Guid ProcessId)> messages = new();
         using var scope = new AssertionScope();
         foreach (var message in sentMessages)
         {
@@ -407,10 +406,10 @@ public class BehavioursTestBase : IDisposable
     private async Task ProcessBackgroundTasksAsync()
     {
         using var scope = _serviceProvider.CreateScope();
-        var clock = scope.ServiceProvider.GetRequiredService<IClock>();
+        var datetimeProvider = scope.ServiceProvider.GetRequiredService<ISystemDateTimeProvider>();
         await scope.ServiceProvider
             .GetRequiredService<IMediator>()
-            .Publish(new TenSecondsHasHasPassed(clock.GetCurrentInstant()));
+            .Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
     }
 
     private ServiceProvider BuildServices(ITestOutputHelper testOutputHelper)
@@ -442,17 +441,8 @@ public class BehavioursTestBase : IDisposable
                 })
             .Build();
 
-        _services = [];
+        _services = new ServiceCollection();
         _services.AddScoped<IConfiguration>(_ => config);
-
-        _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
-            .AddIntegrationEventModule(config)
-            .AddOutgoingMessagesModule(config)
-            .AddProcessModule(config)
-            .AddArchivedMessagesModule(config)
-            .AddIncomingMessagesModule(config)
-            .AddMasterDataModule(config)
-            .AddDataAccessUnitOfWorkModule();
 
         _services.AddTransient<InboxEventsProcessor>()
             .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>>(
@@ -465,9 +455,16 @@ public class BehavioursTestBase : IDisposable
             .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
             .AddSerializer()
             .AddLogging()
-            // Some of the modules registers IClock.
-            // To override it we must ensure to register it after any module has been registered.
-            .AddScoped<IClock>(_ => _clockStub);
+            .AddScoped<ISystemDateTimeProvider>(_ => _systemDateTimeProviderStub);
+
+        _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
+            .AddIntegrationEventModule(config)
+            .AddOutgoingMessagesModule(config)
+            .AddProcessModule(config)
+            .AddArchivedMessagesModule(config)
+            .AddIncomingMessagesModule(config)
+            .AddMasterDataModule(config)
+            .AddDataAccessUnitOfWorkModule();
 
         _services.AddScoped<Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext>((x) =>
         {

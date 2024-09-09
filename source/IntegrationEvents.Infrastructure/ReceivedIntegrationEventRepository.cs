@@ -15,7 +15,6 @@
 using System.Data;
 using Dapper;
 using Microsoft.Data.SqlClient;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure;
 
@@ -24,11 +23,11 @@ public class ReceivedIntegrationEventRepository : IReceivedIntegrationEventRepos
     // Error code can be found here: https://learn.microsoft.com/en-us/sql/relational-databases/errors-events/database-engine-events-and-errors-2000-to-2999?view=sql-server-ver16
     private const int UniqueConstraintSqlException = 2627;
 
-    private readonly IClock _clock;
+    private readonly ISystemDateTimeProvider _dateTimeProvider;
 
-    public ReceivedIntegrationEventRepository(IClock clock)
+    public ReceivedIntegrationEventRepository(ISystemDateTimeProvider dateTimeProvider)
     {
-        _clock = clock;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<AddReceivedIntegrationEventResult> AddIfNotExistsAsync(Guid eventId, string eventType, IDbConnection dbConnection, IDbTransaction dbTransaction)
@@ -37,7 +36,7 @@ public class ReceivedIntegrationEventRepository : IReceivedIntegrationEventRepos
         {
             await dbConnection.ExecuteAsync(
                     "INSERT INTO [dbo].[ReceivedIntegrationEvents] ([Id], [EventType], [OccurredOn]) VALUES (@id, @eventType, @occuredOn)",
-                    new { id = eventId.ToString(), eventType, occuredOn = _clock.GetCurrentInstant() },
+                    new { id = eventId.ToString(), eventType = eventType, occuredOn = _dateTimeProvider.Now() },
                     dbTransaction)
                 .ConfigureAwait(false);
         }

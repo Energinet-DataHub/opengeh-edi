@@ -22,10 +22,8 @@ using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
-using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
-using Period = Energinet.DataHub.Edi.Responses.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
@@ -99,7 +97,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
             _eventType,
             _referenceId,
             _aggregatedTimeSeriesRequestAcceptedResponse.ToByteArray(),
-            GetService<IClock>().GetCurrentInstant()));
+            GetService<ISystemDateTimeProvider>().Now()));
         await context.SaveChangesAsync();
     }
 

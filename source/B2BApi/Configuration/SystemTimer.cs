@@ -12,35 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.B2BApi.Configuration;
 
 public class SystemTimer
 {
     private readonly IMediator _mediator;
-    private readonly IClock _clock;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public SystemTimer(IMediator mediator, IClock clock)
+    public SystemTimer(IMediator mediator, ISystemDateTimeProvider systemDateTimeProvider)
     {
         _mediator = mediator;
-        _clock = clock;
+        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
     [Function("TenSecondsHasPassed")]
     public Task TenSecondsHasPassedAsync([TimerTrigger("*/10 * * * * *")] TimerInfo timerTimerInfo, FunctionContext context)
     {
-        return _mediator.Publish(new TenSecondsHasHasPassed(_clock.GetCurrentInstant()));
+        return _mediator.Publish(new TenSecondsHasHasPassed(_systemDateTimeProvider.Now()));
     }
 
     [Function("ADayHasPassed")]
     public Task ADayHasPassedAsync([TimerTrigger("0 0 0 * * *")] TimerInfo timerTimerInfo, FunctionContext context)
     {
-        return _mediator.Publish(new ADayHasPassed(_clock.GetCurrentInstant()));
+        return _mediator.Publish(new ADayHasPassed(_systemDateTimeProvider.Now()));
     }
 }

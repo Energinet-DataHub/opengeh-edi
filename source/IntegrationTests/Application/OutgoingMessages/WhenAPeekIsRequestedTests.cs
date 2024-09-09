@@ -12,24 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
-using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages;
 using Energinet.DataHub.EDI.Tests.Factories;
 using FluentAssertions;
@@ -46,7 +37,7 @@ public class WhenAPeekIsRequestedTests : TestBase
     private readonly EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder;
     private readonly EnergyResultPerGridAreaMessageDtoBuilder _energyResultPerGridAreaMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
-    private readonly ClockStub _clockStub;
+    private readonly SystemDateTimeProviderStub _dateTimeProvider;
 
     public WhenAPeekIsRequestedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
@@ -54,7 +45,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
         _energyResultPerGridAreaMessageDtoBuilder = new EnergyResultPerGridAreaMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
-        _clockStub = (ClockStub)GetService<IClock>();
+        _dateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
     }
 
     public static object[][] GetUnusedDataHubTypesWithDocumentFormat()
@@ -156,7 +147,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         int year = 2024,
             month = 01,
             date = 02;
-        _clockStub.SetCurrentInstant(Instant.FromUtc(year, month, date, 11, 07));
+        _dateTimeProvider.SetNow(Instant.FromUtc(year, month, date, 11, 07));
         var receiverNumber = SampleData.NewEnergySupplierNumber;
         var message = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
             .WithEnergySupplierReceiverNumber(receiverNumber)
@@ -290,7 +281,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         var hour = 13;
         var minute = 37;
         var expectedTimestamp = new DateTime(year, month, day, hour, minute, 0, DateTimeKind.Utc);
-        _clockStub.SetCurrentInstant(expectedTimestamp.ToInstant());
+        _dateTimeProvider.SetNow(expectedTimestamp.ToInstant());
 
         // Act / When
         var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);

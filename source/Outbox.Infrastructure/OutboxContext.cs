@@ -18,7 +18,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DbContext;
 using Energinet.DataHub.EDI.Outbox.Domain;
 using Microsoft.EntityFrameworkCore;
-using NodaTime;
 using ExecutionContext = Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext;
 
 namespace Energinet.DataHub.EDI.Outbox.Infrastructure;
@@ -27,18 +26,18 @@ public class OutboxContext : DbContext, IEdiDbContext
 {
     private readonly ExecutionContext _executionContext;
     private readonly AuthenticatedActor _authenticatedActor;
-    private readonly IClock _clock;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
     public OutboxContext(
         DbContextOptions<OutboxContext> options,
         ExecutionContext executionContext,
         AuthenticatedActor authenticatedActor,
-        IClock clock)
+        ISystemDateTimeProvider systemDateTimeProvider)
         : base(options)
     {
         _executionContext = executionContext;
         _authenticatedActor = authenticatedActor;
-        _clock = clock;
+        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
     /// <summary>
@@ -50,7 +49,7 @@ public class OutboxContext : DbContext, IEdiDbContext
         _executionContext = new ExecutionContext();
         _executionContext.SetExecutionType(ExecutionType.Test);
         _authenticatedActor = new AuthenticatedActor();
-        _clock = SystemClock.Instance;
+        _systemDateTimeProvider = new SystemDateTimeProvider();
     }
 
     // ReSharper disable once UnusedAutoPropertyAccessor.Local -- Used by EF
@@ -68,13 +67,13 @@ public class OutboxContext : DbContext, IEdiDbContext
 
     public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
-        this.UpdateAuditFields(_executionContext, _authenticatedActor, _clock);
+        this.UpdateAuditFields(_executionContext, _authenticatedActor, _systemDateTimeProvider);
         return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        this.UpdateAuditFields(_executionContext, _authenticatedActor, _clock);
+        this.UpdateAuditFields(_executionContext, _authenticatedActor, _systemDateTimeProvider);
         return base.SaveChangesAsync(cancellationToken);
     }
 

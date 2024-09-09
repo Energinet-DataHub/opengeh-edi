@@ -17,7 +17,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
@@ -56,16 +55,16 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         var chargeOwnerId = ActorNumber.Create("1234567891911");
         var bundleRepository = GetService<IBundleRepository>();
         var actorMessageQueueContext = GetService<ActorMessageQueueContext>();
-        var clockStub = new ClockStub();
+        var systemDateTimeProviderStub = new SystemDateTimeProviderStub();
         var actorMessageQueueRepository = GetService<IActorMessageQueueRepository>();
         var outgoingMessageRepository = GetService<IOutgoingMessageRepository>();
         var fileStorageClient = GetService<IFileStorageClient>();
 
         // When we set the current date to 31 days in the future, any bundles dequeued now should then be removed.
-        clockStub.SetCurrentInstant(clockStub.GetCurrentInstant().PlusDays(31));
+        systemDateTimeProviderStub.SetNow(systemDateTimeProviderStub.Now().PlusDays(31));
 
         var sut = new DequeuedBundlesRetention(
-            clockStub,
+            systemDateTimeProviderStub,
             GetService<IMarketDocumentRepository>(),
             outgoingMessageRepository,
             actorMessageQueueContext,
@@ -92,7 +91,7 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         var actorMessageQueueForEs = await actorMessageQueueRepository.ActorMessageQueueForAsync(receiverId, ActorRole.EnergySupplier);
 
         // The bundle should be removed from the queue for the energy supplier, but not for the grid operator.
-        var dequeuedBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(clockStub.GetCurrentInstant(), 100);
+        var dequeuedBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(systemDateTimeProviderStub.Now(), 100);
         dequeuedBundles.Should().NotContain(x => x.ActorMessageQueueId == actorMessageQueueForEs!.Id);
 
         // We are still able to peek the message for the grid operator.
@@ -112,16 +111,16 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         var chargeOwnerId = ActorNumber.Create("1234567891911");
         var bundleRepository = GetService<IBundleRepository>();
         var actorMessageQueueContext = GetService<ActorMessageQueueContext>();
-        var clockStub = new ClockStub();
+        var systemDateTimeProviderStub = new SystemDateTimeProviderStub();
         var actorMessageQueueRepository = GetService<IActorMessageQueueRepository>();
         var outgoingMessageRepository = GetService<IOutgoingMessageRepository>();
         var fileStorageClient = GetService<IFileStorageClient>();
 
         // When we set the current date to 31 days in the future, any bundles dequeued now should then be removed.
-        clockStub.SetCurrentInstant(clockStub.GetCurrentInstant().PlusDays(31));
+        systemDateTimeProviderStub.SetNow(systemDateTimeProviderStub.Now().PlusDays(31));
 
         var sut = new DequeuedBundlesRetention(
-            clockStub,
+            systemDateTimeProviderStub,
             GetService<IMarketDocumentRepository>(),
             outgoingMessageRepository,
             actorMessageQueueContext,
@@ -151,7 +150,7 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         var actorMessageQueueForEs = await actorMessageQueueRepository.ActorMessageQueueForAsync(receiverId, ActorRole.EnergySupplier);
 
         // The bundle should be removed from the queue for the energy supplier, but not for the grid operator.
-        var dequeuedBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(clockStub.GetCurrentInstant(), 100);
+        var dequeuedBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(systemDateTimeProviderStub.Now(), 100);
         dequeuedBundles.Should().NotContain(x => x.ActorMessageQueueId == actorMessageQueueForEs!.Id);
 
         // We are still able to peek the message for the grid operator.
@@ -167,16 +166,16 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         var chargeOwnerId = ActorNumber.Create("1234567891911");
         var bundleRepository = GetService<IBundleRepository>();
         var actorMessageQueueContext = GetService<ActorMessageQueueContext>();
-        var clockStub = new ClockStub();
+        var systemDateTimeProviderStub = new SystemDateTimeProviderStub();
         var actorMessageQueueRepository = GetService<IActorMessageQueueRepository>();
         var outgoingMessageRepository = GetService<IOutgoingMessageRepository>();
         var fileStorageClient = GetService<IFileStorageClient>();
 
         // When we set the current date to 31 days in the future, any bundles dequeued now should then be removed.
-        clockStub.SetCurrentInstant(clockStub.GetCurrentInstant().PlusDays(31));
+        systemDateTimeProviderStub.SetNow(systemDateTimeProviderStub.Now().PlusDays(31));
 
         var sut = new DequeuedBundlesRetention(
-            clockStub,
+            systemDateTimeProviderStub,
             GetService<IMarketDocumentRepository>(),
             outgoingMessageRepository,
             actorMessageQueueContext,
@@ -213,7 +212,7 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         var actorMessageQueueForEs = await actorMessageQueueRepository.ActorMessageQueueForAsync(receiverId, ActorRole.EnergySupplier);
 
         // The bundle should be removed from the queue for the energy supplier, but not for the grid operator.
-        var dequeuedBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(clockStub.GetCurrentInstant(), 100);
+        var dequeuedBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(systemDateTimeProviderStub.Now(), 100);
         dequeuedBundles.Should().NotContain(x => x.ActorMessageQueueId == actorMessageQueueForEs!.Id);
 
         // We are still able to peek the message for the grid operator.

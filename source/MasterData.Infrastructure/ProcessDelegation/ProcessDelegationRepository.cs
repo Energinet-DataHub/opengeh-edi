@@ -23,12 +23,12 @@ namespace Energinet.DataHub.EDI.MasterData.Infrastructure.ProcessDelegation;
 public class ProcessDelegationRepository : IProcessDelegationRepository
 {
     private readonly MasterDataContext _masterDataContext;
-    private readonly IClock _clock;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
-    public ProcessDelegationRepository(MasterDataContext masterDataContext, IClock clock)
+    public ProcessDelegationRepository(MasterDataContext masterDataContext, ISystemDateTimeProvider systemDateTimeProvider)
     {
         _masterDataContext = masterDataContext;
-        _clock = clock;
+        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
     public void Create(Domain.ProcessDelegations.ProcessDelegation processDelegation, CancellationToken cancellationToken)
@@ -43,7 +43,7 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         ProcessType processType,
         CancellationToken cancellationToken)
     {
-        var now = _clock.GetCurrentInstant();
+        var now = _systemDateTimeProvider.Now();
 
         var query = GetBaseDelegationQuery(
             now,
@@ -60,7 +60,10 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         if (latestDelegation == null)
             return null;
 
-        return latestDelegation.StopsAt <= now ? null : latestDelegation;
+        if (latestDelegation.StopsAt <= now)
+            return null;
+
+        return latestDelegation;
     }
 
     public async Task<IReadOnlyCollection<Domain.ProcessDelegations.ProcessDelegation>> GetProcessesDelegatedToAsync(
@@ -70,7 +73,7 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         ProcessType processType,
         CancellationToken cancellationToken)
     {
-        var now = _clock.GetCurrentInstant();
+        var now = _systemDateTimeProvider.Now();
 
         var query = GetBaseDelegationQuery(
             now,
@@ -104,10 +107,8 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         Actor? delegatedTo,
         ProcessType processType)
     {
-        if (delegatedBy == null && delegatedTo == null)
-            throw new ArgumentException("At least one of the delegatedBy or delegatedTo must be set");
-        if (delegatedBy != null && delegatedTo != null)
-            throw new ArgumentException("Only one of the delegatedBy or delegatedTo must be set");
+        if (delegatedBy == null && delegatedTo == null) throw new ArgumentException("At least one of the delegatedBy or delegatedTo must be set");
+        if (delegatedBy != null && delegatedTo != null) throw new ArgumentException("Only one of the delegatedBy or delegatedTo must be set");
 
         // The latest delegation can cover the period from the start date to the end date.
         // If a delegation relationship has been cancelled the EndsAt is set to StartsAt.

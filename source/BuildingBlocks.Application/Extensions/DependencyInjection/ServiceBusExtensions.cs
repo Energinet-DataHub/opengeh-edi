@@ -13,13 +13,11 @@
 // limitations under the License.
 
 using Azure.Identity;
-using Azure.Messaging.ServiceBus;
 using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
@@ -46,14 +44,12 @@ public static class ServiceBusExtensions
             builder
                 .UseCredential(new DefaultAzureCredential());
 
-            var serviceBusOptions =
-                configuration
-                    .GetRequiredSection(ServiceBusOptions.SectionName)
-                    .Get<ServiceBusOptions>()
-                ?? throw new InvalidOperationException("Missing ServiceBus Namespace configuration.");
+            var serviceBusOptions = configuration
+                .GetRequiredSection(ServiceBusOptions.SectionName)
+                .Get<ServiceBusOptions>();
 
             builder
-                .AddServiceBusClientWithNamespace(serviceBusOptions.FullyQualifiedNamespace);
+                .AddServiceBusClientWithNamespace(serviceBusOptions!.FullyQualifiedNamespace);
         });
 
         services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactory>();

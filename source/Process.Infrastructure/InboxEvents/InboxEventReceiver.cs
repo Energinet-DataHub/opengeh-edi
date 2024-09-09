@@ -12,31 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Interfaces;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 
 public class InboxEventReceiver : IInboxEventReceiver
 {
     private readonly ProcessContext _context;
-    private readonly IClock _clock;
+    private readonly ISystemDateTimeProvider _dateTimeProvider;
     private readonly IEnumerable<IInboxEventMapper> _mappers;
 
     public InboxEventReceiver(
         ProcessContext context,
-        IClock clock,
+        ISystemDateTimeProvider dateTimeProvider,
         IEnumerable<IInboxEventMapper> mappers)
     {
         _context = context;
-        _clock = clock;
+        _dateTimeProvider = dateTimeProvider;
         _mappers = mappers;
     }
 
@@ -65,7 +59,7 @@ public class InboxEventReceiver : IInboxEventReceiver
 
     private async Task RegisterAsync(EventId eventId, string eventType, Guid referenceId, byte[] eventPayload)
     {
-        _context.ReceivedInboxEvents.Add(new ReceivedInboxEvent(eventId.Value, eventType, referenceId, eventPayload, _clock.GetCurrentInstant()));
+        _context.ReceivedInboxEvents.Add(new ReceivedInboxEvent(eventId.Value, eventType, referenceId, eventPayload, _dateTimeProvider.Now()));
         await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 }

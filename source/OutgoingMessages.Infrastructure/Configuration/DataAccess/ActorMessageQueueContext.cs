@@ -14,8 +14,6 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.DataAccess.DataAccess;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DbContext;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
@@ -26,7 +24,6 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.Bundles
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.OutgoingMessages;
 using Microsoft.EntityFrameworkCore;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 
@@ -34,19 +31,19 @@ public class ActorMessageQueueContext : DbContext, IEdiDbContext
 {
     private readonly Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext _executionContext;
     private readonly AuthenticatedActor _authenticatedActor;
-    private readonly IClock _clock;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
 #nullable disable
     public ActorMessageQueueContext(
         DbContextOptions<ActorMessageQueueContext> options,
         Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext executionContext,
         AuthenticatedActor authenticatedActor,
-        IClock clock)
+        ISystemDateTimeProvider systemDateTimeProvider)
         : base(options)
     {
         _executionContext = executionContext;
         _authenticatedActor = authenticatedActor;
-        _clock = clock;
+        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
     public DbSet<OutgoingMessage> OutgoingMessages { get; private set; }
@@ -69,13 +66,13 @@ public class ActorMessageQueueContext : DbContext, IEdiDbContext
 
     public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
-        this.UpdateAuditFields(_executionContext, _authenticatedActor, _clock);
+        this.UpdateAuditFields(_executionContext, _authenticatedActor, _systemDateTimeProvider);
         return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        this.UpdateAuditFields(_executionContext, _authenticatedActor, _clock);
+        this.UpdateAuditFields(_executionContext, _authenticatedActor, _systemDateTimeProvider);
         return base.SaveChangesAsync(cancellationToken);
     }
 

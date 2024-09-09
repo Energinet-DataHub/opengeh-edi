@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Microsoft.EntityFrameworkCore;
-using NodaTime;
 
 namespace Energinet.DataHub.EDI.DataAccess.Extensions.DbContext;
 
@@ -27,15 +26,15 @@ public static class DbContextExtensions
         this Microsoft.EntityFrameworkCore.DbContext dbContext,
         BuildingBlocks.Domain.ExecutionContext executionContext,
         AuthenticatedActor authenticatedActor,
-        IClock clock)
+        ISystemDateTimeProvider systemDateTimeProvider)
     {
         ArgumentNullException.ThrowIfNull(dbContext);
         ArgumentNullException.ThrowIfNull(executionContext);
         ArgumentNullException.ThrowIfNull(authenticatedActor);
-        ArgumentNullException.ThrowIfNull(clock);
+        ArgumentNullException.ThrowIfNull(systemDateTimeProvider);
 
         var modifiedEntries = dbContext.ChangeTracker.Entries()
-            .Where(e => e.State is EntityState.Added or EntityState.Modified);
+            .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
 
         foreach (var entry in modifiedEntries)
         {
@@ -49,7 +48,7 @@ public static class DbContextExtensions
                     authenticatedActor.TryGetCurrentActorIdentity(out var actorIdentity)
                         ? actorIdentity?.ActorNumber.Value
                         : executionContext.CurrentExecutionType?.Name ?? "Unknown";
-                entry.Property("CreatedAt").CurrentValue = clock.GetCurrentInstant();
+                entry.Property("CreatedAt").CurrentValue = systemDateTimeProvider.Now();
             }
 
             if (entry.State == EntityState.Modified
@@ -60,7 +59,7 @@ public static class DbContextExtensions
                     authenticatedActor.TryGetCurrentActorIdentity(out var actorIdentity)
                         ? actorIdentity?.ActorNumber.Value
                         : executionContext.CurrentExecutionType?.Name ?? "Unknown";
-                entry.Property("ModifiedAt").CurrentValue = clock.GetCurrentInstant();
+                entry.Property("ModifiedAt").CurrentValue = systemDateTimeProvider.Now();
             }
         }
     }

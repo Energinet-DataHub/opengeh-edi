@@ -24,22 +24,22 @@ namespace Energinet.DataHub.EDI.IntegrationEvents.Infrastructure;
 public class ReceivedIntegrationEventsRetention : IDataRetention
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
-    private readonly IClock _clock;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly ILogger<ReceivedIntegrationEventsRetention> _logger;
 
     public ReceivedIntegrationEventsRetention(
         IDatabaseConnectionFactory databaseConnectionFactory,
-        IClock clock,
+        ISystemDateTimeProvider systemDateTimeProvider,
         ILogger<ReceivedIntegrationEventsRetention> logger)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
-        _clock = clock;
+        _systemDateTimeProvider = systemDateTimeProvider;
         _logger = logger;
     }
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
     {
-        var monthAgo = _clock.GetCurrentInstant().Plus(-Duration.FromDays(30));
+        var monthAgo = _systemDateTimeProvider.Now().Plus(-Duration.FromDays(30));
         var amountOfOldEvents = await GetAmountOfOldEventsAsync(monthAgo, cancellationToken).ConfigureAwait(false);
         while (amountOfOldEvents > 0)
         {

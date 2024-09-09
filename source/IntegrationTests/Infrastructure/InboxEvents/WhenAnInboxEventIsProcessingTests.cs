@@ -12,19 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -45,7 +40,7 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
         _inboxProcessor = new InboxEventsProcessor(
             GetService<IDatabaseConnectionFactory>(),
             GetService<IMediator>(),
-            GetService<IClock>(),
+            GetService<ISystemDateTimeProvider>(),
             new[] { _testInboxEventMapper },
             GetService<ILogger<InboxEventsProcessor>>());
     }
@@ -77,7 +72,7 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
         var inboxProcessor = new InboxEventsProcessor(
             GetService<IDatabaseConnectionFactory>(),
             GetService<IMediator>(),
-            GetService<IClock>(),
+            GetService<ISystemDateTimeProvider>(),
             Array.Empty<IInboxEventMapper>(),
             GetService<ILogger<InboxEventsProcessor>>());
 
@@ -113,7 +108,7 @@ public class WhenAnInboxEventIsProcessingTests : TestBase
             _eventType,
             _referenceId,
             Encoding.ASCII.GetBytes("Event1"),
-            GetService<IClock>().GetCurrentInstant()));
+            GetService<ISystemDateTimeProvider>().Now()));
         await context.SaveChangesAsync();
     }
 }

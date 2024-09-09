@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.Process.Application.ProcessInitializationHandlers;
 using Energinet.DataHub.EDI.Process.Interfaces;
 

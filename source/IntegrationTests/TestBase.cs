@@ -27,7 +27,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
@@ -45,7 +44,6 @@ using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
@@ -61,7 +59,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
@@ -276,8 +273,8 @@ public class TestBase : IDisposable
 
     private Task ProcessBackgroundTasksAsync()
     {
-        var clock = GetService<IClock>();
-        return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(clock.GetCurrentInstant()));
+        var datetimeProvider = GetService<ISystemDateTimeProvider>();
+        return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
     }
 
     private void BuildServices(ITestOutputHelper testOutputHelper)
@@ -322,7 +319,7 @@ public class TestBase : IDisposable
             .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
             .AddSerializer()
             .AddLogging()
-            .AddScoped<IClock>(_ => new ClockStub());
+            .AddScoped<ISystemDateTimeProvider>(_ => new SystemDateTimeProviderStub());
 
         _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
             .AddIntegrationEventModule(config)

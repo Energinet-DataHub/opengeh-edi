@@ -12,14 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.DataAccess.DataAccess;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DbContext;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
@@ -28,7 +22,6 @@ using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.WholesaleServices;
 using Microsoft.EntityFrameworkCore;
-using NodaTime;
 using ExecutionContext = Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
@@ -37,19 +30,19 @@ public class ProcessContext : DbContext, IEdiDbContext
 {
     private readonly ExecutionContext _executionContext;
     private readonly AuthenticatedActor _authenticatedActor;
-    private readonly IClock _clock;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
 
 #nullable disable
     public ProcessContext(
         DbContextOptions<ProcessContext> options,
         ExecutionContext executionContext,
         AuthenticatedActor authenticatedActor,
-        IClock clock)
+        ISystemDateTimeProvider systemDateTimeProvider)
         : base(options)
     {
         _executionContext = executionContext;
         _authenticatedActor = authenticatedActor;
-        _clock = clock;
+        _systemDateTimeProvider = systemDateTimeProvider;
     }
 
     public ProcessContext()
@@ -76,13 +69,13 @@ public class ProcessContext : DbContext, IEdiDbContext
 
     public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
-        this.UpdateAuditFields(_executionContext, _authenticatedActor, _clock);
+        this.UpdateAuditFields(_executionContext, _authenticatedActor, _systemDateTimeProvider);
         return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        this.UpdateAuditFields(_executionContext, _authenticatedActor, _clock);
+        this.UpdateAuditFields(_executionContext, _authenticatedActor, _systemDateTimeProvider);
         return base.SaveChangesAsync(cancellationToken);
     }
 

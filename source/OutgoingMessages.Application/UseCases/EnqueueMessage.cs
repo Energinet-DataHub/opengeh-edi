@@ -12,13 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 
@@ -32,7 +29,7 @@ public class EnqueueMessage
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
     private readonly IBundleRepository _bundleRepository;
-    private readonly IClock _clock;
+    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
     private readonly ILogger<EnqueueMessage> _logger;
     private readonly DelegateMessage _delegateMessage;
 
@@ -40,14 +37,14 @@ public class EnqueueMessage
         IOutgoingMessageRepository outgoingMessageRepository,
         IActorMessageQueueRepository actorMessageQueueRepository,
         IBundleRepository bundleRepository,
-        IClock clock,
+        ISystemDateTimeProvider systemDateTimeProvider,
         ILogger<EnqueueMessage> logger,
         DelegateMessage delegateMessage)
     {
         _outgoingMessageRepository = outgoingMessageRepository;
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _bundleRepository = bundleRepository;
-        _clock = clock;
+        _systemDateTimeProvider = systemDateTimeProvider;
         _logger = logger;
         _delegateMessage = delegateMessage;
     }
@@ -94,7 +91,7 @@ public class EnqueueMessage
             actorMessageQueueId,
             BusinessReason.FromName(messageToEnqueue.BusinessReason),
             messageToEnqueue.DocumentType,
-            _clock.GetCurrentInstant(),
+            _systemDateTimeProvider.Now(),
             messageToEnqueue.RelatedToMessageId);
         _bundleRepository.Add(newBundle);
 

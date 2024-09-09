@@ -16,7 +16,6 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.SystemTests.Logging;
-using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.SystemTests.Drivers;
 

@@ -17,13 +17,11 @@ using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions;
@@ -193,7 +191,7 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
     {
         var incomingMessageClient = GetService<IIncomingMessageClient>();
         var dateTimeZone = GetService<DateTimeZone>();
-        var clock = GetService<IClock>();
+        var systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
 
         var request = new RequestAggregatedMeasureDataMarketRequest(
             CalculationType: CalculationType.BalanceFixing,
@@ -210,7 +208,7 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
                 senderActorNumber.Value,
                 senderActorRole.Name,
                 dateTimeZone,
-                clock.GetCurrentInstant());
+                systemDateTimeProvider.Now());
 
         var incomingMessageStream = GenerateStreamFromString(new Serializer().Serialize(requestMessage));
 
