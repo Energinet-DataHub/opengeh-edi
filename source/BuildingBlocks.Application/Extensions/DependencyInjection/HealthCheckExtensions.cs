@@ -47,7 +47,7 @@ public static class HealthCheckExtensions
                         tokenCredential: defaultAzureCredential);
 
                     builder.AddServiceBusQueueDeadLetter(
-                        name: key,
+                        name: $"{key}DeadLetter",
                         fullyQualifiedNamespaceFactory: _ => serviceBusFullyQualifiedNamespace,
                         queueNameFactory: _ => key,
                         tokenCredentialFactory: _ => defaultAzureCredential);
