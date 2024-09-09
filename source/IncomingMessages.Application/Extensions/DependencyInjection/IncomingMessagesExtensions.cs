@@ -45,9 +45,6 @@ public static class IncomingMessagesExtensions
             .AddOptions<IncomingMessagesQueueOptions>()
             .BindConfiguration(IncomingMessagesQueueOptions.SectionName)
             .ValidateDataAnnotations();
-        services.AddOptions<ServiceBusNamespaceOptions>()
-            .BindConfiguration(ServiceBusNamespaceOptions.SectionName)
-            .ValidateDataAnnotations();
 
         services
             .AddFeatureFlags()
