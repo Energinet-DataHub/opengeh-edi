@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.MessageFactories;

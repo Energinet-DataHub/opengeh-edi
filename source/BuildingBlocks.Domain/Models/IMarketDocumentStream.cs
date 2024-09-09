@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
-
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 #pragma warning disable CA1711 // Is a "stream" value object

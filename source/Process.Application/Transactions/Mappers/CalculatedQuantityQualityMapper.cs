@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.Edi.Responses;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 

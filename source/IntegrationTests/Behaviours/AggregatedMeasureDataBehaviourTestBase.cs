@@ -23,8 +23,6 @@ using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.Process.Interfaces;
-using Energinet.DataHub.Edi.Requests;
-using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit.Abstractions;

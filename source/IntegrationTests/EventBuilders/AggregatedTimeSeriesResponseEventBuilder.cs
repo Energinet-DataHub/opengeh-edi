@@ -14,7 +14,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
-using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Edi.Responses;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;

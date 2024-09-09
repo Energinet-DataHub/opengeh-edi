@@ -15,7 +15,6 @@
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
-using Energinet.DataHub.Edi.Requests;
 using Google.Protobuf;
 using Period = Energinet.DataHub.Edi.Requests.Period;
 

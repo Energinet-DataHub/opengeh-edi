@@ -15,7 +15,6 @@
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
-using Energinet.DataHub.Edi.Requests;
 using Google.Protobuf;
 using ChargeType = Energinet.DataHub.Edi.Requests.ChargeType;
 

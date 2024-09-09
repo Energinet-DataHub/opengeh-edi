@@ -14,7 +14,6 @@
 
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Factories;
 

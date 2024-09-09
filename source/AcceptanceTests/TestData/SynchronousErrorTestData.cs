@@ -16,7 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.TestData;
 
-    [SuppressMessage("Security", "CA5394:Do not use insecure randomness", Justification = "Number generator not exposed")]
+[SuppressMessage("Security", "CA5394:Do not use insecure randomness", Justification = "Number generator not exposed")]
     public static class SynchronousErrorTestData
     {
         public static Dictionary<string, string> DefaultEnergySupplierTestData()
