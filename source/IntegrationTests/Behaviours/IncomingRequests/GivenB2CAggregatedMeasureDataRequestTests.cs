@@ -51,8 +51,6 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
             MarketRole.EnergySupplier,
             MarketRole.BalanceResponsibleParty,
             MarketRole.MeteredDataResponsible,
-            // GridAccessProvider is allowed to act as a MeteredDataResponsible (MeteredDataResponsibleToGridOperatorHack)
-            MarketRole.GridAccessProvider,
         };
 
         var peekDocumentFormats = DocumentFormats.GetAllDocumentFormats();
