@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Text;
+using Azure.Messaging.ServiceBus;
 using Azure.Storage.Blobs;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.Extensions.Options;
@@ -25,7 +26,6 @@ using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
@@ -55,6 +55,7 @@ using Energinet.DataHub.EDI.Process.Interfaces;
 using Google.Protobuf;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -71,7 +72,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests;
 [Collection("IntegrationTest")]
 public class TestBase : IDisposable
 {
-    private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
+    private readonly IAzureClientFactory<ServiceBusSender> _serviceBusSenderFactoryStub;
     private readonly ProcessContext _processContext;
     private readonly IncomingMessagesContext _incomingMessagesContext;
     private ServiceCollection? _services;
@@ -218,7 +219,6 @@ public class TestBase : IDisposable
 
         _processContext.Dispose();
         _incomingMessagesContext.Dispose();
-        _serviceBusSenderFactoryStub.Dispose();
         ServiceProvider.Dispose();
         _disposed = true;
     }
@@ -333,7 +333,7 @@ public class TestBase : IDisposable
 
         // Replace the services with stub implementations.
         // - Building blocks
-        _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
+        _services.AddSingleton<IAzureClientFactory<ServiceBusSender>>(_serviceBusSenderFactoryStub);
         _services.AddTransient<IFeatureFlagManager>((x) => FeatureFlagManagerStub);
 
         _services.AddScoped<ExecutionContext>((x) =>

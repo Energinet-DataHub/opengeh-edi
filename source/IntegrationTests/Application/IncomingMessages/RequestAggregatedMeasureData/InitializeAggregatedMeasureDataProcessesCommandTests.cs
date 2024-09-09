@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System.Reflection;
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
@@ -25,6 +25,7 @@ using Energinet.DataHub.Edi.Requests;
 using FluentAssertions;
 using FluentAssertions.Equivalency;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.Azure;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
@@ -35,14 +36,16 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages.Re
 public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 {
     private readonly ProcessContext _processContext;
+#pragma warning disable CA2213 // Disposable fields should be disposed
     private readonly ServiceBusSenderSpy _senderSpy;
+#pragma warning restore CA2213 // Disposable fields should be disposed
     private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
 
     public InitializeAggregatedMeasureDataProcessesCommandTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
         _processContext = GetService<ProcessContext>();
-        _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();
+        _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IAzureClientFactory<ServiceBusSender>>();
         _senderSpy = new ServiceBusSenderSpy("Fake");
         _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
     }
@@ -164,8 +167,6 @@ public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
     {
         base.Dispose(disposing);
         _processContext.Dispose();
-        _senderSpy.Dispose();
-        _serviceBusClientSenderFactory.Dispose();
     }
 
     private static InitializeAggregatedMeasureDataProcessDtoBuilder MessageBuilder()
