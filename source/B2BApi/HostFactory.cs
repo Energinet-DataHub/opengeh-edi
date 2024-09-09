@@ -93,6 +93,9 @@ public static class HostFactory
                         .AddMasterDataModule(context.Configuration)
                         .AddDataAccessUnitOfWorkModule()
 
+                        // Missing dead letter health checks
+                        .AddIntegrationEventsHealthChecks()
+
                         // Audit log (outbox publisher)
                         .AddAuditLogOutboxPublisher()
 

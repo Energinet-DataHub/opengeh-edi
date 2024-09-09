@@ -14,16 +14,20 @@
 
 using Azure.Identity;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
-public static class HealtCheckExtensions
+public static class HealthCheckExtensions
 {
     /// <summary>
     /// Used for Service Bus queues where the app have peek (receiver) permissions
     /// </summary>
-    public static IServiceCollection TryAddExternalDomainServiceBusQueuesHealthCheck(this IServiceCollection services, string serviceBusFullyQualifiedNamespace, params string[] queueNames)
+    public static IServiceCollection TryAddExternalDomainServiceBusQueuesHealthCheck(
+        this IServiceCollection services,
+        string serviceBusFullyQualifiedNamespace,
+        params string[] queueNames)
     {
         ArgumentNullException.ThrowIfNull(serviceBusFullyQualifiedNamespace);
         ArgumentNullException.ThrowIfNull(queueNames);
@@ -34,18 +38,29 @@ public static class HealtCheckExtensions
                 registrationKey: name,
                 (key, builder) =>
                 {
+                    var defaultAzureCredential = new DefaultAzureCredential();
+
                     builder.AddAzureServiceBusQueue(
                         name: key,
                         fullyQualifiedNamespace: serviceBusFullyQualifiedNamespace,
                         queueName: key,
-                        tokenCredential: new DefaultAzureCredential());
+                        tokenCredential: defaultAzureCredential);
+
+                    builder.AddServiceBusQueueDeadLetter(
+                        name: key,
+                        fullyQualifiedNamespaceFactory: _ => serviceBusFullyQualifiedNamespace,
+                        queueNameFactory: _ => key,
+                        tokenCredentialFactory: _ => defaultAzureCredential);
                 });
         }
 
         return services;
     }
 
-    public static IServiceCollection TryAddBlobStorageHealthCheck(this IServiceCollection services, string name, string blobConnectionString)
+    public static IServiceCollection TryAddBlobStorageHealthCheck(
+        this IServiceCollection services,
+        string name,
+        string blobConnectionString)
     {
         services.TryAddHealthChecks(
             name,
@@ -57,7 +72,10 @@ public static class HealtCheckExtensions
         return services;
     }
 
-    public static IServiceCollection TryAddBlobStorageHealthCheck(this IServiceCollection services, string name, Uri storageAccountUri)
+    public static IServiceCollection TryAddBlobStorageHealthCheck(
+        this IServiceCollection services,
+        string name,
+        Uri storageAccountUri)
     {
         services.TryAddHealthChecks(
             name,
