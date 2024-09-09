@@ -68,7 +68,8 @@ internal class EnqueueMessagesOrchestration(TelemetryClient telemetryClient)
 
         await Task.WhenAll(tasks);
 
-        var resultsWasSuccessfullyHandled = ResultsWasSuccessfullyHandled(tasks.Select(t => t.Result));
+        var sumOfHandledResults = tasks.Select(t => t.Result).Sum();
+        var resultsWasSuccessfullyHandled = ResultsWasSuccessfullyHandled(sumOfHandledResults);
         await context.CallActivityAsync(
             nameof(SendActorMessagesEnqueuedActivity),
             new SendMessagesEnqueuedInput(
@@ -83,7 +84,8 @@ internal class EnqueueMessagesOrchestration(TelemetryClient telemetryClient)
 
         // Calculate the duration
         var duration = endTime - startTime;
-        telemetryClient.GetMetric(CustomMetricConstants.EnqueueMessagesDuration).TrackValue(duration.Milliseconds);
+        var avgDurationOfHandledResults = duration.Milliseconds / sumOfHandledResults;
+        telemetryClient.GetMetric(CustomMetricConstants.EnqueueMessageAvgDuration).TrackValue(avgDurationOfHandledResults);
         return "Success";
     }
 
@@ -176,8 +178,8 @@ internal class EnqueueMessagesOrchestration(TelemetryClient telemetryClient)
             backoffCoefficient: 2.0));
     }
 
-    private static bool ResultsWasSuccessfullyHandled(IEnumerable<int> numberOfHandledResults)
+    private static bool ResultsWasSuccessfullyHandled(int sumOfHandledResults)
     {
-        return numberOfHandledResults.Sum() > 0;
+        return sumOfHandledResults > 0;
     }
 }
