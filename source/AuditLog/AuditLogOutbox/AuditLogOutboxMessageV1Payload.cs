@@ -12,22 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+namespace Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 
-public class SystemDateTimeProviderStub : ISystemDateTimeProvider
-{
-    private Instant? _now;
-
-    public void SetNow(Instant now)
-    {
-        _now = now;
-    }
-
-    public Instant Now()
-    {
-        return _now ?? SystemClock.Instance.GetCurrentInstant();
-    }
-}
+/// <summary>
+/// The serialized payload of an audit log outbox message. Changes must be backward compatible, or a new version
+/// must be introduced.
+/// </summary>
+public record AuditLogOutboxMessageV1Payload(
+    Guid LogId,
+    Guid UserId,
+    Guid ActorId,
+    Guid SystemId,
+    string? Permissions,
+    Instant OccuredOn,
+    string Activity,
+    string Origin,
+    object? Payload,
+    string? AffectedEntityType,
+    string? AffectedEntityKey);

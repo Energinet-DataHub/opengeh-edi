@@ -191,7 +191,7 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
     {
         var incomingMessageClient = GetService<IIncomingMessageClient>();
         var dateTimeZone = GetService<DateTimeZone>();
-        var systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
+        var clock = GetService<IClock>();
 
         var request = new RequestAggregatedMeasureDataMarketRequest(
             CalculationType: CalculationType.BalanceFixing,
@@ -208,7 +208,7 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
                 senderActorNumber.Value,
                 senderActorRole.Name,
                 dateTimeZone,
-                systemDateTimeProvider.Now());
+                clock.GetCurrentInstant());
 
         var incomingMessageStream = GenerateStreamFromString(new Serializer().Serialize(requestMessage));
 

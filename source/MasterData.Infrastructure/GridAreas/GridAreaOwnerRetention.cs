@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using NodaTime;
@@ -23,29 +20,29 @@ namespace Energinet.DataHub.EDI.MasterData.Infrastructure.GridAreas;
 
 public class GridAreaOwnerRetention : IDataRetention
 {
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IClock _clock;
     private readonly MasterDataContext _masterDataContext;
 
     public GridAreaOwnerRetention(
-        ISystemDateTimeProvider systemDateTimeProvider,
+        IClock clock,
         MasterDataContext masterDataContext)
     {
-        _systemDateTimeProvider = systemDateTimeProvider;
+        _clock = clock;
         _masterDataContext = masterDataContext;
     }
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
     {
-       var now = _systemDateTimeProvider.Now();
-       var monthAgo = now.Plus(-Duration.FromDays(30));
-       _masterDataContext.GridAreaOwners.RemoveRange(
-           _masterDataContext.GridAreaOwners
-                .Where(x => x.ValidFrom < monthAgo)
-                .Where(x => _masterDataContext.GridAreaOwners.Any(y =>
-                    y.GridAreaCode == x.GridAreaCode
-                    && y.ValidFrom < now
-                    && y.SequenceNumber > x.SequenceNumber)));
+        var now = _clock.GetCurrentInstant();
+        var monthAgo = now.Plus(-Duration.FromDays(30));
+        _masterDataContext.GridAreaOwners.RemoveRange(
+            _masterDataContext.GridAreaOwners
+                 .Where(x => x.ValidFrom < monthAgo)
+                 .Where(x => _masterDataContext.GridAreaOwners.Any(y =>
+                     y.GridAreaCode == x.GridAreaCode
+                     && y.ValidFrom < now
+                     && y.SequenceNumber > x.SequenceNumber)));
 
-       await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 }

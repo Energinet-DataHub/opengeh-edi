@@ -32,7 +32,7 @@ public class EnqueueMessage
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly IActorMessageQueueRepository _actorMessageQueueRepository;
     private readonly IBundleRepository _bundleRepository;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IClock _clock;
     private readonly ILogger<EnqueueMessage> _logger;
     private readonly DelegateMessage _delegateMessage;
 
@@ -40,14 +40,14 @@ public class EnqueueMessage
         IOutgoingMessageRepository outgoingMessageRepository,
         IActorMessageQueueRepository actorMessageQueueRepository,
         IBundleRepository bundleRepository,
-        ISystemDateTimeProvider systemDateTimeProvider,
+        IClock clock,
         ILogger<EnqueueMessage> logger,
         DelegateMessage delegateMessage)
     {
         _outgoingMessageRepository = outgoingMessageRepository;
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _bundleRepository = bundleRepository;
-        _systemDateTimeProvider = systemDateTimeProvider;
+        _clock = clock;
         _logger = logger;
         _delegateMessage = delegateMessage;
     }
@@ -94,7 +94,7 @@ public class EnqueueMessage
             actorMessageQueueId,
             BusinessReason.FromName(messageToEnqueue.BusinessReason),
             messageToEnqueue.DocumentType,
-            _systemDateTimeProvider.Now(),
+            _clock.GetCurrentInstant(),
             messageToEnqueue.RelatedToMessageId);
         _bundleRepository.Add(newBundle);
 

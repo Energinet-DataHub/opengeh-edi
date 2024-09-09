@@ -42,4 +42,27 @@ public interface IAuditLogger
         object? activityPayload,
         AuditLogEntityType? affectedEntityType,
         string? affectedEntityKey);
+
+    /// <summary>
+    /// Log an audit log entry and commit the transaction immediately.
+    /// </summary>
+    /// <param name="logId">Globally unique audit log id, used for idempotency.</param>
+    /// <param name="activity">The performed activity</param>
+    /// <param name="activityOrigin">
+    /// Source of the activity. An example in case of a HTTP request could be the route (including query parameters)
+    /// that triggered the activity
+    /// </param>
+    /// <param name="activityPayload">
+    /// Additional information about the activity. An example in case of a HTTP request could be the request POST body.
+    /// If the payload is not a string, it will be converted to a base64 encoded string.
+    /// </param>
+    /// <param name="affectedEntityType">Primary type of the entity affected. If multiple entities are effected, consider whether it warrants an audit log per entity or not.</param>
+    /// <param name="affectedEntityKey">Key (preferably natural key) of the affected entity.</param>
+    Task LogWithCommitAsync(
+        AuditLogId logId,
+        AuditLogActivity activity,
+        string activityOrigin,
+        object? activityPayload,
+        AuditLogEntityType? affectedEntityType,
+        string? affectedEntityKey);
 }

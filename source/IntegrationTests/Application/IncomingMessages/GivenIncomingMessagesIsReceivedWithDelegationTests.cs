@@ -33,7 +33,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 
 public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
 {
-    private readonly SystemDateTimeProviderStub _dateTimeProvider;
+    private readonly ClockStub _clockStub;
     private readonly IIncomingMessageClient _incomingMessagesRequest;
 
     private readonly Actor _originalActor = new(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
@@ -49,7 +49,7 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
         _senderSpy = new ServiceBusSenderSpy("Fake");
         _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
         _incomingMessagesRequest = GetService<IIncomingMessageClient>();
-        _dateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
+        _clockStub = (ClockStub)GetService<IClock>();
         _authenticatedActor = GetService<AuthenticatedActor>();
     }
 
@@ -58,7 +58,7 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
     {
         // Arrange
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
-        _dateTimeProvider.SetNow(now);
+        _clockStub.SetCurrentInstant(now);
         var gridAreaCode = "512";
         var documentFormat = DocumentFormat.Json;
         _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
@@ -122,7 +122,7 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
     {
         // Arrange
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
-        _dateTimeProvider.SetNow(now);
+        _clockStub.SetCurrentInstant(now);
         var gridAreaCode = "512";
         var documentFormat = DocumentFormat.Json;
         _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
@@ -184,7 +184,7 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
     {
         // Arrange
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
-        _dateTimeProvider.SetNow(now);
+        _clockStub.SetCurrentInstant(now);
         var gridAreaCode = "512";
         var documentFormat = DocumentFormat.Json;
         _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
@@ -237,7 +237,7 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
     {
         // Arrange
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
-        _dateTimeProvider.SetNow(now);
+        _clockStub.SetCurrentInstant(now);
         var expectedGridAreaCode = "512";
         var documentFormat = DocumentFormat.Json;
         _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));

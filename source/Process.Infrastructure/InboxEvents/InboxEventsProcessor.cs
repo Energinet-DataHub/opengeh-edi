@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
@@ -30,20 +31,20 @@ public class InboxEventsProcessor
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
     private readonly IMediator _mediator;
-    private readonly ISystemDateTimeProvider _dateTimeProvider;
+    private readonly IClock _clock;
     private readonly ILogger<InboxEventsProcessor> _logger;
     private readonly List<IInboxEventMapper> _mappers;
 
     public InboxEventsProcessor(
         IDatabaseConnectionFactory connectionFactory,
         IMediator mediator,
-        ISystemDateTimeProvider dateTimeProvider,
+        IClock clock,
         IEnumerable<IInboxEventMapper> mappers,
         ILogger<InboxEventsProcessor> logger)
     {
         _connectionFactory = connectionFactory;
         _mediator = mediator;
-        _dateTimeProvider = dateTimeProvider;
+        _clock = clock;
         _mappers = mappers.ToList();
         _logger = logger;
     }
@@ -84,7 +85,7 @@ public class InboxEventsProcessor
         _ = await connection.ExecuteAsync(updateStatement, new
         {
             Id = @event.Id,
-            Now = _dateTimeProvider.Now().ToDateTimeUtc(),
+            Now = _clock.GetCurrentInstant().ToDateTimeUtc(),
         }).ConfigureAwait(false);
     }
 
@@ -98,7 +99,7 @@ public class InboxEventsProcessor
         await connection.ExecuteAsync(updateStatement, new
         {
             Id = @event.Id,
-            Now = _dateTimeProvider.Now().ToDateTimeUtc(),
+            Now = _clock.GetCurrentInstant().ToDateTimeUtc(),
             ErrorMessage = exception.ToString(),
         }).ConfigureAwait(false);
     }

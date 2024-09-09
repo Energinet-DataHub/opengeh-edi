@@ -12,12 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using NodaTime;
+using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DateTime;
+namespace Energinet.DataHub.EDI.DataAccess.UnitOfWork;
 
-public class SystemDateTimeProvider : ISystemDateTimeProvider
+public sealed class UnitOfWork : IUnitOfWork
 {
-    public Instant Now() => SystemClock.Instance.GetCurrentInstant();
+    private readonly IReadOnlyCollection<DbContext> _dbContexts;
+
+    public UnitOfWork(
+        IEnumerable<IEdiDbContext> dbContexts)
+    {
+        _dbContexts = dbContexts.Cast<DbContext>().ToArray();
+    }
+
+    public Task CommitTransactionAsync()
+    {
+        return ResilientTransaction.New()
+            .SaveChangesAsync(_dbContexts);
+    }
 }

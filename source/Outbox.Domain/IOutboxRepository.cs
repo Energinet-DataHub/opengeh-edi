@@ -12,18 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
-
-namespace Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+namespace Energinet.DataHub.EDI.Outbox.Domain;
 
 /// <summary>
-/// System time provider
+/// A repository of outbox messages, used to implement an outbox pattern.
 /// </summary>
-public interface ISystemDateTimeProvider
+public interface IOutboxRepository
 {
     /// <summary>
-    /// Return current date and time
+    /// Add outbox message to the repository.
     /// </summary>
-    /// <returns><see cref="Instant"/></returns>
-    Instant Now();
+    void Add(OutboxMessage outboxMessage);
+
+    /// <summary>
+    /// Get all unprocessed outbox messages.
+    /// </summary>
+    public Task<IReadOnlyCollection<OutboxMessageId>> GetUnprocessedOutboxMessageIdsAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Get outbox message by id.
+    /// </summary>
+    Task<OutboxMessage> GetAsync(OutboxMessageId outboxMessageId, CancellationToken cancellationToken);
 }

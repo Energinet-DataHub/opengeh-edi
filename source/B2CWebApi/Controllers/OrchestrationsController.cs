@@ -53,7 +53,7 @@ public class OrchestrationsController(
     [Authorize(Roles = CalculationManageRole)]
     public async Task<IActionResult> IndexAsync(DateTime? from)
     {
-        await _auditLogger.LogAsync(
+        await _auditLogger.LogWithCommitAsync(
                 AuditLogId.New(),
                 AuditLogActivity.OrchestrationsSearch,
                 HttpContext.Request.GetDisplayUrl(),
@@ -97,7 +97,7 @@ public class OrchestrationsController(
     [Authorize(Roles = CalculationManageRole)]
     public async Task<IActionResult> IndexAsync(string id)
     {
-        await _auditLogger.LogAsync(
+        await _auditLogger.LogWithCommitAsync(
                 AuditLogId.New(),
                 AuditLogActivity.OrchestrationsGet,
                 HttpContext.Request.GetDisplayUrl(),
@@ -125,7 +125,7 @@ public class OrchestrationsController(
     [Authorize(Roles = CalculationManageRole)]
     public async Task<IActionResult> TerminateAsync(string id, string reason)
     {
-        await _auditLogger.LogAsync(
+        await _auditLogger.LogWithCommitAsync(
                 AuditLogId.New(),
                 AuditLogActivity.OrchestrationsTerminate,
                 HttpContext.Request.GetDisplayUrl(),

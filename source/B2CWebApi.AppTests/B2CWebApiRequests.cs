@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Net.Http.Json;
+using System.Text.Json;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.AppTests;
@@ -21,10 +22,7 @@ public static class B2CWebApiRequests
 {
     public static HttpRequestMessage CreateArchivedMessageGetDocumentRequest()
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMessageGetDocument")
-        {
-            Content = new StringContent(Guid.NewGuid().ToString()),
-        };
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/ArchivedMessageGetDocument?id={Guid.NewGuid()}");
         return request;
     }
 
@@ -32,7 +30,7 @@ public static class B2CWebApiRequests
     {
         var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMessageSearch")
         {
-            Content = JsonContent.Create(
+            Content = CreateJsonContent(
                 new SearchArchivedMessagesCriteria(
                     CreatedDuringPeriod: null,
                     MessageId: null,
@@ -46,7 +44,7 @@ public static class B2CWebApiRequests
 
     public static HttpRequestMessage CreateOrchestrationsRequest()
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, "/Orchestrations");
+        var request = new HttpRequestMessage(HttpMethod.Get, "/Orchestrations?from=2024-09-03T13:37:00");
         return request;
     }
 
@@ -66,7 +64,7 @@ public static class B2CWebApiRequests
     {
         var request = new HttpRequestMessage(HttpMethod.Post, "/RequestAggregatedMeasureData")
         {
-            Content = JsonContent.Create(
+            Content = CreateJsonContent(
                 new RequestAggregatedMeasureDataMarketRequest(
                     CalculationType: CalculationType.BalanceFixing,
                     MeteringPointType: null,
@@ -83,7 +81,7 @@ public static class B2CWebApiRequests
     {
         var request = new HttpRequestMessage(HttpMethod.Post, "/RequestWholesaleSettlement")
         {
-            Content = JsonContent.Create(
+            Content = CreateJsonContent(
                 new RequestWholesaleSettlementMarketRequest(
                     CalculationType: CalculationType.WholesaleFixing,
                     StartDate: "2024-08-27T00:00:00Z",
@@ -94,5 +92,16 @@ public static class B2CWebApiRequests
                     PriceType: null)),
         };
         return request;
+    }
+
+    private static StringContent CreateJsonContent(object payload)
+    {
+        var serializedObject = JsonSerializer.Serialize(payload);
+        var stringContent = new StringContent(
+            serializedObject,
+            System.Text.Encoding.UTF8,
+            "application/json");
+
+        return stringContent;
     }
 }

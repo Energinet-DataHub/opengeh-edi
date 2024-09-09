@@ -12,12 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DateTime;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -28,12 +23,12 @@ namespace Energinet.DataHub.EDI.MasterData.Infrastructure.GridAreas;
 public class GridAreaRepository : IGridAreaRepository
 {
     private readonly MasterDataContext _masterDataContext;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IClock _clock;
 
-    public GridAreaRepository(MasterDataContext masterDataContext, ISystemDateTimeProvider systemDateTimeProvider)
+    public GridAreaRepository(MasterDataContext masterDataContext, IClock clock)
     {
         _masterDataContext = masterDataContext;
-        _systemDateTimeProvider = systemDateTimeProvider;
+        _clock = clock;
     }
 
     public async Task UpdateOwnershipAsync(
@@ -50,7 +45,7 @@ public class GridAreaRepository : IGridAreaRepository
 
     public async Task<ActorNumber?> GetGridOwnerForAsync(string gridAreaCode, CancellationToken cancellationToken)
     {
-        var now = _systemDateTimeProvider.Now();
+        var now = _clock.GetCurrentInstant();
         var gridAreaOwner = await _masterDataContext.GridAreaOwners
             .Where(gridArea => gridArea.GridAreaCode == gridAreaCode && gridArea.ValidFrom <= now)
             .OrderByDescending(gridArea => gridArea.SequenceNumber)

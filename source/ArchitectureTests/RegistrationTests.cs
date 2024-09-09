@@ -20,21 +20,31 @@ using Energinet.DataHub.Core.App.Common.Extensions.Options;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.EDI.B2BApi;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.DataAccess.DataAccess;
+using Energinet.DataHub.EDI.DataAccess.UnitOfWork;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.WholesaleSettlementMessageParsers;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -239,6 +249,41 @@ public class RegistrationTests
             .AllSatisfy(
                 middleware =>
                     _host.Services.GetService(middleware).Should().NotBeNull());
+    }
+
+    /// <summary>
+    /// The <see cref="UnitOfWork"/> uses dependency injection to get a list of generic DbContexts. Those
+    /// must be the same references as the specific DbContexts that are registered in the DI container and used in
+    /// repositories etc., which this test verifies.
+    /// </summary>
+    [Fact]
+    public void Generic_and_specific_db_contexts_have_same_references()
+    {
+        using var scope = _host.Services.CreateScope();
+
+        DbContext[] specificContexts =
+        [
+            scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>(),
+            scope.ServiceProvider.GetRequiredService<IncomingMessagesContext>(),
+            scope.ServiceProvider.GetRequiredService<ProcessContext>(),
+            scope.ServiceProvider.GetRequiredService<MasterDataContext>(),
+            scope.ServiceProvider.GetRequiredService<OutboxContext>(),
+        ];
+
+        var genericDbContexts = scope.ServiceProvider.GetServices<IEdiDbContext>()
+            .Cast<DbContext>()
+            .ToList();
+
+        using var assertionScope = new AssertionScope();
+        genericDbContexts.Should().HaveSameCount(specificContexts);
+
+        foreach (var genericDbContext in genericDbContexts)
+        {
+            var specificDbContext = specificContexts.SingleOrDefault(specific => specific.GetType() == genericDbContext.GetType());
+            specificDbContext.Should().NotBeNull();
+            var dbContextIsSameReference = ReferenceEquals(specificDbContext, genericDbContext);
+            dbContextIsSameReference.Should().BeTrue($"expected {specificDbContext?.GetType().Name} to be the same reference as {genericDbContext.GetType().Name}");
+        }
     }
 
     private static IEnumerable<object[]> ResolveTypes(Type targetType, Assembly[] assemblies)

@@ -14,8 +14,6 @@
 
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
@@ -23,8 +21,8 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 
@@ -39,7 +37,7 @@ public class PeekMessage
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
     private readonly IArchivedMessagesClient _archivedMessageClient;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IClock _clock;
     private readonly IBundleRepository _bundleRepository;
 
     public PeekMessage(
@@ -49,7 +47,7 @@ public class PeekMessage
         IOutgoingMessageRepository outgoingMessageRepository,
         ActorMessageQueueContext actorMessageQueueContext,
         IArchivedMessagesClient archivedMessageClient,
-        ISystemDateTimeProvider systemDateTimeProvider,
+        IClock clock,
         IBundleRepository bundleRepository)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
@@ -58,7 +56,7 @@ public class PeekMessage
         _outgoingMessageRepository = outgoingMessageRepository;
         _actorMessageQueueContext = actorMessageQueueContext;
         _archivedMessageClient = archivedMessageClient;
-        _systemDateTimeProvider = systemDateTimeProvider;
+        _clock = clock;
         _bundleRepository = bundleRepository;
     }
 
@@ -94,10 +92,7 @@ public class PeekMessage
 
         var marketDocument = await _marketDocumentRepository.GetAsync(peekResult.BundleId).ConfigureAwait(false);
 
-        if (marketDocument == null)
-        {
-            marketDocument = await GenerateMarketDocumentAsync(request, cancellationToken, peekResult).ConfigureAwait(false);
-        }
+        marketDocument ??= await GenerateMarketDocumentAsync(request, cancellationToken, peekResult).ConfigureAwait(false);
 
         return new PeekResultDto(marketDocument.GetMarketDocumentStream().Stream, peekResult.MessageId);
     }
@@ -108,7 +103,7 @@ public class PeekMessage
         PeekResult peekResult)
     {
         MarketDocument marketDocument;
-        var timestamp = _systemDateTimeProvider.Now();
+        var timestamp = _clock.GetCurrentInstant();
 
         var outgoingMessageBundle = await _outgoingMessageRepository.GetAsync(peekResult).ConfigureAwait(false);
         var marketDocumentStream = await _documentFactory.CreateFromAsync(outgoingMessageBundle, request.DocumentFormat, timestamp).ConfigureAwait(false);

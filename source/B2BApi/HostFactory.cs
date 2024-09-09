@@ -13,9 +13,11 @@
 // limitations under the License.
 
 using BuildingBlocks.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware;
 using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
@@ -23,6 +25,7 @@ using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.Outbox.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
 using Microsoft.Azure.Functions.Worker;
@@ -76,7 +79,7 @@ public static class HostFactory
                         .AddB2BAuthentication(tokenValidationParameters)
 
                         // System timer
-                        .AddSystemTimer()
+                        .AddNodaTimeForApplication()
 
                         // Serializer
                         .AddSerializer()
@@ -88,7 +91,15 @@ public static class HostFactory
                         .AddOutgoingMessagesModule(context.Configuration)
                         .AddProcessModule(context.Configuration)
                         .AddMasterDataModule(context.Configuration)
-                        .AddDataAccessUnitOfWorkModule(context.Configuration);
+                        .AddDataAccessUnitOfWorkModule()
+
+                        // Audit log (outbox publisher)
+                        .AddAuditLogOutboxPublisher()
+
+                        // Outbox module and outbox processing
+                        .AddOutboxModule(context.Configuration)
+                        .AddOutboxProcessor()
+                        .AddOutboxRetention();
                 })
             .ConfigureLogging(
                 (hostingContext, logging) =>

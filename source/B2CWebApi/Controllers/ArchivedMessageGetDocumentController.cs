@@ -39,7 +39,7 @@ public class ArchivedMessageGetDocumentController : ControllerBase
     {
         ArgumentNullException.ThrowIfNull(id);
 
-        await _auditLogger.LogAsync(
+        await _auditLogger.LogWithCommitAsync(
                 AuditLogId.New(),
                 AuditLogActivity.ArchivedMessagesGet,
                 HttpContext.Request.GetDisplayUrl(),

@@ -12,17 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DateTime;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.Outbox.Domain;
+using Energinet.DataHub.EDI.Outbox.Interfaces;
 
-namespace BuildingBlocks.Application.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.Outbox.Application;
 
-public static class SystemDateTimeExtensions
+public class OutboxClient(
+    IOutboxRepository outboxRepository)
+    : IOutboxClient
 {
-    public static IServiceCollection AddSystemTimer(this IServiceCollection services)
+    private readonly IOutboxRepository _outboxRepository = outboxRepository;
+
+    public async Task CreateWithoutCommitAsync<T>(IOutboxMessage<T> message)
     {
-        services.AddScoped<ISystemDateTimeProvider, SystemDateTimeProvider>();
-        return services;
+        var payload = await message.SerializeAsync()
+            .ConfigureAwait(false);
+
+        var outboxMessage = new OutboxMessage(
+            message.Type,
+            payload);
+
+        _outboxRepository.Add(outboxMessage);
     }
 }

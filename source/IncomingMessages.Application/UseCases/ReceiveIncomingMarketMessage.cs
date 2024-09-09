@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
@@ -23,21 +21,22 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
 
 public class ReceiveIncomingMarketMessage
 {
-       private readonly MarketMessageParser _marketMessageParser;
-       private readonly ValidateIncomingMessage _validateIncomingMessage;
-       private readonly ResponseFactory _responseFactory;
-       private readonly IArchivedMessagesClient _archivedMessagesClient;
-       private readonly ILogger<IncomingMessageClient> _logger;
-       private readonly IIncomingMessageReceiver _incomingMessageReceiver;
-       private readonly DelegateIncomingMessage _delegateIncomingMessage;
-       private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly MarketMessageParser _marketMessageParser;
+    private readonly ValidateIncomingMessage _validateIncomingMessage;
+    private readonly ResponseFactory _responseFactory;
+    private readonly IArchivedMessagesClient _archivedMessagesClient;
+    private readonly ILogger<IncomingMessageClient> _logger;
+    private readonly IIncomingMessageReceiver _incomingMessageReceiver;
+    private readonly DelegateIncomingMessage _delegateIncomingMessage;
+    private readonly IClock _clock;
 
-       public ReceiveIncomingMarketMessage(
+    public ReceiveIncomingMarketMessage(
         MarketMessageParser marketMessageParser,
         ValidateIncomingMessage validateIncomingMessage,
         ResponseFactory responseFactory,
@@ -45,7 +44,7 @@ public class ReceiveIncomingMarketMessage
         ILogger<IncomingMessageClient> logger,
         IIncomingMessageReceiver incomingMessageReceiver,
         DelegateIncomingMessage delegateIncomingMessage,
-        ISystemDateTimeProvider systemDateTimeProvider)
+        IClock clock)
     {
         _marketMessageParser = marketMessageParser;
         _validateIncomingMessage = validateIncomingMessage;
@@ -54,10 +53,10 @@ public class ReceiveIncomingMarketMessage
         _logger = logger;
         _incomingMessageReceiver = incomingMessageReceiver;
         _delegateIncomingMessage = delegateIncomingMessage;
-        _systemDateTimeProvider = systemDateTimeProvider;
+        _clock = clock;
     }
 
-       public async Task<ResponseMessage> ReceiveIncomingMarketMessageAsync(
+    public async Task<ResponseMessage> ReceiveIncomingMarketMessageAsync(
         IIncomingMarketMessageStream incomingMarketMessageStream,
         DocumentFormat incomingDocumentFormat,
         IncomingDocumentType documentType,
@@ -126,7 +125,7 @@ public class ReceiveIncomingMarketMessage
         return _responseFactory.From(result, responseDocumentFormat);
     }
 
-       private async Task ArchiveIncomingMessageAsync(
+    private async Task ArchiveIncomingMessageAsync(
         IIncomingMarketMessageStream incomingMarketMessageStream,
         IIncomingMessage incomingMessage,
         IncomingDocumentType incomingDocumentType,
@@ -138,7 +137,7 @@ public class ReceiveIncomingMarketMessage
                 incomingDocumentType.Name,
                 incomingMessage.SenderNumber,
                 incomingMessage.ReceiverNumber,
-                _systemDateTimeProvider.Now(),
+                _clock.GetCurrentInstant(),
                 incomingMessage.BusinessReason,
                 ArchivedMessageType.IncomingMessage,
                 incomingMarketMessageStream),
