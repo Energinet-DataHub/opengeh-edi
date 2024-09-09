@@ -138,8 +138,7 @@ public static class RequestAggregatedMeasureDataDtoFactory
             return marketRole.Code;
         }
 
-        if (WorkaroundFlags.GridOperatorToMeteredDataResponsibleHack // TODO: LRN Where do we test this?
-            && marketRole == MarketRole.GridAccessProvider)
+        if (WorkaroundFlags.GridOperatorToMeteredDataResponsibleHack && marketRole == MarketRole.GridAccessProvider)
         {
             return MarketRole.MeteredDataResponsible.Code!;
         }
