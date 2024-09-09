@@ -51,7 +51,7 @@ public static class HealthCheckExtensions
                         fullyQualifiedNamespaceFactory: _ => serviceBusFullyQualifiedNamespace,
                         queueNameFactory: _ => key,
                         tokenCredentialFactory: _ => defaultAzureCredential,
-                        $"{key}DeadLetter",
+                        "Dead-letter",
                         [HealthChecksConstants.StatusHealthCheckTag]);
                 });
         }

@@ -29,12 +29,12 @@ public static class HealthCheckExtensions
     {
         services.TryAddHealthChecks(
             "EdiIntegrationEventsDeadLetter",
-            (key, builder) => builder.AddServiceBusTopicSubscriptionDeadLetter(
+            (_, builder) => builder.AddServiceBusTopicSubscriptionDeadLetter(
                 sp => sp.GetRequiredService<IOptions<ServiceBusOptions>>().Value.FullyQualifiedNamespace,
                 sp => sp.GetRequiredService<IOptions<IntegrationEventsOptions>>().Value.TopicName,
                 sp => sp.GetRequiredService<IOptions<IntegrationEventsOptions>>().Value.SubscriptionName,
                 _ => new DefaultAzureCredential(),
-                key,
+                "Dead-letter",
                 [HealthChecksConstants.StatusHealthCheckTag]));
 
         return services;
