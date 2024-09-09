@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using System.Security.Claims;
 using Azure.Storage.Blobs;
 using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
@@ -23,7 +22,6 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Database;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
 using Xunit;
 using Xunit.Abstractions;
 
