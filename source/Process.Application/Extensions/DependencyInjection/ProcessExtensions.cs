@@ -60,11 +60,6 @@ public static class ProcessExtensions
             .ValidateDataAnnotations();
 
         services
-            .AddOptions<WholesaleInboxQueueOptions>()
-            .BindConfiguration(WholesaleInboxQueueOptions.SectionName)
-            .ValidateDataAnnotations();
-
-        services
             .AddScopedSqlDbContext<ProcessContext>(configuration)
             .AddMediatR()
             .AddScoped<BuildingBlocks.Domain.ExecutionContext>();
@@ -75,7 +70,7 @@ public static class ProcessExtensions
             .AddTransient(typeof(IPipelineBehavior<,>), typeof(RaiseDomainEventsBehaviour<,>))
             .AddInternalCommands()
             .AddInboxEvents()
-            .AddWholesaleInbox();
+            .AddWholesaleInbox(configuration);
 
         // EnqueueMessageConfiguration
         services.AddTransient<INotificationHandler<EnqueuedAcceptedWholesaleServicesEvent>, EnqueuedWholesaleServicesMessageHandler>();
@@ -123,8 +118,7 @@ public static class ProcessExtensions
             // Health checks
             .TryAddExternalDomainServiceBusQueuesHealthCheck(
                 configuration.GetSection(ServiceBusNamespaceOptions.SectionName).Get<ServiceBusNamespaceOptions>()!.FullyQualifiedNamespace,
-                configuration.GetSection(EdiInboxQueueOptions.SectionName).Get<EdiInboxQueueOptions>()!.QueueName,
-                configuration.GetSection(WholesaleInboxQueueOptions.SectionName).Get<WholesaleInboxQueueOptions>()!.QueueName);
+                configuration.GetSection(EdiInboxQueueOptions.SectionName).Get<EdiInboxQueueOptions>()!.QueueName);
         return services;
     }
 }
