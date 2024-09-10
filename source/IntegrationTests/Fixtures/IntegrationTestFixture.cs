@@ -77,7 +77,6 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
             $"DELETE FROM [dbo].[ReceivedInboxEvents]" +
             $"DELETE FROM [dbo].[MessageRegistry]" +
             $"DELETE FROM [dbo].[TransactionRegistry]" +
-            $"DELETE FROM [dbo].[Actor]" +
             $"DELETE FROM [dbo].[GridAreaOwner]" +
             $"DELETE FROM [dbo].[ActorCertificate]" +
             $"DELETE FROM [dbo].[WholesaleServicesProcessChargeTypes]" +
