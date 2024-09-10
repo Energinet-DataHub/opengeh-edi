@@ -16,6 +16,8 @@ using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.Extensions.Options;
+using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
@@ -101,12 +103,21 @@ public static class IncomingMessagesExtensions
         });
 
         // => Health checks
-        services.AddHealthChecks()
+        var defaultAzureCredential = new DefaultAzureCredential();
+
+        services
+            .AddHealthChecks()
             .AddAzureServiceBusQueue(
                 sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 sp => sp.GetRequiredService<IOptions<IncomingMessagesQueueOptions>>().Value.QueueName,
-                _ => new DefaultAzureCredential(),
-                name: incommingMessagesQueueOptions.QueueName);
+                _ => defaultAzureCredential,
+                name: incommingMessagesQueueOptions.QueueName)
+            .AddServiceBusQueueDeadLetter(
+                sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
+                sp => sp.GetRequiredService<IOptions<IncomingMessagesQueueOptions>>().Value.QueueName,
+                _ => defaultAzureCredential,
+                "Dead-letter (incoming messages)",
+                [HealthChecksConstants.StatusHealthCheckTag]);
 
         /*
         // RegisterSchemaProviders
