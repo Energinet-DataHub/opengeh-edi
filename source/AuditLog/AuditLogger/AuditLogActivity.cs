@@ -21,6 +21,7 @@ public record AuditLogActivity(string Identifier)
 {
     public static readonly AuditLogActivity RequestEnergyResults = new("RequestEnergyResults");
     public static readonly AuditLogActivity RequestWholesaleResults = new("RequestWholesaleResults");
+    public static readonly AuditLogActivity RequestInvalidCalculationTypeResults = new("RequestInvalidCalculationTypeResults");
 
     public static readonly AuditLogActivity ArchivedMessagesSearch = new("ArchivedMessagesSearch");
     public static readonly AuditLogActivity ArchivedMessagesGet = new("ArchivedMessagesGet");
@@ -28,4 +29,7 @@ public record AuditLogActivity(string Identifier)
     public static readonly AuditLogActivity OrchestrationsSearch = new("OrchestrationsSearch");
     public static readonly AuditLogActivity OrchestrationsGet = new("OrchestrationsGet");
     public static readonly AuditLogActivity OrchestrationsTerminate = new("OrchestrationsTerminate");
+
+    public static readonly AuditLogActivity Dequeue = new("Dequeue");
+    public static readonly AuditLogActivity Peek = new("Peek");
 }

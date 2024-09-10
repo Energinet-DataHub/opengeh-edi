@@ -43,4 +43,9 @@ public record AuditLogEntityType(string Identifier)
     /// Used when searching for orchestrations or getting status of a specific orchestration.
     /// </summary>
     public static readonly AuditLogEntityType Orchestration = new("Orchestration");
+
+    /// <summary>
+    /// Used when nothing is affected by the action. E.g. invalid calculation results request (RSM-16, RSM-17).
+    /// </summary>
+    public static readonly AuditLogEntityType None = new("None");
 }

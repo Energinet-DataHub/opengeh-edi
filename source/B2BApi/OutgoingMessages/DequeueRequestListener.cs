@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System.Net;
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2BApi.Common;
+using Energinet.DataHub.EDI.B2BApi.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Dequeue;
@@ -25,12 +27,17 @@ namespace Energinet.DataHub.EDI.B2BApi.OutgoingMessages;
 public class DequeueRequestListener
 {
     private readonly AuthenticatedActor _authenticatedActor;
+    private readonly IAuditLogger _auditLogger;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
 
-    public DequeueRequestListener(IOutgoingMessagesClient outgoingMessagesClient, AuthenticatedActor authenticatedActor)
+    public DequeueRequestListener(
+        IOutgoingMessagesClient outgoingMessagesClient,
+        AuthenticatedActor authenticatedActor,
+        IAuditLogger auditLogger)
     {
         _outgoingMessagesClient = outgoingMessagesClient;
         _authenticatedActor = authenticatedActor;
+        _auditLogger = auditLogger;
     }
 
     [Function("DequeueRequestListener")]
@@ -41,6 +48,15 @@ public class DequeueRequestListener
         string messageId,
         CancellationToken hostCancellationToken)
     {
+        await _auditLogger.LogWithCommitAsync(
+                logId: AuditLogId.New(),
+                activity: AuditLogActivity.Dequeue,
+                activityOrigin: request.Url.ToString(),
+                activityPayload: request,
+                affectedEntityType: AuditLogEntityType.Bundle,
+                affectedEntityKey: string.Empty)
+            .ConfigureAwait(false);
+
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
         var result = await _outgoingMessagesClient.DequeueAndCommitAsync(
                 new DequeueRequestDto(

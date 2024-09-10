@@ -14,6 +14,7 @@
 
 using System.Net;
 using System.Text;
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2BApi.Common;
 using Energinet.DataHub.EDI.B2BApi.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -28,12 +29,17 @@ namespace Energinet.DataHub.EDI.B2BApi.IncomingMessages;
 public class IncomingMessageReceiver
 {
     private readonly IIncomingMessageClient _incomingMessageClient;
+    private readonly IAuditLogger _auditLogger;
     private readonly ILogger<IncomingMessageReceiver> _logger;
 
-    public IncomingMessageReceiver(ILogger<IncomingMessageReceiver> logger, IIncomingMessageClient incomingMessageClient)
+    public IncomingMessageReceiver(
+        ILogger<IncomingMessageReceiver> logger,
+        IIncomingMessageClient incomingMessageClient,
+        IAuditLogger auditLogger)
     {
         _logger = logger;
         _incomingMessageClient = incomingMessageClient;
+        _auditLogger = auditLogger;
     }
 
     [Function(nameof(IncomingMessageReceiver))]
@@ -44,6 +50,8 @@ public class IncomingMessageReceiver
         string? incomingDocumentTypeName,
         CancellationToken hostCancellationToken)
     {
+        await AuditLogAsync(request, incomingDocumentTypeName).ConfigureAwait(false);
+
         ArgumentNullException.ThrowIfNull(request);
 
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
@@ -86,12 +94,67 @@ public class IncomingMessageReceiver
     }
 
     private static async Task<HttpResponseData> CreateResponseAsync(
-    HttpRequestData request,
-    HttpStatusCode statusCode,
-    ResponseMessage responseMessage)
+        HttpRequestData request,
+        HttpStatusCode statusCode,
+        ResponseMessage responseMessage)
     {
         var response = request.CreateResponse(statusCode);
         await response.WriteStringAsync(responseMessage.MessageBody, Encoding.UTF8).ConfigureAwait(false);
         return response;
+    }
+
+    private async Task AuditLogAsync(HttpRequestData request, string? incomingDocumentTypeName)
+    {
+        IncomingDocumentType? incomingDocumentType;
+        try
+        {
+            incomingDocumentType = IncomingDocumentType.FromName(incomingDocumentTypeName);
+        }
+        catch (InvalidOperationException)
+        {
+            incomingDocumentType = null;
+        }
+
+        if (incomingDocumentType == null)
+        {
+            await _auditLogger.LogWithCommitAsync(
+                    logId: AuditLogId.New(),
+                    activity: AuditLogActivity.RequestInvalidCalculationTypeResults,
+                    activityOrigin: request.Url.ToString(),
+                    activityPayload: request,
+                    affectedEntityType: AuditLogEntityType.None,
+                    affectedEntityKey: string.Empty)
+                .ConfigureAwait(false);
+            return;
+        }
+
+        // Audit log for RequestAggregatedMeasureData and B2CRequestAggregatedMeasureData
+        if (incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData
+            || incomingDocumentType == IncomingDocumentType.B2CRequestAggregatedMeasureData)
+        {
+            await _auditLogger.LogWithCommitAsync(
+                    logId: AuditLogId.New(),
+                    activity: AuditLogActivity.RequestEnergyResults,
+                    activityOrigin: request.Url.ToString(),
+                    activityPayload: request,
+                    affectedEntityType: AuditLogEntityType.RequestAggregatedMeasureDataProcess,
+                    affectedEntityKey: string.Empty)
+                .ConfigureAwait(false);
+            return;
+        }
+
+        // Audit log for RequestWholesaleSettlement and B2CRequestWholesaleSettlement
+        if (incomingDocumentType == IncomingDocumentType.RequestWholesaleSettlement
+            || incomingDocumentType == IncomingDocumentType.B2CRequestWholesaleSettlement)
+        {
+            await _auditLogger.LogWithCommitAsync(
+                    logId: AuditLogId.New(),
+                    activity: AuditLogActivity.RequestWholesaleResults,
+                    activityOrigin: request.Url.ToString(),
+                    activityPayload: request,
+                    affectedEntityType: AuditLogEntityType.RequestWholesaleServicesProcess,
+                    affectedEntityKey: string.Empty)
+                .ConfigureAwait(false);
+        }
     }
 }
