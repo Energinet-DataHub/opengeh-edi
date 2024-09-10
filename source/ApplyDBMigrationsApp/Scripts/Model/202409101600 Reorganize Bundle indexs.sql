@@ -1,0 +1,1 @@
+ALTER INDEX ALL ON [dbo].[Bundles] REORGANIZE

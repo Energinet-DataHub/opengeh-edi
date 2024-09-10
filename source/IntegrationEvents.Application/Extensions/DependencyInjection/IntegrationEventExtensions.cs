@@ -74,6 +74,8 @@ public static class IntegrationEventExtensions
             options.IsExternalClient = true;
         });
 
+        services.AddIntegrationEventsHealthChecks();
+
         return services;
     }
 }

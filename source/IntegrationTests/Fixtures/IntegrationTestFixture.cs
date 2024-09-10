@@ -61,12 +61,9 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
     public void CleanupDatabase()
     {
         var cleanupStatement =
-            $"DELETE FROM [dbo].[MoveInTransactions] " +
-            $"DELETE FROM [dbo].[UpdateCustomerMasterDataTransactions] " +
             $"DELETE FROM [dbo].[MessageRegistry] " +
             $"DELETE FROM [dbo].[TransactionRegistry]" +
             $"DELETE FROM [dbo].[OutgoingMessages] " +
-            $"DELETE FROM [dbo].[ReasonTranslations] " +
             $"DELETE FROM [dbo].[QueuedInternalCommands] " +
             $"DELETE FROM [dbo].[MarketEvaluationPoints]" +
             $"DELETE FROM [dbo].[Actor]" +
@@ -80,7 +77,6 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
             $"DELETE FROM [dbo].[ReceivedInboxEvents]" +
             $"DELETE FROM [dbo].[MessageRegistry]" +
             $"DELETE FROM [dbo].[TransactionRegistry]" +
-            $"DELETE FROM [dbo].[Actor]" +
             $"DELETE FROM [dbo].[GridAreaOwner]" +
             $"DELETE FROM [dbo].[ActorCertificate]" +
             $"DELETE FROM [dbo].[WholesaleServicesProcessChargeTypes]" +
