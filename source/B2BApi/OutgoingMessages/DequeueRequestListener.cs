@@ -54,7 +54,7 @@ public class DequeueRequestListener
                 activityOrigin: request.Url.ToString(),
                 activityPayload: request,
                 affectedEntityType: AuditLogEntityType.Bundle,
-                affectedEntityKey: string.Empty)
+                affectedEntityKey: null)
             .ConfigureAwait(false);
 
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);

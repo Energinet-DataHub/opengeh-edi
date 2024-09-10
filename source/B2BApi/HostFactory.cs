@@ -92,6 +92,7 @@ public static class HostFactory
                         .AddProcessModule(context.Configuration)
                         .AddMasterDataModule(context.Configuration)
                         .AddDataAccessUnitOfWorkModule()
+                        .AddAuditLog()
 
                         // Audit log (outbox publisher)
                         .AddAuditLogOutboxPublisher()
