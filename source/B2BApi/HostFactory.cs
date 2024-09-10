@@ -71,7 +71,6 @@ public static class HostFactory
                         .TryAddBlobStorageHealthCheck(
                             "edi-web-jobs-storage",
                             context.Configuration["AzureWebJobsStorage"]!)
-                        .AddIntegrationEventsHealthChecks()
 
                         // Data retention
                         .AddDataRetention()

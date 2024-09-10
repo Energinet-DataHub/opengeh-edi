@@ -21,7 +21,7 @@ using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
 
 public static class HealthCheckExtensions
 {
