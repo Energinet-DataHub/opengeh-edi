@@ -25,7 +25,6 @@ using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
@@ -58,6 +57,7 @@ using FluentAssertions.Execution;
 using Google.Protobuf;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -202,7 +202,6 @@ public class BehavioursTestBase : IDisposable
 
         _processContext.Dispose();
         _incomingMessagesContext.Dispose();
-        _serviceBusSenderFactoryStub.Dispose();
         _serviceProvider.Dispose();
         _disposed = true;
     }
@@ -424,9 +423,9 @@ public class BehavioursTestBase : IDisposable
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.FullyQualifiedNamespace)}"] = MockServiceBusName,
-                    [$"{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}"] = MockServiceBusName,
-                    [$"{WholesaleInboxOptions.SectionName}:{nameof(WholesaleInboxOptions.QueueName)}"] = MockServiceBusName,
+                    [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = MockServiceBusName,
+                    [$"{EdiInboxQueueOptions.SectionName}:{nameof(EdiInboxQueueOptions.QueueName)}"] = MockServiceBusName,
+                    [$"{WholesaleInboxQueueOptions.SectionName}:{nameof(WholesaleInboxQueueOptions.QueueName)}"] = MockServiceBusName,
                     [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = MockServiceBusName,
                     ["IntegrationEvents:TopicName"] = "NotEmpty",
                     ["IntegrationEvents:SubscriptionName"] = "NotEmpty",
@@ -478,7 +477,7 @@ public class BehavioursTestBase : IDisposable
 
         // Replace the services with stub implementations.
         // - Building blocks
-        _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
+        _services.AddSingleton<IAzureClientFactory<ServiceBusSender>>(_serviceBusSenderFactoryStub);
         _services.AddTransient<IFeatureFlagManager>(_ => new FeatureFlagManagerStub());
 
         // Add test logger

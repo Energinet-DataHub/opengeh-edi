@@ -12,46 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
+using Azure.Messaging.ServiceBus;
+using Microsoft.Extensions.Azure;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 
-public sealed class ServiceBusSenderFactoryStub : IServiceBusSenderFactory
+public sealed class ServiceBusSenderFactoryStub : IAzureClientFactory<ServiceBusSender>
 {
-    private readonly List<IServiceBusSenderAdapter> _senders = new();
+    private readonly IList<ServiceBusSenderSpy> _senders = [];
 
-    public IServiceBusSenderAdapter GetSender(string topicName)
+    public ServiceBusSender CreateClient(string name)
     {
-        return _senders.First(a => a.TopicName.Equals(topicName, StringComparison.OrdinalIgnoreCase));
+        return _senders.First(a => a.QueueOrTopicName.Equals(name, StringComparison.OrdinalIgnoreCase));
     }
 
-    #pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
-    public async ValueTask DisposeAsync()
+    internal void AddSenderSpy(ServiceBusSenderSpy senderSpy)
     {
-        foreach (var serviceBusSenderAdapter in _senders)
-        {
-            await serviceBusSenderAdapter.DisposeAsync().ConfigureAwait(false);
-        }
-
-        GC.SuppressFinalize(this);
-    }
-
-    public void Dispose()
-    {
-        foreach (var serviceBusSenderAdapter in _senders)
-        {
-            serviceBusSenderAdapter.Dispose();
-        }
-
-        GC.SuppressFinalize(this);
-    }
-
-    internal void AddSenderSpy(IServiceBusSenderAdapter senderAdapter)
-    {
-        _senders.Add(senderAdapter);
+        _senders.Add(senderSpy);
     }
 }

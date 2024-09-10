@@ -13,13 +13,13 @@
 // limitations under the License.
 
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Factories;
 using Energinet.DataHub.EDI.Process.Interfaces;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
@@ -27,18 +27,18 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 public class IncomingMessagePublisher
 {
     private readonly ISerializer _serializer;
-    private readonly IServiceBusSenderAdapter _senderCreator;
+    private readonly ServiceBusSender _sender;
 
     public IncomingMessagePublisher(
-        IServiceBusSenderFactory serviceBusSenderFactory,
         IOptions<IncomingMessagesQueueOptions> options,
+        IAzureClientFactory<ServiceBusSender> senderFactory,
         ISerializer serializer)
     {
-        ArgumentNullException.ThrowIfNull(serviceBusSenderFactory);
         ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(senderFactory);
         _serializer = serializer;
 
-        _senderCreator = serviceBusSenderFactory.GetSender(options.Value.QueueName);
+        _sender = senderFactory.CreateClient(options.Value.QueueName);
     }
 
     public async Task PublishAsync(
@@ -70,7 +70,7 @@ public class IncomingMessagePublisher
                 Subject = nameof(InitializeAggregatedMeasureDataProcessDto),
             };
 
-        await _senderCreator.SendAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
+        await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
     }
 
     private async Task SendInitializeWholesaleServicesProcessAsync(InitializeWholesaleServicesProcessDto initializeWholesaleServicesProcessDto, CancellationToken cancellationToken)
@@ -84,6 +84,6 @@ public class IncomingMessagePublisher
                 Subject = nameof(InitializeWholesaleServicesProcessDto),
             };
 
-        await _senderCreator.SendAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
+        await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
     }
 }

@@ -12,23 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.ComponentModel.DataAnnotations;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 
-namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
+namespace Energinet.DataHub.EDI.Process.Domain.Wholesale;
 
 /// <summary>
-/// Options related to wholesale inbox queue.
+/// Interface for wholesale inbox
 /// </summary>
-public class WholesaleInboxOptions
+public interface IWholesaleInboxClient
 {
     /// <summary>
-    /// The name of the section in the configuration file where this option should find its information.
+    /// Send <paramref name="aggregatedMeasureDataProcess"/> to wholesale
     /// </summary>
-    public const string SectionName = "WholesaleInbox";
+    Task SendProcessAsync(AggregatedMeasureDataProcess aggregatedMeasureDataProcess, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Queue name for the wholesale inbox.
+    /// Send <paramref name="wholesaleServicesProcess"/> to wholesale
     /// </summary>
-    [Required]
-    public string QueueName { get; set; } = string.Empty;
+    Task SendProcessAsync(WholesaleServicesProcess wholesaleServicesProcess, CancellationToken cancellationToken);
 }

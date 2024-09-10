@@ -173,14 +173,14 @@ public class B2BApiAppFixture : IAsyncLifetime
         await ServiceBusResourceProvider
             .BuildQueue("edi-inbox")
             .Do(queue => appHostSettings.ProcessEnvironmentVariables
-                .Add($"{EdiInboxOptions.SectionName}__{nameof(EdiInboxOptions.QueueName)}", queue.Name))
+                .Add($"{EdiInboxQueueOptions.SectionName}__{nameof(EdiInboxQueueOptions.QueueName)}", queue.Name))
             .CreateAsync();
         LogStopwatch(stopwatch, "ServiceBusQueue (edi-inbox)");
 
         var wholesaleInboxQueueResource = await ServiceBusResourceProvider
             .BuildQueue("wholesale-inbox")
             .Do(queue => appHostSettings.ProcessEnvironmentVariables
-                .Add($"{WholesaleInboxOptions.SectionName}__{nameof(WholesaleInboxOptions.QueueName)}", queue.Name))
+                .Add($"{WholesaleInboxQueueOptions.SectionName}__{nameof(WholesaleInboxQueueOptions.QueueName)}", queue.Name))
             .CreateAsync();
         LogStopwatch(stopwatch, "ServiceBusQueue (wholesale-inbox)");
 
@@ -394,7 +394,7 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // ServiceBus connection strings
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.FullyQualifiedNamespace)}",
+            $"{ServiceBusNamespaceOptions.SectionName}__{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}",
             ServiceBusResourceProvider.FullyQualifiedNamespace);
 
         // Feature Flags: Default values
