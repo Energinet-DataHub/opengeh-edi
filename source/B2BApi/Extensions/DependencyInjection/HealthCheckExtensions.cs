@@ -28,14 +28,26 @@ public static class HealthCheckExtensions
     public static IServiceCollection AddIntegrationEventsHealthChecks(this IServiceCollection services)
     {
         services.TryAddHealthChecks(
-            "EdiIntegrationEventsDeadLetter",
-            (_, builder) => builder.AddServiceBusTopicSubscriptionDeadLetter(
-                sp => sp.GetRequiredService<IOptions<ServiceBusOptions>>().Value.FullyQualifiedNamespace,
-                sp => sp.GetRequiredService<IOptions<IntegrationEventsOptions>>().Value.TopicName,
-                sp => sp.GetRequiredService<IOptions<IntegrationEventsOptions>>().Value.SubscriptionName,
-                _ => new DefaultAzureCredential(),
-                "Dead-letter (integration events)",
-                [HealthChecksConstants.StatusHealthCheckTag]));
+            "EdiIntegrationEvents",
+            (_, builder) =>
+            {
+                var defaultAzureCredential = new DefaultAzureCredential();
+
+                builder.AddAzureServiceBusSubscription(
+                    sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
+                    sp => sp.GetRequiredService<IOptions<IntegrationEventsOptions>>().Value.TopicName,
+                    sp => sp.GetRequiredService<IOptions<IntegrationEventsOptions>>().Value.SubscriptionName,
+                    _ => defaultAzureCredential,
+                    name: "EDI integration events");
+
+                builder.AddServiceBusTopicSubscriptionDeadLetter(
+                    sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
+                    sp => sp.GetRequiredService<IOptions<IntegrationEventsOptions>>().Value.TopicName,
+                    sp => sp.GetRequiredService<IOptions<IntegrationEventsOptions>>().Value.SubscriptionName,
+                    _ => defaultAzureCredential,
+                    "Dead-letter (integration events)",
+                    [HealthChecksConstants.StatusHealthCheckTag]);
+            });
 
         return services;
     }

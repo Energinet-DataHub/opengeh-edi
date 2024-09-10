@@ -15,6 +15,8 @@
 using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using BuildingBlocks.Application.Extensions.Options;
+using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
 using Energinet.DataHub.EDI.Process.Domain.Wholesale;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
@@ -53,12 +55,21 @@ public static class WholesaleInboxExtensions
         });
 
         // Health checks
-        services.AddHealthChecks()
+        var defaultAzureCredential = new DefaultAzureCredential();
+
+        services
+            .AddHealthChecks()
             .AddAzureServiceBusQueue(
                 sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 sp => sp.GetRequiredService<IOptions<WholesaleInboxQueueOptions>>().Value.QueueName,
-                _ => new DefaultAzureCredential(),
-                name: wholesaleInboxQueueOptions.QueueName);
+                _ => defaultAzureCredential,
+                name: wholesaleInboxQueueOptions.QueueName)
+            .AddServiceBusQueueDeadLetter(
+                sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
+                sp => sp.GetRequiredService<IOptions<WholesaleInboxQueueOptions>>().Value.QueueName,
+                _ => defaultAzureCredential,
+                "Dead-letter (wholesale inbox)",
+                [HealthChecksConstants.StatusHealthCheckTag]);
 
         return services;
     }
