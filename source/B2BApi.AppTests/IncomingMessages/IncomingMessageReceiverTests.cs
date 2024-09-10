@@ -72,7 +72,7 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
         //  * the external id matching the actor in the database
         var b2bToken = new JwtBuilder()
             .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
-            .WithClaim(ClaimsMap.UserId, externalId)
+            .WithClaim(ClaimsMap.ActorId, externalId)
             .CreateToken();
 
         using var request = new HttpRequestMessage(HttpMethod.Post, $"api/incomingMessages/{documentTypeName}");

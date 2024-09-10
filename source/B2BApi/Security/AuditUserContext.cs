@@ -26,11 +26,9 @@ public class AuditUserContext(AuthenticatedActor authenticatedActor) : IAuditUse
             var currentActor = authenticatedActor.CurrentActorIdentity;
 
             return new AuditUser(
-                UserId: null,
-                ActorId: null,
-                Permissions: null);
-                // ActorNumber: currentActor.ActorNumber.Value,
-                // MarketRole: currentActor.MarketRole?.Name);
+                null,
+                null, //currentActor.ActorNumber,
+                currentActor.MarketRole?.Name);
         }
     }
 }

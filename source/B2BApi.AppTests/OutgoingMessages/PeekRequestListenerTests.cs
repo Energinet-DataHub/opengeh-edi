@@ -70,7 +70,7 @@ public class PeekRequestListenerTests : IAsyncLifetime
         var actorRole = ActorRole.MeteredDataResponsible;
         var b2bToken = new JwtBuilder()
             .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
-            .WithClaim(ClaimsMap.UserId, externalId)
+            .WithClaim(ClaimsMap.ActorId, externalId)
             .CreateToken();
 
         using var request = new HttpRequestMessage(HttpMethod.Get, $"api/peek/{messageCategory}");

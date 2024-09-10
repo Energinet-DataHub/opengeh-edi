@@ -56,7 +56,7 @@ public class MarketActorAuthenticatorTests : TestBase
         await CreateActorAsync();
         var claims = new List<Claim>()
         {
-            new(ClaimsMap.UserId, SampleData.StsAssignedUserId),
+            new(ClaimsMap.ActorId, SampleData.StsAssignedUserId),
         };
         var claimsPrincipal = CreateIdentity(claims);
 
@@ -86,7 +86,7 @@ public class MarketActorAuthenticatorTests : TestBase
         await CreateActorAsync();
         var claims = new List<Claim>()
         {
-            new(ClaimsMap.UserId, SampleData.StsAssignedUserId),
+            new(ClaimsMap.ActorId, SampleData.StsAssignedUserId),
             ClaimsMap.RoleFrom(ActorRole.EnergySupplier),
         };
         var claimsPrincipal = CreateIdentity(claims);
@@ -102,7 +102,7 @@ public class MarketActorAuthenticatorTests : TestBase
     {
         var validClaims = new List<Claim>()
         {
-            new(ClaimsMap.UserId, Guid.NewGuid().ToString()),
+            new(ClaimsMap.ActorId, Guid.NewGuid().ToString()),
             ClaimsMap.RoleFrom(ActorRole.GridOperator),
             ClaimsMap.RoleFrom(ActorRole.EnergySupplier),
         };

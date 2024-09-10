@@ -50,14 +50,13 @@ public class IncomingMessageReceiver
         string? incomingDocumentTypeName,
         CancellationToken hostCancellationToken)
     {
-        using var seekingStreamFromBody = await request.CreateSeekingStreamFromBodyAsync().ConfigureAwait(false);
-        var body = await new StreamReader(seekingStreamFromBody).ReadToEndAsync(hostCancellationToken).ConfigureAwait(false);
-        seekingStreamFromBody.Position = 0;
-        await AuditLogAsync(request, incomingDocumentTypeName, body).ConfigureAwait(false);
-
         ArgumentNullException.ThrowIfNull(request);
-
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
+
+        using var seekingStreamFromBody = await request.CreateSeekingStreamFromBodyAsync().ConfigureAwait(false);
+        var incomingMarketMessageStream = new IncomingMarketMessageStream(seekingStreamFromBody);
+        await AuditLogAsync(request, incomingDocumentTypeName, incomingMarketMessageStream, cancellationToken).ConfigureAwait(false);
+
         var contentType = request.Headers.TryGetContentType();
         if (contentType is null)
         {
@@ -81,7 +80,7 @@ public class IncomingMessageReceiver
 
         var responseMessage = await _incomingMessageClient
             .ReceiveIncomingMarketMessageAsync(
-                new IncomingMarketMessageStream(seekingStreamFromBody),
+                incomingMarketMessageStream,
                 incomingDocumentFormat: documentFormat,
                 incomingDocumentType,
                 responseDocumentFormat: documentFormat,
@@ -121,7 +120,11 @@ public class IncomingMessageReceiver
         return affectedEntityType;
     }
 
-    private async Task AuditLogAsync(HttpRequestData request, string? incomingDocumentTypeName, string body)
+    private async Task AuditLogAsync(
+        HttpRequestData request,
+        string? incomingDocumentTypeName,
+        IncomingMarketMessageStream incomingMarketMessageStream,
+        CancellationToken cancellationToken)
     {
         AuditLogEntityType? affectedEntityType;
         try
@@ -138,12 +141,12 @@ public class IncomingMessageReceiver
         var auditLogActivity = affectedEntityType is null
             ? AuditLogActivity.RequestInvalidCalculationTypeResults
             : AuditLogActivity.RequestCalculationResults;
-
+        var incomingMessage = await new StreamReader(incomingMarketMessageStream.Stream).ReadToEndAsync(cancellationToken).ConfigureAwait(false);
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
                 activity: auditLogActivity,
                 activityOrigin: request.Url.ToString(),
-                activityPayload: body,
+                activityPayload: incomingMessage,
                 affectedEntityType: affectedEntityType,
                 affectedEntityKey: null)
             .ConfigureAwait(false);
