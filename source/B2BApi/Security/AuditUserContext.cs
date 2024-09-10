@@ -25,9 +25,10 @@ public class AuditUserContext(AuthenticatedActor authenticatedActor) : IAuditUse
         {
             var currentActor = authenticatedActor.CurrentActorIdentity;
 
+            // TODO: Add the correct values to the AuditUser when contract has been updated
             return new AuditUser(
                 null,
-                null, //currentActor.ActorNumber,
+                null,
                 currentActor.MarketRole?.Name);
         }
     }
