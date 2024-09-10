@@ -106,7 +106,12 @@ public class AcceptanceTestFixture : IAsyncLifetime
         _b2cUsername = root.GetValue<string>("B2C_USERNAME") ?? throw new InvalidOperationException("B2C_USERNAME is not set in configuration");
         _b2cPassword = root.GetValue<string>("B2C_PASSWORD") ?? throw new InvalidOperationException("B2C_PASSWORD is not set in configuration");
 
-        ServiceBusClient = new ServiceBusClient(serviceBusConnectionString);
+        ServiceBusClient = new ServiceBusClient(
+            serviceBusConnectionString,
+            new ServiceBusClientOptions()
+            {
+                TransportType = ServiceBusTransportType.AmqpWebSockets, // Firewall is not open for AMQP and Therefore, needs to go over WebSockets.
+            });
         EventPublisher = new IntegrationEventPublisher(ServiceBusClient, topicName, dbConnectionString);
         EdiInboxClient = new EdiInboxClient(ServiceBusClient, ediInboxQueueName);
         B2CAuthorizedHttpClient = new AsyncLazy<HttpClient>(CreateB2CAuthorizedHttpClientAsync);
