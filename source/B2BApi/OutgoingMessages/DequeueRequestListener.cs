@@ -52,7 +52,7 @@ public class DequeueRequestListener
                 logId: AuditLogId.New(),
                 activity: AuditLogActivity.Dequeue,
                 activityOrigin: request.Url.ToString(),
-                activityPayload: request,
+                activityPayload: messageId,
                 affectedEntityType: AuditLogEntityType.Bundle,
                 affectedEntityKey: null)
             .ConfigureAwait(false);

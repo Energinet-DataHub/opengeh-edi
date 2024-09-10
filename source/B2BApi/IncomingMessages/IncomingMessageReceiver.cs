@@ -50,7 +50,10 @@ public class IncomingMessageReceiver
         string? incomingDocumentTypeName,
         CancellationToken hostCancellationToken)
     {
-        await AuditLogAsync(request, incomingDocumentTypeName).ConfigureAwait(false);
+        using var seekingStreamFromBody = await request.CreateSeekingStreamFromBodyAsync().ConfigureAwait(false);
+        var body = await new StreamReader(seekingStreamFromBody).ReadToEndAsync(hostCancellationToken).ConfigureAwait(false);
+        seekingStreamFromBody.Position = 0;
+        await AuditLogAsync(request, incomingDocumentTypeName, body).ConfigureAwait(false);
 
         ArgumentNullException.ThrowIfNull(request);
 
@@ -76,7 +79,6 @@ public class IncomingMessageReceiver
         if (incomingDocumentType == null)
             return request.CreateResponse(HttpStatusCode.NotFound);
 
-        using var seekingStreamFromBody = await request.CreateSeekingStreamFromBodyAsync().ConfigureAwait(false);
         var responseMessage = await _incomingMessageClient
             .ReceiveIncomingMarketMessageAsync(
                 new IncomingMarketMessageStream(seekingStreamFromBody),
@@ -119,7 +121,7 @@ public class IncomingMessageReceiver
         return affectedEntityType;
     }
 
-    private async Task AuditLogAsync(HttpRequestData request, string? incomingDocumentTypeName)
+    private async Task AuditLogAsync(HttpRequestData request, string? incomingDocumentTypeName, string body)
     {
         AuditLogEntityType? affectedEntityType;
         try
@@ -141,7 +143,7 @@ public class IncomingMessageReceiver
                 logId: AuditLogId.New(),
                 activity: auditLogActivity,
                 activityOrigin: request.Url.ToString(),
-                activityPayload: request,
+                activityPayload: body,
                 affectedEntityType: affectedEntityType,
                 affectedEntityKey: null)
             .ConfigureAwait(false);

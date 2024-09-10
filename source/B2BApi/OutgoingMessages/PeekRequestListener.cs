@@ -64,7 +64,7 @@ public class PeekRequestListener
                 logId: AuditLogId.New(),
                 activity: AuditLogActivity.Peek,
                 activityOrigin: request.Url.ToString(),
-                activityPayload: request,
+                activityPayload: messageCategory,
                 affectedEntityType: AuditLogEntityType.Bundle,
                 affectedEntityKey: null)
             .ConfigureAwait(false);
