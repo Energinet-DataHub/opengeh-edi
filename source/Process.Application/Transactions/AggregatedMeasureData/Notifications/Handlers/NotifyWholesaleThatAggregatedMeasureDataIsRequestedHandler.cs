@@ -22,12 +22,12 @@ public sealed class
     NotifyWholesaleThatAggregatedMeasureDataIsRequestedHandler : INotificationHandler<
     NotifyWholesaleThatAggregatedMeasureDataIsRequested>
 {
-    private readonly WholesaleInboxClient _wholesaleInbox;
+    private readonly WholesaleInboxClient _wholesaleInboxClient;
 
     public NotifyWholesaleThatAggregatedMeasureDataIsRequestedHandler(
-        WholesaleInboxClient wholesaleInbox)
+        WholesaleInboxClient wholesaleInboxClient)
     {
-        _wholesaleInbox = wholesaleInbox;
+        _wholesaleInboxClient = wholesaleInboxClient;
     }
 
     public async Task Handle(
@@ -35,6 +35,6 @@ public sealed class
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
-        await _wholesaleInbox.SendProcessAsync(notification.Process, cancellationToken).ConfigureAwait(false);
+        await _wholesaleInboxClient.SendProcessAsync(notification.Process, cancellationToken).ConfigureAwait(false);
     }
 }

@@ -23,17 +23,17 @@ namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServic
 
 public class NotifyWholesaleThatWholesaleServicesIsRequestedHandler : INotificationHandler<NotifyWholesaleThatWholesaleServicesIsRequested>
 {
-    private readonly WholesaleInboxClient _wholesaleInbox;
+    private readonly WholesaleInboxClient _wholesaleInboxClient;
 
     public NotifyWholesaleThatWholesaleServicesIsRequestedHandler(
-        WholesaleInboxClient wholesaleInbox)
+        WholesaleInboxClient wholesaleInboxClient)
     {
-        _wholesaleInbox = wholesaleInbox;
+        _wholesaleInboxClient = wholesaleInboxClient;
     }
 
     public async Task Handle(NotifyWholesaleThatWholesaleServicesIsRequested notification, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(notification);
-        await _wholesaleInbox.SendProcessAsync(notification.Process, cancellationToken).ConfigureAwait(false);
+        await _wholesaleInboxClient.SendProcessAsync(notification.Process, cancellationToken).ConfigureAwait(false);
     }
 }
