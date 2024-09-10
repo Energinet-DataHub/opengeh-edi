@@ -18,37 +18,23 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
 internal sealed class EdiInboxClient : IAsyncDisposable
 {
-    private readonly ServiceBusClient _client;
     private readonly ServiceBusSender _sender;
 
     public EdiInboxClient(
-        string queueName,
-        string connectionString)
+        ServiceBusClient client,
+        string queueName)
     {
-        _client = new ServiceBusClient(
-            connectionString,
-            new ServiceBusClientOptions()
-            {
-                TransportType = ServiceBusTransportType.AmqpWebSockets, // Firewall is not open for AMQP and Therefore, needs to go over WebSockets.
-            });
-        _sender = _client.CreateSender(queueName);
+        _sender = client.CreateSender(queueName);
     }
 
     public async ValueTask DisposeAsync()
     {
-        await DisposeCoreAsync().ConfigureAwait(false);
-
+        await _sender.DisposeAsync().ConfigureAwait(false);
         GC.SuppressFinalize(this);
     }
 
     internal async Task SendAsync(ServiceBusMessage message, CancellationToken cancellationToken)
     {
         await _sender.SendMessageAsync(message, cancellationToken).ConfigureAwait(false);
-    }
-
-    private async ValueTask DisposeCoreAsync()
-    {
-        await _client.DisposeAsync().ConfigureAwait(false);
-        await _sender.DisposeAsync().ConfigureAwait(false);
     }
 }

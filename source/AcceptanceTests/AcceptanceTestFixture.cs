@@ -14,6 +14,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration; // DO NOT REMOVE THIS! use in debug mode
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
@@ -42,6 +43,8 @@ public class AcceptanceTestFixture : IAsyncLifetime
     private readonly string _azureEntraBackendBffScope;
     private readonly string _b2cUsername;
     private readonly string _b2cPassword;
+
+    private readonly ServiceBusClient _serviceBusClient;
 
     public AcceptanceTestFixture()
     {
@@ -104,8 +107,10 @@ public class AcceptanceTestFixture : IAsyncLifetime
         MarketParticipantUri = new Uri(root.GetValue<string>("MARKET_PARTICIPANT_URI") ?? "https://app-webapi-markpart-u-001.azurewebsites.net");
         _b2cUsername = root.GetValue<string>("B2C_USERNAME") ?? throw new InvalidOperationException("B2C_USERNAME is not set in configuration");
         _b2cPassword = root.GetValue<string>("B2C_PASSWORD") ?? throw new InvalidOperationException("B2C_PASSWORD is not set in configuration");
-        EventPublisher = new IntegrationEventPublisher(serviceBusConnectionString, topicName, dbConnectionString);
-        EdiInboxClient = new EdiInboxClient(ediInboxQueueName, serviceBusConnectionString);
+
+        _serviceBusClient = new ServiceBusClient(serviceBusConnectionString);
+        EventPublisher = new IntegrationEventPublisher(_serviceBusClient, topicName, dbConnectionString);
+        EdiInboxClient = new EdiInboxClient(_serviceBusClient, ediInboxQueueName);
         B2CAuthorizedHttpClient = new AsyncLazy<HttpClient>(CreateB2CAuthorizedHttpClientAsync);
 
         // AzureWebJobsStorage connection string name/value is set implicitly from terraform as an application setting in Azure,
@@ -162,7 +167,10 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
+        // Close subclients before client (ServiceBusClient)
         await EventPublisher.DisposeAsync().ConfigureAwait(false);
+        await EdiInboxClient.DisposeAsync().ConfigureAwait(false);
+        _serviceBusClient.DisposeAsync().ConfigureAwait(false);
 
         if (B2CAuthorizedHttpClient.IsStarted && !B2CAuthorizedHttpClient.Task.IsFaulted)
             (await B2CAuthorizedHttpClient).Dispose();
