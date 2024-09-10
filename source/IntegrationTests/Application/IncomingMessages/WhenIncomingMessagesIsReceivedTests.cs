@@ -18,7 +18,6 @@ using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
@@ -26,6 +25,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using NodaTime.Extensions;
@@ -38,14 +38,16 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 {
     private readonly IIncomingMessageClient _incomingMessagesRequest;
     private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
+#pragma warning disable CA2213 // Disposable fields should be disposed
     private readonly ServiceBusSenderSpy _senderSpy;
+#pragma warning restore CA2213 // Disposable fields should be disposed
     private readonly IncomingMessagesContext _incomingMessageContext;
     private readonly ClockStub _clockStub;
 
     public WhenIncomingMessagesIsReceivedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
-        _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();
+        _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IAzureClientFactory<ServiceBusSender>>();
         _senderSpy = new ServiceBusSenderSpy("Fake");
         _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
         _incomingMessagesRequest = GetService<IIncomingMessageClient>();
@@ -394,8 +396,6 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
     protected override void Dispose(bool disposing)
     {
-        _senderSpy.Dispose();
-        _serviceBusClientSenderFactory.Dispose();
         _incomingMessageContext.Dispose();
         base.Dispose(disposing);
     }

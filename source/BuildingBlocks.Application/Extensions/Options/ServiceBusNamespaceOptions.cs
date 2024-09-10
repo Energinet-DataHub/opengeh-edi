@@ -19,7 +19,7 @@ namespace BuildingBlocks.Application.Extensions.Options;
 /// <summary>
 /// Options for the ServiceBus namespace used in the DH3 system.
 /// </summary>
-public class ServiceBusOptions
+public class ServiceBusNamespaceOptions
 {
     public const string SectionName = "ServiceBus";
 

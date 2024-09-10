@@ -12,28 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 
-public sealed class ServiceBusSenderSpy : IServiceBusSenderAdapter
+public sealed class ServiceBusSenderSpy : ServiceBusSender
 {
-    public ServiceBusSenderSpy(string topicName)
+    public ServiceBusSenderSpy(string queueOrTopicName)
     {
-        TopicName = topicName;
-        MessagesSent = new List<ServiceBusMessage>();
+        QueueOrTopicName = queueOrTopicName;
+        MessagesSent = [];
     }
 
     public bool ShouldFail { get; set; }
 
-    public string TopicName { get; }
+    public string QueueOrTopicName { get; }
 
     public ServiceBusMessage? LatestMessage => MessagesSent.LastOrDefault();
 
@@ -41,7 +34,7 @@ public sealed class ServiceBusSenderSpy : IServiceBusSenderAdapter
 
     public bool MessageSent { get; private set; }
 
-    public Task SendAsync(ServiceBusMessage message, CancellationToken cancellationToken)
+    public override Task SendMessageAsync(ServiceBusMessage message, CancellationToken cancellationToken = default)
     {
         if (ShouldFail)
             throw new ServiceBusException();
@@ -52,29 +45,21 @@ public sealed class ServiceBusSenderSpy : IServiceBusSenderAdapter
         return Task.CompletedTask;
     }
 
-    public Task SendAsync(ReadOnlyCollection<ServiceBusMessage> messages, CancellationToken cancellationToken)
+    public override Task SendMessagesAsync(IEnumerable<ServiceBusMessage> messages, CancellationToken cancellationToken = default)
     {
-        if (ShouldFail)
-            throw new ServiceBusException();
+        return ShouldFail
+            ? throw new ServiceBusException()
+            : Task.CompletedTask;
+    }
 
-        return Task.CompletedTask;
+    public override Task SendMessagesAsync(ServiceBusMessageBatch messageBatch, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException("Spy doesn't support this operation.");
     }
 
     public void Reset()
     {
         MessageSent = false;
         MessagesSent.Clear();
-    }
-
-#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
-    public ValueTask DisposeAsync()
-    {
-        Dispose();
-        return ValueTask.CompletedTask;
-    }
-
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
     }
 }
