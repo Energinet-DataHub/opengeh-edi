@@ -26,6 +26,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.Marke
 using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
@@ -46,11 +47,11 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
 
     private B2BApiAppFixture Fixture { get; }
 
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
         Fixture.AppHostManager.ClearHostLog();
-
-        return Task.CompletedTask;
+        await using var context = Fixture.DatabaseManager.CreateDbContext<OutboxContext>();
+        await context.Outbox.ExecuteDeleteAsync();
     }
 
     public Task DisposeAsync()
@@ -68,6 +69,9 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
         var actorNumber = ActorNumber.Create("5790000392551");
         var actorRole = ActorRole.EnergySupplier;
         var jsonDocument = await File.ReadAllTextAsync("TestData/Messages/json/RequestAggregatedMeasureData.json");
+        jsonDocument = jsonDocument
+            .Replace("{MessageId}", Guid.NewGuid().ToString())
+            .Replace("{TransactionId}", Guid.NewGuid().ToString());
 
         // The actor must exist in the database
         var externalId = Guid.NewGuid().ToString();

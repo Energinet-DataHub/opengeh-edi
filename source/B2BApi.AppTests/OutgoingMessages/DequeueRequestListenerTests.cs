@@ -25,6 +25,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.Marke
 using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
@@ -45,11 +46,11 @@ public class DequeueRequestListenerTests : IAsyncLifetime
 
     private B2BApiAppFixture Fixture { get; }
 
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
         Fixture.AppHostManager.ClearHostLog();
-
-        return Task.CompletedTask;
+        await using var context = Fixture.DatabaseManager.CreateDbContext<OutboxContext>();
+        await context.Outbox.ExecuteDeleteAsync();
     }
 
     public Task DisposeAsync()

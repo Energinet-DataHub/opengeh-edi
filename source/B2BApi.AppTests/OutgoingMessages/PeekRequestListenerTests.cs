@@ -26,6 +26,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.Marke
 using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
@@ -53,11 +54,11 @@ public class PeekRequestListenerTests : IAsyncLifetime
         return Task.CompletedTask;
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
         Fixture.SetTestOutputHelper(null!);
-
-        return Task.CompletedTask;
+        await using var context = Fixture.DatabaseManager.CreateDbContext<OutboxContext>();
+        await context.Outbox.ExecuteDeleteAsync();
     }
 
     [Fact]
