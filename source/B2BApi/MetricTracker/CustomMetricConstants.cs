@@ -16,5 +16,5 @@ namespace Energinet.DataHub.EDI.B2BApi.MetricTracker;
 
 public static class CustomMetricConstants
 {
-    public const string EnqueueMessagesDuration = nameof(EnqueueMessagesDuration);
+    public const string EnqueueMessageAvgDuration = nameof(EnqueueMessageAvgDuration);
 }
