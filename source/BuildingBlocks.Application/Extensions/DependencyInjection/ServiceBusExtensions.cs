@@ -14,7 +14,6 @@
 
 using Azure.Identity;
 using BuildingBlocks.Application.Extensions.Options;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,8 +34,8 @@ public static class ServiceBusExtensions
         ArgumentNullException.ThrowIfNull(configuration);
 
         services
-            .AddOptions<ServiceBusOptions>()
-            .BindConfiguration(ServiceBusOptions.SectionName)
+            .AddOptions<ServiceBusNamespaceOptions>()
+            .BindConfiguration(ServiceBusNamespaceOptions.SectionName)
             .ValidateDataAnnotations();
 
         services.AddAzureClients(builder =>
@@ -46,15 +45,13 @@ public static class ServiceBusExtensions
 
             var serviceBusOptions =
                 configuration
-                    .GetRequiredSection(ServiceBusOptions.SectionName)
-                    .Get<ServiceBusOptions>()
+                    .GetRequiredSection(ServiceBusNamespaceOptions.SectionName)
+                    .Get<ServiceBusNamespaceOptions>()
                 ?? throw new InvalidOperationException("Missing ServiceBus Namespace configuration.");
 
             builder
                 .AddServiceBusClientWithNamespace(serviceBusOptions.FullyQualifiedNamespace);
         });
-
-        services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactory>();
 
         return services;
     }

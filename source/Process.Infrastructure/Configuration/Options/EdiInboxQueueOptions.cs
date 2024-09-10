@@ -19,7 +19,7 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 /// <summary>
 /// Options related to Edi inbox queue.
 /// </summary>
-public class EdiInboxOptions
+public class EdiInboxQueueOptions
 {
     /// <summary>
     /// The name of the section in the configuration file where this option should find its information.

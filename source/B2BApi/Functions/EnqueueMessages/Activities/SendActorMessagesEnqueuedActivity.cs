@@ -14,27 +14,27 @@
 
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EnergySupplying.RequestResponse.IntegrationEvents;
 using Google.Protobuf;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 
 public class SendActorMessagesEnqueuedActivity
 {
-    private readonly IServiceBusSenderAdapter _senderCreator;
+    private readonly ServiceBusSender _sender;
 
     public SendActorMessagesEnqueuedActivity(
-        IServiceBusSenderFactory serviceBusSenderFactory,
-        IOptions<WholesaleInboxOptions> options)
+        IOptions<WholesaleInboxQueueOptions> options,
+        IAzureClientFactory<ServiceBusSender> senderFactory)
     {
-        ArgumentNullException.ThrowIfNull(serviceBusSenderFactory);
         ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(senderFactory);
 
-        _senderCreator = serviceBusSenderFactory.GetSender(options.Value.QueueName);
+        _sender = senderFactory.CreateClient(options.Value.QueueName);
     }
 
     [Function(nameof(SendActorMessagesEnqueuedActivity))]
@@ -51,7 +51,7 @@ public class SendActorMessagesEnqueuedActivity
         var eventId = Guid.Parse(input.OrchestrationInstanceId);
         var serviceBusMessage = CreateServiceBusMessage(messagesEnqueuedEvent, eventId);
 
-        await _senderCreator.SendAsync(serviceBusMessage, CancellationToken.None).ConfigureAwait(false);
+        await _sender.SendMessageAsync(serviceBusMessage, CancellationToken.None).ConfigureAwait(false);
     }
 
     private static ServiceBusMessage CreateServiceBusMessage(ActorMessagesEnqueuedV1 messagesEnqueuedEvent, Guid eventId)

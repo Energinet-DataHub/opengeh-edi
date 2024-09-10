@@ -292,7 +292,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
                 new Dictionary<string, string?>
                 {
                     { "DB_CONNECTION_STRING", dbConnectionString },
-                    { $"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.FullyQualifiedNamespace)}", "dummy-value" },
+                    { $"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}", "dummy-value" },
                 })
             .Build();
 
