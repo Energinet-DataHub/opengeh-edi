@@ -14,6 +14,7 @@
 
 using System.Net;
 using System.Text;
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2BApi.Common;
 using Energinet.DataHub.EDI.B2BApi.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -28,12 +29,17 @@ namespace Energinet.DataHub.EDI.B2BApi.IncomingMessages;
 public class IncomingMessageReceiver
 {
     private readonly IIncomingMessageClient _incomingMessageClient;
+    private readonly IAuditLogger _auditLogger;
     private readonly ILogger<IncomingMessageReceiver> _logger;
 
-    public IncomingMessageReceiver(ILogger<IncomingMessageReceiver> logger, IIncomingMessageClient incomingMessageClient)
+    public IncomingMessageReceiver(
+        ILogger<IncomingMessageReceiver> logger,
+        IIncomingMessageClient incomingMessageClient,
+        IAuditLogger auditLogger)
     {
         _logger = logger;
         _incomingMessageClient = incomingMessageClient;
+        _auditLogger = auditLogger;
     }
 
     [Function(nameof(IncomingMessageReceiver))]
@@ -45,8 +51,12 @@ public class IncomingMessageReceiver
         CancellationToken hostCancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
+
+        using var seekingStreamFromBody = await request.CreateSeekingStreamFromBodyAsync().ConfigureAwait(false);
+        var incomingMarketMessageStream = new IncomingMarketMessageStream(seekingStreamFromBody);
+        await AuditLogAsync(request, incomingDocumentTypeName, incomingMarketMessageStream, cancellationToken).ConfigureAwait(false);
+
         var contentType = request.Headers.TryGetContentType();
         if (contentType is null)
         {
@@ -68,10 +78,9 @@ public class IncomingMessageReceiver
         if (incomingDocumentType == null)
             return request.CreateResponse(HttpStatusCode.NotFound);
 
-        using var seekingStreamFromBody = await request.CreateSeekingStreamFromBodyAsync().ConfigureAwait(false);
         var responseMessage = await _incomingMessageClient
             .ReceiveIncomingMarketMessageAsync(
-                new IncomingMarketMessageStream(seekingStreamFromBody),
+                incomingMarketMessageStream,
                 incomingDocumentFormat: documentFormat,
                 incomingDocumentType,
                 responseDocumentFormat: documentFormat,
@@ -86,12 +95,57 @@ public class IncomingMessageReceiver
     }
 
     private static async Task<HttpResponseData> CreateResponseAsync(
-    HttpRequestData request,
-    HttpStatusCode statusCode,
-    ResponseMessage responseMessage)
+        HttpRequestData request,
+        HttpStatusCode statusCode,
+        ResponseMessage responseMessage)
     {
         var response = request.CreateResponse(statusCode);
         await response.WriteStringAsync(responseMessage.MessageBody, Encoding.UTF8).ConfigureAwait(false);
         return response;
+    }
+
+    private static AuditLogEntityType? GetAffectedEntityType(IncomingDocumentType? incomingDocumentType)
+    {
+        if (incomingDocumentType == null) return null;
+
+        var entityTypeMapping = new Dictionary<IncomingDocumentType, AuditLogEntityType>
+        {
+            { IncomingDocumentType.RequestAggregatedMeasureData, AuditLogEntityType.RequestAggregatedMeasureData },
+            { IncomingDocumentType.B2CRequestAggregatedMeasureData, AuditLogEntityType.RequestAggregatedMeasureData },
+            { IncomingDocumentType.RequestWholesaleSettlement, AuditLogEntityType.RequestWholesaleServices },
+            { IncomingDocumentType.B2CRequestWholesaleSettlement, AuditLogEntityType.RequestWholesaleServices },
+        };
+
+        entityTypeMapping.TryGetValue(incomingDocumentType, out var affectedEntityType);
+        return affectedEntityType;
+    }
+
+    private async Task AuditLogAsync(
+        HttpRequestData request,
+        string? incomingDocumentTypeName,
+        IncomingMarketMessageStream incomingMarketMessageStream,
+        CancellationToken cancellationToken)
+    {
+        AuditLogEntityType? affectedEntityType;
+        try
+        {
+            var incomingDocumentType = IncomingDocumentType.FromName(incomingDocumentTypeName);
+            affectedEntityType = GetAffectedEntityType(incomingDocumentType);
+        }
+        catch (InvalidOperationException)
+        {
+            // If the incomingDocumentTypeName is not a valid IncomingDocumentType, we do not log a affectedEntityType
+            affectedEntityType = null;
+        }
+
+        var incomingMessage = await new StreamReader(incomingMarketMessageStream.Stream).ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+        await _auditLogger.LogWithCommitAsync(
+                logId: AuditLogId.New(),
+                activity: AuditLogActivity.RequestCalculationResults,
+                activityOrigin: request.Url.ToString(),
+                activityPayload: (incomingDocumentTypeName, incomingMessage),
+                affectedEntityType: affectedEntityType,
+                affectedEntityKey: null)
+            .ConfigureAwait(false);
     }
 }
