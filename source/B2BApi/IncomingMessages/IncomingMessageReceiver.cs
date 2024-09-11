@@ -120,6 +120,14 @@ public class IncomingMessageReceiver
         return affectedEntityType;
     }
 
+    private static AuditLogActivity GetAffectedEntityType(AuditLogEntityType? affectedEntityType)
+    {
+        var auditLogActivity = affectedEntityType is null
+            ? AuditLogActivity.RequestInvalidCalculationTypeResults
+            : AuditLogActivity.RequestCalculationResults;
+        return auditLogActivity;
+    }
+
     private async Task AuditLogAsync(
         HttpRequestData request,
         string? incomingDocumentTypeName,
@@ -138,9 +146,7 @@ public class IncomingMessageReceiver
             affectedEntityType = null;
         }
 
-        var auditLogActivity = affectedEntityType is null
-            ? AuditLogActivity.RequestInvalidCalculationTypeResults
-            : AuditLogActivity.RequestCalculationResults;
+        var auditLogActivity = GetAffectedEntityType(affectedEntityType);
         var incomingMessage = await new StreamReader(incomingMarketMessageStream.Stream).ReadToEndAsync(cancellationToken).ConfigureAwait(false);
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
