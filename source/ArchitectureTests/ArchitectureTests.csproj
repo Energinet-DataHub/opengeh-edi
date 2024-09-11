@@ -49,8 +49,11 @@ limitations under the License.
       <ProjectReference Include="..\B2BApi\B2BApi.csproj" />
       <ProjectReference Include="..\B2CWebApi\B2CWebApi.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+      <ProjectReference Include="..\DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj" />
       <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj" />
       <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
+      <ProjectReference Include="..\MasterData.Infrastructure\MasterData.Infrastructure.csproj" />
+      <ProjectReference Include="..\Outbox.Infrastructure\Outbox.Infrastructure.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Application\OutgoingMessages.Application.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Domain\OutgoingMessages.Domain.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />

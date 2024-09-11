@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.Extensions.Options;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.ProcessInitializationHandlers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
@@ -52,18 +50,13 @@ public static class ProcessExtensions
         ArgumentNullException.ThrowIfNull(configuration);
 
         // Options
-        services.AddOptions<ServiceBusOptions>()
-            .BindConfiguration(ServiceBusOptions.SectionName)
+        services.AddOptions<ServiceBusNamespaceOptions>()
+            .BindConfiguration(ServiceBusNamespaceOptions.SectionName)
             .ValidateDataAnnotations();
 
         services
-            .AddOptionsWithValidateOnStart<EdiInboxOptions>()
-            .BindConfiguration(EdiInboxOptions.SectionName)
-            .ValidateDataAnnotations();
-
-        services
-            .AddOptions<WholesaleInboxOptions>()
-            .BindConfiguration(WholesaleInboxOptions.SectionName)
+            .AddOptionsWithValidateOnStart<EdiInboxQueueOptions>()
+            .BindConfiguration(EdiInboxQueueOptions.SectionName)
             .ValidateDataAnnotations();
 
         services
@@ -71,15 +64,15 @@ public static class ProcessExtensions
             .AddMediatR()
             .AddScoped<BuildingBlocks.Domain.ExecutionContext>();
 
-        //ProcessingConfiguration
+        // ProcessingConfiguration
         services.AddScoped<DomainEventsAccessor>()
             .AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehaviour<,>))
             .AddTransient(typeof(IPipelineBehavior<,>), typeof(RaiseDomainEventsBehaviour<,>))
             .AddInternalCommands()
             .AddInboxEvents()
-            .AddWholesaleInbox();
+            .AddWholesaleInbox(configuration);
 
-        //EnqueueMessageConfiguration
+        // EnqueueMessageConfiguration
         services.AddTransient<INotificationHandler<EnqueuedAcceptedWholesaleServicesEvent>, EnqueuedWholesaleServicesMessageHandler>();
         services.AddTransient<INotificationHandler<EnqueueAcceptedEnergyResultMessageEvent>, EnqueueAcceptedEnergyResultMessageHandler>();
         services.AddTransient<INotificationHandler<EnqueueRejectedEnergyResultMessageEvent>, EnqueueRejectedEnergyResultMessageHandler>();
@@ -105,7 +98,7 @@ public static class ProcessExtensions
             .AddTransient<IRequestHandler<InitializeAggregatedMeasureDataProcessesCommand, Unit>, InitializeAggregatedMeasureDataProcessesHandler>()
             .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>, WhenAnAcceptedAggregatedTimeSeriesRequestIsAvailable>()
             .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasRejected>, WhenAnRejectedAggregatedTimeSeriesRequestIsAvailable>()
-            .AddScoped<WholesaleInbox>()
+            .AddScoped<WholesaleInboxClient>()
             .AddScoped<IAggregatedMeasureDataProcessRepository, AggregatedMeasureDataProcessRepository>();
 
         // RequestedWholesaleServicesConfiguration
@@ -122,11 +115,10 @@ public static class ProcessExtensions
             .AddTransient<INotificationHandler<WholesaleServicesRequestWasRejected>,
                 WhenARejectedWholesaleServicesRequestIsAvailable>()
 
-            // health checks
+            // Health checks
             .TryAddExternalDomainServiceBusQueuesHealthCheck(
-                configuration.GetSection(ServiceBusOptions.SectionName).Get<ServiceBusOptions>()!.ListenConnectionString,
-                configuration.GetSection(EdiInboxOptions.SectionName).Get<EdiInboxOptions>()!.QueueName,
-                configuration.GetSection(WholesaleInboxOptions.SectionName).Get<WholesaleInboxOptions>()!.QueueName);
+                configuration.GetSection(ServiceBusNamespaceOptions.SectionName).Get<ServiceBusNamespaceOptions>()!.FullyQualifiedNamespace,
+                configuration.GetSection(EdiInboxQueueOptions.SectionName).Get<EdiInboxQueueOptions>()!.QueueName);
         return services;
     }
 }

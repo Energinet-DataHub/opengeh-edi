@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.AuditLog;
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -42,7 +43,7 @@ public class ArchivedMessageSearchController : ControllerBase
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        await _auditLogger.LogAsync(
+        await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
                 activity: AuditLogActivity.ArchivedMessagesSearch,
                 activityOrigin: HttpContext.Request.GetDisplayUrl(),

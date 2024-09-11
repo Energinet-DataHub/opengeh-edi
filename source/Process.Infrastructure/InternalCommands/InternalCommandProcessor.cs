@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using Polly;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
@@ -33,7 +31,7 @@ public class InternalCommandProcessor
     private readonly CommandExecutor _commandExecutor;
     private readonly ILogger<InternalCommandProcessor> _logger;
     private readonly IDatabaseConnectionFactory _connectionFactory;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IClock _clock;
 
     public InternalCommandProcessor(
         InternalCommandMapper mapper,
@@ -42,7 +40,7 @@ public class InternalCommandProcessor
         CommandExecutor commandExecutor,
         ILogger<InternalCommandProcessor> logger,
         IDatabaseConnectionFactory connectionFactory,
-        ISystemDateTimeProvider systemDateTimeProvider)
+        IClock clock)
     {
         _mapper = mapper;
         _internalCommandAccessor = internalCommandAccessor ?? throw new ArgumentNullException(nameof(internalCommandAccessor));
@@ -50,7 +48,7 @@ public class InternalCommandProcessor
         _commandExecutor = commandExecutor ?? throw new ArgumentNullException(nameof(commandExecutor));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
-        _systemDateTimeProvider = systemDateTimeProvider;
+        _clock = clock;
     }
 
     public async Task ProcessPendingAsync(CancellationToken cancellationToken)
@@ -118,7 +116,7 @@ public class InternalCommandProcessor
             "WHERE [Id] = @Id",
             new
             {
-                NowDate = _systemDateTimeProvider.Now().ToDateTimeUtc(),
+                NowDate = _clock.GetCurrentInstant().ToDateTimeUtc(),
                 Error = exception,
                 queuedCommand.Id,
             }).ConfigureAwait(false);
@@ -133,7 +131,7 @@ public class InternalCommandProcessor
             "WHERE [Id] = @Id",
             new
             {
-                NowDate = _systemDateTimeProvider.Now().ToDateTimeUtc(),
+                NowDate = _clock.GetCurrentInstant().ToDateTimeUtc(),
                 queuedCommand.Id,
             }).ConfigureAwait(false);
     }

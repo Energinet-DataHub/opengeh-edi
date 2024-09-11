@@ -46,6 +46,9 @@ public class BundleEntityConfiguration : IEntityTypeConfiguration<Bundle>
         builder.Property<DocumentType>(b => b.DocumentTypeInBundle)
             .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<DocumentType>(fromDbValue));
 
+        builder.Property<MessageCategory>(b => b.MessageCategory)
+            .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<MessageCategory>(fromDbValue));
+
         builder.Property<BusinessReason>(b => b.BusinessReason)
             .HasConversion(toDbValue => toDbValue.Name, fromDbValue => EnumerationType.FromName<BusinessReason>(fromDbValue));
 
@@ -58,6 +61,5 @@ public class BundleEntityConfiguration : IEntityTypeConfiguration<Bundle>
                 fromDbValue => fromDbValue != null ? MessageId.Create(fromDbValue) : null);
 
         builder.HasMany<OutgoingMessage>().WithOne().HasForeignKey(o => o.AssignedBundleId);
-        builder.HasOne<ActorMessageQueue>().WithMany("_bundles").HasForeignKey(b => b.ActorMessageQueueId);
     }
 }

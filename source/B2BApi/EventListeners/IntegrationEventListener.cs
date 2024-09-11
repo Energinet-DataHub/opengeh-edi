@@ -45,7 +45,7 @@ public class IntegrationEventListener
         [ServiceBusTrigger(
             $"%{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.TopicName)}%",
             $"%{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.SubscriptionName)}%",
-            Connection = $"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ManageConnectionString)}")]
+            Connection = ServiceBusNamespaceOptions.SectionName)]
         byte[] eventData,
         FunctionContext context)
     {

@@ -32,19 +32,19 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.SearchMessages;
 public class SearchMessagesTests : TestBase
 {
     private readonly IArchivedMessagesClient _archivedMessagesClient;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IClock _clock;
 
     public SearchMessagesTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
         _archivedMessagesClient = GetService<IArchivedMessagesClient>();
-        _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
+        _clock = GetService<IClock>();
     }
 
     [Fact]
     public async Task Can_fetch_messages()
     {
-        var archivedMessage = CreateArchivedMessage(_systemDateTimeProvider.Now());
+        var archivedMessage = CreateArchivedMessage(_clock.GetCurrentInstant());
         await ArchiveMessage(archivedMessage);
 
         var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(), CancellationToken.None);
@@ -209,21 +209,21 @@ public class SearchMessagesTests : TestBase
         var messageIdOfMessage3 = MessageId.New();
         var messageIdOfMessage31 = MessageId.New();
         var messageIdOfMessage32 = MessageId.New();
-        var archivedMessage3 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage3.Value);
-        var archivedMessage31 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage3, messageId: messageIdOfMessage31.Value);
-        var archivedMessage32 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage3, messageId: messageIdOfMessage32.Value);
+        var archivedMessage3 = CreateArchivedMessage(_clock.GetCurrentInstant(), messageId: messageIdOfMessage3.Value);
+        var archivedMessage31 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageIdOfMessage3, messageId: messageIdOfMessage31.Value);
+        var archivedMessage32 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageIdOfMessage3, messageId: messageIdOfMessage32.Value);
         await ArchiveMessage(archivedMessage3);
         await ArchiveMessage(archivedMessage31);
         await ArchiveMessage(archivedMessage32);
 
         var messageIdOfMessage2 = MessageId.New();
-        var archivedMessage2 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage2.Value);
-        var archivedMessage21 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage2, messageId: Guid.NewGuid().ToString());
+        var archivedMessage2 = CreateArchivedMessage(_clock.GetCurrentInstant(), messageId: messageIdOfMessage2.Value);
+        var archivedMessage21 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageIdOfMessage2, messageId: Guid.NewGuid().ToString());
         await ArchiveMessage(archivedMessage2);
         await ArchiveMessage(archivedMessage21);
 
         var messageIdOfMessage1 = MessageId.New();
-        var archivedMessage1 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage1.Value);
+        var archivedMessage1 = CreateArchivedMessage(_clock.GetCurrentInstant(), messageId: messageIdOfMessage1.Value);
         await ArchiveMessage(archivedMessage1);
 
         // Act
@@ -253,21 +253,21 @@ public class SearchMessagesTests : TestBase
         // Arrange
         var messageIdOfMessage3 = MessageId.New();
         var messageIdOfMessage33 = MessageId.New();
-        var archivedMessage3 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage3.Value);
-        var archivedMessage31 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage3, messageId: messageIdOfMessage33.Value);
-        var archivedMessage32 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage3, messageId: Guid.NewGuid().ToString());
+        var archivedMessage3 = CreateArchivedMessage(_clock.GetCurrentInstant(), messageId: messageIdOfMessage3.Value);
+        var archivedMessage31 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageIdOfMessage3, messageId: messageIdOfMessage33.Value);
+        var archivedMessage32 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageIdOfMessage3, messageId: Guid.NewGuid().ToString());
         await ArchiveMessage(archivedMessage3);
         await ArchiveMessage(archivedMessage31);
         await ArchiveMessage(archivedMessage32);
 
         var messageIdOfMessage2 = MessageId.New();
-        var archivedMessage2 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage2.Value);
-        var archivedMessage21 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage2, messageId: Guid.NewGuid().ToString());
+        var archivedMessage2 = CreateArchivedMessage(_clock.GetCurrentInstant(), messageId: messageIdOfMessage2.Value);
+        var archivedMessage21 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageIdOfMessage2, messageId: Guid.NewGuid().ToString());
         await ArchiveMessage(archivedMessage2);
         await ArchiveMessage(archivedMessage21);
 
         var messageIdOfMessage1 = MessageId.New();
-        var archivedMessage1 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage1.Value);
+        var archivedMessage1 = CreateArchivedMessage(_clock.GetCurrentInstant(), messageId: messageIdOfMessage1.Value);
         await ArchiveMessage(archivedMessage1);
 
         // Act
@@ -296,21 +296,21 @@ public class SearchMessagesTests : TestBase
         // Arrange
         var messageIdOfMessage3 = MessageId.New();
         var messageIdOfMessage33 = MessageId.New();
-        var archivedMessage3 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage3.Value);
-        var archivedMessage31 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage3, messageId: messageIdOfMessage33.Value);
-        var archivedMessage32 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage3, messageId: Guid.NewGuid().ToString());
+        var archivedMessage3 = CreateArchivedMessage(_clock.GetCurrentInstant(), messageId: messageIdOfMessage3.Value);
+        var archivedMessage31 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageIdOfMessage3, messageId: messageIdOfMessage33.Value);
+        var archivedMessage32 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageIdOfMessage3, messageId: Guid.NewGuid().ToString());
         await ArchiveMessage(archivedMessage3);
         await ArchiveMessage(archivedMessage31);
         await ArchiveMessage(archivedMessage32);
 
         var messageIdOfMessage2 = MessageId.New();
-        var archivedMessage2 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage2.Value);
-        var archivedMessage21 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageIdOfMessage2, messageId: Guid.NewGuid().ToString());
+        var archivedMessage2 = CreateArchivedMessage(_clock.GetCurrentInstant(), messageId: messageIdOfMessage2.Value);
+        var archivedMessage21 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageIdOfMessage2, messageId: Guid.NewGuid().ToString());
         await ArchiveMessage(archivedMessage2);
         await ArchiveMessage(archivedMessage21);
 
         var messageIdOfMessage1 = MessageId.New();
-        var archivedMessage1 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageIdOfMessage1.Value);
+        var archivedMessage1 = CreateArchivedMessage(_clock.GetCurrentInstant(), messageId: messageIdOfMessage1.Value);
         await ArchiveMessage(archivedMessage1);
 
         // Act
@@ -330,8 +330,8 @@ public class SearchMessagesTests : TestBase
     {
         // Arrange
         var messageId = MessageId.New();
-        var archivedMessage1 = CreateArchivedMessage(_systemDateTimeProvider.Now(), messageId: messageId.Value);
-        var archivedMessage2 = CreateArchivedMessage(_systemDateTimeProvider.Now(), relatedToMessageId: messageId, messageId: MessageId.New().Value);
+        var archivedMessage1 = CreateArchivedMessage(_clock.GetCurrentInstant(), messageId: messageId.Value);
+        var archivedMessage2 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageId, messageId: MessageId.New().Value);
         await ArchiveMessage(archivedMessage1);
         await ArchiveMessage(archivedMessage2);
 
@@ -352,9 +352,9 @@ public class SearchMessagesTests : TestBase
         var authenticatedActor = GetService<AuthenticatedActor>();
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ownActorNumber, restriction: Restriction.Owned));
 
-        var archivedMessageOwnMessageAsReceiver = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: ownActorNumber.Value, senderNumber: someoneElseActorNumber.Value);
-        var archivedMessageOwnMessageAsSender = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: someoneElseActorNumber.Value, senderNumber: ownActorNumber.Value);
-        var archivedMessage = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: someoneElseActorNumber.Value, senderNumber: someoneElseActorNumber.Value);
+        var archivedMessageOwnMessageAsReceiver = CreateArchivedMessage(_clock.GetCurrentInstant(), receiverNumber: ownActorNumber.Value, senderNumber: someoneElseActorNumber.Value);
+        var archivedMessageOwnMessageAsSender = CreateArchivedMessage(_clock.GetCurrentInstant(), receiverNumber: someoneElseActorNumber.Value, senderNumber: ownActorNumber.Value);
+        var archivedMessage = CreateArchivedMessage(_clock.GetCurrentInstant(), receiverNumber: someoneElseActorNumber.Value, senderNumber: someoneElseActorNumber.Value);
         await ArchiveMessage(archivedMessageOwnMessageAsReceiver);
         await ArchiveMessage(archivedMessageOwnMessageAsSender);
         await ArchiveMessage(archivedMessage);
@@ -374,8 +374,8 @@ public class SearchMessagesTests : TestBase
         var authenticatedActor = GetService<AuthenticatedActor>();
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ownActorNumber, restriction: Restriction.None));
 
-        var archivedMessageOwnMessageAsSender = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: someoneElseActorNumber.Value, senderNumber: ownActorNumber.Value);
-        var archivedMessage = CreateArchivedMessage(_systemDateTimeProvider.Now(), receiverNumber: someoneElseActorNumber.Value, senderNumber: someoneElseActorNumber.Value);
+        var archivedMessageOwnMessageAsSender = CreateArchivedMessage(_clock.GetCurrentInstant(), receiverNumber: someoneElseActorNumber.Value, senderNumber: ownActorNumber.Value);
+        var archivedMessage = CreateArchivedMessage(_clock.GetCurrentInstant(), receiverNumber: someoneElseActorNumber.Value, senderNumber: someoneElseActorNumber.Value);
         await ArchiveMessage(archivedMessageOwnMessageAsSender);
         await ArchiveMessage(archivedMessage);
 
@@ -463,7 +463,7 @@ public class SearchMessagesTests : TestBase
             documentType ?? DocumentType.NotifyAggregatedMeasureData.Name,
             senderNumber ?? "1234512345123",
             receiverNumber ?? "1234512345128",
-            createdAt.GetValueOrDefault(_systemDateTimeProvider.Now()),
+            createdAt.GetValueOrDefault(_clock.GetCurrentInstant()),
             businessReason ?? BusinessReason.BalanceFixing.Name,
             archivedMessageType ?? ArchivedMessageType.OutgoingMessage,
 #pragma warning disable CA2000 // Do not dispose here

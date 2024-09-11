@@ -12,20 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
@@ -33,7 +25,9 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
+using NodaTime;
 using NodaTime.Extensions;
 using Xunit;
 using Xunit.Abstractions;
@@ -44,19 +38,21 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 {
     private readonly IIncomingMessageClient _incomingMessagesRequest;
     private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
+#pragma warning disable CA2213 // Disposable fields should be disposed
     private readonly ServiceBusSenderSpy _senderSpy;
+#pragma warning restore CA2213 // Disposable fields should be disposed
     private readonly IncomingMessagesContext _incomingMessageContext;
-    private readonly SystemDateTimeProviderStub _dateTimeProvider;
+    private readonly ClockStub _clockStub;
 
     public WhenIncomingMessagesIsReceivedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
-        _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();
+        _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IAzureClientFactory<ServiceBusSender>>();
         _senderSpy = new ServiceBusSenderSpy("Fake");
         _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
         _incomingMessagesRequest = GetService<IIncomingMessageClient>();
         _incomingMessageContext = GetService<IncomingMessagesContext>();
-        _dateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
+        _clockStub = (ClockStub)GetService<IClock>();
     }
 
     public static IEnumerable<object[]> ValidIncomingRequestMessages()
@@ -348,7 +344,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             hour = 04,
             minute = 23;
         var expectedTimestamp = new DateTime(year, month, date, hour, minute, 0, DateTimeKind.Utc);
-        _dateTimeProvider.SetNow(expectedTimestamp.ToInstant());
+        _clockStub.SetCurrentInstant(expectedTimestamp.ToInstant());
 
         var senderActorNumber = ActorNumber.Create("5799999933318");
         var authenticatedActor = GetService<AuthenticatedActor>();
@@ -400,8 +396,6 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
     protected override void Dispose(bool disposing)
     {
-        _senderSpy.Dispose();
-        _serviceBusClientSenderFactory.Dispose();
         _incomingMessageContext.Dispose();
         base.Dispose(disposing);
     }

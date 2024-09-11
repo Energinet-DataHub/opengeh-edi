@@ -24,7 +24,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure;
 
 public class DequeuedBundlesRetention : IDataRetention
 {
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IClock _clock;
     private readonly IMarketDocumentRepository _marketDocumentRepository;
     private readonly IOutgoingMessageRepository _outgoingMessageRepository;
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
@@ -32,14 +32,14 @@ public class DequeuedBundlesRetention : IDataRetention
     private readonly ILogger<DequeuedBundlesRetention> _logger;
 
     public DequeuedBundlesRetention(
-        ISystemDateTimeProvider systemDateTimeProvider,
+        IClock clock,
         IMarketDocumentRepository marketDocumentRepository,
         IOutgoingMessageRepository outgoingMessageRepository,
         ActorMessageQueueContext actorMessageQueueContext,
         IBundleRepository bundleRepository,
         ILogger<DequeuedBundlesRetention> logger)
     {
-        _systemDateTimeProvider = systemDateTimeProvider;
+        _clock = clock;
         _marketDocumentRepository = marketDocumentRepository;
         _outgoingMessageRepository = outgoingMessageRepository;
         _actorMessageQueueContext = actorMessageQueueContext;
@@ -51,7 +51,7 @@ public class DequeuedBundlesRetention : IDataRetention
     {
         while (true)
         {
-            var monthAgo = _systemDateTimeProvider.Now().Plus(-Duration.FromDays(30));
+            var monthAgo = _clock.GetCurrentInstant().Plus(-Duration.FromDays(30));
             var dequeuedBundles = await _bundleRepository
                 .GetDequeuedBundlesOlderThanAsync(monthAgo, 500)
                 .ConfigureAwait(false);

@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
@@ -48,7 +46,7 @@ public class ProcessInitializationListener
     public async Task RunAsync(
         [ServiceBusTrigger(
             $"%{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}%",
-            Connection = $"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ManageConnectionString)}")]
+            Connection = ServiceBusNamespaceOptions.SectionName)]
         ServiceBusReceivedMessage message)
     {
         ArgumentNullException.ThrowIfNull(message);

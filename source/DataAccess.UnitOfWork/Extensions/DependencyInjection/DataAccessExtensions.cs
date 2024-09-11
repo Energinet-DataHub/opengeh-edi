@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
@@ -21,10 +20,9 @@ namespace Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjec
 public static class DataAccessExtensions
 {
     public static IServiceCollection AddDataAccessUnitOfWorkModule(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services)
     {
-        services.AddScoped<IUnitOfWork, UnitOfWorkImpl>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
     }

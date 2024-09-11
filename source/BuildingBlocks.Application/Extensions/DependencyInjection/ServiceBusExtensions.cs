@@ -12,33 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Azure.Messaging.ServiceBus;
+using Azure.Identity;
 using BuildingBlocks.Application.Extensions.Options;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
+/// <summary>
+/// Extension methods for <see cref="IServiceCollection"/>
+/// that allow adding ServiceBus services to an application.
+/// </summary>
 public static class ServiceBusExtensions
 {
-    public static IServiceCollection AddServiceBus(this IServiceCollection services, IConfiguration configuration)
+    /// <summary>
+    /// Register ServiceBus services commonly used by DH3 applications.
+    /// </summary>
+    public static IServiceCollection AddServiceBusClientForApplication(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
-        services.AddOptions<ServiceBusOptions>()
-            .BindConfiguration(ServiceBusOptions.SectionName)
+        services
+            .AddOptions<ServiceBusNamespaceOptions>()
+            .BindConfiguration(ServiceBusNamespaceOptions.SectionName)
             .ValidateDataAnnotations();
 
-        services.AddSingleton<ServiceBusClient>(provider => new ServiceBusClient(
-            provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.SendConnectionString,
-            new ServiceBusClientOptions()
-            {
-                TransportType = ServiceBusTransportType.AmqpWebSockets,
-            }));
+        services.AddAzureClients(builder =>
+        {
+            builder
+                .UseCredential(new DefaultAzureCredential());
 
-        services.AddSingleton<IServiceBusSenderFactory, ServiceBusSenderFactory>();
+            var serviceBusOptions =
+                configuration
+                    .GetRequiredSection(ServiceBusNamespaceOptions.SectionName)
+                    .Get<ServiceBusNamespaceOptions>()
+                ?? throw new InvalidOperationException("Missing ServiceBus Namespace configuration.");
+
+            builder
+                .AddServiceBusClientWithNamespace(serviceBusOptions.FullyQualifiedNamespace);
+        });
 
         return services;
     }

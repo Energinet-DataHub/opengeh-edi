@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using System.Security.Claims;
 using Azure.Storage.Blobs;
+using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.OpenIdJwt;
@@ -39,9 +39,8 @@ public class B2CWebApiFixture : IAsyncLifetime
         AzuriteManager = new AzuriteManager();
         OpenIdJwtManager = new OpenIdJwtManager(IntegrationTestConfiguration.B2CSettings);
         ServiceBusResourceProvider = new ServiceBusResourceProvider(
-            IntegrationTestConfiguration.ServiceBusConnectionString,
-            TestLogger);
-        AuditLogMockServer = new AuditLogMockServer();
+            TestLogger,
+            IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace);
 
         B2CWebApiApplicationFactory = new B2CWebApiApplicationFactory();
     }
@@ -49,8 +48,6 @@ public class B2CWebApiFixture : IAsyncLifetime
     public EdiDatabaseManager DatabaseManager { get; }
 
     public OpenIdJwtManager OpenIdJwtManager { get; }
-
-    public AuditLogMockServer AuditLogMockServer { get; }
 
     [NotNull]
     public HttpClient? WebApiClient { get; private set; }
@@ -72,8 +69,6 @@ public class B2CWebApiFixture : IAsyncLifetime
 
         OpenIdJwtManager.StartServer();
 
-        AuditLogMockServer.StartServer();
-
         await DatabaseManager.CreateDatabaseAsync();
 
         var incomingMessagesQueue = await ServiceBusResourceProvider.BuildQueue(IncomingMessagesQueueName)
@@ -93,7 +88,6 @@ public class B2CWebApiFixture : IAsyncLifetime
         OpenIdJwtManager.Dispose();
         await DatabaseManager.DeleteDatabaseAsync();
         await ServiceBusResourceProvider.DisposeAsync();
-        AuditLogMockServer.Dispose();
         await B2CWebApiApplicationFactory.DisposeAsync();
         WebApiClient.Dispose();
     }
@@ -124,14 +118,10 @@ public class B2CWebApiFixture : IAsyncLifetime
             { "UserAuthentication:ExternalMetadataAddress", OpenIdJwtManager.ExternalMetadataAddress },
             { "UserAuthentication:InternalMetadataAddress", OpenIdJwtManager.InternalMetadataAddress },
             { "UserAuthentication:BackendBffAppId", OpenIdJwtManager.TestBffAppId },
-            { "ServiceBus:ManageConnectionString", ServiceBusResourceProvider.ConnectionString },
-            { "ServiceBus:ListenConnectionString", ServiceBusResourceProvider.ConnectionString },
-            { "ServiceBus:SendConnectionString", ServiceBusResourceProvider.ConnectionString },
-            { "AuditLog:IngestionUrl", AuditLogMockServer.IngestionUrl },
+            { $"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}", ServiceBusResourceProvider.FullyQualifiedNamespace },
             { "IncomingMessages:QueueName", incomingMessagesQueueName },
             { "OrchestrationsStorageAccountConnectionString", AzuriteManager.FullConnectionString },
             { "OrchestrationsTaskHubName", "EdiTest01" },
-            { "FeatureManagement:UseAuditLog", "true" },
         };
 
         return appSettings;

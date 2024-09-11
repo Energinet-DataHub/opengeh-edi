@@ -24,12 +24,15 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
+using Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Database;
+using Energinet.DataHub.EDI.B2BApi.Functions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.Options;
+using Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
@@ -79,13 +82,13 @@ public class B2BApiAppFixture : IAsyncLifetime
         LogStopwatch(stopwatch, nameof(DatabaseManager));
 
         ServiceBusResourceProvider = new ServiceBusResourceProvider(
-            IntegrationTestConfiguration.ServiceBusConnectionString,
-            TestLogger);
+            TestLogger,
+            IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace);
         LogStopwatch(stopwatch, nameof(ServiceBusResourceProvider));
 
         ServiceBusListenerMock = new ServiceBusListenerMock(
-            IntegrationTestConfiguration.ServiceBusConnectionString,
-            TestLogger);
+            TestLogger,
+            IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace);
         LogStopwatch(stopwatch, nameof(ServiceBusListenerMock));
 
         HostConfigurationBuilder = new FunctionAppHostConfigurationBuilder();
@@ -95,10 +98,15 @@ public class B2BApiAppFixture : IAsyncLifetime
             new HttpClientFactory(),
             IntegrationTestConfiguration.DatabricksSettings,
             "edi_B2BApi_tests");
-
         LogStopwatch(stopwatch, nameof(DatabricksSchemaManager));
+
+        AuditLogMockServer = new AuditLogMockServer();
+        LogStopwatch(stopwatch, nameof(AuditLogMockServer));
+
         LogStopwatch(constructorStopwatch, "B2BApiAppFixture constructor");
     }
+
+    public AuditLogMockServer AuditLogMockServer { get; }
 
     public ITestDiagnosticsLogger TestLogger { get; }
 
@@ -165,14 +173,14 @@ public class B2BApiAppFixture : IAsyncLifetime
         await ServiceBusResourceProvider
             .BuildQueue("edi-inbox")
             .Do(queue => appHostSettings.ProcessEnvironmentVariables
-                .Add($"{EdiInboxOptions.SectionName}__{nameof(EdiInboxOptions.QueueName)}", queue.Name))
+                .Add($"{EdiInboxQueueOptions.SectionName}__{nameof(EdiInboxQueueOptions.QueueName)}", queue.Name))
             .CreateAsync();
         LogStopwatch(stopwatch, "ServiceBusQueue (edi-inbox)");
 
         var wholesaleInboxQueueResource = await ServiceBusResourceProvider
             .BuildQueue("wholesale-inbox")
             .Do(queue => appHostSettings.ProcessEnvironmentVariables
-                .Add($"{WholesaleInboxOptions.SectionName}__{nameof(WholesaleInboxOptions.QueueName)}", queue.Name))
+                .Add($"{WholesaleInboxQueueOptions.SectionName}__{nameof(WholesaleInboxQueueOptions.QueueName)}", queue.Name))
             .CreateAsync();
         LogStopwatch(stopwatch, "ServiceBusQueue (wholesale-inbox)");
 
@@ -186,6 +194,9 @@ public class B2BApiAppFixture : IAsyncLifetime
         // => Receive messages on Wholesale Inbox Queue
         await ServiceBusListenerMock.AddQueueListenerAsync(wholesaleInboxQueueResource.Name);
         LogStopwatch(stopwatch, nameof(ServiceBusListenerMock.AddQueueListenerAsync));
+
+        AuditLogMockServer.StartServer();
+        LogStopwatch(stopwatch, nameof(AuditLogMockServer.StartServer));
 
         // Create and start host
         AppHostManager = new FunctionAppHostManager(appHostSettings, TestLogger);
@@ -383,14 +394,8 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // ServiceBus connection strings
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ManageConnectionString)}",
-            ServiceBusResourceProvider.ConnectionString);
-        appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}",
-            ServiceBusResourceProvider.ConnectionString);
-        appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.SendConnectionString)}",
-            ServiceBusResourceProvider.ConnectionString);
+            $"{ServiceBusNamespaceOptions.SectionName}__{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}",
+            ServiceBusResourceProvider.FullyQualifiedNamespace);
 
         // Feature Flags: Default values
         appHostSettings.ProcessEnvironmentVariables.Add(
@@ -400,6 +405,20 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.ProcessEnvironmentVariables.Add(
             "FeatureManagement__UsePeekMessages",
             true.ToString().ToLower());
+
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"{AuditLogOptions.SectionName}__{nameof(AuditLogOptions.IngestionUrl)}",
+            AuditLogMockServer.IngestionUrl);
+
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"AzureWebJobs.TenSecondsHasPassed.Disabled",
+            "true");
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"AzureWebJobs.ADayHasPassed.Disabled",
+            "true");
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"AzureWebJobs.{nameof(OutboxPublisher)}.Disabled",
+            "true");
 
         return appHostSettings;
     }

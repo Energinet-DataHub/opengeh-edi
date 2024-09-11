@@ -21,25 +21,17 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 internal sealed class IntegrationEventPublisher : IAsyncDisposable
 {
     private readonly string _dbConnectionString;
-    private readonly ServiceBusClient _client;
     private readonly ServiceBusSender _sender;
 
-    internal IntegrationEventPublisher(string serviceBusConnectionString, string topicName, string dbConnectionString)
+    internal IntegrationEventPublisher(ServiceBusClient client, string topicName, string dbConnectionString)
     {
         _dbConnectionString = dbConnectionString;
-        _client = new ServiceBusClient(
-            serviceBusConnectionString,
-            new ServiceBusClientOptions()
-            {
-                TransportType = ServiceBusTransportType.AmqpWebSockets, // Firewall is not open for AMQP and Therefore, needs to go over WebSockets.
-            });
-        _sender = _client.CreateSender(topicName);
+        _sender = client.CreateSender(topicName);
     }
 
     public async ValueTask DisposeAsync()
     {
-        await DisposeCoreAsync().ConfigureAwait(false);
-
+        await _sender.DisposeAsync().ConfigureAwait(false);
         GC.SuppressFinalize(this);
     }
 
@@ -93,11 +85,5 @@ internal sealed class IntegrationEventPublisher : IAsyncDisposable
         };
         message.ApplicationProperties.Add("EventMinorVersion", 0);
         return message;
-    }
-
-    private async ValueTask DisposeCoreAsync()
-    {
-        await _client.DisposeAsync().ConfigureAwait(false);
-        await _sender.DisposeAsync().ConfigureAwait(false);
     }
 }

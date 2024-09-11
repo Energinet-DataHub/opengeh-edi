@@ -22,6 +22,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -30,7 +31,7 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Retention;
 public class RemoveInternalCommandsWhenADayHasPassedTests : TestBase
 {
     private readonly ProcessContext _processContext;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IClock _clock;
     private readonly InternalCommandsRetention _sut;
 
     public RemoveInternalCommandsWhenADayHasPassedTests(
@@ -38,7 +39,7 @@ public class RemoveInternalCommandsWhenADayHasPassedTests : TestBase
         : base(integrationTestFixture, testOutputHelper)
     {
         _processContext = GetService<ProcessContext>();
-        _systemDateTimeProvider = GetService<ISystemDateTimeProvider>();
+        _clock = GetService<IClock>();
         _sut = new InternalCommandsRetention(GetService<IDatabaseConnectionFactory>(), GetService<ILogger<InternalCommandsRetention>>());
     }
 
@@ -78,14 +79,14 @@ public class RemoveInternalCommandsWhenADayHasPassedTests : TestBase
     {
         for (int i = 0; i < amountOfProcessedInternalCommands; i++)
         {
-            var processedCommand = new QueuedInternalCommand(Guid.NewGuid(), string.Empty, string.Empty, _systemDateTimeProvider.Now());
-            processedCommand.ProcessedDate = _systemDateTimeProvider.Now();
+            var processedCommand = new QueuedInternalCommand(Guid.NewGuid(), string.Empty, string.Empty, _clock.GetCurrentInstant());
+            processedCommand.ProcessedDate = _clock.GetCurrentInstant();
             _processContext.QueuedInternalCommands.Add(processedCommand);
         }
 
         for (int i = 0; i < amountOfNotProcessedInternalCommands; i++)
         {
-            var notProcessedCommand = new QueuedInternalCommand(Guid.NewGuid(), string.Empty, string.Empty, _systemDateTimeProvider.Now());
+            var notProcessedCommand = new QueuedInternalCommand(Guid.NewGuid(), string.Empty, string.Empty, _clock.GetCurrentInstant());
             _processContext.QueuedInternalCommands.Add(notProcessedCommand);
         }
 

@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.AuditLog;
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,7 +40,7 @@ public class ArchivedMessageGetDocumentController : ControllerBase
     {
         ArgumentNullException.ThrowIfNull(id);
 
-        await _auditLogger.LogAsync(
+        await _auditLogger.LogWithCommitAsync(
                 AuditLogId.New(),
                 AuditLogActivity.ArchivedMessagesGet,
                 HttpContext.Request.GetDisplayUrl(),

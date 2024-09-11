@@ -12,12 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
@@ -26,8 +22,10 @@ using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.Edi.Responses;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
+using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
+using Period = Energinet.DataHub.Edi.Responses.Period;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 
@@ -101,7 +99,7 @@ public class WhenAggregatedTimeSeriesRequestAcceptedEventIsReceivedTests : TestB
             _eventType,
             _referenceId,
             _aggregatedTimeSeriesRequestAcceptedResponse.ToByteArray(),
-            GetService<ISystemDateTimeProvider>().Now()));
+            GetService<IClock>().GetCurrentInstant()));
         await context.SaveChangesAsync();
     }
 

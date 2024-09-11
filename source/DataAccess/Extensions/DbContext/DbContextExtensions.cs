@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.DataAccess.Extensions.DbContext;
 
@@ -29,15 +27,15 @@ public static class DbContextExtensions
         this Microsoft.EntityFrameworkCore.DbContext dbContext,
         BuildingBlocks.Domain.ExecutionContext executionContext,
         AuthenticatedActor authenticatedActor,
-        ISystemDateTimeProvider systemDateTimeProvider)
+        IClock clock)
     {
         ArgumentNullException.ThrowIfNull(dbContext);
         ArgumentNullException.ThrowIfNull(executionContext);
         ArgumentNullException.ThrowIfNull(authenticatedActor);
-        ArgumentNullException.ThrowIfNull(systemDateTimeProvider);
+        ArgumentNullException.ThrowIfNull(clock);
 
         var modifiedEntries = dbContext.ChangeTracker.Entries()
-            .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+            .Where(e => e.State is EntityState.Added or EntityState.Modified);
 
         foreach (var entry in modifiedEntries)
         {
@@ -51,7 +49,7 @@ public static class DbContextExtensions
                     authenticatedActor.TryGetCurrentActorIdentity(out var actorIdentity)
                         ? actorIdentity?.ActorNumber.Value
                         : executionContext.CurrentExecutionType?.Name ?? "Unknown";
-                entry.Property("CreatedAt").CurrentValue = systemDateTimeProvider.Now();
+                entry.Property("CreatedAt").CurrentValue = clock.GetCurrentInstant();
             }
 
             if (entry.State == EntityState.Modified
@@ -62,7 +60,7 @@ public static class DbContextExtensions
                     authenticatedActor.TryGetCurrentActorIdentity(out var actorIdentity)
                         ? actorIdentity?.ActorNumber.Value
                         : executionContext.CurrentExecutionType?.Name ?? "Unknown";
-                entry.Property("ModifiedAt").CurrentValue = systemDateTimeProvider.Now();
+                entry.Property("ModifiedAt").CurrentValue = clock.GetCurrentInstant();
             }
         }
     }

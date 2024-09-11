@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 
@@ -25,19 +24,19 @@ public class CommandScheduler : ICommandScheduler
     private readonly InternalCommandMapper _internalCommandMapper;
     private readonly ProcessContext _context;
     private readonly ISerializer _serializer;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IClock _clock;
 
     public CommandScheduler(
         InternalCommandMapper internalCommandMapper,
         ProcessContext context,
         ISerializer serializer,
-        ISystemDateTimeProvider systemDateTimeProvider)
+        IClock clock)
     {
         _internalCommandMapper = internalCommandMapper;
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-        _systemDateTimeProvider =
-            systemDateTimeProvider ?? throw new ArgumentNullException(nameof(systemDateTimeProvider));
+        _clock =
+            clock ?? throw new ArgumentNullException(nameof(clock));
     }
 
     public async Task EnqueueAsync<TCommand>(TCommand command)
@@ -47,7 +46,7 @@ public class CommandScheduler : ICommandScheduler
 
         var data = _serializer.Serialize(command);
         var commandMetadata = _internalCommandMapper.GetByType(command.GetType());
-        var queuedCommand = new QueuedInternalCommand(command.Id, commandMetadata.CommandName, data, _systemDateTimeProvider.Now());
+        var queuedCommand = new QueuedInternalCommand(command.Id, commandMetadata.CommandName, data, _clock.GetCurrentInstant());
         await _context.QueuedInternalCommands.AddAsync(queuedCommand).ConfigureAwait(false);
     }
 }

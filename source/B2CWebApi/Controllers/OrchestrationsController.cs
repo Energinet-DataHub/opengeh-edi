@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.EDI.AuditLog;
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -53,7 +54,7 @@ public class OrchestrationsController(
     [Authorize(Roles = CalculationManageRole)]
     public async Task<IActionResult> IndexAsync(DateTime? from)
     {
-        await _auditLogger.LogAsync(
+        await _auditLogger.LogWithCommitAsync(
                 AuditLogId.New(),
                 AuditLogActivity.OrchestrationsSearch,
                 HttpContext.Request.GetDisplayUrl(),
@@ -97,7 +98,7 @@ public class OrchestrationsController(
     [Authorize(Roles = CalculationManageRole)]
     public async Task<IActionResult> IndexAsync(string id)
     {
-        await _auditLogger.LogAsync(
+        await _auditLogger.LogWithCommitAsync(
                 AuditLogId.New(),
                 AuditLogActivity.OrchestrationsGet,
                 HttpContext.Request.GetDisplayUrl(),
@@ -125,7 +126,7 @@ public class OrchestrationsController(
     [Authorize(Roles = CalculationManageRole)]
     public async Task<IActionResult> TerminateAsync(string id, string reason)
     {
-        await _auditLogger.LogAsync(
+        await _auditLogger.LogWithCommitAsync(
                 AuditLogId.New(),
                 AuditLogActivity.OrchestrationsTerminate,
                 HttpContext.Request.GetDisplayUrl(),
@@ -166,7 +167,7 @@ public class OrchestrationsController(
         if (user.MarketRole != "DataHubAdministrator")
             throw new UnauthorizedAccessException($"User market role ({user.MarketRole}) is invalid for this action");
 
-        if (user.Roles.Contains(CalculationManageRole))
+        if (!user.Roles.Contains(CalculationManageRole))
             throw new UnauthorizedAccessException($"User roles ({string.Join(", ", user.Roles)}) are invalid for this action");
     }
 }

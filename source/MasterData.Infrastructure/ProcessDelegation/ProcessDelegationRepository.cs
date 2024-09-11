@@ -12,13 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -29,12 +23,12 @@ namespace Energinet.DataHub.EDI.MasterData.Infrastructure.ProcessDelegation;
 public class ProcessDelegationRepository : IProcessDelegationRepository
 {
     private readonly MasterDataContext _masterDataContext;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IClock _clock;
 
-    public ProcessDelegationRepository(MasterDataContext masterDataContext, ISystemDateTimeProvider systemDateTimeProvider)
+    public ProcessDelegationRepository(MasterDataContext masterDataContext, IClock clock)
     {
         _masterDataContext = masterDataContext;
-        _systemDateTimeProvider = systemDateTimeProvider;
+        _clock = clock;
     }
 
     public void Create(Domain.ProcessDelegations.ProcessDelegation processDelegation, CancellationToken cancellationToken)
@@ -49,7 +43,7 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         ProcessType processType,
         CancellationToken cancellationToken)
     {
-        var now = _systemDateTimeProvider.Now();
+        var now = _clock.GetCurrentInstant();
 
         var query = GetBaseDelegationQuery(
             now,
@@ -66,10 +60,7 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         if (latestDelegation == null)
             return null;
 
-        if (latestDelegation.StopsAt <= now)
-            return null;
-
-        return latestDelegation;
+        return latestDelegation.StopsAt <= now ? null : latestDelegation;
     }
 
     public async Task<IReadOnlyCollection<Domain.ProcessDelegations.ProcessDelegation>> GetProcessesDelegatedToAsync(
@@ -79,7 +70,7 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         ProcessType processType,
         CancellationToken cancellationToken)
     {
-        var now = _systemDateTimeProvider.Now();
+        var now = _clock.GetCurrentInstant();
 
         var query = GetBaseDelegationQuery(
             now,
@@ -113,8 +104,10 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         Actor? delegatedTo,
         ProcessType processType)
     {
-        if (delegatedBy == null && delegatedTo == null) throw new ArgumentException("At least one of the delegatedBy or delegatedTo must be set");
-        if (delegatedBy != null && delegatedTo != null) throw new ArgumentException("Only one of the delegatedBy or delegatedTo must be set");
+        if (delegatedBy == null && delegatedTo == null)
+            throw new ArgumentException("At least one of the delegatedBy or delegatedTo must be set");
+        if (delegatedBy != null && delegatedTo != null)
+            throw new ArgumentException("Only one of the delegatedBy or delegatedTo must be set");
 
         // The latest delegation can cover the period from the start date to the end date.
         // If a delegation relationship has been cancelled the EndsAt is set to StartsAt.

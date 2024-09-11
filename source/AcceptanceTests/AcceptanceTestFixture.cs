@@ -14,6 +14,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration; // DO NOT REMOVE THIS! use in debug mode
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
@@ -104,8 +105,15 @@ public class AcceptanceTestFixture : IAsyncLifetime
         MarketParticipantUri = new Uri(root.GetValue<string>("MARKET_PARTICIPANT_URI") ?? "https://app-webapi-markpart-u-001.azurewebsites.net");
         _b2cUsername = root.GetValue<string>("B2C_USERNAME") ?? throw new InvalidOperationException("B2C_USERNAME is not set in configuration");
         _b2cPassword = root.GetValue<string>("B2C_PASSWORD") ?? throw new InvalidOperationException("B2C_PASSWORD is not set in configuration");
-        EventPublisher = new IntegrationEventPublisher(serviceBusConnectionString, topicName, dbConnectionString);
-        EdiInboxClient = new EdiInboxClient(ediInboxQueueName, serviceBusConnectionString);
+
+        ServiceBusClient = new ServiceBusClient(
+            serviceBusConnectionString,
+            new ServiceBusClientOptions()
+            {
+                TransportType = ServiceBusTransportType.AmqpWebSockets, // Firewall is not open for AMQP and Therefore, needs to go over WebSockets.
+            });
+        EventPublisher = new IntegrationEventPublisher(ServiceBusClient, topicName, dbConnectionString);
+        EdiInboxClient = new EdiInboxClient(ServiceBusClient, ediInboxQueueName);
         B2CAuthorizedHttpClient = new AsyncLazy<HttpClient>(CreateB2CAuthorizedHttpClientAsync);
 
         // AzureWebJobsStorage connection string name/value is set implicitly from terraform as an application setting in Azure,
@@ -153,6 +161,8 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
     internal AsyncLazy<HttpClient> B2BSystemOperatorAuthorizedHttpClient { get; }
 
+    private ServiceBusClient ServiceBusClient { get; }
+
     public Task InitializeAsync()
     {
         DurableClient = DurableTaskManager.CreateClient("Edi01"); // Must be the same task hub name as used in B2BApi
@@ -162,7 +172,10 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
+        // Close subclients before client (ServiceBusClient)
         await EventPublisher.DisposeAsync().ConfigureAwait(false);
+        await EdiInboxClient.DisposeAsync().ConfigureAwait(false);
+        await ServiceBusClient.DisposeAsync().ConfigureAwait(false);
 
         if (B2CAuthorizedHttpClient.IsStarted && !B2CAuthorizedHttpClient.Task.IsFaulted)
             (await B2CAuthorizedHttpClient).Dispose();

@@ -17,9 +17,7 @@ using Azure.Storage.Blobs;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
-using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Microsoft.Extensions.Configuration;
 using Xunit;
 using HttpClientFactory = Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks.HttpClientFactory;
 
@@ -33,35 +31,26 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
     {
         IntegrationTestConfiguration = new IntegrationTestConfiguration();
 
+        DatabaseManager = new EdiDatabaseManager();
+
         DatabricksSchemaManager = new DatabricksSchemaManager(
             new HttpClientFactory(),
             databricksSettings: IntegrationTestConfiguration.DatabricksSettings,
             schemaPrefix: "edi_integration_tests");
     }
 
-    public static string DatabaseConnectionString
+    public string DatabaseConnectionString
     {
         get
         {
-            var connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;Initial Catalog=B2BTransactions;Integrated Security=True;Connection Timeout=60";
-
-            var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.local.json", optional: true)
-                .Build();
-
-            var connectionStringFromConfig = configuration.GetConnectionString("Default");
-            if (!string.IsNullOrEmpty(connectionStringFromConfig))
-                connectionString = connectionStringFromConfig;
-
-            var environmentVariableConnectionString = Environment.GetEnvironmentVariable("B2B_MESSAGING_CONNECTION_STRING");
-            if (!string.IsNullOrWhiteSpace(environmentVariableConnectionString))
-            {
-                connectionString = environmentVariableConnectionString;
-            }
-
-            return connectionString;
+            var dbConnectionString = DatabaseManager.ConnectionString;
+            if (!dbConnectionString.Contains("Trust")) // Trust Server Certificate might be required for some
+                dbConnectionString = $"{dbConnectionString};Trust Server Certificate=True;";
+            return dbConnectionString;
         }
     }
+
+    public EdiDatabaseManager DatabaseManager { get; set; }
 
     public AzuriteManager AzuriteManager { get; } = new(true);
 
@@ -69,15 +58,12 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
 
     public DatabricksSchemaManager DatabricksSchemaManager { get; }
 
-    public static void CleanupDatabase()
+    public void CleanupDatabase()
     {
         var cleanupStatement =
-            $"DELETE FROM [dbo].[MoveInTransactions] " +
-            $"DELETE FROM [dbo].[UpdateCustomerMasterDataTransactions] " +
             $"DELETE FROM [dbo].[MessageRegistry] " +
             $"DELETE FROM [dbo].[TransactionRegistry]" +
             $"DELETE FROM [dbo].[OutgoingMessages] " +
-            $"DELETE FROM [dbo].[ReasonTranslations] " +
             $"DELETE FROM [dbo].[QueuedInternalCommands] " +
             $"DELETE FROM [dbo].[MarketEvaluationPoints]" +
             $"DELETE FROM [dbo].[Actor]" +
@@ -91,7 +77,6 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
             $"DELETE FROM [dbo].[ReceivedInboxEvents]" +
             $"DELETE FROM [dbo].[MessageRegistry]" +
             $"DELETE FROM [dbo].[TransactionRegistry]" +
-            $"DELETE FROM [dbo].[Actor]" +
             $"DELETE FROM [dbo].[GridAreaOwner]" +
             $"DELETE FROM [dbo].[ActorCertificate]" +
             $"DELETE FROM [dbo].[WholesaleServicesProcessChargeTypes]" +
@@ -99,7 +84,7 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
             $"DELETE FROM [dbo].[WholesaleServicesProcesses]" +
             $"DELETE FROM [dbo].[ProcessDelegation]";
 
-        using var connection = new SqlConnection(DatabaseConnectionString);
+        using var connection = new SqlConnection(DatabaseManager.ConnectionString);
         connection.Open();
 
         using (var command = new SqlCommand(cleanupStatement, connection))
@@ -110,21 +95,17 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
         connection.Close();
     }
 
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
-        CreateSchema();
-        CleanupDatabase();
-
+        await DatabaseManager.CreateDatabaseAsync();
         AzuriteManager.StartAzurite();
         CleanupFileStorage();
-
-        return Task.CompletedTask;
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
         Dispose();
-        return Task.CompletedTask;
+        await Task.CompletedTask;
     }
 
     public void CleanupFileStorage(bool disposing = false)
@@ -187,19 +168,12 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
 
         if (disposing)
         {
-            CleanupDatabase();
             CleanupFileStorage(true);
+            DatabaseManager.DeleteDatabase();
             AzuriteManager.Dispose();
         }
 
         _disposed = true;
-    }
-
-    private static void CreateSchema()
-    {
-        var upgradeResult = DbUpgradeRunner.RunDbUpgrade(DatabaseConnectionString);
-        if (!upgradeResult.Successful)
-            throw new InvalidOperationException("Database upgrade failed", upgradeResult.Error);
     }
 
     private void CreateRequiredContainers()

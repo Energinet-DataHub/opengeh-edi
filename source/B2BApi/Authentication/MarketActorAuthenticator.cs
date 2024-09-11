@@ -12,12 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
@@ -48,10 +43,10 @@ public class MarketActorAuthenticator : IMarketActorAuthenticator
         var rolesFromClaims = GetClaimValuesFrom(claimsPrincipal, ClaimsMap.Roles);
         var role = ParseRole(rolesFromClaims);
 
-        var userIdFromAzp = GetClaimValueFrom(claimsPrincipal, ClaimsMap.UserId);
-        _logger.LogDebug("azp claim value: {Azp}", userIdFromAzp ?? "null");
-        var actorNumber = !string.IsNullOrEmpty(userIdFromAzp)
-            ? await _masterDataClient.GetActorNumberByExternalIdAsync(userIdFromAzp, cancellationToken)
+        var actorIdFromAzp = GetClaimValueFrom(claimsPrincipal, ClaimsMap.ActorId);
+        _logger.LogDebug("azp claim value: {Azp}", actorIdFromAzp ?? "null");
+        var actorNumber = !string.IsNullOrEmpty(actorIdFromAzp)
+            ? await _masterDataClient.GetActorNumberByExternalIdAsync(actorIdFromAzp, cancellationToken)
                 .ConfigureAwait(false)
             : null;
 

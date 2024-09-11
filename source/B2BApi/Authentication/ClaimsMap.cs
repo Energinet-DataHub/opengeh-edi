@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
@@ -32,7 +30,7 @@ public static class ClaimsMap
         { "delegated", ActorRole.Delegated },
     };
 
-    public static string UserId => "azp";
+    public static string ActorId => "azp";
 
     public static string Roles => "roles";
 

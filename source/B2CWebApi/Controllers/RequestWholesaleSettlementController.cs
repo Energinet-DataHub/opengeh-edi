@@ -15,6 +15,7 @@
 using System.Text;
 using Energinet.DataHub.Core.App.Common.Users;
 using Energinet.DataHub.EDI.AuditLog;
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
@@ -37,7 +38,7 @@ public class RequestWholesaleSettlementController : ControllerBase
     private readonly DateTimeZone _dateTimeZone;
     private readonly IIncomingMessageClient _incomingMessageClient;
     private readonly ISerializer _serializer;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IClock _clock;
     private readonly IAuditLogger _auditLogger;
 
     public RequestWholesaleSettlementController(
@@ -45,14 +46,14 @@ public class RequestWholesaleSettlementController : ControllerBase
         DateTimeZone dateTimeZone,
         IIncomingMessageClient incomingMessageClient,
         ISerializer serializer,
-        ISystemDateTimeProvider systemDateTimeProvider,
+        IClock clock,
         IAuditLogger auditLogger)
     {
         _userContext = userContext;
         _dateTimeZone = dateTimeZone;
         _incomingMessageClient = incomingMessageClient;
         _serializer = serializer;
-        _systemDateTimeProvider = systemDateTimeProvider;
+        _clock = clock;
         _auditLogger = auditLogger;
     }
 
@@ -62,13 +63,13 @@ public class RequestWholesaleSettlementController : ControllerBase
         RequestWholesaleSettlementMarketRequest request,
         CancellationToken cancellationToken)
     {
-        await _auditLogger.LogAsync(
+        await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
                 activity: AuditLogActivity.RequestWholesaleResults,
                 activityOrigin: HttpContext.Request.GetDisplayUrl(),
                 activityPayload: request,
-                affectedEntityType: AuditLogEntityType.RequestWholesaleServicesProcess,
-                affectedEntityKey: string.Empty)
+                affectedEntityType: AuditLogEntityType.RequestWholesaleServices,
+                affectedEntityKey: null)
             .ConfigureAwait(false);
 
         var currentUser = _userContext.CurrentUser;
@@ -79,7 +80,7 @@ public class RequestWholesaleSettlementController : ControllerBase
                 currentUser.ActorNumber,
                 currentUser.MarketRole,
                 _dateTimeZone,
-                _systemDateTimeProvider.Now());
+                _clock.GetCurrentInstant());
 
         var responseMessage = await _incomingMessageClient.ReceiveIncomingMarketMessageAsync(
                 GenerateStreamFromString(_serializer.Serialize(message)),

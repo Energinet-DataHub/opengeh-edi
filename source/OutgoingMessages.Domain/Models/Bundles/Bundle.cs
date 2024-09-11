@@ -46,6 +46,7 @@ public sealed class Bundle
         DocumentTypeInBundle = documentTypeInBundle;
         Created = created;
         RelatedToMessageId = relatedToMessageId;
+        MessageCategory = DocumentTypeInBundle.Category;
     }
 
     private Bundle()
@@ -76,6 +77,8 @@ public sealed class Bundle
 
     public Instant? ClosedAt { get; private set; }
 
+    public MessageCategory MessageCategory { get; set; }
+
     public void PeekBundle()
     {
         // If the bundle is closed, because it was full. Then we should not update it at the peeked time.
@@ -93,9 +96,20 @@ public sealed class Bundle
         CloseBundleIfFull(outgoingMessage.CreatedAt);
     }
 
-    internal void Dequeue()
+    public bool TryDequeue()
     {
-        DequeuedAt = SystemClock.Instance.GetCurrentInstant();
+        if (ClosedAt is not null && PeekedAt is not null)
+        {
+            DequeuedAt = SystemClock.Instance.GetCurrentInstant();
+            return true;
+        }
+
+        return false;
+    }
+
+    public void Close()
+    {
+        ClosedAt = SystemClock.Instance.GetCurrentInstant();
     }
 
     private void CloseBundleIfFull(Instant messageCreatedAt)

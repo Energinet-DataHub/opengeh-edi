@@ -35,7 +35,7 @@ public interface IOutgoingMessageRepository
     Task<OutgoingMessageBundle> GetAsync(PeekResult peekResult);
 
     /// <summary>
-    /// Get messsage in the database for the designated receiver and the external id.
+    /// Get message in the database for the designated receiver and the external id.
     /// </summary>
     Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId);
 

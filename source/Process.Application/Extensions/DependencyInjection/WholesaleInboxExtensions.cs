@@ -12,18 +12,65 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure.Identity;
+using Azure.Messaging.ServiceBus;
+using BuildingBlocks.Application.Extensions.Options;
+using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
 using Energinet.DataHub.EDI.Process.Domain.Wholesale;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
+using Microsoft.Extensions.Azure;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
 
 public static class WholesaleInboxExtensions
 {
-    public static IServiceCollection AddWholesaleInbox(this IServiceCollection services)
+    public static IServiceCollection AddWholesaleInbox(this IServiceCollection services, IConfiguration configuration)
     {
-       services.AddTransient<IWholesaleInbox, WholesaleInbox>();
+        services.AddScoped<IWholesaleInboxClient, WholesaleInboxClient>();
 
-       return services;
+        services
+            .AddOptions<WholesaleInboxQueueOptions>()
+            .BindConfiguration(WholesaleInboxQueueOptions.SectionName)
+            .ValidateDataAnnotations();
+
+        var wholesaleInboxQueueOptions =
+            configuration
+                .GetRequiredSection(WholesaleInboxQueueOptions.SectionName)
+                .Get<WholesaleInboxQueueOptions>()
+            ?? throw new InvalidOperationException("Missing Wholesale Inbox configuration.");
+
+        services.AddAzureClients(builder =>
+        {
+            builder
+                .AddClient<ServiceBusSender, ServiceBusClientOptions>((_, _, provider) =>
+                    provider
+                        .GetRequiredService<ServiceBusClient>()
+                        .CreateSender(wholesaleInboxQueueOptions.QueueName))
+                .WithName(wholesaleInboxQueueOptions.QueueName);
+        });
+
+        // Health checks
+        var defaultAzureCredential = new DefaultAzureCredential();
+
+        services
+            .AddHealthChecks()
+            .AddAzureServiceBusQueue(
+                sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
+                sp => sp.GetRequiredService<IOptions<WholesaleInboxQueueOptions>>().Value.QueueName,
+                _ => defaultAzureCredential,
+                name: wholesaleInboxQueueOptions.QueueName)
+            .AddServiceBusQueueDeadLetter(
+                sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
+                sp => sp.GetRequiredService<IOptions<WholesaleInboxQueueOptions>>().Value.QueueName,
+                _ => defaultAzureCredential,
+                "Dead-letter (wholesale inbox)",
+                [HealthChecksConstants.StatusHealthCheckTag]);
+
+        return services;
     }
 }

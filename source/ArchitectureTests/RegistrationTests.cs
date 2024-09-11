@@ -20,21 +20,30 @@ using Energinet.DataHub.Core.App.Common.Extensions.Options;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.EDI.B2BApi;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.DataAccess.UnitOfWork;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.WholesaleSettlementMessageParsers;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyAggregatedMeasureData;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.NotifyWholesaleServices;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData;
+using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -49,17 +58,15 @@ public class RegistrationTests
     public RegistrationTests()
     {
         Environment.SetEnvironmentVariable($"{IncomingMessagesQueueOptions.SectionName}__{nameof(IncomingMessagesQueueOptions.QueueName)}", "FakeQueueNameIncoming");
-        Environment.SetEnvironmentVariable($"{WholesaleInboxOptions.SectionName}__{nameof(WholesaleInboxOptions.QueueName)}", "FakeQueueNameWholesale");
-        Environment.SetEnvironmentVariable($"{EdiInboxOptions.SectionName}__{nameof(EdiInboxOptions.QueueName)}", "FakeQueueNameEdi");
+        Environment.SetEnvironmentVariable($"{WholesaleInboxQueueOptions.SectionName}__{nameof(WholesaleInboxQueueOptions.QueueName)}", "FakeQueueNameWholesale");
+        Environment.SetEnvironmentVariable($"{EdiInboxQueueOptions.SectionName}__{nameof(EdiInboxQueueOptions.QueueName)}", "FakeQueueNameEdi");
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", TestEnvironment.CreateConnectionString());
         Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", TestEnvironment.CreateDevelopmentStorageConnectionString());
 
         // The following declaration slows down the test execution, since creating a new Uri is a heavy operation
         Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_URL", TestEnvironment.CreateFakeStorageUrl());
 
-        Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ManageConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
-        Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
-        Environment.SetEnvironmentVariable($"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.SendConnectionString)}", TestEnvironment.CreateFakeServiceBusConnectionString());
+        Environment.SetEnvironmentVariable($"{ServiceBusNamespaceOptions.SectionName}__{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}", TestEnvironment.CreateFakeServiceBusFullyQualifiedNamespace());
 
         Environment.SetEnvironmentVariable(nameof(DatabricksSqlStatementOptions.WorkspaceUrl), "https://adb-1000.azuredatabricks.net/");
         Environment.SetEnvironmentVariable(nameof(DatabricksSqlStatementOptions.WorkspaceToken), "FakeToken");
@@ -197,9 +204,7 @@ public class RegistrationTests
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    [$"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ManageConnectionString)}"] = "Fake",
-                    [$"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.ListenConnectionString)}"] = "Fake",
-                    [$"{ServiceBusOptions.SectionName}__{nameof(ServiceBusOptions.SendConnectionString)}"] = "Fake",
+                    [$"{ServiceBusNamespaceOptions.SectionName}__{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
 
                     [$"{UserAuthenticationOptions.SectionName}:{nameof(UserAuthenticationOptions.MitIdExternalMetadataAddress)}"] = "NotEmpty",
                     [$"{UserAuthenticationOptions.SectionName}:{nameof(UserAuthenticationOptions.ExternalMetadataAddress)}"] = "NotEmpty",
@@ -245,6 +250,41 @@ public class RegistrationTests
                     _host.Services.GetService(middleware).Should().NotBeNull());
     }
 
+    /// <summary>
+    /// The <see cref="UnitOfWork"/> uses dependency injection to get a list of generic DbContexts. Those
+    /// must be the same references as the specific DbContexts that are registered in the DI container and used in
+    /// repositories etc., which this test verifies.
+    /// </summary>
+    [Fact]
+    public void Generic_and_specific_db_contexts_have_same_references()
+    {
+        using var scope = _host.Services.CreateScope();
+
+        DbContext[] specificContexts =
+        [
+            scope.ServiceProvider.GetRequiredService<ActorMessageQueueContext>(),
+            scope.ServiceProvider.GetRequiredService<IncomingMessagesContext>(),
+            scope.ServiceProvider.GetRequiredService<ProcessContext>(),
+            scope.ServiceProvider.GetRequiredService<MasterDataContext>(),
+            scope.ServiceProvider.GetRequiredService<OutboxContext>(),
+        ];
+
+        var genericDbContexts = scope.ServiceProvider.GetServices<IEdiDbContext>()
+            .Cast<DbContext>()
+            .ToList();
+
+        using var assertionScope = new AssertionScope();
+        genericDbContexts.Should().HaveSameCount(specificContexts);
+
+        foreach (var genericDbContext in genericDbContexts)
+        {
+            var specificDbContext = specificContexts.SingleOrDefault(specific => specific.GetType() == genericDbContext.GetType());
+            specificDbContext.Should().NotBeNull();
+            var dbContextIsSameReference = ReferenceEquals(specificDbContext, genericDbContext);
+            dbContextIsSameReference.Should().BeTrue($"expected {specificDbContext?.GetType().Name} to be the same reference as {genericDbContext.GetType().Name}");
+        }
+    }
+
     private static IEnumerable<object[]> ResolveTypes(Type targetType, Assembly[] assemblies)
     {
         var allTypes = ReflectionHelper.FindAllTypesInAssemblies();
@@ -267,10 +307,10 @@ public class RegistrationTests
     private sealed class TestEnvironment : RuntimeEnvironment
     {
         public override string? ServiceBus__SendConnectionString =>
-            CreateFakeServiceBusConnectionString();
+            CreateFakeServiceBusFullyQualifiedNamespace();
 
         public override string? REQUEST_RESPONSE_LOGGING_CONNECTION_STRING =>
-            CreateFakeServiceBusConnectionString();
+            CreateFakeServiceBusFullyQualifiedNamespace();
 
         public override string? DB_CONNECTION_STRING =>
             CreateConnectionString();
@@ -279,12 +319,10 @@ public class RegistrationTests
 
         public override string AZURE_FUNCTIONS_ENVIRONMENT => "Development";
 
-        public static string CreateFakeServiceBusConnectionString()
+        public static string CreateFakeServiceBusFullyQualifiedNamespace()
         {
             return new StringBuilder()
-                .Append(CultureInfo.InvariantCulture, $"Endpoint=sb://sb-{Guid.NewGuid():N}.servicebus.windows.net/;")
-                .Append("SharedAccessKeyName=send;")
-                .Append(CultureInfo.InvariantCulture, $"SharedAccessKey={Guid.NewGuid():N}")
+                .Append(CultureInfo.InvariantCulture, $"sb://sb-{Guid.NewGuid():N}.servicebus.windows.net/")
                 .ToString();
         }
 

@@ -25,16 +25,13 @@ using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
@@ -46,7 +43,6 @@ using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Dequeue;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
@@ -55,13 +51,13 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
-using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Google.Protobuf;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -117,7 +113,6 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 ///
 /// </summary>
 [Collection("IntegrationTest")]
-[SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "This is a test class")]
 [SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Test class")]
 public class BehavioursTestBase : IDisposable
 {
@@ -125,7 +120,7 @@ public class BehavioursTestBase : IDisposable
     private readonly ServiceBusSenderFactoryStub _serviceBusSenderFactoryStub;
     private readonly ProcessContext _processContext;
     private readonly IncomingMessagesContext _incomingMessagesContext;
-    private readonly SystemDateTimeProviderStub _systemDateTimeProviderStub;
+    private readonly ClockStub _clockStub;
     private readonly AuthenticatedActor _authenticatedActor;
     private readonly DateTimeZone _dateTimeZone;
     private readonly ServiceProvider _serviceProvider;
@@ -139,14 +134,15 @@ public class BehavioursTestBase : IDisposable
 
         _integrationTestFixture = integrationTestFixture;
 
-        IntegrationTestFixture.CleanupDatabase();
-        integrationTestFixture.CleanupFileStorage();
+        _integrationTestFixture.CleanupDatabase();
+        _integrationTestFixture.CleanupFileStorage();
         _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
         TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
         InboxEventNotificationHandler = new TestNotificationHandlerSpy();
-        _systemDateTimeProviderStub = new SystemDateTimeProviderStub();
-        _dateTimeZone = DateTimeZoneProviders.Tzdb["Europe/Copenhagen"];
+        _clockStub = new ClockStub();
         _serviceProvider = BuildServices(testOutputHelper);
+
+        _dateTimeZone = GetService<DateTimeZone>();
         _processContext = GetService<ProcessContext>();
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         _authenticatedActor = GetService<AuthenticatedActor>();
@@ -186,7 +182,8 @@ public class BehavioursTestBase : IDisposable
 
     protected void ClearDbContextCaches()
     {
-        if (_services == null) throw new InvalidOperationException("ServiceCollection is not yet initialized");
+        if (_services == null)
+            throw new InvalidOperationException("ServiceCollection is not yet initialized");
 
         var dbContextServices = _services
             .Where(s => s.ServiceType.IsSubclassOf(typeof(DbContext)) || s.ServiceType == typeof(DbContext))
@@ -205,7 +202,6 @@ public class BehavioursTestBase : IDisposable
 
         _processContext.Dispose();
         _incomingMessagesContext.Dispose();
-        _serviceBusSenderFactoryStub.Dispose();
         _serviceProvider.Dispose();
         _disposed = true;
     }
@@ -216,7 +212,7 @@ public class BehavioursTestBase : IDisposable
             .UpdateGridAreaOwnershipAsync(
                 new GridAreaOwnershipAssignedDto(
                     gridArea,
-                    _systemDateTimeProviderStub.Now().Minus(Duration.FromDays(100)),
+                    _clockStub.GetCurrentInstant().Minus(Duration.FromDays(100)),
                     actorNumber,
                     0),
                 CancellationToken.None);
@@ -252,12 +248,12 @@ public class BehavioursTestBase : IDisposable
 
     protected void GivenNowIs(Instant now)
     {
-        _systemDateTimeProviderStub.SetNow(now);
+        _clockStub.SetCurrentInstant(now);
     }
 
     protected Instant GetNow()
     {
-        return _systemDateTimeProviderStub.Now();
+        return _clockStub.GetCurrentInstant();
     }
 
     protected Instant CreateDateInstant(int year, int month, int day)
@@ -314,7 +310,7 @@ public class BehavioursTestBase : IDisposable
 
         sentMessages.Should().HaveCount(expectedCount);
 
-        List<(TServiceBusMessage Message, Guid ProcessId)> messages = new();
+        List<(TServiceBusMessage Message, Guid ProcessId)> messages = [];
         using var scope = new AssertionScope();
         foreach (var message in sentMessages)
         {
@@ -410,16 +406,16 @@ public class BehavioursTestBase : IDisposable
     private async Task ProcessBackgroundTasksAsync()
     {
         using var scope = _serviceProvider.CreateScope();
-        var datetimeProvider = scope.ServiceProvider.GetRequiredService<ISystemDateTimeProvider>();
+        var clock = scope.ServiceProvider.GetRequiredService<IClock>();
         await scope.ServiceProvider
             .GetRequiredService<IMediator>()
-            .Publish(new TenSecondsHasHasPassed(datetimeProvider.Now()));
+            .Publish(new TenSecondsHasHasPassed(clock.GetCurrentInstant()));
     }
 
     private ServiceProvider BuildServices(ITestOutputHelper testOutputHelper)
     {
         Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
-        Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", IntegrationTestFixture.DatabaseConnectionString);
+        Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", _integrationTestFixture.DatabaseConnectionString);
         Environment.SetEnvironmentVariable("AZURE_STORAGE_ACCOUNT_CONNECTION_STRING", _integrationTestFixture.AzuriteManager.BlobStorageConnectionString);
 
         var config = new ConfigurationBuilder()
@@ -427,11 +423,9 @@ public class BehavioursTestBase : IDisposable
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
-                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ManageConnectionString)}"] = MockServiceBusName,
-                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.ListenConnectionString)}"] = MockServiceBusName,
-                    [$"{ServiceBusOptions.SectionName}:{nameof(ServiceBusOptions.SendConnectionString)}"] = MockServiceBusName,
-                    [$"{EdiInboxOptions.SectionName}:{nameof(EdiInboxOptions.QueueName)}"] = MockServiceBusName,
-                    [$"{WholesaleInboxOptions.SectionName}:{nameof(WholesaleInboxOptions.QueueName)}"] = MockServiceBusName,
+                    [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = MockServiceBusName,
+                    [$"{EdiInboxQueueOptions.SectionName}:{nameof(EdiInboxQueueOptions.QueueName)}"] = MockServiceBusName,
+                    [$"{WholesaleInboxQueueOptions.SectionName}:{nameof(WholesaleInboxQueueOptions.QueueName)}"] = MockServiceBusName,
                     [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = MockServiceBusName,
                     ["IntegrationEvents:TopicName"] = "NotEmpty",
                     ["IntegrationEvents:SubscriptionName"] = "NotEmpty",
@@ -447,8 +441,17 @@ public class BehavioursTestBase : IDisposable
                 })
             .Build();
 
-        _services = new ServiceCollection();
+        _services = [];
         _services.AddScoped<IConfiguration>(_ => config);
+
+        _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
+            .AddIntegrationEventModule(config)
+            .AddOutgoingMessagesModule(config)
+            .AddProcessModule(config)
+            .AddArchivedMessagesModule(config)
+            .AddIncomingMessagesModule(config)
+            .AddMasterDataModule(config)
+            .AddDataAccessUnitOfWorkModule();
 
         _services.AddTransient<InboxEventsProcessor>()
             .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>>(
@@ -461,16 +464,9 @@ public class BehavioursTestBase : IDisposable
             .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
             .AddSerializer()
             .AddLogging()
-            .AddScoped<ISystemDateTimeProvider>(_ => _systemDateTimeProviderStub);
-
-        _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
-            .AddIntegrationEventModule(config)
-            .AddOutgoingMessagesModule(config)
-            .AddProcessModule(config)
-            .AddArchivedMessagesModule(config)
-            .AddIncomingMessagesModule(config)
-            .AddMasterDataModule(config)
-            .AddDataAccessUnitOfWorkModule(config);
+            // Some of the modules registers IClock.
+            // To override it we must ensure to register it after any module has been registered.
+            .AddScoped<IClock>(_ => _clockStub);
 
         _services.AddScoped<Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext>((x) =>
         {
@@ -481,7 +477,7 @@ public class BehavioursTestBase : IDisposable
 
         // Replace the services with stub implementations.
         // - Building blocks
-        _services.AddSingleton<IServiceBusSenderFactory>(_serviceBusSenderFactoryStub);
+        _services.AddSingleton<IAzureClientFactory<ServiceBusSender>>(_serviceBusSenderFactoryStub);
         _services.AddTransient<IFeatureFlagManager>(_ => new FeatureFlagManagerStub());
 
         // Add test logger

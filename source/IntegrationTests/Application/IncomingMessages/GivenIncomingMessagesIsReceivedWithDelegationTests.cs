@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.MessageBus;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -25,6 +24,7 @@ using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.Azure;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
@@ -33,23 +33,25 @@ namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
 
 public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
 {
-    private readonly SystemDateTimeProviderStub _dateTimeProvider;
+    private readonly ClockStub _clockStub;
     private readonly IIncomingMessageClient _incomingMessagesRequest;
 
     private readonly Actor _originalActor = new(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
     private readonly Actor _delegatedTo = new(ActorNumber.Create("2222222222222"), ActorRole.Delegated);
+#pragma warning disable CA2213 // Disposable fields should be disposed
     private readonly ServiceBusSenderSpy _senderSpy;
+#pragma warning restore CA2213 // Disposable fields should be disposed
     private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
     private readonly AuthenticatedActor _authenticatedActor;
 
     public GivenIncomingMessagesIsReceivedWithDelegationTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
-        _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IServiceBusSenderFactory>();
+        _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IAzureClientFactory<ServiceBusSender>>();
         _senderSpy = new ServiceBusSenderSpy("Fake");
         _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
         _incomingMessagesRequest = GetService<IIncomingMessageClient>();
-        _dateTimeProvider = (SystemDateTimeProviderStub)GetService<ISystemDateTimeProvider>();
+        _clockStub = (ClockStub)GetService<IClock>();
         _authenticatedActor = GetService<AuthenticatedActor>();
     }
 
@@ -58,7 +60,7 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
     {
         // Arrange
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
-        _dateTimeProvider.SetNow(now);
+        _clockStub.SetCurrentInstant(now);
         var gridAreaCode = "512";
         var documentFormat = DocumentFormat.Json;
         _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
@@ -122,7 +124,7 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
     {
         // Arrange
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
-        _dateTimeProvider.SetNow(now);
+        _clockStub.SetCurrentInstant(now);
         var gridAreaCode = "512";
         var documentFormat = DocumentFormat.Json;
         _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
@@ -184,7 +186,7 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
     {
         // Arrange
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
-        _dateTimeProvider.SetNow(now);
+        _clockStub.SetCurrentInstant(now);
         var gridAreaCode = "512";
         var documentFormat = DocumentFormat.Json;
         _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
@@ -237,7 +239,7 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
     {
         // Arrange
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
-        _dateTimeProvider.SetNow(now);
+        _clockStub.SetCurrentInstant(now);
         var expectedGridAreaCode = "512";
         var documentFormat = DocumentFormat.Json;
         _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
@@ -308,13 +310,6 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
             series.RequestedGridAreaCode.Should().BeNull();
             series.GridAreas.Should().Equal(expectedGridAreaCode);
         }
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        _serviceBusClientSenderFactory.Dispose();
-        _senderSpy.Dispose();
-        base.Dispose(disposing);
     }
 
     private async Task AddDelegationAsync(

@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System.Data.Common;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Data.SqlClient;
@@ -26,22 +24,22 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 public class ReceivedInboxEventsRetention : IDataRetention
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
-    private readonly ISystemDateTimeProvider _systemDateTimeProvider;
+    private readonly IClock _clock;
     private readonly ILogger<ReceivedInboxEventsRetention> _logger;
 
     public ReceivedInboxEventsRetention(
         IDatabaseConnectionFactory databaseConnectionFactory,
-        ISystemDateTimeProvider systemDateTimeProvider,
+        IClock clock,
         ILogger<ReceivedInboxEventsRetention> logger)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
-        _systemDateTimeProvider = systemDateTimeProvider;
+        _clock = clock;
         _logger = logger;
     }
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
     {
-        var monthAgo = _systemDateTimeProvider.Now().Plus(-Duration.FromDays(30));
+        var monthAgo = _clock.GetCurrentInstant().Plus(-Duration.FromDays(30));
         var amountOfOldEvents = await GetAmountOfOldEventsAsync(monthAgo, cancellationToken).ConfigureAwait(false);
         while (amountOfOldEvents > 0)
         {

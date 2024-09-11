@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Net;
-using System.Text.Json;
 using Energinet.DataHub.EDI.AuditLog;
-using Energinet.DataHub.EDI.AuditLog.AuditLogClient;
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
+using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.B2CWebApi.AppTests.Fixture;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
+using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.EntityFrameworkCore;
 using NodaTime;
-using NodaTime.Text;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -30,6 +31,10 @@ namespace Energinet.DataHub.EDI.B2CWebApi.AppTests.Tests;
 [Collection(nameof(B2CWebApiCollectionFixture))]
 public class B2CWebApiAuditLogTests : IAsyncLifetime
 {
+    private static readonly string _datahubAdministratorRole = "DataHubAdministrator";
+    private static readonly Guid _datahubAdministratorActorId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+    private static readonly string _datahubAdministratorActorNumber = "5790001330583";
+
     private readonly B2CWebApiFixture _fixture;
 
     public B2CWebApiAuditLogTests(B2CWebApiFixture fixture, ITestOutputHelper logger)
@@ -42,20 +47,20 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
     {
         return
         [
-            [B2CWebApiRequests.CreateArchivedMessageGetDocumentRequest(), "DataHubAdministrator", AuditLogActivity.ArchivedMessagesGet],
-            [B2CWebApiRequests.CreateArchivedMessageSearchRequest(), "DataHubAdministrator", AuditLogActivity.ArchivedMessagesSearch],
-            [B2CWebApiRequests.CreateOrchestrationsRequest(), "DataHubAdministrator", AuditLogActivity.OrchestrationsSearch],
-            [B2CWebApiRequests.CreateOrchestrationRequest(), "DataHubAdministrator", AuditLogActivity.OrchestrationsGet],
-            [B2CWebApiRequests.CreateOrchestrationTerminateRequest(), "DataHubAdministrator", AuditLogActivity.OrchestrationsTerminate],
+            [B2CWebApiRequests.CreateArchivedMessageGetDocumentRequest(), _datahubAdministratorRole, AuditLogActivity.ArchivedMessagesGet],
+            [B2CWebApiRequests.CreateArchivedMessageSearchRequest(), _datahubAdministratorRole, AuditLogActivity.ArchivedMessagesSearch],
+            [B2CWebApiRequests.CreateOrchestrationsRequest(), _datahubAdministratorRole, AuditLogActivity.OrchestrationsSearch],
+            [B2CWebApiRequests.CreateOrchestrationRequest(), _datahubAdministratorRole, AuditLogActivity.OrchestrationsGet],
+            [B2CWebApiRequests.CreateOrchestrationTerminateRequest(), _datahubAdministratorRole, AuditLogActivity.OrchestrationsTerminate],
             [B2CWebApiRequests.CreateRequestAggregatedMeasureDataRequest(), ActorRole.EnergySupplier.Name, AuditLogActivity.RequestEnergyResults],
             [B2CWebApiRequests.CreateRequestWholesaleSettlementRequest(), ActorRole.EnergySupplier.Name, AuditLogActivity.RequestWholesaleResults],
         ];
     }
 
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
-        _fixture.AuditLogMockServer.ResetCallLogs();
-        return Task.CompletedTask;
+        await using var context = _fixture.DatabaseManager.CreateDbContext<OutboxContext>();
+        await context.Outbox.ExecuteDeleteAsync();
     }
 
     public Task DisposeAsync()
@@ -70,14 +75,23 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
     /// </summary>
     [Theory]
     [MemberData(nameof(GetB2CWebApiRequests))]
-    public async Task B2CWebApiRequest_WhenRequestPerformed_CorrectAuditLogRequestIsSent(
+    public async Task B2CWebApiRequest_WhenRequestPerformed_CorrectAuditLogRequestAddedToOutbox(
         HttpRequestMessage request,
         string actorRole,
         AuditLogActivity expectedActivity)
     {
         // Arrange
+        var serializer = new Serializer();
+
+        // The OrchestrationsTerminate request will fail since there is no orchestration to terminate
+        var checkRequestSuccess = expectedActivity != AuditLogActivity.OrchestrationsTerminate;
+
+        var isAdministrator = actorRole == _datahubAdministratorRole;
         var expectedUserId = Guid.NewGuid();
-        var expectedActorId = Guid.NewGuid();
+        var expectedActorId = isAdministrator
+            ? _datahubAdministratorActorId
+            : Guid.NewGuid();
+
         string[] permissions =
         [
             "request-wholesale-settlement:view",
@@ -94,51 +108,43 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
                 actorId: expectedActorId.ToString(),
                 roles: permissions,
                 extraClaims: [
-                    new("actornumber", "1234567890123"),
+                    new("actornumber", isAdministrator ? _datahubAdministratorActorNumber : "1234567890123"),
                     new("marketroles", actorRole),
                 ]);
 
         // Act
-        await _fixture.WebApiClient.SendAsync(request);
+        var response = await _fixture.WebApiClient.SendAsync(request);
 
         // Assert
-        var auditLogCalls = _fixture.AuditLogMockServer.GetAuditLogIngestionCalls();
+        await using var outboxContext = _fixture.DatabaseManager.CreateDbContext<OutboxContext>();
+        var outboxMessage = outboxContext.Outbox.SingleOrDefault();
 
-        var auditLogCall = auditLogCalls.Should()
-            .ContainSingle()
-            .Subject;
-
-        AuditLogRequestBody? deserializedBody;
         using (new AssertionScope())
         {
-            // => Ensure that the audit log request was successful
-            auditLogCall.Response.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            if (checkRequestSuccess)
+            {
+                var ensureSuccess = () => response.EnsureSuccessStatusCodeWithLogAsync(_fixture.TestLogger);
+                await ensureSuccess.Should().NotThrowAsync();
+            }
 
-            // => Ensure that the audit log request contains a body
-            auditLogCall.Request.Body.Should().NotBeNull();
-
-            // => Ensure that the audit log request body can be deserialized to an instance of AuditLogRequestBody
-            var deserializeBody = () =>
-                JsonSerializer.Deserialize<AuditLogRequestBody>(auditLogCall.Request.Body ?? string.Empty, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                });
-
-            deserializedBody = deserializeBody.Should().NotThrow().Subject;
-            deserializedBody.Should().NotBeNull();
+            outboxMessage.Should().NotBeNull();
         }
 
-        deserializedBody!.LogId.Should().NotBeEmpty();
-        deserializedBody.UserId.Should().Be(expectedUserId);
-        deserializedBody.ActorId.Should().Be(expectedActorId);
-        deserializedBody.SystemId.Should().Be(Guid.Parse("688b2dca-7231-490f-a731-d7869d33fe5e")); // EDI subsystem id
-        deserializedBody.Permissions.Should().Be(expectedPermissions);
-        InstantPattern.General.Parse(deserializedBody.OccurredOn).Success.Should().BeTrue($"because {deserializedBody.OccurredOn} should be a valid Instant");
-        deserializedBody.Activity.Should().Be(expectedActivity.Identifier);
-        deserializedBody.Origin.Should().Be(request.RequestUri?.AbsoluteUri);
-        deserializedBody.Payload.Should().NotBeNull();
-        deserializedBody.AffectedEntityType.Should().NotBeNullOrWhiteSpace();
-        deserializedBody.AffectedEntityKey.Should().NotBeNull();
+        outboxMessage!.Type.Should().Be(AuditLogOutboxMessageV1.OutboxMessageType);
+        outboxMessage.ShouldProcessNow(SystemClock.Instance).Should().BeTrue();
+        var auditLogPayload = serializer.Deserialize<AuditLogOutboxMessageV1Payload>(outboxMessage.Payload);
+
+        using var assertionScope = new AssertionScope();
+        auditLogPayload!.LogId.Should().NotBeEmpty();
+        auditLogPayload.UserId.Should().Be(expectedUserId);
+        auditLogPayload.ActorId.Should().Be(expectedActorId);
+        auditLogPayload.SystemId.Should().Be(Guid.Parse("688b2dca-7231-490f-a731-d7869d33fe5e")); // EDI subsystem id
+        auditLogPayload.Permissions.Should().Be(expectedPermissions);
+        auditLogPayload.OccuredOn.Should().NotBeNull();
+        auditLogPayload.Activity.Should().Be(expectedActivity.Identifier);
+        auditLogPayload.Origin.Should().Be(request.RequestUri?.AbsoluteUri);
+        auditLogPayload.Payload.Should().NotBeNull();
+        auditLogPayload.AffectedEntityType.Should().NotBeNullOrWhiteSpace();
 
         request.Dispose();
     }

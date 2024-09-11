@@ -12,46 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime;
 using NodaTime.Text;
 using Xunit;
+using MeteringPointType = Energinet.DataHub.EDI.B2CWebApi.Models.MeteringPointType;
 
 namespace Energinet.DataHub.EDI.Tests.B2CWebApi.RequestAggregatedMeasureData;
 
 public class RequestAggregatedMeasureDataFactoryTests
 {
+    private const string SenderId = "9876543210987";
+    private const int StartDay = 10;
+    private const int EndDay = 12;
     private readonly DateTimeZone _dateTimeZone = DateTimeZoneProviders.Tzdb["Europe/Copenhagen"];
 
     [Fact]
     public void Can_create_RequestAggregatedMeasureData_with_correct_data()
     {
-        var senderId = "9876543210987";
-        var startDay = 10;
-        var endDay = 12;
-        var request = new RequestAggregatedMeasureDataMarketRequest(
-            CalculationType: CalculationType.BalanceFixing,
-            MeteringPointType: MeteringPointType.Production,
-            StartDate: $"2023-10-{startDay}T22:00:00.000Z",
-            EndDate: $"2023-10-{endDay}T21:59:59.999Z",
-            GridArea: "803",
-            EnergySupplierId: "579000000003042",
-            BalanceResponsibleId: "1234567890123");
+        var request = RequestAggregatedMeasureDataMarketRequest();
 
         var result = RequestAggregatedMeasureDataDtoFactory.Create(
             request,
-            senderId,
+            SenderId,
             MarketRole.MeteredDataResponsible.Name,
             _dateTimeZone,
             SystemClock.Instance.GetCurrentInstant());
 
         using var assertionScope = new AssertionScope();
         Assert.Equal("D04", result.BusinessReason);
-        Assert.Equal(senderId, result.SenderNumber);
+        Assert.Equal(SenderId, result.SenderNumber);
         Assert.Equal(MarketRole.MeteredDataResponsible.Code, result.SenderRoleCode);
         Assert.Equal("E74", result.MessageType);
 
@@ -62,25 +58,16 @@ public class RequestAggregatedMeasureDataFactoryTests
             Assert.Null(serie.SettlementVersion);
 
             var startDate = InstantPattern.General.Parse(serie.StartDateAndOrTimeDateTime).GetValueOrThrow();
-            Assert.Equal(startDay, startDate.Day());
+            Assert.Equal(StartDay, startDate.Day());
             var endDate = InstantPattern.General.Parse(serie.EndDateAndOrTimeDateTime!).GetValueOrThrow();
-            Assert.Equal(endDay, endDate.Day());
+            Assert.Equal(EndDay, endDate.Day());
         });
     }
 
     [Fact]
     public void Can_create_RequestAggregatedMeasureData_wrong_endData_input()
     {
-        var endDay = 12;
-        var endDataMilliseconds = 998;
-        var request = new RequestAggregatedMeasureDataMarketRequest(
-            CalculationType: CalculationType.BalanceFixing,
-            MeteringPointType: MeteringPointType.Production,
-            StartDate: $"2023-10-10T22:00:00.000Z",
-            EndDate: $"2023-10-{endDay}T21:59:59.{endDataMilliseconds}Z",
-            GridArea: "803",
-            EnergySupplierId: "579000000003042",
-            BalanceResponsibleId: "1234567890123");
+        var request = RequestAggregatedMeasureDataMarketRequest(998);
 
         var result = RequestAggregatedMeasureDataDtoFactory.Create(
             request,
@@ -90,6 +77,41 @@ public class RequestAggregatedMeasureDataFactoryTests
             SystemClock.Instance.GetCurrentInstant());
 
         var endDate = InstantPattern.General.Parse(result.Serie.First().EndDateAndOrTimeDateTime!).GetValueOrThrow();
-        Assert.Equal(endDay - 1, endDate.Day());
+        Assert.Equal(EndDay - 1, endDate.Day());
+    }
+
+    /// <summary>
+    /// This test verifies when requesting aggregated measure data as a DDM the role is switched to MDR.
+    /// Please see this file for reference: Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub.WorkaroundFlags.
+    /// </summary>
+    [Fact]
+    public void RequestingRequestAggregatedMeasureData_AsGridOperator_RequestingRoleIsChangedToMeteredDataResponsible()
+    {
+        if (!WorkaroundFlags.GridOperatorToMeteredDataResponsibleHack)
+            throw new Exception("This test is only relevant as long as GridOperatorToMeteredDataResponsibleHack is implemented.");
+
+        var request = RequestAggregatedMeasureDataMarketRequest();
+
+        var result = RequestAggregatedMeasureDataDtoFactory.Create(
+            request,
+            "9876543210987",
+            MarketRole.GridAccessProvider.Name,
+            _dateTimeZone,
+            SystemClock.Instance.GetCurrentInstant());
+
+        result.ReceiverRoleCode.Should().Be(ActorRole.MeteredDataAdministrator.Code);
+    }
+
+    private static RequestAggregatedMeasureDataMarketRequest RequestAggregatedMeasureDataMarketRequest(int milliseconds = 999)
+    {
+        var request = new RequestAggregatedMeasureDataMarketRequest(
+            CalculationType: CalculationType.BalanceFixing,
+            MeteringPointType: MeteringPointType.Production,
+            StartDate: $"2023-10-{StartDay}T22:00:00.000Z",
+            EndDate: $"2023-10-{EndDay}T21:59:59.{milliseconds}Z",
+            GridArea: "803",
+            EnergySupplierId: "579000000003042",
+            BalanceResponsibleId: "1234567890123");
+        return request;
     }
 }

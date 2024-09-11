@@ -12,13 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
@@ -66,8 +63,8 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 
         var scopedServiceCollection = new ServiceCollection();
         scopedServiceCollection.AddMasterDataModule(config);
-        scopedServiceCollection.AddScoped<ISystemDateTimeProvider>(
-            _ => new SystemProviderMock(Instant.FromUtc(2023, 11, 3, 0, 0, 0)));
+        scopedServiceCollection.AddScoped<IClock>(
+            _ => new ClockStub(Instant.FromUtc(2023, 11, 3, 0, 0, 0)));
 
         var sut = scopedServiceCollection.BuildServiceProvider().GetService<IDataRetention>()
                   ?? throw new ArgumentNullException();
@@ -107,8 +104,8 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 
         var scopedServiceCollection = new ServiceCollection();
         scopedServiceCollection.AddMasterDataModule(config);
-        scopedServiceCollection.AddScoped<ISystemDateTimeProvider>(
-            _ => new SystemProviderMock(Instant.FromUtc(2023, 11, 3, 0, 0, 0)));
+        scopedServiceCollection.AddScoped<IClock>(
+            _ => new ClockStub(Instant.FromUtc(2023, 11, 3, 0, 0, 0)));
 
         var sut = scopedServiceCollection.BuildServiceProvider().GetService<IDataRetention>()
                   ?? throw new ArgumentNullException();
@@ -161,8 +158,8 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 
         var scopedServiceCollection = new ServiceCollection();
         scopedServiceCollection.AddMasterDataModule(config);
-        scopedServiceCollection.AddScoped<ISystemDateTimeProvider>(
-            _ => new SystemProviderMock(Instant.FromUtc(2023, 11, 3, 0, 0, 0)));
+        scopedServiceCollection.AddScoped<IClock>(
+            _ => new ClockStub(Instant.FromUtc(2023, 11, 3, 0, 0, 0)));
 
         var sut = scopedServiceCollection.BuildServiceProvider().GetService<IDataRetention>()
                   ?? throw new ArgumentNullException();
@@ -185,17 +182,5 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
     {
         var gridAreaOwner = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(gridAreaCode, CancellationToken.None);
         return gridAreaOwner.ActorNumber;
-    }
-
-    private sealed class SystemProviderMock : ISystemDateTimeProvider
-    {
-        private readonly Instant _now;
-
-        public SystemProviderMock(Instant now)
-        {
-            _now = now;
-        }
-
-        public Instant Now() => _now;
     }
 }
