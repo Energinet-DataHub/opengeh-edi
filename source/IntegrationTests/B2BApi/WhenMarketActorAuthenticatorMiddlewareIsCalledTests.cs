@@ -196,7 +196,7 @@ public class WhenMarketActorAuthenticatorMiddlewareIsCalledTests : TestBase
         await CreateActorInDatabaseAsync(ActorNumber.Create("1234567891234"), externalId);
         var token = new JwtBuilder()
             .WithRole("energysupplier")
-            .WithClaim(ClaimsMap.UserId, externalId)
+            .WithClaim(ClaimsMap.ActorId, externalId)
             .CreateToken();
 
         var functionContext = _functionContextBuilder

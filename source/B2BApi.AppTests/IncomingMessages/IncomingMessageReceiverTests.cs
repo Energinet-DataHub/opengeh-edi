@@ -15,12 +15,19 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
+using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.B2BApi.IncomingMessages;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
+using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using FluentAssertions;
+using FluentAssertions.Execution;
+using Microsoft.EntityFrameworkCore;
+using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -40,11 +47,11 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
 
     private B2BApiAppFixture Fixture { get; }
 
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
         Fixture.AppHostManager.ClearHostLog();
-
-        return Task.CompletedTask;
+        await using var context = Fixture.DatabaseManager.CreateDbContext<OutboxContext>();
+        await context.Outbox.ExecuteDeleteAsync();
     }
 
     public Task DisposeAsync()
@@ -62,6 +69,9 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
         var actorNumber = ActorNumber.Create("5790000392551");
         var actorRole = ActorRole.EnergySupplier;
         var jsonDocument = await File.ReadAllTextAsync("TestData/Messages/json/RequestAggregatedMeasureData.json");
+        jsonDocument = jsonDocument
+            .Replace("{MessageId}", Guid.NewGuid().ToString())
+            .Replace("{TransactionId}", Guid.NewGuid().ToString());
 
         // The actor must exist in the database
         var externalId = Guid.NewGuid().ToString();
@@ -72,7 +82,7 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
         //  * the external id matching the actor in the database
         var b2bToken = new JwtBuilder()
             .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
-            .WithClaim(ClaimsMap.UserId, externalId)
+            .WithClaim(ClaimsMap.ActorId, externalId)
             .CreateToken();
 
         using var request = new HttpRequestMessage(HttpMethod.Post, $"api/incomingMessages/{documentTypeName}");
@@ -87,5 +97,60 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
 
         // Assert
         actualResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
+    }
+
+    [Fact]
+    public async Task Given_PersistedActor_When_CallingIncomingMessagesWithValidDocumentAndBearerToken_Then_CorrectAuditLogRequestAddedToOutbox()
+    {
+        // Arrange
+        var serializer = new Serializer();
+        var documentTypeName = IncomingDocumentType.RequestAggregatedMeasureData.Name;
+        var actorNumber = ActorNumber.Create("5790000392551");
+        var actorRole = ActorRole.EnergySupplier;
+        var jsonDocument = await File.ReadAllTextAsync("TestData/Messages/json/RequestAggregatedMeasureData.json");
+
+        // The actor must exist in the database
+        var externalId = Guid.NewGuid().ToString();
+        await Fixture.DatabaseManager.AddActorAsync(actorNumber, externalId);
+
+        // The bearer token must contain:
+        //  * the actor role matching the document content
+        //  * the external id matching the actor in the database
+        var b2bToken = new JwtBuilder()
+            .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
+            .WithClaim(ClaimsMap.ActorId, externalId)
+            .CreateToken();
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, $"api/incomingMessages/{documentTypeName}");
+        request.Content = new StringContent(
+            jsonDocument,
+            Encoding.UTF8,
+            "application/json");
+        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", b2bToken);
+
+        // Act
+        using var actualResponse = await Fixture.AppHostManager.HttpClient.SendAsync(request);
+
+        // Assert
+        actualResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
+
+        await using var outboxContext = Fixture.DatabaseManager.CreateDbContext<OutboxContext>();
+        var outboxMessage = outboxContext.Outbox.SingleOrDefault();
+        outboxMessage!.Type.Should().Be(AuditLogOutboxMessageV1.OutboxMessageType);
+        outboxMessage.ShouldProcessNow(SystemClock.Instance).Should().BeTrue();
+        var auditLogPayload = serializer.Deserialize<AuditLogOutboxMessageV1Payload>(outboxMessage.Payload);
+
+        using var assertionScope = new AssertionScope();
+        auditLogPayload.LogId.Should().NotBeEmpty();
+        auditLogPayload.UserId.Should().Be(Guid.Empty);
+        auditLogPayload.ActorId.Should().Be(Guid.Empty);
+        //auditLogPayload.ActorNumber.Should().Be(actorNumber);
+        auditLogPayload.SystemId.Should().Be(Guid.Parse("688b2dca-7231-490f-a731-d7869d33fe5e")); // EDI subsystem id
+        auditLogPayload.Permissions.Should().Be(actorRole.Name);
+        auditLogPayload.OccuredOn.Should().NotBeNull();
+        auditLogPayload.Activity.Should().Be(AuditLogActivity.RequestCalculationResults.Identifier);
+        auditLogPayload.Origin.Should().Be(request.RequestUri?.AbsoluteUri);
+        auditLogPayload.Payload.Should().NotBeNull();
+        auditLogPayload.AffectedEntityType.Should().NotBeNullOrWhiteSpace();
     }
 }
