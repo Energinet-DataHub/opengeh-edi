@@ -68,7 +68,7 @@ public class RequestWholesaleSettlementController : ControllerBase
                 activity: AuditLogActivity.RequestWholesaleResults,
                 activityOrigin: HttpContext.Request.GetDisplayUrl(),
                 activityPayload: request,
-                affectedEntityType: AuditLogEntityType.RequestWholesaleServicesProcess,
+                affectedEntityType: AuditLogEntityType.RequestWholesaleServices,
                 affectedEntityKey: null)
             .ConfigureAwait(false);
 

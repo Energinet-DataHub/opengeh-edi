@@ -110,22 +110,14 @@ public class IncomingMessageReceiver
 
         var entityTypeMapping = new Dictionary<IncomingDocumentType, AuditLogEntityType>
         {
-            { IncomingDocumentType.RequestAggregatedMeasureData, AuditLogEntityType.RequestAggregatedMeasureDataProcess },
-            { IncomingDocumentType.B2CRequestAggregatedMeasureData, AuditLogEntityType.RequestAggregatedMeasureDataProcess },
-            { IncomingDocumentType.RequestWholesaleSettlement, AuditLogEntityType.RequestWholesaleServicesProcess },
-            { IncomingDocumentType.B2CRequestWholesaleSettlement, AuditLogEntityType.RequestWholesaleServicesProcess },
+            { IncomingDocumentType.RequestAggregatedMeasureData, AuditLogEntityType.RequestAggregatedMeasureData },
+            { IncomingDocumentType.B2CRequestAggregatedMeasureData, AuditLogEntityType.RequestAggregatedMeasureData },
+            { IncomingDocumentType.RequestWholesaleSettlement, AuditLogEntityType.RequestWholesaleServices },
+            { IncomingDocumentType.B2CRequestWholesaleSettlement, AuditLogEntityType.RequestWholesaleServices },
         };
 
         entityTypeMapping.TryGetValue(incomingDocumentType, out var affectedEntityType);
         return affectedEntityType;
-    }
-
-    private static AuditLogActivity GetAffectedEntityType(AuditLogEntityType? affectedEntityType)
-    {
-        var auditLogActivity = affectedEntityType is null
-            ? AuditLogActivity.RequestInvalidCalculationTypeResults
-            : AuditLogActivity.RequestCalculationResults;
-        return auditLogActivity;
     }
 
     private async Task AuditLogAsync(
@@ -146,13 +138,12 @@ public class IncomingMessageReceiver
             affectedEntityType = null;
         }
 
-        var auditLogActivity = GetAffectedEntityType(affectedEntityType);
         var incomingMessage = await new StreamReader(incomingMarketMessageStream.Stream).ReadToEndAsync(cancellationToken).ConfigureAwait(false);
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
-                activity: auditLogActivity,
+                activity: AuditLogActivity.RequestCalculationResults,
                 activityOrigin: request.Url.ToString(),
-                activityPayload: incomingMessage,
+                activityPayload: (incomingDocumentTypeName, incomingMessage),
                 affectedEntityType: affectedEntityType,
                 affectedEntityKey: null)
             .ConfigureAwait(false);

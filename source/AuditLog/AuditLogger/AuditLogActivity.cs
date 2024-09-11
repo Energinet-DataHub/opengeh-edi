@@ -21,7 +21,6 @@ public record AuditLogActivity(string Identifier)
 {
     public static readonly AuditLogActivity RequestEnergyResults = new("RequestEnergyResults");
     public static readonly AuditLogActivity RequestWholesaleResults = new("RequestWholesaleResults");
-    public static readonly AuditLogActivity RequestInvalidCalculationTypeResults = new("RequestInvalidCalculationTypeResults");
     public static readonly AuditLogActivity RequestCalculationResults = new("RequestCalculationResults");
 
     public static readonly AuditLogActivity ArchivedMessagesSearch = new("ArchivedMessagesSearch");

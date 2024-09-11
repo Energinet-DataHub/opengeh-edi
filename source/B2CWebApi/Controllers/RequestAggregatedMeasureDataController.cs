@@ -66,7 +66,7 @@ public class RequestAggregatedMeasureDataController : ControllerBase
                 activity: AuditLogActivity.RequestEnergyResults,
                 activityOrigin: HttpContext.Request.GetDisplayUrl(),
                 activityPayload: request,
-                affectedEntityType: AuditLogEntityType.RequestAggregatedMeasureDataProcess,
+                affectedEntityType: AuditLogEntityType.RequestAggregatedMeasureData,
                 affectedEntityKey: null)
             .ConfigureAwait(false);
 
