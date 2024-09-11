@@ -32,12 +32,12 @@ public record AuditLogEntityType(string Identifier)
     /// <summary>
     /// Used when creating a new energy result request process.
     /// </summary>
-    public static readonly AuditLogEntityType RequestAggregatedMeasureDataProcess = new("RequestAggregatedMeasureDataProcess");
+    public static readonly AuditLogEntityType RequestAggregatedMeasureData = new("RequestAggregatedMeasureData");
 
     /// <summary>
     /// Used when creating a new wholesale services request process.
     /// </summary>
-    public static readonly AuditLogEntityType RequestWholesaleServicesProcess = new("RequestWholesaleServicesProcess");
+    public static readonly AuditLogEntityType RequestWholesaleServices = new("RequestWholesaleServices");
 
     /// <summary>
     /// Used when searching for orchestrations or getting status of a specific orchestration.

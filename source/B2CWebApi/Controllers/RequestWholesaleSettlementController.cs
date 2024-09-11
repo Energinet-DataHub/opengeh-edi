@@ -68,8 +68,8 @@ public class RequestWholesaleSettlementController : ControllerBase
                 activity: AuditLogActivity.RequestWholesaleResults,
                 activityOrigin: HttpContext.Request.GetDisplayUrl(),
                 activityPayload: request,
-                affectedEntityType: AuditLogEntityType.RequestWholesaleServicesProcess,
-                affectedEntityKey: string.Empty)
+                affectedEntityType: AuditLogEntityType.RequestWholesaleServices,
+                affectedEntityKey: null)
             .ConfigureAwait(false);
 
         var currentUser = _userContext.CurrentUser;

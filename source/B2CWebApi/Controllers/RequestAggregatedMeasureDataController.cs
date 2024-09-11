@@ -66,8 +66,8 @@ public class RequestAggregatedMeasureDataController : ControllerBase
                 activity: AuditLogActivity.RequestEnergyResults,
                 activityOrigin: HttpContext.Request.GetDisplayUrl(),
                 activityPayload: request,
-                affectedEntityType: AuditLogEntityType.RequestAggregatedMeasureDataProcess,
-                affectedEntityKey: string.Empty)
+                affectedEntityType: AuditLogEntityType.RequestAggregatedMeasureData,
+                affectedEntityKey: null)
             .ConfigureAwait(false);
 
         var currentUser = _userContext.CurrentUser;
