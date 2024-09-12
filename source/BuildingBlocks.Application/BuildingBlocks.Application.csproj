@@ -12,7 +12,7 @@
       <PackageReference Include="AspNetCore.HealthChecks.AzureStorage" Version="7.0.0" />
       <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.1" />
       <PackageReference Include="Energinet.DataHub.Core.App.Common" Version="13.1.0" />
-        <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="6.0.0-alpha-141" />
+        <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="6.0.0" />
       <PackageReference Include="Microsoft.ApplicationInsights" Version="2.22.0" />
       <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
       <PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.5" />
