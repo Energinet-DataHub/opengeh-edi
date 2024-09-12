@@ -26,6 +26,8 @@ public record AuditLogRequestBody(
     Guid LogId,
     Guid UserId,
     Guid ActorId,
+    string? ActorNumber,
+    string? MarketRoles,
     Guid SystemId,
     string? Permissions,
     string OccurredOn,
