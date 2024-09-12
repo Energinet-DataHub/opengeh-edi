@@ -87,6 +87,12 @@ jobs:
             filter: (DisplayName!~IntegrationTests.Behaviours)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
+            
+          - name: Archived messages - integration tests
+            paths: \source\ArchivedMessages.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.dll
+            filter: (DisplayName!~ArchivedMessages.IntegrationTests)
+            use_azure_functions_tools: true
+            contentroot_variable_name: empty # Means skip
 
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
     with:
