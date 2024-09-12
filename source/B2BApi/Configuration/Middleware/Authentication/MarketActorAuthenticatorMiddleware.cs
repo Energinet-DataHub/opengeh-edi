@@ -57,14 +57,12 @@ public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
             return;
         }
 
-        var serializer = context.InstanceServices.GetRequiredService<ISerializer>();
-        WriteAuthenticatedIdentityToLog(authenticatedActor.CurrentActorIdentity, serializer);
+        WriteAuthenticatedIdentityToLog(authenticatedActor.CurrentActorIdentity);
         await next(context);
     }
 
-    private void WriteAuthenticatedIdentityToLog(ActorIdentity? actorIdentity, ISerializer serializer)
+    private void WriteAuthenticatedIdentityToLog(ActorIdentity? actorIdentity)
     {
-        _logger.LogInformation("Successfully authenticated market actor identity.");
-        _logger.LogInformation(serializer.Serialize(actorIdentity));
+        _logger.BeginScope("ActorNumber: {ActorNumber}, ActorRole: {ActorRole}", actorIdentity?.ActorNumber.Value, actorIdentity?.MarketRole?.Name);
     }
 }
