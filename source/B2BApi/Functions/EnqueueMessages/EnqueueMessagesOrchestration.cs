@@ -84,7 +84,7 @@ internal class EnqueueMessagesOrchestration(TelemetryClient telemetryClient)
 
         // Calculate the duration
         var duration = endTime - startTime;
-        var avgDurationOfHandledResults = duration.Milliseconds / sumOfHandledResults;
+        var avgDurationOfHandledResults = duration.Nanoseconds / sumOfHandledResults;
         telemetryClient.GetMetric(CustomMetricConstants.EnqueueMessageAvgDuration).TrackValue(avgDurationOfHandledResults);
         return "Success";
     }
