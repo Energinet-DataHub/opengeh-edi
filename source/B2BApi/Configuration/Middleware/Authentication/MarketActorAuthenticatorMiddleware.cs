@@ -57,12 +57,9 @@ public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
             return;
         }
 
-        WriteAuthenticatedIdentityToLog(authenticatedActor.CurrentActorIdentity);
-        await next(context);
-    }
-
-    private void WriteAuthenticatedIdentityToLog(ActorIdentity? actorIdentity)
-    {
-        _logger.BeginScope("ActorNumber: {ActorNumber}, ActorRole: {ActorRole}", actorIdentity?.ActorNumber.Value, actorIdentity?.MarketRole?.Name);
+        _logger.BeginScope("ActorNumber: {ActorNumber}, ActorRole: {ActorRole}", authenticatedActor.CurrentActorIdentity.ActorNumber.Value, authenticatedActor.CurrentActorIdentity.MarketRole?.Name);
+        {
+            await next(context);
+        }
     }
 }
