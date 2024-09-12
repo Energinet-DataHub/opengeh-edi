@@ -90,7 +90,7 @@ internal sealed class MasterDataClient : IMasterDataClient
     public async Task<GridAreaOwnerDto> GetGridOwnerForGridAreaCodeAsync(string gridAreaCode, CancellationToken cancellationToken)
     {
         var owner = await _gridAreaRepository
-            .GetGridOwnerAsync(gridAreaCode, cancellationToken)
+            .GetGridAreaOwnerAsync(gridAreaCode, cancellationToken)
             .ConfigureAwait(false);
 
         if (owner == null)
@@ -101,7 +101,7 @@ internal sealed class MasterDataClient : IMasterDataClient
 
     public async Task<GridAreaOwnerDto?> TryGetGridOwnerForGridAreaCodeAsync(string gridAreaCode, CancellationToken cancellationToken)
     {
-        var gridAreaOwner = await _gridAreaRepository.GetGridOwnerAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
+        var gridAreaOwner = await _gridAreaRepository.GetGridAreaOwnerAsync(gridAreaCode, cancellationToken).ConfigureAwait(false);
 
         if (gridAreaOwner == null)
             return null;

@@ -43,7 +43,7 @@ public class GridAreaRepository : IGridAreaRepository
             .ConfigureAwait(false);
     }
 
-    public async Task<GridAreaOwner?> GetGridOwnerAsync(string gridAreaCode, CancellationToken cancellationToken)
+    public async Task<GridAreaOwner?> GetGridAreaOwnerAsync(string gridAreaCode, CancellationToken cancellationToken)
     {
         var now = _clock.GetCurrentInstant();
         return await _masterDataContext.GridAreaOwners

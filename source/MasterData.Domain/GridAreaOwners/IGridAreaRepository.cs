@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
 public interface IGridAreaRepository
 {
     /// <summary>
-    /// Responsible for creating a grid area if it does not exist.
+    /// Responsible for creating grid area ownership relation if it does not exist.
     /// </summary>
     Task UpdateOwnershipAsync(
         string gridAreaCode,
@@ -33,7 +33,7 @@ public interface IGridAreaRepository
         CancellationToken cancellationToken);
 
     /// <summary>
-    /// Responsible for getting the grid owner for a given grid area code.
+    /// Responsible for getting the grid area owner for a given grid area code.
     /// </summary>
-    Task<GridAreaOwner?> GetGridOwnerAsync(string gridAreaCode, CancellationToken cancellationToken);
+    Task<GridAreaOwner?> GetGridAreaOwnerAsync(string gridAreaCode, CancellationToken cancellationToken);
 }

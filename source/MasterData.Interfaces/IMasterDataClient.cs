@@ -40,7 +40,7 @@ public interface IMasterDataClient
         CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Get the <see cref="ActorNumber"/> of the grid operator for a given grid area.
+    ///     Get the <see cref="GridAreaOwnerDto"/> for a given grid area.
     /// </summary>
     Task<GridAreaOwnerDto> GetGridOwnerForGridAreaCodeAsync(string gridAreaCode, CancellationToken cancellationToken);
 
