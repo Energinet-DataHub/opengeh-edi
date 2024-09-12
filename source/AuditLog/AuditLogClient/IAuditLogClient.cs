@@ -28,6 +28,8 @@ public interface IAuditLogClient
     /// <param name="logId">The unique log id, used for idempotency</param>
     /// <param name="userId">Id of the user. If token is available, use the 'sub' claim.</param>
     /// <param name="actorId">Id of the actor. If token is available, use the 'azp' claim.</param>
+    /// <param name="actorNumber">Actor number of the actor. If token is available, use the actornumber claim.</param>
+    /// <param name="marketRoles">Market roles of the actor. If token is available, use the marketroles claim.</param>
     /// <param name="systemId">Id of the system that generated the audit. Should be a fixed value for the same subsystem.</param>
     /// <param name="permissions">The set of permissions that were granted when the activity was performed (if any). An example could be the values of the 'role' claims.</param>
     /// <param name="occuredOn">When the activity occured.</param>
@@ -44,6 +46,8 @@ public interface IAuditLogClient
         Guid logId,
         Guid userId,
         Guid actorId,
+        string? actorNumber,
+        string? marketRoles,
         Guid systemId,
         string? permissions,
         Instant occuredOn,

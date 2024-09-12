@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.AuditLog.AuditUser;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.B2BApi.Security;
 
@@ -25,10 +26,14 @@ public class AuditUserContext(AuthenticatedActor authenticatedActor) : IAuditUse
         {
             var currentActor = authenticatedActor.CurrentActorIdentity;
 
-            // TODO: Add the correct values to the AuditUser when contract has been updated
+            var actorRoles = currentActor.MarketRole is not null
+                ? new List<ActorRole> { currentActor.MarketRole }.AsReadOnly()
+                : null;
             return new AuditUser(
                 null,
                 null,
+                currentActor.ActorNumber,
+                actorRoles,
                 currentActor.MarketRole?.Name);
         }
     }
