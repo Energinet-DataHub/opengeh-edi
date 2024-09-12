@@ -14,12 +14,20 @@
 
 using ArchivedMessages.IntegrationTests.Fixture.Database;
 using Azure.Storage.Blobs;
+using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
+using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using Xunit;
 
-namespace ArchivedMessages.IntegrationTests.Fixture;
+namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture;
 
 public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
 {
@@ -29,6 +37,20 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
     public AzuriteManager AzuriteManager { get; } = new(true);
 
     public EdiDatabaseManager DatabaseManager { get; set; } = new();
+
+    public IArchivedMessagesClient ArchivedMessagesClient { get; set; } = null!;
+
+    protected AuthenticatedActor AuthenticatedActor { get; set; } = null!;
+
+    protected ServiceProvider ServiceProvider { get; private set; } = null!;
+
+    private TokenValidationParameters DisableAllTokenValidations => new()
+    {
+        ValidateAudience = false,
+        ValidateLifetime = false,
+        ValidateIssuer = false,
+        SignatureValidator = (token, _) => new JsonWebToken(token),
+    };
 
     public void CleanupDatabase()
     {
@@ -96,6 +118,11 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         await DatabaseManager.CreateDatabaseAsync();
         AzuriteManager.StartAzurite();
         CleanupFileStorage();
+        BuildService();
+
+        ArchivedMessagesClient = ServiceProvider.GetService<IArchivedMessagesClient>()!;
+        //AuthenticatedActor = ServiceProvider.GetService<AuthenticatedActor>()!;
+        //AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
     }
 
     public async Task DisposeAsync()
@@ -108,6 +135,37 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
     {
         Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    public ServiceProvider BuildService()
+    {
+        var builder = new ConfigurationBuilder();
+        builder.AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["FEATUREFLAG_ACTORMESSAGEQUEUE"] = "true", //Needed?
+            ["DB_CONNECTION_STRING"] = DatabaseManager.ConnectionString, //Needed?
+            ["AZURE_STORAGE_ACCOUNT_CONNECTION_STRING"] = AzuriteManager.BlobStorageConnectionString, //Needed?
+            // TODO: fix this
+            // Archived messages does not depend on ServiceBus, but the dependency injection in building blocks require it :(
+            [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
+        });
+
+        var services = new ServiceCollection();
+        var configuration = builder.Build();
+
+        services
+            .AddScoped<AuthenticatedActor>()
+            .AddArchivedMessagesModule(configuration);
+
+        ServiceProvider = services.BuildServiceProvider();
+
+        return ServiceProvider;
+    }
+
+    public T GetService<T>()
+        where T : notnull
+    {
+        return ServiceProvider.GetRequiredService<T>();
     }
 
     protected virtual void Dispose(bool disposing)

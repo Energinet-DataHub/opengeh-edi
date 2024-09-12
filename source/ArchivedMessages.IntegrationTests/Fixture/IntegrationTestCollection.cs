@@ -14,10 +14,10 @@
 
 using Xunit;
 
-namespace ArchivedMessages.IntegrationTests.Fixture;
+namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture;
 
 [CollectionDefinition("ArchivedMessages.IntegrationTests")]
-public class ArchivedMessagesIntegrationTestCollection : ICollectionFixture<ArchivedMessagesFixture>
+public class ArchivedMessagesIntegrationTestCollectionFixture : ICollectionFixture<ArchivedMessagesFixture>
 {
     // This class has no code, and is never created. Its purpose is simply
     // to be the place to apply [CollectionDefinition] and all the
