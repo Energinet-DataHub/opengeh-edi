@@ -90,7 +90,7 @@ jobs:
 
           - name: Archived messages - integration tests
             paths: \source\ArchivedMessages.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.dll
-            filter: (DisplayName!~ArchivedMessages.IntegrationTests)
+            filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
