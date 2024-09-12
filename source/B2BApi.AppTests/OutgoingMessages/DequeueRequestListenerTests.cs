@@ -130,6 +130,7 @@ public class DequeueRequestListenerTests : IAsyncLifetime
         auditLogPayload.UserId.Should().Be(Guid.Empty);
         auditLogPayload.ActorId.Should().Be(Guid.Empty);
         auditLogPayload.ActorNumber.Should().Be(actorNumber.Value);
+        auditLogPayload.MarketRoles.Should().Be(actorRole.Name);
         auditLogPayload.SystemId.Should().Be(Guid.Parse("688b2dca-7231-490f-a731-d7869d33fe5e")); // EDI subsystem id
         auditLogPayload.Permissions.Should().Be(actorRole.Name);
         auditLogPayload.OccuredOn.Should().NotBeNull();
