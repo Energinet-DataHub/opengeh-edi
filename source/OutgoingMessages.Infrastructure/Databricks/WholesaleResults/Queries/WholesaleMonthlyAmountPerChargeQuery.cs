@@ -80,8 +80,8 @@ public class WholesaleMonthlyAmountPerChargeQuery(
                 .GetGridOwnerForGridAreaCodeAsync(gridAreaCode, CancellationToken.None)
                 .ConfigureAwait(false);
 
-            _logger.LogInformation("Message created from CalculationResultId: {CalculationResultId}, was tax. ChargeOwnerReceiver was changed from {ChargeOwnerReceiverId} to {NewChargeOwnerReceiverId}", calculationResultId, originalChargeOwnerReceiverId, chargeOwnerReceiverId);
             chargeOwnerReceiverId = gridAreaOwner.ActorNumber;
+            _logger.LogInformation("Message created from CalculationResultId: {CalculationResultId}, was tax. ChargeOwnerReceiver was changed from {ChargeOwnerReceiverId} to {NewChargeOwnerReceiverId}", calculationResultId, originalChargeOwnerReceiverId, chargeOwnerReceiverId);
         }
 
         var (businessReason, settlementVersion) = BusinessReasonAndSettlementVersionMapper.FromDeltaTableValue(
