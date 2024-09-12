@@ -64,6 +64,8 @@ public class OutboxPublisherTests : IAsyncLifetime
                 LogId: expectedLogId,
                 UserId: Guid.NewGuid(),
                 ActorId: Guid.NewGuid(),
+                ActorNumber: null,
+                MarketRoles: null,
                 SystemId: Guid.NewGuid(),
                 Permissions: "the-permissions",
                 OccuredOn: Instant.FromUtc(2024, 09, 05, 13, 37),

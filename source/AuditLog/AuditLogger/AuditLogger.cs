@@ -48,6 +48,8 @@ public class AuditLogger(
 
         var userId = currentUser?.UserId ?? Guid.Empty;
         var actorId = currentUser?.ActorId ?? Guid.Empty;
+        var actorNumber = currentUser?.ActorNumber?.Value;
+        var actorRoles = currentUser?.ActorRoles is not null ? string.Join(';', currentUser.ActorRoles.ToList()) : null;
         var permissions = currentUser?.Permissions;
 
         var outboxMessage = new AuditLogOutboxMessageV1(
@@ -56,6 +58,8 @@ public class AuditLogger(
                 logId.Id,
                 userId,
                 actorId,
+                actorNumber,
+                actorRoles,
                 _ediSystemId,
                 permissions,
                 _clock.GetCurrentInstant(),

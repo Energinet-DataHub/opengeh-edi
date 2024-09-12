@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.EDI.AuditLog.AuditUser;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Security;
 
@@ -30,6 +31,8 @@ public class AuditUserContext(IUserContext<FrontendUser> userContext) : IAuditUs
             return new AuditUser(
                 currentUser.UserId,
                 currentUser.ActorId,
+                ActorNumber.Create(currentUser.ActorNumber),
+                ActorRoles: null,
                 string.Join(", ", currentUser.Roles));
         }
     }

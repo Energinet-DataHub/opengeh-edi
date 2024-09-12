@@ -36,6 +36,8 @@ public class AuditLogOutboxPublisher(IAuditLogClient auditLogClient, ISerializer
             logId: payload.LogId,
             userId: payload.UserId,
             actorId: payload.ActorId,
+            actorNumber: payload.ActorNumber,
+            marketRoles: payload.MarketRoles,
             systemId: payload.SystemId,
             permissions: payload.Permissions,
             occuredOn: payload.OccuredOn,
