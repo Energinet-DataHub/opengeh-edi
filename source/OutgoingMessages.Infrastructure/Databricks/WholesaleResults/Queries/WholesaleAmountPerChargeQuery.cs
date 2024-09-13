@@ -42,6 +42,7 @@ public class WholesaleAmountPerChargeQuery(
 {
     private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly EventId _eventId = eventId;
+    private readonly ILogger _logger = logger;
 
     public override string DataObjectName => "amounts_per_charge_v1";
 
@@ -75,14 +76,23 @@ public class WholesaleAmountPerChargeQuery(
         DatabricksSqlRow databricksSqlRow,
         IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
+        var calculationResultId = databricksSqlRow.ToGuid(WholesaleResultColumnNames.ResultId);
         var gridAreaCode = databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.GridAreaCode);
         var chargeOwnerId = ActorNumber.Create(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.ChargeOwnerId));
+        var originalChargeOwnerReceiverId = ActorNumber.Create(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.ChargeOwnerId));
+        var chargeOwnerReceiverId = originalChargeOwnerReceiverId;
         var isTax = databricksSqlRow.ToBool(WholesaleResultColumnNames.IsTax);
 
-        var chargeOwnerReceiverId = await GetChargeOwnerReceiverAsync(
-            gridAreaCode,
-            chargeOwnerId,
-            isTax).ConfigureAwait(false);
+        if (isTax)
+        {
+            var gridAreaOwner = await _masterDataClient
+                .GetGridOwnerForGridAreaCodeAsync(gridAreaCode, CancellationToken.None)
+                .ConfigureAwait(false);
+
+            chargeOwnerReceiverId = gridAreaOwner.ActorNumber;
+            _logger.LogInformation("Message created from CalculationResultId: {CalculationResultId}, was tax. ChargeOwnerReceiver was changed from {ChargeOwnerReceiverId} to {NewChargeOwnerReceiverId}", calculationResultId, originalChargeOwnerReceiverId, chargeOwnerReceiverId);
+        }
+
         var (businessReason, settlementVersion) = BusinessReasonAndSettlementVersionMapper.FromDeltaTableValue(
             databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.CalculationType));
         var resolution =
@@ -93,7 +103,7 @@ public class WholesaleAmountPerChargeQuery(
         return new WholesaleAmountPerChargeMessageDto(
             eventId: _eventId,
             calculationId: databricksSqlRow.ToGuid(WholesaleResultColumnNames.CalculationId),
-            calculationResultId: databricksSqlRow.ToGuid(WholesaleResultColumnNames.ResultId),
+            calculationResultId: calculationResultId,
             calculationResultVersion: databricksSqlRow.ToLong(WholesaleResultColumnNames.CalculationVersion),
             energySupplierReceiverId: ActorNumber.Create(
                 databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.EnergySupplierId)),
@@ -121,14 +131,5 @@ public class WholesaleAmountPerChargeQuery(
                         QuantityQualitiesFactor.CreateQuantityQuality(p.Price, p.Qualities, chargeType)))
                 .ToList()
                 .AsReadOnly());
-    }
-
-    private async Task<ActorNumber> GetChargeOwnerReceiverAsync(string gridAreaCode, ActorNumber chargeOwnerId, bool isTax)
-    {
-        return isTax
-            ? await _masterDataClient
-                .GetGridOwnerForGridAreaCodeAsync(gridAreaCode, CancellationToken.None)
-                .ConfigureAwait(false)
-            : chargeOwnerId;
     }
 }

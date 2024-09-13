@@ -43,13 +43,12 @@ public class GridAreaRepository : IGridAreaRepository
             .ConfigureAwait(false);
     }
 
-    public async Task<ActorNumber?> GetGridOwnerForAsync(string gridAreaCode, CancellationToken cancellationToken)
+    public async Task<GridAreaOwner?> GetGridAreaOwnerAsync(string gridAreaCode, CancellationToken cancellationToken)
     {
         var now = _clock.GetCurrentInstant();
-        var gridAreaOwner = await _masterDataContext.GridAreaOwners
+        return await _masterDataContext.GridAreaOwners
             .Where(gridArea => gridArea.GridAreaCode == gridAreaCode && gridArea.ValidFrom <= now)
             .OrderByDescending(gridArea => gridArea.SequenceNumber)
             .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
-        return gridAreaOwner?.GridAreaOwnerActorNumber;
     }
 }
