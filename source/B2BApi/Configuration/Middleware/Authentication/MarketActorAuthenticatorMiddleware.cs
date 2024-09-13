@@ -50,19 +50,20 @@ public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
 
         var authenticated = await authenticationMethod.AuthenticateAsync(httpRequestData, context.CancellationToken);
 
-        if (!authenticated)
-        {
-            _logger.LogError("Could not authenticate market actor identity by using {AuthenticationMethod}", authenticationMethod.GetType().Name);
-            context.RespondWithUnauthorized(httpRequestData);
-            return;
-        }
-
         _logger.BeginScope(
             "ActorNumber: {ActorNumber}, ActorRole: {ActorRole}, Restriction: {Restriction}",
             authenticatedActor.CurrentActorIdentity.ActorNumber.Value,
             authenticatedActor.CurrentActorIdentity.MarketRole?.Name,
             authenticatedActor.CurrentActorIdentity.Restriction.Name);
         {
+            if (!authenticated)
+            {
+                _logger.LogError("Could not authenticate market actor identity by using {AuthenticationMethod}", authenticationMethod.GetType().Name);
+                context.RespondWithUnauthorized(httpRequestData);
+                return;
+            }
+
+            _logger.LogInformation("Successfully authenticated market actor identity.");
             await next(context);
         }
     }
