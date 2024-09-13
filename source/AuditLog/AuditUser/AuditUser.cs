@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+
 namespace Energinet.DataHub.EDI.AuditLog.AuditUser;
 
 /// <summary>
@@ -19,8 +21,12 @@ namespace Energinet.DataHub.EDI.AuditLog.AuditUser;
 /// </summary>
 /// <param name="UserId">The user id, typically found in a 'sub' claim.</param>
 /// <param name="ActorId">The user id, typically found in an 'azp' claim.</param>
+/// <param name="ActorNumber">The actor number.</param>
+/// <param name="ActorRoles">The actor roles</param>
 /// <param name="Permissions">The user's permission, typically found in 'role' claims</param>
 public record AuditUser(
     Guid? UserId,
     Guid? ActorId,
+    ActorNumber? ActorNumber,
+    IReadOnlyList<ActorRole>? ActorRoles,
     string? Permissions);

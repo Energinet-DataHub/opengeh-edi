@@ -71,7 +71,7 @@ public class EnergyResultPerGridAreaQuery(
     {
         var gridArea = databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.GridAreaCode);
 
-        var gridAreaOwnerNumber = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(gridArea, CancellationToken.None).ConfigureAwait(false);
+        var gridAreaOwner = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(gridArea, CancellationToken.None).ConfigureAwait(false);
 
         var resolution = ResolutionMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.Resolution));
         var calculationType = CalculationTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(EnergyResultColumnNames.CalculationType));
@@ -90,7 +90,7 @@ public class EnergyResultPerGridAreaQuery(
             measurementUnit: MeasurementUnitMapper.FromDeltaTableValue(databricksSqlRow.ToNullableString(EnergyResultColumnNames.QuantityUnit)),
             resolution: resolution,
             period: PeriodFactory.GetPeriod(timeSeriesPoints, resolution),
-            meteredDataResponsibleNumber: gridAreaOwnerNumber,
+            meteredDataResponsibleNumber: gridAreaOwner.ActorNumber,
             points: EnergyResultMessageDtoFactory.CreateEnergyResultMessagePoints(timeSeriesPoints));
 
         return messageDto;

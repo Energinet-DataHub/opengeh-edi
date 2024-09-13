@@ -12,17 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.ComponentModel.DataAnnotations;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using NodaTime;
 
-namespace BuildingBlocks.Application.Extensions.Options;
+namespace Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 
-/// <summary>
-/// Options for the ServiceBus namespace used in the DH3 system.
-/// </summary>
-public class ServiceBusNamespaceOptions
-{
-    public const string SectionName = "ServiceBus";
-
-    [Required]
-    public string FullyQualifiedNamespace { get; set; } = string.Empty;
-}
+public record GridAreaOwnerDto(string GridAreaCode, Instant ValidFrom, ActorNumber ActorNumber, int SequenceNumber);

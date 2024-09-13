@@ -203,6 +203,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202409091600 Drop unused tables.sql" />
     <EmbeddedResource Include="Scripts\Model\202409101600 Reorganize Bundle indexs.sql" />
     <EmbeddedResource Include="Scripts\Model\202409111315 Rebuild OutgoingMessages indexes.sql" />
+    <EmbeddedResource Include="Scripts\Model\202409111300 Rebuild Bundle indexs.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <None Remove="Scripts\Model\202310231329 Alter Bundles1.sql" />
@@ -235,6 +236,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202404170840 Add CreatedAt and CreatedBy and ModifiedAt and ModifiedBy columns to OutgoingMessages.sql" />
     <None Remove="Scripts\Model\202406031318 Add MessageId to bundles.sql" />
     <EmbeddedResource Include="Scripts\Model\202406031318 Add MessageId to bundles.sql" />
+    <None Remove="Scripts\Model\202409121115 Change Id length for ChargeType.sql" />
+    <EmbeddedResource Include="Scripts\Model\202409121115 Change Id length for ChargeType.sql" />
   </ItemGroup>
 
   <ItemGroup>
