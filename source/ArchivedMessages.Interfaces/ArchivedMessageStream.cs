@@ -28,7 +28,9 @@ public sealed record ArchivedMessageStream : StreamValueObject, IArchivedMessage
     public ArchivedMessageStream(IIncomingMarketMessageStream incomingMarketMessageStream)
         : base(incomingMarketMessageStream?.Stream) { }
 
-    // This is only intended for testing purposes
+    /// <summary>
+    /// This is only intended for testing purposes
+    /// </summary>
     public ArchivedMessageStream(Stream stream)
         : base(stream) { }
 }

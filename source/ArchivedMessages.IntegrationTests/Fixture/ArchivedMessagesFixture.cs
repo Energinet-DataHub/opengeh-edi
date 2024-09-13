@@ -20,11 +20,8 @@ using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture.Database;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.JsonWebTokens;
-using Microsoft.IdentityModel.Tokens;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture;
@@ -43,49 +40,9 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
 
     protected ServiceProvider ServiceProvider { get; private set; } = null!;
 
-    private TokenValidationParameters DisableAllTokenValidations => new()
-    {
-        ValidateAudience = false,
-        ValidateLifetime = false,
-        ValidateIssuer = false,
-        SignatureValidator = (token, _) => new JsonWebToken(token),
-    };
-
     public void CleanupDatabase()
     {
-        var cleanupStatement =
-            $"DELETE FROM [dbo].[MessageRegistry] " +
-            $"DELETE FROM [dbo].[TransactionRegistry]" +
-            $"DELETE FROM [dbo].[OutgoingMessages] " +
-            $"DELETE FROM [dbo].[QueuedInternalCommands] " +
-            $"DELETE FROM [dbo].[MarketEvaluationPoints]" +
-            $"DELETE FROM [dbo].[Actor]" +
-            $"DELETE FROM [dbo].[ReceivedIntegrationEvents]" +
-            $"DELETE FROM [dbo].[AggregatedMeasureDataProcessGridAreas]" +
-            $"DELETE FROM [dbo].[AggregatedMeasureDataProcesses]" +
-            $"DELETE FROM [dbo].[ArchivedMessages]" +
-            $"DELETE FROM [dbo].[MarketDocuments]" +
-            $"DELETE FROM [dbo].[Bundles]" +
-            $"DELETE FROM [dbo].[ActorMessageQueues]" +
-            $"DELETE FROM [dbo].[ReceivedInboxEvents]" +
-            $"DELETE FROM [dbo].[MessageRegistry]" +
-            $"DELETE FROM [dbo].[TransactionRegistry]" +
-            $"DELETE FROM [dbo].[GridAreaOwner]" +
-            $"DELETE FROM [dbo].[ActorCertificate]" +
-            $"DELETE FROM [dbo].[WholesaleServicesProcessChargeTypes]" +
-            $"DELETE FROM [dbo].[WholesaleServicesProcessGridAreas]" +
-            $"DELETE FROM [dbo].[WholesaleServicesProcesses]" +
-            $"DELETE FROM [dbo].[ProcessDelegation]";
-
-        using var connection = new SqlConnection(DatabaseManager.ConnectionString);
-        connection.Open();
-
-        using (var command = new SqlCommand(cleanupStatement, connection))
-        {
-            command.ExecuteNonQuery();
-        }
-
-        connection.Close();
+        DatabaseManager.CleanupDatabase();
     }
 
     public void CleanupFileStorage(bool disposing = false)
