@@ -13,10 +13,10 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.Options;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
