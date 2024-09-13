@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
@@ -45,7 +46,7 @@ public class IntegrationEventListener
             $"%{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.TopicName)}%",
             $"%{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.SubscriptionName)}%",
             Connection = ServiceBusNamespaceOptions.SectionName)]
-        byte[] eventData,
+        ServiceBusReceivedMessage message,
         FunctionContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
@@ -54,7 +55,7 @@ public class IntegrationEventListener
         _logger.LogInformation("Integration event details: {EventDetails}", eventDetails);
 
         await _subscriber
-            .HandleAsync(IntegrationEventServiceBusMessage.Create(eventData, context.BindingContext.BindingData!))
+            .HandleAsync(IntegrationEventServiceBusMessage.Create(message))
             .ConfigureAwait(false);
     }
 }
