@@ -83,18 +83,20 @@ public class DelegateMessage
             cancellationToken)
             .ConfigureAwait(false);
 
-        if (messageDelegation != null)
+        var delegatedReceiverAsync = messageDelegation is not null
+            ? Receiver.Create(messageDelegation.DelegatedTo.ActorNumber, messageDelegation.DelegatedTo.ActorRole)
+            : null;
+
+        if (delegatedReceiverAsync is not null && messageDelegation is not null)
         {
             _logger.LogInformation(
                 "Message was delegated from {FromActorNumber} to {ToActorNumber}, with role {ActorRole} based on delegation with sequence number {SequenceNumber}",
                 delegatedByActorNumber.Value,
-                messageDelegation.DelegatedTo.ActorNumber.Value,
+                delegatedReceiverAsync.Number.Value,
                 delegatedByActorRole.Code,
                 messageDelegation.SequenceNumber);
         }
 
-        return messageDelegation is not null
-            ? Receiver.Create(messageDelegation.DelegatedTo.ActorNumber, messageDelegation.DelegatedTo.ActorRole)
-            : null;
+        return delegatedReceiverAsync;
     }
 }
