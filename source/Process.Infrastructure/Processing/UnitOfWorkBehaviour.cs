@@ -22,22 +22,16 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Processing;
 
-public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+public sealed class UnitOfWorkBehaviour<TRequest, TResponse>(
+    IUnitOfWork unitOfWork,
+    IDatabaseConnectionFactory databaseConnectionFactory,
+    ILogger<UnitOfWorkBehaviour<TRequest, TResponse>> logger)
+    : IPipelineBehavior<TRequest, TResponse>
     where TRequest : ICommand<TResponse>
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
-    private readonly ILogger<UnitOfWorkBehaviour<TRequest, TResponse>> _logger;
-
-    public UnitOfWorkBehaviour(
-        IUnitOfWork unitOfWork,
-        IDatabaseConnectionFactory databaseConnectionFactory,
-        ILogger<UnitOfWorkBehaviour<TRequest, TResponse>> logger)
-    {
-        _unitOfWork = unitOfWork;
-        _databaseConnectionFactory = databaseConnectionFactory;
-        _logger = logger;
-    }
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly IDatabaseConnectionFactory _databaseConnectionFactory = databaseConnectionFactory;
+    private readonly ILogger<UnitOfWorkBehaviour<TRequest, TResponse>> _logger = logger;
 
     public async Task<TResponse> Handle(
         TRequest request,
@@ -59,7 +53,19 @@ public class UnitOfWorkBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
         }
         else
         {
-            await _unitOfWork.CommitTransactionAsync().ConfigureAwait(false);
+            try
+            {
+                await _unitOfWork.CommitTransactionAsync().ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                _logger.Log(
+                    LogLevel.Error,
+                    e,
+                    "An error occurred during the commit of the Unit of Work. All changes will be discarded");
+
+                throw;
+            }
         }
 
         return result;

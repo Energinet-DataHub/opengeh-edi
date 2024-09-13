@@ -14,9 +14,9 @@
 
 using Azure.Identity;
 using Azure.Messaging.ServiceBus;
-using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
+using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.Process.Domain.Wholesale;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;

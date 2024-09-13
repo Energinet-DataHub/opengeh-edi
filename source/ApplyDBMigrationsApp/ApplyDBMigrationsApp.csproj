@@ -236,6 +236,8 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202404170840 Add CreatedAt and CreatedBy and ModifiedAt and ModifiedBy columns to OutgoingMessages.sql" />
     <None Remove="Scripts\Model\202406031318 Add MessageId to bundles.sql" />
     <EmbeddedResource Include="Scripts\Model\202406031318 Add MessageId to bundles.sql" />
+    <None Remove="Scripts\Model\202409121115 Change Id length for ChargeType.sql" />
+    <EmbeddedResource Include="Scripts\Model\202409121115 Change Id length for ChargeType.sql" />
   </ItemGroup>
 
   <ItemGroup>
