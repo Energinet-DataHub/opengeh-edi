@@ -83,7 +83,7 @@ public class EnqueueMessage
             "Enqueued message for OutgoingMessageId: {OutgoingMessageId} for ActorNumber: {ActorNumber} ActorRole: {ActorRole}, for Received Event id: {EventId}",
             messageToEnqueue.Id,
             messageToEnqueue.Receiver.Number.Value,
-            messageToEnqueue.Receiver.ActorRole,
+            messageToEnqueue.Receiver.ActorRole.Code,
             messageToEnqueue.EventId);
 
         return messageToEnqueue.Id;
