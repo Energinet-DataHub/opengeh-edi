@@ -36,9 +36,9 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
 
     public IArchivedMessagesClient ArchivedMessagesClient { get; set; } = null!;
 
-    protected AuthenticatedActor AuthenticatedActor { get; set; } = null!;
+    public ServiceProvider ServiceProvider { get; private set; } = null!;
 
-    protected ServiceProvider ServiceProvider { get; private set; } = null!;
+    protected AuthenticatedActor AuthenticatedActor { get; set; } = null!;
 
     public void CleanupDatabase()
     {
@@ -121,8 +121,8 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         builder.AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["FEATUREFLAG_ACTORMESSAGEQUEUE"] = "true", //Needed?
-            ["DB_CONNECTION_STRING"] = DatabaseManager.ConnectionString, //Needed?
-            ["AZURE_STORAGE_ACCOUNT_CONNECTION_STRING"] = AzuriteManager.BlobStorageConnectionString, //Needed?
+            ["DB_CONNECTION_STRING"] = DatabaseManager.ConnectionString,
+            ["AZURE_STORAGE_ACCOUNT_CONNECTION_STRING"] = AzuriteManager.BlobStorageConnectionString,
             // TODO: fix this
             // Archived messages does not depend on ServiceBus, but the dependency injection in building blocks require it :(
             [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",

@@ -12,10 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Dapper;
 using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture;
+using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Models;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using FluentAssertions;
+using FluentAssertions.Execution;
+using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
 
@@ -39,16 +45,37 @@ public class WhenArchivedMessageIsCreatedTests : IClassFixture<ArchivedMessagesF
     public async Task Given_ArchivedMessage_When_Creating_Then_MessageIsStored()
     {
         // Arrange
-        var correctArchivedMessage = CreateArchivedMessage();
+        var archivedMessage = CreateArchivedMessage(ArchivedMessageType.IncomingMessage);
+        var messageCreatedAt = archivedMessage.CreatedAt.ToDateTimeUtc();
+        var expectedBlobPath = $"{archivedMessage.SenderNumber}/"
+                               + $"{messageCreatedAt.Year:0000}/"
+                               + $"{messageCreatedAt.Month:00}/"
+                               + $"{messageCreatedAt.Day:00}/"
+                               + $"{archivedMessage.Id.Value:N}"; // remove dashes from guid
+
+        var expectedBlocReference = new FileStorageReference(
+            category: FileStorageCategory.ArchivedMessage(),
+            path: expectedBlobPath);
 
         // Act
-        await _sut.CreateAsync(correctArchivedMessage, CancellationToken.None);
+        await _sut.CreateAsync(archivedMessage, CancellationToken.None);
 
         // Assert
-        var dbResult = await _sut.SearchAsync(new GetMessagesQuery(), CancellationToken.None);
-        var blobResult = await _sut.GetAsync(correctArchivedMessage.Id, CancellationToken.None);
+        var dbResult = await GetAllMessagesInDatabase();
 
-        dbResult.Messages.Should().HaveCount(1);
+        var message = dbResult.Single();
+        using var assertionScope = new AssertionScope();
+
+        message.SenderNumber.Should().Be(archivedMessage.SenderNumber);
+        message.MessageId.Should().Be(archivedMessage.MessageId);
+        message.DocumentType.Should().Be(archivedMessage.DocumentType);
+        message.ReceiverNumber.Should().Be(archivedMessage.ReceiverNumber);
+        message.BusinessReason.Should().Be(archivedMessage.BusinessReason);
+        message.FileStorageReference.Should().Be(expectedBlocReference.Path);
+        message.RelatedToMessageId.Should().BeNull();
+        message.EventIds.Should().BeNull();
+
+        var blobResult = await GetMessagesFromBlob(expectedBlocReference);
         blobResult.Should().NotBeNull();
     }
 
@@ -79,5 +106,37 @@ public class WhenArchivedMessageIsCreatedTests : IClassFixture<ArchivedMessagesF
             BusinessReason.BalanceFixing.Name,
             archivedMessageType ?? ArchivedMessageType.IncomingMessage,
             new ArchivedMessageStream(documentStream));
+    }
+
+    private async Task<IReadOnlyCollection<ArchivedMessageFromDb>> GetAllMessagesInDatabase()
+    {
+        var connectionFactory = _fixture.ServiceProvider.GetService<IDatabaseConnectionFactory>()!;
+        using var connection = await connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+
+        var archivedMessages =
+            await connection.QueryAsync<ArchivedMessageFromDb>(
+                    "SELECT "
+                    + "Id,"
+                    + " MessageId,"
+                    + " DocumentType,"
+                    + " SenderNumber,"
+                    + " ReceiverNumber,"
+                    + " CreatedAt,"
+                    + " BusinessReason,"
+                    + " FileStorageReference,"
+                    + " RelatedToMessageId,"
+                    + " EventIds"
+                    + " FROM dbo.[ArchivedMessages]")
+                .ConfigureAwait(false);
+
+        return archivedMessages.ToList().AsReadOnly();
+    }
+
+    private async Task<ArchivedMessageStream> GetMessagesFromBlob(FileStorageReference reference)
+    {
+        var blobClient = _fixture.ServiceProvider.GetService<IFileStorageClient>()!;
+
+        var fileStorageFile = await blobClient.DownloadAsync(reference).ConfigureAwait(false);
+        return new ArchivedMessageStream(fileStorageFile);
     }
 }
