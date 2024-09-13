@@ -15,9 +15,9 @@
 using System.Globalization;
 using System.Reflection;
 using System.Text;
-using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.Core.App.Common.Extensions.Options;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
+using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.B2BApi;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
@@ -87,35 +87,43 @@ public class RegistrationTests
     }
 
     public static IEnumerable<object[]> GetRequestHandlerRequirements()
-        => ResolveTypes(
-            typeof(IRequestHandler<,>),
-            new[] { typeof(InitializeAggregatedMeasureDataProcessesHandler).Assembly, typeof(PeekMessage).Assembly });
+    {
+        return ResolveTypes(
+                typeof(IRequestHandler<,>),
+                new[] { typeof(InitializeAggregatedMeasureDataProcessesHandler).Assembly, typeof(PeekMessage).Assembly });
+    }
 
     public static IEnumerable<object[]> GetNotificationsHandlerRequirements()
-        => ResolveTypes(
-            typeof(INotificationHandler<>),
-            new[]
-            {
+    {
+        return ResolveTypes(
+                typeof(INotificationHandler<>),
+                new[]
+                {
                 typeof(ExecuteDataRetentionsWhenADayHasPassed).Assembly,
                 typeof(Process.Application.Transactions.AggregatedMeasureData.Notifications.Handlers.EnqueueAcceptedEnergyResultMessageHandler).Assembly,
                 typeof(Process.Infrastructure.InboxEvents.ProcessInboxEventsOnTenSecondsHasPassed).Assembly,
-            });
+                });
+    }
 
     public static IEnumerable<object[]> GetDocumentWritersRequirements()
-        => ResolveTypesThatImplementType(
-            typeof(IDocumentWriter),
-            new[]
-            {
+    {
+        return ResolveTypesThatImplementType(
+                typeof(IDocumentWriter),
+                new[]
+                {
                 typeof(NotifyWholesaleServicesEbixDocumentWriter).Assembly,
-            });
+                });
+    }
 
     public static IEnumerable<object[]> GetMessageParserRequirements()
-        => ResolveTypesThatImplementType(
-            typeof(IMarketMessageParser),
-            new[]
-            {
+    {
+        return ResolveTypesThatImplementType(
+                typeof(IMarketMessageParser),
+                new[]
+                {
                 typeof(WholesaleSettlementJsonMessageParser).Assembly,
-            });
+                });
+    }
 
     public static IEnumerable<object[]> GetFunctionRequirements()
     {
@@ -213,9 +221,7 @@ public class RegistrationTests
                 })
             .Build();
 
-#pragma warning disable CA2000
         using var application = new WebApplicationFactory<global::Energinet.DataHub.EDI.B2CWebApi.Program>()
-#pragma warning restore CA2000
             .WithWebHostBuilder(
                 webBuilder =>
                 {
@@ -301,7 +307,7 @@ public class RegistrationTests
         var allImplementations = ReflectionHelper.FindAllTypesThatImplementType();
 
         return allImplementations(targetType, allTypes(assemblies))
-            .Select(type => new object[] { new Requirement(type.Name, new List<Type> { targetType }, type) });
+            .Select(type => new object[] { new Requirement(type.Name, [targetType], type) });
     }
 
     private sealed class TestEnvironment : RuntimeEnvironment
@@ -315,7 +321,7 @@ public class RegistrationTests
         public override string? DB_CONNECTION_STRING =>
             CreateConnectionString();
 
-        public override Uri? AZURE_STORAGE_ACCOUNT_URL => new Uri(CreateFakeStorageUrl());
+        public override Uri? AZURE_STORAGE_ACCOUNT_URL => new(CreateFakeStorageUrl());
 
         public override string AZURE_FUNCTIONS_ENVIRONMENT => "Development";
 
@@ -332,9 +338,15 @@ public class RegistrationTests
                 "Server=(LocalDB)\\\\MSSQLLocalDB;Database=B2BTransactions;User=User;Password=Password;TrustServerCertificate=true;Encrypt=True;Trusted_Connection=True;";
         }
 
-        public static string CreateFakeStorageUrl() => "https://dummy.url";
+        public static string CreateFakeStorageUrl()
+        {
+            return "https://dummy.url";
+        }
 
-        public static string CreateDevelopmentStorageConnectionString() => "UseDevelopmentStorage=true";
+        public static string CreateDevelopmentStorageConnectionString()
+        {
+            return "UseDevelopmentStorage=true";
+        }
 
         public override bool IsRunningLocally()
         {
