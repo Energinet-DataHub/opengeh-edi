@@ -13,11 +13,10 @@
 // limitations under the License.
 
 using Azure.Identity;
-using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Builder;
-using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.Options;
+using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
