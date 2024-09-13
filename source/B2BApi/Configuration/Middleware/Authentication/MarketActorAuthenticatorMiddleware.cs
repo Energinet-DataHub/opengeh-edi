@@ -57,7 +57,11 @@ public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
             return;
         }
 
-        _logger.BeginScope("ActorNumber: {ActorNumber}, ActorRole: {ActorRole}", authenticatedActor.CurrentActorIdentity.ActorNumber.Value, authenticatedActor.CurrentActorIdentity.MarketRole?.Name);
+        _logger.BeginScope(
+            "ActorNumber: {ActorNumber}, ActorRole: {ActorRole}, Restriction: {Restriction}",
+            authenticatedActor.CurrentActorIdentity.ActorNumber.Value,
+            authenticatedActor.CurrentActorIdentity.MarketRole?.Name,
+            authenticatedActor.CurrentActorIdentity.Restriction.Name);
         {
             await next(context);
         }
