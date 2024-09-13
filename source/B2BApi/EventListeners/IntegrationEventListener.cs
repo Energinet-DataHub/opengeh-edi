@@ -46,12 +46,9 @@ public class IntegrationEventListener
             $"%{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.TopicName)}%",
             $"%{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.SubscriptionName)}%",
             Connection = ServiceBusNamespaceOptions.SectionName)]
-        ServiceBusReceivedMessage message,
-        FunctionContext context)
+        ServiceBusReceivedMessage message)
     {
-        ArgumentNullException.ThrowIfNull(context);
-
-        var eventDetails = context.ExtractEventDetails();
+        var eventDetails = new EventDetails(message.MessageId, message.Subject);
         _logger.LogInformation("Integration event details: {EventDetails}", eventDetails);
 
         await _subscriber
