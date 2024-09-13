@@ -17,6 +17,10 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Models;
 
+/// <summary>
+/// Using to represent an archived message from the database.
+/// Which enables us to use a typed model in test.
+/// </summary>
 public record ArchivedMessageFromDb(
     Guid Id,
     string? MessageId,
