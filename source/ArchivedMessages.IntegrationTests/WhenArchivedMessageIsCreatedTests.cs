@@ -42,7 +42,7 @@ public class WhenArchivedMessageIsCreatedTests : IClassFixture<ArchivedMessagesF
     }
 
     [Fact]
-    public async Task Given_ArchivedMessage_When_Creating_Then_MessageIsStored()
+    public async Task Given_ArchivedMessage_When_Creating_Then_MessageIsStoredInDatabaseAndBlob()
     {
         // Arrange
         var archivedMessage = CreateArchivedMessage(ArchivedMessageType.IncomingMessage);
