@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using ArchivedMessages.IntegrationTests.Fixture.Database;
 using Azure.Storage.Blobs;
 using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture.Database;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -33,7 +33,6 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
 {
     private bool _disposed;
 
-    // Azurite lives in the Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite namespace
     public AzuriteManager AzuriteManager { get; } = new(true);
 
     public EdiDatabaseManager DatabaseManager { get; set; } = new();
@@ -55,7 +54,28 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
     public void CleanupDatabase()
     {
         var cleanupStatement =
-            $"DELETE FROM [dbo].[ArchivedMessages]";
+            $"DELETE FROM [dbo].[MessageRegistry] " +
+            $"DELETE FROM [dbo].[TransactionRegistry]" +
+            $"DELETE FROM [dbo].[OutgoingMessages] " +
+            $"DELETE FROM [dbo].[QueuedInternalCommands] " +
+            $"DELETE FROM [dbo].[MarketEvaluationPoints]" +
+            $"DELETE FROM [dbo].[Actor]" +
+            $"DELETE FROM [dbo].[ReceivedIntegrationEvents]" +
+            $"DELETE FROM [dbo].[AggregatedMeasureDataProcessGridAreas]" +
+            $"DELETE FROM [dbo].[AggregatedMeasureDataProcesses]" +
+            $"DELETE FROM [dbo].[ArchivedMessages]" +
+            $"DELETE FROM [dbo].[MarketDocuments]" +
+            $"DELETE FROM [dbo].[Bundles]" +
+            $"DELETE FROM [dbo].[ActorMessageQueues]" +
+            $"DELETE FROM [dbo].[ReceivedInboxEvents]" +
+            $"DELETE FROM [dbo].[MessageRegistry]" +
+            $"DELETE FROM [dbo].[TransactionRegistry]" +
+            $"DELETE FROM [dbo].[GridAreaOwner]" +
+            $"DELETE FROM [dbo].[ActorCertificate]" +
+            $"DELETE FROM [dbo].[WholesaleServicesProcessChargeTypes]" +
+            $"DELETE FROM [dbo].[WholesaleServicesProcessGridAreas]" +
+            $"DELETE FROM [dbo].[WholesaleServicesProcesses]" +
+            $"DELETE FROM [dbo].[ProcessDelegation]";
 
         using var connection = new SqlConnection(DatabaseManager.ConnectionString);
         connection.Open();
@@ -120,9 +140,10 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         CleanupFileStorage();
         BuildService();
 
+        AuthenticatedActor = ServiceProvider.GetService<AuthenticatedActor>()!;
+        AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
+
         ArchivedMessagesClient = ServiceProvider.GetService<IArchivedMessagesClient>()!;
-        //AuthenticatedActor = ServiceProvider.GetService<AuthenticatedActor>()!;
-        //AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
     }
 
     public async Task DisposeAsync()
@@ -137,7 +158,7 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         GC.SuppressFinalize(this);
     }
 
-    public ServiceProvider BuildService()
+    public void BuildService()
     {
         var builder = new ConfigurationBuilder();
         builder.AddInMemoryCollection(new Dictionary<string, string?>
@@ -158,14 +179,6 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
             .AddArchivedMessagesModule(configuration);
 
         ServiceProvider = services.BuildServiceProvider();
-
-        return ServiceProvider;
-    }
-
-    public T GetService<T>()
-        where T : notnull
-    {
-        return ServiceProvider.GetRequiredService<T>();
     }
 
     protected virtual void Dispose(bool disposing)

@@ -16,7 +16,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.Database;
 using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
 using Microsoft.EntityFrameworkCore;
 
-namespace ArchivedMessages.IntegrationTests.Fixture.Database;
+namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture.Database;
 
 //TODO: We have this manager defined in 3 separate files. Consider moving them.
 public class EdiDatabaseManager : SqlServerDatabaseManager<DbContext>

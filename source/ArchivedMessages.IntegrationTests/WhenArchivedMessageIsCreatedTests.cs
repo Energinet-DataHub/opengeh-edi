@@ -21,7 +21,6 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests;
 
-[Collection(nameof(ArchivedMessagesIntegrationTestCollectionFixture))]
 public class WhenArchivedMessageIsCreatedTests : IClassFixture<ArchivedMessagesFixture>
 {
     private readonly IArchivedMessagesClient _sut;
@@ -31,6 +30,8 @@ public class WhenArchivedMessageIsCreatedTests : IClassFixture<ArchivedMessagesF
     {
         _fixture = fixture;
         _sut = fixture.ArchivedMessagesClient;
+        _fixture.CleanupDatabase();
+        _fixture.CleanupFileStorage();
     }
 
     [Fact]
@@ -43,9 +44,11 @@ public class WhenArchivedMessageIsCreatedTests : IClassFixture<ArchivedMessagesF
         await _sut.CreateAsync(correctArchivedMessage, CancellationToken.None);
 
         // Assert
-        var result = await _sut.GetAsync(correctArchivedMessage.Id, CancellationToken.None);
+        var dbResult = await _sut.SearchAsync(new GetMessagesQuery(), CancellationToken.None);
+        var blobResult = await _sut.GetAsync(correctArchivedMessage.Id, CancellationToken.None);
 
-        result.Should().NotBeNull();
+        dbResult.Messages.Should().HaveCount(1);
+        blobResult.Should().NotBeNull();
     }
 
     private static ArchivedMessage CreateArchivedMessage(

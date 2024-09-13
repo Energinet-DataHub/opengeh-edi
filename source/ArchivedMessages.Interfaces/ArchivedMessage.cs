@@ -51,7 +51,6 @@ public class ArchivedMessage
         IIncomingMarketMessageStream incomingMarketMessageStream)
         : this(messageId, Array.Empty<EventId>(), documentType, senderNumber, receiverNumber, createdAt, businessReason, archivedMessageType, new ArchivedMessageStream(incomingMarketMessageStream)) { }
 
-    // Do we want this as public?
     public ArchivedMessage(
         string? messageId,
         IReadOnlyList<EventId> eventIds,
