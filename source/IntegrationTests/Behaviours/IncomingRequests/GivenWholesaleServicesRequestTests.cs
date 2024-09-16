@@ -23,6 +23,8 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using NodaTime.Text;
 using Xunit;
@@ -204,6 +206,53 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
                     CreateDateInstant(2024, 1, 1),
                     CreateDateInstant(2024, 1, 31)),
                 Points: acceptedResponse.Series.Single().TimeSeriesPoints));
+    }
+
+    [Fact]
+    public async Task AndGiven_TooLongChargeCode_When_WholesaleServicesProcessIsInitialized_Then_DbExceptionIsThrown()
+    {
+        // Arrange
+        var senderSpy = CreateServiceBusSenderSpy();
+        var actor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: ActorRole.EnergySupplier);
+        var energySupplierNumber = actor.ActorRole == ActorRole.EnergySupplier
+            ? actor.ActorNumber
+            : ActorNumber.Create("3333333333333");
+        var chargeOwnerNumber = actor.ActorRole == ActorRole.SystemOperator
+            ? actor.ActorNumber
+            : ActorNumber.Create("5799999933444");
+        var gridOperatorNumber = actor.ActorRole == ActorRole.GridOperator
+            ? actor.ActorNumber
+            : ActorNumber.Create("4444444444444");
+
+        GivenNowIs(Instant.FromUtc(2024, 7, 1, 14, 57, 09));
+        GivenAuthenticatedActorIs(actor.ActorNumber, actor.ActorRole);
+        await GivenGridAreaOwnershipAsync("512", gridOperatorNumber);
+
+        await GivenReceivedWholesaleServicesRequest(
+            DocumentFormat.Json,
+            actor.ActorNumber,
+            actor.ActorRole,
+            (2024, 1, 1),
+            (2024, 1, 31),
+            energySupplierNumber,
+            chargeOwnerNumber,
+            "64852f7a-b928-477e-9213-e219bf250ec3-that-is-too-long",
+            ChargeType.Tariff,
+            false,
+            [
+                ("512", TransactionId.From("12356478912356478912356478912356478")),
+            ]);
+
+        // Act
+        var initializeProcess = async () => await WhenWholesaleServicesProcessIsInitialized(senderSpy.LatestMessage!);
+
+        // Assert
+        await initializeProcess
+            .Should()
+            .ThrowExactlyAsync<DbUpdateException>()
+            .WithInnerException<DbUpdateException, SqlException>()
+            .WithMessage(
+                "String or binary data would be truncated *WholesaleServicesProcessChargeTypes', column 'Id'. Truncated value: '64852f7a-b928-477e-9213-e219bf250ec3-'*");
     }
 
     [Theory]
