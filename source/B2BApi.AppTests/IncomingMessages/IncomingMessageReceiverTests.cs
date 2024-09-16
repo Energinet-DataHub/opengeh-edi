@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Dynamic;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
@@ -151,7 +152,10 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
         auditLogPayload.OccuredOn.Should().NotBeNull();
         auditLogPayload.Activity.Should().Be(AuditLogActivity.RequestCalculationResults.Identifier);
         auditLogPayload.Origin.Should().Be(request.RequestUri?.AbsoluteUri);
-        auditLogPayload.Payload.Should().NotBeNull();
         auditLogPayload.AffectedEntityType.Should().NotBeNullOrWhiteSpace();
+        auditLogPayload.Payload.Should().NotBeNull();
+        dynamic payload = serializer.Deserialize<ExpandoObject>(auditLogPayload.Payload!.ToString()!);
+        ((string)payload.IncomingDocumentType).Should().Be(documentTypeName);
+        ((string)payload.Message).Should().NotBeNull();
     }
 }

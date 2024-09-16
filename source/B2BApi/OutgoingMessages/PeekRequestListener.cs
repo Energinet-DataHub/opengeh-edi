@@ -72,9 +72,9 @@ public class PeekRequestListener
         ArgumentNullException.ThrowIfNull(request);
         if (!await _featureFlagManager.UsePeekMessagesAsync().ConfigureAwait(false))
         {
-            var notFoundResponse = HttpResponseData.CreateResponse(request);
-            notFoundResponse.StatusCode = HttpStatusCode.NotFound;
-            return notFoundResponse;
+            var noContentResponse = HttpResponseData.CreateResponse(request);
+            noContentResponse.StatusCode = HttpStatusCode.NoContent;
+            return noContentResponse;
         }
 
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
