@@ -143,7 +143,7 @@ public class IncomingMessageReceiver
                 logId: AuditLogId.New(),
                 activity: AuditLogActivity.RequestCalculationResults,
                 activityOrigin: request.Url.ToString(),
-                activityPayload: (incomingDocumentTypeName, incomingMessage),
+                activityPayload: new { IncomingDocumentType = incomingDocumentTypeName, Message = incomingMessage },
                 affectedEntityType: affectedEntityType,
                 affectedEntityKey: null)
             .ConfigureAwait(false);
