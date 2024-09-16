@@ -41,6 +41,7 @@ public class IntegrationEventDeadLetterListener
         ServiceBusReceivedMessage message,
         ServiceBusMessageActions messageActions)
     {
+        // TODO: Move everthing into a DeadLetterHandler
         message.ApplicationProperties.TryGetValue(DeadLetterIsLoggedProperty, out var isLogged);
         if (isLogged is null or (object)false)
         {
