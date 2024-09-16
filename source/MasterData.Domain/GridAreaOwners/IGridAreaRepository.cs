@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
@@ -25,7 +23,7 @@ namespace Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
 public interface IGridAreaRepository
 {
     /// <summary>
-    /// Responsible for creating a grid area if it does not exist.
+    /// Responsible for creating grid area ownership relation if it does not exist.
     /// </summary>
     Task UpdateOwnershipAsync(
         string gridAreaCode,
@@ -35,7 +33,7 @@ public interface IGridAreaRepository
         CancellationToken cancellationToken);
 
     /// <summary>
-    /// Responsible for getting the grid operator for a given grid area.
+    /// Responsible for getting the grid area owner for a given grid area code.
     /// </summary>
-    Task<ActorNumber?> GetGridOwnerForAsync(string gridAreaCode, CancellationToken cancellationToken);
+    Task<GridAreaOwner?> GetGridAreaOwnerAsync(string gridAreaCode, CancellationToken cancellationToken);
 }

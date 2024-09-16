@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
@@ -31,13 +30,16 @@ public class GridAreaOwner
         SequenceNumber = sequenceNumber;
     }
 
-#pragma warning disable
+    #pragma warning disable CS8618 // Needed by Entity Framework
     private GridAreaOwner()
     {
     }
 
     public string GridAreaCode { get; }
+
     public Instant ValidFrom { get; private set; }
+
     public ActorNumber GridAreaOwnerActorNumber { get; private set; }
+
     public int SequenceNumber { get; private set; }
 }
