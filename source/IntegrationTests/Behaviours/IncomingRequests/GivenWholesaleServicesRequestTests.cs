@@ -35,7 +35,6 @@ using Resolution = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Resolution
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours.IncomingRequests;
 
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Test class")]
-[SuppressMessage("Usage", "xUnit1026:Theory methods should use all of their parameters", Justification = "f")]
 public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTestBase
 {
     public GivenWholesaleServicesRequestTests(IntegrationTestFixture fixture, ITestOutputHelper testOutput)
