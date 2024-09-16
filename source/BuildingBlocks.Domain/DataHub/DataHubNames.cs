@@ -88,7 +88,7 @@ public static class DataHubNames
         public const string MeteredDataResponsible = "MeteredDataResponsible";
         public const string EnergySupplier = "EnergySupplier";
         public const string BalanceResponsibleParty = "BalanceResponsibleParty";
-        public const string GridAccessProvider = "GridAccessProvider";
+        public const string GridAccessProvider = "GridOperator";
         public const string MeteredDataAdministrator = "MeteredDataAdministrator";
         public const string ImbalanceSettlementResponsible = "ImbalanceSettlementResponsible";
         public const string SystemOperator = "SystemOperator";
