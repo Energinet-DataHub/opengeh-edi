@@ -83,7 +83,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
     [MemberData(nameof(DocumentFormatsWithAllActorRoleCombinations))]
     public async Task
         AndGiven_DataInOneGridArea_When_ActorPeeksAllMessages_Then_ReceivesOneNotifyWholesaleServicesDocumentWithCorrectContent(
-            BuildingBlocks.Domain.Models.ActorRole actorRole,
+            ActorRole actorRole,
             DocumentFormat incomingDocumentFormat,
             DocumentFormat peekDocumentFormat)
     {
