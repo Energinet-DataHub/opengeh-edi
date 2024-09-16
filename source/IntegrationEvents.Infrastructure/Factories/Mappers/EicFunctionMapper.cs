@@ -25,7 +25,7 @@ public static class EicFunctionMapper
         {
             EicFunction.MeteringPointAdministrator => ActorRole.MeteringPointAdministrator,
             EicFunction.EnergySupplier => ActorRole.EnergySupplier,
-            EicFunction.GridAccessProvider => ActorRole.GridOperator,
+            EicFunction.GridAccessProvider => ActorRole.GridAccessProvider,
             EicFunction.MeteredDataAdministrator => ActorRole.MeteredDataAdministrator,
             EicFunction.MeteredDataResponsible => ActorRole.MeteredDataResponsible,
             EicFunction.BalanceResponsibleParty => ActorRole.BalanceResponsibleParty,

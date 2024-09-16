@@ -55,7 +55,7 @@ public record RequestAggregatedMeasureDataMessageSeries(
             DataHubNames.ActorRole.EnergySupplier => ActorNumber.TryCreate(EnergySupplierId),
             DataHubNames.ActorRole.BalanceResponsibleParty => ActorNumber.TryCreate(BalanceResponsiblePartyId),
             DataHubNames.ActorRole.MeteredDataResponsible => gridAreaOwner,
-            DataHubNames.ActorRole.GridOperator => gridAreaOwner,
+            DataHubNames.ActorRole.GridAccessProvider => gridAreaOwner,
             _ => null,
         };
     }

@@ -70,7 +70,7 @@ public class MarketActorAuthenticator : IMarketActorAuthenticator
             return false;
         }
 
-        _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, marketRole: marketRole));
+        _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, actorRole: marketRole));
         return true;
     }
 

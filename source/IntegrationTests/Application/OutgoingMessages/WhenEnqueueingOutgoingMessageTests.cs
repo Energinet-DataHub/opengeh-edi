@@ -458,7 +458,7 @@ public class WhenEnqueueingOutgoingMessageTests : TestBase
         var fromDb = await GetOutgoingMessageWithActorMessageQueueFromDatabase(createdId);
 
         fromDb.ActorMessageQueueNumber.Should().Be(message.ReceiverNumber.Value);
-        fromDb.ActorMessageQueueRole.Should().Be(ActorRole.GridOperator.Code);
+        fromDb.ActorMessageQueueRole.Should().Be(ActorRole.GridAccessProvider.Code);
         fromDb.OutgoingMessageReceiverRole.Should().Be(ActorRole.MeteredDataResponsible.Code);
     }
 

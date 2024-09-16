@@ -125,12 +125,11 @@ public static class RequestWholesaleSettlementDtoFactory
     private static string MapRoleNameToCode(string roleName)
     {
         ArgumentException.ThrowIfNullOrEmpty(roleName);
-        var marketRole = MarketRole.FromName(roleName);
+        var marketRole = ActorRole.FromName(roleName);
 
-        if ((marketRole == MarketRole.SystemOperator
-             || marketRole == MarketRole.EnergySupplier
-             || marketRole == MarketRole.GridAccessProvider)
-            && marketRole.Code != null)
+        if (marketRole == ActorRole.SystemOperator
+             || marketRole == ActorRole.EnergySupplier
+             || marketRole == ActorRole.GridAccessProvider)
         {
             return marketRole.Code;
         }

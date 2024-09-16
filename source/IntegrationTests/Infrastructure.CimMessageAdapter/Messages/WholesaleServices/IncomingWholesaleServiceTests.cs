@@ -55,7 +55,7 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
         new List<object[]>
         {
             new object[] { ActorRole.EnergySupplier.Code },
-            new object[] { ActorRole.GridOperator.Code },
+            new object[] { ActorRole.GridAccessProvider.Code },
             new object[] { ActorRole.SystemOperator.Code },
         };
 
