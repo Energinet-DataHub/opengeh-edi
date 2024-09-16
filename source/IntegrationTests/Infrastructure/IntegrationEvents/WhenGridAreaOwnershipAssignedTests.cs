@@ -185,9 +185,10 @@ public class WhenGridAreaOwnershipAssignedTests : TestBase
         var serviceScopeFactory = GetService<IServiceScopeFactory>();
         using var newScope = serviceScopeFactory.CreateScope();
         var masterDataClient = newScope.ServiceProvider.GetRequiredService<IMasterDataClient>();
-        return await masterDataClient
+        var gridAreaOwner = await masterDataClient
             .GetGridOwnerForGridAreaCodeAsync(gridAreaCode, CancellationToken.None)
             .ConfigureAwait(false);
+        return gridAreaOwner.ActorNumber;
     }
 
 #pragma warning disable

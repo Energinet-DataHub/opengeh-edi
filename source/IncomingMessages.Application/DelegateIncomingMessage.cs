@@ -16,6 +16,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Application;
@@ -91,7 +92,7 @@ public class DelegateIncomingMessage
 
             if (delegations.Count != 0)
             {
-                ActorNumber? gridAreaOwner = null;
+                GridAreaOwnerDto? gridAreaOwner = null;
                 if (series.GridArea != null)
                 {
                     // Try to get grid area owner for the grid area, returning null if none was found,
@@ -102,7 +103,7 @@ public class DelegateIncomingMessage
                         .ConfigureAwait(false);
                 }
 
-                var originalActorNumber = series.GetActorNumberForRole(originalActorRole, gridAreaOwner);
+                var originalActorNumber = series.GetActorNumberForRole(originalActorRole, gridAreaOwner?.ActorNumber);
                 if (originalActorNumber == null)
                 {
                     // Some part of the incoming message is invalid, since we cannot find the original
