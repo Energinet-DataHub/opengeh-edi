@@ -53,19 +53,7 @@ public sealed class UnitOfWorkBehaviour<TRequest, TResponse>(
         }
         else
         {
-            try
-            {
-                await _unitOfWork.CommitTransactionAsync().ConfigureAwait(false);
-            }
-            catch (Exception e)
-            {
-                _logger.Log(
-                    LogLevel.Error,
-                    e,
-                    "An error occurred during the commit of the Unit of Work. All changes will be discarded");
-
-                throw;
-            }
+            await _unitOfWork.CommitTransactionAsync().ConfigureAwait(false);
         }
 
         return result;
