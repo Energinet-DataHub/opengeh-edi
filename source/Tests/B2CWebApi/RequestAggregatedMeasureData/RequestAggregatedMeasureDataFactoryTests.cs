@@ -41,14 +41,14 @@ public class RequestAggregatedMeasureDataFactoryTests
         var result = RequestAggregatedMeasureDataDtoFactory.Create(
             request,
             SenderId,
-            MarketRole.MeteredDataResponsible.Name,
+            ActorRole.MeteredDataResponsible.Name,
             _dateTimeZone,
             SystemClock.Instance.GetCurrentInstant());
 
         using var assertionScope = new AssertionScope();
         Assert.Equal("D04", result.BusinessReason);
         Assert.Equal(SenderId, result.SenderNumber);
-        Assert.Equal(MarketRole.MeteredDataResponsible.Code, result.SenderRoleCode);
+        Assert.Equal(ActorRole.MeteredDataResponsible.Code, result.SenderRoleCode);
         Assert.Equal("E74", result.MessageType);
 
         Assert.All(result.Serie, serie =>
@@ -72,7 +72,7 @@ public class RequestAggregatedMeasureDataFactoryTests
         var result = RequestAggregatedMeasureDataDtoFactory.Create(
             request,
             "9876543210987",
-            MarketRole.MeteredDataResponsible.Name,
+            ActorRole.MeteredDataResponsible.Name,
             _dateTimeZone,
             SystemClock.Instance.GetCurrentInstant());
 
@@ -95,7 +95,7 @@ public class RequestAggregatedMeasureDataFactoryTests
         var result = RequestAggregatedMeasureDataDtoFactory.Create(
             request,
             "9876543210987",
-            MarketRole.GridAccessProvider.Name,
+            ActorRole.GridAccessProvider.Name,
             _dateTimeZone,
             SystemClock.Instance.GetCurrentInstant());
 

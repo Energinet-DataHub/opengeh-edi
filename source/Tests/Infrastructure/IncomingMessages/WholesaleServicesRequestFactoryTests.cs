@@ -36,7 +36,7 @@ public class WholesaleServicesRequestFactoryTests
         string? type)
     {
         // Arrange
-        var requestedByActor = RequestedByActor.From(ActorNumber.Create("1111111111111"), ActorRole.GridOperator);
+        var requestedByActor = RequestedByActor.From(ActorNumber.Create("1111111111111"), ActorRole.GridAccessProvider);
 
         var process = new WholesaleServicesProcess(
             ProcessId.New(),

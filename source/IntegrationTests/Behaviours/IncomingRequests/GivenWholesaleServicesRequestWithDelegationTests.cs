@@ -63,8 +63,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
         if (!nullGridArea)
         {
             // Grid operator can delegate to both delegated and grid operator
-            roleCombinations.Add((ActorRole.GridOperator, ActorRole.Delegated));
-            roleCombinations.Add((ActorRole.GridOperator, ActorRole.GridOperator));
+            roleCombinations.Add((ActorRole.GridAccessProvider, ActorRole.Delegated));
+            roleCombinations.Add((ActorRole.GridAccessProvider, ActorRole.GridAccessProvider));
         }
 
         var requestDocumentFormats = DocumentFormats
@@ -108,7 +108,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
         var chargeOwnerNumber = originalActor.ActorRole == ActorRole.SystemOperator
             ? originalActor.ActorNumber
             : ActorNumber.Create("5799999933444");
-        var gridOperatorNumber = originalActor.ActorRole == ActorRole.GridOperator
+        var gridOperatorNumber = originalActor.ActorRole == ActorRole.GridAccessProvider
             ? originalActor.ActorNumber
             : ActorNumber.Create("4444444444444");
 
@@ -250,7 +250,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
         var chargeOwnerNumber = originalActor.ActorRole == ActorRole.SystemOperator
             ? originalActor.ActorNumber
             : ActorNumber.Create("5799999933444");
-        var gridOperatorNumber = originalActor.ActorRole == ActorRole.GridOperator
+        var gridOperatorNumber = originalActor.ActorRole == ActorRole.GridAccessProvider
             ? originalActor.ActorNumber
             : ActorNumber.Create("4444444444444");
 
@@ -415,7 +415,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
         var chargeOwnerNumber = originalActor.ActorRole == ActorRole.SystemOperator
             ? originalActor.ActorNumber
             : ActorNumber.Create("5799999933444");
-        var gridOperatorNumber = originalActor.ActorRole == ActorRole.GridOperator
+        var gridOperatorNumber = originalActor.ActorRole == ActorRole.GridAccessProvider
             ? originalActor.ActorNumber
             : ActorNumber.Create("4444444444444");
 
@@ -550,7 +550,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
         var chargeOwnerNumber = originalActor.ActorRole == ActorRole.SystemOperator
             ? originalActor.ActorNumber
             : ActorNumber.Create("5799999933444");
-        var gridOperatorNumber = originalActor.ActorRole == ActorRole.GridOperator
+        var gridOperatorNumber = originalActor.ActorRole == ActorRole.GridAccessProvider
             ? originalActor.ActorNumber
             : ActorNumber.Create("4444444444444");
 
@@ -693,7 +693,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
         var chargeOwnerNumber = originalActor.ActorRole == ActorRole.SystemOperator
             ? originalActor.ActorNumber
             : ActorNumber.Create("5799999933444");
-        var gridOperatorNumber = originalActor.ActorRole == ActorRole.GridOperator
+        var gridOperatorNumber = originalActor.ActorRole == ActorRole.GridAccessProvider
             ? originalActor.ActorNumber
             : ActorNumber.Create("4444444444444");
 
@@ -847,7 +847,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
         var chargeOwnerNumber = originalActor.ActorRole == ActorRole.SystemOperator
             ? originalActor.ActorNumber
             : ActorNumber.Create("5799999933444");
-        var gridOperatorNumber = originalActor.ActorRole == ActorRole.GridOperator
+        var gridOperatorNumber = originalActor.ActorRole == ActorRole.GridAccessProvider
             ? originalActor.ActorNumber
             : ActorNumber.Create("4444444444444");
 
@@ -973,8 +973,8 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
     }
 
     [Theory]
-    [InlineData("Xml", DataHubNames.ActorRole.GridOperator, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Json", DataHubNames.ActorRole.GridOperator, DataHubNames.ActorRole.Delegated)]
+    [InlineData("Xml", DataHubNames.ActorRole.GridAccessProvider, DataHubNames.ActorRole.Delegated)]
+    [InlineData("Json", DataHubNames.ActorRole.GridAccessProvider, DataHubNames.ActorRole.Delegated)]
     [InlineData("Xml", DataHubNames.ActorRole.EnergySupplier, DataHubNames.ActorRole.Delegated)]
     [InlineData("Json", DataHubNames.ActorRole.EnergySupplier, DataHubNames.ActorRole.Delegated)]
     [InlineData("Xml", DataHubNames.ActorRole.SystemOperator, DataHubNames.ActorRole.Delegated)]
@@ -989,7 +989,7 @@ public class GivenWholesaleServicesRequestWithDelegationTests : WholesaleService
         var originalActor = new Actor(ActorNumber.Create("1111111111111"), actorRole: originalActorRole);
         var delegatedToActor = new Actor(actorNumber: ActorNumber.Create("2222222222222"), actorRole: delegatedToRole);
 
-        if (originalActor.ActorRole == ActorRole.GridOperator)
+        if (originalActor.ActorRole == ActorRole.GridAccessProvider)
             await GivenGridAreaOwnershipAsync("804", originalActor.ActorNumber);
 
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);

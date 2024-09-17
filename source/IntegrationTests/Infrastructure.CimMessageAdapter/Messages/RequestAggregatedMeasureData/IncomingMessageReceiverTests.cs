@@ -60,7 +60,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
             new object[] { ActorRole.EnergySupplier.Code },
             new object[] { ActorRole.MeteredDataResponsible.Code },
             new object[] { ActorRole.BalanceResponsibleParty.Code },
-            new object[] { ActorRole.GridOperator.Code },
+            new object[] { ActorRole.GridAccessProvider.Code },
         };
 
     public async Task InitializeAsync()
@@ -210,7 +210,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
         // Arrange
         var authenticatedActor = GetService<AuthenticatedActor>();
         authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(ActorNumber.Create("0192837465019"), Restriction.None, ActorRole.GridOperator));
+            new ActorIdentity(ActorNumber.Create("0192837465019"), Restriction.None, ActorRole.GridAccessProvider));
 
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
