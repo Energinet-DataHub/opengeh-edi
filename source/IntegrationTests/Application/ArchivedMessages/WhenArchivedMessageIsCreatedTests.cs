@@ -42,28 +42,6 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
     }
 
     [Fact]
-    public async Task Then_Fields_Is_Persisted()
-    {
-        var archivedMessageToBeCreated = CreateArchivedMessage();
-
-        await _archivedMessagesClient.CreateAsync(archivedMessageToBeCreated, CancellationToken.None);
-
-        var storedArchivedMessage = await GetArchivedMessageFromDatabaseAsync(archivedMessageToBeCreated.MessageId!);
-        Assert.NotNull(storedArchivedMessage);
-        Assert.Equal(archivedMessageToBeCreated.Id.Value, storedArchivedMessage!.Id);
-        Assert.Equal(archivedMessageToBeCreated.MessageId, storedArchivedMessage!.MessageId);
-        Assert.Equal(archivedMessageToBeCreated.DocumentType, storedArchivedMessage!.DocumentType);
-        Assert.Equal(archivedMessageToBeCreated.SenderNumber.Value, storedArchivedMessage!.SenderNumber);
-        Assert.Equal(archivedMessageToBeCreated.SenderRole.Code, storedArchivedMessage!.SenderRoleCode);
-        Assert.Equal(archivedMessageToBeCreated.ReceiverNumber, storedArchivedMessage!.ReceiverNumber);
-        Assert.Equal(archivedMessageToBeCreated.ReceiverRoleCode, storedArchivedMessage!.ReceiverRoleCode);
-        Assert.Equal(archivedMessageToBeCreated.CreatedAt.ToDateTimeUtc(), (DateTime)storedArchivedMessage!.CreatedAt);
-        Assert.Equal(archivedMessageToBeCreated.BusinessReason, storedArchivedMessage!.BusinessReason);
-        Assert.Equal(archivedMessageToBeCreated.RelatedToMessageId, storedArchivedMessage!.RelatedToMessageId);
-        Assert.Equal(archivedMessageToBeCreated.FileStorageReference.Path, storedArchivedMessage!.FileStorageReference);
-    }
-
-    [Fact]
     public async Task Archived_document_can_be_retrieved_by_id()
     {
         var correctArchivedMessage = CreateArchivedMessage();

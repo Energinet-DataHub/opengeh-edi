@@ -276,11 +276,13 @@ public class WhenAPeekIsRequestedTests : TestBase
     {
         // Arrange / Given
         var expectedEventId = EventId.From(Guid.NewGuid());
-        var receiverNumber = SampleData.NewEnergySupplierNumber;
         var outgoingMessage = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
-            .WithEnergySupplierReceiverNumber(receiverNumber)
+            //.WithEnergySupplierReceiverNumber(receiverNumber)
             .WithEventId(expectedEventId)
             .Build();
+
+        // The receiver of a EnergyResultPerEnergySupplierPerBalanceResponsibleMessage is always the balance responsible
+        var receiver = (ReceiverNumber: outgoingMessage.BalanceResponsibleNumber, ReceiverRole: ActorRole.BalanceResponsibleParty);
 
         await EnqueueMessage(outgoingMessage);
 
@@ -293,7 +295,10 @@ public class WhenAPeekIsRequestedTests : TestBase
         _clockStub.SetCurrentInstant(expectedTimestamp.ToInstant());
 
         // Act / When
-        var peekResult = await PeekMessageAsync(MessageCategory.Aggregations);
+        var peekResult = await PeekMessageAsync(
+            MessageCategory.Aggregations,
+            actorNumber: receiver.ReceiverNumber,
+            actorRole: receiver.ReceiverRole);
 
         // Assert / Then
         peekResult.Should().NotBeNull("because a peek result should be found");
@@ -302,7 +307,7 @@ public class WhenAPeekIsRequestedTests : TestBase
         var archivedMessage = await GetArchivedMessageFromDatabaseAsync(peekResult.MessageId.Value);
         ((object?)archivedMessage).Should().NotBeNull("because an archived message should exists");
 
-        var expectedFileStorageReference = $"{receiverNumber}/{year:0000}/{month:00}/{day:00}/{archivedMessage!.Id:N}";
+        var expectedFileStorageReference = $"{receiver.ReceiverNumber.Value}/{year:0000}/{month:00}/{day:00}/{archivedMessage!.Id:N}";
         var assertProperties = new Dictionary<string, Action<object?>>
         {
             { "BusinessReason", businessReason => businessReason.Should().Be(outgoingMessage.BusinessReason) },
@@ -312,7 +317,9 @@ public class WhenAPeekIsRequestedTests : TestBase
             { "FileStorageReference", fileStorageReference => fileStorageReference.Should().Be(expectedFileStorageReference) },
             { "Id", id => id.Should().NotBeNull() },
             { "MessageId", messageId => messageId.Should().Be(peekResult.MessageId.Value) },
-            { "ReceiverNumber", receiverNumber => receiverNumber.Should().Be(outgoingMessage.EnergySupplierNumber.Value) },
+            { "ReceiverNumber", receiverNumber => receiverNumber.Should().Be(receiver.ReceiverNumber.Value) },
+            { "ReceiverRoleCode", receiverRoleCode => receiverRoleCode.Should().Be(receiver.ReceiverRole.Code) },
+            { "SenderRoleCode", senderRoleCode => senderRoleCode.Should().Be(ActorRole.MeteredDataAdministrator.Code) },
             { "RecordId", recordId => recordId.Should().NotBeNull() },
             { "RelatedToMessageId", relatedToMessageId => relatedToMessageId.Should().BeNull() },
             { "SenderNumber", senderNumber => senderNumber.Should().Be(DataHubDetails.DataHubActorNumber.Value) },
