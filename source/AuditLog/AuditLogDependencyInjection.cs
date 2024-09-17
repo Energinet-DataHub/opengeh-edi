@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.Outbox.Interfaces;
+using Energinet.DataHub.RevisionLog.Integration.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.AuditLog;
@@ -29,9 +30,11 @@ public static class AuditLogDependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddAuditLogOutboxPublisher(this IServiceCollection services)
+    public static IServiceCollection AddAuditLogOutboxPublisher(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddAuditLogClient();
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        services.AddRevisionLogIntegrationModule(configuration);
         services.AddTransient<IOutboxPublisher, AuditLogOutboxPublisher>();
 
         return services;
