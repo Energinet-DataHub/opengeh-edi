@@ -442,6 +442,29 @@ public class SearchMessagesTests : TestBase
             .Should().Be(messageWithinSearchPeriod.MessageId);
     }
 
+    [Fact]
+    public async Task Filter_messages_by_authenticated_actor_role()
+    {
+        // Arrange
+        var authenticatedActorNumber = ActorNumber.Create("1234512345888");
+        var authenticatedActorRole = ActorRole.EnergySupplier;
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(authenticatedActorNumber, restriction: Restriction.Owned, authenticatedActorRole));
+        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-04-01T22:00:00Z")));
+        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z"), receiverNumber: authenticatedActorNumber.Value, receiverRole: authenticatedActorRole));
+        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-06-01T22:00:00Z"), senderNumber: authenticatedActorNumber.Value, senderRole: authenticatedActorRole));
+
+        // Act
+        var result = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(),
+            CancellationToken.None);
+
+        // Assert
+        Assert.Equal(2, result.Messages.Count);
+        Assert.Equal(CreatedAt("2023-05-01T22:00:00Z"), result.Messages[0].CreatedAt);
+        Assert.Equal(CreatedAt("2023-06-01T22:00:00Z"), result.Messages[1].CreatedAt);
+    }
+
     private static Instant CreatedAt(string date)
     {
         return InstantPattern.General.Parse(date).Value;
@@ -450,7 +473,9 @@ public class SearchMessagesTests : TestBase
     private ArchivedMessage CreateArchivedMessage(
         Instant? createdAt = null,
         string? senderNumber = null,
+        ActorRole? senderRole = null,
         string? receiverNumber = null,
+        ActorRole? receiverRole = null,
         string? documentType = null,
         string? businessReason = null,
         string? messageId = null,
@@ -462,9 +487,9 @@ public class SearchMessagesTests : TestBase
             Array.Empty<EventId>(),
             documentType ?? DocumentType.NotifyAggregatedMeasureData.Name,
             ActorNumber.Create(senderNumber ?? "1234512345123"),
-            ActorRole.EnergySupplier,
+            senderRole ?? ActorRole.EnergySupplier,
             receiverNumber ?? "1234512345128",
-            ActorRole.EnergySupplier.Code,
+            receiverRole?.Code ?? ActorRole.EnergySupplier.Code,
             createdAt.GetValueOrDefault(_clock.GetCurrentInstant()),
             businessReason ?? BusinessReason.BalanceFixing.Name,
             archivedMessageType ?? ArchivedMessageType.OutgoingMessage,
