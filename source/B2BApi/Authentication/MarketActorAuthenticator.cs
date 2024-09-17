@@ -53,7 +53,7 @@ public class MarketActorAuthenticator : IMarketActorAuthenticator
         return Authenticate(actorNumber, role);
     }
 
-    public bool Authenticate(ActorNumber? actorNumber, ActorRole? marketRole)
+    public bool Authenticate(ActorNumber? actorNumber, ActorRole? actorRole)
     {
         if (actorNumber is null)
         {
@@ -61,7 +61,7 @@ public class MarketActorAuthenticator : IMarketActorAuthenticator
             return false;
         }
 
-        if (marketRole is null)
+        if (actorRole is null)
         {
             _logger.LogError(
                 @"Could not authenticate market actor identity.
@@ -70,7 +70,7 @@ public class MarketActorAuthenticator : IMarketActorAuthenticator
             return false;
         }
 
-        _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, marketRole: marketRole));
+        _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, actorRole: actorRole));
         return true;
     }
 

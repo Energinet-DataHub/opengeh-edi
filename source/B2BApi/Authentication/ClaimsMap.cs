@@ -22,11 +22,11 @@ public static class ClaimsMap
     private static readonly Dictionary<string, ActorRole> _rolesMap = new()
     {
         { "energysupplier", ActorRole.EnergySupplier },
-        { "gridaccessprovider", ActorRole.GridOperator },
+        { "gridaccessprovider", ActorRole.GridAccessProvider },
         { "metereddataresponsible", ActorRole.MeteredDataResponsible },
         { "balanceresponsibleparty", ActorRole.BalanceResponsibleParty },
         { "systemoperator", ActorRole.SystemOperator },
-        { "gridoperator", ActorRole.GridOperator },
+        { "gridoperator", ActorRole.GridAccessProvider },
         { "delegated", ActorRole.Delegated },
     };
 
@@ -36,8 +36,8 @@ public static class ClaimsMap
 
     public static ActorRole? RoleFrom(string roleClaimValue)
     {
-        _rolesMap.TryGetValue(roleClaimValue, out var marketRole);
-        return marketRole;
+        _rolesMap.TryGetValue(roleClaimValue, out var actorRole);
+        return actorRole;
     }
 
     public static Claim RoleFrom(ActorRole actorRole)

@@ -123,6 +123,6 @@ public class WholesaleTotalAmountQuery(
     {
         return chargeOwnerId == DataHubDetails.SystemOperatorActorNumber
             ? ActorRole.SystemOperator
-            : ActorRole.GridOperator;
+            : ActorRole.GridAccessProvider;
     }
 }
