@@ -277,7 +277,6 @@ public class WhenAPeekIsRequestedTests : TestBase
         // Arrange / Given
         var expectedEventId = EventId.From(Guid.NewGuid());
         var outgoingMessage = _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder
-            //.WithEnergySupplierReceiverNumber(receiverNumber)
             .WithEventId(expectedEventId)
             .Build();
 

@@ -25,7 +25,6 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NodaTime;
-using NodaTime.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 
