@@ -42,19 +42,19 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
     {
     }
 
-    public static object[][] DocumentFormatsWithMarketRoleCombinations()
+    public static object[][] DocumentFormatsWithActorRoleCombinations()
     {
         // The actor roles who can perform WholesaleServicesRequest's
-        var marketRoles = new List<MarketRole>
+        var actorRoles = new List<ActorRole>
         {
-            MarketRole.EnergySupplier,
-            MarketRole.SystemOperator,
-            MarketRole.GridAccessProvider,
+            ActorRole.EnergySupplier,
+            ActorRole.SystemOperator,
+            ActorRole.GridAccessProvider,
         };
 
         var peekDocumentFormats = DocumentFormats.GetAllDocumentFormats();
 
-        return marketRoles
+        return actorRoles
                 .SelectMany(actorRole => peekDocumentFormats
                     .Select(peekDocumentFormat => new object[]
                     {
@@ -65,8 +65,8 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
     }
 
     [Theory]
-    [MemberData(nameof(DocumentFormatsWithMarketRoleCombinations))]
-    public async Task AndGiven_DataInOneGridArea_When_ActorPeeksAllMessages_Then_ReceivesOneNotifyWholesaleServicesDocumentWithCorrectContent(MarketRole marketRole, DocumentFormat peekDocumentFormat)
+    [MemberData(nameof(DocumentFormatsWithActorRoleCombinations))]
+    public async Task AndGiven_DataInOneGridArea_When_ActorPeeksAllMessages_Then_ReceivesOneNotifyWholesaleServicesDocumentWithCorrectContent(ActorRole actorRole, DocumentFormat peekDocumentFormat)
     {
         /*
          *  --- PART 1: Receive request, create process and send message to Wholesale ---
@@ -74,7 +74,6 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
 
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
-        var actorRole = ActorRole.FromCode(marketRole.Code!);
         var actor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: actorRole);
         var energySupplierNumber = actor.ActorRole == ActorRole.EnergySupplier
             ? actor.ActorNumber
@@ -82,7 +81,7 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
         var chargeOwnerNumber = actor.ActorRole == ActorRole.SystemOperator
             ? actor.ActorNumber
             : ActorNumber.Create("5799999933444");
-        var gridOperatorNumber = actor.ActorRole == ActorRole.GridOperator
+        var gridOperatorNumber = actor.ActorRole == ActorRole.GridAccessProvider
             ? actor.ActorNumber
             : ActorNumber.Create("4444444444444");
 
@@ -93,7 +92,7 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
 
         var transactionId = await GivenReceivedB2CWholesaleServicesRequest(
             senderActorNumber: actor.ActorNumber,
-            senderActorRole: marketRole,
+            senderActorRole: actorRole,
             energySupplier: energySupplierNumber,
             gridArea: "512");
 
@@ -194,7 +193,7 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
 
     private async Task<string> GivenReceivedB2CWholesaleServicesRequest(
         ActorNumber senderActorNumber,
-        MarketRole senderActorRole,
+        ActorRole senderActorRole,
         ActorNumber? energySupplier,
         string gridArea,
         bool assertRequestWasSuccessful = true)

@@ -110,7 +110,7 @@ public class EnqueueMessage
 
         if (actorMessageQueueId == null)
         {
-            _logger.LogInformation("Creating new message queue for Actor: {ActorNumber}, MarketRole: {MarketRole}", receiver.Number.Value, receiver.ActorRole.Name);
+            _logger.LogInformation("Creating new message queue for Actor: {ActorNumber}, ActorRole: {ActorRole}", receiver.Number.Value, receiver.ActorRole.Name);
             var actorMessageQueueToCreate = ActorMessageQueue.CreateFor(receiver);
             _actorMessageQueueRepository.Add(actorMessageQueueToCreate);
             actorMessageQueueId = actorMessageQueueToCreate.Id;

@@ -88,11 +88,12 @@ public static class DataHubNames
         public const string MeteredDataResponsible = "MeteredDataResponsible";
         public const string EnergySupplier = "EnergySupplier";
         public const string BalanceResponsibleParty = "BalanceResponsibleParty";
-        public const string GridOperator = "GridOperator";
+        public const string GridAccessProvider = "GridAccessProvider";
         public const string MeteredDataAdministrator = "MeteredDataAdministrator";
         public const string ImbalanceSettlementResponsible = "ImbalanceSettlementResponsible";
         public const string SystemOperator = "SystemOperator";
         public const string DanishEnergyAgency = "DanishEnergyAgency";
         public const string Delegated = "Delegated";
+        public const string DataHubAdministrator = "DataHubAdministrator";
     }
 }

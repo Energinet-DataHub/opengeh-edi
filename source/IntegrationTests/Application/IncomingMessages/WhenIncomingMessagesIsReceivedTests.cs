@@ -114,7 +114,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         // Assert
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.GridOperator));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.GridAccessProvider));
 
         // Act
         await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(

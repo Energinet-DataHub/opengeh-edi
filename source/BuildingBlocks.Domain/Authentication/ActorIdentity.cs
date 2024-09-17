@@ -21,31 +21,31 @@ public class ActorIdentity
     public ActorIdentity(
         ActorNumber actorNumber,
         Restriction restriction,
-        ActorRole? marketRole = null)
+        ActorRole actorRole)
     {
         ActorNumber = actorNumber;
         Restriction = restriction;
-        MarketRole = marketRole;
+        ActorRole = actorRole;
     }
 
     public ActorNumber ActorNumber { get; }
 
     public Restriction Restriction { get; set; }
 
-    public ActorRole? MarketRole { get; set; }
+    public ActorRole ActorRole { get; set; }
 
     public bool HasRole(ActorRole role)
     {
-        return MarketRole != null && role != null && MarketRole.Name.Equals(role.Name, StringComparison.OrdinalIgnoreCase) && MarketRole.Code.Equals(role.Code, StringComparison.OrdinalIgnoreCase);
+        return ActorRole.Name.Equals(role.Name, StringComparison.OrdinalIgnoreCase) && ActorRole.Code.Equals(role.Code, StringComparison.OrdinalIgnoreCase);
     }
 
     public bool HasAnyOfRoles(params ActorRole[] roles)
     {
-        return MarketRole != null && roles.Contains(MarketRole);
+        return roles.Contains(ActorRole);
     }
 
     public bool HasRestriction(Restriction suspect)
     {
-        return suspect != null && Restriction.Name.Equals(suspect.Name, StringComparison.OrdinalIgnoreCase);
+        return Restriction.Name.Equals(suspect.Name, StringComparison.OrdinalIgnoreCase);
     }
 }
