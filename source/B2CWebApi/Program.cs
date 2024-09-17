@@ -70,8 +70,7 @@ builder.Services
 
     // Http
     .AddHttpClient()
-    .AddControllers()
-    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+    .AddControllers();
 
 // ***********************************************************************************************
 // App building start here, aka Configure if one uses StartUp
