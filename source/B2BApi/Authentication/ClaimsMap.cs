@@ -36,8 +36,8 @@ public static class ClaimsMap
 
     public static ActorRole? RoleFrom(string roleClaimValue)
     {
-        _rolesMap.TryGetValue(roleClaimValue, out var marketRole);
-        return marketRole;
+        _rolesMap.TryGetValue(roleClaimValue, out var actorRole);
+        return actorRole;
     }
 
     public static Claim RoleFrom(ActorRole actorRole)

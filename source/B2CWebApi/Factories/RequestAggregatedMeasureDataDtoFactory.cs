@@ -128,20 +128,20 @@ public static class RequestAggregatedMeasureDataDtoFactory
     private static string MapRoleNameToCode(string roleName)
     {
         ArgumentException.ThrowIfNullOrEmpty(roleName);
-        var marketRole = ActorRole.FromName(roleName);
+        var actorRole = ActorRole.FromName(roleName);
 
-        if (marketRole == ActorRole.MeteredDataResponsible
-           || marketRole == ActorRole.EnergySupplier
-           || marketRole == ActorRole.BalanceResponsibleParty)
+        if (actorRole == ActorRole.MeteredDataResponsible
+           || actorRole == ActorRole.EnergySupplier
+           || actorRole == ActorRole.BalanceResponsibleParty)
         {
-            return marketRole.Code;
+            return actorRole.Code;
         }
 
-        if (WorkaroundFlags.GridOperatorToMeteredDataResponsibleHack && marketRole == ActorRole.GridAccessProvider)
+        if (WorkaroundFlags.GridOperatorToMeteredDataResponsibleHack && actorRole == ActorRole.GridAccessProvider)
         {
             return ActorRole.MeteredDataResponsible.Code;
         }
 
-        throw new ArgumentException($"Market Role: {marketRole}, is not allowed to request aggregated measure data.");
+        throw new ArgumentException($"Market Role: {actorRole}, is not allowed to request aggregated measure data.");
     }
 }

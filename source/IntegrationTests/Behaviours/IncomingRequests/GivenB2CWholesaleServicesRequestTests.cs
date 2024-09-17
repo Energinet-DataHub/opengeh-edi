@@ -42,10 +42,10 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
     {
     }
 
-    public static object[][] DocumentFormatsWithMarketRoleCombinations()
+    public static object[][] DocumentFormatsWithActorRoleCombinations()
     {
         // The actor roles who can perform WholesaleServicesRequest's
-        var marketRoles = new List<ActorRole>
+        var actorRoles = new List<ActorRole>
         {
             ActorRole.EnergySupplier,
             ActorRole.SystemOperator,
@@ -54,7 +54,7 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
 
         var peekDocumentFormats = DocumentFormats.GetAllDocumentFormats();
 
-        return marketRoles
+        return actorRoles
                 .SelectMany(actorRole => peekDocumentFormats
                     .Select(peekDocumentFormat => new object[]
                     {
@@ -65,7 +65,7 @@ public class GivenB2CWholesaleServicesRequestTests : WholesaleServicesBehaviourT
     }
 
     [Theory]
-    [MemberData(nameof(DocumentFormatsWithMarketRoleCombinations))]
+    [MemberData(nameof(DocumentFormatsWithActorRoleCombinations))]
     public async Task AndGiven_DataInOneGridArea_When_ActorPeeksAllMessages_Then_ReceivesOneNotifyWholesaleServicesDocumentWithCorrectContent(ActorRole actorRole, DocumentFormat peekDocumentFormat)
     {
         /*
