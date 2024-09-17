@@ -25,6 +25,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NodaTime;
+using NodaTime.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -38,6 +39,28 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
         : base(integrationTestFixture, testOutputHelper)
     {
         _archivedMessagesClient = GetService<IArchivedMessagesClient>();
+    }
+
+    [Fact]
+    public async Task Then_Fields_Is_Persisted()
+    {
+        var archivedMessageToBeCreated = CreateArchivedMessage();
+
+        await _archivedMessagesClient.CreateAsync(archivedMessageToBeCreated, CancellationToken.None);
+
+        var storedArchivedMessage = await GetArchivedMessageFromDatabaseAsync(archivedMessageToBeCreated.MessageId!);
+        Assert.NotNull(storedArchivedMessage);
+        Assert.Equal(archivedMessageToBeCreated.Id.Value, storedArchivedMessage!.Id);
+        Assert.Equal(archivedMessageToBeCreated.MessageId, storedArchivedMessage!.MessageId);
+        Assert.Equal(archivedMessageToBeCreated.DocumentType, storedArchivedMessage!.DocumentType);
+        Assert.Equal(archivedMessageToBeCreated.SenderNumber.Value, storedArchivedMessage!.SenderNumber);
+        Assert.Equal(archivedMessageToBeCreated.SenderRole.Code, storedArchivedMessage!.SenderRoleCode);
+        Assert.Equal(archivedMessageToBeCreated.ReceiverNumber, storedArchivedMessage!.ReceiverNumber);
+        Assert.Equal(archivedMessageToBeCreated.ReceiverRoleCode, storedArchivedMessage!.ReceiverRoleCode);
+        Assert.Equal(archivedMessageToBeCreated.CreatedAt.ToDateTimeUtc(), (DateTime)storedArchivedMessage!.CreatedAt);
+        Assert.Equal(archivedMessageToBeCreated.BusinessReason, storedArchivedMessage!.BusinessReason);
+        Assert.Equal(archivedMessageToBeCreated.RelatedToMessageId, storedArchivedMessage!.RelatedToMessageId);
+        Assert.Equal(archivedMessageToBeCreated.FileStorageReference.Path, storedArchivedMessage!.FileStorageReference);
     }
 
     [Fact]
@@ -155,7 +178,13 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
         Assert.Equal(messageId, result.Messages[1].MessageId);
     }
 
-    private static ArchivedMessage CreateArchivedMessage(ArchivedMessageType? archivedMessageType = null, string? messageId = null, string? documentContent = null, string? senderNumber = null, string? receiverNumber = null, Instant? timestamp = null)
+    private static ArchivedMessage CreateArchivedMessage(
+        ArchivedMessageType? archivedMessageType = null,
+        string? messageId = null,
+        string? documentContent = null,
+        string? senderNumber = null,
+        string? receiverNumber = null,
+        Instant? timestamp = null)
     {
 #pragma warning disable CA2000 // Don't dispose stream
         var documentStream = new MarketDocumentWriterMemoryStream();
@@ -173,10 +202,12 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
 
         return new ArchivedMessage(
             string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
-            Array.Empty<EventId>(),
+            new[] { EventId.From(Guid.NewGuid()) },
             DocumentType.NotifyAggregatedMeasureData.Name,
-            senderNumber ?? "1234512345123",
+            ActorNumber.Create(senderNumber ?? "1234512345123"),
+            ActorRole.EnergySupplier,
             receiverNumber ?? "1234512345128",
+            ActorRole.EnergySupplier.Code,
             timestamp ?? Instant.FromUtc(2023, 01, 01, 0, 0),
             BusinessReason.BalanceFixing.Name,
             archivedMessageType ?? ArchivedMessageType.OutgoingMessage,
