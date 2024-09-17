@@ -100,4 +100,11 @@
       </EmbeddedResource>
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="acceptancetest.dev002.settings.json" />
+      <Content Include="acceptancetest.dev002.settings.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
 </Project>
