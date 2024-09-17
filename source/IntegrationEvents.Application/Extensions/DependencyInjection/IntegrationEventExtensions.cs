@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.Core.Messaging.Communication.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
@@ -45,7 +46,7 @@ public static class IntegrationEventExtensions
                 sp => sp.GetServices<IIntegrationEventProcessor>()
                     .ToDictionary(m => m.EventTypeToHandle, m => m));
 
-        var integrationEventDescriptors = new List<MessageDescriptor>
+        services.AddSubscriber<IntegrationEventHandler>(new List<MessageDescriptor>
         {
             ActorActivated.Descriptor,
             GridAreaOwnershipAssigned.Descriptor,
@@ -53,10 +54,11 @@ public static class IntegrationEventExtensions
             ActorCertificateCredentialsAssigned.Descriptor,
             ProcessDelegationConfigured.Descriptor,
             CalculationCompletedV1.Descriptor,
-        };
+        });
+        services.AddDeadLetterHandlerForIsolatedWorker();
 
-        services.AddSubscriber<IntegrationEventHandler>(integrationEventDescriptors);
-        services.AddTransient<IDataRetention, ReceivedIntegrationEventsRetention>()
+        services
+            .AddTransient<IDataRetention, ReceivedIntegrationEventsRetention>()
             .AddTransient<IReceivedIntegrationEventRepository, ReceivedIntegrationEventRepository>()
             .AddTransient<IIntegrationEventHandler, IntegrationEventHandler>();
 
