@@ -63,13 +63,7 @@ public static class WholesaleInboxExtensions
                 sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
                 sp => sp.GetRequiredService<IOptions<WholesaleInboxQueueOptions>>().Value.QueueName,
                 _ => defaultAzureCredential,
-                name: wholesaleInboxQueueOptions.QueueName)
-            .AddServiceBusQueueDeadLetter(
-                sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.FullyQualifiedNamespace,
-                sp => sp.GetRequiredService<IOptions<WholesaleInboxQueueOptions>>().Value.QueueName,
-                _ => defaultAzureCredential,
-                "Dead-letter (wholesale inbox)",
-                [HealthChecksConstants.StatusHealthCheckTag]);
+                name: wholesaleInboxQueueOptions.QueueName);
 
         return services;
     }
