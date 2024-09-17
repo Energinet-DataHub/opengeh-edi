@@ -58,7 +58,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
         if (!nullGridArea)
         {
             actorRoles.Add(ActorRole.MeteredDataResponsible);
-            actorRoles.Add(ActorRole.GridOperator); // Grid Operator can make requests because of DDM -> MDR hack
+            actorRoles.Add(ActorRole.GridAccessProvider); // Grid Operator can make requests because of DDM -> MDR hack
         }
 
         var incomingDocumentFormats = DocumentFormats
@@ -341,7 +341,7 @@ public class GivenAggregatedMeasureDataRequestTests : AggregatedMeasureDataBehav
         var balanceResponsibleOrNull = currentActor.ActorRole == ActorRole.BalanceResponsibleParty
             ? currentActor.ActorNumber
             : null;
-        var gridAreaOrNull = currentActor.ActorRole == ActorRole.GridOperator || currentActor.ActorRole == ActorRole.MeteredDataResponsible
+        var gridAreaOrNull = currentActor.ActorRole == ActorRole.GridAccessProvider || currentActor.ActorRole == ActorRole.MeteredDataResponsible
             ? "512"
             : null;
 

@@ -82,39 +82,13 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
             frontendUser.MarketRole,
             string.Join(", ", frontendUser.Roles));
 
-        SetAuthenticatedActor(ActorNumber.Create(actorNumber), accessAllData: multiTenancy, role: TryGetActorRole(marketRole));
+        var actorRole = ActorRole.FromName(marketRole);
+        SetAuthenticatedActor(ActorNumber.Create(actorNumber), accessAllData: multiTenancy, role: actorRole);
 
         return Task.FromResult<FrontendUser?>(frontendUser);
     }
 
-    private ActorRole? TryGetActorRole(string role)
-    {
-        try
-        {
-            var marketRole = EnumerationType.FromName<MarketRole>(role);
-
-            // DataHubAdministrator does not have a corresponding actor role
-            if (marketRole == MarketRole.DataHubAdministrator)
-                return null;
-
-            if (marketRole.Code == null)
-                throw new InvalidOperationException("Market role code is null");
-
-            var actorRole = ActorRole.FromCode(marketRole.Code);
-            return actorRole;
-        }
-        catch (Exception e)
-        {
-            _logger.LogWarning(
-                e,
-                "Failed to parse front-end user's market role to actor role (market role: {Role})",
-                role);
-
-            return null;
-        }
-    }
-
-    private void SetAuthenticatedActor(ActorNumber actorNumber, bool accessAllData, ActorRole? role)
+    private void SetAuthenticatedActor(ActorNumber actorNumber, bool accessAllData, ActorRole role)
     {
         var restriction = accessAllData ? Restriction.None : Restriction.Owned;
 
@@ -127,6 +101,6 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
         _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(
             actorNumber: actorNumber,
             restriction: restriction,
-            marketRole: role));
+            actorRole: role));
     }
 }

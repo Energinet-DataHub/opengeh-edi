@@ -25,7 +25,7 @@ public class DelegateIncomingMessage
 {
     private static readonly HashSet<ActorRole> _rolesWithAllowedDelegation = new()
     {
-        ActorRole.GridOperator,
+        ActorRole.GridAccessProvider,
         ActorRole.Delegated,
     };
 
@@ -55,8 +55,8 @@ public class DelegateIncomingMessage
         // - message.SenderRoleCode is the delegated BY actor role (original actor role)
         // - the original actor number is found in the series based on the original actor role
         var requestedByActorNumber = ActorNumber.TryCreate(message.SenderNumber);
-        var requestedByActorRole = _authenticatedActor.CurrentActorIdentity.MarketRole != null
-            ? ActorRole.TryFromCode(_authenticatedActor.CurrentActorIdentity.MarketRole.Code)
+        var requestedByActorRole = _authenticatedActor.CurrentActorIdentity.ActorRole != null
+            ? ActorRole.TryFromCode(_authenticatedActor.CurrentActorIdentity.ActorRole.Code)
             : null;
 
         var originalActorRole = ActorRole.TryFromCode(message.SenderRoleCode);
@@ -76,7 +76,7 @@ public class DelegateIncomingMessage
         // Delegation is setup for grid areas, so we need to set delegated for each series since they contain the grid area
         foreach (var series in message.Series)
         {
-            if ((originalActorRole == ActorRole.GridOperator || originalActorRole == ActorRole.MeteredDataResponsible)
+            if ((originalActorRole == ActorRole.GridAccessProvider || originalActorRole == ActorRole.MeteredDataResponsible)
                 && series.GridArea == null)
             {
                 continue;

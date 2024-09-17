@@ -147,7 +147,7 @@ public class BehavioursTestBase : IDisposable
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         _authenticatedActor = GetService<AuthenticatedActor>();
         _authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None));
+            new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None, ActorRole.DataHubAdministrator));
     }
 
     private TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
