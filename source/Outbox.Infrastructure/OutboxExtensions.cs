@@ -12,26 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Outbox.Domain;
-using Energinet.DataHub.EDI.Outbox.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.Outbox.Application;
+namespace Energinet.DataHub.EDI.Outbox.Infrastructure;
 
-public class OutboxClient(
-    IOutboxRepository outboxRepository)
-    : IOutboxClient
+public static class OutboxExtensions
 {
-    private readonly IOutboxRepository _outboxRepository = outboxRepository;
-
-    public async Task CreateWithoutCommitAsync<T>(IOutboxMessage<T> message)
+    public static void AddOutboxRetention(this IServiceCollection serviceCollection)
     {
-        var payload = await message.SerializeAsync()
-            .ConfigureAwait(false);
-
-        var outboxMessage = new OutboxMessage(
-            message.Type,
-            payload);
-
-        _outboxRepository.Add(outboxMessage);
+        serviceCollection.AddTransient<IDataRetention, OutboxRetention>();
     }
 }

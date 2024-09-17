@@ -24,6 +24,7 @@ limitations under the License.
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Energinet.DataHub.Core.Databricks.SqlStatementExecution" Version="11.1.0" />
+        <PackageReference Include="Energinet.DataHub.Core.Outbox" Version="1.0.0-alpha-2" />
         <PackageReference Include="Microsoft.ApplicationInsights" Version="2.22.0" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.DurableTask" Version="1.1.5" />
         <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.1" />
@@ -60,8 +61,7 @@ limitations under the License.
       <ProjectReference Include="..\IntegrationEvents.Infrastructure\IntegrationEvents.Infrastructure.csproj" />
       <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
       <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
-      <ProjectReference Include="..\Outbox.Application\Outbox.Application.csproj" />
-      <ProjectReference Include="..\Outbox.Interfaces\Outbox.Interfaces.csproj" />
+      <ProjectReference Include="..\Outbox.Infrastructure\Outbox.Infrastructure.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Application\OutgoingMessages.Application.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Interfaces\OutgoingMessages.Interfaces.csproj" />

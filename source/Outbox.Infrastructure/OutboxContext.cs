@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.Core.Outbox.Domain;
+using Energinet.DataHub.Core.Outbox.Infrastructure.DbContext;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DbContext;
-using Energinet.DataHub.EDI.Outbox.Domain;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using ExecutionContext = Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext;
 
 namespace Energinet.DataHub.EDI.Outbox.Infrastructure;
 
-public class OutboxContext : DbContext, IEdiDbContext
+public class OutboxContext : DbContext, IEdiDbContext, IOutboxContext
 {
     private readonly ExecutionContext _executionContext;
     private readonly AuthenticatedActor _authenticatedActor;

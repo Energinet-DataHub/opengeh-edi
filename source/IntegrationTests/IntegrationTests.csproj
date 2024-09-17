@@ -66,9 +66,7 @@ limitations under the License.
       <ProjectReference Include="..\IntegrationEvents.Infrastructure\IntegrationEvents.Infrastructure.csproj" />
       <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
       <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
-      <ProjectReference Include="..\Outbox.Domain\Outbox.Domain.csproj" />
       <ProjectReference Include="..\Outbox.Infrastructure\Outbox.Infrastructure.csproj" />
-      <ProjectReference Include="..\Outbox.Interfaces\Outbox.Interfaces.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Application\OutgoingMessages.Application.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Domain\OutgoingMessages.Domain.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />

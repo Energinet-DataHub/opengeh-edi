@@ -13,17 +13,20 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
+using Energinet.DataHub.Core.Outbox.Abstractions;
+using Energinet.DataHub.Core.Outbox.Application;
+using Energinet.DataHub.Core.Outbox.Domain;
+using Energinet.DataHub.Core.Outbox.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
-using Energinet.DataHub.EDI.Outbox.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.Outbox.Domain;
 using Energinet.DataHub.EDI.Outbox.Infrastructure;
-using Energinet.DataHub.EDI.Outbox.Interfaces;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NodaTime;
 using Xunit;
@@ -59,15 +62,12 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
         // Arrange
         var clock = new Mock<IClock>();
         var outboxMessagePublisher = new Mock<IOutboxPublisher>();
-        var serviceProvider = ServiceCollection
-            .AddTransient<IOutboxPublisher>(_ => outboxMessagePublisher.Object)
-            .AddTransient<IClock>(_ => clock.Object)
-            .BuildServiceProvider();
+        var serviceProvider = BuildServiceProvider(clock, outboxMessagePublisher);
         var now = Instant.FromUtc(2024, 09, 02, 13, 37);
 
         var processor = serviceProvider.GetRequiredService<IOutboxProcessor>();
 
-        var outboxMessage = new OutboxMessage("mock-type", "mock-payload");
+        var outboxMessage = new OutboxMessage(now, "mock-type", "mock-payload");
         using (var writeScope = serviceProvider.CreateScope())
         {
             var repository = writeScope.ServiceProvider.GetRequiredService<IOutboxRepository>();
@@ -85,7 +85,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
             .Returns(now);
 
         // Act
-        await processor.ProcessOutboxAsync(CancellationToken.None);
+        await processor.ProcessOutboxAsync();
 
         // Assert
         using var readScope = serviceProvider.CreateScope();
@@ -116,7 +116,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
 
         var processor = serviceProvider.GetRequiredService<IOutboxProcessor>();
 
-        var outboxMessage = new OutboxMessage("mock-type", "mock-payload");
+        var outboxMessage = new OutboxMessage(now, "mock-type", "mock-payload");
         using (var writeScope = serviceProvider.CreateScope())
         {
             var repository = writeScope.ServiceProvider.GetRequiredService<IOutboxRepository>();
@@ -138,7 +138,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
             .Throws<Exception>();
 
         // Act
-        await processor.ProcessOutboxAsync(CancellationToken.None);
+        await processor.ProcessOutboxAsync();
 
         // Assert
         using var readScope = serviceProvider.CreateScope();
@@ -178,7 +178,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
 
         var processor = serviceProvider.GetRequiredService<IOutboxProcessor>();
 
-        var outboxMessage = new OutboxMessage(outboxMessageType, "mock-payload");
+        var outboxMessage = new OutboxMessage(failedAt, outboxMessageType, "mock-payload");
         outboxMessage.SetAsFailed(clock.Object, "an-error-message");
         using (var writeScope = serviceProvider.CreateScope())
         {
@@ -191,7 +191,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
 
         // Act
         // => Clock is set to the same time as the message failed, so the message is not ready to be retried yet
-        await processor.ProcessOutboxAsync(CancellationToken.None);
+        await processor.ProcessOutboxAsync();
 
         // Assert
         using var readScope = serviceProvider.CreateScope();
@@ -237,7 +237,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
 
         var processor = serviceProvider.GetRequiredService<IOutboxProcessor>();
 
-        var outboxMessage = new OutboxMessage(outboxMessageType, "mock-payload");
+        var outboxMessage = new OutboxMessage(inThePast, outboxMessageType, "mock-payload");
 
         // => Set clock to a time in the past, so SetAsFailed() sets FailedAt to sometime in the past
         clock.Setup(c => c.GetCurrentInstant())
@@ -258,7 +258,7 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
             .Returns(now);
 
         // Act
-        await processor.ProcessOutboxAsync(CancellationToken.None);
+        await processor.ProcessOutboxAsync();
 
         // Assert
         using var readScope = serviceProvider.CreateScope();
@@ -281,6 +281,15 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
                 Times.Once);
     }
 
+    private ServiceProvider BuildServiceProvider(Mock<IClock> clock, Mock<IOutboxPublisher> outboxMessagePublisher)
+    {
+        var serviceProvider = ServiceCollection
+            .AddTransient<IClock>(_ => clock.Object)
+            .AddTransient<IOutboxPublisher>(_ => outboxMessagePublisher.Object)
+            .BuildServiceProvider();
+        return serviceProvider;
+    }
+
     private void SetupServiceCollection()
     {
         var dbConnectionString = Fixture.DatabaseManager.ConnectionString;
@@ -298,14 +307,16 @@ public class OutboxProcessorTests : IClassFixture<OutboxTestFixture>, IAsyncLife
 
         ServiceCollection
             .AddSingleton<IConfiguration>(config)
+            .AddScopedSqlDbContext<OutboxContext>(config)
             .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
-            .AddOutboxModule(config)
-            .AddOutboxProcessor()
+            .AddOutboxProcessor<OutboxContext>()
+            .AddOutboxClient<OutboxContext>()
             .AddScoped<ExecutionContext>((x) =>
             {
                 var executionContext = new ExecutionContext();
                 executionContext.SetExecutionType(ExecutionType.Test);
                 return executionContext;
-            });
+            })
+            .AddLogging();
     }
 }
