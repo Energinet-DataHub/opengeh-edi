@@ -140,8 +140,8 @@ public class ReceiveIncomingMarketMessage
             new ArchivedMessage(
                 incomingMessage.MessageId,
                 incomingDocumentType.Name,
-                authenticatedActor.ActorNumber,
-                authenticatedActor.ActorRole,
+                authenticatedActor.ActorNumber.Value,
+                authenticatedActor.ActorRole.Code,
                 incomingMessage.ReceiverNumber,
                 incomingMessage.ReceiverRoleCode,
                 _clock.GetCurrentInstant(),

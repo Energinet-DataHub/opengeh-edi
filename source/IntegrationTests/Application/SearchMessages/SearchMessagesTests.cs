@@ -52,7 +52,7 @@ public class SearchMessagesTests : TestBase
         var messageInfo = result.Messages.FirstOrDefault(message => message.Id == archivedMessage.Id.Value);
         Assert.NotNull(messageInfo);
         Assert.Equal(archivedMessage.DocumentType, messageInfo.DocumentType);
-        Assert.Equal(archivedMessage.SenderNumber.Value, messageInfo.SenderNumber);
+        Assert.Equal(archivedMessage.SenderNumber, messageInfo.SenderNumber);
         Assert.Equal(archivedMessage.ReceiverNumber, messageInfo.ReceiverNumber);
         Assert.Equal(archivedMessage.CreatedAt.ToDateTimeUtc().ToString("u"), messageInfo.CreatedAt.ToDateTimeUtc().ToString("u")); // "u" is the "yyyy-mm-dd hh:MM:ssZ" format
         Assert.Equal(archivedMessage.MessageId, messageInfo.MessageId);
@@ -461,8 +461,8 @@ public class SearchMessagesTests : TestBase
             messageId ?? "MessageId",
             Array.Empty<EventId>(),
             documentType ?? DocumentType.NotifyAggregatedMeasureData.Name,
-            ActorNumber.Create(senderNumber ?? "1234512345123"),
-            ActorRole.EnergySupplier,
+            senderNumber ?? "1234512345123",
+            ActorRole.EnergySupplier.Code,
             receiverNumber ?? "1234512345128",
             ActorRole.EnergySupplier.Code,
             createdAt.GetValueOrDefault(_clock.GetCurrentInstant()),
