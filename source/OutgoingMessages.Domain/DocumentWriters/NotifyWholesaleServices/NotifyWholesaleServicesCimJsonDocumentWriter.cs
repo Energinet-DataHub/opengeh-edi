@@ -14,7 +14,9 @@
 
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Unicode;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM.Json;
@@ -49,7 +51,14 @@ public sealed class NotifyWholesaleServicesCimJsonDocumentWriter : IDocumentWrit
         IReadOnlyCollection<string> marketActivityRecords)
     {
         var stream = new MarketDocumentWriterMemoryStream();
-        var options = new JsonWriterOptions { Indented = true };
+        var options = new JsonWriterOptions
+        {
+            Indented = true,
+            Encoder = JavaScriptEncoder.Create(
+                UnicodeRanges.BasicLatin,
+                UnicodeRanges.Latin1Supplement,
+                UnicodeRanges.LatinExtendedA),
+        };
 
         using var writer = new Utf8JsonWriter(stream, options);
         CimJsonHeaderWriter.Write(header, DocumentTypeName, TypeCode, null, writer);

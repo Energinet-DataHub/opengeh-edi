@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System.Collections.ObjectModel;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Unicode;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM.Json;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
@@ -47,7 +49,15 @@ public class RejectRequestAggregatedMeasureDataCimJsonDocumentWriter : IDocument
     public async Task<MarketDocumentStream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
     {
         var stream = new MarketDocumentWriterMemoryStream();
-        var options = new JsonWriterOptions() { Indented = true };
+        var options = new JsonWriterOptions
+        {
+            Indented = true,
+            Encoder = JavaScriptEncoder.Create(
+                UnicodeRanges.BasicLatin,
+                UnicodeRanges.Latin1Supplement,
+                UnicodeRanges.LatinExtendedA),
+        };
+
         using var writer = new Utf8JsonWriter(stream, options);
 
         CimJsonHeaderWriter.Write(header, DocumentTypeName, TypeCode, ReasonCode.FullyRejected.Code, writer);
