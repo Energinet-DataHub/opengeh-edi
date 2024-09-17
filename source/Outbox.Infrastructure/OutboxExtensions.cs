@@ -13,14 +13,25 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.EDI.Outbox.Infrastructure;
 
 public static class OutboxExtensions
 {
-    public static void AddOutboxRetention(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddOutboxRetention(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddTransient<IDataRetention, OutboxRetention>();
+
+        return serviceCollection;
+    }
+
+    public static IServiceCollection AddOutboxContext(this IServiceCollection serviceCollection, IConfiguration configuration)
+    {
+        serviceCollection.AddScopedSqlDbContext<OutboxContext>(configuration);
+
+        return serviceCollection;
     }
 }

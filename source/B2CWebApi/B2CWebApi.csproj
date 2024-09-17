@@ -31,6 +31,7 @@
       <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj" />
       <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
+      <ProjectReference Include="..\Outbox.Infrastructure\Outbox.Infrastructure.csproj" />
       <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
     </ItemGroup>
 
