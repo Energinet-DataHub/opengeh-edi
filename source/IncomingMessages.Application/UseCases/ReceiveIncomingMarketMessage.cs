@@ -135,7 +135,6 @@ public class ReceiveIncomingMarketMessage
         IncomingDocumentType incomingDocumentType,
         CancellationToken cancellationToken)
     {
-        Thread.Sleep(5000);
         var authenticatedActor = _actorAuthenticator.CurrentActorIdentity;
         await _archivedMessagesClient.CreateAsync(
             new ArchivedMessage(
