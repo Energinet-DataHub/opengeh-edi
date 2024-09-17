@@ -55,7 +55,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
 
         if (!nullGridArea)
         {
-            actorRoles.Add(ActorRole.GridOperator);
+            actorRoles.Add(ActorRole.GridAccessProvider);
         }
 
         var incomingDocumentFormats = DocumentFormats
@@ -100,7 +100,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
         var chargeOwnerNumber = actor.ActorRole == ActorRole.SystemOperator
             ? actor.ActorNumber
             : ActorNumber.Create("5799999933444");
-        var gridOperatorNumber = actor.ActorRole == ActorRole.GridOperator
+        var gridOperatorNumber = actor.ActorRole == ActorRole.GridAccessProvider
             ? actor.ActorNumber
             : ActorNumber.Create("4444444444444");
 
@@ -220,7 +220,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
         var chargeOwnerNumber = actor.ActorRole == ActorRole.SystemOperator
             ? actor.ActorNumber
             : ActorNumber.Create("5799999933444");
-        var gridOperatorNumber = actor.ActorRole == ActorRole.GridOperator
+        var gridOperatorNumber = actor.ActorRole == ActorRole.GridAccessProvider
             ? actor.ActorNumber
             : ActorNumber.Create("4444444444444");
 
@@ -272,7 +272,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
         var chargeOwnerNumber = actor.ActorRole == ActorRole.SystemOperator
             ? actor.ActorNumber
             : ActorNumber.Create("5799999933444");
-        var gridOperatorNumber = actor.ActorRole == ActorRole.GridOperator
+        var gridOperatorNumber = actor.ActorRole == ActorRole.GridAccessProvider
             ? actor.ActorNumber
             : ActorNumber.Create("4444444444444");
 
@@ -413,7 +413,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
         var chargeOwnerOrNull = actor.ActorRole == ActorRole.SystemOperator
             ? actor.ActorNumber
             : null;
-        var gridAreaOrNull = actor.ActorRole == ActorRole.GridOperator
+        var gridAreaOrNull = actor.ActorRole == ActorRole.GridAccessProvider
             ? "512"
             : null;
 
@@ -542,7 +542,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
         var chargeOwnerNumber = actor.ActorRole == ActorRole.SystemOperator
             ? actor.ActorNumber
             : ActorNumber.Create("5799999933444");
-        var gridOperatorNumber = actor.ActorRole == ActorRole.GridOperator
+        var gridOperatorNumber = actor.ActorRole == ActorRole.GridAccessProvider
             ? actor.ActorNumber
             : ActorNumber.Create("4444444444444");
 
@@ -851,7 +851,7 @@ public class GivenWholesaleServicesRequestTests : WholesaleServicesBehaviourTest
         var chargeOwnerNumber = actor.ActorRole == ActorRole.SystemOperator
             ? actor.ActorNumber
             : ActorNumber.Create("5799999933444");
-        var gridOperatorNumber = actor.ActorRole == ActorRole.GridOperator
+        var gridOperatorNumber = actor.ActorRole == ActorRole.GridAccessProvider
             ? actor.ActorNumber
             : ActorNumber.Create("4444444444444");
 

@@ -44,11 +44,11 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
     public static object[][] DocumentFormatsWithMarketRoleCombinations()
     {
         // The actor roles who can perform AggregatedMeasureDataRequest's
-        var actorRoles = new List<MarketRole>
+        var actorRoles = new List<ActorRole>
         {
-            MarketRole.EnergySupplier,
-            MarketRole.BalanceResponsibleParty,
-            MarketRole.MeteredDataResponsible,
+            ActorRole.EnergySupplier,
+            ActorRole.BalanceResponsibleParty,
+            ActorRole.MeteredDataResponsible,
         };
 
         var peekDocumentFormats = DocumentFormats.GetAllDocumentFormats();
@@ -65,7 +65,7 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
 
     [Theory]
     [MemberData(nameof(DocumentFormatsWithMarketRoleCombinations))]
-    public async Task AndGiven_DataInOneGridArea_When_ActorPeeksAllMessages_Then_ReceivesOneNotifyAggregatedMeasureDataDocumentWithCorrectContent(MarketRole marketRole, DocumentFormat peekDocumentFormat)
+    public async Task AndGiven_DataInOneGridArea_When_ActorPeeksAllMessages_Then_ReceivesOneNotifyAggregatedMeasureDataDocumentWithCorrectContent(ActorRole actorRole, DocumentFormat peekDocumentFormat)
     {
         /*
          *  --- PART 1: Receive request, create process and send message to Wholesale ---
@@ -73,7 +73,6 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
 
         // Arrange
         var senderSpy = CreateServiceBusSenderSpy();
-        var actorRole = ActorRole.FromCode(marketRole.Code!);
         var currentActor = (ActorNumber: ActorNumber.Create("1111111111111"), ActorRole: actorRole);
         var energySupplierNumber = currentActor.ActorRole == ActorRole.EnergySupplier
             ? currentActor.ActorNumber
@@ -87,7 +86,7 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
 
         var transactionId = await GivenReceivedAggregatedMeasureDataRequest(
             senderActorNumber: currentActor.ActorNumber,
-            senderActorRole: marketRole,
+            senderActorRole: actorRole,
             energySupplier: energySupplierNumber,
             balanceResponsibleParty: balanceResponsibleParty,
             "512");
@@ -182,7 +181,7 @@ public class GivenB2CAggregatedMeasureDataRequestTests : AggregatedMeasureDataBe
 
     private async Task<string> GivenReceivedAggregatedMeasureDataRequest(
         ActorNumber senderActorNumber,
-        MarketRole senderActorRole,
+        ActorRole senderActorRole,
         ActorNumber energySupplier,
         ActorNumber balanceResponsibleParty,
         string gridArea)

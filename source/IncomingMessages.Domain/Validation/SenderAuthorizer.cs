@@ -47,7 +47,7 @@ public class SenderAuthorizer : ISenderAuthorizer
     private static bool HackThatAllowDdmToDoRequestsAsMdr(string senderRoleCode)
     {
         return WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack &&
-            !senderRoleCode.Equals(ActorRole.GridOperator.Code, StringComparison.OrdinalIgnoreCase);
+            !senderRoleCode.Equals(ActorRole.GridAccessProvider.Code, StringComparison.OrdinalIgnoreCase);
     }
 
     private void EnsureCurrentUserHasRequiredRole(string senderRole, bool allSeriesAreDelegated)
@@ -88,7 +88,7 @@ public class SenderAuthorizer : ISenderAuthorizer
                 switch (rwsm.SenderRoleCode)
                 {
                     case var sc1 when sc1.Equals(ActorRole.EnergySupplier.Code, StringComparison.OrdinalIgnoreCase):
-                    case var sc2 when sc2.Equals(ActorRole.GridOperator.Code, StringComparison.OrdinalIgnoreCase):
+                    case var sc2 when sc2.Equals(ActorRole.GridAccessProvider.Code, StringComparison.OrdinalIgnoreCase):
                     case var sc3 when sc3.Equals(ActorRole.SystemOperator.Code, StringComparison.OrdinalIgnoreCase):
                         break;
                     default:
@@ -104,7 +104,7 @@ public class SenderAuthorizer : ISenderAuthorizer
 
     private bool AllSeriesAreDelegatedToSender(bool allSeriesAreDelegated)
     {
-        return allSeriesAreDelegated && _actorAuthenticator.CurrentActorIdentity.HasAnyOfRoles(ActorRole.Delegated, ActorRole.GridOperator);
+        return allSeriesAreDelegated && _actorAuthenticator.CurrentActorIdentity.HasAnyOfRoles(ActorRole.Delegated, ActorRole.GridAccessProvider);
     }
 
     private void EnsureSenderIdMatches(string senderNumber)
@@ -121,6 +121,6 @@ public class SenderAuthorizer : ISenderAuthorizer
     {
         return WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack
                && senderRole == ActorRole.MeteredDataResponsible.Code
-               && _actorAuthenticator.CurrentActorIdentity.HasRole(ActorRole.GridOperator);
+               && _actorAuthenticator.CurrentActorIdentity.HasRole(ActorRole.GridAccessProvider);
     }
 }

@@ -75,7 +75,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
 
         GivenNowIs(Instant.FromUtc(2023, 09, 07, 13, 37, 05));
         var systemOperator = new Actor(DataHubDetails.SystemOperatorActorNumber, ActorRole.SystemOperator);
-        var gridOperator = new Actor(ActorNumber.Create("8500000000502"), ActorRole.GridOperator);
+        var gridOperator = new Actor(ActorNumber.Create("8500000000502"), ActorRole.GridAccessProvider);
         var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
 
         await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCode, gridOperator.ActorNumber);
@@ -201,7 +201,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
 
         GivenNowIs(Instant.FromUtc(2023, 09, 07, 13, 37, 05));
         var systemOperator = new Actor(DataHubDetails.SystemOperatorActorNumber, ActorRole.SystemOperator);
-        var gridOperator = new Actor(ActorNumber.Create("8500000000502"), ActorRole.GridOperator);
+        var gridOperator = new Actor(ActorNumber.Create("8500000000502"), ActorRole.GridAccessProvider);
         var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
 
         await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCode, gridOperator.ActorNumber);
@@ -325,7 +325,7 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
 
         GivenNowIs(Instant.FromUtc(2023, 09, 07, 13, 37, 05));
         var systemOperator = new Actor(DataHubDetails.SystemOperatorActorNumber, ActorRole.SystemOperator);
-        var gridOperator = new Actor(ActorNumber.Create("8500000000502"), ActorRole.GridOperator);
+        var gridOperator = new Actor(ActorNumber.Create("8500000000502"), ActorRole.GridAccessProvider);
         var energySupplier = new Actor(ActorNumber.Create("5790001662233"), ActorRole.EnergySupplier);
 
         await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCode, gridOperator.ActorNumber);

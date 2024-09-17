@@ -268,7 +268,7 @@ internal static class RequestAggregatedMeasureDataRequestBuilder
         {
             { ActorRole.EnergySupplier, (input) => input.EnergySupplier is not null },
             { ActorRole.BalanceResponsibleParty, (input) => input.BalanceResponsible is not null },
-            { ActorRole.GridOperator, (input) => input.GridAreas.Any(ga => ga is not null) },
+            { ActorRole.GridAccessProvider, (input) => input.GridAreas.Any(ga => ga is not null) },
             { ActorRole.MeteredDataResponsible, (input) => input.GridAreas.Any(ga => ga is not null) },
         };
 

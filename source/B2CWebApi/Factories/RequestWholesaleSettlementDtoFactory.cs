@@ -125,16 +125,15 @@ public static class RequestWholesaleSettlementDtoFactory
     private static string MapRoleNameToCode(string roleName)
     {
         ArgumentException.ThrowIfNullOrEmpty(roleName);
-        var marketRole = MarketRole.FromName(roleName);
+        var actorRole = ActorRole.FromName(roleName);
 
-        if ((marketRole == MarketRole.SystemOperator
-             || marketRole == MarketRole.EnergySupplier
-             || marketRole == MarketRole.GridAccessProvider)
-            && marketRole.Code != null)
+        if (actorRole == ActorRole.SystemOperator
+             || actorRole == ActorRole.EnergySupplier
+             || actorRole == ActorRole.GridAccessProvider)
         {
-            return marketRole.Code;
+            return actorRole.Code;
         }
 
-        throw new ArgumentException($"Market Role: {marketRole}, is not allowed to request wholesale settlement.");
+        throw new ArgumentException($"Market Role: {actorRole}, is not allowed to request wholesale settlement.");
     }
 }
