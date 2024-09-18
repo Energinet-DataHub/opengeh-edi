@@ -35,7 +35,7 @@ limitations under the License.
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.3.1" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.17.4" OutputItemType="Analyzer" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.23.0" />
-        <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="6.1.0-alpha-143" />
+        <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="6.1.0-alpha-145" />
         <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
       <!--Microsoft.IdentityModel.XX has to be in sync, aka. same version-->
       <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.0.2" />

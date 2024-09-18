@@ -66,7 +66,7 @@ public class B2BApiAppFixture : IAsyncLifetime
         IntegrationTestConfiguration = new IntegrationTestConfiguration();
         LogStopwatch(stopwatch, nameof(IntegrationTestConfiguration));
 
-        AzuriteManager = new AzuriteManager(useOAuth: false);
+        AzuriteManager = new AzuriteManager(useOAuth: true);
         LogStopwatch(stopwatch, nameof(AzuriteManager));
 
         CleanupAzuriteStorage();
@@ -365,6 +365,14 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.ProcessEnvironmentVariables.Add(
             nameof(BlobServiceClientConnectionOptions.AZURE_STORAGE_ACCOUNT_CONNECTION_STRING),
             AzuriteManager.FullConnectionString);
+
+        // Dead-letter logging
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"{BlobDeadLetterLoggerOptions.SectionName}__{nameof(BlobDeadLetterLoggerOptions.StorageAccountUrl)}",
+            AzuriteManager.BlobStorageServiceUri.OriginalString);
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"{BlobDeadLetterLoggerOptions.SectionName}__{nameof(BlobDeadLetterLoggerOptions.ContainerName)}",
+            "edi-b2bapi");
 
         // Database
         var dbConnectionString = DatabaseManager.ConnectionString;

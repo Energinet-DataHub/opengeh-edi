@@ -39,7 +39,7 @@ public class IntegrationEventDeadLetterListener
         ServiceBusMessageActions messageActions)
     {
         await _deadLetterHandler
-            .HandleAsync(message, messageActions)
+            .HandleAsync(deadLetterSource: "integration-events", message, messageActions)
             .ConfigureAwait(false);
     }
 }

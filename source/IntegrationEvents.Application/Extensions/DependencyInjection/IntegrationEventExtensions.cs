@@ -55,7 +55,7 @@ public static class IntegrationEventExtensions
             ProcessDelegationConfigured.Descriptor,
             CalculationCompletedV1.Descriptor,
         });
-        services.AddDeadLetterHandlerForIsolatedWorker();
+        services.AddDeadLetterHandlerForIsolatedWorker(configuration);
 
         services
             .AddTransient<IDataRetention, ReceivedIntegrationEventsRetention>()
