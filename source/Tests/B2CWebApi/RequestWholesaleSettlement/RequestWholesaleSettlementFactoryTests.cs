@@ -37,9 +37,9 @@ public class RequestWholesaleSettlementFactoryTests
     {
         return
         [
-            [MarketRole.EnergySupplier.Name],
-            [MarketRole.GridAccessProvider.Name],
-            [MarketRole.SystemOperator.Name],
+            [ActorRole.EnergySupplier.Name],
+            [ActorRole.GridAccessProvider.Name],
+            [ActorRole.SystemOperator.Name],
         ];
     }
 
@@ -47,7 +47,7 @@ public class RequestWholesaleSettlementFactoryTests
     {
         var validActorRoles = GetValidActorRoles().SelectMany(a => a);
 
-        var invalidActorRoles = EnumerationType.GetAll<MarketRole>()
+        var invalidActorRoles = EnumerationType.GetAll<ActorRole>()
             .Select(r => r.Name)
             .Where(v => !validActorRoles.Contains(v!))
             .Select(v => new[] { v! })
@@ -84,14 +84,14 @@ public class RequestWholesaleSettlementFactoryTests
         var result = RequestWholesaleSettlementDtoFactory.Create(
             request,
             senderId,
-            MarketRole.GridAccessProvider.Name,
+            ActorRole.GridAccessProvider.Name,
             _dateTimeZone,
             SystemClock.Instance.GetCurrentInstant());
 
         using var assertionScope = new AssertionScope();
         result.BusinessReason.Should().Be("D05");
         result.SenderNumber.Should().Be(senderId);
-        result.SenderRoleCode.Should().Be(MarketRole.GridAccessProvider.Code);
+        result.SenderRoleCode.Should().Be(ActorRole.GridAccessProvider.Code);
         result.MessageType.Should().Be("D21");
 
         result.Series.Should()
@@ -141,7 +141,7 @@ public class RequestWholesaleSettlementFactoryTests
         var result = RequestWholesaleSettlementDtoFactory.Create(
             request,
             "9876543210987",
-            MarketRole.SystemOperator.Name,
+            ActorRole.SystemOperator.Name,
             _dateTimeZone,
             SystemClock.Instance.GetCurrentInstant());
 
@@ -161,7 +161,7 @@ public class RequestWholesaleSettlementFactoryTests
         var result = RequestWholesaleSettlementDtoFactory.Create(
             request,
             "9876543210987",
-            MarketRole.GridAccessProvider.Name,
+            ActorRole.GridAccessProvider.Name,
             _dateTimeZone,
             SystemClock.Instance.GetCurrentInstant());
 

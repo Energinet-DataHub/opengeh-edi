@@ -60,7 +60,7 @@ public class MarketActorAuthenticatorMiddleware : IFunctionsWorkerMiddleware
         _logger.BeginScope(
             "ActorNumber: {ActorNumber}, ActorRole: {ActorRole}, Restriction: {Restriction}",
             authenticatedActor.CurrentActorIdentity.ActorNumber.Value,
-            authenticatedActor.CurrentActorIdentity.MarketRole?.Name,
+            authenticatedActor.CurrentActorIdentity.ActorRole?.Name,
             authenticatedActor.CurrentActorIdentity.Restriction.Name);
         {
             _logger.LogInformation("Successfully authenticated market actor identity.");

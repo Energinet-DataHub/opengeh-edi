@@ -26,15 +26,15 @@ public class AuditUserContext(AuthenticatedActor authenticatedActor) : IAuditUse
         {
             var currentActor = authenticatedActor.CurrentActorIdentity;
 
-            var actorRoles = currentActor.MarketRole is not null
-                ? new List<ActorRole> { currentActor.MarketRole }.AsReadOnly()
+            var actorRoles = currentActor.ActorRole is not null
+                ? new List<ActorRole> { currentActor.ActorRole }.AsReadOnly()
                 : null;
             return new AuditUser(
                 null,
                 null,
                 currentActor.ActorNumber,
                 actorRoles,
-                currentActor.MarketRole?.Name);
+                currentActor.ActorRole?.Name);
         }
     }
 }
