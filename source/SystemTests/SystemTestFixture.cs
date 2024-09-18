@@ -32,9 +32,12 @@ public class SystemTestFixture : IAsyncLifetime
             .AddEnvironmentVariables();
 
         var jsonConfiguration = configurationBuilder.Build();
-        var keyVaultName = jsonConfiguration.GetValue<string>("SHARED_KEYVAULT_NAME");
+        var sharedKeyVaultName = jsonConfiguration.GetValue<string>("SHARED_KEYVAULT_NAME");
+        var ediKeyVaultName = jsonConfiguration.GetValue<string>("INTERNAL_KEYVAULT_NAME");
 
-        configurationBuilder = configurationBuilder.AddAuthenticatedAzureKeyVault($"https://{keyVaultName}.vault.azure.net/");
+        configurationBuilder = configurationBuilder
+            .AddAuthenticatedAzureKeyVault($"https://{sharedKeyVaultName}.vault.azure.net/")
+            .AddAuthenticatedAzureKeyVault($"https://{ediKeyVaultName}.vault.azure.net/");
 
         var root = configurationBuilder.Build();
 
