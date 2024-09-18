@@ -16,7 +16,9 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
+using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
+using Google.Protobuf;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages;
@@ -67,7 +69,7 @@ public sealed class JsonEncoderTests
     }
 
     [Fact]
-    public void JsonDocumentParse_CanHandleEscapedCharacters()
+    public void JsonDocumentParse_HandlesScandinavianCharacters()
     {
         const string jsonPropertyName = "møøseStræng";
 
@@ -100,5 +102,34 @@ public sealed class JsonEncoderTests
         jsonElement.Should().NotBeNull();
 
         jsonElement.GetString().Should().Be(TestString);
+    }
+
+    [Fact]
+    public void ProtoBuff_HandlesScandinavianCharacters()
+    {
+        // Arrange
+        var message = new WholesaleServicesRequestRejected();
+        message.RejectReasons.Add(new RejectReason { ErrorCode = "mØøSe", ErrorMessage = TestString });
+
+        // Act
+        byte[] serializedMessage;
+        using (var memoryStream = new MemoryStream())
+        {
+            using (var codedOutputStream = new CodedOutputStream(memoryStream))
+            {
+                message.WriteTo(codedOutputStream);
+                codedOutputStream.Flush();
+                serializedMessage = memoryStream.ToArray();
+            }
+        }
+
+        var deserializedMessage = WholesaleServicesRequestRejected.Parser.ParseFrom(serializedMessage);
+
+        // Assert
+        deserializedMessage.RejectReasons.Should().ContainSingle();
+
+        var rejectReason = deserializedMessage.RejectReasons.Single();
+        rejectReason.ErrorCode.Should().Be("mØøSe");
+        rejectReason.ErrorMessage.Should().Be(TestString);
     }
 }
