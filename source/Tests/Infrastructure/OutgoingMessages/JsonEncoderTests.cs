@@ -65,4 +65,40 @@ public sealed class JsonEncoderTests
         // Assert
         result.Should().Contain(TestString);
     }
+
+    [Fact]
+    public void JsonDocumentParse_CanHandleEscapedCharacters()
+    {
+        const string jsonPropertyName = "møøseStræng";
+
+        // Arrange
+        var options = new JsonWriterOptions { Indented = true, Encoder = JavaScriptEncoder.Default };
+        var stream = new MemoryStream();
+        using var writer = new Utf8JsonWriter(stream, options);
+
+        // Act
+        writer.WriteStartObject();
+        writer.WritePropertyName(jsonPropertyName);
+        writer.WriteStringValue(TestString);
+        writer.WriteEndObject();
+        writer.Flush();
+
+        // Assert
+        Encoding.UTF8.GetString(stream.ToArray())
+            .Should()
+            .BeEquivalentTo(
+                """
+                {
+                  "m\u00F8\u00F8seStr\u00E6ng": "\u00C5\u00D8\u00C6\u00C4\u00D6\u00E5\u00F8\u00E6\u00E4\u00F6"
+                }
+                """);
+
+        var jsonDocument = JsonDocument.Parse(stream.ToArray());
+        jsonDocument.Should().NotBeNull();
+
+        var jsonElement = jsonDocument.RootElement.GetProperty(jsonPropertyName);
+        jsonElement.Should().NotBeNull();
+
+        jsonElement.GetString().Should().Be(TestString);
+    }
 }
