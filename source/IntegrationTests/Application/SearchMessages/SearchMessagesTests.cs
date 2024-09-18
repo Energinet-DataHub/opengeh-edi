@@ -53,7 +53,7 @@ public class SearchMessagesTests : TestBase
         Assert.NotNull(messageInfo);
         Assert.Equal(archivedMessage.DocumentType, messageInfo.DocumentType);
         Assert.Equal(archivedMessage.SenderNumber.Value, messageInfo.SenderNumber);
-        Assert.Equal(archivedMessage.ReceiverNumber, messageInfo.ReceiverNumber);
+        Assert.Equal(archivedMessage.ReceiverNumber.Value, messageInfo.ReceiverNumber);
         Assert.Equal(archivedMessage.CreatedAt.ToDateTimeUtc().ToString("u"), messageInfo.CreatedAt.ToDateTimeUtc().ToString("u")); // "u" is the "yyyy-mm-dd hh:MM:ssZ" format
         Assert.Equal(archivedMessage.MessageId, messageInfo.MessageId);
     }
@@ -487,9 +487,9 @@ public class SearchMessagesTests : TestBase
             Array.Empty<EventId>(),
             documentType ?? DocumentType.NotifyAggregatedMeasureData.Name,
             ActorNumber.Create(senderNumber ?? "1234512345123"),
-            senderRole ?? ActorRole.EnergySupplier,
-            receiverNumber ?? "1234512345128",
-            receiverRole?.Code ?? ActorRole.EnergySupplier.Code,
+            ActorRole.EnergySupplier,
+            ActorNumber.Create(receiverNumber ?? "1234512345128"),
+            ActorRole.EnergySupplier,
             createdAt.GetValueOrDefault(_clock.GetCurrentInstant()),
             businessReason ?? BusinessReason.BalanceFixing.Name,
             archivedMessageType ?? ArchivedMessageType.OutgoingMessage,

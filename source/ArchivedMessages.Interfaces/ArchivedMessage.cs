@@ -30,14 +30,14 @@ public class ArchivedMessage
         string documentType,
         ActorNumber senderNumber,
         ActorRole senderRole,
-        string receiverNumber, // Doesn't use ActorNumber since we want to make sure to always create a ArchivedMessage
-        string receiverRoleCode, // Doesn't use ActorRole since we want to make sure to always create a ArchivedMessage
+        ActorNumber receiverNumber,
+        ActorRole receiverRole,
         Instant createdAt,
         string? businessReason,
         ArchivedMessageType archivedMessageType,
         IMarketDocumentStream marketDocumentStream,
         MessageId? relatedToMessageId = null)
-        : this(messageId, eventIds, documentType, senderNumber, senderRole, receiverNumber, receiverRoleCode, createdAt, businessReason, archivedMessageType, new ArchivedMessageStream(marketDocumentStream), relatedToMessageId) { }
+        : this(messageId, eventIds, documentType, senderNumber, senderRole, receiverNumber, receiverRole, createdAt, businessReason, archivedMessageType, new ArchivedMessageStream(marketDocumentStream), relatedToMessageId) { }
 
     /// <summary>
     /// Creates an ArchivedMessage for an incoming message
@@ -47,13 +47,13 @@ public class ArchivedMessage
         string documentType,
         ActorNumber senderNumber,
         ActorRole senderRole,
-        string receiverNumber, // Doesn't use ActorNumber since we want to make sure to always create a ArchivedMessage
-        string receiverRoleCode, // Doesn't use ActorRole since we want to make sure to always create a ArchivedMessage
+        ActorNumber receiverNumber,
+        ActorRole receiverRole,
         Instant createdAt,
         string? businessReason,
         ArchivedMessageType archivedMessageType,
         IIncomingMarketMessageStream incomingMarketMessageStream)
-        : this(messageId, Array.Empty<EventId>(), documentType, senderNumber, senderRole, receiverNumber, receiverRoleCode, createdAt, businessReason, archivedMessageType, new ArchivedMessageStream(incomingMarketMessageStream)) { }
+        : this(messageId, Array.Empty<EventId>(), documentType, senderNumber, senderRole, receiverNumber, receiverRole, createdAt, businessReason, archivedMessageType, new ArchivedMessageStream(incomingMarketMessageStream)) { }
 
     private ArchivedMessage(
         string? messageId,
@@ -61,8 +61,8 @@ public class ArchivedMessage
         string documentType,
         ActorNumber senderNumber,
         ActorRole senderRole,
-        string receiverNumber, // Doesn't use ActorNumber since we want to make sure to always create a ArchivedMessage
-        string receiverRoleCode, // Doesn't use ActorRole since we want to make sure to always create a ArchivedMessage
+        ActorNumber receiverNumber,
+        ActorRole receiverRole,
         Instant createdAt,
         string? businessReason,
         ArchivedMessageType archivedMessageType,
@@ -76,14 +76,21 @@ public class ArchivedMessage
         SenderNumber = senderNumber;
         SenderRole = senderRole;
         ReceiverNumber = receiverNumber;
-        ReceiverRoleCode = receiverRoleCode;
+        ReceiverRole = receiverRole;
         CreatedAt = createdAt;
         BusinessReason = businessReason;
         RelatedToMessageId = relatedToMessageId;
         ArchivedMessageStream = archivedMessageStream;
 
-        var actorNumberForFileStorage = GetActorNumberForFileStoragePlacement(archivedMessageType, senderNumber.Value, receiverNumber);
-        FileStorageReference = FileStorageReference.Create(FileStorageCategory, actorNumberForFileStorage, createdAt, Id.Value);
+        var actorNumberForFileStorage = GetActorNumberForFileStoragePlacement(
+            archivedMessageType,
+            senderNumber.Value,
+            receiverNumber.Value);
+        FileStorageReference = FileStorageReference.Create(
+            FileStorageCategory,
+            actorNumberForFileStorage,
+            createdAt,
+            Id.Value);
     }
 
     public ArchivedMessageId Id { get; }
@@ -98,9 +105,9 @@ public class ArchivedMessage
 
     public ActorRole SenderRole { get; }
 
-    public string ReceiverNumber { get; }
+    public ActorNumber ReceiverNumber { get; }
 
-    public string ReceiverRoleCode { get; }
+    public ActorRole ReceiverRole { get; }
 
     public Instant CreatedAt { get; }
 
