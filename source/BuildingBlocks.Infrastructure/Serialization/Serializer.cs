@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Unicode;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization.Converters;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using NodaTime.Serialization.SystemTextJson;
@@ -28,8 +30,15 @@ public class Serializer : ISerializer
 
     public Serializer()
     {
-        _options = new JsonSerializerOptions();
-        _options.PropertyNameCaseInsensitive = true;
+        _options = new JsonSerializerOptions
+        {
+            Encoder = JavaScriptEncoder.Create(
+                UnicodeRanges.BasicLatin,
+                UnicodeRanges.Latin1Supplement,
+                UnicodeRanges.LatinExtendedA),
+            PropertyNameCaseInsensitive = true,
+        };
+
         _options.Converters.Add(NodaConverters.InstantConverter);
         _options.Converters.Add(new CustomJsonConverterForType());
         _options.Converters.Add(new ObjectToInferredTypesConverter());

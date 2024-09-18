@@ -16,6 +16,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Google.Protobuf;
@@ -131,5 +132,18 @@ public sealed class JsonEncoderTests
         var rejectReason = deserializedMessage.RejectReasons.Single();
         rejectReason.ErrorCode.Should().Be("mØøSe");
         rejectReason.ErrorMessage.Should().Be(TestString);
+    }
+
+    [Fact]
+    public void DataHubSerializer_HandlesScandinavianCharacters()
+    {
+        // Arrange
+        var serializer = new Serializer();
+
+        // Act
+        var serialized = serializer.Serialize(TestString);
+
+        // Assert
+        serialized.Should().Contain(TestString);
     }
 }
