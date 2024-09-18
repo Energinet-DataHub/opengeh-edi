@@ -96,7 +96,7 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         dequeuedBundles.Should().NotContain(x => x.ActorMessageQueueId == actorMessageQueueForEs!.Id);
 
         // We are still able to peek the message for the grid operator.
-        var peekResultForGo = await PeekMessageAsync(MessageCategory.Aggregations, chargeOwnerId, ActorRole.GridOperator);
+        var peekResultForGo = await PeekMessageAsync(MessageCategory.Aggregations, chargeOwnerId, ActorRole.GridAccessProvider);
         peekResultForGo.Should().NotBeNull();
 
         // blob should be cleaned up
@@ -155,7 +155,7 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         dequeuedBundles.Should().NotContain(x => x.ActorMessageQueueId == actorMessageQueueForEs!.Id);
 
         // We are still able to peek the message for the grid operator.
-        var peekResultForGo = await PeekMessageAsync(MessageCategory.Aggregations, chargeOwnerId, ActorRole.GridOperator);
+        var peekResultForGo = await PeekMessageAsync(MessageCategory.Aggregations, chargeOwnerId, ActorRole.GridAccessProvider);
         peekResultForGo.Should().NotBeNull();
     }
 
@@ -217,7 +217,7 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         dequeuedBundles.Should().NotContain(x => x.ActorMessageQueueId == actorMessageQueueForEs!.Id);
 
         // We are still able to peek the message for the grid operator.
-        var peekResultForGo = await PeekMessageAsync(MessageCategory.Aggregations, chargeOwnerId, ActorRole.GridOperator);
+        var peekResultForGo = await PeekMessageAsync(MessageCategory.Aggregations, chargeOwnerId, ActorRole.GridAccessProvider);
         peekResultForGo.Should().NotBeNull();
 
         // blob should be cleaned up

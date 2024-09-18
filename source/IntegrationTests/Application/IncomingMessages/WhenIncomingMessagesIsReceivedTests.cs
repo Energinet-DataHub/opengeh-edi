@@ -114,7 +114,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         // Assert
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.GridOperator));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.GridAccessProvider));
 
         // Act
         await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
@@ -347,12 +347,14 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         _clockStub.SetCurrentInstant(expectedTimestamp.ToInstant());
 
         var senderActorNumber = ActorNumber.Create("5799999933318");
+        var senderActorRole = "DDK";
         var authenticatedActor = GetService<AuthenticatedActor>();
         authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
         var messageStream = ReadJsonFile(path);
         var messageIdFromFile = "123564789123564789123564789123564789";
         var businessReasonFromFile = "D05";
         var receiverActorNumberFromFile = "5790001330552";
+        var receiverActorRoleFromFile = "DGL";
 
         // Act
         await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
@@ -377,6 +379,8 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             { "Id", id => id.Should().NotBeNull() },
             { "MessageId", messageId => messageId.Should().Be(messageIdFromFile) },
             { "ReceiverNumber", receiverNumber => receiverNumber.Should().Be(receiverActorNumberFromFile) },
+            { "ReceiverRoleCode", receiverRoleCode => receiverRoleCode.Should().Be(receiverActorRoleFromFile) },
+            { "SenderRoleCode", senderRoleCode => senderRoleCode.Should().Be(senderActorRole) },
             { "RecordId", recordId => recordId.Should().NotBeNull() },
             { "RelatedToMessageId", relatedToMessageId => relatedToMessageId.Should().BeNull() },
             { "SenderNumber", senderNumber => senderNumber.Should().Be(senderActorNumber.Value) },

@@ -155,7 +155,13 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
         Assert.Equal(messageId, result.Messages[1].MessageId);
     }
 
-    private static ArchivedMessage CreateArchivedMessage(ArchivedMessageType? archivedMessageType = null, string? messageId = null, string? documentContent = null, string? senderNumber = null, string? receiverNumber = null, Instant? timestamp = null)
+    private static ArchivedMessage CreateArchivedMessage(
+        ArchivedMessageType? archivedMessageType = null,
+        string? messageId = null,
+        string? documentContent = null,
+        string? senderNumber = null,
+        string? receiverNumber = null,
+        Instant? timestamp = null)
     {
 #pragma warning disable CA2000 // Don't dispose stream
         var documentStream = new MarketDocumentWriterMemoryStream();
@@ -173,10 +179,12 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
 
         return new ArchivedMessage(
             string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
-            Array.Empty<EventId>(),
+            new[] { EventId.From(Guid.NewGuid()) },
             DocumentType.NotifyAggregatedMeasureData.Name,
-            senderNumber ?? "1234512345123",
-            receiverNumber ?? "1234512345128",
+            ActorNumber.Create(senderNumber ?? "1234512345123"),
+            ActorRole.EnergySupplier,
+            ActorNumber.Create(receiverNumber ?? "1234512345128"),
+            ActorRole.EnergySupplier,
             timestamp ?? Instant.FromUtc(2023, 01, 01, 0, 0),
             BusinessReason.BalanceFixing.Name,
             archivedMessageType ?? ArchivedMessageType.OutgoingMessage,

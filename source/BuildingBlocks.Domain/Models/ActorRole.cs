@@ -25,7 +25,7 @@ public class ActorRole : DataHubType<ActorRole>
 
     // A grid operator has two roles.
     // GridOperator (DDM) when creating a new metering point
-    public static readonly ActorRole GridOperator = new(DataHubNames.ActorRole.GridOperator, "DDM");
+    public static readonly ActorRole GridAccessProvider = new(DataHubNames.ActorRole.GridAccessProvider, "DDM");
     public static readonly ActorRole MeteredDataAdministrator = new(DataHubNames.ActorRole.MeteredDataAdministrator, "DGL");
 
     // A grid operator has two roles.
@@ -37,6 +37,9 @@ public class ActorRole : DataHubType<ActorRole>
     public static readonly ActorRole SystemOperator = new(DataHubNames.ActorRole.SystemOperator, "EZ");
     public static readonly ActorRole DanishEnergyAgency = new(DataHubNames.ActorRole.DanishEnergyAgency, "STS");
     public static readonly ActorRole Delegated = new(DataHubNames.ActorRole.Delegated, "DEL");
+
+    // DataHubAdministrator is a special role that is used to indicate that the user has special permissions.
+    public static readonly ActorRole DataHubAdministrator = new(DataHubNames.ActorRole.DataHubAdministrator, string.Empty);
 
     [JsonConstructor]
     private ActorRole(string name, string code)
@@ -71,7 +74,7 @@ public class ActorRole : DataHubType<ActorRole>
     private ActorRole HackForMeteredDataResponsible()
     {
         if (WorkaroundFlags.MeteredDataResponsibleToGridOperatorHack && Equals(MeteredDataResponsible))
-            return GridOperator;
+            return GridAccessProvider;
 
         return this;
     }

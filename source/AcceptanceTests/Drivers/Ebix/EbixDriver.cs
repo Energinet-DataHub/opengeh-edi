@@ -191,6 +191,22 @@ internal sealed class EbixDriver : IDisposable
             node = response.MessageContainer.Payload.SelectSingleNode(query, nsmgr);
         }
 
+        if (node == null)
+        {
+            nsmgr = new XmlNamespaceManager(new NameTable());
+            nsmgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_RejectAggregatedBillingInformation:v3");
+            query = "/ns0:HeaderEnergyDocument/ns0:Identification";
+            node = response.MessageContainer.Payload.SelectSingleNode(query, nsmgr);
+        }
+
+        if (node == null)
+        {
+            nsmgr = new XmlNamespaceManager(new NameTable());
+            nsmgr.AddNamespace("ns0", "un:unece:260:data:EEM-DK_RejectRequestMeteredDataAggregated:v3");
+            query = "/ns0:HeaderEnergyDocument/ns0:Identification";
+            node = response.MessageContainer.Payload.SelectSingleNode(query, nsmgr);
+        }
+
         return node!.InnerText;
     }
 

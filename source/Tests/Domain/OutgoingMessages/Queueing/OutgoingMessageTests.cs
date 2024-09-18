@@ -284,7 +284,7 @@ public class OutgoingMessageTests
         // Assert
         using var scope = new AssertionScope();
         outgoingMessage.Receiver.ActorRole.Should().Be(ActorRole.MeteredDataResponsible);
-        outgoingMessage.GetActorMessageQueueMetadata().ActorRole.Should().Be(ActorRole.GridOperator);
+        outgoingMessage.GetActorMessageQueueMetadata().ActorRole.Should().Be(ActorRole.GridAccessProvider);
     }
 
     private static OutgoingMessageHeader GetHeader()
