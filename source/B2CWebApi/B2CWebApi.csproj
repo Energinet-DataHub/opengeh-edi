@@ -1,43 +1,43 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <OutputType>Exe</OutputType>
-    <AssemblyName>Energinet.DataHub.EDI.B2CWebApi</AssemblyName>
-    <RootNamespace>Energinet.DataHub.EDI.B2CWebApi</RootNamespace>
-  </PropertyGroup>
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <OutputType>Exe</OutputType>
+        <AssemblyName>Energinet.DataHub.EDI.B2CWebApi</AssemblyName>
+        <RootNamespace>Energinet.DataHub.EDI.B2CWebApi</RootNamespace>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Energinet.DataHub.Core.App.WebApp" Version="13.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
-    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="2.13.5" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.3" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Energinet.DataHub.Core.App.WebApp" Version="13.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8" />
+        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
+        <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="2.13.5" />
+        <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.3" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />
-    <ProjectReference Include="..\ArchivedMessages.Interfaces\ArchivedMessages.Interfaces.csproj" />
-    <ProjectReference Include="..\AuditLog\AuditLog.csproj" />
-    <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
-    <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
-    <ProjectReference Include="..\DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj" />
-    <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj" />
-    <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj" />
-    <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
-    <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
-    <ProjectReference Include="..\Outbox.Application\Outbox.Application.csproj" />
-    <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />
+      <ProjectReference Include="..\ArchivedMessages.Interfaces\ArchivedMessages.Interfaces.csproj" />
+      <ProjectReference Include="..\AuditLog\AuditLog.csproj" />
+      <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+      <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+      <ProjectReference Include="..\DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj" />
+      <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj" />
+      <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj" />
+      <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
+      <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
+      <ProjectReference Include="..\Outbox.Application\Outbox.Application.csproj" />
+      <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
+    </ItemGroup>
 
-  <ItemDefinitionGroup>
-    <ProjectReference>
-      <PrivateAssets>all</PrivateAssets>
-    </ProjectReference>
-  </ItemDefinitionGroup>
+    <ItemDefinitionGroup>
+      <ProjectReference>
+        <PrivateAssets>all</PrivateAssets>
+      </ProjectReference>
+    </ItemDefinitionGroup>
 </Project>
