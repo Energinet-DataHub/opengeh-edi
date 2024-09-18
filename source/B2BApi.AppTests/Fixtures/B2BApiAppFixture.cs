@@ -34,6 +34,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Option
 using Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
+using Energinet.DataHub.RevisionLog.Integration.Options;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Xunit;
 using Xunit.Abstractions;
@@ -414,7 +415,7 @@ public class B2BApiAppFixture : IAsyncLifetime
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"{AuditLogOptions.SectionName}__{nameof(AuditLogOptions.IngestionUrl)}",
+            $"RevisionLogOptions__{nameof(RevisionLogOptions.ApiAddress)}",
             AuditLogMockServer.IngestionUrl);
 
         appHostSettings.ProcessEnvironmentVariables.Add(
