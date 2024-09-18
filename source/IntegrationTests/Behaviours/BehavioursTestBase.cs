@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using AutoFixture;
 using Azure.Messaging.ServiceBus;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.FeatureFlag;
@@ -423,18 +424,22 @@ public class BehavioursTestBase : IDisposable
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
+                    // ServiceBus
                     [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = MockServiceBusName,
                     [$"{EdiInboxQueueOptions.SectionName}:{nameof(EdiInboxQueueOptions.QueueName)}"] = MockServiceBusName,
                     [$"{WholesaleInboxQueueOptions.SectionName}:{nameof(WholesaleInboxQueueOptions.QueueName)}"] = MockServiceBusName,
                     [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = MockServiceBusName,
-                    ["IntegrationEvents:TopicName"] = "NotEmpty",
-                    ["IntegrationEvents:SubscriptionName"] = "NotEmpty",
+                    [$"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.TopicName)}"] = "NotEmpty",
+                    [$"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.SubscriptionName)}"] = "NotEmpty",
+
+                    // Dead-letter logging
+                    [$"{BlobDeadLetterLoggerOptions.SectionName}:{nameof(BlobDeadLetterLoggerOptions.StorageAccountUrl)}"] = _integrationTestFixture.AzuriteManager.BlobStorageServiceUri.ToString(),
+                    [$"{BlobDeadLetterLoggerOptions.SectionName}:{nameof(BlobDeadLetterLoggerOptions.ContainerName)}"] = "edi-tests",
 
                     // Databricks
                     [nameof(DatabricksSqlStatementOptions.WorkspaceUrl)] = _integrationTestFixture.IntegrationTestConfiguration.DatabricksSettings.WorkspaceUrl,
                     [nameof(DatabricksSqlStatementOptions.WorkspaceToken)] = _integrationTestFixture.IntegrationTestConfiguration.DatabricksSettings.WorkspaceAccessToken,
                     [nameof(DatabricksSqlStatementOptions.WarehouseId)] = _integrationTestFixture.IntegrationTestConfiguration.DatabricksSettings.WarehouseId,
-
                     // => EDI views
                     [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.DatabaseName)}"] = _integrationTestFixture.DatabricksSchemaManager.SchemaName,
                     [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.CatalogName)}"] = "hive_metastore",
