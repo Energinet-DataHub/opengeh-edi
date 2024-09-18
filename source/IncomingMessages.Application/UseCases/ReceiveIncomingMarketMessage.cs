@@ -144,7 +144,7 @@ public class ReceiveIncomingMarketMessage
                 authenticatedActor.ActorNumber,
                 authenticatedActor.ActorRole,
                 // For RequestAggregatedMeteringData and RequestWholesaleServices,
-                // the receiver is the Metered Data Administrator
+                // the receiver is Metered Data Administrator
                 DataHubDetails.DataHubActorNumber,
                 ActorRole.MeteredDataAdministrator,
                 _clock.GetCurrentInstant(),
