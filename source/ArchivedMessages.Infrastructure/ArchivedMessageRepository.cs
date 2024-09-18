@@ -47,17 +47,19 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
 
         var sql = @"INSERT INTO [dbo].[ArchivedMessages]
-                       ([Id], [EventIds], [DocumentType], [ReceiverNumber], [SenderNumber], [CreatedAt], [BusinessReason], [FileStorageReference], [MessageId], [RelatedToMessageId])
+                       ([Id], [EventIds], [DocumentType], [ReceiverNumber], [ReceiverRoleCode], [SenderNumber], [SenderRoleCode], [CreatedAt], [BusinessReason], [FileStorageReference], [MessageId], [RelatedToMessageId])
                        VALUES
-                       (@Id, @EventIds, @DocumentType, @ReceiverNumber, @SenderNumber, @CreatedAt, @BusinessReason, @FileStorageReference, @MessageId, @RelatedToMessageId)";
+                       (@Id, @EventIds, @DocumentType, @ReceiverNumber, @ReceiverRoleCode, @SenderNumber, @SenderRoleCode, @CreatedAt, @BusinessReason, @FileStorageReference, @MessageId, @RelatedToMessageId)";
 
         var parameters = new
         {
             Id = message.Id.Value.ToString(),
             EventIds = message.EventIds.Count > 0 ? string.Join("::", message.EventIds.Select(id => id.Value)) : null,
             message.DocumentType,
-            message.ReceiverNumber,
-            message.SenderNumber,
+            ReceiverNumber = message.ReceiverNumber.Value,
+            ReceiverRoleCode = message.ReceiverRole.Code,
+            SenderNumber = message.SenderNumber.Value,
+            SenderRoleCode = message.SenderRole.Code,
             message.CreatedAt,
             message.BusinessReason,
             FileStorageReference = message.FileStorageReference.Path,
