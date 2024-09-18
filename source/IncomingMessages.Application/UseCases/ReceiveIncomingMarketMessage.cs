@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
@@ -140,10 +141,12 @@ public class ReceiveIncomingMarketMessage
             new ArchivedMessage(
                 incomingMessage.MessageId,
                 incomingDocumentType.Name,
-                authenticatedActor.ActorNumber.Value,
-                authenticatedActor.ActorRole.Code,
-                incomingMessage.ReceiverNumber,
-                incomingMessage.ReceiverRoleCode,
+                authenticatedActor.ActorNumber,
+                authenticatedActor.ActorRole,
+                // For RequestAggregatedMeteringData and RequestWholesaleServices,
+                // the receiver is the Metered Data Administrator
+                DataHubDetails.DataHubActorNumber,
+                ActorRole.MeteredDataAdministrator,
                 _clock.GetCurrentInstant(),
                 incomingMessage.BusinessReason,
                 ArchivedMessageType.IncomingMessage,
