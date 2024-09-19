@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Encodings.Web;
+using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
@@ -20,6 +22,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
@@ -80,9 +83,11 @@ public class RejectRequestAggregatedMeasureDataDocumentWriterTests : IClassFixtu
         }
         else
         {
-            return new RejectRequestAggregatedMeasureDataCimJsonDocumentWriter(_parser).WriteAsync(
-                documentHeader,
-                new[] { records, });
+            var serviceProvider = new ServiceCollection().AddJavaScriptEncoder().BuildServiceProvider();
+            return new RejectRequestAggregatedMeasureDataCimJsonDocumentWriter(
+                    _parser,
+                    serviceProvider.GetRequiredService<JavaScriptEncoder>())
+                .WriteAsync(documentHeader, new[] { records });
         }
     }
 
