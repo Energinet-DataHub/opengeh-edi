@@ -84,6 +84,9 @@ public static class HostFactory
                         // System timer
                         .AddNodaTimeForApplication()
 
+                        // Encoder
+                        .AddJavaScriptEncoder()
+
                         // Serializer
                         .AddSerializer()
 

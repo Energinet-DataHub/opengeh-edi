@@ -167,6 +167,7 @@ public class AuditLogOutboxPublisherTests : IClassFixture<AuditLogTestFixture>, 
         ServiceCollection
             .AddSingleton<IConfiguration>(config)
             .AddHttpClient()
+            .AddJavaScriptEncoder()
             .AddSerializer()
             .AddAuditLogOutboxPublisher(config)
             .AddTransient<AuditLogOutboxPublisher>(sp => (AuditLogOutboxPublisher)sp.GetRequiredService<IOutboxPublisher>());

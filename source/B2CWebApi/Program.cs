@@ -68,6 +68,9 @@ builder.Services
     // Defined in app settings
     .AddJwtTokenSecurity(builder.Configuration)
 
+    // Encoder
+    .AddJavaScriptEncoder()
+
     // Serializer
     .AddSerializer()
 
