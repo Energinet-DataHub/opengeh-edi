@@ -37,6 +37,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
     internal const string EdiSubsystemTestCimEnergySupplierNumber = "5790000392551"; // Corresponds to the "EDI - SUBSYSTEM TEST CIM" in the UI. Same as B2BEnergySupplierAuthorizedHttpClient
     internal const string EZTestCimActorNumber = "5790001330552"; // Corresponds to the "EDI - SUBSYSTEM TEST SYSTEM OPERATØR". Same as B2BSystemOperatorAuthorizedHttpClient
     internal const string ChargeOwnerId = "5790000391919"; // For now is a dummy value, but when we support multiple receivers, this will be the charge owners GLN.
+    internal const string B2CActorNumber = "5790001330583"; // Corresponds to the "Energinet DataHub A/S (DataHub systemadministrator)" actor in the UI.
 
     private readonly Uri _azureEntraB2CTenantUrl;
     private readonly string _azureEntraFrontendAppId;
