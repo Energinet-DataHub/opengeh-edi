@@ -184,7 +184,7 @@ public class TestBase : IDisposable
 
         var outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), restriction: Restriction.None, actorRole ?? ActorRole.EnergySupplier));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), restriction: Restriction.Owned, actorRole ?? ActorRole.EnergySupplier));
         return outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, actorRole ?? ActorRole.EnergySupplier, documentFormat ?? DocumentFormat.Xml), CancellationToken.None);
     }
 
