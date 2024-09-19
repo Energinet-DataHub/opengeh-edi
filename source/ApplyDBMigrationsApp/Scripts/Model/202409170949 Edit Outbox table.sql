@@ -22,7 +22,7 @@ CREATE TABLE [dbo].[Outbox]
     CONSTRAINT [PK_Outbox]            PRIMARY KEY NONCLUSTERED ([Id]),
 
     -- A UNIQUE CLUSTERED constraint on an INT IDENTITY column optimizes the performance of the outbox table
-    -- by ordering indexes by the sequential RecordId column instead of the UNIQUEIDENTIFIER  primary key (which is random).
+    -- by ordering indexes by the sequential RecordId column instead of the UNIQUEIDENTIFIER primary key (which is random).
     CONSTRAINT [UX_Outbox_RecordId]   UNIQUE CLUSTERED ([RecordId] ASC),
 )
 GO
