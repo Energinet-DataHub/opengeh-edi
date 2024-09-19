@@ -13,7 +13,11 @@
 // limitations under the License.
 
 using System.Diagnostics;
+using Dapper;
+using Energinet.DataHub.Core.Outbox.Domain;
+using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Microsoft.Data.SqlClient;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
@@ -194,5 +198,54 @@ internal sealed class EdiDatabaseDriver
             deleteOutgoingMessagesCommand.Connection = connection;
             await deleteOutgoingMessagesCommand.ExecuteNonQueryAsync().ConfigureAwait(false);
         }
+    }
+
+    internal async Task<(bool Success, DateTime? PublishedAt, string? Payload, DateTime? FailedAt, string? ErrorMessage)>
+        GetPublishedOutboxMessageAsync(
+            Instant publishedAfter,
+            CancellationToken cancellationToken)
+    {
+        await using var connection = new SqlConnection(_connectionString);
+
+        var stopWatch = Stopwatch.StartNew();
+
+        DateTime? publishedAt = null;
+        DateTime? failedAt = null;
+        string? errorMessage = null;
+        string? payload = null;
+
+        await connection.OpenAsync(cancellationToken);
+        while (stopWatch.Elapsed < TimeSpan.FromSeconds(30))
+        {
+            var outboxMessage = await connection.QueryFirstAsync(
+                    @"SELECT * FROM [Outbox]
+                            WHERE [PublishedAt] > @PublishedAfter AND
+                                  [Type] = @OutboxMessageType
+                            ORDER BY [CreatedAt] ASC",
+                    new
+                    {
+                        PublishedAfter = publishedAfter.ToDateTimeUtc(),
+                        OutboxMessageType = AuditLogOutboxMessageV1.OutboxMessageType,
+                    })
+                .ConfigureAwait(false);
+
+            if (outboxMessage == null)
+                continue;
+
+            publishedAt = outboxMessage.PublishedAt;
+            failedAt = outboxMessage.FailedAt;
+            errorMessage = outboxMessage.ErrorMessage;
+            payload = outboxMessage.Payload;
+
+            if (outboxMessage.PublishedAt != null)
+                return (true, publishedAt, payload, failedAt, errorMessage);
+
+            await Task.Delay(1000, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        await connection.CloseAsync();
+
+        return (false, publishedAt, payload, failedAt, errorMessage);
     }
 }

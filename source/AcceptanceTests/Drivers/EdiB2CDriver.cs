@@ -16,6 +16,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using Energinet.DataHub.EDI.AcceptanceTests.Logging;
 using Energinet.DataHub.EDI.AcceptanceTests.Responses.Json;
+using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Nito.AsyncEx;
@@ -40,12 +41,14 @@ public sealed class EdiB2CDriver : IDisposable
     {
     }
 
-    public async Task<List<ArchivedMessageSearchResponse>> RequestArchivedMessageSearchAsync(JObject payload)
+    public async Task<List<ArchivedMessageSearchResponse>> SearchArchivedMessagesAsync(SearchArchivedMessagesCriteria parameters)
     {
         var b2cClient = await _httpClient;
-        ArgumentNullException.ThrowIfNull(payload);
+        ArgumentNullException.ThrowIfNull(parameters);
+        var parametersAsJson = JsonConvert.SerializeObject(parameters);
+
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(_apiManagementUri, "b2c/v1.0/ArchivedMessageSearch"));
-        request.Content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
+        request.Content = new StringContent(parametersAsJson, Encoding.UTF8, "application/json");
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         var response = await b2cClient.SendAsync(request).ConfigureAwait(false);
         await response.EnsureSuccessStatusCodeWithLogAsync(_logger);
