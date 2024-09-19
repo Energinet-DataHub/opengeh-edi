@@ -217,7 +217,7 @@ internal sealed class EdiDatabaseDriver
         await connection.OpenAsync(cancellationToken);
         while (stopWatch.Elapsed < TimeSpan.FromSeconds(30))
         {
-            var outboxMessage = await connection.QueryFirstAsync(
+            var outboxMessage = await connection.QueryFirstOrDefaultAsync(
                     @"SELECT * FROM [Outbox]
                             WHERE [PublishedAt] > @PublishedAfter AND
                                   [Type] = @OutboxMessageType
@@ -229,18 +229,18 @@ internal sealed class EdiDatabaseDriver
                     })
                 .ConfigureAwait(false);
 
-            if (outboxMessage == null)
-                continue;
+            if (outboxMessage != null)
+            {
+                publishedAt = outboxMessage.PublishedAt;
+                failedAt = outboxMessage.FailedAt;
+                errorMessage = outboxMessage.ErrorMessage;
+                payload = outboxMessage.Payload;
 
-            publishedAt = outboxMessage.PublishedAt;
-            failedAt = outboxMessage.FailedAt;
-            errorMessage = outboxMessage.ErrorMessage;
-            payload = outboxMessage.Payload;
+                if (outboxMessage.PublishedAt != null)
+                    return (true, publishedAt, payload, failedAt, errorMessage);
+            }
 
-            if (outboxMessage.PublishedAt != null)
-                return (true, publishedAt, payload, failedAt, errorMessage);
-
-            await Task.Delay(1000, cancellationToken)
+            await Task.Delay(500, cancellationToken)
                 .ConfigureAwait(false);
         }
 
