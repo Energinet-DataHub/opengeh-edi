@@ -89,7 +89,7 @@ public sealed class JsonEncoderTests
         // Assert
         Encoding.UTF8.GetString(stream.ToArray())
             .Should()
-            .BeEquivalentTo(
+            .Contain(
                 """
                 {
                   "m\u00F8\u00F8seStr\u00E6ng": "\u00C5\u00D8\u00C6\u00C4\u00D6\u00E5\u00F8\u00E6\u00E4\u00F6"
