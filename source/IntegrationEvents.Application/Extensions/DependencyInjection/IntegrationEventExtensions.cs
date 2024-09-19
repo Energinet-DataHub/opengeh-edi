@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure.Storage.Blobs;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
@@ -22,10 +23,11 @@ using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure;
 using Energinet.DataHub.EDI.IntegrationEvents.Infrastructure.EventProcessors;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
-using Google.Protobuf.Reflection;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
 
@@ -46,16 +48,28 @@ public static class IntegrationEventExtensions
                 sp => sp.GetServices<IIntegrationEventProcessor>()
                     .ToDictionary(m => m.EventTypeToHandle, m => m));
 
-        services.AddSubscriber<IntegrationEventHandler>(new List<MessageDescriptor>
-        {
+        services.AddSubscriber<IntegrationEventHandler>(
+        [
             ActorActivated.Descriptor,
             GridAreaOwnershipAssigned.Descriptor,
             ActorCertificateCredentialsRemoved.Descriptor,
             ActorCertificateCredentialsAssigned.Descriptor,
             ProcessDelegationConfigured.Descriptor,
             CalculationCompletedV1.Descriptor,
-        });
+        ]);
+        // Dead-letter logging
         services.AddDeadLetterHandlerForIsolatedWorker(configuration);
+        services
+            .AddHealthChecks()
+            .AddAzureBlobStorage(
+                clientFactory: sp =>
+                {
+                    var options = sp.GetRequiredService<IOptions<BlobDeadLetterLoggerOptions>>();
+                    var clientFactory = sp.GetRequiredService<IAzureClientFactory<BlobServiceClient>>();
+                    return clientFactory.CreateClient(options.Value.ContainerName);
+                },
+                configureOptions: (_, _) => { }, // Necessary to hint compiler of which method overload to use
+                name: "dead-letter-logging");
 
         services
             .AddTransient<IDataRetention, ReceivedIntegrationEventsRetention>()
