@@ -71,7 +71,7 @@ public class MarketActorAuthenticatorTests : TestBase
         var claims = new List<Claim>()
         {
             ClaimsMap.RoleFrom(ActorRole.EnergySupplier),
-            ClaimsMap.RoleFrom(ActorRole.GridOperator),
+            ClaimsMap.RoleFrom(ActorRole.GridAccessProvider),
         };
         var claimsPrincipal = CreateIdentity(claims);
 
@@ -103,7 +103,7 @@ public class MarketActorAuthenticatorTests : TestBase
         var validClaims = new List<Claim>()
         {
             new(ClaimsMap.ActorId, Guid.NewGuid().ToString()),
-            ClaimsMap.RoleFrom(ActorRole.GridOperator),
+            ClaimsMap.RoleFrom(ActorRole.GridAccessProvider),
             ClaimsMap.RoleFrom(ActorRole.EnergySupplier),
         };
 

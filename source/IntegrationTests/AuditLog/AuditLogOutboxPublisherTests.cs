@@ -160,7 +160,7 @@ public class AuditLogOutboxPublisherTests : IClassFixture<AuditLogTestFixture>, 
                 new Dictionary<string, string?>
                 {
                     { "DB_CONNECTION_STRING", dbConnectionString },
-                    { "AuditLog:IngestionUrl", Fixture.AuditLogMockServer.IngestionUrl },
+                    { "RevisionLogOptions:ApiAddress", Fixture.AuditLogMockServer.IngestionUrl },
                 })
             .Build();
 
@@ -169,7 +169,7 @@ public class AuditLogOutboxPublisherTests : IClassFixture<AuditLogTestFixture>, 
             .AddHttpClient()
             .AddJavaScriptEncoder()
             .AddSerializer()
-            .AddAuditLogOutboxPublisher()
+            .AddAuditLogOutboxPublisher(config)
             .AddTransient<AuditLogOutboxPublisher>(sp => (AuditLogOutboxPublisher)sp.GetRequiredService<IOutboxPublisher>());
     }
 }

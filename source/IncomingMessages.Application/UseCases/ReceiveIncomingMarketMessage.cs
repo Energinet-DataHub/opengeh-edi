@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
@@ -35,6 +37,7 @@ public class ReceiveIncomingMarketMessage
     private readonly IIncomingMessageReceiver _incomingMessageReceiver;
     private readonly DelegateIncomingMessage _delegateIncomingMessage;
     private readonly IClock _clock;
+    private readonly AuthenticatedActor _actorAuthenticator;
 
     public ReceiveIncomingMarketMessage(
         MarketMessageParser marketMessageParser,
@@ -44,7 +47,8 @@ public class ReceiveIncomingMarketMessage
         ILogger<IncomingMessageClient> logger,
         IIncomingMessageReceiver incomingMessageReceiver,
         DelegateIncomingMessage delegateIncomingMessage,
-        IClock clock)
+        IClock clock,
+        AuthenticatedActor actorAuthenticator)
     {
         _marketMessageParser = marketMessageParser;
         _validateIncomingMessage = validateIncomingMessage;
@@ -54,6 +58,7 @@ public class ReceiveIncomingMarketMessage
         _incomingMessageReceiver = incomingMessageReceiver;
         _delegateIncomingMessage = delegateIncomingMessage;
         _clock = clock;
+        _actorAuthenticator = actorAuthenticator;
     }
 
     public async Task<ResponseMessage> ReceiveIncomingMarketMessageAsync(
@@ -131,12 +136,17 @@ public class ReceiveIncomingMarketMessage
         IncomingDocumentType incomingDocumentType,
         CancellationToken cancellationToken)
     {
+        var authenticatedActor = _actorAuthenticator.CurrentActorIdentity;
         await _archivedMessagesClient.CreateAsync(
             new ArchivedMessage(
                 incomingMessage.MessageId,
                 incomingDocumentType.Name,
-                incomingMessage.SenderNumber,
-                incomingMessage.ReceiverNumber,
+                authenticatedActor.ActorNumber,
+                authenticatedActor.ActorRole,
+                // For RequestAggregatedMeteringData and RequestWholesaleServices,
+                // the receiver is Metered Data Administrator
+                DataHubDetails.DataHubActorNumber,
+                ActorRole.MeteredDataAdministrator,
                 _clock.GetCurrentInstant(),
                 incomingMessage.BusinessReason,
                 ArchivedMessageType.IncomingMessage,

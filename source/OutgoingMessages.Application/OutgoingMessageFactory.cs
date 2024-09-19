@@ -382,6 +382,6 @@ public static class OutgoingMessageFactory
     {
         return chargeOwnerId == DataHubDetails.SystemOperatorActorNumber
             ? ActorRole.SystemOperator
-            : ActorRole.GridOperator;
+            : ActorRole.GridAccessProvider;
     }
 }

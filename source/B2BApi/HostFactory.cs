@@ -98,7 +98,7 @@ public static class HostFactory
                         .AddAuditLog()
 
                         // Audit log (outbox publisher)
-                        .AddAuditLogOutboxPublisher()
+                        .AddAuditLogOutboxPublisher(context.Configuration)
 
                         // Outbox module and outbox processing
                         .AddOutboxModule(context.Configuration)
