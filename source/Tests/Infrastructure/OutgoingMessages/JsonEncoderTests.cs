@@ -26,7 +26,7 @@ namespace Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages;
 
 public sealed class JsonEncoderTests
 {
-    private const string TestString = "ÅØÆÄÖåøæäö";
+    private const string TestString = "ÅØÆÄÖÜåøæäöüáÁéÉíÍóÓúÚýÝþðÐ";
 
     [Fact]
     public void DefaultEncoder_DoesNotHandleScandinavianCharacters()
