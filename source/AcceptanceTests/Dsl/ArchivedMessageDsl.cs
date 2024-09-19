@@ -14,7 +14,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
-using Energinet.DataHub.EDI.AcceptanceTests.TestData;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using FluentAssertions;
