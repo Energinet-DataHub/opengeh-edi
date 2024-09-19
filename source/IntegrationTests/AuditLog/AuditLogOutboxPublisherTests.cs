@@ -14,12 +14,12 @@
 
 using System.Net;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.Outbox.Abstractions;
 using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
-using Energinet.DataHub.EDI.Outbox.Interfaces;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.Configuration;
@@ -167,6 +167,7 @@ public class AuditLogOutboxPublisherTests : IClassFixture<AuditLogTestFixture>, 
         ServiceCollection
             .AddSingleton<IConfiguration>(config)
             .AddHttpClient()
+            .AddJavaScriptEncoder()
             .AddSerializer()
             .AddAuditLogOutboxPublisher(config)
             .AddTransient<AuditLogOutboxPublisher>(sp => (AuditLogOutboxPublisher)sp.GetRequiredService<IOutboxPublisher>());

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Outbox.Interfaces;
+using Energinet.DataHub.Core.Outbox.Application;
 using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions;
@@ -27,6 +27,6 @@ public class OutboxPublisher(IOutboxProcessor outboxProcessor)
         FunctionContext context,
         CancellationToken cancellationToken)
     {
-        return _outboxProcessor.ProcessOutboxAsync(cancellationToken);
+        return _outboxProcessor.ProcessOutboxAsync();
     }
 }

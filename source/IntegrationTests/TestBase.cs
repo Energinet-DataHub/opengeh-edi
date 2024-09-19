@@ -324,6 +324,7 @@ public class TestBase : IDisposable
                 TestCreateOutgoingCommandHandler>()
             .AddScopedSqlDbContext<ProcessContext>(config)
             .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
+            .AddJavaScriptEncoder()
             .AddSerializer()
             .AddLogging()
             .AddScoped<IClock>(_ => new ClockStub());

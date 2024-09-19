@@ -12,20 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Encodings.Web;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
+using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BuildingBlocks.Application.Extensions.DependencyInjection;
+namespace Energinet.DataHub.EDI.Outbox.Infrastructure;
 
-public static class SerializerExtensions
+public static class OutboxExtensions
 {
-    public static IServiceCollection AddSerializer(this IServiceCollection services)
+    public static IServiceCollection AddOutboxRetention(this IServiceCollection serviceCollection)
     {
-        services.AddSingleton<ISerializer, Serializer>(
-            sp => new Serializer(sp.GetRequiredService<JavaScriptEncoder>()));
+        serviceCollection.AddTransient<IDataRetention, OutboxRetention>();
 
-        return services;
+        return serviceCollection;
+    }
+
+    public static IServiceCollection AddOutboxContext(this IServiceCollection serviceCollection, IConfiguration configuration)
+    {
+        serviceCollection.AddScopedSqlDbContext<OutboxContext>(configuration);
+
+        return serviceCollection;
     }
 }

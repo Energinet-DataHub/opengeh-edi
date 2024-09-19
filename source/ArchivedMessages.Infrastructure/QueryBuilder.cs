@@ -86,6 +86,9 @@ internal sealed class QueryBuilder
             AddFilter(
                 "(ReceiverNumber=@Requester OR SenderNumber=@Requester)",
                 new KeyValuePair<string, object>("Requester", _actorIdentity.ActorNumber.Value));
+            AddFilter(
+                "(ReceiverRoleCode=@RequesterRoleCode OR SenderRoleCode=@RequesterRoleCode)",
+                new KeyValuePair<string, object>("RequesterRoleCode", _actorIdentity.ActorRole.Code));
         }
         else if (!_actorIdentity.HasRestriction(Restriction.None))
         {

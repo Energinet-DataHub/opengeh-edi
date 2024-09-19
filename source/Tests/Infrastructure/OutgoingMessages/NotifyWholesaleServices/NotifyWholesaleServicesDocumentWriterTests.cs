@@ -14,6 +14,8 @@
 
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Text.Encodings.Web;
+using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
@@ -27,6 +29,7 @@ using Energinet.DataHub.EDI.Tests.Factories;
 using Energinet.DataHub.EDI.Tests.Fixtures;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.DependencyInjection;
 using NodaTime.Text;
 using Xunit;
 using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
@@ -531,9 +534,11 @@ public class NotifyWholesaleServicesDocumentWriterTests : IClassFixture<Document
 
         if (documentFormat == DocumentFormat.Json)
         {
-            return new NotifyWholesaleServicesCimJsonDocumentWriter(_parser).WriteAsync(
-                header,
-                new[] { records });
+            var serviceProvider = new ServiceCollection().AddJavaScriptEncoder().BuildServiceProvider();
+            return new NotifyWholesaleServicesCimJsonDocumentWriter(
+                    _parser,
+                    serviceProvider.GetRequiredService<JavaScriptEncoder>())
+                .WriteAsync(header, new[] { records });
         }
 
         throw new NotImplementedException();

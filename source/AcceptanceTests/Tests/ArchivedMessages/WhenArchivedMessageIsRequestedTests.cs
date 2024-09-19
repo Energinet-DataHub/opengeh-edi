@@ -24,7 +24,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.ArchivedMessages;
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Testing")]
 public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 {
-    private readonly ArchivedMessageDsl _archivedMessage;
+    private readonly ArchivedMessageDsl _archivedMessages;
     private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureData;
     private readonly CalculationCompletedDsl _calculationCompleted;
 
@@ -33,14 +33,17 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
-        _archivedMessage = new ArchivedMessageDsl(
-            new EdiB2CDriver(fixture.B2CAuthorizedHttpClient, fixture.ApiManagementUri, output));
+        var ediDatabaseDriver = new EdiDatabaseDriver(fixture.ConnectionString);
+
+        _archivedMessages = new ArchivedMessageDsl(
+            new EdiB2CDriver(fixture.B2CAuthorizedHttpClient, fixture.ApiManagementUri, output),
+            ediDatabaseDriver);
 
         var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BMeteredDataResponsibleAuthorizedHttpClient, output);
         var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
         _calculationCompleted = new CalculationCompletedDsl(
             ediDriver,
-            new EdiDatabaseDriver(fixture.ConnectionString),
+            ediDatabaseDriver,
             wholesaleDriver,
             output,
             fixture.BalanceFixingCalculationId,
@@ -55,6 +58,13 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 
         var messageId = await _notifyAggregatedMeasureData.ConfirmResultIsAvailable();
 
-        await _archivedMessage.ConfirmMessageIsArchived(messageId);
+        await _archivedMessages.ConfirmMessageIsArchived(messageId);
+    }
+
+    [Fact]
+    public async Task Audit_log_outbox_is_published_after_searching_for_archived_message()
+    {
+        var (messageId, createdAfter) = await _archivedMessages.PerformArchivedMessageSearch();
+        await _archivedMessages.ConfirmArchivedMessageSearchAuditLogExistsForMessageId(messageId, createdAfter);
     }
 }
