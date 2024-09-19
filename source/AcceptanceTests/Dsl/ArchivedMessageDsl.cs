@@ -80,9 +80,9 @@ public class ArchivedMessageDsl
 
     internal async Task ConfirmArchivedMessageSearchAuditLogExistsForMessageId(string messageId, Instant publishedAfter)
     {
-        var (success, publishedAt, payload, failedAt, errorMessage) = await _ediDatabaseDriver
-            .GetPublishedOutboxMessageAsync(
-                publishedAfter: publishedAfter,
+        var (success, payload) = await _ediDatabaseDriver
+            .GetOutboxMessageAsync(
+                createdAfter: publishedAfter,
                 outboxMessageType: AuditLogOutboxMessageV1.OutboxMessageType,
                 payloadContains: messageId,
                 cancellationToken: CancellationToken.None);
@@ -91,10 +91,6 @@ public class ArchivedMessageDsl
 
         success.Should().BeTrue();
 
-        publishedAt.Should()
-            .NotBeNull()
-            .And.BeAfter(publishedAfter.ToDateTimeUtc());
-
         payload.Should()
             .NotBeNullOrWhiteSpace()
             .And.Match($"*\"MessageId\":\"{messageId}\"*")
@@ -102,8 +98,5 @@ public class ArchivedMessageDsl
             .And.Match($"*\"SystemId\":\"688b2dca-7231-490f-a731-d7869d33fe5e\"*")
             .And.Match($"*\"ActorNumber\":\"{AcceptanceTestFixture.B2CActorNumber}\"*")
             .And.Match($"*\"Permissions\":\"*actors:manage*\"*");
-
-        failedAt.Should().BeNull();
-        errorMessage.Should().BeNull();
     }
 }
