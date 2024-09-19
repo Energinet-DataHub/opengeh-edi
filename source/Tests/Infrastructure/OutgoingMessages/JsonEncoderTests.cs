@@ -72,7 +72,7 @@ public sealed class JsonEncoderTests
     [Fact]
     public void JsonDocumentParse_HandlesScandinavianCharacters()
     {
-        const string jsonPropertyName = "møøseStræng";
+        const string jsonPropertyName = "ÅBigMøøseØnceÅteMyÆppleTrææ";
 
         // Arrange
         var options = new JsonWriterOptions { Indented = true, Encoder = JavaScriptEncoder.Default };
