@@ -16,6 +16,7 @@ using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.Outbox.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware;
@@ -25,13 +26,15 @@ using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.Outbox.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+
+using OutboxContext = Energinet.DataHub.EDI.Outbox.Infrastructure.OutboxContext;
 
 namespace Energinet.DataHub.EDI.B2BApi;
 
@@ -100,9 +103,10 @@ public static class HostFactory
                         // Audit log (outbox publisher)
                         .AddAuditLogOutboxPublisher(context.Configuration)
 
-                        // Outbox module and outbox processing
-                        .AddOutboxModule(context.Configuration)
-                        .AddOutboxProcessor()
+                        // Outbox context, client, processor and retention
+                        .AddOutboxContext(context.Configuration)
+                        .AddOutboxClient<OutboxContext>()
+                        .AddOutboxProcessor<OutboxContext>()
                         .AddOutboxRetention();
                 })
             .ConfigureLogging(

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.Core.Outbox.Abstractions;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.Outbox.Interfaces;
 using Energinet.DataHub.RevisionLog.Integration;
 
 namespace Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
