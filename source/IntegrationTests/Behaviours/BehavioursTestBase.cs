@@ -462,6 +462,7 @@ public class BehavioursTestBase : IDisposable
                 TestCreateOutgoingCommandHandler>()
             .AddScopedSqlDbContext<ProcessContext>(config)
             .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
+            .AddJavaScriptEncoder()
             .AddSerializer()
             .AddLogging()
             // Some of the modules registers IClock.

@@ -24,9 +24,18 @@ namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 /// <summary>
 /// JSON serializer that specifically support NodaTime's <see cref="NodaTime.Instant"/>.
 /// </summary>
-public class Serializer : ISerializer
+public sealed class Serializer : ISerializer
 {
     private readonly JsonSerializerOptions _options;
+
+    public Serializer(JavaScriptEncoder encoder)
+    {
+        _options = new JsonSerializerOptions { Encoder = encoder, PropertyNameCaseInsensitive = true };
+
+        _options.Converters.Add(NodaConverters.InstantConverter);
+        _options.Converters.Add(new CustomJsonConverterForType());
+        _options.Converters.Add(new ObjectToInferredTypesConverter());
+    }
 
     public Serializer()
     {
@@ -46,23 +55,24 @@ public class Serializer : ISerializer
 
     public ValueTask<TValue> DeserializeAsync<TValue>(Stream json, CancellationToken cancellationToken)
     {
-        return System.Text.Json.JsonSerializer.DeserializeAsync<TValue>(json, _options, cancellationToken)!;
+        return JsonSerializer.DeserializeAsync<TValue>(json, _options, cancellationToken)!;
     }
 
     public TValue Deserialize<TValue>(string json)
     {
-        return System.Text.Json.JsonSerializer.Deserialize<TValue>(json, _options)!;
+        return JsonSerializer.Deserialize<TValue>(json, _options)!;
     }
 
     public object Deserialize(string json, Type returnType)
     {
-        return System.Text.Json.JsonSerializer.Deserialize(json, returnType, _options)!;
+        return JsonSerializer.Deserialize(json, returnType, _options)!;
     }
 
     public string Serialize<TValue>(TValue value)
     {
-        if (value == null) throw new ArgumentNullException(nameof(value));
-        return System.Text.Json.JsonSerializer.Serialize<object>(value, _options);
+        ArgumentNullException.ThrowIfNull(value);
+
+        return JsonSerializer.Serialize<object>(value, _options);
     }
 
     public Task SerializeAsync<TValue>(Stream stream, TValue value)
