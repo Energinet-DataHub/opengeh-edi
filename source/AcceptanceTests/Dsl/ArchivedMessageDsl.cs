@@ -15,6 +15,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.TestData;
+using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -80,7 +81,12 @@ public class ArchivedMessageDsl
 
     internal async Task ConfirmArchivedMessageSearchAuditLogExistsForMessageId(string messageId, Instant publishedAfter)
     {
-        var (success, publishedAt, payload, failedAt, errorMessage) = await _ediDatabaseDriver.GetPublishedOutboxMessageAsync(publishedAfter, CancellationToken.None);
+        var (success, publishedAt, payload, failedAt, errorMessage) = await _ediDatabaseDriver
+            .GetPublishedOutboxMessageAsync(
+                publishedAfter: publishedAfter,
+                outboxMessageType: AuditLogOutboxMessageV1.OutboxMessageType,
+                payloadContains: messageId,
+                cancellationToken: CancellationToken.None);
 
         using var assertionScope = new AssertionScope();
 

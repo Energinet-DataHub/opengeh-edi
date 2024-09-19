@@ -203,6 +203,8 @@ internal sealed class EdiDatabaseDriver
     internal async Task<(bool Success, DateTime? PublishedAt, string? Payload, DateTime? FailedAt, string? ErrorMessage)>
         GetPublishedOutboxMessageAsync(
             Instant publishedAfter,
+            string outboxMessageType,
+            string payloadContains,
             CancellationToken cancellationToken)
     {
         await using var connection = new SqlConnection(_connectionString);
@@ -219,13 +221,15 @@ internal sealed class EdiDatabaseDriver
         {
             var outboxMessage = await connection.QueryFirstOrDefaultAsync(
                     @"SELECT * FROM [Outbox]
-                            WHERE [PublishedAt] > @PublishedAfter AND
-                                  [Type] = @OutboxMessageType
+                            WHERE [PublishedAt] >= @PublishedAfter AND
+                                  [Type] = @OutboxMessageType AND
+                                  [Payload] LIKE @PayloadContains
                             ORDER BY [CreatedAt] ASC",
                     new
                     {
                         PublishedAfter = publishedAfter.ToDateTimeUtc(),
-                        OutboxMessageType = AuditLogOutboxMessageV1.OutboxMessageType,
+                        OutboxMessageType = outboxMessageType,
+                        PayloadContains = $"%{payloadContains}%",
                     })
                 .ConfigureAwait(false);
 
