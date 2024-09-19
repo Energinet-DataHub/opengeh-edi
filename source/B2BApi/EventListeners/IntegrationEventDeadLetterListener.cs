@@ -19,14 +19,10 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.EDI.B2BApi.EventListeners;
 
-public class IntegrationEventDeadLetterListener
+public class IntegrationEventDeadLetterListener(
+    IDeadLetterHandler deadLetterHandler)
 {
-    private readonly IDeadLetterHandler _deadLetterHandler;
-
-    public IntegrationEventDeadLetterListener(IDeadLetterHandler deadLetterHandler)
-    {
-        _deadLetterHandler = deadLetterHandler;
-    }
+    private readonly IDeadLetterHandler _deadLetterHandler = deadLetterHandler;
 
     [Function(nameof(IntegrationEventDeadLetterListener))]
     public async Task RunAsync(

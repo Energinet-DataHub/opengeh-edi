@@ -22,18 +22,12 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.EDI.B2BApi.EventListeners;
 
-public class InboxEventListener
+public class InboxEventListener(
+    ISerializer jsonSerializer,
+    IInboxEventReceiver inboxEventReceiver)
 {
-    private readonly ISerializer _jsonSerializer;
-    private readonly IInboxEventReceiver _inboxEventReceiver;
-
-    public InboxEventListener(
-        ISerializer jsonSerializer,
-        IInboxEventReceiver inboxEventReceiver)
-    {
-        _jsonSerializer = jsonSerializer;
-        _inboxEventReceiver = inboxEventReceiver;
-    }
+    private readonly ISerializer _jsonSerializer = jsonSerializer;
+    private readonly IInboxEventReceiver _inboxEventReceiver = inboxEventReceiver;
 
     /// <summary>
     /// Receives messages from the inbox queue and forwards them to the inbox event receiver.

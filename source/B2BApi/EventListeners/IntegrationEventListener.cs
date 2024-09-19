@@ -21,16 +21,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.EventListeners;
 
-public class IntegrationEventListener
+public class IntegrationEventListener(
+    ILogger<IntegrationEventListener> logger,
+    ISubscriber subscriber)
 {
-    private readonly ILogger<IntegrationEventListener> _logger;
-    private readonly ISubscriber _subscriber;
-
-    public IntegrationEventListener(ILogger<IntegrationEventListener> logger, ISubscriber subscriber)
-    {
-        _logger = logger;
-        _subscriber = subscriber;
-    }
+    private readonly ILogger<IntegrationEventListener> _logger = logger;
+    private readonly ISubscriber _subscriber = subscriber;
 
     /// <summary>
     /// Receives messages from the integration event topic and processes them.
