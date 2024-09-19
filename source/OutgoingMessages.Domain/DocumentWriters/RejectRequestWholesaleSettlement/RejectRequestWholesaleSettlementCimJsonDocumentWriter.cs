@@ -15,7 +15,6 @@
 using System.Collections.ObjectModel;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Unicode;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.CIM.Json;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
@@ -23,20 +22,16 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.RejectRequestWholesaleSettlement;
 
-public class RejectRequestWholesaleSettlementCimJsonDocumentWriter : IDocumentWriter
+public sealed class RejectRequestWholesaleSettlementCimJsonDocumentWriter(
+    IMessageRecordParser parser,
+    JavaScriptEncoder encoder) : IDocumentWriter
 {
     private const string DocumentTypeName = "RejectRequestWholesaleSettlement_MarketDocument";
     private const string TypeCode = "ERR";
-    private readonly IMessageRecordParser _parser;
+    private readonly IMessageRecordParser _parser = parser;
+    private readonly JsonWriterOptions _options = new() { Indented = true, Encoder = encoder };
 
-    public RejectRequestWholesaleSettlementCimJsonDocumentWriter(IMessageRecordParser parser)
-    {
-        _parser = parser;
-    }
-
-#pragma warning disable CA1822
     public bool HandlesFormat(DocumentFormat format)
-#pragma warning restore CA1822
     {
         return format == DocumentFormat.Json;
     }
@@ -51,16 +46,8 @@ public class RejectRequestWholesaleSettlementCimJsonDocumentWriter : IDocumentWr
         IReadOnlyCollection<string> marketActivityRecords)
     {
         var stream = new MarketDocumentWriterMemoryStream();
-        var options = new JsonWriterOptions
-        {
-            Indented = true,
-            Encoder = JavaScriptEncoder.Create(
-                UnicodeRanges.BasicLatin,
-                UnicodeRanges.Latin1Supplement,
-                UnicodeRanges.LatinExtendedA),
-        };
 
-        using var writer = new Utf8JsonWriter(stream, options);
+        using var writer = new Utf8JsonWriter(stream, _options);
 
         CimJsonHeaderWriter.Write(header, DocumentTypeName, TypeCode, ReasonCode.FullyRejected.Code, writer);
         WriteSeries(marketActivityRecords, writer);

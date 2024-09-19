@@ -22,7 +22,7 @@ public static class JavaScriptEncoderExtensions
 {
     public static IServiceCollection AddJavaScriptEncoder(this IServiceCollection services)
     {
-        services.AddSingleton<JavaScriptEncoder>(
+        services.AddSingleton(
             JavaScriptEncoder.Create(
                 UnicodeRanges.BasicLatin,
                 UnicodeRanges.Latin1Supplement,
