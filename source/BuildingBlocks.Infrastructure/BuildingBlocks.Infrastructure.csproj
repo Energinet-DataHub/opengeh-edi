@@ -4,8 +4,8 @@
     <RootNamespace>Energinet.DataHub.EDI.BuildingBlocks.Infrastructure</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs.Batch" Version="12.18.1" />
-    <PackageReference Include="Azure.Storage.Files.DataLake" Version="12.19.1" />
+    <PackageReference Include="Azure.Storage.Blobs.Batch" Version="12.19.0" />
+    <PackageReference Include="Azure.Storage.Files.DataLake" Version="12.20.0" />
     <PackageReference Include="MediatR.Contracts" Version="2.0.1" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
