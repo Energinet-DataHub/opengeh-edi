@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using Azure.Storage.Blobs;
-using BuildingBlocks.Application.Extensions.Options;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
+using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture.Database;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
@@ -98,7 +98,11 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         BuildService();
 
         AuthenticatedActor = ServiceProvider.GetService<AuthenticatedActor>()!;
-        AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None));
+        AuthenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(
+                ActorNumber.Create("1234512345888"),
+                restriction: Restriction.None,
+                ActorRole.MeteredDataAdministrator));
 
         ArchivedMessagesClient = ServiceProvider.GetService<IArchivedMessagesClient>()!;
     }

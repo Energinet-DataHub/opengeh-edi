@@ -66,10 +66,10 @@ public class WhenArchivedMessageIsCreatedTests : IClassFixture<ArchivedMessagesF
         var message = dbResult.Single();
         using var assertionScope = new AssertionScope();
 
-        message.SenderNumber.Should().Be(archivedMessage.SenderNumber);
+        message.SenderNumber.Should().Be(archivedMessage.SenderNumber.Value);
         message.MessageId.Should().Be(archivedMessage.MessageId);
         message.DocumentType.Should().Be(archivedMessage.DocumentType);
-        message.ReceiverNumber.Should().Be(archivedMessage.ReceiverNumber);
+        message.ReceiverNumber.Should().Be(archivedMessage.ReceiverNumber.Value);
         message.BusinessReason.Should().Be(archivedMessage.BusinessReason);
         message.FileStorageReference.Should().Be(expectedBlocReference.Path);
         message.RelatedToMessageId.Should().BeNull();
@@ -100,12 +100,15 @@ public class WhenArchivedMessageIsCreatedTests : IClassFixture<ArchivedMessagesF
             string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
             Array.Empty<EventId>(),
             DocumentType.NotifyAggregatedMeasureData.Name,
-            senderNumber ?? "1234512345123",
-            receiverNumber ?? "1234512345128",
+            ActorNumber.Create(senderNumber ?? "1234512345123"),
+            ActorRole.MeteredDataAdministrator,
+            ActorNumber.Create(receiverNumber ?? "1234512345128"),
+            ActorRole.DanishEnergyAgency,
             timestamp ?? Instant.FromUtc(2023, 01, 01, 0, 0),
             BusinessReason.BalanceFixing.Name,
             archivedMessageType ?? ArchivedMessageType.IncomingMessage,
-            new ArchivedMessageStream(documentStream));
+            new ArchivedMessageStream(documentStream),
+            null);
     }
 
     private async Task<IReadOnlyCollection<ArchivedMessageFromDb>> GetAllMessagesInDatabase()
