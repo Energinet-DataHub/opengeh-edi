@@ -342,6 +342,8 @@ public class BehavioursTestBase : IDisposable
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
         var outgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        var authenticatedActor = scope.ServiceProvider.GetRequiredService<AuthenticatedActor>();
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, actorRole));
         var peekResult = await outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber, MessageCategory.Aggregations, actorRole, documentFormat), CancellationToken.None);
         return peekResult;
     }
