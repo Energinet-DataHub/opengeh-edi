@@ -97,14 +97,14 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         CleanupFileStorage();
         BuildService();
 
-        AuthenticatedActor = ServiceProvider.GetService<AuthenticatedActor>()!;
+        AuthenticatedActor = ServiceProvider.GetRequiredService<AuthenticatedActor>();
         AuthenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(
                 ActorNumber.Create("1234512345888"),
                 restriction: Restriction.None,
                 ActorRole.MeteredDataAdministrator));
 
-        ArchivedMessagesClient = ServiceProvider.GetService<IArchivedMessagesClient>()!;
+        ArchivedMessagesClient = ServiceProvider.GetRequiredService<IArchivedMessagesClient>();
     }
 
     public async Task DisposeAsync()
