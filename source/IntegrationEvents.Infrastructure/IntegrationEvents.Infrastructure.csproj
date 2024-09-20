@@ -14,9 +14,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="2.13.5" />
+      <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="2.13.6" />
       <PackageReference Include="Dapper" Version="2.1.35" />
-        <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="6.1.0-alpha-145" />
+        <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="6.1.0" />
       <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="10.0.0" />
       <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
       <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
