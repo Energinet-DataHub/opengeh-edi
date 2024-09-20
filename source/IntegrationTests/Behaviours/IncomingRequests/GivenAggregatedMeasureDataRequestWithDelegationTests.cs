@@ -63,10 +63,10 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
         if (!nullGridArea)
         {
             roleCombinations.Add((ActorRole.MeteredDataResponsible, ActorRole.Delegated));
-            roleCombinations.Add((ActorRole.GridOperator, ActorRole.Delegated));
+            roleCombinations.Add((ActorRole.GridAccessProvider, ActorRole.Delegated));
 
             // Grid operator can delegate to both delegated and grid operator
-            roleCombinations.Add((ActorRole.GridOperator, ActorRole.GridOperator));
+            roleCombinations.Add((ActorRole.GridAccessProvider, ActorRole.GridAccessProvider));
         }
 
         var requestDocumentFormats = DocumentFormats
@@ -110,7 +110,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
         var balanceResponsibleParty = originalActor.ActorRole == ActorRole.BalanceResponsibleParty
             ? originalActor.ActorNumber
             : ActorNumber.Create("4444444444444");
-        var gridAreaOwner = originalActor.ActorRole == ActorRole.GridOperator
+        var gridAreaOwner = originalActor.ActorRole == ActorRole.GridAccessProvider
             || originalActor.ActorRole == ActorRole.MeteredDataResponsible
             ? originalActor.ActorNumber
             : ActorNumber.Create("5555555555555");
@@ -248,7 +248,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
         var balanceResponsibleParty = originalActor.ActorRole == ActorRole.BalanceResponsibleParty
             ? originalActor.ActorNumber
             : ActorNumber.Create("4444444444444");
-        var gridAreaOwner = originalActor.ActorRole == ActorRole.GridOperator
+        var gridAreaOwner = originalActor.ActorRole == ActorRole.GridAccessProvider
                             || originalActor.ActorRole == ActorRole.MeteredDataResponsible
             ? originalActor.ActorNumber
             : ActorNumber.Create("5555555555555");
@@ -376,7 +376,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
         var balanceResponsibleParty = originalActor.ActorRole == ActorRole.BalanceResponsibleParty
             ? originalActor.ActorNumber
             : ActorNumber.Create("4444444444444");
-        var gridAreaOwner = originalActor.ActorRole == ActorRole.GridOperator
+        var gridAreaOwner = originalActor.ActorRole == ActorRole.GridAccessProvider
                             || originalActor.ActorRole == ActorRole.MeteredDataResponsible
             ? originalActor.ActorNumber
             : ActorNumber.Create("5555555555555");
@@ -511,7 +511,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
         var balanceResponsibleParty = originalActor.ActorRole == ActorRole.BalanceResponsibleParty
             ? originalActor.ActorNumber
             : ActorNumber.Create("4444444444444");
-        var gridAreaOwner = originalActor.ActorRole == ActorRole.GridOperator
+        var gridAreaOwner = originalActor.ActorRole == ActorRole.GridAccessProvider
                             || originalActor.ActorRole == ActorRole.MeteredDataResponsible
             ? originalActor.ActorNumber
             : ActorNumber.Create("5555555555555");
@@ -666,7 +666,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
         var balanceResponsibleParty = originalActor.ActorRole == ActorRole.BalanceResponsibleParty
             ? originalActor.ActorNumber
             : ActorNumber.Create("4444444444444");
-        var gridAreaOwner = originalActor.ActorRole == ActorRole.GridOperator
+        var gridAreaOwner = originalActor.ActorRole == ActorRole.GridAccessProvider
                             || originalActor.ActorRole == ActorRole.MeteredDataResponsible
             ? originalActor.ActorNumber
             : ActorNumber.Create("5555555555555");
@@ -928,8 +928,8 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
     }
 
     [Theory]
-    [InlineData("Xml", DataHubNames.ActorRole.GridOperator, DataHubNames.ActorRole.Delegated)]
-    [InlineData("Json", DataHubNames.ActorRole.GridOperator, DataHubNames.ActorRole.Delegated)]
+    [InlineData("Xml", DataHubNames.ActorRole.GridAccessProvider, DataHubNames.ActorRole.Delegated)]
+    [InlineData("Json", DataHubNames.ActorRole.GridAccessProvider, DataHubNames.ActorRole.Delegated)]
     [InlineData("Xml", DataHubNames.ActorRole.EnergySupplier, DataHubNames.ActorRole.Delegated)]
     [InlineData("Json", DataHubNames.ActorRole.EnergySupplier, DataHubNames.ActorRole.Delegated)]
     [InlineData("Xml", DataHubNames.ActorRole.BalanceResponsibleParty, DataHubNames.ActorRole.Delegated)]
@@ -944,7 +944,7 @@ public class GivenAggregatedMeasureDataRequestWithDelegationTests : AggregatedMe
         var originalActor = new Actor(ActorNumber.Create("1111111111111"), actorRole: originalActorRole);
         var delegatedToActor = new Actor(actorNumber: ActorNumber.Create("2222222222222"), actorRole: delegatedToRole);
 
-        if (originalActor.ActorRole == ActorRole.GridOperator)
+        if (originalActor.ActorRole == ActorRole.GridAccessProvider)
             await GivenGridAreaOwnershipAsync("804", originalActor.ActorNumber);
 
         GivenAuthenticatedActorIs(delegatedToActor.ActorNumber, delegatedToActor.ActorRole);

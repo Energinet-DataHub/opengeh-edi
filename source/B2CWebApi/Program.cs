@@ -19,13 +19,14 @@ using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.WebApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.WebApp.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.Outbox.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.Outbox.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.Outbox.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,9 +49,11 @@ builder.Services
     // Durable client (orchestration)
     .AddDurableClient(builder.Configuration)
 
+    .AddOutboxContext(builder.Configuration)
+    .AddOutboxClient<OutboxContext>()
+
     // Modules
     .AddDataAccessUnitOfWorkModule()
-    .AddOutboxModule(builder.Configuration)
     .AddIncomingMessagesModule(builder.Configuration)
     .AddArchivedMessagesModule(builder.Configuration)
     .AddMasterDataModule(builder.Configuration)
@@ -65,13 +68,15 @@ builder.Services
     // Defined in app settings
     .AddJwtTokenSecurity(builder.Configuration)
 
+    // Encoder
+    .AddJavaScriptEncoder()
+
     // Serializer
     .AddSerializer()
 
     // Http
     .AddHttpClient()
-    .AddControllers()
-    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+    .AddControllers();
 
 // ***********************************************************************************************
 // App building start here, aka Configure if one uses StartUp

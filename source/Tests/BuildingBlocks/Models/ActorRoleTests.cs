@@ -36,7 +36,7 @@ public class ActorRoleTests
         {
             (ActorRole.MeteredDataResponsible, "MeteredDataResponsible", "MDR"),
             (ActorRole.MeteredDataAdministrator, "MeteredDataAdministrator", "DGL"),
-            (ActorRole.GridOperator, "GridOperator", "DDM"),
+            (ActorRole.GridAccessProvider, "GridAccessProvider", "DDM"),
             (ActorRole.BalanceResponsibleParty, "BalanceResponsibleParty", "DDK"),
             (ActorRole.EnergySupplier, "EnergySupplier", "DDQ"),
             (ActorRole.MeteringPointAdministrator, "MeteringPointAdministrator", "DDZ"),
@@ -44,6 +44,7 @@ public class ActorRoleTests
             (ActorRole.SystemOperator, "SystemOperator", "EZ"),
             (ActorRole.DanishEnergyAgency, "DanishEnergyAgency", "STS"),
             (ActorRole.Delegated, "Delegated", "DEL"),
+            (ActorRole.DataHubAdministrator, "DataHubAdministrator", string.Empty),
         };
 
         using var scope = new AssertionScope();

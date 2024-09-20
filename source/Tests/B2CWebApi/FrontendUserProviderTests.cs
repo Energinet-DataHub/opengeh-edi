@@ -32,12 +32,13 @@ public class FrontendUserProviderTests
     }
 
     [Theory]
-    [InlineData("CalculationResponsible", "DGL")]
     [InlineData("EnergySupplier", "DDQ")]
     [InlineData("MeteredDataResponsible", "MDR")]
     [InlineData("BalanceResponsibleParty", "DDK")]
     [InlineData("GridAccessProvider", "DDM")]
     [InlineData("SystemOperator", "EZ")]
+    [InlineData("Delegated", "DEL")]
+    [InlineData("DataHubAdministrator", "")]
     public async Task Given_ValidFrontendUserRole_When_ProvideUserAsync_Then_CorrectAuthenticatedUserIsSet(string marketrole, string expectedCode)
     {
         // Arrange
@@ -69,11 +70,11 @@ public class FrontendUserProviderTests
             .Should()
             .NotBeNull("because the actor identity should be set");
 
-        authenticatedActorIdentity!.MarketRole
+        authenticatedActorIdentity!.ActorRole
             .Should()
             .NotBeNull();
 
-        authenticatedActorIdentity!.MarketRole!.Code
+        authenticatedActorIdentity!.ActorRole!.Code
             .Should()
             .Be(expectedCode);
 
@@ -87,7 +88,7 @@ public class FrontendUserProviderTests
     }
 
     [Fact]
-    public async Task Given_InvalidFrontendUserRole_When_ProvideUserAsync_Then_AuthenticatedUserIsSetWithoutRole()
+    public async Task Given_InvalidFrontendUserRole_When_ProvideUserAsync_Then_Exception()
     {
         // Arrange
         var authenticatedActor = new AuthenticatedActor();
@@ -96,7 +97,7 @@ public class FrontendUserProviderTests
         var sut = new FrontendUserProvider(logger, authenticatedActor);
 
         // Act
-        await sut.ProvideUserAsync(
+        var act = () => sut.ProvideUserAsync(
             Guid.NewGuid(),
             Guid.NewGuid(),
             true,
@@ -107,17 +108,15 @@ public class FrontendUserProviderTests
             ]);
 
         // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>();
+
         authenticatedActor
             .TryGetCurrentActorIdentity(out var authenticatedActorIdentity)
             .Should()
-            .BeTrue("because the actor identity should be set");
+            .BeFalse("because the actor identity should not be set");
 
         authenticatedActorIdentity
             .Should()
-            .NotBeNull("because the actor identity should be set");
-
-        authenticatedActorIdentity!.MarketRole
-            .Should()
-            .BeNull("because the given market role was invalid");
+            .BeNull("because the actor identity should not be set");
     }
 }

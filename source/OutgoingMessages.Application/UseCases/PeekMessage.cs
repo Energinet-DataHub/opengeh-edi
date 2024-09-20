@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
@@ -39,6 +40,7 @@ public class PeekMessage
     private readonly IArchivedMessagesClient _archivedMessageClient;
     private readonly IClock _clock;
     private readonly IBundleRepository _bundleRepository;
+    private readonly AuthenticatedActor _actorAuthenticator;
 
     public PeekMessage(
         IActorMessageQueueRepository actorMessageQueueRepository,
@@ -48,7 +50,8 @@ public class PeekMessage
         ActorMessageQueueContext actorMessageQueueContext,
         IArchivedMessagesClient archivedMessageClient,
         IClock clock,
-        IBundleRepository bundleRepository)
+        IBundleRepository bundleRepository,
+        AuthenticatedActor actorAuthenticator)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _marketDocumentRepository = marketDocumentRepository;
@@ -58,6 +61,7 @@ public class PeekMessage
         _archivedMessageClient = archivedMessageClient;
         _clock = clock;
         _bundleRepository = bundleRepository;
+        _actorAuthenticator = actorAuthenticator;
     }
 
     public async Task<PeekResultDto?> PeekAsync(PeekRequestDto request, CancellationToken cancellationToken)
@@ -108,12 +112,16 @@ public class PeekMessage
         var outgoingMessageBundle = await _outgoingMessageRepository.GetAsync(peekResult).ConfigureAwait(false);
         var marketDocumentStream = await _documentFactory.CreateFromAsync(outgoingMessageBundle, request.DocumentFormat, timestamp).ConfigureAwait(false);
 
+        var authenticatedActor = _actorAuthenticator.CurrentActorIdentity;
         var archivedMessageToCreate = new ArchivedMessage(
             outgoingMessageBundle.MessageId.Value,
             outgoingMessageBundle.OutgoingMessages.Select(om => om.EventId).ToArray(),
             outgoingMessageBundle.DocumentType.ToString(),
-            outgoingMessageBundle.SenderId.Value,
-            outgoingMessageBundle.Receiver.Number.Value,
+            outgoingMessageBundle.SenderId,
+            outgoingMessageBundle.SenderRole,
+            // The receiver is always the authenticated actor
+            authenticatedActor.ActorNumber,
+            authenticatedActor.ActorRole,
             timestamp,
             outgoingMessageBundle.BusinessReason,
             ArchivedMessageType.OutgoingMessage,

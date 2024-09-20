@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Energinet.DataHub.Core.App.WebApp" Version="13.1.0" />
+        <PackageReference Include="Energinet.DataHub.Core.App.WebApp" Version="13.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8" />
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
         <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="2.13.5" />
@@ -31,7 +31,7 @@
       <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj" />
       <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
-      <ProjectReference Include="..\Outbox.Application\Outbox.Application.csproj" />
+      <ProjectReference Include="..\Outbox.Infrastructure\Outbox.Infrastructure.csproj" />
       <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
     </ItemGroup>
 

@@ -12,26 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Outbox.Domain;
-using Energinet.DataHub.EDI.Outbox.Interfaces;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.EDI.Outbox.Application;
+namespace BuildingBlocks.Application.Extensions.DependencyInjection;
 
-public class OutboxClient(
-    IOutboxRepository outboxRepository)
-    : IOutboxClient
+public static class JavaScriptEncoderExtensions
 {
-    private readonly IOutboxRepository _outboxRepository = outboxRepository;
-
-    public async Task CreateWithoutCommitAsync<T>(IOutboxMessage<T> message)
+    public static IServiceCollection AddJavaScriptEncoder(this IServiceCollection services)
     {
-        var payload = await message.SerializeAsync()
-            .ConfigureAwait(false);
+        services.AddSingleton(
+            JavaScriptEncoder.Create(
+                UnicodeRanges.BasicLatin,
+                UnicodeRanges.Latin1Supplement,
+                UnicodeRanges.LatinExtendedA));
 
-        var outboxMessage = new OutboxMessage(
-            message.Type,
-            payload);
-
-        _outboxRepository.Add(outboxMessage);
+        return services;
     }
 }

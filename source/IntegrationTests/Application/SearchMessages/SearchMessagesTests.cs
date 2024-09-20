@@ -52,8 +52,8 @@ public class SearchMessagesTests : TestBase
         var messageInfo = result.Messages.FirstOrDefault(message => message.Id == archivedMessage.Id.Value);
         Assert.NotNull(messageInfo);
         Assert.Equal(archivedMessage.DocumentType, messageInfo.DocumentType);
-        Assert.Equal(archivedMessage.SenderNumber, messageInfo.SenderNumber);
-        Assert.Equal(archivedMessage.ReceiverNumber, messageInfo.ReceiverNumber);
+        Assert.Equal(archivedMessage.SenderNumber.Value, messageInfo.SenderNumber);
+        Assert.Equal(archivedMessage.ReceiverNumber.Value, messageInfo.ReceiverNumber);
         Assert.Equal(archivedMessage.CreatedAt.ToDateTimeUtc().ToString("u"), messageInfo.CreatedAt.ToDateTimeUtc().ToString("u")); // "u" is the "yyyy-mm-dd hh:MM:ssZ" format
         Assert.Equal(archivedMessage.MessageId, messageInfo.MessageId);
     }
@@ -350,7 +350,7 @@ public class SearchMessagesTests : TestBase
         var ownActorNumber = ActorNumber.Create("1234512345888");
         var someoneElseActorNumber = ActorNumber.Create("1234512345777");
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ownActorNumber, restriction: Restriction.Owned));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ownActorNumber, restriction: Restriction.Owned, ActorRole.EnergySupplier));
 
         var archivedMessageOwnMessageAsReceiver = CreateArchivedMessage(_clock.GetCurrentInstant(), receiverNumber: ownActorNumber.Value, senderNumber: someoneElseActorNumber.Value);
         var archivedMessageOwnMessageAsSender = CreateArchivedMessage(_clock.GetCurrentInstant(), receiverNumber: someoneElseActorNumber.Value, senderNumber: ownActorNumber.Value);
@@ -372,7 +372,7 @@ public class SearchMessagesTests : TestBase
         var ownActorNumber = ActorNumber.Create("1234512345888");
         var someoneElseActorNumber = ActorNumber.Create("1234512345777");
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ownActorNumber, restriction: Restriction.None));
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ownActorNumber, restriction: Restriction.None, ActorRole.DataHubAdministrator));
 
         var archivedMessageOwnMessageAsSender = CreateArchivedMessage(_clock.GetCurrentInstant(), receiverNumber: someoneElseActorNumber.Value, senderNumber: ownActorNumber.Value);
         var archivedMessage = CreateArchivedMessage(_clock.GetCurrentInstant(), receiverNumber: someoneElseActorNumber.Value, senderNumber: someoneElseActorNumber.Value);
@@ -442,6 +442,29 @@ public class SearchMessagesTests : TestBase
             .Should().Be(messageWithinSearchPeriod.MessageId);
     }
 
+    [Fact]
+    public async Task Filter_messages_by_authenticated_actor_role()
+    {
+        // Arrange
+        var authenticatedActorNumber = ActorNumber.Create("1234512345888");
+        var authenticatedActorRole = ActorRole.EnergySupplier;
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(authenticatedActorNumber, restriction: Restriction.Owned, authenticatedActorRole));
+        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-04-01T22:00:00Z")));
+        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z"), receiverNumber: authenticatedActorNumber.Value, receiverRole: authenticatedActorRole));
+        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-06-01T22:00:00Z"), senderNumber: authenticatedActorNumber.Value, senderRole: authenticatedActorRole));
+
+        // Act
+        var result = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(),
+            CancellationToken.None);
+
+        // Assert
+        Assert.Equal(2, result.Messages.Count);
+        Assert.Equal(CreatedAt("2023-05-01T22:00:00Z"), result.Messages[0].CreatedAt);
+        Assert.Equal(CreatedAt("2023-06-01T22:00:00Z"), result.Messages[1].CreatedAt);
+    }
+
     private static Instant CreatedAt(string date)
     {
         return InstantPattern.General.Parse(date).Value;
@@ -450,7 +473,9 @@ public class SearchMessagesTests : TestBase
     private ArchivedMessage CreateArchivedMessage(
         Instant? createdAt = null,
         string? senderNumber = null,
+        ActorRole? senderRole = null,
         string? receiverNumber = null,
+        ActorRole? receiverRole = null,
         string? documentType = null,
         string? businessReason = null,
         string? messageId = null,
@@ -461,8 +486,10 @@ public class SearchMessagesTests : TestBase
             messageId ?? "MessageId",
             Array.Empty<EventId>(),
             documentType ?? DocumentType.NotifyAggregatedMeasureData.Name,
-            senderNumber ?? "1234512345123",
-            receiverNumber ?? "1234512345128",
+            ActorNumber.Create(senderNumber ?? "1234512345123"),
+            ActorRole.EnergySupplier,
+            ActorNumber.Create(receiverNumber ?? "1234512345128"),
+            ActorRole.EnergySupplier,
             createdAt.GetValueOrDefault(_clock.GetCurrentInstant()),
             businessReason ?? BusinessReason.BalanceFixing.Name,
             archivedMessageType ?? ArchivedMessageType.OutgoingMessage,

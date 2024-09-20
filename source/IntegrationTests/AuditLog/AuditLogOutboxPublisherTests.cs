@@ -14,12 +14,12 @@
 
 using System.Net;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.Outbox.Abstractions;
 using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
-using Energinet.DataHub.EDI.Outbox.Interfaces;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.Configuration;
@@ -160,15 +160,16 @@ public class AuditLogOutboxPublisherTests : IClassFixture<AuditLogTestFixture>, 
                 new Dictionary<string, string?>
                 {
                     { "DB_CONNECTION_STRING", dbConnectionString },
-                    { "AuditLog:IngestionUrl", Fixture.AuditLogMockServer.IngestionUrl },
+                    { "RevisionLogOptions:ApiAddress", Fixture.AuditLogMockServer.IngestionUrl },
                 })
             .Build();
 
         ServiceCollection
             .AddSingleton<IConfiguration>(config)
             .AddHttpClient()
+            .AddJavaScriptEncoder()
             .AddSerializer()
-            .AddAuditLogOutboxPublisher()
+            .AddAuditLogOutboxPublisher(config)
             .AddTransient<AuditLogOutboxPublisher>(sp => (AuditLogOutboxPublisher)sp.GetRequiredService<IOutboxPublisher>());
     }
 }

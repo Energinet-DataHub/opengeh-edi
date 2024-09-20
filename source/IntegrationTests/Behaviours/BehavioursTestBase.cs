@@ -147,7 +147,7 @@ public class BehavioursTestBase : IDisposable
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         _authenticatedActor = GetService<AuthenticatedActor>();
         _authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None));
+            new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None, ActorRole.DataHubAdministrator));
     }
 
     private TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
@@ -341,6 +341,8 @@ public class BehavioursTestBase : IDisposable
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
         var outgoingMessagesClient = scope.ServiceProvider.GetRequiredService<IOutgoingMessagesClient>();
+        var authenticatedActor = scope.ServiceProvider.GetRequiredService<AuthenticatedActor>();
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber, Restriction.Owned, actorRole));
         var peekResult = await outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber, MessageCategory.Aggregations, actorRole, documentFormat), CancellationToken.None);
         return peekResult;
     }
@@ -462,6 +464,7 @@ public class BehavioursTestBase : IDisposable
                 TestCreateOutgoingCommandHandler>()
             .AddScopedSqlDbContext<ProcessContext>(config)
             .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
+            .AddJavaScriptEncoder()
             .AddSerializer()
             .AddLogging()
             // Some of the modules registers IClock.

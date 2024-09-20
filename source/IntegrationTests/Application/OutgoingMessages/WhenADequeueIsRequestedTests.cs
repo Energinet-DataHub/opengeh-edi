@@ -110,7 +110,7 @@ public class WhenADequeueIsRequestedTests : TestBase
         var actorNumber = ActorNumber.Create(SampleData.SenderId);
         var message = _energyResultPerGridAreaMessageDtoBuilder
             .WithReceiverNumber(actorNumber.Value)
-            .WithReceiverRole(ActorRole.GridOperator)
+            .WithReceiverRole(ActorRole.GridAccessProvider)
             .Build();
 
         await _outgoingMessagesClient.EnqueueAsync(message, CancellationToken.None);

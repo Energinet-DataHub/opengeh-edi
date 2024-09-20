@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.AuditLog.AuditLogClient;
+using Energinet.DataHub.Core.Outbox.Abstractions;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.Outbox.Interfaces;
+using Energinet.DataHub.RevisionLog.Integration;
 
 namespace Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 
-public class AuditLogOutboxPublisher(IAuditLogClient auditLogClient, ISerializer serializer) : IOutboxPublisher
+public class AuditLogOutboxPublisher(IRevisionLogClient revisionLogClient, ISerializer serializer) : IOutboxPublisher
 {
-    private readonly IAuditLogClient _auditLogClient = auditLogClient;
+    private readonly IRevisionLogClient _revisionLogClient = revisionLogClient;
     private readonly ISerializer _serializer = serializer;
 
     public bool CanPublish(string type) => type.Equals(AuditLogOutboxMessageV1.OutboxMessageType, StringComparison.OrdinalIgnoreCase);
@@ -32,20 +32,27 @@ public class AuditLogOutboxPublisher(IAuditLogClient auditLogClient, ISerializer
         var payload = _serializer.Deserialize<AuditLogOutboxMessageV1Payload>(serializedPayload)
             ?? throw new InvalidOperationException($"Failed to deserialize payload of type {nameof(AuditLogOutboxMessageV1Payload)}");
 
-        await _auditLogClient.LogAsync(
-            logId: payload.LogId,
+        var payloadAsJson = payload.Payload switch
+        {
+            null => string.Empty,
+            string p => p,
+            _ => _serializer.Serialize(payload),
+        };
+
+        await _revisionLogClient.LogAsync(new RevisionLogEntry(
+            logId: payload!.LogId,
             userId: payload.UserId,
             actorId: payload.ActorId,
             actorNumber: payload.ActorNumber,
             marketRoles: payload.MarketRoles,
             systemId: payload.SystemId,
             permissions: payload.Permissions,
-            occuredOn: payload.OccuredOn,
+            occurredOn: payload.OccuredOn,
             activity: payload.Activity,
             origin: payload.Origin,
-            payload: payload.Payload,
+            payload: payloadAsJson,
             affectedEntityType: payload.AffectedEntityType,
-            affectedEntityKey: payload.AffectedEntityKey)
+            affectedEntityKey: payload.AffectedEntityKey))
                 .ConfigureAwait(false);
     }
 }

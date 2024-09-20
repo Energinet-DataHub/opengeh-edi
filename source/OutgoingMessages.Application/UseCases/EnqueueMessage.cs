@@ -80,9 +80,10 @@ public class EnqueueMessage
         await _outgoingMessageRepository.AddAsync(messageToEnqueue).ConfigureAwait(false);
 
         _logger.LogInformation(
-            "Enqueued message for OutgoingMessageId: {OutgoingMessageId} for ActorNumber: {ActorNumber} for Received Event id: {EventId}",
+            "Enqueued message for OutgoingMessageId: {OutgoingMessageId} for ActorNumber: {ActorNumber} ActorRole: {ActorRole}, for Received Event id: {EventId}",
             messageToEnqueue.Id,
             messageToEnqueue.Receiver.Number.Value,
+            messageToEnqueue.Receiver.ActorRole.Code,
             messageToEnqueue.EventId);
 
         return messageToEnqueue.Id;
@@ -109,7 +110,7 @@ public class EnqueueMessage
 
         if (actorMessageQueueId == null)
         {
-            _logger.LogInformation("Creating new message queue for Actor: {ActorNumber}, MarketRole: {MarketRole}", receiver.Number.Value, receiver.ActorRole.Name);
+            _logger.LogInformation("Creating new message queue for Actor: {ActorNumber}, ActorRole: {ActorRole}", receiver.Number.Value, receiver.ActorRole.Name);
             var actorMessageQueueToCreate = ActorMessageQueue.CreateFor(receiver);
             _actorMessageQueueRepository.Add(actorMessageQueueToCreate);
             actorMessageQueueId = actorMessageQueueToCreate.Id;

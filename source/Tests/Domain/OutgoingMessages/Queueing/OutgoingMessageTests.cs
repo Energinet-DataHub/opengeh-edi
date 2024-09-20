@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Encodings.Web;
+using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;
@@ -24,6 +26,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.Tests.Factories;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
 
@@ -31,24 +34,25 @@ namespace Energinet.DataHub.EDI.Tests.Domain.OutgoingMessages.Queueing;
 
 public class OutgoingMessageTests
 {
-    private readonly IList<IDocumentWriter> _documentWriters = new List<IDocumentWriter>()
-    {
-        new NotifyWholesaleServicesCimJsonDocumentWriter(new MessageRecordParser(new Serializer())),
+    private static readonly IServiceProvider _serviceProvider = new ServiceCollection().AddJavaScriptEncoder().BuildServiceProvider();
+    private readonly IList<IDocumentWriter> _documentWriters =
+    [
+        new NotifyWholesaleServicesCimJsonDocumentWriter(new MessageRecordParser(new Serializer()), _serviceProvider.GetRequiredService<JavaScriptEncoder>()),
         new NotifyWholesaleServicesEbixDocumentWriter(new MessageRecordParser(new Serializer())),
         new NotifyWholesaleServicesCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
 
         new NotifyAggregatedMeasureDataEbixDocumentWriter(new MessageRecordParser(new Serializer())),
         new NotifyAggregatedMeasureDataCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
-        new NotifyAggregatedMeasureDataCimJsonDocumentWriter(new MessageRecordParser(new Serializer())),
+        new NotifyAggregatedMeasureDataCimJsonDocumentWriter(new MessageRecordParser(new Serializer()), _serviceProvider.GetRequiredService<JavaScriptEncoder>()),
 
-        new RejectRequestAggregatedMeasureDataCimJsonDocumentWriter(new MessageRecordParser(new Serializer())),
+        new RejectRequestAggregatedMeasureDataCimJsonDocumentWriter(new MessageRecordParser(new Serializer()), _serviceProvider.GetRequiredService<JavaScriptEncoder>()),
         new RejectRequestAggregatedMeasureDataEbixDocumentWriter(new MessageRecordParser(new Serializer())),
         new RejectRequestAggregatedMeasureDataCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
 
-        new RejectRequestWholesaleSettlementCimJsonDocumentWriter(new MessageRecordParser(new Serializer())),
+        new RejectRequestWholesaleSettlementCimJsonDocumentWriter(new MessageRecordParser(new Serializer()), _serviceProvider.GetRequiredService<JavaScriptEncoder>()),
         new RejectRequestWholesaleSettlementEbixDocumentWriter(new MessageRecordParser(new Serializer())),
         new RejectRequestWholesaleSettlementCimXmlDocumentWriter(new MessageRecordParser(new Serializer())),
-    };
+    ];
 
     /// <summary>
     /// This contains the serialized content for the different messages that we should be able to deserialize in order to write message from actor queues
@@ -284,7 +288,7 @@ public class OutgoingMessageTests
         // Assert
         using var scope = new AssertionScope();
         outgoingMessage.Receiver.ActorRole.Should().Be(ActorRole.MeteredDataResponsible);
-        outgoingMessage.GetActorMessageQueueMetadata().ActorRole.Should().Be(ActorRole.GridOperator);
+        outgoingMessage.GetActorMessageQueueMetadata().ActorRole.Should().Be(ActorRole.GridAccessProvider);
     }
 
     private static OutgoingMessageHeader GetHeader()

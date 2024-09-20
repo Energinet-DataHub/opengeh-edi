@@ -198,12 +198,14 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202408220811 Remove IdempotentId to OutgoingMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202409021105 Create index on MarketDocuments BundleId.sql" />
     <EmbeddedResource Include="Scripts\Model\202409041545 Add MessageCategory to Bundles.sql" />
+    <EmbeddedResource Include="Scripts\Model\202409171118 Add ReceiverRoleCode and SenderRoleCode to ArchivedMessages.sql" />
     <EmbeddedResource Include="Scripts\Model\202409050900 New Index to get oldest Bundle.sql" />
     <EmbeddedResource Include="Scripts\Model\202408301351 Add Outbox table.sql" />
     <EmbeddedResource Include="Scripts\Model\202409091600 Drop unused tables.sql" />
     <EmbeddedResource Include="Scripts\Model\202409101600 Reorganize Bundle indexs.sql" />
     <EmbeddedResource Include="Scripts\Model\202409111315 Rebuild OutgoingMessages indexes.sql" />
     <EmbeddedResource Include="Scripts\Model\202409111300 Rebuild Bundle indexs.sql" />
+    <EmbeddedResource Include="Scripts\Model\202409170949 Edit Outbox table.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <None Remove="Scripts\Model\202310231329 Alter Bundles1.sql" />

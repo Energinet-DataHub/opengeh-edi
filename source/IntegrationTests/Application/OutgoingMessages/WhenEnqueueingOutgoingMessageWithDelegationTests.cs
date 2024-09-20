@@ -69,7 +69,7 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
             .WithMeteredDataResponsibleNumber(outgoingEnergyResultMessageReceiver.ActorNumber.Value)
             .Build();
 
-        _delegatedBy = CreateActor(outgoingEnergyResultMessageReceiver.ActorNumber, actorRole: ActorRole.GridOperator);
+        _delegatedBy = CreateActor(outgoingEnergyResultMessageReceiver.ActorNumber, actorRole: ActorRole.GridAccessProvider);
         await AddDelegationAsync(_delegatedBy, _delegatedTo, message.Series.GridAreaCode);
 
         // Act
@@ -119,11 +119,11 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
     public async Task Enqueue_message_to_delegated_as_grid_operator()
     {
         // Arrange
-        var delegatedBy = CreateActor(ActorNumber.Create("1234567891234"), actorRole: ActorRole.GridOperator);
-        var delegatedTo = CreateActor(ActorNumber.Create("1234567891235"), actorRole: ActorRole.GridOperator);
+        var delegatedBy = CreateActor(ActorNumber.Create("1234567891234"), actorRole: ActorRole.GridAccessProvider);
+        var delegatedTo = CreateActor(ActorNumber.Create("1234567891235"), actorRole: ActorRole.GridAccessProvider);
         var builder = new WholesaleTotalAmountMessageDtoBuilder();
         var message = builder.WithReceiverNumber(delegatedBy.ActorNumber)
-            .WithReceiverRole(ActorRole.GridOperator).Build();
+            .WithReceiverRole(ActorRole.GridAccessProvider).Build();
         await AddDelegationAsync(delegatedBy, delegatedTo, message.Series.GridAreaCode!, ProcessType.ReceiveWholesaleResults);
 
         // Act
