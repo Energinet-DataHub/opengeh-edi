@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.Core.Outbox.Abstractions;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.AuditLog.AuditUser;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.Outbox.Interfaces;
-using Microsoft.Extensions.Logging;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.AuditLog.AuditLogger;
@@ -69,7 +68,7 @@ public class AuditLogger(
                 affectedEntityType?.Identifier,
                 affectedEntityKey));
 
-        await _outbox.CreateWithoutCommitAsync(outboxMessage)
+        await _outbox.AddToOutboxAsync(outboxMessage)
             .ConfigureAwait(false);
     }
 

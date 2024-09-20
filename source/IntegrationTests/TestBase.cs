@@ -184,6 +184,8 @@ public class TestBase : IDisposable
         ClearDbContextCaches();
 
         var outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), restriction: Restriction.Owned, actorRole ?? ActorRole.EnergySupplier));
         return outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, actorRole ?? ActorRole.EnergySupplier, documentFormat ?? DocumentFormat.Xml), CancellationToken.None);
     }
 
@@ -324,6 +326,7 @@ public class TestBase : IDisposable
                 TestCreateOutgoingCommandHandler>()
             .AddScopedSqlDbContext<ProcessContext>(config)
             .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
+            .AddJavaScriptEncoder()
             .AddSerializer()
             .AddLogging()
             .AddScoped<IClock>(_ => new ClockStub());

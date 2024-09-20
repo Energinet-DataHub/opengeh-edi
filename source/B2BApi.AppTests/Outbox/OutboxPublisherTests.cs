@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
+using Energinet.DataHub.Core.Outbox.Domain;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.Functions;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
-using Energinet.DataHub.EDI.Outbox.Domain;
 using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -56,6 +56,8 @@ public class OutboxPublisherTests : IAsyncLifetime
     [Fact]
     public async Task Given_AuditLogOutboxMessage_When_RunningOutboxPublisher_Then_CorrectAuditLogRequestSent()
     {
+        var now = Instant.FromUtc(2024, 09, 05, 13, 37);
+
         // Arrange
         var expectedLogId = Guid.NewGuid();
         var auditLogOutboxMessageV1 = new AuditLogOutboxMessageV1(
@@ -68,7 +70,7 @@ public class OutboxPublisherTests : IAsyncLifetime
                 MarketRoles: null,
                 SystemId: Guid.NewGuid(),
                 Permissions: "the-permissions",
-                OccuredOn: Instant.FromUtc(2024, 09, 05, 13, 37),
+                OccuredOn: now,
                 Activity: "an-activity",
                 Origin: "an-origin",
                 Payload: "a-payload",
@@ -76,6 +78,7 @@ public class OutboxPublisherTests : IAsyncLifetime
                 AffectedEntityKey: "an-entity-key"));
 
         var outboxMessage = new OutboxMessage(
+            now,
             auditLogOutboxMessageV1.Type,
             await auditLogOutboxMessageV1.SerializeAsync());
 
