@@ -47,7 +47,9 @@ public class WhenArchivedMessageIsCreatedTests : IClassFixture<ArchivedMessagesF
         // Arrange
         var archivedMessage = CreateArchivedMessage(ArchivedMessageType.IncomingMessage);
         var messageCreatedAt = archivedMessage.CreatedAt.ToDateTimeUtc();
-        var expectedBlobPath = $"{archivedMessage.SenderNumber}/"
+
+        // Since the message is an incoming message, we need the "senderNumber" in the path
+        var expectedBlobPath = $"{archivedMessage.SenderNumber.Value}/"
                                + $"{messageCreatedAt.Year:0000}/"
                                + $"{messageCreatedAt.Month:00}/"
                                + $"{messageCreatedAt.Day:00}/"
