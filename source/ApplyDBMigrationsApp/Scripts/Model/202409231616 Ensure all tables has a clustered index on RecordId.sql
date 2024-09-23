@@ -16,14 +16,14 @@ GO
 -- AggregatedMeasureDataProcesses
 ALTER TABLE AggregatedMeasureDataProcessGridAreas DROP CONSTRAINT FK_AggregatedMeasureDataProcessGridAreas_AggregatedMeasureDataProcessId
 ALTER TABLE AggregatedMeasureDataProcesses DROP CONSTRAINT PK_AggregatedMeasureDataProcesses
-    GO
+GO
 
 ALTER TABLE AggregatedMeasureDataProcesses ADD CONSTRAINT PK_AggregatedMeasureDataProcesses
     PRIMARY KEY NONCLUSTERED (ProcessId)
 
 ALTER TABLE AggregatedMeasureDataProcessGridAreas  WITH CHECK ADD  CONSTRAINT FK_AggregatedMeasureDataProcessGridAreas_AggregatedMeasureDataProcessId FOREIGN KEY(AggregatedMeasureDataProcessId)
     REFERENCES AggregatedMeasureDataProcesses (ProcessId)
-    GO
+GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON AggregatedMeasureDataProcesses(RecordId)
 GO
@@ -33,7 +33,7 @@ GO
 
 -- ArchivedMessages
 ALTER TABLE ArchivedMessages DROP CONSTRAINT PK_ArchivedMessages_Id
-    GO
+GO
 
 ALTER TABLE ArchivedMessages ADD CONSTRAINT PK_ArchivedMessages_Id
     PRIMARY KEY NONCLUSTERED ([Id])
@@ -81,7 +81,7 @@ GO
 
 -- WholesaleServicesProcessChargeTypes
 ALTER TABLE WholesaleServicesProcessChargeTypes DROP CONSTRAINT PK_WholesaleServicesProcessChargeTypes
-    GO
+GO
 
 ALTER TABLE WholesaleServicesProcessChargeTypes ADD CONSTRAINT PK_WholesaleServicesProcessChargeTypes
     PRIMARY KEY NONCLUSTERED (ChargeTypeId)
@@ -93,7 +93,7 @@ GO
 ALTER TABLE WholesaleServicesProcessChargeTypes DROP CONSTRAINT FK_WholesaleServicesProcessId
 ALTER TABLE WholesaleServicesProcessGridAreas DROP CONSTRAINT FK_WholesaleServicesProcessGridAreas_WholesaleServicesProcessId
 ALTER TABLE WholesaleServicesProcesses DROP CONSTRAINT PK_WholesaleServicesProcesses
-    GO
+GO
 
 ALTER TABLE WholesaleServicesProcesses ADD CONSTRAINT PK_WholesaleServicesProcesses
     PRIMARY KEY NONCLUSTERED (ProcessId)
@@ -101,6 +101,6 @@ ALTER TABLE WholesaleServicesProcessGridAreas  WITH CHECK ADD  CONSTRAINT [FK_Wh
     REFERENCES WholesaleServicesProcesses (ProcessId)
 ALTER TABLE WholesaleServicesProcessChargeTypes  WITH CHECK ADD  CONSTRAINT [FK_WholesaleServicesProcessId] FOREIGN KEY(WholesaleServicesProcessId)
     REFERENCES WholesaleServicesProcesses (ProcessId)
-    GO
+GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON WholesaleServicesProcesses(RecordId) -- should delete old clustered index and create new ones
