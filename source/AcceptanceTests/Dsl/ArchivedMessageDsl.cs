@@ -14,6 +14,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using FluentAssertions;
@@ -28,18 +29,18 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
     Justification = "Dsl classes uses a naming convention based on the business domain")]
 public class ArchivedMessageDsl
 {
-    private readonly EdiB2CDriver _ediB2CDriver;
+    private readonly B2CEdiDriver _b2CEdiDriver;
     private readonly EdiDatabaseDriver _ediDatabaseDriver;
 
-    internal ArchivedMessageDsl(EdiB2CDriver ediB2CDriver, EdiDatabaseDriver ediDatabaseDriver)
+    internal ArchivedMessageDsl(B2CEdiDriver b2CEdiDriver, EdiDatabaseDriver ediDatabaseDriver)
     {
-        _ediB2CDriver = ediB2CDriver;
+        _b2CEdiDriver = b2CEdiDriver;
         _ediDatabaseDriver = ediDatabaseDriver;
     }
 
     internal async Task ConfirmMessageIsArchived(string messageId)
     {
-        var archivedMessages = await _ediB2CDriver.SearchArchivedMessagesAsync(
+        var archivedMessages = await _b2CEdiDriver.SearchArchivedMessagesAsync(
             new SearchArchivedMessagesCriteria(
                 MessageId: messageId,
                 CreatedDuringPeriod: null,
@@ -65,7 +66,7 @@ public class ArchivedMessageDsl
     {
         var unknownMessageId = Guid.NewGuid().ToString();
         var outboxCreatedAfter = SystemClock.Instance.GetCurrentInstant();
-        await _ediB2CDriver.SearchArchivedMessagesAsync(
+        await _b2CEdiDriver.SearchArchivedMessagesAsync(
             new SearchArchivedMessagesCriteria(
                 MessageId: unknownMessageId,
                 CreatedDuringPeriod: null,

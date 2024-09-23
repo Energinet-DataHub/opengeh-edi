@@ -45,7 +45,7 @@ internal sealed class ActorDsl
         await _marketParticipant.PublishActorCertificateCredentialsRemovedAsync(actorNumber, actorRole, thumbprint).ConfigureAwait(false);
     }
 
-    public async Task ActorCertificateCredentialsAssigned(string actorNumber, string actorRole, string thumbprint)
+    public async Task PublishActorCertificateCredentialsAssigned(string actorNumber, string actorRole, string thumbprint)
     {
         await _marketParticipant.PublishActorCertificateCredentialsAssignedAsync(actorNumber, actorRole, thumbprint).ConfigureAwait(false);
     }

@@ -14,6 +14,7 @@
 
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C;
 using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
 using FluentAssertions;
 
@@ -24,15 +25,18 @@ public sealed class AggregatedMeasureDataRequestDsl
     private readonly EdiDriver _ediDriver;
     private readonly EdiDatabaseDriver _ediDatabaseDriver;
     private readonly WholesaleDriver _wholesaleDriver;
+    private readonly B2CEdiDriver _b2CEdiDriver;
 
 #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
 
     internal AggregatedMeasureDataRequestDsl(
         EdiDriver ediDriver,
+        B2CEdiDriver b2CEdiDriver,
         EdiDatabaseDriver ediDatabaseDriver,
         WholesaleDriver wholesaleDriver)
     {
         _ediDriver = ediDriver;
+        _b2CEdiDriver = b2CEdiDriver;
         _ediDatabaseDriver = ediDatabaseDriver;
         _wholesaleDriver = wholesaleDriver;
     }
@@ -48,6 +52,12 @@ public sealed class AggregatedMeasureDataRequestDsl
         return await _ediDriver
                 .RequestAggregatedMeasureDataAsync(false, cancellationToken)
                 .ConfigureAwait(false);
+    }
+
+    internal Task<Guid> B2CRequest(CancellationToken cancellationToken)
+    {
+        return _b2CEdiDriver
+            .RequestAggregatedMeasureDataAsync(false, cancellationToken);
     }
 
     internal async Task ConfirmInvalidRequestIsRejected(CancellationToken cancellationToken = default)

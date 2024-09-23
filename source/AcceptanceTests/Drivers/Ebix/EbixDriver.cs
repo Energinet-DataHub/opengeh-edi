@@ -29,7 +29,7 @@ internal sealed class EbixDriver : IDisposable
     private readonly HttpClient _httpClientWithCertificate;
     private readonly HttpClientHandler _certificateHttpClientHandler;
 
-    public EbixDriver(Uri dataHubUrlEbixUrl, string ebixCertificatePassword, ActorRole actorRole)
+    public EbixDriver(Uri dataHubUrlEbixUrl, EbixCredentials ebixCredentials)
     {
         // Create a binding using Transport and a certificate.
         var binding = new BasicHttpBinding
@@ -50,18 +50,9 @@ internal sealed class EbixDriver : IDisposable
 
         _ebixServiceClient = new marketMessagingB2BServiceV01PortTypeClient(binding, endpoint);
 
-        if (actorRole == ActorRole.EnergySupplier)
-        {
-            _certificate = _ebixServiceClient.ClientCredentials.ClientCertificate.Certificate = new X509Certificate2(
-                "./Drivers/Ebix/DH3-test-mosaik-energysupplier-private-and-public.pfx",
-                ebixCertificatePassword);
-        }
-        else
-        {
-            _certificate = _ebixServiceClient.ClientCredentials.ClientCertificate.Certificate = new X509Certificate2(
-                "./Drivers/Ebix/DH3-test-mosaik-1-private-and-public.pfx",
-                ebixCertificatePassword);
-        }
+        _certificate = _ebixServiceClient.ClientCredentials.ClientCertificate.Certificate = new X509Certificate2(
+            $"./Drivers/Ebix/{ebixCredentials.CertificateName}",
+            ebixCredentials.CertificatePassword);
 
         _unauthorizedHttpClient = new HttpClient
         {

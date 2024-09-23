@@ -40,19 +40,19 @@ public class B2BTokenReceiver
         _httpClient.Dispose();
     }
 
-    public async Task<string> GetB2BTokenAsync(string clientId, string clientSecret)
+    public async Task<string> GetB2BTokenAsync(B2BCredentials credentials)
     {
-        ArgumentNullException.ThrowIfNull(clientId);
-        ArgumentNullException.ThrowIfNull(clientSecret);
+        ArgumentNullException.ThrowIfNull(credentials);
+
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri($"https://login.microsoftonline.com/{_tenantId}/oauth2/v2.0/token", UriKind.Absolute));
 
-        request.Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
-        {
+        request.Content = new FormUrlEncodedContent(
+        [
             new("grant_type", "client_credentials"),
-            new("client_id", clientId),
-            new("client_secret", clientSecret),
+            new("client_id", credentials.ClientId),
+            new("client_secret", credentials.ClientSecret),
             new("scope", $"{_backendAppId}/.default"),
-        });
+        ]);
 
         var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
         await response.EnsureSuccessStatusCodeWithLogAsync(_logger);

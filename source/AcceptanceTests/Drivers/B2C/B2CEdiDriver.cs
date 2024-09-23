@@ -18,19 +18,18 @@ using Energinet.DataHub.EDI.AcceptanceTests.Logging;
 using Energinet.DataHub.EDI.AcceptanceTests.Responses.Json;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Nito.AsyncEx;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C;
 
-public sealed class EdiB2CDriver : IDisposable
+public sealed class B2CEdiDriver : IDisposable
 {
     private readonly AsyncLazy<HttpClient> _httpClient;
     private readonly Uri _apiManagementUri;
     private readonly ITestOutputHelper _logger;
 
-    public EdiB2CDriver(AsyncLazy<HttpClient> b2CHttpClient, Uri apiManagementUri, ITestOutputHelper logger)
+    public B2CEdiDriver(AsyncLazy<HttpClient> b2CHttpClient, Uri apiManagementUri, ITestOutputHelper logger)
     {
         _httpClient = b2CHttpClient;
         _apiManagementUri = apiManagementUri;
@@ -58,5 +57,14 @@ public sealed class EdiB2CDriver : IDisposable
         var archivedMessageResponse = JsonConvert.DeserializeObject<List<ArchivedMessageSearchResponse>>(responseString) ?? throw new InvalidOperationException("Did not receive valid response");
 
         return archivedMessageResponse;
+    }
+
+    public async Task<Guid> RequestAggregatedMeasureDataAsync(bool withSyncError, CancellationToken cancellationToken)
+    {
+        var httpClient = await _httpClient;
+
+        using var request = new HttpRequestMessage(HttpMethod.Get, "b2c/v1.0/cim/aggregations");
+
+        throw new InvalidOperationException();
     }
 }
