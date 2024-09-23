@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C;
 using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
 using FluentAssertions;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
@@ -54,10 +55,10 @@ public sealed class AggregatedMeasureDataRequestDsl
                 .ConfigureAwait(false);
     }
 
-    internal Task<Guid> B2CRequest(CancellationToken cancellationToken)
+    internal Task B2CRequest(CancellationToken cancellationToken)
     {
         return _b2CEdiDriver
-            .RequestAggregatedMeasureDataAsync(false, cancellationToken);
+            .RequestAggregatedMeasureDataAsync(cancellationToken);
     }
 
     internal async Task ConfirmInvalidRequestIsRejected(CancellationToken cancellationToken = default)
@@ -79,6 +80,17 @@ public sealed class AggregatedMeasureDataRequestDsl
     {
         var processId = await _ediDatabaseDriver
             .GetAggregatedMeasureDataProcessIdAsync(requestMessageId, cancellationToken)
+            .ConfigureAwait(false);
+
+        processId.Should().NotBeNull();
+    }
+
+    internal async Task ConfirmRequestIsInitialized(
+        Instant createdAfter,
+        string requestedByActorNumber)
+    {
+        var processId = await _ediDatabaseDriver
+            .GetAggregatedMeasureDataProcessIdAsync(createdAfter, requestedByActorNumber, CancellationToken.None)
             .ConfigureAwait(false);
 
         processId.Should().NotBeNull();

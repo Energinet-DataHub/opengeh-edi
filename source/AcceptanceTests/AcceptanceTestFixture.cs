@@ -144,6 +144,8 @@ public class AcceptanceTestFixture : IAsyncLifetime
             "MARKET_PARTICIPANT_URI",
             defaultValue: "https://app-webapi-markpart-u-001.azurewebsites.net"));
 
+        EdiB2CWebApiUri = new Uri(GetConfigurationValue<string>(root, "EDI_B2C_WEB_API_URI"));
+
         var b2cUsername = GetConfigurationValue<string>(root, "B2C_USERNAME");
         var b2cPassword = GetConfigurationValue<string>(root, "B2C_PASSWORD");
 
@@ -177,13 +179,15 @@ public class AcceptanceTestFixture : IAsyncLifetime
 
     internal B2BClients B2BClients { get; }
 
-    internal B2CClients B2CClients { get; set; }
+    internal B2CClients B2CClients { get; }
 
-    internal EbixCredentials EbixEnergySupplierCredentials { get; set; }
+    internal EbixCredentials EbixEnergySupplierCredentials { get; }
 
-    internal EbixCredentials EbixMeteredDataResponsibleCredentials { get; set; }
+    internal EbixCredentials EbixMeteredDataResponsibleCredentials { get; }
 
     internal string EbixMeteredDataResponsibleCertificateThumbprint { get; }
+
+    internal Uri EdiB2CWebApiUri { get; }
 
     internal Guid BalanceFixingCalculationId { get; }
 
@@ -228,11 +232,20 @@ public class AcceptanceTestFixture : IAsyncLifetime
         await B2CClients.DisposeAsync();
     }
 
-    private TValue GetConfigurationValue<TValue>(IConfigurationRoot root, string key, TValue? defaultValue = default)
+    private TValue GetConfigurationValue<TValue>(IConfigurationRoot root, string key)
     {
-        return defaultValue != null
-            ? root.GetValue<TValue?>(key) ?? defaultValue
-            : root.GetValue<TValue?>(key) ?? throw new InvalidOperationException($"{key} was not found in configuration");
+        var value = root.GetValue<TValue>(key);
+
+        // GetValue<T> return default(T) for complex types like Guid's, so we need to compare with the default(TValue) as well.
+        if (value is null || value.Equals(default(TValue)))
+            throw new InvalidOperationException($"{key} was not found in configuration");
+
+        return value;
+    }
+
+    private TValue GetConfigurationValue<TValue>(IConfigurationRoot root, string key, TValue defaultValue)
+    {
+        return root.GetValue<TValue?>(key) ?? defaultValue;
     }
 
     private AsyncLazy<HttpClient> CreateLazyB2BHttpClient(B2BCredentials credentials)

@@ -37,7 +37,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         var ediDatabaseDriver = new EdiDatabaseDriver(fixture.ConnectionString);
 
         _archivedMessages = new ArchivedMessageDsl(
-            new B2CEdiDriver(fixture.B2CClients.DatahubAdministrator, fixture.ApiManagementUri, output),
+            new B2CEdiDriver(fixture.B2CClients.DatahubAdministrator, fixture.ApiManagementUri, fixture.EdiB2CWebApiUri, output),
             ediDatabaseDriver);
 
         var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BClients.MeteredDataResponsible, output);

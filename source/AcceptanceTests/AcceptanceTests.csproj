@@ -12,7 +12,7 @@
     <Target Name="NSwag" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' == 'Debug' ">
         <PropertyGroup>
             <SwaggerConfiguration>Drivers\B2C\Client\swagger.json</SwaggerConfiguration>
-            <WholesaleClient>Drivers\B2C\Client\B2CEdiClient.cs</WholesaleClient>
+            <B2CEdiClient>Drivers\B2C\Client\B2CEdiClient.cs</B2CEdiClient>
         </PropertyGroup>
 
         <PropertyGroup>
@@ -117,10 +117,6 @@
       <EmbeddedResource Include="Messages\xml\RequestWholesaleSettlementWithBadPeriod.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Drivers\B2C\Client\" />
     </ItemGroup>
 
 </Project>

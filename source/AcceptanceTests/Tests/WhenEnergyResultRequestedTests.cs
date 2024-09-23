@@ -16,6 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
+using NodaTime;
 using Xunit.Abstractions;
 using Xunit.Categories;
 
@@ -31,6 +32,7 @@ public sealed class WhenEnergyResultRequestedTests : BaseTestClass
 {
     private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureDataResult;
     private readonly AggregatedMeasureDataRequestDsl _aggregatedMeasureDataRequest;
+    private readonly string _energySupplierActorNumber;
 
     public WhenEnergyResultRequestedTests(AcceptanceTestFixture fixture, ITestOutputHelper output)
         : base(output, fixture)
@@ -47,9 +49,11 @@ public sealed class WhenEnergyResultRequestedTests : BaseTestClass
         _aggregatedMeasureDataRequest =
             new AggregatedMeasureDataRequestDsl(
                 ediDriver,
-                new B2CEdiDriver(fixture.B2CClients.EnergySupplier, fixture.ApiManagementUri, output),
+                new B2CEdiDriver(fixture.B2CClients.EnergySupplier, fixture.ApiManagementUri, fixture.EdiB2CWebApiUri, output),
                 new EdiDatabaseDriver(fixture.ConnectionString),
                 wholesaleDriver);
+
+        _energySupplierActorNumber = AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber;
     }
 
     [Fact]
@@ -65,11 +69,13 @@ public sealed class WhenEnergyResultRequestedTests : BaseTestClass
     [Fact]
     public async Task B2C_actor_can_request_aggregated_measure_data()
     {
-        var messageId = await _aggregatedMeasureDataRequest.B2CRequest(cancellationToken: CancellationToken.None);
+        var createdAfter = SystemClock.Instance.GetCurrentInstant();
+        var energySupplierId = _energySupplierActorNumber;
+        await _aggregatedMeasureDataRequest.B2CRequest(cancellationToken: CancellationToken.None);
 
         await _aggregatedMeasureDataRequest.ConfirmRequestIsInitialized(
-            messageId,
-            CancellationToken.None);
+            createdAfter,
+            requestedByActorNumber: energySupplierId);
     }
 
     [Fact]

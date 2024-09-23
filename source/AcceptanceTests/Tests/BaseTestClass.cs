@@ -48,6 +48,7 @@ public class BaseTestClass
             new B2CEdiDriver(
                 _fixture.B2CClients.EnergySupplier,
                 _fixture.ApiManagementUri,
+                _fixture.EdiB2CWebApiUri,
                 Output),
             new EdiDatabaseDriver(_fixture.ConnectionString),
             new WholesaleDriver(_fixture.EventPublisher, _fixture.EdiInboxClient));
