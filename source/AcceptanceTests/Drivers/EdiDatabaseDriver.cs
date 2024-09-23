@@ -200,9 +200,9 @@ internal sealed class EdiDatabaseDriver
         }
     }
 
-    internal async Task<(bool Success, DateTime? PublishedAt, string? Payload, DateTime? FailedAt, string? ErrorMessage)>
-        GetPublishedOutboxMessageAsync(
-            Instant publishedAfter,
+    internal async Task<(bool Success, string? Payload)>
+        GetOutboxMessageAsync(
+            Instant createdAfter,
             string outboxMessageType,
             string payloadContains,
             CancellationToken cancellationToken)
@@ -211,23 +211,18 @@ internal sealed class EdiDatabaseDriver
 
         var stopWatch = Stopwatch.StartNew();
 
-        DateTime? publishedAt = null;
-        DateTime? failedAt = null;
-        string? errorMessage = null;
-        string? payload = null;
-
         await connection.OpenAsync(cancellationToken);
         while (stopWatch.Elapsed < TimeSpan.FromSeconds(30))
         {
             var outboxMessage = await connection.QueryFirstOrDefaultAsync(
                     @"SELECT * FROM [Outbox]
-                            WHERE [PublishedAt] >= @PublishedAfter AND
+                            WHERE [CreatedAt] >= @CreatedAfter AND
                                   [Type] = @OutboxMessageType AND
                                   [Payload] LIKE @PayloadContains
                             ORDER BY [CreatedAt] ASC",
                     new
                     {
-                        PublishedAfter = publishedAfter.ToDateTimeUtc(),
+                        CreatedAfter = createdAfter.ToDateTimeUtc(),
                         OutboxMessageType = outboxMessageType,
                         PayloadContains = $"%{payloadContains}%",
                     })
@@ -235,13 +230,7 @@ internal sealed class EdiDatabaseDriver
 
             if (outboxMessage != null)
             {
-                publishedAt = outboxMessage.PublishedAt;
-                failedAt = outboxMessage.FailedAt;
-                errorMessage = outboxMessage.ErrorMessage;
-                payload = outboxMessage.Payload;
-
-                if (outboxMessage.PublishedAt != null)
-                    return (true, publishedAt, payload, failedAt, errorMessage);
+                return (true, outboxMessage.Payload);
             }
 
             await Task.Delay(500, cancellationToken)
@@ -250,6 +239,6 @@ internal sealed class EdiDatabaseDriver
 
         await connection.CloseAsync();
 
-        return (false, publishedAt, payload, failedAt, errorMessage);
+        return (false, null);
     }
 }
