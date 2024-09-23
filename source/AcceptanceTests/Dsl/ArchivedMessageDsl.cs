@@ -78,11 +78,11 @@ public class ArchivedMessageDsl
         return (unknownMessageId, outboxCreatedAfter);
     }
 
-    internal async Task ConfirmArchivedMessageSearchAuditLogExistsForMessageId(string messageId, Instant publishedAfter)
+    internal async Task ConfirmArchivedMessageSearchAuditLogExistsForMessageId(string messageId, Instant createdAfter)
     {
         var (success, payload) = await _ediDatabaseDriver
             .GetOutboxMessageAsync(
-                createdAfter: publishedAfter,
+                createdAfter: createdAfter,
                 outboxMessageType: AuditLogOutboxMessageV1.OutboxMessageType,
                 payloadContains: messageId,
                 cancellationToken: CancellationToken.None);
