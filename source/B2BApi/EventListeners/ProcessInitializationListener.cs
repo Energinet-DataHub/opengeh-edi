@@ -21,18 +21,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.EventListeners;
 
-public class ProcessInitializationListener
+public class ProcessInitializationListener(
+    ILogger<ProcessInitializationListener> logger,
+    IProcessClient processClient)
 {
-    private readonly ILogger<ProcessInitializationListener> _logger;
-    private readonly IProcessClient _processClient;
-
-    public ProcessInitializationListener(
-        ILogger<ProcessInitializationListener> logger,
-        IProcessClient processClient)
-    {
-        _logger = logger;
-        _processClient = processClient;
-    }
+    private readonly ILogger<ProcessInitializationListener> _logger = logger;
+    private readonly IProcessClient _processClient = processClient;
 
     /// <summary>
     /// Receives messages from the inbox queue and forwards them to the inbox event receiver.

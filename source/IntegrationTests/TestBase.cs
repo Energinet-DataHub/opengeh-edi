@@ -19,6 +19,7 @@ using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
@@ -183,6 +184,8 @@ public class TestBase : IDisposable
         ClearDbContextCaches();
 
         var outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), restriction: Restriction.Owned, actorRole ?? ActorRole.EnergySupplier));
         return outgoingMessagesClient.PeekAndCommitAsync(new PeekRequestDto(actorNumber ?? ActorNumber.Create(SampleData.NewEnergySupplierNumber), category, actorRole ?? ActorRole.EnergySupplier, documentFormat ?? DocumentFormat.Xml), CancellationToken.None);
     }
 
@@ -289,12 +292,17 @@ public class TestBase : IDisposable
             .AddInMemoryCollection(
                 new Dictionary<string, string?>
                 {
+                    // ServiceBus
                     [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
                     [$"{EdiInboxQueueOptions.SectionName}:{nameof(EdiInboxQueueOptions.QueueName)}"] = "Fake",
                     [$"{WholesaleInboxQueueOptions.SectionName}:{nameof(WholesaleInboxQueueOptions.QueueName)}"] = "Fake",
                     [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] = "Fake",
-                    ["IntegrationEvents:TopicName"] = "NotEmpty",
-                    ["IntegrationEvents:SubscriptionName"] = "NotEmpty",
+                    [$"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.TopicName)}"] = "NotEmpty",
+                    [$"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.SubscriptionName)}"] = "NotEmpty",
+
+                    // Dead-letter logging
+                    [$"{BlobDeadLetterLoggerOptions.SectionName}:{nameof(BlobDeadLetterLoggerOptions.StorageAccountUrl)}"] = Fixture.AzuriteManager.BlobStorageServiceUri.OriginalString,
+                    [$"{BlobDeadLetterLoggerOptions.SectionName}:{nameof(BlobDeadLetterLoggerOptions.ContainerName)}"] = "edi-tests",
 
                     // Databricks
                     [nameof(DatabricksSqlStatementOptions.WorkspaceUrl)] = Fixture.IntegrationTestConfiguration.DatabricksSettings.WorkspaceUrl,

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
@@ -20,16 +21,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.B2BApi.EventListeners;
 
-public class IntegrationEventListener
+public class IntegrationEventListener(
+    ILogger<IntegrationEventListener> logger,
+    ISubscriber subscriber)
 {
-    private readonly ILogger<IntegrationEventListener> _logger;
-    private readonly ISubscriber _subscriber;
-
-    public IntegrationEventListener(ILogger<IntegrationEventListener> logger, ISubscriber subscriber)
-    {
-        _logger = logger;
-        _subscriber = subscriber;
-    }
+    private readonly ILogger<IntegrationEventListener> _logger = logger;
+    private readonly ISubscriber _subscriber = subscriber;
 
     /// <summary>
     /// Receives messages from the integration event topic and processes them.
@@ -45,16 +42,13 @@ public class IntegrationEventListener
             $"%{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.TopicName)}%",
             $"%{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.SubscriptionName)}%",
             Connection = ServiceBusNamespaceOptions.SectionName)]
-        byte[] eventData,
-        FunctionContext context)
+        ServiceBusReceivedMessage message)
     {
-        ArgumentNullException.ThrowIfNull(context);
-
-        var eventDetails = context.ExtractEventDetails();
+        var eventDetails = new EventDetails(message.MessageId, message.Subject);
         _logger.LogInformation("Integration event details: {EventDetails}", eventDetails);
 
         await _subscriber
-            .HandleAsync(IntegrationEventServiceBusMessage.Create(eventData, context.BindingContext.BindingData!))
+            .HandleAsync(IntegrationEventServiceBusMessage.Create(message))
             .ConfigureAwait(false);
     }
 }
