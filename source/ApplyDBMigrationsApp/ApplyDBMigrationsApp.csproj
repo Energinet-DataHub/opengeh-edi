@@ -126,7 +126,6 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202310200959 Actor ExternalId to nvarchar.sql" />
     <EmbeddedResource Include="Scripts\Model\202310241037 Create GridArea table.sql" />
     <EmbeddedResource Include="Scripts\Model\202310241037 Rename ActorNumber to GridAreaOwnerActorNumber in GridArea table.sql" />
-    <EmbeddedResource Include="Scripts\Model\202310241414 Create static GridAreas.sql" />
     <EmbeddedResource Include="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <EmbeddedResource Include="Scripts\Model\202310231329 Alter Bundles2.sql" />
     <EmbeddedResource Include="Scripts\Model\202310231329 Alter Bundles1.sql" />
