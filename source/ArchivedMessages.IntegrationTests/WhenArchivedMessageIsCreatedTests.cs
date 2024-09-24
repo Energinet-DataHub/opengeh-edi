@@ -122,20 +122,7 @@ public class WhenArchivedMessageIsCreatedTests : IClassFixture<ArchivedMessagesF
 
         var archivedMessages =
             await connection.QueryAsync<ArchivedMessageFromDb>(
-                    "SELECT "
-                    + "Id,"
-                    + " MessageId,"
-                    + " DocumentType,"
-                    + " SenderNumber,"
-                    + " SenderRoleCode,"
-                    + " ReceiverNumber,"
-                    + " ReceiverRoleCode,"
-                    + " CreatedAt,"
-                    + " BusinessReason,"
-                    + " FileStorageReference,"
-                    + " RelatedToMessageId,"
-                    + " EventIds"
-                    + " FROM dbo.[ArchivedMessages]")
+                    "SELECT * FROM dbo.[ArchivedMessages]")
                 .ConfigureAwait(false);
 
         return archivedMessages.ToList().AsReadOnly();
