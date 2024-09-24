@@ -31,6 +31,6 @@ public sealed record ArchivedMessageStream : StreamValueObject, IArchivedMessage
     /// <summary>
     /// This is only intended for testing purposes
     /// </summary>
-    public ArchivedMessageStream(Stream stream)
+    internal ArchivedMessageStream(Stream stream)
         : base(stream) { }
 }
