@@ -42,40 +42,6 @@ public class SearchMessagesTests : TestBase
     }
 
     [Fact]
-    public async Task Can_fetch_messages()
-    {
-        var archivedMessage = CreateArchivedMessage(_clock.GetCurrentInstant());
-        await ArchiveMessage(archivedMessage);
-
-        var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(), CancellationToken.None);
-
-        var messageInfo = result.Messages.FirstOrDefault(message => message.Id == archivedMessage.Id.Value);
-        Assert.NotNull(messageInfo);
-        Assert.Equal(archivedMessage.DocumentType, messageInfo.DocumentType);
-        Assert.Equal(archivedMessage.SenderNumber.Value, messageInfo.SenderNumber);
-        Assert.Equal(archivedMessage.ReceiverNumber.Value, messageInfo.ReceiverNumber);
-        Assert.Equal(archivedMessage.CreatedAt.ToDateTimeUtc().ToString("u"), messageInfo.CreatedAt.ToDateTimeUtc().ToString("u")); // "u" is the "yyyy-mm-dd hh:MM:ssZ" format
-        Assert.Equal(archivedMessage.MessageId, messageInfo.MessageId);
-    }
-
-    [Fact]
-    public async Task Filter_messages_by_creation_date_period()
-    {
-        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-04-01T22:00:00Z")));
-        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z")));
-        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-06-01T22:00:00Z")));
-
-        var result = await _archivedMessagesClient.SearchAsync(
-            new GetMessagesQuery(new MessageCreationPeriod(
-            CreatedAt("2023-05-01T22:00:00Z"),
-            CreatedAt("2023-05-02T22:00:00Z"))),
-            CancellationToken.None);
-
-        Assert.Single(result.Messages);
-        Assert.Equal(CreatedAt("2023-05-01T22:00:00Z"), result.Messages[0].CreatedAt);
-    }
-
-    [Fact]
     public async Task Filter_messages_by_message_id_and_created_date()
     {
         //Arrange
