@@ -55,7 +55,7 @@ public class ArchivedMessage
         IIncomingMarketMessageStream incomingMarketMessageStream)
         : this(messageId, Array.Empty<EventId>(), documentType, senderNumber, senderRole, receiverNumber, receiverRole, createdAt, businessReason, archivedMessageType, new ArchivedMessageStream(incomingMarketMessageStream)) { }
 
-    private ArchivedMessage(
+    internal ArchivedMessage(
         string? messageId,
         IReadOnlyList<EventId> eventIds,
         string documentType,
