@@ -22,8 +22,7 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Models;
 /// Which enables us to use a typed model in test.
 /// </summary>
 public record ArchivedMessageFromDb(
-    int RecordId, // This is there to make a "SELECT *" query work
-    Guid Id,
+    Guid Id, // This is there to make a "SELECT *" query work
     string DocumentType,
     string ReceiverNumber,
     string SenderNumber,
@@ -34,7 +33,8 @@ public record ArchivedMessageFromDb(
     string? RelatedToMessageId,
     string? EventIds,
     string ReceiverRoleCode,
-    string SenderRoleCode)
+    string SenderRoleCode,
+    long RecordId)
     : MessageInfo(
     Id,
     MessageId,
