@@ -12,7 +12,6 @@ GO
 
 -- ActorMessageQueues
 ALTER TABLE ActorMessageQueues ALTER COLUMN RecordId BIGINT 
-GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON ActorMessageQueues(RecordId)
 GO
@@ -59,7 +58,6 @@ GO
 
 -- Bundles
 ALTER TABLE Bundles ALTER COLUMN RecordId BIGINT 
-GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON Bundles(RecordId)
 GO
@@ -73,21 +71,18 @@ GO
 
 -- MarketDocuments
 ALTER TABLE MarketDocuments ALTER COLUMN RecordId BIGINT 
-GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON MarketDocuments(RecordId)
 GO
 
 -- MarketEvaluationPoints
 ALTER TABLE MarketEvaluationPoints ALTER COLUMN RecordId BIGINT 
-GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON MarketEvaluationPoints(RecordId)
 GO
 
 -- MessageRegistry
 ALTER TABLE MessageRegistry ALTER COLUMN RecordId BIGINT 
-GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON MessageRegistry(RecordId)
 GO
@@ -102,7 +97,6 @@ GO
 
 -- OutgoingMessages
 ALTER TABLE OutgoingMessages ALTER COLUMN RecordId BIGINT 
-GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON OutgoingMessages(RecordId)
 GO
@@ -125,21 +119,18 @@ GO
 
 -- ReceivedInboxEvents 
 ALTER TABLE ReceivedInboxEvents ALTER COLUMN RecordId BIGINT 
-GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON ReceivedInboxEvents(RecordId)
 GO
 
 -- ReceivedIntegrationEvents
 ALTER TABLE ReceivedIntegrationEvents ALTER COLUMN RecordId BIGINT 
-GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON ReceivedIntegrationEvents(RecordId)
 GO
 
 -- TransactionRegistry
 ALTER TABLE TransactionRegistry ALTER COLUMN RecordId BIGINT 
-GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON TransactionRegistry(RecordId)
 GO
@@ -151,8 +142,7 @@ GO
 ALTER TABLE WholesaleServicesProcessChargeTypes ADD CONSTRAINT PK_WholesaleServicesProcessChargeTypes
     PRIMARY KEY NONCLUSTERED (ChargeTypeId)
 
-ALTER TABLE WholesaleServicesProcessChargeTypes ALTER COLUMN RecordId BIGINT 
-GO
+ALTER TABLE WholesaleServicesProcessChargeTypes ALTER COLUMN RecordId BIGINT
 
 CREATE CLUSTERED INDEX IX_RecordId ON WholesaleServicesProcessChargeTypes(RecordId)
 GO
@@ -172,14 +162,12 @@ ALTER TABLE WholesaleServicesProcessChargeTypes  WITH CHECK ADD  CONSTRAINT [FK_
 GO
 
 ALTER TABLE WholesaleServicesProcesses ALTER COLUMN RecordId BIGINT 
-GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON WholesaleServicesProcesses(RecordId)
 
 -- WholesaleServicesProcessGridAreas
 ALTER TABLE WholesaleServicesProcessGridAreas DROP CONSTRAINT UX_WholesaleServicesProcessGridAreas_RecordId
 ALTER TABLE WholesaleServicesProcessGridAreas ALTER COLUMN RecordId BIGINT 
-GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON WholesaleServicesProcessGridAreas(RecordId)
 GO
