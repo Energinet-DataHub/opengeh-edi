@@ -124,7 +124,6 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         var builder = new ConfigurationBuilder();
         builder.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["FEATUREFLAG_ACTORMESSAGEQUEUE"] = "true", //Needed?
             ["DB_CONNECTION_STRING"] = DatabaseManager.ConnectionString,
             ["AZURE_STORAGE_ACCOUNT_CONNECTION_STRING"] = AzuriteManager.BlobStorageConnectionString,
             // TODO: fix this
