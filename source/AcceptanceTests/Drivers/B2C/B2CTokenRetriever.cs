@@ -45,14 +45,12 @@ public class B2CTokenRetriever
 
         request.Content = new MultipartFormDataContent
         {
-#pragma warning disable CA2000
             { new StringContent(credentials.Username), "username" },
             { new StringContent(credentials.Password), "password" },
             { new StringContent("password"), "grant_type" },
             { new StringContent($"openid {_backendBffScope} offline_access"), "scope" },
             { new StringContent(_frontendAppId), "client_id" },
             { new StringContent("token id_token"), "response_type" },
-#pragma warning restore CA2000
         };
 
         var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
