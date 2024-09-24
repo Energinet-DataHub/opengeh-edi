@@ -23,13 +23,11 @@ GO
 
 ALTER TABLE AggregatedMeasureDataProcesses ADD CONSTRAINT PK_AggregatedMeasureDataProcesses
     PRIMARY KEY NONCLUSTERED (ProcessId)
-
 ALTER TABLE AggregatedMeasureDataProcessGridAreas  WITH CHECK ADD  CONSTRAINT FK_AggregatedMeasureDataProcessGridAreas_AggregatedMeasureDataProcessId FOREIGN KEY(AggregatedMeasureDataProcessId)
     REFERENCES AggregatedMeasureDataProcesses (ProcessId)
 GO
 
 ALTER TABLE AggregatedMeasureDataProcesses ALTER COLUMN RecordId BIGINT 
-GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON AggregatedMeasureDataProcesses(RecordId)
 GO
@@ -37,7 +35,6 @@ GO
 -- AggregatedMeasureDataProcessGridAreas
 ALTER TABLE AggregatedMeasureDataProcessGridAreas DROP CONSTRAINT UX_AggregatedMeasureDataProcessGridAreas_RecordId
 ALTER TABLE AggregatedMeasureDataProcessGridAreas ALTER COLUMN RecordId BIGINT 
-GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON AggregatedMeasureDataProcessGridAreas(RecordId)
 GO
@@ -48,7 +45,6 @@ GO
 
 ALTER TABLE ArchivedMessages ADD CONSTRAINT PK_ArchivedMessages_Id
     PRIMARY KEY NONCLUSTERED ([Id])
-GO
 
 ALTER TABLE ArchivedMessages ALTER COLUMN RecordId BIGINT 
 GO
@@ -64,7 +60,6 @@ GO
 
 -- GridAreaOwner
 ALTER TABLE GridAreaOwner ADD RecordId BIGINT IDENTITY(1,1);
-GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON GridAreaOwner(RecordId)
 GO
@@ -90,7 +85,6 @@ GO
 -- Outbox
 ALTER TABLE Outbox DROP CONSTRAINT UX_Outbox_RecordId
 ALTER TABLE Outbox ALTER COLUMN RecordId BIGINT 
-GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON Outbox(RecordId)
 GO
@@ -104,7 +98,6 @@ GO
 -- ProcessDelegation
 ALTER TABLE ProcessDelegation DROP CONSTRAINT UX_ProcessDelegation_RecordId
 ALTER TABLE ProcessDelegation ALTER COLUMN RecordId BIGINT 
-GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON ProcessDelegation(RecordId)
 GO
@@ -112,7 +105,6 @@ GO
 -- QueuedInternalCommands
 ALTER TABLE QueuedInternalCommands DROP CONSTRAINT UC_InternalCommandQueue_Id
 ALTER TABLE QueuedInternalCommands ALTER COLUMN RecordId BIGINT 
-GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON QueuedInternalCommands(RecordId)
 GO
@@ -137,10 +129,10 @@ GO
 
 -- WholesaleServicesProcessChargeTypes
 ALTER TABLE WholesaleServicesProcessChargeTypes DROP CONSTRAINT PK_WholesaleServicesProcessChargeTypes
-GO
 
 ALTER TABLE WholesaleServicesProcessChargeTypes ADD CONSTRAINT PK_WholesaleServicesProcessChargeTypes
     PRIMARY KEY NONCLUSTERED (ChargeTypeId)
+GO
 
 ALTER TABLE WholesaleServicesProcessChargeTypes ALTER COLUMN RecordId BIGINT
 
