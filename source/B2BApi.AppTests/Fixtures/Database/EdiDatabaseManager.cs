@@ -16,6 +16,8 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.Database;
 using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
+using NodaTime.Extensions;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Database;
 
@@ -51,6 +53,21 @@ public class EdiDatabaseManager : SqlServerDatabaseManager<DbContext>
         sqlCommand.Parameters.AddWithValue("@id", Guid.NewGuid());
         sqlCommand.Parameters.AddWithValue("@actorNumber", actorNumber.Value);
         sqlCommand.Parameters.AddWithValue("@externalId", externalId);
+
+        await sqlConnection.OpenAsync();
+        await sqlCommand.ExecuteNonQueryAsync();
+    }
+
+    public async Task AddGridAreaOwnerAsync(ActorNumber actorNumber, string gridAreaCode)
+    {
+        await using var sqlConnection = new Microsoft.Data.SqlClient.SqlConnection(ConnectionString);
+
+        await using var sqlCommand = sqlConnection.CreateCommand();
+        sqlCommand.CommandText = "INSERT INTO [dbo].[GridAreaOwner] VALUES (@id, @gridAreaCode, @validFrom, @gridAreaOwnerActorNumber, 0)";
+        sqlCommand.Parameters.AddWithValue("@id", Guid.NewGuid());
+        sqlCommand.Parameters.AddWithValue("@gridAreaOwnerActorNumber", actorNumber.Value);
+        sqlCommand.Parameters.AddWithValue("@gridAreaCode", gridAreaCode);
+        sqlCommand.Parameters.AddWithValue("@validFrom", SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(1)).ToDateTimeUtc());
 
         await sqlConnection.OpenAsync();
         await sqlCommand.ExecuteNonQueryAsync();
