@@ -13,6 +13,10 @@
   <ItemGroup>
     <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
   </ItemGroup>
+  <!--Giving the integration test project of ArchivedMessages access to internals -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests"/>
+  </ItemGroup>
   <ItemDefinitionGroup>
     <ProjectReference>
       <PrivateAssets>all</PrivateAssets>

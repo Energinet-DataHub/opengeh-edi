@@ -112,6 +112,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Outbox", "Outbox", "{91A432
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outbox.Infrastructure", "Outbox.Infrastructure\Outbox.Infrastructure.csproj", "{534B030E-3850-4004-8FEF-1F541EC83E4E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{2C913160-3AB3-45DC-B558-0D7D59E1550A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchivedMessages.IntegrationTests", "ArchivedMessages.IntegrationTests\ArchivedMessages.IntegrationTests.csproj", "{E2346172-856B-44F3-8B64-AADD08BBBEA3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -278,6 +282,10 @@ Global
 		{534B030E-3850-4004-8FEF-1F541EC83E4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{534B030E-3850-4004-8FEF-1F541EC83E4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{534B030E-3850-4004-8FEF-1F541EC83E4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2346172-856B-44F3-8B64-AADD08BBBEA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2346172-856B-44F3-8B64-AADD08BBBEA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2346172-856B-44F3-8B64-AADD08BBBEA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2346172-856B-44F3-8B64-AADD08BBBEA3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -321,6 +329,8 @@ Global
 		{81B1C1E2-7406-42D7-AC2C-460C7475B95C} = {49203B33-3DA4-4FC2-B64F-4F351CF545C8}
 		{96200E35-A700-4237-99CF-71DF235BCE66} = {49203B33-3DA4-4FC2-B64F-4F351CF545C8}
 		{534B030E-3850-4004-8FEF-1F541EC83E4E} = {91A432F1-B66D-42DC-927A-C0739BBA5BB7}
+		{2C913160-3AB3-45DC-B558-0D7D59E1550A} = {6CF61246-046C-47F8-BE8B-C5BFFFB0811F}
+		{E2346172-856B-44F3-8B64-AADD08BBBEA3} = {2C913160-3AB3-45DC-B558-0D7D59E1550A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D7925810-FA85-4F9E-A124-72F36BAEB9F0}
