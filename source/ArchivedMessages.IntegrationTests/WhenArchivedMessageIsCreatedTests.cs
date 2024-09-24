@@ -70,11 +70,11 @@ public class WhenArchivedMessageIsCreatedTests : IClassFixture<ArchivedMessagesF
 
         message.SenderNumber.Should().Be(archivedMessage.SenderNumber.Value);
         message.SenderRoleCode.Should().Be(archivedMessage.SenderRole.Code);
-        message.MessageId.Should().Be(archivedMessage.MessageId);
-        message.DocumentType.Should().Be(archivedMessage.DocumentType);
         message.ReceiverNumber.Should().Be(archivedMessage.ReceiverNumber.Value);
         message.ReceiverRoleCode.Should().Be(archivedMessage.ReceiverRole.Code);
+        message.DocumentType.Should().Be(archivedMessage.DocumentType);
         message.BusinessReason.Should().Be(archivedMessage.BusinessReason);
+        message.MessageId.Should().Be(archivedMessage.MessageId);
         message.FileStorageReference.Should().Be(expectedBlocReference.Path);
         message.RelatedToMessageId.Should().BeNull();
         message.EventIds.Should().BeNull();
