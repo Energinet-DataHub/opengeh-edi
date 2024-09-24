@@ -58,8 +58,8 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         // Clear mappings etc. before each test
         Fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
 
-        await GivenGridAreaOwner(ActorNumber.Create("5790001662233"), "543");
-        await GivenGridAreaOwner(ActorNumber.Create("5790001662233"), "804");
+        await AddGridAreaOwner(ActorNumber.Create("5790001662233"), "543");
+        await AddGridAreaOwner(ActorNumber.Create("5790001662233"), "804");
     }
 
     public async Task DisposeAsync()
@@ -609,7 +609,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(schemaInformation.DataObjectName, schemaInformation.SchemaDefinition, testFilePath);
     }
 
-    private async Task GivenGridAreaOwner(ActorNumber actorNumber, string gridAreaCode)
+    private async Task AddGridAreaOwner(ActorNumber actorNumber, string gridAreaCode)
     {
         await Fixture.DatabaseManager.AddGridAreaOwnerAsync(actorNumber, gridAreaCode);
     }
