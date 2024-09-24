@@ -1,8 +1,5 @@
 -- Actor
-ALTER TABLE Actor DROP COLUMN RecordId;
-GO
-ALTER TABLE Actor ADD RecordId BIGINT IDENTITY(1,1);
-GO
+ALTER TABLE Actor ALTER COLUMN RecordId BIGINT
 
 CREATE CLUSTERED INDEX IX_RecordId ON Actor(RecordId)
 GO
@@ -14,8 +11,7 @@ CREATE CLUSTERED INDEX IX_RecordId ON ActorCertificate(RecordId)
 GO
 
 -- ActorMessageQueues
-ALTER TABLE ActorMessageQueues DROP COLUMN RecordId;
-ALTER TABLE ActorMessageQueues ADD RecordId BIGINT IDENTITY(1,1);
+ALTER TABLE ActorMessageQueues ALTER COLUMN RecordId BIGINT 
 GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON ActorMessageQueues(RecordId)
@@ -33,8 +29,7 @@ ALTER TABLE AggregatedMeasureDataProcessGridAreas  WITH CHECK ADD  CONSTRAINT FK
     REFERENCES AggregatedMeasureDataProcesses (ProcessId)
 GO
 
-ALTER TABLE AggregatedMeasureDataProcesses DROP COLUMN RecordId;
-ALTER TABLE AggregatedMeasureDataProcesses ADD RecordId BIGINT IDENTITY(1,1);
+ALTER TABLE AggregatedMeasureDataProcesses ALTER COLUMN RecordId BIGINT 
 GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON AggregatedMeasureDataProcesses(RecordId)
@@ -42,8 +37,7 @@ GO
 
 -- AggregatedMeasureDataProcessGridAreas
 ALTER TABLE AggregatedMeasureDataProcessGridAreas DROP CONSTRAINT UX_AggregatedMeasureDataProcessGridAreas_RecordId
-ALTER TABLE AggregatedMeasureDataProcessGridAreas DROP COLUMN RecordId;
-ALTER TABLE AggregatedMeasureDataProcessGridAreas ADD RecordId BIGINT IDENTITY(1,1);
+ALTER TABLE AggregatedMeasureDataProcessGridAreas ALTER COLUMN RecordId BIGINT 
 GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON AggregatedMeasureDataProcessGridAreas(RecordId)
@@ -57,16 +51,14 @@ ALTER TABLE ArchivedMessages ADD CONSTRAINT PK_ArchivedMessages_Id
     PRIMARY KEY NONCLUSTERED ([Id])
 GO
 
-ALTER TABLE ArchivedMessages DROP COLUMN RecordId;
-ALTER TABLE ArchivedMessages ADD RecordId BIGINT IDENTITY(1,1);
+ALTER TABLE ArchivedMessages ALTER COLUMN RecordId BIGINT 
 GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON ArchivedMessages(RecordId)
 GO
 
 -- Bundles
-ALTER TABLE Bundles DROP COLUMN RecordId;
-ALTER TABLE Bundles ADD RecordId BIGINT IDENTITY(1,1);
+ALTER TABLE Bundles ALTER COLUMN RecordId BIGINT 
 GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON Bundles(RecordId)
@@ -80,24 +72,21 @@ CREATE CLUSTERED INDEX IX_RecordId ON GridAreaOwner(RecordId)
 GO
 
 -- MarketDocuments
-ALTER TABLE MarketDocuments DROP COLUMN RecordId;
-ALTER TABLE MarketDocuments ADD RecordId BIGINT IDENTITY(1,1);
+ALTER TABLE MarketDocuments ALTER COLUMN RecordId BIGINT 
 GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON MarketDocuments(RecordId)
 GO
 
 -- MarketEvaluationPoints
-ALTER TABLE MarketEvaluationPoints DROP COLUMN RecordId;
-ALTER TABLE MarketEvaluationPoints ADD RecordId BIGINT IDENTITY(1,1);
+ALTER TABLE MarketEvaluationPoints ALTER COLUMN RecordId BIGINT 
 GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON MarketEvaluationPoints(RecordId)
 GO
 
 -- MessageRegistry
-ALTER TABLE MessageRegistry DROP COLUMN RecordId;
-ALTER TABLE MessageRegistry ADD RecordId BIGINT IDENTITY(1,1);
+ALTER TABLE MessageRegistry ALTER COLUMN RecordId BIGINT 
 GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON MessageRegistry(RecordId)
@@ -105,16 +94,14 @@ GO
 
 -- Outbox
 ALTER TABLE Outbox DROP CONSTRAINT UX_Outbox_RecordId
-ALTER TABLE Outbox DROP COLUMN RecordId;
-ALTER TABLE Outbox ADD RecordId BIGINT IDENTITY(1,1);
+ALTER TABLE Outbox ALTER COLUMN RecordId BIGINT 
 GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON Outbox(RecordId)
 GO
 
 -- OutgoingMessages
-ALTER TABLE OutgoingMessages DROP COLUMN RecordId;
-ALTER TABLE OutgoingMessages ADD RecordId BIGINT IDENTITY(1,1);
+ALTER TABLE OutgoingMessages ALTER COLUMN RecordId BIGINT 
 GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON OutgoingMessages(RecordId)
@@ -122,8 +109,7 @@ GO
 
 -- ProcessDelegation
 ALTER TABLE ProcessDelegation DROP CONSTRAINT UX_ProcessDelegation_RecordId
-ALTER TABLE ProcessDelegation DROP COLUMN RecordId;
-ALTER TABLE ProcessDelegation ADD RecordId BIGINT IDENTITY(1,1);
+ALTER TABLE ProcessDelegation ALTER COLUMN RecordId BIGINT 
 GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON ProcessDelegation(RecordId)
@@ -131,32 +117,28 @@ GO
 
 -- QueuedInternalCommands
 ALTER TABLE QueuedInternalCommands DROP CONSTRAINT UC_InternalCommandQueue_Id
-ALTER TABLE QueuedInternalCommands DROP COLUMN RecordId;
-ALTER TABLE QueuedInternalCommands ADD RecordId BIGINT IDENTITY(1,1);
+ALTER TABLE QueuedInternalCommands ALTER COLUMN RecordId BIGINT 
 GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON QueuedInternalCommands(RecordId)
 GO
 
 -- ReceivedInboxEvents 
-ALTER TABLE ReceivedInboxEvents DROP COLUMN RecordId;
-ALTER TABLE ReceivedInboxEvents ADD RecordId BIGINT IDENTITY(1,1);
+ALTER TABLE ReceivedInboxEvents ALTER COLUMN RecordId BIGINT 
 GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON ReceivedInboxEvents(RecordId)
 GO
 
 -- ReceivedIntegrationEvents
-ALTER TABLE ReceivedIntegrationEvents DROP COLUMN RecordId;
-ALTER TABLE ReceivedIntegrationEvents ADD RecordId BIGINT IDENTITY(1,1);
+ALTER TABLE ReceivedIntegrationEvents ALTER COLUMN RecordId BIGINT 
 GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON ReceivedIntegrationEvents(RecordId)
 GO
 
 -- TransactionRegistry
-ALTER TABLE TransactionRegistry DROP COLUMN RecordId;
-ALTER TABLE TransactionRegistry ADD RecordId BIGINT IDENTITY(1,1);
+ALTER TABLE TransactionRegistry ALTER COLUMN RecordId BIGINT 
 GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON TransactionRegistry(RecordId)
@@ -169,8 +151,7 @@ GO
 ALTER TABLE WholesaleServicesProcessChargeTypes ADD CONSTRAINT PK_WholesaleServicesProcessChargeTypes
     PRIMARY KEY NONCLUSTERED (ChargeTypeId)
 
-ALTER TABLE WholesaleServicesProcessChargeTypes DROP COLUMN RecordId;
-ALTER TABLE WholesaleServicesProcessChargeTypes ADD RecordId BIGINT IDENTITY(1,1);
+ALTER TABLE WholesaleServicesProcessChargeTypes ALTER COLUMN RecordId BIGINT 
 GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON WholesaleServicesProcessChargeTypes(RecordId)
@@ -190,16 +171,14 @@ ALTER TABLE WholesaleServicesProcessChargeTypes  WITH CHECK ADD  CONSTRAINT [FK_
     REFERENCES WholesaleServicesProcesses (ProcessId)
 GO
 
-ALTER TABLE WholesaleServicesProcesses DROP COLUMN RecordId;
-ALTER TABLE WholesaleServicesProcesses ADD RecordId BIGINT IDENTITY(1,1);
+ALTER TABLE WholesaleServicesProcesses ALTER COLUMN RecordId BIGINT 
 GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON WholesaleServicesProcesses(RecordId)
 
 -- WholesaleServicesProcessGridAreas
 ALTER TABLE WholesaleServicesProcessGridAreas DROP CONSTRAINT UX_WholesaleServicesProcessGridAreas_RecordId
-ALTER TABLE WholesaleServicesProcessGridAreas DROP COLUMN RecordId;
-ALTER TABLE WholesaleServicesProcessGridAreas ADD RecordId BIGINT IDENTITY(1,1);
+ALTER TABLE WholesaleServicesProcessGridAreas ALTER COLUMN RecordId BIGINT 
 GO
 
 CREATE CLUSTERED INDEX IX_RecordId ON WholesaleServicesProcessGridAreas(RecordId)
