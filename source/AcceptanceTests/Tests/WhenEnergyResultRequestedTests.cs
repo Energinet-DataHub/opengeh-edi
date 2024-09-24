@@ -70,12 +70,12 @@ public sealed class WhenEnergyResultRequestedTests : BaseTestClass
     public async Task B2C_actor_can_request_aggregated_measure_data()
     {
         var createdAfter = SystemClock.Instance.GetCurrentInstant();
-        var energySupplierId = _energySupplierActorNumber;
+        var energySupplierActorNumber = _energySupplierActorNumber;
         await _aggregatedMeasureDataRequest.B2CRequest(cancellationToken: CancellationToken.None);
 
         await _aggregatedMeasureDataRequest.ConfirmRequestIsInitialized(
             createdAfter,
-            requestedByActorNumber: energySupplierId);
+            requestedByActorNumber: energySupplierActorNumber);
     }
 
     [Fact]

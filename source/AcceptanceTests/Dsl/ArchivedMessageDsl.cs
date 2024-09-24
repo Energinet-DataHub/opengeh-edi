@@ -20,6 +20,7 @@ using Energinet.DataHub.EDI.B2CWebApi.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
+using SearchArchivedMessagesCriteria = Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C.Client.SearchArchivedMessagesCriteria;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
@@ -41,14 +42,16 @@ public class ArchivedMessageDsl
     internal async Task ConfirmMessageIsArchived(string messageId)
     {
         var archivedMessages = await _b2CEdiDriver.SearchArchivedMessagesAsync(
-            new SearchArchivedMessagesCriteria(
-                MessageId: messageId,
-                CreatedDuringPeriod: null,
-                SenderNumber: null,
-                ReceiverNumber: null,
-                DocumentTypes: null,
-                BusinessReasons: null,
-                IncludeRelatedMessages: false))
+            new SearchArchivedMessagesCriteria
+            {
+                MessageId = messageId,
+                CreatedDuringPeriod = null,
+                BusinessReasons = null,
+                DocumentTypes = null,
+                ReceiverNumber = null,
+                SenderNumber = null,
+                IncludeRelatedMessages = false,
+            })
             .ConfigureAwait(false);
 
         archivedMessages.Should().NotBeNull();
@@ -67,14 +70,16 @@ public class ArchivedMessageDsl
         var unknownMessageId = Guid.NewGuid().ToString();
         var outboxCreatedAfter = SystemClock.Instance.GetCurrentInstant();
         await _b2CEdiDriver.SearchArchivedMessagesAsync(
-            new SearchArchivedMessagesCriteria(
-                MessageId: unknownMessageId,
-                CreatedDuringPeriod: null,
-                SenderNumber: null,
-                ReceiverNumber: null,
-                DocumentTypes: null,
-                BusinessReasons: null,
-                IncludeRelatedMessages: false)).ConfigureAwait(false);
+            new SearchArchivedMessagesCriteria
+            {
+                MessageId = unknownMessageId,
+                CreatedDuringPeriod = null,
+                SenderNumber = null,
+                ReceiverNumber = null,
+                DocumentTypes = null,
+                BusinessReasons = null,
+                IncludeRelatedMessages = false,
+            }).ConfigureAwait(false);
 
         return (unknownMessageId, outboxCreatedAfter);
     }

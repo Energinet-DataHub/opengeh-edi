@@ -14,7 +14,9 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
+using NodaTime;
 using Xunit.Abstractions;
 using Xunit.Categories;
 
@@ -30,6 +32,7 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
 {
     private readonly NotifyWholesaleServicesDsl _notifyWholesaleServices;
     private readonly WholesaleSettlementRequestDsl _wholesaleSettlementRequest;
+    private readonly string _energySupplierActorNumber;
 
     public WhenWholesaleSettlementRequestedTests(AcceptanceTestFixture fixture, ITestOutputHelper output)
         : base(output, fixture)
@@ -44,7 +47,13 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
             wholesaleDriver);
 
         _wholesaleSettlementRequest =
-            new WholesaleSettlementRequestDsl(new EdiDatabaseDriver(fixture.ConnectionString), ediDriver, wholesaleDriver);
+            new WholesaleSettlementRequestDsl(
+                new EdiDatabaseDriver(fixture.ConnectionString),
+                ediDriver,
+                new B2CEdiDriver(fixture.B2CClients.EnergySupplier, fixture.ApiManagementUri, fixture.EdiB2CWebApiUri, output),
+                wholesaleDriver);
+
+        _energySupplierActorNumber = AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber;
     }
 
     [Fact]
@@ -52,9 +61,19 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
     {
         var messageId = await _wholesaleSettlementRequest.Request(CancellationToken.None);
 
+        await _wholesaleSettlementRequest.ConfirmRequestIsInitialized(messageId);
+    }
+
+    [Fact]
+    public async Task B2C_actor_can_request_wholesale_settlement()
+    {
+        var createdAfter = SystemClock.Instance.GetCurrentInstant();
+        var energySupplierActorNumber = _energySupplierActorNumber;
+        await _wholesaleSettlementRequest.B2CRequest(cancellationToken: CancellationToken.None);
+
         await _wholesaleSettlementRequest.ConfirmRequestIsInitialized(
-            messageId,
-            CancellationToken.None);
+            createdAfter,
+            requestedByActorNumber: energySupplierActorNumber);
     }
 
     [Fact]

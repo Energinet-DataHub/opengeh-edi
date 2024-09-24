@@ -19,8 +19,9 @@ using Energinet.DataHub.EDI.AcceptanceTests.Logging;
 using Energinet.DataHub.EDI.AcceptanceTests.Responses.Json;
 using Newtonsoft.Json;
 using Nito.AsyncEx;
+using NodaTime;
+using NodaTime.Text;
 using Xunit.Abstractions;
-using SearchArchivedMessagesCriteria = Energinet.DataHub.EDI.B2CWebApi.Models.SearchArchivedMessagesCriteria;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C;
 
@@ -43,34 +44,43 @@ public sealed class B2CEdiDriver : IDisposable
     {
     }
 
-    public async Task<List<ArchivedMessageSearchResponse>> SearchArchivedMessagesAsync(SearchArchivedMessagesCriteria parameters)
+    public async Task<ICollection<ArchivedMessageResult>> SearchArchivedMessagesAsync(SearchArchivedMessagesCriteria parameters)
     {
-        var b2cClient = await _httpClient;
-        ArgumentNullException.ThrowIfNull(parameters);
-        var parametersAsJson = JsonConvert.SerializeObject(parameters);
+        var webApiClient = await CreateWebApiClientAsync();
 
-        using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(_apiManagementUri, "b2c/v1.0/ArchivedMessageSearch"));
-        request.Content = new StringContent(parametersAsJson, Encoding.UTF8, "application/json");
-        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-        var response = await b2cClient.SendAsync(request).ConfigureAwait(false);
-        await response.EnsureSuccessStatusCodeWithLogAsync(_logger);
+        var result = await webApiClient.ArchivedMessageSearchAsync(body: parameters);
 
-        var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-        var archivedMessageResponse = JsonConvert.DeserializeObject<List<ArchivedMessageSearchResponse>>(responseString) ?? throw new InvalidOperationException("Did not receive valid response");
-
-        return archivedMessageResponse;
+        return result;
     }
 
     public async Task RequestAggregatedMeasureDataAsync(CancellationToken cancellationToken)
     {
         var webApiClient = await CreateWebApiClientAsync();
 
+        var start = Instant.FromUtc(2024, 09, 24, 00, 00);
         await webApiClient.RequestAggregatedMeasureDataAsync(
                 body: new RequestAggregatedMeasureDataMarketRequest
                 {
                     CalculationType = CalculationType.BalanceFixing,
-                    StartDate = "2024-09-24T23:00:00",
+                    StartDate = InstantPattern.General.Format(start),
+                    EndDate = InstantPattern.General.Format(start.Plus(Duration.FromDays(1))),
+                    GridArea = "804",
+                },
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    public async Task RequestWholesaleSettlementAsync(CancellationToken cancellationToken)
+    {
+        var webApiClient = await CreateWebApiClientAsync();
+
+        var start = Instant.FromUtc(2024, 09, 01, 00, 00);
+        await webApiClient.RequestWholesaleSettlementAsync(
+                body: new RequestWholesaleSettlementMarketRequest
+                {
+                    CalculationType = CalculationType.WholesaleFixing,
+                    StartDate = InstantPattern.General.Format(start),
+                    EndDate = InstantPattern.General.Format(start.Plus(Duration.FromDays(30))),
                     GridArea = "804",
                 },
                 cancellationToken: cancellationToken)

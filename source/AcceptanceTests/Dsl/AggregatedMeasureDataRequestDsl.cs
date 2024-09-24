@@ -26,18 +26,18 @@ public sealed class AggregatedMeasureDataRequestDsl
     private readonly EdiDriver _ediDriver;
     private readonly EdiDatabaseDriver _ediDatabaseDriver;
     private readonly WholesaleDriver _wholesaleDriver;
-    private readonly B2CEdiDriver _b2CEdiDriver;
+    private readonly B2CEdiDriver _b2cEdiDriver;
 
 #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
 
     internal AggregatedMeasureDataRequestDsl(
         EdiDriver ediDriver,
-        B2CEdiDriver b2CEdiDriver,
+        B2CEdiDriver b2cEdiDriver,
         EdiDatabaseDriver ediDatabaseDriver,
         WholesaleDriver wholesaleDriver)
     {
         _ediDriver = ediDriver;
-        _b2CEdiDriver = b2CEdiDriver;
+        _b2cEdiDriver = b2cEdiDriver;
         _ediDatabaseDriver = ediDatabaseDriver;
         _wholesaleDriver = wholesaleDriver;
     }
@@ -57,7 +57,7 @@ public sealed class AggregatedMeasureDataRequestDsl
 
     internal Task B2CRequest(CancellationToken cancellationToken)
     {
-        return _b2CEdiDriver
+        return _b2cEdiDriver
             .RequestAggregatedMeasureDataAsync(cancellationToken);
     }
 
