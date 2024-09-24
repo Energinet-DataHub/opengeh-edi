@@ -30,18 +30,18 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
     Justification = "Dsl classes uses a naming convention based on the business domain")]
 public class ArchivedMessageDsl
 {
-    private readonly B2CEdiDriver _b2CEdiDriver;
+    private readonly B2CEdiDriver _b2cEdiDriver;
     private readonly EdiDatabaseDriver _ediDatabaseDriver;
 
-    internal ArchivedMessageDsl(B2CEdiDriver b2CEdiDriver, EdiDatabaseDriver ediDatabaseDriver)
+    internal ArchivedMessageDsl(B2CEdiDriver b2cEdiDriver, EdiDatabaseDriver ediDatabaseDriver)
     {
-        _b2CEdiDriver = b2CEdiDriver;
+        _b2cEdiDriver = b2cEdiDriver;
         _ediDatabaseDriver = ediDatabaseDriver;
     }
 
     internal async Task ConfirmMessageIsArchived(string messageId)
     {
-        var archivedMessages = await _b2CEdiDriver.SearchArchivedMessagesAsync(
+        var archivedMessages = await _b2cEdiDriver.SearchArchivedMessagesAsync(
             new SearchArchivedMessagesCriteria
             {
                 MessageId = messageId,
@@ -51,8 +51,7 @@ public class ArchivedMessageDsl
                 ReceiverNumber = null,
                 SenderNumber = null,
                 IncludeRelatedMessages = false,
-            })
-            .ConfigureAwait(false);
+            });
 
         archivedMessages.Should().NotBeNull();
         var archivedMessage = archivedMessages.Single();
@@ -69,7 +68,7 @@ public class ArchivedMessageDsl
     {
         var unknownMessageId = Guid.NewGuid().ToString();
         var outboxCreatedAfter = SystemClock.Instance.GetCurrentInstant();
-        await _b2CEdiDriver.SearchArchivedMessagesAsync(
+        await _b2cEdiDriver.SearchArchivedMessagesAsync(
             new SearchArchivedMessagesCriteria
             {
                 MessageId = unknownMessageId,
@@ -79,7 +78,7 @@ public class ArchivedMessageDsl
                 DocumentTypes = null,
                 BusinessReasons = null,
                 IncludeRelatedMessages = false,
-            }).ConfigureAwait(false);
+            });
 
         return (unknownMessageId, outboxCreatedAfter);
     }
