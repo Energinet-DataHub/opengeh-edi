@@ -61,7 +61,7 @@ public class ArchivedMessageDsl
         Assert.NotNull(archivedMessage.DocumentType);
         Assert.NotNull(archivedMessage.SenderNumber);
         Assert.NotNull(archivedMessage.ReceiverNumber);
-        Assert.IsType<DateTime>(archivedMessage.CreatedAt);
+        Assert.IsType<DateTimeOffset>(archivedMessage.CreatedAt);
         Assert.NotNull(archivedMessage.BusinessReason);
     }
 
