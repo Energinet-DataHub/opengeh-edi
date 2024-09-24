@@ -12,12 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Net.Http.Headers;
-using System.Text;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C.Client;
-using Energinet.DataHub.EDI.AcceptanceTests.Logging;
-using Energinet.DataHub.EDI.AcceptanceTests.Responses.Json;
-using Newtonsoft.Json;
 using Nito.AsyncEx;
 using NodaTime;
 using NodaTime.Text;
