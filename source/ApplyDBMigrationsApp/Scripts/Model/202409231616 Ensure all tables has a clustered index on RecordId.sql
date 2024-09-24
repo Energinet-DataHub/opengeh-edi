@@ -28,9 +28,6 @@ GO
 CREATE CLUSTERED INDEX IX_RecordId ON AggregatedMeasureDataProcesses(RecordId)
 GO
 
--- AggregatedMeasureDataProcessGridAreas
--- LGTM
-
 -- ArchivedMessages
 ALTER TABLE ArchivedMessages DROP CONSTRAINT PK_ArchivedMessages_Id
 GO
@@ -103,4 +100,4 @@ ALTER TABLE WholesaleServicesProcessChargeTypes  WITH CHECK ADD  CONSTRAINT [FK_
     REFERENCES WholesaleServicesProcesses (ProcessId)
 GO
 
-CREATE CLUSTERED INDEX IX_RecordId ON WholesaleServicesProcesses(RecordId) -- should delete old clustered index and create new ones
+CREATE CLUSTERED INDEX IX_RecordId ON WholesaleServicesProcesses(RecordId)
