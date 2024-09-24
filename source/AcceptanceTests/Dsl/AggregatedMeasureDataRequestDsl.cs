@@ -82,7 +82,7 @@ public sealed class AggregatedMeasureDataRequestDsl
             .GetAggregatedMeasureDataProcessIdAsync(requestMessageId, cancellationToken)
             .ConfigureAwait(false);
 
-        processId.Should().NotBeNull();
+        processId.Should().NotBeNull("because the aggregated measure data process should be initialized");
     }
 
     internal async Task ConfirmRequestIsInitialized(
@@ -93,7 +93,7 @@ public sealed class AggregatedMeasureDataRequestDsl
             .GetAggregatedMeasureDataProcessIdAsync(createdAfter, requestedByActorNumber, CancellationToken.None)
             .ConfigureAwait(false);
 
-        processId.Should().NotBeNull();
+        processId.Should().NotBeNull("because the aggregated measure data process should be initialized");
     }
 
     internal async Task PublishAggregatedMeasureDataRequestAcceptedResponse(

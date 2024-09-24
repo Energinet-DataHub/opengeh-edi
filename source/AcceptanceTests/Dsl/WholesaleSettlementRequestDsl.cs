@@ -75,7 +75,7 @@ public sealed class WholesaleSettlementRequestDsl
             .GetWholesaleServiceProcessIdAsync(requestMessageId, CancellationToken.None)
             .ConfigureAwait(false);
 
-        processId.Should().NotBeNull();
+        processId.Should().NotBeNull("because the wholesale settlement process should be initialized");
     }
 
     internal async Task ConfirmRequestIsInitialized(Instant createdAfter, string requestedByActorNumber)
@@ -84,7 +84,7 @@ public sealed class WholesaleSettlementRequestDsl
             .GetWholesaleServiceProcessIdAsync(createdAfter, requestedByActorNumber, CancellationToken.None)
             .ConfigureAwait(false);
 
-        processId.Should().NotBeNull();
+        processId.Should().NotBeNull("because the wholesale settlement process should be initialized");
     }
 
     internal async Task PublishWholesaleServicesRequestAcceptedResponse(

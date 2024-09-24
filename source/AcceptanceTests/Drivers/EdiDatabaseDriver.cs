@@ -254,7 +254,7 @@ internal sealed class EdiDatabaseDriver
 
         command.Connection = connection;
 
-        while (stopWatch.ElapsedMilliseconds < 30000)
+        while (stopWatch.Elapsed < TimeSpan.FromSeconds(30))
         {
             await command.Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
             if (await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false) is Guid messageId)
@@ -274,7 +274,7 @@ internal sealed class EdiDatabaseDriver
 
         command.Connection = connection;
 
-        while (stopWatch.ElapsedMilliseconds < 30000)
+        while (stopWatch.Elapsed < TimeSpan.FromSeconds(30))
         {
             await command.Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
             if (await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false) is Guid messageId)
