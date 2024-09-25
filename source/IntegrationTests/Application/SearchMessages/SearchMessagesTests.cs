@@ -42,28 +42,6 @@ public class SearchMessagesTests : TestBase
     }
 
     [Fact]
-    public async Task Filter_messages_by_message_id_and_created_date()
-    {
-        //Arrange
-        var messageId = Guid.NewGuid().ToString();
-        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z"), messageId: messageId));
-        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:01Z")));
-
-        //Act
-        var result = await _archivedMessagesClient.SearchAsync(
-            new GetMessagesQuery(
-                new MessageCreationPeriod(
-                CreatedAt("2023-05-01T22:00:00Z"),
-                CreatedAt("2023-05-02T22:00:01Z")),
-                messageId),
-            CancellationToken.None);
-
-        //Assert
-        Assert.Single(result.Messages);
-        Assert.Equal(messageId, result.Messages[0].MessageId);
-    }
-
-    [Fact]
     public async Task Filter_messages_by_message_id()
     {
         //Arrange
@@ -78,38 +56,6 @@ public class SearchMessagesTests : TestBase
         //Assert
         Assert.Single(result.Messages);
         Assert.Equal(messageId, result.Messages[0].MessageId);
-    }
-
-    [Fact]
-    public async Task Filter_messages_by_sender_number()
-    {
-        //Arrange
-        var senderNumber = "1234512345128";
-        await ArchiveMessage(CreateArchivedMessage(senderNumber: senderNumber));
-        await ArchiveMessage(CreateArchivedMessage());
-
-        //Act
-        var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(SenderNumber: senderNumber), CancellationToken.None);
-
-        //Assert
-        Assert.Single(result.Messages);
-        Assert.Equal(senderNumber, result.Messages[0].SenderNumber);
-    }
-
-    [Fact]
-    public async Task Filter_messages_by_receiver()
-    {
-        // Arrange
-        var receiverNumber = "1234512345129";
-        await ArchiveMessage(CreateArchivedMessage(receiverNumber: receiverNumber));
-        await ArchiveMessage(CreateArchivedMessage());
-
-        // Act
-        var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(ReceiverNumber: receiverNumber), CancellationToken.None);
-
-        // Assert
-        Assert.Single(result.Messages);
-        Assert.Equal(receiverNumber, result.Messages[0].ReceiverNumber);
     }
 
     [Fact]

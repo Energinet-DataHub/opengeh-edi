@@ -82,6 +82,99 @@ public class SearchMessageWithoutAuthRestrictionTests
         result.Messages.Should().ContainSingle().Subject.CreatedAt.Should().Be(expectedCreatedAt);
     }
 
+    [Fact]
+    public async Task Given_TwoArchivedMessages_When_SearchingByDateAndMessageId_Then_ReturnsExpectedMessage()
+    {
+        // Arrange
+        var expectedMessageId = Guid.NewGuid().ToString();
+        var expectedCreatedAt = CreatedAt("2023-05-01T22:00:00Z");
+        await CreateArchivedMessageAsync(timestamp: expectedCreatedAt, messageId: expectedMessageId);
+        await CreateArchivedMessageAsync(timestamp: expectedCreatedAt.PlusDays(1));
+
+        // Act
+        var result = await _sut.SearchAsync(
+            new GetMessagesQuery(
+                CreationPeriod: new MessageCreationPeriod(
+                    expectedCreatedAt.PlusHours(-2),
+                    expectedCreatedAt.PlusHours(2)),
+                MessageId: expectedMessageId),
+            CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        using var assertionScope = new AssertionScope();
+        var message = result.Messages.Should().ContainSingle().Subject;
+        message.CreatedAt.Should().Be(expectedCreatedAt);
+        message.MessageId.Should().Be(expectedMessageId);
+    }
+
+    [Fact]
+    public async Task Given_TwoArchivedMessages_When_SearchingBySenderNumber_Then_ReturnsExpectedMessage()
+    {
+        // Arrange
+        var expectedSenderNumber = "9999999999999";
+        await CreateArchivedMessageAsync(senderNumber: expectedSenderNumber);
+        await CreateArchivedMessageAsync();
+
+        // Act
+        var result = await _sut.SearchAsync(
+            new GetMessagesQuery(
+                SenderNumber: expectedSenderNumber),
+            CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        using var assertionScope = new AssertionScope();
+        result.Messages.Should().ContainSingle().Subject
+            .SenderNumber.Should().Be(expectedSenderNumber);
+    }
+
+    [Fact]
+    public async Task Given_TwoArchivedMessages_When_SearchingByReceiverNumber_Then_ReturnsExpectedMessage()
+    {
+        // Arrange
+        var expectedReceiverNumber = "9999999999999";
+        await CreateArchivedMessageAsync(receiverNumber: expectedReceiverNumber);
+        await CreateArchivedMessageAsync();
+
+        // Act
+        var result = await _sut.SearchAsync(
+            new GetMessagesQuery(
+                ReceiverNumber: expectedReceiverNumber),
+            CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        using var assertionScope = new AssertionScope();
+        result.Messages.Should().ContainSingle().Subject
+            .ReceiverNumber.Should().Be(expectedReceiverNumber);
+    }
+
+    [Fact]
+    public async Task Given_TwoArchivedMessages_When_SearchingByDocumentType_Then_ReturnsExpectedMessage()
+    {
+        // Arrange
+        var expectedDocumentType = DocumentType.NotifyAggregatedMeasureData.Name;
+        var unexpectedDocumentType = DocumentType.RejectRequestAggregatedMeasureData.Name;
+        await CreateArchivedMessageAsync(documentType: expectedDocumentType);
+        await CreateArchivedMessageAsync(documentType: unexpectedDocumentType);
+
+        // Act
+        var result = await _sut.SearchAsync(
+            new GetMessagesQuery(
+                DocumentTypes: new List<string>
+                {
+                    expectedDocumentType,
+                }),
+            CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        using var assertionScope = new AssertionScope();
+        result.Messages.Should().ContainSingle().Subject
+            .DocumentType.Should().Be(expectedDocumentType);
+    }
+
     private static Instant CreatedAt(string date)
     {
         return InstantPattern.General.Parse(date).Value;
@@ -91,6 +184,7 @@ public class SearchMessageWithoutAuthRestrictionTests
         ArchivedMessageType? archivedMessageType = null,
         string? messageId = null,
         string? documentContent = null,
+        string? documentType = null,
         string? senderNumber = null,
         string? receiverNumber = null,
         Instant? timestamp = null)
@@ -107,7 +201,7 @@ public class SearchMessageWithoutAuthRestrictionTests
         var archivedMessage = new ArchivedMessage(
             string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
             Array.Empty<EventId>(),
-            DocumentType.NotifyAggregatedMeasureData.Name,
+            documentType ?? DocumentType.NotifyAggregatedMeasureData.Name,
             ActorNumber.Create(senderNumber ?? "1234512345123"),
             ActorRole.MeteredDataAdministrator,
             ActorNumber.Create(receiverNumber ?? "1234512345128"),
