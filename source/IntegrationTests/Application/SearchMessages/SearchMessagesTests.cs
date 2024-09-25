@@ -59,34 +59,6 @@ public class SearchMessagesTests : TestBase
     }
 
     [Fact]
-    public async Task Filter_messages_by_document_types()
-    {
-        // Arrange
-        var confirmRequestChangeOfSupplier = DocumentType.NotifyAggregatedMeasureData.Name;
-        var rejectRequestChangeOfSupplier = DocumentType.RejectRequestAggregatedMeasureData.Name;
-        await ArchiveMessage(CreateArchivedMessage(documentType: confirmRequestChangeOfSupplier));
-        await ArchiveMessage(CreateArchivedMessage(documentType: rejectRequestChangeOfSupplier));
-        await ArchiveMessage(CreateArchivedMessage());
-
-        // Act
-        var result = await _archivedMessagesClient.SearchAsync(
-            new GetMessagesQuery(DocumentTypes: new List<string>
-            {
-            confirmRequestChangeOfSupplier,
-            rejectRequestChangeOfSupplier,
-            }),
-            CancellationToken.None);
-
-        // Assert
-        Assert.Contains(
-            result.Messages,
-            message => message.DocumentType.Equals(confirmRequestChangeOfSupplier, StringComparison.OrdinalIgnoreCase));
-        Assert.Contains(
-            result.Messages,
-            message => message.DocumentType.Equals(rejectRequestChangeOfSupplier, StringComparison.OrdinalIgnoreCase));
-    }
-
-    [Fact]
     public async Task Filter_messages_by_business_reasons()
     {
         // Arrange

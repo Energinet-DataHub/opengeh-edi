@@ -175,6 +175,36 @@ public class SearchMessageWithoutAuthRestrictionTests
             .DocumentType.Should().Be(expectedDocumentType);
     }
 
+    [Fact]
+    public async Task Given_ThreeArchivedMessages_When_SearchingByDocumentType_Then_ReturnsExpectedMessages()
+    {
+        // Arrange
+        var expectedDocumentType1 = DocumentType.NotifyAggregatedMeasureData.Name;
+        var expectedDocumentType2 = DocumentType.NotifyWholesaleServices.Name;
+        var unexpectedDocumentType = DocumentType.RejectRequestAggregatedMeasureData.Name;
+        await CreateArchivedMessageAsync(documentType: expectedDocumentType1);
+        await CreateArchivedMessageAsync(documentType: expectedDocumentType2);
+        await CreateArchivedMessageAsync(documentType: unexpectedDocumentType);
+
+        // Act
+        var result = await _sut.SearchAsync(
+            new GetMessagesQuery(
+                DocumentTypes: new List<string>
+                {
+                    expectedDocumentType1,
+                    expectedDocumentType2,
+                }),
+            CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        using var assertionScope = new AssertionScope();
+        result.Messages.Should().HaveCount(2);
+        result.Messages.Select(message => message.DocumentType)
+            .Should()
+            .BeEquivalentTo(new List<string> { expectedDocumentType1, expectedDocumentType2, });
+    }
+
     private static Instant CreatedAt(string date)
     {
         return InstantPattern.General.Parse(date).Value;
