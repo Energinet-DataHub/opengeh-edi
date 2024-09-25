@@ -15,7 +15,6 @@
 using System.Net;
 using System.ServiceModel.Security;
 using System.Xml;
-using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.Ebix;
 using FluentAssertions;
 using FluentAssertions.Execution;

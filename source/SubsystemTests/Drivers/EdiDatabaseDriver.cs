@@ -255,8 +255,8 @@ internal sealed class EdiDatabaseDriver
         while (stopWatch.Elapsed < TimeSpan.FromSeconds(30))
         {
             await command.Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-            if (await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false) is Guid messageId)
-                return messageId;
+            if (await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false) is Guid processId)
+                return processId;
             await command.Connection.CloseAsync().ConfigureAwait(false);
             await Task.Delay(500, cancellationToken).ConfigureAwait(false);
         }
@@ -275,8 +275,8 @@ internal sealed class EdiDatabaseDriver
         while (stopWatch.Elapsed < TimeSpan.FromSeconds(30))
         {
             await command.Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-            if (await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false) is Guid messageId)
-                return messageId;
+            if (await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false) is Guid processId)
+                return processId;
             await command.Connection.CloseAsync().ConfigureAwait(false);
             await Task.Delay(500, cancellationToken).ConfigureAwait(false);
         }

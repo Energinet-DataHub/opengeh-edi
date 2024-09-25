@@ -21,7 +21,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix {
+namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.Ebix {
 
 
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -31,55 +31,55 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix {
         // CODEGEN: Generating message contract since the wrapper namespace (urn:www:datahub:dk:b2b:v01) of message sendMessageRequest does not match the default value (urn:www:datahub:dk:b2b:service:v01)
         [System.ServiceModel.OperationContractAttribute(Action="sendMessage", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.sendMessageResponse sendMessage(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.sendMessageRequest request);
+        sendMessageResponse sendMessage(sendMessageRequest request);
 
         [System.ServiceModel.OperationContractAttribute(Action="sendMessage", ReplyAction="*")]
-        System.Threading.Tasks.Task<Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.sendMessageResponse> sendMessageAsync(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.sendMessageRequest request);
+        System.Threading.Tasks.Task<sendMessageResponse> sendMessageAsync(sendMessageRequest request);
 
         // CODEGEN: Generating message contract since the wrapper namespace (urn:www:datahub:dk:b2b:v01) of message getMessageRequest does not match the default value (urn:www:datahub:dk:b2b:service:v01)
         [System.ServiceModel.OperationContractAttribute(Action="getMessage", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageResponse getMessage(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageRequest request);
+        getMessageResponse getMessage(getMessageRequest request);
 
         [System.ServiceModel.OperationContractAttribute(Action="getMessage", ReplyAction="*")]
-        System.Threading.Tasks.Task<Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageResponse> getMessageAsync(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageRequest request);
+        System.Threading.Tasks.Task<getMessageResponse> getMessageAsync(getMessageRequest request);
 
         // CODEGEN: Generating message contract since the wrapper namespace (urn:www:datahub:dk:b2b:v01) of message getMessageIdsRequest does not match the default value (urn:www:datahub:dk:b2b:service:v01)
         [System.ServiceModel.OperationContractAttribute(Action="getMessageIds", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageIdsResponse getMessageIds(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageIdsRequest request);
+        getMessageIdsResponse getMessageIds(getMessageIdsRequest request);
 
         [System.ServiceModel.OperationContractAttribute(Action="getMessageIds", ReplyAction="*")]
-        System.Threading.Tasks.Task<Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageIdsResponse> getMessageIdsAsync(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageIdsRequest request);
+        System.Threading.Tasks.Task<getMessageIdsResponse> getMessageIdsAsync(getMessageIdsRequest request);
 
         [System.ServiceModel.OperationContractAttribute(Action="queryData", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.queryDataResponse queryData(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.queryDataRequest request);
+        queryDataResponse queryData(queryDataRequest request);
 
         // CODEGEN: Generating message contract since the operation has multiple return values.
         [System.ServiceModel.OperationContractAttribute(Action="queryData", ReplyAction="*")]
-        System.Threading.Tasks.Task<Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.queryDataResponse> queryDataAsync(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.queryDataRequest request);
+        System.Threading.Tasks.Task<queryDataResponse> queryDataAsync(queryDataRequest request);
 
         // CODEGEN: Generating message contract since the wrapper namespace (urn:www:datahub:dk:b2b:v01) of message peekMessageRequest does not match the default value (urn:www:datahub:dk:b2b:service:v01)
         [System.ServiceModel.OperationContractAttribute(Action="peekMessage", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.peekMessageResponse peekMessage(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.peekMessageRequest request);
+        peekMessageResponse peekMessage(peekMessageRequest request);
 
         [System.ServiceModel.OperationContractAttribute(Action="peekMessage", ReplyAction="*")]
-        System.Threading.Tasks.Task<Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.peekMessageResponse> peekMessageAsync(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.peekMessageRequest request);
+        System.Threading.Tasks.Task<peekMessageResponse> peekMessageAsync(peekMessageRequest request);
 
         // CODEGEN: Generating message contract since the wrapper namespace (urn:www:datahub:dk:b2b:v01) of message dequeueMessageRequest does not match the default value (urn:www:datahub:dk:b2b:service:v01)
         [System.ServiceModel.OperationContractAttribute(Action="dequeueMessage", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.dequeueMessageResponse dequeueMessage(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.dequeueMessageRequest request);
+        dequeueMessageResponse dequeueMessage(dequeueMessageRequest request);
 
         [System.ServiceModel.OperationContractAttribute(Action="dequeueMessage", ReplyAction="*")]
-        System.Threading.Tasks.Task<Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.dequeueMessageResponse> dequeueMessageAsync(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.dequeueMessageRequest request);
+        System.Threading.Tasks.Task<dequeueMessageResponse> dequeueMessageAsync(dequeueMessageRequest request);
     }
 
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
-    [System.SerializableAttribute()]
+    [Serializable()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:www:datahub:dk:b2b:v01")]
@@ -153,7 +153,7 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix {
 
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.3752.0")]
-    [System.SerializableAttribute()]
+    [Serializable()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:www:datahub:dk:b2b:v01")]
     public enum MessageType_Type {
 
@@ -171,12 +171,12 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix {
     public partial class sendMessageRequest {
 
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:www:datahub:dk:b2b:v01", Order=0)]
-        public Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.MessageContainer_Type MessageContainer;
+        public MessageContainer_Type MessageContainer;
 
         public sendMessageRequest() {
         }
 
-        public sendMessageRequest(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.MessageContainer_Type MessageContainer) {
+        public sendMessageRequest(MessageContainer_Type MessageContainer) {
             this.MessageContainer = MessageContainer;
         }
     }
@@ -222,12 +222,12 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix {
     public partial class getMessageResponse {
 
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:www:datahub:dk:b2b:v01", Order=0)]
-        public Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.MessageContainer_Type MessageContainer;
+        public MessageContainer_Type MessageContainer;
 
         public getMessageResponse() {
         }
 
-        public getMessageResponse(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.MessageContainer_Type MessageContainer) {
+        public getMessageResponse(MessageContainer_Type MessageContainer) {
             this.MessageContainer = MessageContainer;
         }
     }
@@ -322,12 +322,12 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix {
     public partial class peekMessageResponse {
 
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:www:datahub:dk:b2b:v01", Order=0)]
-        public Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.MessageContainer_Type MessageContainer;
+        public MessageContainer_Type MessageContainer;
 
         public peekMessageResponse() {
         }
 
-        public peekMessageResponse(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.MessageContainer_Type MessageContainer) {
+        public peekMessageResponse(MessageContainer_Type MessageContainer) {
             this.MessageContainer = MessageContainer;
         }
     }
@@ -360,12 +360,12 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix {
     }
 
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public interface marketMessagingB2BServiceV01PortTypeChannel : Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType, System.ServiceModel.IClientChannel {
+    public interface marketMessagingB2BServiceV01PortTypeChannel : marketMessagingB2BServiceV01PortType, System.ServiceModel.IClientChannel {
     }
 
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public partial class marketMessagingB2BServiceV01PortTypeClient : System.ServiceModel.ClientBase<Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType>, Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType {
+    public partial class marketMessagingB2BServiceV01PortTypeClient : System.ServiceModel.ClientBase<marketMessagingB2BServiceV01PortType>, marketMessagingB2BServiceV01PortType {
 
         public marketMessagingB2BServiceV01PortTypeClient() {
         }
@@ -375,133 +375,133 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix {
         }
 
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.sendMessageResponse Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType.sendMessage(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.sendMessageRequest request) {
+        sendMessageResponse marketMessagingB2BServiceV01PortType.sendMessage(sendMessageRequest request) {
             return base.Channel.sendMessage(request);
         }
 
-        public string sendMessage(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.MessageContainer_Type MessageContainer) {
-            Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.sendMessageRequest inValue = new Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.sendMessageRequest();
+        public string sendMessage(MessageContainer_Type MessageContainer) {
+            sendMessageRequest inValue = new sendMessageRequest();
             inValue.MessageContainer = MessageContainer;
-            Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.sendMessageResponse retVal = ((Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType)(this)).sendMessage(inValue);
+            sendMessageResponse retVal = ((marketMessagingB2BServiceV01PortType)(this)).sendMessage(inValue);
             return retVal.MessageId;
         }
 
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.sendMessageResponse> Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType.sendMessageAsync(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.sendMessageRequest request) {
+        System.Threading.Tasks.Task<sendMessageResponse> marketMessagingB2BServiceV01PortType.sendMessageAsync(sendMessageRequest request) {
             return base.Channel.sendMessageAsync(request);
         }
 
-        public System.Threading.Tasks.Task<Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.sendMessageResponse> sendMessageAsync(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.MessageContainer_Type MessageContainer) {
-            Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.sendMessageRequest inValue = new Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.sendMessageRequest();
+        public System.Threading.Tasks.Task<sendMessageResponse> sendMessageAsync(MessageContainer_Type MessageContainer) {
+            sendMessageRequest inValue = new sendMessageRequest();
             inValue.MessageContainer = MessageContainer;
-            return ((Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType)(this)).sendMessageAsync(inValue);
+            return ((marketMessagingB2BServiceV01PortType)(this)).sendMessageAsync(inValue);
         }
 
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageResponse Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType.getMessage(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageRequest request) {
+        getMessageResponse marketMessagingB2BServiceV01PortType.getMessage(getMessageRequest request) {
             return base.Channel.getMessage(request);
         }
 
-        public Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.MessageContainer_Type getMessage(string MessageId) {
-            Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageRequest inValue = new Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageRequest();
+        public MessageContainer_Type getMessage(string MessageId) {
+            getMessageRequest inValue = new getMessageRequest();
             inValue.MessageId = MessageId;
-            Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageResponse retVal = ((Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType)(this)).getMessage(inValue);
+            getMessageResponse retVal = ((marketMessagingB2BServiceV01PortType)(this)).getMessage(inValue);
             return retVal.MessageContainer;
         }
 
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageResponse> Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType.getMessageAsync(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageRequest request) {
+        System.Threading.Tasks.Task<getMessageResponse> marketMessagingB2BServiceV01PortType.getMessageAsync(getMessageRequest request) {
             return base.Channel.getMessageAsync(request);
         }
 
-        public System.Threading.Tasks.Task<Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageResponse> getMessageAsync(string MessageId) {
-            Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageRequest inValue = new Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageRequest();
+        public System.Threading.Tasks.Task<getMessageResponse> getMessageAsync(string MessageId) {
+            getMessageRequest inValue = new getMessageRequest();
             inValue.MessageId = MessageId;
-            return ((Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType)(this)).getMessageAsync(inValue);
+            return ((marketMessagingB2BServiceV01PortType)(this)).getMessageAsync(inValue);
         }
 
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageIdsResponse Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType.getMessageIds(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageIdsRequest request) {
+        getMessageIdsResponse marketMessagingB2BServiceV01PortType.getMessageIds(getMessageIdsRequest request) {
             return base.Channel.getMessageIds(request);
         }
 
         public string[] getMessageIds(System.DateTime From, System.DateTime To) {
-            Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageIdsRequest inValue = new Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageIdsRequest();
+            getMessageIdsRequest inValue = new getMessageIdsRequest();
             inValue.From = From;
             inValue.To = To;
-            Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageIdsResponse retVal = ((Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType)(this)).getMessageIds(inValue);
+            getMessageIdsResponse retVal = ((marketMessagingB2BServiceV01PortType)(this)).getMessageIds(inValue);
             return retVal.MessageIdList;
         }
 
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageIdsResponse> Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType.getMessageIdsAsync(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageIdsRequest request) {
+        System.Threading.Tasks.Task<getMessageIdsResponse> marketMessagingB2BServiceV01PortType.getMessageIdsAsync(getMessageIdsRequest request) {
             return base.Channel.getMessageIdsAsync(request);
         }
 
-        public System.Threading.Tasks.Task<Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageIdsResponse> getMessageIdsAsync(System.DateTime From, System.DateTime To) {
-            Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageIdsRequest inValue = new Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.getMessageIdsRequest();
+        public System.Threading.Tasks.Task<getMessageIdsResponse> getMessageIdsAsync(System.DateTime From, System.DateTime To) {
+            getMessageIdsRequest inValue = new getMessageIdsRequest();
             inValue.From = From;
             inValue.To = To;
-            return ((Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType)(this)).getMessageIdsAsync(inValue);
+            return ((marketMessagingB2BServiceV01PortType)(this)).getMessageIdsAsync(inValue);
         }
 
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.queryDataResponse Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType.queryData(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.queryDataRequest request) {
+        queryDataResponse marketMessagingB2BServiceV01PortType.queryData(queryDataRequest request) {
             return base.Channel.queryData(request);
         }
 
         public void queryData(ref System.Xml.XmlElement[] Any) {
-            Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.queryDataRequest inValue = new Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.queryDataRequest();
+            queryDataRequest inValue = new queryDataRequest();
             inValue.Any = Any;
-            Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.queryDataResponse retVal = ((Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType)(this)).queryData(inValue);
+            queryDataResponse retVal = ((marketMessagingB2BServiceV01PortType)(this)).queryData(inValue);
             Any = retVal.Any;
         }
 
-        public System.Threading.Tasks.Task<Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.queryDataResponse> queryDataAsync(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.queryDataRequest request) {
+        public System.Threading.Tasks.Task<queryDataResponse> queryDataAsync(queryDataRequest request) {
             return base.Channel.queryDataAsync(request);
         }
 
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.peekMessageResponse Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType.peekMessage(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.peekMessageRequest request) {
+        peekMessageResponse marketMessagingB2BServiceV01PortType.peekMessage(peekMessageRequest request) {
             return base.Channel.peekMessage(request);
         }
 
-        public Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.MessageContainer_Type peekMessage() {
-            Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.peekMessageRequest inValue = new Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.peekMessageRequest();
-            Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.peekMessageResponse retVal = ((Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType)(this)).peekMessage(inValue);
+        public MessageContainer_Type peekMessage() {
+            peekMessageRequest inValue = new peekMessageRequest();
+            peekMessageResponse retVal = ((marketMessagingB2BServiceV01PortType)(this)).peekMessage(inValue);
             return retVal.MessageContainer;
         }
 
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.peekMessageResponse> Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType.peekMessageAsync(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.peekMessageRequest request) {
+        System.Threading.Tasks.Task<peekMessageResponse> marketMessagingB2BServiceV01PortType.peekMessageAsync(peekMessageRequest request) {
             return base.Channel.peekMessageAsync(request);
         }
 
-        public System.Threading.Tasks.Task<Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.peekMessageResponse> peekMessageAsync() {
-            Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.peekMessageRequest inValue = new Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.peekMessageRequest();
-            return ((Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType)(this)).peekMessageAsync(inValue);
+        public System.Threading.Tasks.Task<peekMessageResponse> peekMessageAsync() {
+            peekMessageRequest inValue = new peekMessageRequest();
+            return ((marketMessagingB2BServiceV01PortType)(this)).peekMessageAsync(inValue);
         }
 
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.dequeueMessageResponse Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType.dequeueMessage(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.dequeueMessageRequest request) {
+        dequeueMessageResponse marketMessagingB2BServiceV01PortType.dequeueMessage(dequeueMessageRequest request) {
             return base.Channel.dequeueMessage(request);
         }
 
         public void dequeueMessage(string MessageId) {
-            Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.dequeueMessageRequest inValue = new Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.dequeueMessageRequest();
+            dequeueMessageRequest inValue = new dequeueMessageRequest();
             inValue.MessageId = MessageId;
-            Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.dequeueMessageResponse retVal = ((Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType)(this)).dequeueMessage(inValue);
+            dequeueMessageResponse retVal = ((marketMessagingB2BServiceV01PortType)(this)).dequeueMessage(inValue);
         }
 
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.dequeueMessageResponse> Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType.dequeueMessageAsync(Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.dequeueMessageRequest request) {
+        System.Threading.Tasks.Task<dequeueMessageResponse> marketMessagingB2BServiceV01PortType.dequeueMessageAsync(dequeueMessageRequest request) {
             return base.Channel.dequeueMessageAsync(request);
         }
 
-        public System.Threading.Tasks.Task<Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.dequeueMessageResponse> dequeueMessageAsync(string MessageId) {
-            Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.dequeueMessageRequest inValue = new Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.dequeueMessageRequest();
+        public System.Threading.Tasks.Task<dequeueMessageResponse> dequeueMessageAsync(string MessageId) {
+            dequeueMessageRequest inValue = new dequeueMessageRequest();
             inValue.MessageId = MessageId;
-            return ((Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix.marketMessagingB2BServiceV01PortType)(this)).dequeueMessageAsync(inValue);
+            return ((marketMessagingB2BServiceV01PortType)(this)).dequeueMessageAsync(inValue);
         }
     }
 }
