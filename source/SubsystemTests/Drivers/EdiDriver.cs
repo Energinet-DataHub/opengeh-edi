@@ -17,16 +17,16 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Xml;
-using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
-using Energinet.DataHub.EDI.AcceptanceTests.Logging;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.SubsystemTests.Exceptions;
+using Energinet.DataHub.EDI.SubsystemTests.Logging;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Nito.AsyncEx;
 using NodaTime;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+namespace Energinet.DataHub.EDI.SubsystemTests.Drivers;
 
 internal sealed class EdiDriver : IDisposable
 {

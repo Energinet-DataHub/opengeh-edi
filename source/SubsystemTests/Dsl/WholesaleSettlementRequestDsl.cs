@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
-using Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C;
-using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
+using Energinet.DataHub.EDI.SubsystemTests.Exceptions;
 using FluentAssertions;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
+namespace Energinet.DataHub.EDI.SubsystemTests.Dsl;
 
 public sealed class WholesaleSettlementRequestDsl
 {

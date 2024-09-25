@@ -14,7 +14,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests;
+namespace Energinet.DataHub.EDI.SubsystemTests;
 
 [CollectionDefinition(AcceptanceTestCollectionName)]
 [SuppressMessage("Naming", "CA1711:Identifiers should not have incorrect suffix", Justification = "This is a XUNIT Collection")]

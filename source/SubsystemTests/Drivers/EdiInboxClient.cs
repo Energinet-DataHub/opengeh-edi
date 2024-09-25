@@ -14,7 +14,7 @@
 
 using Azure.Messaging.ServiceBus;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+namespace Energinet.DataHub.EDI.SubsystemTests.Drivers;
 
 internal sealed class EdiInboxClient : IAsyncDisposable
 {

@@ -16,10 +16,11 @@ using System.Net;
 using System.ServiceModel.Security;
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers.Ebix;
 using FluentAssertions;
 using FluentAssertions.Execution;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
+namespace Energinet.DataHub.EDI.SubsystemTests.Dsl;
 
 internal sealed class EbixRequestDsl
 {

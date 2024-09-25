@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C.Client;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client;
 using Nito.AsyncEx;
 using NodaTime;
 using NodaTime.Text;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C;
+namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 
 public sealed class B2CEdiDriver : IDisposable
 {

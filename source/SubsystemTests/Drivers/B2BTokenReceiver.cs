@@ -15,10 +15,10 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Energinet.DataHub.EDI.AcceptanceTests.Logging;
+using Energinet.DataHub.EDI.SubsystemTests.Logging;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+namespace Energinet.DataHub.EDI.SubsystemTests.Drivers;
 
 public class B2BTokenReceiver
 {

@@ -14,7 +14,7 @@
 
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Logging;
+namespace Energinet.DataHub.EDI.SubsystemTests.Logging;
 
 public static class HttpResponseMessageExtensions
 {

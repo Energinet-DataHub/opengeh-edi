@@ -13,10 +13,10 @@
 // limitations under the License.
 
 using System.Net.Http.Json;
-using Energinet.DataHub.EDI.AcceptanceTests.Logging;
+using Energinet.DataHub.EDI.SubsystemTests.Logging;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C;
+namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 
 public class B2CTokenRetriever
 {

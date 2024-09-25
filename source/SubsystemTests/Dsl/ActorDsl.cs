@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
+namespace Energinet.DataHub.EDI.SubsystemTests.Dsl;
 
 internal sealed class ActorDsl
 {

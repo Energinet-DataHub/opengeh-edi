@@ -14,13 +14,11 @@
 
 using System.Diagnostics;
 using Dapper;
-using Energinet.DataHub.Core.Outbox.Domain;
-using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Microsoft.Data.SqlClient;
 using NodaTime;
 using NodaTime.Text;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+namespace Energinet.DataHub.EDI.SubsystemTests.Drivers;
 
 internal sealed class EdiDatabaseDriver
 {

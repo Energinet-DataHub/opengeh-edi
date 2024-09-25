@@ -15,7 +15,7 @@
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Google.Protobuf.WellKnownTypes;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Factories;
+namespace Energinet.DataHub.EDI.SubsystemTests.Factories;
 
 public static class ActorCertificateFactory
 {

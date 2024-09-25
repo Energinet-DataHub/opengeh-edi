@@ -17,9 +17,9 @@ using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Xml;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
+namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.Ebix;
 
 internal sealed class EbixDriver : IDisposable
 {

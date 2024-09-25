@@ -13,13 +13,14 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
-using Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C;
-using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
+using Energinet.DataHub.EDI.SubsystemTests.Dsl;
 using Xunit.Abstractions;
+
 #pragma warning disable CS0162 // Unreachable code detected
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.ArchivedMessages;
+namespace Energinet.DataHub.EDI.SubsystemTests.Tests.ArchivedMessages;
 
 [Collection("Acceptance test collection")]
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Testing")]

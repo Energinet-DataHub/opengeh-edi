@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System.Xml;
-using Energinet.DataHub.EDI.AcceptanceTests.TestData;
+using Energinet.DataHub.EDI.SubsystemTests.TestData;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Factories;
+namespace Energinet.DataHub.EDI.SubsystemTests.Factories;
 
 internal sealed class RequestAggregatedMeasureXmlBuilder
 {

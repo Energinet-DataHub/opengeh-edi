@@ -13,13 +13,14 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
-using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers;
+using Energinet.DataHub.EDI.SubsystemTests.Dsl;
 using Xunit.Abstractions;
 using Xunit.Categories;
+
 #pragma warning disable CS0162 // Unreachable code detected
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
+namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 
 [SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 [IntegrationTest]

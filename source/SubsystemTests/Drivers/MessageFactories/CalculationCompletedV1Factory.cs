@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.MessageFactories;
+namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.MessageFactories;
 
 internal static class CalculationCompletedV1Factory
 {

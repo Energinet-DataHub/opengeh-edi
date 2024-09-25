@@ -14,9 +14,10 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
+
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Responses.Xml;
+namespace Energinet.DataHub.EDI.SubsystemTests.Responses.Xml;
 
 [SuppressMessage("Security", "CA5369:Use XmlReader for \'XmlSerializer.Deserialize()\'", Justification = "Not available through API")]
 public static class SynchronousError

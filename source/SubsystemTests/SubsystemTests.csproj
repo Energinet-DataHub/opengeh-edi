@@ -4,8 +4,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
-        <AssemblyName>Energinet.DataHub.EDI.AcceptanceTests</AssemblyName>
-        <RootNamespace>Energinet.DataHub.EDI.AcceptanceTests</RootNamespace>
+        <AssemblyName>Energinet.DataHub.EDI.SubsystemTests</AssemblyName>
+        <RootNamespace>Energinet.DataHub.EDI.SubsystemTests</RootNamespace>
     </PropertyGroup>
 
     <!-- Build EDI B2C Client using nswag (the same client the BFF uses) -->

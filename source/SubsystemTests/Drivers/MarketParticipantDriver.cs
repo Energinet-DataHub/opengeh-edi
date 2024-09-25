@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.AcceptanceTests.Factories;
+using Energinet.DataHub.EDI.SubsystemTests.Factories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Google.Protobuf;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+namespace Energinet.DataHub.EDI.SubsystemTests.Drivers;
 
 internal sealed class MarketParticipantDriver
 {

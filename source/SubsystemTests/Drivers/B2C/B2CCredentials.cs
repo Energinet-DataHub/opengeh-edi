@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C;
+namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 
 public class B2CCredentials(string username, string password, Guid actorId)
 {

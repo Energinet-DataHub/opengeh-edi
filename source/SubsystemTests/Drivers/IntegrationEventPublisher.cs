@@ -16,7 +16,7 @@ using Azure.Messaging.ServiceBus;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+namespace Energinet.DataHub.EDI.SubsystemTests.Drivers;
 
 internal sealed class IntegrationEventPublisher : IAsyncDisposable
 {

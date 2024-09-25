@@ -15,17 +15,18 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration; // DO NOT REMOVE THIS! use in debug mode
-using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
-using Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C;
-using Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers.Ebix;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Configuration;
 using Nito.AsyncEx;
 using Xunit.Abstractions;
+// DO NOT REMOVE THIS! use in debug mode
 
-namespace Energinet.DataHub.EDI.AcceptanceTests;
+namespace Energinet.DataHub.EDI.SubsystemTests;
 
 // ReSharper disable once ClassNeverInstantiated.Global -- Instantiated by XUnit
 public class AcceptanceTestFixture : IAsyncLifetime

@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using Energinet.DataHub.EDI.AcceptanceTests.Factories;
-using Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors.Asserters;
+using Energinet.DataHub.EDI.SubsystemTests.Factories;
+using Energinet.DataHub.EDI.SubsystemTests.Tests.B2BErrors.Asserters;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Tests.B2BErrors;
+namespace Energinet.DataHub.EDI.SubsystemTests.Tests.B2BErrors;
 
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Test code should not configure await.")]
 [Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]

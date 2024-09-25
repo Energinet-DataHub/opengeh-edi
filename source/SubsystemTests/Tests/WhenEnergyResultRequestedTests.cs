@@ -13,14 +13,14 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
-using Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C;
-using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
+using Energinet.DataHub.EDI.SubsystemTests.Dsl;
 using NodaTime;
 using Xunit.Abstractions;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Tests;
+namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 
 [SuppressMessage(
     "Usage",

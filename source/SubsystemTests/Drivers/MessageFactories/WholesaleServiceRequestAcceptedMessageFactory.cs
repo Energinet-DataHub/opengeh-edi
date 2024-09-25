@@ -19,7 +19,7 @@ using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Period = Energinet.DataHub.Edi.Responses.Period;
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.MessageFactories;
+namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.MessageFactories;
 
 public static class WholesaleServiceRequestAcceptedMessageFactory
 {
