@@ -17,6 +17,7 @@
   "B2C_USERNAME": "<username for user in b2c tenant>",
   "B2C_PASSWORD": "<password for user in b2c tenant>",
   "MARKET_PARTICIPANT_URI": "<market participant url>",
+  "EDI_B2C_WEB_API_URI": "<edi b2c web api url (not api management url)>",
 
   "EBIX_APIM_URL": "<URL to use, when you want to peek/dequeue in EbiX>",
 

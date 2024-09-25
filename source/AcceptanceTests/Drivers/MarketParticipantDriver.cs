@@ -27,11 +27,11 @@ internal sealed class MarketParticipantDriver
         _integrationEventPublisher = integrationEventPublisher;
     }
 
-    internal async Task PublishActorActivatedAsync(string actorNumber, string b2CId)
+    internal async Task PublishActorActivatedAsync(string actorNumber, string b2cId)
     {
         await _integrationEventPublisher.PublishAsync(
             ActorActivated.EventName,
-            ActorFactory.CreateActorActivated(actorNumber, b2CId).ToByteArray(),
+            ActorFactory.CreateActorActivated(actorNumber, b2cId).ToByteArray(),
             waitForHandled: true).ConfigureAwait(false);
     }
 

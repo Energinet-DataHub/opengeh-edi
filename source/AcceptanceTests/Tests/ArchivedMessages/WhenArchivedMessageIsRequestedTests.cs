@@ -14,6 +14,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 using Xunit.Abstractions;
 #pragma warning disable CS0162 // Unreachable code detected
@@ -36,10 +37,10 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         var ediDatabaseDriver = new EdiDatabaseDriver(fixture.ConnectionString);
 
         _archivedMessages = new ArchivedMessageDsl(
-            new EdiB2CDriver(fixture.B2CAuthorizedHttpClient, fixture.ApiManagementUri, output),
+            new B2CEdiDriver(fixture.B2CClients.DatahubAdministrator, fixture.ApiManagementUri, fixture.EdiB2CWebApiUri, output),
             ediDatabaseDriver);
 
-        var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BMeteredDataResponsibleAuthorizedHttpClient, output);
+        var ediDriver = new EdiDriver(fixture.DurableClient, fixture.B2BClients.MeteredDataResponsible, output);
         var wholesaleDriver = new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient);
         _calculationCompleted = new CalculationCompletedDsl(
             ediDriver,

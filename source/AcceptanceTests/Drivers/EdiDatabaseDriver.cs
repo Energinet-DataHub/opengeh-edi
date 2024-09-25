@@ -18,6 +18,7 @@ using Energinet.DataHub.Core.Outbox.Domain;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Microsoft.Data.SqlClient;
 using NodaTime;
+using NodaTime.Text;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers;
 
@@ -35,12 +36,12 @@ internal sealed class EdiDatabaseDriver
         string chargeOwnerNumber,
         CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
+        await using var connection = new SqlConnection(_connectionString);
 
         var processId = Guid.NewGuid();
 
         await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-        using (var createProcessCommand = new SqlCommand())
+        await using (var createProcessCommand = new SqlCommand())
         {
             createProcessCommand.CommandText = @"INSERT INTO [WholesaleServicesProcesses]
                 (ProcessId, BusinessTransactionId, StartOfPeriod, EndOfPeriod, RequestedGridArea, ChargeOwner, Resolution, EnergySupplierId, BusinessReason, RequestedByActorNumber, RequestedByActorRole, OriginalActorNumber, OriginalActorRole, State, SettlementVersion, InitiatedByMessageId, CreatedBy, CreatedAt, ModifiedBy, ModifiedAt)
@@ -56,7 +57,7 @@ internal sealed class EdiDatabaseDriver
             await createProcessCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        using (var createProcessGridAreaCommand = new SqlCommand())
+        await using (var createProcessGridAreaCommand = new SqlCommand())
         {
             var gridAreaId = Guid.NewGuid();
             createProcessGridAreaCommand.CommandText = @"INSERT INTO [WholesaleServicesProcessGridAreas]
@@ -79,11 +80,11 @@ internal sealed class EdiDatabaseDriver
         string actorNumber,
         CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
+        await using var connection = new SqlConnection(_connectionString);
         var processId = Guid.NewGuid();
 
         await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-        using (var createProcessCommand = new SqlCommand())
+        await using (var createProcessCommand = new SqlCommand())
         {
             createProcessCommand.CommandText = @"INSERT INTO [AggregatedMeasureDataProcesses]
             (ProcessId, BusinessTransactionId, MeteringPointType, SettlementMethod, StartOfPeriod, EndOfPeriod, RequestedGridArea, EnergySupplierId, BalanceResponsibleId,  BusinessReason, RequestedByActorNumber, RequestedByActorRole, OriginalActorNumber, OriginalActorRole, State, SettlementVersion, InitiatedByMessageId, CreatedBy, CreatedAt, ModifiedBy, ModifiedAt)
@@ -99,7 +100,7 @@ internal sealed class EdiDatabaseDriver
             await createProcessCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        using (var createProcessGridAreaCommand = new SqlCommand())
+        await using (var createProcessGridAreaCommand = new SqlCommand())
         {
             var gridAreaId = Guid.NewGuid();
             createProcessGridAreaCommand.CommandText = @"INSERT INTO [AggregatedMeasureDataProcessGridAreas]
@@ -121,56 +122,59 @@ internal sealed class EdiDatabaseDriver
         Guid initiatedByMessageId,
         CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
-        using var command = new SqlCommand();
-
-        var stopWatch = Stopwatch.StartNew();
+        await using var command = new SqlCommand();
 
         // To avoid receiving a unexpected response on the process in a later test, we mark the process as rejected.
         command.CommandText = @"
             UPDATE [WholesaleServicesProcesses] SET State = 'Rejected' WHERE InitiatedByMessageId = @InitiatedByMessageId;
             SELECT ProcessId FROM [WholesaleServicesProcesses] WHERE InitiatedByMessageId = @InitiatedByMessageId";
         command.Parameters.AddWithValue("@InitiatedByMessageId", initiatedByMessageId.ToString());
-        command.Connection = connection;
+        return await GetWholesaleServiceProcessIdAsync(command, cancellationToken);
+    }
 
-        while (stopWatch.ElapsedMilliseconds < 30000)
-        {
-            await command.Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-            if (await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false) is Guid messageId)
-                return messageId;
-            await command.Connection.CloseAsync().ConfigureAwait(false);
-            await Task.Delay(500, cancellationToken).ConfigureAwait(false);
-        }
+    internal async Task<Guid?> GetWholesaleServiceProcessIdAsync(Instant createdAfter, string requestedByActorNumber, CancellationToken cancellationToken)
+    {
+        await using var command = new SqlCommand();
 
-        return null;
+        // To avoid receiving a unexpected response on the process in a later test, we mark the process as rejected.
+        command.CommandText = @"
+            UPDATE [WholesaleServicesProcesses] SET State = 'Rejected' WHERE CreatedAt >= @CreatedAfter AND RequestedByActorNumber = @RequestedByActorNumber;
+            SELECT ProcessId FROM [WholesaleServicesProcesses] WHERE CreatedAt >= @CreatedAfter AND RequestedByActorNumber = @RequestedByActorNumber";
+        command.Parameters.AddWithValue("@CreatedAfter", InstantPattern.General.Format(createdAfter));
+        command.Parameters.AddWithValue("@RequestedByActorNumber", requestedByActorNumber);
+        return await GetWholesaleServiceProcessIdAsync(command, cancellationToken);
     }
 
     internal async Task<Guid?> GetAggregatedMeasureDataProcessIdAsync(
         Guid initiatedByMessageId,
         CancellationToken cancellationToken)
     {
-        using var connection = new SqlConnection(_connectionString);
-        using var command = new SqlCommand();
-
-        var stopWatch = Stopwatch.StartNew();
+        await using var command = new SqlCommand();
 
         // To avoid receiving a unexpected response on the process in a later test, we mark the process as rejected.
         command.CommandText = @"
             UPDATE [AggregatedMeasureDataProcesses] SET State = 'Rejected' WHERE InitiatedByMessageId = @InitiatedByMessageId;
             SELECT ProcessId FROM [AggregatedMeasureDataProcesses] WHERE InitiatedByMessageId = @InitiatedByMessageId";
         command.Parameters.AddWithValue("@InitiatedByMessageId", initiatedByMessageId.ToString());
-        command.Connection = connection;
 
-        while (stopWatch.ElapsedMilliseconds < 30000)
-        {
-            await command.Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-            if (await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false) is Guid messageId)
-                return messageId;
-            await command.Connection.CloseAsync().ConfigureAwait(false);
-            await Task.Delay(500, cancellationToken).ConfigureAwait(false);
-        }
+        return await GetAggregatedMeasureDataProcessIdAsync(command, cancellationToken);
+    }
 
-        return null;
+    internal async Task<Guid?> GetAggregatedMeasureDataProcessIdAsync(
+        Instant createdAfter,
+        string requestedByActorNumber,
+        CancellationToken cancellationToken)
+    {
+        await using var command = new SqlCommand();
+        // To avoid receiving a unexpected response on the process in a later test, we mark the process as rejected.
+        command.CommandText = @"
+            UPDATE [AggregatedMeasureDataProcesses] SET State = 'Rejected' WHERE CreatedAt >= @CreatedAfter AND RequestedByActorNumber = @RequestedByActorNumber;
+            SELECT ProcessId FROM [AggregatedMeasureDataProcesses] WHERE CreatedAt >= @CreatedAfter AND RequestedByActorNumber = @RequestedByActorNumber";
+
+        command.Parameters.AddWithValue("@CreatedAfter", InstantPattern.General.Format(createdAfter));
+        command.Parameters.AddWithValue("@RequestedByActorNumber", requestedByActorNumber);
+
+        return await GetAggregatedMeasureDataProcessIdAsync(command, cancellationToken);
     }
 
     /// <summary>
@@ -179,10 +183,10 @@ internal sealed class EdiDatabaseDriver
     /// </summary>
     internal async Task DeleteOutgoingMessagesForCalculationAsync(Guid calculationId)
     {
-        using var connection = new SqlConnection(_connectionString);
+        await using var connection = new SqlConnection(_connectionString);
 
         await connection.OpenAsync().ConfigureAwait(false);
-        using (var deleteOutgoingMessagesCommand = new SqlCommand())
+        await using (var deleteOutgoingMessagesCommand = new SqlCommand())
         {
             // Delete outgoing messages (OutgoingMessages table) and their bundles (Bundles table)
             // where EventId = @CalculationId in the OutgoingMessages table and outgoingmessages
@@ -240,5 +244,45 @@ internal sealed class EdiDatabaseDriver
         await connection.CloseAsync();
 
         return (false, null);
+    }
+
+    private async Task<Guid?> GetAggregatedMeasureDataProcessIdAsync(SqlCommand command, CancellationToken cancellationToken)
+    {
+        await using var connection = new SqlConnection(_connectionString);
+
+        var stopWatch = Stopwatch.StartNew();
+
+        command.Connection = connection;
+
+        while (stopWatch.Elapsed < TimeSpan.FromSeconds(30))
+        {
+            await command.Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+            if (await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false) is Guid messageId)
+                return messageId;
+            await command.Connection.CloseAsync().ConfigureAwait(false);
+            await Task.Delay(500, cancellationToken).ConfigureAwait(false);
+        }
+
+        return null;
+    }
+
+    private async Task<Guid?> GetWholesaleServiceProcessIdAsync(SqlCommand command, CancellationToken cancellationToken)
+    {
+        await using var connection = new SqlConnection(_connectionString);
+
+        var stopWatch = Stopwatch.StartNew();
+
+        command.Connection = connection;
+
+        while (stopWatch.Elapsed < TimeSpan.FromSeconds(30))
+        {
+            await command.Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+            if (await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false) is Guid messageId)
+                return messageId;
+            await command.Connection.CloseAsync().ConfigureAwait(false);
+            await Task.Delay(500, cancellationToken).ConfigureAwait(false);
+        }
+
+        return null;
     }
 }

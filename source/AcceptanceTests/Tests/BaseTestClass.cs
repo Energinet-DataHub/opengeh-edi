@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C;
 using Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 using Xunit.Abstractions;
 
@@ -42,7 +43,12 @@ public class BaseTestClass
         return new AggregatedMeasureDataRequestDsl(
             new EdiDriver(
                 _fixture.DurableClient,
-                _fixture.B2BEnergySupplierAuthorizedHttpClient,
+                _fixture.B2BClients.EnergySupplier,
+                Output),
+            new B2CEdiDriver(
+                _fixture.B2CClients.EnergySupplier,
+                _fixture.ApiManagementUri,
+                _fixture.EdiB2CWebApiUri,
                 Output),
             new EdiDatabaseDriver(_fixture.ConnectionString),
             new WholesaleDriver(_fixture.EventPublisher, _fixture.EdiInboxClient));

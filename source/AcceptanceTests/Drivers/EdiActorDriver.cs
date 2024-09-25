@@ -25,14 +25,14 @@ public class EdiActorDriver
         _connectionString = connectionString;
     }
 
-    public async Task<bool> ActorExistsAsync(string actorNumber, string azpToken)
+    public async Task<bool> ActorExistsAsync(string actorNumber, string actorId)
     {
         using var connection = new SqlConnection(_connectionString);
         using var command = new SqlCommand();
 
         command.CommandText = "SELECT COUNT(*) FROM [Actor] WHERE ActorNumber = @ActorNumber AND ExternalId = @ExternalId";
         command.Parameters.AddWithValue("@ActorNumber", actorNumber);
-        command.Parameters.AddWithValue("@ExternalId", azpToken);
+        command.Parameters.AddWithValue("@ExternalId", actorId);
         command.Connection = connection;
 
         await command.Connection.OpenAsync().ConfigureAwait(false);

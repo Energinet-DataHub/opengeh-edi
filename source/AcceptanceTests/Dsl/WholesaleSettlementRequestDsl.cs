@@ -13,8 +13,10 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C;
 using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
 using FluentAssertions;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
@@ -22,16 +24,19 @@ public sealed class WholesaleSettlementRequestDsl
 {
     private readonly EdiDatabaseDriver _ediDatabaseDriver;
     private readonly EdiDriver _ediDriver;
+    private readonly B2CEdiDriver _b2cEdiDriver;
     private readonly WholesaleDriver _wholesaleDriver;
 
 #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
     internal WholesaleSettlementRequestDsl(
         EdiDatabaseDriver ediDatabaseDriver,
         EdiDriver ediDriver,
+        B2CEdiDriver b2cEdiDriver,
         WholesaleDriver wholesaleDriver)
     {
         _ediDatabaseDriver = ediDatabaseDriver;
         _ediDriver = ediDriver;
+        _b2cEdiDriver = b2cEdiDriver;
         _wholesaleDriver = wholesaleDriver;
     }
 
@@ -42,6 +47,12 @@ public sealed class WholesaleSettlementRequestDsl
         return await _ediDriver
             .RequestWholesaleSettlementAsync(withSyncError: false, cancellationToken)
             .ConfigureAwait(false);
+    }
+
+    internal Task B2CRequest(CancellationToken cancellationToken)
+    {
+        return _b2cEdiDriver
+            .RequestWholesaleSettlementAsync(cancellationToken);
     }
 
     internal async Task ConfirmInvalidRequestIsRejected(CancellationToken cancellationToken)
@@ -58,15 +69,22 @@ public sealed class WholesaleSettlementRequestDsl
         await Assert.ThrowsAsync<BadWholesaleSettlementRequestException>(act).ConfigureAwait(false);
     }
 
-    internal async Task ConfirmRequestIsInitialized(
-        Guid requestMessageId,
-        CancellationToken cancellationToken)
+    internal async Task ConfirmRequestIsInitialized(Guid requestMessageId)
     {
         var processId = await _ediDatabaseDriver
-            .GetWholesaleServiceProcessIdAsync(requestMessageId, cancellationToken)
+            .GetWholesaleServiceProcessIdAsync(requestMessageId, CancellationToken.None)
             .ConfigureAwait(false);
 
-        processId.Should().NotBeNull();
+        processId.Should().NotBeNull("because the wholesale settlement process should be initialized");
+    }
+
+    internal async Task ConfirmRequestIsInitialized(Instant createdAfter, string requestedByActorNumber)
+    {
+        var processId = await _ediDatabaseDriver
+            .GetWholesaleServiceProcessIdAsync(createdAfter, requestedByActorNumber, CancellationToken.None)
+            .ConfigureAwait(false);
+
+        processId.Should().NotBeNull("because the wholesale settlement process should be initialized");
     }
 
     internal async Task PublishWholesaleServicesRequestAcceptedResponse(
