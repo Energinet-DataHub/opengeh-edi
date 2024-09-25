@@ -1,5 +1,5 @@
 ﻿{
-   "SHARED_KEYVAULT_NAME": "<SHARED_KEYVAULT_NAME>",
+  "SHARED_KEYVAULT_NAME": "<SHARED_KEYVAULT_NAME>",
   "EBIX_CERTIFICATE_PASSWORD_MDR": "<certificate password for performing an ebix peek in api management for the meter data responsible>",
   "EBIX_CERTIFICATE_PASSWORD_ES": "<certificate password for performing an ebix peek in api management for the energysupplier>",
 

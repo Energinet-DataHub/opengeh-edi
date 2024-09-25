@@ -63,7 +63,7 @@ public class SubsystemTestFixture : IAsyncLifetime
     public SubsystemTestFixture()
     {
         var configurationBuilder = new ConfigurationBuilder()
-            .AddJsonFile("subsystemtest.dev002.settings.json", true)
+            .AddJsonFile("subsystemtests.dev002.settings.json", true)
             .AddEnvironmentVariables();
 
         var jsonConfiguration = configurationBuilder.Build();
