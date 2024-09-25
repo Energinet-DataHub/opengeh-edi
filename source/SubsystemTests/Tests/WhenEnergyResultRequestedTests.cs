@@ -27,14 +27,14 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
     "CA2007",
     Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 [IntegrationTest]
-[Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
+[Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 public sealed class WhenEnergyResultRequestedTests : BaseTestClass
 {
     private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureDataResult;
     private readonly AggregatedMeasureDataRequestDsl _aggregatedMeasureDataRequest;
     private readonly string _energySupplierActorNumber;
 
-    public WhenEnergyResultRequestedTests(AcceptanceTestFixture fixture, ITestOutputHelper output)
+    public WhenEnergyResultRequestedTests(SubsystemTestFixture fixture, ITestOutputHelper output)
         : base(output, fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
@@ -53,7 +53,7 @@ public sealed class WhenEnergyResultRequestedTests : BaseTestClass
                 new EdiDatabaseDriver(fixture.ConnectionString),
                 wholesaleDriver);
 
-        _energySupplierActorNumber = AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber;
+        _energySupplierActorNumber = SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber;
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public sealed class WhenEnergyResultRequestedTests : BaseTestClass
     {
         await _aggregatedMeasureDataRequest.PublishAggregatedMeasureDataRequestAcceptedResponse(
             "804",
-            AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
+            SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
             CancellationToken.None);
 
         await _notifyAggregatedMeasureDataResult.ConfirmResultIsAvailable();
@@ -100,7 +100,7 @@ public sealed class WhenEnergyResultRequestedTests : BaseTestClass
     {
          await _aggregatedMeasureDataRequest.PublishAggregatedMeasureDataRequestRejectedResponse(
             "804",
-            AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
+            SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber,
             CancellationToken.None);
 
          await _notifyAggregatedMeasureDataResult.ConfirmRejectResultIsAvailable();

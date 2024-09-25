@@ -27,14 +27,14 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
     "CA2007",
     Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 [IntegrationTest]
-[Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
+[Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
 {
     private readonly NotifyWholesaleServicesDsl _notifyWholesaleServices;
     private readonly WholesaleSettlementRequestDsl _wholesaleSettlementRequest;
     private readonly string _energySupplierActorNumber;
 
-    public WhenWholesaleSettlementRequestedTests(AcceptanceTestFixture fixture, ITestOutputHelper output)
+    public WhenWholesaleSettlementRequestedTests(SubsystemTestFixture fixture, ITestOutputHelper output)
         : base(output, fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
@@ -53,7 +53,7 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
                 new B2CEdiDriver(fixture.B2CClients.EnergySupplier, fixture.ApiManagementUri, fixture.EdiB2CWebApiUri, output),
                 wholesaleDriver);
 
-        _energySupplierActorNumber = AcceptanceTestFixture.EdiSubsystemTestCimEnergySupplierNumber;
+        _energySupplierActorNumber = SubsystemTestFixture.EdiSubsystemTestCimEnergySupplierNumber;
     }
 
     [Fact]
@@ -87,8 +87,8 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
     {
         await _wholesaleSettlementRequest.PublishWholesaleServicesRequestAcceptedResponse(
             "888",
-            AcceptanceTestFixture.ActorNumber,
-            AcceptanceTestFixture.EZTestCimActorNumber,
+            SubsystemTestFixture.ActorNumber,
+            SubsystemTestFixture.EZTestCimActorNumber,
             CancellationToken.None);
 
         await _notifyWholesaleServices.ConfirmResultIsAvailable();
@@ -99,7 +99,7 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
     {
         await _wholesaleSettlementRequest.PublishWholesaleServicesRequestRejectedResponse(
             "888",
-            AcceptanceTestFixture.EZTestCimActorNumber,
+            SubsystemTestFixture.EZTestCimActorNumber,
             CancellationToken.None);
 
         await _notifyWholesaleServices.ConfirmRejectResultIsAvailable();

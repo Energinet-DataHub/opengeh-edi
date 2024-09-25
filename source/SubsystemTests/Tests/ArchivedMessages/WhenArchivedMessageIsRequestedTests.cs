@@ -22,7 +22,7 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Tests.ArchivedMessages;
 
-[Collection("Acceptance test collection")]
+[Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Testing")]
 public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 {
@@ -30,7 +30,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
     private readonly NotifyAggregatedMeasureDataResultDsl _notifyAggregatedMeasureData;
     private readonly CalculationCompletedDsl _calculationCompleted;
 
-    public WhenArchivedMessageIsRequestedTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
+    public WhenArchivedMessageIsRequestedTests(ITestOutputHelper output, SubsystemTestFixture fixture)
         : base(output, fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);

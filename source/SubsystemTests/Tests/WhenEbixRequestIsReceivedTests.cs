@@ -23,7 +23,7 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 
 [IntegrationTest]
-[Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
+[Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
 {
     private readonly string _meteredDataResponsibleCertificateThumbprint;
@@ -32,7 +32,7 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
     private readonly ActorDsl _actors;
     private readonly CalculationCompletedDsl _calculationCompleted;
 
-    public WhenEbixPeekRequestIsReceivedTests(AcceptanceTestFixture fixture, ITestOutputHelper output)
+    public WhenEbixPeekRequestIsReceivedTests(SubsystemTestFixture fixture, ITestOutputHelper output)
         : base(output, fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
@@ -108,20 +108,20 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
     [Fact]
     public async Task Actor_cannot_peek_when_certificate_has_been_removed()
     {
-        await _actors.PublishActorCertificateCredentialsRemoved(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _meteredDataResponsibleCertificateThumbprint);
+        await _actors.PublishActorCertificateCredentialsRemoved(SubsystemTestFixture.ActorNumber, SubsystemTestFixture.ActorRole, _meteredDataResponsibleCertificateThumbprint);
 
         await _ebixMeteredDataResponsible.ConfirmPeekWithRemovedCertificateIsNotAllowed();
 
-        await _actors.PublishActorCertificateCredentialsAssigned(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _meteredDataResponsibleCertificateThumbprint);
+        await _actors.PublishActorCertificateCredentialsAssigned(SubsystemTestFixture.ActorNumber, SubsystemTestFixture.ActorRole, _meteredDataResponsibleCertificateThumbprint);
     }
 
     [Fact]
     public async Task Actor_cannot_dequeue_when_certificated_has_been_removed()
     {
-        await _actors.PublishActorCertificateCredentialsRemoved(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _meteredDataResponsibleCertificateThumbprint);
+        await _actors.PublishActorCertificateCredentialsRemoved(SubsystemTestFixture.ActorNumber, SubsystemTestFixture.ActorRole, _meteredDataResponsibleCertificateThumbprint);
 
         await _ebixMeteredDataResponsible.ConfirmDequeueWithRemovedCertificateIsNotAllowed();
 
-        await _actors.PublishActorCertificateCredentialsAssigned(AcceptanceTestFixture.ActorNumber, AcceptanceTestFixture.ActorRole, _meteredDataResponsibleCertificateThumbprint);
+        await _actors.PublishActorCertificateCredentialsAssigned(SubsystemTestFixture.ActorNumber, SubsystemTestFixture.ActorRole, _meteredDataResponsibleCertificateThumbprint);
     }
 }

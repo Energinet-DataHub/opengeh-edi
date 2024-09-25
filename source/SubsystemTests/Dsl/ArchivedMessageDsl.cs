@@ -100,7 +100,7 @@ public class ArchivedMessageDsl
             .And.Match($"*\"MessageId\":\"{messageId}\"*")
             .And.Match($"*\"Activity\":\"ArchivedMessagesSearch\"*")
             .And.Match($"*\"SystemId\":\"688b2dca-7231-490f-a731-d7869d33fe5e\"*")
-            .And.Match($"*\"ActorNumber\":\"{AcceptanceTestFixture.B2CActorNumber}\"*")
+            .And.Match($"*\"ActorNumber\":\"{SubsystemTestFixture.B2CActorNumber}\"*")
             .And.Match($"*\"Permissions\":\"*actors:manage*\"*");
     }
 }

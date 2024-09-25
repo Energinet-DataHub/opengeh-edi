@@ -58,7 +58,7 @@ public class B2CTokenRetriever
         await response.EnsureSuccessStatusCodeWithLogAsync(_logger);
 
         var tokenResult = await response.Content.ReadFromJsonAsync<AccessTokenResponse>().ConfigureAwait(false)
-                    ?? throw new InvalidOperationException($"Couldn't get acceptance test B2C token for user {credentials.Username}");
+                    ?? throw new InvalidOperationException($"Couldn't get subsystem test B2C token for user {credentials.Username}");
 
         var tokenFromMarketParticipant = await GetB2CTokenWithPermissionsFromMarketParticipantAsync(tokenResult.AccessToken, credentials.ActorId).ConfigureAwait(false);
 
@@ -74,7 +74,7 @@ public class B2CTokenRetriever
         await response.EnsureSuccessStatusCodeWithLogAsync(_logger);
 
         var token = await response.Content.ReadFromJsonAsync<TokenFromMarketParticipantResponse>().ConfigureAwait(false)
-                    ?? throw new InvalidOperationException("Couldn't get acceptance test token from market participant");
+                    ?? throw new InvalidOperationException("Couldn't get subsystem test token from market participant");
 
         return token.Token;
     }

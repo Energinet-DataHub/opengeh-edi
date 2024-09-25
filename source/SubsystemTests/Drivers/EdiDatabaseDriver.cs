@@ -44,7 +44,7 @@ internal sealed class EdiDatabaseDriver
             createProcessCommand.CommandText = @"INSERT INTO [WholesaleServicesProcesses]
                 (ProcessId, BusinessTransactionId, StartOfPeriod, EndOfPeriod, RequestedGridArea, ChargeOwner, Resolution, EnergySupplierId, BusinessReason, RequestedByActorNumber, RequestedByActorRole, OriginalActorNumber, OriginalActorRole, State, SettlementVersion, InitiatedByMessageId, CreatedBy, CreatedAt, ModifiedBy, ModifiedAt)
                 VALUES
-                (@ProcessId, @BusinessTransactionId, '2022-06-17T22:00:00Z', '2022-07-22T22:00:00Z', @RequestedGridArea, @ChargeOwnerNumber, 'P1M', 5790000000002, 'D05', @ChargeOwnerNumber, 'EZ', @ChargeOwnerNumber, 'EZ', 'Sent', NULL, '318dcf73-4b3b-4b8a-ad47-64743dd77e66', 'Acceptance Tests', @CreatedAt, NULL, NULL);";
+                (@ProcessId, @BusinessTransactionId, '2022-06-17T22:00:00Z', '2022-07-22T22:00:00Z', @RequestedGridArea, @ChargeOwnerNumber, 'P1M', 5790000000002, 'D05', @ChargeOwnerNumber, 'EZ', @ChargeOwnerNumber, 'EZ', 'Sent', NULL, '318dcf73-4b3b-4b8a-ad47-64743dd77e66', 'Subsystem Tests', @CreatedAt, NULL, NULL);";
             createProcessCommand.Parameters.AddWithValue("@ProcessId", processId);
             createProcessCommand.Parameters.AddWithValue("@BusinessTransactionId", Guid.NewGuid());
             createProcessCommand.Parameters.AddWithValue("@RequestedGridArea", requestedGridAreaCode);
@@ -87,7 +87,7 @@ internal sealed class EdiDatabaseDriver
             createProcessCommand.CommandText = @"INSERT INTO [AggregatedMeasureDataProcesses]
             (ProcessId, BusinessTransactionId, MeteringPointType, SettlementMethod, StartOfPeriod, EndOfPeriod, RequestedGridArea, EnergySupplierId, BalanceResponsibleId,  BusinessReason, RequestedByActorNumber, RequestedByActorRole, OriginalActorNumber, OriginalActorRole, State, SettlementVersion, InitiatedByMessageId, CreatedBy, CreatedAt, ModifiedBy, ModifiedAt)
             VALUES
-            (@ProcessId, @BusinessTransactionId, 'E17', 'D01', '2024-04-22T22:00:00Z', '2024-04-23T22:00:00Z', @RequestedGridArea, @EnergySupplierId, null, 'D04', @EnergySupplierId, 'DDQ', @EnergySupplierId, 'DDQ', 'Sent', NULL, '9e831318-f12c-48b0-9151-c9c6e73081dc', 'Acceptance Tests', @CreatedAt, NULL, NULL);";
+            (@ProcessId, @BusinessTransactionId, 'E17', 'D01', '2024-04-22T22:00:00Z', '2024-04-23T22:00:00Z', @RequestedGridArea, @EnergySupplierId, null, 'D04', @EnergySupplierId, 'DDQ', @EnergySupplierId, 'DDQ', 'Sent', NULL, '9e831318-f12c-48b0-9151-c9c6e73081dc', 'Subsystem Tests', @CreatedAt, NULL, NULL);";
             createProcessCommand.Parameters.AddWithValue("@ProcessId", processId);
             createProcessCommand.Parameters.AddWithValue("@BusinessTransactionId", Guid.NewGuid());
             createProcessCommand.Parameters.AddWithValue("@RequestedGridArea", requestedGridAreaCode);
@@ -177,7 +177,7 @@ internal sealed class EdiDatabaseDriver
 
     /// <summary>
     /// Delete outgoing messages for a calculation, since if outgoing messages already exists they won't be sent again,
-    /// and the acceptance tests will fail
+    /// and the subsystem tests will fail
     /// </summary>
     internal async Task DeleteOutgoingMessagesForCalculationAsync(Guid calculationId)
     {

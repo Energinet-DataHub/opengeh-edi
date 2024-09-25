@@ -24,13 +24,13 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 
 [SuppressMessage("Usage", "CA2007", Justification = "Test methods should not call ConfigureAwait(), as it may bypass parallelization limits")]
 [IntegrationTest]
-[Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
+[Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 [SuppressMessage("ReSharper", "HeuristicUnreachableCode", Justification = "Unreachable code is disabled for local executions")]
 public sealed class WhenNewB2BActorIsCreatedTests : BaseTestClass
 {
     private readonly ActorDsl _actorDsl;
 
-    public WhenNewB2BActorIsCreatedTests(AcceptanceTestFixture fixture, ITestOutputHelper output)
+    public WhenNewB2BActorIsCreatedTests(SubsystemTestFixture fixture, ITestOutputHelper output)
         : base(output, fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);

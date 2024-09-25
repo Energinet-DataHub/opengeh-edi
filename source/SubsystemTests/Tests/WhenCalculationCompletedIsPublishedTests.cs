@@ -20,12 +20,12 @@ using Xunit.Categories;
 namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 
 [IntegrationTest]
-[Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
+[Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 public class WhenCalculationCompletedIsPublishedTests : BaseTestClass
 {
     private readonly CalculationCompletedDsl _calculationCompleted;
 
-    public WhenCalculationCompletedIsPublishedTests(AcceptanceTestFixture fixture, ITestOutputHelper output)
+    public WhenCalculationCompletedIsPublishedTests(SubsystemTestFixture fixture, ITestOutputHelper output)
         : base(output, fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);

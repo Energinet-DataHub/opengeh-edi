@@ -16,11 +16,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Energinet.DataHub.EDI.SubsystemTests;
 
-[CollectionDefinition(AcceptanceTestCollectionName)]
+[CollectionDefinition(SubsystemTestCollectionName)]
 [SuppressMessage("Naming", "CA1711:Identifiers should not have incorrect suffix", Justification = "This is a XUNIT Collection")]
-public class AcceptanceTestCollection : ICollectionFixture<AcceptanceTestFixture>
+public class SubsystemTestCollection : ICollectionFixture<SubsystemTestFixture>
 {
-    public const string AcceptanceTestCollectionName = "Acceptance test collection";
+    public const string SubsystemTestCollectionName = "Subsystem test collection";
 
     // This class has no code, and is never created. Its purpose is simply
     // to be the place to apply [CollectionDefinition] and all the

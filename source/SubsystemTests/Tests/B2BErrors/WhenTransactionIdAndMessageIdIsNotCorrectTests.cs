@@ -21,10 +21,10 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.SubsystemTests.Tests.B2BErrors;
 
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Test code should not configure await.")]
-[Collection(AcceptanceTestCollection.AcceptanceTestCollectionName)]
+[Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 public class WhenTransactionIdAndMessageIdIsNotCorrectTests : BaseTestClass
 {
-    public WhenTransactionIdAndMessageIdIsNotCorrectTests(ITestOutputHelper output, AcceptanceTestFixture fixture)
+    public WhenTransactionIdAndMessageIdIsNotCorrectTests(ITestOutputHelper output, SubsystemTestFixture fixture)
         : base(output, fixture)
     {
     }

@@ -29,7 +29,7 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.SubsystemTests;
 
 // ReSharper disable once ClassNeverInstantiated.Global -- Instantiated by XUnit
-public class AcceptanceTestFixture : IAsyncLifetime
+public class SubsystemTestFixture : IAsyncLifetime
 {
     internal const string EbixActorGridArea = "543";
     internal const string CimActorGridArea = "804";
@@ -60,10 +60,10 @@ public class AcceptanceTestFixture : IAsyncLifetime
     private readonly string _azureB2CTenantId;
     private readonly string _azureEntraBackendAppId;
 
-    public AcceptanceTestFixture()
+    public SubsystemTestFixture()
     {
         var configurationBuilder = new ConfigurationBuilder()
-            .AddJsonFile("acceptancetest.dev002.settings.json", true)
+            .AddJsonFile("subsystemtest.dev002.settings.json", true)
             .AddEnvironmentVariables();
 
         var jsonConfiguration = configurationBuilder.Build();
@@ -297,7 +297,7 @@ public class AcceptanceTestFixture : IAsyncLifetime
     {
         return Logger
                ?? throw new NullReferenceException(
-                   "AcceptanceTestFixture.Logger must be set from tests. Inject ITestOutputHelper in tests constructor and set it on the fixture");
+                   "SubsystemTestFixture.Logger must be set from tests. Inject ITestOutputHelper in tests constructor and set it on the fixture");
     }
 }
 

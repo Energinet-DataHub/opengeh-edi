@@ -21,10 +21,10 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 
 public class BaseTestClass
 {
-    private readonly AcceptanceTestFixture _fixture;
+    private readonly SubsystemTestFixture _fixture;
     private readonly Lazy<AggregatedMeasureDataRequestDsl> _aggregationRequest;
 
-    protected BaseTestClass(ITestOutputHelper output, AcceptanceTestFixture fixture)
+    protected BaseTestClass(ITestOutputHelper output, SubsystemTestFixture fixture)
     {
         ArgumentNullException.ThrowIfNull(fixture);
 
