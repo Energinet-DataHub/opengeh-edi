@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -23,11 +25,13 @@ namespace Energinet.DataHub.EDI.Outbox.Infrastructure;
 public class OutboxRetention(
     OutboxContext outboxContext,
     IClock clock,
-    ILogger<OutboxRetention> logger) : IDataRetention
+    ILogger<OutboxRetention> logger,
+    IAuditLogger auditLogger) : IDataRetention
 {
     private readonly OutboxContext _outboxContext = outboxContext;
     private readonly IClock _clock = clock;
     private readonly ILogger<OutboxRetention> _logger = logger;
+    private readonly IAuditLogger _auditLogger = auditLogger;
 
     /// <summary>
     /// Deletes all messages that have been processed more than a week ago.
@@ -79,5 +83,14 @@ public class OutboxRetention(
                     skip);
             }
         }
+
+        await _auditLogger.LogWithCommitAsync(
+                logId: AuditLogId.New(),
+                activity: AuditLogActivity.Retention,
+                activityOrigin: nameof(ADayHasPassed),
+                activityPayload: _clock.GetCurrentInstant(),
+                affectedEntityType: AuditLogEntityType.OutboxMessage,
+                affectedEntityKey: null)
+            .ConfigureAwait(false);
     }
 }

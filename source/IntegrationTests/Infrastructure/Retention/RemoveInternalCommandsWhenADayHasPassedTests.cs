@@ -16,11 +16,16 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.Outbox.Domain;
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
+using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using Xunit;
@@ -40,7 +45,11 @@ public class RemoveInternalCommandsWhenADayHasPassedTests : TestBase
     {
         _processContext = GetService<ProcessContext>();
         _clock = GetService<IClock>();
-        _sut = new InternalCommandsRetention(GetService<IDatabaseConnectionFactory>(), GetService<ILogger<InternalCommandsRetention>>());
+        _sut = new InternalCommandsRetention(
+            GetService<IDatabaseConnectionFactory>(),
+            GetService<ILogger<InternalCommandsRetention>>(),
+            GetService<IAuditLogger>(),
+            GetService<IClock>());
     }
 
     [Fact]
@@ -56,6 +65,28 @@ public class RemoveInternalCommandsWhenADayHasPassedTests : TestBase
 
         // Assert
         AssertProcessedInternalCommandIsRemoved(amountOfNotProcessedInternalCommands);
+    }
+
+    [Fact]
+    public async Task Clean_up_internal_commands_execution_is_being_audit_logged()
+    {
+        // arrange
+        var outboxRepository = GetService<IOutboxRepository>();
+        var serializer = GetService<ISerializer>();
+        var amountOfProcessedInternalCommands = 2500;
+        var amountOfNotProcessedInternalCommands = 25;
+        await GenerateInternalCommands(amountOfProcessedInternalCommands, amountOfNotProcessedInternalCommands);
+
+        // Act
+        await _sut.CleanupAsync(CancellationToken.None);
+
+        // Assert
+        var outBoxMessageIds = await outboxRepository.GetUnprocessedOutboxMessageIdsAsync(1, CancellationToken.None);
+        var outBoxMessageId = outBoxMessageIds.Should().ContainSingle().Subject;
+        var outboxMessage = await outboxRepository.GetAsync(outBoxMessageId!, CancellationToken.None);
+        var payload = serializer.Deserialize<AuditLogOutboxMessageV1Payload>(outboxMessage.Payload);
+        payload.Origin.Should().Be(nameof(ADayHasPassed));
+        payload.AffectedEntityType.Should().Be(AuditLogEntityType.InternalCommand.Identifier);
     }
 
     protected override void Dispose(bool disposing)

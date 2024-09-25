@@ -32,4 +32,6 @@ public record AuditLogActivity(string Identifier)
 
     public static readonly AuditLogActivity Dequeue = new("Dequeue");
     public static readonly AuditLogActivity Peek = new("Peek");
+
+    public static readonly AuditLogActivity Retention = new("Retention");
 }

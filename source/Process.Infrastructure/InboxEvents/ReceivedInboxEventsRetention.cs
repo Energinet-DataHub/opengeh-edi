@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System.Data.Common;
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
@@ -26,15 +28,18 @@ public class ReceivedInboxEventsRetention : IDataRetention
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
     private readonly IClock _clock;
     private readonly ILogger<ReceivedInboxEventsRetention> _logger;
+    private readonly IAuditLogger _auditLogger;
 
     public ReceivedInboxEventsRetention(
         IDatabaseConnectionFactory databaseConnectionFactory,
         IClock clock,
-        ILogger<ReceivedInboxEventsRetention> logger)
+        ILogger<ReceivedInboxEventsRetention> logger,
+        IAuditLogger auditLogger)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
         _clock = clock;
         _logger = logger;
+        _auditLogger = auditLogger;
     }
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
@@ -78,6 +83,15 @@ public class ReceivedInboxEventsRetention : IDataRetention
 
             amountOfOldEvents = await GetAmountOfOldEventsAsync(monthAgo, cancellationToken).ConfigureAwait(false);
         }
+
+        await _auditLogger.LogWithCommitAsync(
+                logId: AuditLogId.New(),
+                activity: AuditLogActivity.Retention,
+                activityOrigin: nameof(ADayHasPassed),
+                activityPayload: _clock.GetCurrentInstant(),
+                affectedEntityType: AuditLogEntityType.ReceivedInboxEvent,
+                affectedEntityKey: null)
+            .ConfigureAwait(false);
     }
 
     private async Task<int> GetAmountOfOldEventsAsync(Instant monthAgo, CancellationToken cancellationToken)

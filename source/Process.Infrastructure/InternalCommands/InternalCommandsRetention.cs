@@ -13,10 +13,13 @@
 // limitations under the License.
 
 using System.Data.Common;
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 
@@ -24,13 +27,19 @@ public class InternalCommandsRetention : IDataRetention
 {
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
     private readonly ILogger<InternalCommandsRetention> _logger;
+    private readonly IAuditLogger _auditLogger;
+    private readonly IClock _clock;
 
     public InternalCommandsRetention(
         IDatabaseConnectionFactory databaseConnectionFactory,
-        ILogger<InternalCommandsRetention> logger)
+        ILogger<InternalCommandsRetention> logger,
+        IAuditLogger auditLogger,
+        IClock clock)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
         _logger = logger;
+        _auditLogger = auditLogger;
+        _clock = clock;
     }
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
@@ -70,6 +79,15 @@ public class InternalCommandsRetention : IDataRetention
 
             amountOfOldEvents = await GetAmountOfRemainingCommandsAsync(cancellationToken).ConfigureAwait(false);
         }
+
+        await _auditLogger.LogWithCommitAsync(
+                logId: AuditLogId.New(),
+                activity: AuditLogActivity.Retention,
+                activityOrigin: nameof(ADayHasPassed),
+                activityPayload: _clock.GetCurrentInstant(),
+                affectedEntityType: AuditLogEntityType.InternalCommand,
+                affectedEntityKey: null)
+            .ConfigureAwait(false);
     }
 
     private async Task<int> GetAmountOfRemainingCommandsAsync(CancellationToken cancellationToken)

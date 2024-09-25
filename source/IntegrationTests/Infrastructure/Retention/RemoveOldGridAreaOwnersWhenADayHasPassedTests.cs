@@ -12,13 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using BuildingBlocks.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.Outbox.Domain;
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
+using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
+using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
+using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
@@ -57,17 +64,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 
         await AddActorsToDatabaseAsync(new List<GridAreaOwnershipAssignedDto> { gridAreaOwner1, gridAreaOwner2 });
 
-        var config = new ConfigurationBuilder()
-            .AddEnvironmentVariables()
-            .Build();
-
-        var scopedServiceCollection = new ServiceCollection();
-        scopedServiceCollection.AddMasterDataModule(config);
-        scopedServiceCollection.AddScoped<IClock>(
-            _ => new ClockStub(Instant.FromUtc(2023, 11, 3, 0, 0, 0)));
-
-        var sut = scopedServiceCollection.BuildServiceProvider().GetService<IDataRetention>()
-                  ?? throw new ArgumentNullException();
+        var sut = GetService<IDataRetention>();
 
         // Act
         await sut.CleanupAsync(CancellationToken.None);
@@ -98,17 +95,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 
         await AddActorsToDatabaseAsync(new List<GridAreaOwnershipAssignedDto> { gridAreaOwner1, gridAreaOwner2 });
 
-        var config = new ConfigurationBuilder()
-            .AddEnvironmentVariables()
-            .Build();
-
-        var scopedServiceCollection = new ServiceCollection();
-        scopedServiceCollection.AddMasterDataModule(config);
-        scopedServiceCollection.AddScoped<IClock>(
-            _ => new ClockStub(Instant.FromUtc(2023, 11, 3, 0, 0, 0)));
-
-        var sut = scopedServiceCollection.BuildServiceProvider().GetService<IDataRetention>()
-                  ?? throw new ArgumentNullException();
+        var sut = GetService<IDataRetention>();
 
         // Act
         await sut.CleanupAsync(CancellationToken.None);
@@ -152,17 +139,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 
         await AddActorsToDatabaseAsync(new List<GridAreaOwnershipAssignedDto> { gridAreaOwner3, gridAreaOwner4 });
 
-        var config = new ConfigurationBuilder()
-            .AddEnvironmentVariables()
-            .Build();
-
-        var scopedServiceCollection = new ServiceCollection();
-        scopedServiceCollection.AddMasterDataModule(config);
-        scopedServiceCollection.AddScoped<IClock>(
-            _ => new ClockStub(Instant.FromUtc(2023, 11, 3, 0, 0, 0)));
-
-        var sut = scopedServiceCollection.BuildServiceProvider().GetService<IDataRetention>()
-                  ?? throw new ArgumentNullException();
+        var sut = GetService<IDataRetention>();
 
         // Act
         await sut.CleanupAsync(CancellationToken.None);
@@ -170,6 +147,35 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
         // Assert
         Assert.NotNull(await GetGridAreaOwnersForGridArea(gridAreaCode1));
         Assert.NotNull(await GetGridAreaOwnersForGridArea(gridAreaCode2));
+    }
+
+    [Fact]
+    public async Task Clean_up_grid_area_owners_is_being_audit_logged()
+    {
+        // Arrange
+        var outboxRepository = GetService<IOutboxRepository>();
+        var serializer = GetService<ISerializer>();
+        var gridAreaCode = "303";
+        var gridAreaOwner = new GridAreaOwnershipAssignedDto(
+            gridAreaCode,
+            Instant.FromUtc(2023, 10, 1, 0, 0, 0),
+            ActorNumber.Create("1234567890123"),
+            1);
+
+        await AddActorsToDatabaseAsync(new List<GridAreaOwnershipAssignedDto> { gridAreaOwner });
+
+        var sut = GetService<IDataRetention>();
+
+        // Act
+        await sut.CleanupAsync(CancellationToken.None);
+
+        // Assert
+        var outBoxMessageIds = await outboxRepository.GetUnprocessedOutboxMessageIdsAsync(1, CancellationToken.None);
+        var outBoxMessageId = outBoxMessageIds.Should().ContainSingle().Subject;
+        var outboxMessage = await outboxRepository.GetAsync(outBoxMessageId!, CancellationToken.None);
+        var payload = serializer.Deserialize<AuditLogOutboxMessageV1Payload>(outboxMessage.Payload);
+        payload.Origin.Should().Be(nameof(ADayHasPassed));
+        payload.AffectedEntityType.Should().Be(AuditLogEntityType.GridAreaOwner.Identifier);
     }
 
     private async Task AddActorsToDatabaseAsync(List<GridAreaOwnershipAssignedDto> gridAreaOwners)

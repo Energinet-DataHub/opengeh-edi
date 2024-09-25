@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
@@ -30,6 +32,7 @@ public class DequeuedBundlesRetention : IDataRetention
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
     private readonly IBundleRepository _bundleRepository;
     private readonly ILogger<DequeuedBundlesRetention> _logger;
+    private readonly IAuditLogger _auditLogger;
 
     public DequeuedBundlesRetention(
         IClock clock,
@@ -37,7 +40,8 @@ public class DequeuedBundlesRetention : IDataRetention
         IOutgoingMessageRepository outgoingMessageRepository,
         ActorMessageQueueContext actorMessageQueueContext,
         IBundleRepository bundleRepository,
-        ILogger<DequeuedBundlesRetention> logger)
+        ILogger<DequeuedBundlesRetention> logger,
+        IAuditLogger auditLogger)
     {
         _clock = clock;
         _marketDocumentRepository = marketDocumentRepository;
@@ -45,6 +49,7 @@ public class DequeuedBundlesRetention : IDataRetention
         _actorMessageQueueContext = actorMessageQueueContext;
         _bundleRepository = bundleRepository;
         _logger = logger;
+        _auditLogger = auditLogger;
     }
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
@@ -77,6 +82,15 @@ public class DequeuedBundlesRetention : IDataRetention
                 _bundleRepository.Delete(dequeuedBundles);
 
                 await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+                await _auditLogger.LogWithCommitAsync(
+                        logId: AuditLogId.New(),
+                        activity: AuditLogActivity.Retention,
+                        activityOrigin: nameof(ADayHasPassed),
+                        activityPayload: monthAgo,
+                        affectedEntityType: AuditLogEntityType.Bundle,
+                        affectedEntityKey: null)
+                    .ConfigureAwait(false);
             }
             catch (Exception e)
             {
