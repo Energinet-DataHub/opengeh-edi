@@ -170,4 +170,8 @@ limitations under the License.
       </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Infrastructure\IntegrationEvents\" />
+    </ItemGroup>
+
 </Project>

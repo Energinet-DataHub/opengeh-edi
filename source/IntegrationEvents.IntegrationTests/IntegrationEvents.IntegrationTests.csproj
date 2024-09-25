@@ -22,12 +22,15 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="2.13.6" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\ApplyDBMigrationsApp\ApplyDBMigrationsApp.csproj" />
         <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
         <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+        <ProjectReference Include="..\Contracts\Contracts.csproj" />
         <ProjectReference Include="..\IntegrationEvents.Application\IntegrationEvents.Application.csproj" />
+        <ProjectReference Include="..\IntegrationTests\IntegrationTests.csproj" />
     </ItemGroup>
 </Project>

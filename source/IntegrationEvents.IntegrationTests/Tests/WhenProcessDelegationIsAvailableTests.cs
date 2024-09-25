@@ -12,30 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.IntegrationTests.Factories;
-using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Builders;
+using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.IntegrationEvents;
+namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Tests;
 
-public class WhenProcessDelegationIsAvailableTests : TestBase
+[Collection(nameof(IntegrationEventsIntegrationTestCollectionFixture))]
+public class WhenProcessDelegationIsAvailableTests : IntegrationEventsTestBase
 {
-    private readonly IDatabaseConnectionFactory _connectionFactory;
-
-    public WhenProcessDelegationIsAvailableTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+    public WhenProcessDelegationIsAvailableTests(IntegrationEventsFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
-        _connectionFactory = GetService<IDatabaseConnectionFactory>();
+        SetupServiceCollection();
     }
 
     [Fact]
@@ -52,16 +48,17 @@ public class WhenProcessDelegationIsAvailableTests : TestBase
 
     private async Task HavingReceivedAndHandledIntegrationEventAsync(string eventType, ProcessDelegationConfigured processDelegationConfigured)
     {
-        var integrationEventHandler = GetService<IIntegrationEventHandler>();
+        var integrationEventHandler = Services.GetService<IIntegrationEventHandler>();
 
         var integrationEvent = new IntegrationEvent(Guid.NewGuid(), eventType, 1, processDelegationConfigured);
 
-        await integrationEventHandler.HandleAsync(integrationEvent).ConfigureAwait(false);
+        await integrationEventHandler!.HandleAsync(integrationEvent).ConfigureAwait(false);
     }
 
     private async Task<IEnumerable<Guid>> GetProcessDelegationIds(string delegatedToActorNumber)
     {
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
+        var connectionFactory = Services.GetService<IDatabaseConnectionFactory>();
+        using var connection = await connectionFactory!.GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = $@"SELECT [Id] FROM [dbo].[ProcessDelegation] WHERE DelegatedToActorNumber = '{delegatedToActorNumber}'";
         return await connection.QueryAsync<Guid>(sql);
     }
