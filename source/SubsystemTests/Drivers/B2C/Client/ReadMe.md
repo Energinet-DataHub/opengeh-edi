@@ -9,7 +9,7 @@
 
 1. Run B2CWebApi.
 2. Copy the content of the swagger.json (from Swagger website) to the local swagger.json file.
-3. Rebuild the AcceptanceTests project.
+3. Rebuild the SubsystemTests project.
 4. Manually re-add the license header to the B2CEdiClient.cs file.
 
 The B2CEdiClient.cs file will be updated in step 3.
@@ -21,7 +21,7 @@ Simply go to the nswag.json file and change the url to the swagger.json file you
 
 # How is the nswag.json file run to generate the client code
 
-In the AcceptanceTests.csproj file there is a target that runs the nswag.json file. Look for the element `<Target Name="NSwag" ...>`.
+In the SubsystemTests.csproj file there is a target that runs the nswag.json file. Look for the element `<Target Name="NSwag" ...>`.
 
 # Breaking changes to the client code
 

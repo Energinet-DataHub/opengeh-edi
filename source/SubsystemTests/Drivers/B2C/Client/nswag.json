@@ -10,7 +10,7 @@
   },
   "codeGenerators": {
     "openApiToCSharpClient": {
-      "namespace": "Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C.Client",
+      "namespace": "Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client",
       "className": "{controller}B2CEdiClient",
       "output": "B2CEdiClient.cs",
       "generateOptionalParameters": true,

@@ -406,4 +406,4 @@ src/streaming/geh_stream.egg-info/
 build/terraform/**/*.tfvars
 
 # Include certificate used for ebIX acceptance tests
-!source/AcceptanceTests/Drivers/Ebix/DH3-test-mosaik-1-private-and-public.pfx
+!source/SubsystemTests/Drivers/Ebix/DH3-test-mosaik-1-private-and-public.pfx
