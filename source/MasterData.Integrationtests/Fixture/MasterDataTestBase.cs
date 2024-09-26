@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
@@ -55,6 +56,7 @@ public class MasterDataTestBase
 
         services
             .AddNodaTimeForApplication()
+            .AddBuildingBlocks(configuration)
             .AddMasterDataModule(configuration);
 
         services.AddScoped<IConfiguration>(_ => configuration);
@@ -92,15 +94,15 @@ public class MasterDataTestBase
                  $"DELETE FROM [dbo].[WholesaleServicesProcessGridAreas]" +
                  $"DELETE FROM [dbo].[WholesaleServicesProcesses]" +
                  $"DELETE FROM [dbo].[ProcessDelegation]";
-     
-        using var connection = new SqlConnection(_masterDataFixture.DatabaseManager.ConnectionString);
-        connection.Open();
 
-        using (var command = new SqlCommand(cleanupStatement, connection))
-        {
-            command.ExecuteNonQuery();
-        }
+     using var connection = new SqlConnection(_masterDataFixture.DatabaseManager.ConnectionString);
+     connection.Open();
 
-        connection.Close();
+     using (var command = new SqlCommand(cleanupStatement, connection))
+     {
+         command.ExecuteNonQuery();
+     }
+
+     connection.Close();
     }
 }

@@ -16,7 +16,7 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture;
 
-[CollectionDefinition("MasterData.IntegrationTests")]
+[CollectionDefinition(nameof(MasterDataTestCollectionFixture))]
 public class MasterDataTestCollectionFixture : ICollectionFixture<MasterDataFixture>
 {
     // This class has no code, and is never created. Its purpose is simply

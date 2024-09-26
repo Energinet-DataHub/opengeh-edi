@@ -12,33 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.Application.Actors;
+using Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.Actors;
+namespace Energinet.DataHub.EDI.MasterData.IntegrationTests.Tests.Actors;
 
-public class CreateActorsTests : TestBase
+[Collection(nameof(MasterDataTestCollectionFixture))]
+public class CreateActorsTests : MasterDataTestBase
 {
-    private readonly IMasterDataClient _masterDataClient;
-    private readonly IDatabaseConnectionFactory _connectionFactory;
+    [NotNull]
+    private readonly IMasterDataClient? _masterDataClient;
+    [NotNull]
+    private readonly IDatabaseConnectionFactory? _connectionFactory;
 
-    public CreateActorsTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
-        : base(integrationTestFixture, testOutputHelper)
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    public CreateActorsTests(MasterDataFixture masterDataFixture, ITestOutputHelper testOutputHelper)
+        : base(masterDataFixture, testOutputHelper)
     {
-        _masterDataClient = GetService<IMasterDataClient>();
-        _connectionFactory = GetService<IDatabaseConnectionFactory>();
+        SetupServiceCollection();
+        _masterDataClient = Services.GetService<IMasterDataClient>();
+        _connectionFactory = Services.GetService<IDatabaseConnectionFactory>();
     }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
     [Fact]
     public async Task Actor_is_created()
