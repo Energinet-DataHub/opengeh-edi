@@ -72,6 +72,15 @@ public class OutboxRetention(
                 await _outboxContext.SaveChangesAsync(cancellationToken)
                     .ConfigureAwait(false);
 
+                await _auditLogger.LogWithCommitAsync(
+                        logId: AuditLogId.New(),
+                        activity: AuditLogActivity.Retention,
+                        activityOrigin: nameof(ADayHasPassed),
+                        activityPayload: (OlderThan: oneWeekAgo, DeletedAmount: messagesToDelete.Count),
+                        affectedEntityType: AuditLogEntityType.OutboxMessage,
+                        affectedEntityKey: null)
+                    .ConfigureAwait(false);
+
                 skip += messagesToDelete.Count;
             }
             catch (Exception e)
@@ -83,14 +92,5 @@ public class OutboxRetention(
                     skip);
             }
         }
-
-        await _auditLogger.LogWithCommitAsync(
-                logId: AuditLogId.New(),
-                activity: AuditLogActivity.Retention,
-                activityOrigin: nameof(ADayHasPassed),
-                activityPayload: _clock.GetCurrentInstant(),
-                affectedEntityType: AuditLogEntityType.OutboxMessage,
-                affectedEntityKey: null)
-            .ConfigureAwait(false);
     }
 }

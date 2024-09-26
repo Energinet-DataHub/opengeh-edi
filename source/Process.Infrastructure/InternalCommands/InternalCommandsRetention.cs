@@ -47,44 +47,51 @@ public class InternalCommandsRetention : IDataRetention
         var amountOfOldEvents = await GetAmountOfRemainingCommandsAsync(cancellationToken).ConfigureAwait(false);
         while (amountOfOldEvents > 0)
         {
-            const string deleteStmt = @"
-                WITH CTE AS
-                 (
-                     SELECT TOP 500 *
-                     FROM [dbo].[QueuedInternalCommands]
-                      WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL
-                 )
-                DELETE FROM CTE;";
-
-            using var connection =
-                (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-            using var transaction =
-                (SqlTransaction)await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
-            using var command = connection.CreateCommand();
-            command.Transaction = transaction;
-            command.CommandText = deleteStmt;
-
-            try
-            {
-                var numberDeletedRecords = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
-                await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-                _logger.LogInformation("Successfully deleted {NumberDeletedQueuedInternalCommand} of old commands", numberDeletedRecords);
-            }
-            catch (DbException)
-            {
-                // Add exception logging
-                await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-                throw; // re-throw exception
-            }
-
+            var numberDeletedRecords = await DeleteOldCommandsAsync(cancellationToken).ConfigureAwait(false);
+            await LogAuditAsync(numberDeletedRecords).ConfigureAwait(false);
             amountOfOldEvents = await GetAmountOfRemainingCommandsAsync(cancellationToken).ConfigureAwait(false);
         }
+    }
 
+    private async Task<int> DeleteOldCommandsAsync(CancellationToken cancellationToken)
+    {
+        const string deleteStmt = @"
+            WITH CTE AS
+             (
+                 SELECT TOP 500 *
+                 FROM [dbo].[QueuedInternalCommands]
+                  WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL
+             )
+            DELETE FROM CTE;";
+
+        using var connection = (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
+        using var transaction = (SqlTransaction)await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = deleteStmt;
+
+        try
+        {
+            var numberDeletedRecords = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+            _logger.LogInformation("Successfully deleted {NumberDeletedQueuedInternalCommand} of old commands", numberDeletedRecords);
+            return numberDeletedRecords;
+        }
+        catch (DbException e)
+        {
+            _logger.LogError(e, "Failed to delete old commands: {ErrorMessage}", e.Message);
+            await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
+            throw;
+        }
+    }
+
+    private async Task LogAuditAsync(int deletedAmount)
+    {
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
                 activity: AuditLogActivity.Retention,
                 activityOrigin: nameof(ADayHasPassed),
-                activityPayload: _clock.GetCurrentInstant(),
+                activityPayload: (OlderThan: _clock.GetCurrentInstant(), DeletedAmount: deletedAmount),
                 affectedEntityType: AuditLogEntityType.InternalCommand,
                 affectedEntityKey: null)
             .ConfigureAwait(false);
@@ -95,9 +102,7 @@ public class InternalCommandsRetention : IDataRetention
         const string selectStmt = @"SELECT Count(*) FROM [dbo].[QueuedInternalCommands]
                     WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL";
 
-        using var connection =
-            (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
-                .ConfigureAwait(false);
+        using var connection = (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         using var command = connection.CreateCommand();
         command.CommandText = selectStmt;
 
@@ -110,7 +115,7 @@ public class InternalCommandsRetention : IDataRetention
         catch (DbException e)
         {
             _logger.LogError(e, "Failed to get number of old integration events: {ErrorMessage}", e.Message);
-            throw; // re-throw exception
+            throw;
         }
     }
 }

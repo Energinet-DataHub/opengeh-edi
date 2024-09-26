@@ -87,7 +87,7 @@ public class DequeuedBundlesRetention : IDataRetention
                         logId: AuditLogId.New(),
                         activity: AuditLogActivity.Retention,
                         activityOrigin: nameof(ADayHasPassed),
-                        activityPayload: monthAgo,
+                        activityPayload: (OlderThan: monthAgo, DeletedAmount: dequeuedBundles.Count),
                         affectedEntityType: AuditLogEntityType.Bundle,
                         affectedEntityKey: null)
                     .ConfigureAwait(false);
