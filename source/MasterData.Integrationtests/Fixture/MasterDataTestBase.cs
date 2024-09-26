@@ -48,8 +48,6 @@ public class MasterDataTestBase
         {
             ["DB_CONNECTION_STRING"] = _masterDataFixture.DatabaseManager.ConnectionString,
             [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
-            [$"{BlobDeadLetterLoggerOptions.SectionName}:{nameof(BlobDeadLetterLoggerOptions.StorageAccountUrl)}"] = "https://fakeurl.com",
-            [$"{BlobDeadLetterLoggerOptions.SectionName}:{nameof(BlobDeadLetterLoggerOptions.ContainerName)}"] = "fake-container-name",
         });
 
         var services = new ServiceCollection();
