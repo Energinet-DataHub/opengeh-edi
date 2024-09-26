@@ -45,13 +45,13 @@ public class ReceivedInboxEventsRetention : IDataRetention
     public async Task CleanupAsync(CancellationToken cancellationToken)
     {
         var monthAgo = _clock.GetCurrentInstant().Plus(-Duration.FromDays(30));
-        var anyOfOldEvents = await GetAnyOldEventsAsync(monthAgo, cancellationToken).ConfigureAwait(false);
-        while (anyOfOldEvents)
+        var anyEventsFromAMonthAgo = await AnyEventsOlderThanAsync(monthAgo, cancellationToken).ConfigureAwait(false);
+        while (anyEventsFromAMonthAgo)
         {
             var numberDeletedRecords = await DeleteOldEventsAsync(monthAgo, cancellationToken).ConfigureAwait(false);
             await LogAuditAsync(monthAgo, numberDeletedRecords).ConfigureAwait(false);
 
-            anyOfOldEvents = await GetAnyOldEventsAsync(monthAgo, cancellationToken).ConfigureAwait(false);
+            anyEventsFromAMonthAgo = await AnyEventsOlderThanAsync(monthAgo, cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -100,7 +100,7 @@ public class ReceivedInboxEventsRetention : IDataRetention
             .ConfigureAwait(false);
     }
 
-    private async Task<bool> GetAnyOldEventsAsync(Instant monthAgo, CancellationToken cancellationToken)
+    private async Task<bool> AnyEventsOlderThanAsync(Instant monthAgo, CancellationToken cancellationToken)
     {
         const string selectStmt = @"SELECT CASE WHEN EXISTS (
             SELECT 1 FROM [dbo].[ReceivedInboxEvents]
