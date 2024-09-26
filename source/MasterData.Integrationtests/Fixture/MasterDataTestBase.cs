@@ -73,38 +73,6 @@ public class MasterDataTestBase
 
     public void CleanupDatabase()
     {
-     var cleanupStatement =
-                 $"DELETE FROM [dbo].[MessageRegistry] " +
-                 $"DELETE FROM [dbo].[TransactionRegistry]" +
-                 $"DELETE FROM [dbo].[OutgoingMessages] " +
-                 $"DELETE FROM [dbo].[QueuedInternalCommands] " +
-                 $"DELETE FROM [dbo].[MarketEvaluationPoints]" +
-                 $"DELETE FROM [dbo].[Actor]" +
-                 $"DELETE FROM [dbo].[ReceivedIntegrationEvents]" +
-                 $"DELETE FROM [dbo].[AggregatedMeasureDataProcessGridAreas]" +
-                 $"DELETE FROM [dbo].[AggregatedMeasureDataProcesses]" +
-                 $"DELETE FROM [dbo].[ArchivedMessages]" +
-                 $"DELETE FROM [dbo].[MarketDocuments]" +
-                 $"DELETE FROM [dbo].[Bundles]" +
-                 $"DELETE FROM [dbo].[ActorMessageQueues]" +
-                 $"DELETE FROM [dbo].[ReceivedInboxEvents]" +
-                 $"DELETE FROM [dbo].[MessageRegistry]" +
-                 $"DELETE FROM [dbo].[TransactionRegistry]" +
-                 $"DELETE FROM [dbo].[GridAreaOwner]" +
-                 $"DELETE FROM [dbo].[ActorCertificate]" +
-                 $"DELETE FROM [dbo].[WholesaleServicesProcessChargeTypes]" +
-                 $"DELETE FROM [dbo].[WholesaleServicesProcessGridAreas]" +
-                 $"DELETE FROM [dbo].[WholesaleServicesProcesses]" +
-                 $"DELETE FROM [dbo].[ProcessDelegation]";
-
-     using var connection = new SqlConnection(_masterDataFixture.DatabaseManager.ConnectionString);
-     connection.Open();
-
-     using (var command = new SqlCommand(cleanupStatement, connection))
-     {
-         command.ExecuteNonQuery();
-     }
-
-     connection.Close();
+        _masterDataFixture.DatabaseManager.CleanupDatabase();
     }
 }

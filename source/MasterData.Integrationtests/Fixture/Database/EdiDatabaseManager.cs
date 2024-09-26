@@ -19,7 +19,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture.Database;
 
-//TODO: We have this manager defined in 4 separate files. Consider moving them.
+//TODO: We have this manager defined in 5 separate files. Consider moving them.
 public class EdiDatabaseManager : SqlServerDatabaseManager<DbContext>
 {
     public EdiDatabaseManager()
