@@ -15,6 +15,7 @@
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
+using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Microsoft.Data.SqlClient;
@@ -57,6 +58,7 @@ public class MasterDataTestBase
         services
             .AddNodaTimeForApplication()
             .AddBuildingBlocks(configuration)
+            .AddDapperConnectionToDatabase(configuration)
             .AddMasterDataModule(configuration);
 
         services.AddScoped<IConfiguration>(_ => configuration);
