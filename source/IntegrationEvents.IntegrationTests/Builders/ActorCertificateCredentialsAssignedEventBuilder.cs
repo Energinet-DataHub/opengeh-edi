@@ -17,13 +17,13 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
+namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Builders;
 
-internal sealed class ActorCertificateCredentialsRemovedEventBuilder
+internal sealed class ActorCertificateCredentialsAssignedEventBuilder
 {
     internal ActorNumber ActorNumber { get; private set; } = ActorNumber.Create("1234567890123");
 
-    internal EicFunction ActorRole { get; }
+    internal EicFunction ActorRole { get; private set; } = EicFunction.EnergySupplier;
 
     internal string CertificateThumbprint { get; private set; } = "12345";
 
@@ -31,9 +31,9 @@ internal sealed class ActorCertificateCredentialsRemovedEventBuilder
 
     internal int SequenceNumber { get; private set; } = 1;
 
-    internal ActorCertificateCredentialsRemoved Build()
+    internal ActorCertificateCredentialsAssigned Build()
     {
-        return new ActorCertificateCredentialsRemoved()
+        return new ActorCertificateCredentialsAssigned()
         {
             ActorNumber = ActorNumber.Value,
             ActorRole = ActorRole,
@@ -43,15 +43,33 @@ internal sealed class ActorCertificateCredentialsRemovedEventBuilder
         };
     }
 
-    internal ActorCertificateCredentialsRemovedEventBuilder SetActorNumber(string actorNumber)
+    internal ActorCertificateCredentialsAssignedEventBuilder SetActorNumber(string actorNumber)
     {
         ActorNumber = ActorNumber.Create(actorNumber);
         return this;
     }
 
-    internal ActorCertificateCredentialsRemovedEventBuilder SetCertificateThumbprint(string thumbprint)
+    internal ActorCertificateCredentialsAssignedEventBuilder SetActorRole(EicFunction actorRole)
+    {
+        ActorRole = actorRole;
+        return this;
+    }
+
+    internal ActorCertificateCredentialsAssignedEventBuilder SetCertificateThumbprint(string thumbprint)
     {
         CertificateThumbprint = thumbprint;
+        return this;
+    }
+
+    internal ActorCertificateCredentialsAssignedEventBuilder SetValidFrom(Instant validFrom)
+    {
+        ValidFrom = validFrom;
+        return this;
+    }
+
+    internal ActorCertificateCredentialsAssignedEventBuilder SetSequenceNumber(int sequenceNumber)
+    {
+        SequenceNumber = sequenceNumber;
         return this;
     }
 }

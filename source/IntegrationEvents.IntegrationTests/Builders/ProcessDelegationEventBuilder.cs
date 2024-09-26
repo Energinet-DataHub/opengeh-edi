@@ -18,7 +18,7 @@ using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using DelegatedProcess = Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts.DelegatedProcess;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
+namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Builders;
 
 internal static class ProcessDelegationEventBuilder
 {
