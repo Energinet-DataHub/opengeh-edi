@@ -1,0 +1,125 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+        <AssemblyName>Energinet.DataHub.EDI.SubsystemTests</AssemblyName>
+        <RootNamespace>Energinet.DataHub.EDI.SubsystemTests</RootNamespace>
+    </PropertyGroup>
+
+    <!-- Build EDI B2C Client using nswag (the same client the BFF uses) -->
+    <Target Name="NSwag" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' == 'Debug' ">
+        <PropertyGroup>
+            <SwaggerConfiguration>Drivers\B2C\Client\swagger.json</SwaggerConfiguration>
+            <B2CEdiClient>Drivers\B2C\Client\B2CEdiClient.cs</B2CEdiClient>
+        </PropertyGroup>
+
+        <PropertyGroup>
+            <!-- True if the swagger.json file was updated after the generated client -->
+            <SwaggerConfigurationIsNewer>$([MSBuild]::Subtract($([System.IO.File]::GetLastWriteTime('$(SwaggerConfiguration)').Ticks), $([System.IO.File]::GetLastWriteTime('$(B2CEdiClient)').Ticks)))</SwaggerConfigurationIsNewer>
+        </PropertyGroup>
+
+        <Exec WorkingDirectory="$(ProjectDir)" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net60) run Drivers/B2C/Client/nswag.json /variables:Configuration=$(Configuration)" Condition="$(SwaggerConfigurationIsNewer) &gt; 0" />
+    </Target>
+    
+    <ItemGroup>
+      <None Remove="Messages\json\RequestAggregatedMeasureDataBalanceResponsible.json" />
+      <None Remove="Messages\json\RequestAggregatedMeasureDataBalanceResponsibleWithBadPeriod.json" />
+      <None Remove="Messages\json\RequestAggregatedMeasureDataBalanceResponsibleWithInvalidSchema.json" />
+      <None Update="Drivers\Ebix\DH3-test-mosaik-1-private-and-public.pfx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Drivers\Ebix\DH3-test-mosaik-energysupplier-private-and-public.pfx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="subsystemtests.dev002.settings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.1" />
+        <PackageReference Include="Dapper" Version="2.1.35" />
+        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="6.3.0" />
+        <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="10.0.0" />
+        <PackageReference Include="FluentAssertions" Version="6.12.1" />
+        <PackageReference Include="FluentAssertions.Analyzers" Version="0.33.0">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="NodaTime" Version="3.1.12" />
+        <PackageReference Include="NSwag.MSBuild" Version="14.1.0">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="System.ServiceModel.Http" Version="8.0.0" />
+        <PackageReference Include="System.ServiceModel.Primitives" Version="8.0.0" />
+        <PackageReference Include="xunit" Version="2.9.0" />
+        <PackageReference Include="xunit.categories" Version="2.0.8" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="coverlet.collector" Version="6.0.2">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="functionapphost.settings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\B2BApi.AppTests\B2BApi.AppTests.csproj" />
+      <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+      <ProjectReference Include="..\Contracts\Contracts.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataBalanceResponsibleWithBadPeriod.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataBalanceResponsible.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataWithBadPeriod.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureData.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataWithSyncError.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Messages\json\RequestWholesaleSettlement.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <None Remove="Messages\xml\RequestWholesaleSettlement.xml" />
+      <EmbeddedResource Include="Messages\json\RequestWholesaleSettlementWithSyncError.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Messages\json\RequestWholesaleSettlementWithWrongDateFormat.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Messages\xml\RequestWholesaleSettlementWithBadPeriod.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+    </ItemGroup>
+
+</Project>
