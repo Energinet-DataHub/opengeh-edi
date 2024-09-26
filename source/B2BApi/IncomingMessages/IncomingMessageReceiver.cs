@@ -103,7 +103,7 @@ public class IncomingMessageReceiver
         ResponseMessage responseMessage)
     {
         var response = request.CreateResponse(statusCode);
-        response.Headers.Add("Content-Type", $"{contentType}");
+        response.Headers.Add("Content-Type", $"{contentType}; charset=utf-8");
         await response.WriteStringAsync(responseMessage.MessageBody, Encoding.UTF8).ConfigureAwait(false);
 
         return response;
