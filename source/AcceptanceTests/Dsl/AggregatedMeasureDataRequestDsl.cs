@@ -14,8 +14,10 @@
 
 using System.Xml;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C;
 using Energinet.DataHub.EDI.AcceptanceTests.Exceptions;
 using FluentAssertions;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
@@ -24,15 +26,18 @@ public sealed class AggregatedMeasureDataRequestDsl
     private readonly EdiDriver _ediDriver;
     private readonly EdiDatabaseDriver _ediDatabaseDriver;
     private readonly WholesaleDriver _wholesaleDriver;
+    private readonly B2CEdiDriver _b2cEdiDriver;
 
 #pragma warning disable VSTHRD200 // Since this is a DSL we don't want to suffix tasks with 'Async' since it is not part of the ubiquitous language
 
     internal AggregatedMeasureDataRequestDsl(
         EdiDriver ediDriver,
+        B2CEdiDriver b2cEdiDriver,
         EdiDatabaseDriver ediDatabaseDriver,
         WholesaleDriver wholesaleDriver)
     {
         _ediDriver = ediDriver;
+        _b2cEdiDriver = b2cEdiDriver;
         _ediDatabaseDriver = ediDatabaseDriver;
         _wholesaleDriver = wholesaleDriver;
     }
@@ -48,6 +53,12 @@ public sealed class AggregatedMeasureDataRequestDsl
         return await _ediDriver
                 .RequestAggregatedMeasureDataAsync(false, cancellationToken)
                 .ConfigureAwait(false);
+    }
+
+    internal Task B2CRequest(CancellationToken cancellationToken)
+    {
+        return _b2cEdiDriver
+            .RequestAggregatedMeasureDataAsync(cancellationToken);
     }
 
     internal async Task ConfirmInvalidRequestIsRejected(CancellationToken cancellationToken = default)
@@ -71,7 +82,18 @@ public sealed class AggregatedMeasureDataRequestDsl
             .GetAggregatedMeasureDataProcessIdAsync(requestMessageId, cancellationToken)
             .ConfigureAwait(false);
 
-        processId.Should().NotBeNull();
+        processId.Should().NotBeNull("because the aggregated measure data process should be initialized");
+    }
+
+    internal async Task ConfirmRequestIsInitialized(
+        Instant createdAfter,
+        string requestedByActorNumber)
+    {
+        var processId = await _ediDatabaseDriver
+            .GetAggregatedMeasureDataProcessIdAsync(createdAfter, requestedByActorNumber, CancellationToken.None)
+            .ConfigureAwait(false);
+
+        processId.Should().NotBeNull("because the aggregated measure data process should be initialized");
     }
 
     internal async Task PublishAggregatedMeasureDataRequestAcceptedResponse(
