@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture.Database;
 using Xunit;
 
@@ -22,14 +21,11 @@ public class IntegrationEventsFixture : IDisposable, IAsyncLifetime
 {
     private bool _disposed;
 
-    public AzuriteManager AzuriteManager { get; } = new(true);
-
     public EdiDatabaseManager DatabaseManager { get; set; } = new();
 
     public async Task InitializeAsync()
     {
         await DatabaseManager.CreateDatabaseAsync();
-        AzuriteManager.StartAzurite();
     }
 
     public async Task DisposeAsync()
@@ -54,7 +50,6 @@ public class IntegrationEventsFixture : IDisposable, IAsyncLifetime
         if (disposing)
         {
             DatabaseManager.DeleteDatabase();
-            AzuriteManager.Dispose();
         }
 
         _disposed = true;
