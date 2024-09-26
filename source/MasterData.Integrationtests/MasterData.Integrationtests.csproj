@@ -28,6 +28,7 @@
         <ProjectReference Include="..\ApplyDBMigrationsApp\ApplyDBMigrationsApp.csproj" />
         <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
         <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+        <ProjectReference Include="..\IntegrationTests\IntegrationTests.csproj" />
         <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
     </ItemGroup>
 

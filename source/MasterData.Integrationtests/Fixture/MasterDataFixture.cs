@@ -35,71 +35,15 @@ public class MasterDataFixture : IDisposable, IAsyncLifetime
 
     public ServiceProvider ServiceProvider { get; private set; } = null!;
 
-    protected AuthenticatedActor AuthenticatedActor { get; set; } = null!;
-
     public void CleanupDatabase()
     {
         DatabaseManager.CleanupDatabase();
-    }
-
-    public void CleanupFileStorage(bool disposing = false)
-    {
-        var blobServiceClient = new BlobServiceClient(AzuriteManager.BlobStorageConnectionString);
-
-        var containers = blobServiceClient.GetBlobContainers();
-
-        foreach (var containerToDelete in containers)
-            blobServiceClient.DeleteBlobContainer(containerToDelete.Name);
-
-        if (disposing)
-        {
-            // Cleanup actual Azurite "database" files
-            if (Directory.Exists("__blobstorage__"))
-                Directory.Delete("__blobstorage__", true);
-
-            if (Directory.Exists("__queuestorage__"))
-                Directory.Delete("__queuestorage__", true);
-
-            if (Directory.Exists("__tablestorage__"))
-                Directory.Delete("__tablestorage__", true);
-
-            if (File.Exists("__azurite_db_blob__.json"))
-                File.Delete("__azurite_db_blob__.json");
-
-            if (File.Exists("__azurite_db_blob_extent__.json"))
-                File.Delete("__azurite_db_blob_extent__.json");
-
-            if (File.Exists("__azurite_db_queue__.json"))
-                File.Delete("__azurite_db_queue__.json");
-
-            if (File.Exists("__azurite_db_queue_extent__.json"))
-                File.Delete("__azurite_db_queue_extent__.json");
-
-            if (File.Exists("__azurite_db_table__.json"))
-                File.Delete("__azurite_db_table__.json");
-
-            if (File.Exists("__azurite_db_table_extent__.json"))
-                File.Delete("__azurite_db_table_extent__.json");
-        }
-        else
-        {
-            CreateRequiredContainers();
-        }
     }
 
     public async Task InitializeAsync()
     {
         await DatabaseManager.CreateDatabaseAsync();
         AzuriteManager.StartAzurite();
-        CleanupFileStorage();
-        BuildService();
-
-        AuthenticatedActor = ServiceProvider.GetRequiredService<AuthenticatedActor>();
-        AuthenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(
-                ActorNumber.Create("1234512345888"),
-                restriction: Restriction.None,
-                ActorRole.MeteredDataAdministrator));
     }
 
     public async Task DisposeAsync()
@@ -114,28 +58,6 @@ public class MasterDataFixture : IDisposable, IAsyncLifetime
         GC.SuppressFinalize(this);
     }
 
-    public void BuildService()
-    {
-        var builder = new ConfigurationBuilder();
-        builder.AddInMemoryCollection(new Dictionary<string, string?>
-        {
-            ["DB_CONNECTION_STRING"] = DatabaseManager.ConnectionString,
-            ["AZURE_STORAGE_ACCOUNT_CONNECTION_STRING"] = AzuriteManager.BlobStorageConnectionString,
-            // TODO: fix this
-            // Archived messages does not depend on ServiceBus, but the dependency injection in building blocks require it :(
-            [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
-        });
-
-        var services = new ServiceCollection();
-        var configuration = builder.Build();
-
-        services
-            .AddScoped<AuthenticatedActor>()
-            .AddMasterDataModule(configuration);
-
-        ServiceProvider = services.BuildServiceProvider();
-    }
-
     protected virtual void Dispose(bool disposing)
     {
         if (_disposed)
@@ -145,7 +67,6 @@ public class MasterDataFixture : IDisposable, IAsyncLifetime
 
         if (disposing)
         {
-            CleanupFileStorage(true);
             DatabaseManager.DeleteDatabase();
             AzuriteManager.Dispose();
         }
