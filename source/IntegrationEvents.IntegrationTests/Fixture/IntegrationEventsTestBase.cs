@@ -48,7 +48,7 @@ public class IntegrationEventsTestBase
         {
             ["DB_CONNECTION_STRING"] = _integrationEventsFixture.DatabaseManager.ConnectionString,
             [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] = "Fake",
-            [$"{BlobDeadLetterLoggerOptions.SectionName}:{nameof(BlobDeadLetterLoggerOptions.StorageAccountUrl)}"] = "https://Fakeurl.com",
+            [$"{BlobDeadLetterLoggerOptions.SectionName}:{nameof(BlobDeadLetterLoggerOptions.StorageAccountUrl)}"] = "https://fakeurl.com",
             [$"{BlobDeadLetterLoggerOptions.SectionName}:{nameof(BlobDeadLetterLoggerOptions.ContainerName)}"] = "fake-container-name",
         });
 
@@ -75,6 +75,7 @@ public class IntegrationEventsTestBase
         var cleanupStatement =
             $"DELETE FROM [dbo].[Actor]" +
             $"DELETE FROM [dbo].[GridAreaOwner]" +
+            $"DELETE FROM [dbo].[ActorCertificate]" +
             $"DELETE FROM [dbo].[ProcessDelegation]";
 
         using var connection = new SqlConnection(_integrationEventsFixture.DatabaseManager.ConnectionString);
