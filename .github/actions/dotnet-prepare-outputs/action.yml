@@ -52,17 +52,17 @@ runs:
           --configuration Release \
           --output '${{ inputs.output_path }}\functions\b2bapi'
 
-    - name: Publish AcceptanceTest
+    - name: Publish SubsystemTests
       shell: bash
       run: |
         dotnet publish \
-          'source/AcceptanceTests/AcceptanceTests.csproj' \
+          'source/SubsystemTests/SubsystemTests.csproj' \
           --no-build \
           --no-restore \
           --configuration Release \
-          --output '${{ inputs.output_path }}\AcceptanceTests'
+          --output '${{ inputs.output_path }}\SubsystemTests'
 
-    - name: Publish SystemTest
+    - name: Publish SystemTests
       shell: bash
       run: |
         dotnet publish \
