@@ -12,35 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.IntegrationTests.Factories;
-using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Builders;
+using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
+using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Categories;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.ActorCertificate;
+namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Tests;
 
-[SuppressMessage("Style", "VSTHRD200", Justification = "Test class")]
-[SuppressMessage("Naming", "CA1707", Justification = "Test class")]
-[IntegrationTest]
-public class WhenActorCertificateCredentialsRemovedEventIsReceived : TestBase
+[Collection(nameof(IntegrationEventsIntegrationTestCollectionFixture))]
+public class WhenActorCertificateCredentialsRemovedEventIsReceived : IntegrationEventsTestBase
 {
-    public WhenActorCertificateCredentialsRemovedEventIsReceived(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
-        : base(integrationTestFixture, testOutputHelper)
+    public WhenActorCertificateCredentialsRemovedEventIsReceived(IntegrationEventsFixture integrationEventsFixture, ITestOutputHelper testOutputHelper)
+        : base(integrationEventsFixture, testOutputHelper)
     {
+        SetupServiceCollection();
     }
 
     [Fact]
@@ -123,8 +116,8 @@ public class WhenActorCertificateCredentialsRemovedEventIsReceived : TestBase
     private async Task CreateCertifiedActorAsync(string actorNumber, string thumbprint)
     {
         var validFrom = Instant.FromUtc(2022, 6, 6, 0, 0);
-        var connectionFactory = GetService<IDatabaseConnectionFactory>();
-        using var connection = await connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
+        var connectionFactory = Services.GetService<IDatabaseConnectionFactory>();
+        using var connection = await connectionFactory!.GetConnectionAndOpenAsync(CancellationToken.None);
         await connection.ExecuteAsync(
             @"INSERT INTO [dbo].[ActorCertificate] ([Id], [ActorNumber], [ActorRole], [Thumbprint], [ValidFrom], [SequenceNumber])
                     VALUES (@id, @actorNumber, @actorRole, @thumbprint, @validFrom, @sequenceNumber)",
@@ -133,17 +126,17 @@ public class WhenActorCertificateCredentialsRemovedEventIsReceived : TestBase
 
     private async Task HavingReceivedAndHandledIntegrationEventAsync(ActorCertificateCredentialsRemoved actorCertificateCredentialsRemoved)
     {
-        var integrationEventHandler = GetService<IIntegrationEventHandler>();
+        var integrationEventHandler = Services.GetService<IIntegrationEventHandler>();
 
         var integrationEvent = new IntegrationEvent(Guid.NewGuid(), ActorCertificateCredentialsRemoved.EventName, 1, actorCertificateCredentialsRemoved);
 
-        await integrationEventHandler.HandleAsync(integrationEvent).ConfigureAwait(false);
+        await integrationEventHandler!.HandleAsync(integrationEvent).ConfigureAwait(false);
     }
 
     private async Task<List<ActorCertificateForTest>> GetActorCertificatesFromDatabaseAsync()
     {
-        var connectionFactory = GetService<IDatabaseConnectionFactory>();
-        using var connection = await connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
+        var connectionFactory = Services.GetService<IDatabaseConnectionFactory>();
+        using var connection = await connectionFactory!.GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = $"SELECT ActorNumber, ActorRole, Thumbprint, ValidFrom, SequenceNumber FROM [dbo].[ActorCertificate]";
         var results = await connection.QueryAsync<ActorCertificateForTest>(sql);
         return results.ToList();
