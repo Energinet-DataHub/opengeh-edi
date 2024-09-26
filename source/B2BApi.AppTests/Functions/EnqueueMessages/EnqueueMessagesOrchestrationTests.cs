@@ -18,6 +18,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
@@ -50,14 +51,15 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
     private B2BApiAppFixture Fixture { get; }
 
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
         Fixture.AppHostManager.ClearHostLog();
 
         // Clear mappings etc. before each test
         Fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
 
-        return Task.CompletedTask;
+        await AddGridAreaOwner(ActorNumber.Create("5790001662233"), "543");
+        await AddGridAreaOwner(ActorNumber.Create("5790001662233"), "804");
     }
 
     public async Task DisposeAsync()
@@ -605,6 +607,11 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     {
         await Fixture.DatabricksSchemaManager.CreateTableAsync(schemaInformation.DataObjectName, schemaInformation.SchemaDefinition);
         await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(schemaInformation.DataObjectName, schemaInformation.SchemaDefinition, testFilePath);
+    }
+
+    private async Task AddGridAreaOwner(ActorNumber actorNumber, string gridAreaCode)
+    {
+        await Fixture.DatabaseManager.AddGridAreaOwnerAsync(actorNumber, gridAreaCode);
     }
 
     private void EnableEnqueueMessagesOrchestration()

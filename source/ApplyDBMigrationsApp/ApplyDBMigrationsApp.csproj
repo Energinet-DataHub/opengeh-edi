@@ -126,7 +126,6 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202310200959 Actor ExternalId to nvarchar.sql" />
     <EmbeddedResource Include="Scripts\Model\202310241037 Create GridArea table.sql" />
     <EmbeddedResource Include="Scripts\Model\202310241037 Rename ActorNumber to GridAreaOwnerActorNumber in GridArea table.sql" />
-    <EmbeddedResource Include="Scripts\Model\202310241414 Create static GridAreas.sql" />
     <EmbeddedResource Include="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <EmbeddedResource Include="Scripts\Model\202310231329 Alter Bundles2.sql" />
     <EmbeddedResource Include="Scripts\Model\202310231329 Alter Bundles1.sql" />
@@ -206,6 +205,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\Model\202409111315 Rebuild OutgoingMessages indexes.sql" />
     <EmbeddedResource Include="Scripts\Model\202409111300 Rebuild Bundle indexs.sql" />
     <EmbeddedResource Include="Scripts\Model\202409170949 Edit Outbox table.sql" />
+    <EmbeddedResource Include="Scripts\Model\202409231616 Ensure all tables has a clustered index on RecordId.sql" />
     <None Remove="Scripts\Model\202227101333 Add AggregatedTimeSeriesTransactions table.sql" />
     <None Remove="Scripts\Model\202310201142 resize ActorNumber nvarchar on Actor.sql" />
     <None Remove="Scripts\Model\202310231329 Alter Bundles1.sql" />

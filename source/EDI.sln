@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplyDBMigrationsApp", "App
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{49203B33-3DA4-4FC2-B64F-4F351CF545C8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AcceptanceTests", "AcceptanceTests\AcceptanceTests.csproj", "{2310420F-0099-4FB3-B46A-1A34E7A919F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SubsystemTests", "SubsystemTests\SubsystemTests.csproj", "{2310420F-0099-4FB3-B46A-1A34E7A919F4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apps", "Apps", "{94212340-B43E-4FBB-A844-A86557DCBA72}"
 EndProject
