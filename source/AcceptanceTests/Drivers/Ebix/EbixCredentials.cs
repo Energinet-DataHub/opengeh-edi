@@ -12,21 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.AcceptanceTests.Responses.Json;
+namespace Energinet.DataHub.EDI.AcceptanceTests.Drivers.Ebix;
 
-public class ArchivedMessageSearchResponse
+public sealed class EbixCredentials(string certificateName, string certificatePassword)
 {
-    public string? Id { get; set; }
+    public string CertificateName { get; } = !string.IsNullOrWhiteSpace(certificateName)
+        ? certificateName
+        : throw new ArgumentNullException(nameof(certificateName));
 
-    public string? MessageId { get; set; }
-
-    public string? DocumentType { get; set; }
-
-    public string? SenderNumber { get; set; }
-
-    public string? ReceiverNumber { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public string? BusinessReason { get; set; }
+    public string CertificatePassword { get; } = !string.IsNullOrWhiteSpace(certificatePassword)
+        ? certificatePassword
+        : throw new ArgumentNullException(nameof(certificatePassword));
 }

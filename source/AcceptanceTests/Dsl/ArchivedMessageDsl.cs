@@ -14,11 +14,13 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AcceptanceTests.Drivers;
+using Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
+using SearchArchivedMessagesCriteria = Energinet.DataHub.EDI.AcceptanceTests.Drivers.B2C.Client.SearchArchivedMessagesCriteria;
 
 namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
 
@@ -28,27 +30,28 @@ namespace Energinet.DataHub.EDI.AcceptanceTests.Dsl;
     Justification = "Dsl classes uses a naming convention based on the business domain")]
 public class ArchivedMessageDsl
 {
-    private readonly EdiB2CDriver _ediB2CDriver;
+    private readonly B2CEdiDriver _b2cEdiDriver;
     private readonly EdiDatabaseDriver _ediDatabaseDriver;
 
-    internal ArchivedMessageDsl(EdiB2CDriver ediB2CDriver, EdiDatabaseDriver ediDatabaseDriver)
+    internal ArchivedMessageDsl(B2CEdiDriver b2cEdiDriver, EdiDatabaseDriver ediDatabaseDriver)
     {
-        _ediB2CDriver = ediB2CDriver;
+        _b2cEdiDriver = b2cEdiDriver;
         _ediDatabaseDriver = ediDatabaseDriver;
     }
 
     internal async Task ConfirmMessageIsArchived(string messageId)
     {
-        var archivedMessages = await _ediB2CDriver.SearchArchivedMessagesAsync(
-            new SearchArchivedMessagesCriteria(
-                MessageId: messageId,
-                CreatedDuringPeriod: null,
-                SenderNumber: null,
-                ReceiverNumber: null,
-                DocumentTypes: null,
-                BusinessReasons: null,
-                IncludeRelatedMessages: false))
-            .ConfigureAwait(false);
+        var archivedMessages = await _b2cEdiDriver.SearchArchivedMessagesAsync(
+            new SearchArchivedMessagesCriteria
+            {
+                MessageId = messageId,
+                CreatedDuringPeriod = null,
+                BusinessReasons = null,
+                DocumentTypes = null,
+                ReceiverNumber = null,
+                SenderNumber = null,
+                IncludeRelatedMessages = false,
+            });
 
         archivedMessages.Should().NotBeNull();
         var archivedMessage = archivedMessages.Single();
@@ -57,7 +60,7 @@ public class ArchivedMessageDsl
         Assert.NotNull(archivedMessage.DocumentType);
         Assert.NotNull(archivedMessage.SenderNumber);
         Assert.NotNull(archivedMessage.ReceiverNumber);
-        Assert.IsType<DateTime>(archivedMessage.CreatedAt);
+        Assert.IsType<DateTimeOffset>(archivedMessage.CreatedAt);
         Assert.NotNull(archivedMessage.BusinessReason);
     }
 
@@ -65,15 +68,17 @@ public class ArchivedMessageDsl
     {
         var unknownMessageId = Guid.NewGuid().ToString();
         var outboxCreatedAfter = SystemClock.Instance.GetCurrentInstant();
-        await _ediB2CDriver.SearchArchivedMessagesAsync(
-            new SearchArchivedMessagesCriteria(
-                MessageId: unknownMessageId,
-                CreatedDuringPeriod: null,
-                SenderNumber: null,
-                ReceiverNumber: null,
-                DocumentTypes: null,
-                BusinessReasons: null,
-                IncludeRelatedMessages: false)).ConfigureAwait(false);
+        await _b2cEdiDriver.SearchArchivedMessagesAsync(
+            new SearchArchivedMessagesCriteria
+            {
+                MessageId = unknownMessageId,
+                CreatedDuringPeriod = null,
+                SenderNumber = null,
+                ReceiverNumber = null,
+                DocumentTypes = null,
+                BusinessReasons = null,
+                IncludeRelatedMessages = false,
+            });
 
         return (unknownMessageId, outboxCreatedAfter);
     }

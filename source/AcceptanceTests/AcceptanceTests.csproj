@@ -8,6 +8,21 @@
         <RootNamespace>Energinet.DataHub.EDI.AcceptanceTests</RootNamespace>
     </PropertyGroup>
 
+    <!-- Build EDI B2C Client using nswag (the same client the BFF uses) -->
+    <Target Name="NSwag" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' == 'Debug' ">
+        <PropertyGroup>
+            <SwaggerConfiguration>Drivers\B2C\Client\swagger.json</SwaggerConfiguration>
+            <B2CEdiClient>Drivers\B2C\Client\B2CEdiClient.cs</B2CEdiClient>
+        </PropertyGroup>
+
+        <PropertyGroup>
+            <!-- True if the swagger.json file was updated after the generated client -->
+            <SwaggerConfigurationIsNewer>$([MSBuild]::Subtract($([System.IO.File]::GetLastWriteTime('$(SwaggerConfiguration)').Ticks), $([System.IO.File]::GetLastWriteTime('$(B2CEdiClient)').Ticks)))</SwaggerConfigurationIsNewer>
+        </PropertyGroup>
+
+        <Exec WorkingDirectory="$(ProjectDir)" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net60) run Drivers/B2C/Client/nswag.json /variables:Configuration=$(Configuration)" Condition="$(SwaggerConfigurationIsNewer) &gt; 0" />
+    </Target>
+    
     <ItemGroup>
       <None Remove="Messages\json\RequestAggregatedMeasureDataBalanceResponsible.json" />
       <None Remove="Messages\json\RequestAggregatedMeasureDataBalanceResponsibleWithBadPeriod.json" />
@@ -40,6 +55,10 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="NodaTime" Version="3.1.12" />
+        <PackageReference Include="NSwag.MSBuild" Version="14.1.0">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="System.ServiceModel.Http" Version="8.0.0" />
         <PackageReference Include="System.ServiceModel.Primitives" Version="8.0.0" />
         <PackageReference Include="xunit" Version="2.9.0" />

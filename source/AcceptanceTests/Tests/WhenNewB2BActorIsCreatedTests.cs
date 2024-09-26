@@ -43,13 +43,10 @@ public sealed class WhenNewB2BActorIsCreatedTests : BaseTestClass
     [Fact]
     public async Task Actor_is_created()
     {
-#if DEBUG
-        return; // skipped locally, b2c api is not public available
-#endif
-        var b2CId = Guid.NewGuid().ToString();
-        await _actorDsl.PublishResult(actorNumber: "8880000610888", b2CId: b2CId);
+        var b2cId = Guid.NewGuid().ToString();
+        await _actorDsl.PublishResult(actorNumber: "8880000610888", b2cId: b2cId);
 
-        var exists = await _actorDsl.ConfirmActorIsAvailable(actorNumber: "8880000610888", b2CId: b2CId);
+        var exists = await _actorDsl.ConfirmActorIsAvailable(actorNumber: "8880000610888", b2cId: b2cId);
         Assert.True(exists);
     }
 }

@@ -30,14 +30,14 @@ internal sealed class ActorDsl
         _ediActorDriver = ediActorDriver;
     }
 
-    public async Task PublishResult(string actorNumber, string b2CId)
+    public async Task PublishResult(string actorNumber, string b2cId)
     {
-        await _marketParticipant.PublishActorActivatedAsync(actorNumber, b2CId).ConfigureAwait(false);
+        await _marketParticipant.PublishActorActivatedAsync(actorNumber, b2cId).ConfigureAwait(false);
     }
 
-    public async Task<bool> ConfirmActorIsAvailable(string actorNumber, string b2CId)
+    public async Task<bool> ConfirmActorIsAvailable(string actorNumber, string b2cId)
     {
-        return await _ediActorDriver.ActorExistsAsync(actorNumber, b2CId).ConfigureAwait(false);
+        return await _ediActorDriver.ActorExistsAsync(actorNumber, b2cId).ConfigureAwait(false);
     }
 
     public async Task PublishActorCertificateCredentialsRemoved(string actorNumber, string actorRole, string thumbprint)
@@ -45,7 +45,7 @@ internal sealed class ActorDsl
         await _marketParticipant.PublishActorCertificateCredentialsRemovedAsync(actorNumber, actorRole, thumbprint).ConfigureAwait(false);
     }
 
-    public async Task ActorCertificateCredentialsAssigned(string actorNumber, string actorRole, string thumbprint)
+    public async Task PublishActorCertificateCredentialsAssigned(string actorNumber, string actorRole, string thumbprint)
     {
         await _marketParticipant.PublishActorCertificateCredentialsAssignedAsync(actorNumber, actorRole, thumbprint).ConfigureAwait(false);
     }
