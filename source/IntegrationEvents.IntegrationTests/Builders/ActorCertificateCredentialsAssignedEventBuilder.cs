@@ -17,7 +17,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Factories;
+namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Builders;
 
 internal sealed class ActorCertificateCredentialsAssignedEventBuilder
 {

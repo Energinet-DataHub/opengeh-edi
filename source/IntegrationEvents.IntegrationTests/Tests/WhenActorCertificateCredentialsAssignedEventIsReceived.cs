@@ -17,6 +17,7 @@ using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Builders;
 using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
@@ -25,7 +26,7 @@ using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.ActorCertificate;
+namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Tests;
 
 [Collection(nameof(IntegrationEventsIntegrationTestCollectionFixture))]
 public class WhenActorCertificateCredentialsAssignedEventIsReceived : IntegrationEventsTestBase

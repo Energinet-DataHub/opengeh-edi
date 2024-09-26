@@ -39,7 +39,7 @@ public class IntegrationEventsTestBase
         CleanupDatabase();
     }
 
-    public ServiceProvider Services { get; set; } = null!;
+    protected ServiceProvider Services { get; private set; } = null!;
 
     public void SetupServiceCollection()
     {
@@ -70,22 +70,8 @@ public class IntegrationEventsTestBase
         Services = services.BuildServiceProvider();
     }
 
-    public void CleanupDatabase()
+    private void CleanupDatabase()
     {
-        var cleanupStatement =
-            $"DELETE FROM [dbo].[Actor]" +
-            $"DELETE FROM [dbo].[GridAreaOwner]" +
-            $"DELETE FROM [dbo].[ActorCertificate]" +
-            $"DELETE FROM [dbo].[ProcessDelegation]";
-
-        using var connection = new SqlConnection(_integrationEventsFixture.DatabaseManager.ConnectionString);
-        connection.Open();
-
-        using (var command = new SqlCommand(cleanupStatement, connection))
-        {
-            command.ExecuteNonQuery();
-        }
-
-        connection.Close();
+        _integrationEventsFixture.DatabaseManager.CleanupDatabase();
     }
 }
