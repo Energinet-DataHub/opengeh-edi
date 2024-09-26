@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics.CodeAnalysis;
 using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture;
@@ -27,12 +26,9 @@ namespace Energinet.DataHub.EDI.MasterData.IntegrationTests.Tests.Actors;
 [Collection(nameof(MasterDataTestCollectionFixture))]
 public class CreateActorsTests : MasterDataTestBase
 {
-    [NotNull]
     private readonly IMasterDataClient? _masterDataClient;
-    [NotNull]
     private readonly IDatabaseConnectionFactory? _connectionFactory;
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public CreateActorsTests(MasterDataFixture masterDataFixture, ITestOutputHelper testOutputHelper)
         : base(masterDataFixture, testOutputHelper)
     {
@@ -40,7 +36,6 @@ public class CreateActorsTests : MasterDataTestBase
         _masterDataClient = Services.GetService<IMasterDataClient>();
         _connectionFactory = Services.GetService<IDatabaseConnectionFactory>();
     }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
     private static string ActorNumber => "5148796574821";
 
@@ -51,7 +46,7 @@ public class CreateActorsTests : MasterDataTestBase
     {
         var createActorDto = CreateDto();
 
-        await _masterDataClient.CreateActorIfNotExistAsync(createActorDto, CancellationToken.None);
+        await _masterDataClient!.CreateActorIfNotExistAsync(createActorDto, CancellationToken.None);
 
         var actor = await GetActor();
 
@@ -68,7 +63,7 @@ public class CreateActorsTests : MasterDataTestBase
         var createActorDto3 = CreateDto();
         var createActorDto4 = CreateDto();
 
-        await _masterDataClient.CreateActorIfNotExistAsync(createActorDto1, CancellationToken.None);
+        await _masterDataClient!.CreateActorIfNotExistAsync(createActorDto1, CancellationToken.None);
         await _masterDataClient.CreateActorIfNotExistAsync(createActorDto2, CancellationToken.None);
         await _masterDataClient.CreateActorIfNotExistAsync(createActorDto3, CancellationToken.None);
         await _masterDataClient.CreateActorIfNotExistAsync(createActorDto4, CancellationToken.None);
@@ -87,14 +82,14 @@ public class CreateActorsTests : MasterDataTestBase
 
     private async Task<Actor?> GetActor()
     {
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
+        using var connection = await _connectionFactory!.GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = $"SELECT Id, ActorNumber, ExternalId FROM [dbo].[Actor] WHERE ExternalId = '{ExternalId}' AND ActorNumber = '{ActorNumber}'";
         return await connection.QuerySingleOrDefaultAsync<Actor>(sql);
     }
 
     private async Task<IEnumerable<Actor>> GetAllActors()
     {
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
+        using var connection = await _connectionFactory!.GetConnectionAndOpenAsync(CancellationToken.None);
         var sql =
             $"SELECT Id, ActorNumber, ExternalId " +
             $"FROM [dbo].[Actor] " +

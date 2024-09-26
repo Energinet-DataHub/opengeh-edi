@@ -12,14 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Azure.Storage.Blobs;
-using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
-using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture.Database;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -29,21 +22,13 @@ public class MasterDataFixture : IDisposable, IAsyncLifetime
 {
     private bool _disposed;
 
-    public AzuriteManager AzuriteManager { get; } = new(true);
-
-    public EdiDatabaseManager DatabaseManager { get; set; } = new();
+    public EdiDatabaseManager DatabaseManager { get; } = new();
 
     public ServiceProvider ServiceProvider { get; private set; } = null!;
-
-    public void CleanupDatabase()
-    {
-        DatabaseManager.CleanupDatabase();
-    }
 
     public async Task InitializeAsync()
     {
         await DatabaseManager.CreateDatabaseAsync();
-        AzuriteManager.StartAzurite();
     }
 
     public async Task DisposeAsync()
@@ -68,26 +53,8 @@ public class MasterDataFixture : IDisposable, IAsyncLifetime
         if (disposing)
         {
             DatabaseManager.DeleteDatabase();
-            AzuriteManager.Dispose();
         }
 
         _disposed = true;
-    }
-
-    private void CreateRequiredContainers()
-    {
-        List<FileStorageCategory> containerCategories = [
-            FileStorageCategory.ArchivedMessage(),
-        ];
-
-        var blobServiceClient = new BlobServiceClient(AzuriteManager.BlobStorageConnectionString);
-        foreach (var fileStorageCategory in containerCategories)
-        {
-            var container = blobServiceClient.GetBlobContainerClient(fileStorageCategory.Value);
-            var containerExists = container.Exists();
-
-            if (!containerExists)
-                container.Create();
-        }
     }
 }
