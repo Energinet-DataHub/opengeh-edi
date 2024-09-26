@@ -91,8 +91,7 @@ public class IncomingMessageReceiver
             ? HttpStatusCode.BadRequest
             : HttpStatusCode.Accepted;
 
-        var httpResponseData = await CreateResponseAsync(request, httpStatusCode, responseMessage).ConfigureAwait(false);
-        httpResponseData.Headers.Add("Content-Type", $"{contentType}; charset=utf-8");
+        var httpResponseData = await CreateResponseAsync(request, httpStatusCode, contentType, responseMessage).ConfigureAwait(false);
 
         return httpResponseData;
     }
@@ -100,10 +99,13 @@ public class IncomingMessageReceiver
     private static async Task<HttpResponseData> CreateResponseAsync(
         HttpRequestData request,
         HttpStatusCode statusCode,
+        string contentType,
         ResponseMessage responseMessage)
     {
         var response = request.CreateResponse(statusCode);
+        response.Headers.Add("Content-Type", $"{contentType}");
         await response.WriteStringAsync(responseMessage.MessageBody, Encoding.UTF8).ConfigureAwait(false);
+
         return response;
     }
 
