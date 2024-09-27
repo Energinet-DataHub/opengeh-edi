@@ -67,7 +67,7 @@ public sealed class LoadTestHelperTests
         if (_fixture.LoadTestOrchestrationId == null)
             throw new Exception("Load test orchestration id is not set");
 
-        // TODO: Stop orchestration
+        // TODO: Stop orchestration (_fixture.LoadTestOrchestrationId)
         // TODO: Remove outgoing messages for calculation (_loadTestCalculationId)
 
         await Task.CompletedTask;
