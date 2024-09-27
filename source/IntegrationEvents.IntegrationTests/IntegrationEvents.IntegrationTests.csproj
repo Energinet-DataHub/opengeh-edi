@@ -30,10 +30,10 @@
         <ProjectReference Include="..\ApplyDBMigrationsApp\ApplyDBMigrationsApp.csproj" />
         <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
         <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+        <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj" />
         <ProjectReference Include="..\Contracts\Contracts.csproj" />
         <ProjectReference Include="..\IntegrationEvents.Application\IntegrationEvents.Application.csproj" />
         <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
         <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
-        <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj" />
     </ItemGroup>
 </Project>

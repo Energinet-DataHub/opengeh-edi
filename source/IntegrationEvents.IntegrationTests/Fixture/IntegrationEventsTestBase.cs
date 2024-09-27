@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.BuildingBlocks.Tests.Shared;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.Tests.Shared;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
