@@ -36,7 +36,7 @@ public class MasterDataTestBase
     {
         _masterDataFixture = masterDataFixture;
         _testOutputHelper = testOutputHelper;
-        CleanupDatabase();
+        masterDataFixture.DatabaseManager.CleanupDatabase();
     }
 
     public ServiceProvider Services { get; set; } = null!;
@@ -67,10 +67,5 @@ public class MasterDataTestBase
         services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
 
         Services = services.BuildServiceProvider();
-    }
-
-    public void CleanupDatabase()
-    {
-        _masterDataFixture.DatabaseManager.CleanupDatabase();
     }
 }

@@ -12,14 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture.Database;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture;
 
-[CollectionDefinition(nameof(MasterDataTestCollectionFixture))]
-public class MasterDataTestCollectionFixture : ICollectionFixture<MasterDataFixture>
+public sealed class MasterDataFixture : IAsyncLifetime
 {
-    // This class has no code, and is never created. Its purpose is simply
-    // to be the place to apply [CollectionDefinition] and all the
-    // ICollectionFixture<> interfaces.
+    public EdiDatabaseManager DatabaseManager { get; } = new();
+
+    public async Task InitializeAsync()
+    {
+        await DatabaseManager.CreateDatabaseAsync();
+    }
+
+    public Task DisposeAsync()
+    {
+        DatabaseManager.CleanupDatabase();
+        return Task.CompletedTask;
+    }
 }

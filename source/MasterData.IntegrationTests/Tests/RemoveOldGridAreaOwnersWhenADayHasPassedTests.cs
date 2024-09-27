@@ -24,16 +24,16 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.MasterData.IntegrationTests.Tests;
 
-[Collection(nameof(MasterDataTestCollectionFixture))]
+[Collection(nameof(MasterDataTestCollection))]
 public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : MasterDataTestBase
 {
-    private readonly IMasterDataClient? _masterDataClient;
+    private readonly IMasterDataClient _masterDataClient;
 
     public RemoveOldGridAreaOwnersWhenADayHasPassedTests(MasterDataFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
         SetupServiceCollection();
-        _masterDataClient = Services.GetService<IMasterDataClient>();
+        _masterDataClient = Services.GetRequiredService<IMasterDataClient>();
     }
 
     [Fact]
@@ -56,8 +56,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : MasterDataTestBase
 
         await AddActorsToDatabaseAsync(new List<GridAreaOwnershipAssignedDto> { gridAreaOwner1, gridAreaOwner2 });
 
-        var sut = Services.GetService<IDataRetention>()
-                  ?? throw new ArgumentNullException();
+        var sut = Services.GetRequiredService<IDataRetention>();
 
         // Act
         await sut.CleanupAsync(CancellationToken.None);
@@ -88,8 +87,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : MasterDataTestBase
 
         await AddActorsToDatabaseAsync(new List<GridAreaOwnershipAssignedDto> { gridAreaOwner1, gridAreaOwner2 });
 
-        var sut = Services.GetService<IDataRetention>()
-                  ?? throw new ArgumentNullException();
+        var sut = Services.GetRequiredService<IDataRetention>();
 
         // Act
         await sut.CleanupAsync(CancellationToken.None);
@@ -133,8 +131,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : MasterDataTestBase
 
         await AddActorsToDatabaseAsync(new List<GridAreaOwnershipAssignedDto> { gridAreaOwner3, gridAreaOwner4 });
 
-        var sut = Services.GetService<IDataRetention>()
-                  ?? throw new ArgumentNullException();
+        var sut = Services.GetRequiredService<IDataRetention>();
 
         // Act
         await sut.CleanupAsync(CancellationToken.None);
@@ -152,7 +149,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : MasterDataTestBase
 
     private async Task<ActorNumber> GetGridAreaOwnersForGridArea(string gridAreaCode)
     {
-        var gridAreaOwner = await _masterDataClient!.GetGridOwnerForGridAreaCodeAsync(gridAreaCode, CancellationToken.None);
+        var gridAreaOwner = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(gridAreaCode, CancellationToken.None);
         return gridAreaOwner.ActorNumber;
     }
 }

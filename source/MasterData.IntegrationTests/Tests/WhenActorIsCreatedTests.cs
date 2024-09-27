@@ -21,20 +21,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.MasterData.IntegrationTests.Tests.Actors;
+namespace Energinet.DataHub.EDI.MasterData.IntegrationTests.Tests;
 
-[Collection(nameof(MasterDataTestCollectionFixture))]
+[Collection(nameof(MasterDataTestCollection))]
 public class WhenActorIsCreatedTests : MasterDataTestBase
 {
-    private readonly IMasterDataClient? _masterDataClient;
-    private readonly IDatabaseConnectionFactory? _connectionFactory;
+    private readonly IMasterDataClient _masterDataClient;
+    private readonly IDatabaseConnectionFactory _connectionFactory;
 
     public WhenActorIsCreatedTests(MasterDataFixture masterDataFixture, ITestOutputHelper testOutputHelper)
         : base(masterDataFixture, testOutputHelper)
     {
         SetupServiceCollection();
-        _masterDataClient = Services.GetService<IMasterDataClient>();
-        _connectionFactory = Services.GetService<IDatabaseConnectionFactory>();
+        _masterDataClient = Services.GetRequiredService<IMasterDataClient>();
+        _connectionFactory = Services.GetRequiredService<IDatabaseConnectionFactory>();
     }
 
     private static string ActorNumber => "5148796574821";
@@ -82,14 +82,14 @@ public class WhenActorIsCreatedTests : MasterDataTestBase
 
     private async Task<Actor?> GetActor()
     {
-        using var connection = await _connectionFactory!.GetConnectionAndOpenAsync(CancellationToken.None);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = $"SELECT Id, ActorNumber, ExternalId FROM [dbo].[Actor] WHERE ExternalId = '{ExternalId}' AND ActorNumber = '{ActorNumber}'";
         return await connection.QuerySingleOrDefaultAsync<Actor>(sql);
     }
 
     private async Task<IEnumerable<Actor>> GetAllActors()
     {
-        using var connection = await _connectionFactory!.GetConnectionAndOpenAsync(CancellationToken.None);
+        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
         var sql =
             $"SELECT Id, ActorNumber, ExternalId " +
             $"FROM [dbo].[Actor] " +

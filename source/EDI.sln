@@ -118,7 +118,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchivedMessages.Integratio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{18455100-41B7-4B88-B228-DE267E460DFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterData.Integrationtests", "MasterData.Integrationtests\MasterData.Integrationtests.csproj", "{53FB8324-46B1-418F-9120-041DA95F2CF7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterData.IntegrationTests", "MasterData.IntegrationTests\MasterData.IntegrationTests.csproj", "{53FB8324-46B1-418F-9120-041DA95F2CF7}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{954BE2C2-EE2B-4D4C-BF0E-11D7A17999E4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationEvents.IntegrationTests", "IntegrationEvents.IntegrationTests\IntegrationEvents.IntegrationTests.csproj", "{9EF364A1-5EFD-43BA-BF0E-9DDECF9C9F3C}"

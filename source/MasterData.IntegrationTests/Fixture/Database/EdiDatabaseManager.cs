@@ -37,7 +37,6 @@ public class EdiDatabaseManager : SqlServerDatabaseManager<DbContext>
             .UseSqlServer(ConnectionString, options =>
             {
                 options.UseNodaTime();
-                options.EnableRetryOnFailure();
             });
 
         return (TDatabaseContext)Activator.CreateInstance(typeof(TDatabaseContext), optionsBuilder.Options)!;
@@ -45,17 +44,11 @@ public class EdiDatabaseManager : SqlServerDatabaseManager<DbContext>
 
     public void CleanupDatabase()
     {
-        var cleanupStatement = """
-                               DECLARE @sql NVARCHAR(MAX) = N'';
-
-                               SELECT @sql += 'DELETE FROM ' + QUOTENAME(TABLE_SCHEMA) + '.' + QUOTENAME(TABLE_NAME) + ' '
-                               FROM INFORMATION_SCHEMA.TABLES
-                               WHERE TABLE_TYPE = 'BASE TABLE';
-
-                               select @sql += ';'
-
-                               EXEC sp_executesql @sql;
-                               """;
+        var cleanupStatement =
+            $"DELETE FROM [dbo].[Actor]" +
+            $"DELETE FROM [dbo].[GridAreaOwner]" +
+            $"DELETE FROM [dbo].[ActorCertificate]" +
+            $"DELETE FROM [dbo].[ProcessDelegation]";
 
         using var connection = new SqlConnection(ConnectionString);
         connection.Open();
