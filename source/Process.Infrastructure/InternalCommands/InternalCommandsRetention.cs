@@ -47,13 +47,13 @@ public class InternalCommandsRetention : IDataRetention
         var amountOfOldEvents = await GetAmountOfRemainingCommandsAsync(cancellationToken).ConfigureAwait(false);
         while (amountOfOldEvents > 0)
         {
-            var numberDeletedRecords = await DeleteOldCommandsAsync(cancellationToken).ConfigureAwait(false);
-            await LogAuditAsync(numberDeletedRecords).ConfigureAwait(false);
+            await LogAuditAsync().ConfigureAwait(false);
+            await DeleteOldCommandsAsync(cancellationToken).ConfigureAwait(false);
             amountOfOldEvents = await GetAmountOfRemainingCommandsAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 
-    private async Task<int> DeleteOldCommandsAsync(CancellationToken cancellationToken)
+    private async Task DeleteOldCommandsAsync(CancellationToken cancellationToken)
     {
         const string deleteStmt = @"
             WITH CTE AS
@@ -65,33 +65,28 @@ public class InternalCommandsRetention : IDataRetention
             DELETE FROM CTE;";
 
         using var connection = (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        using var transaction = (SqlTransaction)await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
         using var command = connection.CreateCommand();
-        command.Transaction = transaction;
         command.CommandText = deleteStmt;
 
         try
         {
             var numberDeletedRecords = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
-            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             _logger.LogInformation("Successfully deleted {NumberDeletedQueuedInternalCommand} of old commands", numberDeletedRecords);
-            return numberDeletedRecords;
         }
         catch (DbException e)
         {
             _logger.LogError(e, "Failed to delete old commands: {ErrorMessage}", e.Message);
-            await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
             throw;
         }
     }
 
-    private async Task LogAuditAsync(int deletedAmount)
+    private async Task LogAuditAsync()
     {
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
-                activity: AuditLogActivity.Retention,
+                activity: AuditLogActivity.Deletion,
                 activityOrigin: nameof(ADayHasPassed),
-                activityPayload: (OlderThan: _clock.GetCurrentInstant(), DeletedAmount: deletedAmount),
+                activityPayload: _clock.GetCurrentInstant(),
                 affectedEntityType: AuditLogEntityType.InternalCommand,
                 affectedEntityKey: null)
             .ConfigureAwait(false);

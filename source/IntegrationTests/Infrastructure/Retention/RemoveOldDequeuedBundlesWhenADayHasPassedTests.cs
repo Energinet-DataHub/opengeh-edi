@@ -13,12 +13,11 @@
 // limitations under the License.
 
 using Azure;
-using Energinet.DataHub.Core.Outbox.Domain;
+using Energinet.DataHub.Core.Outbox.Infrastructure.DbContext;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -33,6 +32,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Dequeue;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Xunit;
 using Xunit.Abstractions;
@@ -246,8 +246,6 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         var actorMessageQueueContext = GetService<ActorMessageQueueContext>();
         var clockStub = new ClockStub();
         var outgoingMessageRepository = GetService<IOutgoingMessageRepository>();
-        var outboxRepository = GetService<IOutboxRepository>();
-        var serializer = GetService<ISerializer>();
 
         // When we set the current date to 31 days in the future, any bundles dequeued now should then be removed.
         clockStub.SetCurrentInstant(clockStub.GetCurrentInstant().PlusDays(31));
@@ -275,12 +273,18 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         await sut.CleanupAsync(CancellationToken.None);
 
         // Assert
-        ClearDbContextCaches();
-        var outBoxMessageIds = await outboxRepository.GetUnprocessedOutboxMessageIdsAsync(1, CancellationToken.None);
-        var outBoxMessageId = outBoxMessageIds.Should().ContainSingle().Subject;
-        var outboxMessage = await outboxRepository.GetAsync(outBoxMessageId!, CancellationToken.None);
-        var payload = serializer.Deserialize<AuditLogOutboxMessageV1Payload>(outboxMessage.Payload);
-        payload.Origin.Should().Be(nameof(ADayHasPassed));
-        payload.AffectedEntityType.Should().Be(AuditLogEntityType.Bundle.Identifier);
+        using var secondScope = ServiceProvider.CreateScope();
+        var outboxContext = secondScope.ServiceProvider.GetRequiredService<IOutboxContext>();
+        var serializer = secondScope.ServiceProvider.GetRequiredService<ISerializer>();
+        var outboxMessages = outboxContext.Outbox;
+        outboxMessages.Should().NotBeEmpty();
+
+        outboxMessages.Should().Contain(message =>
+                serializer.Deserialize<AuditLogOutboxMessageV1Payload>(message.Payload).AffectedEntityType == AuditLogEntityType.Bundle.Identifier)
+            .And.Contain(message =>
+                serializer.Deserialize<AuditLogOutboxMessageV1Payload>(message.Payload).AffectedEntityType == AuditLogEntityType.MarketDocument.Identifier)
+            .And.Contain(message =>
+                serializer.Deserialize<AuditLogOutboxMessageV1Payload>(message.Payload).AffectedEntityType == AuditLogEntityType.OutgoingMessage.Identifier)
+            .And.HaveCount(6, "There should be 6 audit log entries for the bundle, market document and outgoing message one set to the receiver and one set to the charge owner.");
     }
 }

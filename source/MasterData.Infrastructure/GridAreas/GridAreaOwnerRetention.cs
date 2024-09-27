@@ -48,15 +48,15 @@ public class GridAreaOwnerRetention : IDataRetention
                      && y.ValidFrom < now
                      && y.SequenceNumber > x.SequenceNumber)));
 
-        await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
-                activity: AuditLogActivity.Retention,
+                activity: AuditLogActivity.Deletion,
                 activityOrigin: nameof(ADayHasPassed),
                 activityPayload: monthAgo,
                 affectedEntityType: AuditLogEntityType.GridAreaOwner,
                 affectedEntityKey: null)
             .ConfigureAwait(false);
+
+        await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 }

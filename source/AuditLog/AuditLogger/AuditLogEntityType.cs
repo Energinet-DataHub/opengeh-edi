@@ -68,4 +68,14 @@ public record AuditLogEntityType(string Identifier)
     /// Used when received integration event are cleaned up.
     /// </summary>
     public static readonly AuditLogEntityType ReceivedIntegrationEvent = new("ReceivedIntegrationEvent");
+
+    /// <summary>
+    /// Used when market document are cleaned up.
+    /// </summary>
+    public static readonly AuditLogEntityType MarketDocument = new("MarketDocument");
+
+    /// <summary>
+    /// Used when outgoing message are cleaned up.
+    /// </summary>
+    public static readonly AuditLogEntityType OutgoingMessage = new("OutgoingMessage");
 }

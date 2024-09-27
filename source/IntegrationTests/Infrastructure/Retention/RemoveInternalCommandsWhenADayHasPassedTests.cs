@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Energinet.DataHub.Core.Outbox.Domain;
+using Energinet.DataHub.Core.Outbox.Infrastructure.DbContext;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
@@ -26,6 +22,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.InternalCommands;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using Xunit;
@@ -71,7 +68,6 @@ public class RemoveInternalCommandsWhenADayHasPassedTests : TestBase
     public async Task Clean_up_internal_commands_execution_is_being_audit_logged()
     {
         // arrange
-        var outboxRepository = GetService<IOutboxRepository>();
         var serializer = GetService<ISerializer>();
         var amountOfProcessedInternalCommands = 2500;
         var amountOfNotProcessedInternalCommands = 25;
@@ -81,9 +77,10 @@ public class RemoveInternalCommandsWhenADayHasPassedTests : TestBase
         await _sut.CleanupAsync(CancellationToken.None);
 
         // Assert
-        var outBoxMessageIds = await outboxRepository.GetUnprocessedOutboxMessageIdsAsync(1, CancellationToken.None);
-        var outBoxMessageId = outBoxMessageIds.Should().ContainSingle().Subject;
-        var outboxMessage = await outboxRepository.GetAsync(outBoxMessageId!, CancellationToken.None);
+        using var secondScope = ServiceProvider.CreateScope();
+        var outboxContext = secondScope.ServiceProvider.GetRequiredService<IOutboxContext>();
+        var outboxMessages = outboxContext.Outbox;
+        var outboxMessage = outboxMessages.Should().NotBeEmpty().And.Subject.First();
         var payload = serializer.Deserialize<AuditLogOutboxMessageV1Payload>(outboxMessage.Payload);
         payload.Origin.Should().Be(nameof(ADayHasPassed));
         payload.AffectedEntityType.Should().Be(AuditLogEntityType.InternalCommand.Identifier);

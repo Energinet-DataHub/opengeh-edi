@@ -69,16 +69,17 @@ public class OutboxRetention(
                     break;
 
                 _outboxContext.Outbox.RemoveRange(messagesToDelete);
-                await _outboxContext.SaveChangesAsync(cancellationToken)
-                    .ConfigureAwait(false);
 
                 await _auditLogger.LogWithCommitAsync(
                         logId: AuditLogId.New(),
-                        activity: AuditLogActivity.Retention,
+                        activity: AuditLogActivity.Deletion,
                         activityOrigin: nameof(ADayHasPassed),
                         activityPayload: (OlderThan: oneWeekAgo, DeletedAmount: messagesToDelete.Count),
                         affectedEntityType: AuditLogEntityType.OutboxMessage,
                         affectedEntityKey: null)
+                    .ConfigureAwait(false);
+
+                await _outboxContext.SaveChangesAsync(cancellationToken)
                     .ConfigureAwait(false);
 
                 skip += messagesToDelete.Count;

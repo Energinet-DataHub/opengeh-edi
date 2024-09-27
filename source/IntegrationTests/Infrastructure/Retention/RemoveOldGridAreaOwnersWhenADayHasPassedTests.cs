@@ -12,21 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Outbox.Domain;
+using Energinet.DataHub.Core.Outbox.Infrastructure.DbContext;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
-using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
-using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using FluentAssertions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
@@ -153,8 +149,6 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
     public async Task Clean_up_grid_area_owners_is_being_audit_logged()
     {
         // Arrange
-        var outboxRepository = GetService<IOutboxRepository>();
-        var serializer = GetService<ISerializer>();
         var gridAreaCode = "303";
         var gridAreaOwner = new GridAreaOwnershipAssignedDto(
             gridAreaCode,
@@ -170,9 +164,11 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
         await sut.CleanupAsync(CancellationToken.None);
 
         // Assert
-        var outBoxMessageIds = await outboxRepository.GetUnprocessedOutboxMessageIdsAsync(1, CancellationToken.None);
-        var outBoxMessageId = outBoxMessageIds.Should().ContainSingle().Subject;
-        var outboxMessage = await outboxRepository.GetAsync(outBoxMessageId!, CancellationToken.None);
+        using var secondScope = ServiceProvider.CreateScope();
+        var outboxContext = secondScope.ServiceProvider.GetRequiredService<IOutboxContext>();
+        var serializer = secondScope.ServiceProvider.GetRequiredService<ISerializer>();
+        var outboxMessages = outboxContext.Outbox;
+        var outboxMessage = outboxMessages.Should().NotBeEmpty().And.Subject.First();
         var payload = serializer.Deserialize<AuditLogOutboxMessageV1Payload>(outboxMessage.Payload);
         payload.Origin.Should().Be(nameof(ADayHasPassed));
         payload.AffectedEntityType.Should().Be(AuditLogEntityType.GridAreaOwner.Identifier);

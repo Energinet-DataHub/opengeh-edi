@@ -71,26 +71,20 @@ public class DequeuedBundlesRetention : IDataRetention
 
             try
             {
+                await AuditLogOutgoingMessageDeletionAsync(monthAgo).ConfigureAwait(false);
                 await _outgoingMessageRepository
                     .DeleteOutgoingMessagesIfExistsAsync(dequeuedBundleIds)
                     .ConfigureAwait(false);
 
+                await AuditLogMarketDocumentDeletionAsync(monthAgo).ConfigureAwait(false);
                 await _marketDocumentRepository
                     .DeleteMarketDocumentsIfExistsAsync(dequeuedBundleIds)
                     .ConfigureAwait(false);
 
+                await AuditLogBundleDeletionAsync(monthAgo, dequeuedBundles).ConfigureAwait(false);
                 _bundleRepository.Delete(dequeuedBundles);
 
                 await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-
-                await _auditLogger.LogWithCommitAsync(
-                        logId: AuditLogId.New(),
-                        activity: AuditLogActivity.Retention,
-                        activityOrigin: nameof(ADayHasPassed),
-                        activityPayload: (OlderThan: monthAgo, DeletedAmount: dequeuedBundles.Count),
-                        affectedEntityType: AuditLogEntityType.Bundle,
-                        affectedEntityKey: null)
-                    .ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -101,5 +95,33 @@ public class DequeuedBundlesRetention : IDataRetention
                         string.Join(',', dequeuedBundles.Select(x => x.Id)));
             }
         }
+    }
+
+    private async Task AuditLogOutgoingMessageDeletionAsync(Instant monthAgo)
+    {
+        await AuditLogAsync(AuditLogEntityType.OutgoingMessage, monthAgo).ConfigureAwait(false);
+    }
+
+    private async Task AuditLogMarketDocumentDeletionAsync(Instant monthAgo)
+    {
+        await AuditLogAsync(AuditLogEntityType.MarketDocument, monthAgo).ConfigureAwait(false);
+    }
+
+    private async Task AuditLogBundleDeletionAsync(Instant monthAgo, IReadOnlyCollection<Bundle> dequeuedBundles)
+    {
+        await AuditLogAsync(AuditLogEntityType.Bundle, (OlderThan: monthAgo, DeletedAmount: dequeuedBundles.Count))
+            .ConfigureAwait(false);
+    }
+
+    private async Task AuditLogAsync(AuditLogEntityType auditLogEntityType, object? payload)
+    {
+        await _auditLogger.LogWithCommitAsync(
+                logId: AuditLogId.New(),
+                activity: AuditLogActivity.Deletion,
+                activityOrigin: nameof(ADayHasPassed),
+                activityPayload: payload,
+                affectedEntityType: auditLogEntityType,
+                affectedEntityKey: null)
+            .ConfigureAwait(false);
     }
 }
