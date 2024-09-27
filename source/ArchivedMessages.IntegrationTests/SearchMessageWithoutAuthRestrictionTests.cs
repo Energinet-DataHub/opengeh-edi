@@ -151,6 +151,27 @@ public class SearchMessageWithoutAuthRestrictionTests
     }
 
     [Fact]
+    public async Task Given_TwoArchivedMessages_When_SearchingByMessageId_Then_ReturnsExpectedMessage()
+    {
+        // Arrange
+        var expectedMessageId = Guid.NewGuid().ToString();
+        await CreateArchivedMessageAsync(messageId: expectedMessageId);
+        await CreateArchivedMessageAsync();
+
+        // Act
+        var result = await _sut.SearchAsync(
+            new GetMessagesQuery(
+                MessageId: expectedMessageId),
+            CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        using var assertionScope = new AssertionScope();
+        result.Messages.Should().ContainSingle().Subject
+            .MessageId.Should().Be(expectedMessageId);
+    }
+
+    [Fact]
     public async Task Given_TwoArchivedMessages_When_SearchingByDocumentType_Then_ReturnsExpectedMessage()
     {
         // Arrange
@@ -176,7 +197,7 @@ public class SearchMessageWithoutAuthRestrictionTests
     }
 
     [Fact]
-    public async Task Given_ThreeArchivedMessages_When_SearchingByDocumentType_Then_ReturnsExpectedMessages()
+    public async Task Given_ThreeArchivedMessages_When_SearchingByDocumentTypes_Then_ReturnsExpectedMessages()
     {
         // Arrange
         var expectedDocumentType1 = DocumentType.NotifyAggregatedMeasureData.Name;
@@ -205,6 +226,61 @@ public class SearchMessageWithoutAuthRestrictionTests
             .BeEquivalentTo(new List<string> { expectedDocumentType1, expectedDocumentType2, });
     }
 
+    [Fact]
+    public async Task Given_TwoArchivedMessages_When_SearchingByBusinessReason_Then_ReturnsExpectedMessage()
+    {
+        // Arrange
+        var expectedBusinessReason = BusinessReason.MoveIn.Name;
+        var unexpectedBusinessReason = BusinessReason.BalanceFixing.Name;
+        await CreateArchivedMessageAsync(businessReasons: expectedBusinessReason);
+        await CreateArchivedMessageAsync(businessReasons: unexpectedBusinessReason);
+
+        // Act
+        var result = await _sut.SearchAsync(
+            new GetMessagesQuery(
+                BusinessReasons: new List<string>
+                {
+                    expectedBusinessReason,
+                }),
+            CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        using var assertionScope = new AssertionScope();
+        result.Messages.Should().ContainSingle().Subject
+            .BusinessReason.Should().Be(expectedBusinessReason);
+    }
+
+    [Fact]
+    public async Task Given_ThreeArchivedMessages_When_SearchingByBusinessReasons_Then_ReturnsExpectedMessages()
+    {
+        // Arrange
+        var expectedBusinessReason1 = BusinessReason.MoveIn.Name;
+        var expectedBusinessReason2 = BusinessReason.Correction.Name;
+        var unexpectedBusinessReason = BusinessReason.BalanceFixing.Name;
+        await CreateArchivedMessageAsync(businessReasons: expectedBusinessReason1);
+        await CreateArchivedMessageAsync(businessReasons: expectedBusinessReason2);
+        await CreateArchivedMessageAsync(businessReasons: unexpectedBusinessReason);
+
+        // Act
+        var result = await _sut.SearchAsync(
+            new GetMessagesQuery(
+                BusinessReasons: new List<string>
+                {
+                    expectedBusinessReason1,
+                    expectedBusinessReason2,
+                }),
+            CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        using var assertionScope = new AssertionScope();
+        result.Messages.Should().HaveCount(2);
+        result.Messages.Select(message => message.BusinessReason)
+            .Should()
+            .BeEquivalentTo(new List<string> { expectedBusinessReason1, expectedBusinessReason2, });
+    }
+
     private static Instant CreatedAt(string date)
     {
         return InstantPattern.General.Parse(date).Value;
@@ -215,6 +291,7 @@ public class SearchMessageWithoutAuthRestrictionTests
         string? messageId = null,
         string? documentContent = null,
         string? documentType = null,
+        string? businessReasons = null,
         string? senderNumber = null,
         string? receiverNumber = null,
         Instant? timestamp = null)
@@ -237,7 +314,7 @@ public class SearchMessageWithoutAuthRestrictionTests
             ActorNumber.Create(receiverNumber ?? "1234512345128"),
             ActorRole.DanishEnergyAgency,
             timestamp ?? Instant.FromUtc(2023, 01, 01, 0, 0),
-            BusinessReason.BalanceFixing.Name,
+            businessReasons ?? BusinessReason.BalanceFixing.Name,
             archivedMessageType ?? ArchivedMessageType.IncomingMessage,
             new ArchivedMessageStream(documentStream),
             null);

@@ -42,51 +42,6 @@ public class SearchMessagesTests : TestBase
     }
 
     [Fact]
-    public async Task Filter_messages_by_message_id()
-    {
-        //Arrange
-        var messageId = Guid.NewGuid().ToString();
-        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z"), messageId: messageId));
-        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z")));
-
-        //Act
-        var result = await _archivedMessagesClient.SearchAsync(
-            new GetMessagesQuery(MessageId: messageId), CancellationToken.None);
-
-        //Assert
-        Assert.Single(result.Messages);
-        Assert.Equal(messageId, result.Messages[0].MessageId);
-    }
-
-    [Fact]
-    public async Task Filter_messages_by_business_reasons()
-    {
-        // Arrange
-        var moveIn = BusinessReason.MoveIn;
-        var balanceFixing = BusinessReason.BalanceFixing;
-        await ArchiveMessage(CreateArchivedMessage(businessReason: moveIn.Name));
-        await ArchiveMessage(CreateArchivedMessage(businessReason: balanceFixing.Name));
-        await ArchiveMessage(CreateArchivedMessage());
-
-        // Act
-        var result = await _archivedMessagesClient.SearchAsync(
-            new GetMessagesQuery(BusinessReasons: new List<string>()
-        {
-            moveIn.Name,
-            balanceFixing.Name,
-        }),
-            CancellationToken.None);
-
-        // Assert
-        Assert.Contains(
-            result.Messages,
-            message => message.BusinessReason!.Equals(moveIn.Name, StringComparison.OrdinalIgnoreCase));
-        Assert.Contains(
-            result.Messages,
-            message => message.BusinessReason!.Equals(balanceFixing.Name, StringComparison.OrdinalIgnoreCase));
-    }
-
-    [Fact]
     public async Task Include_related_messages_when_searching_for_a_message_which_has_a_relation_to_more_than_one_message()
     {
         // Arrange
