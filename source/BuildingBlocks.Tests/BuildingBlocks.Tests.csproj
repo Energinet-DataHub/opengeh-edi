@@ -16,8 +16,8 @@ limitations under the License.
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <AssemblyName>Energinet.DataHub.BuildingBlocks.Tests.Shared</AssemblyName>
-        <RootNamespace>Energinet.DataHub.BuildingBlocks.Tests.Shared</RootNamespace>
+        <AssemblyName>Energinet.DataHub.BuildingBlocks.Tests</AssemblyName>
+        <RootNamespace>Energinet.DataHub.BuildingBlocks.Tests</RootNamespace>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
     

@@ -15,7 +15,7 @@
 using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.BuildingBlocks.Tests.Shared;
+namespace Energinet.DataHub.BuildingBlocks.Tests;
 
 public class TestLogger<T> : ILogger<T>
 {

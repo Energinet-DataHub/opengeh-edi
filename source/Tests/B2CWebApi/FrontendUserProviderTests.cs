@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Security.Claims;
-using Energinet.DataHub.BuildingBlocks.Tests.Shared;
+using Energinet.DataHub.BuildingBlocks.Tests;
 using Energinet.DataHub.EDI.B2CWebApi.Security;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using FluentAssertions;
