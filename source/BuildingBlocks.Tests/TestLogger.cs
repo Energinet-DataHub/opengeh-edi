@@ -20,10 +20,12 @@ namespace Energinet.DataHub.BuildingBlocks.Tests;
 public class TestLogger<T> : ILogger<T>
 {
     private readonly ITestOutputHelper _testOutputHelper;
+    private readonly ILogger<T>? _logger;
 
-    public TestLogger(ITestOutputHelper testOutputHelper)
+    public TestLogger(ITestOutputHelper testOutputHelper, Logger<T>? logger)
     {
         _testOutputHelper = testOutputHelper;
+        _logger = logger;
     }
 
     public IDisposable? BeginScope<TState>(TState state)
@@ -41,13 +43,17 @@ public class TestLogger<T> : ILogger<T>
     {
         ArgumentNullException.ThrowIfNull(formatter);
 
-        var logOutput = formatter(state, exception);
-
-        _testOutputHelper.WriteLine("[{0}] {1}", logLevel.ToString().ToUpperInvariant(), logOutput);
-
-        if (exception != null)
+        if (logLevel == LogLevel.Error || logLevel == LogLevel.Critical)
         {
-            _testOutputHelper.WriteLine("Test logger found an exception: {0}", exception);
+            var logOutput = formatter(state, exception);
+            _testOutputHelper.WriteLine("[{0}] {1}", logLevel.ToString().ToUpperInvariant(), logOutput);
+
+            if (exception != null)
+            {
+                _testOutputHelper.WriteLine("Test logger found an exception: {0}", exception);
+            }
         }
+
+        _logger?.Log(logLevel, eventId, state, exception, formatter);
     }
 }
