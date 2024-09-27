@@ -97,6 +97,56 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
         using var actualResponse = await Fixture.AppHostManager.HttpClient.SendAsync(request);
 
         // Assert
+        var contentType = actualResponse.Content.Headers.ContentType;
+        contentType.Should().NotBeNull();
+        contentType!.MediaType.Should().Be("application/json");
+        contentType.CharSet.Should().Be("utf-8");
+        actualResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
+    }
+
+    [Fact]
+    public async Task
+        Given_PersistedActor_When_CallingIncomingMessagesWithInvalidDocumentAndBearerToken_Then_ResponseShouldBeBadRequest()
+    {
+        // The following must match with the XML document content
+        var documentTypeName = IncomingDocumentType.RequestWholesaleSettlement.Name;
+        var actorNumber = ActorNumber.Create("5790000392551");
+        var actorRole = ActorRole.EnergySupplier;
+        var xmlDocument = await File.ReadAllTextAsync("TestData/Messages/xml/RequestWholesaleSettlement.xml");
+        xmlDocument = xmlDocument
+            .Replace("{MessageId}", Guid.NewGuid().ToString())
+            .Replace("{TransactionId}", Guid.NewGuid().ToString());
+
+        // The actor must exist in the database
+        var externalId = Guid.NewGuid().ToString();
+        await Fixture.DatabaseManager.AddActorAsync(actorNumber, externalId);
+
+        // The bearer token must contain:
+        //  * the actor role matching the document content
+        //  * the external id matching the actor in the database
+        var b2bToken = new JwtBuilder()
+            .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
+            .WithClaim(ClaimsMap.ActorId, externalId)
+            .CreateToken();
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, $"api/incomingMessages/{documentTypeName}");
+        request.Content = new StringContent(
+            xmlDocument,
+            Encoding.UTF8,
+            "application/xml");
+
+        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", b2bToken);
+
+        // Act
+        using var actualResponse = await Fixture.AppHostManager.HttpClient.SendAsync(request);
+
+        // Assert
+        var contentType = actualResponse.Content.Headers.ContentType;
+        contentType.Should().NotBeNull();
+        contentType!.MediaType.Should().Be("application/xml");
+        contentType.CharSet.Should().Be("utf-8");
+        var content = await actualResponse.Content.ReadAsByteArrayAsync();
+        Encoding.UTF8.GetString(content).Should().Be("Invalid document");
         actualResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
     }
 

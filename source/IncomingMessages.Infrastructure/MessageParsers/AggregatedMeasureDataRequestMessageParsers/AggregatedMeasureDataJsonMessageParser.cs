@@ -51,7 +51,7 @@ public sealed class AggregatedMeasureDataJsonMessageParser(JsonSchemaProvider sc
 
             if (errors.Count > 0)
             {
-                return new IncomingMarketMessageParserResult(errors.ToArray());
+                return new IncomingMarketMessageParserResult([.. errors]);
             }
 
             using var document = await JsonDocument

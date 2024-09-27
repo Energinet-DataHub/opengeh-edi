@@ -52,6 +52,9 @@
     <None Update="TestData\Messages\json\RequestAggregatedMeasureData.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+      <None Update="TestData\Messages\xml\RequestWholesaleSettlement.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
   </ItemGroup>
 
 </Project>

@@ -78,7 +78,7 @@ public class ReceiveIncomingMarketMessage
         if (incomingMarketMessageParserResult.Errors.Count != 0
             || incomingMarketMessageParserResult.IncomingMessage == null)
         {
-            var res = Result.Failure(incomingMarketMessageParserResult.Errors.ToArray());
+            var res = Result.Failure([.. incomingMarketMessageParserResult.Errors]);
 
             _logger.LogInformation(
                 "Failed to parse incoming message {DocumentType}. Errors: {Errors}",

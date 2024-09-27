@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Net;
+using Energinet.DataHub.EDI.B2BApi.Common;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker.Middleware;
@@ -56,11 +57,33 @@ public class UnHandledExceptionMiddleware : IFunctionsWorkerMiddleware
             {
                 // Create an instance of HttpResponseData with 500 status code.
                 var newHttpResponse = httpReqData.CreateResponse(HttpStatusCode.InternalServerError);
-                // You need to explicitly pass the status code in WriteAsJsonAsync method.
-                // https://github.com/Azure/azure-functions-dotnet-worker/issues/776
-                await newHttpResponse.WriteAsJsonAsync(
-                    new { Message = "An unexpected error occurred! Please try later." },
-                    newHttpResponse.StatusCode);
+
+                var contentType = httpReqData.Headers.TryGetContentType();
+
+                if (contentType is not null && contentType.Contains("application/json"))
+                {
+                    newHttpResponse.Headers.Add("Content-Type", "application/json; charset=utf-8");
+                    // You need to explicitly pass the status code in WriteAsJsonAsync method.
+                    // https://github.com/Azure/azure-functions-dotnet-worker/issues/776
+                    await newHttpResponse.WriteAsJsonAsync(
+                        new { Message = "An unexpected error occurred! Please try later." },
+                        newHttpResponse.StatusCode);
+                }
+                else if (contentType is not null && contentType.Contains("application/xml"))
+                {
+                    newHttpResponse.Headers.Add("Content-Type", "application/xml; charset=utf-8");
+                    await newHttpResponse.WriteStringAsync(
+                        """
+                        <Error>
+                            <Message>An unexpected error occurred! Please try later.</Message>
+                        </Error>
+                        """);
+                }
+                else
+                {
+                    newHttpResponse.Headers.Add("Content-Type", "text/plain; charset=utf-8");
+                    await newHttpResponse.WriteStringAsync("An unexpected error occurred! Please try later.");
+                }
 
                 var invocationResult = context.GetInvocationResult();
 

@@ -52,6 +52,7 @@ public static class FunctionContextExtensions
     internal static void RespondWithUnauthorized(this FunctionContext context, HttpRequestData httpRequestData)
     {
         var httpResponseData = httpRequestData.CreateResponse(HttpStatusCode.Unauthorized);
+        httpResponseData.Headers.Add("Content-Type", "text/plain; charset=utf-8");
         context.SetHttpResponseData(httpResponseData);
     }
 
