@@ -93,7 +93,7 @@ public class FrontendUserProviderTests
     {
         // Arrange
         var authenticatedActor = new AuthenticatedActor();
-        var logger = new TestLogger<FrontendUserProvider>(_testOutputHelper);
+        var logger = new TestLogger<FrontendUserProvider>(_testOutputHelper, null);
 
         var sut = new FrontendUserProvider(logger, authenticatedActor);
 
