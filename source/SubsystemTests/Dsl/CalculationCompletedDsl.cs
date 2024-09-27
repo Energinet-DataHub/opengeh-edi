@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using NodaTime;
 using Xunit.Abstractions;
 
@@ -64,6 +65,14 @@ public sealed class CalculationCompletedDsl
         await StartAndWaitForOrchestrationToComplete(
             CalculationCompletedV1.Types.CalculationType.WholesaleFixing,
             _wholesaleFixingCalculationId);
+    }
+
+    internal async Task PublishForCalculationId(
+        Guid calculationId,
+        CalculationCompletedV1.Types.CalculationType calculationType)
+    {
+        await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(calculationId);
+        await StartEnqueueMessagesOrchestration(calculationType, calculationId);
     }
 
     /// <summary>
@@ -139,6 +148,22 @@ public sealed class CalculationCompletedDsl
         CalculationCompletedV1.Types.CalculationType calculationType,
         Guid calculationId)
     {
+        var orchestrationStartedAt = SystemClock.Instance.GetCurrentInstant();
+        var orchestration = await StartEnqueueMessagesOrchestration(calculationType, calculationId);
+
+        _logger.WriteLine("Wait for message orchestration to be completed for instance id {0}", orchestration.InstanceId);
+        await _ediDriver.WaitForOrchestrationCompletedAsync(orchestration.InstanceId);
+
+        _logger.WriteLine(
+            "Message orchestration completed for instance id {0}, took {1}",
+            orchestration.InstanceId,
+            SystemClock.Instance.GetCurrentInstant() - orchestrationStartedAt);
+    }
+
+    private async Task<DurableOrchestrationStatus> StartEnqueueMessagesOrchestration(
+        CalculationCompletedV1.Types.CalculationType calculationType,
+        Guid calculationId)
+    {
         // Get current instant and subtract 10 second to ensure that the orchestration is started after the instant
         // In some cases the orchestration can be started before a second has passed which meant that the orchestration
         // would not be retrieved by the durable client
@@ -157,9 +182,6 @@ public sealed class CalculationCompletedDsl
                 calculationId.ToString(),
                 $"because the orchestration should be for the given calculation id {calculationId}");
 
-        _logger.WriteLine("Wait for message orchestration to be completed for instance id {0}", orchestration.InstanceId);
-        await _ediDriver.WaitForOrchestrationCompletedAsync(orchestration.InstanceId);
-
-        _logger.WriteLine("Message orchestration completed for instance id {0}, took {1}", orchestration.InstanceId, SystemClock.Instance.GetCurrentInstant() - orchestrationStartedAfter);
+        return orchestration;
     }
 }
