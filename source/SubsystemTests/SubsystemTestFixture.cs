@@ -213,6 +213,8 @@ public class SubsystemTestFixture : IAsyncLifetime
 
     internal Uri EbixUri { get; }
 
+    internal string? LoadTestOrchestrationId { get; set; }
+
     private ServiceBusClient ServiceBusClient { get; }
 
     public Task InitializeAsync()

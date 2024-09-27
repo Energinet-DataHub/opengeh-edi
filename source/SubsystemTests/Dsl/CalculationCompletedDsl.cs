@@ -67,12 +67,13 @@ public sealed class CalculationCompletedDsl
             _wholesaleFixingCalculationId);
     }
 
-    internal async Task PublishForCalculationId(
+    internal async Task<string> PublishForCalculationId(
         Guid calculationId,
         CalculationCompletedV1.Types.CalculationType calculationType)
     {
         await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(calculationId);
-        await StartEnqueueMessagesOrchestration(calculationType, calculationId);
+        var orchestration = await StartEnqueueMessagesOrchestration(calculationType, calculationId);
+        return orchestration.InstanceId;
     }
 
     /// <summary>

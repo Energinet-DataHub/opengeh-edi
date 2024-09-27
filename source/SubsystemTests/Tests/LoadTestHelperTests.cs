@@ -23,30 +23,48 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 /// Test class used in the CI to trigger a calculation completed event, used for performance testing on t001.
 /// </summary>
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
-public sealed class PerformanceTestHelperTests
+public sealed class LoadTestHelperTests
 {
+    private readonly Guid _loadTestCalculationId = Guid.Parse("c0dc2726-168f-4eb0-a072-29ff97bb32f1");
+
+    private readonly SubsystemTestFixture _fixture;
     private readonly CalculationCompletedDsl _calculationCompleted;
 
-    public PerformanceTestHelperTests(SubsystemTestFixture fixture, ITestOutputHelper output)
+    public LoadTestHelperTests(SubsystemTestFixture fixture, ITestOutputHelper output)
     {
+        _fixture = fixture;
+
         _calculationCompleted = new CalculationCompletedDsl(
             new EdiDriver(
-                fixture.DurableClient,
-                fixture.B2BClients.MeteredDataResponsible,
+                _fixture.DurableClient,
+                _fixture.B2BClients.MeteredDataResponsible,
                 output),
-            new EdiDatabaseDriver(fixture.ConnectionString),
-            new WholesaleDriver(fixture.EventPublisher, fixture.EdiInboxClient),
+            new EdiDatabaseDriver(_fixture.ConnectionString),
+            new WholesaleDriver(_fixture.EventPublisher, _fixture.EdiInboxClient),
             output,
-            fixture.BalanceFixingCalculationId,
-            fixture.WholesaleFixingCalculationId);
+            _fixture.BalanceFixingCalculationId,
+            _fixture.WholesaleFixingCalculationId);
     }
 
     [Fact]
-    public async Task Send_calculation_completed_event()
+    public async Task Prepare_load_test()
     {
-        var performanceTestCalculationId = Guid.Parse("c0dc2726-168f-4eb0-a072-29ff97bb32f1");
-        await _calculationCompleted.PublishForCalculationId(
-            performanceTestCalculationId,
+        var orchestrationId = await _calculationCompleted.PublishForCalculationId(
+            _loadTestCalculationId,
             CalculationCompletedV1.Types.CalculationType.WholesaleFixing);
+
+        _fixture.LoadTestOrchestrationId = orchestrationId;
+    }
+
+    [Fact]
+    public async Task Cleanup_load_test()
+    {
+        if (_fixture.LoadTestOrchestrationId == null)
+            throw new Exception("Load test orchestration id is not set");
+
+        // TODO: Stop orchestration
+        // TODO: Remove outgoing messages for calculation (_loadTestCalculationId)
+
+        await Task.CompletedTask;
     }
 }
