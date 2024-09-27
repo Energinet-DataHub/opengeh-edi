@@ -20,7 +20,12 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 
 /// <summary>
-/// Test class used in the CI to trigger a calculation completed event, used for performance testing on t001.
+/// Test class used in the CI to trigger a calculation completed event, used for load testing on t001.
+/// GitHub action should be as following:
+/// 1. Run Prepare_load_test() test
+/// 2. Start Azure Load Test
+/// 3. Wait for the Azure Load Test to finish
+/// 4. Run Cleanup_load_test() test
 /// </summary>
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 public sealed class LoadTestHelperTests
