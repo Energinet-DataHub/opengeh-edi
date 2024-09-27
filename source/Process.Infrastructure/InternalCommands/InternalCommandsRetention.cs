@@ -44,12 +44,12 @@ public class InternalCommandsRetention : IDataRetention
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
     {
-        var amountOfOldEvents = await GetAmountOfRemainingCommandsAsync(cancellationToken).ConfigureAwait(false);
-        while (amountOfOldEvents > 0)
+        var anyOldInternaCommands = await GetAmountOfRemainingCommandsAsync(cancellationToken).ConfigureAwait(false);
+        while (anyOldInternaCommands)
         {
             await LogAuditAsync().ConfigureAwait(false);
             await DeleteOldCommandsAsync(cancellationToken).ConfigureAwait(false);
-            amountOfOldEvents = await GetAmountOfRemainingCommandsAsync(cancellationToken).ConfigureAwait(false);
+            anyOldInternaCommands = await GetAmountOfRemainingCommandsAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -92,10 +92,12 @@ public class InternalCommandsRetention : IDataRetention
             .ConfigureAwait(false);
     }
 
-    private async Task<int> GetAmountOfRemainingCommandsAsync(CancellationToken cancellationToken)
+    private async Task<bool> GetAmountOfRemainingCommandsAsync(CancellationToken cancellationToken)
     {
-        const string selectStmt = @"SELECT Count(*) FROM [dbo].[QueuedInternalCommands]
-                    WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL";
+        const string selectStmt = @"SELECT CASE WHEN EXISTS (
+            SELECT 1 FROM [dbo].[QueuedInternalCommands]
+            WHERE [ProcessedDate] IS NOT NULL AND [ErrorMessage] IS NULL
+        ) THEN 1 ELSE 0 END";
 
         using var connection = (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
         using var command = connection.CreateCommand();
@@ -103,9 +105,9 @@ public class InternalCommandsRetention : IDataRetention
 
         try
         {
-            var amountOfOldEvents = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
-            _logger.LogInformation("Number of old integration events: {AmountOfOldEvents} to be deleted", amountOfOldEvents);
-            return amountOfOldEvents;
+            var exists = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+            _logger.LogInformation("Existence of old commands: {Exists}", exists == 1);
+            return exists == 1;
         }
         catch (DbException e)
         {
