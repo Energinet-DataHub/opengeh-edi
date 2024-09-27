@@ -51,21 +51,31 @@ public class ArchivedMessageSearchController : ControllerBase
                 affectedEntityType: AuditLogEntityType.ArchivedMessage,
                 affectedEntityKey: null)
             .ConfigureAwait(false);
+        var messageCreationPeriod = request.CreatedDuringPeriod is not null
+            ? new ArchivedMessages.Interfaces.MessageCreationPeriod(
+                request.CreatedDuringPeriod.Start.ToInstant(),
+                request.CreatedDuringPeriod.End.ToInstant())
+            : null;
 
-        var query = new GetMessagesQuery
-        {
-            CreationPeriod = request.CreatedDuringPeriod is not null
-                ? new EDI.ArchivedMessages.Interfaces.MessageCreationPeriod(
-                    request.CreatedDuringPeriod.Start.ToInstant(),
-                    request.CreatedDuringPeriod.End.ToInstant())
-                : null,
-            MessageId = request.MessageId,
-            SenderNumber = request.SenderNumber,
-            ReceiverNumber = request.ReceiverNumber,
-            DocumentTypes = request.DocumentTypes,
-            BusinessReasons = request.BusinessReasons,
-            IncludeRelatedMessages = request.IncludeRelatedMessages,
-        };
+        var cursor = new PaginationCursor(null, 0);
+        var pageSize = 100;
+        var navigationForward = true;
+        FieldToSortBy? sortBy = null;
+        //object sortDirection = null;
+
+        var query = new GetMessagesQuery(
+            new SortedCursorBasedPagination(
+                cursor,
+                pageSize,
+                navigationForward,
+                sortBy),
+            messageCreationPeriod,
+            request.MessageId,
+            request.SenderNumber,
+            request.ReceiverNumber,
+            request.DocumentTypes,
+            request.BusinessReasons,
+            request.IncludeRelatedMessages);
 
         var result = await _archivedMessagesClient.SearchAsync(query, cancellationToken).ConfigureAwait(false);
 

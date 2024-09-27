@@ -12,16 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
-
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
-public record MessageInfo(
-    long RecordId,
-    Guid Id,
-    string? MessageId,
-    string DocumentType,
-    string SenderNumber,
-    string ReceiverNumber,
-    Instant CreatedAt,
-    string? BusinessReason);
+public record FieldToSortBy(string Identifier)
+{
+    public static readonly FieldToSortBy MessageId = new FieldToSortBy("MessageId");
+    public static readonly FieldToSortBy DocumentType = new FieldToSortBy("DocumentType");
+    public static readonly FieldToSortBy Sender = new FieldToSortBy("Sender");
+    public static readonly FieldToSortBy Receiver = new FieldToSortBy("Receiver");
+    public static readonly FieldToSortBy CreatedAt = new FieldToSortBy("CreatedAt");
+}

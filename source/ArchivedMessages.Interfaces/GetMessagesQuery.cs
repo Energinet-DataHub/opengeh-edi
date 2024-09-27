@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
-
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
 public sealed record GetMessagesQuery(
+    SortedCursorBasedPagination Pagination,
     MessageCreationPeriod? CreationPeriod = null,
     string? MessageId = null,
     string? SenderNumber = null,
     string? ReceiverNumber = null,
     IReadOnlyCollection<string>? DocumentTypes = null,
     IReadOnlyCollection<string>? BusinessReasons = null,
-    bool IncludeRelatedMessages = false);
-
-public record MessageCreationPeriod(Instant DateToSearchFrom, Instant DateToSearchTo);
+    bool IncludeRelatedMessages = false)
+{
+}

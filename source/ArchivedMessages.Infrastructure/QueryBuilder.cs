@@ -30,55 +30,55 @@ internal sealed class QueryBuilder
         _actorIdentity = actorIdentity;
     }
 
-    public QueryInput BuildFrom(GetMessagesQuery request)
+    public QueryInput BuildFrom(GetMessagesQuery query)
     {
-        if (request.CreationPeriod is not null)
+        if (query.CreationPeriod is not null)
         {
             AddFilter(
                 "CreatedAt BETWEEN @StartOfPeriod AND @EndOfPeriod",
-                new KeyValuePair<string, object>("StartOfPeriod", request.CreationPeriod.DateToSearchFrom.ToString()),
-                new KeyValuePair<string, object>("EndOfPeriod", request.CreationPeriod.DateToSearchTo.ToString()));
+                new KeyValuePair<string, object>("StartOfPeriod", query.CreationPeriod.DateToSearchFrom.ToString()),
+                new KeyValuePair<string, object>("EndOfPeriod", query.CreationPeriod.DateToSearchTo.ToString()));
         }
 
-        if (request.MessageId is not null)
+        if (query.MessageId is not null)
         {
             AddFilter(
-                request.IncludeRelatedMessages ? "(MessageId=@MessageId or RelatedToMessageId = @MessageId)" : "MessageId=@MessageId",
-                new KeyValuePair<string, object>("MessageId", request.MessageId));
+                query.IncludeRelatedMessages ? "(MessageId=@MessageId or RelatedToMessageId = @MessageId)" : "MessageId=@MessageId",
+                new KeyValuePair<string, object>("MessageId", query.MessageId));
         }
 
-        if (request.SenderNumber is not null && request.ReceiverNumber is not null)
+        if (query.SenderNumber is not null && query.ReceiverNumber is not null)
         {
             AddFilter(
                 "(SenderNumber=@SenderNumber OR ReceiverNumber=@ReceiverNumber)",
-                new KeyValuePair<string, object>("SenderNumber", request.SenderNumber),
-                new KeyValuePair<string, object>("ReceiverNumber", request.ReceiverNumber));
+                new KeyValuePair<string, object>("SenderNumber", query.SenderNumber),
+                new KeyValuePair<string, object>("ReceiverNumber", query.ReceiverNumber));
         }
-        else if (request.SenderNumber is not null)
+        else if (query.SenderNumber is not null)
         {
             AddFilter(
                 "SenderNumber=@SenderNumber",
-                new KeyValuePair<string, object>("SenderNumber", request.SenderNumber));
+                new KeyValuePair<string, object>("SenderNumber", query.SenderNumber));
         }
-        else if (request.ReceiverNumber is not null)
+        else if (query.ReceiverNumber is not null)
         {
             AddFilter(
                 "ReceiverNumber=@ReceiverNumber",
-                new KeyValuePair<string, object>("ReceiverNumber", request.ReceiverNumber));
+                new KeyValuePair<string, object>("ReceiverNumber", query.ReceiverNumber));
         }
 
-        if (request.DocumentTypes is not null)
+        if (query.DocumentTypes is not null)
         {
             AddFilter(
                 "DocumentType in @DocumentType",
-                new KeyValuePair<string, object>("DocumentType", request.DocumentTypes));
+                new KeyValuePair<string, object>("DocumentType", query.DocumentTypes));
         }
 
-        if (request.BusinessReasons is not null)
+        if (query.BusinessReasons is not null)
         {
             AddFilter(
                 "BusinessReason in @BusinessReason",
-                new KeyValuePair<string, object>("BusinessReason", request.BusinessReasons));
+                new KeyValuePair<string, object>("BusinessReason", query.BusinessReasons));
         }
 
         if (_actorIdentity.HasRestriction(Restriction.Owned))
@@ -95,15 +95,45 @@ internal sealed class QueryBuilder
             throw new InvalidRestrictionException($"Invalid restriction for fetching archived messages. Must be either {nameof(Restriction.Owned)} or {nameof(Restriction.None)}. ActorNumber: {_actorIdentity.ActorNumber.Value}; Restriction: {_actorIdentity.Restriction.Name}");
         }
 
-        return new QueryInput(BuildStatement(request.IncludeRelatedMessages, request.MessageId), _queryParameters);
+        return new QueryInput(BuildStatement(query), _queryParameters);
     }
 
-    private string BuildStatement(bool includeRelatedMessages, string? messageId)
+    private static string WherePaginationPosition(FieldToSortBy fieldToSortBy, PaginationCursor cursor, bool isForward)
     {
-        var whereClause = _statement.Count > 0 ? $" WHERE {string.Join(" AND ", _statement)}" : string.Empty;
+        // TODO: Missing direction on fieldToSortBy
+        if (cursor.SortedField is null)
+        {
+            return isForward ? $" (RecordId > {cursor.RecordId} OR {cursor.RecordId} = 0) "
+                    : $" (RecordId < {cursor.RecordId} OR {cursor.RecordId} = 0) ";
+        }
+
+        return isForward
+            ? $"""
+                  ({fieldToSortBy.Identifier} = {cursor.SortedField} AND (RecordId < {cursor.RecordId} OR {cursor.RecordId} = 0)) 
+                  OR ({fieldToSortBy.Identifier} < {cursor.SortedField})
+              """
+            : $"""
+                   ({fieldToSortBy.Identifier} = {cursor.SortedField} AND (RecordId > {cursor.RecordId} OR {cursor.RecordId} = 0)) 
+                   OR ({fieldToSortBy.Identifier} > {cursor.SortedField}) 
+               """;
+    }
+
+    private string OrderBy(FieldToSortBy fieldToSortBy, bool isForward)
+    {
+        return isForward
+            ? $" ORDER BY {fieldToSortBy.Identifier} ASC, RecordId ASC"
+            : $" ORDER BY {fieldToSortBy.Identifier} DESC, RecordId DESC";
+    }
+
+    private string BuildStatement(GetMessagesQuery query)
+    {
+        var whereClause = " WHERE ";
+        whereClause += _statement.Count > 0 ? $"{string.Join(" AND ", _statement)} AND " : string.Empty;
+        whereClause += WherePaginationPosition(query.Pagination.FieldToSortBy, query.Pagination.Cursor, query.Pagination.NavigationForward);
         string sqlStatement;
 
-        if (includeRelatedMessages == true && messageId is not null)
+        var orderBy = OrderBy(query.Pagination.FieldToSortBy, query.Pagination.NavigationForward);
+        if (query.IncludeRelatedMessages == true && query.MessageId is not null)
         {
             // Messages may be related in different ways, hence we have the following 3 cases:
             // 1. The message is related to other messages (Searching for a request with responses)
@@ -116,17 +146,18 @@ internal sealed class QueryBuilder
 
             // Case 3 is solved by joining every message onto itself (t1.MessageId = t2.MessageId)
             // Since table 2 would be empty without it, hence we would not get anything when we do our inner join
-            sqlStatement = "SELECT DISTINCT t2.Id, t2.MessageId, t2.DocumentType, t2.SenderNumber, t2.ReceiverNumber, t2.CreatedAt, t2.BusinessReason " +
+            sqlStatement = $"SELECT DISTINCT TOP ({query.Pagination.PageSize}) t2.RecordId, t2.Id, t2.MessageId, t2.DocumentType, t2.SenderNumber, t2.ReceiverNumber, t2.CreatedAt, t2.BusinessReason " +
                            $"FROM ( SELECT * FROM dbo.ArchivedMessages {whereClause} ) AS t1 " +
                            "INNER JOIN dbo.ArchivedMessages as t2 " +
                            "ON t1.RelatedToMessageId = t2.RelatedToMessageId OR t1.RelatedToMessageId = t2.MessageId OR t1.MessageId= t2.MessageId";
         }
         else
         {
-            var selectStatement = "SELECT Id, MessageId, DocumentType, SenderNumber, ReceiverNumber, CreatedAt, BusinessReason FROM dbo.ArchivedMessages";
+            var selectStatement = $"SELECT TOP ({query.Pagination.PageSize}) RecordId, Id, MessageId, DocumentType, SenderNumber, ReceiverNumber, CreatedAt, BusinessReason FROM dbo.ArchivedMessages";
             sqlStatement = selectStatement + whereClause;
         }
 
+        sqlStatement += orderBy;
         return sqlStatement;
     }
 

@@ -15,7 +15,6 @@
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
@@ -47,14 +46,18 @@ public class SearchMessagesTests : TestBase
         var archivedMessage = CreateArchivedMessage(_clock.GetCurrentInstant());
         await ArchiveMessage(archivedMessage);
 
-        var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(), CancellationToken.None);
+        var result = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(new SortedCursorBasedPagination()),
+            CancellationToken.None);
 
         var messageInfo = result.Messages.FirstOrDefault(message => message.Id == archivedMessage.Id.Value);
         Assert.NotNull(messageInfo);
         Assert.Equal(archivedMessage.DocumentType, messageInfo.DocumentType);
         Assert.Equal(archivedMessage.SenderNumber.Value, messageInfo.SenderNumber);
         Assert.Equal(archivedMessage.ReceiverNumber.Value, messageInfo.ReceiverNumber);
-        Assert.Equal(archivedMessage.CreatedAt.ToDateTimeUtc().ToString("u"), messageInfo.CreatedAt.ToDateTimeUtc().ToString("u")); // "u" is the "yyyy-mm-dd hh:MM:ssZ" format
+        Assert.Equal(
+            archivedMessage.CreatedAt.ToDateTimeUtc().ToString("u"),
+            messageInfo.CreatedAt.ToDateTimeUtc().ToString("u")); // "u" is the "yyyy-mm-dd hh:MM:ssZ" format
         Assert.Equal(archivedMessage.MessageId, messageInfo.MessageId);
     }
 
@@ -66,9 +69,11 @@ public class SearchMessagesTests : TestBase
         await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-06-01T22:00:00Z")));
 
         var result = await _archivedMessagesClient.SearchAsync(
-            new GetMessagesQuery(new MessageCreationPeriod(
-            CreatedAt("2023-05-01T22:00:00Z"),
-            CreatedAt("2023-05-02T22:00:00Z"))),
+            new GetMessagesQuery(
+                new SortedCursorBasedPagination(),
+                new MessageCreationPeriod(
+                    CreatedAt("2023-05-01T22:00:00Z"),
+                    CreatedAt("2023-05-02T22:00:00Z"))),
             CancellationToken.None);
 
         Assert.Single(result.Messages);
@@ -86,9 +91,10 @@ public class SearchMessagesTests : TestBase
         //Act
         var result = await _archivedMessagesClient.SearchAsync(
             new GetMessagesQuery(
+                new SortedCursorBasedPagination(),
                 new MessageCreationPeriod(
-                CreatedAt("2023-05-01T22:00:00Z"),
-                CreatedAt("2023-05-02T22:00:01Z")),
+                    CreatedAt("2023-05-01T22:00:00Z"),
+                    CreatedAt("2023-05-02T22:00:01Z")),
                 messageId),
             CancellationToken.None);
 
@@ -107,7 +113,10 @@ public class SearchMessagesTests : TestBase
 
         //Act
         var result = await _archivedMessagesClient.SearchAsync(
-            new GetMessagesQuery(MessageId: messageId), CancellationToken.None);
+            new GetMessagesQuery(
+                new SortedCursorBasedPagination(),
+                MessageId: messageId),
+            CancellationToken.None);
 
         //Assert
         Assert.Single(result.Messages);
@@ -123,7 +132,11 @@ public class SearchMessagesTests : TestBase
         await ArchiveMessage(CreateArchivedMessage());
 
         //Act
-        var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(SenderNumber: senderNumber), CancellationToken.None);
+        var result = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(
+                new SortedCursorBasedPagination(),
+                SenderNumber: senderNumber),
+            CancellationToken.None);
 
         //Assert
         Assert.Single(result.Messages);
@@ -139,7 +152,11 @@ public class SearchMessagesTests : TestBase
         await ArchiveMessage(CreateArchivedMessage());
 
         // Act
-        var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(ReceiverNumber: receiverNumber), CancellationToken.None);
+        var result = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(
+                new SortedCursorBasedPagination(),
+                ReceiverNumber: receiverNumber),
+            CancellationToken.None);
 
         // Assert
         Assert.Single(result.Messages);
@@ -158,11 +175,9 @@ public class SearchMessagesTests : TestBase
 
         // Act
         var result = await _archivedMessagesClient.SearchAsync(
-            new GetMessagesQuery(DocumentTypes: new List<string>
-            {
-            confirmRequestChangeOfSupplier,
-            rejectRequestChangeOfSupplier,
-            }),
+            new GetMessagesQuery(
+                new SortedCursorBasedPagination(),
+                DocumentTypes: new List<string> { confirmRequestChangeOfSupplier, rejectRequestChangeOfSupplier, }),
             CancellationToken.None);
 
         // Assert
@@ -186,11 +201,9 @@ public class SearchMessagesTests : TestBase
 
         // Act
         var result = await _archivedMessagesClient.SearchAsync(
-            new GetMessagesQuery(BusinessReasons: new List<string>()
-        {
-            moveIn.Name,
-            balanceFixing.Name,
-        }),
+            new GetMessagesQuery(
+                new SortedCursorBasedPagination(),
+                BusinessReasons: new List<string>() { moveIn.Name, balanceFixing.Name, }),
             CancellationToken.None);
 
         // Assert
@@ -203,22 +216,32 @@ public class SearchMessagesTests : TestBase
     }
 
     [Fact]
-    public async Task Include_related_messages_when_searching_for_a_message_which_has_a_relation_to_more_than_one_message()
+    public async Task
+        Include_related_messages_when_searching_for_a_message_which_has_a_relation_to_more_than_one_message()
     {
         // Arrange
         var messageIdOfMessage3 = MessageId.New();
         var messageIdOfMessage31 = MessageId.New();
         var messageIdOfMessage32 = MessageId.New();
         var archivedMessage3 = CreateArchivedMessage(_clock.GetCurrentInstant(), messageId: messageIdOfMessage3.Value);
-        var archivedMessage31 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageIdOfMessage3, messageId: messageIdOfMessage31.Value);
-        var archivedMessage32 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageIdOfMessage3, messageId: messageIdOfMessage32.Value);
+        var archivedMessage31 = CreateArchivedMessage(
+            _clock.GetCurrentInstant(),
+            relatedToMessageId: messageIdOfMessage3,
+            messageId: messageIdOfMessage31.Value);
+        var archivedMessage32 = CreateArchivedMessage(
+            _clock.GetCurrentInstant(),
+            relatedToMessageId: messageIdOfMessage3,
+            messageId: messageIdOfMessage32.Value);
         await ArchiveMessage(archivedMessage3);
         await ArchiveMessage(archivedMessage31);
         await ArchiveMessage(archivedMessage32);
 
         var messageIdOfMessage2 = MessageId.New();
         var archivedMessage2 = CreateArchivedMessage(_clock.GetCurrentInstant(), messageId: messageIdOfMessage2.Value);
-        var archivedMessage21 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageIdOfMessage2, messageId: Guid.NewGuid().ToString());
+        var archivedMessage21 = CreateArchivedMessage(
+            _clock.GetCurrentInstant(),
+            relatedToMessageId: messageIdOfMessage2,
+            messageId: Guid.NewGuid().ToString());
         await ArchiveMessage(archivedMessage2);
         await ArchiveMessage(archivedMessage21);
 
@@ -230,6 +253,7 @@ public class SearchMessagesTests : TestBase
         // This could simulate a search for a message, where it is a response to a request with more than one response
         var resultForMessageId3 = await _archivedMessagesClient.SearchAsync(
             new GetMessagesQuery(
+                new SortedCursorBasedPagination(),
                 MessageId: messageIdOfMessage31.Value,
                 IncludeRelatedMessages: true),
             CancellationToken.None);
@@ -239,12 +263,7 @@ public class SearchMessagesTests : TestBase
         resultForMessageId3.Messages.Select(m => m.MessageId)
             .Should()
             .BeEquivalentTo(
-                new[]
-                {
-                    archivedMessage3.MessageId,
-                    archivedMessage31.MessageId,
-                    archivedMessage32.MessageId,
-                });
+                new[] { archivedMessage3.MessageId, archivedMessage31.MessageId, archivedMessage32.MessageId, });
     }
 
     [Fact]
@@ -254,15 +273,24 @@ public class SearchMessagesTests : TestBase
         var messageIdOfMessage3 = MessageId.New();
         var messageIdOfMessage33 = MessageId.New();
         var archivedMessage3 = CreateArchivedMessage(_clock.GetCurrentInstant(), messageId: messageIdOfMessage3.Value);
-        var archivedMessage31 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageIdOfMessage3, messageId: messageIdOfMessage33.Value);
-        var archivedMessage32 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageIdOfMessage3, messageId: Guid.NewGuid().ToString());
+        var archivedMessage31 = CreateArchivedMessage(
+            _clock.GetCurrentInstant(),
+            relatedToMessageId: messageIdOfMessage3,
+            messageId: messageIdOfMessage33.Value);
+        var archivedMessage32 = CreateArchivedMessage(
+            _clock.GetCurrentInstant(),
+            relatedToMessageId: messageIdOfMessage3,
+            messageId: Guid.NewGuid().ToString());
         await ArchiveMessage(archivedMessage3);
         await ArchiveMessage(archivedMessage31);
         await ArchiveMessage(archivedMessage32);
 
         var messageIdOfMessage2 = MessageId.New();
         var archivedMessage2 = CreateArchivedMessage(_clock.GetCurrentInstant(), messageId: messageIdOfMessage2.Value);
-        var archivedMessage21 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageIdOfMessage2, messageId: Guid.NewGuid().ToString());
+        var archivedMessage21 = CreateArchivedMessage(
+            _clock.GetCurrentInstant(),
+            relatedToMessageId: messageIdOfMessage2,
+            messageId: Guid.NewGuid().ToString());
         await ArchiveMessage(archivedMessage2);
         await ArchiveMessage(archivedMessage21);
 
@@ -274,6 +302,7 @@ public class SearchMessagesTests : TestBase
         // This could simulate a search for a message, where it is a request with one response
         var resultForMessageId2 = await _archivedMessagesClient.SearchAsync(
             new GetMessagesQuery(
+                new SortedCursorBasedPagination(),
                 MessageId: messageIdOfMessage2.Value,
                 IncludeRelatedMessages: true),
             CancellationToken.None);
@@ -283,11 +312,7 @@ public class SearchMessagesTests : TestBase
         resultForMessageId2.Messages.Select(m => m.MessageId)
             .Should()
             .BeEquivalentTo(
-                new[]
-                    {
-                        archivedMessage2.MessageId,
-                        archivedMessage21.MessageId,
-                    });
+                new[] { archivedMessage2.MessageId, archivedMessage21.MessageId, });
     }
 
     [Fact]
@@ -297,15 +322,24 @@ public class SearchMessagesTests : TestBase
         var messageIdOfMessage3 = MessageId.New();
         var messageIdOfMessage33 = MessageId.New();
         var archivedMessage3 = CreateArchivedMessage(_clock.GetCurrentInstant(), messageId: messageIdOfMessage3.Value);
-        var archivedMessage31 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageIdOfMessage3, messageId: messageIdOfMessage33.Value);
-        var archivedMessage32 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageIdOfMessage3, messageId: Guid.NewGuid().ToString());
+        var archivedMessage31 = CreateArchivedMessage(
+            _clock.GetCurrentInstant(),
+            relatedToMessageId: messageIdOfMessage3,
+            messageId: messageIdOfMessage33.Value);
+        var archivedMessage32 = CreateArchivedMessage(
+            _clock.GetCurrentInstant(),
+            relatedToMessageId: messageIdOfMessage3,
+            messageId: Guid.NewGuid().ToString());
         await ArchiveMessage(archivedMessage3);
         await ArchiveMessage(archivedMessage31);
         await ArchiveMessage(archivedMessage32);
 
         var messageIdOfMessage2 = MessageId.New();
         var archivedMessage2 = CreateArchivedMessage(_clock.GetCurrentInstant(), messageId: messageIdOfMessage2.Value);
-        var archivedMessage21 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageIdOfMessage2, messageId: Guid.NewGuid().ToString());
+        var archivedMessage21 = CreateArchivedMessage(
+            _clock.GetCurrentInstant(),
+            relatedToMessageId: messageIdOfMessage2,
+            messageId: Guid.NewGuid().ToString());
         await ArchiveMessage(archivedMessage2);
         await ArchiveMessage(archivedMessage21);
 
@@ -317,6 +351,7 @@ public class SearchMessagesTests : TestBase
         // This could simulate a search for a message, where it is a request with one response
         var resultForMessageId1 = await _archivedMessagesClient.SearchAsync(
             new GetMessagesQuery(
+                new SortedCursorBasedPagination(),
                 MessageId: messageIdOfMessage1.Value,
                 IncludeRelatedMessages: true),
             CancellationToken.None);
@@ -331,12 +366,16 @@ public class SearchMessagesTests : TestBase
         // Arrange
         var messageId = MessageId.New();
         var archivedMessage1 = CreateArchivedMessage(_clock.GetCurrentInstant(), messageId: messageId.Value);
-        var archivedMessage2 = CreateArchivedMessage(_clock.GetCurrentInstant(), relatedToMessageId: messageId, messageId: MessageId.New().Value);
+        var archivedMessage2 = CreateArchivedMessage(
+            _clock.GetCurrentInstant(),
+            relatedToMessageId: messageId,
+            messageId: MessageId.New().Value);
         await ArchiveMessage(archivedMessage1);
         await ArchiveMessage(archivedMessage2);
 
         var resultForMessageId = await _archivedMessagesClient.SearchAsync(
             new GetMessagesQuery(
+                new SortedCursorBasedPagination(),
                 MessageId: messageId.Value,
                 IncludeRelatedMessages: false),
             CancellationToken.None);
@@ -350,20 +389,36 @@ public class SearchMessagesTests : TestBase
         var ownActorNumber = ActorNumber.Create("1234512345888");
         var someoneElseActorNumber = ActorNumber.Create("1234512345777");
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ownActorNumber, restriction: Restriction.Owned, ActorRole.EnergySupplier));
+        authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(ownActorNumber, restriction: Restriction.Owned, ActorRole.EnergySupplier));
 
-        var archivedMessageOwnMessageAsReceiver = CreateArchivedMessage(_clock.GetCurrentInstant(), receiverNumber: ownActorNumber.Value, senderNumber: someoneElseActorNumber.Value);
-        var archivedMessageOwnMessageAsSender = CreateArchivedMessage(_clock.GetCurrentInstant(), receiverNumber: someoneElseActorNumber.Value, senderNumber: ownActorNumber.Value);
-        var archivedMessage = CreateArchivedMessage(_clock.GetCurrentInstant(), receiverNumber: someoneElseActorNumber.Value, senderNumber: someoneElseActorNumber.Value);
+        var archivedMessageOwnMessageAsReceiver = CreateArchivedMessage(
+            _clock.GetCurrentInstant(),
+            receiverNumber: ownActorNumber.Value,
+            senderNumber: someoneElseActorNumber.Value);
+        var archivedMessageOwnMessageAsSender = CreateArchivedMessage(
+            _clock.GetCurrentInstant(),
+            receiverNumber: someoneElseActorNumber.Value,
+            senderNumber: ownActorNumber.Value);
+        var archivedMessage = CreateArchivedMessage(
+            _clock.GetCurrentInstant(),
+            receiverNumber: someoneElseActorNumber.Value,
+            senderNumber: someoneElseActorNumber.Value);
         await ArchiveMessage(archivedMessageOwnMessageAsReceiver);
         await ArchiveMessage(archivedMessageOwnMessageAsSender);
         await ArchiveMessage(archivedMessage);
 
-        var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(), CancellationToken.None);
+        var result = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(new SortedCursorBasedPagination()),
+            CancellationToken.None);
 
         Assert.Equal(2, result.Messages.Count);
-        Assert.True(result.Messages.First().SenderNumber == ownActorNumber.Value || result.Messages.First().ReceiverNumber == ownActorNumber.Value);
-        Assert.True(result.Messages.Last().SenderNumber == ownActorNumber.Value || result.Messages.Last().ReceiverNumber == ownActorNumber.Value);
+        Assert.True(
+            result.Messages.First().SenderNumber == ownActorNumber.Value
+            || result.Messages.First().ReceiverNumber == ownActorNumber.Value);
+        Assert.True(
+            result.Messages.Last().SenderNumber == ownActorNumber.Value
+            || result.Messages.Last().ReceiverNumber == ownActorNumber.Value);
     }
 
     [Fact]
@@ -372,14 +427,23 @@ public class SearchMessagesTests : TestBase
         var ownActorNumber = ActorNumber.Create("1234512345888");
         var someoneElseActorNumber = ActorNumber.Create("1234512345777");
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ownActorNumber, restriction: Restriction.None, ActorRole.DataHubAdministrator));
+        authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(ownActorNumber, restriction: Restriction.None, ActorRole.DataHubAdministrator));
 
-        var archivedMessageOwnMessageAsSender = CreateArchivedMessage(_clock.GetCurrentInstant(), receiverNumber: someoneElseActorNumber.Value, senderNumber: ownActorNumber.Value);
-        var archivedMessage = CreateArchivedMessage(_clock.GetCurrentInstant(), receiverNumber: someoneElseActorNumber.Value, senderNumber: someoneElseActorNumber.Value);
+        var archivedMessageOwnMessageAsSender = CreateArchivedMessage(
+            _clock.GetCurrentInstant(),
+            receiverNumber: someoneElseActorNumber.Value,
+            senderNumber: ownActorNumber.Value);
+        var archivedMessage = CreateArchivedMessage(
+            _clock.GetCurrentInstant(),
+            receiverNumber: someoneElseActorNumber.Value,
+            senderNumber: someoneElseActorNumber.Value);
         await ArchiveMessage(archivedMessageOwnMessageAsSender);
         await ArchiveMessage(archivedMessage);
 
-        var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(), CancellationToken.None);
+        var result = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(new SortedCursorBasedPagination()),
+            CancellationToken.None);
 
         Assert.Equal(2, result.Messages.Count);
     }
@@ -394,11 +458,15 @@ public class SearchMessagesTests : TestBase
 
         //Act
         var result = await _archivedMessagesClient.SearchAsync(
-            new GetMessagesQuery(ReceiverNumber: expectedActorNumber, SenderNumber: expectedActorNumber),
+            new GetMessagesQuery(
+                new SortedCursorBasedPagination(),
+                ReceiverNumber: expectedActorNumber,
+                SenderNumber: expectedActorNumber),
             CancellationToken.None);
 
         //Assert
-        var receiverAndSenderNumber = result.Messages.Select(m => m.ReceiverNumber).Intersect(result.Messages.Select(m => m.SenderNumber));
+        var receiverAndSenderNumber = result.Messages.Select(m => m.ReceiverNumber)
+            .Intersect(result.Messages.Select(m => m.SenderNumber));
         foreach (var actualActorNumber in receiverAndSenderNumber)
         {
             Assert.Equal(expectedActorNumber, actualActorNumber);
@@ -427,11 +495,12 @@ public class SearchMessagesTests : TestBase
         // Act
         var result = await _archivedMessagesClient.SearchAsync(
             new GetMessagesQuery(
+                new SortedCursorBasedPagination(),
                 ReceiverNumber: expectedActorNumber,
                 SenderNumber: expectedActorNumber,
                 CreationPeriod: new MessageCreationPeriod(
-                startDate.PlusDays(-2),
-                startDate.PlusDays(2))),
+                    startDate.PlusDays(-2),
+                    startDate.PlusDays(2))),
             CancellationToken.None);
 
         // Assert
@@ -439,7 +508,8 @@ public class SearchMessagesTests : TestBase
         result.Messages.Should()
             .ContainSingle()
             .Subject.MessageId
-            .Should().Be(messageWithinSearchPeriod.MessageId);
+            .Should()
+            .Be(messageWithinSearchPeriod.MessageId);
     }
 
     [Fact]
@@ -449,20 +519,230 @@ public class SearchMessagesTests : TestBase
         var authenticatedActorNumber = ActorNumber.Create("1234512345888");
         var authenticatedActorRole = ActorRole.EnergySupplier;
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(authenticatedActorNumber, restriction: Restriction.Owned, authenticatedActorRole));
+        authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(authenticatedActorNumber, restriction: Restriction.Owned, authenticatedActorRole));
         await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-04-01T22:00:00Z")));
-        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-05-01T22:00:00Z"), receiverNumber: authenticatedActorNumber.Value, receiverRole: authenticatedActorRole));
-        await ArchiveMessage(CreateArchivedMessage(CreatedAt("2023-06-01T22:00:00Z"), senderNumber: authenticatedActorNumber.Value, senderRole: authenticatedActorRole));
+        await ArchiveMessage(
+            CreateArchivedMessage(
+                CreatedAt("2023-05-01T22:00:00Z"),
+                receiverNumber: authenticatedActorNumber.Value,
+                receiverRole: authenticatedActorRole));
+        await ArchiveMessage(
+            CreateArchivedMessage(
+                CreatedAt("2023-06-01T22:00:00Z"),
+                senderNumber: authenticatedActorNumber.Value,
+                senderRole: authenticatedActorRole));
 
         // Act
         var result = await _archivedMessagesClient.SearchAsync(
-            new GetMessagesQuery(),
+            new GetMessagesQuery(new SortedCursorBasedPagination()),
             CancellationToken.None);
 
         // Assert
         Assert.Equal(2, result.Messages.Count);
         Assert.Equal(CreatedAt("2023-05-01T22:00:00Z"), result.Messages[0].CreatedAt);
         Assert.Equal(CreatedAt("2023-06-01T22:00:00Z"), result.Messages[1].CreatedAt);
+    }
+
+    [Fact]
+    public async Task Can_fetch_messages_with_pagination_navigation_forward_returns_expected_messages()
+    {
+        // Arrange
+        var createdArchivedMessages = new List<ArchivedMessage>();
+        for (var i = 0; i < 6; i++)
+        {
+            var archivedMessage = CreateArchivedMessage(_clock.GetCurrentInstant());
+            await ArchiveMessage(archivedMessage);
+            createdArchivedMessages.Add(archivedMessage);
+        }
+
+        // Act
+        var result = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(new SortedCursorBasedPagination(pageSize: 5, navigationForward: true)),
+            CancellationToken.None);
+
+        // Assert
+        result.Messages.Should().HaveCount(5);
+        var expectedFirst5Messages = createdArchivedMessages.Take(5).Select(x => x.MessageId).ToList();
+
+        Assert.Equal(expectedFirst5Messages, result.Messages.Select(x => x.MessageId));
+    }
+
+    [Theory]
+    [InlineData(-8)]
+    [InlineData(-1)]
+    [InlineData(0)]
+    public Task Can_not_fetch_messages_with_invalid_page_size(int pageSize)
+    {
+        // Arrange
+        // Act
+        var act = () => new SortedCursorBasedPagination(pageSize: pageSize, navigationForward: true);
+
+        // Assert
+        act.Should().Throw<ArgumentOutOfRangeException>();
+        return Task.CompletedTask;
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(10)]
+    public async Task Can_fetch_all_messages_with_pagination_navigation_forward_returns_expected_messages(int pageSize)
+    {
+        // Arrange
+        var createdArchivedMessages = new List<ArchivedMessage>();
+        for (var i = 0; i < 6; i++)
+        {
+            var archivedMessage = CreateArchivedMessage(_clock.GetCurrentInstant());
+            await ArchiveMessage(archivedMessage);
+            createdArchivedMessages.Add(archivedMessage);
+        }
+
+        var pagination = new SortedCursorBasedPagination(pageSize: pageSize, navigationForward: true);
+
+        // Act
+        var skip = 0;
+        var nextPage = true;
+        while (nextPage)
+        {
+            var result = await _archivedMessagesClient.SearchAsync(
+                new GetMessagesQuery(pagination),
+                CancellationToken.None);
+
+            if (result.Messages.Count < pageSize)
+            {
+                nextPage = false;
+            }
+            else
+            {
+                pagination = new SortedCursorBasedPagination(
+                    cursor: new PaginationCursor(RecordId: result.Messages.Last().RecordId),
+                    pageSize: pageSize,
+                    navigationForward: true);
+            }
+
+            // Assert
+            if (nextPage)
+            {
+                result.Messages.Should().HaveCount(pageSize);
+                var expectedMessages = createdArchivedMessages
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .Select(x => x.MessageId)
+                    .ToList();
+
+                Assert.Equal(expectedMessages, result.Messages.Select(x => x.MessageId));
+            }
+            else
+            {
+                var expectedMessages = createdArchivedMessages
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .Select(x => x.MessageId)
+                    .ToList();
+
+                result.Messages.Should().HaveCount(expectedMessages.Count);
+                Assert.Equal(expectedMessages, result.Messages.Select(x => x.MessageId));
+            }
+
+            skip += pageSize;
+        }
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(10)]
+    public async Task Can_fetch_all_messages_with_pagination_navigation_backward_returns_expected_messages(int pageSize)
+    {
+        // Arrange
+        var createdArchivedMessages = new List<ArchivedMessage>();
+        for (var i = 0; i < 6; i++)
+        {
+            var archivedMessage = CreateArchivedMessage(_clock.GetCurrentInstant());
+            await ArchiveMessage(archivedMessage);
+            createdArchivedMessages.Add(archivedMessage);
+        }
+
+        var pagination = new SortedCursorBasedPagination(pageSize: pageSize, navigationForward: false);
+
+        // Act
+        var skip = 0;
+        var nextPage = true;
+        while (nextPage)
+        {
+            var result = await _archivedMessagesClient.SearchAsync(
+                new GetMessagesQuery(pagination),
+                CancellationToken.None);
+
+            if (result.Messages.Count < pageSize)
+            {
+                nextPage = false;
+            }
+            else
+            {
+                pagination = new SortedCursorBasedPagination(
+                    cursor: new PaginationCursor(RecordId: result.Messages.First().RecordId),
+                    pageSize: pageSize,
+                    navigationForward: false);
+            }
+
+            // Assert
+            if (nextPage)
+            {
+                result.Messages.Should().HaveCount(pageSize);
+                var expectedMessages = createdArchivedMessages
+                    .OrderByDescending(x => x.CreatedAt)
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .ToList()
+                    .OrderBy(x => x.CreatedAt)
+                    .Select(x => x.MessageId)
+                    .ToList();
+
+                Assert.Equal(expectedMessages, result.Messages.Select(x => x.MessageId));
+            }
+            else
+            {
+                var expectedMessages = createdArchivedMessages
+                    .OrderByDescending(x => x.CreatedAt)
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .ToList()
+                    .OrderBy(x => x.CreatedAt)
+                    .Select(x => x.MessageId)
+                    .ToList();
+
+                result.Messages.Should().HaveCount(expectedMessages.Count);
+                Assert.Equal(expectedMessages, result.Messages.Select(x => x.MessageId));
+            }
+
+            skip += pageSize;
+        }
+    }
+
+    [Fact]
+    public async Task Can_fetch_messages_with_pagination_navigation_backward_returns_expected_messages()
+    {
+        // Arrange
+        var createdArchivedMessages = new List<ArchivedMessage>();
+        for (var i = 0; i < 6; i++)
+        {
+            var archivedMessage = CreateArchivedMessage(_clock.GetCurrentInstant());
+            await ArchiveMessage(archivedMessage);
+            createdArchivedMessages.Add(archivedMessage);
+        }
+
+        // Act
+        var result = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(new SortedCursorBasedPagination(pageSize: 5, navigationForward: false)),
+            CancellationToken.None);
+
+        // Assert
+        result.Messages.Should().HaveCount(5);
+        var expectedLast5Messages = createdArchivedMessages.Skip(1).Take(5).Select(x => x.MessageId).ToList();
+
+        Assert.Equal(expectedLast5Messages, result.Messages.Select(x => x.MessageId));
     }
 
     private static Instant CreatedAt(string date)
@@ -483,7 +763,7 @@ public class SearchMessagesTests : TestBase
         MessageId? relatedToMessageId = null)
     {
         return new ArchivedMessage(
-            messageId ?? "MessageId",
+            messageId ?? Guid.NewGuid().ToString(),
             Array.Empty<EventId>(),
             documentType ?? DocumentType.NotifyAggregatedMeasureData.Name,
             ActorNumber.Create(senderNumber ?? "1234512345123"),

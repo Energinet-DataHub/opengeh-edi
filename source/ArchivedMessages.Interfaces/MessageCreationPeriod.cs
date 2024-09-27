@@ -16,12 +16,4 @@ using NodaTime;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
-public record MessageInfo(
-    long RecordId,
-    Guid Id,
-    string? MessageId,
-    string DocumentType,
-    string SenderNumber,
-    string ReceiverNumber,
-    Instant CreatedAt,
-    string? BusinessReason);
+public record MessageCreationPeriod(Instant DateToSearchFrom, Instant DateToSearchTo);
