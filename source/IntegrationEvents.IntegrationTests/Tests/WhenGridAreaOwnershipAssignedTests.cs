@@ -12,18 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Dapper;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.IntegrationTests.Factories;
-using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Builders;
+using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Google.Protobuf.WellKnownTypes;
@@ -31,17 +26,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.IntegrationEvents;
+namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Tests;
 
-public class WhenGridAreaOwnershipAssignedTests : TestBase
+[Collection(nameof(IntegrationEventsIntegrationTestCollectionFixture))]
+public class WhenGridAreaOwnershipAssignedTests : IntegrationEventsTestBase
 {
-    private readonly IDatabaseConnectionFactory _connectionFactory;
     private readonly GridAreaOwnershipAssignedEventBuilder _gridAreaOwnershipAssignedEventBuilder = new();
 
-    public WhenGridAreaOwnershipAssignedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+    public WhenGridAreaOwnershipAssignedTests(IntegrationEventsFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
-        _connectionFactory = GetService<IDatabaseConnectionFactory>();
+        SetupServiceCollection();
     }
 
     [Fact]
@@ -67,7 +62,6 @@ public class WhenGridAreaOwnershipAssignedTests : TestBase
 
         await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent01);
         await HavingReceivedAndHandledIntegrationEventAsync(GridAreaOwnershipAssigned.EventName, gridAreaOwnershipAssignedEvent02);
-
         var gridAreas = await GetGridAreas();
         Assert.All(gridAreas, area => Assert.Equal(area.GridAreaOwnerActorNumber, gridAreaOwnershipAssignedEvent01.ActorNumber));
     }
@@ -166,24 +160,25 @@ public class WhenGridAreaOwnershipAssignedTests : TestBase
 
     private async Task HavingReceivedAndHandledIntegrationEventAsync(string eventType, GridAreaOwnershipAssigned gridAreaOwnershipAssigned)
     {
-        var integrationEventHandler = GetService<IIntegrationEventHandler>();
+        var integrationEventHandler = Services.GetService<IIntegrationEventHandler>();
 
         var integrationEvent = new IntegrationEvent(Guid.NewGuid(), eventType, 1, gridAreaOwnershipAssigned);
 
-        await integrationEventHandler.HandleAsync(integrationEvent).ConfigureAwait(false);
+        await integrationEventHandler!.HandleAsync(integrationEvent).ConfigureAwait(false);
     }
 
     private async Task<IEnumerable<GridArea>> GetGridAreas()
     {
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
+        var connectionFactory = Services.GetService<IDatabaseConnectionFactory>();
+        using var connection = await connectionFactory!.GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = $"SELECT GridAreaCode, GridAreaOwnerActorNumber FROM [dbo].[GridAreaOwner]";
         return await connection.QueryAsync<GridArea>(sql);
     }
 
     private async Task<ActorNumber> GetOwner(string gridAreaCode)
     {
-        var serviceScopeFactory = GetService<IServiceScopeFactory>();
-        using var newScope = serviceScopeFactory.CreateScope();
+        var serviceScopeFactory = Services.GetService<IServiceScopeFactory>();
+        using var newScope = serviceScopeFactory!.CreateScope();
         var masterDataClient = newScope.ServiceProvider.GetRequiredService<IMasterDataClient>();
         var gridAreaOwner = await masterDataClient
             .GetGridOwnerForGridAreaCodeAsync(gridAreaCode, CancellationToken.None)

@@ -16,22 +16,22 @@ using Dapper;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Subscriber;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.IntegrationTests.Factories;
-using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Builders;
+using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.IntegrationEvents;
+namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Tests;
 
-public class WhenAnActorActivatedIsAvailableTests : TestBase
+[Collection(nameof(IntegrationEventsIntegrationTestCollectionFixture))]
+public class WhenAnActorActivatedIsAvailableTests : IntegrationEventsTestBase
 {
-    private readonly IDatabaseConnectionFactory _connectionFactory;
-
-    public WhenAnActorActivatedIsAvailableTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+    public WhenAnActorActivatedIsAvailableTests(IntegrationEventsFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
-        _connectionFactory = GetService<IDatabaseConnectionFactory>();
+        SetupServiceCollection();
     }
 
     [Fact]
@@ -59,16 +59,17 @@ public class WhenAnActorActivatedIsAvailableTests : TestBase
 
     private async Task HavingReceivedAndHandledIntegrationEventAsync(string eventType, ActorActivated actorActivated)
     {
-        var integrationEventHandler = GetService<IIntegrationEventHandler>();
+        var integrationEventHandler = Services.GetService<IIntegrationEventHandler>();
 
         var integrationEvent = new IntegrationEvent(Guid.NewGuid(), eventType, 1, actorActivated);
 
-        await integrationEventHandler.HandleAsync(integrationEvent).ConfigureAwait(false);
+        await integrationEventHandler!.HandleAsync(integrationEvent).ConfigureAwait(false);
     }
 
     private async Task<IEnumerable<Actor>> GetActors(string actorNumber, string externalActorId)
     {
-        using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
+        var connectionFactory = Services.GetService<IDatabaseConnectionFactory>();
+        using var connection = await connectionFactory!.GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = $"SELECT Id, ActorNumber, ExternalId FROM [dbo].[Actor] WHERE ActorNumber = '{actorNumber}' AND ExternalId = '{externalActorId}'";
         return await connection.QueryAsync<Actor>(sql);
     }
