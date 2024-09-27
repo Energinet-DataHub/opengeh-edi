@@ -25,7 +25,7 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Tests;
 
-[Collection(nameof(IntegrationEventsIntegrationTestCollectionFixture))]
+[Collection(nameof(IntegrationEventsIntegrationTestCollection))]
 public class WhenProcessDelegationIsAvailableTests : IntegrationEventsTestBase
 {
     public WhenProcessDelegationIsAvailableTests(IntegrationEventsFixture integrationTestFixture, ITestOutputHelper testOutputHelper)

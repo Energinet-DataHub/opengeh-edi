@@ -27,7 +27,7 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Tests;
 
-[Collection(nameof(IntegrationEventsIntegrationTestCollectionFixture))]
+[Collection(nameof(IntegrationEventsIntegrationTestCollection))]
 public class WhenActorCertificateCredentialsRemovedEventIsReceived : IntegrationEventsTestBase
 {
     public WhenActorCertificateCredentialsRemovedEventIsReceived(IntegrationEventsFixture integrationEventsFixture, ITestOutputHelper testOutputHelper)

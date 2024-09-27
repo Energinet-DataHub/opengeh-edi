@@ -36,7 +36,7 @@ public class IntegrationEventsTestBase
         _integrationEventsFixture = integrationEventsFixture;
         _testOutputHelper = testOutputHelper;
 
-        CleanupDatabase();
+        integrationEventsFixture.DatabaseManager.CleanupDatabase();
     }
 
     protected ServiceProvider Services { get; private set; } = null!;
@@ -68,10 +68,5 @@ public class IntegrationEventsTestBase
         services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
 
         Services = services.BuildServiceProvider();
-    }
-
-    private void CleanupDatabase()
-    {
-        _integrationEventsFixture.DatabaseManager.CleanupDatabase();
     }
 }
