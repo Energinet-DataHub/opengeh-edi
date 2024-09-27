@@ -16,8 +16,13 @@ limitations under the License.
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <AssemblyName>Energinet.DataHub.EDI.Tests.Shared</AssemblyName>
-        <RootNamespace>Energinet.DataHub.EDI.Tests.Shared</RootNamespace>
+        <AssemblyName>Energinet.DataHub.BuildingBlocks.Tests.Shared</AssemblyName>
+        <RootNamespace>Energinet.DataHub.BuildingBlocks.Tests.Shared</RootNamespace>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
+    
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
+      <PackageReference Include="xunit.abstractions" Version="2.0.3" />
+    </ItemGroup>
 </Project>

@@ -53,6 +53,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.EDI.Tests.Shared;
 using Google.Protobuf;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
