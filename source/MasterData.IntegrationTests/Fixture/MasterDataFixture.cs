@@ -12,13 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture.Database;
+using Microsoft.Extensions.DependencyInjection;
+using Xunit;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.Actors;
+namespace Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture;
 
-internal static class SampleData
+public sealed class MasterDataFixture : IAsyncLifetime
 {
-    internal static string ActorNumber => "5148796574821";
+    public EdiDatabaseManager DatabaseManager { get; } = new();
 
-    internal static string ExternalId => Guid.Parse("9222905B-8B02-4D8B-A2C1-3BD51B1AD8D9").ToString();
+    public async Task InitializeAsync()
+    {
+        await DatabaseManager.CreateDatabaseAsync();
+    }
+
+    public Task DisposeAsync()
+    {
+        DatabaseManager.CleanupDatabase();
+        return Task.CompletedTask;
+    }
 }
