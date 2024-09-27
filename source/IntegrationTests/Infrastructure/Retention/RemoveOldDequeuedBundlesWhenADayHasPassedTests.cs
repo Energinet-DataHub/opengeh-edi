@@ -285,6 +285,6 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
                 serializer.Deserialize<AuditLogOutboxMessageV1Payload>(message.Payload).AffectedEntityType == AuditLogEntityType.MarketDocument.Identifier)
             .And.Contain(message =>
                 serializer.Deserialize<AuditLogOutboxMessageV1Payload>(message.Payload).AffectedEntityType == AuditLogEntityType.OutgoingMessage.Identifier)
-            .And.HaveCount(6, "There should be 6 audit log entries for the bundle, market document and outgoing message one set to the receiver and one set to the charge owner.");
+            .And.HaveCount(3, "There should be 3 audit log entries for the bundle, when the messages has been peeked by the receiver.");
     }
 }
