@@ -97,19 +97,19 @@ public class DequeuedBundlesRetention : IDataRetention
         }
     }
 
-    private async Task AuditLogOutgoingMessageDeletionAsync(Instant monthAgo)
+    private async Task AuditLogOutgoingMessageDeletionAsync(Instant deletedAfter)
     {
-        await AuditLogAsync(AuditLogEntityType.OutgoingMessage, monthAgo).ConfigureAwait(false);
+        await AuditLogAsync(AuditLogEntityType.OutgoingMessage, deletedAfter).ConfigureAwait(false);
     }
 
-    private async Task AuditLogMarketDocumentDeletionAsync(Instant monthAgo)
+    private async Task AuditLogMarketDocumentDeletionAsync(Instant deletedAfter)
     {
-        await AuditLogAsync(AuditLogEntityType.MarketDocument, monthAgo).ConfigureAwait(false);
+        await AuditLogAsync(AuditLogEntityType.MarketDocument, deletedAfter).ConfigureAwait(false);
     }
 
-    private async Task AuditLogBundleDeletionAsync(Instant monthAgo, IReadOnlyCollection<Bundle> dequeuedBundles)
+    private async Task AuditLogBundleDeletionAsync(Instant deletedAfter, IReadOnlyCollection<Bundle> dequeuedBundles)
     {
-        await AuditLogAsync(AuditLogEntityType.Bundle, (OlderThan: monthAgo, DeletedAmount: dequeuedBundles.Count))
+        await AuditLogAsync(AuditLogEntityType.Bundle, (OlderThan: deletedAfter, DeletedAmount: dequeuedBundles.Count))
             .ConfigureAwait(false);
     }
 

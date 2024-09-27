@@ -83,13 +83,13 @@ public class ReceivedInboxEventsRetention : IDataRetention
         }
     }
 
-    private async Task LogAuditAsync(Instant monthAgo)
+    private async Task LogAuditAsync(Instant deletedAfter)
     {
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
                 activity: AuditLogActivity.Deletion,
                 activityOrigin: nameof(ADayHasPassed),
-                activityPayload: monthAgo,
+                activityPayload: deletedAfter,
                 affectedEntityType: AuditLogEntityType.ReceivedInboxEvent,
                 affectedEntityKey: null)
             .ConfigureAwait(false);
