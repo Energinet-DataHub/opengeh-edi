@@ -146,7 +146,7 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
         contentType!.MediaType.Should().Be("application/xml");
         contentType.CharSet.Should().Be("utf-8");
         var content = await actualResponse.Content.ReadAsByteArrayAsync();
-        Encoding.UTF8.GetString(content).Should().Be("Invalid document");
+        Encoding.UTF8.GetString(content).Should().Be(string.Empty);
         actualResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
     }
 

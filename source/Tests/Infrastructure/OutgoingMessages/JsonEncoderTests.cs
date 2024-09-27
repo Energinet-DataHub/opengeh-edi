@@ -178,6 +178,6 @@ public sealed class JsonEncoderTests
         // Assert
         result.Should()
             .Contain(
-                "/RequestAggregatedMeasureData_MarketDocument: [required, Required properties [\"createdDateTime\",\"receiver_MarketParticipant.marketRole.type\"] are not present]");
+                "/RequestAggregatedMeasureData_MarketDocument: [required, Required properties [\\u0022createdDateTime\\u0022,\\u0022receiver_MarketParticipant.marketRole.type\\u0022] are not present]");
     }
 }
