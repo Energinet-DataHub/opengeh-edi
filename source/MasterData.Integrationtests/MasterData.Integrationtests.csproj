@@ -32,8 +32,4 @@
         <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Tests\" />
-    </ItemGroup>
-
 </Project>

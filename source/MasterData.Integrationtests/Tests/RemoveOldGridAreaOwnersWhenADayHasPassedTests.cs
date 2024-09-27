@@ -14,27 +14,26 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
-using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
-using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Retention;
+namespace Energinet.DataHub.EDI.MasterData.IntegrationTests.Tests;
 
-public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
+[Collection(nameof(MasterDataTestCollectionFixture))]
+public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : MasterDataTestBase
 {
-    private readonly IMasterDataClient _masterDataClient;
+    private readonly IMasterDataClient? _masterDataClient;
 
-    public RemoveOldGridAreaOwnersWhenADayHasPassedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+    public RemoveOldGridAreaOwnersWhenADayHasPassedTests(MasterDataFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
-        _masterDataClient = GetService<IMasterDataClient>();
+        SetupServiceCollection();
+        _masterDataClient = Services.GetService<IMasterDataClient>();
     }
 
     [Fact]
@@ -57,16 +56,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 
         await AddActorsToDatabaseAsync(new List<GridAreaOwnershipAssignedDto> { gridAreaOwner1, gridAreaOwner2 });
 
-        var config = new ConfigurationBuilder()
-            .AddEnvironmentVariables()
-            .Build();
-
-        var scopedServiceCollection = new ServiceCollection();
-        scopedServiceCollection.AddMasterDataModule(config);
-        scopedServiceCollection.AddScoped<IClock>(
-            _ => new ClockStub(Instant.FromUtc(2023, 11, 3, 0, 0, 0)));
-
-        var sut = scopedServiceCollection.BuildServiceProvider().GetService<IDataRetention>()
+        var sut = Services.GetService<IDataRetention>()
                   ?? throw new ArgumentNullException();
 
         // Act
@@ -98,16 +88,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 
         await AddActorsToDatabaseAsync(new List<GridAreaOwnershipAssignedDto> { gridAreaOwner1, gridAreaOwner2 });
 
-        var config = new ConfigurationBuilder()
-            .AddEnvironmentVariables()
-            .Build();
-
-        var scopedServiceCollection = new ServiceCollection();
-        scopedServiceCollection.AddMasterDataModule(config);
-        scopedServiceCollection.AddScoped<IClock>(
-            _ => new ClockStub(Instant.FromUtc(2023, 11, 3, 0, 0, 0)));
-
-        var sut = scopedServiceCollection.BuildServiceProvider().GetService<IDataRetention>()
+        var sut = Services.GetService<IDataRetention>()
                   ?? throw new ArgumentNullException();
 
         // Act
@@ -152,16 +133,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
 
         await AddActorsToDatabaseAsync(new List<GridAreaOwnershipAssignedDto> { gridAreaOwner3, gridAreaOwner4 });
 
-        var config = new ConfigurationBuilder()
-            .AddEnvironmentVariables()
-            .Build();
-
-        var scopedServiceCollection = new ServiceCollection();
-        scopedServiceCollection.AddMasterDataModule(config);
-        scopedServiceCollection.AddScoped<IClock>(
-            _ => new ClockStub(Instant.FromUtc(2023, 11, 3, 0, 0, 0)));
-
-        var sut = scopedServiceCollection.BuildServiceProvider().GetService<IDataRetention>()
+        var sut = Services.GetService<IDataRetention>()
                   ?? throw new ArgumentNullException();
 
         // Act
@@ -175,12 +147,12 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : TestBase
     private async Task AddActorsToDatabaseAsync(List<GridAreaOwnershipAssignedDto> gridAreaOwners)
     {
         foreach (var gao in gridAreaOwners)
-            await _masterDataClient.UpdateGridAreaOwnershipAsync(gao, CancellationToken.None);
+            await _masterDataClient!.UpdateGridAreaOwnershipAsync(gao, CancellationToken.None);
     }
 
     private async Task<ActorNumber> GetGridAreaOwnersForGridArea(string gridAreaCode)
     {
-        var gridAreaOwner = await _masterDataClient.GetGridOwnerForGridAreaCodeAsync(gridAreaCode, CancellationToken.None);
+        var gridAreaOwner = await _masterDataClient!.GetGridOwnerForGridAreaCodeAsync(gridAreaCode, CancellationToken.None);
         return gridAreaOwner.ActorNumber;
     }
 }

@@ -24,12 +24,12 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.MasterData.IntegrationTests.Tests.Actors;
 
 [Collection(nameof(MasterDataTestCollectionFixture))]
-public class CreateActorsTests : MasterDataTestBase
+public class WhenActorIsCreatedTests : MasterDataTestBase
 {
     private readonly IMasterDataClient? _masterDataClient;
     private readonly IDatabaseConnectionFactory? _connectionFactory;
 
-    public CreateActorsTests(MasterDataFixture masterDataFixture, ITestOutputHelper testOutputHelper)
+    public WhenActorIsCreatedTests(MasterDataFixture masterDataFixture, ITestOutputHelper testOutputHelper)
         : base(masterDataFixture, testOutputHelper)
     {
         SetupServiceCollection();
