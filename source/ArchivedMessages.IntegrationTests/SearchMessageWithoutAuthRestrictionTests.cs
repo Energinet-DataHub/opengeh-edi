@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -30,9 +31,16 @@ public class SearchMessageWithoutAuthRestrictionTests
     private readonly IArchivedMessagesClient _sut;
     private readonly ArchivedMessagesFixture _fixture;
 
+    private readonly ActorIdentity _authenticatedActor = new(
+        ActorNumber.Create("1234512345811"),
+        Restriction.None,
+        ActorRole.MeteredDataAdministrator);
+
     public SearchMessageWithoutAuthRestrictionTests(ArchivedMessagesFixture fixture)
     {
         _fixture = fixture;
+
+        fixture.AuthenticatedActor.SetAuthenticatedActor(_authenticatedActor);
         _sut = fixture.ArchivedMessagesClient;
         _fixture.CleanupDatabase();
         _fixture.CleanupFileStorage();
@@ -42,7 +50,7 @@ public class SearchMessageWithoutAuthRestrictionTests
     public async Task Given_ArchivedMessage_When_SearchingWithoutCriteria_Then_ReturnsExpectedMessage()
     {
         // Arrange
-        var archivedMessage = await CreateArchivedMessageAsync();
+        var archivedMessage = await _fixture.CreateArchivedMessageAsync();
 
         // Act
         var result = await _sut.SearchAsync(new GetMessagesQuery(), CancellationToken.None);
@@ -52,8 +60,12 @@ public class SearchMessageWithoutAuthRestrictionTests
         using var assertionScope = new AssertionScope();
         var message = result.Messages.Should().ContainSingle().Subject;
         message.MessageId.Should().Be(archivedMessage.MessageId);
-        message.SenderNumber.Should().Be(archivedMessage.SenderNumber.Value);
-        message.ReceiverNumber.Should().Be(archivedMessage.ReceiverNumber.Value);
+        message.SenderNumber.Should()
+            .Be(archivedMessage.SenderNumber.Value)
+            .And.NotBe(_authenticatedActor.ActorNumber.Value);
+        message.ReceiverNumber.Should()
+            .Be(archivedMessage.ReceiverNumber.Value)
+            .And.NotBe(_authenticatedActor.ActorNumber.Value);
         message.DocumentType.Should().Be(archivedMessage.DocumentType);
         message.BusinessReason.Should().Be(archivedMessage.BusinessReason);
         message.CreatedAt.Should().Be(archivedMessage.CreatedAt);
@@ -65,9 +77,9 @@ public class SearchMessageWithoutAuthRestrictionTests
     {
         // Arrange
         var expectedCreatedAt = CreatedAt("2023-05-01T22:00:00Z");
-        await CreateArchivedMessageAsync(timestamp: expectedCreatedAt.PlusDays(-1));
-        await CreateArchivedMessageAsync(timestamp: expectedCreatedAt);
-        await CreateArchivedMessageAsync(timestamp: expectedCreatedAt.PlusDays(1));
+        await _fixture.CreateArchivedMessageAsync(timestamp: expectedCreatedAt.PlusDays(-1));
+        await _fixture.CreateArchivedMessageAsync(timestamp: expectedCreatedAt);
+        await _fixture.CreateArchivedMessageAsync(timestamp: expectedCreatedAt.PlusDays(1));
 
         // Act
         var result = await _sut.SearchAsync(
@@ -83,38 +95,12 @@ public class SearchMessageWithoutAuthRestrictionTests
     }
 
     [Fact]
-    public async Task Given_TwoArchivedMessages_When_SearchingByDateAndMessageId_Then_ReturnsExpectedMessage()
-    {
-        // Arrange
-        var expectedMessageId = Guid.NewGuid().ToString();
-        var expectedCreatedAt = CreatedAt("2023-05-01T22:00:00Z");
-        await CreateArchivedMessageAsync(timestamp: expectedCreatedAt, messageId: expectedMessageId);
-        await CreateArchivedMessageAsync(timestamp: expectedCreatedAt.PlusDays(1));
-
-        // Act
-        var result = await _sut.SearchAsync(
-            new GetMessagesQuery(
-                CreationPeriod: new MessageCreationPeriod(
-                    expectedCreatedAt.PlusHours(-2),
-                    expectedCreatedAt.PlusHours(2)),
-                MessageId: expectedMessageId),
-            CancellationToken.None);
-
-        // Assert
-        result.Should().NotBeNull();
-        using var assertionScope = new AssertionScope();
-        var message = result.Messages.Should().ContainSingle().Subject;
-        message.CreatedAt.Should().Be(expectedCreatedAt);
-        message.MessageId.Should().Be(expectedMessageId);
-    }
-
-    [Fact]
     public async Task Given_TwoArchivedMessages_When_SearchingBySenderNumber_Then_ReturnsExpectedMessage()
     {
         // Arrange
         var expectedSenderNumber = "9999999999999";
-        await CreateArchivedMessageAsync(senderNumber: expectedSenderNumber);
-        await CreateArchivedMessageAsync();
+        await _fixture.CreateArchivedMessageAsync(senderNumber: expectedSenderNumber);
+        await _fixture.CreateArchivedMessageAsync();
 
         // Act
         var result = await _sut.SearchAsync(
@@ -134,8 +120,8 @@ public class SearchMessageWithoutAuthRestrictionTests
     {
         // Arrange
         var expectedReceiverNumber = "9999999999999";
-        await CreateArchivedMessageAsync(receiverNumber: expectedReceiverNumber);
-        await CreateArchivedMessageAsync();
+        await _fixture.CreateArchivedMessageAsync(receiverNumber: expectedReceiverNumber);
+        await _fixture.CreateArchivedMessageAsync();
 
         // Act
         var result = await _sut.SearchAsync(
@@ -155,8 +141,8 @@ public class SearchMessageWithoutAuthRestrictionTests
     {
         // Arrange
         var expectedMessageId = Guid.NewGuid().ToString();
-        await CreateArchivedMessageAsync(messageId: expectedMessageId);
-        await CreateArchivedMessageAsync();
+        await _fixture.CreateArchivedMessageAsync(messageId: expectedMessageId);
+        await _fixture.CreateArchivedMessageAsync();
 
         // Act
         var result = await _sut.SearchAsync(
@@ -177,16 +163,13 @@ public class SearchMessageWithoutAuthRestrictionTests
         // Arrange
         var expectedDocumentType = DocumentType.NotifyAggregatedMeasureData.Name;
         var unexpectedDocumentType = DocumentType.RejectRequestAggregatedMeasureData.Name;
-        await CreateArchivedMessageAsync(documentType: expectedDocumentType);
-        await CreateArchivedMessageAsync(documentType: unexpectedDocumentType);
+        await _fixture.CreateArchivedMessageAsync(documentType: expectedDocumentType);
+        await _fixture.CreateArchivedMessageAsync(documentType: unexpectedDocumentType);
 
         // Act
         var result = await _sut.SearchAsync(
             new GetMessagesQuery(
-                DocumentTypes: new List<string>
-                {
-                    expectedDocumentType,
-                }),
+                DocumentTypes: [expectedDocumentType]),
             CancellationToken.None);
 
         // Assert
@@ -203,18 +186,18 @@ public class SearchMessageWithoutAuthRestrictionTests
         var expectedDocumentType1 = DocumentType.NotifyAggregatedMeasureData.Name;
         var expectedDocumentType2 = DocumentType.NotifyWholesaleServices.Name;
         var unexpectedDocumentType = DocumentType.RejectRequestAggregatedMeasureData.Name;
-        await CreateArchivedMessageAsync(documentType: expectedDocumentType1);
-        await CreateArchivedMessageAsync(documentType: expectedDocumentType2);
-        await CreateArchivedMessageAsync(documentType: unexpectedDocumentType);
+        await _fixture.CreateArchivedMessageAsync(documentType: expectedDocumentType1);
+        await _fixture.CreateArchivedMessageAsync(documentType: expectedDocumentType2);
+        await _fixture.CreateArchivedMessageAsync(documentType: unexpectedDocumentType);
 
         // Act
         var result = await _sut.SearchAsync(
             new GetMessagesQuery(
-                DocumentTypes: new List<string>
-                {
+                DocumentTypes:
+                [
                     expectedDocumentType1,
                     expectedDocumentType2,
-                }),
+                ]),
             CancellationToken.None);
 
         // Assert
@@ -223,7 +206,11 @@ public class SearchMessageWithoutAuthRestrictionTests
         result.Messages.Should().HaveCount(2);
         result.Messages.Select(message => message.DocumentType)
             .Should()
-            .BeEquivalentTo(new List<string> { expectedDocumentType1, expectedDocumentType2, });
+            .BeEquivalentTo(
+            [
+                expectedDocumentType1,
+                expectedDocumentType2,
+            ]);
     }
 
     [Fact]
@@ -232,16 +219,13 @@ public class SearchMessageWithoutAuthRestrictionTests
         // Arrange
         var expectedBusinessReason = BusinessReason.MoveIn.Name;
         var unexpectedBusinessReason = BusinessReason.BalanceFixing.Name;
-        await CreateArchivedMessageAsync(businessReasons: expectedBusinessReason);
-        await CreateArchivedMessageAsync(businessReasons: unexpectedBusinessReason);
+        await _fixture.CreateArchivedMessageAsync(businessReasons: expectedBusinessReason);
+        await _fixture.CreateArchivedMessageAsync(businessReasons: unexpectedBusinessReason);
 
         // Act
         var result = await _sut.SearchAsync(
             new GetMessagesQuery(
-                BusinessReasons: new List<string>
-                {
-                    expectedBusinessReason,
-                }),
+                BusinessReasons: [expectedBusinessReason]),
             CancellationToken.None);
 
         // Assert
@@ -258,18 +242,18 @@ public class SearchMessageWithoutAuthRestrictionTests
         var expectedBusinessReason1 = BusinessReason.MoveIn.Name;
         var expectedBusinessReason2 = BusinessReason.Correction.Name;
         var unexpectedBusinessReason = BusinessReason.BalanceFixing.Name;
-        await CreateArchivedMessageAsync(businessReasons: expectedBusinessReason1);
-        await CreateArchivedMessageAsync(businessReasons: expectedBusinessReason2);
-        await CreateArchivedMessageAsync(businessReasons: unexpectedBusinessReason);
+        await _fixture.CreateArchivedMessageAsync(businessReasons: expectedBusinessReason1);
+        await _fixture.CreateArchivedMessageAsync(businessReasons: expectedBusinessReason2);
+        await _fixture.CreateArchivedMessageAsync(businessReasons: unexpectedBusinessReason);
 
         // Act
         var result = await _sut.SearchAsync(
             new GetMessagesQuery(
-                BusinessReasons: new List<string>
-                {
+                BusinessReasons:
+                [
                     expectedBusinessReason1,
                     expectedBusinessReason2,
-                }),
+                ]),
             CancellationToken.None);
 
         // Assert
@@ -278,49 +262,200 @@ public class SearchMessageWithoutAuthRestrictionTests
         result.Messages.Should().HaveCount(2);
         result.Messages.Select(message => message.BusinessReason)
             .Should()
-            .BeEquivalentTo(new List<string> { expectedBusinessReason1, expectedBusinessReason2, });
+            .BeEquivalentTo(
+            [
+                expectedBusinessReason1,
+                expectedBusinessReason2,
+            ]);
     }
+
+    [Fact]
+    public async Task Given_SevenArchivedMessages_When_SearchingByAllCriteria_Then_AllCriteriaAreMet()
+    {
+        // Arrange
+        var expectedMessageId = Guid.NewGuid().ToString();
+        var expectedCreatedAt = CreatedAt("2023-05-01T22:00:00Z");
+        var expectedSenderNumber = "9999999999999";
+        var expectedReceiverNumber = "9999999999998";
+        var expectedDocumentType = DocumentType.NotifyWholesaleServices.Name;
+        var expectedBusinessReason = BusinessReason.MoveIn.Name;
+
+        var expectedMessage = await _fixture.CreateArchivedMessageAsync(
+            messageId: expectedMessageId,
+            timestamp: expectedCreatedAt,
+            senderNumber: expectedSenderNumber,
+            receiverNumber: expectedReceiverNumber,
+            documentType: expectedDocumentType,
+            businessReasons: expectedBusinessReason);
+        var messageWithMismatchingId = await _fixture.CreateArchivedMessageAsync(
+            messageId: Guid.NewGuid().ToString(),
+            timestamp: expectedCreatedAt,
+            senderNumber: expectedSenderNumber,
+            receiverNumber: expectedReceiverNumber,
+            documentType: expectedDocumentType,
+            businessReasons: expectedBusinessReason);
+        var messageWithMismatchingTimestamp = await _fixture.CreateArchivedMessageAsync(
+            messageId: expectedMessageId,
+            timestamp: expectedCreatedAt.PlusDays(-2),
+            senderNumber: expectedSenderNumber,
+            receiverNumber: expectedReceiverNumber,
+            documentType: expectedDocumentType,
+            businessReasons: expectedBusinessReason);
+        var messageWithMismatchingSenderNumber = await _fixture.CreateArchivedMessageAsync(
+            messageId: expectedMessageId,
+            timestamp: expectedCreatedAt,
+            senderNumber: expectedSenderNumber + "999",
+            receiverNumber: expectedReceiverNumber,
+            documentType: expectedDocumentType,
+            businessReasons: expectedBusinessReason);
+        var messageWithMismatchingReceiverNumber = await _fixture.CreateArchivedMessageAsync(
+            messageId: expectedMessageId,
+            timestamp: expectedCreatedAt,
+            senderNumber: expectedSenderNumber,
+            receiverNumber: expectedReceiverNumber + "999",
+            documentType: expectedDocumentType,
+            businessReasons: expectedBusinessReason);
+        var messageWithMismatchingDocumentType = await _fixture.CreateArchivedMessageAsync(
+            messageId: expectedMessageId,
+            timestamp: expectedCreatedAt,
+            senderNumber: expectedSenderNumber,
+            receiverNumber: expectedReceiverNumber,
+            documentType: DocumentType.RejectRequestAggregatedMeasureData.Name,
+            businessReasons: expectedBusinessReason);
+        var messageWithMismatchingBusinessReason = await _fixture.CreateArchivedMessageAsync(
+            messageId: expectedMessageId,
+            timestamp: expectedCreatedAt,
+            senderNumber: expectedSenderNumber,
+            receiverNumber: expectedReceiverNumber,
+            documentType: expectedDocumentType,
+            businessReasons: BusinessReason.PreliminaryAggregation.Name);
+
+        // Act
+        var result = await _sut.SearchAsync(
+            new GetMessagesQuery(
+                MessageId: expectedMessageId,
+                CreationPeriod: new MessageCreationPeriod(
+                    expectedCreatedAt.PlusHours(-2),
+                    expectedCreatedAt.PlusHours(2)),
+                SenderNumber: expectedSenderNumber,
+                ReceiverNumber: expectedReceiverNumber,
+                DocumentTypes: [expectedDocumentType],
+                BusinessReasons: [expectedBusinessReason]),
+            CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        using var assertionScope = new AssertionScope();
+
+        // note that we do have a OR-statement between sender and receiver number. hence we have 3 messages
+        result.Messages.Should().HaveCount(3);
+        result.Messages.Should()
+            .AllSatisfy(
+                message =>
+                {
+                    message.MessageId.Should().Be(expectedMessageId);
+                    message.CreatedAt.Should().Be(expectedCreatedAt);
+                    message.DocumentType.Should().Be(expectedDocumentType);
+                    message.BusinessReason.Should().Be(expectedBusinessReason);
+                });
+        result.Messages.Select(message => message.SenderNumber)
+            .Should()
+            .BeEquivalentTo(
+            [
+                expectedSenderNumber,
+                messageWithMismatchingReceiverNumber.SenderNumber.Value,
+                messageWithMismatchingSenderNumber.SenderNumber.Value,
+            ]);
+        result.Messages.Select(message => message.ReceiverNumber)
+            .Should()
+            .BeEquivalentTo(
+            [
+                expectedReceiverNumber,
+                messageWithMismatchingReceiverNumber.ReceiverNumber.Value,
+                messageWithMismatchingSenderNumber.ReceiverNumber.Value,
+            ]);
+    }
+
+    #region include_related_messages
+
+    [Fact]
+    public async Task
+        Given_TwoArchivedMessagesWithRelation_When_ExcludingRelatedMessagesAndSearchingByMessageId_Then_RelatedMessagesAreNotIncluded()
+    {
+        // Arrange
+        var expectedMessageId = Guid.NewGuid().ToString();
+        await _fixture.CreateArchivedMessageAsync(
+            messageId: expectedMessageId,
+            archivedMessageType: ArchivedMessageType.IncomingMessage);
+        await _fixture.CreateArchivedMessageAsync(
+            relatedToMessageId: MessageId.Create(expectedMessageId),
+            archivedMessageType: ArchivedMessageType.OutgoingMessage);
+
+        // Act
+        var result = await _sut.SearchAsync(
+            new GetMessagesQuery(
+                MessageId: expectedMessageId,
+                IncludeRelatedMessages: false),
+            CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        using var assertionScope = new AssertionScope();
+        result.Messages.Should()
+            .ContainSingle()
+            .Which.MessageId.Should()
+            .Be(expectedMessageId);
+    }
+
+    [Fact]
+    public async Task
+        Given_FourArchivedMessagesWithRelations_When_IncludingRelatedMessagesAndSearchingByMessageId_Then_RelatedMessagesAreReturned()
+    {
+        // Arrange
+        var messageWithoutRelation = await _fixture.CreateArchivedMessageAsync(
+            relatedToMessageId: null,
+            archivedMessageType: ArchivedMessageType.IncomingMessage);
+        var messageWithRelation = await _fixture.CreateArchivedMessageAsync(
+            relatedToMessageId: MessageId.Create(messageWithoutRelation.MessageId!),
+            archivedMessageType: ArchivedMessageType.OutgoingMessage);
+        var messageWithRelation2 = await _fixture.CreateArchivedMessageAsync(
+            relatedToMessageId: MessageId.Create(messageWithoutRelation.MessageId!),
+            archivedMessageType: ArchivedMessageType.OutgoingMessage);
+        var unexpectedMessage = await _fixture.CreateArchivedMessageAsync();
+
+        // Act
+        // This could simulate a search for a message, where it is a request with one response
+        var searchForRequest = await _sut.SearchAsync(
+            new GetMessagesQuery(
+                MessageId: messageWithoutRelation.MessageId,
+                IncludeRelatedMessages: true),
+            CancellationToken.None);
+
+        // This could simulate a search for a message, where it is a response to a request
+        var searchForResponse = await _sut.SearchAsync(
+            new GetMessagesQuery(
+                MessageId: messageWithRelation.MessageId,
+                IncludeRelatedMessages: true),
+            CancellationToken.None);
+
+        // Assert
+        using var assertionScope = new AssertionScope();
+        searchForRequest.Messages.Should().HaveCount(3);
+        searchForRequest.Should().BeEquivalentTo(searchForResponse); // Note that they are sorted differently
+        searchForRequest.Messages.Select(m => m.MessageId)
+            .Should()
+            .BeEquivalentTo(
+            [
+                messageWithoutRelation.MessageId,
+                messageWithRelation.MessageId,
+                messageWithRelation2.MessageId,
+            ]);
+    }
+
+    #endregion
 
     private static Instant CreatedAt(string date)
     {
         return InstantPattern.General.Parse(date).Value;
-    }
-
-    private async Task<ArchivedMessage> CreateArchivedMessageAsync(
-        ArchivedMessageType? archivedMessageType = null,
-        string? messageId = null,
-        string? documentContent = null,
-        string? documentType = null,
-        string? businessReasons = null,
-        string? senderNumber = null,
-        string? receiverNumber = null,
-        Instant? timestamp = null)
-    {
-        var documentStream = new MemoryStream();
-
-        if (!string.IsNullOrEmpty(documentContent))
-        {
-            var streamWriter = new StreamWriter(documentStream);
-            streamWriter.Write(documentContent);
-            streamWriter.Flush();
-        }
-
-        var archivedMessage = new ArchivedMessage(
-            string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
-            Array.Empty<EventId>(),
-            documentType ?? DocumentType.NotifyAggregatedMeasureData.Name,
-            ActorNumber.Create(senderNumber ?? "1234512345123"),
-            ActorRole.MeteredDataAdministrator,
-            ActorNumber.Create(receiverNumber ?? "1234512345128"),
-            ActorRole.DanishEnergyAgency,
-            timestamp ?? Instant.FromUtc(2023, 01, 01, 0, 0),
-            businessReasons ?? BusinessReason.BalanceFixing.Name,
-            archivedMessageType ?? ArchivedMessageType.IncomingMessage,
-            new ArchivedMessageStream(documentStream),
-            null);
-
-        await _sut.CreateAsync(archivedMessage, CancellationToken.None);
-
-        return archivedMessage;
     }
 }
