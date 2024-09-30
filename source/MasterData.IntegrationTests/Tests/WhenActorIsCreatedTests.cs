@@ -12,46 +12,47 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.Actors;
+namespace Energinet.DataHub.EDI.MasterData.IntegrationTests.Tests;
 
-public class CreateActorsTests : TestBase
+[Collection(nameof(MasterDataTestCollection))]
+public class WhenActorIsCreatedTests : MasterDataTestBase
 {
     private readonly IMasterDataClient _masterDataClient;
     private readonly IDatabaseConnectionFactory _connectionFactory;
 
-    public CreateActorsTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
-        : base(integrationTestFixture, testOutputHelper)
+    public WhenActorIsCreatedTests(MasterDataFixture masterDataFixture, ITestOutputHelper testOutputHelper)
+        : base(masterDataFixture, testOutputHelper)
     {
-        _masterDataClient = GetService<IMasterDataClient>();
-        _connectionFactory = GetService<IDatabaseConnectionFactory>();
+        SetupServiceCollection();
+        _masterDataClient = Services.GetRequiredService<IMasterDataClient>();
+        _connectionFactory = Services.GetRequiredService<IDatabaseConnectionFactory>();
     }
+
+    private static string ActorNumber => "5148796574821";
+
+    private static string ExternalId => Guid.Parse("9222905B-8B02-4D8B-A2C1-3BD51B1AD8D9").ToString();
 
     [Fact]
     public async Task Actor_is_created()
     {
         var createActorDto = CreateDto();
 
-        await _masterDataClient.CreateActorIfNotExistAsync(createActorDto, CancellationToken.None);
+        await _masterDataClient!.CreateActorIfNotExistAsync(createActorDto, CancellationToken.None);
 
         var actor = await GetActor();
 
         Assert.NotNull(actor);
-        Assert.Equal(SampleData.ActorNumber, actor.ActorNumber);
-        Assert.Equal(SampleData.ExternalId, actor.ExternalId);
+        Assert.Equal(ActorNumber, actor.ActorNumber);
+        Assert.Equal(ExternalId, actor.ExternalId);
     }
 
     [Fact]
@@ -62,7 +63,7 @@ public class CreateActorsTests : TestBase
         var createActorDto3 = CreateDto();
         var createActorDto4 = CreateDto();
 
-        await _masterDataClient.CreateActorIfNotExistAsync(createActorDto1, CancellationToken.None);
+        await _masterDataClient!.CreateActorIfNotExistAsync(createActorDto1, CancellationToken.None);
         await _masterDataClient.CreateActorIfNotExistAsync(createActorDto2, CancellationToken.None);
         await _masterDataClient.CreateActorIfNotExistAsync(createActorDto3, CancellationToken.None);
         await _masterDataClient.CreateActorIfNotExistAsync(createActorDto4, CancellationToken.None);
@@ -70,19 +71,19 @@ public class CreateActorsTests : TestBase
         var actors = (await GetAllActors()).ToList();
 
         Assert.Single(actors);
-        Assert.Equal(SampleData.ActorNumber, actors.First().ActorNumber);
-        Assert.Equal(SampleData.ExternalId, actors.First().ExternalId);
+        Assert.Equal(ActorNumber, actors.First().ActorNumber);
+        Assert.Equal(ExternalId, actors.First().ExternalId);
     }
 
     private static CreateActorDto CreateDto()
     {
-        return new CreateActorDto(SampleData.ExternalId, ActorNumber.Create(SampleData.ActorNumber));
+        return new CreateActorDto(ExternalId, BuildingBlocks.Domain.Models.ActorNumber.Create(ActorNumber));
     }
 
     private async Task<Actor?> GetActor()
     {
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None);
-        var sql = $"SELECT Id, ActorNumber, ExternalId FROM [dbo].[Actor] WHERE ExternalId = '{SampleData.ExternalId}' AND ActorNumber = '{SampleData.ActorNumber}'";
+        var sql = $"SELECT Id, ActorNumber, ExternalId FROM [dbo].[Actor] WHERE ExternalId = '{ExternalId}' AND ActorNumber = '{ActorNumber}'";
         return await connection.QuerySingleOrDefaultAsync<Actor>(sql);
     }
 
@@ -92,8 +93,8 @@ public class CreateActorsTests : TestBase
         var sql =
             $"SELECT Id, ActorNumber, ExternalId " +
             $"FROM [dbo].[Actor] " +
-            $"WHERE ExternalId = '{SampleData.ExternalId}' " +
-            $"AND ActorNumber = '{SampleData.ActorNumber}'";
+            $"WHERE ExternalId = '{ExternalId}' " +
+            $"AND ActorNumber = '{ActorNumber}'";
 
         return await connection.QueryAsync<Actor>(sql);
     }
