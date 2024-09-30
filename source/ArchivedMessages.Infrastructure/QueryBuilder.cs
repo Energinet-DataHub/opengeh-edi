@@ -117,11 +117,11 @@ internal sealed class QueryBuilder
                """;
     }
 
-    private string OrderBy(FieldToSortBy fieldToSortBy, DirectionSortBy directionSortBy, bool navigatingForward)
+    private string OrderBy(FieldToSortBy fieldToSortBy, SortByDirection sortByDirection, bool navigatingForward)
     {
         var pagingDirection = navigatingForward ? "DESC" : "ASC";
         // Toggle the sort direction if navigating backwards, because sql use top to limit the result
-        var sortDirection = navigatingForward ? directionSortBy : directionSortBy == DirectionSortBy.Ascending ? DirectionSortBy.Descending : DirectionSortBy.Ascending;
+        var sortDirection = navigatingForward ? sortByDirection : sortByDirection == SortByDirection.Ascending ? SortByDirection.Descending : SortByDirection.Ascending;
         return $" ORDER BY {fieldToSortBy.Identifier} {sortDirection.Identifier}, RecordId {pagingDirection}";
     }
 
@@ -129,10 +129,10 @@ internal sealed class QueryBuilder
     {
         var whereClause = " WHERE ";
         whereClause += _statement.Count > 0 ? $"{string.Join(" AND ", _statement)} AND " : string.Empty;
-        whereClause += WherePaginationPosition(query.Pagination.FieldToSortBy, query.Pagination.Cursor, query.Pagination.NavigationForward);
+        whereClause += WherePaginationPosition(query.Pagination.SortBy, query.Pagination.Cursor, query.Pagination.NavigationForward);
         string sqlStatement;
 
-        var orderBy = OrderBy(query.Pagination.FieldToSortBy, query.Pagination.DirectionSortBy, query.Pagination.NavigationForward);
+        var orderBy = OrderBy(query.Pagination.SortBy, query.Pagination.SortByDirection, query.Pagination.NavigationForward);
         if (query.IncludeRelatedMessages == true && query.MessageId is not null)
         {
             // Messages may be related in different ways, hence we have the following 3 cases:

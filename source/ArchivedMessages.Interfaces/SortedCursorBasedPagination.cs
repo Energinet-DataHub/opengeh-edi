@@ -15,19 +15,20 @@
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
 /// <summary>
-/// The SortedCursorBasedPagination is navigating through a dataset by moving the cursor to a specific position in the sorted dataset.
+/// The SortedCursorBasedPagination is navigating forward or backwards through a dataset
+/// by moving the cursor to a specific position in the sorted dataset.
 /// </summary>
 public class SortedCursorBasedPagination(
     PaginationCursor? cursor = null,
     int pageSize = 100,
     bool navigationForward = true,
     FieldToSortBy? fieldToSortBy = null,
-    DirectionSortBy? directionSortBy = null)
+    SortByDirection? directionSortBy = null)
 {
     /// <summary>
     ///  The current position in the dataset.
     /// </summary>
-    public PaginationCursor Cursor { get; } = cursor ?? new PaginationCursor(null, 0);
+    public PaginationCursor Cursor { get; } = cursor ?? new PaginationCursor();
 
     /// <summary>
     /// The number of items per page.
@@ -40,11 +41,14 @@ public class SortedCursorBasedPagination(
     public bool NavigationForward { get; } = navigationForward;
 
     /// <summary>
-    ///  A boolean indicating the direction of pagination.
+    ///  The field to sort by.
     /// </summary>
-    public FieldToSortBy FieldToSortBy { get; } = fieldToSortBy ?? FieldToSortBy.CreatedAt;
+    public FieldToSortBy SortBy { get; } = fieldToSortBy ?? FieldToSortBy.CreatedAt;
 
-    public DirectionSortBy DirectionSortBy { get; } = directionSortBy ?? DirectionSortBy.Descending;
+    /// <summary>
+    /// The direction to sort by.
+    /// </summary>
+    public SortByDirection SortByDirection { get; } = directionSortBy ?? SortByDirection.Descending;
 }
 
 /// <summary>
@@ -57,11 +61,11 @@ public class SortedCursorBasedPagination(
 /// [3]
 /// [4] - Cursor
 /// -- Looking backwards
-/// [9]
-/// [8]
-/// [7]
-/// [6]
 /// [5] - Cursor
+/// [6]
+/// [7]
+/// [8]
+/// [9]
 /// </summary>
 /// <param name="SortedField">If dataset should be short, we need to point at the current value of the field being sorted on.</param>
 /// <param name="RecordId"></param>

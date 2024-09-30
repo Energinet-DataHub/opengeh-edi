@@ -654,10 +654,38 @@ public class SearchMessagesTests : TestBase
         }
     }
 
+    [Fact]
+    public async Task Can_fetch_messages_with_pagination_navigation_backward_returns_expected_messages()
+    {
+        // Arrange
+        var createdArchivedMessages = new List<ArchivedMessage>();
+        for (var i = 0; i < 6; i++)
+        {
+            var archivedMessage = CreateArchivedMessage(_clock.GetCurrentInstant());
+            await ArchiveMessage(archivedMessage);
+            createdArchivedMessages.Add(archivedMessage);
+        }
+
+        // Act
+        var result = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(new SortedCursorBasedPagination(pageSize: 5, navigationForward: false)),
+            CancellationToken.None);
+
+        // Assert
+        result.Messages.Should().HaveCount(5);
+        var expectedLast5Messages = createdArchivedMessages
+            // Default sorting is descending by CreatedAt
+            .OrderByDescending(x => x.CreatedAt)
+            .Skip(1).Take(5)
+            .Select(x => x.MessageId).ToList();
+
+        Assert.Equal(expectedLast5Messages, result.Messages.Select(x => x.MessageId));
+    }
+
     [Theory]
-    //[InlineData(1)]
+    [InlineData(1)]
     [InlineData(2)]
-    //[InlineData(10)]
+    [InlineData(10)]
     public async Task Can_fetch_all_messages_with_pagination_navigation_backward_returns_expected_messages(int pageSize)
     {
         // Arrange
@@ -726,33 +754,9 @@ public class SearchMessagesTests : TestBase
         }
     }
 
-    [Fact]
-    public async Task Can_fetch_messages_with_pagination_navigation_backward_returns_expected_messages()
-    {
-        // Arrange
-        var createdArchivedMessages = new List<ArchivedMessage>();
-        for (var i = 0; i < 6; i++)
-        {
-            var archivedMessage = CreateArchivedMessage(_clock.GetCurrentInstant());
-            await ArchiveMessage(archivedMessage);
-            createdArchivedMessages.Add(archivedMessage);
-        }
-
-        // Act
-        var result = await _archivedMessagesClient.SearchAsync(
-            new GetMessagesQuery(new SortedCursorBasedPagination(pageSize: 5, navigationForward: false)),
-            CancellationToken.None);
-
-        // Assert
-        result.Messages.Should().HaveCount(5);
-        var expectedLast5Messages = createdArchivedMessages
-            // Default sorting is descending by CreatedAt
-            .OrderByDescending(x => x.CreatedAt)
-            .Skip(1).Take(5)
-            .Select(x => x.MessageId).ToList();
-
-        Assert.Equal(expectedLast5Messages, result.Messages.Select(x => x.MessageId));
-    }
+    // TODOS:
+    // - Add tests for sorting by different fields
+    // - Add tests for sorting by different directions
 
     private static Instant CreatedAt(string date)
     {

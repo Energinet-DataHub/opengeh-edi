@@ -14,11 +14,8 @@
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
-public record FieldToSortBy(string Identifier)
+public record SortByDirection(string Identifier)
 {
-    public static readonly FieldToSortBy MessageId = new("MessageId");
-    public static readonly FieldToSortBy DocumentType = new("DocumentType");
-    public static readonly FieldToSortBy Sender = new("Sender");
-    public static readonly FieldToSortBy Receiver = new("Receiver");
-    public static readonly FieldToSortBy CreatedAt = new("CreatedAt");
+    public static readonly SortByDirection Ascending = new("ASC");
+    public static readonly SortByDirection Descending = new("DESC");
 }
