@@ -53,7 +53,7 @@ public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
     }
 
     [Fact]
-    public async Task Pre_load_test()
+    public async Task Before_load_test()
     {
         await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(_fixture.LoadTestCalculationId);
         await CalculationCompletedDsl.StartEnqueueMessagesOrchestration(

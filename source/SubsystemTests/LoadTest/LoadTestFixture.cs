@@ -31,7 +31,6 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
     public LoadTestFixture()
     {
         var configurationBuilder = new ConfigurationBuilder()
-            .AddJsonFile("subsystemtests.dev002.settings.json", true)
             .AddEnvironmentVariables();
 
         var baseConfiguration = configurationBuilder.Build();
