@@ -145,6 +145,19 @@ public sealed class CalculationCompletedDsl
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
     }
 
+    internal async Task CleanupAfterCalculationId(Guid calculationId, string orchestrationInstanceId)
+    {
+        await _ediDriver.StopOrchestrationAsync(orchestrationInstanceId);
+
+        var dequeuedMessagesCount = await _ediDatabaseDriver.CountDequeuedMessagesForCalculationAsync(
+            calculationId,
+            CancellationToken.None);
+
+        _logger.WriteLine("Found {0} dequeued messages for calculation with Id={1}: ", dequeuedMessagesCount, calculationId);
+
+        await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(calculationId);
+    }
+
     private async Task StartAndWaitForOrchestrationToComplete(
         CalculationCompletedV1.Types.CalculationType calculationType,
         Guid calculationId)

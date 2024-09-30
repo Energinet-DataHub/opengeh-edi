@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
 using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
+namespace Energinet.DataHub.EDI.SubsystemTests.LoadTest;
 
 /// <summary>
 /// Test class used in the CI to trigger a calculation completed event, used for load testing on t001.
@@ -28,14 +29,15 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Tests;
 /// 4. Run Cleanup_load_test() test
 /// </summary>
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
-public sealed class LoadTestHelperTests
+[SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Test class")]
+public sealed class LoadTestHelpers
 {
     private readonly Guid _loadTestCalculationId = Guid.Parse("c0dc2726-168f-4eb0-a072-29ff97bb32f1");
 
     private readonly SubsystemTestFixture _fixture;
     private readonly CalculationCompletedDsl _calculationCompleted;
 
-    public LoadTestHelperTests(SubsystemTestFixture fixture, ITestOutputHelper output)
+    public LoadTestHelpers(SubsystemTestFixture fixture, ITestOutputHelper output)
     {
         _fixture = fixture;
 
@@ -52,7 +54,7 @@ public sealed class LoadTestHelperTests
     }
 
     [Fact]
-    public async Task Prepare_load_test()
+    public async Task Pre_load_test()
     {
         var orchestrationId = await _calculationCompleted.PublishForCalculationId(
             _loadTestCalculationId,
@@ -62,13 +64,12 @@ public sealed class LoadTestHelperTests
     }
 
     [Fact]
-    public async Task Cleanup_load_test()
+    public async Task After_load_test()
     {
         if (_fixture.LoadTestOrchestrationId == null)
             throw new Exception("Load test orchestration id is not set");
 
-        // TODO: Stop orchestration (_fixture.LoadTestOrchestrationId)
-        // TODO: Remove outgoing messages for calculation (_loadTestCalculationId)
+        await _calculationCompleted.CleanupAfterCalculationId(_loadTestCalculationId, _fixture.LoadTestOrchestrationId);
 
         await Task.CompletedTask;
     }

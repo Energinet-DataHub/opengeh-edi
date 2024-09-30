@@ -174,6 +174,11 @@ internal sealed class EdiDriver : IDisposable
         await _durableClient.WaitForInstanceCompletedAsync(orchestrationInstanceId, TimeSpan.FromMinutes(30));
     }
 
+    internal async Task StopOrchestrationAsync(string orchestrationInstanceId)
+    {
+        await _durableClient.TerminateAsync(orchestrationInstanceId, "Stopped by subsystem test");
+    }
+
     private static async Task<(Guid MessageId, string Content)> GetRequestWholesaleSettlementContentAsync(
         bool withSyncError,
         CancellationToken cancellationToken)
