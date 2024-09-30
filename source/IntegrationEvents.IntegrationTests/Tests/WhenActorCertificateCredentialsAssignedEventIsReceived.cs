@@ -19,7 +19,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Builders;
 using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
-using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
