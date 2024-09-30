@@ -100,7 +100,12 @@ public sealed class MessageParserTests
     [MemberData(nameof(CreateMessagesWithSingleAndMultipleTransactions))]
     public async Task Successfully_parsed(DocumentFormat format, Stream message)
     {
-        var result = await _marketMessageParser.ParseAsync(new IncomingMarketMessageStream(message), format, IncomingDocumentType.RequestAggregatedMeasureData, CancellationToken.None);
+        var result = await _marketMessageParser.ParseAsync(
+            new IncomingMarketMessageStream(message),
+            format,
+            IncomingDocumentType.RequestAggregatedMeasureData,
+            CancellationToken.None);
+
         using var assertionScope = new AssertionScope();
         result.Success.Should().BeTrue();
 
@@ -112,7 +117,7 @@ public sealed class MessageParserTests
         marketMessage.SenderRoleCode.Should().Be("DDK");
         marketMessage.ReceiverNumber.Should().Be("5790001330552");
         marketMessage.ReceiverRoleCode.Should().Be("DGL");
-        // marketMessage.CreatedAt.Should().Be("2022-12-17T09:30:47Z");
+        marketMessage.CreatedAt.Should().Be("2022-12-17T09:30:47Z");
         marketMessage.BusinessType.Should().Be("23");
 
         foreach (var series in marketMessage.Series.Cast<RequestAggregatedMeasureDataMessageSeries>())
@@ -134,7 +139,12 @@ public sealed class MessageParserTests
     [MemberData(nameof(CreateB2CMessagesWithSingleAndMultipleTransactions))]
     public async Task Successfully_parsed_b2c_messages(DocumentFormat format, Stream message)
     {
-        var result = await _marketMessageParser.ParseAsync(new IncomingMarketMessageStream(message), format, IncomingDocumentType.B2CRequestAggregatedMeasureData, CancellationToken.None);
+        var result = await _marketMessageParser.ParseAsync(
+            new IncomingMarketMessageStream(message),
+            format,
+            IncomingDocumentType.B2CRequestAggregatedMeasureData,
+            CancellationToken.None);
+
         using var assertionScope = new AssertionScope();
         result.Success.Should().BeTrue();
 
@@ -146,7 +156,7 @@ public sealed class MessageParserTests
         marketMessage.SenderRoleCode.Should().Be("DDK");
         marketMessage.ReceiverNumber.Should().Be("5790001330552");
         marketMessage.ReceiverRoleCode.Should().Be("DGL");
-        // marketMessage.CreatedAt.Should().Be("2022-12-17T09:30:47Z");
+        marketMessage.CreatedAt.Should().Be("2022-12-17T09:30:47Z");
         marketMessage.BusinessType.Should().Be("23");
 
         foreach (var series in marketMessage.Series.Cast<RequestAggregatedMeasureDataMessageSeries>())
@@ -251,7 +261,7 @@ public sealed class MessageParserTests
             "D05",
             "E74",
             "123564789123564789123564789123564789",
-            SystemClock.Instance.GetCurrentInstant().ToString(),
+            "2022-12-17T09:30:47Z",
             BusinessType: "23",
             [series]);
 
