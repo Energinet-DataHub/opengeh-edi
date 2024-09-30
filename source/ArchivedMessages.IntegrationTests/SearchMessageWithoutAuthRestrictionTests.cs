@@ -442,13 +442,13 @@ public class SearchMessageWithoutAuthRestrictionTests
         using var assertionScope = new AssertionScope();
         searchForRequest.Messages.Should().HaveCount(3);
         searchForRequest.Should().BeEquivalentTo(searchForResponse); // Note that they are sorted differently
-        searchForRequest.Messages.Select(m => m.MessageId)
+        searchForRequest.Messages.Select(m => m.Id)
             .Should()
             .BeEquivalentTo(
             [
-                messageWithoutRelation.MessageId,
-                messageWithRelation.MessageId,
-                messageWithRelation2.MessageId,
+                messageWithoutRelation.Id.Value,
+                messageWithRelation.Id.Value,
+                messageWithRelation2.Id.Value,
             ]);
     }
 
