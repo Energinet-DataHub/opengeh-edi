@@ -108,6 +108,7 @@ public class SubsystemTestFixture : IAsyncLifetime
 
         BalanceFixingCalculationId = GetConfigurationValue<Guid>(root, "BALANCE_FIXING_CALCULATION_ID");
         WholesaleFixingCalculationId = GetConfigurationValue<Guid>(root, "WHOLESALE_FIXING_CALCULATION_ID");
+        LoadTestCalculationId = GetConfigurationValue<Guid>(root, "LOAD_TEST_CALCULATION_ID");
 
         EbixMeteredDataResponsibleCertificateThumbprint = GetConfigurationValue<string>(
             root,
@@ -193,6 +194,8 @@ public class SubsystemTestFixture : IAsyncLifetime
     internal Guid BalanceFixingCalculationId { get; }
 
     internal Guid WholesaleFixingCalculationId { get; }
+
+    internal Guid LoadTestCalculationId { get; }
 
     internal ITestOutputHelper? Logger { get; set; }
 

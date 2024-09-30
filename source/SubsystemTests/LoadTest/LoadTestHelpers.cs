@@ -32,8 +32,6 @@ namespace Energinet.DataHub.EDI.SubsystemTests.LoadTest;
 [SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Test class")]
 public sealed class LoadTestHelpers
 {
-    private readonly Guid _loadTestCalculationId = Guid.Parse("c0dc2726-168f-4eb0-a072-29ff97bb32f1");
-
     private readonly SubsystemTestFixture _fixture;
     private readonly CalculationCompletedDsl _calculationCompleted;
 
@@ -57,7 +55,7 @@ public sealed class LoadTestHelpers
     public async Task Pre_load_test()
     {
         var orchestrationId = await _calculationCompleted.PublishForCalculationId(
-            _loadTestCalculationId,
+            _fixture.LoadTestCalculationId,
             CalculationCompletedV1.Types.CalculationType.WholesaleFixing);
 
         _fixture.LoadTestOrchestrationId = orchestrationId;
@@ -69,7 +67,7 @@ public sealed class LoadTestHelpers
         if (_fixture.LoadTestOrchestrationId == null)
             throw new Exception("Load test orchestration id is not set");
 
-        await _calculationCompleted.CleanupAfterCalculationId(_loadTestCalculationId, _fixture.LoadTestOrchestrationId);
+        await _calculationCompleted.CleanupAfterCalculationId(_fixture.LoadTestCalculationId, _fixture.LoadTestOrchestrationId);
 
         await Task.CompletedTask;
     }

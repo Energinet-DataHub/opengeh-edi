@@ -25,5 +25,7 @@
   "BALANCE_FIXING_CALCULATION_ID": "<balance fixing calculation id that has results in databrick views>",
 
   // The chosen wholesale fixing calculation should be in the period 1/2/2023 to 28/2/2023 with grid area 804
-  "WHOLESALE_FIXING_CALCULATION_ID": "<wholesale fixing calculation id that has results in databrick views>"
+  "WHOLESALE_FIXING_CALCULATION_ID": "<wholesale fixing calculation id that has results in databrick views>",
+
+  "LOAD_TEST_CALCULATION_ID": "<load test calculation id that has results in databrick views. c0dc2726-168f-4eb0-a072-29ff97bb32f1 on t001>"
 }
