@@ -73,8 +73,7 @@ public class SearchMessagesWithAuthRestrictionTests
     #region include_related_messages
 
     [Fact]
-    public async Task
-        Given_TwoArchivedMessagesWithRelation_When_ExcludingRelatedMessagesAndSearchingByMessageId_Then_RelatedMessagesAreNotIncluded()
+    public async Task Given_TwoArchivedMessagesWithRelation_When_ExcludingRelatedMessagesAndSearchingByMessageId_Then_RelatedMessagesAreNotIncluded()
     {
         // Arrange
         var expectedMessageId = Guid.NewGuid().ToString();
@@ -106,8 +105,7 @@ public class SearchMessagesWithAuthRestrictionTests
     }
 
     [Fact]
-    public async Task
-        Given_FourArchivedMessagesWithRelations_When_IncludingRelatedMessagesAndSearchingByMessageId_Then_RelatedMessagesAreReturned()
+    public async Task Given_FourArchivedMessagesWithRelations_When_IncludingRelatedMessagesAndSearchingByMessageId_Then_RelatedMessagesAreReturned()
     {
         // Arrange
         var messageWithoutRelation = await _fixture.CreateArchivedMessageAsync(
@@ -128,14 +126,14 @@ public class SearchMessagesWithAuthRestrictionTests
         var unexpectedMessage = await _fixture.CreateArchivedMessageAsync();
 
         // Act
-        // This could simulate a search for a message, where it is a request with one response
+        // This could simulate a search for a message, where the message is a request with two responses
         var searchForRequest = await _sut.SearchAsync(
             new GetMessagesQuery(
                 MessageId: messageWithoutRelation.MessageId,
                 IncludeRelatedMessages: true),
             CancellationToken.None);
 
-        // This could simulate a search for a message, where it is a response to a request
+        // This could simulate a search for a message, where it is a response to a request with two responses
         var searchForResponse = await _sut.SearchAsync(
             new GetMessagesQuery(
                 MessageId: messageWithRelation.MessageId,
@@ -160,8 +158,7 @@ public class SearchMessagesWithAuthRestrictionTests
     /// The following test is almost the same as the previous one, but messageWithRelation2 has a different receiver!.
     /// </summary>
     [Fact]
-    public async Task
-        Given_FourArchivedMessagesWithRelations_When_IncludingRelatedMessagesAndSearchingByMessageId_Then_RelatedMessagesAreReturned_WAAAWHWHAEHAHDSHDHASDHASHDHSHEEELP()
+    public async Task Given_FourArchivedMessagesWithRelations_When_IncludingRelatedMessagesAndSearchingByMessageId_Then_RelatedMessagesAreReturned_WAAAWHWHAEHAHDSHDHASDHASHDHSHEEELP()
     {
         // Arrange
         var messageWithoutRelation = await _fixture.CreateArchivedMessageAsync(
