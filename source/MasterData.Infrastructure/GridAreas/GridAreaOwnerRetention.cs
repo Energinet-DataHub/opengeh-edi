@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using NodaTime;
@@ -22,13 +24,16 @@ public class GridAreaOwnerRetention : IDataRetention
 {
     private readonly IClock _clock;
     private readonly MasterDataContext _masterDataContext;
+    private readonly IAuditLogger _auditLogger;
 
     public GridAreaOwnerRetention(
         IClock clock,
-        MasterDataContext masterDataContext)
+        MasterDataContext masterDataContext,
+        IAuditLogger auditLogger)
     {
         _clock = clock;
         _masterDataContext = masterDataContext;
+        _auditLogger = auditLogger;
     }
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
@@ -42,6 +47,15 @@ public class GridAreaOwnerRetention : IDataRetention
                      y.GridAreaCode == x.GridAreaCode
                      && y.ValidFrom < now
                      && y.SequenceNumber > x.SequenceNumber)));
+
+        await _auditLogger.LogWithCommitAsync(
+                logId: AuditLogId.New(),
+                activity: AuditLogActivity.Deletion,
+                activityOrigin: nameof(ADayHasPassed),
+                activityPayload: monthAgo,
+                affectedEntityType: AuditLogEntityType.GridAreaOwner,
+                affectedEntityKey: null)
+            .ConfigureAwait(false);
 
         await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }

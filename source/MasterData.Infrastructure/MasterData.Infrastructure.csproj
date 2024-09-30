@@ -4,6 +4,7 @@
     <RootNamespace>Energinet.DataHub.EDI.MasterData.Infrastructure</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AuditLog\AuditLog.csproj" />
     <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
     <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\MasterData.Domain\MasterData.Domain.csproj" />
