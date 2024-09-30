@@ -83,6 +83,21 @@ public class WhenArchivedMessageIsCreatedTests : IClassFixture<ArchivedMessagesF
         blobResult.Should().NotBeNull();
     }
 
+    [Fact]
+    public async Task Given_ArchivedMessagesInStorage_When_GettingMessage_Then_StreamExists()
+    {
+        // Arrange
+        var archivedMessage = CreateArchivedMessage();
+        await _sut.CreateAsync(archivedMessage, CancellationToken.None);
+
+        // Act
+        var result = await _sut.GetAsync(archivedMessage.Id, CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.Stream.Should().NotBeNull();
+    }
+
     private static ArchivedMessage CreateArchivedMessage(
         ArchivedMessageType? archivedMessageType = null,
         string? messageId = null,

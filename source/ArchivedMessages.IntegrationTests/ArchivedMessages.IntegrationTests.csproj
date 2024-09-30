@@ -45,6 +45,7 @@ limitations under the License.
       <ProjectReference Include="..\ArchivedMessages.Interfaces\ArchivedMessages.Interfaces.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+      <ProjectReference Include="..\Tests\Tests.csproj" />
     </ItemGroup>
 
 </Project>
