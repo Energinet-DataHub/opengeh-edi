@@ -15,8 +15,9 @@
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
-using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using Xunit.Abstractions;
+
+using CalculationType = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.CalculationCompletedV1.Types.CalculationType;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.LoadTest;
 
@@ -30,12 +31,12 @@ namespace Energinet.DataHub.EDI.SubsystemTests.LoadTest;
 /// </summary>
 [Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 [SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Test class")]
-public sealed class LoadTestHelpers
+public sealed class LoadTestHelper
 {
     private readonly SubsystemTestFixture _fixture;
     private readonly CalculationCompletedDsl _calculationCompleted;
 
-    public LoadTestHelpers(SubsystemTestFixture fixture, ITestOutputHelper output)
+    public LoadTestHelper(SubsystemTestFixture fixture, ITestOutputHelper output)
     {
         _fixture = fixture;
 
@@ -54,21 +55,8 @@ public sealed class LoadTestHelpers
     [Fact]
     public async Task Pre_load_test()
     {
-        var orchestrationId = await _calculationCompleted.PublishForCalculationId(
+        await _calculationCompleted.PublishForCalculation(
             _fixture.LoadTestCalculationId,
-            CalculationCompletedV1.Types.CalculationType.WholesaleFixing);
-
-        _fixture.LoadTestOrchestrationId = orchestrationId;
-    }
-
-    [Fact]
-    public async Task After_load_test()
-    {
-        if (_fixture.LoadTestOrchestrationId == null)
-            throw new Exception("Load test orchestration id is not set");
-
-        await _calculationCompleted.CleanupAfterCalculationId(_fixture.LoadTestCalculationId, _fixture.LoadTestOrchestrationId);
-
-        await Task.CompletedTask;
+            CalculationType.WholesaleFixing);
     }
 }

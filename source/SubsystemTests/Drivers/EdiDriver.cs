@@ -162,9 +162,9 @@ internal sealed class EdiDriver : IDisposable
         return requestContent.MessageId;
     }
 
-    internal async Task<DurableOrchestrationStatus> WaitForOrchestrationStartedAsync(Instant calculationCompletedAt)
+    internal async Task<DurableOrchestrationStatus> WaitForOrchestrationStartedAsync(Instant orchestrationStartedAfter)
     {
-        var orchestration = await _durableClient.WaitForOrchestationStatusAsync(calculationCompletedAt.ToDateTimeUtc());
+        var orchestration = await _durableClient.WaitForOrchestrationStatusAsync(orchestrationStartedAfter.ToDateTimeUtc());
 
         return orchestration;
     }

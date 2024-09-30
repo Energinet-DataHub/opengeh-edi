@@ -32,7 +32,7 @@ public static class DurableClientExtensions
     /// <param name="createdTimeFrom"></param>
     /// <param name="waitTimeLimit">Max time to wait for orchestration. If not specified it defaults to 30 seconds.</param>
     /// <returns>If started within given <paramref name="waitTimeLimit"/> it returns the orchestration status; otherwise it throws an exception.</returns>
-    public static async Task<DurableOrchestrationStatus> WaitForOrchestationStatusAsync(
+    public static async Task<DurableOrchestrationStatus> WaitForOrchestrationStatusAsync(
         this IDurableClient client,
         DateTime createdTimeFrom,
         TimeSpan? waitTimeLimit = null)

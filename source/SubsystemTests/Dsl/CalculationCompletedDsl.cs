@@ -14,12 +14,13 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
-using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using NodaTime;
 using Xunit.Abstractions;
+
+using CalculationType = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.CalculationCompletedV1.Types.CalculationType;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Dsl;
 
@@ -53,7 +54,7 @@ public sealed class CalculationCompletedDsl
         await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(_balanceFixingCalculationId);
 
         await StartAndWaitForOrchestrationToComplete(
-            CalculationCompletedV1.Types.CalculationType.BalanceFixing,
+            CalculationType.BalanceFixing,
             _balanceFixingCalculationId);
     }
 
@@ -63,17 +64,16 @@ public sealed class CalculationCompletedDsl
         await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(_wholesaleFixingCalculationId);
 
         await StartAndWaitForOrchestrationToComplete(
-            CalculationCompletedV1.Types.CalculationType.WholesaleFixing,
+            CalculationType.WholesaleFixing,
             _wholesaleFixingCalculationId);
     }
 
-    internal async Task<string> PublishForCalculationId(
+    internal async Task PublishForCalculation(
         Guid calculationId,
-        CalculationCompletedV1.Types.CalculationType calculationType)
+        CalculationType calculationType)
     {
         await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(calculationId);
-        var orchestration = await StartEnqueueMessagesOrchestration(calculationType, calculationId);
-        return orchestration.InstanceId;
+        await StartEnqueueMessagesOrchestration(calculationType, calculationId);
     }
 
     /// <summary>
@@ -145,21 +145,8 @@ public sealed class CalculationCompletedDsl
         await _ediDriver.EmptyQueueAsync().ConfigureAwait(false);
     }
 
-    internal async Task CleanupAfterCalculationId(Guid calculationId, string orchestrationInstanceId)
-    {
-        await _ediDriver.StopOrchestrationAsync(orchestrationInstanceId);
-
-        var dequeuedMessagesCount = await _ediDatabaseDriver.CountDequeuedMessagesForCalculationAsync(
-            calculationId,
-            CancellationToken.None);
-
-        _logger.WriteLine("Found {0} dequeued messages for calculation with Id={1}: ", dequeuedMessagesCount, calculationId);
-
-        await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(calculationId);
-    }
-
     private async Task StartAndWaitForOrchestrationToComplete(
-        CalculationCompletedV1.Types.CalculationType calculationType,
+        CalculationType calculationType,
         Guid calculationId)
     {
         var orchestrationStartedAt = SystemClock.Instance.GetCurrentInstant();
@@ -175,7 +162,7 @@ public sealed class CalculationCompletedDsl
     }
 
     private async Task<DurableOrchestrationStatus> StartEnqueueMessagesOrchestration(
-        CalculationCompletedV1.Types.CalculationType calculationType,
+        CalculationType calculationType,
         Guid calculationId)
     {
         // Get current instant and subtract 10 second to ensure that the orchestration is started after the instant
@@ -183,7 +170,7 @@ public sealed class CalculationCompletedDsl
         // would not be retrieved by the durable client
         var orchestrationStartedAfter = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromSeconds(10));
 
-        _logger.WriteLine("Publish calculation completed for calculation with id {0}", _balanceFixingCalculationId);
+        _logger.WriteLine("Publish calculation completed for calculation with id {0}", calculationId);
         await _wholesaleDriver.PublishCalculationCompletedAsync(
             calculationId,
             calculationType);

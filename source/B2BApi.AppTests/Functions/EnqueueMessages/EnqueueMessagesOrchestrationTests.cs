@@ -111,7 +111,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
         // Assert
         // => Verify expected behaviour by searching the orchestration history
-        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
+        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestrationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
 
         // => Wait for completion
         var completeOrchestrationStatus = await Fixture.DurableClient.WaitForInstanceCompletedAsync(
@@ -209,7 +209,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
         // Assert
         // => Verify expected behaviour by searching the orchestration history
-        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
+        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestrationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
 
         // => Wait for completion
         var completeOrchestrationStatus = await Fixture.DurableClient.WaitForInstanceCompletedAsync(
@@ -306,7 +306,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
         // Assert
         // => Verify expected behaviour by searching the orchestration history
-        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
+        var actualOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestrationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
 
         // => Wait for running and expected history
         JArray? actualHistory = null;
@@ -366,7 +366,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
         await Fixture.TopicResource.SenderClient.SendMessageAsync(wholesaleCalculationCompletedEventMessage);
-        var actualWholesaleOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
+        var actualWholesaleOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestrationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
 
         // Assert
         using var assertionScope = new AssertionScope();
@@ -432,7 +432,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         // Act
         var beforeOrchestrationCreated = DateTime.UtcNow;
         await Fixture.TopicResource.SenderClient.SendMessageAsync(energyCalculationCompletedEventMessage);
-        var actualEnergyOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
+        var actualEnergyOrchestrationStatus = await Fixture.DurableClient.WaitForOrchestrationStatusAsync(createdTimeFrom: beforeOrchestrationCreated);
 
         // Assert
         using var assertionScope = new AssertionScope();
