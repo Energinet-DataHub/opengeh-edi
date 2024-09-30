@@ -25,18 +25,14 @@ namespace Energinet.DataHub.EDI.B2BApi.Configuration.Middleware;
 /// Ensure we dont leak exception details for http triggers.
 /// </summary>
 /// <remarks>Inspired by https://github.com/Azure/azure-functions-dotnet-worker/blob/main/samples/CustomMiddleware/ExceptionHandlingMiddleware.cs</remarks>
-public class UnHandledExceptionMiddleware : IFunctionsWorkerMiddleware
+public abstract class UnHandledExceptionMiddleware(ILogger<UnHandledExceptionMiddleware> logger)
+    : IFunctionsWorkerMiddleware
 {
-    private readonly ILogger _logger;
-
     // DO NOT inject scoped services in the middleware constructor.
     // DO use scoped services in middleware by retrieving them from 'FunctionContext.InstanceServices'
     // DO NOT store scoped services in fields or properties of the middleware object. See https://github.com/Azure/azure-functions-dotnet-worker/issues/1327#issuecomment-1434408603
-    public UnHandledExceptionMiddleware(
-        ILogger<UnHandledExceptionMiddleware> logger)
-    {
-        _logger = logger;
-    }
+    private const string ErrorMessage = "An unexpected error occurred! Please try later.";
+    private readonly ILogger _logger = logger;
 
     public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
     {
@@ -53,51 +49,73 @@ public class UnHandledExceptionMiddleware : IFunctionsWorkerMiddleware
 
             var httpReqData = await context.GetHttpRequestDataAsync();
 
-            if (httpReqData != null)
+            if (httpReqData == null)
             {
-                // Create an instance of HttpResponseData with 500 status code.
-                var newHttpResponse = httpReqData.CreateResponse(HttpStatusCode.InternalServerError);
+                return;
+            }
 
-                var contentType = httpReqData.Headers.TryGetContentType();
+            // Create an instance of HttpResponseData with 500 status code.
+            var newHttpResponse = await CreateHttpResponseAsync(httpReqData);
 
-                if (contentType is not null && contentType.Contains("application/json"))
-                {
-                    newHttpResponse.Headers.Add("Content-Type", "application/json; charset=utf-8");
-                    // You need to explicitly pass the status code in WriteAsJsonAsync method.
-                    // https://github.com/Azure/azure-functions-dotnet-worker/issues/776
-                    await newHttpResponse.WriteAsJsonAsync(
-                        new { Message = "An unexpected error occurred! Please try later." },
-                        newHttpResponse.StatusCode);
-                }
-                else if (contentType is not null && contentType.Contains("application/xml"))
-                {
-                    newHttpResponse.Headers.Add("Content-Type", "application/xml; charset=utf-8");
-                    await newHttpResponse.WriteStringAsync(
-                        """
-                        <Error>
-                            <Message>An unexpected error occurred! Please try later.</Message>
-                        </Error>
-                        """);
-                }
-                else
-                {
-                    newHttpResponse.Headers.Add("Content-Type", "text/plain; charset=utf-8");
-                    await newHttpResponse.WriteStringAsync("An unexpected error occurred! Please try later.");
-                }
+            var invocationResult = context.GetInvocationResult();
 
-                var invocationResult = context.GetInvocationResult();
-
-                var httpOutputBindingFromMultipleOutputBindings = GetHttpOutputBindingFromMultipleOutputBinding(context);
-                if (httpOutputBindingFromMultipleOutputBindings is not null)
-                {
-                    httpOutputBindingFromMultipleOutputBindings.Value = newHttpResponse;
-                }
-                else
-                {
-                    invocationResult.Value = newHttpResponse;
-                }
+            var httpOutputBindingFromMultipleOutputBindings = GetHttpOutputBindingFromMultipleOutputBinding(context);
+            if (httpOutputBindingFromMultipleOutputBindings is not null)
+            {
+                httpOutputBindingFromMultipleOutputBindings.Value = newHttpResponse;
+            }
+            else
+            {
+                invocationResult.Value = newHttpResponse;
             }
         }
+    }
+
+    private static async Task<HttpResponseData> CreateHttpResponseAsync(HttpRequestData httpReqData)
+    {
+        var newHttpResponse = httpReqData.CreateResponse(HttpStatusCode.InternalServerError);
+
+        var contentType = httpReqData.Headers.TryGetContentType();
+
+        if (contentType is not null && contentType.Contains("application/json"))
+        {
+            await CreateJsonResponseAsync(newHttpResponse);
+        }
+        else if (contentType is not null && contentType.Contains("application/xml"))
+        {
+            await CreateXmlResponseAsync(newHttpResponse);
+        }
+        else
+        {
+            await CreatePlainTextResponseAsync(newHttpResponse);
+        }
+
+        return newHttpResponse;
+    }
+
+    private static async Task CreatePlainTextResponseAsync(HttpResponseData newHttpResponse)
+    {
+        newHttpResponse.Headers.Add("Content-Type", "text/plain; charset=utf-8");
+        await newHttpResponse.WriteStringAsync(ErrorMessage);
+    }
+
+    private static async Task CreateXmlResponseAsync(HttpResponseData newHttpResponse)
+    {
+        newHttpResponse.Headers.Add("Content-Type", "application/xml; charset=utf-8");
+        await newHttpResponse.WriteStringAsync(
+            $"""
+             <Error>
+                 <Message>{ErrorMessage}</Message>
+             </Error>
+             """);
+    }
+
+    private static async Task CreateJsonResponseAsync(HttpResponseData newHttpResponse)
+    {
+        newHttpResponse.Headers.Add("Content-Type", "application/json; charset=utf-8");
+        // You need to explicitly pass the status code in WriteAsJsonAsync method.
+        // https://github.com/Azure/azure-functions-dotnet-worker/issues/776
+        await newHttpResponse.WriteAsJsonAsync(new { Message = ErrorMessage }, newHttpResponse.StatusCode);
     }
 
     private static OutputBindingData<HttpResponseData>? GetHttpOutputBindingFromMultipleOutputBinding(FunctionContext context)
