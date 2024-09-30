@@ -91,7 +91,8 @@ public class SearchMessageWithoutAuthRestrictionTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Messages.Should().ContainSingle().Subject.CreatedAt.Should().Be(expectedCreatedAt);
+        result.Messages.Should().ContainSingle()
+            .Which.CreatedAt.Should().Be(expectedCreatedAt);
     }
 
     [Fact]
@@ -111,8 +112,8 @@ public class SearchMessageWithoutAuthRestrictionTests
         // Assert
         result.Should().NotBeNull();
         using var assertionScope = new AssertionScope();
-        result.Messages.Should().ContainSingle().Subject
-            .SenderNumber.Should().Be(expectedSenderNumber);
+        result.Messages.Should().ContainSingle()
+            .Which.SenderNumber.Should().Be(expectedSenderNumber);
     }
 
     [Fact]
@@ -132,8 +133,8 @@ public class SearchMessageWithoutAuthRestrictionTests
         // Assert
         result.Should().NotBeNull();
         using var assertionScope = new AssertionScope();
-        result.Messages.Should().ContainSingle().Subject
-            .ReceiverNumber.Should().Be(expectedReceiverNumber);
+        result.Messages.Should().ContainSingle()
+            .Which.ReceiverNumber.Should().Be(expectedReceiverNumber);
     }
 
     [Fact]
@@ -153,8 +154,8 @@ public class SearchMessageWithoutAuthRestrictionTests
         // Assert
         result.Should().NotBeNull();
         using var assertionScope = new AssertionScope();
-        result.Messages.Should().ContainSingle().Subject
-            .MessageId.Should().Be(expectedMessageId);
+        result.Messages.Should().ContainSingle()
+            .Which.MessageId.Should().Be(expectedMessageId);
     }
 
     [Fact]
@@ -175,8 +176,8 @@ public class SearchMessageWithoutAuthRestrictionTests
         // Assert
         result.Should().NotBeNull();
         using var assertionScope = new AssertionScope();
-        result.Messages.Should().ContainSingle().Subject
-            .DocumentType.Should().Be(expectedDocumentType);
+        result.Messages.Should().ContainSingle()
+            .Which.DocumentType.Should().Be(expectedDocumentType);
     }
 
     [Fact]
@@ -231,8 +232,8 @@ public class SearchMessageWithoutAuthRestrictionTests
         // Assert
         result.Should().NotBeNull();
         using var assertionScope = new AssertionScope();
-        result.Messages.Should().ContainSingle().Subject
-            .BusinessReason.Should().Be(expectedBusinessReason);
+        result.Messages.Should().ContainSingle()
+            .Which.BusinessReason.Should().Be(expectedBusinessReason);
     }
 
     [Fact]
@@ -379,8 +380,7 @@ public class SearchMessageWithoutAuthRestrictionTests
     #region include_related_messages
 
     [Fact]
-    public async Task
-        Given_TwoArchivedMessagesWithRelation_When_ExcludingRelatedMessagesAndSearchingByMessageId_Then_RelatedMessagesAreNotIncluded()
+    public async Task Given_TwoArchivedMessagesWithRelation_When_ExcludingRelatedMessagesAndSearchingByMessageId_Then_RelatedMessagesAreNotReturned()
     {
         // Arrange
         var expectedMessageId = Guid.NewGuid().ToString();
@@ -401,15 +401,12 @@ public class SearchMessageWithoutAuthRestrictionTests
         // Assert
         result.Should().NotBeNull();
         using var assertionScope = new AssertionScope();
-        result.Messages.Should()
-            .ContainSingle()
-            .Which.MessageId.Should()
-            .Be(expectedMessageId);
+        result.Messages.Should().ContainSingle()
+            .Which.MessageId.Should().Be(expectedMessageId);
     }
 
     [Fact]
-    public async Task
-        Given_FourArchivedMessagesWithRelations_When_IncludingRelatedMessagesAndSearchingByMessageId_Then_RelatedMessagesAreReturned()
+    public async Task Given_FourArchivedMessagesWithRelations_When_IncludingRelatedMessagesAndSearchingByMessageId_Then_RelatedMessagesAreReturned()
     {
         // Arrange
         var messageWithoutRelation = await _fixture.CreateArchivedMessageAsync(
@@ -424,14 +421,14 @@ public class SearchMessageWithoutAuthRestrictionTests
         var unexpectedMessage = await _fixture.CreateArchivedMessageAsync();
 
         // Act
-        // This could simulate a search for a message, where it is a request with one response
+        // This could simulate a search for a message, where the message is a request with two responses
         var searchForRequest = await _sut.SearchAsync(
             new GetMessagesQuery(
                 MessageId: messageWithoutRelation.MessageId,
                 IncludeRelatedMessages: true),
             CancellationToken.None);
 
-        // This could simulate a search for a message, where it is a response to a request
+        // This could simulate a search for a message, where the message is a response to a request with two responses
         var searchForResponse = await _sut.SearchAsync(
             new GetMessagesQuery(
                 MessageId: messageWithRelation.MessageId,
