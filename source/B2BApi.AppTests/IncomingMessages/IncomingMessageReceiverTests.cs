@@ -65,33 +65,9 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
     [Fact]
     public async Task Given_PersistedActor_When_CallingIncomingMessagesWithValidDocumentAndBearerToken_Then_ResponseShouldBeAccepted()
     {
-        // The following must match with the JSON document content
-        var documentTypeName = IncomingDocumentType.RequestAggregatedMeasureData.Name;
-        var actorNumber = ActorNumber.Create("5790000392551");
-        var actorRole = ActorRole.EnergySupplier;
-        var jsonDocument = await File.ReadAllTextAsync("TestData/Messages/json/RequestAggregatedMeasureData.json");
-        jsonDocument = jsonDocument
-            .Replace("{MessageId}", Guid.NewGuid().ToString())
-            .Replace("{TransactionId}", Guid.NewGuid().ToString());
-
-        // The actor must exist in the database
-        var externalId = Guid.NewGuid().ToString();
-        await Fixture.DatabaseManager.AddActorAsync(actorNumber, externalId);
-
-        // The bearer token must contain:
-        //  * the actor role matching the document content
-        //  * the external id matching the actor in the database
-        var b2bToken = new JwtBuilder()
-            .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
-            .WithClaim(ClaimsMap.ActorId, externalId)
-            .CreateToken();
-
-        using var request = new HttpRequestMessage(HttpMethod.Post, $"api/incomingMessages/{documentTypeName}");
-        request.Content = new StringContent(
-            jsonDocument,
-            Encoding.UTF8,
+        using var request = await CreateHttpRequest(
+            "TestData/Messages/json/RequestAggregatedMeasureData.json",
             "application/json");
-        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", b2bToken);
 
         // Act
         using var actualResponse = await Fixture.AppHostManager.HttpClient.SendAsync(request);
@@ -108,34 +84,9 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
     public async Task
         Given_PersistedActor_When_CallingIncomingMessagesWithInvalidDocumentAndBearerToken_Then_ResponseShouldBeBadRequest()
     {
-        // The following must match with the XML document content
-        var documentTypeName = IncomingDocumentType.RequestWholesaleSettlement.Name;
-        var actorNumber = ActorNumber.Create("5790000392551");
-        var actorRole = ActorRole.EnergySupplier;
-        var xmlDocument = await File.ReadAllTextAsync("TestData/Messages/xml/RequestWholesaleSettlement.xml");
-        xmlDocument = xmlDocument
-            .Replace("{MessageId}", Guid.NewGuid().ToString())
-            .Replace("{TransactionId}", Guid.NewGuid().ToString());
-
-        // The actor must exist in the database
-        var externalId = Guid.NewGuid().ToString();
-        await Fixture.DatabaseManager.AddActorAsync(actorNumber, externalId);
-
-        // The bearer token must contain:
-        //  * the actor role matching the document content
-        //  * the external id matching the actor in the database
-        var b2bToken = new JwtBuilder()
-            .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
-            .WithClaim(ClaimsMap.ActorId, externalId)
-            .CreateToken();
-
-        using var request = new HttpRequestMessage(HttpMethod.Post, $"api/incomingMessages/{documentTypeName}");
-        request.Content = new StringContent(
-            xmlDocument,
-            Encoding.UTF8,
+        using var request = await CreateHttpRequest(
+            "TestData/Messages/xml/RequestWholesaleSettlement.xml",
             "application/xml");
-
-        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", b2bToken);
 
         // Act
         using var actualResponse = await Fixture.AppHostManager.HttpClient.SendAsync(request);
@@ -207,5 +158,50 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
         dynamic payload = serializer.Deserialize<ExpandoObject>(auditLogPayload.Payload!.ToString()!);
         ((string)payload.IncomingDocumentType).Should().Be(documentTypeName);
         ((string)payload.Message).Should().NotBeNull();
+    }
+
+    private async Task<HttpRequestMessage> CreateHttpRequest(string filePath, string contentType)
+    {
+        HttpRequestMessage? request = null;
+        try
+        {
+            // The following must match with the JSON/XML document content
+            var documentTypeName = IncomingDocumentType.RequestAggregatedMeasureData.Name;
+            var actorNumber = ActorNumber.Create("5790000392551");
+            var actorRole = ActorRole.EnergySupplier;
+            var jsonDocument = await File.ReadAllTextAsync(filePath);
+            jsonDocument = jsonDocument
+                .Replace("{MessageId}", Guid.NewGuid().ToString())
+                .Replace("{TransactionId}", Guid.NewGuid().ToString());
+
+            // The actor must exist in the database
+            var externalId = Guid.NewGuid().ToString();
+            await Fixture.DatabaseManager.AddActorAsync(actorNumber, externalId);
+
+            // The bearer token must contain:
+            //  * the actor role matching the document content
+            //  * the external id matching the actor in the database
+            var b2bToken = new JwtBuilder()
+                .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
+                .WithClaim(ClaimsMap.ActorId, externalId)
+                .CreateToken();
+
+            request = new HttpRequestMessage(HttpMethod.Post, $"api/incomingMessages/{documentTypeName}")
+            {
+                Content = new StringContent(
+                    jsonDocument,
+                    Encoding.UTF8,
+                    contentType),
+            };
+
+            request.Headers.Authorization = new AuthenticationHeaderValue("bearer", b2bToken);
+
+            return request;
+        }
+        catch
+        {
+            request?.Dispose();
+            throw;
+        }
     }
 }
