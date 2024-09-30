@@ -44,7 +44,7 @@ public class SearchMessagesWithAuthRestrictionTests
     }
 
     [Fact]
-    public async Task Given_ThreeArchivedMessages_When_SearchingWithoutCriteriaAsRestrictedUsed_Then_ReturnsOwnMessage()
+    public async Task Given_ThreeArchivedMessages_When_SearchingWithoutCriteria_Then_ReturnsOwnMessage()
     {
         // Arrange
         await _fixture.CreateArchivedMessageAsync(receiverNumber: "9999999999999");
@@ -133,7 +133,7 @@ public class SearchMessagesWithAuthRestrictionTests
                 IncludeRelatedMessages: true),
             CancellationToken.None);
 
-        // This could simulate a search for a message, where it is a response to a request with two responses
+        // This could simulate a search for a message, where the message is a response to a request with two responses
         var searchForResponse = await _sut.SearchAsync(
             new GetMessagesQuery(
                 MessageId: messageWithRelation.MessageId,
@@ -182,14 +182,14 @@ public class SearchMessagesWithAuthRestrictionTests
         var unexpectedMessage = await _fixture.CreateArchivedMessageAsync();
 
         // Act
-        // This could simulate a search for a message, where it is a request with one response
+        // This could simulate a search for a message, where the message is a request with two responses
         var searchForRequest = await _sut.SearchAsync(
             new GetMessagesQuery(
                 MessageId: messageWithoutRelation.MessageId,
                 IncludeRelatedMessages: true),
             CancellationToken.None);
 
-        // This could simulate a search for a message, where it is a response to a request
+        // This could simulate a search for a message, where the message is a response to a request with two responses
         var searchForResponse = await _sut.SearchAsync(
             new GetMessagesQuery(
                 MessageId: messageWithRelation.MessageId,
