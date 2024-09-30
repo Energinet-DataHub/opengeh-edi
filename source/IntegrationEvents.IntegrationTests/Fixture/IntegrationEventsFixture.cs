@@ -28,7 +28,7 @@ public sealed class IntegrationEventsFixture : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        DatabaseManager.CleanupDatabase();
+        await DatabaseManager.DeleteDatabaseAsync();
         await Task.CompletedTask;
     }
 }
