@@ -101,6 +101,12 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
                     input.SqlStatement,
                     input.Parameters)
                 .ConfigureAwait(false);
-        return new MessageSearchResult(archivedMessages.OrderBy(x => x.CreatedAt).ToList().AsReadOnly());
+
+        // If navigating backwards the list must be reversed to get the correct order.
+        // Because sql use top to limit the result set and backwards is looking at the records from behind.
+        if (!queryInput.Pagination.NavigationForward)
+            return new MessageSearchResult(archivedMessages.Reverse().ToList().AsReadOnly());
+
+        return new MessageSearchResult(archivedMessages.ToList().AsReadOnly());
     }
 }

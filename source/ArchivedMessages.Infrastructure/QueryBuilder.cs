@@ -100,11 +100,10 @@ internal sealed class QueryBuilder
 
     private static string WherePaginationPosition(FieldToSortBy fieldToSortBy, PaginationCursor cursor, bool isForward)
     {
-        // TODO: Missing direction on fieldToSortBy
         if (cursor.SortedField is null)
         {
-            return isForward ? $" (RecordId > {cursor.RecordId} OR {cursor.RecordId} = 0) "
-                    : $" (RecordId < {cursor.RecordId} OR {cursor.RecordId} = 0) ";
+            return isForward ? $" (RecordId < {cursor.RecordId} OR {cursor.RecordId} = 0) "
+                    : $" (RecordId > {cursor.RecordId} OR {cursor.RecordId} = 0) ";
         }
 
         return isForward
@@ -118,11 +117,12 @@ internal sealed class QueryBuilder
                """;
     }
 
-    private string OrderBy(FieldToSortBy fieldToSortBy, bool isForward)
+    private string OrderBy(FieldToSortBy fieldToSortBy, DirectionSortBy directionSortBy, bool navigatingForward)
     {
-        return isForward
-            ? $" ORDER BY {fieldToSortBy.Identifier} ASC, RecordId ASC"
-            : $" ORDER BY {fieldToSortBy.Identifier} DESC, RecordId DESC";
+        var pagingDirection = navigatingForward ? "DESC" : "ASC";
+        // Toggle the sort direction if navigating backwards, because sql use top to limit the result
+        var sortDirection = navigatingForward ? directionSortBy : directionSortBy == DirectionSortBy.Ascending ? DirectionSortBy.Descending : DirectionSortBy.Ascending;
+        return $" ORDER BY {fieldToSortBy.Identifier} {sortDirection.Identifier}, RecordId {pagingDirection}";
     }
 
     private string BuildStatement(GetMessagesQuery query)
@@ -132,7 +132,7 @@ internal sealed class QueryBuilder
         whereClause += WherePaginationPosition(query.Pagination.FieldToSortBy, query.Pagination.Cursor, query.Pagination.NavigationForward);
         string sqlStatement;
 
-        var orderBy = OrderBy(query.Pagination.FieldToSortBy, query.Pagination.NavigationForward);
+        var orderBy = OrderBy(query.Pagination.FieldToSortBy, query.Pagination.DirectionSortBy, query.Pagination.NavigationForward);
         if (query.IncludeRelatedMessages == true && query.MessageId is not null)
         {
             // Messages may be related in different ways, hence we have the following 3 cases:

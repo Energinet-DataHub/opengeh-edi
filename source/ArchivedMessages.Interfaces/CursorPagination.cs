@@ -17,15 +17,12 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 /// <summary>
 /// The SortedCursorBasedPagination is navigating through a dataset by moving the cursor to a specific position in the sorted dataset.
 /// </summary>
-/// <param name="cursor"></param>
-/// <param name="pageSize"></param>
-/// <param name="navigationForward"></param>
-/// <param name="fieldToSortBy"></param>
 public class SortedCursorBasedPagination(
     PaginationCursor? cursor = null,
     int pageSize = 100,
     bool navigationForward = true,
-    FieldToSortBy? fieldToSortBy = null)
+    FieldToSortBy? fieldToSortBy = null,
+    DirectionSortBy? directionSortBy = null)
 {
     /// <summary>
     ///  The current position in the dataset.
@@ -46,6 +43,8 @@ public class SortedCursorBasedPagination(
     ///  A boolean indicating the direction of pagination.
     /// </summary>
     public FieldToSortBy FieldToSortBy { get; } = fieldToSortBy ?? FieldToSortBy.CreatedAt;
+
+    public DirectionSortBy DirectionSortBy { get; } = directionSortBy ?? DirectionSortBy.Descending;
 }
 
 /// <summary>
