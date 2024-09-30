@@ -14,17 +14,16 @@
 
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Database;
 using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using NodaTime;
-using NodaTime.Extensions;
 
-namespace Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Database;
+namespace Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture.Database;
 
+//TODO: We have this manager defined in 5 separate files. Consider moving them.
 public class EdiDatabaseManager : SqlServerDatabaseManager<DbContext>
 {
     public EdiDatabaseManager()
-        : base($"Edi_{DateTime.Now:yyyyMMddHHmm}_")
+        : base("MasterData.IntegrationTests")
     {
     }
 
@@ -38,39 +37,28 @@ public class EdiDatabaseManager : SqlServerDatabaseManager<DbContext>
             .UseSqlServer(ConnectionString, options =>
             {
                 options.UseNodaTime();
-                options.EnableRetryOnFailure();
             });
 
         return (TDatabaseContext)Activator.CreateInstance(typeof(TDatabaseContext), optionsBuilder.Options)!;
     }
 
-    public async Task AddActorAsync(ActorNumber actorNumber, string externalId)
+    public void CleanupDatabase()
     {
-        await using var sqlConnection = new Microsoft.Data.SqlClient.SqlConnection(ConnectionString);
+        var cleanupStatement =
+            $"DELETE FROM [dbo].[Actor]" +
+            $"DELETE FROM [dbo].[GridAreaOwner]" +
+            $"DELETE FROM [dbo].[ActorCertificate]" +
+            $"DELETE FROM [dbo].[ProcessDelegation]";
 
-        await using var sqlCommand = sqlConnection.CreateCommand();
-        sqlCommand.CommandText = "INSERT INTO [dbo].[Actor] VALUES (@id, @actorNumber, @externalId)";
-        sqlCommand.Parameters.AddWithValue("@id", Guid.NewGuid());
-        sqlCommand.Parameters.AddWithValue("@actorNumber", actorNumber.Value);
-        sqlCommand.Parameters.AddWithValue("@externalId", externalId);
+        using var connection = new SqlConnection(ConnectionString);
+        connection.Open();
 
-        await sqlConnection.OpenAsync();
-        await sqlCommand.ExecuteNonQueryAsync();
-    }
+        using (var command = new SqlCommand(cleanupStatement, connection))
+        {
+            command.ExecuteNonQuery();
+        }
 
-    public async Task AddGridAreaOwnerAsync(ActorNumber actorNumber, string gridAreaCode)
-    {
-        await using var sqlConnection = new Microsoft.Data.SqlClient.SqlConnection(ConnectionString);
-
-        await using var sqlCommand = sqlConnection.CreateCommand();
-        sqlCommand.CommandText = "INSERT INTO [dbo].[GridAreaOwner] VALUES (@id, @gridAreaCode, @validFrom, @gridAreaOwnerActorNumber, 0)";
-        sqlCommand.Parameters.AddWithValue("@id", Guid.NewGuid());
-        sqlCommand.Parameters.AddWithValue("@gridAreaOwnerActorNumber", actorNumber.Value);
-        sqlCommand.Parameters.AddWithValue("@gridAreaCode", gridAreaCode);
-        sqlCommand.Parameters.AddWithValue("@validFrom", SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(1)).ToDateTimeUtc());
-
-        await sqlConnection.OpenAsync();
-        await sqlCommand.ExecuteNonQueryAsync();
+        connection.Close();
     }
 
     /// <summary>
