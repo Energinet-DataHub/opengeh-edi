@@ -82,6 +82,7 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
             $"DELETE FROM [dbo].[WholesaleServicesProcessChargeTypes]" +
             $"DELETE FROM [dbo].[WholesaleServicesProcessGridAreas]" +
             $"DELETE FROM [dbo].[WholesaleServicesProcesses]" +
+            $"DELETE FROM [dbo].[Outbox]" +
             $"DELETE FROM [dbo].[ProcessDelegation]";
 
         using var connection = new SqlConnection(DatabaseManager.ConnectionString);
