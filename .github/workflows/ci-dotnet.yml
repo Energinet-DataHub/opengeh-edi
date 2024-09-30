@@ -99,13 +99,12 @@ jobs:
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
-        
+
           - name: MasterData - integration tests
             paths: \source\MasterData.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.MasterData.IntegrationTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
-
 
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
     with:
