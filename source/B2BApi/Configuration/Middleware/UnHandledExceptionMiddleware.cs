@@ -25,7 +25,7 @@ namespace Energinet.DataHub.EDI.B2BApi.Configuration.Middleware;
 /// Ensure we dont leak exception details for http triggers.
 /// </summary>
 /// <remarks>Inspired by https://github.com/Azure/azure-functions-dotnet-worker/blob/main/samples/CustomMiddleware/ExceptionHandlingMiddleware.cs</remarks>
-public abstract class UnHandledExceptionMiddleware(ILogger<UnHandledExceptionMiddleware> logger)
+public class UnHandledExceptionMiddleware(ILogger<UnHandledExceptionMiddleware> logger)
     : IFunctionsWorkerMiddleware
 {
     // DO NOT inject scoped services in the middleware constructor.
