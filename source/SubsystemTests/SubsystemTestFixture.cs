@@ -79,8 +79,7 @@ public class SubsystemTestFixture : IAsyncLifetime
         var sqlServer = GetConfigurationValue<string>(root, "mssql-data-url");
         var databaseName = GetConfigurationValue<string>(root, "mssql-edi-database-name");
 
-        var dbConnectionString =
-            $"Server={sqlServer};Authentication=Active Directory Default;Database={databaseName};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+        var dbConnectionString = BuiDbConnectionString(sqlServer, databaseName);
         ConnectionString = dbConnectionString;
 
         var serviceBusConnectionString = GetConfigurationValue<string>(root, "sb-domain-relay-manage-connection-string");
@@ -236,7 +235,12 @@ public class SubsystemTestFixture : IAsyncLifetime
         await B2CClients.DisposeAsync();
     }
 
-    private TValue GetConfigurationValue<TValue>(IConfigurationRoot root, string key)
+    internal static string BuiDbConnectionString(string sqlServer, string databaseName)
+    {
+        return $"Server={sqlServer};Authentication=Active Directory Default;Database={databaseName};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+    }
+
+    private static TValue GetConfigurationValue<TValue>(IConfigurationRoot root, string key)
     {
         var value = root.GetValue<TValue>(key);
 

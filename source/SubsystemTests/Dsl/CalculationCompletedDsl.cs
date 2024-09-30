@@ -48,6 +48,34 @@ public sealed class CalculationCompletedDsl
         _ediDatabaseDriver = ediDatabaseDriver;
     }
 
+    internal static async Task<DurableOrchestrationStatus> StartEnqueueMessagesOrchestration(
+        ITestOutputHelper logger,
+        WholesaleDriver wholesaleDriver,
+        EdiDriver ediDriver,
+        CalculationType calculationType,
+        Guid calculationId)
+    {
+        // Get current instant and subtract 10 second to ensure that the orchestration is started after the instant
+        // In some cases the orchestration can be started before a second has passed which meant that the orchestration
+        // would not be retrieved by the durable client
+        var orchestrationStartedAfter = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromSeconds(10));
+
+        logger.WriteLine("Publish calculation completed for calculation with id {0}", calculationId);
+        await wholesaleDriver.PublishCalculationCompletedAsync(
+            calculationId,
+            calculationType);
+
+        logger.WriteLine("Wait for message orchestration to be started after {0}", orchestrationStartedAfter.ToString());
+        var orchestration = await ediDriver.WaitForOrchestrationStartedAsync(orchestrationStartedAfter);
+        orchestration.Input.Value<string>("CalculationId")
+            .Should()
+            .Be(
+                calculationId.ToString(),
+                $"because the orchestration should be for the given calculation id {calculationId}");
+
+        return orchestration;
+    }
+
     internal async Task PublishForBalanceFixingCalculation()
     {
         await _ediDriver.EmptyQueueAsync();
@@ -66,14 +94,6 @@ public sealed class CalculationCompletedDsl
         await StartAndWaitForOrchestrationToComplete(
             CalculationType.WholesaleFixing,
             _wholesaleFixingCalculationId);
-    }
-
-    internal async Task PublishForCalculation(
-        Guid calculationId,
-        CalculationType calculationType)
-    {
-        await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(calculationId);
-        await StartEnqueueMessagesOrchestration(calculationType, calculationId);
     }
 
     /// <summary>
@@ -150,7 +170,12 @@ public sealed class CalculationCompletedDsl
         Guid calculationId)
     {
         var orchestrationStartedAt = SystemClock.Instance.GetCurrentInstant();
-        var orchestration = await StartEnqueueMessagesOrchestration(calculationType, calculationId);
+        var orchestration = await StartEnqueueMessagesOrchestration(
+            _logger,
+            _wholesaleDriver,
+            _ediDriver,
+            calculationType,
+            calculationId);
 
         _logger.WriteLine("Wait for message orchestration to be completed for instance id {0}", orchestration.InstanceId);
         await _ediDriver.WaitForOrchestrationCompletedAsync(orchestration.InstanceId);
@@ -159,30 +184,5 @@ public sealed class CalculationCompletedDsl
             "Message orchestration completed for instance id {0}, took {1}",
             orchestration.InstanceId,
             SystemClock.Instance.GetCurrentInstant() - orchestrationStartedAt);
-    }
-
-    private async Task<DurableOrchestrationStatus> StartEnqueueMessagesOrchestration(
-        CalculationType calculationType,
-        Guid calculationId)
-    {
-        // Get current instant and subtract 10 second to ensure that the orchestration is started after the instant
-        // In some cases the orchestration can be started before a second has passed which meant that the orchestration
-        // would not be retrieved by the durable client
-        var orchestrationStartedAfter = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromSeconds(10));
-
-        _logger.WriteLine("Publish calculation completed for calculation with id {0}", calculationId);
-        await _wholesaleDriver.PublishCalculationCompletedAsync(
-            calculationId,
-            calculationType);
-
-        _logger.WriteLine("Wait for message orchestration to be started after {0}", orchestrationStartedAfter.ToString());
-        var orchestration = await _ediDriver.WaitForOrchestrationStartedAsync(orchestrationStartedAfter);
-        orchestration.Input.Value<string>("CalculationId")
-            .Should()
-            .Be(
-                calculationId.ToString(),
-                $"because the orchestration should be for the given calculation id {calculationId}");
-
-        return orchestration;
     }
 }

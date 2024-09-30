@@ -31,7 +31,7 @@ namespace Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 /// the Durable Functions orchestration client binding.
 /// See https://github.com/Azure/azure-functions-durable-extension/issues/1600#issuecomment-742176091.
 /// </summary>
-public class DurableTaskManager : IDisposable
+public sealed class DurableTaskManager : IDisposable, IAsyncDisposable
 {
     // TODO:
     // We should move this class to TestCommon, maybe to a new project named DurableFunctionApp.TestCommon.
@@ -79,13 +79,12 @@ public class DurableTaskManager : IDisposable
         });
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        await ServiceProvider.DisposeAsync();
     }
 
-    protected virtual void Dispose(bool disposing)
+    public void Dispose()
     {
         ServiceProvider.Dispose();
     }

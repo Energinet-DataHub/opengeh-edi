@@ -15,6 +15,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
+using Nito.AsyncEx;
 using Xunit.Abstractions;
 
 using CalculationType = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.CalculationCompletedV1.Types.CalculationType;
@@ -29,34 +30,37 @@ namespace Energinet.DataHub.EDI.SubsystemTests.LoadTest;
 /// 3. Wait for the Azure Load Test to finish
 /// 4. Run Cleanup_load_test() test
 /// </summary>
-[Collection(SubsystemTestCollection.SubsystemTestCollectionName)]
 [SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Test class")]
-public sealed class LoadTestHelper
+public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
 {
-    private readonly SubsystemTestFixture _fixture;
-    private readonly CalculationCompletedDsl _calculationCompleted;
+    private readonly LoadTestFixture _fixture;
+    private readonly ITestOutputHelper _logger;
+    private readonly EdiDriver _ediDriver;
+    private readonly EdiDatabaseDriver _ediDatabaseDriver;
+    private readonly WholesaleDriver _wholesaleDriver;
 
-    public LoadTestHelper(SubsystemTestFixture fixture, ITestOutputHelper output)
+    public LoadTestHelper(LoadTestFixture fixture, ITestOutputHelper logger)
     {
         _fixture = fixture;
+        _logger = logger;
 
-        _calculationCompleted = new CalculationCompletedDsl(
-            new EdiDriver(
-                _fixture.DurableClient,
-                _fixture.B2BClients.MeteredDataResponsible,
-                output),
-            new EdiDatabaseDriver(_fixture.ConnectionString),
-            new WholesaleDriver(_fixture.EventPublisher, _fixture.EdiInboxClient),
-            output,
-            _fixture.BalanceFixingCalculationId,
-            _fixture.WholesaleFixingCalculationId);
+        _ediDriver = new EdiDriver(
+            _fixture.DurableClient,
+            new AsyncLazy<HttpClient>(() => throw new NotImplementedException("Not used in load test")),
+            logger);
+        _ediDatabaseDriver = new EdiDatabaseDriver(_fixture.DatabaseConnectionString);
+        _wholesaleDriver = new WholesaleDriver(_fixture.IntegrationEventPublisher, _fixture.EdiInboxClient);
     }
 
     [Fact]
     public async Task Pre_load_test()
     {
-        await _calculationCompleted.PublishForCalculation(
-            _fixture.LoadTestCalculationId,
-            CalculationType.WholesaleFixing);
+        await _ediDatabaseDriver.DeleteOutgoingMessagesForCalculationAsync(_fixture.LoadTestCalculationId);
+        await CalculationCompletedDsl.StartEnqueueMessagesOrchestration(
+            _logger,
+            _wholesaleDriver,
+            _ediDriver,
+            CalculationType.WholesaleFixing,
+            _fixture.LoadTestCalculationId);
     }
 }

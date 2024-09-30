@@ -28,7 +28,7 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers;
 
-internal sealed class EdiDriver : IDisposable
+internal sealed class EdiDriver
 {
     private readonly IDurableClient _durableClient;
     private readonly AsyncLazy<HttpClient> _httpClient;
@@ -39,10 +39,6 @@ internal sealed class EdiDriver : IDisposable
         _durableClient = durableClient;
         _httpClient = b2bHttpClient;
         _logger = logger;
-    }
-
-    public void Dispose()
-    {
     }
 
     internal async Task<HttpResponseMessage> PeekMessageAsync(DocumentFormat? documentFormat = null)
