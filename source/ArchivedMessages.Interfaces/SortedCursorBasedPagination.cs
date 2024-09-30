@@ -23,7 +23,7 @@ public class SortedCursorBasedPagination(
     int pageSize = 100,
     bool navigationForward = true,
     FieldToSortBy? fieldToSortBy = null,
-    SortByDirection? directionSortBy = null)
+    DirectionToSortBy? directionSortBy = null)
 {
     /// <summary>
     ///  The current position in the dataset.
@@ -48,7 +48,7 @@ public class SortedCursorBasedPagination(
     /// <summary>
     /// The direction to sort by.
     /// </summary>
-    public SortByDirection SortByDirection { get; } = directionSortBy ?? SortByDirection.Descending;
+    public DirectionToSortBy DirectionToSortBy { get; } = directionSortBy ?? DirectionToSortBy.Descending;
 }
 
 /// <summary>
@@ -67,6 +67,6 @@ public class SortedCursorBasedPagination(
 /// [8]
 /// [9]
 /// </summary>
-/// <param name="SortedField">If dataset should be short, we need to point at the current value of the field being sorted on.</param>
+/// <param name="SortedFieldValue">If dataset should be sorted, we need to point at the current value of the field being sorted on.</param>
 /// <param name="RecordId"></param>
-public record PaginationCursor(string? SortedField = null, long RecordId = 0);
+public record PaginationCursor(string? SortedFieldValue = null, long RecordId = 0);

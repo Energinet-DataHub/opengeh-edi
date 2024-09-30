@@ -18,7 +18,7 @@ public record FieldToSortBy(string Identifier)
 {
     public static readonly FieldToSortBy MessageId = new("MessageId");
     public static readonly FieldToSortBy DocumentType = new("DocumentType");
-    public static readonly FieldToSortBy Sender = new("Sender");
-    public static readonly FieldToSortBy Receiver = new("Receiver");
+    public static readonly FieldToSortBy SenderNumber = new("SenderNumber");
+    public static readonly FieldToSortBy ReceiverNumber = new("ReceiverNumber");
     public static readonly FieldToSortBy CreatedAt = new("CreatedAt");
 }

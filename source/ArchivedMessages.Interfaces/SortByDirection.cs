@@ -14,8 +14,8 @@
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
-public record SortByDirection(string Identifier)
+public record DirectionToSortBy(string Identifier)
 {
-    public static readonly SortByDirection Ascending = new("ASC");
-    public static readonly SortByDirection Descending = new("DESC");
+    public static readonly DirectionToSortBy Ascending = new("ASC");
+    public static readonly DirectionToSortBy Descending = new("DESC");
 }

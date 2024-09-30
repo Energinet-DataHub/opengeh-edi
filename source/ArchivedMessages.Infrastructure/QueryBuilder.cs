@@ -98,30 +98,32 @@ internal sealed class QueryBuilder
         return new QueryInput(BuildStatement(query), _queryParameters);
     }
 
-    private static string WherePaginationPosition(FieldToSortBy fieldToSortBy, PaginationCursor cursor, bool isForward)
+    private static string WherePaginationPosition(FieldToSortBy fieldToSortBy, DirectionToSortBy directionToSortBy, PaginationCursor cursor, bool isForward)
     {
-        if (cursor.SortedField is null)
+        if (cursor.SortedFieldValue is null)
         {
             return isForward ? $" (RecordId < {cursor.RecordId} OR {cursor.RecordId} = 0) "
                     : $" (RecordId > {cursor.RecordId} OR {cursor.RecordId} = 0) ";
         }
 
+        var sortingDirection = isForward ? directionToSortBy == DirectionToSortBy.Descending ? "<" : ">"
+                : directionToSortBy == DirectionToSortBy.Descending ? ">" : "<";
         return isForward
             ? $"""
-                  ({fieldToSortBy.Identifier} = {cursor.SortedField} AND (RecordId < {cursor.RecordId} OR {cursor.RecordId} = 0)) 
-                  OR ({fieldToSortBy.Identifier} < {cursor.SortedField})
+                  ({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (RecordId < {cursor.RecordId} OR {cursor.RecordId} = 0)) 
+                  OR ({fieldToSortBy.Identifier} {sortingDirection} '{cursor.SortedFieldValue}')
               """
             : $"""
-                   ({fieldToSortBy.Identifier} = {cursor.SortedField} AND (RecordId > {cursor.RecordId} OR {cursor.RecordId} = 0)) 
-                   OR ({fieldToSortBy.Identifier} > {cursor.SortedField}) 
+                   ({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (RecordId > {cursor.RecordId} OR {cursor.RecordId} = 0)) 
+                   OR ({fieldToSortBy.Identifier} {sortingDirection} '{cursor.SortedFieldValue}') 
                """;
     }
 
-    private string OrderBy(FieldToSortBy fieldToSortBy, SortByDirection sortByDirection, bool navigatingForward)
+    private string OrderBy(FieldToSortBy fieldToSortBy, DirectionToSortBy directionToSortBy, bool navigatingForward)
     {
         var pagingDirection = navigatingForward ? "DESC" : "ASC";
         // Toggle the sort direction if navigating backwards, because sql use top to limit the result
-        var sortDirection = navigatingForward ? sortByDirection : sortByDirection == SortByDirection.Ascending ? SortByDirection.Descending : SortByDirection.Ascending;
+        var sortDirection = navigatingForward ? directionToSortBy : directionToSortBy == DirectionToSortBy.Ascending ? DirectionToSortBy.Descending : DirectionToSortBy.Ascending;
         return $" ORDER BY {fieldToSortBy.Identifier} {sortDirection.Identifier}, RecordId {pagingDirection}";
     }
 
@@ -129,10 +131,9 @@ internal sealed class QueryBuilder
     {
         var whereClause = " WHERE ";
         whereClause += _statement.Count > 0 ? $"{string.Join(" AND ", _statement)} AND " : string.Empty;
-        whereClause += WherePaginationPosition(query.Pagination.SortBy, query.Pagination.Cursor, query.Pagination.NavigationForward);
+        whereClause += WherePaginationPosition(query.Pagination.SortBy, query.Pagination.DirectionToSortBy, query.Pagination.Cursor, query.Pagination.NavigationForward);
         string sqlStatement;
 
-        var orderBy = OrderBy(query.Pagination.SortBy, query.Pagination.SortByDirection, query.Pagination.NavigationForward);
         if (query.IncludeRelatedMessages == true && query.MessageId is not null)
         {
             // Messages may be related in different ways, hence we have the following 3 cases:
@@ -157,7 +158,7 @@ internal sealed class QueryBuilder
             sqlStatement = selectStatement + whereClause;
         }
 
-        sqlStatement += orderBy;
+        sqlStatement += OrderBy(query.Pagination.SortBy, query.Pagination.DirectionToSortBy, query.Pagination.NavigationForward);
         return sqlStatement;
     }
 
