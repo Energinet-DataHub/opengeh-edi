@@ -67,6 +67,7 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
     {
         using var request = await CreateHttpRequest(
             "TestData/Messages/json/RequestAggregatedMeasureData.json",
+            IncomingDocumentType.RequestAggregatedMeasureData.Name,
             "application/json");
 
         // Act
@@ -77,6 +78,8 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
         contentType.Should().NotBeNull();
         contentType!.MediaType.Should().Be("application/json");
         contentType.CharSet.Should().Be("utf-8");
+        var content = await actualResponse.Content.ReadAsByteArrayAsync();
+        Encoding.UTF8.GetString(content).Should().Contain(string.Empty);
         actualResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
     }
 
@@ -86,6 +89,7 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
     {
         using var request = await CreateHttpRequest(
             "TestData/Messages/xml/RequestWholesaleSettlement.xml",
+            IncomingDocumentType.RequestWholesaleSettlement.Name,
             "application/xml");
 
         // Act
@@ -160,17 +164,16 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
         ((string)payload.Message).Should().NotBeNull();
     }
 
-    private async Task<HttpRequestMessage> CreateHttpRequest(string filePath, string contentType)
+    private async Task<HttpRequestMessage> CreateHttpRequest(string filePath, string documentType, string contentType)
     {
         HttpRequestMessage? request = null;
         try
         {
             // The following must match with the JSON/XML document content
-            var documentTypeName = IncomingDocumentType.RequestAggregatedMeasureData.Name;
             var actorNumber = ActorNumber.Create("5790000392551");
             var actorRole = ActorRole.EnergySupplier;
-            var jsonDocument = await File.ReadAllTextAsync(filePath);
-            jsonDocument = jsonDocument
+            var document = await File.ReadAllTextAsync(filePath);
+            document = document
                 .Replace("{MessageId}", Guid.NewGuid().ToString())
                 .Replace("{TransactionId}", Guid.NewGuid().ToString());
 
@@ -186,10 +189,10 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
                 .WithClaim(ClaimsMap.ActorId, externalId)
                 .CreateToken();
 
-            request = new HttpRequestMessage(HttpMethod.Post, $"api/incomingMessages/{documentTypeName}")
+            request = new HttpRequestMessage(HttpMethod.Post, $"api/incomingMessages/{documentType}")
             {
                 Content = new StringContent(
-                    jsonDocument,
+                    document,
                     Encoding.UTF8,
                     contentType),
             };
