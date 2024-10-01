@@ -22,6 +22,4 @@ public sealed record GetMessagesQuery(
     string? ReceiverNumber = null,
     IReadOnlyCollection<string>? DocumentTypes = null,
     IReadOnlyCollection<string>? BusinessReasons = null,
-    bool IncludeRelatedMessages = false)
-{
-}
+    bool IncludeRelatedMessages = false);

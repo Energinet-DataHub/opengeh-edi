@@ -16,11 +16,11 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
 /// <summary>
 /// Pagination cursor for the search of archived messages.
-/// Pointing to the field value to sort by and the record id.
+/// Pointing to the field being sorted by and the record id.
 /// When navigating forward, the cursor points to the last record of the current page.
 /// and when navigating backward, the cursor points to the first record of the current page.
 /// </summary>
-/// <param name="FieldToSortByValue"></param>
+/// <param name="FieldToSortByValue">is null if dataset is not being sorted</param>
 /// <param name="RecordId"></param>
 [Serializable]
 public record SearchArchivedMessagesCursor(string? FieldToSortByValue, long RecordId);

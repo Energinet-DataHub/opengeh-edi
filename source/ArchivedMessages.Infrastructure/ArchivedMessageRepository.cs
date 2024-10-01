@@ -102,7 +102,7 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
                     input.Parameters)
                 .ConfigureAwait(false);
 
-        // If navigating backwards the list must be reversed to get the correct order.
+        // When navigating backwards the list must be reversed to get the correct order.
         // Because sql use top to limit the result set and backwards is looking at the records from behind.
         if (!queryInput.Pagination.NavigationForward)
             return new MessageSearchResult(archivedMessages.Reverse().ToList().AsReadOnly());

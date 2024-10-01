@@ -17,11 +17,6 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 /// <summary>
 /// Pagination when searching for archived messages that supports sorting on a specific field.
 /// </summary>
-/// <param name="Cursor"></param>
-/// <param name="PageSize"></param>
-/// <param name="NavigationForward"></param>
-/// <param name="SortBy"></param>
-/// <param name="DirectionToSortBy"></param>
 [Serializable]
 public record SearchArchivedMessagesPagination(
     SearchArchivedMessagesCursor? Cursor = null,

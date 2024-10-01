@@ -46,14 +46,14 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
     {
         return
         [
-            // [B2CWebApiRequests.CreateArchivedMessageGetDocumentRequest(), _datahubAdministratorRole, AuditLogActivity.ArchivedMessagesGet],
+            [B2CWebApiRequests.CreateArchivedMessageGetDocumentRequest(), _datahubAdministratorRole, AuditLogActivity.ArchivedMessagesGet],
             [B2CWebApiRequests.CreateArchivedMessageSearchRequest(), _datahubAdministratorRole, AuditLogActivity.ArchivedMessagesSearch],
             [B2CWebApiRequests.CreateArchivedMessageSearchV2Request(), _datahubAdministratorRole, AuditLogActivity.ArchivedMessagesSearch],
-            // [B2CWebApiRequests.CreateOrchestrationsRequest(), _datahubAdministratorRole, AuditLogActivity.OrchestrationsSearch],
-            // [B2CWebApiRequests.CreateOrchestrationRequest(), _datahubAdministratorRole, AuditLogActivity.OrchestrationsGet],
-            // [B2CWebApiRequests.CreateOrchestrationTerminateRequest(), _datahubAdministratorRole, AuditLogActivity.OrchestrationsTerminate],
-            // [B2CWebApiRequests.CreateRequestAggregatedMeasureDataRequest(), ActorRole.EnergySupplier.Name, AuditLogActivity.RequestEnergyResults],
-            // [B2CWebApiRequests.CreateRequestWholesaleSettlementRequest(), ActorRole.EnergySupplier.Name, AuditLogActivity.RequestWholesaleResults],
+            [B2CWebApiRequests.CreateOrchestrationsRequest(), _datahubAdministratorRole, AuditLogActivity.OrchestrationsSearch],
+            [B2CWebApiRequests.CreateOrchestrationRequest(), _datahubAdministratorRole, AuditLogActivity.OrchestrationsGet],
+            [B2CWebApiRequests.CreateOrchestrationTerminateRequest(), _datahubAdministratorRole, AuditLogActivity.OrchestrationsTerminate],
+            [B2CWebApiRequests.CreateRequestAggregatedMeasureDataRequest(), ActorRole.EnergySupplier.Name, AuditLogActivity.RequestEnergyResults],
+            [B2CWebApiRequests.CreateRequestWholesaleSettlementRequest(), ActorRole.EnergySupplier.Name, AuditLogActivity.RequestWholesaleResults],
         ];
     }
 

@@ -106,6 +106,7 @@ internal sealed class QueryBuilder
                     : $" (RecordId > {cursor.RecordId} OR {cursor.RecordId} = 0) ";
         }
 
+        // Toggle the sort direction if navigating backwards, because sql use top to limit the result
         var sortingDirection = isForward ? directionToSortBy == DirectionToSortBy.Descending ? "<" : ">"
                 : directionToSortBy == DirectionToSortBy.Descending ? ">" : "<";
         return isForward

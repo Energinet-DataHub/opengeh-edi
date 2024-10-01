@@ -18,14 +18,4 @@ public record DirectionToSortBy(string Identifier)
 {
     public static readonly DirectionToSortBy Ascending = new("ASC");
     public static readonly DirectionToSortBy Descending = new("DESC");
-
-    public static DirectionToSortBy FromIdentifier(string identifier)
-    {
-        return identifier switch
-        {
-            "ASC" => Ascending,
-            "DESC" => Descending,
-            _ => throw new ArgumentOutOfRangeException(nameof(identifier), $"Unknown direction to sort by: {identifier}"),
-        };
-    }
 }
