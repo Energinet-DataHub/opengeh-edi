@@ -14,11 +14,18 @@
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
-public record FieldToSortBy(string Identifier)
+public readonly struct FieldToSortBy
 {
     public static readonly FieldToSortBy MessageId = new("MessageId");
     public static readonly FieldToSortBy DocumentType = new("DocumentType");
     public static readonly FieldToSortBy SenderNumber = new("SenderNumber");
     public static readonly FieldToSortBy ReceiverNumber = new("ReceiverNumber");
     public static readonly FieldToSortBy CreatedAt = new("CreatedAt");
+
+    private FieldToSortBy(string identifier)
+    {
+        Identifier = identifier;
+    }
+
+    public string Identifier { get; }
 }

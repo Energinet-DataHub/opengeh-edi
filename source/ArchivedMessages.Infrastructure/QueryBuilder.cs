@@ -30,6 +30,10 @@ internal sealed class QueryBuilder
         _actorIdentity = actorIdentity;
     }
 
+    /// <summary>
+    /// Build a query for fetching archived messages based on the given query options.
+    /// </summary>
+    /// <param name="query"></param>
     public QueryInput BuildFrom(GetMessagesQuery query)
     {
         if (query.CreationPeriod is not null)
@@ -107,8 +111,8 @@ internal sealed class QueryBuilder
         }
 
         // Toggle the sort direction if navigating backwards, because sql use top to limit the result
-        var sortingDirection = isForward ? directionToSortBy == DirectionToSortBy.Descending ? "<" : ">"
-                : directionToSortBy == DirectionToSortBy.Descending ? ">" : "<";
+        var sortingDirection = isForward ? directionToSortBy.Identifier == DirectionToSortBy.Descending.Identifier ? "<" : ">"
+                : directionToSortBy.Identifier == DirectionToSortBy.Descending.Identifier ? ">" : "<";
         return isForward
             ? $"""
                   ({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (RecordId < {cursor.RecordId} OR {cursor.RecordId} = 0)) 
@@ -124,7 +128,7 @@ internal sealed class QueryBuilder
     {
         var pagingDirection = navigatingForward ? "DESC" : "ASC";
         // Toggle the sort direction if navigating backwards, because sql use top to limit the result
-        var sortDirection = navigatingForward ? directionToSortBy : directionToSortBy == DirectionToSortBy.Ascending ? DirectionToSortBy.Descending : DirectionToSortBy.Ascending;
+        var sortDirection = navigatingForward ? directionToSortBy : directionToSortBy.Identifier == DirectionToSortBy.Ascending.Identifier ? DirectionToSortBy.Descending : DirectionToSortBy.Ascending;
         return $" ORDER BY {fieldToSortBy.Identifier} {sortDirection.Identifier}, RecordId {pagingDirection}";
     }
 

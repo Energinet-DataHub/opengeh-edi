@@ -957,37 +957,37 @@ public class SearchMessagesTests : TestBase
         List<(Instant CreatedAt, string MessageId, string Sender, string Receiver, string DocumentType)> messages)
     {
         var orderedMessages = messages.Order();
-        if (sortedBy == FieldToSortBy.MessageId)
+        if (sortedBy.Identifier == FieldToSortBy.MessageId.Identifier)
         {
-            orderedMessages = sortedDirection == DirectionToSortBy.Ascending
+            orderedMessages = sortedDirection.Identifier == DirectionToSortBy.Ascending.Identifier
                 ? messages.OrderBy(x => x.MessageId)
                 : messages.OrderByDescending(x => x.MessageId);
         }
 
-        if (sortedBy == FieldToSortBy.CreatedAt)
+        if (sortedBy.Identifier == FieldToSortBy.CreatedAt.Identifier)
         {
-            orderedMessages = sortedDirection == DirectionToSortBy.Ascending
+            orderedMessages = sortedDirection.Identifier == DirectionToSortBy.Ascending.Identifier
                 ? messages.OrderBy(x => x.CreatedAt)
                 : messages.OrderByDescending(x => x.CreatedAt);
         }
 
-        if (sortedBy == FieldToSortBy.DocumentType)
+        if (sortedBy.Identifier == FieldToSortBy.DocumentType.Identifier)
         {
-            orderedMessages = sortedDirection == DirectionToSortBy.Ascending
+            orderedMessages = sortedDirection.Identifier == DirectionToSortBy.Ascending.Identifier
                 ? messages.OrderBy(x => x.DocumentType)
                 : messages.OrderByDescending(x => x.DocumentType);
         }
 
-        if (sortedBy == FieldToSortBy.SenderNumber)
+        if (sortedBy.Identifier == FieldToSortBy.SenderNumber.Identifier)
         {
-            orderedMessages = sortedDirection == DirectionToSortBy.Ascending
+            orderedMessages = sortedDirection.Identifier == DirectionToSortBy.Ascending.Identifier
                 ? messages.OrderBy(x => x.Sender)
                 : messages.OrderByDescending(x => x.Sender);
         }
 
-        if (sortedBy == FieldToSortBy.ReceiverNumber)
+        if (sortedBy.Identifier == FieldToSortBy.ReceiverNumber.Identifier)
         {
-            orderedMessages = sortedDirection == DirectionToSortBy.Ascending
+            orderedMessages = sortedDirection.Identifier == DirectionToSortBy.Ascending.Identifier
                 ? messages.OrderBy(x => x.Receiver)
                 : messages.OrderByDescending(x => x.Receiver);
         }

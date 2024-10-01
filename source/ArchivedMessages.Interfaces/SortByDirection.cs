@@ -14,8 +14,15 @@
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
-public record DirectionToSortBy(string Identifier)
+public readonly struct DirectionToSortBy
 {
     public static readonly DirectionToSortBy Ascending = new("ASC");
     public static readonly DirectionToSortBy Descending = new("DESC");
+
+    private DirectionToSortBy(string identifier)
+    {
+        Identifier = identifier;
+    }
+
+    public string Identifier { get; }
 }
