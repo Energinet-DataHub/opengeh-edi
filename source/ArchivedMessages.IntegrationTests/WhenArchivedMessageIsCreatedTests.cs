@@ -24,6 +24,7 @@ using FluentAssertions.Execution;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests;
 
@@ -33,10 +34,10 @@ public class WhenArchivedMessageIsCreatedTests : IClassFixture<ArchivedMessagesF
     private readonly IArchivedMessagesClient _sut;
     private readonly ArchivedMessagesFixture _fixture;
 
-    public WhenArchivedMessageIsCreatedTests(ArchivedMessagesFixture fixture)
+    public WhenArchivedMessageIsCreatedTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
     {
         _fixture = fixture;
-        _sut = fixture.ArchivedMessagesClient;
+        _sut = fixture.GetArchivedMessagesClient(testOutputHelper);
         _fixture.CleanupDatabase();
         _fixture.CleanupFileStorage();
     }

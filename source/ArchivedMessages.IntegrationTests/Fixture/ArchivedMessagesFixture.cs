@@ -20,9 +20,13 @@ using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture.Database;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.Tests;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture;
 
@@ -95,7 +99,7 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         await DatabaseManager.CreateDatabaseAsync();
         AzuriteManager.StartAzurite();
         CleanupFileStorage();
-        BuildService();
+        ServiceProvider = BuildService();
 
         AuthenticatedActor = ServiceProvider.GetRequiredService<AuthenticatedActor>();
         AuthenticatedActor.SetAuthenticatedActor(
@@ -119,7 +123,7 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         GC.SuppressFinalize(this);
     }
 
-    public void BuildService()
+    public ServiceProvider BuildService(ITestOutputHelper? testOutputHelper = null)
     {
         var builder = new ConfigurationBuilder();
         builder.AddInMemoryCollection(new Dictionary<string, string?>
@@ -134,14 +138,24 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         var services = new ServiceCollection();
         var configuration = builder.Build();
 
-        // services.AddSingleton(sp => testOutputHelper);
-        // services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
-        // services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
+        if (testOutputHelper != null)
+        {
+            services.AddSingleton(sp => testOutputHelper);
+            services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
+            services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
+        }
+
         services
             .AddScoped<AuthenticatedActor>()
             .AddArchivedMessagesModule(configuration);
 
-        ServiceProvider = services.BuildServiceProvider();
+        return services.BuildServiceProvider();
+    }
+
+    public IArchivedMessagesClient GetArchivedMessagesClient(ITestOutputHelper testOutputHelper)
+    {
+        var serviceProvider = BuildService(testOutputHelper);
+        return serviceProvider.GetRequiredService<IArchivedMessagesClient>();
     }
 
     protected virtual void Dispose(bool disposing)
