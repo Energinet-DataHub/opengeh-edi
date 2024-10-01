@@ -79,7 +79,7 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
         contentType!.MediaType.Should().Be("application/json");
         contentType.CharSet.Should().Be("utf-8");
         var content = await actualResponse.Content.ReadAsByteArrayAsync();
-        Encoding.UTF8.GetString(content).Should().Contain(string.Empty);
+        Encoding.UTF8.GetString(content).Should().BeEmpty();
         actualResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
     }
 

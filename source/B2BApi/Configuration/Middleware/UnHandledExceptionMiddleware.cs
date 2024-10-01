@@ -112,9 +112,9 @@ public sealed class UnHandledExceptionMiddleware(ILogger<UnHandledExceptionMiddl
 
     private static async Task CreateJsonResponseAsync(HttpResponseData newHttpResponse)
     {
-        newHttpResponse.Headers.Add("Content-Type", "application/json; charset=utf-8");
         // You need to explicitly pass the status code in WriteAsJsonAsync method.
         // https://github.com/Azure/azure-functions-dotnet-worker/issues/776
+        // The method also ensures that the content type is "application/json; charset=utf-8"
         await newHttpResponse.WriteAsJsonAsync(new { Message = ErrorMessage }, newHttpResponse.StatusCode);
     }
 
