@@ -24,7 +24,7 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 /// <param name="DirectionToSortBy"></param>
 [Serializable]
 public record SearchArchivedMessagesPagination(
-    SearchArchivedMessagesCursor? Cursor,
+    SearchArchivedMessagesCursor? Cursor = null,
     FieldToSortBy? SortBy = null,
     DirectionToSortBy? DirectionToSortBy = null,
     int PageSize = 100,
