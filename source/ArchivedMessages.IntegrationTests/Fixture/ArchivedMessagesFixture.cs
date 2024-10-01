@@ -152,12 +152,6 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         return services.BuildServiceProvider();
     }
 
-    public IArchivedMessagesClient GetArchivedMessagesClient(ITestOutputHelper testOutputHelper)
-    {
-        var serviceProvider = BuildService(testOutputHelper);
-        return serviceProvider.GetRequiredService<IArchivedMessagesClient>();
-    }
-
     protected virtual void Dispose(bool disposing)
     {
         if (_disposed)

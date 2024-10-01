@@ -37,7 +37,8 @@ public class WhenArchivedMessageIsCreatedTests : IClassFixture<ArchivedMessagesF
     public WhenArchivedMessageIsCreatedTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
     {
         _fixture = fixture;
-        _sut = fixture.GetArchivedMessagesClient(testOutputHelper);
+        _sut = fixture.BuildService(testOutputHelper)
+            .GetRequiredService<IArchivedMessagesClient>();
         _fixture.CleanupDatabase();
         _fixture.CleanupFileStorage();
     }
