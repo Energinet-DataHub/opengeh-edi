@@ -8,7 +8,8 @@
 # How to generate the client code
 
 1. Run B2CWebApi.
-2. Copy the content of the swagger.json (from Swagger website) to the local swagger.json file.
+2. Copy the content of the swagger.json (from Swagger website) to the local swagger.json file. 
+   - Ensure you copy the correct version of the swagger.json file. 
 3. Rebuild the SubsystemTests project.
 4. Manually re-add the license header to the B2CEdiClient.cs file.
 

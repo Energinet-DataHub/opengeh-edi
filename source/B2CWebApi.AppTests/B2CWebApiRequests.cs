@@ -30,6 +30,22 @@ public static class B2CWebApiRequests
         var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMessageSearch")
         {
             Content = CreateJsonContent(
+                new SearchArchivedMessagesCriteria(
+                    CreatedDuringPeriod: null,
+                    MessageId: null,
+                    SenderNumber: null,
+                    ReceiverNumber: null,
+                    DocumentTypes: null,
+                    BusinessReasons: null)),
+        };
+        return request;
+    }
+
+    public static HttpRequestMessage CreateArchivedMessageSearchV2Request()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMessageSearch?api-version=2")
+        {
+            Content = CreateJsonContent(
                 new SearchArchivedMessagesRequest(
                     new SearchArchivedMessagesCriteria(
                         CreatedDuringPeriod: null,

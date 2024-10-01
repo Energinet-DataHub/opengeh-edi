@@ -13,10 +13,14 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2;
 using Nito.AsyncEx;
 using NodaTime;
 using NodaTime.Text;
 using Xunit.Abstractions;
+using ArchivedMessageResult = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client.ArchivedMessageResult;
+using ArchivedMessageResultV2 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2.ArchivedMessageResult;
+using SearchArchivedMessagesCriteria = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client.SearchArchivedMessagesCriteria;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 
@@ -39,11 +43,20 @@ public sealed class B2CEdiDriver : IDisposable
     {
     }
 
-    public async Task<ICollection<ArchivedMessageResult>> SearchArchivedMessagesAsync(SearchArchivedMessagesRequest request)
+    public async Task<ICollection<ArchivedMessageResult>> SearchArchivedMessagesAsync(SearchArchivedMessagesCriteria request)
     {
         var webApiClient = await CreateWebApiClientAsync();
 
         var result = await webApiClient.ArchivedMessageSearchAsync(body: request);
+
+        return result;
+    }
+
+    public async Task<ICollection<ArchivedMessageResultV2>> SearchArchivedMessagesV2Async(SearchArchivedMessagesRequest request)
+    {
+        var webApiClient = await CreateWebApiClientV2Async();
+
+        var result = await webApiClient.ArchivedMessageSearchAsync(api_version: "2.0", body: request);
 
         return result;
     }
@@ -87,5 +100,12 @@ public sealed class B2CEdiDriver : IDisposable
         var httpClient = await _httpClient;
 
         return new B2CEdiClient(_b2cWebApiUri.AbsoluteUri, httpClient);
+    }
+
+    private async Task<B2CEdiClientV2> CreateWebApiClientV2Async()
+    {
+        var httpClient = await _httpClient;
+
+        return new B2CEdiClientV2(_b2cWebApiUri.AbsoluteUri, httpClient);
     }
 }
