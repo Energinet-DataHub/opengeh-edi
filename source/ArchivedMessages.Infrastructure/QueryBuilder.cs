@@ -98,7 +98,7 @@ internal sealed class QueryBuilder
         return new QueryInput(BuildStatement(query), _queryParameters);
     }
 
-    private static string WherePaginationPosition(FieldToSortBy fieldToSortBy, DirectionToSortBy directionToSortBy, PaginationCursor cursor, bool isForward)
+    private static string WherePaginationPosition(FieldToSortBy fieldToSortBy, DirectionToSortBy directionToSortBy, SortingCursor cursor, bool isForward)
     {
         if (cursor.SortedFieldValue is null)
         {

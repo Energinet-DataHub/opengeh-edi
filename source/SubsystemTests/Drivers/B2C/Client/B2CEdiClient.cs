@@ -17,6 +17,8 @@
 // </auto-generated>
 //----------------------
 
+using System.IO;
+
 #pragma warning disable 108 // Disable "CS0108 '{derivedDto}.ToJson()' hides inherited member '{dtoBase}.ToJson()'. Use the new keyword if hiding was intended."
 #pragma warning disable 114 // Disable "CS0114 '{derivedDto}.RaisePropertyChanged(String)' hides inherited member 'dtoBase.RaisePropertyChanged(String)'. To make the current member override that implementation, add the override keyword. Otherwise add the new keyword."
 #pragma warning disable 472 // Disable "CS0472 The result of the expression is always 'false' since a value of type 'Int32' is never equal to 'null' of type 'Int32?'
@@ -47,7 +49,7 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ArchivedMessageResult>> ArchivedMessageSearchAsync(string api_version = null, SearchArchivedMessagesCriteria body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ArchivedMessageResult>> ArchivedMessageSearchAsync(string api_version = null, SearchArchivedMessagesRequest body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -219,7 +221,7 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ArchivedMessageResult>> ArchivedMessageSearchAsync(string api_version = null, SearchArchivedMessagesCriteria body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ArchivedMessageResult>> ArchivedMessageSearchAsync(string api_version = null, SearchArchivedMessagesRequest body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -859,6 +861,19 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client
 
     }
 
+    /// <summary>
+    /// Represents the direction to sort by when searching for archived messages.
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum DirectionToSortBy
+    {
+
+        Ascending = 0,
+
+        Descending = 1,
+
+    }
+
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class DurableOrchestrationStatus
     {
@@ -888,6 +903,25 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client
 
         [Newtonsoft.Json.JsonProperty("history", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.ICollection<JToken> History { get; set; }
+
+    }
+
+    /// <summary>
+    /// Represents the fields that can be sorted on when searching for archived messages.
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum FieldToSortBy
+    {
+
+        MessageId = 0,
+
+        DocumentType = 1,
+
+        SenderNumber = 2,
+
+        ReceiverNumber = 3,
+
+        CreatedAt = 4,
 
     }
 
@@ -1067,6 +1101,60 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client
 
         [Newtonsoft.Json.JsonProperty("includeRelatedMessages", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public bool IncludeRelatedMessages { get; set; }
+
+    }
+
+    /// <summary>
+    /// Pagination cursor for the search of archived messages.
+    /// <br/>Pointing to the field value to sort by and the record id.
+    /// <br/>When navigating forward, the cursor points to the last record of the current page.
+    /// <br/>and when navigating backward, the cursor points to the first record of the current page.
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class SearchArchivedMessagesCursor
+    {
+        [Newtonsoft.Json.JsonProperty("fieldToSortByValue", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string FieldToSortByValue { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("recordId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public long RecordId { get; set; }
+
+    }
+
+    /// <summary>
+    /// Pagination when searching for archived messages that supports sorting on a specific field.
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class SearchArchivedMessagesPagination
+    {
+        [Newtonsoft.Json.JsonProperty("cursor", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public SearchArchivedMessagesCursor Cursor { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("sortBy", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public FieldToSortBy? SortBy { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("directionToSortBy", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public DirectionToSortBy? DirectionToSortBy { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("pageSize", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int PageSize { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("navigationForward", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool NavigationForward { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class SearchArchivedMessagesRequest
+    {
+        [Newtonsoft.Json.JsonProperty("searchCriteria", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public SearchArchivedMessagesCriteria SearchCriteria { get; set; }
+
+        /// <summary>
+        /// Pagination when searching for archived messages that supports sorting on a specific field.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("pagination", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public SearchArchivedMessagesPagination Pagination { get; set; }
 
     }
 

@@ -12,20 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
-public record DirectionToSortBy(string Identifier)
-{
-    public static readonly DirectionToSortBy Ascending = new("ASC");
-    public static readonly DirectionToSortBy Descending = new("DESC");
-
-    public static DirectionToSortBy FromIdentifier(string identifier)
-    {
-        return identifier switch
-        {
-            "ASC" => Ascending,
-            "DESC" => Descending,
-            _ => throw new ArgumentOutOfRangeException(nameof(identifier), $"Unknown direction to sort by: {identifier}"),
-        };
-    }
-}
+/// <summary>
+/// Pagination cursor for the search of archived messages.
+/// Pointing to the field value to sort by and the record id.
+/// When navigating forward, the cursor points to the last record of the current page.
+/// and when navigating backward, the cursor points to the first record of the current page.
+/// </summary>
+/// <param name="FieldToSortByValue"></param>
+/// <param name="RecordId"></param>
+[Serializable]
+public record SearchArchivedMessagesCursor(string? FieldToSortByValue, long RecordId);

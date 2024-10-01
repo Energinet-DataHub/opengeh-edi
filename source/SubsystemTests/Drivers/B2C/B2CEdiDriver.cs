@@ -39,11 +39,11 @@ public sealed class B2CEdiDriver : IDisposable
     {
     }
 
-    public async Task<ICollection<ArchivedMessageResult>> SearchArchivedMessagesAsync(SearchArchivedMessagesCriteria parameters)
+    public async Task<ICollection<ArchivedMessageResult>> SearchArchivedMessagesAsync(SearchArchivedMessagesRequest request)
     {
         var webApiClient = await CreateWebApiClientAsync();
 
-        var result = await webApiClient.ArchivedMessageSearchAsync(body: parameters);
+        var result = await webApiClient.ArchivedMessageSearchAsync(body: request);
 
         return result;
     }

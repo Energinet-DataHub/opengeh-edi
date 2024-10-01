@@ -16,6 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
@@ -41,15 +42,19 @@ public class ArchivedMessageDsl
     internal async Task ConfirmMessageIsArchived(string messageId)
     {
         var archivedMessages = await _b2cEdiDriver.SearchArchivedMessagesAsync(
-            new SearchArchivedMessagesCriteria
+            new SearchArchivedMessagesRequest
             {
-                MessageId = messageId,
-                CreatedDuringPeriod = null,
-                BusinessReasons = null,
-                DocumentTypes = null,
-                ReceiverNumber = null,
-                SenderNumber = null,
-                IncludeRelatedMessages = false,
+                SearchCriteria = new SearchArchivedMessagesCriteria
+                {
+                    MessageId = messageId,
+                    CreatedDuringPeriod = null,
+                    BusinessReasons = null,
+                    DocumentTypes = null,
+                    ReceiverNumber = null,
+                    SenderNumber = null,
+                    IncludeRelatedMessages = false,
+                },
+                Pagination = new SearchArchivedMessagesPagination(),
             });
 
         archivedMessages.Should().NotBeNull();
@@ -68,15 +73,19 @@ public class ArchivedMessageDsl
         var unknownMessageId = Guid.NewGuid().ToString();
         var outboxCreatedAfter = SystemClock.Instance.GetCurrentInstant();
         await _b2cEdiDriver.SearchArchivedMessagesAsync(
-            new SearchArchivedMessagesCriteria
+            new SearchArchivedMessagesRequest
             {
-                MessageId = unknownMessageId,
-                CreatedDuringPeriod = null,
-                SenderNumber = null,
-                ReceiverNumber = null,
-                DocumentTypes = null,
-                BusinessReasons = null,
-                IncludeRelatedMessages = false,
+                SearchCriteria = new SearchArchivedMessagesCriteria
+                {
+                    MessageId = unknownMessageId,
+                    CreatedDuringPeriod = null,
+                    SenderNumber = null,
+                    ReceiverNumber = null,
+                    DocumentTypes = null,
+                    BusinessReasons = null,
+                    IncludeRelatedMessages = false,
+                },
+                Pagination = new SearchArchivedMessagesPagination(),
             });
 
         return (unknownMessageId, outboxCreatedAfter);

@@ -12,20 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
-public record DirectionToSortBy(string Identifier)
+/// <summary>
+/// Represents the fields that can be sorted on when searching for archived messages.
+/// </summary>
+[Serializable]
+public enum FieldToSortBy
 {
-    public static readonly DirectionToSortBy Ascending = new("ASC");
-    public static readonly DirectionToSortBy Descending = new("DESC");
-
-    public static DirectionToSortBy FromIdentifier(string identifier)
-    {
-        return identifier switch
-        {
-            "ASC" => Ascending,
-            "DESC" => Descending,
-            _ => throw new ArgumentOutOfRangeException(nameof(identifier), $"Unknown direction to sort by: {identifier}"),
-        };
-    }
+    MessageId = 0,
+    DocumentType = 1,
+    SenderNumber = 2,
+    ReceiverNumber = 3,
+    CreatedAt = 4,
 }

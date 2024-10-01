@@ -19,7 +19,7 @@ namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 /// by moving the cursor to a specific position in the sorted dataset.
 /// </summary>
 public class SortedCursorBasedPagination(
-    PaginationCursor? cursor = null,
+    SortingCursor? cursor = null,
     int pageSize = 100,
     bool navigationForward = true,
     FieldToSortBy? fieldToSortBy = null,
@@ -28,7 +28,7 @@ public class SortedCursorBasedPagination(
     /// <summary>
     ///  The current position in the dataset.
     /// </summary>
-    public PaginationCursor Cursor { get; } = cursor ?? new PaginationCursor();
+    public SortingCursor Cursor { get; } = cursor ?? new SortingCursor();
 
     /// <summary>
     /// The number of items per page.
@@ -52,21 +52,11 @@ public class SortedCursorBasedPagination(
 }
 
 /// <summary>
-/// The current last known position in the dataset. Used to navigate through the dataset.
-/// Current displayed dataset:
-/// -- Looking ahead
-/// [0]
-/// [1]
-/// [2]
-/// [3]
-/// [4] - Cursor
-/// -- Looking backwards
-/// [5] - Cursor
-/// [6]
-/// [7]
-/// [8]
-/// [9]
+/// Pagination cursor for the search of archived messages.
+/// Pointing to the field value to sort by and the record id.
+/// When navigating forward, the cursor points to the last record of the current page.
+/// and when navigating backward, the cursor points to the first record of the current page.
 /// </summary>
 /// <param name="SortedFieldValue">If dataset should be sorted, we need to point at the current value of the field being sorted on.</param>
 /// <param name="RecordId"></param>
-public record PaginationCursor(string? SortedFieldValue = null, long RecordId = 0);
+public record SortingCursor(string? SortedFieldValue = null, long RecordId = 0);

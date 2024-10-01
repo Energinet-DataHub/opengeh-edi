@@ -660,7 +660,7 @@ public class SearchMessagesTests : TestBase
                 // use the last message as the cursor when navigating forward
                 var lastMessage = result.Messages.Last();
                 pagination = new SortedCursorBasedPagination(
-                    cursor: new PaginationCursor(
+                    cursor: new SortingCursor(
                         SortedFieldValue: lastMessage.CreatedAt.ToString(),
                         RecordId: lastMessage.RecordId),
                     pageSize: pageSize,
@@ -773,7 +773,7 @@ public class SearchMessagesTests : TestBase
                 // use the first message as the cursor when navigating forward
                 var firstMessage = result.Messages.First();
                 pagination = new SortedCursorBasedPagination(
-                    cursor: new PaginationCursor(
+                    cursor: new SortingCursor(
                         SortedFieldValue: firstMessage.CreatedAt.ToString(),
                         RecordId: firstMessage.RecordId),
                     pageSize: pageSize,
@@ -856,7 +856,7 @@ public class SearchMessagesTests : TestBase
                 // use the last message as the cursor when navigating forward
                 var lastMessage = result.Messages.Last();
                 pagination = new SortedCursorBasedPagination(
-                    cursor: new PaginationCursor(
+                    cursor: new SortingCursor(
                         SortedFieldValue: lastMessage.GetType().GetProperty(sortedBy.Identifier)!.GetValue(lastMessage)!
                             .ToString(),
                         RecordId: lastMessage.RecordId),
@@ -929,7 +929,7 @@ public class SearchMessagesTests : TestBase
                 // use the first message as the cursor when navigating backward
                 var firstMessage = result.Messages.First();
                 pagination = new SortedCursorBasedPagination(
-                    cursor: new PaginationCursor(
+                    cursor: new SortingCursor(
                         SortedFieldValue: firstMessage.GetType().GetProperty(sortedBy.Identifier)!.GetValue(firstMessage)!
                             .ToString(),
                         RecordId: firstMessage.RecordId),
