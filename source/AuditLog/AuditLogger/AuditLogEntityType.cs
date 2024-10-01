@@ -25,7 +25,7 @@ public record AuditLogEntityType(string Identifier)
     public static readonly AuditLogEntityType ArchivedMessage = new("ArchivedMessage");
 
     /// <summary>
-    /// Used when peeking and dequeueing a bundle from the actor message queue.
+    /// Used when peeking and dequeueing a bundle from the actor message queue and cleaned up.
     /// </summary>
     public static readonly AuditLogEntityType Bundle = new("Bundle");
 
@@ -43,4 +43,39 @@ public record AuditLogEntityType(string Identifier)
     /// Used when searching for orchestrations or getting status of a specific orchestration.
     /// </summary>
     public static readonly AuditLogEntityType Orchestration = new("Orchestration");
+
+    /// <summary>
+    /// Used when grid area owner are cleaned up.
+    /// </summary>
+    public static readonly AuditLogEntityType GridAreaOwner = new("GridAreaOwner");
+
+    /// <summary>
+    /// Used when internal command are cleaned up.
+    /// </summary>
+    public static readonly AuditLogEntityType InternalCommand = new("InternalCommand");
+
+    /// <summary>
+    /// Used when outbox message are cleaned up.
+    /// </summary>
+    public static readonly AuditLogEntityType OutboxMessage = new("OutboxMessage");
+
+    /// <summary>
+    /// Used when received inbox event are cleaned up.
+    /// </summary>
+    public static readonly AuditLogEntityType ReceivedInboxEvent = new("ReceivedInboxEvent");
+
+    /// <summary>
+    /// Used when received integration event are cleaned up.
+    /// </summary>
+    public static readonly AuditLogEntityType ReceivedIntegrationEvent = new("ReceivedIntegrationEvent");
+
+    /// <summary>
+    /// Used when market document are cleaned up.
+    /// </summary>
+    public static readonly AuditLogEntityType MarketDocument = new("MarketDocument");
+
+    /// <summary>
+    /// Used when outgoing message are cleaned up.
+    /// </summary>
+    public static readonly AuditLogEntityType OutgoingMessage = new("OutgoingMessage");
 }
