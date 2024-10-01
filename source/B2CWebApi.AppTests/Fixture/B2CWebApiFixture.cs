@@ -40,7 +40,8 @@ public class B2CWebApiFixture : IAsyncLifetime
         OpenIdJwtManager = new OpenIdJwtManager(IntegrationTestConfiguration.B2CSettings);
         ServiceBusResourceProvider = new ServiceBusResourceProvider(
             TestLogger,
-            IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace);
+            IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace,
+            IntegrationTestConfiguration.Credential);
 
         B2CWebApiApplicationFactory = new B2CWebApiApplicationFactory();
     }
