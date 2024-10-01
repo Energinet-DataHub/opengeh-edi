@@ -20,17 +20,13 @@ using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture.Database;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.Tests;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture;
 
-public class ArchivedMessagesFixture(ITestOutputHelper testOutputHelper) : IDisposable, IAsyncLifetime
+public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
 {
     private bool _disposed;
 
@@ -138,10 +134,9 @@ public class ArchivedMessagesFixture(ITestOutputHelper testOutputHelper) : IDisp
         var services = new ServiceCollection();
         var configuration = builder.Build();
 
-        services.AddSingleton(sp => testOutputHelper);
-        services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
-        services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
-
+        // services.AddSingleton(sp => testOutputHelper);
+        // services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
+        // services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
         services
             .AddScoped<AuthenticatedActor>()
             .AddArchivedMessagesModule(configuration);
