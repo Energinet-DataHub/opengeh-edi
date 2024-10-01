@@ -23,7 +23,7 @@ using Xunit;
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests;
 
 [Collection(nameof(ArchivedMessagesCollection))]
-public class SearchMessagesWithAuthRestrictionTests
+public class SearchMessagesWithOwnedRestrictionTests
 {
     private readonly IArchivedMessagesClient _sut;
     private readonly ArchivedMessagesFixture _fixture;
@@ -33,7 +33,7 @@ public class SearchMessagesWithAuthRestrictionTests
         Restriction.Owned,
         ActorRole.EnergySupplier);
 
-    public SearchMessagesWithAuthRestrictionTests(ArchivedMessagesFixture fixture)
+    public SearchMessagesWithOwnedRestrictionTests(ArchivedMessagesFixture fixture)
     {
         _fixture = fixture;
 
@@ -153,62 +153,5 @@ public class SearchMessagesWithAuthRestrictionTests
                 messageWithRelation2.Id.Value,
             ]);
     }
-
-    /// <summary>
-    /// The following test is almost the same as the previous one, but messageWithRelation2 has a different receiver!.
-    /// </summary>
-    [Fact]
-    public async Task Given_FourArchivedMessagesWithRelations_When_IncludingRelatedMessagesAndSearchingByMessageId_Then_RelatedMessagesAreReturned_WAAAWHWHAEHAHDSHDHASDHASHDHSHEEELP()
-    {
-        // Arrange
-        var messageWithoutRelation = await _fixture.CreateArchivedMessageAsync(
-            relatedToMessageId: null,
-            archivedMessageType: ArchivedMessageType.IncomingMessage,
-            receiverNumber: _authenticatedActor.ActorNumber.Value,
-            receiverRole: _authenticatedActor.ActorRole);
-        var messageWithRelation = await _fixture.CreateArchivedMessageAsync(
-            relatedToMessageId: MessageId.Create(messageWithoutRelation.MessageId!),
-            archivedMessageType: ArchivedMessageType.OutgoingMessage,
-            receiverNumber: _authenticatedActor.ActorNumber.Value,
-            receiverRole: _authenticatedActor.ActorRole);
-
-        // TODO: The following message is a thought of scenario and should not be possible if we view the EDI solution as a whole.
-        // But if we consider archived messages as a standalone service, then it is possible to two messages which are related but the receivers are different.
-        // is this a test we want to have?
-        var messageWithRelation2 = await _fixture.CreateArchivedMessageAsync(
-            relatedToMessageId: MessageId.Create(messageWithoutRelation.MessageId!),
-            archivedMessageType: ArchivedMessageType.OutgoingMessage,
-            receiverNumber: "9999999999999");
-        var unexpectedMessage = await _fixture.CreateArchivedMessageAsync();
-
-        // Act
-        // This could simulate a search for a message, where the message is a request with two responses
-        var searchForRequest = await _sut.SearchAsync(
-            new GetMessagesQuery(
-                MessageId: messageWithoutRelation.MessageId,
-                IncludeRelatedMessages: true),
-            CancellationToken.None);
-
-        // This could simulate a search for a message, where the message is a response to a request with two responses
-        var searchForResponse = await _sut.SearchAsync(
-            new GetMessagesQuery(
-                MessageId: messageWithRelation.MessageId,
-                IncludeRelatedMessages: true),
-            CancellationToken.None);
-
-        // Assert
-        using var assertionScope = new AssertionScope();
-        searchForRequest.Messages.Should().HaveCount(3);
-        searchForRequest.Should().BeEquivalentTo(searchForResponse); // Note that they are sorted differently
-        searchForRequest.Messages.Select(m => m.Id)
-            .Should()
-            .BeEquivalentTo(
-            [
-                messageWithoutRelation.Id.Value,
-                messageWithRelation.Id.Value,
-                messageWithRelation2.Id.Value, // TODO: Should this be included?
-            ]);
-    }
-
     #endregion
 }

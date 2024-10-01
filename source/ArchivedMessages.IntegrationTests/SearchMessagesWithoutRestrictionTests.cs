@@ -26,7 +26,7 @@ using Xunit;
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests;
 
 [Collection(nameof(ArchivedMessagesCollection))]
-public class SearchMessageWithoutAuthRestrictionTests
+public class SearchMessagesWithoutRestrictionTests
 {
     private readonly IArchivedMessagesClient _sut;
     private readonly ArchivedMessagesFixture _fixture;
@@ -36,7 +36,7 @@ public class SearchMessageWithoutAuthRestrictionTests
         Restriction.None,
         ActorRole.MeteredDataAdministrator);
 
-    public SearchMessageWithoutAuthRestrictionTests(ArchivedMessagesFixture fixture)
+    public SearchMessagesWithoutRestrictionTests(ArchivedMessagesFixture fixture)
     {
         _fixture = fixture;
 
