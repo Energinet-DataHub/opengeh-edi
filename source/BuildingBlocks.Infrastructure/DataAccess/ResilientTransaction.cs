@@ -58,6 +58,10 @@ public class ResilientTransaction
             }
 
             await transaction.CommitAsync().ConfigureAwait(false);
+            foreach (var dbContext in dbContexts)
+            {
+                await dbContext.Database.UseTransactionAsync(null).ConfigureAwait(false);
+            }
         }
     }
 }
