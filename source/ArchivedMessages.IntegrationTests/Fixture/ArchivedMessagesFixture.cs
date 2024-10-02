@@ -42,7 +42,7 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
 
     public IArchivedMessagesClient ArchivedMessagesClient { get; set; } = null!;
 
-    public ServiceProvider ServiceProvider { get; private set; } = null!;
+    public ServiceProvider Services { get; private set; } = null!;
 
     public void CleanupDatabase()
     {
@@ -99,16 +99,16 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         await DatabaseManager.CreateDatabaseAsync();
         AzuriteManager.StartAzurite();
         CleanupFileStorage();
-        ServiceProvider = BuildService();
+        Services = BuildService();
 
-        ServiceProvider.GetRequiredService<AuthenticatedActor>()
+        Services.GetRequiredService<AuthenticatedActor>()
             .SetAuthenticatedActor(
                 new ActorIdentity(
                     ActorNumber.Create("1234512345888"),
                     restriction: Restriction.None,
                     ActorRole.MeteredDataAdministrator));
 
-        ArchivedMessagesClient = ServiceProvider.GetRequiredService<IArchivedMessagesClient>();
+        ArchivedMessagesClient = Services.GetRequiredService<IArchivedMessagesClient>();
     }
 
     public async Task DisposeAsync()

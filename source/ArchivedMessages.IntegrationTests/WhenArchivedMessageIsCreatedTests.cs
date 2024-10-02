@@ -144,7 +144,7 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
 
     private async Task<IReadOnlyCollection<ArchivedMessageFromDb>> GetAllMessagesInDatabase()
     {
-        var connectionFactory = _fixture.ServiceProvider.GetService<IDatabaseConnectionFactory>()!;
+        var connectionFactory = _fixture.Services.GetService<IDatabaseConnectionFactory>()!;
         using var connection = await connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
 
         var archivedMessages =
@@ -157,7 +157,7 @@ public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
 
     private async Task<ArchivedMessageStream> GetMessagesFromBlob(FileStorageReference reference)
     {
-        var blobClient = _fixture.ServiceProvider.GetService<IFileStorageClient>()!;
+        var blobClient = _fixture.Services.GetService<IFileStorageClient>()!;
 
         var fileStorageFile = await blobClient.DownloadAsync(reference).ConfigureAwait(false);
         return new ArchivedMessageStream(fileStorageFile);
