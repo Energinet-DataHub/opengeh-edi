@@ -18,6 +18,7 @@ using Azure.Storage.Blobs;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
+using Energinet.DataHub.BuildingBlocks.Tests;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
