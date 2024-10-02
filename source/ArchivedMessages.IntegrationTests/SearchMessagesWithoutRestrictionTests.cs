@@ -493,7 +493,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Can_fetch_all_messages_with_pagination_navigation_forward()
+    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrue_Then_ExpectedMessageAreReturned()
     {
         // Arrange
         var messages = new List<(Instant CreatedAt, string MessageId)>()
@@ -533,7 +533,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Can_fetch_all_messages_with_pagination_navigation_backward()
+    public async Task Given_SevenArchivedMessages_When_NavigatingBackwardIsTrue_Then_ExpectedMessageAreReturned()
     {
         // Arrange
         var messages = new List<(Instant CreatedAt, string MessageId)>()
@@ -576,7 +576,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
     [InlineData(-8)]
     [InlineData(-1)]
     [InlineData(0)]
-    public Task Can_not_fetch_messages_with_invalid_page_size(int pageSize)
+    public Task Given_SevenArchivedMessages_When_PageSizeIsInvalid_Then_ExpectedMessageAreReturned(int pageSize)
     {
         // Arrange
         // Act
@@ -589,7 +589,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Can_fetch_messages_from_second_page_navigation_forward_returns_expected_order_messages()
+    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrueAndSecondPage_Then_ExpectedMessageAreReturned()
     {
         // Arrange
         var pageSize = 2;
@@ -646,7 +646,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Can_fetch_messages_from_second_page_navigation_backward_returns_expected_order_messages()
+    public async Task Given_SevenArchivedMessages_When_NavigatingBackwardIsTrueAndSecondPage_Then_ExpectedMessageAreReturned()
     {
         // Arrange
         var pageSize = 2;
@@ -704,7 +704,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
 
     [Theory]
     [MemberData(nameof(GetAllCombinationOfFieldsToSortByAndDirectionsToSortBy))]
-    public async Task Can_fetch_all_messages_with_pagination_navigation_forward_and_sorted_by_returns_expected_messages(
+    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrueAndSortByField_Then_ExpectedMessageAreReturned(
         FieldToSortBy sortedBy,
         DirectionToSortBy sortedDirection)
     {
@@ -785,7 +785,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
     [Theory]
     [MemberData(nameof(GetAllCombinationOfFieldsToSortByAndDirectionsToSortBy))]
     public async Task
-        Can_fetch_all_messages_with_pagination_navigation_backward_and_sorted_by_returns_expected_messages(
+        Given_SevenArchivedMessages_When_NavigatingBackwardIsTrueAndSortByField_Then_ExpectedMessageAreReturned(
             FieldToSortBy sortedBy,
             DirectionToSortBy sortedDirection)
     {
