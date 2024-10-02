@@ -76,7 +76,11 @@ public class IncomingMessageReceiver
 
         var incomingDocumentType = IncomingDocumentType.FromName(incomingDocumentTypeName);
         if (incomingDocumentType == null)
-            return request.CreateResponse(HttpStatusCode.NotFound);
+        {
+            var responseData = request.CreateResponse(HttpStatusCode.NotFound);
+            responseData.Headers.Add("Content-Type", $"{documentFormat.GetContentType()}; charset=utf-8");
+            return responseData;
+        }
 
         var responseMessage = await _incomingMessageClient
             .ReceiveIncomingMarketMessageAsync(
@@ -91,16 +95,22 @@ public class IncomingMessageReceiver
             ? HttpStatusCode.BadRequest
             : HttpStatusCode.Accepted;
 
-        return await CreateResponseAsync(request, httpStatusCode, responseMessage).ConfigureAwait(false);
+        var httpResponseData = await CreateResponseAsync(request, httpStatusCode, documentFormat, responseMessage)
+            .ConfigureAwait(false);
+
+        return httpResponseData;
     }
 
     private static async Task<HttpResponseData> CreateResponseAsync(
         HttpRequestData request,
         HttpStatusCode statusCode,
+        DocumentFormat documentFormat,
         ResponseMessage responseMessage)
     {
         var response = request.CreateResponse(statusCode);
+        response.Headers.Add("Content-Type", $"{documentFormat.GetContentType()}; charset=utf-8");
         await response.WriteStringAsync(responseMessage.MessageBody, Encoding.UTF8).ConfigureAwait(false);
+
         return response;
     }
 

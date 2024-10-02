@@ -21,16 +21,12 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Json;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.WholesaleSettlementMessageParsers;
 
-public class WholesaleSettlementJsonMessageParser : JsonParserBase, IMarketMessageParser
+public sealed class WholesaleSettlementJsonMessageParser(JsonSchemaProvider schemaProvider)
+    : JsonParserBase(schemaProvider), IMarketMessageParser
 {
     private const string SeriesElementName = "Series";
     private const string HeaderElementName = "RequestWholesaleSettlement_MarketDocument";
     private const string DocumentName = "RequestWholesaleSettlement";
-
-    public WholesaleSettlementJsonMessageParser(JsonSchemaProvider schemaProvider)
-        : base(schemaProvider)
-    {
-    }
 
     public DocumentFormat HandledFormat => DocumentFormat.Json;
 
@@ -73,6 +69,10 @@ public class WholesaleSettlementJsonMessageParser : JsonParserBase, IMarketMessa
         catch (IOException e)
         {
             return InvalidJsonFailure(e);
+        }
+        catch (KeyNotFoundException e)
+        {
+            return InvalidJsonFailure(new KeyNotFoundException("Missing root element", e));
         }
     }
 

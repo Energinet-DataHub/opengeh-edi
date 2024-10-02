@@ -21,16 +21,12 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Json;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.AggregatedMeasureDataRequestMessageParsers;
 
-public class AggregatedMeasureDataJsonMessageParser : JsonParserBase, IMarketMessageParser
+public sealed class AggregatedMeasureDataJsonMessageParser(JsonSchemaProvider schemaProvider)
+    : JsonParserBase(schemaProvider), IMarketMessageParser
 {
     private const string SeriesElementName = "Series";
     private const string HeaderElementName = "RequestAggregatedMeasureData_MarketDocument";
     private const string DocumentName = "RequestAggregatedMeasureData";
-
-    public AggregatedMeasureDataJsonMessageParser(JsonSchemaProvider schemaProvider)
-        : base(schemaProvider)
-    {
-    }
 
     public DocumentFormat HandledFormat => DocumentFormat.Json;
 
@@ -55,10 +51,11 @@ public class AggregatedMeasureDataJsonMessageParser : JsonParserBase, IMarketMes
 
             if (errors.Count > 0)
             {
-                return new IncomingMarketMessageParserResult(errors.ToArray());
+                return new IncomingMarketMessageParserResult([.. errors]);
             }
 
-            using var document = await JsonDocument.ParseAsync(incomingMarketMessageStream.Stream, cancellationToken: cancellationToken)
+            using var document = await JsonDocument
+                .ParseAsync(incomingMarketMessageStream.Stream, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
             var header = document.RootElement.GetProperty(HeaderElementName);
@@ -77,6 +74,10 @@ public class AggregatedMeasureDataJsonMessageParser : JsonParserBase, IMarketMes
         catch (IOException e)
         {
             return InvalidJsonFailure(e);
+        }
+        catch (KeyNotFoundException e)
+        {
+            return InvalidJsonFailure(new KeyNotFoundException("Missing root element", e));
         }
     }
 
