@@ -581,7 +581,7 @@ public class SearchMessagesWithoutRestrictionTests
             new(CreatedAt("2023-04-01T22:00:00Z"), Guid.NewGuid().ToString()),
         };
 
-        // Create messages in  order when they were created at
+        // Create messages in order when they were created at
         foreach (var messageToCreate in messages.OrderBy(x => x.CreatedAt))
         {
             await _fixture.CreateArchivedMessageAsync(
@@ -615,7 +615,7 @@ public class SearchMessagesWithoutRestrictionTests
             .Select(x => x.MessageId)
             .ToList();
 
-        Assert.Equal(expectedMessageIds, result.Messages.Select(x => x.MessageId));
+        result.Messages.Select(x => x.MessageId).Should().BeEquivalentTo(expectedMessageIds);
     }
 
     [Fact]
@@ -672,7 +672,7 @@ public class SearchMessagesWithoutRestrictionTests
             .Select(x => x.MessageId)
             .ToList();
 
-        Assert.Equal(expectedMessageIds, result.Messages.Select(x => x.MessageId));
+        result.Messages.Select(x => x.MessageId).Should().BeEquivalentTo(expectedMessageIds);
     }
 
     [Theory]
