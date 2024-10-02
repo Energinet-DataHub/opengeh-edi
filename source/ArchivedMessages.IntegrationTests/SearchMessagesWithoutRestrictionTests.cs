@@ -719,7 +719,7 @@ public class SearchMessagesWithoutRestrictionTests
                 new(
                     CreatedAt("2023-04-04T22:00:00Z"),
                     Guid.NewGuid().ToString(),
-                    "1234512345124",
+                    "1234512345123",
                     "1234512345126",
                     DocumentType.NotifyAggregatedMeasureData.Name),
                 new(
@@ -732,7 +732,7 @@ public class SearchMessagesWithoutRestrictionTests
                     CreatedAt("2023-04-06T22:00:00Z"),
                     Guid.NewGuid().ToString(),
                     "1234512345122",
-                    "1234512345127",
+                    "1234512345128",
                     DocumentType.NotifyAggregatedMeasureData.Name),
             };
         var recordIdsForMessages = new Dictionary<string, int>();
@@ -875,8 +875,8 @@ public class SearchMessagesWithoutRestrictionTests
         if (sortedBy.Identifier == FieldToSortBy.CreatedAt.Identifier)
         {
             orderedMessages = sortedDirection.Identifier == DirectionToSortBy.Ascending.Identifier
-                ? messages.OrderBy(x => x.CreatedAt)
-                : messages.OrderByDescending(x => x.CreatedAt);
+                ? messages.OrderBy(x => x.CreatedAt).ThenByDescending(x => recordIdsForMessages[x.MessageId])
+                : messages.OrderByDescending(x => x.CreatedAt).ThenByDescending(x => recordIdsForMessages[x.MessageId]);
         }
 
         if (sortedBy.Identifier == FieldToSortBy.DocumentType.Identifier)
