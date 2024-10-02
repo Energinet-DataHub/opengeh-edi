@@ -137,4 +137,47 @@ public sealed class JsonEncoderTests
         // Assert
         serialized.Should().Contain(TestString);
     }
+
+    [Fact]
+    /*
+     * Caution
+     * Compared to the default encoder, the UnsafeRelaxedJsonEscaping encoder is more permissive about allowing
+     * characters to pass through unescaped:
+     * - It doesn't escape HTML-sensitive characters such as <, >, &, and '.
+     * - It doesn't offer any additional defense-in-depth protections against XSS or information disclosure attacks,
+     *   such as those which might result from the client and server disagreeing on the charset.
+     * Use the unsafe encoder only when it's known that the client will be interpreting the resulting payload as
+     * UTF-8 encoded JSON.
+     * For example, you can use it if the server is sending the response header
+     *   Content-Type: application/json; charset=utf-8.
+     * Never allow the raw UnsafeRelaxedJsonEscaping output to be emitted into an HTML page or a <script> element.
+     */
+    public void CustomEncoder_DoesNotHandlesCertainEscapedCharacters()
+    {
+        // Arrange
+        var options = new JsonWriterOptions
+        {
+            Indented = true,
+            Encoder = JavaScriptEncoder.Create(
+                UnicodeRanges.BasicLatin,
+                UnicodeRanges.Latin1Supplement,
+                UnicodeRanges.LatinExtendedA),
+        };
+        var stream = new MemoryStream();
+        using var writer = new Utf8JsonWriter(stream, options);
+
+        // Act
+        writer.WriteStringValue(
+            """
+            /RequestAggregatedMeasureData_MarketDocument: [required, Required properties ["createdDateTime","receiver_MarketParticipant.marketRole.type"] are not present]
+            """);
+        writer.Flush();
+
+        var result = Encoding.UTF8.GetString(stream.ToArray());
+
+        // Assert
+        result.Should()
+            .Contain(
+                "/RequestAggregatedMeasureData_MarketDocument: [required, Required properties [\\u0022createdDateTime\\u0022,\\u0022receiver_MarketParticipant.marketRole.type\\u0022] are not present]");
+    }
 }

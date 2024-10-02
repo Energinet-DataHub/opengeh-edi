@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
@@ -20,11 +21,11 @@ using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 
-public class JsonResponseFactory : IResponseFactory
+public sealed class JsonResponseFactory(JavaScriptEncoder javaScriptEncoder) : IResponseFactory
 {
-#pragma warning disable CA1822
+    private readonly JsonWriterOptions _writerOptions = new() { Indented = true, Encoder = javaScriptEncoder };
+
     public DocumentFormat HandledFormat => DocumentFormat.Json;
-#pragma warning restore CA1822
 
     public ResponseMessage From(Result result)
     {
@@ -32,12 +33,12 @@ public class JsonResponseFactory : IResponseFactory
         return result.Success ? new ResponseMessage() : new ResponseMessage(CreateMessageBodyFrom(result));
     }
 
-    private static string CreateMessageBodyFrom(Result result)
+    private string CreateMessageBodyFrom(Result result)
     {
         ArgumentNullException.ThrowIfNull(result);
+
         var messageBody = new MemoryStream();
-        var options = new JsonWriterOptions() { Indented = true };
-        using var writer = new Utf8JsonWriter(messageBody, options);
+        using var writer = new Utf8JsonWriter(messageBody, _writerOptions);
 
         writer.WriteStartObject();
         writer.WritePropertyName("Error");

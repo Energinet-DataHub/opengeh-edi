@@ -52,6 +52,9 @@ public static class FunctionContextExtensions
     internal static void RespondWithUnauthorized(this FunctionContext context, HttpRequestData httpRequestData)
     {
         var httpResponseData = httpRequestData.CreateResponse(HttpStatusCode.Unauthorized);
+        var mediaTypeOrNull = GetMediaType(httpRequestData);
+
+        httpResponseData.Headers.Add("Content-Type", $"{mediaTypeOrNull ?? "text/plain"}; charset=utf-8");
         context.SetHttpResponseData(httpResponseData);
     }
 
@@ -64,5 +67,20 @@ public static class FunctionContextExtensions
     {
         var keyValuePair = functionContext.Features.SingleOrDefault(f => f.Key.Name is "IFunctionBindingsFeature");
         return keyValuePair.Value;
+    }
+
+    private static string? GetMediaType(HttpRequestData request)
+    {
+        if (!request.Headers.TryGetValues("Content-Type", out var contentTypeValues))
+        {
+            return null;
+        }
+
+        var contentType = contentTypeValues.FirstOrDefault();
+        // We assume that the media type is the first substring containing '/' of the content type header,
+        // e.g. "application/json; charset=utf-8" → "application/json"
+        var mediaType = contentType?.Split(';').FirstOrDefault(s => s.Contains('/'))?.Trim();
+
+        return mediaType;
     }
 }

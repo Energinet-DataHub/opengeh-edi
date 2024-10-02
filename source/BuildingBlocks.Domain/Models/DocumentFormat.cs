@@ -30,4 +30,24 @@ public class DocumentFormat : EnumerationType
         return GetAll<DocumentFormat>().FirstOrDefault(f => f.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                ?? throw new InvalidOperationException($"{name} is not a valid {typeof(DocumentFormat)} {nameof(name)}");
     }
+
+    public string GetContentType()
+    {
+        if (Name.Equals(Xml.Name, StringComparison.OrdinalIgnoreCase))
+        {
+            return "application/xml";
+        }
+
+        if (Name.Equals(Json.Name, StringComparison.OrdinalIgnoreCase))
+        {
+            return "application/json";
+        }
+
+        if (Name.Equals(Ebix.Name, StringComparison.OrdinalIgnoreCase))
+        {
+            return "application/ebix";
+        }
+
+        return "text/plain";
+    }
 }

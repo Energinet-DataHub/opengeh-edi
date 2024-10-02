@@ -70,12 +70,6 @@ public class PeekRequestListener
             .ConfigureAwait(false);
 
         ArgumentNullException.ThrowIfNull(request);
-        if (!await _featureFlagManager.UsePeekMessagesAsync().ConfigureAwait(false))
-        {
-            var noContentResponse = HttpResponseData.CreateResponse(request);
-            noContentResponse.StatusCode = HttpStatusCode.NoContent;
-            return noContentResponse;
-        }
 
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
         var contentType = request.Headers.TryGetContentType();
@@ -95,6 +89,14 @@ public class PeekRequestListener
             return await request.CreateInvalidContentTypeResponseAsync(cancellationToken).ConfigureAwait(false);
         }
 
+        if (!await _featureFlagManager.UsePeekMessagesAsync().ConfigureAwait(false))
+        {
+            var noContentResponse = HttpResponseData.CreateResponse(request);
+            noContentResponse.Headers.Add("Content-Type", $"{desiredDocumentFormat.GetContentType()}; charset=utf-8");
+            noContentResponse.StatusCode = HttpStatusCode.NoContent;
+            return noContentResponse;
+        }
+
         var parsedMessageCategory = messageCategory != null && desiredDocumentFormat != DocumentFormat.Ebix
             ? EnumerationType.FromName<MessageCategory>(messageCategory)
             : MessageCategory.None;
@@ -109,6 +111,8 @@ public class PeekRequestListener
             .ConfigureAwait(false);
 
         var response = HttpResponseData.CreateResponse(request);
+        response.Headers.Add("Content-Type", $"{desiredDocumentFormat.GetContentType()}; charset=utf-8");
+
         if (peekResult is null)
         {
             response.StatusCode = HttpStatusCode.NoContent;
@@ -117,10 +121,9 @@ public class PeekRequestListener
 
         // Must set status code before writing to body
         response.StatusCode = HttpStatusCode.OK;
-        response.Headers.Add("content-type", contentType);
         response.Headers.Add("MessageId", peekResult.MessageId.Value);
 
-        await peekResult.Bundle.CopyToAsync(response.Body).ConfigureAwait(false);
+        await peekResult.Bundle.CopyToAsync(response.Body, hostCancellationToken).ConfigureAwait(false);
 
         return response;
     }

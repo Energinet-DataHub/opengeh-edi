@@ -60,12 +60,13 @@ public static class HttpRequestDataExtensions
         string message,
         CancellationToken cancellationToken)
     {
-        var missingContentTypeResponse = request.CreateResponse(
-            HttpStatusCode.UnsupportedMediaType);
+        var missingContentTypeResponse = request.CreateResponse(HttpStatusCode.UnsupportedMediaType);
+        missingContentTypeResponse.Headers.Add("Content-Type", "text/plain; charset=utf-8");
         await missingContentTypeResponse.WriteStringAsync(
                 message,
                 cancellationToken)
             .ConfigureAwait(false);
+
         return missingContentTypeResponse;
     }
 }
