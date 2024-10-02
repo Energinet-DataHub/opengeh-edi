@@ -49,18 +49,6 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
         _sut = services.GetRequiredService<IArchivedMessagesClient>();
     }
 
-    public Task InitializeAsync()
-    {
-        _fixture.CleanupDatabase();
-        _fixture.CleanupFileStorage();
-        return Task.CompletedTask;
-    }
-
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
-    }
-
     public static IEnumerable<object[]> GetAllCombinationOfFieldsToSortByAndDirectionsToSortBy()
     {
         var fieldsToSortBy =
@@ -75,6 +63,18 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
                 yield return [field.GetValue(null)!, direction.GetValue(null)!];
             }
         }
+    }
+
+    public Task InitializeAsync()
+    {
+        _fixture.CleanupDatabase();
+        _fixture.CleanupFileStorage();
+        return Task.CompletedTask;
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 
     [Fact]
