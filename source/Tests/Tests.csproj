@@ -58,6 +58,7 @@ limitations under the License.
       <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\Process.Application\Process.Application.csproj" />
       <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
+      <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -80,6 +81,9 @@ limitations under the License.
       <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\RequestAggregatedMeasureData.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+        <EmbeddedResource Include="CimMessageAdapter\Messages\json\WholesaleSettlement\EmptyJsonObject.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
       <EmbeddedResource Include="CimMessageAdapter\Messages\json\WholesaleSettlement\RequestWholesaleSettlement2ChargeTypes.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
@@ -119,6 +123,10 @@ limitations under the License.
       </EmbeddedResource>
       <None Remove="CimMessageAdapter\Messages\json\WholesaleSettlement\FailRequestWholesaleSettlement.json" />
       <EmbeddedResource Include="CimMessageAdapter\Messages\json\WholesaleSettlement\FailSchemeValidationRequestWholesaleSettlement.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+        <None Remove="CimMessageAdapter\Messages\json\AggregatedMeasure\EmptyJsonObject.json"/>
+        <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\EmptyJsonObject.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
     </ItemGroup>

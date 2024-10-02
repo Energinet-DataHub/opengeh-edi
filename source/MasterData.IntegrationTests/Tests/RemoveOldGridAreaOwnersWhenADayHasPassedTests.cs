@@ -12,11 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.Core.Outbox.Infrastructure.DbContext;
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
+using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
+using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
@@ -34,6 +40,9 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : MasterDataTestBase
     {
         SetupServiceCollection();
         _masterDataClient = Services.GetRequiredService<IMasterDataClient>();
+        var authenticatedActor = Services.GetRequiredService<AuthenticatedActor>();
+        authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None, ActorRole.DataHubAdministrator));
     }
 
     [Fact]
@@ -139,6 +148,35 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : MasterDataTestBase
         // Assert
         Assert.NotNull(await GetGridAreaOwnersForGridArea(gridAreaCode1));
         Assert.NotNull(await GetGridAreaOwnersForGridArea(gridAreaCode2));
+    }
+
+    [Fact]
+    public async Task Clean_up_grid_area_owners_is_being_audit_logged()
+    {
+        // Arrange
+        var gridAreaCode = "303";
+        var gridAreaOwner = new GridAreaOwnershipAssignedDto(
+            gridAreaCode,
+            Instant.FromUtc(2023, 10, 1, 0, 0, 0),
+            ActorNumber.Create("1234567890123"),
+            1);
+
+        await AddActorsToDatabaseAsync(new List<GridAreaOwnershipAssignedDto> { gridAreaOwner });
+
+        var sut = Services.GetRequiredService<IDataRetention>();
+
+        // Act
+        await sut.CleanupAsync(CancellationToken.None);
+
+        // Assert
+        using var secondScope = Services.CreateScope();
+        var outboxContext = secondScope.ServiceProvider.GetRequiredService<IOutboxContext>();
+        var serializer = secondScope.ServiceProvider.GetRequiredService<ISerializer>();
+        var outboxMessages = outboxContext.Outbox;
+        var outboxMessage = outboxMessages.Should().NotBeEmpty().And.Subject.First();
+        var payload = serializer.Deserialize<AuditLogOutboxMessageV1Payload>(outboxMessage.Payload);
+        payload.Origin.Should().Be(nameof(ADayHasPassed));
+        payload.AffectedEntityType.Should().Be(AuditLogEntityType.GridAreaOwner.Identifier);
     }
 
     private async Task AddActorsToDatabaseAsync(List<GridAreaOwnershipAssignedDto> gridAreaOwners)

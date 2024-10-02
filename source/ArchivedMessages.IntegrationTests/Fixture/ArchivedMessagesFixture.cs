@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Azure.Storage.Blobs;
+using Energinet.DataHub.BuildingBlocks.Tests;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
@@ -22,7 +23,12 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using NodaTime;
 using Xunit;
+using Xunit.Abstractions;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture;
 
@@ -36,9 +42,7 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
 
     public IArchivedMessagesClient ArchivedMessagesClient { get; set; } = null!;
 
-    public ServiceProvider ServiceProvider { get; private set; } = null!;
-
-    protected AuthenticatedActor AuthenticatedActor { get; set; } = null!;
+    public ServiceProvider Services { get; private set; } = null!;
 
     public void CleanupDatabase()
     {
@@ -95,16 +99,16 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         await DatabaseManager.CreateDatabaseAsync();
         AzuriteManager.StartAzurite();
         CleanupFileStorage();
-        BuildService();
+        Services = BuildService();
 
-        AuthenticatedActor = ServiceProvider.GetRequiredService<AuthenticatedActor>();
-        AuthenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(
-                ActorNumber.Create("1234512345888"),
-                restriction: Restriction.None,
-                ActorRole.MeteredDataAdministrator));
+        Services.GetRequiredService<AuthenticatedActor>()
+            .SetAuthenticatedActor(
+                new ActorIdentity(
+                    ActorNumber.Create("1234512345888"),
+                    restriction: Restriction.None,
+                    ActorRole.MeteredDataAdministrator));
 
-        ArchivedMessagesClient = ServiceProvider.GetRequiredService<IArchivedMessagesClient>();
+        ArchivedMessagesClient = Services.GetRequiredService<IArchivedMessagesClient>();
     }
 
     public async Task DisposeAsync()
@@ -119,7 +123,7 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         GC.SuppressFinalize(this);
     }
 
-    public void BuildService()
+    public ServiceProvider BuildService(ITestOutputHelper? testOutputHelper = null)
     {
         var builder = new ConfigurationBuilder();
         builder.AddInMemoryCollection(new Dictionary<string, string?>
@@ -134,11 +138,59 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         var services = new ServiceCollection();
         var configuration = builder.Build();
 
+        if (testOutputHelper != null)
+        {
+            services.AddSingleton(sp => testOutputHelper);
+            services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
+            services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
+        }
+
         services
             .AddScoped<AuthenticatedActor>()
             .AddArchivedMessagesModule(configuration);
 
-        ServiceProvider = services.BuildServiceProvider();
+        return services.BuildServiceProvider();
+    }
+
+    public async Task<ArchivedMessage> CreateArchivedMessageAsync(
+        ArchivedMessageType? archivedMessageType = null,
+        string? messageId = null,
+        string? documentContent = null,
+        string? documentType = null,
+        string? businessReasons = null,
+        string? senderNumber = null,
+        ActorRole? senderRole = null,
+        string? receiverNumber = null,
+        ActorRole? receiverRole = null,
+        Instant? timestamp = null,
+        MessageId? relatedToMessageId = null)
+    {
+        var documentStream = new MemoryStream();
+
+        if (!string.IsNullOrEmpty(documentContent))
+        {
+            var streamWriter = new StreamWriter(documentStream);
+            streamWriter.Write(documentContent);
+            streamWriter.Flush();
+        }
+
+        var archivedMessage = new ArchivedMessage(
+            string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
+            Array.Empty<EventId>(),
+            documentType ?? DocumentType.NotifyAggregatedMeasureData.Name,
+            ActorNumber.Create(senderNumber ?? "1234512345123"),
+            senderRole ?? ActorRole.MeteredDataAdministrator,
+            ActorNumber.Create(receiverNumber ?? "1234512345128"),
+            receiverRole ?? ActorRole.DanishEnergyAgency,
+            timestamp ?? Instant.FromUtc(2023, 01, 01, 0, 0),
+            businessReasons ?? BusinessReason.BalanceFixing.Name,
+            archivedMessageType ?? ArchivedMessageType.IncomingMessage,
+            new ArchivedMessageStream(documentStream),
+            relatedToMessageId ?? null);
+
+        await ArchivedMessagesClient.CreateAsync(archivedMessage, CancellationToken.None);
+
+        return archivedMessage;
     }
 
     protected virtual void Dispose(bool disposing)

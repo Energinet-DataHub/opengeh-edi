@@ -15,7 +15,6 @@
 using System.Net;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2BApi.Common;
-using Energinet.DataHub.EDI.B2BApi.Extensions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Dequeue;
@@ -66,8 +65,12 @@ public class DequeueRequestListener
                 cancellationToken)
             .ConfigureAwait(false);
 
-        return result.Success
+        var httpResponseData = result.Success
             ? request.CreateResponse(HttpStatusCode.OK)
             : request.CreateResponse(HttpStatusCode.BadRequest);
+
+        httpResponseData.Headers.Add("Content-Type", "text/plain; charset=utf-8");
+
+        return httpResponseData;
     }
 }
