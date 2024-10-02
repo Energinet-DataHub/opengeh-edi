@@ -83,12 +83,14 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         ServiceBusResourceProvider = new ServiceBusResourceProvider(
             TestLogger,
-            IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace);
+            IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace,
+            IntegrationTestConfiguration.Credential);
         LogStopwatch(stopwatch, nameof(ServiceBusResourceProvider));
 
         ServiceBusListenerMock = new ServiceBusListenerMock(
             TestLogger,
-            IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace);
+            IntegrationTestConfiguration.ServiceBusFullyQualifiedNamespace,
+            IntegrationTestConfiguration.Credential);
         LogStopwatch(stopwatch, nameof(ServiceBusListenerMock));
 
         HostConfigurationBuilder = new FunctionAppHostConfigurationBuilder();
