@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.Bundles;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
@@ -30,6 +32,7 @@ public class DequeuedBundlesRetention : IDataRetention
     private readonly ActorMessageQueueContext _actorMessageQueueContext;
     private readonly IBundleRepository _bundleRepository;
     private readonly ILogger<DequeuedBundlesRetention> _logger;
+    private readonly IAuditLogger _auditLogger;
 
     public DequeuedBundlesRetention(
         IClock clock,
@@ -37,7 +40,8 @@ public class DequeuedBundlesRetention : IDataRetention
         IOutgoingMessageRepository outgoingMessageRepository,
         ActorMessageQueueContext actorMessageQueueContext,
         IBundleRepository bundleRepository,
-        ILogger<DequeuedBundlesRetention> logger)
+        ILogger<DequeuedBundlesRetention> logger,
+        IAuditLogger auditLogger)
     {
         _clock = clock;
         _marketDocumentRepository = marketDocumentRepository;
@@ -45,6 +49,7 @@ public class DequeuedBundlesRetention : IDataRetention
         _actorMessageQueueContext = actorMessageQueueContext;
         _bundleRepository = bundleRepository;
         _logger = logger;
+        _auditLogger = auditLogger;
     }
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
@@ -66,14 +71,17 @@ public class DequeuedBundlesRetention : IDataRetention
 
             try
             {
+                await AuditLogOutgoingMessageDeletionAsync(monthAgo).ConfigureAwait(false);
                 await _outgoingMessageRepository
                     .DeleteOutgoingMessagesIfExistsAsync(dequeuedBundleIds)
                     .ConfigureAwait(false);
 
+                await AuditLogMarketDocumentDeletionAsync(monthAgo).ConfigureAwait(false);
                 await _marketDocumentRepository
                     .DeleteMarketDocumentsIfExistsAsync(dequeuedBundleIds)
                     .ConfigureAwait(false);
 
+                await AuditLogBundleDeletionAsync(monthAgo, dequeuedBundles).ConfigureAwait(false);
                 _bundleRepository.Delete(dequeuedBundles);
 
                 await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -87,5 +95,33 @@ public class DequeuedBundlesRetention : IDataRetention
                         string.Join(',', dequeuedBundles.Select(x => x.Id)));
             }
         }
+    }
+
+    private async Task AuditLogOutgoingMessageDeletionAsync(Instant deletedAfter)
+    {
+        await AuditLogAsync(AuditLogEntityType.OutgoingMessage, deletedAfter).ConfigureAwait(false);
+    }
+
+    private async Task AuditLogMarketDocumentDeletionAsync(Instant deletedAfter)
+    {
+        await AuditLogAsync(AuditLogEntityType.MarketDocument, deletedAfter).ConfigureAwait(false);
+    }
+
+    private async Task AuditLogBundleDeletionAsync(Instant deletedAfter, IReadOnlyCollection<Bundle> dequeuedBundles)
+    {
+        await AuditLogAsync(AuditLogEntityType.Bundle, (OlderThan: deletedAfter, DeletedAmount: dequeuedBundles.Count))
+            .ConfigureAwait(false);
+    }
+
+    private async Task AuditLogAsync(AuditLogEntityType auditLogEntityType, object? payload)
+    {
+        await _auditLogger.LogWithCommitAsync(
+                logId: AuditLogId.New(),
+                activity: AuditLogActivity.Deletion,
+                activityOrigin: nameof(ADayHasPassed),
+                activityPayload: payload,
+                affectedEntityType: auditLogEntityType,
+                affectedEntityKey: null)
+            .ConfigureAwait(false);
     }
 }

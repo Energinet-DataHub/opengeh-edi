@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture.Database;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture;
@@ -27,9 +26,8 @@ public sealed class MasterDataFixture : IAsyncLifetime
         await DatabaseManager.CreateDatabaseAsync();
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
-        DatabaseManager.DeleteDatabase();
-        return Task.CompletedTask;
+        await DatabaseManager.DeleteDatabaseAsync();
     }
 }

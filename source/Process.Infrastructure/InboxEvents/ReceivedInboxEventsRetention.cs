@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System.Data.Common;
+using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
@@ -26,64 +28,79 @@ public class ReceivedInboxEventsRetention : IDataRetention
     private readonly IDatabaseConnectionFactory _databaseConnectionFactory;
     private readonly IClock _clock;
     private readonly ILogger<ReceivedInboxEventsRetention> _logger;
+    private readonly IAuditLogger _auditLogger;
 
     public ReceivedInboxEventsRetention(
         IDatabaseConnectionFactory databaseConnectionFactory,
         IClock clock,
-        ILogger<ReceivedInboxEventsRetention> logger)
+        ILogger<ReceivedInboxEventsRetention> logger,
+        IAuditLogger auditLogger)
     {
         _databaseConnectionFactory = databaseConnectionFactory;
         _clock = clock;
         _logger = logger;
+        _auditLogger = auditLogger;
     }
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
     {
         var monthAgo = _clock.GetCurrentInstant().Plus(-Duration.FromDays(30));
-        var amountOfOldEvents = await GetAmountOfOldEventsAsync(monthAgo, cancellationToken).ConfigureAwait(false);
-        while (amountOfOldEvents > 0)
+        var anyEventsFromAMonthAgo = await AnyEventsOlderThanAsync(monthAgo, cancellationToken).ConfigureAwait(false);
+        while (anyEventsFromAMonthAgo)
         {
-            const string deleteStmt = @"
-                WITH CTE AS
-                 (
-                     SELECT TOP 500 *
-                     FROM [dbo].[ReceivedInboxEvents]
-                     WHERE [ErrorMessage] IS NULL AND [ProcessedDate] IS NOT NULL AND [ProcessedDate] < @LastMonthInstant
-                 )
-                DELETE FROM CTE;";
+            await LogAuditAsync(monthAgo).ConfigureAwait(false);
+            await DeleteOldEventsAsync(monthAgo, cancellationToken).ConfigureAwait(false);
 
-            using var connection =
-                (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-            using var transaction =
-                (SqlTransaction)await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
-            using var command = connection.CreateCommand();
-            command.Parameters.AddWithValue(
-                "@LastMonthInstant",
-                monthAgo.ToDateTimeUtc());
-            command.Transaction = transaction;
-            command.CommandText = deleteStmt;
-
-            try
-            {
-                var numberDeletedRecords = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
-                await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-                _logger.LogInformation("Successfully deleted {NumberDeletedInboxEvents} of inbox events", numberDeletedRecords);
-            }
-            catch (DbException e)
-            {
-                _logger.LogError(e, "Failed to delete old inbox events: {ErrorMessage}", e.Message);
-                await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-                throw; // re-throw exception
-            }
-
-            amountOfOldEvents = await GetAmountOfOldEventsAsync(monthAgo, cancellationToken).ConfigureAwait(false);
+            anyEventsFromAMonthAgo = await AnyEventsOlderThanAsync(monthAgo, cancellationToken).ConfigureAwait(false);
         }
     }
 
-    private async Task<int> GetAmountOfOldEventsAsync(Instant monthAgo, CancellationToken cancellationToken)
+    private async Task DeleteOldEventsAsync(Instant monthAgo, CancellationToken cancellationToken)
     {
-        const string selectStmt = @"SELECT Count(*) FROM [dbo].[ReceivedInboxEvents]
-                    WHERE [ErrorMessage] IS NULL AND [ProcessedDate] IS NOT NULL AND [ProcessedDate] < @LastMonthInstant";
+        const string deleteStmt = @"
+            WITH CTE AS
+             (
+                 SELECT TOP 500 *
+                 FROM [dbo].[ReceivedInboxEvents]
+                 WHERE [ErrorMessage] IS NULL AND [ProcessedDate] IS NOT NULL AND [ProcessedDate] < @LastMonthInstant
+             )
+            DELETE FROM CTE;";
+
+        using var connection = (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
+        using var command = connection.CreateCommand();
+        command.Parameters.AddWithValue("@LastMonthInstant", monthAgo.ToDateTimeUtc());
+        command.CommandText = deleteStmt;
+
+        try
+        {
+            var numberDeletedRecords = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            _logger.LogInformation("Successfully deleted {NumberDeletedInboxEvents} of inbox events", numberDeletedRecords);
+        }
+        catch (DbException e)
+        {
+            _logger.LogError(e, "Failed to delete old inbox events: {ErrorMessage}", e.Message);
+            throw;
+        }
+    }
+
+    private async Task LogAuditAsync(Instant deletedAfter)
+    {
+        await _auditLogger.LogWithCommitAsync(
+                logId: AuditLogId.New(),
+                activity: AuditLogActivity.Deletion,
+                activityOrigin: nameof(ADayHasPassed),
+                activityPayload: deletedAfter,
+                affectedEntityType: AuditLogEntityType.ReceivedInboxEvent,
+                affectedEntityKey: null)
+            .ConfigureAwait(false);
+    }
+
+    private async Task<bool> AnyEventsOlderThanAsync(Instant monthAgo, CancellationToken cancellationToken)
+    {
+        const string selectStmt = @"SELECT CASE WHEN EXISTS (
+            SELECT 1 FROM [dbo].[ReceivedInboxEvents]
+            WHERE [ErrorMessage] IS NULL AND [ProcessedDate] IS NOT NULL AND [ProcessedDate] < @LastMonthInstant
+        ) THEN 1 ELSE 0 END";
 
         using var connection =
             (SqlConnection)await _databaseConnectionFactory.GetConnectionAndOpenAsync(cancellationToken)
@@ -96,9 +113,9 @@ public class ReceivedInboxEventsRetention : IDataRetention
 
         try
         {
-            var amountOfOldEvents = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
-            _logger.LogInformation("Number of old inbox events: {AmountOfOldEvents} to be deleted", amountOfOldEvents);
-            return amountOfOldEvents;
+            var exists = (int)await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+            _logger.LogInformation("Existence of old inbox events: {Exists}", exists == 1);
+            return exists == 1;
         }
         catch (DbException e)
         {
