@@ -510,6 +510,12 @@ public class SearchMessagesWithoutRestrictionTests
 
         // Assert
         result.Messages.Should().HaveCount(messages.Count);
+
+        var expectedMessageIds = messages
+            .OrderByDescending(x => x.CreatedAt)
+            .Select(x => x.MessageId)
+            .ToList();
+        result.Messages.Select(x => x.MessageId).Should().Equal(expectedMessageIds);
     }
 
     [Fact]
@@ -544,6 +550,12 @@ public class SearchMessagesWithoutRestrictionTests
 
         // Assert
         result.Messages.Should().HaveCount(messages.Count);
+
+        var expectedMessageIds = messages
+            .OrderByDescending(x => x.CreatedAt)
+            .Select(x => x.MessageId)
+            .ToList();
+        result.Messages.Select(x => x.MessageId).Should().Equal(expectedMessageIds);
     }
 
     [Theory]
@@ -557,7 +569,8 @@ public class SearchMessagesWithoutRestrictionTests
         var act = () => new SortedCursorBasedPagination(pageSize: pageSize, navigationForward: true);
 
         // Assert
-        act.Should().Throw<ArgumentOutOfRangeException>();
+        act.Should().Throw<ArgumentOutOfRangeException>()
+            .WithMessage("Page size must be a positive number. (Parameter 'pageSize')");
         return Task.CompletedTask;
     }
 
@@ -615,7 +628,7 @@ public class SearchMessagesWithoutRestrictionTests
             .Select(x => x.MessageId)
             .ToList();
 
-        result.Messages.Select(x => x.MessageId).Should().BeEquivalentTo(expectedMessageIds);
+        result.Messages.Select(x => x.MessageId).Should().Equal(expectedMessageIds);
     }
 
     [Fact]
@@ -672,7 +685,7 @@ public class SearchMessagesWithoutRestrictionTests
             .Select(x => x.MessageId)
             .ToList();
 
-        result.Messages.Select(x => x.MessageId).Should().BeEquivalentTo(expectedMessageIds);
+        result.Messages.Select(x => x.MessageId).Should().Equal(expectedMessageIds);
     }
 
     [Theory]
@@ -682,7 +695,6 @@ public class SearchMessagesWithoutRestrictionTests
         DirectionToSortBy sortedDirection)
     {
         // Arrange
-        var pageSize = 2;
         var messages =
             new List<(Instant CreatedAt, string MessageId, string Sender, string Receiver, string DocumentType)>()
             {
@@ -723,58 +735,37 @@ public class SearchMessagesWithoutRestrictionTests
                     "1234512345127",
                     DocumentType.NotifyAggregatedMeasureData.Name),
             };
+        var recordIdsForMessages = new Dictionary<string, int>();
+        var recordId = 0;
         foreach (var messageToCreate in messages.OrderBy(_ => Random.Shared.Next()))
         {
+            recordIdsForMessages.Add(messageToCreate.MessageId, recordId++);
             await _fixture.CreateArchivedMessageAsync(
                 timestamp: messageToCreate.CreatedAt,
-                messageId: messageToCreate.MessageId);
+                messageId: messageToCreate.MessageId,
+                documentType: messageToCreate.DocumentType,
+                senderNumber: messageToCreate.Sender,
+                receiverNumber: messageToCreate.Receiver);
         }
 
         var pagination = new SortedCursorBasedPagination(
-            pageSize: pageSize,
+            pageSize: messages.Count,
             navigationForward: true,
             fieldToSortBy: sortedBy,
             directionSortBy: sortedDirection);
 
-        var nextPage = true;
-
         // Act
-        var searchResults = new List<MessageInfo>();
-        while (nextPage)
-        {
-            var result = await _sut.SearchAsync(
+        var result = await _sut.SearchAsync(
                 new GetMessagesQuery(pagination),
                 CancellationToken.None);
 
-            if (result.Messages.Count < pageSize)
-            {
-                nextPage = false;
-            }
-            else
-            {
-                // use the last message as the cursor when navigating forward
-                var lastMessage = result.Messages.Last();
-                pagination = new SortedCursorBasedPagination(
-                    cursor: new SortingCursor(
-                        SortedFieldValue: lastMessage.GetType().GetProperty(sortedBy.Identifier)!.GetValue(lastMessage)!
-                            .ToString(),
-                        RecordId: lastMessage.RecordId),
-                    pageSize: pageSize,
-                    navigationForward: true,
-                    fieldToSortBy: sortedBy,
-                    directionSortBy: sortedDirection);
-            }
-
-            searchResults.AddRange(result.Messages);
-        }
-
         // Assert
-        searchResults.Should().HaveCount(messages.Count);
-        var orderedMessages = GetSortedMessaged(sortedBy, sortedDirection, messages);
+        result.Messages.Should().HaveCount(messages.Count);
+        var orderedMessages = GetSortedMessaged(sortedBy, sortedDirection, messages, recordIdsForMessages);
 
-        searchResults.Select(x => x.MessageId)
+        result.Messages.Select(x => x.MessageId)
             .Should()
-            .BeEquivalentTo(orderedMessages.Select(x => x.MessageId));
+            .Equal(orderedMessages.Select(x => x.MessageId));
     }
 
     [Theory]
@@ -785,7 +776,6 @@ public class SearchMessagesWithoutRestrictionTests
             DirectionToSortBy sortedDirection)
     {
         // Arrange
-        var pageSize = 2;
         var messages =
             new List<(Instant CreatedAt, string MessageId, string Sender, string Receiver, string DocumentType)>()
             {
@@ -810,7 +800,7 @@ public class SearchMessagesWithoutRestrictionTests
                 new(
                     CreatedAt("2023-04-04T22:00:00Z"),
                     Guid.NewGuid().ToString(),
-                    "1234512345124",
+                    "1234512345123",
                     "1234512345126",
                     DocumentType.NotifyAggregatedMeasureData.Name),
                 new(
@@ -823,62 +813,40 @@ public class SearchMessagesWithoutRestrictionTests
                     CreatedAt("2023-04-06T22:00:00Z"),
                     Guid.NewGuid().ToString(),
                     "1234512345122",
-                    "1234512345127",
+                    "1234512345128",
                     DocumentType.NotifyAggregatedMeasureData.Name),
             };
+        var recordIdsForMessages = new Dictionary<string, int>();
+        var recordId = 0;
         foreach (var messageToCreate in messages.OrderBy(_ => Random.Shared.Next()))
         {
+            recordIdsForMessages.Add(messageToCreate.MessageId, recordId++);
             await _fixture.CreateArchivedMessageAsync(
                 timestamp: messageToCreate.CreatedAt,
-                messageId: messageToCreate.MessageId);
+                messageId: messageToCreate.MessageId,
+                documentType: messageToCreate.DocumentType,
+                senderNumber: messageToCreate.Sender,
+                receiverNumber: messageToCreate.Receiver);
         }
 
         var pagination = new SortedCursorBasedPagination(
-            pageSize: pageSize,
+            pageSize: messages.Count,
             navigationForward: false,
             fieldToSortBy: sortedBy,
             directionSortBy: sortedDirection);
 
-        var nextPage = true;
-
         // Act
-        var searchResults = new List<MessageInfo>();
-        while (nextPage)
-        {
-            var result = await _sut.SearchAsync(
+        var result = await _sut.SearchAsync(
                 new GetMessagesQuery(pagination),
                 CancellationToken.None);
 
-            if (result.Messages.Count < pageSize)
-            {
-                nextPage = false;
-            }
-            else
-            {
-                // use the first message as the cursor when navigating backward
-                var firstMessage = result.Messages.First();
-                pagination = new SortedCursorBasedPagination(
-                    cursor: new SortingCursor(
-                        SortedFieldValue: firstMessage.GetType().GetProperty(sortedBy.Identifier)!.GetValue(
-                                firstMessage)!
-                            .ToString(),
-                        RecordId: firstMessage.RecordId),
-                    pageSize: pageSize,
-                    navigationForward: false,
-                    fieldToSortBy: sortedBy,
-                    directionSortBy: sortedDirection);
-            }
-
-            searchResults.AddRange(result.Messages);
-        }
-
         // Assert
-        searchResults.Should().HaveCount(messages.Count);
-        var orderedMessages = GetSortedMessaged(sortedBy, sortedDirection, messages);
+        result.Messages.Should().HaveCount(messages.Count);
+        var orderedMessages = GetSortedMessaged(sortedBy, sortedDirection, messages, recordIdsForMessages);
 
-        searchResults.Select(x => x.MessageId)
+        result.Messages.Select(x => x.MessageId)
             .Should()
-            .BeEquivalentTo(orderedMessages.Select(x => x.MessageId));
+            .Equal(orderedMessages.Select(x => x.MessageId), $"Message is sorted by {sortedBy.Identifier} {sortedDirection.Identifier}");
     }
 
     #endregion
@@ -888,11 +856,13 @@ public class SearchMessagesWithoutRestrictionTests
         return InstantPattern.General.Parse(date).Value;
     }
 
-    private static IOrderedEnumerable<(Instant CreatedAt, string MessageId, string Sender, string Receiver, string DocumentType)>
+    private static
+        IOrderedEnumerable<(Instant CreatedAt, string MessageId, string Sender, string Receiver, string DocumentType)>
         GetSortedMessaged(
             FieldToSortBy sortedBy,
             DirectionToSortBy sortedDirection,
-            List<(Instant CreatedAt, string MessageId, string Sender, string Receiver, string DocumentType)> messages)
+            List<(Instant CreatedAt, string MessageId, string Sender, string Receiver, string DocumentType)> messages,
+            Dictionary<string, int> recordIdsForMessages)
     {
         var orderedMessages = messages.Order();
         if (sortedBy.Identifier == FieldToSortBy.MessageId.Identifier)
@@ -912,22 +882,22 @@ public class SearchMessagesWithoutRestrictionTests
         if (sortedBy.Identifier == FieldToSortBy.DocumentType.Identifier)
         {
             orderedMessages = sortedDirection.Identifier == DirectionToSortBy.Ascending.Identifier
-                ? messages.OrderBy(x => x.DocumentType)
-                : messages.OrderByDescending(x => x.DocumentType);
+                ? messages.OrderBy(x => x.DocumentType).ThenByDescending(x => recordIdsForMessages[x.MessageId])
+                : messages.OrderByDescending(x => x.DocumentType).ThenByDescending(x => recordIdsForMessages[x.MessageId]);
         }
 
         if (sortedBy.Identifier == FieldToSortBy.SenderNumber.Identifier)
         {
             orderedMessages = sortedDirection.Identifier == DirectionToSortBy.Ascending.Identifier
-                ? messages.OrderBy(x => x.Sender)
-                : messages.OrderByDescending(x => x.Sender);
+                ? messages.OrderBy(x => x.Sender).ThenByDescending(x => recordIdsForMessages[x.MessageId])
+                : messages.OrderByDescending(x => x.Sender).ThenByDescending(x => recordIdsForMessages[x.MessageId]);
         }
 
         if (sortedBy.Identifier == FieldToSortBy.ReceiverNumber.Identifier)
         {
             orderedMessages = sortedDirection.Identifier == DirectionToSortBy.Ascending.Identifier
-                ? messages.OrderBy(x => x.Receiver)
-                : messages.OrderByDescending(x => x.Receiver);
+                ? messages.OrderBy(x => x.Receiver).ThenByDescending(x => recordIdsForMessages[x.MessageId])
+                : messages.OrderByDescending(x => x.Receiver).ThenByDescending(x => recordIdsForMessages[x.MessageId]);
         }
 
         return orderedMessages;
