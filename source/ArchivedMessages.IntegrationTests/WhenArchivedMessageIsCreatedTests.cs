@@ -29,7 +29,7 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests;
 
 [Collection(nameof(ArchivedMessagesCollection))]
-public class WhenArchivedMessageIsCreatedTests
+public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
 {
     private readonly IArchivedMessagesClient _sut;
     private readonly ArchivedMessagesFixture _fixture;
@@ -37,10 +37,20 @@ public class WhenArchivedMessageIsCreatedTests
     public WhenArchivedMessageIsCreatedTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
     {
         _fixture = fixture;
-        _sut = fixture.BuildService(testOutputHelper)
+        _sut = _fixture.BuildService(testOutputHelper)
             .GetRequiredService<IArchivedMessagesClient>();
+    }
+
+    public Task InitializeAsync()
+    {
         _fixture.CleanupDatabase();
         _fixture.CleanupFileStorage();
+        return Task.CompletedTask;
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 
     [Fact]
