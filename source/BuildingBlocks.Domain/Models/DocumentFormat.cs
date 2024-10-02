@@ -45,7 +45,7 @@ public class DocumentFormat : EnumerationType
 
         if (Name.Equals(Ebix.Name, StringComparison.OrdinalIgnoreCase))
         {
-            return "application/xml";
+            return "application/ebix";
         }
 
         return "text/plain";
