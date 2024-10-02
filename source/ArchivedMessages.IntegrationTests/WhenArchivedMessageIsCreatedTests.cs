@@ -27,8 +27,8 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests;
 
-[Collection(nameof(ArchivedMessagesIntegrationTestCollectionFixture))]
-public class WhenArchivedMessageIsCreatedTests : IClassFixture<ArchivedMessagesFixture>
+[Collection(nameof(ArchivedMessagesCollection))]
+public class WhenArchivedMessageIsCreatedTests
 {
     private readonly IArchivedMessagesClient _sut;
     private readonly ArchivedMessagesFixture _fixture;
