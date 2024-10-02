@@ -51,6 +51,8 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
     {
         _wholesaleAmountPerChargeDtoBuilder = new WholesaleAmountPerChargeDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
+        // Retention jobs does not have an authenticated actor, so we need to set it to null.
+        AuthenticatedActor.SetAuthenticatedActor(null);
     }
 
     [Fact]
