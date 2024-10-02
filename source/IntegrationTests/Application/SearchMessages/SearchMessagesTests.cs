@@ -562,7 +562,7 @@ public class SearchMessagesTests : TestBase
     }
 
     [Fact]
-    public async Task Can_fetch_messages_with_pagination_navigation_forward_returns_expected_messages()
+    public async Task Can_fetch_all_messages_with_pagination_navigation_forward()
     {
         // Arrange
         var messages = new List<(Instant CreatedAt, string MessageId)>()
@@ -573,6 +573,7 @@ public class SearchMessagesTests : TestBase
             new(CreatedAt("2023-04-04T22:00:00Z"), Guid.NewGuid().ToString()),
             new(CreatedAt("2023-04-05T22:00:00Z"), Guid.NewGuid().ToString()),
             new(CreatedAt("2023-04-06T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-07T22:00:00Z"), Guid.NewGuid().ToString()),
         };
         foreach (var exceptedMessage in messages.OrderBy(_ => Random.Shared.Next()))
         {
@@ -582,21 +583,52 @@ public class SearchMessagesTests : TestBase
             await ArchiveMessage(archivedMessage);
         }
 
+        var pagination = new SortedCursorBasedPagination(
+            pageSize: 10,
+            navigationForward: true);
+
         // Act
         var result = await _archivedMessagesClient.SearchAsync(
-            new GetMessagesQuery(new SortedCursorBasedPagination(pageSize: 5, navigationForward: true)),
+            new GetMessagesQuery(pagination),
             CancellationToken.None);
 
         // Assert
-        result.Messages.Should().HaveCount(5);
-        var expectedFirst5MessageIds = messages
-            // Default sorting is descending by CreatedAt
-            .OrderByDescending(x => x.CreatedAt)
-            .Take(5)
-            .Select(x => x.MessageId)
-            .ToList();
+        result.Messages.Should().HaveCount(messages.Count);
+    }
 
-        Assert.Equal(expectedFirst5MessageIds, result.Messages.Select(x => x.MessageId));
+    [Fact]
+    public async Task Can_fetch_all_messages_with_pagination_navigation_backward()
+    {
+        // Arrange
+        var messages = new List<(Instant CreatedAt, string MessageId)>()
+        {
+            new(CreatedAt("2023-04-01T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-02T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-03T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-04T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-05T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-06T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-07T22:00:00Z"), Guid.NewGuid().ToString()),
+        };
+        foreach (var messageToCreate in messages.OrderBy(_ => Random.Shared.Next()))
+        {
+            var archivedMessage = CreateArchivedMessage(
+                messageToCreate.CreatedAt,
+                messageId: messageToCreate.MessageId);
+            await ArchiveMessage(archivedMessage);
+        }
+
+        var pagination = new SortedCursorBasedPagination(
+            pageSize: 10,
+            navigationForward: false);
+
+        // Act
+        var result = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(pagination),
+            CancellationToken.None);
+
+        // Assert
+        result.Messages.Should().HaveCount(messages.Count);
     }
 
     [Theory]
@@ -614,195 +646,120 @@ public class SearchMessagesTests : TestBase
         return Task.CompletedTask;
     }
 
-    [Theory]
-    [InlineData(1)]
-    [InlineData(2)]
-    [InlineData(10)]
-    public async Task Can_fetch_all_messages_with_pagination_navigation_forward_returns_expected_messages(int pageSize)
+    [Fact]
+    public async Task Can_fetch_messages_from_second_page_navigation_forward_returns_expected_order_messages()
     {
         // Arrange
+        var pageSize = 2;
+        var pageNumber = 2;
+
         var messages = new List<(Instant CreatedAt, string MessageId)>()
         {
-            new(CreatedAt("2023-04-01T22:00:00Z"), Guid.NewGuid().ToString()),
-            new(CreatedAt("2023-04-02T22:00:00Z"), Guid.NewGuid().ToString()),
-            new(CreatedAt("2023-04-03T22:00:00Z"), Guid.NewGuid().ToString()),
-            new(CreatedAt("2023-04-04T22:00:00Z"), Guid.NewGuid().ToString()),
-            new(CreatedAt("2023-04-05T22:00:00Z"), Guid.NewGuid().ToString()),
+            // page 1 <- the previous page
             new(CreatedAt("2023-04-06T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-05T22:00:00Z"), Guid.NewGuid().ToString()), // <- cursor points here
+            // page 2 <- the page to fetch
+            new(CreatedAt("2023-04-04T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-03T22:00:00Z"), Guid.NewGuid().ToString()),
+            // page 3
+            new(CreatedAt("2023-04-02T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-01T22:00:00Z"), Guid.NewGuid().ToString()),
         };
-        foreach (var exceptedMessage in messages.OrderBy(_ => Random.Shared.Next()))
+
+        // Create messages in  order when they were created at
+        foreach (var messageToCreate in messages.OrderBy(x => x.CreatedAt))
         {
             var archivedMessage = CreateArchivedMessage(
-                exceptedMessage.CreatedAt,
-                messageId: exceptedMessage.MessageId);
+                messageToCreate.CreatedAt,
+                messageId: messageToCreate.MessageId);
             await ArchiveMessage(archivedMessage);
         }
 
+        var firstPageMessages = await SkipFirstPage(pageSize, navigatingForward: true);
+        // The cursor points at the last item of the previous page, when navigating backward
+        var lastMessageInOnThePreviousPage = firstPageMessages.Messages.Last();
+        var cursor = new SortingCursor(RecordId: lastMessageInOnThePreviousPage.RecordId);
+
         var pagination = new SortedCursorBasedPagination(
+            cursor: cursor,
             pageSize: pageSize,
             navigationForward: true);
 
-        // Act and Assert
-        var skip = 0;
-        var nextPage = true;
-        while (nextPage)
-        {
-            var result = await _archivedMessagesClient.SearchAsync(
-                new GetMessagesQuery(pagination),
-                CancellationToken.None);
-
-            if (result.Messages.Count < pageSize)
-            {
-                nextPage = false;
-            }
-            else
-            {
-                // use the last message as the cursor when navigating forward
-                var lastMessage = result.Messages.Last();
-                pagination = new SortedCursorBasedPagination(
-                    cursor: new SortingCursor(
-                        SortedFieldValue: lastMessage.CreatedAt.ToString(),
-                        RecordId: lastMessage.RecordId),
-                    pageSize: pageSize,
-                    navigationForward: true);
-            }
-
-            if (nextPage)
-            {
-                result.Messages.Should().HaveCount(pageSize);
-            }
-            else
-            {
-                result.Messages.Should().HaveCount(messages.Count % pageSize);
-            }
-
-            var expectedMessageIds = messages
-                // Default sorting is descending by CreatedAt
-                .OrderByDescending(x => x.CreatedAt)
-                .Skip(skip)
-                .Take(pageSize)
-                .Select(x => x.MessageId)
-                .ToList();
-
-            Assert.Equal(expectedMessageIds, result.Messages.Select(x => x.MessageId));
-
-            skip += pageSize;
-        }
-    }
-
-    [Fact]
-    public async Task Can_fetch_messages_with_pagination_navigation_backward_returns_expected_messages()
-    {
-        // Arrange
-        var messages = new List<(Instant CreatedAt, string MessageId)>()
-        {
-            new(CreatedAt("2023-04-01T22:00:00Z"), Guid.NewGuid().ToString()),
-            new(CreatedAt("2023-04-02T22:00:00Z"), Guid.NewGuid().ToString()),
-            new(CreatedAt("2023-04-03T22:00:00Z"), Guid.NewGuid().ToString()),
-            new(CreatedAt("2023-04-04T22:00:00Z"), Guid.NewGuid().ToString()),
-            new(CreatedAt("2023-04-05T22:00:00Z"), Guid.NewGuid().ToString()),
-            new(CreatedAt("2023-04-06T22:00:00Z"), Guid.NewGuid().ToString()),
-        };
-        foreach (var exceptedMessage in messages.OrderBy(_ => Random.Shared.Next()))
-        {
-            var archivedMessage = CreateArchivedMessage(
-                exceptedMessage.CreatedAt,
-                messageId: exceptedMessage.MessageId);
-            await ArchiveMessage(archivedMessage);
-        }
-
         // Act
         var result = await _archivedMessagesClient.SearchAsync(
-            new GetMessagesQuery(new SortedCursorBasedPagination(pageSize: 5, navigationForward: false)),
+            new GetMessagesQuery(pagination),
             CancellationToken.None);
 
         // Assert
-        result.Messages.Should().HaveCount(5);
-        var expectedLast5MessageIds = messages
+        result.Messages.Should().HaveCount(pageSize);
+
+        var expectedMessageIds = messages
             // Default sorting is descending by CreatedAt
             .OrderByDescending(x => x.CreatedAt)
-            .Skip(1)
-            .Take(5)
+            .Skip((pageSize * pageNumber) - pageSize)
+            .Take(pageSize)
             .Select(x => x.MessageId)
             .ToList();
 
-        Assert.Equal(expectedLast5MessageIds, result.Messages.Select(x => x.MessageId));
+        Assert.Equal(expectedMessageIds, result.Messages.Select(x => x.MessageId));
     }
 
-    [Theory]
-    [InlineData(1)]
-    [InlineData(2)]
-    [InlineData(10)]
-    public async Task Can_fetch_all_messages_with_pagination_navigation_backward_returns_expected_messages(int pageSize)
+    [Fact]
+    public async Task Can_fetch_messages_from_second_page_navigation_backward_returns_expected_order_messages()
     {
         // Arrange
+        var pageSize = 2;
+        var pageNumber = 2;
+
         var messages = new List<(Instant CreatedAt, string MessageId)>()
         {
-            new(CreatedAt("2023-04-01T22:00:00Z"), Guid.NewGuid().ToString()),
-            new(CreatedAt("2023-04-02T22:00:00Z"), Guid.NewGuid().ToString()),
-            new(CreatedAt("2023-04-03T22:00:00Z"), Guid.NewGuid().ToString()),
-            new(CreatedAt("2023-04-04T22:00:00Z"), Guid.NewGuid().ToString()),
-            new(CreatedAt("2023-04-05T22:00:00Z"), Guid.NewGuid().ToString()),
+            // page 1
             new(CreatedAt("2023-04-06T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-05T22:00:00Z"), Guid.NewGuid().ToString()),
+            // page 2 <- the page to fetch
+            new(CreatedAt("2023-04-04T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-03T22:00:00Z"), Guid.NewGuid().ToString()),
+            // page 3 <- the previous page
+            new(CreatedAt("2023-04-02T22:00:00Z"), Guid.NewGuid().ToString()), // <- cursor points here
+            new(CreatedAt("2023-04-01T22:00:00Z"), Guid.NewGuid().ToString()),
         };
-        foreach (var exceptedMessage in messages.OrderBy(_ => Random.Shared.Next()))
+
+        // Create messages in order when they were created at
+        foreach (var messageToCreate in messages.OrderBy(x => x.CreatedAt))
         {
             var archivedMessage = CreateArchivedMessage(
-                exceptedMessage.CreatedAt,
-                messageId: exceptedMessage.MessageId);
+                messageToCreate.CreatedAt,
+                messageId: messageToCreate.MessageId);
             await ArchiveMessage(archivedMessage);
         }
 
-        var pagination = new SortedCursorBasedPagination(pageSize: pageSize, navigationForward: false);
+        var firstPageMessages = await SkipFirstPage(pageSize, navigatingForward: false);
+        // The cursor points at the first item of the previous page, when navigating backward
+        var firstMessageInOnThePreviousPage = firstPageMessages.Messages.First();
+        var cursor = new SortingCursor(RecordId: firstMessageInOnThePreviousPage.RecordId);
+
+        var pagination = new SortedCursorBasedPagination(
+            cursor: cursor,
+            pageSize: pageSize,
+            navigationForward: false);
 
         // Act
-        var skip = 0;
-        var nextPage = true;
-        while (nextPage)
-        {
-            var result = await _archivedMessagesClient.SearchAsync(
-                new GetMessagesQuery(pagination),
-                CancellationToken.None);
+        var result = await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(pagination),
+            CancellationToken.None);
 
-            if (result.Messages.Count < pageSize)
-            {
-                nextPage = false;
-            }
-            else
-            {
-                // use the first message as the cursor when navigating forward
-                var firstMessage = result.Messages.First();
-                pagination = new SortedCursorBasedPagination(
-                    cursor: new SortingCursor(
-                        SortedFieldValue: firstMessage.CreatedAt.ToString(),
-                        RecordId: firstMessage.RecordId),
-                    pageSize: pageSize,
-                    navigationForward: false);
-            }
+        // Assert
+        result.Messages.Should().HaveCount(pageSize);
 
-            // Assert
-            if (nextPage)
-            {
-                result.Messages.Should().HaveCount(pageSize);
-            }
-            else
-            {
-                result.Messages.Should().HaveCount(messages.Count % pageSize);
-            }
+        var expectedMessageIds = messages
+            .Skip((pageSize * pageNumber) - pageSize)
+            .Take(pageSize)
+            // Default sorting is descending by CreatedAt
+            .OrderByDescending(x => x.CreatedAt)
+            .Select(x => x.MessageId)
+            .ToList();
 
-            var expectedMessageIds = messages
-                .Skip(skip)
-                .Take(pageSize)
-                .ToList()
-                // Default sorting is descending by CreatedAt
-                .OrderByDescending(x => x.CreatedAt)
-                .Select(x => x.MessageId)
-                .ToList();
-
-            Assert.Equal(expectedMessageIds, result.Messages.Select(x => x.MessageId));
-
-            skip += pageSize;
-        }
+        Assert.Equal(expectedMessageIds, result.Messages.Select(x => x.MessageId));
     }
 
     [Theory]
@@ -816,12 +773,42 @@ public class SearchMessagesTests : TestBase
         var messages =
             new List<(Instant CreatedAt, string MessageId, string Sender, string Receiver, string DocumentType)>()
             {
-                new(CreatedAt("2023-04-01T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345128", "1234512345122", DocumentType.NotifyAggregatedMeasureData.Name),
-                new(CreatedAt("2023-04-02T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345127", "1234512345123", DocumentType.NotifyWholesaleServices.Name),
-                new(CreatedAt("2023-04-03T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345125", "1234512345121", DocumentType.RejectRequestAggregatedMeasureData.Name),
-                new(CreatedAt("2023-04-04T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345124", "1234512345126", DocumentType.NotifyAggregatedMeasureData.Name),
-                new(CreatedAt("2023-04-05T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345123", "1234512345128", DocumentType.RejectRequestWholesaleSettlement.Name),
-                new(CreatedAt("2023-04-06T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345122", "1234512345127", DocumentType.NotifyAggregatedMeasureData.Name),
+                new(
+                    CreatedAt("2023-04-01T22:00:00Z"),
+                    Guid.NewGuid().ToString(),
+                    "1234512345128",
+                    "1234512345122",
+                    DocumentType.NotifyAggregatedMeasureData.Name),
+                new(
+                    CreatedAt("2023-04-02T22:00:00Z"),
+                    Guid.NewGuid().ToString(),
+                    "1234512345127",
+                    "1234512345123",
+                    DocumentType.NotifyWholesaleServices.Name),
+                new(
+                    CreatedAt("2023-04-03T22:00:00Z"),
+                    Guid.NewGuid().ToString(),
+                    "1234512345125",
+                    "1234512345121",
+                    DocumentType.RejectRequestAggregatedMeasureData.Name),
+                new(
+                    CreatedAt("2023-04-04T22:00:00Z"),
+                    Guid.NewGuid().ToString(),
+                    "1234512345124",
+                    "1234512345126",
+                    DocumentType.NotifyAggregatedMeasureData.Name),
+                new(
+                    CreatedAt("2023-04-05T22:00:00Z"),
+                    Guid.NewGuid().ToString(),
+                    "1234512345123",
+                    "1234512345128",
+                    DocumentType.RejectRequestWholesaleSettlement.Name),
+                new(
+                    CreatedAt("2023-04-06T22:00:00Z"),
+                    Guid.NewGuid().ToString(),
+                    "1234512345122",
+                    "1234512345127",
+                    DocumentType.NotifyAggregatedMeasureData.Name),
             };
         foreach (var exceptedMessage in messages.OrderBy(_ => Random.Shared.Next()))
         {
@@ -880,21 +867,52 @@ public class SearchMessagesTests : TestBase
 
     [Theory]
     [MemberData(nameof(GetAllCombinationOfFieldsToSortByAndDirectionsToSortBy))]
-    public async Task Can_fetch_all_messages_with_pagination_navigation_backward_and_sorted_by_returns_expected_messages(
-        FieldToSortBy sortedBy,
-        DirectionToSortBy sortedDirection)
+    public async Task
+        Can_fetch_all_messages_with_pagination_navigation_backward_and_sorted_by_returns_expected_messages(
+            FieldToSortBy sortedBy,
+            DirectionToSortBy sortedDirection)
     {
         // Arrange
         var pageSize = 2;
         var messages =
             new List<(Instant CreatedAt, string MessageId, string Sender, string Receiver, string DocumentType)>()
             {
-                new(CreatedAt("2023-04-01T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345128", "1234512345122", DocumentType.NotifyAggregatedMeasureData.Name),
-                new(CreatedAt("2023-04-02T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345127", "1234512345123", DocumentType.NotifyWholesaleServices.Name),
-                new(CreatedAt("2023-04-03T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345125", "1234512345121", DocumentType.RejectRequestAggregatedMeasureData.Name),
-                new(CreatedAt("2023-04-04T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345124", "1234512345126", DocumentType.NotifyAggregatedMeasureData.Name),
-                new(CreatedAt("2023-04-05T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345123", "1234512345128", DocumentType.RejectRequestWholesaleSettlement.Name),
-                new(CreatedAt("2023-04-06T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345122", "1234512345127", DocumentType.NotifyAggregatedMeasureData.Name),
+                new(
+                    CreatedAt("2023-04-01T22:00:00Z"),
+                    Guid.NewGuid().ToString(),
+                    "1234512345128",
+                    "1234512345122",
+                    DocumentType.NotifyAggregatedMeasureData.Name),
+                new(
+                    CreatedAt("2023-04-02T22:00:00Z"),
+                    Guid.NewGuid().ToString(),
+                    "1234512345127",
+                    "1234512345123",
+                    DocumentType.NotifyWholesaleServices.Name),
+                new(
+                    CreatedAt("2023-04-03T22:00:00Z"),
+                    Guid.NewGuid().ToString(),
+                    "1234512345125",
+                    "1234512345121",
+                    DocumentType.RejectRequestAggregatedMeasureData.Name),
+                new(
+                    CreatedAt("2023-04-04T22:00:00Z"),
+                    Guid.NewGuid().ToString(),
+                    "1234512345124",
+                    "1234512345126",
+                    DocumentType.NotifyAggregatedMeasureData.Name),
+                new(
+                    CreatedAt("2023-04-05T22:00:00Z"),
+                    Guid.NewGuid().ToString(),
+                    "1234512345123",
+                    "1234512345128",
+                    DocumentType.RejectRequestWholesaleSettlement.Name),
+                new(
+                    CreatedAt("2023-04-06T22:00:00Z"),
+                    Guid.NewGuid().ToString(),
+                    "1234512345122",
+                    "1234512345127",
+                    DocumentType.NotifyAggregatedMeasureData.Name),
             };
         foreach (var exceptedMessage in messages.OrderBy(_ => Random.Shared.Next()))
         {
@@ -930,7 +948,8 @@ public class SearchMessagesTests : TestBase
                 var firstMessage = result.Messages.First();
                 pagination = new SortedCursorBasedPagination(
                     cursor: new SortingCursor(
-                        SortedFieldValue: firstMessage.GetType().GetProperty(sortedBy.Identifier)!.GetValue(firstMessage)!
+                        SortedFieldValue: firstMessage.GetType().GetProperty(sortedBy.Identifier)!.GetValue(
+                                firstMessage)!
                             .ToString(),
                         RecordId: firstMessage.RecordId),
                     pageSize: pageSize,
@@ -951,10 +970,12 @@ public class SearchMessagesTests : TestBase
             .BeEquivalentTo(orderedMessages.Select(x => x.MessageId));
     }
 
-    private static IOrderedEnumerable<(Instant CreatedAt, string MessageId, string Sender, string Receiver, string DocumentType)> GetOrderedMessagedAfterSorting(
-        FieldToSortBy sortedBy,
-        DirectionToSortBy sortedDirection,
-        List<(Instant CreatedAt, string MessageId, string Sender, string Receiver, string DocumentType)> messages)
+    private static
+        IOrderedEnumerable<(Instant CreatedAt, string MessageId, string Sender, string Receiver, string DocumentType)>
+        GetOrderedMessagedAfterSorting(
+            FieldToSortBy sortedBy,
+            DirectionToSortBy sortedDirection,
+            List<(Instant CreatedAt, string MessageId, string Sender, string Receiver, string DocumentType)> messages)
     {
         var orderedMessages = messages.Order();
         if (sortedBy.Identifier == FieldToSortBy.MessageId.Identifier)
@@ -998,6 +1019,14 @@ public class SearchMessagesTests : TestBase
     private static Instant CreatedAt(string date)
     {
         return InstantPattern.General.Parse(date).Value;
+    }
+
+    private async Task<MessageSearchResult> SkipFirstPage(int pageSize, bool navigatingForward)
+    {
+        var pagination = new SortedCursorBasedPagination(pageSize: pageSize, navigationForward: navigatingForward);
+        return await _archivedMessagesClient.SearchAsync(
+            new GetMessagesQuery(pagination),
+            CancellationToken.None);
     }
 
     private ArchivedMessage CreateArchivedMessage(
