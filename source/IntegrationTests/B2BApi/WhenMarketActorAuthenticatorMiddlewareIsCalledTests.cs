@@ -16,6 +16,7 @@ using System;
 using System.Net;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
@@ -27,6 +28,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.B2BApi.Mocks;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
+using FluentAssertions;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -124,8 +126,13 @@ public class WhenMarketActorAuthenticatorMiddlewareIsCalledTests : TestBase
 
         // Assert
         var response = functionContext.GetHttpResponse();
-        Assert.NotNull(response);
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        response.Should().NotBeNull();
+        response!.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        response.Headers.GetValues("Content-Type").FirstOrDefault()
+            .Should().NotBeNull()
+            .And.Contain("application/ebix; charset=utf-8");
+
+        response.Body.Should().BeNull();
     }
 
     [Fact]
