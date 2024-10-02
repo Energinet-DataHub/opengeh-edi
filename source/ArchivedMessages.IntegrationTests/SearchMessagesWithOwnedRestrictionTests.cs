@@ -18,12 +18,14 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests;
 
 [Collection(nameof(ArchivedMessagesCollection))]
-public class SearchMessagesWithOwnedRestrictionTests
+public class SearchMessagesWithOwnedRestrictionTests : IAsyncLifetime
 {
     private readonly IArchivedMessagesClient _sut;
     private readonly ArchivedMessagesFixture _fixture;
@@ -33,14 +35,26 @@ public class SearchMessagesWithOwnedRestrictionTests
         Restriction.Owned,
         ActorRole.EnergySupplier);
 
-    public SearchMessagesWithOwnedRestrictionTests(ArchivedMessagesFixture fixture)
+    public SearchMessagesWithOwnedRestrictionTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
     {
         _fixture = fixture;
 
-        fixture.AuthenticatedActor.SetAuthenticatedActor(_authenticatedActor);
-        _sut = fixture.ArchivedMessagesClient;
+        var services = _fixture.BuildService(testOutputHelper);
+
+        services.GetRequiredService<AuthenticatedActor>().SetAuthenticatedActor(_authenticatedActor);
+        _sut = services.GetRequiredService<IArchivedMessagesClient>();
+    }
+
+    public Task InitializeAsync()
+    {
         _fixture.CleanupDatabase();
         _fixture.CleanupFileStorage();
+        return Task.CompletedTask;
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 
     [Fact]
