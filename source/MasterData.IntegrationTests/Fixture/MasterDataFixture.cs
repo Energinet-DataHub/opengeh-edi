@@ -27,9 +27,8 @@ public sealed class MasterDataFixture : IAsyncLifetime
         await DatabaseManager.CreateDatabaseAsync();
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
-        DatabaseManager.CleanupDatabase();
-        return Task.CompletedTask;
+        await DatabaseManager.DeleteDatabaseAsync();
     }
 }

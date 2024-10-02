@@ -23,8 +23,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Tests;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
+using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -42,7 +41,7 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
 
     public ServiceProvider ServiceProvider { get; private set; } = null!;
 
-    protected AuthenticatedActor AuthenticatedActor { get; set; } = null!;
+    public AuthenticatedActor AuthenticatedActor { get; set; } = null!;
 
     public void CleanupDatabase()
     {
@@ -150,6 +149,47 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
             .AddArchivedMessagesModule(configuration);
 
         return services.BuildServiceProvider();
+    }
+
+    public async Task<ArchivedMessage> CreateArchivedMessageAsync(
+        ArchivedMessageType? archivedMessageType = null,
+        string? messageId = null,
+        string? documentContent = null,
+        string? documentType = null,
+        string? businessReasons = null,
+        string? senderNumber = null,
+        ActorRole? senderRole = null,
+        string? receiverNumber = null,
+        ActorRole? receiverRole = null,
+        Instant? timestamp = null,
+        MessageId? relatedToMessageId = null)
+    {
+        var documentStream = new MemoryStream();
+
+        if (!string.IsNullOrEmpty(documentContent))
+        {
+            var streamWriter = new StreamWriter(documentStream);
+            streamWriter.Write(documentContent);
+            streamWriter.Flush();
+        }
+
+        var archivedMessage = new ArchivedMessage(
+            string.IsNullOrWhiteSpace(messageId) ? Guid.NewGuid().ToString() : messageId,
+            Array.Empty<EventId>(),
+            documentType ?? DocumentType.NotifyAggregatedMeasureData.Name,
+            ActorNumber.Create(senderNumber ?? "1234512345123"),
+            senderRole ?? ActorRole.MeteredDataAdministrator,
+            ActorNumber.Create(receiverNumber ?? "1234512345128"),
+            receiverRole ?? ActorRole.DanishEnergyAgency,
+            timestamp ?? Instant.FromUtc(2023, 01, 01, 0, 0),
+            businessReasons ?? BusinessReason.BalanceFixing.Name,
+            archivedMessageType ?? ArchivedMessageType.IncomingMessage,
+            new ArchivedMessageStream(documentStream),
+            relatedToMessageId ?? null);
+
+        await ArchivedMessagesClient.CreateAsync(archivedMessage, CancellationToken.None);
+
+        return archivedMessage;
     }
 
     protected virtual void Dispose(bool disposing)
