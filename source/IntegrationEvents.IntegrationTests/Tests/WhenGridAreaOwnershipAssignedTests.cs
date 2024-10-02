@@ -19,7 +19,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Builders;
 using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.DependencyInjection;
@@ -67,7 +66,7 @@ public class WhenGridAreaOwnershipAssignedTests : IntegrationEventsTestBase
     {
         var connectionFactory = Services.GetService<IDatabaseConnectionFactory>();
         using var connection = await connectionFactory!.GetConnectionAndOpenAsync(CancellationToken.None);
-        var sql = $"SELECT GridAreaCode, GridAreaOwnerActorNumber FROM [dbo].[GridAreaOwner]";
+        var sql = $"SELECT GridAreaCode, GridAreaOwnerActorNumber, SequenceNumber FROM [dbo].[GridAreaOwner]";
         return await connection.QueryAsync<GridArea>(sql);
     }
 
