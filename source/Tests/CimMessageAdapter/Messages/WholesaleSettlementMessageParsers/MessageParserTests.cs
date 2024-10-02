@@ -33,7 +33,7 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.WholesaleSettlementMessageParsers;
 
-public class MessageParserTests
+public sealed class MessageParserTests
 {
     private const string SeriesDummy =
         "{\"mRID\":\"25836143\",\"aggregationSeries_Period.resolution\":\"P1M\",\"chargeTypeOwner_MarketParticipant.mRID\":{\"codingScheme\":\"A10\",\"value\":\"570001110111\"},\"end_DateAndOrTime.dateTime\": \"2022-08-31T22:00:00Z\",\"energySupplier_MarketParticipant.mRID\":{\"codingScheme\":\"A10\",\"value\":\"5799999933318\"},\"meteringGridArea_Domain.mRID\":{\"codingScheme\": \"NDK\",\"value\":\"244\"},\"settlement_Series.version\":{\"value\":\"D01\"},\"start_DateAndOrTime.dateTime\":\"2022-08-17T22:00:00Z\",\"ChargeType\":[{\"mRID\":\"EA-001\",\"type\":{\"value\":\"D03\"}}]},";
@@ -50,50 +50,59 @@ public class MessageParserTests
     public MessageParserTests()
     {
         _marketMessageParser = new MarketMessageParser(
-            new IMarketMessageParser[]
-            {
-                new WholesaleSettlementXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
+        [
+            new WholesaleSettlementXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
                 new WholesaleSettlementJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
                 new WholesaleSettlementB2CJsonMessageParser(_serializer),
-            });
+        ]);
     }
 
     public static IEnumerable<object[]> CreateMessagesWithTwoChargeTypes()
     {
-        return new List<object[]>
-        {
-            new object[] { DocumentFormat.Json, CreateBaseJsonMessages("RequestWholesaleSettlement2ChargeTypes.json") },
-            new object[] { DocumentFormat.Xml, CreateBaseXmlMessage("RequestWholesaleSettlement2ChargeTypes.xml") },
-        };
+        return
+        [
+            [DocumentFormat.Json, CreateBaseJsonMessages("RequestWholesaleSettlement2ChargeTypes.json")],
+            [DocumentFormat.Xml, CreateBaseXmlMessage("RequestWholesaleSettlement2ChargeTypes.xml")],
+        ];
     }
 
     public static IEnumerable<object[]> CreateMessagesWithSingleAndMultipleTransactions()
     {
-        return new List<object[]>
-        {
-            new object[] { DocumentFormat.Json, CreateBaseJsonMessages("RequestWholesaleSettlement.json") },
-            new object[] { DocumentFormat.Json, CreateBaseJsonMessages("RequestWholesaleSettlement.json", 1) },
-            new object[] { DocumentFormat.Xml, CreateBaseXmlMessage("RequestWholesaleSettlement.xml") },
-            new object[] { DocumentFormat.Xml, CreateBaseXmlMessage("RequestWholesaleSettlementTwoSeries.xml") },
-        };
+        return
+        [
+            [DocumentFormat.Json, CreateBaseJsonMessages("RequestWholesaleSettlement.json")],
+            [DocumentFormat.Json, CreateBaseJsonMessages("RequestWholesaleSettlement.json", 1)],
+            [DocumentFormat.Xml, CreateBaseXmlMessage("RequestWholesaleSettlement.xml")],
+            [DocumentFormat.Xml, CreateBaseXmlMessage("RequestWholesaleSettlementTwoSeries.xml")],
+        ];
     }
 
     public static IEnumerable<object[]> CreateBadMessages()
     {
-        return new List<object[]>
-        {
-                new object[] { DocumentFormat.Json, CreateBaseJsonMessages("FailSchemeValidationRequestWholesaleSettlement.json"), nameof(InvalidMessageStructure) },
-                new object[] { DocumentFormat.Json, CreateBaseJsonMessages("InvalidJsonRequestWholesaleSettlement.json"), nameof(InvalidMessageStructure) },
-        };
+        return
+        [
+            [
+                DocumentFormat.Json, CreateBaseJsonMessages("FailSchemeValidationRequestWholesaleSettlement.json"),
+                nameof(InvalidMessageStructure),
+            ],
+            [
+                DocumentFormat.Json, CreateBaseJsonMessages("InvalidJsonRequestWholesaleSettlement.json"),
+                nameof(InvalidMessageStructure),
+            ],
+            [
+                DocumentFormat.Json, CreateBaseJsonMessages("EmptyJsonObject.json"),
+                nameof(InvalidMessageStructure),
+            ],
+        ];
     }
 
     public static IEnumerable<object[]> CreateMessagesWithOneBigSeriesAndOneSmall()
     {
-        return new List<object[]>
-        {
-            new object[] { DocumentFormat.Xml, CreateBaseXmlMessage("RequestWholesaleSettlementOneSmallOneBigSeries.xml"), },
-            new object[] { DocumentFormat.Json, CreateBaseJsonMessages("RequestWholesaleSettlementOneSmallOneBigSeries.json") },
-        };
+        return
+        [
+            [DocumentFormat.Xml, CreateBaseXmlMessage("RequestWholesaleSettlementOneSmallOneBigSeries.xml")],
+            [DocumentFormat.Json, CreateBaseJsonMessages("RequestWholesaleSettlementOneSmallOneBigSeries.json")],
+        ];
     }
 
     [Theory]
@@ -102,32 +111,34 @@ public class MessageParserTests
     {
         var result = await _marketMessageParser.ParseAsync(new IncomingMarketMessageStream(message), format, IncomingDocumentType.RequestWholesaleSettlement, CancellationToken.None);
         using var assertionScope = new AssertionScope();
-        Assert.True(result.Success);
-        var marketMessage = (RequestWholesaleServicesMessage)result.IncomingMessage!;
-        Assert.NotNull(marketMessage);
-        Assert.Equal("12345678", marketMessage.MessageId);
-        Assert.Equal("D05", marketMessage.BusinessReason);
-        Assert.Equal("5799999933318", marketMessage.SenderNumber);
-        Assert.Equal("DDQ", marketMessage.SenderRoleCode);
-        Assert.Equal("5790001330552", marketMessage.ReceiverNumber);
-        Assert.Equal("DDZ", marketMessage.ReceiverRoleCode);
-        Assert.Equal("2022-12-17T09:30:47Z", marketMessage.CreatedAt);
-        Assert.Equal("23", marketMessage.BusinessType);
+        result.Success.Should().BeTrue();
 
-        foreach (var serie in marketMessage.Series.Cast<RequestWholesaleServicesSeries>())
+        var marketMessage = (RequestWholesaleServicesMessage)result.IncomingMessage!;
+        marketMessage.Should().NotBeNull();
+        marketMessage.MessageId.Should().Be("12345678");
+        marketMessage.BusinessReason.Should().Be("D05");
+        marketMessage.SenderNumber.Should().Be("5799999933318");
+        marketMessage.SenderRoleCode.Should().Be("DDQ");
+        marketMessage.ReceiverNumber.Should().Be("5790001330552");
+        marketMessage.ReceiverRoleCode.Should().Be("DDZ");
+        marketMessage.CreatedAt.Should().Be("2022-12-17T09:30:47Z");
+        marketMessage.BusinessType.Should().Be("23");
+
+        foreach (var series in marketMessage.Series.Cast<RequestWholesaleServicesSeries>())
         {
-            Assert.NotNull(serie);
-            Assert.Equal("25836143", serie.TransactionId);
-            Assert.Equal("570001110111", serie.ChargeOwner);
-            Assert.Equal("5799999933318", serie.EnergySupplierId);
-            Assert.Equal("2022-08-31T22:00:00Z", serie.EndDateTime);
-            Assert.Equal("244", serie.GridArea);
-            Assert.Equal("D01", serie.SettlementVersion);
-            Assert.Equal("2022-08-17T22:00:00Z", serie.StartDateTime);
-            Assert.Single(serie.ChargeTypes);
-            Assert.Equal("EA-001", serie.ChargeTypes.First().Id);
-            Assert.Equal("D03", serie.ChargeTypes.First().Type);
-            Assert.Equal("P1M", serie.Resolution);
+            series.Should().NotBeNull();
+            series.TransactionId.Should().Be("25836143");
+            series.ChargeOwner.Should().Be("570001110111");
+            series.EnergySupplierId.Should().Be("5799999933318");
+            series.EndDateTime.Should().Be("2022-08-31T22:00:00Z");
+            series.GridArea.Should().Be("244");
+            series.SettlementVersion.Should().Be("D01");
+            series.StartDateTime.Should().Be("2022-08-17T22:00:00Z");
+            series.Resolution.Should().Be("P1M");
+
+            var chargeType = series.ChargeTypes.Should().ContainSingle().Subject;
+            chargeType.Id.Should().Be("EA-001");
+            chargeType.Type.Should().Be("D03");
         }
     }
 
@@ -145,21 +156,21 @@ public class MessageParserTests
 
         using var assertionScope = new AssertionScope();
 
-        Assert.True(result.Success);
+        result.Success.Should().BeTrue();
 
         var marketMessage = (RequestWholesaleServicesMessage)result.IncomingMessage!;
-        Assert.NotNull(marketMessage);
+        marketMessage.Should().NotBeNull();
 
         var series = marketMessage.Series.Cast<RequestWholesaleServicesSeries>().ToList();
 
         var firstChargeType = series.First().ChargeTypes.First();
         var secondChargeType = series.First().ChargeTypes.Last();
 
-        Assert.Equal("EA-001", firstChargeType.Id);
-        Assert.Equal("D03", firstChargeType.Type);
+        firstChargeType.Id.Should().Be("EA-001");
+        firstChargeType.Type.Should().Be("D03");
 
-        Assert.Equal("EA-002", secondChargeType.Id);
-        Assert.Equal("D02", secondChargeType.Type);
+        secondChargeType.Id.Should().Be("EA-002");
+        secondChargeType.Type.Should().Be("D02");
     }
 
     [Theory]
@@ -168,10 +179,10 @@ public class MessageParserTests
     {
         var result = await _marketMessageParser.ParseAsync(new IncomingMarketMessageStream(message), format, IncomingDocumentType.RequestWholesaleSettlement, CancellationToken.None);
 
-        Assert.NotEmpty(result.Errors);
-        Assert.True(result.Success == false);
-        Assert.True(expectedError != null);
-        Assert.Contains(result.Errors, error => error.GetType().Name == expectedError);
+        result.Success.Should().BeFalse();
+        result.Errors.Should().NotBeEmpty();
+        expectedError.Should().NotBeNull();
+        result.Errors.Should().Contain(error => error.GetType().Name == expectedError);
     }
 
     [Theory]
@@ -188,45 +199,45 @@ public class MessageParserTests
 
         using var assertionScope = new AssertionScope();
 
-        Assert.True(result.Success);
+        result.Success.Should().BeTrue();
 
         var marketMessage = (RequestWholesaleServicesMessage)result.IncomingMessage!;
-        Assert.NotNull(marketMessage);
+        marketMessage.Should().NotBeNull();
 
         var series = marketMessage.Series.Cast<RequestWholesaleServicesSeries>().ToList();
 
-        Assert.Equal(2, series.Count);
+        series.Should().HaveCount(2);
 
         var bigSeries = series.First();
         var smallSeries = series.Last();
 
-        Assert.Equal("111111111111", bigSeries.TransactionId);
-        Assert.Equal("PT1M", bigSeries.Resolution);
-        Assert.Equal("570001110111", bigSeries.ChargeOwner);
-        Assert.Equal("5799999933318", bigSeries.EnergySupplierId);
-        Assert.Equal("2022-08-31T22:00:00Z", bigSeries.EndDateTime);
-        Assert.Equal("244", bigSeries.GridArea);
-        Assert.Equal("D01", bigSeries.SettlementVersion);
-        Assert.Equal("2022-08-17T22:00:00Z", bigSeries.StartDateTime);
-        Assert.Equal(3, bigSeries.ChargeTypes.Count);
+        bigSeries.TransactionId.Should().Be("111111111111");
+        bigSeries.Resolution.Should().Be("PT1M");
+        bigSeries.ChargeOwner.Should().Be("570001110111");
+        bigSeries.EnergySupplierId.Should().Be("5799999933318");
+        bigSeries.EndDateTime.Should().Be("2022-08-31T22:00:00Z");
+        bigSeries.GridArea.Should().Be("244");
+        bigSeries.SettlementVersion.Should().Be("D01");
+        bigSeries.StartDateTime.Should().Be("2022-08-17T22:00:00Z");
+        bigSeries.ChargeTypes.Should().HaveCount(3);
 
         var chargeTypes = bigSeries.ChargeTypes.ToList();
 
         for (var i = 0; i < chargeTypes.Count; i++)
         {
-            Assert.Equal($"EA-00{i + 1}", chargeTypes[i].Id);
-            Assert.Equal($"D0{i + 1}", chargeTypes[i].Type);
+            chargeTypes[i].Id.Should().Be($"EA-00{i + 1}");
+            chargeTypes[i].Type.Should().Be($"D0{i + 1}");
         }
 
-        Assert.Equal("1", smallSeries.TransactionId);
-        Assert.Equal("2022-08-17T22:00:00Z", smallSeries.StartDateTime);
-        Assert.Null(smallSeries.Resolution);
-        Assert.Null(smallSeries.ChargeOwner);
-        Assert.Null(smallSeries.EnergySupplierId);
-        Assert.Null(smallSeries.EndDateTime);
-        Assert.Null(smallSeries.GridArea);
-        Assert.Null(smallSeries.SettlementVersion);
-        Assert.Empty(smallSeries.ChargeTypes);
+        smallSeries.TransactionId.Should().Be("1");
+        smallSeries.StartDateTime.Should().Be("2022-08-17T22:00:00Z");
+        smallSeries.Resolution.Should().BeNull();
+        smallSeries.ChargeOwner.Should().BeNull();
+        smallSeries.EnergySupplierId.Should().BeNull();
+        smallSeries.EndDateTime.Should().BeNull();
+        smallSeries.GridArea.Should().BeNull();
+        smallSeries.SettlementVersion.Should().BeNull();
+        smallSeries.ChargeTypes.Should().BeEmpty();
     }
 
     [Fact]
