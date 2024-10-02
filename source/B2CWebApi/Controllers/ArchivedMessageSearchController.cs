@@ -88,7 +88,7 @@ public class ArchivedMessageSearchController : ControllerBase
 
     [ApiVersion("2.0")]
     [HttpPost]
-    [ProducesResponseType(typeof(ArchivedMessageResult[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ArchivedMessageResultV2[]), StatusCodes.Status200OK)]
     public async Task<ActionResult> RequestAsync(SearchArchivedMessagesRequest request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -130,7 +130,8 @@ public class ArchivedMessageSearchController : ControllerBase
 
         var result = await _archivedMessagesClient.SearchAsync(query, cancellationToken).ConfigureAwait(false);
 
-        return Ok(result.Messages.Select(x => new ArchivedMessageResult(
+        return Ok(result.Messages.Select(x => new ArchivedMessageResultV2(
+            x.RecordId,
             x.Id.ToString(),
             x.MessageId,
             x.DocumentType,
