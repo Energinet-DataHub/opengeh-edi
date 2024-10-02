@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Reflection;
+using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture;
 using FluentAssertions;
 using Xunit;
 
@@ -33,9 +34,16 @@ public static class MetaTests
         // Arrange
         var needsToBeOfForm_Given_xx_When_yy_Then_zz = @"^(((Given)|(AndGiven))_[^_]+_)*When_[^_]+_Then_[^_]+$";
 
-        var allTestNames = Assembly.GetAssembly(typeof(MetaTests))?
-            .GetTypes()
-            .Where(
+        var integrationTestsAssembly = Assembly.GetAssembly(typeof(MetaTests));
+        var archivedMessagesIntegrationAssembly = Assembly.GetAssembly(typeof(ArchivedMessagesFixture));
+
+        var allTypes = new[]
+        {
+            integrationTestsAssembly,
+            archivedMessagesIntegrationAssembly,
+        }.SelectMany(x => x?.GetTypes()!);
+
+        var allTestNames = allTypes.Where(
                 type =>
                     type.IsClass
                     && type.Namespace != null
