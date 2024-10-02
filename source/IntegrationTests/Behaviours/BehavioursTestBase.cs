@@ -17,6 +17,7 @@ using AutoFixture;
 using Azure.Messaging.ServiceBus;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.FeatureFlag;
+using Energinet.DataHub.BuildingBlocks.Tests;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
