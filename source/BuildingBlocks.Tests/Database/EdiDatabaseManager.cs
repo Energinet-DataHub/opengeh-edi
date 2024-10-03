@@ -53,7 +53,11 @@ public class EdiDatabaseManager(string name) : SqlServerDatabaseManager<DbContex
                                             THEN 0
                                         When TABLE_NAME = 'ActorMessageQueues'
                                             THEN 1
-                                        ELSE 2
+                                        WHEN TABLE_NAME LIKE '%ProcessGridAreas%'
+                                            THEN 2
+                                        WHEN TABLE_NAME LIKE '%Processes%'
+                                            THEN 3
+                                        ELSE 4
                                     END,
                                     TABLE_NAME
                                     ASC;    
