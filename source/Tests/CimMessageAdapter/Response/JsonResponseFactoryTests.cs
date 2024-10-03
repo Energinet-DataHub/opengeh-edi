@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Encodings.Web;
+using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using Xunit;
 using Xunit.Categories;
@@ -29,7 +32,12 @@ public class JsonResponseFactoryTests
 
     public JsonResponseFactoryTests()
     {
-        _responseFactory = new JsonResponseFactory();
+        var javaScriptEncoder = new ServiceCollection()
+            .AddJavaScriptEncoder()
+            .BuildServiceProvider()
+            .GetRequiredService<JavaScriptEncoder>();
+
+        _responseFactory = new JsonResponseFactory(javaScriptEncoder);
     }
 
     [Fact]

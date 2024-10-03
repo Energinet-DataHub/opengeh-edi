@@ -24,21 +24,33 @@ using FluentAssertions.Execution;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests;
 
 [Collection(nameof(ArchivedMessagesCollection))]
-public class WhenArchivedMessageIsCreatedTests
+public class WhenArchivedMessageIsCreatedTests : IAsyncLifetime
 {
     private readonly IArchivedMessagesClient _sut;
     private readonly ArchivedMessagesFixture _fixture;
 
-    public WhenArchivedMessageIsCreatedTests(ArchivedMessagesFixture fixture)
+    public WhenArchivedMessageIsCreatedTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
     {
         _fixture = fixture;
-        _sut = fixture.ArchivedMessagesClient;
+        _sut = _fixture.BuildService(testOutputHelper)
+            .GetRequiredService<IArchivedMessagesClient>();
+    }
+
+    public Task InitializeAsync()
+    {
         _fixture.CleanupDatabase();
         _fixture.CleanupFileStorage();
+        return Task.CompletedTask;
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 
     [Fact]
@@ -83,6 +95,21 @@ public class WhenArchivedMessageIsCreatedTests
         blobResult.Should().NotBeNull();
     }
 
+    [Fact]
+    public async Task Given_ArchivedMessagesInStorage_When_GettingMessage_Then_StreamExists()
+    {
+        // Arrange
+        var archivedMessage = CreateArchivedMessage();
+        await _sut.CreateAsync(archivedMessage, CancellationToken.None);
+
+        // Act
+        var result = await _sut.GetAsync(archivedMessage.Id, CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.Stream.Should().NotBeNull();
+    }
+
     private static ArchivedMessage CreateArchivedMessage(
         ArchivedMessageType? archivedMessageType = null,
         string? messageId = null,
@@ -117,7 +144,7 @@ public class WhenArchivedMessageIsCreatedTests
 
     private async Task<IReadOnlyCollection<ArchivedMessageFromDb>> GetAllMessagesInDatabase()
     {
-        var connectionFactory = _fixture.ServiceProvider.GetService<IDatabaseConnectionFactory>()!;
+        var connectionFactory = _fixture.Services.GetService<IDatabaseConnectionFactory>()!;
         using var connection = await connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
 
         var archivedMessages =
@@ -130,7 +157,7 @@ public class WhenArchivedMessageIsCreatedTests
 
     private async Task<ArchivedMessageStream> GetMessagesFromBlob(FileStorageReference reference)
     {
-        var blobClient = _fixture.ServiceProvider.GetService<IFileStorageClient>()!;
+        var blobClient = _fixture.Services.GetService<IFileStorageClient>()!;
 
         var fileStorageFile = await blobClient.DownloadAsync(reference).ConfigureAwait(false);
         return new ArchivedMessageStream(fileStorageFile);
