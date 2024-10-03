@@ -41,55 +41,41 @@ public class EdiDatabaseManager(string name) : SqlServerDatabaseManager<DbContex
 
     public void CleanupDatabase()
     {
-//         var cleanupStatement = """
-//                                DECLARE @sql NVARCHAR(MAX) = N'';
-//
-//                                SELECT @sql += 'DELETE FROM ' + QUOTENAME(TABLE_SCHEMA) + '.' + QUOTENAME(TABLE_NAME) + ' '
-//                                FROM INFORMATION_SCHEMA.TABLES
-//                                WHERE TABLE_TYPE = 'BASE TABLE';
-//
-//                                select @sql += ';'
-//
-//                                EXEC sp_executesql @sql;
-//                                """;
-        var cleanupStatement =
-            $"DELETE FROM [dbo].[MessageRegistry] " +
-            $"DELETE FROM [dbo].[TransactionRegistry]" +
-            $"DELETE FROM [dbo].[OutgoingMessages] " +
-            $"DELETE FROM [dbo].[QueuedInternalCommands] " +
-            $"DELETE FROM [dbo].[MarketEvaluationPoints]" +
-            $"DELETE FROM [dbo].[Actor]" +
-            $"DELETE FROM [dbo].[ReceivedIntegrationEvents]" +
-            $"DELETE FROM [dbo].[AggregatedMeasureDataProcessGridAreas]" +
-            $"DELETE FROM [dbo].[AggregatedMeasureDataProcesses]" +
-            $"DELETE FROM [dbo].[ArchivedMessages]" +
-            $"DELETE FROM [dbo].[MarketDocuments]" +
-            $"DELETE FROM [dbo].[Bundles]" +
-            $"DELETE FROM [dbo].[ActorMessageQueues]" +
-            $"DELETE FROM [dbo].[ReceivedInboxEvents]" +
-            $"DELETE FROM [dbo].[MessageRegistry]" +
-            $"DELETE FROM [dbo].[TransactionRegistry]" +
-            $"DELETE FROM [dbo].[GridAreaOwner]" +
-            $"DELETE FROM [dbo].[ActorCertificate]" +
-            $"DELETE FROM [dbo].[WholesaleServicesProcessChargeTypes]" +
-            $"DELETE FROM [dbo].[WholesaleServicesProcessGridAreas]" +
-            $"DELETE FROM [dbo].[WholesaleServicesProcesses]" +
-            $"DELETE FROM [dbo].[Outbox]" +
-            $"DELETE FROM [dbo].[ProcessDelegation]";
-        using var connection = new SqlConnection(ConnectionString);
-        connection.Open();
+         var cleanupStatement = """
+                                DECLARE @sql NVARCHAR(MAX) = N'';
 
-        using (var command = new SqlCommand(cleanupStatement, connection))
-        {
-            command.ExecuteNonQuery();
-        }
+                                SELECT @sql += 'DELETE FROM ' + QUOTENAME(TABLE_SCHEMA) + '.' + QUOTENAME(TABLE_NAME) + ' '
+                                FROM INFORMATION_SCHEMA.TABLES
+                                WHERE TABLE_TYPE = 'BASE TABLE'
+                                ORDER BY
+                                    CASE
+                                        WHEN TABLE_NAME = 'Bundles'
+                                            THEN 0
+                                        When TABLE_NAME = 'ActorMessageQueues'
+                                            THEN 1
+                                        ELSE 2
+                                    END,
+                                    TABLE_NAME
+                                    ASC;    
+                                select @sql += ';'
 
-        connection.Close();
+                                EXEC sp_executesql @sql;
+                                """;
+
+         using var connection = new SqlConnection(ConnectionString);
+         connection.Open();
+
+         using (var command = new SqlCommand(cleanupStatement, connection))
+         {
+             command.ExecuteNonQuery();
+         }
+
+         connection.Close();
     }
 
     public async Task AddActorAsync(ActorNumber actorNumber, string externalId)
     {
-        await using var sqlConnection = new Microsoft.Data.SqlClient.SqlConnection(ConnectionString);
+        await using var sqlConnection = new SqlConnection(ConnectionString);
 
         await using var sqlCommand = sqlConnection.CreateCommand();
         sqlCommand.CommandText = "INSERT INTO [dbo].[Actor] VALUES (@id, @actorNumber, @externalId)";
@@ -103,7 +89,7 @@ public class EdiDatabaseManager(string name) : SqlServerDatabaseManager<DbContex
 
     public async Task AddGridAreaOwnerAsync(ActorNumber actorNumber, string gridAreaCode)
     {
-        await using var sqlConnection = new Microsoft.Data.SqlClient.SqlConnection(ConnectionString);
+        await using var sqlConnection = new SqlConnection(ConnectionString);
 
         await using var sqlCommand = sqlConnection.CreateCommand();
         sqlCommand.CommandText = "INSERT INTO [dbo].[GridAreaOwner] VALUES (@id, @gridAreaCode, @validFrom, @gridAreaOwnerActorNumber, 0)";
