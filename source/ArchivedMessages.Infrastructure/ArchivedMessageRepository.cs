@@ -96,17 +96,20 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
         ArgumentNullException.ThrowIfNull(queryInput);
         var input = new QueryBuilder(_authenticatedActor.CurrentActorIdentity).BuildFrom(queryInput);
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
-        var archivedMessages =
-            await connection.QueryAsync<MessageInfo>(
-                    input.SqlStatement,
-                    input.Parameters)
-                .ConfigureAwait(false);
+
+        var sql = $@"
+            {input.SqlStatement};
+            SELECT COUNT(*) FROM dbo.[ArchivedMessages]";
+
+        using var multi = await connection.QueryMultipleAsync(sql, input.Parameters).ConfigureAwait(false);
+        var archivedMessages = (await multi.ReadAsync<MessageInfo>().ConfigureAwait(false)).ToList();
+        var totalAmountOfMessages = await multi.ReadSingleAsync<int>().ConfigureAwait(false);
 
         // When navigating backwards the list must be reversed to get the correct order.
         // Because sql use top to limit the result set and backwards is looking at the records from behind.
         if (!queryInput.Pagination.NavigationForward)
-            return new MessageSearchResult(archivedMessages.Reverse().ToList().AsReadOnly());
+            archivedMessages.Reverse();
 
-        return new MessageSearchResult(archivedMessages.ToList().AsReadOnly());
+        return new MessageSearchResult(archivedMessages.ToList().AsReadOnly(), totalAmountOfMessages);
     }
 }

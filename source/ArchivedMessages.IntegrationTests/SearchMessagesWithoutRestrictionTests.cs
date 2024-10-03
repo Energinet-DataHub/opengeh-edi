@@ -88,6 +88,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Assert
         result.Should().NotBeNull();
+        result.TotalAmountOfMessages.Should().Be(1);
         using var assertionScope = new AssertionScope();
         var message = result.Messages.Should().ContainSingle().Subject;
         message.MessageId.Should().Be(archivedMessage.MessageId);

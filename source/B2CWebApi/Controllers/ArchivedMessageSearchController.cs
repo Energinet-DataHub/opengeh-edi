@@ -88,7 +88,7 @@ public class ArchivedMessageSearchController : ControllerBase
 
     [ApiVersion("2.0")]
     [HttpPost]
-    [ProducesResponseType(typeof(ArchivedMessageResultV2[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ArchivedMessageSearchResponse[]), StatusCodes.Status200OK)]
     public async Task<ActionResult> RequestAsync(SearchArchivedMessagesRequest request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -130,15 +130,17 @@ public class ArchivedMessageSearchController : ControllerBase
 
         var result = await _archivedMessagesClient.SearchAsync(query, cancellationToken).ConfigureAwait(false);
 
-        return Ok(result.Messages.Select(x => new ArchivedMessageResultV2(
-            x.RecordId,
-            x.Id.ToString(),
-            x.MessageId,
-            x.DocumentType,
-            x.SenderNumber,
-            x.ReceiverNumber,
-            x.CreatedAt.ToDateTimeOffset(),
-            x.BusinessReason)));
+        var messages = result.Messages.Select(
+            x => new ArchivedMessageResultV2(
+                x.RecordId,
+                x.Id.ToString(),
+                x.MessageId,
+                x.DocumentType,
+                x.SenderNumber,
+                x.ReceiverNumber,
+                x.CreatedAt.ToDateTimeOffset(),
+                x.BusinessReason));
+        return Ok(new ArchivedMessageSearchResponse(messages, TotalCount: result.TotalAmountOfMessages));
     }
 
     private DirectionToSortBy? MapToDirectionToSortBy(Energinet.DataHub.EDI.B2CWebApi.Models.DirectionToSortBy? directionToSortBy)
