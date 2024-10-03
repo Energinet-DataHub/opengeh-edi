@@ -25,24 +25,29 @@ public class EdiDatabaseManager : SqlServerDatabaseManager<DbContext>
     {
     }
 
-    /// <inheritdoc/>
-    public override DbContext CreateDbContext() => CreateDbContext<DbContext>();
+    /// <inheritdoc />
+    public override DbContext CreateDbContext()
+    {
+        return CreateDbContext<DbContext>();
+    }
 
     public TDatabaseContext CreateDbContext<TDatabaseContext>()
         where TDatabaseContext : DbContext
     {
         var optionsBuilder = new DbContextOptionsBuilder<TDatabaseContext>()
-            .UseSqlServer(ConnectionString, options =>
-            {
-                options.UseNodaTime();
-                options.EnableRetryOnFailure();
-            });
+            .UseSqlServer(
+                ConnectionString,
+                options =>
+                {
+                    options.UseNodaTime();
+                    options.EnableRetryOnFailure();
+                });
 
         return (TDatabaseContext)Activator.CreateInstance(typeof(TDatabaseContext), optionsBuilder.Options)!;
     }
 
     /// <summary>
-    /// Creates the database schema using DbUp instead of a database context.
+    ///     Creates the database schema using DbUp instead of a database context.
     /// </summary>
     protected override Task<bool> CreateDatabaseSchemaAsync(DbContext context)
     {
@@ -50,7 +55,7 @@ public class EdiDatabaseManager : SqlServerDatabaseManager<DbContext>
     }
 
     /// <summary>
-    /// Creates the database schema using DbUp instead of a database context.
+    ///     Creates the database schema using DbUp instead of a database context.
     /// </summary>
     protected override bool CreateDatabaseSchema(DbContext context)
     {
