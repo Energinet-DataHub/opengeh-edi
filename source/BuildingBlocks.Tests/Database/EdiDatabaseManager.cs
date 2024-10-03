@@ -14,12 +14,14 @@
 
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Database;
 using Energinet.DataHub.EDI.ApplyDBMigrationsApp.Helpers;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace Energinet.DataHub.BuildingBlocks.Tests.Database;
 
-public class EdiDatabaseManager(string name) : SqlServerDatabaseManager<DbContext>(name)
+public class EdiDatabaseManager(string name) : SqlServerDatabaseManager<DbContext>(name + $"_{DateTime.Now:yyyyMMddHHmm}_")
 {
     /// <inheritdoc/>
     public override DbContext CreateDbContext() => CreateDbContext<DbContext>();
@@ -60,6 +62,35 @@ public class EdiDatabaseManager(string name) : SqlServerDatabaseManager<DbContex
         }
 
         connection.Close();
+    }
+
+    public async Task AddActorAsync(ActorNumber actorNumber, string externalId)
+    {
+        await using var sqlConnection = new Microsoft.Data.SqlClient.SqlConnection(ConnectionString);
+
+        await using var sqlCommand = sqlConnection.CreateCommand();
+        sqlCommand.CommandText = "INSERT INTO [dbo].[Actor] VALUES (@id, @actorNumber, @externalId)";
+        sqlCommand.Parameters.AddWithValue("@id", Guid.NewGuid());
+        sqlCommand.Parameters.AddWithValue("@actorNumber", actorNumber.Value);
+        sqlCommand.Parameters.AddWithValue("@externalId", externalId);
+
+        await sqlConnection.OpenAsync();
+        await sqlCommand.ExecuteNonQueryAsync();
+    }
+
+    public async Task AddGridAreaOwnerAsync(ActorNumber actorNumber, string gridAreaCode)
+    {
+        await using var sqlConnection = new Microsoft.Data.SqlClient.SqlConnection(ConnectionString);
+
+        await using var sqlCommand = sqlConnection.CreateCommand();
+        sqlCommand.CommandText = "INSERT INTO [dbo].[GridAreaOwner] VALUES (@id, @gridAreaCode, @validFrom, @gridAreaOwnerActorNumber, 0)";
+        sqlCommand.Parameters.AddWithValue("@id", Guid.NewGuid());
+        sqlCommand.Parameters.AddWithValue("@gridAreaOwnerActorNumber", actorNumber.Value);
+        sqlCommand.Parameters.AddWithValue("@gridAreaCode", gridAreaCode);
+        sqlCommand.Parameters.AddWithValue("@validFrom", SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(1)).ToDateTimeUtc());
+
+        await sqlConnection.OpenAsync();
+        await sqlCommand.ExecuteNonQueryAsync();
     }
 
     /// <summary>
