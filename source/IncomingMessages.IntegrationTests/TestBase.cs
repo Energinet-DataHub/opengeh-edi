@@ -23,7 +23,6 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
-using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
@@ -273,12 +272,12 @@ public class TestBase : IDisposable
             // .AddProcessModule(config)
             // .AddArchivedMessagesModule(config)
             .AddIncomingMessagesModule(config);
-            // .AddMasterDataModule(config)
-            // .AddDataAccessUnitOfWorkModule()
-            // .AddAuditLog()
-            // .AddOutboxContext(config)
-            // .AddOutboxClient<OutboxContext>()
-            // .AddOutboxProcessor<OutboxContext>();
+        // .AddMasterDataModule(config)
+        // .AddDataAccessUnitOfWorkModule()
+        // .AddAuditLog()
+        // .AddOutboxContext(config)
+        // .AddOutboxClient<OutboxContext>()
+        // .AddOutboxProcessor<OutboxContext>();
 
         // Replace the services with stub implementations.
         // - Building blocks
