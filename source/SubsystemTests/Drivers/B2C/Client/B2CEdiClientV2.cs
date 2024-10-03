@@ -44,7 +44,7 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ArchivedMessageSearchResponse>> ArchivedMessageSearchAsync(string api_version, SearchArchivedMessagesRequest body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<ArchivedMessageSearchResponse> ArchivedMessageSearchAsync(string api_version, SearchArchivedMessagesRequest body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
     }
 
@@ -99,7 +99,7 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ArchivedMessageSearchResponse>> ArchivedMessageSearchAsync(string api_version, SearchArchivedMessagesRequest body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<ArchivedMessageSearchResponse> ArchivedMessageSearchAsync(string api_version, SearchArchivedMessagesRequest body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (api_version == null)
                 throw new System.ArgumentNullException("api_version");
@@ -150,7 +150,7 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<ArchivedMessageSearchResponse>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<ArchivedMessageSearchResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);

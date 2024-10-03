@@ -51,7 +51,7 @@ public sealed class B2CEdiDriver : IDisposable
         return result;
     }
 
-    public async Task<ICollection<ArchivedMessageSearchResponse>> SearchArchivedMessagesV2Async(SearchArchivedMessagesRequest request)
+    public async Task<ArchivedMessageSearchResponse> SearchArchivedMessagesV2Async(SearchArchivedMessagesRequest request)
     {
         var webApiClient = await CreateWebApiClientV2Async();
 
