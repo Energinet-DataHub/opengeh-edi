@@ -23,6 +23,17 @@ namespace Energinet.DataHub.BuildingBlocks.Tests.Database;
 
 public class EdiDatabaseManager(string name) : SqlServerDatabaseManager<DbContext>(name + $"_{DateTime.Now:yyyyMMddHHmm}_")
 {
+    public new string ConnectionString
+    {
+        get
+        {
+            var dbConnectionString = base.ConnectionString;
+            if (!dbConnectionString.Contains("Trust")) // Trust Server Certificate might be required for some
+                dbConnectionString = $"{dbConnectionString};Trust Server Certificate=True;";
+            return dbConnectionString;
+        }
+    }
+
     /// <inheritdoc/>
     public override DbContext CreateDbContext() => CreateDbContext<DbContext>();
 
