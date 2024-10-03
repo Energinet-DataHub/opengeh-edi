@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Text.RegularExpressions;
 using FluentAssertions;
 using FluentAssertions.Primitives;
 
-namespace Energinet.DataHub.EDI.IntegrationTests;
+namespace Energinet.DataHub.BuildingBlocks.Tests;
 
-public static class FluentAssertionExtensions
+public static partial class FluentAssertionExtensions
 {
     /*
      * This RegEx test if a string looks like a CIM code
@@ -32,7 +31,7 @@ public static class FluentAssertionExtensions
      * Match examples: D01, D32, E02, PT15M, P1D, P1M, KWH, H87, A09, E65, PT1H, DDM, MDR
      * Non-match examples: Fee, DanishCrowns, Exchange, abc, fee
      */
-    private static readonly Regex _cimCodeRegex = new(@"^[A,D,E,P,K,H,M,S](..)(.?.?)$", RegexOptions.Compiled);
+    private static readonly Regex _cimCodeRegex = CimCodeRegex();
 
     [CustomAssertion]
     public static AndConstraint<StringAssertions> NotBeCimCode(this StringAssertions should)
@@ -41,4 +40,7 @@ public static class FluentAssertionExtensions
 
         return should.NotMatchRegex(_cimCodeRegex, "because value shouldn't look like a CIM code");
     }
+
+    [GeneratedRegex("^[A,D,E,P,K,H,M,S](..)(.?.?)$", RegexOptions.Compiled)]
+    private static partial Regex CimCodeRegex();
 }

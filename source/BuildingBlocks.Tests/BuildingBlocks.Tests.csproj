@@ -22,15 +22,20 @@ limitations under the License.
     </PropertyGroup>
     
     <ItemGroup>
-      <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.0.0" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
-      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
-      <PackageReference Include="SimplerSoftware.EntityFrameworkCore.SqlServer.NodaTime" Version="8.0.1" />
-      <PackageReference Include="xunit.abstractions" Version="2.0.3" />
+        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
+        <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.1"/>
+        <PackageReference Include="FluentAssertions" Version="6.12.1" />
+        <PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.5"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
+        <PackageReference Include="SimplerSoftware.EntityFrameworkCore.SqlServer.NodaTime" Version="8.0.1" />
+        <PackageReference Include="xunit.abstractions" Version="2.0.3" />
     </ItemGroup>
-    
+
     <ItemGroup>
-      <ProjectReference Include="..\ApplyDBMigrationsApp\ApplyDBMigrationsApp.csproj" />
-      <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+        <ProjectReference Include="..\ApplyDBMigrationsApp\ApplyDBMigrationsApp.csproj" />
+        <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+        <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj"/>
+        <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj"/>
     </ItemGroup>
 </Project>

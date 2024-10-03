@@ -15,21 +15,17 @@
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
-using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
-using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
-using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.Azure;
 using NodaTime;
-using Xunit;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
+namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.IncomingMessages;
 
 public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
 {
