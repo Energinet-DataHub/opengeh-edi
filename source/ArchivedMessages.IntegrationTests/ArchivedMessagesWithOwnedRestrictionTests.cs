@@ -74,7 +74,7 @@ public class ArchivedMessagesWithOwnedRestrictionTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_ArchivedMessages_When_GettingMessageWithAuthAsReceiver_Then_ReturnsOwnMessage()
+    public async Task Given_ArchivedMessages_When_GettingMessageWithAuthActorAsReceiver_Then_ReturnsOwnMessage()
     {
         // Arrange
         var archivedMessage = await _fixture.CreateArchivedMessageAsync(
@@ -90,7 +90,7 @@ public class ArchivedMessagesWithOwnedRestrictionTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_ArchivedMessages_When_GettingMessageWithAuthAsSender_Then_ReturnsOwnMessage()
+    public async Task Given_ArchivedMessages_When_GettingMessageWithAuthActorAsSender_Then_ReturnsOwnMessage()
     {
         // Arrange
         var archivedMessage = await _fixture.CreateArchivedMessageAsync(
