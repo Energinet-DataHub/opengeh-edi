@@ -136,4 +136,11 @@
       </EmbeddedResource>
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="subsystemtests.local.settings.json" />
+      <Content Include="subsystemtests.dev002.settings.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
 </Project>

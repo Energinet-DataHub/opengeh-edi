@@ -88,7 +88,7 @@ public class ArchivedMessageSearchController : ControllerBase
 
     [ApiVersion("2.0")]
     [HttpPost]
-    [ProducesResponseType(typeof(ArchivedMessageSearchResponse[]), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ArchivedMessageSearchResponse), StatusCodes.Status200OK)]
     public async Task<ActionResult> RequestAsync(SearchArchivedMessagesRequest request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
