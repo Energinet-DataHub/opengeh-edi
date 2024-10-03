@@ -27,7 +27,7 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Tests;
 
-[Collection(nameof(IntegrationEventsIntegrationTestCollectionFixture))]
+[Collection(nameof(IntegrationEventsIntegrationTestCollection))]
 public class WhenActorCertificateCredentialsAssignedEventIsReceived : IntegrationEventsTestBase
 {
     public WhenActorCertificateCredentialsAssignedEventIsReceived(IntegrationEventsFixture integrationEventsFixture, ITestOutputHelper testOutputHelper)
@@ -37,7 +37,7 @@ public class WhenActorCertificateCredentialsAssignedEventIsReceived : Integratio
     }
 
     [Fact]
-    public async Task When_received_ActorCertificateCredentialsAssigned_event_and_no_ActorCertificate_exists_creates_new_ActorCertificate_with_correct_values()
+    public async Task Given_ReceivedActorCertificateCredentialsAssignedEvent_When_NoActorCertificateExists_Then_CreatesNewActorCertificateWithCorrectValues()
     {
         // Arrange
         var integrationEvent = new ActorCertificateCredentialsAssignedEventBuilder()
@@ -64,7 +64,7 @@ public class WhenActorCertificateCredentialsAssignedEventIsReceived : Integratio
     }
 
     [Fact]
-    public async Task When_received_ActorCertificateCredentialsAssigned_event_and_ActorCertificate_already_exists_then_ActorCertificate_is_updated_with_correct_values()
+    public async Task Given_ReceivedActorCertificateCredentialsAssignedEvent_When_ActorCertificateAlreadyExists_Then_ActorCertificateIsUpdatedWithCorrectValues()
     {
         // Arrange
         var integrationEvent1 = new ActorCertificateCredentialsAssignedEventBuilder()
@@ -94,7 +94,7 @@ public class WhenActorCertificateCredentialsAssignedEventIsReceived : Integratio
     }
 
     [Fact]
-    public async Task When_received_multiple_ActorCertificateCredentialsAssigned_events_for_4_different_actor_roles_then_4_actor_certificates_exists_in_database()
+    public async Task Given_ReceivedActorCertificateCredentialsAssignedEvent_When_ReceivedMultipleActorCertificateCredentialsAssignedEventsFor4DifferentActorRoles_Then_4ActorCertificatesIsCreated()
     {
         var integrationEventForActorRole1 = new ActorCertificateCredentialsAssignedEventBuilder()
             .SetActorNumber("1111111111111")
@@ -143,7 +143,7 @@ public class WhenActorCertificateCredentialsAssignedEventIsReceived : Integratio
     }
 
     [Fact]
-    public async Task When_received_multiple_ActorCertificateCredentialsAssigned_events_out_of_order_then_highest_sequence_number_is_applied_with_correct_values()
+    public async Task Given_ReceivedActorCertificateCredentialsAssignedEvent_When_EventOutOfOrder_Then_HighestSequenceNumberIsAppliedWithCorrectValues()
     {
         var expectedCertificateThumbprint = "thumbprint-b";
         var expectedSequenceNumber = 4;
