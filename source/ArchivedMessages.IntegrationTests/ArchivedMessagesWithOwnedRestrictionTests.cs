@@ -58,7 +58,7 @@ public class ArchivedMessagesWithOwnedRestrictionTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_ArchivedMessagesInStorage_When_GettingMessageToAnotherActor_Then_GetsNoMessage()
+    public async Task Given_ArchivedMessagesInStorage_When_GettingMessageToAnotherActor_Then_ReturnsNoMessage()
     {
         // Arrange
         var notAuthActor = "9999999999999";
@@ -71,6 +71,38 @@ public class ArchivedMessagesWithOwnedRestrictionTests : IAsyncLifetime
 
         // Assert
         result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task Given_ArchivedMessages_When_GettingMessageWithAuthAsReceiver_Then_ReturnsOwnMessage()
+    {
+        // Arrange
+        var archivedMessage = await _fixture.CreateArchivedMessageAsync(
+            receiverNumber: _authenticatedActor.ActorNumber.Value,
+            receiverRole: _authenticatedActor.ActorRole);
+
+        // Act
+        var result = await _sut.GetAsync(archivedMessage.Id, CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.Stream.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task Given_ArchivedMessages_When_GettingMessageWithAuthAsSender_Then_ReturnsOwnMessage()
+    {
+        // Arrange
+        var archivedMessage = await _fixture.CreateArchivedMessageAsync(
+            senderNumber: _authenticatedActor.ActorNumber.Value,
+            senderRole: _authenticatedActor.ActorRole);
+
+        // Act
+        var result = await _sut.GetAsync(archivedMessage.Id, CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.Stream.Should().NotBeNull();
     }
 
     [Fact]
