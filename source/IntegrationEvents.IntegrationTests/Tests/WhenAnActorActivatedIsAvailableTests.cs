@@ -35,7 +35,7 @@ public class WhenAnActorActivatedIsAvailableTests : IntegrationEventsTestBase
     }
 
     [Fact]
-    public async Task New_actor_event_is_received_stores_actor()
+    public async Task Given_NewActorEvent_When_IsReceived_Then_StoresActor()
     {
         var actorActivatedEvent = ActorActivatedEventBuilder.Build();
 
@@ -46,7 +46,7 @@ public class WhenAnActorActivatedIsAvailableTests : IntegrationEventsTestBase
     }
 
     [Fact]
-    public async Task New_actor_event_is_received_with_existing_actor_does_not_store_second_actor()
+    public async Task Given_NewActorEvent_When_ActorExists_Then_SecondActorIsNotStored()
     {
         var actorActivatedEvent = ActorActivatedEventBuilder.Build();
         await HavingReceivedAndHandledIntegrationEventAsync(ActorActivated.EventName, actorActivatedEvent);

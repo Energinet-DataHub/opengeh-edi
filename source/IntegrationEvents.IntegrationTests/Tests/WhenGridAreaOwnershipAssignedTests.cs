@@ -37,7 +37,7 @@ public class WhenGridAreaOwnershipAssignedTests : IntegrationEventsTestBase
     }
 
     [Fact]
-    public async Task New_grid_area_ownership_assigned_event_is_received_stores_grid_area_owner()
+    public async Task Given_GridAreaOwnershipAssigned_When_IsReceived_Then_StoresGridAreaOwner()
     {
         var gridAreaOwnershipAssignedEvent = _gridAreaOwnershipAssignedEventBuilder.Build();
 

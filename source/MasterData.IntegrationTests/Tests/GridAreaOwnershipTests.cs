@@ -41,7 +41,7 @@ public class GridAreaOwnershipTests : MasterDataTestBase
     }
 
     [Fact]
-    public async Task WhenMultipleGridAreaAssignedDtoIsReceived_ForSameActor_GridAreaOwnerIsUpdatedForTheSameActor()
+    public async Task Given_MultipleGridAreaAssignedIsReceived_When_ActorSameActor_Then_GridAreaOwnerIsUpdatedForTheSameActor()
     {
         var gridAreaOwnershipAssignedEvent01 = _gridAreaOwnershipAssignedDtoBuilder
             .WithGridAreaCode("543")
@@ -58,7 +58,7 @@ public class GridAreaOwnershipTests : MasterDataTestBase
     }
 
     [Fact]
-    public async Task WhenGridAreaAssignedDtoIsReceived_WithValidFromInTheFuture_GridAreaOwnerIsNotUpdated()
+    public async Task Given_MultipleGridAreaAssignedIsReceived_When_ValidFromInTheFuture_Then_GridAreaOwnerIsNotUpdated()
     {
         var futureValidFrom = SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(1));
         var owner = ActorNumber.Create("1234567890123");
@@ -82,7 +82,7 @@ public class GridAreaOwnershipTests : MasterDataTestBase
     }
 
     [Fact]
-    public async Task WhenGridAreaAssignedDtoIsReceived_WithValidFromInThePast_GridAreaOwnerIsUpdated()
+    public async Task Given_MultipleGridAreaAssignedIsReceived_When_ValidFromInThePast_Then_GridAreaOwnerIsUpdated()
     {
         var olderValidFrom = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(1));
         var owner = ActorNumber.Create("1234567890123");
@@ -104,7 +104,7 @@ public class GridAreaOwnershipTests : MasterDataTestBase
     }
 
     [Fact]
-    public async Task WhenGridAreaAssignedDtoIsReceived_WithSameValidFromButDifferentSequenceNumber_GridAreaOwnerIsUpdatedForHighestSequenceNumber()
+    public async Task Given_MultipleGridAreaAssignedIsReceived_When_ValidFromButDifferentSequenceNumber_Then_GridAreaOwnerIsUpdatedForHighestSequenceNumber()
     {
         var owner = ActorNumber.Create("9876543210987");
         var validFrom = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromMinutes(4));
@@ -126,7 +126,7 @@ public class GridAreaOwnershipTests : MasterDataTestBase
     }
 
     [Fact]
-    public async Task WhenGridAreaAssignedDtoIsReceived_WithSameValidFromButDifferentSequenceNumber_GridAreaOwnerIsUpdatedForHighestSequenceNumberInReversedOrder()
+    public async Task Given_MultipleGridAreaAssignedIsReceived_When_ValidFromButDifferentSequenceNumber_Then_GridAreaOwnerIsUpdatedForHighestSequenceNumberInReversedOrder()
     {
         var gridAreaOwner1 = ActorNumber.Create("9876543210987");
         var owner = ActorNumber.Create("1234567890123");
