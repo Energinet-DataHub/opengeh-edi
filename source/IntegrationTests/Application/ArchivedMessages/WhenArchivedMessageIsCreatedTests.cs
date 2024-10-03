@@ -148,7 +148,7 @@ public class WhenArchivedMessageIsCreatedTests : TestBase
             Assert.Fail("We should be able to save multiple messages with the same message id");
         }
 
-        var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(), CancellationToken.None);
+        var result = await _archivedMessagesClient.SearchAsync(new GetMessagesQuery(new SortedCursorBasedPagination()), CancellationToken.None);
 
         Assert.Equal(2, result.Messages.Count);
         Assert.Equal(messageId, result.Messages[0].MessageId);

@@ -12,8 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
+namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
-
-public record MessageSearchResult(ReadOnlyCollection<MessageInfo> Messages, int TotalAmountOfMessages);
+/// <summary>
+/// Pagination when searching for archived messages that supports sorting on a specific field.
+/// </summary>
+[Serializable]
+public record SearchArchivedMessagesPagination(
+    SearchArchivedMessagesCursor? Cursor = null,
+    FieldToSortBy? SortBy = null,
+    DirectionToSortBy? DirectionToSortBy = null,
+    int PageSize = 100,
+    bool NavigationForward = true);

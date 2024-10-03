@@ -12,8 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
-
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
-public record MessageSearchResult(ReadOnlyCollection<MessageInfo> Messages, int TotalAmountOfMessages);
+public readonly struct DirectionToSortBy
+{
+    public static readonly DirectionToSortBy Ascending = new("ASC");
+    public static readonly DirectionToSortBy Descending = new("DESC");
+
+    private DirectionToSortBy(string identifier)
+    {
+        Identifier = identifier;
+    }
+
+    public string Identifier { get; }
+}

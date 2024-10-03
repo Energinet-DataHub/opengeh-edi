@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
+using NodaTime;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
-public record MessageSearchResult(ReadOnlyCollection<MessageInfo> Messages, int TotalAmountOfMessages);
+public record MessageCreationPeriod(Instant DateToSearchFrom, Instant DateToSearchTo);

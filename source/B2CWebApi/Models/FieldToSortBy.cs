@@ -12,8 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
+namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
-
-public record MessageSearchResult(ReadOnlyCollection<MessageInfo> Messages, int TotalAmountOfMessages);
+/// <summary>
+/// Represents the fields that can be sorted on when searching for archived messages.
+/// </summary>
+[Serializable]
+public enum FieldToSortBy
+{
+    MessageId = 0,
+    DocumentType = 1,
+    SenderNumber = 2,
+    ReceiverNumber = 3,
+    CreatedAt = 4,
+}
