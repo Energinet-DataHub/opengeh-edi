@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Data.SqlClient;
 using Azure.Storage.Blobs;
+using Energinet.DataHub.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
@@ -31,23 +31,12 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
     {
         IntegrationTestConfiguration = new IntegrationTestConfiguration();
 
-        DatabaseManager = new EdiDatabaseManager();
+        DatabaseManager = new EdiDatabaseManager("IntegrationTests");
 
         DatabricksSchemaManager = new DatabricksSchemaManager(
             new HttpClientFactory(),
             databricksSettings: IntegrationTestConfiguration.DatabricksSettings,
             schemaPrefix: "edi_integration_tests");
-    }
-
-    public string DatabaseConnectionString
-    {
-        get
-        {
-            var dbConnectionString = DatabaseManager.ConnectionString;
-            if (!dbConnectionString.Contains("Trust")) // Trust Server Certificate might be required for some
-                dbConnectionString = $"{dbConnectionString};Trust Server Certificate=True;";
-            return dbConnectionString;
-        }
     }
 
     public EdiDatabaseManager DatabaseManager { get; set; }
@@ -57,44 +46,6 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
     public IntegrationTestConfiguration IntegrationTestConfiguration { get; }
 
     public DatabricksSchemaManager DatabricksSchemaManager { get; }
-
-    public void CleanupDatabase()
-    {
-        var cleanupStatement =
-            $"DELETE FROM [dbo].[MessageRegistry] " +
-            $"DELETE FROM [dbo].[TransactionRegistry]" +
-            $"DELETE FROM [dbo].[OutgoingMessages] " +
-            $"DELETE FROM [dbo].[QueuedInternalCommands] " +
-            $"DELETE FROM [dbo].[MarketEvaluationPoints]" +
-            $"DELETE FROM [dbo].[Actor]" +
-            $"DELETE FROM [dbo].[ReceivedIntegrationEvents]" +
-            $"DELETE FROM [dbo].[AggregatedMeasureDataProcessGridAreas]" +
-            $"DELETE FROM [dbo].[AggregatedMeasureDataProcesses]" +
-            $"DELETE FROM [dbo].[ArchivedMessages]" +
-            $"DELETE FROM [dbo].[MarketDocuments]" +
-            $"DELETE FROM [dbo].[Bundles]" +
-            $"DELETE FROM [dbo].[ActorMessageQueues]" +
-            $"DELETE FROM [dbo].[ReceivedInboxEvents]" +
-            $"DELETE FROM [dbo].[MessageRegistry]" +
-            $"DELETE FROM [dbo].[TransactionRegistry]" +
-            $"DELETE FROM [dbo].[GridAreaOwner]" +
-            $"DELETE FROM [dbo].[ActorCertificate]" +
-            $"DELETE FROM [dbo].[WholesaleServicesProcessChargeTypes]" +
-            $"DELETE FROM [dbo].[WholesaleServicesProcessGridAreas]" +
-            $"DELETE FROM [dbo].[WholesaleServicesProcesses]" +
-            $"DELETE FROM [dbo].[Outbox]" +
-            $"DELETE FROM [dbo].[ProcessDelegation]";
-
-        using var connection = new SqlConnection(DatabaseManager.ConnectionString);
-        connection.Open();
-
-        using (var command = new SqlCommand(cleanupStatement, connection))
-        {
-            command.ExecuteNonQuery();
-        }
-
-        connection.Close();
-    }
 
     public async Task InitializeAsync()
     {
