@@ -17,10 +17,8 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
 
-public class IntegrationEventsFixture : IDisposable, IAsyncLifetime
+public sealed class IntegrationEventsFixture : IAsyncLifetime
 {
-    private bool _disposed;
-
     public EdiDatabaseManager DatabaseManager { get; set; } = new();
 
     public async Task InitializeAsync()
@@ -30,28 +28,7 @@ public class IntegrationEventsFixture : IDisposable, IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        Dispose();
+        await DatabaseManager.DeleteDatabaseAsync();
         await Task.CompletedTask;
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
-        if (disposing)
-        {
-            DatabaseManager.DeleteDatabase();
-        }
-
-        _disposed = true;
     }
 }
