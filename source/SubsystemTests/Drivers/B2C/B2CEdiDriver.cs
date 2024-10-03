@@ -19,7 +19,6 @@ using NodaTime;
 using NodaTime.Text;
 using Xunit.Abstractions;
 using ArchivedMessageResult = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client.ArchivedMessageResult;
-using ArchivedMessageResultV2 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2.ArchivedMessageResult;
 using SearchArchivedMessagesCriteria = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client.SearchArchivedMessagesCriteria;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
@@ -52,7 +51,7 @@ public sealed class B2CEdiDriver : IDisposable
         return result;
     }
 
-    public async Task<ICollection<ArchivedMessageResultV2>> SearchArchivedMessagesV2Async(SearchArchivedMessagesRequest request)
+    public async Task<ICollection<ArchivedMessageSearchResponse>> SearchArchivedMessagesV2Async(SearchArchivedMessagesRequest request)
     {
         var webApiClient = await CreateWebApiClientV2Async();
 
