@@ -12,8 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
+namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
-
-public record MessageSearchResult(ReadOnlyCollection<MessageInfo> Messages, int TotalAmountOfMessages);
+/// <summary>
+/// Pagination cursor for the search of archived messages.
+/// Pointing to the field being sorted by and the record id.
+/// When navigating forward, the cursor points to the last record of the current page.
+/// and when navigating backward, the cursor points to the first record of the current page.
+/// </summary>
+/// <param name="FieldToSortByValue">is null if dataset is not being sorted</param>
+/// <param name="RecordId"></param>
+[Serializable]
+public record SearchArchivedMessagesCursor(string? FieldToSortByValue, long RecordId);
