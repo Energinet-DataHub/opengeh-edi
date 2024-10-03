@@ -28,7 +28,7 @@ public class EdiDatabaseManager(string name) : SqlServerDatabaseManager<DbContex
         get
         {
             var dbConnectionString = base.ConnectionString;
-            if (!dbConnectionString.Contains("Trust")) // Trust Server Certificate might be required for some
+            if (!dbConnectionString.Contains("Trust")) // Trust Server Certificate is required for some tests
                 dbConnectionString = $"{dbConnectionString};Trust Server Certificate=True;";
             return dbConnectionString;
         }
