@@ -16,10 +16,12 @@ using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
 using SearchArchivedMessagesCriteria = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client.SearchArchivedMessagesCriteria;
+using SearchArchivedMessagesCriteriaV2 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2.SearchArchivedMessagesCriteria;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Dsl;
 
@@ -42,15 +44,15 @@ public class ArchivedMessageDsl
     {
         var archivedMessages = await _b2cEdiDriver.SearchArchivedMessagesAsync(
             new SearchArchivedMessagesCriteria
-            {
-                MessageId = messageId,
-                CreatedDuringPeriod = null,
-                BusinessReasons = null,
-                DocumentTypes = null,
-                ReceiverNumber = null,
-                SenderNumber = null,
-                IncludeRelatedMessages = false,
-            });
+                {
+                    MessageId = messageId,
+                    CreatedDuringPeriod = null,
+                    BusinessReasons = null,
+                    DocumentTypes = null,
+                    ReceiverNumber = null,
+                    SenderNumber = null,
+                    IncludeRelatedMessages = false,
+                });
 
         archivedMessages.Should().NotBeNull();
         var archivedMessage = archivedMessages.Single();
@@ -69,14 +71,40 @@ public class ArchivedMessageDsl
         var outboxCreatedAfter = SystemClock.Instance.GetCurrentInstant();
         await _b2cEdiDriver.SearchArchivedMessagesAsync(
             new SearchArchivedMessagesCriteria
+                {
+                    MessageId = unknownMessageId,
+                    CreatedDuringPeriod = null,
+                    SenderNumber = null,
+                    ReceiverNumber = null,
+                    DocumentTypes = null,
+                    BusinessReasons = null,
+                    IncludeRelatedMessages = false,
+                });
+
+        return (unknownMessageId, outboxCreatedAfter);
+    }
+
+    internal async Task<(string MessageId, Instant CreatedAfter)> PerformArchivedMessageSearchV2(int pageSize)
+    {
+        var unknownMessageId = Guid.NewGuid().ToString();
+        var outboxCreatedAfter = SystemClock.Instance.GetCurrentInstant();
+        await _b2cEdiDriver.SearchArchivedMessagesV2Async(
+            new SearchArchivedMessagesRequest
             {
-                MessageId = unknownMessageId,
-                CreatedDuringPeriod = null,
-                SenderNumber = null,
-                ReceiverNumber = null,
-                DocumentTypes = null,
-                BusinessReasons = null,
-                IncludeRelatedMessages = false,
+                SearchCriteria = new SearchArchivedMessagesCriteriaV2
+                {
+                    MessageId = unknownMessageId,
+                    CreatedDuringPeriod = null,
+                    SenderNumber = null,
+                    ReceiverNumber = null,
+                    DocumentTypes = null,
+                    BusinessReasons = null,
+                    IncludeRelatedMessages = false,
+                },
+                Pagination = new SearchArchivedMessagesPagination
+                {
+                    PageSize = pageSize,
+                },
             });
 
         return (unknownMessageId, outboxCreatedAfter);
