@@ -15,6 +15,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Azure.Storage.Blobs;
+using Energinet.DataHub.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
@@ -24,9 +25,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
-using Energinet.DataHub.EDI.AuditLog.AuditLogClient;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
-using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Database;
 using Energinet.DataHub.EDI.B2BApi.Functions;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
@@ -78,7 +77,7 @@ public class B2BApiAppFixture : IAsyncLifetime
             AzuriteManager.FullConnectionString);
         LogStopwatch(stopwatch, nameof(DurableTaskManager));
 
-        DatabaseManager = new EdiDatabaseManager();
+        DatabaseManager = new EdiDatabaseManager("B2BApiAppTests");
         LogStopwatch(stopwatch, nameof(DatabaseManager));
 
         ServiceBusResourceProvider = new ServiceBusResourceProvider(

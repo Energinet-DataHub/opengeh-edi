@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture.Database;
+using Energinet.DataHub.BuildingBlocks.Tests.Database;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
 
 public sealed class IntegrationEventsFixture : IAsyncLifetime
 {
-    public EdiDatabaseManager DatabaseManager { get; set; } = new();
+    public EdiDatabaseManager DatabaseManager { get; set; } = new("IntegrationEvents.IntegrationTests");
 
     public async Task InitializeAsync()
     {
