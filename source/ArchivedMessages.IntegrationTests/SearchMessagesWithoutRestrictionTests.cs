@@ -482,7 +482,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
         // Assert
         using var assertionScope = new AssertionScope();
         searchForRequest.Messages.Should().HaveCount(3);
-        searchForRequest.TotalAmountOfMessages.Should().Be();
+        searchForRequest.TotalAmountOfMessages.Should().Be(3);
         searchForRequest.Should().BeEquivalentTo(searchForResponse); // Note that they are sorted differently
         searchForRequest.Messages.Select(m => m.Id)
             .Should()
