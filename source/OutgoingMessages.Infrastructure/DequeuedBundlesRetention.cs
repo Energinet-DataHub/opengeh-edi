@@ -117,7 +117,7 @@ public class DequeuedBundlesRetention : IDataRetention
     {
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
-                activity: AuditLogActivity.Deletion,
+                activity: AuditLogActivity.RetentionDeletion,
                 activityOrigin: nameof(ADayHasPassed),
                 activityPayload: payload,
                 affectedEntityType: auditLogEntityType,

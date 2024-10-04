@@ -86,7 +86,7 @@ public class ReceivedIntegrationEventsRetention : IDataRetention
     {
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
-                activity: AuditLogActivity.Deletion,
+                activity: AuditLogActivity.RetentionDeletion,
                 activityOrigin: nameof(ADayHasPassed),
                 activityPayload: monthAgo,
                 affectedEntityType: AuditLogEntityType.ReceivedIntegrationEvent,
