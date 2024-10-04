@@ -905,9 +905,11 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_SecondPageIsRequest_When_NavigatingForwardIsTrueAndSortingOnSenderAndAMessageForADifferentSenderExists_Then_ExpectedMessageAreReturned()
+    public async Task Given_SecondPageIsRequest_When_NavigatingForwardIsTrueAndSortingOnSenderAndAMessageForADifferentSenderExistsWithPeriodSearchCritieria_Then_ExpectedMessageAreReturned()
     {
         // Arrange
+        var expectedPeriodStartedAt = CreatedAt("2023-04-02T22:00:00Z");
+        var expectedPeriodEndedAt = CreatedAt("2023-04-06T22:00:00Z");
         var pageSize = 3;
         var pageNumber = 2;
 
@@ -948,7 +950,8 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
         // Act
         var result = await _sut.SearchAsync(
             new GetMessagesQuery(
-                pagination),
+                pagination,
+                new MessageCreationPeriod(expectedPeriodStartedAt, expectedPeriodEndedAt)),
             CancellationToken.None);
 
         // Assert
