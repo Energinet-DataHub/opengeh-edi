@@ -54,7 +54,17 @@ public static class FunctionContextExtensions
         var httpResponseData = httpRequestData.CreateResponse(HttpStatusCode.Unauthorized);
         var mediaTypeOrNull = GetMediaType(httpRequestData);
 
-        httpResponseData.Headers.Add("Content-Type", $"{mediaTypeOrNull ?? "text/plain"}; charset=utf-8");
+        if (mediaTypeOrNull is null)
+        {
+            httpResponseData.Headers.Add("Content-Type", "text/plain; charset=utf-8");
+        }
+        else
+        {
+            httpResponseData.Headers.Add(
+                "Content-Type",
+                mediaTypeOrNull.Contains("ebix") ? "text/xml; charset=utf-8" : $"{mediaTypeOrNull}; charset=utf-8");
+        }
+
         context.SetHttpResponseData(httpResponseData);
     }
 
