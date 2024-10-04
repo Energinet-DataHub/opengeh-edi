@@ -44,6 +44,10 @@ public class AuditLogger(
         string? affectedEntityKey)
     {
         var currentUser = _auditUserContext.CurrentUser;
+        if (activity.AuthenticatedUserRequired && currentUser == null)
+        {
+            throw new InvalidOperationException("An authenticated user is required to log this activity.");
+        }
 
         var userId = currentUser?.UserId ?? Guid.Empty;
         var actorId = currentUser?.ActorId ?? Guid.Empty;

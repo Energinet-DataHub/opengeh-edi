@@ -41,8 +41,8 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : MasterDataTestBase
         SetupServiceCollection();
         _masterDataClient = Services.GetRequiredService<IMasterDataClient>();
         var authenticatedActor = Services.GetRequiredService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(
-            new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None, ActorRole.DataHubAdministrator));
+        // Retention jobs does not have an authenticated actor, so we need to set it to null.
+        authenticatedActor.SetAuthenticatedActor(null);
     }
 
     [Fact]

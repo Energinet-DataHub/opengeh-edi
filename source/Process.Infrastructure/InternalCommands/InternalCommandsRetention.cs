@@ -84,7 +84,7 @@ public class InternalCommandsRetention : IDataRetention
     {
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
-                activity: AuditLogActivity.Deletion,
+                activity: AuditLogActivity.RetentionDeletion,
                 activityOrigin: nameof(ADayHasPassed),
                 activityPayload: _clock.GetCurrentInstant(),
                 affectedEntityType: AuditLogEntityType.InternalCommand,
