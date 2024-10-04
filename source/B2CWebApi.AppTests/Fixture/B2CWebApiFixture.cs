@@ -14,13 +14,13 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Azure.Storage.Blobs;
+using Energinet.DataHub.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.OpenIdJwt;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ResourceProvider;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
-using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Database;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Xunit;
 using Xunit.Abstractions;
@@ -35,7 +35,7 @@ public class B2CWebApiFixture : IAsyncLifetime
     {
         TestLogger = new TestDiagnosticsLogger();
         IntegrationTestConfiguration = new IntegrationTestConfiguration();
-        DatabaseManager = new EdiDatabaseManager();
+        DatabaseManager = new EdiDatabaseManager("B2CWebApi");
         AzuriteManager = new AzuriteManager();
         OpenIdJwtManager = new OpenIdJwtManager(IntegrationTestConfiguration.B2CSettings);
         ServiceBusResourceProvider = new ServiceBusResourceProvider(

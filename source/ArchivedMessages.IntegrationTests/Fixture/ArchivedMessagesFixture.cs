@@ -15,11 +15,10 @@
 using Azure.Storage.Blobs;
 using Dapper;
 using Energinet.DataHub.BuildingBlocks.Tests;
+using Energinet.DataHub.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture.Database;
-using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Models;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -42,7 +41,7 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
 
     public AzuriteManager AzuriteManager { get; } = new(true);
 
-    public EdiDatabaseManager DatabaseManager { get; set; } = new();
+    public EdiDatabaseManager DatabaseManager { get; set; } = new("ArchivedMessages.IntegrationTests");
 
     public IArchivedMessagesClient ArchivedMessagesClient { get; set; } = null!;
 
