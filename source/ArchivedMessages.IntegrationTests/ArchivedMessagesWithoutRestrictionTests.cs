@@ -29,7 +29,7 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests;
 
 [Collection(nameof(ArchivedMessagesCollection))]
-public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
+public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 {
     private readonly IArchivedMessagesClient _sut;
     private readonly ArchivedMessagesFixture _fixture;
@@ -39,7 +39,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
         Restriction.None,
         ActorRole.MeteredDataAdministrator);
 
-    public SearchMessagesWithoutRestrictionTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
+    public ArchivedMessagesWithoutRestrictionTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
     {
         _fixture = fixture;
 
@@ -75,6 +75,65 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
     public Task DisposeAsync()
     {
         return Task.CompletedTask;
+    }
+
+    [Fact]
+    public async Task Given_ArchivedMessage_When_Creating_Then_MessageIsStoredInDatabaseAndBlob()
+    {
+        // Arrange
+        var archivedMessage = await _fixture.CreateArchivedMessageAsync(
+            archivedMessageType: ArchivedMessageType.IncomingMessage,
+            storeMessage: false);
+
+        var messageCreatedAt = archivedMessage.CreatedAt.ToDateTimeUtc();
+
+        // Since the message is an incoming message, we need the "senderNumber" in the path
+        var expectedBlobPath = $"{archivedMessage.SenderNumber.Value}/"
+                               + $"{messageCreatedAt.Year:0000}/"
+                               + $"{messageCreatedAt.Month:00}/"
+                               + $"{messageCreatedAt.Day:00}/"
+                               + $"{archivedMessage.Id.Value:N}"; // remove dashes from guid
+
+        var expectedBlocReference = new FileStorageReference(
+            category: FileStorageCategory.ArchivedMessage(),
+            path: expectedBlobPath);
+
+        // Act
+        await _sut.CreateAsync(archivedMessage, CancellationToken.None);
+
+        // Assert
+        var dbResult = await _fixture.GetAllMessagesInDatabase();
+
+        var message = dbResult.Single();
+        using var assertionScope = new AssertionScope();
+
+        message.SenderNumber.Should().Be(archivedMessage.SenderNumber.Value);
+        message.SenderRoleCode.Should().Be(archivedMessage.SenderRole.Code);
+        message.ReceiverNumber.Should().Be(archivedMessage.ReceiverNumber.Value);
+        message.ReceiverRoleCode.Should().Be(archivedMessage.ReceiverRole.Code);
+        message.DocumentType.Should().Be(archivedMessage.DocumentType);
+        message.BusinessReason.Should().Be(archivedMessage.BusinessReason);
+        message.MessageId.Should().Be(archivedMessage.MessageId);
+        message.FileStorageReference.Should().Be(expectedBlocReference.Path);
+        message.RelatedToMessageId.Should().BeNull();
+        message.EventIds.Should().BeNull();
+
+        var blobResult = await _fixture.GetMessagesFromBlob(expectedBlocReference);
+        blobResult.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task Given_ArchivedMessagesInStorage_When_GettingMessage_Then_StreamExists()
+    {
+        // Arrange
+        var archivedMessage = await _fixture.CreateArchivedMessageAsync();
+
+        // Act
+        var result = await _sut.GetAsync(archivedMessage.Id, CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.Stream.Should().NotBeNull();
     }
 
     [Fact]
@@ -494,6 +553,9 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
             ]);
     }
 
+    #endregion
+
+    #region pagination
     [Fact]
     public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrue_Then_ExpectedMessagesAreReturned()
     {

@@ -13,14 +13,18 @@
 // limitations under the License.
 
 using Azure.Storage.Blobs;
+using Dapper;
 using Energinet.DataHub.BuildingBlocks.Tests;
 using Energinet.DataHub.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Models;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -163,7 +167,8 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         string? receiverNumber = null,
         ActorRole? receiverRole = null,
         Instant? timestamp = null,
-        MessageId? relatedToMessageId = null)
+        MessageId? relatedToMessageId = null,
+        bool storeMessage = true)
     {
         var documentStream = new MemoryStream();
 
@@ -188,9 +193,31 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
             new ArchivedMessageStream(documentStream),
             relatedToMessageId ?? null);
 
-        await ArchivedMessagesClient.CreateAsync(archivedMessage, CancellationToken.None);
+        if (storeMessage)
+            await ArchivedMessagesClient.CreateAsync(archivedMessage, CancellationToken.None);
 
         return archivedMessage;
+    }
+
+    public async Task<IReadOnlyCollection<ArchivedMessageFromDb>> GetAllMessagesInDatabase()
+    {
+        var connectionFactory = Services.GetService<IDatabaseConnectionFactory>()!;
+        using var connection = await connectionFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+
+        var archivedMessages =
+            await connection.QueryAsync<ArchivedMessageFromDb>(
+                    "SELECT * FROM dbo.[ArchivedMessages]")
+                .ConfigureAwait(false);
+
+        return archivedMessages.ToList().AsReadOnly();
+    }
+
+    public async Task<ArchivedMessageStream> GetMessagesFromBlob(FileStorageReference reference)
+    {
+        var blobClient = Services.GetService<IFileStorageClient>()!;
+
+        var fileStorageFile = await blobClient.DownloadAsync(reference).ConfigureAwait(false);
+        return new ArchivedMessageStream(fileStorageFile);
     }
 
     protected virtual void Dispose(bool disposing)
