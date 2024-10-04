@@ -115,12 +115,12 @@ internal sealed class QueryBuilder
                 : directionToSortBy.Identifier == DirectionToSortBy.Descending.Identifier ? ">" : "<";
         return isForward
             ? $"""
-                  ({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (RecordId < {cursor.RecordId} OR {cursor.RecordId} = 0)) 
-                  OR ({fieldToSortBy.Identifier} {sortingDirection} '{cursor.SortedFieldValue}')
+                  (({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (RecordId < {cursor.RecordId} OR {cursor.RecordId} = 0)) 
+                  OR ({fieldToSortBy.Identifier} {sortingDirection} '{cursor.SortedFieldValue}'))
               """
             : $"""
-                   ({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (RecordId > {cursor.RecordId} OR {cursor.RecordId} = 0)) 
-                   OR ({fieldToSortBy.Identifier} {sortingDirection} '{cursor.SortedFieldValue}') 
+                   (({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (RecordId > {cursor.RecordId} OR {cursor.RecordId} = 0)) 
+                   OR ({fieldToSortBy.Identifier} {sortingDirection} '{cursor.SortedFieldValue}')) 
                """;
     }
 
