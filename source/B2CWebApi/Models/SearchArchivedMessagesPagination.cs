@@ -12,23 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture.Database;
-using Xunit;
+namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
-namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
-
-public sealed class IntegrationEventsFixture : IAsyncLifetime
-{
-    public EdiDatabaseManager DatabaseManager { get; set; } = new();
-
-    public async Task InitializeAsync()
-    {
-        await DatabaseManager.CreateDatabaseAsync();
-    }
-
-    public async Task DisposeAsync()
-    {
-        await DatabaseManager.DeleteDatabaseAsync();
-        await Task.CompletedTask;
-    }
-}
+/// <summary>
+/// Pagination when searching for archived messages that supports sorting on a specific field.
+/// </summary>
+[Serializable]
+public record SearchArchivedMessagesPagination(
+    SearchArchivedMessagesCursor? Cursor = null,
+    FieldToSortBy? SortBy = null,
+    DirectionToSortBy? DirectionToSortBy = null,
+    int PageSize = 100,
+    bool NavigationForward = true);

@@ -14,6 +14,8 @@
 
 using System.Reflection;
 using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture;
+using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
+using Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture;
 using FluentAssertions;
 using Xunit;
 
@@ -35,12 +37,16 @@ public static class MetaTests
         var needsToBeOfForm_Given_xx_When_yy_Then_zz = @"^(((Given)|(AndGiven))_[^_]+_)*When_[^_]+_Then_[^_]+$";
 
         var integrationTestsAssembly = Assembly.GetAssembly(typeof(MetaTests));
-        var archivedMessagesIntegrationAssembly = Assembly.GetAssembly(typeof(ArchivedMessagesFixture));
+        var archivedMessagesIntegrationTestsAssembly = Assembly.GetAssembly(typeof(ArchivedMessagesFixture));
+        var integrationEventsIntegrationTestsAssembly = Assembly.GetAssembly(typeof(IntegrationEventsFixture));
+        var masterDataIntegrationTestsAssembly = Assembly.GetAssembly(typeof(MasterDataFixture));
 
         var allTypes = new[]
         {
             integrationTestsAssembly,
-            archivedMessagesIntegrationAssembly,
+            archivedMessagesIntegrationTestsAssembly,
+            integrationEventsIntegrationTestsAssembly,
+            masterDataIntegrationTestsAssembly,
         }.SelectMany(x => x?.GetTypes()!);
 
         var allTestNames = allTypes.Where(

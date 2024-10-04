@@ -12,23 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture.Database;
-using Xunit;
+namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
-namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
-
-public sealed class IntegrationEventsFixture : IAsyncLifetime
+/// <summary>
+/// Represents the fields that can be sorted on when searching for archived messages.
+/// </summary>
+[Serializable]
+public enum FieldToSortBy
 {
-    public EdiDatabaseManager DatabaseManager { get; set; } = new();
-
-    public async Task InitializeAsync()
-    {
-        await DatabaseManager.CreateDatabaseAsync();
-    }
-
-    public async Task DisposeAsync()
-    {
-        await DatabaseManager.DeleteDatabaseAsync();
-        await Task.CompletedTask;
-    }
+    MessageId = 0,
+    DocumentType = 1,
+    SenderNumber = 2,
+    ReceiverNumber = 3,
+    CreatedAt = 4,
 }

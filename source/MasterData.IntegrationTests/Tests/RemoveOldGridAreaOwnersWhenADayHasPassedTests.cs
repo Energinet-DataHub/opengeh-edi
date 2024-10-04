@@ -46,7 +46,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : MasterDataTestBase
     }
 
     [Fact]
-    public async Task Clean_up_grid_area_owners__has_single_owner()
+    public async Task Given_RetentionCleanUp_When_TwoGridOwnerOnSameArea_Then_RemoveOldest()
     {
         // Arrange
         var actorNumberOfExpectedOwner = ActorNumber.Create("9876543210987");
@@ -77,7 +77,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : MasterDataTestBase
     }
 
     [Fact]
-    public async Task Clean_up_grid_area_owners__does_not_delete_non_expired_grid_owners()
+    public async Task Given_RetentionCleanUp_When_NonExpiredGridOwners_Then_NoGridAreaOwnerIsRemoved()
     {
         // Arrange
         var actorNumberOfExpectedOwner = ActorNumber.Create("9876543210987");
@@ -107,7 +107,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : MasterDataTestBase
     }
 
     [Fact]
-    public async Task Clean_up_grid_area_owners_with_multiple_owners__all_grid_areas_has_owner()
+    public async Task Given_RetentionCleanUp_When_MultipleOwnersOnMulitpleAreas_Then_AllGridAreasHasOneOwner()
     {
         // Arrange
         var gridAreaCode1 = "301";
@@ -151,7 +151,7 @@ public class RemoveOldGridAreaOwnersWhenADayHasPassedTests : MasterDataTestBase
     }
 
     [Fact]
-    public async Task Clean_up_grid_area_owners_is_being_audit_logged()
+    public async Task Given_RetentionCleanUp_When_GridAreaOwnerIsRemoved_Then_AuditLogIsBeingLogged()
     {
         // Arrange
         var gridAreaCode = "303";

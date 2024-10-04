@@ -20,13 +20,13 @@ using Energinet.DataHub.Core.Outbox.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture;
@@ -58,7 +58,13 @@ public class MasterDataTestBase
         var configuration = builder.Build();
 
         services
-            .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
+            .AddB2BAuthentication(new()
+            {
+                ValidateAudience = false,
+                ValidateLifetime = false,
+                ValidateIssuer = false,
+                SignatureValidator = (token, parameters) => new JsonWebToken(token),
+            })
             .AddNodaTimeForApplication()
             .AddBuildingBlocks(configuration)
             .AddDapperConnectionToDatabase(configuration)

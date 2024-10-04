@@ -71,7 +71,7 @@ public class SearchMessagesWithOwnedRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQuery(),
+            new GetMessagesQuery(new SortedCursorBasedPagination()),
             CancellationToken.None);
 
         // Assert
@@ -105,6 +105,7 @@ public class SearchMessagesWithOwnedRestrictionTests : IAsyncLifetime
         // Act
         var result = await _sut.SearchAsync(
             new GetMessagesQuery(
+                new SortedCursorBasedPagination(),
                 MessageId: expectedMessageId,
                 IncludeRelatedMessages: false),
             CancellationToken.None);
@@ -143,6 +144,7 @@ public class SearchMessagesWithOwnedRestrictionTests : IAsyncLifetime
         // This could simulate a search for a message, where the message is a request with two responses
         var searchForRequest = await _sut.SearchAsync(
             new GetMessagesQuery(
+                new SortedCursorBasedPagination(),
                 MessageId: messageWithoutRelation.MessageId,
                 IncludeRelatedMessages: true),
             CancellationToken.None);
@@ -150,6 +152,7 @@ public class SearchMessagesWithOwnedRestrictionTests : IAsyncLifetime
         // This could simulate a search for a message, where the message is a response to a request with two responses
         var searchForResponse = await _sut.SearchAsync(
             new GetMessagesQuery(
+                new SortedCursorBasedPagination(),
                 MessageId: messageWithRelation.MessageId,
                 IncludeRelatedMessages: true),
             CancellationToken.None);

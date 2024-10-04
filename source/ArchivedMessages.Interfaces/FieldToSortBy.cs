@@ -12,23 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture.Database;
-using Xunit;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 
-namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
-
-public sealed class IntegrationEventsFixture : IAsyncLifetime
+public readonly struct FieldToSortBy
 {
-    public EdiDatabaseManager DatabaseManager { get; set; } = new();
+    public static readonly FieldToSortBy MessageId = new("MessageId");
+    public static readonly FieldToSortBy DocumentType = new("DocumentType");
+    public static readonly FieldToSortBy SenderNumber = new("SenderNumber");
+    public static readonly FieldToSortBy ReceiverNumber = new("ReceiverNumber");
+    public static readonly FieldToSortBy CreatedAt = new("CreatedAt");
 
-    public async Task InitializeAsync()
+    private FieldToSortBy(string identifier)
     {
-        await DatabaseManager.CreateDatabaseAsync();
+        Identifier = identifier;
     }
 
-    public async Task DisposeAsync()
-    {
-        await DatabaseManager.DeleteDatabaseAsync();
-        await Task.CompletedTask;
-    }
+    public string Identifier { get; }
 }

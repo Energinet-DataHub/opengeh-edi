@@ -41,6 +41,24 @@ public static class B2CWebApiRequests
         return request;
     }
 
+    public static HttpRequestMessage CreateArchivedMessageSearchV2Request()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMessageSearch?api-version=2")
+        {
+            Content = CreateJsonContent(
+                new SearchArchivedMessagesRequest(
+                    new SearchArchivedMessagesCriteria(
+                        CreatedDuringPeriod: null,
+                        MessageId: null,
+                        SenderNumber: null,
+                        ReceiverNumber: null,
+                        DocumentTypes: null,
+                        BusinessReasons: null),
+                    new SearchArchivedMessagesPagination())),
+        };
+        return request;
+    }
+
     public static HttpRequestMessage CreateOrchestrationsRequest()
     {
         var request = new HttpRequestMessage(HttpMethod.Get, "/Orchestrations?from=2024-09-03T13:37:00");
@@ -55,7 +73,9 @@ public static class B2CWebApiRequests
 
     public static HttpRequestMessage CreateOrchestrationTerminateRequest()
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/Orchestrations/{Guid.NewGuid()}/terminate?reason=\"Reason\"");
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/Orchestrations/{Guid.NewGuid()}/terminate?reason=\"Reason\"");
         return request;
     }
 
