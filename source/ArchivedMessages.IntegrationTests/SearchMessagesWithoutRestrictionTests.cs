@@ -494,7 +494,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrue_Then_ExpectedMessageAreReturned()
+    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrue_Then_ExpectedMessagesAreReturned()
     {
         // Arrange
         var messages = new List<(Instant CreatedAt, string MessageId)>()
@@ -534,7 +534,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_SevenArchivedMessages_When_NavigatingBackwardIsTrue_Then_ExpectedMessageAreReturned()
+    public async Task Given_SevenArchivedMessages_When_NavigatingBackwardIsTrue_Then_ExpectedMessagesAreReturned()
     {
         // Arrange
         var messages = new List<(Instant CreatedAt, string MessageId)>()
@@ -577,7 +577,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
     [InlineData(-8)]
     [InlineData(-1)]
     [InlineData(0)]
-    public Task Given_SevenArchivedMessages_When_PageSizeIsInvalid_Then_ExpectedMessageAreReturned(int pageSize)
+    public Task Given_SevenArchivedMessages_When_PageSizeIsInvalid_Then_ExceptionIsThrown(int pageSize)
     {
         // Arrange
         // Act
@@ -590,7 +590,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrueAndSecondPage_Then_ExpectedMessageAreReturned()
+    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrueAndSecondPage_Then_ExpectedMessagesAreReturned()
     {
         // Arrange
         var pageSize = 2;
@@ -644,10 +644,11 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
             .ToList();
 
         result.Messages.Select(x => x.MessageId).Should().Equal(expectedMessageIds);
+        result.TotalAmountOfMessages.Should().Be(6);
     }
 
     [Fact]
-    public async Task Given_SevenArchivedMessages_When_NavigatingBackwardIsTrueAndSecondPage_Then_ExpectedMessageAreReturned()
+    public async Task Given_SevenArchivedMessages_When_NavigatingBackwardIsTrueAndSecondPage_Then_ExpectedMessagesAreReturned()
     {
         // Arrange
         var pageSize = 2;
@@ -701,11 +702,12 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
             .ToList();
 
         result.Messages.Select(x => x.MessageId).Should().Equal(expectedMessageIds);
+        result.TotalAmountOfMessages.Should().Be(6);
     }
 
     [Theory]
     [MemberData(nameof(GetAllCombinationOfFieldsToSortByAndDirectionsToSortBy))]
-    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrueAndSortByField_Then_ExpectedMessageAreReturned(
+    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrueAndSortByField_Then_ExpectedMessagesAreReturned(
         FieldToSortBy sortedBy,
         DirectionToSortBy sortedDirection)
     {
@@ -786,7 +788,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
     [Theory]
     [MemberData(nameof(GetAllCombinationOfFieldsToSortByAndDirectionsToSortBy))]
     public async Task
-        Given_SevenArchivedMessages_When_NavigatingBackwardIsTrueAndSortByField_Then_ExpectedMessageAreReturned(
+        Given_SevenArchivedMessages_When_NavigatingBackwardIsTrueAndSortByField_Then_ExpectedMessagesAreReturned(
             FieldToSortBy sortedBy,
             DirectionToSortBy sortedDirection)
     {
@@ -902,6 +904,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Assert
         result.Messages.Should().HaveCount(5);
+        result.TotalAmountOfMessages.Should().Be(5);
     }
 
     [Fact]
@@ -956,6 +959,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Assert
         result.Messages.Should().HaveCount(pageNumber);
+        result.TotalAmountOfMessages.Should().Be(5);
     }
 
     #endregion

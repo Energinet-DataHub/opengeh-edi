@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.RegularExpressions;
 using Dapper;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
@@ -99,7 +100,7 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
 
         var sql = $@"
             {input.SqlStatement};
-            SELECT COUNT(*) FROM dbo.[ArchivedMessages]";
+            {input.SqlStatementTotalCount}";
 
         using var multi = await connection.QueryMultipleAsync(sql, input.Parameters).ConfigureAwait(false);
         var archivedMessages = (await multi.ReadAsync<MessageInfo>().ConfigureAwait(false)).ToList();
