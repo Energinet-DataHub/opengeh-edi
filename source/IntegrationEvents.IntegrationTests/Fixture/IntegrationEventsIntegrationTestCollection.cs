@@ -16,8 +16,8 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
 
-[CollectionDefinition(nameof(IntegrationEventsIntegrationTestCollectionFixture))]
-public class IntegrationEventsIntegrationTestCollectionFixture : ICollectionFixture<IntegrationEventsFixture>
+[CollectionDefinition(nameof(IntegrationEventsIntegrationTestCollection))]
+public class IntegrationEventsIntegrationTestCollection : ICollectionFixture<IntegrationEventsFixture>
 {
     // This class has no code, and is never created. Its purpose is simply
     // to be the place to apply [CollectionDefinition] and all the

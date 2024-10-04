@@ -21,11 +21,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Xunit;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
 
-public class IntegrationEventsTestBase
+public class IntegrationEventsTestBase : IAsyncLifetime
 {
     private readonly IntegrationEventsFixture _integrationEventsFixture;
     private readonly ITestOutputHelper _testOutputHelper;
@@ -34,8 +35,6 @@ public class IntegrationEventsTestBase
     {
         _integrationEventsFixture = integrationEventsFixture;
         _testOutputHelper = testOutputHelper;
-
-        CleanupDatabase();
     }
 
     protected ServiceProvider Services { get; private set; } = null!;
@@ -69,8 +68,14 @@ public class IntegrationEventsTestBase
         Services = services.BuildServiceProvider();
     }
 
-    private void CleanupDatabase()
+    public Task InitializeAsync()
     {
         _integrationEventsFixture.DatabaseManager.CleanupDatabase();
+        return Task.CompletedTask;
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 }

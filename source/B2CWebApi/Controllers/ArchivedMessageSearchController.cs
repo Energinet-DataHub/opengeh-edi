@@ -161,6 +161,7 @@ public class ArchivedMessageSearchController : ControllerBase
             Energinet.DataHub.EDI.B2CWebApi.Models.FieldToSortBy.MessageId => FieldToSortBy.MessageId,
             Energinet.DataHub.EDI.B2CWebApi.Models.FieldToSortBy.SenderNumber => FieldToSortBy.SenderNumber,
             Energinet.DataHub.EDI.B2CWebApi.Models.FieldToSortBy.ReceiverNumber => FieldToSortBy.ReceiverNumber,
+            Energinet.DataHub.EDI.B2CWebApi.Models.FieldToSortBy.DocumentType => FieldToSortBy.DocumentType,
             _ => null,
         };
     }

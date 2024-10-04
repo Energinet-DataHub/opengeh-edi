@@ -25,7 +25,7 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Tests;
 
-[Collection(nameof(IntegrationEventsIntegrationTestCollectionFixture))]
+[Collection(nameof(IntegrationEventsIntegrationTestCollection))]
 public class WhenProcessDelegationIsAvailableTests : IntegrationEventsTestBase
 {
     public WhenProcessDelegationIsAvailableTests(IntegrationEventsFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
@@ -35,7 +35,7 @@ public class WhenProcessDelegationIsAvailableTests : IntegrationEventsTestBase
     }
 
     [Fact]
-    public async Task New_process_delegation_event_is_received_stores_delegation()
+    public async Task Given_ProcessDelegationEvent_When_IsReceived_Then_StoresDelegation()
     {
         var processDelegationEvent = ProcessDelegationEventBuilder.Build();
 
