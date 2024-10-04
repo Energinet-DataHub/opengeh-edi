@@ -507,11 +507,11 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
             new(CreatedAt("2023-04-06T22:00:00Z"), Guid.NewGuid().ToString()),
             new(CreatedAt("2023-04-07T22:00:00Z"), Guid.NewGuid().ToString()),
         };
-        foreach (var exceptedMessage in messages.OrderBy(_ => Random.Shared.Next()))
+        foreach (var messageToCreate in messages.OrderBy(_ => Random.Shared.Next()))
         {
             await _fixture.CreateArchivedMessageAsync(
-                timestamp: exceptedMessage.CreatedAt,
-                messageId: exceptedMessage.MessageId);
+                timestamp: messageToCreate.CreatedAt,
+                messageId: messageToCreate.MessageId);
         }
 
         var pagination = new SortedCursorBasedPagination(
@@ -882,11 +882,11 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
             new(CreatedAt("2023-04-06T22:00:00Z"), Guid.NewGuid().ToString()),
             new(CreatedAt("2023-04-07T22:00:00Z"), Guid.NewGuid().ToString()),
         };
-        foreach (var exceptedMessage in messages.OrderBy(_ => Random.Shared.Next()))
+        foreach (var messageToCreate in messages.OrderBy(_ => Random.Shared.Next()))
         {
             await _fixture.CreateArchivedMessageAsync(
-                timestamp: exceptedMessage.CreatedAt,
-                messageId: exceptedMessage.MessageId);
+                timestamp: messageToCreate.CreatedAt,
+                messageId: messageToCreate.MessageId);
         }
 
         var pagination = new SortedCursorBasedPagination(
