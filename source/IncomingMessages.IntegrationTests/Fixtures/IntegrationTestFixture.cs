@@ -43,7 +43,9 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
         get
         {
             var dbConnectionString = DatabaseManager.ConnectionString;
-            if (!dbConnectionString.Contains("Trust")) // Trust Server Certificate might be required for some
+
+            // Trust Server Certificate might be required for some
+            if (!dbConnectionString.Contains("Trust"))
             {
                 dbConnectionString = $"{dbConnectionString};Trust Server Certificate=True;";
             }
@@ -62,30 +64,29 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
 
     public void CleanupDatabase()
     {
-        var cleanupStatement =
-            $"DELETE FROM [dbo].[MessageRegistry] "
-            + $"DELETE FROM [dbo].[TransactionRegistry]"
-            + $"DELETE FROM [dbo].[OutgoingMessages] "
-            + $"DELETE FROM [dbo].[QueuedInternalCommands] "
-            + $"DELETE FROM [dbo].[MarketEvaluationPoints]"
-            + $"DELETE FROM [dbo].[Actor]"
-            + $"DELETE FROM [dbo].[ReceivedIntegrationEvents]"
-            + $"DELETE FROM [dbo].[AggregatedMeasureDataProcessGridAreas]"
-            + $"DELETE FROM [dbo].[AggregatedMeasureDataProcesses]"
-            + $"DELETE FROM [dbo].[ArchivedMessages]"
-            + $"DELETE FROM [dbo].[MarketDocuments]"
-            + $"DELETE FROM [dbo].[Bundles]"
-            + $"DELETE FROM [dbo].[ActorMessageQueues]"
-            + $"DELETE FROM [dbo].[ReceivedInboxEvents]"
-            + $"DELETE FROM [dbo].[MessageRegistry]"
-            + $"DELETE FROM [dbo].[TransactionRegistry]"
-            + $"DELETE FROM [dbo].[GridAreaOwner]"
-            + $"DELETE FROM [dbo].[ActorCertificate]"
-            + $"DELETE FROM [dbo].[WholesaleServicesProcessChargeTypes]"
-            + $"DELETE FROM [dbo].[WholesaleServicesProcessGridAreas]"
-            + $"DELETE FROM [dbo].[WholesaleServicesProcesses]"
-            + $"DELETE FROM [dbo].[Outbox]"
-            + $"DELETE FROM [dbo].[ProcessDelegation]";
+        const string cleanupStatement = $"DELETE FROM [dbo].[MessageRegistry] "
+                                        + $"DELETE FROM [dbo].[TransactionRegistry]"
+                                        + $"DELETE FROM [dbo].[OutgoingMessages] "
+                                        + $"DELETE FROM [dbo].[QueuedInternalCommands] "
+                                        + $"DELETE FROM [dbo].[MarketEvaluationPoints]"
+                                        + $"DELETE FROM [dbo].[Actor]"
+                                        + $"DELETE FROM [dbo].[ReceivedIntegrationEvents]"
+                                        + $"DELETE FROM [dbo].[AggregatedMeasureDataProcessGridAreas]"
+                                        + $"DELETE FROM [dbo].[AggregatedMeasureDataProcesses]"
+                                        + $"DELETE FROM [dbo].[ArchivedMessages]"
+                                        + $"DELETE FROM [dbo].[MarketDocuments]"
+                                        + $"DELETE FROM [dbo].[Bundles]"
+                                        + $"DELETE FROM [dbo].[ActorMessageQueues]"
+                                        + $"DELETE FROM [dbo].[ReceivedInboxEvents]"
+                                        + $"DELETE FROM [dbo].[MessageRegistry]"
+                                        + $"DELETE FROM [dbo].[TransactionRegistry]"
+                                        + $"DELETE FROM [dbo].[GridAreaOwner]"
+                                        + $"DELETE FROM [dbo].[ActorCertificate]"
+                                        + $"DELETE FROM [dbo].[WholesaleServicesProcessChargeTypes]"
+                                        + $"DELETE FROM [dbo].[WholesaleServicesProcessGridAreas]"
+                                        + $"DELETE FROM [dbo].[WholesaleServicesProcesses]"
+                                        + $"DELETE FROM [dbo].[Outbox]"
+                                        + $"DELETE FROM [dbo].[ProcessDelegation]";
 
         using var connection = new SqlConnection(DatabaseManager.ConnectionString);
         connection.Open();
@@ -209,9 +210,8 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
         foreach (var fileStorageCategory in containerCategories)
         {
             var container = blobServiceClient.GetBlobContainerClient(fileStorageCategory.Value);
-            var containerExists = container.Exists();
 
-            if (!containerExists)
+            if (!container.Exists())
             {
                 container.Create();
             }
