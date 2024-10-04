@@ -16,11 +16,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Xml;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
+namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.EventBuilders;
 
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Used only in tests")]
 internal static class RequestWholesaleServicesRequestBuilder
