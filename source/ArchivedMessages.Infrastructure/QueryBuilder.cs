@@ -99,7 +99,7 @@ internal sealed class QueryBuilder
             throw new InvalidRestrictionException($"Invalid restriction for fetching archived messages. Must be either {nameof(Restriction.Owned)} or {nameof(Restriction.None)}. ActorNumber: {_actorIdentity.ActorNumber.Value}; Restriction: {_actorIdentity.Restriction.Name}");
         }
 
-        return new QueryInput(BuildStatement(query), _queryParameters);
+        return new QueryInput(BuildStatement(query), BuildTotalCountStatement(query), _queryParameters);
     }
 
     private static string WherePaginationPosition(FieldToSortBy fieldToSortBy, DirectionToSortBy directionToSortBy, SortingCursor cursor, bool isForward)
@@ -164,6 +164,38 @@ internal sealed class QueryBuilder
         }
 
         sqlStatement += OrderBy(query.Pagination.SortBy, query.Pagination.DirectionToSortBy, query.Pagination.NavigationForward);
+        return sqlStatement;
+    }
+
+    private string BuildTotalCountStatement(GetMessagesQuery query)
+    {
+        var whereClause = _statement.Count > 0 ? $" WHERE {string.Join(" AND ", _statement)} " : string.Empty;
+        string sqlStatement;
+
+        if (query.IncludeRelatedMessages == true && query.MessageId is not null)
+        {
+            // Messages may be related in different ways, hence we have the following 3 cases:
+            // 1. The message is related to other messages (Searching for a request with responses)
+            // 2. The message is related to a message that is related to another message (Searching for a response with a request, where the request has multiple responses)
+            // 3. The message is not related to any other messages
+            // Case 1 and 2 may be solve by joining every request onto a response (t1.RelatedToMessageId = t2.MessageId)
+            // and every response onto another response (t1.RelatedToMessageId = t2.RelatedToMessageId)
+            // Hence, if we were in case 1: Table 2 would consist of all responses to the request and the request itself (containing duplications)
+            // For case 2: Table 2 would consists of the response you searched for, all other responses which has a reference to the same request and the request itself (containing duplications)
+
+            // Case 3 is solved by joining every message onto itself (t1.MessageId = t2.MessageId)
+            // Since table 2 would be empty without it, hence we would not get anything when we do our inner join
+            sqlStatement = $"SELECT Count(DISTINCT t2.RecordId) " +
+                           $"FROM ( SELECT * FROM dbo.ArchivedMessages {whereClause} ) AS t1 " +
+                           "INNER JOIN dbo.ArchivedMessages as t2 " +
+                           "ON t1.RelatedToMessageId = t2.RelatedToMessageId OR t1.RelatedToMessageId = t2.MessageId OR t1.MessageId= t2.MessageId";
+        }
+        else
+        {
+            var selectStatement = $"SELECT Count(*) FROM dbo.ArchivedMessages";
+            sqlStatement = selectStatement + whereClause;
+        }
+
         return sqlStatement;
     }
 

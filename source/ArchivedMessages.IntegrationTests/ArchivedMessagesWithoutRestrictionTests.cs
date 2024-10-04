@@ -541,6 +541,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         // Assert
         using var assertionScope = new AssertionScope();
         searchForRequest.Messages.Should().HaveCount(3);
+        searchForRequest.TotalAmountOfMessages.Should().Be(3);
         searchForRequest.Should().BeEquivalentTo(searchForResponse); // Note that they are sorted differently
         searchForRequest.Messages.Select(m => m.Id)
             .Should()
@@ -556,7 +557,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
     #region pagination
     [Fact]
-    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrue_Then_ExpectedMessageAreReturned()
+    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrue_Then_ExpectedMessagesAreReturned()
     {
         // Arrange
         var messages = new List<(Instant CreatedAt, string MessageId)>()
@@ -569,11 +570,11 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
             new(CreatedAt("2023-04-06T22:00:00Z"), Guid.NewGuid().ToString()),
             new(CreatedAt("2023-04-07T22:00:00Z"), Guid.NewGuid().ToString()),
         };
-        foreach (var exceptedMessage in messages.OrderBy(_ => Random.Shared.Next()))
+        foreach (var messageToCreate in messages.OrderBy(_ => Random.Shared.Next()))
         {
             await _fixture.CreateArchivedMessageAsync(
-                timestamp: exceptedMessage.CreatedAt,
-                messageId: exceptedMessage.MessageId);
+                timestamp: messageToCreate.CreatedAt,
+                messageId: messageToCreate.MessageId);
         }
 
         var pagination = new SortedCursorBasedPagination(
@@ -596,7 +597,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_SevenArchivedMessages_When_NavigatingBackwardIsTrue_Then_ExpectedMessageAreReturned()
+    public async Task Given_SevenArchivedMessages_When_NavigatingBackwardIsTrue_Then_ExpectedMessagesAreReturned()
     {
         // Arrange
         var messages = new List<(Instant CreatedAt, string MessageId)>()
@@ -639,7 +640,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     [InlineData(-8)]
     [InlineData(-1)]
     [InlineData(0)]
-    public Task Given_SevenArchivedMessages_When_PageSizeIsInvalid_Then_ExpectedMessageAreReturned(int pageSize)
+    public Task Given_SevenArchivedMessages_When_PageSizeIsInvalid_Then_ExceptionIsThrown(int pageSize)
     {
         // Arrange
         // Act
@@ -652,7 +653,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrueAndSecondPage_Then_ExpectedMessageAreReturned()
+    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrueAndSecondPage_Then_ExpectedMessagesAreReturned()
     {
         // Arrange
         var pageSize = 2;
@@ -706,10 +707,11 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
             .ToList();
 
         result.Messages.Select(x => x.MessageId).Should().Equal(expectedMessageIds);
+        result.TotalAmountOfMessages.Should().Be(6);
     }
 
     [Fact]
-    public async Task Given_SevenArchivedMessages_When_NavigatingBackwardIsTrueAndSecondPage_Then_ExpectedMessageAreReturned()
+    public async Task Given_SevenArchivedMessages_When_NavigatingBackwardIsTrueAndSecondPage_Then_ExpectedMessagesAreReturned()
     {
         // Arrange
         var pageSize = 2;
@@ -763,11 +765,12 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
             .ToList();
 
         result.Messages.Select(x => x.MessageId).Should().Equal(expectedMessageIds);
+        result.TotalAmountOfMessages.Should().Be(6);
     }
 
     [Theory]
     [MemberData(nameof(GetAllCombinationOfFieldsToSortByAndDirectionsToSortBy))]
-    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrueAndSortByField_Then_ExpectedMessageAreReturned(
+    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrueAndSortByField_Then_ExpectedMessagesAreReturned(
         FieldToSortBy sortedBy,
         DirectionToSortBy sortedDirection)
     {
@@ -848,7 +851,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
     [Theory]
     [MemberData(nameof(GetAllCombinationOfFieldsToSortByAndDirectionsToSortBy))]
     public async Task
-        Given_SevenArchivedMessages_When_NavigatingBackwardIsTrueAndSortByField_Then_ExpectedMessageAreReturned(
+        Given_SevenArchivedMessages_When_NavigatingBackwardIsTrueAndSortByField_Then_ExpectedMessagesAreReturned(
             FieldToSortBy sortedBy,
             DirectionToSortBy sortedDirection)
     {
@@ -942,11 +945,11 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
             new(CreatedAt("2023-04-06T22:00:00Z"), Guid.NewGuid().ToString()),
             new(CreatedAt("2023-04-07T22:00:00Z"), Guid.NewGuid().ToString()),
         };
-        foreach (var exceptedMessage in messages.OrderBy(_ => Random.Shared.Next()))
+        foreach (var messageToCreate in messages.OrderBy(_ => Random.Shared.Next()))
         {
             await _fixture.CreateArchivedMessageAsync(
-                timestamp: exceptedMessage.CreatedAt,
-                messageId: exceptedMessage.MessageId);
+                timestamp: messageToCreate.CreatedAt,
+                messageId: messageToCreate.MessageId);
         }
 
         var pagination = new SortedCursorBasedPagination(
@@ -964,6 +967,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Assert
         result.Messages.Should().HaveCount(5);
+        result.TotalAmountOfMessages.Should().Be(5);
     }
 
     [Fact]
@@ -1018,6 +1022,7 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 
         // Assert
         result.Messages.Should().HaveCount(pageNumber);
+        result.TotalAmountOfMessages.Should().Be(5);
     }
 
     #endregion
