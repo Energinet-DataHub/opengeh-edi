@@ -27,7 +27,7 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Tests;
 
-[Collection(nameof(IntegrationEventsIntegrationTestCollectionFixture))]
+[Collection(nameof(IntegrationEventsIntegrationTestCollection))]
 public class WhenActorCertificateCredentialsRemovedEventIsReceived : IntegrationEventsTestBase
 {
     public WhenActorCertificateCredentialsRemovedEventIsReceived(IntegrationEventsFixture integrationEventsFixture, ITestOutputHelper testOutputHelper)
@@ -37,7 +37,7 @@ public class WhenActorCertificateCredentialsRemovedEventIsReceived : Integration
     }
 
     [Fact]
-    public async Task When_received_ActorCertificateCredentialsRemoved_event_for_existing_ActorCertificate_then_ActorCertificate_is_removed()
+    public async Task Given_ActorCertificateCredentialsRemovedEvent_When_ActorCertificateExists_Then_ActorCertificateIsRemoved()
     {
         // Arrange
         var actorNumberToBeRemoved = "1234567891234568";
@@ -59,7 +59,7 @@ public class WhenActorCertificateCredentialsRemovedEventIsReceived : Integration
     }
 
     [Fact]
-    public async Task When_received_multiple_ActorCertificateCredentialsRemoved_events_for_a_single_existing_ActorCertificate_is_removed_runs_successfully()
+    public async Task Given_ActorCertificateCredentialsRemovedEvent_When_ReceivedMultipleTimesAndASingleActorCertificateExists_Then_OneIsRemovedSuccessfully()
     {
         // Arrange
         var actorNumberToBeRemoved = "1234567891234568";
@@ -85,7 +85,7 @@ public class WhenActorCertificateCredentialsRemovedEventIsReceived : Integration
     }
 
     [Fact]
-    public async Task When_received_ActorCertificateCredentialsRemoved_event_for_not_existing_ActorCertificate_runs_successfully()
+    public async Task Given_ActorCertificateCredentialsRemovedEvent_When_ActorCertificateDoesNotExists_Then_RunsSuccessfully()
     {
         // Arrange
         var existingActorNumber = "1234567891234567";
