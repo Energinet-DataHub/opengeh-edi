@@ -864,6 +864,100 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
             .Equal(orderedMessages.Select(x => x.MessageId), $"Message is sorted by {sortedBy.Identifier} {sortedDirection.Identifier}");
     }
 
+    [Fact]
+    public async Task Given_ArchivedMessages_When_OneIsOlderThenSearchCriteriaAndNavigatingForwardIsTrue_Then_ExpectedAmountOfMessagesAreReturned()
+    {
+        // Arrange
+        var expectedPeriodStartedAt = CreatedAt("2023-04-02T22:00:00Z");
+        var expectedPeriodEndedAt = CreatedAt("2023-04-06T22:00:00Z");
+        var messages = new List<(Instant CreatedAt, string MessageId)>()
+        {
+            new(CreatedAt("2023-04-01T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-02T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-03T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-04T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-05T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-06T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-07T22:00:00Z"), Guid.NewGuid().ToString()),
+        };
+        foreach (var exceptedMessage in messages.OrderBy(_ => Random.Shared.Next()))
+        {
+            await _fixture.CreateArchivedMessageAsync(
+                timestamp: exceptedMessage.CreatedAt,
+                messageId: exceptedMessage.MessageId);
+        }
+
+        var pagination = new SortedCursorBasedPagination(
+            pageSize: 10,
+            navigationForward: true);
+
+        // Act
+        var result = await _sut.SearchAsync(
+            new GetMessagesQuery(
+                pagination,
+                new MessageCreationPeriod(
+                expectedPeriodStartedAt,
+                expectedPeriodEndedAt)),
+            CancellationToken.None);
+
+        // Assert
+        result.Messages.Should().HaveCount(5);
+    }
+
+    [Fact]
+    public async Task Given_SecondPageIsRequest_When_NavigatingForwardIsTrueAndSortingOnSenderAndAMessageForADifferentSenderExistsWithPeriodSearchCritieria_Then_ExpectedMessageAreReturned()
+    {
+        // Arrange
+        var expectedPeriodStartedAt = CreatedAt("2023-04-02T22:00:00Z");
+        var expectedPeriodEndedAt = CreatedAt("2023-04-06T22:00:00Z");
+        var pageSize = 3;
+        var pageNumber = 2;
+
+        var messages = new List<(Instant CreatedAt, string MessageId, string SenderNumber)>()
+        {
+            // page 1 <- the previous page
+            new(CreatedAt("2023-04-06T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345123"),
+            new(CreatedAt("2023-04-05T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345123"), // <- cursor points here
+            new(CreatedAt("2023-04-04T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345123"),
+            // page 2
+            new(CreatedAt("2023-04-03T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345123"),
+            new(CreatedAt("2023-04-02T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345123"),
+            // has a different sender
+            new(CreatedAt("2023-04-01T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345122"),
+        };
+
+        // Create messages in order when they were created at
+        foreach (var messageToCreate in messages.OrderBy(x => x.CreatedAt))
+        {
+            await _fixture.CreateArchivedMessageAsync(
+                timestamp: messageToCreate.CreatedAt,
+                messageId: messageToCreate.MessageId,
+                senderNumber: messageToCreate.SenderNumber);
+        }
+
+        var firstPageMessages = await SkipFirstPage(pageSize, navigatingForward: true, orderByField: FieldToSortBy.SenderNumber);
+        // The cursor points at the last item of the previous page, when navigating backward
+        var lastMessageInOnThePreviousPage = firstPageMessages.Messages.Last();
+        var cursor = new SortingCursor(RecordId: lastMessageInOnThePreviousPage.RecordId, SortedFieldValue: lastMessageInOnThePreviousPage.SenderNumber);
+
+        var pagination = new SortedCursorBasedPagination(
+            cursor: cursor,
+            pageSize: pageSize,
+            navigationForward: true,
+            fieldToSortBy: FieldToSortBy.SenderNumber,
+            directionSortBy: DirectionToSortBy.Descending);
+
+        // Act
+        var result = await _sut.SearchAsync(
+            new GetMessagesQuery(
+                pagination,
+                new MessageCreationPeriod(expectedPeriodStartedAt, expectedPeriodEndedAt)),
+            CancellationToken.None);
+
+        // Assert
+        result.Messages.Should().HaveCount(pageNumber);
+    }
+
     #endregion
 
     private static Instant CreatedAt(string date)
@@ -918,9 +1012,12 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
         return orderedMessages;
     }
 
-    private async Task<MessageSearchResult> SkipFirstPage(int pageSize, bool navigatingForward)
+    private async Task<MessageSearchResult> SkipFirstPage(
+        int pageSize,
+        bool navigatingForward,
+        FieldToSortBy? orderByField = null)
     {
-        var pagination = new SortedCursorBasedPagination(pageSize: pageSize, navigationForward: navigatingForward);
+        var pagination = new SortedCursorBasedPagination(pageSize: pageSize, navigationForward: navigatingForward, fieldToSortBy: orderByField, directionSortBy: DirectionToSortBy.Descending);
         return await _sut.SearchAsync(
             new GetMessagesQuery(pagination),
             CancellationToken.None);
