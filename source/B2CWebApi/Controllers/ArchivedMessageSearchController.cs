@@ -165,6 +165,7 @@ public class ArchivedMessageSearchController : ControllerBase
                 affectedEntityType: AuditLogEntityType.ArchivedMessage,
                 affectedEntityKey: null)
             .ConfigureAwait(false);
+
         var messageCreationPeriod = request.SearchCriteria.CreatedDuringPeriod is not null
             ? new ArchivedMessages.Interfaces.MessageCreationPeriod(
                 request.SearchCriteria.CreatedDuringPeriod.Start.ToInstant(),
