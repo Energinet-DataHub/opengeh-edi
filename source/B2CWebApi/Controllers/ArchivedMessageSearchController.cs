@@ -190,22 +190,22 @@ public class ArchivedMessageSearchController : ControllerBase
             request.SearchCriteria.MessageId,
             request.SearchCriteria.SenderNumber,
             request.SearchCriteria.ReceiverNumber,
-            DocumentTypeMapper.MapDocumentTypes(request.SearchCriteria.DocumentTypes),
+            DocumentTypeMapper.FromDocumentTypes(request.SearchCriteria.DocumentTypes),
             request.SearchCriteria.BusinessReasons,
             request.SearchCriteria.IncludeRelatedMessages);
 
         var result = await _archivedMessagesClient.SearchAsync(query, cancellationToken).ConfigureAwait(false);
 
         var messages = result.Messages.Select(
-            x => new ArchivedMessageResultV2(
+            x => new ArchivedMessageResultV3(
                 x.RecordId,
                 x.Id.ToString(),
                 x.MessageId,
-                x.DocumentType,
+                DocumentTypeMapper.ToDocumentType(x.DocumentType),
                 x.SenderNumber,
                 x.ReceiverNumber,
                 x.CreatedAt.ToDateTimeOffset(),
                 x.BusinessReason));
-        return Ok(new ArchivedMessageSearchResponse(messages, TotalCount: result.TotalAmountOfMessages));
+        return Ok(new ArchivedMessageSearchResponseV3(messages, TotalCount: result.TotalAmountOfMessages));
     }
 }

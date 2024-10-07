@@ -36,7 +36,7 @@ public class DocumentTypeMapperTests
     public void Ensure_all_DocumentTypes(DocumentType documentType)
     {
         // Act
-        var act = () => DocumentTypeMapper.MapDocumentTypes(new[] { documentType });
+        var act = () => DocumentTypeMapper.FromDocumentTypes(new[] { documentType });
 
         // Assert
         var result = act.Should().NotThrow().Subject;
