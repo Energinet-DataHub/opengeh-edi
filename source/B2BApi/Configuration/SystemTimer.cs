@@ -37,7 +37,7 @@ public class SystemTimer
     }
 
     [Function("ADayHasPassed")]
-    public Task ADayHasPassedAsync([TimerTrigger("0 0 0 * * *")] TimerInfo timerTimerInfo, FunctionContext context)
+    public Task ADayHasPassedAsync([TimerTrigger("0 0 12 * * *")] TimerInfo timerTimerInfo, FunctionContext context)
     {
         return _mediator.Publish(new ADayHasPassed(_clock.GetCurrentInstant()));
     }
