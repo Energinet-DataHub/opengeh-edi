@@ -23,6 +23,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.MarketDocuments;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.OutgoingMessages;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
+using Microsoft.ApplicationInsights;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Application.UseCases;
@@ -41,6 +42,7 @@ public class PeekMessage
     private readonly IClock _clock;
     private readonly IBundleRepository _bundleRepository;
     private readonly AuthenticatedActor _actorAuthenticator;
+    private readonly TelemetryClient _telemetryClient;
 
     public PeekMessage(
         IActorMessageQueueRepository actorMessageQueueRepository,
@@ -51,7 +53,8 @@ public class PeekMessage
         IArchivedMessagesClient archivedMessageClient,
         IClock clock,
         IBundleRepository bundleRepository,
-        AuthenticatedActor actorAuthenticator)
+        AuthenticatedActor actorAuthenticator,
+        TelemetryClient telemetryClient)
     {
         _actorMessageQueueRepository = actorMessageQueueRepository;
         _marketDocumentRepository = marketDocumentRepository;
@@ -62,6 +65,7 @@ public class PeekMessage
         _clock = clock;
         _bundleRepository = bundleRepository;
         _actorAuthenticator = actorAuthenticator;
+        _telemetryClient = telemetryClient;
     }
 
     public async Task<PeekResultDto?> PeekAsync(PeekRequestDto request, CancellationToken cancellationToken)
@@ -132,6 +136,9 @@ public class PeekMessage
 
         marketDocument = new MarketDocument(peekResult.BundleId, archivedFile);
         _marketDocumentRepository.Add(marketDocument);
+
+        _telemetryClient.GetMetric(outgoingMessageBundle.DocumentType.ToString())
+            .TrackValue(outgoingMessageBundle.OutgoingMessages.Count);
         return marketDocument;
     }
 
