@@ -15,11 +15,14 @@
 namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
 [Serializable]
-public record ArchivedMessageSearchResponse(
-    IEnumerable<ArchivedMessageResultV2> Messages,
-    int TotalCount);
-
-[Serializable]
-public record ArchivedMessageSearchResponseV3(
-    IEnumerable<ArchivedMessageResultV3> Messages,
-    int TotalCount);
+public enum DocumentType
+{
+    NotifyAggregatedMeasureData = 0,
+    NotifyWholesaleServices = 1,
+    RejectRequestAggregatedMeasureData = 2,
+    RejectRequestWholesaleSettlement = 3,
+    RequestAggregatedMeasureData = 4,
+    B2CRequestAggregatedMeasureData = 5,
+    RequestWholesaleSettlement = 6,
+    B2CRequestWholesaleSettlement = 7,
+}
