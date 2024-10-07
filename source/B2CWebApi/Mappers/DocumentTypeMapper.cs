@@ -45,6 +45,7 @@ public static class DocumentTypeMapper
         {
             return DocumentTypeMappings.First(x => x.Value == documentType).Key;
         }
+
         throw new NotSupportedException($"Document type not supported: {documentType}");
     }
 }
