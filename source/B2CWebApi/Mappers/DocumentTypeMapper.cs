@@ -41,6 +41,10 @@ public static class DocumentTypeMapper
 
     public static Models.DocumentType ToDocumentType(string documentType)
     {
-        return DocumentTypeMappings.FirstOrDefault(x => x.Value == documentType).Key;
+        if (DocumentTypeMappings.ContainsValue(documentType))
+        {
+            return DocumentTypeMappings.First(x => x.Value == documentType).Key;
+        }
+        throw new NotSupportedException($"Document type not supported: {documentType}");
     }
 }
