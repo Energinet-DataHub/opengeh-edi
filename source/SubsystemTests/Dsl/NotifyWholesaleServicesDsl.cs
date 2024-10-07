@@ -38,9 +38,8 @@ internal sealed class NotifyWholesaleServicesDsl
         peekResponse.Content.Headers.ContentType!.MediaType.Should().Be("application/json");
         peekResponse.Content.Headers.ContentType!.CharSet.Should().Be("utf-8");
 
-        dequeueResponse.Content.Headers.ContentType.Should().NotBeNull();
-        dequeueResponse.Content.Headers.ContentType!.MediaType.Should().Be("application/json");
-        dequeueResponse.Content.Headers.ContentType!.CharSet.Should().Be("utf-8");
+        dequeueResponse.Content.Headers.ContentType.Should().BeNull();
+        (await dequeueResponse.Content.ReadAsStringAsync().ConfigureAwait(false)).Should().BeEmpty();
 
         var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
         messageId.Should().NotBeNull();
@@ -54,11 +53,19 @@ internal sealed class NotifyWholesaleServicesDsl
 
     internal async Task ConfirmRejectResultIsAvailable()
     {
-        var (peekResponse, _) = await _ediDriver.PeekMessageAsync().ConfigureAwait(false);
-        var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
-        var contentString = await peekResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var (peekResponse, dequeueResponse) = await _ediDriver.PeekMessageAsync().ConfigureAwait(false);
 
+        peekResponse.Content.Headers.ContentType.Should().NotBeNull();
+        peekResponse.Content.Headers.ContentType!.MediaType.Should().Be("application/json");
+        peekResponse.Content.Headers.ContentType!.CharSet.Should().Be("utf-8");
+
+        dequeueResponse.Content.Headers.ContentType.Should().BeNull();
+        (await dequeueResponse.Content.ReadAsStringAsync().ConfigureAwait(false)).Should().BeEmpty();
+
+        var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
         messageId.Should().NotBeNull();
+
+        var contentString = await peekResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
         contentString.Should().NotBeNull();
         contentString.Should().Contain("RejectRequestWholesaleSettlement_MarketDocument");
     }
