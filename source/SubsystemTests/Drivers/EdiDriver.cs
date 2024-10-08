@@ -170,9 +170,29 @@ internal sealed class EdiDriver
         await _durableClient.WaitForInstanceCompletedAsync(orchestrationInstanceId, TimeSpan.FromMinutes(30));
     }
 
-    internal async Task StopOrchestrationAsync(string orchestrationInstanceId)
+    internal async Task StopOrchestrationForCalculationAsync(Guid calculationId, Instant createdAfter)
     {
-        await _durableClient.TerminateAsync(orchestrationInstanceId, "Stopped by subsystem test");
+        var runningOrchestrationsResult = await _durableClient.ListInstancesAsync(
+            new OrchestrationStatusQueryCondition
+            {
+                RuntimeStatus = [
+                    OrchestrationRuntimeStatus.Pending,
+                    OrchestrationRuntimeStatus.Running,
+                ],
+                ShowInput = true,
+                CreatedTimeFrom = createdAfter.ToDateTimeUtc(),
+            },
+            CancellationToken.None);
+
+        var orchestrationsForCalculation = runningOrchestrationsResult
+            .DurableOrchestrationState
+            .Where(o => o.Input.ToString().Contains(calculationId.ToString()))
+            .ToList();
+
+        foreach (var orchestration in orchestrationsForCalculation)
+            await _durableClient.TerminateAsync(orchestration.InstanceId, "Stopped by subsystem test");
+
+        await Task.CompletedTask;
     }
 
     private static async Task<(Guid MessageId, string Content)> GetRequestWholesaleSettlementContentAsync(

@@ -16,6 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
 using Nito.AsyncEx;
+using NodaTime;
 using Xunit.Abstractions;
 
 using CalculationType = Energinet.DataHub.Wholesale.Contracts.IntegrationEvents.CalculationCompletedV1.Types.CalculationType;
@@ -67,8 +68,12 @@ public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
     [Fact]
     public async Task After_load_test()
     {
+        await _ediDriver.StopOrchestrationForCalculationAsync(
+            calculationId: _fixture.LoadTestCalculationId,
+            createdAfter: SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromHours(1)));
+
+        // TODO: Report dequeued count as metric? Maybe assert that the count is higher than a given baseline.
         var dequeuedMessagesCount = await _ediDatabaseDriver.CountDequeuedMessagesForCalculationAsync(_fixture.LoadTestCalculationId);
-        // TODO: Report dequeued count metric? Maybe assert that the count is higher than a given baseline.
         _logger.WriteLine($"Dequeued messages count: {dequeuedMessagesCount} (CalculationId={_fixture.LoadTestCalculationId})");
     }
 }
