@@ -47,6 +47,9 @@ public class RemoveInternalCommandsWhenADayHasPassedTests : TestBase
             GetService<ILogger<InternalCommandsRetention>>(),
             GetService<IAuditLogger>(),
             GetService<IClock>());
+
+        // Retention jobs does not have an authenticated actor, so we need to set it to null.
+        AuthenticatedActor.SetAuthenticatedActor(null);
     }
 
     [Fact]

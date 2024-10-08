@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.RegularExpressions;
 using Dapper;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
@@ -74,11 +75,25 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
     {
         ArgumentNullException.ThrowIfNull(id);
 
+        var sqlStatement = $"SELECT FileStorageReference FROM dbo.[ArchivedMessages] WHERE Id = @Id";
+        DynamicParameters parameters = new();
+        parameters.Add("Id", id.Value.ToString());
+
+        if (_authenticatedActor.CurrentActorIdentity.Restriction == Restriction.Owned)
+        {
+            sqlStatement += $" AND ("
+                            + $"( ReceiverNumber=@ActorNumber AND ReceiverRoleCode = @ActorRoleCode ) "
+                            + $"OR ( SenderNumber=@ActorNumber AND SenderRoleCode = @ActorRoleCode )"
+                            + $")";
+            parameters.Add("ActorNumber", _authenticatedActor.CurrentActorIdentity.ActorNumber.Value);
+            parameters.Add("ActorRoleCode", _authenticatedActor.CurrentActorIdentity.ActorRole.Code);
+        }
+
         using var connection = await _connectionFactory.GetConnectionAndOpenAsync(cancellationToken).ConfigureAwait(false);
 
         var fileStorageReferenceString = await connection.ExecuteScalarAsync<string>(
-                $"SELECT FileStorageReference FROM dbo.[ArchivedMessages] WHERE Id = @Id",
-                new { Id = id.Value.ToString() })
+                sqlStatement,
+                parameters)
             .ConfigureAwait(false);
 
         if (fileStorageReferenceString == null)
@@ -99,7 +114,7 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
 
         var sql = $@"
             {input.SqlStatement};
-            SELECT COUNT(*) FROM dbo.[ArchivedMessages]";
+            {input.SqlStatementTotalCount}";
 
         using var multi = await connection.QueryMultipleAsync(sql, input.Parameters).ConfigureAwait(false);
         var archivedMessages = (await multi.ReadAsync<MessageInfo>().ConfigureAwait(false)).ToList();

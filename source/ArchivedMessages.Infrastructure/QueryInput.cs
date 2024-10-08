@@ -16,4 +16,4 @@ using Dapper;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Infrastructure;
 
-public record QueryInput(string SqlStatement, DynamicParameters Parameters);
+public record QueryInput(string SqlStatement, string SqlStatementTotalCount, DynamicParameters Parameters);

@@ -72,7 +72,7 @@ public class OutboxRetention(
 
                 await _auditLogger.LogWithCommitAsync(
                         logId: AuditLogId.New(),
-                        activity: AuditLogActivity.Deletion,
+                        activity: AuditLogActivity.RetentionDeletion,
                         activityOrigin: nameof(ADayHasPassed),
                         activityPayload: (OlderThan: oneWeekAgo, DeletedAmount: messagesToDelete.Count),
                         affectedEntityType: AuditLogEntityType.OutboxMessage,

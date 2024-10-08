@@ -29,7 +29,7 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests;
 
 [Collection(nameof(ArchivedMessagesCollection))]
-public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
+public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
 {
     private readonly IArchivedMessagesClient _sut;
     private readonly ArchivedMessagesFixture _fixture;
@@ -39,7 +39,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
         Restriction.None,
         ActorRole.MeteredDataAdministrator);
 
-    public SearchMessagesWithoutRestrictionTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
+    public ArchivedMessagesWithoutRestrictionTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
     {
         _fixture = fixture;
 
@@ -75,6 +75,65 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
     public Task DisposeAsync()
     {
         return Task.CompletedTask;
+    }
+
+    [Fact]
+    public async Task Given_ArchivedMessage_When_Creating_Then_MessageIsStoredInDatabaseAndBlob()
+    {
+        // Arrange
+        var archivedMessage = await _fixture.CreateArchivedMessageAsync(
+            archivedMessageType: ArchivedMessageType.IncomingMessage,
+            storeMessage: false);
+
+        var messageCreatedAt = archivedMessage.CreatedAt.ToDateTimeUtc();
+
+        // Since the message is an incoming message, we need the "senderNumber" in the path
+        var expectedBlobPath = $"{archivedMessage.SenderNumber.Value}/"
+                               + $"{messageCreatedAt.Year:0000}/"
+                               + $"{messageCreatedAt.Month:00}/"
+                               + $"{messageCreatedAt.Day:00}/"
+                               + $"{archivedMessage.Id.Value:N}"; // remove dashes from guid
+
+        var expectedBlocReference = new FileStorageReference(
+            category: FileStorageCategory.ArchivedMessage(),
+            path: expectedBlobPath);
+
+        // Act
+        await _sut.CreateAsync(archivedMessage, CancellationToken.None);
+
+        // Assert
+        var dbResult = await _fixture.GetAllMessagesInDatabase();
+
+        var message = dbResult.Single();
+        using var assertionScope = new AssertionScope();
+
+        message.SenderNumber.Should().Be(archivedMessage.SenderNumber.Value);
+        message.SenderRoleCode.Should().Be(archivedMessage.SenderRole.Code);
+        message.ReceiverNumber.Should().Be(archivedMessage.ReceiverNumber.Value);
+        message.ReceiverRoleCode.Should().Be(archivedMessage.ReceiverRole.Code);
+        message.DocumentType.Should().Be(archivedMessage.DocumentType);
+        message.BusinessReason.Should().Be(archivedMessage.BusinessReason);
+        message.MessageId.Should().Be(archivedMessage.MessageId);
+        message.FileStorageReference.Should().Be(expectedBlocReference.Path);
+        message.RelatedToMessageId.Should().BeNull();
+        message.EventIds.Should().BeNull();
+
+        var blobResult = await _fixture.GetMessagesFromBlob(expectedBlocReference);
+        blobResult.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task Given_ArchivedMessagesInStorage_When_GettingMessage_Then_StreamExists()
+    {
+        // Arrange
+        var archivedMessage = await _fixture.CreateArchivedMessageAsync();
+
+        // Act
+        var result = await _sut.GetAsync(archivedMessage.Id, CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.Stream.Should().NotBeNull();
     }
 
     [Fact]
@@ -482,6 +541,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
         // Assert
         using var assertionScope = new AssertionScope();
         searchForRequest.Messages.Should().HaveCount(3);
+        searchForRequest.TotalAmountOfMessages.Should().Be(3);
         searchForRequest.Should().BeEquivalentTo(searchForResponse); // Note that they are sorted differently
         searchForRequest.Messages.Select(m => m.Id)
             .Should()
@@ -493,8 +553,11 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
             ]);
     }
 
+    #endregion
+
+    #region pagination
     [Fact]
-    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrue_Then_ExpectedMessageAreReturned()
+    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrue_Then_ExpectedMessagesAreReturned()
     {
         // Arrange
         var messages = new List<(Instant CreatedAt, string MessageId)>()
@@ -507,11 +570,11 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
             new(CreatedAt("2023-04-06T22:00:00Z"), Guid.NewGuid().ToString()),
             new(CreatedAt("2023-04-07T22:00:00Z"), Guid.NewGuid().ToString()),
         };
-        foreach (var exceptedMessage in messages.OrderBy(_ => Random.Shared.Next()))
+        foreach (var messageToCreate in messages.OrderBy(_ => Random.Shared.Next()))
         {
             await _fixture.CreateArchivedMessageAsync(
-                timestamp: exceptedMessage.CreatedAt,
-                messageId: exceptedMessage.MessageId);
+                timestamp: messageToCreate.CreatedAt,
+                messageId: messageToCreate.MessageId);
         }
 
         var pagination = new SortedCursorBasedPagination(
@@ -534,7 +597,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_SevenArchivedMessages_When_NavigatingBackwardIsTrue_Then_ExpectedMessageAreReturned()
+    public async Task Given_SevenArchivedMessages_When_NavigatingBackwardIsTrue_Then_ExpectedMessagesAreReturned()
     {
         // Arrange
         var messages = new List<(Instant CreatedAt, string MessageId)>()
@@ -577,7 +640,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
     [InlineData(-8)]
     [InlineData(-1)]
     [InlineData(0)]
-    public Task Given_SevenArchivedMessages_When_PageSizeIsInvalid_Then_ExpectedMessageAreReturned(int pageSize)
+    public Task Given_SevenArchivedMessages_When_PageSizeIsInvalid_Then_ExceptionIsThrown(int pageSize)
     {
         // Arrange
         // Act
@@ -590,7 +653,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrueAndSecondPage_Then_ExpectedMessageAreReturned()
+    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrueAndSecondPage_Then_ExpectedMessagesAreReturned()
     {
         // Arrange
         var pageSize = 2;
@@ -644,10 +707,11 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
             .ToList();
 
         result.Messages.Select(x => x.MessageId).Should().Equal(expectedMessageIds);
+        result.TotalAmountOfMessages.Should().Be(6);
     }
 
     [Fact]
-    public async Task Given_SevenArchivedMessages_When_NavigatingBackwardIsTrueAndSecondPage_Then_ExpectedMessageAreReturned()
+    public async Task Given_SevenArchivedMessages_When_NavigatingBackwardIsTrueAndSecondPage_Then_ExpectedMessagesAreReturned()
     {
         // Arrange
         var pageSize = 2;
@@ -701,11 +765,12 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
             .ToList();
 
         result.Messages.Select(x => x.MessageId).Should().Equal(expectedMessageIds);
+        result.TotalAmountOfMessages.Should().Be(6);
     }
 
     [Theory]
     [MemberData(nameof(GetAllCombinationOfFieldsToSortByAndDirectionsToSortBy))]
-    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrueAndSortByField_Then_ExpectedMessageAreReturned(
+    public async Task Given_SevenArchivedMessages_When_NavigatingForwardIsTrueAndSortByField_Then_ExpectedMessagesAreReturned(
         FieldToSortBy sortedBy,
         DirectionToSortBy sortedDirection)
     {
@@ -786,7 +851,7 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
     [Theory]
     [MemberData(nameof(GetAllCombinationOfFieldsToSortByAndDirectionsToSortBy))]
     public async Task
-        Given_SevenArchivedMessages_When_NavigatingBackwardIsTrueAndSortByField_Then_ExpectedMessageAreReturned(
+        Given_SevenArchivedMessages_When_NavigatingBackwardIsTrueAndSortByField_Then_ExpectedMessagesAreReturned(
             FieldToSortBy sortedBy,
             DirectionToSortBy sortedDirection)
     {
@@ -864,6 +929,102 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
             .Equal(orderedMessages.Select(x => x.MessageId), $"Message is sorted by {sortedBy.Identifier} {sortedDirection.Identifier}");
     }
 
+    [Fact]
+    public async Task Given_ArchivedMessages_When_OneIsOlderThenSearchCriteriaAndNavigatingForwardIsTrue_Then_ExpectedAmountOfMessagesAreReturned()
+    {
+        // Arrange
+        var expectedPeriodStartedAt = CreatedAt("2023-04-02T22:00:00Z");
+        var expectedPeriodEndedAt = CreatedAt("2023-04-06T22:00:00Z");
+        var messages = new List<(Instant CreatedAt, string MessageId)>()
+        {
+            new(CreatedAt("2023-04-01T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-02T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-03T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-04T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-05T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-06T22:00:00Z"), Guid.NewGuid().ToString()),
+            new(CreatedAt("2023-04-07T22:00:00Z"), Guid.NewGuid().ToString()),
+        };
+        foreach (var messageToCreate in messages.OrderBy(_ => Random.Shared.Next()))
+        {
+            await _fixture.CreateArchivedMessageAsync(
+                timestamp: messageToCreate.CreatedAt,
+                messageId: messageToCreate.MessageId);
+        }
+
+        var pagination = new SortedCursorBasedPagination(
+            pageSize: 10,
+            navigationForward: true);
+
+        // Act
+        var result = await _sut.SearchAsync(
+            new GetMessagesQuery(
+                pagination,
+                new MessageCreationPeriod(
+                expectedPeriodStartedAt,
+                expectedPeriodEndedAt)),
+            CancellationToken.None);
+
+        // Assert
+        result.Messages.Should().HaveCount(5);
+        result.TotalAmountOfMessages.Should().Be(5);
+    }
+
+    [Fact]
+    public async Task Given_SecondPageIsRequest_When_NavigatingForwardIsTrueAndSortingOnSenderAndAMessageForADifferentSenderExistsWithPeriodSearchCritieria_Then_ExpectedMessageAreReturned()
+    {
+        // Arrange
+        var expectedPeriodStartedAt = CreatedAt("2023-04-02T22:00:00Z");
+        var expectedPeriodEndedAt = CreatedAt("2023-04-06T22:00:00Z");
+        var pageSize = 3;
+        var pageNumber = 2;
+
+        var messages = new List<(Instant CreatedAt, string MessageId, string SenderNumber)>()
+        {
+            // page 1 <- the previous page
+            new(CreatedAt("2023-04-06T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345123"),
+            new(CreatedAt("2023-04-05T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345123"), // <- cursor points here
+            new(CreatedAt("2023-04-04T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345123"),
+            // page 2
+            new(CreatedAt("2023-04-03T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345123"),
+            new(CreatedAt("2023-04-02T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345123"),
+            // has a different sender
+            new(CreatedAt("2023-04-01T22:00:00Z"), Guid.NewGuid().ToString(), "1234512345122"),
+        };
+
+        // Create messages in order when they were created at
+        foreach (var messageToCreate in messages.OrderBy(x => x.CreatedAt))
+        {
+            await _fixture.CreateArchivedMessageAsync(
+                timestamp: messageToCreate.CreatedAt,
+                messageId: messageToCreate.MessageId,
+                senderNumber: messageToCreate.SenderNumber);
+        }
+
+        var firstPageMessages = await SkipFirstPage(pageSize, navigatingForward: true, orderByField: FieldToSortBy.SenderNumber);
+        // The cursor points at the last item of the previous page, when navigating backward
+        var lastMessageInOnThePreviousPage = firstPageMessages.Messages.Last();
+        var cursor = new SortingCursor(RecordId: lastMessageInOnThePreviousPage.RecordId, SortedFieldValue: lastMessageInOnThePreviousPage.SenderNumber);
+
+        var pagination = new SortedCursorBasedPagination(
+            cursor: cursor,
+            pageSize: pageSize,
+            navigationForward: true,
+            fieldToSortBy: FieldToSortBy.SenderNumber,
+            directionSortBy: DirectionToSortBy.Descending);
+
+        // Act
+        var result = await _sut.SearchAsync(
+            new GetMessagesQuery(
+                pagination,
+                new MessageCreationPeriod(expectedPeriodStartedAt, expectedPeriodEndedAt)),
+            CancellationToken.None);
+
+        // Assert
+        result.Messages.Should().HaveCount(pageNumber);
+        result.TotalAmountOfMessages.Should().Be(5);
+    }
+
     #endregion
 
     private static Instant CreatedAt(string date)
@@ -918,9 +1079,12 @@ public class SearchMessagesWithoutRestrictionTests : IAsyncLifetime
         return orderedMessages;
     }
 
-    private async Task<MessageSearchResult> SkipFirstPage(int pageSize, bool navigatingForward)
+    private async Task<MessageSearchResult> SkipFirstPage(
+        int pageSize,
+        bool navigatingForward,
+        FieldToSortBy? orderByField = null)
     {
-        var pagination = new SortedCursorBasedPagination(pageSize: pageSize, navigationForward: navigatingForward);
+        var pagination = new SortedCursorBasedPagination(pageSize: pageSize, navigationForward: navigatingForward, fieldToSortBy: orderByField, directionSortBy: DirectionToSortBy.Descending);
         return await _sut.SearchAsync(
             new GetMessagesQuery(pagination),
             CancellationToken.None);

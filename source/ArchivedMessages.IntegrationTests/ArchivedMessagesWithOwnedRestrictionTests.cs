@@ -25,7 +25,7 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests;
 
 [Collection(nameof(ArchivedMessagesCollection))]
-public class SearchMessagesWithOwnedRestrictionTests : IAsyncLifetime
+public class ArchivedMessagesWithOwnedRestrictionTests : IAsyncLifetime
 {
     private readonly IArchivedMessagesClient _sut;
     private readonly ArchivedMessagesFixture _fixture;
@@ -35,7 +35,7 @@ public class SearchMessagesWithOwnedRestrictionTests : IAsyncLifetime
         Restriction.Owned,
         ActorRole.EnergySupplier);
 
-    public SearchMessagesWithOwnedRestrictionTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
+    public ArchivedMessagesWithOwnedRestrictionTests(ArchivedMessagesFixture fixture, ITestOutputHelper testOutputHelper)
     {
         _fixture = fixture;
 
@@ -55,6 +55,54 @@ public class SearchMessagesWithOwnedRestrictionTests : IAsyncLifetime
     public Task DisposeAsync()
     {
         return Task.CompletedTask;
+    }
+
+    [Fact]
+    public async Task Given_ArchivedMessagesInStorage_When_GettingMessageToAnotherActor_Then_ReturnsNoMessage()
+    {
+        // Arrange
+        var notAuthActor = "9999999999999";
+        var archivedMessage = await _fixture.CreateArchivedMessageAsync(
+            receiverNumber: notAuthActor,
+            senderNumber: notAuthActor);
+
+        // Act
+        var result = await _sut.GetAsync(archivedMessage.Id, CancellationToken.None);
+
+        // Assert
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task Given_ArchivedMessages_When_GettingMessageWithAuthActorAsReceiver_Then_ReturnsOwnMessage()
+    {
+        // Arrange
+        var archivedMessage = await _fixture.CreateArchivedMessageAsync(
+            receiverNumber: _authenticatedActor.ActorNumber.Value,
+            receiverRole: _authenticatedActor.ActorRole);
+
+        // Act
+        var result = await _sut.GetAsync(archivedMessage.Id, CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.Stream.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task Given_ArchivedMessages_When_GettingMessageWithAuthActorAsSender_Then_ReturnsOwnMessage()
+    {
+        // Arrange
+        var archivedMessage = await _fixture.CreateArchivedMessageAsync(
+            senderNumber: _authenticatedActor.ActorNumber.Value,
+            senderRole: _authenticatedActor.ActorRole);
+
+        // Act
+        var result = await _sut.GetAsync(archivedMessage.Id, CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.Stream.Should().NotBeNull();
     }
 
     [Fact]

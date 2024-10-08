@@ -24,17 +24,21 @@ public class AuditUserContext(AuthenticatedActor authenticatedActor) : IAuditUse
     {
         get
         {
-            var currentActor = authenticatedActor.CurrentActorIdentity;
+            if (!authenticatedActor.TryGetCurrentActorIdentity(out var currentActor))
+            {
+                // In some cases, we don't have an authenticated actor, e.g. when we are running in a background service like retention jobs.
+                return null;
+            }
 
-            var actorRoles = currentActor.ActorRole is not null
+            var actorRoles = currentActor?.ActorRole is not null
                 ? new List<ActorRole> { currentActor.ActorRole }.AsReadOnly()
                 : null;
             return new AuditUser(
                 null,
                 null,
-                currentActor.ActorNumber,
+                currentActor?.ActorNumber,
                 actorRoles,
-                currentActor.ActorRole?.Name);
+                currentActor?.ActorRole?.Name);
         }
     }
 }

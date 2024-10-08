@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.BuildingBlocks.Tests.Database;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
@@ -20,7 +21,7 @@ public class AuditLogTestFixture : IAsyncLifetime
 {
     public AuditLogTestFixture()
     {
-        DatabaseManager = new EdiDatabaseManager();
+        DatabaseManager = new EdiDatabaseManager("AuditLogTests");
         AuditLogMockServer = new AuditLogMockServer();
     }
 

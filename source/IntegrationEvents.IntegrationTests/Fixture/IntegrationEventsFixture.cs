@@ -12,16 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture.Database;
+using Energinet.DataHub.BuildingBlocks.Tests.Database;
 using Xunit;
 
 namespace Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
 
-public class IntegrationEventsFixture : IDisposable, IAsyncLifetime
+public sealed class IntegrationEventsFixture : IAsyncLifetime
 {
-    private bool _disposed;
-
-    public EdiDatabaseManager DatabaseManager { get; set; } = new();
+    public EdiDatabaseManager DatabaseManager { get; set; } = new("IntegrationEvents.IntegrationTests");
 
     public async Task InitializeAsync()
     {
@@ -30,28 +28,7 @@ public class IntegrationEventsFixture : IDisposable, IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        Dispose();
+        await DatabaseManager.DeleteDatabaseAsync();
         await Task.CompletedTask;
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
-        if (disposing)
-        {
-            DatabaseManager.DeleteDatabase();
-        }
-
-        _disposed = true;
     }
 }

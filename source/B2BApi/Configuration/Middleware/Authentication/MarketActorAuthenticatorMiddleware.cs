@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.DependencyInjection;

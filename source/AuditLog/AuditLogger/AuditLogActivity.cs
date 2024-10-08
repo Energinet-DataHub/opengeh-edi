@@ -17,7 +17,7 @@ namespace Energinet.DataHub.EDI.AuditLog.AuditLogger;
 /// <summary>
 /// An activity which an audit log entry is related to, describing the activity (an action, event etc.) that is being logged.
 /// </summary>
-public record AuditLogActivity(string Identifier)
+public record AuditLogActivity(string Identifier, bool AuthenticatedUserRequired = true)
 {
     public static readonly AuditLogActivity RequestEnergyResults = new("RequestEnergyResults");
     public static readonly AuditLogActivity RequestWholesaleResults = new("RequestWholesaleResults");
@@ -33,5 +33,5 @@ public record AuditLogActivity(string Identifier)
     public static readonly AuditLogActivity Dequeue = new("Dequeue");
     public static readonly AuditLogActivity Peek = new("Peek");
 
-    public static readonly AuditLogActivity Deletion = new("Deletion");
+    public static readonly AuditLogActivity RetentionDeletion = new("RetentionDeletion", AuthenticatedUserRequired: false);
 }

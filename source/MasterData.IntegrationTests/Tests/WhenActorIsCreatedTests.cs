@@ -42,7 +42,7 @@ public class WhenActorIsCreatedTests : MasterDataTestBase
     private static string ExternalId => Guid.Parse("9222905B-8B02-4D8B-A2C1-3BD51B1AD8D9").ToString();
 
     [Fact]
-    public async Task Actor_is_created()
+    public async Task Given_ActorIsCreated_When_ActorDoesNotExists_Then_ActorIsCreated()
     {
         var createActorDto = CreateDto();
 
@@ -56,7 +56,7 @@ public class WhenActorIsCreatedTests : MasterDataTestBase
     }
 
     [Fact]
-    public async Task Actor_is_not_created_multiple_times()
+    public async Task Given_ActorIsCreated_When_ActorAlreadyExists_Then_IsNotCreatedMultipleTimes()
     {
         var createActorDto1 = CreateDto();
         var createActorDto2 = CreateDto();
