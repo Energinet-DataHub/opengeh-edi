@@ -19,6 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
@@ -28,6 +29,7 @@ using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
 using Google.Protobuf;
+using Microsoft.ApplicationInsights;
 using NodaTime;
 using NodaTime.Serialization.Protobuf;
 using NodaTime.Text;
@@ -92,6 +94,8 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSeries => timeSeries.CalculationResultVersion, 1)
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSeries => timeSeries.OriginalTransactionIdReference, process.BusinessTransactionId)
             .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSeries => timeSeries.SettlementVersion, BuildingBlocks.Domain.Models.SettlementVersion.ThirdCorrection.Name);
+
+        var telemetryChannel = GetService<TelemetryClient>().TelemetryConfiguration.TelemetryChannel;
     }
 
     [Fact]

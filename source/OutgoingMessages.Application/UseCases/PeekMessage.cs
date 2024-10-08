@@ -137,8 +137,10 @@ public class PeekMessage
         marketDocument = new MarketDocument(peekResult.BundleId, archivedFile);
         _marketDocumentRepository.Add(marketDocument);
 
-        _telemetryClient.GetMetric(outgoingMessageBundle.DocumentType.ToString())
+        _telemetryClient.GetMetric(
+                outgoingMessageBundle.DocumentType.ToString() + request.DocumentFormat)
             .TrackValue(outgoingMessageBundle.OutgoingMessages.Count);
+
         return marketDocument;
     }
 
