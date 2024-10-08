@@ -63,4 +63,11 @@ public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
             CalculationType.WholesaleFixing,
             _fixture.LoadTestCalculationId);
     }
+
+    [Fact]
+    public async Task After_load_test()
+    {
+        var dequeuedMessagesCount = await _ediDatabaseDriver.CountDequeuedMessagesForCalculationAsync(_fixture.LoadTestCalculationId);
+        _logger.WriteLine($"Dequeued messages count: {dequeuedMessagesCount} (CalculationId={_fixture.LoadTestCalculationId})");
+    }
 }

@@ -244,11 +244,11 @@ internal sealed class EdiDatabaseDriver
         return (false, null);
     }
 
-    internal async Task<int> CountDequeuedMessagesForCalculationAsync(Guid calculationId, CancellationToken cancellationToken)
+    internal async Task<int> CountDequeuedMessagesForCalculationAsync(Guid calculationId)
     {
         await using var connection = new SqlConnection(_connectionString);
 
-        await connection.OpenAsync(cancellationToken);
+        await connection.OpenAsync();
 
         var dequeuedMessagesCount = await connection.ExecuteScalarAsync<int>(
             sql: @"SELECT COUNT(B.[Id]) FROM [Bundles] B
