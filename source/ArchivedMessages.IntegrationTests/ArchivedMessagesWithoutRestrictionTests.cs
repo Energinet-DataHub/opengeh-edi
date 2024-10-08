@@ -154,9 +154,13 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         message.SenderNumber.Should()
             .Be(archivedMessage.SenderNumber.Value)
             .And.NotBe(_authenticatedActor.ActorNumber.Value);
+        message.SenderRoleCode.Should()
+            .Be(archivedMessage.SenderRole.Code);
         message.ReceiverNumber.Should()
             .Be(archivedMessage.ReceiverNumber.Value)
             .And.NotBe(_authenticatedActor.ActorNumber.Value);
+        message.ReceiverRoleCode.Should()
+            .Be(archivedMessage.ReceiverRole.Code);
         message.DocumentType.Should().Be(archivedMessage.DocumentType);
         message.BusinessReason.Should().Be(archivedMessage.BusinessReason);
         message.CreatedAt.Should().Be(archivedMessage.CreatedAt);

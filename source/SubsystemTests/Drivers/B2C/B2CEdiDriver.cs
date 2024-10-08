@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV3;
 using Nito.AsyncEx;
 using NodaTime;
 using NodaTime.Text;
@@ -56,6 +57,15 @@ public sealed class B2CEdiDriver : IDisposable
         var webApiClient = await CreateWebApiClientV2Async();
 
         var result = await webApiClient.ArchivedMessageSearchAsync(api_version: "2.0", body: request);
+
+        return result;
+    }
+
+    public async Task<ArchivedMessageSearchResponseV3> SearchArchivedMessagesV3Async(SearchArchivedMessagesRequestV3 request)
+    {
+        var webApiClient = await CreateWebApiClientV3Async();
+
+        var result = await webApiClient.ArchivedMessageSearchAsync(api_version: "3.0", body: request);
 
         return result;
     }
@@ -106,5 +116,12 @@ public sealed class B2CEdiDriver : IDisposable
         var httpClient = await _httpClient;
 
         return new B2CEdiClientV2(_b2cWebApiUri.AbsoluteUri, httpClient);
+    }
+
+    private async Task<B2CEdiClientV3> CreateWebApiClientV3Async()
+    {
+        var httpClient = await _httpClient;
+
+        return new B2CEdiClientV3(_b2cWebApiUri.AbsoluteUri, httpClient);
     }
 }
