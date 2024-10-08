@@ -152,14 +152,14 @@ internal sealed class QueryBuilder
 
             // Case 3 is solved by joining every message onto itself (t1.MessageId = t2.MessageId)
             // Since table 2 would be empty without it, hence we would not get anything when we do our inner join
-            sqlStatement = $"SELECT DISTINCT TOP ({query.Pagination.PageSize}) t2.RecordId, t2.Id, t2.MessageId, t2.DocumentType, t2.SenderNumber, t2.ReceiverNumber, t2.CreatedAt, t2.BusinessReason " +
+            sqlStatement = $"SELECT DISTINCT TOP ({query.Pagination.PageSize}) t2.RecordId, t2.Id, t2.MessageId, t2.DocumentType, t2.SenderNumber, t2.SenderRoleCode, t2.ReceiverNumber, t2.ReceiverRoleCode, t2.CreatedAt, t2.BusinessReason " +
                            $"FROM ( SELECT * FROM dbo.ArchivedMessages {whereClause} ) AS t1 " +
                            "INNER JOIN dbo.ArchivedMessages as t2 " +
                            "ON t1.RelatedToMessageId = t2.RelatedToMessageId OR t1.RelatedToMessageId = t2.MessageId OR t1.MessageId= t2.MessageId";
         }
         else
         {
-            var selectStatement = $"SELECT TOP ({query.Pagination.PageSize}) RecordId, Id, MessageId, DocumentType, SenderNumber, ReceiverNumber, CreatedAt, BusinessReason FROM dbo.ArchivedMessages";
+            var selectStatement = $"SELECT TOP ({query.Pagination.PageSize}) RecordId, Id, MessageId, DocumentType, SenderNumber, SenderRoleCode, ReceiverNumber, ReceiverRoleCode, CreatedAt, BusinessReason FROM dbo.ArchivedMessages";
             sqlStatement = selectStatement + whereClause;
         }
 

@@ -204,7 +204,9 @@ public class ArchivedMessageSearchController : ControllerBase
                 x.MessageId,
                 DocumentTypeMapper.ToDocumentType(x.DocumentType),
                 x.SenderNumber,
+                x.SenderRoleCode,
                 x.ReceiverNumber,
+                x.ReceiverRoleCode,
                 x.CreatedAt.ToDateTimeOffset(),
                 x.BusinessReason));
         return Ok(new ArchivedMessageSearchResponseV3(messages, TotalCount: result.TotalAmountOfMessages));

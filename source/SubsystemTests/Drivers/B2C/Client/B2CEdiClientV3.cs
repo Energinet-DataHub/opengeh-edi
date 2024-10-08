@@ -307,8 +307,14 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV3
         [Newtonsoft.Json.JsonProperty("senderNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string SenderNumber { get; set; }
 
+        [Newtonsoft.Json.JsonProperty("senderRoleCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SenderRoleCode { get; set; }
+
         [Newtonsoft.Json.JsonProperty("receiverNumber", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string ReceiverNumber { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("receiverRoleCode", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string ReceiverRoleCode { get; set; }
 
         [Newtonsoft.Json.JsonProperty("createdAt", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.DateTimeOffset CreatedAt { get; set; }
