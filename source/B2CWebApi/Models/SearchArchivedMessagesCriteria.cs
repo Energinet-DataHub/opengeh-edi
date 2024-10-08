@@ -23,3 +23,13 @@ public record SearchArchivedMessagesCriteria(
     IReadOnlyCollection<string>? DocumentTypes,
     IReadOnlyCollection<string>? BusinessReasons,
     bool IncludeRelatedMessages = false);
+
+[Serializable]
+public record SearchArchivedMessagesCriteriaV3(
+    MessageCreationPeriod? CreatedDuringPeriod,
+    string? MessageId,
+    string? SenderNumber,
+    string? ReceiverNumber,
+    IReadOnlyCollection<DocumentType>? DocumentTypes,
+    IReadOnlyCollection<string>? BusinessReasons,
+    bool IncludeRelatedMessages = false);

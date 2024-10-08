@@ -36,6 +36,20 @@
 
         <Exec WorkingDirectory="$(ProjectDir)" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net60) run Drivers/B2C/Client/nswagV2.json /variables:Configuration=$(Configuration)" Condition="$(SwaggerConfigurationIsNewer) &gt; 0" />
     </Target>
+    <!-- Build EDI B2C V3 Client using nswag (the same client the BFF uses) -->
+    <Target Name="NSwagV3" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' == 'Debug' ">
+        <PropertyGroup>
+            <SwaggerConfiguration>Drivers\B2C\Client\swaggerV3.json</SwaggerConfiguration>
+            <B2CEdiClientV3>Drivers\B2C\Client\B2CEdiClientV3.cs</B2CEdiClientV3>
+        </PropertyGroup>
+
+        <PropertyGroup>
+            <!-- True if the swagger.json file was updated after the generated client -->
+            <SwaggerConfigurationIsNewer>$([MSBuild]::Subtract($([System.IO.File]::GetLastWriteTime('$(SwaggerConfiguration)').Ticks), $([System.IO.File]::GetLastWriteTime('$(B2CEdiClientV3)').Ticks)))</SwaggerConfigurationIsNewer>
+        </PropertyGroup>
+
+        <Exec WorkingDirectory="$(ProjectDir)" EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net60) run Drivers/B2C/Client/nswagV3.json /variables:Configuration=$(Configuration)" Condition="$(SwaggerConfigurationIsNewer) &gt; 0" />
+    </Target>
     
     <ItemGroup>
       <None Remove="Messages\json\RequestAggregatedMeasureDataBalanceResponsible.json" />
