@@ -76,7 +76,7 @@ public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
         var dequeuedMessagesCount = await _ediDatabaseDriver.CountDequeuedMessagesForCalculationAsync(_fixture.LoadTestCalculationId);
         _logger.WriteLine($"Dequeued messages count: {dequeuedMessagesCount} (CalculationId={_fixture.LoadTestCalculationId})");
 
-        dequeuedMessagesCount.Should().BeGreaterThan(
+        dequeuedMessagesCount.Should().BeGreaterThanOrEqualTo(
             _fixture.MinimumDequeuedMessagesCount,
             $"because the system should be performant enough to dequeue at least {_fixture.MinimumDequeuedMessagesCount} messages during the load test");
     }
