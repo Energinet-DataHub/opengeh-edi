@@ -114,7 +114,13 @@
           "senderNumber": {
             "type": "string"
           },
+          "senderRoleCode": {
+            "type": "string"
+          },
           "receiverNumber": {
+            "type": "string"
+          },
+          "receiverRoleCode": {
             "type": "string"
           },
           "createdAt": {
