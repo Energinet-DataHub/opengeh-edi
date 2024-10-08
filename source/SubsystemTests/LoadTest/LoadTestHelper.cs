@@ -68,6 +68,7 @@ public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
     public async Task After_load_test()
     {
         var dequeuedMessagesCount = await _ediDatabaseDriver.CountDequeuedMessagesForCalculationAsync(_fixture.LoadTestCalculationId);
+        // TODO: Report dequeued count metric? Maybe assert that the count is higher than a given baseline.
         _logger.WriteLine($"Dequeued messages count: {dequeuedMessagesCount} (CalculationId={_fixture.LoadTestCalculationId})");
     }
 }
