@@ -58,6 +58,8 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Google.Protobuf;
 using MediatR;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
@@ -488,6 +490,12 @@ public class BehavioursTestBase : IDisposable
         // - Building blocks
         _services.AddSingleton<IAzureClientFactory<ServiceBusSender>>(_serviceBusSenderFactoryStub);
         _services.AddTransient<IFeatureFlagManager>(_ => new FeatureFlagManagerStub());
+
+        _services.AddSingleton<TelemetryClient>(x =>
+        {
+            return new TelemetryClient(
+                new TelemetryConfiguration { TelemetryChannel = new TelemetryChannelStub(), });
+        });
 
         // Add test logger
         _services.AddSingleton<ITestOutputHelper>(sp => testOutputHelper);
