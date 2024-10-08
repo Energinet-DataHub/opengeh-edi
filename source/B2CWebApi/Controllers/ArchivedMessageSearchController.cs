@@ -70,7 +70,9 @@ public class ArchivedMessageSearchController : ControllerBase
             messageCreationPeriod,
             request.MessageId,
             request.SenderNumber,
+            null,
             request.ReceiverNumber,
+            null,
             request.DocumentTypes,
             request.BusinessReasons,
             request.IncludeRelatedMessages);
@@ -128,7 +130,9 @@ public class ArchivedMessageSearchController : ControllerBase
             messageCreationPeriod,
             request.SearchCriteria.MessageId,
             request.SearchCriteria.SenderNumber,
+            null,
             request.SearchCriteria.ReceiverNumber,
+            null,
             request.SearchCriteria.DocumentTypes,
             request.SearchCriteria.BusinessReasons,
             request.SearchCriteria.IncludeRelatedMessages);
@@ -190,7 +194,9 @@ public class ArchivedMessageSearchController : ControllerBase
             messageCreationPeriod,
             request.SearchCriteria.MessageId,
             request.SearchCriteria.SenderNumber,
+            request.SearchCriteria.SenderRoleCode,
             request.SearchCriteria.ReceiverNumber,
+            request.SearchCriteria.ReceiverRoleCode,
             DocumentTypeMapper.FromDocumentTypes(request.SearchCriteria.DocumentTypes),
             request.SearchCriteria.BusinessReasons,
             request.SearchCriteria.IncludeRelatedMessages);
