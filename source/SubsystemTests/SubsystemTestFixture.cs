@@ -240,7 +240,7 @@ public class SubsystemTestFixture : IAsyncLifetime
         return $"Server={sqlServer};Authentication=Active Directory Default;Database={databaseName};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
     }
 
-    private static TValue GetConfigurationValue<TValue>(IConfigurationRoot root, string key)
+    private TValue GetConfigurationValue<TValue>(IConfigurationRoot root, string key)
     {
         var value = root.GetValue<TValue>(key);
 
@@ -253,7 +253,13 @@ public class SubsystemTestFixture : IAsyncLifetime
 
     private TValue GetConfigurationValue<TValue>(IConfigurationRoot root, string key, TValue defaultValue)
     {
-        return root.GetValue<TValue?>(key) ?? defaultValue;
+        var value = root.GetValue<TValue>(key);
+
+        // GetValue<T> return default(T) for complex types like Guid's, so we need to compare with the default(TValue) as well.
+        if (value is null || value.Equals(default(TValue)))
+            return defaultValue;
+
+        return value;
     }
 
     private AsyncLazy<HttpClient> CreateLazyB2BHttpClient(B2BCredentials credentials)

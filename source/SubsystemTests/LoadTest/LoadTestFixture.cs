@@ -65,6 +65,10 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
             configuration,
             "LOAD_TEST_CALCULATION_ID");
 
+        MinimumDequeuedMessagesCount = GetConfigurationValue<int>(
+            configuration,
+            "MINIMUM_DEQUEUED_MESSAGES_COUNT");
+
         EdiInboxClient = new EdiInboxClient(
             _serviceBusClient,
             GetConfigurationValue<string>(configuration, "sbq-edi-inbox-messagequeue-name"));
@@ -81,6 +85,8 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
     internal EdiInboxClient EdiInboxClient { get; }
 
     internal Guid LoadTestCalculationId { get; }
+
+    internal int MinimumDequeuedMessagesCount { get; }
 
     internal IntegrationEventPublisher IntegrationEventPublisher { get; }
 
@@ -116,6 +122,17 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
         // GetValue<T> return default(T) for complex types like Guid's, so we need to compare with the default(TValue) as well.
         if (value is null || value.Equals(default(TValue)))
             throw new InvalidOperationException($"{key} was not found in configuration");
+
+        return value;
+    }
+
+    private TValue GetConfigurationValue<TValue>(IConfigurationRoot root, string key, TValue defaultValue)
+    {
+        var value = root.GetValue<TValue>(key);
+
+        // GetValue<T> return default(T) for complex types like Guid's, so we need to compare with the default(TValue) as well.
+        if (value is null || value.Equals(default(TValue)))
+            return defaultValue;
 
         return value;
     }

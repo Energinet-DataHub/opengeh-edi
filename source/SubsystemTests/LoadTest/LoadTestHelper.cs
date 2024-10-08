@@ -15,6 +15,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Dsl;
+using FluentAssertions;
 using Nito.AsyncEx;
 using NodaTime;
 using Xunit.Abstractions;
@@ -72,8 +73,11 @@ public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
             calculationId: _fixture.LoadTestCalculationId,
             createdAfter: SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromHours(1)));
 
-        // TODO: Report dequeued count as metric? Maybe assert that the count is higher than a given baseline.
         var dequeuedMessagesCount = await _ediDatabaseDriver.CountDequeuedMessagesForCalculationAsync(_fixture.LoadTestCalculationId);
         _logger.WriteLine($"Dequeued messages count: {dequeuedMessagesCount} (CalculationId={_fixture.LoadTestCalculationId})");
+
+        dequeuedMessagesCount.Should().BeGreaterThan(
+            _fixture.MinimumDequeuedMessagesCount,
+            $"because the system should be performant enough to dequeue at least {_fixture.MinimumDequeuedMessagesCount} messages during the load test");
     }
 }
