@@ -16,12 +16,15 @@ using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
-using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV3;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
 using SearchArchivedMessagesCriteria = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client.SearchArchivedMessagesCriteria;
 using SearchArchivedMessagesCriteriaV2 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2.SearchArchivedMessagesCriteria;
+using SearchArchivedMessagesPagination = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2.SearchArchivedMessagesPagination;
+using SearchArchivedMessagesPaginationV3 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV3.SearchArchivedMessagesPagination;
+using SearchArchivedMessagesRequest = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2.SearchArchivedMessagesRequest;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Dsl;
 
@@ -102,6 +105,32 @@ public class ArchivedMessageDsl
                     IncludeRelatedMessages = false,
                 },
                 Pagination = new SearchArchivedMessagesPagination
+                {
+                    PageSize = pageSize,
+                },
+            });
+
+        return (unknownMessageId, outboxCreatedAfter);
+    }
+
+    internal async Task<(string MessageId, Instant CreatedAfter)> PerformArchivedMessageSearchV3(int pageSize)
+    {
+        var unknownMessageId = Guid.NewGuid().ToString();
+        var outboxCreatedAfter = SystemClock.Instance.GetCurrentInstant();
+        await _b2cEdiDriver.SearchArchivedMessagesV3Async(
+            new SearchArchivedMessagesRequestV3
+            {
+                SearchCriteria = new SearchArchivedMessagesCriteriaV3
+                {
+                    MessageId = unknownMessageId,
+                    CreatedDuringPeriod = null,
+                    SenderNumber = null,
+                    ReceiverNumber = null,
+                    DocumentTypes = null,
+                    BusinessReasons = null,
+                    IncludeRelatedMessages = false,
+                },
+                Pagination = new SearchArchivedMessagesPaginationV3
                 {
                     PageSize = pageSize,
                 },

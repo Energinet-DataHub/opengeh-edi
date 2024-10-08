@@ -34,3 +34,14 @@ public record ArchivedMessageResultV2(
     string ReceiverNumber,
     DateTimeOffset CreatedAt,
     string? BusinessReason);
+
+[Serializable]
+public record ArchivedMessageResultV3(
+    long RecordId,
+    string Id,
+    string? MessageId,
+    DocumentType DocumentType,
+    string SenderNumber,
+    string ReceiverNumber,
+    DateTimeOffset CreatedAt,
+    string? BusinessReason);

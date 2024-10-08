@@ -76,4 +76,11 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
         var (messageId, createdAfter) = await _archivedMessages.PerformArchivedMessageSearchV2(pageSize: 10);
         await _archivedMessages.ConfirmArchivedMessageSearchAuditLogExistsForMessageId(messageId, createdAfter);
     }
+
+    [Fact]
+    public async Task Audit_log_outbox_is_published_after_searching_for_archived_message_with_pagination_v3()
+    {
+        var (messageId, createdAfter) = await _archivedMessages.PerformArchivedMessageSearchV3(pageSize: 10);
+        await _archivedMessages.ConfirmArchivedMessageSearchAuditLogExistsForMessageId(messageId, createdAfter);
+    }
 }
