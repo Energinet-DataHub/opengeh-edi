@@ -189,10 +189,13 @@ internal sealed class EdiDriver
             .Where(o => o.Input.ToString().Contains(calculationId.ToString()))
             .ToList();
 
+        if (orchestrationsForCalculation.Any())
+            return;
+
+        _logger.WriteLine($"Stopping {orchestrationsForCalculation.Count} orchestrations for calculation (CalculationId={calculationId})");
+
         foreach (var orchestration in orchestrationsForCalculation)
             await _durableClient.TerminateAsync(orchestration.InstanceId, "Stopped by subsystem test");
-
-        await Task.CompletedTask;
     }
 
     private static async Task<(Guid MessageId, string Content)> GetRequestWholesaleSettlementContentAsync(
