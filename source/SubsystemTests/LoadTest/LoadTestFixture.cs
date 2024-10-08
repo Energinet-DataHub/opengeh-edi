@@ -43,7 +43,7 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
 
         var configuration = configurationBuilder.Build();
 
-        DatabaseConnectionString = SubsystemTestFixture.BuiDbConnectionString(
+        DatabaseConnectionString = SubsystemTestFixture.BuildDbConnectionString(
             GetConfigurationValue<string>(configuration, "mssql-data-url"),
             GetConfigurationValue<string>(configuration, "mssql-edi-database-name"));
 
