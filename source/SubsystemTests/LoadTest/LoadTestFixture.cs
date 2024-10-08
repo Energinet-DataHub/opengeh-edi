@@ -67,7 +67,8 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
 
         MinimumDequeuedMessagesCount = GetConfigurationValue<int>(
             configuration,
-            "MINIMUM_DEQUEUED_MESSAGES_COUNT");
+            "MINIMUM_DEQUEUED_MESSAGES_COUNT",
+            defaultValue: 0);
 
         EdiInboxClient = new EdiInboxClient(
             _serviceBusClient,
