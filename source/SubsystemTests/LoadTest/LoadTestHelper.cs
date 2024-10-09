@@ -27,10 +27,10 @@ namespace Energinet.DataHub.EDI.SubsystemTests.LoadTest;
 /// <summary>
 /// Test class used in the CI to trigger a calculation completed event, used for load testing on t001.
 /// GitHub action should be as following:
-/// 1. Run Prepare_load_test() test
+/// 1. Run Before_load_test() test
 /// 2. Start Azure Load Test
 /// 3. Wait for the Azure Load Test to finish
-/// 4. Run Cleanup_load_test() test
+/// 4. Run After_load_test() test
 /// </summary>
 [SuppressMessage("Style", "VSTHRD200:Use \"Async\" suffix for async methods", Justification = "Test class")]
 public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
