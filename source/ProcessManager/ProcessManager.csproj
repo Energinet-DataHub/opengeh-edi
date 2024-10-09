@@ -12,6 +12,8 @@
     <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.22.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="1.2.0" />
     <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="13.2.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.3.1" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.DurableTask" Version="1.1.5" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
@@ -27,7 +29,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Api\" />
-    <Folder Include="Scheduler\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ProcessManager.Core\ProcessManager.Core.csproj" />

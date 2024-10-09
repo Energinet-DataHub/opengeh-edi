@@ -15,6 +15,8 @@
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.ProcessManagement.Core.Telemetry;
+using Energinet.DataHub.ProcessManager.Scheduler;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var host = new HostBuilder()
@@ -24,6 +26,9 @@ var host = new HostBuilder()
         // Common
         services.AddApplicationInsightsForIsolatedWorker(TelemetryConstants.SubsystemName);
         services.AddHealthChecksForIsolatedWorker();
+
+        // Scheduler
+        services.AddScoped<ProcessSchedulerHandler>();
     })
     .ConfigureLogging((hostingContext, logging) =>
     {
