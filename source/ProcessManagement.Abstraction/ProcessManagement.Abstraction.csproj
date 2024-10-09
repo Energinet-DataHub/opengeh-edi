@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Energinet.DataHub.ProcessManagement.Abstractions</AssemblyName>
+    <RootNamespace>Energinet.DataHub.ProcessManagement.Abstractions</RootNamespace>
+  </PropertyGroup>
+
+</Project>

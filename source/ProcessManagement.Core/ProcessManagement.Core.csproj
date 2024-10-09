@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Energinet.DataHub.ProcessManagement.Core</AssemblyName>
+    <RootNamespace>Energinet.DataHub.ProcessManagement.Core</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProcessManagement.Abstraction\ProcessManagement.Abstraction.csproj" />
+  </ItemGroup>
+
+</Project>
