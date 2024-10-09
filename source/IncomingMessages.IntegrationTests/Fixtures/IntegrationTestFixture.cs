@@ -14,6 +14,7 @@
 
 using System.Data.SqlClient;
 using Azure.Storage.Blobs;
+using Energinet.DataHub.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
@@ -30,7 +31,7 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
     {
         IntegrationTestConfiguration = new IntegrationTestConfiguration();
 
-        DatabaseManager = new EdiDatabaseManager();
+        DatabaseManager = new EdiDatabaseManager("IncomingMessagesTests");
 
         DatabricksSchemaManager = new DatabricksSchemaManager(
             new HttpClientFactory(),
