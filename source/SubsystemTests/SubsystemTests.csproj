@@ -92,7 +92,7 @@
         </PackageReference>
         <PackageReference Include="System.ServiceModel.Http" Version="8.0.0" />
         <PackageReference Include="System.ServiceModel.Primitives" Version="8.0.0" />
-        <PackageReference Include="xunit" Version="2.9.0" />
+        <PackageReference Include="xunit" Version="2.9.2" />
         <PackageReference Include="xunit.categories" Version="2.0.8" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

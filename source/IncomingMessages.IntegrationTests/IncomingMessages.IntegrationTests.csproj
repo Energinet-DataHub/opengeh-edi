@@ -42,24 +42,45 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="IncomingMessages\FailSchemeValidationAggregatedMeasureData.json"/>
-        <EmbeddedResource Include="IncomingMessages\FailSchemeValidationRequestWholesaleSettlement.json"/>
-        <EmbeddedResource Include="IncomingMessages\RequestAggregatedMeasureDataAsDdk.json"/>
-        <EmbeddedResource Include="IncomingMessages\RequestAggregatedMeasureDataAsMdr.json"/>
-        <EmbeddedResource Include="IncomingMessages\RequestWholesaleSettlement.json"/>
-        <EmbeddedResource Include="IncomingMessages\RequestWholesaleSettlementWithUnusedBusinessReason.json"/>
+        <EmbeddedResource Include="IncomingMessages\FailSchemeValidationAggregatedMeasureData.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="IncomingMessages\FailSchemeValidationRequestWholesaleSettlement.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="IncomingMessages\RequestAggregatedMeasureDataAsDdk.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="IncomingMessages\RequestAggregatedMeasureDataAsMdr.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="IncomingMessages\RequestWholesaleSettlement.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="IncomingMessages\RequestWholesaleSettlementWithUnusedBusinessReason.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\ApplyDBMigrationsApp\ApplyDBMigrationsApp.csproj"/>
+        <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />
+        <ProjectReference Include="..\B2BApi\B2BApi.csproj" />
         <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj"/>
         <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj"/>
         <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj"/>
         <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj"/>
         <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj"/>
+        <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
         <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
         <ProjectReference Include="..\Process.Application\Process.Application.csproj"/>
         <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="integrationtest.local.settings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
