@@ -60,16 +60,6 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 
         var messageId = await _notifyAggregatedMeasureData.ConfirmResultIsAvailable();
 
-        await _archivedMessages.ConfirmMessageIsArchived(messageId);
-    }
-
-    [Fact]
-    public async Task B2C_actor_can_get_the_archived_message_after_peeking_the_messageV3()
-    {
-        await _calculationCompleted.PublishForBalanceFixingCalculation();
-
-        var messageId = await _notifyAggregatedMeasureData.ConfirmResultIsAvailable();
-
         await _archivedMessages.ConfirmMessageIsArchivedV3(messageId);
     }
 
