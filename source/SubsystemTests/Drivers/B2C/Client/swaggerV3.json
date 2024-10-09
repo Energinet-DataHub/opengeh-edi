@@ -239,7 +239,15 @@
             "type": "string",
             "nullable": true
           },
+          "senderRoleCode": {
+            "type": "string",
+            "nullable": true
+          },
           "receiverNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "receiverRoleCode": {
             "type": "string",
             "nullable": true
           },
