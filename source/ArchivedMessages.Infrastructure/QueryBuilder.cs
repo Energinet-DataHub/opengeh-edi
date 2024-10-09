@@ -71,6 +71,26 @@ internal sealed class QueryBuilder
                 new KeyValuePair<string, object>("ReceiverNumber", query.ReceiverNumber));
         }
 
+        if (query.SenderRoleCode is not null && query.ReceiverRoleCode is not null)
+        {
+            AddFilter(
+                "(SenderRoleCode=@SenderRoleCode OR ReceiverRoleCode=@ReceiverRoleCode)",
+                new KeyValuePair<string, object>("SenderRoleCode", query.SenderRoleCode),
+                new KeyValuePair<string, object>("ReceiverRoleCode", query.ReceiverRoleCode));
+        }
+        else if (query.SenderRoleCode is not null)
+        {
+            AddFilter(
+                "SenderRoleCode=@SenderRoleCode",
+                new KeyValuePair<string, object>("SenderRoleCode", query.SenderRoleCode));
+        }
+        else if (query.ReceiverRoleCode is not null)
+        {
+            AddFilter(
+                "ReceiverRoleCode=@ReceiverRoleCode",
+                new KeyValuePair<string, object>("ReceiverRoleCode", query.ReceiverRoleCode));
+        }
+
         if (query.DocumentTypes is not null)
         {
             AddFilter(
