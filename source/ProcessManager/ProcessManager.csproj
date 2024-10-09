@@ -30,6 +30,6 @@
     <Folder Include="Scheduler\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ProcessManagement.Core\ProcessManagement.Core.csproj" />
+    <ProjectReference Include="..\ProcessManager.Core\ProcessManager.Core.csproj" />
   </ItemGroup>
 </Project>

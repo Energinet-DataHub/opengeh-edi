@@ -13,28 +13,28 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_ConfigurationFiles", "_Con
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Api", "2. Api", "{46796033-3717-49E3-BDB2-212B65B3CAC1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessManager.Client", "ProcessManager.Client\ProcessManager.Client.csproj", "{FF1650B4-1FAF-4A94-8A77-DBDBFC5F2980}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessManager.Client", "ProcessManager.Client\ProcessManager.Client.csproj", "{FF1650B4-1FAF-4A94-8A77-DBDBFC5F2980}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessManager.DatabaseMigration", "ProcessManager.DatabaseMigration\ProcessManager.DatabaseMigration.csproj", "{A2696E70-DC9B-4A86-958B-70783B0E09EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessManager.DatabaseMigration", "ProcessManager.DatabaseMigration\ProcessManager.DatabaseMigration.csproj", "{A2696E70-DC9B-4A86-958B-70783B0E09EC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Client", "1. Client", "{51477591-692F-43D6-AD5A-171BDBF63387}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3. Orchestrations", "3. Orchestrations", "{C80DEA07-3E11-43F5-A446-29293E81EC00}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4. Orchestrations", "4. Orchestrations", "{C80DEA07-3E11-43F5-A446-29293E81EC00}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessManager", "ProcessManager\ProcessManager.csproj", "{7A0D7283-06BD-4C8B-8389-0EC12B50CF63}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4. Components", "4. Components", "{5439BEE5-8AA2-4852-9C92-7245BEFF71D5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessManagement.Abstraction", "ProcessManagement.Abstraction\ProcessManagement.Abstraction.csproj", "{6AC0C7BB-5D2D-4BBD-8332-30AF4E470F22}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessManagement.Core", "ProcessManagement.Core\ProcessManagement.Core.csproj", "{094F7EEB-D2E2-4D00-AA61-B771B06E2978}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3. Core", "3. Core", "{5439BEE5-8AA2-4852-9C92-7245BEFF71D5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Documentation", "_Documentation", "{CB5BA988-F92E-4A9F-B6CF-416E23DE1493}"
 	ProjectSection(SolutionItems) = preProject
 		..\docs\ProcessManager\Development.md = ..\docs\ProcessManager\Development.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BRS_023_027", "BRS_023_027\BRS_023_027.csproj", "{501F5EA7-699F-4AFB-9000-4EE97BE13CF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessManager.Orchestrations", "ProcessManager.Orchestrations\ProcessManager.Orchestrations.csproj", "{6D38C81C-BD42-4795-95D2-3C7E858A75ED}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessManager", "ProcessManager\ProcessManager.csproj", "{EE52C2A5-8E6C-45CB-9245-63CB961899D0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5. Components", "5. Components", "{4A59957F-21CA-4D10-914D-F088ACD27175}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessManager.Core", "ProcessManager.Core\ProcessManager.Core.csproj", "{1CAF9794-6FA0-487B-9950-41AB72A9E01F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,22 +50,18 @@ Global
 		{A2696E70-DC9B-4A86-958B-70783B0E09EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2696E70-DC9B-4A86-958B-70783B0E09EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2696E70-DC9B-4A86-958B-70783B0E09EC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7A0D7283-06BD-4C8B-8389-0EC12B50CF63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7A0D7283-06BD-4C8B-8389-0EC12B50CF63}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7A0D7283-06BD-4C8B-8389-0EC12B50CF63}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7A0D7283-06BD-4C8B-8389-0EC12B50CF63}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6AC0C7BB-5D2D-4BBD-8332-30AF4E470F22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6AC0C7BB-5D2D-4BBD-8332-30AF4E470F22}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6AC0C7BB-5D2D-4BBD-8332-30AF4E470F22}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6AC0C7BB-5D2D-4BBD-8332-30AF4E470F22}.Release|Any CPU.Build.0 = Release|Any CPU
-		{094F7EEB-D2E2-4D00-AA61-B771B06E2978}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{094F7EEB-D2E2-4D00-AA61-B771B06E2978}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{094F7EEB-D2E2-4D00-AA61-B771B06E2978}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{094F7EEB-D2E2-4D00-AA61-B771B06E2978}.Release|Any CPU.Build.0 = Release|Any CPU
-		{501F5EA7-699F-4AFB-9000-4EE97BE13CF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{501F5EA7-699F-4AFB-9000-4EE97BE13CF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{501F5EA7-699F-4AFB-9000-4EE97BE13CF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{501F5EA7-699F-4AFB-9000-4EE97BE13CF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D38C81C-BD42-4795-95D2-3C7E858A75ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D38C81C-BD42-4795-95D2-3C7E858A75ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D38C81C-BD42-4795-95D2-3C7E858A75ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D38C81C-BD42-4795-95D2-3C7E858A75ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE52C2A5-8E6C-45CB-9245-63CB961899D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE52C2A5-8E6C-45CB-9245-63CB961899D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE52C2A5-8E6C-45CB-9245-63CB961899D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE52C2A5-8E6C-45CB-9245-63CB961899D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CAF9794-6FA0-487B-9950-41AB72A9E01F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CAF9794-6FA0-487B-9950-41AB72A9E01F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CAF9794-6FA0-487B-9950-41AB72A9E01F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CAF9794-6FA0-487B-9950-41AB72A9E01F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,10 +69,9 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{FF1650B4-1FAF-4A94-8A77-DBDBFC5F2980} = {51477591-692F-43D6-AD5A-171BDBF63387}
 		{A2696E70-DC9B-4A86-958B-70783B0E09EC} = {46796033-3717-49E3-BDB2-212B65B3CAC1}
-		{7A0D7283-06BD-4C8B-8389-0EC12B50CF63} = {46796033-3717-49E3-BDB2-212B65B3CAC1}
-		{6AC0C7BB-5D2D-4BBD-8332-30AF4E470F22} = {5439BEE5-8AA2-4852-9C92-7245BEFF71D5}
-		{094F7EEB-D2E2-4D00-AA61-B771B06E2978} = {5439BEE5-8AA2-4852-9C92-7245BEFF71D5}
-		{501F5EA7-699F-4AFB-9000-4EE97BE13CF1} = {C80DEA07-3E11-43F5-A446-29293E81EC00}
+		{6D38C81C-BD42-4795-95D2-3C7E858A75ED} = {C80DEA07-3E11-43F5-A446-29293E81EC00}
+		{EE52C2A5-8E6C-45CB-9245-63CB961899D0} = {46796033-3717-49E3-BDB2-212B65B3CAC1}
+		{1CAF9794-6FA0-487B-9950-41AB72A9E01F} = {5439BEE5-8AA2-4852-9C92-7245BEFF71D5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C390B97-896A-4AAD-8609-3C20E80966D2}

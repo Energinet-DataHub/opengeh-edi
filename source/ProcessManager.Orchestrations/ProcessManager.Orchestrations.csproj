@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AssemblyName>Energinet.DataHub.Orchestrations.BRS_023_027</AssemblyName>
-    <RootNamespace>Energinet.DataHub.Orchestrations.BRS_023_027</RootNamespace>
+    <AssemblyName>Energinet.DataHub.ProcessManager.Orchestrations</AssemblyName>
+    <RootNamespace>Energinet.DataHub.ProcessManager.Orchestrations</RootNamespace>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
@@ -12,9 +12,10 @@
     <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.22.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="1.2.0" />
     <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="13.2.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.DurableTask" Version="1.1.5" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ProcessManagement.Abstraction\ProcessManagement.Abstraction.csproj" />
+    <ProjectReference Include="..\ProcessManager.Core\ProcessManager.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
@@ -27,5 +28,11 @@
   </ItemGroup>
   <ItemGroup>
     <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Features\BRS_021\V1\Activities\" />
+    <Folder Include="Features\BRS_021\V1\Model\" />
+    <Folder Include="Features\BRS_026_028\V1\Activities\" />
+    <Folder Include="Features\BRS_026_028\V1\Model\" />
   </ItemGroup>
 </Project>

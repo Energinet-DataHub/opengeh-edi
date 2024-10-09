@@ -57,7 +57,7 @@ indent_size = 2
 indent_size = 2
 
 # Powershell files
-[*.{ps1, psm1, psd1}]
+[*.{ps1,psm1,psd1}]
 indent_size = 4
 
 # Shell script files
@@ -600,7 +600,7 @@ dotnet_diagnostic.VSTHRD111.severity = none	    # VSTHRD111: [Similar to CA2007]
 # The intention of this section is to match c# code files
 # that is either Durable Function Orchestrations or Activities.
 #
-[**/Functions/**/*{Orchestration}.cs]
+[**/{Functions,Features}/**/*{Orchestration,Orchestrator}.cs]
 
 dotnet_diagnostic.CA2007.severity = none        # CA2007: Consider calling ConfigureAwait on the awaited task
 dotnet_diagnostic.VSTHRD111.severity = none	    # VSTHRD111: [Similar to CA2007] Use ConfigureAwait(bool)

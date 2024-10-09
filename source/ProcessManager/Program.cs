@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
+using Energinet.DataHub.ProcessManagement.Core.Telemetry;
 using Microsoft.Extensions.Hosting;
 
 var host = new HostBuilder()
@@ -21,7 +22,7 @@ var host = new HostBuilder()
     .ConfigureServices((context, services) =>
     {
         // Common
-        services.AddApplicationInsightsForIsolatedWorker(subsystemName: "edi-processmanager");
+        services.AddApplicationInsightsForIsolatedWorker(TelemetryConstants.SubsystemName);
         services.AddHealthChecksForIsolatedWorker();
     })
     .ConfigureLogging((hostingContext, logging) =>
