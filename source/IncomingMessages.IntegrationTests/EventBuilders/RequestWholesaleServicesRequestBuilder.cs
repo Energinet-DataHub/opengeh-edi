@@ -22,7 +22,7 @@ using NodaTime;
 namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.EventBuilders;
 
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Used only in tests")]
-internal static class RequestWholesaleServicesRequestBuilder
+public static class RequestWholesaleServicesRequestBuilder
 {
     /// <summary>
     /// Create a stream containing a RequestWholesaleSettlement message in the specified format

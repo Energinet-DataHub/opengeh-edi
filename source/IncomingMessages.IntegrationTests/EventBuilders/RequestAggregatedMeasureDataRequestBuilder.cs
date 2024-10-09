@@ -21,7 +21,7 @@ using NodaTime;
 namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.EventBuilders;
 
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Used only in tests")]
-internal static class RequestAggregatedMeasureDataRequestBuilder
+public static class RequestAggregatedMeasureDataRequestBuilder
 {
     public static IncomingMarketMessageStream CreateIncomingMessage(
         DocumentFormat format,

@@ -57,6 +57,7 @@ limitations under the License.
         <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj"/>
         <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj"/>
         <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj"/>
+        <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
         <ProjectReference Include="..\Process.Application\Process.Application.csproj"/>
         <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj"/>
     </ItemGroup>
