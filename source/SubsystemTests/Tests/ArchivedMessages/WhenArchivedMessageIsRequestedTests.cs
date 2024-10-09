@@ -64,10 +64,13 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
     }
 
     [Fact]
-    public async Task Audit_log_outbox_is_published_after_searching_for_archived_message()
+    public async Task B2C_actor_can_get_the_archived_message_after_peeking_the_messageV3()
     {
-        var (messageId, createdAfter) = await _archivedMessages.PerformArchivedMessageSearch();
-        await _archivedMessages.ConfirmArchivedMessageSearchAuditLogExistsForMessageId(messageId, createdAfter);
+        await _calculationCompleted.PublishForBalanceFixingCalculation();
+
+        var messageId = await _notifyAggregatedMeasureData.ConfirmResultIsAvailable();
+
+        await _archivedMessages.ConfirmMessageIsArchivedV3(messageId);
     }
 
     [Fact]

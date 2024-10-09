@@ -19,8 +19,6 @@ using Nito.AsyncEx;
 using NodaTime;
 using NodaTime.Text;
 using Xunit.Abstractions;
-using ArchivedMessageResult = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client.ArchivedMessageResult;
-using SearchArchivedMessagesCriteria = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client.SearchArchivedMessagesCriteria;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C;
 
@@ -41,15 +39,6 @@ public sealed class B2CEdiDriver : IDisposable
 
     public void Dispose()
     {
-    }
-
-    public async Task<ICollection<ArchivedMessageResult>> SearchArchivedMessagesAsync(SearchArchivedMessagesCriteria request)
-    {
-        var webApiClient = await CreateWebApiClientAsync();
-
-        var result = await webApiClient.ArchivedMessageSearchAsync(body: request);
-
-        return result;
     }
 
     public async Task<ArchivedMessageSearchResponse> SearchArchivedMessagesV2Async(SearchArchivedMessagesRequest request)
