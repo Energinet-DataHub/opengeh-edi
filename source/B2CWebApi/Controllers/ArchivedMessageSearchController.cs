@@ -15,12 +15,11 @@
 using Asp.Versioning;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
+using Energinet.DataHub.EDI.B2CWebApi.Mappers;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime.Extensions;
-using DirectionToSortBy = Energinet.DataHub.EDI.ArchivedMessages.Interfaces.DirectionToSortBy;
-using FieldToSortBy = Energinet.DataHub.EDI.ArchivedMessages.Interfaces.FieldToSortBy;
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Controllers;
 
@@ -42,7 +41,9 @@ public class ArchivedMessageSearchController : ControllerBase
     [ApiVersion("1.0")]
     [HttpPost]
     [ProducesResponseType(typeof(ArchivedMessageResult[]), StatusCodes.Status200OK)]
-    public async Task<ActionResult> RequestAsync(SearchArchivedMessagesCriteria request, CancellationToken cancellationToken)
+    public async Task<ActionResult> RequestAsync(
+        SearchArchivedMessagesCriteria request,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -56,7 +57,7 @@ public class ArchivedMessageSearchController : ControllerBase
             .ConfigureAwait(false);
 
         var messageCreationPeriod = request.CreatedDuringPeriod is not null
-            ? new EDI.ArchivedMessages.Interfaces.MessageCreationPeriod(
+            ? new ArchivedMessages.Interfaces.MessageCreationPeriod(
                 request.CreatedDuringPeriod.Start.ToInstant(),
                 request.CreatedDuringPeriod.End.ToInstant())
             : null;
@@ -89,7 +90,9 @@ public class ArchivedMessageSearchController : ControllerBase
     [ApiVersion("2.0")]
     [HttpPost]
     [ProducesResponseType(typeof(ArchivedMessageSearchResponse), StatusCodes.Status200OK)]
-    public async Task<ActionResult> RequestAsync(SearchArchivedMessagesRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> RequestAsync(
+        SearchArchivedMessagesRequest request,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -107,11 +110,13 @@ public class ArchivedMessageSearchController : ControllerBase
                 request.SearchCriteria.CreatedDuringPeriod.End.ToInstant())
             : null;
 
-        var cursor = request.Pagination.Cursor != null ? new SortingCursor(request.Pagination.Cursor.FieldToSortByValue, request.Pagination.Cursor.RecordId) : null;
+        var cursor = request.Pagination.Cursor != null
+            ? new SortingCursor(request.Pagination.Cursor.FieldToSortByValue, request.Pagination.Cursor.RecordId)
+            : null;
         var pageSize = request.Pagination.PageSize;
         var navigationForward = request.Pagination.NavigationForward;
-        var fieldToSortBy = MapToFieldToSortBy(request.Pagination.SortBy);
-        var directionToSortBy = MapToDirectionToSortBy(request.Pagination.DirectionToSortBy);
+        var fieldToSortBy = FieldToSortByMapper.MapToFieldToSortBy(request.Pagination.SortBy);
+        var directionToSortBy = DirectionToSortByMapper.MapToDirectionToSortBy(request.Pagination.DirectionToSortBy);
 
         var query = new GetMessagesQuery(
             new SortedCursorBasedPagination(
@@ -143,26 +148,67 @@ public class ArchivedMessageSearchController : ControllerBase
         return Ok(new ArchivedMessageSearchResponse(messages, TotalCount: result.TotalAmountOfMessages));
     }
 
-    private DirectionToSortBy? MapToDirectionToSortBy(Energinet.DataHub.EDI.B2CWebApi.Models.DirectionToSortBy? directionToSortBy)
+    [ApiVersion("3.0")]
+    [HttpPost]
+    [ProducesResponseType(typeof(ArchivedMessageSearchResponseV3), StatusCodes.Status200OK)]
+    public async Task<ActionResult> RequestV3Async(
+        SearchArchivedMessagesRequestV3 request,
+        CancellationToken cancellationToken)
     {
-        return directionToSortBy switch
-        {
-            Energinet.DataHub.EDI.B2CWebApi.Models.DirectionToSortBy.Ascending => DirectionToSortBy.Ascending,
-            Energinet.DataHub.EDI.B2CWebApi.Models.DirectionToSortBy.Descending => DirectionToSortBy.Descending,
-            _ => null,
-        };
-    }
+        ArgumentNullException.ThrowIfNull(request);
 
-    private FieldToSortBy? MapToFieldToSortBy(Energinet.DataHub.EDI.B2CWebApi.Models.FieldToSortBy? fieldToSortBy)
-    {
-        return fieldToSortBy switch
-        {
-            Energinet.DataHub.EDI.B2CWebApi.Models.FieldToSortBy.CreatedAt => FieldToSortBy.CreatedAt,
-            Energinet.DataHub.EDI.B2CWebApi.Models.FieldToSortBy.MessageId => FieldToSortBy.MessageId,
-            Energinet.DataHub.EDI.B2CWebApi.Models.FieldToSortBy.SenderNumber => FieldToSortBy.SenderNumber,
-            Energinet.DataHub.EDI.B2CWebApi.Models.FieldToSortBy.ReceiverNumber => FieldToSortBy.ReceiverNumber,
-            Energinet.DataHub.EDI.B2CWebApi.Models.FieldToSortBy.DocumentType => FieldToSortBy.DocumentType,
-            _ => null,
-        };
+        await _auditLogger.LogWithCommitAsync(
+                logId: AuditLogId.New(),
+                activity: AuditLogActivity.ArchivedMessagesSearch,
+                activityOrigin: HttpContext.Request.GetDisplayUrl(),
+                activityPayload: request,
+                affectedEntityType: AuditLogEntityType.ArchivedMessage,
+                affectedEntityKey: null)
+            .ConfigureAwait(false);
+
+        var messageCreationPeriod = request.SearchCriteria.CreatedDuringPeriod is not null
+            ? new ArchivedMessages.Interfaces.MessageCreationPeriod(
+                request.SearchCriteria.CreatedDuringPeriod.Start.ToInstant(),
+                request.SearchCriteria.CreatedDuringPeriod.End.ToInstant())
+            : null;
+
+        var cursor = request.Pagination.Cursor != null
+            ? new SortingCursor(request.Pagination.Cursor.FieldToSortByValue, request.Pagination.Cursor.RecordId)
+            : null;
+        var pageSize = request.Pagination.PageSize;
+        var navigationForward = request.Pagination.NavigationForward;
+        var fieldToSortBy = FieldToSortByMapper.MapToFieldToSortBy(request.Pagination.SortBy);
+        var directionToSortBy = DirectionToSortByMapper.MapToDirectionToSortBy(request.Pagination.DirectionToSortBy);
+
+        var query = new GetMessagesQuery(
+            new SortedCursorBasedPagination(
+                cursor,
+                pageSize,
+                navigationForward,
+                fieldToSortBy,
+                directionToSortBy),
+            messageCreationPeriod,
+            request.SearchCriteria.MessageId,
+            request.SearchCriteria.SenderNumber,
+            request.SearchCriteria.ReceiverNumber,
+            DocumentTypeMapper.FromDocumentTypes(request.SearchCriteria.DocumentTypes),
+            request.SearchCriteria.BusinessReasons,
+            request.SearchCriteria.IncludeRelatedMessages);
+
+        var result = await _archivedMessagesClient.SearchAsync(query, cancellationToken).ConfigureAwait(false);
+
+        var messages = result.Messages.Select(
+            x => new ArchivedMessageResultV3(
+                x.RecordId,
+                x.Id.ToString(),
+                x.MessageId,
+                DocumentTypeMapper.ToDocumentType(x.DocumentType),
+                x.SenderNumber,
+                x.SenderRoleCode,
+                x.ReceiverNumber,
+                x.ReceiverRoleCode,
+                x.CreatedAt.ToDateTimeOffset(),
+                x.BusinessReason));
+        return Ok(new ArchivedMessageSearchResponseV3(messages, TotalCount: result.TotalAmountOfMessages));
     }
 }

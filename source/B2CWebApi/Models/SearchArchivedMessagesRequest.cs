@@ -16,3 +16,6 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
 [Serializable]
 public record SearchArchivedMessagesRequest(SearchArchivedMessagesCriteria SearchCriteria, SearchArchivedMessagesPagination Pagination);
+
+[Serializable]
+public record SearchArchivedMessagesRequestV3(SearchArchivedMessagesCriteriaV3 SearchCriteria, SearchArchivedMessagesPagination Pagination);
