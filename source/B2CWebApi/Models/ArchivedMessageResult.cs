@@ -12,17 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-[Serializable]
-public record ArchivedMessageResult(
-    string Id,
-    string? MessageId,
-    string DocumentType,
-    string SenderNumber,
-    string ReceiverNumber,
-    DateTimeOffset CreatedAt,
-    string? BusinessReason);
+namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
 [Serializable]
 public record ArchivedMessageResultV2(
@@ -42,8 +34,8 @@ public record ArchivedMessageResultV3(
     string? MessageId,
     DocumentType DocumentType,
     string SenderNumber,
-    string SenderRoleCode,
+    ActorRole SenderRole,
     string ReceiverNumber,
-    string ReceiverRoleCode,
+    ActorRole ReceiverRole,
     DateTimeOffset CreatedAt,
     string? BusinessReason);
