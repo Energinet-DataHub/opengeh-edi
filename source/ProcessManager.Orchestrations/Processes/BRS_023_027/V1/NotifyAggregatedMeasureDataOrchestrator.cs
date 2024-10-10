@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManager.Orchestrations.Features.BRS_023_027.V1.Activities;
-using Energinet.DataHub.ProcessManager.Orchestrations.Features.BRS_023_027.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Activities;
+using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 
-namespace Energinet.DataHub.ProcessManager.Orchestrations.Features.BRS_023_027.V1;
+namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1;
 
 // TODO: Implement according to guidelines: https://energinet.atlassian.net/wiki/spaces/D3/pages/824803345/Durable+Functions+Development+Guidelines
 internal class NotifyAggregatedMeasureDataOrchestrator
@@ -28,9 +28,7 @@ internal class NotifyAggregatedMeasureDataOrchestrator
     {
         var input = context.GetInput<NotifyAggregatedMeasureDataInput>();
         if (input == null)
-        {
             return "Error: No input specified.";
-        }
 
         var defaultRetryOptions = CreateDefaultRetryOptions();
 

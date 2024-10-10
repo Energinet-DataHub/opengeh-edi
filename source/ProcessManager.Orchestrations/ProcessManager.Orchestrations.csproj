@@ -30,9 +30,9 @@
     <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Features\BRS_021\V1\Activities\" />
-    <Folder Include="Features\BRS_021\V1\Model\" />
-    <Folder Include="Features\BRS_026_028\V1\Activities\" />
-    <Folder Include="Features\BRS_026_028\V1\Model\" />
+    <Folder Include="Processes\BRS_021\V1\Activities\" />
+    <Folder Include="Processes\BRS_021\V1\Model\" />
+    <Folder Include="Processes\BRS_026_028\V1\Activities\" />
+    <Folder Include="Processes\BRS_026_028\V1\Model\" />
   </ItemGroup>
 </Project>
