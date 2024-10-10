@@ -16,21 +16,25 @@ using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
+using System.ServiceModel.Security;
 using System.Xml;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.Ebix;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.Ebix;
 
 internal sealed class EbixDriver : IDisposable
 {
+    private readonly ITestOutputHelper _output;
     private readonly marketMessagingB2BServiceV01PortTypeClient _ebixServiceClient;
     private readonly X509Certificate2? _certificate;
     private readonly HttpClient _unauthorizedHttpClient;
     private readonly HttpClient _httpClientWithCertificate;
     private readonly HttpClientHandler _certificateHttpClientHandler;
 
-    public EbixDriver(Uri dataHubUrlEbixUrl, EbixCredentials ebixCredentials)
+    public EbixDriver(Uri dataHubUrlEbixUrl, EbixCredentials ebixCredentials, ITestOutputHelper output)
     {
+        _output = output;
         // Create a binding using Transport and a certificate.
         var binding = new BasicHttpBinding
         {
@@ -123,9 +127,17 @@ internal sealed class EbixDriver : IDisposable
         }
         catch (CommunicationException e)
         {
-            Console.WriteLine(
-                "Encountered CommunicationException while dequeuing. The exception was:");
-            Console.WriteLine(e);
+            if (e is MessageSecurityException messageSecurityException &&
+                messageSecurityException.Message.Contains("The HTTP request is unauthorized"))
+            {
+                // This is a "known" exception, no need to write it to the test output as if it was an unexpected exception.
+                _output.WriteLine("Dequeue ebIX request failed with unauthorized exception.");
+            }
+            else
+            {
+                _output.WriteLine("Encountered unknown CommunicationException while dequeuing. The exception was:\n{0}", e);
+            }
+
             throw;
         }
     }

@@ -42,12 +42,14 @@ public sealed class WhenEbixPeekRequestIsReceivedTests : BaseTestClass
         _ebixMeteredDataResponsible = new EbixRequestDsl(
             new EbixDriver(
                 fixture.EbixUri,
-                fixture.EbixMeteredDataResponsibleCredentials));
+                fixture.EbixMeteredDataResponsibleCredentials,
+                output));
 
         _ebixEnergySupplier = new EbixRequestDsl(
             new EbixDriver(
                 fixture.EbixUri,
-                fixture.EbixEnergySupplierCredentials));
+                fixture.EbixEnergySupplierCredentials,
+                output));
 
         _actors = new ActorDsl(new MarketParticipantDriver(fixture.EventPublisher), new EdiActorDriver(fixture.ConnectionString));
 
