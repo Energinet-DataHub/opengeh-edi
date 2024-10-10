@@ -28,7 +28,11 @@ public class DocumentFactory
         _documentWriters = documentWriters.ToList();
     }
 
-    public Task<MarketDocumentStream> CreateFromAsync(OutgoingMessageBundle bundle, DocumentFormat documentFormat, Instant timestamp)
+    public Task<MarketDocumentStream> CreateFromAsync(
+        OutgoingMessageBundle bundle,
+        DocumentFormat documentFormat,
+        Instant timestamp,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(documentFormat);
         ArgumentNullException.ThrowIfNull(bundle);
@@ -48,6 +52,7 @@ public class DocumentFactory
                 bundle.DocumentReceiver.ActorRole.Code,
                 bundle.MessageId.Value,
                 timestamp),
-            bundle.OutgoingMessages.Select(message => message.GetSerializedContent()).ToList());
+            bundle.OutgoingMessages.Select(message => message.GetSerializedContent()).ToList(),
+            cancellationToken);
     }
 }

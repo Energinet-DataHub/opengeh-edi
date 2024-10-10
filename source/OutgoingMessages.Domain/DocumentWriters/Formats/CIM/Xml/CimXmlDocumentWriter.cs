@@ -35,8 +35,16 @@ public abstract class CimXmlDocumentWriter : IDocumentWriter
 
     protected DocumentDetails DocumentDetails => _documentDetails;
 
-    public virtual async Task<MarketDocumentStream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
+    public virtual async Task<MarketDocumentStream> WriteAsync(
+        OutgoingMessageHeader header,
+        IReadOnlyCollection<string> marketActivityRecords,
+        CancellationToken cancellationToken = default)
     {
+        if (cancellationToken.IsCancellationRequested)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+        }
+
         var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = new UTF8Encoding(false), Async = true, Indent = true };
         var stream = new MarketDocumentWriterMemoryStream();
         using var writer = XmlWriter.Create(stream, settings);
@@ -105,7 +113,10 @@ public abstract class CimXmlDocumentWriter : IDocumentWriter
         writer.Close();
     }
 
-    private Task WriteHeaderAsync(OutgoingMessageHeader header, DocumentDetails documentDetails, XmlWriter writer)
+    private Task WriteHeaderAsync(
+        OutgoingMessageHeader header,
+        DocumentDetails documentDetails,
+        XmlWriter writer)
     {
         return CimXmlHeaderWriter.WriteAsync(writer, header, documentDetails, _reasonCode);
     }

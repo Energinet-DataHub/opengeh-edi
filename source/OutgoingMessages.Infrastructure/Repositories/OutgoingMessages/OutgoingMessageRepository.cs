@@ -48,15 +48,17 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
         _context.OutgoingMessages.Add(message);
     }
 
-    public async Task<OutgoingMessageBundle> GetAsync(PeekResult peekResult)
+    public async Task<OutgoingMessageBundle> GetAsync(PeekResult peekResult, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(peekResult);
 
-        var outgoingMessages = await _context.OutgoingMessages.Where(x => x.AssignedBundleId == peekResult.BundleId)
-            .ToListAsync()
+        var outgoingMessages = await _context.OutgoingMessages
+            .Where(x => x.AssignedBundleId == peekResult.BundleId)
+            .ToListAsync(cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        var downloadAndSetMessageRecordTasks = outgoingMessages.Select(DownloadAndSetMessageRecordAsync);
+        var downloadAndSetMessageRecordTasks = outgoingMessages
+            .Select(x => DownloadAndSetMessageRecordAsync(x, cancellationToken));
 
         await Task.WhenAll(downloadAndSetMessageRecordTasks).ConfigureAwait(false);
 
@@ -75,11 +77,16 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
             firstMessage.RelatedToMessageId);
     }
 
-    public async Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId)
+    public async Task<OutgoingMessage?> GetAsync(
+        Receiver receiver,
+        ExternalId externalId,
+        CancellationToken cancellationToken = default)
     {
-        return await _context.OutgoingMessages.FirstOrDefaultAsync(x => x.Receiver.Number == receiver.Number &&
-                                                                        x.Receiver.ActorRole == receiver.ActorRole &&
-                                                                        x.ExternalId == externalId).ConfigureAwait(false);
+        return await _context.OutgoingMessages.FirstOrDefaultAsync(
+            x => x.Receiver.Number == receiver.Number &&
+                            x.Receiver.ActorRole == receiver.ActorRole &&
+                            x.ExternalId == externalId,
+            cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<OutgoingMessage?> GetAsync(ActorRole receiverRole, ExternalId externalId, Instant? periodStartedAt)
@@ -104,9 +111,11 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
         await _fileStorageClient.DeleteIfExistsAsync(fileStorageReferences, FileStorageCategory.OutgoingMessage()).ConfigureAwait(false);
     }
 
-    private async Task DownloadAndSetMessageRecordAsync(OutgoingMessage outgoingMessage)
+    private async Task DownloadAndSetMessageRecordAsync(OutgoingMessage outgoingMessage, CancellationToken cancellationToken)
     {
-        var fileStorageFile = await _fileStorageClient.DownloadAsync(outgoingMessage.FileStorageReference).ConfigureAwait(false);
+        var fileStorageFile = await _fileStorageClient
+            .DownloadAsync(outgoingMessage.FileStorageReference, cancellationToken)
+            .ConfigureAwait(false);
 
         var messageRecord = await fileStorageFile.ReadAsStringAsync().ConfigureAwait(false);
 

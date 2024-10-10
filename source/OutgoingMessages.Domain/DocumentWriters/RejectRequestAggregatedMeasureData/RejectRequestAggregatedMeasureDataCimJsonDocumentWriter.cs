@@ -41,8 +41,16 @@ public sealed class RejectRequestAggregatedMeasureDataCimJsonDocumentWriter(
         return documentType == DocumentType.RejectRequestAggregatedMeasureData;
     }
 
-    public async Task<MarketDocumentStream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
+    public async Task<MarketDocumentStream> WriteAsync(
+        OutgoingMessageHeader header,
+        IReadOnlyCollection<string> marketActivityRecords,
+        CancellationToken cancellationToken = default)
     {
+        if (cancellationToken.IsCancellationRequested)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+        }
+
         var stream = new MarketDocumentWriterMemoryStream();
 
         using var writer = new Utf8JsonWriter(stream, _options);
@@ -50,7 +58,7 @@ public sealed class RejectRequestAggregatedMeasureDataCimJsonDocumentWriter(
         CimJsonHeaderWriter.Write(header, DocumentTypeName, TypeCode, ReasonCode.FullyRejected.Code, writer);
         WriteSeries(marketActivityRecords, writer);
         writer.WriteEndObject();
-        await writer.FlushAsync().ConfigureAwait(false);
+        await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
         stream.Position = 0;
         return new MarketDocumentStream(stream);
     }

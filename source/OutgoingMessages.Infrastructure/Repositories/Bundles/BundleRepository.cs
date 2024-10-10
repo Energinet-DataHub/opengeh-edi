@@ -37,15 +37,22 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
 
     public async Task<IReadOnlyCollection<Bundle>> GetDequeuedBundlesOlderThanAsync(Instant olderThan, int take)
     {
-        return await _dbContext.Bundles.Where(x => x.DequeuedAt < olderThan).Take(take).ToListAsync().ConfigureAwait(false);
+        return await _dbContext.Bundles.Where(x => x.DequeuedAt < olderThan)
+            .Take(take)
+            .ToListAsync()
+            .ConfigureAwait(false);
     }
 
     public async Task<Bundle?> GetBundleAsync(MessageId messageId, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Bundles.FirstOrDefaultAsync(x => x.MessageId == messageId, cancellationToken).ConfigureAwait(false);
+        return await _dbContext.Bundles.FirstOrDefaultAsync(x => x.MessageId == messageId, cancellationToken)
+            .ConfigureAwait(false);
     }
 
-    public async Task<Bundle?> GetOldestBundleAsync(ActorMessageQueueId id, MessageCategory messageCategory)
+    public async Task<Bundle?> GetOldestBundleAsync(
+        ActorMessageQueueId id,
+        MessageCategory messageCategory,
+        CancellationToken cancellationToken = default)
     {
         if (messageCategory == MessageCategory.None)
         {
@@ -53,7 +60,7 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
                 b.ActorMessageQueueId == id &&
                 b.DequeuedAt == null)
                 .OrderBy(b => b.Created)
-                .FirstOrDefaultAsync().ConfigureAwait(false);
+                .FirstOrDefaultAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
         }
 
         return await _dbContext.Bundles.Where(b =>
@@ -61,6 +68,7 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
                                                    b.DequeuedAt == null &&
                                                    b.MessageCategory == messageCategory)
                                                    .OrderBy(b => b.Created)
-                                                   .FirstOrDefaultAsync().ConfigureAwait(false);
+                                                   .FirstOrDefaultAsync(cancellationToken: cancellationToken)
+                                                   .ConfigureAwait(false);
     }
 }

@@ -44,8 +44,14 @@ public sealed class NotifyWholesaleServicesCimJsonDocumentWriter(IMessageRecordP
 
     public async Task<MarketDocumentStream> WriteAsync(
         OutgoingMessageHeader header,
-        IReadOnlyCollection<string> marketActivityRecords)
+        IReadOnlyCollection<string> marketActivityRecords,
+        CancellationToken cancellationToken = default)
     {
+        if (cancellationToken.IsCancellationRequested)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+        }
+
         var stream = new MarketDocumentWriterMemoryStream();
 
         using var writer = new Utf8JsonWriter(stream, _options);
@@ -53,7 +59,7 @@ public sealed class NotifyWholesaleServicesCimJsonDocumentWriter(IMessageRecordP
         WriteSeries(marketActivityRecords, writer);
         writer.WriteEndObject();
         writer.WriteEndObject();
-        await writer.FlushAsync().ConfigureAwait(false);
+        await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
 
         stream.Position = 0;
         return new MarketDocumentStream(stream);
