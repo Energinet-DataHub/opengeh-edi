@@ -47,8 +47,8 @@ public class B2CWebApiAuditLogTests : IAsyncLifetime
         return
         [
             [B2CWebApiRequests.CreateArchivedMessageGetDocumentRequest(), _datahubAdministratorRole, AuditLogActivity.ArchivedMessagesGet],
-            [B2CWebApiRequests.CreateArchivedMessageSearchRequest(), _datahubAdministratorRole, AuditLogActivity.ArchivedMessagesSearch],
             [B2CWebApiRequests.CreateArchivedMessageSearchV2Request(), _datahubAdministratorRole, AuditLogActivity.ArchivedMessagesSearch],
+            [B2CWebApiRequests.CreateArchivedMessageSearchV3Request(), _datahubAdministratorRole, AuditLogActivity.ArchivedMessagesSearch],
             [B2CWebApiRequests.CreateOrchestrationsRequest(), _datahubAdministratorRole, AuditLogActivity.OrchestrationsSearch],
             [B2CWebApiRequests.CreateOrchestrationRequest(), _datahubAdministratorRole, AuditLogActivity.OrchestrationsGet],
             [B2CWebApiRequests.CreateOrchestrationTerminateRequest(), _datahubAdministratorRole, AuditLogActivity.OrchestrationsTerminate],
