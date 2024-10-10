@@ -96,7 +96,9 @@ public class ArchivedMessageDsl
             });
 
         archivedMessageSearchResponse.Should().NotBeNull();
-        var archivedMessage = archivedMessageSearchResponse.Messages.Single();
+
+        var archivedMessage = archivedMessageSearchResponse.Messages.Should()
+            .ContainSingle($"There should be 1 archived message with {messageId} ").Subject;
         Assert.NotNull(archivedMessage.Id);
         Assert.NotNull(archivedMessage.MessageId);
         Assert.NotNull(archivedMessage.SenderNumber);
