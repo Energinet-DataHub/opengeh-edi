@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Energinet.DataHub.ProcessManagement.Core</AssemblyName>
+    <RootNamespace>Energinet.DataHub.ProcessManagement.Core</RootNamespace>
+  </PropertyGroup>
+
+</Project>
