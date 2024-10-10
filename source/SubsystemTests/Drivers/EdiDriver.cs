@@ -28,7 +28,7 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers;
 
-internal sealed class EdiDriver : IDisposable
+internal sealed class EdiDriver
 {
     private readonly IDurableClient _durableClient;
     private readonly AsyncLazy<HttpClient> _httpClient;
@@ -39,10 +39,6 @@ internal sealed class EdiDriver : IDisposable
         _durableClient = durableClient;
         _httpClient = b2bHttpClient;
         _logger = logger;
-    }
-
-    public void Dispose()
-    {
     }
 
     internal async Task<HttpResponseMessage> PeekMessageAsync(DocumentFormat? documentFormat = null)
@@ -162,9 +158,9 @@ internal sealed class EdiDriver : IDisposable
         return requestContent.MessageId;
     }
 
-    internal async Task<DurableOrchestrationStatus> WaitForOrchestrationStartedAsync(Instant calculationCompletedAt)
+    internal async Task<DurableOrchestrationStatus> WaitForOrchestrationStartedAsync(Instant orchestrationStartedAfter)
     {
-        var orchestration = await _durableClient.WaitForOrchestationStatusAsync(calculationCompletedAt.ToDateTimeUtc());
+        var orchestration = await _durableClient.WaitForOrchestrationStatusAsync(orchestrationStartedAfter.ToDateTimeUtc());
 
         return orchestration;
     }
@@ -172,6 +168,34 @@ internal sealed class EdiDriver : IDisposable
     internal async Task WaitForOrchestrationCompletedAsync(string orchestrationInstanceId)
     {
         await _durableClient.WaitForInstanceCompletedAsync(orchestrationInstanceId, TimeSpan.FromMinutes(30));
+    }
+
+    internal async Task StopOrchestrationForCalculationAsync(Guid calculationId, Instant createdAfter)
+    {
+        var runningOrchestrationsResult = await _durableClient.ListInstancesAsync(
+            new OrchestrationStatusQueryCondition
+            {
+                RuntimeStatus = [
+                    OrchestrationRuntimeStatus.Pending,
+                    OrchestrationRuntimeStatus.Running,
+                ],
+                ShowInput = true,
+                CreatedTimeFrom = createdAfter.ToDateTimeUtc(),
+            },
+            CancellationToken.None);
+
+        var orchestrationsForCalculation = runningOrchestrationsResult
+            .DurableOrchestrationState
+            .Where(o => o.Input.ToString().Contains(calculationId.ToString()))
+            .ToList();
+
+        if (orchestrationsForCalculation.Any())
+            return;
+
+        _logger.WriteLine($"Stopping {orchestrationsForCalculation.Count} orchestrations for calculation (CalculationId={calculationId})");
+
+        foreach (var orchestration in orchestrationsForCalculation)
+            await _durableClient.TerminateAsync(orchestration.InstanceId, "Stopped by subsystem test");
     }
 
     private static async Task<(Guid MessageId, string Content)> GetRequestWholesaleSettlementContentAsync(
