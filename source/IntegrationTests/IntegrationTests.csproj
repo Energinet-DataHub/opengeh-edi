@@ -37,7 +37,7 @@ limitations under the License.
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
-        <PackageReference Include="xunit" Version="2.9.0" />
+        <PackageReference Include="xunit" Version="2.9.2" />
         <PackageReference Include="xunit.categories" Version="2.0.8" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -62,6 +62,7 @@ limitations under the License.
       <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj" />
       <ProjectReference Include="..\IncomingMessages.Domain\IncomingMessages.Domain.csproj" />
       <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
+      <ProjectReference Include="..\IncomingMessages.IntegrationTests\IncomingMessages.IntegrationTests.csproj" />
       <ProjectReference Include="..\IntegrationEvents.Application\IntegrationEvents.Application.csproj" />
       <ProjectReference Include="..\IntegrationEvents.Infrastructure\IntegrationEvents.Infrastructure.csproj" />
       <ProjectReference Include="..\IntegrationEvents.IntegrationTests\IntegrationEvents.IntegrationTests.csproj" />
@@ -88,24 +89,6 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Application\IncomingMessages\FailSchemeValidationAggregatedMeasureData.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="Application\IncomingMessages\FailSchemeValidationRequestWholesaleSettlement.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="Application\IncomingMessages\RequestAggregatedMeasureDataAsDdk.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="Application\IncomingMessages\RequestAggregatedMeasureDataAsMdr.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="Application\IncomingMessages\RequestWholesaleSettlement.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="Application\IncomingMessages\RequestWholesaleSettlementWithUnusedBusinessReason.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
       <EmbeddedResource Include="Infrastructure.CimMessageAdapter\Messages\xml\BadRequestAggregatedMeasureData.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
@@ -170,6 +153,10 @@ limitations under the License.
       <None Update="Behaviours\IntegrationEvents\TestData\balance_fixing_01-11-2022_01-12-2022_ga_543_per_brp_ga_v1_with_invalid_row.csv">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Application\Process\"/>
     </ItemGroup>
 
 </Project>

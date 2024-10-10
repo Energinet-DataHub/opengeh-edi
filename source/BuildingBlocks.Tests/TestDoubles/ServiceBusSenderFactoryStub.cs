@@ -26,7 +26,7 @@ public sealed class ServiceBusSenderFactoryStub : IAzureClientFactory<ServiceBus
         return _senders.First(a => a.QueueOrTopicName.Equals(name, StringComparison.OrdinalIgnoreCase));
     }
 
-    internal void AddSenderSpy(ServiceBusSenderSpy senderSpy)
+    public void AddSenderSpy(ServiceBusSenderSpy senderSpy)
     {
         _senders.Add(senderSpy);
     }
