@@ -43,6 +43,10 @@ public sealed class UnHandledExceptionMiddleware(ILogger<UnHandledExceptionMiddl
         {
             await next(context);
         }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogWarning("Request was cancelled: {Ex}", ex.Message);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error processing invocation: {Ex}", ex.Message);
