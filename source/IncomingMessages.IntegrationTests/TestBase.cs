@@ -25,19 +25,12 @@ using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.Process.Domain.Commands;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
-using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -66,8 +59,6 @@ public class TestBase : IDisposable
         Fixture.DatabaseManager.CleanupDatabase();
         Fixture.CleanupFileStorage();
         _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
-        // TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
-        // InboxEventNotificationHandler = new TestNotificationHandlerSpy();
         BuildServices(testOutputHelper);
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         AuthenticatedActor = GetService<AuthenticatedActor>();
@@ -82,10 +73,6 @@ public class TestBase : IDisposable
     protected AuthenticatedActor AuthenticatedActor { get; }
 
     protected ServiceProvider ServiceProvider { get; private set; } = null!;
-
-    // private TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
-
-    // private TestNotificationHandlerSpy InboxEventNotificationHandler { get; }
 
     public void Dispose()
     {
@@ -113,8 +100,7 @@ public class TestBase : IDisposable
                 $"Couldn't get file content from file storage (container: {container}, blob: {fileStorageReference})");
         }
 
-        var fileStringContent = await GetStreamContentAsStringAsync(blobContent.Value.Content);
-        return fileStringContent;
+        return await GetStreamContentAsStringAsync(blobContent.Value.Content);
     }
 
     protected static async Task<string> GetStreamContentAsStringAsync(Stream stream)
@@ -136,6 +122,7 @@ public class TestBase : IDisposable
     {
         using var connection =
             await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+
         var fileStorageReference = await connection.ExecuteScalarAsync<string>(
             $"SELECT FileStorageReference FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'");
 
@@ -146,6 +133,7 @@ public class TestBase : IDisposable
     {
         using var connection =
             await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+
         var archivedMessage = await connection.QuerySingleOrDefaultAsync(
             $"SELECT * FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'");
 
@@ -156,21 +144,6 @@ public class TestBase : IDisposable
         where T : notnull
     {
         return ServiceProvider.GetRequiredService<T>();
-    }
-
-    protected void ClearDbContextCaches()
-    {
-        if (_services == null)
-        {
-            throw new InvalidOperationException("ServiceCollection is not yet initialized");
-        }
-
-        var dbContextServices = _services
-            .Where(s => s.ServiceType.IsSubclassOf(typeof(DbContext)) || s.ServiceType == typeof(DbContext))
-            .Select(s => (DbContext)ServiceProvider.GetService(s.ServiceType)!);
-
-        foreach (var dbContext in dbContextServices)
-            dbContext.ChangeTracker.Clear();
     }
 
     protected virtual void Dispose(bool disposing)
@@ -187,7 +160,6 @@ public class TestBase : IDisposable
 
     private void BuildServices(ITestOutputHelper testOutputHelper)
     {
-        Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
         Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", Fixture.DatabaseManager.ConnectionString);
         Environment.SetEnvironmentVariable(
             "AZURE_STORAGE_ACCOUNT_CONNECTION_STRING",
@@ -201,37 +173,24 @@ public class TestBase : IDisposable
                     // ServiceBus
                     [$"{ServiceBusNamespaceOptions.SectionName}:{nameof(ServiceBusNamespaceOptions.FullyQualifiedNamespace)}"] =
                         "Fake",
-                    [$"{EdiInboxQueueOptions.SectionName}:{nameof(EdiInboxQueueOptions.QueueName)}"] = "Fake",
-                    [$"{WholesaleInboxQueueOptions.SectionName}:{nameof(WholesaleInboxQueueOptions.QueueName)}"] =
-                        "Fake",
                     [$"{IncomingMessagesQueueOptions.SectionName}:{nameof(IncomingMessagesQueueOptions.QueueName)}"] =
                         "Fake",
-                    [$"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.TopicName)}"] =
-                        "NotEmpty",
-                    [$"{IntegrationEventsOptions.SectionName}:{nameof(IntegrationEventsOptions.SubscriptionName)}"] =
-                        "NotEmpty",
-
-                    // Dead-letter logging
-                    [$"{BlobDeadLetterLoggerOptions.SectionName}:{nameof(BlobDeadLetterLoggerOptions.StorageAccountUrl)}"] =
-                        Fixture.AzuriteManager.BlobStorageServiceUri.OriginalString,
-                    [$"{BlobDeadLetterLoggerOptions.SectionName}:{nameof(BlobDeadLetterLoggerOptions.ContainerName)}"] =
-                        "edi-tests",
                 })
             .Build();
 
         _services = [];
         _services
             .AddScoped<IConfiguration>(_ => config)
-            .AddTransient<InboxEventsProcessor>()
-            .AddB2BAuthentication(new TokenValidationParameters
-            {
-                ValidateAudience = false,
-                ValidateLifetime = false,
-                ValidateIssuer = false,
-                SignatureValidator = (token, _) => new JsonWebToken(token),
-            })
-             .AddJavaScriptEncoder()
-             .AddSerializer()
+            .AddB2BAuthentication(
+                new TokenValidationParameters
+                {
+                    ValidateAudience = false,
+                    ValidateLifetime = false,
+                    ValidateIssuer = false,
+                    SignatureValidator = (token, _) => new JsonWebToken(token),
+                })
+            .AddJavaScriptEncoder()
+            .AddSerializer()
             .AddScoped<IClock>(_ => new ClockStub())
             .AddArchivedMessagesModule(config)
             .AddMasterDataModule(config)
