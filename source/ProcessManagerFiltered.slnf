@@ -1,0 +1,14 @@
+{
+  "solution": {
+    "path": "EdiRepository.sln",
+    "projects": [
+      "ProcessManager.Client\\ProcessManager.Client.csproj",
+      "ProcessManager.Core\\ProcessManager.Core.csproj",
+      "ProcessManager.DatabaseMigration\\ProcessManager.DatabaseMigration.csproj",
+      "ProcessManager.IntegrationTests\\ProcessManager.IntegrationTests.csproj",
+      "ProcessManager.Orchestrations.IntegrationTests\\ProcessManager.Orchestrations.IntegrationTests.csproj",
+      "ProcessManager.Orchestrations\\ProcessManager.Orchestrations.csproj",
+      "ProcessManager\\ProcessManager.csproj"
+    ]
+  }
+}

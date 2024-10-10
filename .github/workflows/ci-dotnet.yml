@@ -22,7 +22,7 @@ jobs:
   dotnet_ci_build:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v14
     with:
-      solution_file_path: source/EDI.sln
+      solution_file_path: source/EdiRepository.sln
 
   # Tests that do not require the integration test environment
   tests:
@@ -47,11 +47,24 @@ jobs:
       fail-fast: false
       matrix:
         tests_filter_expression:
+          - name: ProcessManager IntegrationTests
+            paths: \source\ProcessManager.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.IntegrationTests.dll
+            filter: empty # Means skip
+            use_azure_functions_tools: true
+            contentroot_variable_name: empty # Means skip
+
+          - name: ProcessManager Orchestrations IntegrationTests
+            paths: \source\ProcessManager.Orchestrations.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.Orchestrations.IntegrationTests.dll
+            filter: empty # Means skip
+            use_azure_functions_tools: true
+            contentroot_variable_name: empty # Means skip
+
           - name: B2BApi AppTests
             paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.B2BApi.AppTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
+
           - name: B2CWebApi AppTests
             paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.B2CWebApi.AppTests.dll
             filter: empty # Means skip
