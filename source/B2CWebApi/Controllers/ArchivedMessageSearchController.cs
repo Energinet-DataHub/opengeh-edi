@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2CWebApi.Mappers;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime.Extensions;
@@ -159,9 +160,9 @@ public class ArchivedMessageSearchController : ControllerBase
                 x.MessageId,
                 DocumentTypeMapper.ToDocumentType(x.DocumentType),
                 x.SenderNumber,
-                x.SenderRoleCode,
+                ActorRole.FromCode(x.SenderRoleCode),
                 x.ReceiverNumber,
-                x.ReceiverRoleCode,
+                ActorRole.FromCode(x.ReceiverRoleCode),
                 x.CreatedAt.ToDateTimeOffset(),
                 x.BusinessReason));
         return Ok(new ArchivedMessageSearchResponseV3(messages, TotalCount: result.TotalAmountOfMessages));
