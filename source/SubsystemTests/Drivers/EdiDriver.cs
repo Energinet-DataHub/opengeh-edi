@@ -41,7 +41,8 @@ internal sealed class EdiDriver
         _logger = logger;
     }
 
-    internal async Task<HttpResponseMessage> PeekMessageAsync(DocumentFormat? documentFormat = null)
+    internal async Task<(HttpResponseMessage PeekResponse, HttpResponseMessage DequeueResponse)> PeekMessageAsync(
+        DocumentFormat? documentFormat = null)
     {
         var stopWatch = Stopwatch.StartNew();
 
@@ -49,12 +50,12 @@ internal sealed class EdiDriver
         var timeoutAfter = TimeSpan.FromMinutes(1);
         while (stopWatch.ElapsedMilliseconds < timeoutAfter.TotalMilliseconds)
         {
-            var peekResponse = await PeekAsync(documentFormat)
-                .ConfigureAwait(false);
+            var peekResponse = await PeekAsync(documentFormat).ConfigureAwait(false);
+
             if (peekResponse.StatusCode == HttpStatusCode.OK)
             {
-                await DequeueAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
-                return peekResponse;
+                var dequeueResponse = await DequeueAsync(GetMessageId(peekResponse)).ConfigureAwait(false);
+                return (peekResponse, dequeueResponse);
             }
 
             if (peekResponse.StatusCode != HttpStatusCode.NoContent)
@@ -254,11 +255,13 @@ internal sealed class EdiDriver
         return peekResponse;
     }
 
-    private async Task DequeueAsync(string messageId)
+    private async Task<HttpResponseMessage> DequeueAsync(string messageId)
     {
         var b2bClient = await _httpClient;
         using var request = new HttpRequestMessage(HttpMethod.Delete, $"v1.0/cim/dequeue/{messageId}");
         var dequeueResponse = await b2bClient.SendAsync(request).ConfigureAwait(false);
         await dequeueResponse.EnsureSuccessStatusCodeWithLogAsync(_logger);
+
+        return dequeueResponse;
     }
 }
