@@ -46,10 +46,7 @@ public sealed class NotifyAggregatedMeasureDataCimJsonDocumentWriter(
 
     public async Task<MarketDocumentStream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords, CancellationToken cancellationToken = default)
     {
-        if (cancellationToken.IsCancellationRequested)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-        }
+        cancellationToken.ThrowIfCancellationRequested();
 
         var stream = new MarketDocumentWriterMemoryStream();
 

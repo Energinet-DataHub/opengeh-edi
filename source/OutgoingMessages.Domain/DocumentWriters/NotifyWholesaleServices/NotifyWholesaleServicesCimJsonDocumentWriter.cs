@@ -47,10 +47,7 @@ public sealed class NotifyWholesaleServicesCimJsonDocumentWriter(IMessageRecordP
         IReadOnlyCollection<string> marketActivityRecords,
         CancellationToken cancellationToken = default)
     {
-        if (cancellationToken.IsCancellationRequested)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-        }
+        cancellationToken.ThrowIfCancellationRequested();
 
         var stream = new MarketDocumentWriterMemoryStream();
 

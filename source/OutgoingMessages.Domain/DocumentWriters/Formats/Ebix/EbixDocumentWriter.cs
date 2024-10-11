@@ -45,10 +45,7 @@ public abstract class EbixDocumentWriter : IDocumentWriter
         IReadOnlyCollection<string> marketActivityRecords,
         CancellationToken cancellationToken = default)
     {
-        if (cancellationToken.IsCancellationRequested)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-        }
+        cancellationToken.ThrowIfCancellationRequested();
 
         var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = new UTF8Encoding(false), Async = true, Indent = true };
         var stream = new MarketDocumentWriterMemoryStream();
