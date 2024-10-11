@@ -52,7 +52,7 @@ internal sealed class MicrosoftIdentityDriver
         var response = await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         await response.EnsureSuccessStatusCodeWithLogAsync(_logger);
 
-        var accessToken = await response.Content.ReadFromJsonAsync<AccessTokenResponse>(cancellationToken: cancellationToken).ConfigureAwait(false);
+        var accessToken = await response.Content.ReadFromJsonAsync<AccessTokenResponse>(cancellationToken).ConfigureAwait(false);
 
         if (string.IsNullOrEmpty(accessToken?.AccessToken))
             throw new JsonException($"Couldn't parse Azure AD access token. Response content: {await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false)}");

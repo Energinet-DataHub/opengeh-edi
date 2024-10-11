@@ -59,7 +59,7 @@ public sealed class WhenEnergyResultRequestedTests : BaseTestClass
     [Fact]
     public async Task Actor_can_request_aggregated_measure_data()
     {
-        var messageId = await _aggregatedMeasureDataRequest.Request(cancellationToken: CancellationToken.None);
+        var messageId = await _aggregatedMeasureDataRequest.Request(CancellationToken.None);
 
         await _aggregatedMeasureDataRequest.ConfirmRequestIsInitialized(
             messageId,
@@ -71,7 +71,7 @@ public sealed class WhenEnergyResultRequestedTests : BaseTestClass
     {
         var createdAfter = SystemClock.Instance.GetCurrentInstant();
         var energySupplierActorNumber = _energySupplierActorNumber;
-        await _aggregatedMeasureDataRequest.B2CRequest(cancellationToken: CancellationToken.None);
+        await _aggregatedMeasureDataRequest.B2CRequest(CancellationToken.None);
 
         await _aggregatedMeasureDataRequest.ConfirmRequestIsInitialized(
             createdAfter,

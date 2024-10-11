@@ -67,7 +67,7 @@ public class ActorRepository : IActorRepository
             .AnyAsync(
                 actor => actor.ActorNumber == actorNumber
                                && actor.ExternalId == externalId,
-                cancellationToken: cancellationToken)
+                cancellationToken)
             .ConfigureAwait(false);
     }
 }

@@ -54,7 +54,7 @@ public class ProcessDelegationRepository : IProcessDelegationRepository
         var latestDelegation = await query
             .Where(pd => pd.GridAreaCode == gridAreaCode)
             .OrderByDescending(pd => pd.SequenceNumber)
-            .FirstOrDefaultAsync(cancellationToken: cancellationToken)
+            .FirstOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
 
         if (latestDelegation == null)

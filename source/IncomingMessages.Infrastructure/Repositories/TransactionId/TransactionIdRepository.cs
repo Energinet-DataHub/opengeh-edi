@@ -62,7 +62,7 @@ public class TransactionIdRepository : ITransactionIdRepository
             .FirstOrDefaultAsync(
                 transactionIdForSender => transactionIdForSender.TransactionId == transactionId
                      && transactionIdForSender.SenderId == senderId,
-                cancellationToken: cancellationToken)
+                cancellationToken)
             .ConfigureAwait(false);
     }
 }

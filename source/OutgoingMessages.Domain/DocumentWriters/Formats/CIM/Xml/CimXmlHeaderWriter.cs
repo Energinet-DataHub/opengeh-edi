@@ -20,7 +20,11 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters.Formats.
 
 internal static class CimXmlHeaderWriter
 {
-    internal static async Task WriteAsync(XmlWriter writer, OutgoingMessageHeader messageHeader, DocumentDetails documentDetails, string? reasonCode)
+    internal static async Task WriteAsync(
+        XmlWriter writer,
+        OutgoingMessageHeader messageHeader,
+        DocumentDetails documentDetails,
+        string? reasonCode)
     {
         ArgumentNullException.ThrowIfNull(messageHeader);
         ArgumentNullException.ThrowIfNull(writer);

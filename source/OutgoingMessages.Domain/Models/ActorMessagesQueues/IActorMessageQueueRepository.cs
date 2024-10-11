@@ -24,12 +24,12 @@ public interface IActorMessageQueueRepository
     /// <summary>
     /// Get the actor queue for the given actor number and role.
     /// </summary>
-    Task<ActorMessageQueue?> ActorMessageQueueForAsync(ActorNumber actorNumber, ActorRole actorRole);
+    Task<ActorMessageQueue?> ActorMessageQueueForAsync(ActorNumber actorNumber, ActorRole actorRole, CancellationToken cancellationToken);
 
     /// <summary>
     /// Get the actor queue for the given actor number and role.
     /// </summary>
-    Task<ActorMessageQueueId?> ActorMessageQueueIdForAsync(ActorNumber actorNumber, ActorRole actorRole);
+    Task<ActorMessageQueueId?> ActorMessageQueueIdForAsync(ActorNumber actorNumber, ActorRole actorRole, CancellationToken cancellationToken);
 
     /// <summary>
     /// Add a new actor queue.
