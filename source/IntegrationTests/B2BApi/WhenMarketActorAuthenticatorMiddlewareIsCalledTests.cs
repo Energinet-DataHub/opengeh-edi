@@ -12,15 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Net;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Dapper;
-using Energinet.DataHub.Core.App.FunctionApp;
 using Energinet.DataHub.EDI.B2BApi.Authentication;
 using Energinet.DataHub.EDI.B2BApi.Configuration.Middleware.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -130,7 +125,7 @@ public class WhenMarketActorAuthenticatorMiddlewareIsCalledTests : TestBase
         response!.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         response.Headers.GetValues("Content-Type").FirstOrDefault()
             .Should().NotBeNull()
-            .And.Contain("application/ebix; charset=utf-8");
+            .And.Contain("text/xml; charset=utf-8");
 
         response.Body.Should().BeNull();
     }

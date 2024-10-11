@@ -87,6 +87,10 @@ public class DequeueRequestListenerTests : IAsyncLifetime
 
         // Assert
         actualResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        (await actualResponse.Content.ReadAsStringAsync()).Should().BeEmpty();
+        actualResponse.Content.Headers.ContentType.Should().NotBeNull();
+        actualResponse.Content.Headers.ContentType!.MediaType.Should().Be("text/plain");
+        actualResponse.Content.Headers.ContentType.CharSet.Should().Be("utf-8");
     }
 
     [Fact]
