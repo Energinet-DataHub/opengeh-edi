@@ -32,12 +32,12 @@ public class GivenExecuteDataRetentionsTests : TestBase
     }
 
     [Fact]
-    public async Task Given_ADayHasPassed_When_JobsExecutionTimeLimitExceeds_Then_JobsIsCancelledSuccessfully()
+    public async Task Given_ADayHasPassed_When_AJobExecutionTimeLimitExceeds_Then_JobsIsCancelledSuccessfully()
     {
         // Arrange
         var cancellationToken = new CancellationTokenSource().Token;
         var notification = new ADayHasPassed(GetService<IClock>().GetCurrentInstant());
-        var longRunningDataRetentionJob = new SleepyDataRetentionJob(executionTimeLimitInSeconds: 5);
+        var longRunningDataRetentionJob = new SleepyDataRetentionJob(executionTimeLimitInSeconds: 15);
 
         var loggerSpy = new LoggerSpy();
         var sut = new ExecuteDataRetentionsWhenADayHasPassed(
@@ -54,50 +54,5 @@ public class GivenExecuteDataRetentionsTests : TestBase
         loggerSpy.CapturedLogLevel.Should().Be(LogLevel.Warning);
         loggerSpy.Message.Should()
             .Be($"Data retention job {longRunningDataRetentionJob.GetType().FullName} was cancelled.");
-    }
-}
-
-public class SleepyDataRetentionJob(int executionTimeLimitInSeconds) : IDataRetention
-{
-    public Task CleanupAsync(CancellationToken cancellationToken)
-    {
-        for (var i = 0; i < executionTimeLimitInSeconds; i++)
-        {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-            }
-
-            Thread.Sleep(TimeSpan.FromSeconds(1));
-        }
-
-        return Task.CompletedTask;
-    }
-}
-
-public class LoggerSpy : ILogger<ExecuteDataRetentionsWhenADayHasPassed>
-{
-    public Exception? CapturedException { get; private set; }
-
-    public LogLevel? CapturedLogLevel { get; private set; }
-
-    public string? Message { get; private set; }
-
-    public IDisposable? BeginScope<TState>(TState state)
-        where TState : notnull
-    {
-        throw new NotImplementedException();
-    }
-
-    public bool IsEnabled(LogLevel logLevel)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
-    {
-        CapturedException = exception;
-        CapturedLogLevel = logLevel;
-        Message = state!.ToString();
     }
 }

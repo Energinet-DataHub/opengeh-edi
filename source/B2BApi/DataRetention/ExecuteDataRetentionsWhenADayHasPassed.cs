@@ -56,8 +56,8 @@ public class ExecuteDataRetentionsWhenADayHasPassed : INotificationHandler<ADayH
 
             var tasks = _dataRetentions.Select(async dataCleaner =>
             {
-                var task = executionPolicy.ExecuteAsync(() =>
-                    dataCleaner.CleanupAsync(linkedCts.Token));
+                var task = executionPolicy.ExecuteAsync(
+                    () => dataCleaner.CleanupAsync(linkedCts.Token));
                 taskMap[task] = dataCleaner;
                 await task.ConfigureAwait(false);
             });
@@ -66,16 +66,23 @@ public class ExecuteDataRetentionsWhenADayHasPassed : INotificationHandler<ADayH
         }
         catch (OperationCanceledException ex)
         {
-            var incompleteTasks = taskMap
-                .Where(kvp => kvp.Key.Status != TaskStatus.RanToCompletion)
-                .Select(kvp => kvp.Value);
-            foreach (var dataCleaner in incompleteTasks)
-            {
-                _logger?.LogWarning(
-                    ex,
-                    "Data retention job {DataCleaner} was cancelled.",
-                    dataCleaner.GetType().FullName);
-            }
+            // This catch block handles task-specific cancellations.
+            // It logs the cancellation of data retention jobs.
+            LogCancelledTasks(taskMap, ex);
+        }
+    }
+
+    private void LogCancelledTasks(Dictionary<Task, IDataRetention> taskMap, Exception ex)
+    {
+        var incompleteTasks = taskMap
+            .Where(kvp => kvp.Key.Status != TaskStatus.RanToCompletion)
+            .Select(kvp => kvp.Value);
+        foreach (var dataCleaner in incompleteTasks)
+        {
+            _logger?.LogWarning(
+                ex,
+                "Data retention job {DataCleaner} was cancelled.",
+                dataCleaner.GetType().FullName);
         }
     }
 }
