@@ -25,6 +25,12 @@ public class Orchestration
 
     public Instant ScheduledAt { get; set; }
 
+    public Instant StartedAt { get; set; }
+
+    public Instant ChangedAt { get; set; }
+
+    public Instant CompletedAt { get; set; }
+
     public IList<OrchestrationStep> Steps { get; }
         = [];
 
