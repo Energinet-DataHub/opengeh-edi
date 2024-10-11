@@ -60,7 +60,7 @@ public class DequeuedBundlesRetention : IDataRetention
 
             var monthAgo = _clock.GetCurrentInstant().Plus(-Duration.FromDays(30));
             var dequeuedBundles = await _bundleRepository
-                .GetDequeuedBundlesOlderThanAsync(monthAgo, 500)
+                .GetDequeuedBundlesOlderThanAsync(monthAgo, 500, cancellationToken)
                 .ConfigureAwait(false);
 
             if (dequeuedBundles.Count == 0)
@@ -73,17 +73,17 @@ public class DequeuedBundlesRetention : IDataRetention
 
             try
             {
-                await AuditLogOutgoingMessageDeletionAsync(monthAgo).ConfigureAwait(false);
+                await AuditLogOutgoingMessageDeletionAsync(monthAgo, cancellationToken).ConfigureAwait(false);
                 await _outgoingMessageRepository
-                    .DeleteOutgoingMessagesIfExistsAsync(dequeuedBundleIds)
+                    .DeleteOutgoingMessagesIfExistsAsync(dequeuedBundleIds, cancellationToken)
                     .ConfigureAwait(false);
 
-                await AuditLogMarketDocumentDeletionAsync(monthAgo).ConfigureAwait(false);
+                await AuditLogMarketDocumentDeletionAsync(monthAgo, cancellationToken).ConfigureAwait(false);
                 await _marketDocumentRepository
-                    .DeleteMarketDocumentsIfExistsAsync(dequeuedBundleIds)
+                    .DeleteMarketDocumentsIfExistsAsync(dequeuedBundleIds, cancellationToken)
                     .ConfigureAwait(false);
 
-                await AuditLogBundleDeletionAsync(monthAgo, dequeuedBundles).ConfigureAwait(false);
+                await AuditLogBundleDeletionAsync(monthAgo, dequeuedBundles, cancellationToken).ConfigureAwait(false);
                 _bundleRepository.Delete(dequeuedBundles);
 
                 await _actorMessageQueueContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -99,23 +99,23 @@ public class DequeuedBundlesRetention : IDataRetention
         }
     }
 
-    private async Task AuditLogOutgoingMessageDeletionAsync(Instant deletedAfter)
+    private async Task AuditLogOutgoingMessageDeletionAsync(Instant deletedAfter, CancellationToken cancellationToken)
     {
-        await AuditLogAsync(AuditLogEntityType.OutgoingMessage, deletedAfter).ConfigureAwait(false);
+        await AuditLogAsync(AuditLogEntityType.OutgoingMessage, deletedAfter, cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task AuditLogMarketDocumentDeletionAsync(Instant deletedAfter)
+    private async Task AuditLogMarketDocumentDeletionAsync(Instant deletedAfter, CancellationToken cancellationToken)
     {
-        await AuditLogAsync(AuditLogEntityType.MarketDocument, deletedAfter).ConfigureAwait(false);
+        await AuditLogAsync(AuditLogEntityType.MarketDocument, deletedAfter, cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task AuditLogBundleDeletionAsync(Instant deletedAfter, IReadOnlyCollection<Bundle> dequeuedBundles)
+    private async Task AuditLogBundleDeletionAsync(Instant deletedAfter, IReadOnlyCollection<Bundle> dequeuedBundles, CancellationToken cancellationToken)
     {
-        await AuditLogAsync(AuditLogEntityType.Bundle, (OlderThan: deletedAfter, DeletedAmount: dequeuedBundles.Count))
+        await AuditLogAsync(AuditLogEntityType.Bundle, (OlderThan: deletedAfter, DeletedAmount: dequeuedBundles.Count), cancellationToken)
             .ConfigureAwait(false);
     }
 
-    private async Task AuditLogAsync(AuditLogEntityType auditLogEntityType, object? payload)
+    private async Task AuditLogAsync(AuditLogEntityType auditLogEntityType, object? payload, CancellationToken cancellationToken)
     {
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
@@ -123,7 +123,8 @@ public class DequeuedBundlesRetention : IDataRetention
                 activityOrigin: nameof(ADayHasPassed),
                 activityPayload: payload,
                 affectedEntityType: auditLogEntityType,
-                affectedEntityKey: null)
+                affectedEntityKey: null,
+                cancellationToken: cancellationToken)
             .ConfigureAwait(false);
     }
 }

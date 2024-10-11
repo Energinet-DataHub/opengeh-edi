@@ -67,7 +67,8 @@ public class OutboxRetention(
                         activityOrigin: nameof(ADayHasPassed),
                         activityPayload: (OlderThan: oneWeekAgo, DeletedAmount: messagesToDelete.Count),
                         affectedEntityType: AuditLogEntityType.OutboxMessage,
-                        affectedEntityKey: null)
+                        affectedEntityKey: null,
+                        cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
 
                 await _outboxContext.SaveChangesAsync(cancellationToken)

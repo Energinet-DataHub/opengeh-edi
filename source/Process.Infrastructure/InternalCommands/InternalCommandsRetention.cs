@@ -49,7 +49,7 @@ public class InternalCommandsRetention : IDataRetention
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            await LogAuditAsync().ConfigureAwait(false);
+            await LogAuditAsync(cancellationToken).ConfigureAwait(false);
             await DeleteOldCommandsAsync(cancellationToken).ConfigureAwait(false);
             anyOldInternalCommands = await GetAmountOfRemainingCommandsAsync(cancellationToken).ConfigureAwait(false);
         }
@@ -82,7 +82,7 @@ public class InternalCommandsRetention : IDataRetention
         }
     }
 
-    private async Task LogAuditAsync()
+    private async Task LogAuditAsync(CancellationToken cancellationToken)
     {
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
@@ -90,7 +90,8 @@ public class InternalCommandsRetention : IDataRetention
                 activityOrigin: nameof(ADayHasPassed),
                 activityPayload: _clock.GetCurrentInstant(),
                 affectedEntityType: AuditLogEntityType.InternalCommand,
-                affectedEntityKey: null)
+                affectedEntityKey: null,
+                cancellationToken: cancellationToken)
             .ConfigureAwait(false);
     }
 
