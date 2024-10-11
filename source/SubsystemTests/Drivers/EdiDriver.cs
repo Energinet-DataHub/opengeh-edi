@@ -196,10 +196,12 @@ internal sealed class EdiDriver
             return;
         }
 
-        _logger.WriteLine($"Stopping {orchestrationsForCalculation.Count} orchestrations for calculation (CalculationId={calculationId})");
 
         foreach (var orchestration in orchestrationsForCalculation)
-            await _durableClient.TerminateAsync(orchestration.InstanceId, "Stopped by subsystem test");
+        {
+            _logger.WriteLine($"Stopping orchestration for calculation (CalculationId={calculationId}, OrchestrationInstanceId={orchestration.InstanceId})");
+            await _durableClient.TerminateAsync(orchestration.InstanceId, "Stopped after load test");
+        }
     }
 
     private static async Task<(Guid MessageId, string Content)> GetRequestWholesaleSettlementContentAsync(
