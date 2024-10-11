@@ -37,4 +37,8 @@ public class OrchestrationRegister
     {
         return new List<Orchestration>();
     }
+
+    public void UpdateOrchestration(Orchestration orchestration)
+    {
+    }
 }

@@ -31,7 +31,7 @@ public class Orchestration
     /// <summary>
     /// The overall state of the orchestration.
     /// </summary>
-    public string? State { get; set; }
+    public OrchestrationState? State { get; set; }
 
     /// <summary>
     /// The orchestrator which is conducting the orchestration.

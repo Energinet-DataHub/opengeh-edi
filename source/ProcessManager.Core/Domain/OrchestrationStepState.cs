@@ -14,17 +14,4 @@
 
 namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 
-public class OrchestrationStep
-{
-    public OrchestrationStepId? Id { get; set; }
-
-    /// <summary>
-    /// The state of the step.
-    /// </summary>
-    public OrchestrationStepState? State { get; set; }
-
-    /// <summary>
-    /// The orchestration which this step is part of.
-    /// </summary>
-    public OrchestratorId? OrchestratorId { get; set; }
-}
+public record OrchestrationStepState(string Value);
