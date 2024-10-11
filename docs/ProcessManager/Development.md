@@ -28,3 +28,7 @@
 ### Recipe for implementation of new process
 
 // TODO: Describe how to implement the handling of a new process
+
+## GitHub Workflows
+
+// TODO: What is the purpose of each workflow; what is it's trigger; what is its "output"
