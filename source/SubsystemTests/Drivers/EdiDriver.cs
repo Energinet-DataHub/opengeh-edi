@@ -196,7 +196,6 @@ internal sealed class EdiDriver
             return;
         }
 
-
         foreach (var orchestration in orchestrationsForCalculation)
         {
             _logger.WriteLine($"Stopping orchestration for calculation (CalculationId={calculationId}, OrchestrationInstanceId={orchestration.InstanceId})");
