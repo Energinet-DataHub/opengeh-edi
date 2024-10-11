@@ -1,6 +1,6 @@
 {
   "solution": {
-    "path": "EdiRepository.sln",
+    "path": "Edi.Repository.sln",
     "projects": [
       "ProcessManager.Client.IntegrationTests\\ProcessManager.Client.IntegrationTests.csproj",
       "ProcessManager.Client\\ProcessManager.Client.csproj"

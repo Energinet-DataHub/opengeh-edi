@@ -1,6 +1,6 @@
 {
   "solution": {
-    "path": "EdiRepository.sln",
+    "path": "Edi.Repository.sln",
     "projects": [
       "ApplyDBMigrationsApp\\ApplyDBMigrationsApp.csproj",
       "ArchitectureTests\\ArchitectureTests.csproj",
