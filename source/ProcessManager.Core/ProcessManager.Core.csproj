@@ -5,4 +5,8 @@
     <RootNamespace>Energinet.DataHub.ProcessManagement.Core</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Infrastructure\" />
+  </ItemGroup>
+
 </Project>
