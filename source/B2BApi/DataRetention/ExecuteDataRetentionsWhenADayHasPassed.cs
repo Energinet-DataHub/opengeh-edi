@@ -79,7 +79,7 @@ public class ExecuteDataRetentionsWhenADayHasPassed : INotificationHandler<ADayH
             .Select(kvp => kvp.Value);
         foreach (var dataCleaner in incompleteTasks)
         {
-            _logger?.LogWarning(
+            _logger?.LogError(
                 ex,
                 "Data retention job {DataCleaner} was cancelled.",
                 dataCleaner.GetType().FullName);

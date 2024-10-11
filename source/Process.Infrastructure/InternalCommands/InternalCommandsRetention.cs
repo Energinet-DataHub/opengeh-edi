@@ -44,18 +44,14 @@ public class InternalCommandsRetention : IDataRetention
 
     public async Task CleanupAsync(CancellationToken cancellationToken)
     {
-        var anyOldInternaCommands = await GetAmountOfRemainingCommandsAsync(cancellationToken).ConfigureAwait(false);
-        while (anyOldInternaCommands)
+        var anyOldInternalCommands = await GetAmountOfRemainingCommandsAsync(cancellationToken).ConfigureAwait(false);
+        while (anyOldInternalCommands)
         {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                _logger.LogInformation("Cancellation requested. Exiting cleanup loop.");
-                cancellationToken.ThrowIfCancellationRequested();
-            }
+            cancellationToken.ThrowIfCancellationRequested();
 
             await LogAuditAsync().ConfigureAwait(false);
             await DeleteOldCommandsAsync(cancellationToken).ConfigureAwait(false);
-            anyOldInternaCommands = await GetAmountOfRemainingCommandsAsync(cancellationToken).ConfigureAwait(false);
+            anyOldInternalCommands = await GetAmountOfRemainingCommandsAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 

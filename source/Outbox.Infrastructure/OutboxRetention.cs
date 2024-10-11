@@ -44,11 +44,7 @@ public class OutboxRetention(
         var skip = 0;
         while (true)
         {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                _logger.LogInformation("Cancellation requested. Exiting cleanup loop.");
-                cancellationToken.ThrowIfCancellationRequested();
-            }
+            cancellationToken.ThrowIfCancellationRequested();
 
             try
             {

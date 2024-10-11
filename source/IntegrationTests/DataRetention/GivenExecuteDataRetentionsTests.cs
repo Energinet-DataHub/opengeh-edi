@@ -51,7 +51,7 @@ public class GivenExecuteDataRetentionsTests : TestBase
         // Assert
         await act.Should().NotThrowAsync();
         loggerSpy.CapturedException.Should().BeOfType<OperationCanceledException>();
-        loggerSpy.CapturedLogLevel.Should().Be(LogLevel.Warning);
+        loggerSpy.CapturedLogLevel.Should().Be(LogLevel.Error);
         loggerSpy.Message.Should()
             .Be($"Data retention job {longRunningDataRetentionJob.GetType().FullName} was cancelled.");
     }
