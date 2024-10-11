@@ -19,14 +19,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.ActorMessageQueues;
 
-public class ActorMessageQueueRepository : IActorMessageQueueRepository
+public class ActorMessageQueueRepository(ActorMessageQueueContext actorMessageQueueContext)
+    : IActorMessageQueueRepository
 {
-    private readonly ActorMessageQueueContext _actorMessageQueueContext;
-
-    public ActorMessageQueueRepository(ActorMessageQueueContext actorMessageQueueContext)
-    {
-        _actorMessageQueueContext = actorMessageQueueContext;
-    }
+    private readonly ActorMessageQueueContext _actorMessageQueueContext = actorMessageQueueContext;
 
     public async Task<ActorMessageQueue?> ActorMessageQueueForAsync(
         ActorNumber actorNumber,
