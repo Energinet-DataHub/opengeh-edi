@@ -56,6 +56,12 @@ public class DequeuedBundlesRetention : IDataRetention
     {
         while (true)
         {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogInformation("Cancellation requested. Exiting cleanup loop.");
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
             var monthAgo = _clock.GetCurrentInstant().Plus(-Duration.FromDays(30));
             var dequeuedBundles = await _bundleRepository
                 .GetDequeuedBundlesOlderThanAsync(monthAgo, 500)

@@ -42,18 +42,12 @@ public class OutboxRetention(
 
         var batchSize = 100;
         var skip = 0;
-        var timeoutInMinutes = 60;
-        var timeoutAfter = _clock.GetCurrentInstant().Plus(Duration.FromMinutes(timeoutInMinutes));
-
         while (true)
         {
-            if (_clock.GetCurrentInstant() > timeoutAfter)
+            if (cancellationToken.IsCancellationRequested)
             {
-                _logger.LogError(
-                    "Outbox retention didn't complete after {timeoutInMinutes} minutes. Deleted {DeletedMessagesCount} messages.",
-                    timeoutInMinutes,
-                    skip);
-                break;
+                _logger.LogInformation("Cancellation requested. Exiting cleanup loop.");
+                cancellationToken.ThrowIfCancellationRequested();
             }
 
             try
@@ -70,6 +64,7 @@ public class OutboxRetention(
 
                 _outboxContext.Outbox.RemoveRange(messagesToDelete);
 
+                // TODO: use cancellation token
                 await _auditLogger.LogWithCommitAsync(
                         logId: AuditLogId.New(),
                         activity: AuditLogActivity.RetentionDeletion,

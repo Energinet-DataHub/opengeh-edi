@@ -48,6 +48,12 @@ public class ReceivedInboxEventsRetention : IDataRetention
         var anyEventsFromAMonthAgo = await AnyEventsOlderThanAsync(monthAgo, cancellationToken).ConfigureAwait(false);
         while (anyEventsFromAMonthAgo)
         {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogInformation("Cancellation requested. Exiting cleanup loop.");
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
             await LogAuditAsync(monthAgo).ConfigureAwait(false);
             await DeleteOldEventsAsync(monthAgo, cancellationToken).ConfigureAwait(false);
 
