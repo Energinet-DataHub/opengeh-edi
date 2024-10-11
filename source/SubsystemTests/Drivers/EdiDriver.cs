@@ -190,8 +190,11 @@ internal sealed class EdiDriver
             .Where(o => o.Input.ToString().Contains(calculationId.ToString()))
             .ToList();
 
-        if (orchestrationsForCalculation.Any())
+        if (!orchestrationsForCalculation.Any())
+        {
+            _logger.WriteLine($"Found no orchestrations to stop for calculation (CalculationId={calculationId}, CreatedAfter={createdAfter.ToDateTimeUtc()})");
             return;
+        }
 
         _logger.WriteLine($"Stopping {orchestrationsForCalculation.Count} orchestrations for calculation (CalculationId={calculationId})");
 
