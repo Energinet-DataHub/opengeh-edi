@@ -24,7 +24,7 @@ public interface IMarketDocumentRepository
     /// <summary>
     /// Get document by bundle id
     /// </summary>
-    Task<MarketDocument?> GetAsync(BundleId bundleId);
+    Task<MarketDocument?> GetAsync(BundleId bundleId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Add document to repository

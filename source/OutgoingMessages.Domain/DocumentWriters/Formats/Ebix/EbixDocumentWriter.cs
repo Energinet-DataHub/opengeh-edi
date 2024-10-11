@@ -40,8 +40,13 @@ public abstract class EbixDocumentWriter : IDocumentWriter
 
     protected DocumentDetails DocumentDetails => _documentDetails;
 
-    public virtual async Task<MarketDocumentStream> WriteAsync(OutgoingMessageHeader header, IReadOnlyCollection<string> marketActivityRecords)
+    public virtual async Task<MarketDocumentStream> WriteAsync(
+        OutgoingMessageHeader header,
+        IReadOnlyCollection<string> marketActivityRecords,
+        CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         var settings = new XmlWriterSettings { OmitXmlDeclaration = false, Encoding = new UTF8Encoding(false), Async = true, Indent = true };
         var stream = new MarketDocumentWriterMemoryStream();
         using var writer = XmlWriter.Create(stream, settings);

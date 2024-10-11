@@ -101,7 +101,7 @@ public class ArchivedMessageRepository : IArchivedMessageRepository
 
         var fileStorageReference = new FileStorageReference(ArchivedMessage.FileStorageCategory, fileStorageReferenceString);
 
-        var fileStorageFile = await _fileStorageClient.DownloadAsync(fileStorageReference).ConfigureAwait(false);
+        var fileStorageFile = await _fileStorageClient.DownloadAsync(fileStorageReference, cancellationToken).ConfigureAwait(false);
 
         return new ArchivedMessageStream(fileStorageFile);
     }

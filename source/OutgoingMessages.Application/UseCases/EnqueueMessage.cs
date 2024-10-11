@@ -69,7 +69,9 @@ public class EnqueueMessage
         if (existingMessage != null) // Message is already enqueued, do nothing (idempotency check)
             return existingMessage.Id;
 
-        var actorMessageQueueId = await GetMessageQueueIdForReceiverAsync(messageToEnqueue.GetActorMessageQueueMetadata())
+        var actorMessageQueueId = await GetMessageQueueIdForReceiverAsync(
+                messageToEnqueue.GetActorMessageQueueMetadata(),
+                cancellationToken)
                 .ConfigureAwait(false);
 
         var newBundle = CreateBundle(messageToEnqueue, actorMessageQueueId);
@@ -102,11 +104,12 @@ public class EnqueueMessage
         return newBundle;
     }
 
-    private async Task<ActorMessageQueueId> GetMessageQueueIdForReceiverAsync(Receiver receiver)
+    private async Task<ActorMessageQueueId> GetMessageQueueIdForReceiverAsync(Receiver receiver, CancellationToken cancellationToken)
     {
         var actorMessageQueueId = await _actorMessageQueueRepository.ActorMessageQueueIdForAsync(
             receiver.Number,
-            receiver.ActorRole).ConfigureAwait(false);
+            receiver.ActorRole,
+            cancellationToken).ConfigureAwait(false);
 
         if (actorMessageQueueId == null)
         {

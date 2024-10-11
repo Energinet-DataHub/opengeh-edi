@@ -82,7 +82,8 @@ public class AuditLogger(
         string activityOrigin,
         object? activityPayload,
         AuditLogEntityType? affectedEntityType,
-        string? affectedEntityKey)
+        string? affectedEntityKey,
+        CancellationToken cancellationToken = default)
     {
         await LogAsync(
             logId,
@@ -93,7 +94,7 @@ public class AuditLogger(
             affectedEntityKey)
             .ConfigureAwait(false);
 
-        await _unitOfWork.CommitTransactionAsync()
+        await _unitOfWork.CommitTransactionAsync(cancellationToken)
             .ConfigureAwait(false);
     }
 }
