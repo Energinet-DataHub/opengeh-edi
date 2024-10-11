@@ -32,7 +32,7 @@ public class GivenExecuteDataRetentionsTests : TestBase
     }
 
     [Fact]
-    public async Task When_ADayHasPassed_When_JobsExecutionTimeLimitExceeds_Then_JobsIsCancelledSuccessfully()
+    public async Task Given_ADayHasPassed_When_JobsExecutionTimeLimitExceeds_Then_JobsIsCancelledSuccessfully()
     {
         // Arrange
         var cancellationToken = new CancellationTokenSource().Token;
