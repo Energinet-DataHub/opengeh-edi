@@ -60,7 +60,6 @@ public class OutboxRetention(
 
                 _outboxContext.Outbox.RemoveRange(messagesToDelete);
 
-                // TODO: use cancellation token
                 await _auditLogger.LogWithCommitAsync(
                         logId: AuditLogId.New(),
                         activity: AuditLogActivity.RetentionDeletion,
