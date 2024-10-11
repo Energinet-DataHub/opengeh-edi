@@ -56,6 +56,27 @@ public sealed class UnHandledExceptionMiddleware(ILogger<UnHandledExceptionMiddl
             // This catch block handles all other exceptions.
             // It logs an error message indicating that an error occurred during the invocation.
             _logger.LogError(ex, "Error processing invocation: {Ex}", ex.Message);
+            var httpReqData = await context.GetHttpRequestDataAsync();
+
+            if (httpReqData == null)
+            {
+                return;
+            }
+
+            // Create an instance of HttpResponseData with 500 status code.
+            var newHttpResponse = await CreateHttpResponseAsync(httpReqData);
+
+            var invocationResult = context.GetInvocationResult();
+
+            var httpOutputBindingFromMultipleOutputBindings = GetHttpOutputBindingFromMultipleOutputBinding(context);
+            if (httpOutputBindingFromMultipleOutputBindings is not null)
+            {
+                httpOutputBindingFromMultipleOutputBindings.Value = newHttpResponse;
+            }
+            else
+            {
+                invocationResult.Value = newHttpResponse;
+            }
         }
     }
 
