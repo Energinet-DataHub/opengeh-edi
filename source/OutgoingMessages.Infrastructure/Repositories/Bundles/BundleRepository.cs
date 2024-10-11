@@ -60,7 +60,7 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
                 b.ActorMessageQueueId == id &&
                 b.DequeuedAt == null)
                 .OrderBy(b => b.Created)
-                .FirstOrDefaultAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+                .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
         }
 
         return await _dbContext.Bundles.Where(b =>
@@ -68,7 +68,7 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
                                                    b.DequeuedAt == null &&
                                                    b.MessageCategory == messageCategory)
                                                    .OrderBy(b => b.Created)
-                                                   .FirstOrDefaultAsync(cancellationToken: cancellationToken)
+                                                   .FirstOrDefaultAsync(cancellationToken)
                                                    .ConfigureAwait(false);
     }
 }

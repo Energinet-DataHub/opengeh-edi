@@ -53,14 +53,14 @@ public class ResilientTransaction
 
             foreach (var dbContext in dbContexts)
             {
-                await dbContext.Database.UseTransactionAsync(dbTransaction, cancellationToken: cancellationToken).ConfigureAwait(false);
+                await dbContext.Database.UseTransactionAsync(dbTransaction, cancellationToken).ConfigureAwait(false);
                 await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
 
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             foreach (var dbContext in dbContexts)
             {
-                await dbContext.Database.UseTransactionAsync(null, cancellationToken: cancellationToken).ConfigureAwait(false);
+                await dbContext.Database.UseTransactionAsync(null, cancellationToken).ConfigureAwait(false);
             }
         }
     }

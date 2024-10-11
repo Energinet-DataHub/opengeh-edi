@@ -54,7 +54,7 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
 
         var outgoingMessages = await _context.OutgoingMessages
             .Where(x => x.AssignedBundleId == peekResult.BundleId)
-            .ToListAsync(cancellationToken: cancellationToken)
+            .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
         var downloadAndSetMessageRecordTasks = outgoingMessages
@@ -86,7 +86,7 @@ public class OutgoingMessageRepository : IOutgoingMessageRepository
             x => x.Receiver.Number == receiver.Number &&
                             x.Receiver.ActorRole == receiver.ActorRole &&
                             x.ExternalId == externalId,
-            cancellationToken: cancellationToken).ConfigureAwait(false);
+            cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<OutgoingMessage?> GetAsync(ActorRole receiverRole, ExternalId externalId, Instant? periodStartedAt)

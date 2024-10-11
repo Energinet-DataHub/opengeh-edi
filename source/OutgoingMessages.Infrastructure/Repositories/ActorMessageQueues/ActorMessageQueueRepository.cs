@@ -32,7 +32,7 @@ public class ActorMessageQueueRepository(ActorMessageQueueContext actorMessageQu
 
         var actorMessageQueue = await actorMessageQueueContext.ActorMessageQueues.FirstOrDefaultAsync(
                 queue => queue.Receiver.Number.Equals(actorNumber) && queue.Receiver.ActorRole.Equals(actorRole),
-                cancellationToken: cancellationToken)
+                cancellationToken)
             .ConfigureAwait(false);
 
         if (actorMessageQueue is null)
@@ -59,7 +59,7 @@ public class ActorMessageQueueRepository(ActorMessageQueueContext actorMessageQu
                 queue.Receiver.Number.Equals(actorNumber) &&
                 queue.Receiver.ActorRole.Equals(actorRole))
             .Select(queue => queue.Id)
-            .SingleOrDefaultAsync(cancellationToken: cancellationToken)
+            .SingleOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
 
         if (actorMessageQueueId is null)

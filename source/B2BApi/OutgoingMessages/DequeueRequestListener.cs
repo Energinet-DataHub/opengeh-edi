@@ -55,7 +55,7 @@ public class DequeueRequestListener
                 activityPayload: messageId,
                 affectedEntityType: AuditLogEntityType.Bundle,
                 affectedEntityKey: null,
-                cancellationToken: cancellationToken)
+                cancellationToken)
             .ConfigureAwait(false);
 
         var result = await _outgoingMessagesClient.DequeueAndCommitAsync(

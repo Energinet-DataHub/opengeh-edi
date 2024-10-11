@@ -69,7 +69,7 @@ public class PeekRequestListener
                 activityPayload: messageCategory,
                 affectedEntityType: AuditLogEntityType.Bundle,
                 affectedEntityKey: null,
-                cancellationToken: cancellationToken)
+                cancellationToken)
             .ConfigureAwait(false);
 
         var contentType = request.Headers.TryGetContentType();

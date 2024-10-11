@@ -69,7 +69,7 @@ public sealed class WhenWholesaleSettlementRequestedTests : BaseTestClass
     {
         var createdAfter = SystemClock.Instance.GetCurrentInstant();
         var energySupplierActorNumber = _energySupplierActorNumber;
-        await _wholesaleSettlementRequest.B2CRequest(cancellationToken: CancellationToken.None);
+        await _wholesaleSettlementRequest.B2CRequest(CancellationToken.None);
 
         await _wholesaleSettlementRequest.ConfirmRequestIsInitialized(
             createdAfter,
