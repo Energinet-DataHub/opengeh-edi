@@ -7,7 +7,7 @@
 
   <PropertyGroup>
     <PackageId>Energinet.DataHub.ProcessManager.Client</PackageId>
-    <PackageVersion>1.0.0$(VersionSuffix)</PackageVersion>
+    <PackageVersion>0.0.1$(VersionSuffix)</PackageVersion>
     <Title>DH3 Process Manager Client library</Title>
     <Company>Energinet-DataHub</Company>
     <Authors>Energinet-DataHub</Authors>
@@ -17,14 +17,16 @@
       Is shown in Azure DevOps artifacts Release Notes section
     -->
     <PackageReleaseNotes>
-      TODO: Link to release notes
+      [Release Notes](https://github.com/Energinet-DataHub/opengeh-edi/blob/master/docs/ProcessManager.Client/ReleaseNotes/ReleaseNotes.md)
+      [Documentation](https://github.com/Energinet-DataHub/opengeh-edi/blob/master/docs/ProcessManager.Client/Documentation.md)
     </PackageReleaseNotes>
     <!-- PackageDescription:
       Is shown in GitHub packages "About this package" section,
       and in Visual Studio package manager view.
     -->
     <PackageDescription>
-      TODO: Link to documentation
+      [Release Notes](https://github.com/Energinet-DataHub/opengeh-edi/blob/master/docs/ProcessManager.Client/ReleaseNotes/ReleaseNotes.md)
+      [Documentation](https://github.com/Energinet-DataHub/opengeh-edi/blob/master/docs/ProcessManager.Client/Documentation.md)
     </PackageDescription>
     <Description>Library containing a client to communicate with the Process Manager in Energinet DataHub.</Description>
     <PackageTags>energinet;datahub</PackageTags>
