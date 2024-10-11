@@ -12,22 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.ProcessManagement.Core.Domain;
+using Energinet.DataHub.ProcessManagement.Core.Domain;
+using NodaTime;
 
-/// <summary>
-/// Describe an orchestrator which is capable of conducting the
-/// orchestration of a workflow.
-/// </summary>
-public abstract class OrchestratorDescription
+namespace Energinet.DataHub.ProcessManagement.Core.Application;
+
+public class OrchestrationScheduleRegister
 {
-    public OrchestratorId? Id { get; set; }
+    public OrchestrationId ScheduleOrchestration(
+        string name,
+        int version,
+        IReadOnlyCollection<OrchestratorParameter>? parameters,
+        Instant runAt)
+    {
+        return new OrchestrationId(Guid.NewGuid());
+    }
 
-    public string? Name { get; set; }
-
-    public int Version { get; set; }
-
-    public string? Description { get; set; }
-
-    public IList<OrchestratorParameter> Parameters { get; }
-        = new List<OrchestratorParameter>();
+    public void CancelScheduledOrchestration(
+        OrchestrationId id)
+    {
+    }
 }

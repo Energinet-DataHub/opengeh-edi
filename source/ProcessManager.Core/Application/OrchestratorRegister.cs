@@ -16,6 +16,12 @@ using Energinet.DataHub.ProcessManagement.Core.Domain;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Application;
 
+/// <summary>
+/// Keep a register of known orchestrators.
+/// Each orchestrator is registered with information by which
+/// it is possible to communicate with the orchestrator and
+/// start a new orchestration instance.
+/// </summary>
 public class OrchestratorRegister
 {
     private readonly List<OrchestratorDescription> _knownOrchestrators = [];

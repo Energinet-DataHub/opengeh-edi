@@ -14,20 +14,11 @@
 
 namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 
-/// <summary>
-/// Describe an orchestrator which is capable of conducting the
-/// orchestration of a workflow.
-/// </summary>
-public abstract class OrchestratorDescription
+public class OrchestrationParameter
 {
-    public OrchestratorId? Id { get; set; }
-
     public string? Name { get; set; }
 
-    public int Version { get; set; }
+    public string? Type { get; set; }
 
-    public string? Description { get; set; }
-
-    public IList<OrchestratorParameter> Parameters { get; }
-        = new List<OrchestratorParameter>();
+    public string? Value { get; set; }
 }
