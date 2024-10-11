@@ -19,9 +19,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.ActorMessageQueues;
 
-public class ActorMessageQueueRepository(ActorMessageQueueContext actorMessageQueueContext)
-    : IActorMessageQueueRepository
+public class ActorMessageQueueRepository : IActorMessageQueueRepository
 {
+    private readonly ActorMessageQueueContext _actorMessageQueueContext;
+
+    public ActorMessageQueueRepository(ActorMessageQueueContext actorMessageQueueContext)
+    {
+        _actorMessageQueueContext = actorMessageQueueContext;
+    }
+
     public async Task<ActorMessageQueue?> ActorMessageQueueForAsync(
         ActorNumber actorNumber,
         ActorRole actorRole,
@@ -30,14 +36,14 @@ public class ActorMessageQueueRepository(ActorMessageQueueContext actorMessageQu
         ArgumentNullException.ThrowIfNull(actorNumber);
         ArgumentNullException.ThrowIfNull(actorRole);
 
-        var actorMessageQueue = await actorMessageQueueContext.ActorMessageQueues.FirstOrDefaultAsync(
+        var actorMessageQueue = await _actorMessageQueueContext.ActorMessageQueues.FirstOrDefaultAsync(
                 queue => queue.Receiver.Number.Equals(actorNumber) && queue.Receiver.ActorRole.Equals(actorRole),
                 cancellationToken)
             .ConfigureAwait(false);
 
         if (actorMessageQueue is null)
         {
-            actorMessageQueue = actorMessageQueueContext.ActorMessageQueues.Local
+            actorMessageQueue = _actorMessageQueueContext.ActorMessageQueues.Local
                 .FirstOrDefault(queue =>
                     queue.Receiver.Number.Equals(actorNumber) &&
                     queue.Receiver.ActorRole.Equals(actorRole));
@@ -54,7 +60,7 @@ public class ActorMessageQueueRepository(ActorMessageQueueContext actorMessageQu
         ArgumentNullException.ThrowIfNull(actorNumber);
         ArgumentNullException.ThrowIfNull(actorRole);
 
-        var actorMessageQueueId = await actorMessageQueueContext.ActorMessageQueues
+        var actorMessageQueueId = await _actorMessageQueueContext.ActorMessageQueues
             .Where(queue =>
                 queue.Receiver.Number.Equals(actorNumber) &&
                 queue.Receiver.ActorRole.Equals(actorRole))
@@ -64,7 +70,7 @@ public class ActorMessageQueueRepository(ActorMessageQueueContext actorMessageQu
 
         if (actorMessageQueueId is null)
         {
-            actorMessageQueueId = actorMessageQueueContext.ActorMessageQueues.Local
+            actorMessageQueueId = _actorMessageQueueContext.ActorMessageQueues.Local
                 .Where(queue =>
                     queue.Receiver.Number.Equals(actorNumber) &&
                     queue.Receiver.ActorRole.Equals(actorRole))
@@ -77,6 +83,6 @@ public class ActorMessageQueueRepository(ActorMessageQueueContext actorMessageQu
 
     public void Add(ActorMessageQueue actorMessageQueue)
     {
-        actorMessageQueueContext.ActorMessageQueues.Add(actorMessageQueue);
+        _actorMessageQueueContext.ActorMessageQueues.Add(actorMessageQueue);
     }
 }
