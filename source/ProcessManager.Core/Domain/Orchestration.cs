@@ -12,24 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Domain;
 using NodaTime;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application;
+namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 
-public class OrchestrationScheduleRegister
+public class Orchestration
 {
-    public OrchestrationId ScheduleOrchestration(
-        string name,
-        int version,
-        IReadOnlyCollection<OrchestratorParameter>? parameters,
-        Instant runAt)
-    {
-        return new OrchestrationId(Guid.NewGuid());
-    }
+    public OrchestrationId? Id { get; set; }
 
-    public void CancelScheduledOrchestration(
-        OrchestrationId id)
-    {
-    }
+    public IList<OrchestrationParameter> Parameters { get; }
+        = [];
+
+    public Instant ScheduledAt { get; set; }
+
+    public IList<OrchestrationStep> Steps { get; }
+        = [];
+
+    /// <summary>
+    /// The overall state of the orchestration.
+    /// </summary>
+    public string? State { get; set; }
+
+    /// <summary>
+    /// The orchestrator which is conducting the orchestration.
+    /// </summary>
+    public OrchestratorId? OrchestratorId { get; set; }
 }
