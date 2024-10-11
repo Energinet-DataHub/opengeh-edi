@@ -43,35 +43,19 @@ public sealed class UnHandledExceptionMiddleware(ILogger<UnHandledExceptionMiddl
         {
             await next(context);
         }
-        catch (OperationCanceledException ex)
+        catch (OperationCanceledException operationCanceledException)
         {
-            _logger.LogWarning("Request was cancelled: {Ex}", ex.Message);
+            // This catch block handles cancellations triggered by a CancellationToken.
+            // E.g. if a task is cancelled it throws a TaskCanceledException which is a OperationCanceledException.
+            // E.g. if cancellationToken.ThrowIfCancellationRequested() it throws an task OperationCanceledException.
+            // It logs a warning message indicating that the request was cancelled.
+            _logger.LogWarning(operationCanceledException, "Request was cancelled: {Ex}", operationCanceledException.Message);
         }
         catch (Exception ex)
         {
+            // This catch block handles all other exceptions.
+            // It logs an error message indicating that an error occurred during the invocation.
             _logger.LogError(ex, "Error processing invocation: {Ex}", ex.Message);
-
-            var httpReqData = await context.GetHttpRequestDataAsync();
-
-            if (httpReqData == null)
-            {
-                return;
-            }
-
-            // Create an instance of HttpResponseData with 500 status code.
-            var newHttpResponse = await CreateHttpResponseAsync(httpReqData);
-
-            var invocationResult = context.GetInvocationResult();
-
-            var httpOutputBindingFromMultipleOutputBindings = GetHttpOutputBindingFromMultipleOutputBinding(context);
-            if (httpOutputBindingFromMultipleOutputBindings is not null)
-            {
-                httpOutputBindingFromMultipleOutputBindings.Value = newHttpResponse;
-            }
-            else
-            {
-                invocationResult.Value = newHttpResponse;
-            }
         }
     }
 
