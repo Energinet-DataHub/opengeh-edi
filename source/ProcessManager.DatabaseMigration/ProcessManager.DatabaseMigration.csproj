@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Energinet.DataHub.ProcessManager.DatabaseMigration</AssemblyName>
+    <RootNamespace>Energinet.DataHub.ProcessManager.DatabaseMigration</RootNamespace>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Scripts\" />
+  </ItemGroup>
+
+</Project>

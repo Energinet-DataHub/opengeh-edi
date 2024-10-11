@@ -92,6 +92,10 @@ public class PeekRequestListenerTests : IAsyncLifetime
 
         // Assert
         actualResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        (await actualResponse.Content.ReadAsStringAsync()).Should().BeEmpty();
+        actualResponse.Content.Headers.ContentType.Should().NotBeNull();
+        actualResponse.Content.Headers.ContentType!.MediaType.Should().Be("application/json");
+        actualResponse.Content.Headers.ContentType.CharSet.Should().Be("utf-8");
     }
 
     [Fact]
