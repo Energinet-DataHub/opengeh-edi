@@ -22,5 +22,5 @@ public interface IUnitOfWork
     /// <summary>
     /// Commits all changes made to the database in the current transaction asynchronously.
     /// </summary>
-    Task CommitTransactionAsync();
+    Task CommitTransactionAsync(CancellationToken cancellationToken);
 }

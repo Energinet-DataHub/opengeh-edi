@@ -60,17 +60,18 @@ public class PeekRequestListener
         string? messageCategory,
         CancellationToken hostCancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(request);
+        var cancellationToken = request.GetCancellationToken(hostCancellationToken);
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
                 activity: AuditLogActivity.Peek,
                 activityOrigin: request.Url.ToString(),
                 activityPayload: messageCategory,
                 affectedEntityType: AuditLogEntityType.Bundle,
-                affectedEntityKey: null)
+                affectedEntityKey: null,
+                cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        ArgumentNullException.ThrowIfNull(request);
-        var cancellationToken = request.GetCancellationToken(hostCancellationToken);
         var contentType = request.Headers.TryGetContentType();
         if (contentType is null)
         {

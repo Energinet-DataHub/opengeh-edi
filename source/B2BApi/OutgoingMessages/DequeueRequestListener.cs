@@ -47,16 +47,17 @@ public class DequeueRequestListener
         string messageId,
         CancellationToken hostCancellationToken)
     {
+        var cancellationToken = request.GetCancellationToken(hostCancellationToken);
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
                 activity: AuditLogActivity.Dequeue,
                 activityOrigin: request.Url.ToString(),
                 activityPayload: messageId,
                 affectedEntityType: AuditLogEntityType.Bundle,
-                affectedEntityKey: null)
+                affectedEntityKey: null,
+                cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        var cancellationToken = request.GetCancellationToken(hostCancellationToken);
         var result = await _outgoingMessagesClient.DequeueAndCommitAsync(
                 new DequeueRequestDto(
                     messageId,
