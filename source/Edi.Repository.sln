@@ -174,9 +174,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuditLog", "AuditLog\AuditL
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contracts", "Contracts\Contracts.csproj", "{11842B28-BDCE-4CBA-9955-456808FA82C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessManager.Client.IntegrationTests", "ProcessManager.Client.IntegrationTests\ProcessManager.Client.IntegrationTests.csproj", "{2C71465E-05DE-41DE-83E2-5BEC862ECDEF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessManager.Client.IntegrationTests", "ProcessManager.Client.IntegrationTests\ProcessManager.Client.IntegrationTests.csproj", "{2C71465E-05DE-41DE-83E2-5BEC862ECDEF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessManager.Core.IntegrationTests", "ProcessManager.Core.IntegrationTests\ProcessManager.Core.IntegrationTests.csproj", "{997180C2-1E8D-4996-9AB7-0E992EF08EE0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{F73E0AE8-0F91-4E9E-B36A-D79FA7AD66E3}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\ProcessManager.Client\Documentation.md = ..\docs\ProcessManager.Client\Documentation.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ReleaseNotes", "ReleaseNotes", "{A24C9CBC-426A-424F-A794-50AAF38314A4}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\ProcessManager.Client\ReleaseNotes\ReleaseNotes.md = ..\docs\ProcessManager.Client\ReleaseNotes\ReleaseNotes.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -481,6 +491,8 @@ Global
 		{11842B28-BDCE-4CBA-9955-456808FA82C2} = {5E56C03C-09BD-4F47-917E-4D5B03E4EE0E}
 		{2C71465E-05DE-41DE-83E2-5BEC862ECDEF} = {EC2012DB-B2F7-4181-AFEB-06FB791F7C91}
 		{997180C2-1E8D-4996-9AB7-0E992EF08EE0} = {9CB2AEDE-FAB7-405B-913F-3E7E673F962D}
+		{F73E0AE8-0F91-4E9E-B36A-D79FA7AD66E3} = {51477591-692F-43D6-AD5A-171BDBF63387}
+		{A24C9CBC-426A-424F-A794-50AAF38314A4} = {F73E0AE8-0F91-4E9E-B36A-D79FA7AD66E3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C390B97-896A-4AAD-8609-3C20E80966D2}
