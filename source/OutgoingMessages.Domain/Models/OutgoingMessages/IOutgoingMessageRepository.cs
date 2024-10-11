@@ -32,12 +32,12 @@ public interface IOutgoingMessageRepository
     /// <summary>
     /// Get all messages assigned to a bundle by id
     /// </summary>
-    Task<OutgoingMessageBundle> GetAsync(PeekResult peekResult);
+    Task<OutgoingMessageBundle> GetAsync(PeekResult peekResult, CancellationToken cancellationToken);
 
     /// <summary>
     /// Get message in the database for the designated receiver and the external id.
     /// </summary>
-    Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId);
+    Task<OutgoingMessage?> GetAsync(Receiver receiver, ExternalId externalId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Get message in the database for the designated receiver role and the external id and period started at.

@@ -1,0 +1,16 @@
+{
+  "solution": {
+    "path": "Edi.Repository.sln",
+    "projects": [
+      "ProcessManager.Client.IntegrationTests\\ProcessManager.Client.IntegrationTests.csproj",
+      "ProcessManager.Client\\ProcessManager.Client.csproj",
+      "ProcessManager.Core.IntegrationTests\\ProcessManager.Core.IntegrationTests.csproj",
+      "ProcessManager.Core\\ProcessManager.Core.csproj",
+      "ProcessManager.DatabaseMigration\\ProcessManager.DatabaseMigration.csproj",
+      "ProcessManager.IntegrationTests\\ProcessManager.IntegrationTests.csproj",
+      "ProcessManager.Orchestrations.IntegrationTests\\ProcessManager.Orchestrations.IntegrationTests.csproj",
+      "ProcessManager.Orchestrations\\ProcessManager.Orchestrations.csproj",
+      "ProcessManager\\ProcessManager.csproj"
+    ]
+  }
+}
