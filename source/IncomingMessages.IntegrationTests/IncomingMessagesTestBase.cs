@@ -44,7 +44,7 @@ using ExecutionContext = Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionCo
 
 namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests;
 
-[Collection("IntegrationTest")]
+[Collection("IncomingMessagesIntegrationTest")]
 public class IncomingMessagesTestBase : IDisposable
 {
     private readonly IAzureClientFactory<ServiceBusSender> _serviceBusSenderFactoryStub;
