@@ -41,7 +41,7 @@ public class ExecuteDataRetentionsWhenADayHasPassed : INotificationHandler<ADayH
         var taskMap = new Dictionary<Task, IDataRetention>();
         try
         {
-            // Cancels all retentions after provided minutes
+            // Cancels all retentions after provided seconds
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(_jobsExecutionTimeLimitInSeconds));
             using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token);
 
