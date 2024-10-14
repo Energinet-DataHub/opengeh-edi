@@ -28,9 +28,9 @@ using IServiceScopeFactory = Microsoft.Extensions.DependencyInjection.IServiceSc
 
 namespace Energinet.DataHub.EDI.IntegrationTests.DataRetention;
 
-public class GivenExecuteDataRetentionsTests : TestBase
+public class ExecuteDataRetentionsTests : TestBase
 {
-    public GivenExecuteDataRetentionsTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+    public ExecuteDataRetentionsTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
     }
