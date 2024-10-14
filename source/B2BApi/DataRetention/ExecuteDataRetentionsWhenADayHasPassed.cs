@@ -54,13 +54,15 @@ public class ExecuteDataRetentionsWhenADayHasPassed : INotificationHandler<ADayH
                     TimeSpan.FromSeconds(30),
                 });
 
-            var tasks = _dataRetentions.Select(async dataCleaner =>
+            foreach (var dataCleaner in _dataRetentions)
             {
                 var task = executionPolicy.ExecuteAsync(
                     () => dataCleaner.CleanupAsync(linkedCts.Token));
+
                 taskMap[task] = dataCleaner;
-                await task.ConfigureAwait(false);
-            });
+            }
+
+            var tasks = taskMap.Keys.ToList();
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
