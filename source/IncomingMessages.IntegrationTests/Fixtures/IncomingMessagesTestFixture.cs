@@ -129,10 +129,7 @@ public class IncomingMessagesTestFixture : IDisposable, IAsyncLifetime
 
     private void CreateRequiredContainers()
     {
-        List<FileStorageCategory> containerCategories = [
-            FileStorageCategory.ArchivedMessage(),
-            FileStorageCategory.OutgoingMessage(),
-        ];
+        List<FileStorageCategory> containerCategories = [FileStorageCategory.ArchivedMessage()];
 
         var blobServiceClient = new BlobServiceClient(AzuriteManager.BlobStorageConnectionString);
         foreach (var fileStorageCategory in containerCategories)
