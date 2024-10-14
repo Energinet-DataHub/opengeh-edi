@@ -48,5 +48,6 @@ public interface IFileStorageClient
     /// </summary>
     /// <param name="fileStorageReferences"></param>
     /// <param name="fileStorageCategory"></param>
-    Task DeleteIfExistsAsync(IReadOnlyList<FileStorageReference> fileStorageReferences, FileStorageCategory fileStorageCategory);
+    /// <param name="cancellationToken"></param>
+    Task DeleteIfExistsAsync(IReadOnlyList<FileStorageReference> fileStorageReferences, FileStorageCategory fileStorageCategory, CancellationToken cancellationToken);
 }

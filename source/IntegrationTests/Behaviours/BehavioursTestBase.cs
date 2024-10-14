@@ -18,6 +18,7 @@ using Azure.Messaging.ServiceBus;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.BuildingBlocks.Tests;
+using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
@@ -490,9 +491,7 @@ public class BehavioursTestBase : IDisposable
         _services.AddTransient<IFeatureFlagManager>(_ => new FeatureFlagManagerStub());
 
         // Add test logger
-        _services.AddSingleton<ITestOutputHelper>(sp => testOutputHelper);
-        _services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
-        _services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
+        _services.AddTestLogger(testOutputHelper);
 
         return _services.BuildServiceProvider();
     }

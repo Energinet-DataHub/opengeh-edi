@@ -48,7 +48,9 @@ public class ReceivedIntegrationEventsRetention : IDataRetention
         var anyEventsFromAMonthAgo = await AnyEventsOlderThanAsync(monthAgo, cancellationToken).ConfigureAwait(false);
         while (anyEventsFromAMonthAgo)
         {
-            await LogAuditAsync(monthAgo).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            await LogAuditAsync(monthAgo, cancellationToken).ConfigureAwait(false);
             await DeleteOldEventsAsync(monthAgo, cancellationToken).ConfigureAwait(false);
             anyEventsFromAMonthAgo = await AnyEventsOlderThanAsync(monthAgo, cancellationToken).ConfigureAwait(false);
         }
@@ -82,7 +84,7 @@ public class ReceivedIntegrationEventsRetention : IDataRetention
         }
     }
 
-    private async Task LogAuditAsync(Instant monthAgo)
+    private async Task LogAuditAsync(Instant monthAgo, CancellationToken cancellationToken)
     {
         await _auditLogger.LogWithCommitAsync(
                 logId: AuditLogId.New(),
@@ -90,7 +92,8 @@ public class ReceivedIntegrationEventsRetention : IDataRetention
                 activityOrigin: nameof(ADayHasPassed),
                 activityPayload: monthAgo,
                 affectedEntityType: AuditLogEntityType.ReceivedIntegrationEvent,
-                affectedEntityKey: null)
+                affectedEntityKey: null,
+                cancellationToken: cancellationToken)
             .ConfigureAwait(false);
     }
 

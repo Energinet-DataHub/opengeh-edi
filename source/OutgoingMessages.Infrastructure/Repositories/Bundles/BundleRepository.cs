@@ -35,11 +35,11 @@ public class BundleRepository(ActorMessageQueueContext dbContext) : IBundleRepos
         _dbContext.Bundles.RemoveRange(bundles);
     }
 
-    public async Task<IReadOnlyCollection<Bundle>> GetDequeuedBundlesOlderThanAsync(Instant olderThan, int take)
+    public async Task<IReadOnlyCollection<Bundle>> GetDequeuedBundlesOlderThanAsync(Instant olderThan, int take, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Bundles.Where(x => x.DequeuedAt < olderThan)
             .Take(take)
-            .ToListAsync()
+            .ToListAsync(cancellationToken: cancellationToken)
             .ConfigureAwait(false);
     }
 
