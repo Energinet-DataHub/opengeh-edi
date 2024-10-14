@@ -31,7 +31,7 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.IncomingMessages;
 
-public sealed class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
+public sealed class GivenIncomingMessagesIsReceivedWithDelegationTests : IncomingMessagesTestBase
 {
     private readonly ClockStub _clockStub;
     private readonly IIncomingMessageClient _incomingMessagesRequest;

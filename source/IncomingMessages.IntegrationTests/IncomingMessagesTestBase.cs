@@ -45,14 +45,14 @@ using ExecutionContext = Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionCo
 namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests;
 
 [Collection("IntegrationTest")]
-public class TestBase : IDisposable
+public class IncomingMessagesTestBase : IDisposable
 {
     private readonly IAzureClientFactory<ServiceBusSender> _serviceBusSenderFactoryStub;
     private readonly IncomingMessagesContext _incomingMessagesContext;
     private ServiceCollection? _services;
     private bool _disposed;
 
-    protected TestBase(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+    protected IncomingMessagesTestBase(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
     {
         Fixture = integrationTestFixture;
 

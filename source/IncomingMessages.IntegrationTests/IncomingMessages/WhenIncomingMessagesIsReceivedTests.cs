@@ -38,7 +38,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.IncomingMessag
     "StyleCop.CSharp.ReadabilityRules",
     "SA1118:Parameter should not span multiple lines",
     Justification = "Readability in test-setup")]
-public sealed class WhenIncomingMessagesIsReceivedTests : TestBase
+public sealed class WhenIncomingMessagesIsReceivedTests : IncomingMessagesTestBase
 {
     private readonly IIncomingMessageClient _incomingMessagesRequest;
 #pragma warning disable CA2213 // Disposable fields should be disposed
