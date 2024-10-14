@@ -51,9 +51,9 @@ public class ExecuteDataRetentionsWhenADayHasPassed : INotificationHandler<ADayH
             using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token);
 
             var executionPolicy = Policy
-                .Handle<Exception>()
+                .Handle<Exception>(ex => ex is not OperationCanceledException)
                 .WaitAndRetryAsync(
-                    new[] { TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(15), TimeSpan.FromSeconds(30), });
+                    [TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(15), TimeSpan.FromSeconds(30)]);
 
             foreach (var dataCleaner in _dataRetentions)
             {
@@ -73,7 +73,7 @@ public class ExecuteDataRetentionsWhenADayHasPassed : INotificationHandler<ADayH
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
-        catch (OperationCanceledException ex)
+        catch (TaskCanceledException ex)
         {
             // This catch block handles task-specific cancellations.
             // It logs the cancellation of data retention jobs.
@@ -86,7 +86,7 @@ public class ExecuteDataRetentionsWhenADayHasPassed : INotificationHandler<ADayH
         }
     }
 
-    private void LogCancelledTasks(Dictionary<Task, IDataRetention> taskMap, Exception ex)
+    private void LogCancelledTasks(Dictionary<Task, IDataRetention> taskMap, TaskCanceledException ex)
     {
         var incompleteTasks = taskMap
             .Where(kvp => kvp.Key.Status != TaskStatus.RanToCompletion)

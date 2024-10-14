@@ -16,13 +16,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.BuildingBlocks.Tests.Logging;
 
-public class LoggerSpy<T> : ILogger<T>
+public class LoggerSpy : ILogger
 {
-    public Exception? CapturedException { get; private set; }
-
-    public LogLevel? CapturedLogLevel { get; private set; }
-
-    public string? Message { get; private set; }
+    public List<(Exception Exception, LogLevel LogLevel, string? Message)> CapturedExceptions { get; } = [];
 
     public IDisposable? BeginScope<TState>(TState state)
         where TState : notnull
@@ -37,8 +33,7 @@ public class LoggerSpy<T> : ILogger<T>
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
-        CapturedException = exception;
-        CapturedLogLevel = logLevel;
-        Message = state!.ToString();
+        if (exception is not null)
+            CapturedExceptions.Add((exception, logLevel, state!.ToString()));
     }
 }

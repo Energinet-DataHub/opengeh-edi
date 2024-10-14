@@ -23,7 +23,7 @@ public static class TestLoggerExtensions
     public static IServiceCollection AddTestLogger(this IServiceCollection services, ITestOutputHelper testOutputHelper)
     {
         services.AddSingleton<ITestOutputHelper>(sp => testOutputHelper);
-        services.Add(ServiceDescriptor.Singleton(typeof(LoggerSpy<>), typeof(LoggerSpy<>)));
+        services.AddSingleton<LoggerSpy>();
         services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
         services.Add(ServiceDescriptor.Singleton(typeof(ILogger<>), typeof(TestLogger<>)));
 

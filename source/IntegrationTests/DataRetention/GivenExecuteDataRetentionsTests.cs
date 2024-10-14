@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using FluentAssertions;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NodaTime;
@@ -32,6 +33,28 @@ public class GivenExecuteDataRetentionsTests : TestBase
     public GivenExecuteDataRetentionsTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
+    }
+
+    [Fact]
+    public async Task When_DataRetentionIsExecuted_Then_NoExceptionsAreThrown()
+    {
+        // Arrange
+        var cancellationToken = new CancellationTokenSource().Token;
+        var notification = new ADayHasPassed(GetService<IClock>().GetCurrentInstant());
+
+        var sut = new ExecuteDataRetentionsWhenADayHasPassed(
+            GetServices<IDataRetention>(),
+            GetService<ILogger<ExecuteDataRetentionsWhenADayHasPassed>>(),
+            GetService<IServiceScopeFactory>());
+
+        // Act
+        var act = () => sut.Handle(notification, cancellationToken);
+
+        // Assert
+        await act.Should().NotThrowAsync();
+
+        var loggerSpy = GetService<LoggerSpy>();
+        loggerSpy.CapturedExceptions.Should().BeEmpty();
     }
 
     [Fact]
@@ -53,10 +76,16 @@ public class GivenExecuteDataRetentionsTests : TestBase
         // Assert
         await act.Should().NotThrowAsync();
 
-        var loggerSpy = GetService<LoggerSpy<ExecuteDataRetentionsWhenADayHasPassed>>();
-        loggerSpy.CapturedException.Should().BeOfType<OperationCanceledException>();
-        loggerSpy.CapturedLogLevel.Should().Be(LogLevel.Error);
-        loggerSpy.Message.Should()
-            .Be($"Data retention job {typeof(SleepyDataRetentionJob).FullName} was cancelled.");
+        var loggerSpy = GetService<LoggerSpy>();
+        loggerSpy.CapturedExceptions.Should()
+            .SatisfyRespectively(
+                log =>
+                {
+                    log.Exception.Should().BeOfType<TaskCanceledException>();
+                    log.LogLevel.Should().Be(LogLevel.Error);
+                    log.Message
+                        .Should()
+                        .Be($"Data retention job {typeof(SleepyDataRetentionJob).FullName} was cancelled.");
+                });
     }
 }

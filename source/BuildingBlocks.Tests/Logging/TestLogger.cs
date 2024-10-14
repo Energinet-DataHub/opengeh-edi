@@ -20,12 +20,11 @@ namespace Energinet.DataHub.BuildingBlocks.Tests.Logging;
 public class TestLogger<T> : ILogger<T>
 {
     private readonly ITestOutputHelper _testOutputHelper;
-    private readonly List<ILogger> _loggers;
+    private readonly List<ILogger> _loggers = [];
 
-    public TestLogger(ITestOutputHelper testOutputHelper, Logger<T>? logger, LoggerSpy<T>? loggerSpy)
+    public TestLogger(ITestOutputHelper testOutputHelper, Logger<T>? logger, LoggerSpy? loggerSpy)
     {
         _testOutputHelper = testOutputHelper;
-        _loggers = [];
 
         if (logger != null)
             _loggers.Add(logger);
@@ -33,12 +32,6 @@ public class TestLogger<T> : ILogger<T>
         if (loggerSpy != null)
             _loggers.Add(loggerSpy);
     }
-
-    public Exception? CapturedException { get; private set; }
-
-    public LogLevel? CapturedLogLevel { get; private set; }
-
-    public string? Message { get; private set; }
 
     public IDisposable? BeginScope<TState>(TState state)
         where TState : notnull
@@ -54,10 +47,6 @@ public class TestLogger<T> : ILogger<T>
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
         ArgumentNullException.ThrowIfNull(formatter);
-
-        CapturedException = exception;
-        CapturedLogLevel = logLevel;
-        Message = state!.ToString();
 
         if (logLevel == LogLevel.Error || logLevel == LogLevel.Critical)
         {
