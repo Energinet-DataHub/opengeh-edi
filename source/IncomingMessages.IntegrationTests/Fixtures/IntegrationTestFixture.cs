@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Data.SqlClient;
 using Azure.Storage.Blobs;
 using Energinet.DataHub.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
@@ -35,24 +34,8 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
 
         DatabricksSchemaManager = new DatabricksSchemaManager(
             new HttpClientFactory(),
-            IntegrationTestConfiguration.DatabricksSettings,
-            "edi_integration_tests");
-    }
-
-    public string DatabaseConnectionString
-    {
-        get
-        {
-            var dbConnectionString = DatabaseManager.ConnectionString;
-
-            // Trust Server Certificate might be required for some
-            if (!dbConnectionString.Contains("Trust"))
-            {
-                dbConnectionString = $"{dbConnectionString};Trust Server Certificate=True;";
-            }
-
-            return dbConnectionString;
-        }
+            databricksSettings: IntegrationTestConfiguration.DatabricksSettings,
+            schemaPrefix: "edi_incoming_messages_tests");
     }
 
     public EdiDatabaseManager DatabaseManager { get; set; }
@@ -62,43 +45,6 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
     public IntegrationTestConfiguration IntegrationTestConfiguration { get; }
 
     public DatabricksSchemaManager DatabricksSchemaManager { get; }
-
-    public void CleanupDatabase()
-    {
-        const string cleanupStatement = $"DELETE FROM [dbo].[MessageRegistry] "
-                                        + $"DELETE FROM [dbo].[TransactionRegistry]"
-                                        + $"DELETE FROM [dbo].[OutgoingMessages] "
-                                        + $"DELETE FROM [dbo].[QueuedInternalCommands] "
-                                        + $"DELETE FROM [dbo].[MarketEvaluationPoints]"
-                                        + $"DELETE FROM [dbo].[Actor]"
-                                        + $"DELETE FROM [dbo].[ReceivedIntegrationEvents]"
-                                        + $"DELETE FROM [dbo].[AggregatedMeasureDataProcessGridAreas]"
-                                        + $"DELETE FROM [dbo].[AggregatedMeasureDataProcesses]"
-                                        + $"DELETE FROM [dbo].[ArchivedMessages]"
-                                        + $"DELETE FROM [dbo].[MarketDocuments]"
-                                        + $"DELETE FROM [dbo].[Bundles]"
-                                        + $"DELETE FROM [dbo].[ActorMessageQueues]"
-                                        + $"DELETE FROM [dbo].[ReceivedInboxEvents]"
-                                        + $"DELETE FROM [dbo].[MessageRegistry]"
-                                        + $"DELETE FROM [dbo].[TransactionRegistry]"
-                                        + $"DELETE FROM [dbo].[GridAreaOwner]"
-                                        + $"DELETE FROM [dbo].[ActorCertificate]"
-                                        + $"DELETE FROM [dbo].[WholesaleServicesProcessChargeTypes]"
-                                        + $"DELETE FROM [dbo].[WholesaleServicesProcessGridAreas]"
-                                        + $"DELETE FROM [dbo].[WholesaleServicesProcesses]"
-                                        + $"DELETE FROM [dbo].[Outbox]"
-                                        + $"DELETE FROM [dbo].[ProcessDelegation]";
-
-        using var connection = new SqlConnection(DatabaseManager.ConnectionString);
-        connection.Open();
-
-        using (var command = new SqlCommand(cleanupStatement, connection))
-        {
-            command.ExecuteNonQuery();
-        }
-
-        connection.Close();
-    }
 
     public async Task InitializeAsync()
     {
@@ -126,49 +72,31 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
         {
             // Cleanup actual Azurite "database" files
             if (Directory.Exists("__blobstorage__"))
-            {
                 Directory.Delete("__blobstorage__", true);
-            }
 
             if (Directory.Exists("__queuestorage__"))
-            {
                 Directory.Delete("__queuestorage__", true);
-            }
 
             if (Directory.Exists("__tablestorage__"))
-            {
                 Directory.Delete("__tablestorage__", true);
-            }
 
             if (File.Exists("__azurite_db_blob__.json"))
-            {
                 File.Delete("__azurite_db_blob__.json");
-            }
 
             if (File.Exists("__azurite_db_blob_extent__.json"))
-            {
                 File.Delete("__azurite_db_blob_extent__.json");
-            }
 
             if (File.Exists("__azurite_db_queue__.json"))
-            {
                 File.Delete("__azurite_db_queue__.json");
-            }
 
             if (File.Exists("__azurite_db_queue_extent__.json"))
-            {
                 File.Delete("__azurite_db_queue_extent__.json");
-            }
 
             if (File.Exists("__azurite_db_table__.json"))
-            {
                 File.Delete("__azurite_db_table__.json");
-            }
 
             if (File.Exists("__azurite_db_table_extent__.json"))
-            {
                 File.Delete("__azurite_db_table_extent__.json");
-            }
         }
         else
         {
@@ -201,8 +129,7 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
 
     private void CreateRequiredContainers()
     {
-        List<FileStorageCategory> containerCategories =
-        [
+        List<FileStorageCategory> containerCategories = [
             FileStorageCategory.ArchivedMessage(),
             FileStorageCategory.OutgoingMessage(),
         ];
@@ -211,11 +138,10 @@ public class IntegrationTestFixture : IDisposable, IAsyncLifetime
         foreach (var fileStorageCategory in containerCategories)
         {
             var container = blobServiceClient.GetBlobContainerClient(fileStorageCategory.Value);
+            var containerExists = container.Exists();
 
-            if (!container.Exists())
-            {
+            if (!containerExists)
                 container.Create();
-            }
         }
     }
 }

@@ -68,11 +68,11 @@ public sealed class WhenIncomingMessagesIsReceivedTests : TestBase
         [
             [
                 DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData,
-                ReadJsonFile(@"Application\IncomingMessages\RequestAggregatedMeasureDataAsDdk.json"),
+                ReadJsonFile(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json"),
             ],
             [
                 DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement,
-                ReadJsonFile(@"Application\IncomingMessages\RequestWholesaleSettlement.json"),
+                ReadJsonFile(@"IncomingMessages\RequestWholesaleSettlement.json"),
             ],
         ];
     }
@@ -84,18 +84,18 @@ public sealed class WhenIncomingMessagesIsReceivedTests : TestBase
             [
                 DocumentFormat.Json,
                 IncomingDocumentType.RequestAggregatedMeasureData,
-                ReadJsonFile(@"Application\IncomingMessages\FailSchemeValidationAggregatedMeasureData.json"),
+                ReadJsonFile(@"IncomingMessages\FailSchemeValidationAggregatedMeasureData.json"),
             ],
             [
                 DocumentFormat.Json,
                 IncomingDocumentType.RequestWholesaleSettlement,
-                ReadJsonFile(@"Application\IncomingMessages\FailSchemeValidationRequestWholesaleSettlement.json"),
+                ReadJsonFile(@"IncomingMessages\FailSchemeValidationRequestWholesaleSettlement.json"),
             ],
             [
                 DocumentFormat.Json,
                 IncomingDocumentType.RequestWholesaleSettlement,
                 ReadJsonFile(
-                    @"Application\IncomingMessages\RequestWholesaleSettlementWithUnusedBusinessReason.json"),
+                    @"IncomingMessages\RequestWholesaleSettlementWithUnusedBusinessReason.json"),
             ],
         ];
     }
@@ -150,7 +150,7 @@ public sealed class WhenIncomingMessagesIsReceivedTests : TestBase
 
         // Act
         await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
-            ReadJsonFile(@"Application\IncomingMessages\RequestAggregatedMeasureDataAsMdr.json"),
+            ReadJsonFile(@"IncomingMessages\RequestAggregatedMeasureDataAsMdr.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
             DocumentFormat.Json,
@@ -372,7 +372,7 @@ public sealed class WhenIncomingMessagesIsReceivedTests : TestBase
         authenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
 
-        var messageStream = ReadJsonFile(@"Application\IncomingMessages\RequestAggregatedMeasureDataAsDdk.json");
+        var messageStream = ReadJsonFile(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json");
 
         // Act
         await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
@@ -398,10 +398,8 @@ public sealed class WhenIncomingMessagesIsReceivedTests : TestBase
     }
 
     [Theory]
-    [InlineData(
-        @"Application\IncomingMessages\RequestAggregatedMeasureDataAsDdk.json",
-        "RequestAggregatedMeasureData")]
-    [InlineData(@"Application\IncomingMessages\RequestWholesaleSettlement.json", "RequestWholesaleSettlement")]
+    [InlineData(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json", "RequestAggregatedMeasureData")]
+    [InlineData(@"IncomingMessages\RequestWholesaleSettlement.json", "RequestWholesaleSettlement")]
     public async Task Incoming_message_is_archived_with_correct_data(string path, string incomingDocumentTypeName)
     {
         // Arrange

@@ -15,10 +15,13 @@
 using System.Text;
 using Azure.Messaging.ServiceBus;
 using Azure.Storage.Blobs;
+using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
 using Energinet.DataHub.BuildingBlocks.Tests;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
+using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
@@ -28,6 +31,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
@@ -39,6 +43,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using NodaTime;
 using Xunit.Abstractions;
 using ExecutionContext = Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext;
@@ -49,7 +55,6 @@ namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests;
 public class TestBase : IDisposable
 {
     private readonly IAzureClientFactory<ServiceBusSender> _serviceBusSenderFactoryStub;
-    private readonly ProcessContext _processContext;
     private readonly IncomingMessagesContext _incomingMessagesContext;
     private ServiceCollection? _services;
     private bool _disposed;
@@ -58,13 +63,12 @@ public class TestBase : IDisposable
     {
         Fixture = integrationTestFixture;
 
-        Fixture.CleanupDatabase();
+        Fixture.DatabaseManager.CleanupDatabase();
         Fixture.CleanupFileStorage();
         _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
         // TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
         // InboxEventNotificationHandler = new TestNotificationHandlerSpy();
         BuildServices(testOutputHelper);
-        _processContext = GetService<ProcessContext>();
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
         AuthenticatedActor = GetService<AuthenticatedActor>();
         AuthenticatedActor.SetAuthenticatedActor(
@@ -176,37 +180,15 @@ public class TestBase : IDisposable
             return;
         }
 
-        _processContext.Dispose();
         _incomingMessagesContext.Dispose();
         ServiceProvider.Dispose();
         _disposed = true;
     }
 
-    protected Task<TResult> InvokeCommandAsync<TResult>(ICommand<TResult> command)
-    {
-        return GetService<IMediator>().Send(command);
-    }
-
-    protected async Task ProcessInternalCommandsAsync()
-    {
-        await ProcessBackgroundTasksAsync();
-
-        if (_processContext.QueuedInternalCommands.Any(command => command.ProcessedDate == null))
-        {
-            await ProcessInternalCommandsAsync();
-        }
-    }
-
-    private Task ProcessBackgroundTasksAsync()
-    {
-        var clock = GetService<IClock>();
-        return GetService<IMediator>().Publish(new TenSecondsHasHasPassed(clock.GetCurrentInstant()));
-    }
-
     private void BuildServices(ITestOutputHelper testOutputHelper)
     {
         Environment.SetEnvironmentVariable("FEATUREFLAG_ACTORMESSAGEQUEUE", "true");
-        Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", Fixture.DatabaseConnectionString);
+        Environment.SetEnvironmentVariable("DB_CONNECTION_STRING", Fixture.DatabaseManager.ConnectionString);
         Environment.SetEnvironmentVariable(
             "AZURE_STORAGE_ACCOUNT_CONNECTION_STRING",
             Fixture.AzuriteManager.BlobStorageConnectionString);
@@ -234,58 +216,34 @@ public class TestBase : IDisposable
                         Fixture.AzuriteManager.BlobStorageServiceUri.OriginalString,
                     [$"{BlobDeadLetterLoggerOptions.SectionName}:{nameof(BlobDeadLetterLoggerOptions.ContainerName)}"] =
                         "edi-tests",
-
-                    // Databricks
-                    // [nameof(DatabricksSqlStatementOptions.WorkspaceUrl)] =
-                    //     Fixture.IntegrationTestConfiguration.DatabricksSettings.WorkspaceUrl,
-                    // [nameof(DatabricksSqlStatementOptions.WorkspaceToken)] =
-                    //     Fixture.IntegrationTestConfiguration.DatabricksSettings.WorkspaceAccessToken,
-                    // [nameof(DatabricksSqlStatementOptions.WarehouseId)] =
-                    //     Fixture.IntegrationTestConfiguration.DatabricksSettings.WarehouseId,
-                    // // => EDI views
-                    // [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.DatabaseName)}"] =
-                    //     Fixture.DatabricksSchemaManager.SchemaName,
-                    // [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.CatalogName)}"] =
-                    //     "hive_metastore",
                 })
             .Build();
 
         _services = [];
-        _services.AddScoped<IConfiguration>(_ => config);
-
-        _services.AddTransient<InboxEventsProcessor>()
-            // .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>>(_ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy) ????
-            // .AddTransient<INotificationHandler<TestNotification>>(_ => InboxEventNotificationHandler) ????
-            // .AddTransient<IRequestHandler<TestCommand, Unit>, TestCommandHandler>()
-            // .AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>, TestCreateOutgoingCommandHandler>()
-            // .AddScopedSqlDbContext<ProcessContext>(config) ????
-            // .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
-            // .AddJavaScriptEncoder()
-            // .AddSerializer()
-            // .AddLogging()
-            .AddScoped<IClock>(_ => new ClockStub());
-
         _services
-            // .AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
-            // .AddIntegrationEventModule(config)
-            // .AddOutgoingMessagesModule(config)
-            // .AddProcessModule(config)
-            // .AddArchivedMessagesModule(config)
+            .AddScoped<IConfiguration>(_ => config)
+            .AddTransient<InboxEventsProcessor>()
+            .AddB2BAuthentication(new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateLifetime = false,
+                ValidateIssuer = false,
+                SignatureValidator = (token, _) => new JsonWebToken(token),
+            })
+             .AddJavaScriptEncoder()
+             .AddSerializer()
+            .AddScoped<IClock>(_ => new ClockStub())
+            .AddArchivedMessagesModule(config)
+            .AddMasterDataModule(config)
             .AddIncomingMessagesModule(config);
-        // .AddMasterDataModule(config)
-        // .AddDataAccessUnitOfWorkModule()
-        // .AddAuditLog()
-        // .AddOutboxContext(config)
-        // .AddOutboxClient<OutboxContext>()
-        // .AddOutboxProcessor<OutboxContext>();
 
         // Replace the services with stub implementations.
         // - Building blocks
         _services.AddSingleton(_serviceBusSenderFactoryStub);
-        _services.AddTransient<IFeatureFlagManager>(x => FeatureFlagManagerStub);
+        _services.AddTransient<IFeatureFlagManager>(_ => FeatureFlagManagerStub);
 
         _services.AddScoped<ExecutionContext>(
-            x =>
+            _ =>
             {
                 var executionContext = new ExecutionContext();
                 executionContext.SetExecutionType(ExecutionType.Test);
@@ -293,7 +251,7 @@ public class TestBase : IDisposable
             });
 
         // Add test logger
-        _services.AddSingleton<ITestOutputHelper>(sp => testOutputHelper);
+        _services.AddSingleton<ITestOutputHelper>(_ => testOutputHelper);
         _services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
         _services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
 
