@@ -21,7 +21,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
     "Naming",
     "CA1711:Identifiers should not have incorrect suffix",
     Justification = "Is actually a collection")]
-public class IntegrationTestCollection : ICollectionFixture<IntegrationTestFixture>
+public class IntegrationTestCollection : ICollectionFixture<IncomingMessagesTestFixture>
 {
     // This class has no code, and is never created. Its purpose is simply
     // to be the place to apply [CollectionDefinition] and all the

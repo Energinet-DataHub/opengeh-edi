@@ -48,9 +48,9 @@ public sealed class WhenIncomingMessagesIsReceivedTests : IncomingMessagesTestBa
     private readonly ClockStub _clockStub;
 
     public WhenIncomingMessagesIsReceivedTests(
-        IntegrationTestFixture integrationTestFixture,
+        IncomingMessagesTestFixture incomingMessagesTestFixture,
         ITestOutputHelper testOutputHelper)
-        : base(integrationTestFixture, testOutputHelper)
+        : base(incomingMessagesTestFixture, testOutputHelper)
     {
         _senderSpy = new ServiceBusSenderSpy("Fake");
         var serviceBusClientSenderFactory =

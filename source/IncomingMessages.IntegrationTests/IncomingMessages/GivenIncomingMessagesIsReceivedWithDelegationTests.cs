@@ -43,9 +43,9 @@ public sealed class GivenIncomingMessagesIsReceivedWithDelegationTests : Incomin
     private readonly AuthenticatedActor _authenticatedActor;
 
     public GivenIncomingMessagesIsReceivedWithDelegationTests(
-        IntegrationTestFixture integrationTestFixture,
+        IncomingMessagesTestFixture incomingMessagesTestFixture,
         ITestOutputHelper testOutputHelper)
-        : base(integrationTestFixture, testOutputHelper)
+        : base(incomingMessagesTestFixture, testOutputHelper)
     {
         _senderSpy = new ServiceBusSenderSpy("Fake");
         var serviceBusClientSenderFactory =

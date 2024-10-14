@@ -52,9 +52,9 @@ public class IncomingMessagesTestBase : IDisposable
     private ServiceCollection? _services;
     private bool _disposed;
 
-    protected IncomingMessagesTestBase(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+    protected IncomingMessagesTestBase(IncomingMessagesTestFixture incomingMessagesTestFixture, ITestOutputHelper testOutputHelper)
     {
-        Fixture = integrationTestFixture;
+        Fixture = incomingMessagesTestFixture;
 
         Fixture.DatabaseManager.CleanupDatabase();
         Fixture.CleanupFileStorage();
@@ -66,7 +66,7 @@ public class IncomingMessagesTestBase : IDisposable
             new ActorIdentity(ActorNumber.Create("1234512345888"), Restriction.None, ActorRole.EnergySupplier));
     }
 
-    protected IntegrationTestFixture Fixture { get; }
+    protected IncomingMessagesTestFixture Fixture { get; }
 
     protected FeatureFlagManagerStub FeatureFlagManagerStub { get; } = new();
 
