@@ -63,7 +63,6 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ApplyDBMigrationsApp\ApplyDBMigrationsApp.csproj"/>
         <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />
         <ProjectReference Include="..\B2BApi\B2BApi.csproj" />
         <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj"/>
@@ -73,8 +72,6 @@ limitations under the License.
         <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj"/>
         <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
         <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
-        <ProjectReference Include="..\Process.Application\Process.Application.csproj"/>
-        <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
