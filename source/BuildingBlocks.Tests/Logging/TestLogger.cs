@@ -15,18 +15,30 @@
 using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.BuildingBlocks.Tests;
+namespace Energinet.DataHub.BuildingBlocks.Tests.Logging;
 
 public class TestLogger<T> : ILogger<T>
 {
     private readonly ITestOutputHelper _testOutputHelper;
-    private readonly ILogger<T>? _logger;
+    private readonly List<ILogger> _loggers;
 
-    public TestLogger(ITestOutputHelper testOutputHelper, Logger<T>? logger)
+    public TestLogger(ITestOutputHelper testOutputHelper, Logger<T>? logger, LoggerSpy<T>? loggerSpy)
     {
         _testOutputHelper = testOutputHelper;
-        _logger = logger;
+        _loggers = [];
+
+        if (logger != null)
+            _loggers.Add(logger);
+
+        if (loggerSpy != null)
+            _loggers.Add(loggerSpy);
     }
+
+    public Exception? CapturedException { get; private set; }
+
+    public LogLevel? CapturedLogLevel { get; private set; }
+
+    public string? Message { get; private set; }
 
     public IDisposable? BeginScope<TState>(TState state)
         where TState : notnull
@@ -43,6 +55,10 @@ public class TestLogger<T> : ILogger<T>
     {
         ArgumentNullException.ThrowIfNull(formatter);
 
+        CapturedException = exception;
+        CapturedLogLevel = logLevel;
+        Message = state!.ToString();
+
         if (logLevel == LogLevel.Error || logLevel == LogLevel.Critical)
         {
             var logOutput = formatter(state, exception);
@@ -54,6 +70,6 @@ public class TestLogger<T> : ILogger<T>
             }
         }
 
-        _logger?.Log(logLevel, eventId, state, exception, formatter);
+        _loggers.ForEach(l => l.Log(logLevel, eventId, state, exception, formatter));
     }
 }

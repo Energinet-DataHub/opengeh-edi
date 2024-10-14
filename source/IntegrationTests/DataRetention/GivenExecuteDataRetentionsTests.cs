@@ -12,15 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
+using IServiceScopeFactory = Microsoft.Extensions.DependencyInjection.IServiceScopeFactory;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.DataRetention;
 
@@ -37,12 +40,11 @@ public class GivenExecuteDataRetentionsTests : TestBase
         // Arrange
         var cancellationToken = new CancellationTokenSource().Token;
         var notification = new ADayHasPassed(GetService<IClock>().GetCurrentInstant());
-        var longRunningDataRetentionJob = new SleepyDataRetentionJob(executionTimeLimitInSeconds: 15);
 
-        var loggerSpy = new LoggerSpy();
         var sut = new ExecuteDataRetentionsWhenADayHasPassed(
-            new List<IDataRetention>() { longRunningDataRetentionJob },
-            loggerSpy,
+            GetServices<IDataRetention>(),
+            GetService<ILogger<ExecuteDataRetentionsWhenADayHasPassed>>(),
+            GetService<IServiceScopeFactory>(),
             executionTimeLimitInSeconds: 1);
 
         // Act
@@ -50,9 +52,11 @@ public class GivenExecuteDataRetentionsTests : TestBase
 
         // Assert
         await act.Should().NotThrowAsync();
+
+        var loggerSpy = GetService<LoggerSpy<ExecuteDataRetentionsWhenADayHasPassed>>();
         loggerSpy.CapturedException.Should().BeOfType<OperationCanceledException>();
         loggerSpy.CapturedLogLevel.Should().Be(LogLevel.Error);
         loggerSpy.Message.Should()
-            .Be($"Data retention job {longRunningDataRetentionJob.GetType().FullName} was cancelled.");
+            .Be($"Data retention job {typeof(SleepyDataRetentionJob).FullName} was cancelled.");
     }
 }

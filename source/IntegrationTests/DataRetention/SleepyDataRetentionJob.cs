@@ -12,18 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.DataRetention;
 
-public class SleepyDataRetentionJob(int executionTimeLimitInSeconds) : IDataRetention
+public class SleepyDataRetentionJob(int executionTimeLimitInSeconds = 3) : IDataRetention
 {
     public async Task CleanupAsync(CancellationToken cancellationToken)
     {
-        for (var i = 0; i < executionTimeLimitInSeconds; i++)
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
+
+        while (stopwatch.Elapsed.TotalSeconds < executionTimeLimitInSeconds)
         {
             cancellationToken.ThrowIfCancellationRequested();
             await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken); // Delay for 1 second
         }
+
+        stopwatch.Stop();
     }
 }

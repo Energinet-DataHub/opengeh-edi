@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.DataRetention;
+namespace Energinet.DataHub.BuildingBlocks.Tests.Logging;
 
-public class LoggerSpy : ILogger<ExecuteDataRetentionsWhenADayHasPassed>
+public class LoggerSpy<T> : ILogger<T>
 {
     public Exception? CapturedException { get; private set; }
 
@@ -28,12 +27,12 @@ public class LoggerSpy : ILogger<ExecuteDataRetentionsWhenADayHasPassed>
     public IDisposable? BeginScope<TState>(TState state)
         where TState : notnull
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     public bool IsEnabled(LogLevel logLevel)
     {
-        throw new NotImplementedException();
+        return true;
     }
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
