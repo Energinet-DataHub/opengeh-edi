@@ -88,24 +88,6 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Application\IncomingMessages\FailSchemeValidationAggregatedMeasureData.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="Application\IncomingMessages\FailSchemeValidationRequestWholesaleSettlement.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="Application\IncomingMessages\RequestAggregatedMeasureDataAsDdk.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="Application\IncomingMessages\RequestAggregatedMeasureDataAsMdr.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="Application\IncomingMessages\RequestWholesaleSettlement.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="Application\IncomingMessages\RequestWholesaleSettlementWithUnusedBusinessReason.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
       <EmbeddedResource Include="Infrastructure.CimMessageAdapter\Messages\xml\BadRequestAggregatedMeasureData.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </EmbeddedResource>
@@ -170,6 +152,10 @@ limitations under the License.
       <None Update="Behaviours\IntegrationEvents\TestData\balance_fixing_01-11-2022_01-12-2022_ga_543_per_brp_ga_v1_with_invalid_row.csv">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Application\Process\" />
     </ItemGroup>
 
 </Project>
