@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
+using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.RequestBuilders;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
-using Energinet.DataHub.EDI.IntegrationTests.EventBuilders;
-using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
@@ -26,44 +27,49 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.Azure;
 using NodaTime;
-using Xunit;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
+namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.IncomingMessages;
 
-public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
+public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesTestBase
 {
     private readonly ClockStub _clockStub;
     private readonly IIncomingMessageClient _incomingMessagesRequest;
 
     private readonly Actor _originalActor = new(ActorNumber.Create("1111111111111"), ActorRole.EnergySupplier);
     private readonly Actor _delegatedTo = new(ActorNumber.Create("2222222222222"), ActorRole.Delegated);
-#pragma warning disable CA2213 // Disposable fields should be disposed
+    [SuppressMessage("Usage", "CA2213:Disposable fields should be disposed", Justification = "Disposed in test")]
     private readonly ServiceBusSenderSpy _senderSpy;
-#pragma warning restore CA2213 // Disposable fields should be disposed
-    private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
     private readonly AuthenticatedActor _authenticatedActor;
 
-    public GivenIncomingMessagesIsReceivedWithDelegationTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
-        : base(integrationTestFixture, testOutputHelper)
+    public GivenIncomingMessagesWithDelegationTests(
+        IncomingMessagesTestFixture incomingMessagesTestFixture,
+        ITestOutputHelper testOutputHelper)
+        : base(incomingMessagesTestFixture, testOutputHelper)
     {
-        _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IAzureClientFactory<ServiceBusSender>>();
         _senderSpy = new ServiceBusSenderSpy("Fake");
-        _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
+        var serviceBusClientSenderFactory =
+            (ServiceBusSenderFactoryStub)GetService<IAzureClientFactory<ServiceBusSender>>();
+
+        serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
         _incomingMessagesRequest = GetService<IIncomingMessageClient>();
         _clockStub = (ClockStub)GetService<IClock>();
         _authenticatedActor = GetService<AuthenticatedActor>();
     }
 
     [Fact]
-    public async Task Receive_message_from_delegated()
+    public async Task AndGiven_MessageFromDelegated_When_Received_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
+        const string gridAreaCode = "512";
+
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
         _clockStub.SetCurrentInstant(now);
-        var gridAreaCode = "512";
+
         var documentFormat = DocumentFormat.Json;
-        _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
+
+        _authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
 
         var messageStream = RequestAggregatedMeasureDataRequestBuilder.CreateIncomingMessage(
             DocumentFormat.Json,
@@ -75,18 +81,17 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
             Instant.FromUtc(2024, 01, 31, 0, 0),
             _originalActor.ActorNumber,
             null,
-            new List<(string? GridArea, TransactionId TransactionId)>
-            {
+            [
                 (gridAreaCode, TransactionId.From("555555555555555555555555555555555555")),
-            });
+            ]);
 
         await AddDelegationAsync(
             _originalActor,
             _delegatedTo,
             gridAreaCode,
             ProcessType.RequestEnergyResults,
-            startsAt: now,
-            stopsAt: now.Plus(Duration.FromSeconds(1)));
+            now,
+            now.Plus(Duration.FromSeconds(1)));
 
         // Act
         var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
@@ -120,14 +125,18 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
     }
 
     [Fact]
-    public async Task Receive_message_from_delegated_when_delegation_has_stopped()
+    public async Task AndGiven_MessageFromDelegated_AndGiven_DelegationHasStopped_When_Received_Then_ErrorResponseToActor()
     {
         // Arrange
+        const string gridAreaCode = "512";
+
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
         _clockStub.SetCurrentInstant(now);
-        var gridAreaCode = "512";
+
         var documentFormat = DocumentFormat.Json;
-        _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
+
+        _authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
 
         var messageStream = RequestAggregatedMeasureDataRequestBuilder.CreateIncomingMessage(
             DocumentFormat.Json,
@@ -139,10 +148,9 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
             Instant.FromUtc(2024, 01, 31, 0, 0),
             _originalActor.ActorNumber,
             null,
-            new List<(string? GridArea, TransactionId TransactionId)>
-            {
+            [
                 (gridAreaCode, TransactionId.From("555555555555555555555555555555555555")),
-            },
+            ],
             true);
 
         await AddDelegationAsync(
@@ -150,9 +158,9 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
             _delegatedTo,
             gridAreaCode,
             ProcessType.RequestEnergyResults,
-            startsAt: now.Minus(Duration.FromMinutes(10)),
-            stopsAt: now.Plus(Duration.FromMinutes(10)),
-            sequenceNumber: 1);
+            now.Minus(Duration.FromMinutes(10)),
+            now.Plus(Duration.FromMinutes(10)),
+            1);
 
         // Cancel a delegation by adding a newer (higher sequence number) delegation to same receiver, with startsAt == stopsAt
         await AddDelegationAsync(
@@ -160,9 +168,9 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
             _delegatedTo,
             gridAreaCode,
             ProcessType.RequestEnergyResults,
-            startsAt: now,
-            stopsAt: now,
-            sequenceNumber: 2);
+            now,
+            now,
+            2);
 
         // Act
         var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
@@ -182,14 +190,21 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
     [Theory]
     [InlineData("1111111111111", null, "EnergySupplier")]
     [InlineData(null, "1111111111111", "BalanceResponsibleParty")]
-    public async Task AndGivenAnd_RequestMessageActorIsNotSameAsDelegatedBy_Then_ReturnsErrorMessage(string? requestDataFromEnergySupplierId, string? requestDateFromBalanceResponsible, string requesterActorRole)
+    public async Task AndGiven_RequestMessageActorIsNotSameAsDelegatedBy_When_Received_Then_ReturnsErrorMessage(
+        string? requestDataFromEnergySupplierId,
+        string? requestDateFromBalanceResponsible,
+        string requesterActorRole)
     {
         // Arrange
+        const string gridAreaCode = "512";
+
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
         _clockStub.SetCurrentInstant(now);
-        var gridAreaCode = "512";
+
         var documentFormat = DocumentFormat.Json;
-        _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
+
+        _authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
 
         var messageStream = RequestAggregatedMeasureDataRequestBuilder.CreateIncomingMessage(
             DocumentFormat.Json,
@@ -201,21 +216,23 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
             Instant.FromUtc(2024, 01, 31, 0, 0),
             requestDataFromEnergySupplierId != null ? ActorNumber.Create(requestDataFromEnergySupplierId) : null,
             requestDateFromBalanceResponsible != null ? ActorNumber.Create(requestDateFromBalanceResponsible) : null,
-            new List<(string? GridArea, TransactionId TransactionId)>
-            {
+            [
                 (gridAreaCode, TransactionId.From("555555555555555555555555555555555555")),
-            });
+            ]);
 
         // Delegation by another EnergySupplier or BalanceResponsibleParty
         // on the same grid area as the request
-        var delegatedByAnotherActorThenRequestedActor = new Actor(ActorNumber.Create("3333333333333"), ActorRole.FromName(requesterActorRole));
+        var delegatedByAnotherActorThenRequestedActor = new Actor(
+            ActorNumber.Create("3333333333333"),
+            ActorRole.FromName(requesterActorRole));
+
         await AddDelegationAsync(
             delegatedByAnotherActorThenRequestedActor,
             _delegatedTo,
             gridAreaCode,
             ProcessType.RequestEnergyResults,
-            startsAt: now,
-            stopsAt: now.Plus(Duration.FromSeconds(1)));
+            now,
+            now.Plus(Duration.FromSeconds(1)));
 
         // Act
         var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
@@ -229,24 +246,42 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
         using var scope = new AssertionScope();
         response.IsErrorResponse.Should().BeTrue();
         response.MessageBody.Should().Contain("The authenticated user does not hold the required role");
-        _senderSpy.LatestMessage.Should().BeNull("Since there does not exist a delegation from the energySupplier/balanceResponsible on the requested grid area");
+        _senderSpy.LatestMessage.Should()
+            .BeNull(
+                "Since there does not exist a delegation from the energySupplier/balanceResponsible on the requested grid area");
     }
 
     [Theory]
     [InlineData("1111111111111", null, "EnergySupplier")]
     [InlineData(null, "1111111111111", "BalanceResponsibleParty")]
-    public async Task AndGiven_RequestMessageWithoutGridArea_When_AnotherDelegationExistByAnotherActor_Then_ReceiveMessageForExpectedGridArea(string? requestDataForEnergySupplierId, string? requestDateForBalanceResponsible, string requesterActorRoleName)
+    public async Task
+        AndGiven_RequestMessageWithoutGridArea_AndGiven_AnotherDelegationExistByAnotherActor_When_Received_Then_ReceiveMessageForExpectedGridArea(
+            string? requestDataForEnergySupplierId,
+            string? requestDateForBalanceResponsible,
+            string requesterActorRoleName)
     {
         // Arrange
+        const string expectedGridAreaCode = "512";
+        const string anotherGridAreaCode = "804";
+
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
         _clockStub.SetCurrentInstant(now);
-        var expectedGridAreaCode = "512";
-        var documentFormat = DocumentFormat.Json;
-        _authenticatedActor.SetAuthenticatedActor(new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
 
-        var energySupplier = requestDataForEnergySupplierId != null ? ActorNumber.Create(requestDataForEnergySupplierId) : null;
-        var balanceResponsibleParty = requestDateForBalanceResponsible != null ? ActorNumber.Create(requestDateForBalanceResponsible) : null;
+        var documentFormat = DocumentFormat.Json;
+
+        _authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(_delegatedTo.ActorNumber, Restriction.Owned, _delegatedTo.ActorRole));
+
+        var energySupplier = requestDataForEnergySupplierId != null
+            ? ActorNumber.Create(requestDataForEnergySupplierId)
+            : null;
+
+        var balanceResponsibleParty = requestDateForBalanceResponsible != null
+            ? ActorNumber.Create(requestDateForBalanceResponsible)
+            : null;
+
         var originalActorRole = ActorRole.FromName(requesterActorRoleName);
+
         var messageStream = RequestAggregatedMeasureDataRequestBuilder.CreateIncomingMessage(
             DocumentFormat.Json,
             _delegatedTo.ActorNumber,
@@ -257,28 +292,30 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
             Instant.FromUtc(2024, 01, 31, 0, 0),
             energySupplier,
             balanceResponsibleParty,
-            new List<(string? GridArea, TransactionId TransactionId)>
-            {
+            [
                 (null, TransactionId.From("555555555555555555555555555555555555")),
-            });
+            ]);
 
         await AddDelegationAsync(
-            new Actor(originalActorRole == ActorRole.EnergySupplier ? energySupplier! : balanceResponsibleParty!, originalActorRole),
+            new Actor(
+                originalActorRole == ActorRole.EnergySupplier ? energySupplier! : balanceResponsibleParty!,
+                originalActorRole),
             _delegatedTo,
             expectedGridAreaCode,
             ProcessType.RequestEnergyResults,
-            startsAt: now,
-            stopsAt: now.Plus(Duration.FromSeconds(1)));
+            now,
+            now.Plus(Duration.FromSeconds(1)));
 
-        var delegatedByAnotherActorThenRequestedActor = new Actor(ActorNumber.Create("3333333333333"), originalActorRole);
-        var anotherGridAreaCode = "804";
+        var delegatedByAnotherActorThenRequestedActor =
+            new Actor(ActorNumber.Create("3333333333333"), originalActorRole);
+
         await AddDelegationAsync(
             delegatedByAnotherActorThenRequestedActor,
             _delegatedTo,
             anotherGridAreaCode,
             ProcessType.RequestEnergyResults,
-            startsAt: now,
-            stopsAt: now.Plus(Duration.FromSeconds(1)));
+            now,
+            now.Plus(Duration.FromSeconds(1)));
 
         // Act
         var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
@@ -325,7 +362,7 @@ public class GivenIncomingMessagesIsReceivedWithDelegationTests : TestBase
         await masterDataClient.CreateProcessDelegationAsync(
             new ProcessDelegationDto(
                 sequenceNumber,
-                processType ?? ProcessType.RequestEnergyResults,
+                processType,
                 gridAreaCode,
                 startsAt ?? SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(5)),
                 stopsAt ?? SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(5)),

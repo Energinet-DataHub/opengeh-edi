@@ -1,0 +1,83 @@
+<!--
+Copyright 2020 Energinet DataHub A/S
+
+Licensed under the Apache License, Version 2.0 (the "License2");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <AssemblyName>Energinet.DataHub.EDI.IncomingMessages.IntegrationTests</AssemblyName>
+        <RootNamespace>Energinet.DataHub.EDI.IncomingMessages.IntegrationTests</RootNamespace>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="coverlet.collector" Version="6.0.2">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.0.0"/>
+        <PackageReference Include="Energinet.DataHub.Core.TestCommon" Version="7.0.0"/>
+        <PackageReference Include="FluentAssertions" Version="6.12.1"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1"/>
+        <PackageReference Include="xunit" Version="2.9.2"/>
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="IncomingMessages\FailSchemeValidationAggregatedMeasureData.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="IncomingMessages\FailSchemeValidationRequestWholesaleSettlement.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="IncomingMessages\RequestAggregatedMeasureDataAsDdk.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="IncomingMessages\RequestAggregatedMeasureDataAsMdr.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="IncomingMessages\RequestWholesaleSettlement.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="IncomingMessages\RequestWholesaleSettlementWithUnusedBusinessReason.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />
+        <ProjectReference Include="..\B2BApi\B2BApi.csproj" />
+        <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj"/>
+        <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj"/>
+        <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj"/>
+        <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj"/>
+        <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj"/>
+        <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
+        <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="integrationtest.local.settings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+</Project>
