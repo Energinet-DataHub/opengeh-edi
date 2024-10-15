@@ -25,25 +25,27 @@ public static class B2CWebApiRequests
         return request;
     }
 
-    public static HttpRequestMessage CreateArchivedMessageSearchRequest()
+    public static HttpRequestMessage CreateArchivedMessageSearchV2Request()
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMessageSearch")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMessageSearch?api-version=2")
         {
             Content = CreateJsonContent(
-                new SearchArchivedMessagesCriteria(
-                    CreatedDuringPeriod: null,
-                    MessageId: null,
-                    SenderNumber: null,
-                    ReceiverNumber: null,
-                    DocumentTypes: null,
-                    BusinessReasons: null)),
+                new SearchArchivedMessagesRequest(
+                    new SearchArchivedMessagesCriteria(
+                        CreatedDuringPeriod: null,
+                        MessageId: null,
+                        SenderNumber: null,
+                        ReceiverNumber: null,
+                        DocumentTypes: null,
+                        BusinessReasons: null),
+                    new SearchArchivedMessagesPagination())),
         };
         return request;
     }
 
-    public static HttpRequestMessage CreateArchivedMessageSearchV2Request()
+    public static HttpRequestMessage CreateArchivedMessageSearchV3Request()
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMessageSearch?api-version=2")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/ArchivedMessageSearch?api-version=3")
         {
             Content = CreateJsonContent(
                 new SearchArchivedMessagesRequest(

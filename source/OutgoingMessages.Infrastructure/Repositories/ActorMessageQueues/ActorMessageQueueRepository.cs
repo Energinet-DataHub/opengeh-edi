@@ -19,23 +19,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Repositories.ActorMessageQueues;
 
-public class ActorMessageQueueRepository : IActorMessageQueueRepository
+public class ActorMessageQueueRepository(ActorMessageQueueContext actorMessageQueueContext)
+    : IActorMessageQueueRepository
 {
-    private readonly ActorMessageQueueContext _actorMessageQueueContext;
+    private readonly ActorMessageQueueContext _actorMessageQueueContext = actorMessageQueueContext;
 
-    public ActorMessageQueueRepository(ActorMessageQueueContext actorMessageQueueContext)
-    {
-        _actorMessageQueueContext = actorMessageQueueContext;
-    }
-
-    public async Task<ActorMessageQueue?> ActorMessageQueueForAsync(ActorNumber actorNumber, ActorRole actorRole)
+    public async Task<ActorMessageQueue?> ActorMessageQueueForAsync(
+        ActorNumber actorNumber,
+        ActorRole actorRole,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
         ArgumentNullException.ThrowIfNull(actorRole);
 
-        var actorMessageQueue = await _actorMessageQueueContext.ActorMessageQueues.FirstOrDefaultAsync(queue =>
-                queue.Receiver.Number.Equals(actorNumber) &&
-                queue.Receiver.ActorRole.Equals(actorRole))
+        var actorMessageQueue = await _actorMessageQueueContext.ActorMessageQueues.FirstOrDefaultAsync(
+                queue => queue.Receiver.Number.Equals(actorNumber) && queue.Receiver.ActorRole.Equals(actorRole),
+                cancellationToken)
             .ConfigureAwait(false);
 
         if (actorMessageQueue is null)
@@ -49,7 +48,10 @@ public class ActorMessageQueueRepository : IActorMessageQueueRepository
         return actorMessageQueue;
     }
 
-    public async Task<ActorMessageQueueId?> ActorMessageQueueIdForAsync(ActorNumber actorNumber, ActorRole actorRole)
+    public async Task<ActorMessageQueueId?> ActorMessageQueueIdForAsync(
+        ActorNumber actorNumber,
+        ActorRole actorRole,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(actorNumber);
         ArgumentNullException.ThrowIfNull(actorRole);
@@ -59,7 +61,7 @@ public class ActorMessageQueueRepository : IActorMessageQueueRepository
                 queue.Receiver.Number.Equals(actorNumber) &&
                 queue.Receiver.ActorRole.Equals(actorRole))
             .Select(queue => queue.Id)
-            .SingleOrDefaultAsync()
+            .SingleOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
 
         if (actorMessageQueueId is null)

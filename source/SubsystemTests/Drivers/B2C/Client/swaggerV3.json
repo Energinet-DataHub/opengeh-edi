@@ -79,6 +79,20 @@
   },
   "components": {
     "schemas": {
+      "ActorRole": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "code": {
+            "type": "string",
+            "readOnly": true
+          }
+        }
+      },
       "ArchivedMessageResultV3": {
         "type": "object",
         "additionalProperties": false,
@@ -114,8 +128,22 @@
           "senderNumber": {
             "type": "string"
           },
+          "senderRole": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ActorRole"
+              }
+            ]
+          },
           "receiverNumber": {
             "type": "string"
+          },
+          "receiverRole": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ActorRole"
+              }
+            ]
           },
           "createdAt": {
             "type": "string",
@@ -233,7 +261,15 @@
             "type": "string",
             "nullable": true
           },
+          "senderRoleCode": {
+            "type": "string",
+            "nullable": true
+          },
           "receiverNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "receiverRoleCode": {
             "type": "string",
             "nullable": true
           },

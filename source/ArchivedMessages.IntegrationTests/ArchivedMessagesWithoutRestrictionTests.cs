@@ -154,9 +154,13 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         message.SenderNumber.Should()
             .Be(archivedMessage.SenderNumber.Value)
             .And.NotBe(_authenticatedActor.ActorNumber.Value);
+        message.SenderRoleCode.Should()
+            .Be(archivedMessage.SenderRole.Code);
         message.ReceiverNumber.Should()
             .Be(archivedMessage.ReceiverNumber.Value)
             .And.NotBe(_authenticatedActor.ActorNumber.Value);
+        message.ReceiverRoleCode.Should()
+            .Be(archivedMessage.ReceiverRole.Code);
         message.DocumentType.Should().Be(archivedMessage.DocumentType);
         message.BusinessReason.Should().Be(archivedMessage.BusinessReason);
         message.CreatedAt.Should().Be(archivedMessage.CreatedAt);
@@ -207,6 +211,75 @@ public class ArchivedMessagesWithoutRestrictionTests : IAsyncLifetime
         using var assertionScope = new AssertionScope();
         result.Messages.Should().ContainSingle()
             .Which.SenderNumber.Should().Be(expectedSenderNumber);
+    }
+
+    [Fact]
+    public async Task Given_TwoArchivedMessages_When_SearchingBySenderRole_Then_ReturnsExpectedMessage()
+    {
+        // Arrange
+        var expectedSenderRole = ActorRole.SystemOperator;
+        await _fixture.CreateArchivedMessageAsync(senderRole: expectedSenderRole);
+        await _fixture.CreateArchivedMessageAsync();
+
+        // Act
+        var result = await _sut.SearchAsync(
+        new GetMessagesQuery(
+        new SortedCursorBasedPagination(),
+        SenderRoleCode: expectedSenderRole.Code),
+        CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        using var assertionScope = new AssertionScope();
+        result.Messages.Should().ContainSingle()
+        .Which.SenderRoleCode.Should().Be(expectedSenderRole.Code);
+    }
+
+    [Fact]
+    public async Task Given_TwoArchivedMessages_When_SearchingByReceiverRole_Then_ReturnsExpectedMessage()
+    {
+        // Arrange
+        var expectedReceiverRole = ActorRole.SystemOperator;
+        await _fixture.CreateArchivedMessageAsync(receiverRole: expectedReceiverRole);
+        await _fixture.CreateArchivedMessageAsync();
+
+        // Act
+        var result = await _sut.SearchAsync(
+        new GetMessagesQuery(
+        new SortedCursorBasedPagination(),
+        ReceiverRoleCode: expectedReceiverRole.Code),
+        CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        using var assertionScope = new AssertionScope();
+        result.Messages.Should().ContainSingle()
+        .Which.ReceiverRoleCode.Should().Be(expectedReceiverRole.Code);
+    }
+
+    [Fact]
+    public async Task Given_TwoArchivedMessages_When_SearchingBySenderRoleAndReceiverRole_Then_ReturnsExpectedMessage()
+    {
+        // Arrange
+        var expectedSenderRole = ActorRole.Delegated;
+        var expectedReceiverRole = ActorRole.SystemOperator;
+        await _fixture.CreateArchivedMessageAsync(senderRole: expectedSenderRole, receiverRole: expectedReceiverRole);
+        await _fixture.CreateArchivedMessageAsync();
+
+        // Act
+        var result = await _sut.SearchAsync(
+        new GetMessagesQuery(
+        new SortedCursorBasedPagination(),
+        ReceiverRoleCode: expectedReceiverRole.Code),
+        CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        using var assertionScope = new AssertionScope();
+        result.Messages.Should().ContainSingle()
+            .Which.Should().Match<MessageInfo>(messageInfo =>
+                messageInfo.SenderRoleCode == expectedSenderRole.Code
+                && messageInfo.ReceiverRoleCode == expectedReceiverRole.Code);
     }
 
     [Fact]

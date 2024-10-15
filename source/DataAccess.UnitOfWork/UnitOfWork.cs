@@ -28,9 +28,9 @@ public sealed class UnitOfWork : IUnitOfWork
         _dbContexts = dbContexts.Cast<DbContext>().ToArray();
     }
 
-    public Task CommitTransactionAsync()
+    public Task CommitTransactionAsync(CancellationToken cancellationToken = default)
     {
         return ResilientTransaction.New()
-            .SaveChangesAsync(_dbContexts);
+            .SaveChangesAsync(_dbContexts, cancellationToken);
     }
 }

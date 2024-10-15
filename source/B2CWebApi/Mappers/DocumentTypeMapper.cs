@@ -30,10 +30,9 @@ public static class DocumentTypeMapper
         { Models.DocumentType.B2CRequestWholesaleSettlement, IncomingDocumentType.B2CRequestWholesaleSettlement.Name },
     };
 
-    public static List<string> FromDocumentTypes(IReadOnlyCollection<Models.DocumentType>? documentTypes)
+    public static List<string>? FromDocumentTypes(IReadOnlyCollection<Models.DocumentType>? documentTypes)
     {
-        if (documentTypes == null) return [];
-        return documentTypes.Select(dt => DocumentTypeMappings.TryGetValue(dt, out var name)
+        return documentTypes?.Select(dt => DocumentTypeMappings.TryGetValue(dt, out var name)
                 ? name
                 : throw new NotSupportedException($"Document type not supported: {dt}"))
             .ToList();

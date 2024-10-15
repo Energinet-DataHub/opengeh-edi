@@ -40,7 +40,8 @@ public interface IFileStorageClient
     /// Downloads a file as a stream, found by the given reference string
     /// </summary>
     /// <param name="reference">The reference string is used to determine which file to download</param>
-    Task<FileStorageFile> DownloadAsync(FileStorageReference reference);
+    /// <param name="cancellationToken"></param>
+    Task<FileStorageFile> DownloadAsync(FileStorageReference reference, CancellationToken cancellationToken);
 
     /// <summary>
     /// Deletes files from the file storage

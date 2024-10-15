@@ -22,6 +22,8 @@ public record MessageInfo(
     string? MessageId,
     string DocumentType,
     string SenderNumber,
+    string SenderRoleCode,
     string ReceiverNumber,
+    string ReceiverRoleCode,
     Instant CreatedAt,
     string? BusinessReason);
