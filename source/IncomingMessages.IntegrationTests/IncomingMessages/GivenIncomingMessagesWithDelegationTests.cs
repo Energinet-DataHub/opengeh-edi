@@ -31,7 +31,7 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.IncomingMessages;
 
-public sealed class GivenIncomingMessagesIsReceivedWithDelegationTests : IncomingMessagesTestBase
+public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesTestBase
 {
     private readonly ClockStub _clockStub;
     private readonly IIncomingMessageClient _incomingMessagesRequest;
@@ -42,7 +42,7 @@ public sealed class GivenIncomingMessagesIsReceivedWithDelegationTests : Incomin
     private readonly ServiceBusSenderSpy _senderSpy;
     private readonly AuthenticatedActor _authenticatedActor;
 
-    public GivenIncomingMessagesIsReceivedWithDelegationTests(
+    public GivenIncomingMessagesWithDelegationTests(
         IncomingMessagesTestFixture incomingMessagesTestFixture,
         ITestOutputHelper testOutputHelper)
         : base(incomingMessagesTestFixture, testOutputHelper)
@@ -58,7 +58,7 @@ public sealed class GivenIncomingMessagesIsReceivedWithDelegationTests : Incomin
     }
 
     [Fact]
-    public async Task Receive_message_from_delegated()
+    public async Task AndGiven_MessageFromDelegated_When_Received_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
         const string gridAreaCode = "512";
@@ -125,7 +125,7 @@ public sealed class GivenIncomingMessagesIsReceivedWithDelegationTests : Incomin
     }
 
     [Fact]
-    public async Task Receive_message_from_delegated_when_delegation_has_stopped()
+    public async Task AndGiven_MessageFromDelegated_AndGiven_DelegationHasStopped_When_Received_Then_ErrorResponseToActor()
     {
         // Arrange
         const string gridAreaCode = "512";
@@ -190,7 +190,7 @@ public sealed class GivenIncomingMessagesIsReceivedWithDelegationTests : Incomin
     [Theory]
     [InlineData("1111111111111", null, "EnergySupplier")]
     [InlineData(null, "1111111111111", "BalanceResponsibleParty")]
-    public async Task AndGivenAnd_RequestMessageActorIsNotSameAsDelegatedBy_Then_ReturnsErrorMessage(
+    public async Task AndGiven_RequestMessageActorIsNotSameAsDelegatedBy_When_Received_Then_ReturnsErrorMessage(
         string? requestDataFromEnergySupplierId,
         string? requestDateFromBalanceResponsible,
         string requesterActorRole)
@@ -255,7 +255,7 @@ public sealed class GivenIncomingMessagesIsReceivedWithDelegationTests : Incomin
     [InlineData("1111111111111", null, "EnergySupplier")]
     [InlineData(null, "1111111111111", "BalanceResponsibleParty")]
     public async Task
-        AndGiven_RequestMessageWithoutGridArea_When_AnotherDelegationExistByAnotherActor_Then_ReceiveMessageForExpectedGridArea(
+        AndGiven_RequestMessageWithoutGridArea_AndGiven_AnotherDelegationExistByAnotherActor_When_Received_Then_ReceiveMessageForExpectedGridArea(
             string? requestDataForEnergySupplierId,
             string? requestDateForBalanceResponsible,
             string requesterActorRoleName)

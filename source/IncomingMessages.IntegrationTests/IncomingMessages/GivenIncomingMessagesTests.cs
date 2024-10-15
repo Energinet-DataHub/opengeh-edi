@@ -38,7 +38,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.IncomingMessag
     "StyleCop.CSharp.ReadabilityRules",
     "SA1118:Parameter should not span multiple lines",
     Justification = "Readability in test-setup")]
-public sealed class WhenIncomingMessagesIsReceivedTests : IncomingMessagesTestBase
+public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
 {
     private readonly IIncomingMessageClient _incomingMessagesRequest;
 #pragma warning disable CA2213 // Disposable fields should be disposed
@@ -47,7 +47,7 @@ public sealed class WhenIncomingMessagesIsReceivedTests : IncomingMessagesTestBa
     private readonly IncomingMessagesContext _incomingMessageContext;
     private readonly ClockStub _clockStub;
 
-    public WhenIncomingMessagesIsReceivedTests(
+    public GivenIncomingMessagesTests(
         IncomingMessagesTestFixture incomingMessagesTestFixture,
         ITestOutputHelper testOutputHelper)
         : base(incomingMessagesTestFixture, testOutputHelper)
@@ -102,7 +102,7 @@ public sealed class WhenIncomingMessagesIsReceivedTests : IncomingMessagesTestBa
 
     [Theory]
     [MemberData(nameof(ValidIncomingRequestMessages))]
-    public async Task Incoming_message_is_received(
+    public async Task When_MessageIsReceived_Then_BodyAndTransactionAndMessageIdArePresentOnTheInternalRepresentation(
         DocumentFormat format,
         IncomingDocumentType incomingDocumentType,
         IncomingMarketMessageStream incomingMarketMessageStream)
@@ -140,7 +140,7 @@ public sealed class WhenIncomingMessagesIsReceivedTests : IncomingMessagesTestBa
     }
 
     [Fact]
-    public async Task Incoming_message_is_received_with_Ddm_Mdr_hack()
+    public async Task AndGiven_DdmMdrHackIsApplicable_When_MessageIsReceived_Then_BodyAndTransactionAndMessageIdArePresentOnTheInternalRepresentation()
     {
         // Assert
         var authenticatedActor = GetService<AuthenticatedActor>();
@@ -169,7 +169,7 @@ public sealed class WhenIncomingMessagesIsReceivedTests : IncomingMessagesTestBa
 
     [Theory]
     [MemberData(nameof(ValidIncomingRequestMessages))]
-    public async Task Transaction_and_message_ids_are_not_saved_when_failing_to_send_to_ServiceBus(
+    public async Task AndGiven_ServiceBusFails_When_MessageIsReceived_Then_TransactionAndMessageIdsAreNotSaved(
         DocumentFormat format,
         IncomingDocumentType incomingDocumentType,
         IncomingMarketMessageStream incomingMarketMessageStream)
@@ -210,7 +210,7 @@ public sealed class WhenIncomingMessagesIsReceivedTests : IncomingMessagesTestBa
 
     [Theory]
     [MemberData(nameof(ValidIncomingRequestMessages))]
-    public async Task Only_one_request_pr_transactionId_and_messageId_is_accepted(
+    public async Task AndGiven_MultipleRequestsWithSameTransactionAndMessageId_When_MessageIsReceived_Then_OnlyOneRequestPrTransactionIdAndMessageIdIsAccepted(
         DocumentFormat format,
         IncomingDocumentType incomingDocumentType,
         IncomingMarketMessageStream incomingMarketMessageStream)
@@ -266,7 +266,7 @@ public sealed class WhenIncomingMessagesIsReceivedTests : IncomingMessagesTestBa
 
     [Theory]
     [MemberData(nameof(ValidIncomingRequestMessages))]
-    public async Task Second_request_with_same_transactionId_and_messageId_is_rejected(
+    public async Task AndGiven_ASecondRequestWithSameTransactionIdAndMessageId_When_MessageIsReceived_Then_ItIsRejected(
         DocumentFormat format,
         IncomingDocumentType incomingDocumentType,
         IncomingMarketMessageStream incomingMarketMessageStream)
@@ -331,7 +331,7 @@ public sealed class WhenIncomingMessagesIsReceivedTests : IncomingMessagesTestBa
 
     [Theory]
     [MemberData(nameof(InvalidIncomingRequestMessages))]
-    public async Task Transaction_and_message_ids_are_not_saved_when_receiving_a_faulted_request(
+    public async Task AndGiven_FaultyRequest_When_MessageIsReceived_Then_TransactionAndMessageIdsAreNotSaved(
         DocumentFormat format,
         IncomingDocumentType incomingDocumentType,
         IncomingMarketMessageStream incomingMarketMessageStream)
@@ -362,7 +362,7 @@ public sealed class WhenIncomingMessagesIsReceivedTests : IncomingMessagesTestBa
     }
 
     [Fact]
-    public async Task Incoming_message_is_archived_with_correct_content()
+    public async Task When_MessageIsReceived_Then_IncomingMessageIsArchivedWithCorrectContent()
     {
         // Assert
         const string messageIdFromFile = "123564789123564789123564789123564789";
@@ -400,7 +400,7 @@ public sealed class WhenIncomingMessagesIsReceivedTests : IncomingMessagesTestBa
     [Theory]
     [InlineData(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json", "RequestAggregatedMeasureData")]
     [InlineData(@"IncomingMessages\RequestWholesaleSettlement.json", "RequestWholesaleSettlement")]
-    public async Task Incoming_message_is_archived_with_correct_data(string path, string incomingDocumentTypeName)
+    public async Task When_MessageIsReceived_Then_IncomingMessageIsArchivedWithCorrectData(string path, string incomingDocumentTypeName)
     {
         // Arrange
         const int year = 2024;
