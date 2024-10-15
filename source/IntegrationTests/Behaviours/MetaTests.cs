@@ -14,6 +14,7 @@
 
 using System.Reflection;
 using Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Fixture;
+using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationEvents.IntegrationTests.Fixture;
 using Energinet.DataHub.EDI.MasterData.IntegrationTests.Fixture;
 using FluentAssertions;
@@ -40,6 +41,7 @@ public static class MetaTests
         var archivedMessagesIntegrationTestsAssembly = Assembly.GetAssembly(typeof(ArchivedMessagesFixture));
         var integrationEventsIntegrationTestsAssembly = Assembly.GetAssembly(typeof(IntegrationEventsFixture));
         var masterDataIntegrationTestsAssembly = Assembly.GetAssembly(typeof(MasterDataFixture));
+        var incomingMessageIntegrationTestsAssembly = Assembly.GetAssembly(typeof(IncomingMessagesTestFixture));
 
         var allTypes = new[]
         {
@@ -47,12 +49,12 @@ public static class MetaTests
             archivedMessagesIntegrationTestsAssembly,
             integrationEventsIntegrationTestsAssembly,
             masterDataIntegrationTestsAssembly,
+            incomingMessageIntegrationTestsAssembly,
         }.SelectMany(x => x?.GetTypes()!);
 
         var allTestNames = allTypes.Where(
                 type =>
-                    type.IsClass
-                    && type.Namespace != null
+                    type is { IsClass: true, Namespace: not null }
                     && !_excludedTestFolders.Any(f => type.Namespace.Contains(f, StringComparison.OrdinalIgnoreCase)))
             .SelectMany(type => type.GetMethods())
             .Where(IsXunitTest)

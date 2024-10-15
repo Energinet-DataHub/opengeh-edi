@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.BaseParsers;
@@ -22,7 +19,7 @@ using Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages.RequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Process.RequestAggregatedMeasureData;
 
 public class InitializeAggregatedMeasureDataProcessDtoBuilder
 {

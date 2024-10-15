@@ -14,6 +14,7 @@
 
 using System.Reflection;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.BuildingBlocks.Tests;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
@@ -28,11 +29,9 @@ using FluentAssertions.Execution;
 using Microsoft.Extensions.Azure;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Categories;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages.RequestAggregatedMeasureData;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Process.RequestAggregatedMeasureData;
 
-[IntegrationTest]
 public class InitializeAggregatedMeasureDataProcessesCommandTests : TestBase
 {
     private readonly ProcessContext _processContext;
