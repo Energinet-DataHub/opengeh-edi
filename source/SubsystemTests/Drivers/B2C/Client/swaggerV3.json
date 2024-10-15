@@ -10,7 +10,6 @@
         "tags": [
           "ArchivedMessageSearch"
         ],
-        "operationId": "ArchivedMessageSearch",
         "parameters": [
           {
             "name": "api-version",
@@ -80,22 +79,37 @@
   "components": {
     "schemas": {
       "ActorRole": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "name": {
-            "type": "string",
-            "readOnly": true
-          },
-          "code": {
-            "type": "string",
-            "readOnly": true
-          }
-        }
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "type": "integer",
+        "format": "int32",
+        "x-enumNames": [
+          "MeteringPointAdministrator",
+          "EnergySupplier",
+          "GridAccessProvider",
+          "MeteredDataAdministrator",
+          "MeteredDataResponsible",
+          "BalanceResponsibleParty",
+          "ImbalanceSettlementResponsible",
+          "SystemOperator",
+          "DanishEnergyAgency",
+          "Delegated",
+          "DataHubAdministrator"
+        ]
       },
       "ArchivedMessageResultV3": {
         "type": "object",
-        "additionalProperties": false,
         "properties": {
           "recordId": {
             "type": "integer",
@@ -109,6 +123,11 @@
             "nullable": true
           },
           "documentType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DocumentType"
+              }
+            ],
             "x-enumNames": [
               "NotifyAggregatedMeasureData",
               "NotifyWholesaleServices",
@@ -118,11 +137,6 @@
               "B2CRequestAggregatedMeasureData",
               "RequestWholesaleSettlement",
               "B2CRequestWholesaleSettlement"
-            ],
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DocumentType"
-              }
             ]
           },
           "senderNumber": {
@@ -133,6 +147,19 @@
               {
                 "$ref": "#/components/schemas/ActorRole"
               }
+            ],
+            "x-enumNames": [
+              "MeteringPointAdministrator",
+              "EnergySupplier",
+              "GridAccessProvider",
+              "MeteredDataAdministrator",
+              "MeteredDataResponsible",
+              "BalanceResponsibleParty",
+              "ImbalanceSettlementResponsible",
+              "SystemOperator",
+              "DanishEnergyAgency",
+              "Delegated",
+              "DataHubAdministrator"
             ]
           },
           "receiverNumber": {
@@ -143,6 +170,19 @@
               {
                 "$ref": "#/components/schemas/ActorRole"
               }
+            ],
+            "x-enumNames": [
+              "MeteringPointAdministrator",
+              "EnergySupplier",
+              "GridAccessProvider",
+              "MeteredDataAdministrator",
+              "MeteredDataResponsible",
+              "BalanceResponsibleParty",
+              "ImbalanceSettlementResponsible",
+              "SystemOperator",
+              "DanishEnergyAgency",
+              "Delegated",
+              "DataHubAdministrator"
             ]
           },
           "createdAt": {
@@ -153,11 +193,11 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
       "ArchivedMessageSearchResponseV3": {
         "type": "object",
-        "additionalProperties": false,
         "properties": {
           "messages": {
             "type": "array",
@@ -169,22 +209,33 @@
             "type": "integer",
             "format": "int32"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "DirectionToSortBy": {
+        "enum": [
+          0,
+          1
+        ],
         "type": "integer",
         "description": "Represents the direction to sort by when searching for archived messages.",
         "format": "int32",
         "x-enumNames": [
           "Ascending",
           "Descending"
-        ],
-        "enum": [
-          0,
-          1
         ]
       },
       "DocumentType": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
         "type": "integer",
         "format": "int32",
         "x-enumNames": [
@@ -196,19 +247,16 @@
           "B2CRequestAggregatedMeasureData",
           "RequestWholesaleSettlement",
           "B2CRequestWholesaleSettlement"
-        ],
+        ]
+      },
+      "FieldToSortBy": {
         "enum": [
           0,
           1,
           2,
           3,
-          4,
-          5,
-          6,
-          7
-        ]
-      },
-      "FieldToSortBy": {
+          4
+        ],
         "type": "integer",
         "description": "Represents the fields that can be sorted on when searching for archived messages.",
         "format": "int32",
@@ -218,18 +266,10 @@
           "SenderNumber",
           "ReceiverNumber",
           "CreatedAt"
-        ],
-        "enum": [
-          0,
-          1,
-          2,
-          3,
-          4
         ]
       },
       "MessageCreationPeriod": {
         "type": "object",
-        "additionalProperties": false,
         "properties": {
           "start": {
             "type": "string",
@@ -239,19 +279,19 @@
             "type": "string",
             "format": "date-time"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "SearchArchivedMessagesCriteriaV3": {
         "type": "object",
-        "additionalProperties": false,
         "properties": {
           "createdDuringPeriod": {
-            "nullable": true,
             "allOf": [
               {
                 "$ref": "#/components/schemas/MessageCreationPeriod"
               }
-            ]
+            ],
+            "nullable": true
           },
           "messageId": {
             "type": "string",
@@ -275,27 +315,26 @@
           },
           "documentTypes": {
             "type": "array",
-            "nullable": true,
             "items": {
               "$ref": "#/components/schemas/DocumentType"
-            }
+            },
+            "nullable": true
           },
           "businessReasons": {
             "type": "array",
-            "nullable": true,
             "items": {
               "type": "string"
-            }
+            },
+            "nullable": true
           },
           "includeRelatedMessages": {
             "type": "boolean"
           }
-        }
+        },
+        "additionalProperties": false
       },
       "SearchArchivedMessagesCursor": {
         "type": "object",
-        "description": "Pagination cursor for the search of archived messages.\r\nPointing to the field being sorted by and the record id.\r\nWhen navigating forward, the cursor points to the last record of the current page.\r\nand when navigating backward, the cursor points to the first record of the current page.",
-        "additionalProperties": false,
         "properties": {
           "fieldToSortByValue": {
             "type": "string",
@@ -307,37 +346,37 @@
             "description": "",
             "format": "int64"
           }
-        }
+        },
+        "additionalProperties": false,
+        "description": "Pagination cursor for the search of archived messages.\r\nPointing to the field being sorted by and the record id.\r\nWhen navigating forward, the cursor points to the last record of the current page.\r\nand when navigating backward, the cursor points to the first record of the current page."
       },
       "SearchArchivedMessagesPagination": {
         "type": "object",
-        "description": "Pagination when searching for archived messages that supports sorting on a specific field.",
-        "additionalProperties": false,
         "properties": {
           "cursor": {
-            "description": "Pagination cursor for the search of archived messages.\r\nPointing to the field being sorted by and the record id.\r\nWhen navigating forward, the cursor points to the last record of the current page.\r\nand when navigating backward, the cursor points to the first record of the current page.",
-            "nullable": true,
             "allOf": [
               {
                 "$ref": "#/components/schemas/SearchArchivedMessagesCursor"
               }
-            ]
+            ],
+            "description": "Pagination cursor for the search of archived messages.\r\nPointing to the field being sorted by and the record id.\r\nWhen navigating forward, the cursor points to the last record of the current page.\r\nand when navigating backward, the cursor points to the first record of the current page.",
+            "nullable": true
           },
           "sortBy": {
-            "nullable": true,
             "allOf": [
               {
                 "$ref": "#/components/schemas/FieldToSortBy"
               }
-            ]
+            ],
+            "nullable": true
           },
           "directionToSortBy": {
-            "nullable": true,
             "allOf": [
               {
                 "$ref": "#/components/schemas/DirectionToSortBy"
               }
-            ]
+            ],
+            "nullable": true
           },
           "pageSize": {
             "type": "integer",
@@ -346,11 +385,12 @@
           "navigationForward": {
             "type": "boolean"
           }
-        }
+        },
+        "additionalProperties": false,
+        "description": "Pagination when searching for archived messages that supports sorting on a specific field."
       },
       "SearchArchivedMessagesRequestV3": {
         "type": "object",
-        "additionalProperties": false,
         "properties": {
           "searchCriteria": {
             "allOf": [
@@ -360,14 +400,15 @@
             ]
           },
           "pagination": {
-            "description": "Pagination when searching for archived messages that supports sorting on a specific field.",
             "allOf": [
               {
                 "$ref": "#/components/schemas/SearchArchivedMessagesPagination"
               }
-            ]
+            ],
+            "description": "Pagination when searching for archived messages that supports sorting on a specific field."
           }
-        }
+        },
+        "additionalProperties": false
       }
     },
     "securitySchemes": {
