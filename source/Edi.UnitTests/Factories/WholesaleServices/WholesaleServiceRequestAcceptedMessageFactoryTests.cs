@@ -34,12 +34,12 @@ namespace Energinet.DataHub.Wholesale.Edi.UnitTests.Factories.WholesaleServices;
 
 public class WholesaleServiceRequestAcceptedMessageFactoryTests
 {
+    private static readonly Instant _defaultTime = Instant.FromUtc(2022, 5, 1, 1, 0);
     private readonly string _gridArea = "543";
     private readonly string _energySupplier = "1234567891234";
     private readonly string? _chargeOwner = "1234567891999";
     private readonly Instant _periodStart = Instant.FromUtc(2020, 12, 31, 23, 0);
     private readonly Instant _periodEnd = Instant.FromUtc(2021, 1, 1, 23, 0);
-    private static readonly Instant _defaultTime = Instant.FromUtc(2022, 5, 1, 1, 0);
 
     public static IEnumerable<object[]> QuantityQualitySets()
     {

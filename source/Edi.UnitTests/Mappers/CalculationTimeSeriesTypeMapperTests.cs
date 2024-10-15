@@ -33,6 +33,22 @@ public class CalculationTimeSeriesTypeMapperTests
         CalculationTimeSeriesType.NetExchangePerNeighboringGa,
     ];
 
+    public static IEnumerable<object[]> TimeSeriesTypesEdiModel()
+    {
+        foreach (var number in Enum.GetValues(typeof(TimeSeriesType)))
+        {
+            yield return new[] { number };
+        }
+    }
+
+    public static IEnumerable<object[]> TimeSeriesTypesCalculationModel()
+    {
+        foreach (var number in Enum.GetValues(typeof(CalculationTimeSeriesType)))
+        {
+            yield return new[] { number };
+        }
+    }
+
     [Theory]
     [MemberData(nameof(TimeSeriesTypesEdiModel))]
     public void ToCalculationTimeSerieType_ReturnsExpectedType(TimeSeriesType type)
@@ -83,21 +99,5 @@ public class CalculationTimeSeriesTypeMapperTests
         // Assert
         act.Should().Throw<ArgumentOutOfRangeException>()
             .And.ActualValue.Should().Be(invalidValue);
-    }
-
-    public static IEnumerable<object[]> TimeSeriesTypesEdiModel()
-    {
-        foreach (var number in Enum.GetValues(typeof(TimeSeriesType)))
-        {
-            yield return new[] { number };
-        }
-    }
-
-    public static IEnumerable<object[]> TimeSeriesTypesCalculationModel()
-    {
-        foreach (var number in Enum.GetValues(typeof(CalculationTimeSeriesType)))
-        {
-            yield return new[] { number };
-        }
     }
 }

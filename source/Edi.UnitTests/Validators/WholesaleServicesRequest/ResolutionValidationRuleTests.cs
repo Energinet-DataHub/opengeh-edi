@@ -26,6 +26,7 @@ namespace Energinet.DataHub.Wholesale.Edi.UnitTests.Validators.WholesaleServices
 public class ResolutionValidationRuleTests
 {
     private const string PropertyName = "aggregationSeries_Period.resolution";
+
     private static readonly ValidationError _notMonthlyResolution =
         new(
             $"{PropertyName} skal være 'P1M'/{PropertyName} must be 'P1M'",
@@ -36,6 +37,35 @@ public class ResolutionValidationRuleTests
     public ResolutionValidationRuleTests()
     {
         _sut = new ResolutionValidationRule();
+    }
+
+    public static IEnumerable<object?[]> GetMonthlyAndMissingResolution()
+    {
+        return new[]
+        {
+            new object[] { "Monthly" },
+            new object[] { null! },
+            new object[] { DataHubNames.Resolution.Monthly },
+        };
+    }
+
+    public static IEnumerable<object?[]> GetInvalidResolutions()
+    {
+        var customResolutions = new[]
+        {
+            "NotMonthly",
+            "P1M",
+            "PT1M",
+        }.ToArray();
+
+        var allResolutions = GetAllResolutionsInDatahub();
+        var invalidResolutions = allResolutions
+            .Where(res => res != DataHubNames.Resolution.Monthly);
+
+        var invalidResolutionsWithCustomResolutions = invalidResolutions.Concat(customResolutions)
+            .Select(res => new object[] { res! });
+
+        return invalidResolutionsWithCustomResolutions;
     }
 
     [Theory]
@@ -71,35 +101,6 @@ public class ResolutionValidationRuleTests
         actual.Should().HaveCount(1);
         actual.First().Message.Should().BeSameAs(_notMonthlyResolution.Message);
         actual.First().ErrorCode.Should().BeSameAs(_notMonthlyResolution.ErrorCode);
-    }
-
-    public static IEnumerable<object?[]> GetMonthlyAndMissingResolution()
-    {
-        return new[]
-        {
-            new object[] { "Monthly" },
-            new object[] { null! },
-            new object[] { DataHubNames.Resolution.Monthly },
-        };
-    }
-
-    public static IEnumerable<object?[]> GetInvalidResolutions()
-    {
-        var customResolutions = new[]
-        {
-            "NotMonthly",
-            "P1M",
-            "PT1M",
-        }.ToArray();
-
-        var allResolutions = GetAllResolutionsInDatahub();
-        var invalidResolutions = allResolutions
-            .Where(res => res != DataHubNames.Resolution.Monthly);
-
-        var invalidResolutionsWithCustomResolutions = invalidResolutions.Concat(customResolutions)
-            .Select(res => new object[] { res! });
-
-        return invalidResolutionsWithCustomResolutions;
     }
 
     private static IEnumerable<string?> GetAllResolutionsInDatahub()

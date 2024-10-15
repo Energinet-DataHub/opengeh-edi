@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.Edi.Requests;
-using Energinet.DataHub.Wholesale.Calculations.Infrastructure.Persistence;
-using Energinet.DataHub.Wholesale.Calculations.Infrastructure.Persistence.GridArea;
-using Energinet.DataHub.Wholesale.Calculations.Interfaces.GridArea;
 using Energinet.DataHub.Wholesale.Edi.Contracts;
 using Energinet.DataHub.Wholesale.Edi.Extensions.DependencyInjection;
 using Energinet.DataHub.Wholesale.Edi.UnitTests.Builders;
@@ -39,8 +37,8 @@ public sealed class WholesaleServicesRequestValidatorTests
         services.AddTransient<DateTimeZone>(s => DateTimeZoneProviders.Tzdb.GetZoneOrNull("Europe/Copenhagen")!);
         services.AddTransient<IClock>(s => SystemClock.Instance);
         services.AddTransient<PeriodValidationHelper>();
-        services.AddScoped<IGridAreaOwnerRepository, GridAreaOwnerRepository>();
-        services.AddScoped<IDatabaseContext, DatabaseContext>();
+        services.AddScoped<IMasterDataClient>();
+        //services.AddScoped<IDatabaseContext, DatabaseContext>();
 
         services.AddWholesaleServicesRequestValidation();
 
