@@ -33,14 +33,6 @@ public static class ActorRoleMapper
         { Models.ActorRole.DataHubAdministrator, ActorRole.DataHubAdministrator.Code },
     };
 
-    // public static List<string>? FromDocumentTypes(IReadOnlyCollection<Models.ActorRole>? documentTypes)
-    // {
-    //     return documentTypes?.Select(ar => ActorRoleMappings.TryGetValue(ar, out var name)
-    //             ? name
-    //             : throw new NotSupportedException($"Actor role not supported: {ar}"))
-    //         .ToList();
-    // }
-
     public static Models.ActorRole ToActorRole(string actorRoleCode)
     {
         if (ActorRoleMappings.ContainsValue(actorRoleCode))
