@@ -16,7 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
 
-[CollectionDefinition("IncomingMessagesIntegrationTest")]
+[CollectionDefinition(nameof(IncomingMessagesIntegrationTestCollection))]
 [SuppressMessage(
     "Naming",
     "CA1711:Identifiers should not have incorrect suffix",
