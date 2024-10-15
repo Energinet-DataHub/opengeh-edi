@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Azure.Messaging.ServiceBus;
 using Dapper;
@@ -19,9 +20,9 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
+using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
-using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -29,27 +30,33 @@ using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using NodaTime.Extensions;
-using Xunit;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages;
+namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.IncomingMessages;
 
-public class WhenIncomingMessagesIsReceivedTests : TestBase
+[SuppressMessage(
+    "StyleCop.CSharp.ReadabilityRules",
+    "SA1118:Parameter should not span multiple lines",
+    Justification = "Readability in test-setup")]
+public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
 {
     private readonly IIncomingMessageClient _incomingMessagesRequest;
-    private readonly ServiceBusSenderFactoryStub _serviceBusClientSenderFactory;
 #pragma warning disable CA2213 // Disposable fields should be disposed
     private readonly ServiceBusSenderSpy _senderSpy;
 #pragma warning restore CA2213 // Disposable fields should be disposed
     private readonly IncomingMessagesContext _incomingMessageContext;
     private readonly ClockStub _clockStub;
 
-    public WhenIncomingMessagesIsReceivedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
-        : base(integrationTestFixture, testOutputHelper)
+    public GivenIncomingMessagesTests(
+        IncomingMessagesTestFixture incomingMessagesTestFixture,
+        ITestOutputHelper testOutputHelper)
+        : base(incomingMessagesTestFixture, testOutputHelper)
     {
-        _serviceBusClientSenderFactory = (ServiceBusSenderFactoryStub)GetService<IAzureClientFactory<ServiceBusSender>>();
         _senderSpy = new ServiceBusSenderSpy("Fake");
-        _serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
+        var serviceBusClientSenderFactory =
+            (ServiceBusSenderFactoryStub)GetService<IAzureClientFactory<ServiceBusSender>>();
+
+        serviceBusClientSenderFactory.AddSenderSpy(_senderSpy);
         _incomingMessagesRequest = GetService<IIncomingMessageClient>();
         _incomingMessageContext = GetService<IncomingMessagesContext>();
         _clockStub = (ClockStub)GetService<IClock>();
@@ -57,68 +64,93 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
     public static IEnumerable<object[]> ValidIncomingRequestMessages()
     {
-        return new List<object[]>
-        {
-            new object[] { DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData, ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json") },
-            new object[] { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ReadJsonFile("Application\\IncomingMessages\\RequestWholesaleSettlement.json") },
-        };
+        return
+        [
+            [
+                DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData,
+                ReadJsonFile(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json"),
+            ],
+            [
+                DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement,
+                ReadJsonFile(@"IncomingMessages\RequestWholesaleSettlement.json"),
+            ],
+        ];
     }
 
     public static IEnumerable<object[]> InvalidIncomingRequestMessages()
     {
-        return new List<object[]>
-        {
-            new object[] { DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData, ReadJsonFile("Application\\IncomingMessages\\FailSchemeValidationAggregatedMeasureData.json") },
-            new object[] { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ReadJsonFile("Application\\IncomingMessages\\FailSchemeValidationRequestWholesaleSettlement.json") },
-            new object[] { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ReadJsonFile("Application\\IncomingMessages\\RequestWholesaleSettlementWithUnusedBusinessReason.json") },
-        };
+        return
+        [
+            [
+                DocumentFormat.Json,
+                IncomingDocumentType.RequestAggregatedMeasureData,
+                ReadJsonFile(@"IncomingMessages\FailSchemeValidationAggregatedMeasureData.json"),
+            ],
+            [
+                DocumentFormat.Json,
+                IncomingDocumentType.RequestWholesaleSettlement,
+                ReadJsonFile(@"IncomingMessages\FailSchemeValidationRequestWholesaleSettlement.json"),
+            ],
+            [
+                DocumentFormat.Json,
+                IncomingDocumentType.RequestWholesaleSettlement,
+                ReadJsonFile(
+                    @"IncomingMessages\RequestWholesaleSettlementWithUnusedBusinessReason.json"),
+            ],
+        ];
     }
 
     [Theory]
     [MemberData(nameof(ValidIncomingRequestMessages))]
-    public async Task Incoming_message_is_received(DocumentFormat format, IncomingDocumentType incomingDocumentType, IncomingMarketMessageStream incomingMarketMessageStream)
-    {
-      // Assert
-      var authenticatedActor = GetService<AuthenticatedActor>();
-      var senderActorNumber = ActorNumber.Create("5799999933318");
-      authenticatedActor.SetAuthenticatedActor(
-          new ActorIdentity(
-              senderActorNumber,
-              Restriction.Owned,
-              incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData ? ActorRole.BalanceResponsibleParty : ActorRole.EnergySupplier));
-
-      // Act
-      var registerAndSendAsync = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
-          incomingMarketMessageStream,
-          format,
-          incomingDocumentType,
-          format,
-          CancellationToken.None);
-
-      // Assert
-      registerAndSendAsync.IsErrorResponse.Should().BeFalse(registerAndSendAsync.MessageBody);
-
-      var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
-      var messageIds = await GetMessageIdsAsync(senderActorNumber);
-      var message = _senderSpy.LatestMessage;
-
-      Assert.Multiple(
-          () => Assert.NotNull(message),
-          () => Assert.Single(transactionIds),
-          () => Assert.Single(messageIds));
-    }
-
-    [Fact]
-    public async Task Incoming_message_is_received_with_Ddm_Mdr_hack()
+    public async Task When_MessageIsReceived_Then_BodyAndTransactionAndMessageIdArePresentOnTheInternalRepresentation(
+        DocumentFormat format,
+        IncomingDocumentType incomingDocumentType,
+        IncomingMarketMessageStream incomingMarketMessageStream)
     {
         // Assert
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.GridAccessProvider));
+        authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(
+                senderActorNumber,
+                Restriction.Owned,
+                incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData
+                    ? ActorRole.BalanceResponsibleParty
+                    : ActorRole.EnergySupplier));
+
+        // Act
+        var registerAndSendAsync = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+            incomingMarketMessageStream,
+            format,
+            incomingDocumentType,
+            format,
+            CancellationToken.None);
+
+        // Assert
+        registerAndSendAsync.IsErrorResponse.Should().BeFalse(registerAndSendAsync.MessageBody);
+
+        var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
+        var messageIds = await GetMessageIdsAsync(senderActorNumber);
+        var message = _senderSpy.LatestMessage;
+
+        Assert.Multiple(
+            () => Assert.NotNull(message),
+            () => Assert.Single(transactionIds),
+            () => Assert.Single(messageIds));
+    }
+
+    [Fact]
+    public async Task AndGiven_DdmMdrHackIsApplicable_When_MessageIsReceived_Then_BodyAndTransactionAndMessageIdArePresentOnTheInternalRepresentation()
+    {
+        // Assert
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        var senderActorNumber = ActorNumber.Create("5799999933318");
+        authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.GridAccessProvider));
 
         // Act
         await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
-            ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsMdr.json"),
+            ReadJsonFile(@"IncomingMessages\RequestAggregatedMeasureDataAsMdr.json"),
             DocumentFormat.Json,
             IncomingDocumentType.RequestAggregatedMeasureData,
             DocumentFormat.Json,
@@ -137,7 +169,10 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
     [Theory]
     [MemberData(nameof(ValidIncomingRequestMessages))]
-    public async Task Transaction_and_message_ids_are_not_saved_when_failing_to_send_to_ServiceBus(DocumentFormat format, IncomingDocumentType incomingDocumentType, IncomingMarketMessageStream incomingMarketMessageStream)
+    public async Task AndGiven_ServiceBusFails_When_MessageIsReceived_Then_TransactionAndMessageIdsAreNotSaved(
+        DocumentFormat format,
+        IncomingDocumentType incomingDocumentType,
+        IncomingMarketMessageStream incomingMarketMessageStream)
     {
         // Assert
         var authenticatedActor = GetService<AuthenticatedActor>();
@@ -146,17 +181,20 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             new ActorIdentity(
                 senderActorNumber,
                 Restriction.Owned,
-                incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData ? ActorRole.BalanceResponsibleParty : ActorRole.EnergySupplier));
+                incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData
+                    ? ActorRole.BalanceResponsibleParty
+                    : ActorRole.EnergySupplier));
 
         _senderSpy.ShouldFail = true;
 
         // Act & Assert
-        await Assert.ThrowsAsync<ServiceBusException>(() => _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
-            incomingMarketMessageStream,
-            format,
-            incomingDocumentType,
-            format,
-            CancellationToken.None));
+        await Assert.ThrowsAsync<ServiceBusException>(
+            () => _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+                incomingMarketMessageStream,
+                format,
+                incomingDocumentType,
+                format,
+                CancellationToken.None));
 
         var transactionIds = await GetTransactionIdsAsync(senderActorNumber);
         var messageIds = await GetMessageIdsAsync(senderActorNumber);
@@ -172,7 +210,10 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
     [Theory]
     [MemberData(nameof(ValidIncomingRequestMessages))]
-    public async Task Only_one_request_pr_transactionId_and_messageId_is_accepted(DocumentFormat format, IncomingDocumentType incomingDocumentType, IncomingMarketMessageStream incomingMarketMessageStream)
+    public async Task AndGiven_MultipleRequestsWithSameTransactionAndMessageId_When_MessageIsReceived_Then_OnlyOneRequestPrTransactionIdAndMessageIdIsAccepted(
+        DocumentFormat format,
+        IncomingDocumentType incomingDocumentType,
+        IncomingMarketMessageStream incomingMarketMessageStream)
     {
         // Arrange
         var authenticatedActor = GetService<AuthenticatedActor>();
@@ -181,7 +222,9 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             new ActorIdentity(
                 senderActorNumber,
                 Restriction.Owned,
-                incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData ? ActorRole.BalanceResponsibleParty : ActorRole.EnergySupplier));
+                incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData
+                    ? ActorRole.BalanceResponsibleParty
+                    : ActorRole.EnergySupplier));
 
         // new scope to simulate a race condition.
         var sessionProvider = GetService<IServiceProvider>();
@@ -189,7 +232,8 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var authenticatedActorInSecondScope = secondScope.ServiceProvider.GetService<AuthenticatedActor>();
         var secondParser = secondScope.ServiceProvider.GetRequiredService<IIncomingMessageClient>();
 
-        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, restriction: Restriction.None, ActorRole.BalanceResponsibleParty));
+        authenticatedActorInSecondScope!.SetAuthenticatedActor(
+            new ActorIdentity(senderActorNumber, Restriction.None, ActorRole.BalanceResponsibleParty));
 
         var task01 = _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
             incomingMarketMessageStream,
@@ -197,6 +241,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             incomingDocumentType,
             format,
             CancellationToken.None);
+
         var task02 = secondParser.ReceiveIncomingMarketMessageAsync(
             incomingMarketMessageStream,
             format,
@@ -221,14 +266,21 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
     [Theory]
     [MemberData(nameof(ValidIncomingRequestMessages))]
-    public async Task Second_request_with_same_transactionId_and_messageId_is_rejected(DocumentFormat format, IncomingDocumentType incomingDocumentType, IncomingMarketMessageStream incomingMarketMessageStream)
+    public async Task AndGiven_ASecondRequestWithSameTransactionIdAndMessageId_When_MessageIsReceived_Then_ItIsRejected(
+        DocumentFormat format,
+        IncomingDocumentType incomingDocumentType,
+        IncomingMarketMessageStream incomingMarketMessageStream)
     {
         // Arrange
-        var exceptedDuplicateTransactionIdDetectedErrorCode = "00102";
-        var exceptedDuplicateMessageIdDetectedErrorCode = "00101";
+        const string exceptedDuplicateTransactionIdDetectedErrorCode = "00102";
+        const string exceptedDuplicateMessageIdDetectedErrorCode = "00101";
+
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
-        var authenticatedActorRole = incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData ? ActorRole.BalanceResponsibleParty : ActorRole.EnergySupplier;
+        var authenticatedActorRole = incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData
+            ? ActorRole.BalanceResponsibleParty
+            : ActorRole.EnergySupplier;
+
         authenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(
                 senderActorNumber,
@@ -241,10 +293,11 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var authenticatedActorInSecondScope = secondScope.ServiceProvider.GetService<AuthenticatedActor>();
         var secondParser = secondScope.ServiceProvider.GetRequiredService<IIncomingMessageClient>();
 
-        authenticatedActorInSecondScope!.SetAuthenticatedActor(new ActorIdentity(
-            senderActorNumber,
-            restriction: Restriction.None,
-            authenticatedActorRole));
+        authenticatedActorInSecondScope!.SetAuthenticatedActor(
+            new ActorIdentity(
+                senderActorNumber,
+                Restriction.None,
+                authenticatedActorRole));
 
         var task01 = _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
             incomingMarketMessageStream,
@@ -252,6 +305,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
             incomingDocumentType,
             format,
             CancellationToken.None);
+
         var task02 = secondParser.ReceiveIncomingMarketMessageAsync(
             incomingMarketMessageStream,
             format,
@@ -265,22 +319,28 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         // Assert
         using var assertionScope = new AssertionScope();
         results.Should().NotBeNullOrEmpty();
-        results.Should().ContainSingle(result => result.IsErrorResponse, because: "we expect the results contains exactly 1 error");
+        results.Should()
+            .ContainSingle(result => result.IsErrorResponse, "we expect the results contains exactly 1 error");
 
         var errorResult = results.Single(result => result.IsErrorResponse);
-        errorResult.MessageBody.Should().ContainAny([
-            exceptedDuplicateTransactionIdDetectedErrorCode,
-            exceptedDuplicateMessageIdDetectedErrorCode]);
+        errorResult.MessageBody.Should()
+            .ContainAny(
+                exceptedDuplicateTransactionIdDetectedErrorCode,
+                exceptedDuplicateMessageIdDetectedErrorCode);
     }
 
     [Theory]
     [MemberData(nameof(InvalidIncomingRequestMessages))]
-    public async Task Transaction_and_message_ids_are_not_saved_when_receiving_a_faulted_request(DocumentFormat format, IncomingDocumentType incomingDocumentType, IncomingMarketMessageStream incomingMarketMessageStream)
+    public async Task AndGiven_FaultyRequest_When_MessageIsReceived_Then_TransactionAndMessageIdsAreNotSaved(
+        DocumentFormat format,
+        IncomingDocumentType incomingDocumentType,
+        IncomingMarketMessageStream incomingMarketMessageStream)
     {
         // Assert
         var senderActorNumber = ActorNumber.Create("5799999933318");
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
+        authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
 
         // Act
         await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
@@ -302,14 +362,18 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     }
 
     [Fact]
-    public async Task Incoming_message_is_archived_with_correct_content()
+    public async Task When_MessageIsReceived_Then_IncomingMessageIsArchivedWithCorrectContent()
     {
         // Assert
+        const string messageIdFromFile = "123564789123564789123564789123564789";
+
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
-        var messageStream = ReadJsonFile("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json");
-        var messageIdFromFile = "123564789123564789123564789123564789";
+        authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
+
+        var messageStream = ReadJsonFile(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json");
+
         // Act
         await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
             messageStream,
@@ -321,7 +385,9 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         // Assert
         using var assertionScope = new AssertionScope();
         var incomingMessageContent = await GetStreamContentAsStringAsync(messageStream.Stream);
-        var archivedMessageFileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageIdFromFile);
+        var archivedMessageFileStorageReference =
+            await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(messageIdFromFile);
+
         archivedMessageFileStorageReference.Should().NotBeNull();
 
         var archivedMessageFileContent = await GetFileContentFromFileStorageAsync(
@@ -332,29 +398,34 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
     }
 
     [Theory]
-    [InlineData("Application\\IncomingMessages\\RequestAggregatedMeasureDataAsDdk.json", "RequestAggregatedMeasureData")]
-    [InlineData("Application\\IncomingMessages\\RequestWholesaleSettlement.json", "RequestWholesaleSettlement")]
-    public async Task Incoming_message_is_archived_with_correct_data(string path, string incomingDocumentTypeName)
+    [InlineData(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json", "RequestAggregatedMeasureData")]
+    [InlineData(@"IncomingMessages\RequestWholesaleSettlement.json", "RequestWholesaleSettlement")]
+    public async Task When_MessageIsReceived_Then_IncomingMessageIsArchivedWithCorrectData(string path, string incomingDocumentTypeName)
     {
         // Arrange
+        const int year = 2024;
+        const int month = 01;
+        const int date = 05;
+        const int hour = 04;
+        const int minute = 23;
+
+        const string senderActorRole = "DDK";
+        const string messageIdFromFile = "123564789123564789123564789123564789";
+        const string businessReasonFromFile = "D05";
+        const string receiverActorNumberFromFile = "5790001330552";
+        const string receiverActorRoleFromFile = "DGL";
+
         var incomingDocumentType = IncomingDocumentType.FromName(incomingDocumentTypeName)!;
-        int year = 2024,
-            month = 01,
-            date = 05,
-            hour = 04,
-            minute = 23;
+
         var expectedTimestamp = new DateTime(year, month, date, hour, minute, 0, DateTimeKind.Utc);
         _clockStub.SetCurrentInstant(expectedTimestamp.ToInstant());
 
         var senderActorNumber = ActorNumber.Create("5799999933318");
-        var senderActorRole = "DDK";
         var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
+        authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.BalanceResponsibleParty));
+
         var messageStream = ReadJsonFile(path);
-        var messageIdFromFile = "123564789123564789123564789123564789";
-        var businessReasonFromFile = "D05";
-        var receiverActorNumberFromFile = "5790001330552";
-        var receiverActorRoleFromFile = "DGL";
 
         // Act
         await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
@@ -368,14 +439,19 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var archivedMessage = await GetArchivedMessageFromDatabaseAsync(messageIdFromFile);
         ((object?)archivedMessage).Should().NotBeNull("because an archived message should exists");
 
-        var expectedFileStorageReference = $"{senderActorNumber.Value}/{year:0000}/{month:00}/{date:00}/{archivedMessage!.Id:N}";
+        var expectedFileStorageReference =
+            $"{senderActorNumber.Value}/{year:0000}/{month:00}/{date:00}/{archivedMessage!.Id:N}";
+
         var assertProperties = new Dictionary<string, Action<object?>>
         {
             { "BusinessReason", businessReason => businessReason.Should().Be(businessReasonFromFile) },
             { "CreatedAt", createdAt => createdAt.Should().Be(expectedTimestamp) },
             { "DocumentType", documentType => documentType.Should().Be(incomingDocumentType.Name) },
             { "EventIds", eventIds => eventIds.Should().BeNull() },
-            { "FileStorageReference", fileStorageReference => fileStorageReference.Should().Be(expectedFileStorageReference) },
+            {
+                "FileStorageReference",
+                fileStorageReference => fileStorageReference.Should().Be(expectedFileStorageReference)
+            },
             { "Id", id => id.Should().NotBeNull() },
             { "MessageId", messageId => messageId.Should().Be(messageIdFromFile) },
             { "ReceiverNumber", receiverNumber => receiverNumber.Should().Be(receiverActorNumberFromFile) },
@@ -392,7 +468,8 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         foreach (var assertProperty in assertProperties)
             assertProperty.Value(archivedMessageAsDictionary[assertProperty.Key]);
 
-        assertProperties.Should().HaveSameCount(archivedMessageAsDictionary, "because all archived message properties should be asserted");
+        assertProperties.Should()
+            .HaveSameCount(archivedMessageAsDictionary, "because all archived message properties should be asserted");
 
         foreach (var dbPropertyName in archivedMessageAsDictionary.Keys)
             assertProperties.Keys.Should().Contain(dbPropertyName);
@@ -409,7 +486,7 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
         var jsonDoc = File.ReadAllText(path);
 
         var stream = new MemoryStream();
-        using var writer = new StreamWriter(stream: stream, encoding: Encoding.UTF8, bufferSize: 4096, leaveOpen: true);
+        using var writer = new StreamWriter(stream, Encoding.UTF8, 4096, true);
         writer.Write(jsonDoc);
         writer.Flush();
         stream.Position = 0;
@@ -419,7 +496,8 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
     private async Task<List<dynamic>> GetTransactionIdsAsync(ActorNumber senderNumber)
     {
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        using var connection =
+            await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = $"SELECT [TransactionId] FROM [dbo].[TransactionRegistry] WHERE SenderId = '{senderNumber.Value}'";
         var results = await connection.QueryAsync(sql);
         return results.ToList();
@@ -427,7 +505,8 @@ public class WhenIncomingMessagesIsReceivedTests : TestBase
 
     private async Task<List<dynamic>> GetMessageIdsAsync(ActorNumber senderNumber)
     {
-        using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
+        using var connection =
+            await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var sql = $"SELECT [MessageId] FROM [dbo].[MessageRegistry] WHERE SenderId = '{senderNumber.Value}'";
         var results = await connection.QueryAsync<dynamic>(sql);
         return results.ToList();
