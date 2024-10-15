@@ -290,13 +290,30 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV3
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ActorRole
+    public enum ActorRole
     {
-        [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("code", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Code { get; set; }
+        MeteringPointAdministrator = 0,
+
+        EnergySupplier = 1,
+
+        GridAccessProvider = 2,
+
+        MeteredDataAdministrator = 3,
+
+        MeteredDataResponsible = 4,
+
+        BalanceResponsibleParty = 5,
+
+        ImbalanceSettlementResponsible = 6,
+
+        SystemOperator = 7,
+
+        DanishEnergyAgency = 8,
+
+        Delegated = 9,
+
+        DataHubAdministrator = 10,
 
     }
 
