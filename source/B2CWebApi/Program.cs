@@ -54,7 +54,7 @@ builder.Services
 
     // Modules
     .AddDataAccessUnitOfWorkModule()
-    //.AddIncomingMessagesModule(builder.Configuration)
+    .AddIncomingMessagesModule(builder.Configuration)
     .AddArchivedMessagesModule(builder.Configuration)
     .AddMasterDataModule(builder.Configuration)
     .AddAuditLog()
