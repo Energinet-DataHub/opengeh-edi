@@ -14,26 +14,17 @@
 
 namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
-[Serializable]
-public record ArchivedMessageResultV2(
-    long RecordId,
-    string Id,
-    string? MessageId,
-    string DocumentType,
-    string SenderNumber,
-    string ReceiverNumber,
-    DateTimeOffset CreatedAt,
-    string? BusinessReason);
-
-[Serializable]
-public record ArchivedMessageResultV3(
-    long RecordId,
-    string Id,
-    string? MessageId,
-    DocumentType DocumentType,
-    string SenderNumber,
-    ActorRole SenderRole,
-    string ReceiverNumber,
-    ActorRole ReceiverRole,
-    DateTimeOffset CreatedAt,
-    string? BusinessReason);
+public enum ActorRole
+{
+     MeteringPointAdministrator = 0,
+     EnergySupplier = 1,
+     GridAccessProvider = 2,
+     MeteredDataAdministrator = 3,
+     MeteredDataResponsible = 4,
+     BalanceResponsibleParty = 5,
+     ImbalanceSettlementResponsible = 6,
+     SystemOperator = 7,
+     DanishEnergyAgency = 8,
+     Delegated = 9,
+     DataHubAdministrator = 10,
+}

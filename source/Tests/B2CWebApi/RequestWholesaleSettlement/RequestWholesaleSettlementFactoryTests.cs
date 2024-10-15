@@ -20,6 +20,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
 using Xunit;
+using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
 
 namespace Energinet.DataHub.EDI.Tests.B2CWebApi.RequestWholesaleSettlement;
 
