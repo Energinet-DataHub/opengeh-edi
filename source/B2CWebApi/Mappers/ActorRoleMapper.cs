@@ -18,28 +18,23 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Mappers;
 
 public static class ActorRoleMapper
 {
-    private static readonly Dictionary<Models.ActorRole, string> ActorRoleMappings = new()
+    private static readonly Dictionary<string, Models.ActorRole> ActorRoleMappings = new()
     {
-        { Models.ActorRole.MeteringPointAdministrator, ActorRole.MeteringPointAdministrator.Code },
-        { Models.ActorRole.EnergySupplier, ActorRole.EnergySupplier.Code },
-        { Models.ActorRole.GridAccessProvider, ActorRole.GridAccessProvider.Code },
-        { Models.ActorRole.MeteredDataAdministrator, ActorRole.MeteredDataAdministrator.Code },
-        { Models.ActorRole.MeteredDataResponsible, ActorRole.MeteredDataResponsible.Code },
-        { Models.ActorRole.BalanceResponsibleParty, ActorRole.BalanceResponsibleParty.Code },
-        { Models.ActorRole.ImbalanceSettlementResponsible, ActorRole.ImbalanceSettlementResponsible.Code },
-        { Models.ActorRole.SystemOperator, ActorRole.SystemOperator.Code },
-        { Models.ActorRole.DanishEnergyAgency, ActorRole.DanishEnergyAgency.Code },
-        { Models.ActorRole.Delegated, ActorRole.Delegated.Code },
-        { Models.ActorRole.DataHubAdministrator, ActorRole.DataHubAdministrator.Code },
+        { ActorRole.MeteringPointAdministrator.Code, Models.ActorRole.MeteringPointAdministrator },
+        { ActorRole.EnergySupplier.Code, Models.ActorRole.EnergySupplier },
+        { ActorRole.GridAccessProvider.Code, Models.ActorRole.GridAccessProvider },
+        { ActorRole.MeteredDataAdministrator.Code, Models.ActorRole.MeteredDataAdministrator },
+        { ActorRole.MeteredDataResponsible.Code, Models.ActorRole.MeteredDataResponsible },
+        { ActorRole.BalanceResponsibleParty.Code, Models.ActorRole.BalanceResponsibleParty },
+        { ActorRole.ImbalanceSettlementResponsible.Code, Models.ActorRole.ImbalanceSettlementResponsible },
+        { ActorRole.SystemOperator.Code, Models.ActorRole.SystemOperator },
+        { ActorRole.DanishEnergyAgency.Code, Models.ActorRole.DanishEnergyAgency },
+        { ActorRole.Delegated.Code, Models.ActorRole.Delegated },
+        { ActorRole.DataHubAdministrator.Code, Models.ActorRole.DataHubAdministrator },
     };
 
     public static Models.ActorRole ToActorRole(string actorRoleCode)
     {
-        if (ActorRoleMappings.ContainsValue(actorRoleCode))
-        {
-            return ActorRoleMappings.First(x => x.Value == actorRoleCode).Key;
-        }
-
-        throw new NotSupportedException($"Actor role not supported: {actorRoleCode}");
+        return ActorRoleMappings[actorRoleCode];
     }
 }
