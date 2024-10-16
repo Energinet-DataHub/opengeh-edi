@@ -14,6 +14,7 @@
 
 using Azure.Messaging.ServiceBus;
 using Dapper;
+using Energinet.DataHub.BuildingBlocks.Tests;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
@@ -29,11 +30,9 @@ using FluentAssertions.Execution;
 using Microsoft.Extensions.Azure;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Categories;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Application.IncomingMessages.WholesaleServices;
+namespace Energinet.DataHub.EDI.IntegrationTests.Application.Process.WholesaleServices;
 
-[IntegrationTest]
 public class WhenWholesaleServicesIsRequestedTests : TestBase
 {
     private readonly ProcessContext _processContext;
