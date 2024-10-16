@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using BuildingBlocks.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
+using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
+using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.MasterData.Application;
+using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Wholesale.Edi.Contracts;
@@ -20,31 +26,24 @@ using Energinet.DataHub.Wholesale.Edi.UnitTests.Builders;
 using Energinet.DataHub.Wholesale.Edi.Validation;
 using Energinet.DataHub.Wholesale.Edi.Validation.Helpers;
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.Wholesale.Edi.UnitTests.Validators.WholesaleServicesRequest;
 
-public sealed class WholesaleServicesRequestValidatorTests
+[Collection(nameof(EdiTestCollection))]
+public sealed class WholesaleServicesRequestValidatorTests : EdiTestBase
 {
     private readonly IValidator<DataHub.Edi.Requests.WholesaleServicesRequest> _sut;
 
-    public WholesaleServicesRequestValidatorTests()
+    public WholesaleServicesRequestValidatorTests(EdiFixture ediFixture, ITestOutputHelper testOutputHelper)
+        : base(ediFixture, testOutputHelper)
     {
-        IServiceCollection services = new ServiceCollection();
-
-        services.AddTransient<DateTimeZone>(s => DateTimeZoneProviders.Tzdb.GetZoneOrNull("Europe/Copenhagen")!);
-        services.AddTransient<IClock>(s => SystemClock.Instance);
-        services.AddTransient<PeriodValidationHelper>();
-        services.AddScoped<IMasterDataClient>();
-        //services.AddScoped<IDatabaseContext, DatabaseContext>();
-
-        services.AddWholesaleServicesRequestValidation();
-
-        var serviceProvider = services.BuildServiceProvider();
-
-        _sut = serviceProvider.GetRequiredService<IValidator<DataHub.Edi.Requests.WholesaleServicesRequest>>();
+        SetupServiceCollection();
+        _sut = Services.GetRequiredService<IValidator<DataHub.Edi.Requests.WholesaleServicesRequest>>();
     }
 
     [Fact]

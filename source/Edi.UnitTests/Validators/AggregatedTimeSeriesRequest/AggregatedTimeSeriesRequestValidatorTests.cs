@@ -22,28 +22,20 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Energinet.DataHub.Wholesale.Edi.UnitTests.Validators.AggregatedTimeSeriesRequest;
 
-public class AggregatedTimeSeriesRequestValidatorTests
+[Collection(nameof(EdiTestCollection))]
+public class AggregatedTimeSeriesRequestValidatorTests : EdiTestBase
 {
     private readonly IValidator<DataHub.Edi.Requests.AggregatedTimeSeriesRequest> _sut;
 
-    public AggregatedTimeSeriesRequestValidatorTests()
+    public AggregatedTimeSeriesRequestValidatorTests(EdiFixture ediFixture, ITestOutputHelper testOutputHelper)
+        : base(ediFixture, testOutputHelper)
     {
-        IServiceCollection services = new ServiceCollection();
-
-        services.AddTransient<DateTimeZone>(s => DateTimeZoneProviders.Tzdb.GetZoneOrNull("Europe/Copenhagen")!);
-        services.AddTransient<IClock>(s => SystemClock.Instance);
-        services.AddTransient<PeriodValidationHelper>();
-        services.AddScoped<IMasterDataClient>();
-        //services.AddScoped<IDatabaseContext, DatabaseContext>();
-
-        services.AddAggregatedTimeSeriesRequestValidation();
-
-        var serviceProvider = services.BuildServiceProvider();
-
-        _sut = serviceProvider.GetRequiredService<IValidator<DataHub.Edi.Requests.AggregatedTimeSeriesRequest>>();
+        SetupServiceCollection();
+        _sut = Services.GetRequiredService<IValidator<DataHub.Edi.Requests.AggregatedTimeSeriesRequest>>();
     }
 
     [Fact]

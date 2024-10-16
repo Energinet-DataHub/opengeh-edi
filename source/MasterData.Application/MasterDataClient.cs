@@ -25,7 +25,7 @@ using Actor = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Actor;
 
 namespace Energinet.DataHub.EDI.MasterData.Application;
 
-internal sealed class MasterDataClient : IMasterDataClient
+public sealed class MasterDataClient : IMasterDataClient
 {
     private readonly IActorRepository _actorRepository;
     private readonly IGridAreaRepository _gridAreaRepository;
