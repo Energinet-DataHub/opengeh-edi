@@ -139,7 +139,7 @@ public class PeekMessage
 
         _telemetryClient.GetMetric(
                 outgoingMessageBundle.DocumentType.ToString() + request.DocumentFormat)
-            .TrackValue(outgoingMessageBundle.OutgoingMessages.Count);
+            .TrackValue(1);
 
         return marketDocument;
     }
