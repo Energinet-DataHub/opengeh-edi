@@ -216,7 +216,7 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
     {
         var blobClient = Services.GetService<IFileStorageClient>()!;
 
-        var fileStorageFile = await blobClient.DownloadAsync(reference).ConfigureAwait(false);
+        var fileStorageFile = await blobClient.DownloadAsync(reference, CancellationToken.None).ConfigureAwait(false);
         return new ArchivedMessageStream(fileStorageFile);
     }
 

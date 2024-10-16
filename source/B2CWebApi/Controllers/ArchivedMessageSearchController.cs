@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2CWebApi.Mappers;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime.Extensions;
@@ -36,55 +37,6 @@ public class ArchivedMessageSearchController : ControllerBase
     {
         _archivedMessagesClient = archivedMessagesClient;
         _auditLogger = auditLogger;
-    }
-
-    [ApiVersion("1.0")]
-    [HttpPost]
-    [ProducesResponseType(typeof(ArchivedMessageResult[]), StatusCodes.Status200OK)]
-    public async Task<ActionResult> RequestAsync(
-        SearchArchivedMessagesCriteria request,
-        CancellationToken cancellationToken)
-    {
-        ArgumentNullException.ThrowIfNull(request);
-
-        await _auditLogger.LogWithCommitAsync(
-                logId: AuditLogId.New(),
-                activity: AuditLogActivity.ArchivedMessagesSearch,
-                activityOrigin: HttpContext.Request.GetDisplayUrl(),
-                activityPayload: request,
-                affectedEntityType: AuditLogEntityType.ArchivedMessage,
-                affectedEntityKey: null)
-            .ConfigureAwait(false);
-
-        var messageCreationPeriod = request.CreatedDuringPeriod is not null
-            ? new ArchivedMessages.Interfaces.MessageCreationPeriod(
-                request.CreatedDuringPeriod.Start.ToInstant(),
-                request.CreatedDuringPeriod.End.ToInstant())
-            : null;
-
-        var pagination = new SortedCursorBasedPagination(
-            pageSize: 1500000);
-
-        var query = new GetMessagesQuery(
-            pagination,
-            messageCreationPeriod,
-            request.MessageId,
-            request.SenderNumber,
-            request.ReceiverNumber,
-            request.DocumentTypes,
-            request.BusinessReasons,
-            request.IncludeRelatedMessages);
-
-        var result = await _archivedMessagesClient.SearchAsync(query, cancellationToken).ConfigureAwait(false);
-
-        return Ok(result.Messages.Select(x => new ArchivedMessageResult(
-            x.Id.ToString(),
-            x.MessageId,
-            x.DocumentType,
-            x.SenderNumber,
-            x.ReceiverNumber,
-            x.CreatedAt.ToDateTimeOffset(),
-            x.BusinessReason)));
     }
 
     [ApiVersion("2.0")]
@@ -128,7 +80,9 @@ public class ArchivedMessageSearchController : ControllerBase
             messageCreationPeriod,
             request.SearchCriteria.MessageId,
             request.SearchCriteria.SenderNumber,
+            null,
             request.SearchCriteria.ReceiverNumber,
+            null,
             request.SearchCriteria.DocumentTypes,
             request.SearchCriteria.BusinessReasons,
             request.SearchCriteria.IncludeRelatedMessages);
@@ -190,7 +144,9 @@ public class ArchivedMessageSearchController : ControllerBase
             messageCreationPeriod,
             request.SearchCriteria.MessageId,
             request.SearchCriteria.SenderNumber,
+            request.SearchCriteria.SenderRoleCode,
             request.SearchCriteria.ReceiverNumber,
+            request.SearchCriteria.ReceiverRoleCode,
             DocumentTypeMapper.FromDocumentTypes(request.SearchCriteria.DocumentTypes),
             request.SearchCriteria.BusinessReasons,
             request.SearchCriteria.IncludeRelatedMessages);
@@ -204,7 +160,9 @@ public class ArchivedMessageSearchController : ControllerBase
                 x.MessageId,
                 DocumentTypeMapper.ToDocumentType(x.DocumentType),
                 x.SenderNumber,
+                ActorRoleMapper.ToActorRole(x.SenderRoleCode),
                 x.ReceiverNumber,
+                ActorRoleMapper.ToActorRole(x.ReceiverRoleCode),
                 x.CreatedAt.ToDateTimeOffset(),
                 x.BusinessReason));
         return Ok(new ArchivedMessageSearchResponseV3(messages, TotalCount: result.TotalAmountOfMessages));

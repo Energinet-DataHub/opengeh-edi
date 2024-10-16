@@ -56,7 +56,7 @@ public class AssertOutgoingMessage
         outgoingMessageFileStorageReference.Should().NotBeNull("because an outgoing message should always have a file storage reference");
         outgoingMessageFileStorageReference.Should().Contain(outgoingMessage.ReceiverNumber);
 
-        var fileStorageFile = await fileStorageClient.DownloadAsync(new FileStorageReference(FileStorageCategory.OutgoingMessage(), outgoingMessageFileStorageReference!));
+        var fileStorageFile = await fileStorageClient.DownloadAsync(new FileStorageReference(FileStorageCategory.OutgoingMessage(), outgoingMessageFileStorageReference!), CancellationToken.None);
 
         var messageRecord = await fileStorageFile.ReadAsStringAsync();
 
@@ -85,7 +85,7 @@ public class AssertOutgoingMessage
             var outgoingMessageFileStorageReference = (string?)outgoingMessage.FileStorageReference;
             outgoingMessageFileStorageReference.Should().NotBeNull("because an outgoing message should always have a file storage reference");
 
-            var fileStorageFile = await fileStorageClient.DownloadAsync(new FileStorageReference(FileStorageCategory.OutgoingMessage(), outgoingMessageFileStorageReference!));
+            var fileStorageFile = await fileStorageClient.DownloadAsync(new FileStorageReference(FileStorageCategory.OutgoingMessage(), outgoingMessageFileStorageReference!), CancellationToken.None);
 
             var messageRecord = await fileStorageFile.ReadAsStringAsync();
 

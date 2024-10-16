@@ -41,6 +41,8 @@ public record ArchivedMessageFromDb(
         MessageId,
         DocumentType,
         SenderNumber,
+        SenderRoleCode,
         ReceiverNumber,
+        ReceiverRoleCode,
         CreatedAt,
         BusinessReason);

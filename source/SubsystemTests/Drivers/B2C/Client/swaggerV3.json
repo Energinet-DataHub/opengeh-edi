@@ -79,6 +79,36 @@
   },
   "components": {
     "schemas": {
+      "ActorRole": {
+        "type": "integer",
+        "format": "int32",
+        "x-enumNames": [
+          "MeteringPointAdministrator",
+          "EnergySupplier",
+          "GridAccessProvider",
+          "MeteredDataAdministrator",
+          "MeteredDataResponsible",
+          "BalanceResponsibleParty",
+          "ImbalanceSettlementResponsible",
+          "SystemOperator",
+          "DanishEnergyAgency",
+          "Delegated",
+          "DataHubAdministrator"
+        ],
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
       "ArchivedMessageResultV3": {
         "type": "object",
         "additionalProperties": false,
@@ -114,8 +144,48 @@
           "senderNumber": {
             "type": "string"
           },
+          "senderRole": {
+            "x-enumNames": [
+              "MeteringPointAdministrator",
+              "EnergySupplier",
+              "GridAccessProvider",
+              "MeteredDataAdministrator",
+              "MeteredDataResponsible",
+              "BalanceResponsibleParty",
+              "ImbalanceSettlementResponsible",
+              "SystemOperator",
+              "DanishEnergyAgency",
+              "Delegated",
+              "DataHubAdministrator"
+            ],
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ActorRole"
+              }
+            ]
+          },
           "receiverNumber": {
             "type": "string"
+          },
+          "receiverRole": {
+            "x-enumNames": [
+              "MeteringPointAdministrator",
+              "EnergySupplier",
+              "GridAccessProvider",
+              "MeteredDataAdministrator",
+              "MeteredDataResponsible",
+              "BalanceResponsibleParty",
+              "ImbalanceSettlementResponsible",
+              "SystemOperator",
+              "DanishEnergyAgency",
+              "Delegated",
+              "DataHubAdministrator"
+            ],
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ActorRole"
+              }
+            ]
           },
           "createdAt": {
             "type": "string",
@@ -233,7 +303,15 @@
             "type": "string",
             "nullable": true
           },
+          "senderRoleCode": {
+            "type": "string",
+            "nullable": true
+          },
           "receiverNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "receiverRoleCode": {
             "type": "string",
             "nullable": true
           },

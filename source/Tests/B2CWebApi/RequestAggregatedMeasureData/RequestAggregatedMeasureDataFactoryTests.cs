@@ -22,6 +22,7 @@ using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime;
 using NodaTime.Text;
 using Xunit;
+using ActorRole = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.ActorRole;
 using MeteringPointType = Energinet.DataHub.EDI.B2CWebApi.Models.MeteringPointType;
 
 namespace Energinet.DataHub.EDI.Tests.B2CWebApi.RequestAggregatedMeasureData;

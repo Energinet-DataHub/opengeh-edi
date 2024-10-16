@@ -82,7 +82,10 @@ public class OutgoingMessageTests
             if (documentWriter.HandlesType(documentType))
             {
                 // Act
-                var act = () => documentWriter.WriteAsync(GetHeader(), new List<string> { serializedContent });
+                var act = () => documentWriter.WriteAsync(
+                    GetHeader(),
+                    new List<string> { serializedContent },
+                    CancellationToken.None);
                 // Assert
                 await act.Should().NotThrowAsync();
             }

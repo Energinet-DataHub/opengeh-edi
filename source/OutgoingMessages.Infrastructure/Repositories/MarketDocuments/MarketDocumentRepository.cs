@@ -31,13 +31,17 @@ public class MarketDocumentRepository : IMarketDocumentRepository
         _fileStorageClient = fileStorageClient;
     }
 
-    public async Task<MarketDocument?> GetAsync(BundleId bundleId)
+    public async Task<MarketDocument?> GetAsync(BundleId bundleId, CancellationToken cancellationToken = default)
     {
-        var marketDocument = await _actorMessageQueueContext.MarketDocuments.FirstOrDefaultAsync(x => x.BundleId == bundleId).ConfigureAwait(false);
+        var marketDocument = await _actorMessageQueueContext.MarketDocuments
+            .FirstOrDefaultAsync(x => x.BundleId == bundleId, cancellationToken)
+            .ConfigureAwait(false);
 
         if (marketDocument != null)
         {
-            var fileStorageFile = await _fileStorageClient.DownloadAsync(marketDocument.FileStorageReference).ConfigureAwait(false);
+            var fileStorageFile = await _fileStorageClient
+                .DownloadAsync(marketDocument.FileStorageReference, cancellationToken)
+                .ConfigureAwait(false);
 
             var marketDocumentStream = new MarketDocumentStream(fileStorageFile);
             marketDocument.SetMarketDocumentStream(marketDocumentStream);

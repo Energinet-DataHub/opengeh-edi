@@ -20,7 +20,6 @@ using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV3;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NodaTime;
-using SearchArchivedMessagesCriteria = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client.SearchArchivedMessagesCriteria;
 using SearchArchivedMessagesCriteriaV2 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2.SearchArchivedMessagesCriteria;
 using SearchArchivedMessagesPagination = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2.SearchArchivedMessagesPagination;
 using SearchArchivedMessagesPaginationV3 = Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV3.SearchArchivedMessagesPagination;
@@ -45,20 +44,27 @@ public class ArchivedMessageDsl
 
     internal async Task ConfirmMessageIsArchived(string messageId)
     {
-        var archivedMessages = await _b2cEdiDriver.SearchArchivedMessagesAsync(
-            new SearchArchivedMessagesCriteria
+        var archivedMessageSearchResponse = await _b2cEdiDriver.SearchArchivedMessagesV2Async(
+            new SearchArchivedMessagesRequest
+            {
+                SearchCriteria = new SearchArchivedMessagesCriteriaV2
                 {
                     MessageId = messageId,
                     CreatedDuringPeriod = null,
-                    BusinessReasons = null,
-                    DocumentTypes = null,
-                    ReceiverNumber = null,
                     SenderNumber = null,
+                    ReceiverNumber = null,
+                    DocumentTypes = null,
+                    BusinessReasons = null,
                     IncludeRelatedMessages = false,
-                });
+                },
+                Pagination = new SearchArchivedMessagesPagination
+                {
+                    PageSize = 100,
+                },
+            });
 
-        archivedMessages.Should().NotBeNull();
-        var archivedMessage = archivedMessages.Single();
+        archivedMessageSearchResponse.Should().NotBeNull();
+        var archivedMessage = archivedMessageSearchResponse.Messages.Single();
         Assert.NotNull(archivedMessage.Id);
         Assert.NotNull(archivedMessage.MessageId);
         Assert.NotNull(archivedMessage.DocumentType);
@@ -68,23 +74,37 @@ public class ArchivedMessageDsl
         Assert.NotNull(archivedMessage.BusinessReason);
     }
 
-    internal async Task<(string MessageId, Instant CreatedAfter)> PerformArchivedMessageSearch()
+    internal async Task ConfirmMessageIsArchivedV3(string messageId)
     {
-        var unknownMessageId = Guid.NewGuid().ToString();
-        var outboxCreatedAfter = SystemClock.Instance.GetCurrentInstant();
-        await _b2cEdiDriver.SearchArchivedMessagesAsync(
-            new SearchArchivedMessagesCriteria
+        var archivedMessageSearchResponse = await _b2cEdiDriver.SearchArchivedMessagesV3Async(
+            new SearchArchivedMessagesRequestV3
+            {
+                SearchCriteria = new SearchArchivedMessagesCriteriaV3
                 {
-                    MessageId = unknownMessageId,
+                    MessageId = messageId,
                     CreatedDuringPeriod = null,
                     SenderNumber = null,
                     ReceiverNumber = null,
                     DocumentTypes = null,
                     BusinessReasons = null,
                     IncludeRelatedMessages = false,
-                });
+                },
+                Pagination = new SearchArchivedMessagesPaginationV3
+                {
+                    PageSize = 100,
+                },
+            });
 
-        return (unknownMessageId, outboxCreatedAfter);
+        archivedMessageSearchResponse.Should().NotBeNull();
+
+        var archivedMessage = archivedMessageSearchResponse.Messages.Should()
+            .ContainSingle($"There should be 1 archived message with {messageId} ").Subject;
+        Assert.NotNull(archivedMessage.Id);
+        Assert.NotNull(archivedMessage.MessageId);
+        Assert.NotNull(archivedMessage.SenderNumber);
+        Assert.NotNull(archivedMessage.ReceiverNumber);
+        Assert.IsType<DateTimeOffset>(archivedMessage.CreatedAt);
+        Assert.NotNull(archivedMessage.BusinessReason);
     }
 
     internal async Task<(string MessageId, Instant CreatedAfter)> PerformArchivedMessageSearchV2(int pageSize)

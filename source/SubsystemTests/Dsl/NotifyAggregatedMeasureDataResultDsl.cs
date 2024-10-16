@@ -32,7 +32,7 @@ internal sealed class NotifyAggregatedMeasureDataResultDsl
 
     internal async Task<string> ConfirmResultIsAvailable()
     {
-        var peekResponse = await _ediDriver.PeekMessageAsync().ConfigureAwait(false);
+        var (peekResponse, dequeueResponse) = await _ediDriver.PeekMessageAsync().ConfigureAwait(false);
         var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
         var contentString = await peekResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
 
@@ -45,7 +45,7 @@ internal sealed class NotifyAggregatedMeasureDataResultDsl
 
     internal async Task ConfirmRejectResultIsAvailable()
     {
-        var peekResponse = await _ediDriver.PeekMessageAsync().ConfigureAwait(false);
+        var (peekResponse, dequeueResponse) = await _ediDriver.PeekMessageAsync().ConfigureAwait(false);
         var messageId = peekResponse.Headers.GetValues("MessageId").FirstOrDefault();
         var contentString = await peekResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
 

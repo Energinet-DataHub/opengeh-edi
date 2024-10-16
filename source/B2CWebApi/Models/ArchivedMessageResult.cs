@@ -15,16 +15,6 @@
 namespace Energinet.DataHub.EDI.B2CWebApi.Models;
 
 [Serializable]
-public record ArchivedMessageResult(
-    string Id,
-    string? MessageId,
-    string DocumentType,
-    string SenderNumber,
-    string ReceiverNumber,
-    DateTimeOffset CreatedAt,
-    string? BusinessReason);
-
-[Serializable]
 public record ArchivedMessageResultV2(
     long RecordId,
     string Id,
@@ -42,6 +32,8 @@ public record ArchivedMessageResultV3(
     string? MessageId,
     DocumentType DocumentType,
     string SenderNumber,
+    ActorRole SenderRole,
     string ReceiverNumber,
+    ActorRole ReceiverRole,
     DateTimeOffset CreatedAt,
     string? BusinessReason);

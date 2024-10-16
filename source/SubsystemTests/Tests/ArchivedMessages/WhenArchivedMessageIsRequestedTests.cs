@@ -60,14 +60,7 @@ public class WhenArchivedMessageIsRequestedTests : BaseTestClass
 
         var messageId = await _notifyAggregatedMeasureData.ConfirmResultIsAvailable();
 
-        await _archivedMessages.ConfirmMessageIsArchived(messageId);
-    }
-
-    [Fact]
-    public async Task Audit_log_outbox_is_published_after_searching_for_archived_message()
-    {
-        var (messageId, createdAfter) = await _archivedMessages.PerformArchivedMessageSearch();
-        await _archivedMessages.ConfirmArchivedMessageSearchAuditLogExistsForMessageId(messageId, createdAfter);
+        await _archivedMessages.ConfirmMessageIsArchivedV3(messageId);
     }
 
     [Fact]

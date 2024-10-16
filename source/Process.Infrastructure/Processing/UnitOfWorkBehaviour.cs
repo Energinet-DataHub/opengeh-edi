@@ -53,7 +53,7 @@ public sealed class UnitOfWorkBehaviour<TRequest, TResponse>(
         }
         else
         {
-            await _unitOfWork.CommitTransactionAsync().ConfigureAwait(false);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
         }
 
         return result;
