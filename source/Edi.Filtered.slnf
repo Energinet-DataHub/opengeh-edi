@@ -24,6 +24,7 @@
       "IncomingMessages.Application\\IncomingMessages.Application.csproj",
       "IncomingMessages.Domain\\IncomingMessages.Domain.csproj",
       "IncomingMessages.Infrastructure\\IncomingMessages.Infrastructure.csproj",
+      "IncomingMessages.IntegrationTests\\IncomingMessages.IntegrationTests.csproj",
       "IncomingMessages.Interfaces\\IncomingMessages.Interfaces.csproj",
       "IntegrationEvents.Application\\IntegrationEvents.Application.csproj",
       "IntegrationEvents.Infrastructure\\IntegrationEvents.Infrastructure.csproj",
