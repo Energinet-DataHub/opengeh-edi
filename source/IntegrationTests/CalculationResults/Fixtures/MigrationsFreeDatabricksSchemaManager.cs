@@ -56,16 +56,8 @@ public class MigrationsFreeDatabricksSchemaManager
     public async Task CreateSchemaAsync()
     {
         await ExecuteSqlAsync($"CREATE DATABASE IF NOT EXISTS {DeltaTableOptions.Value.SCHEMA_NAME}");
-        //await CreateTableAsync(DeltaTableOptions.Value.ENERGY_RESULTS_POINTS_PER_GA_V1_VIEW_NAME, SettlementReportEnergyResultViewSchemaDefinition.SchemaDefinition);
-        //await CreateTableAsync(DeltaTableOptions.Value.ENERGY_RESULTS_POINTS_PER_ES_GA_V1_VIEW_NAME, SettlementReportEnergyResultPerEnergySupplierViewSchemaDefinition.SchemaDefinition);
-        //await CreateTableAsync(DeltaTableOptions.Value.WHOLESALE_RESULTS_V1_VIEW_NAME, SettlementReportWholesaleViewColumns.SchemaDefinition);
-        //await CreateTableAsync(DeltaTableOptions.Value.ENERGY_RESULTS_METERING_POINT_TIME_SERIES_V1_VIEW_NAME, SettlementReportMeteringPointTimeSeriesViewColumns.SchemaDefinition);
-        //await CreateTableAsync(DeltaTableOptions.Value.CHARGE_LINK_PERIODS_V1_VIEW_NAME, SettlementReportChargeLinkPeriodsViewColumns.SchemaDefinition);
-        //await CreateTableAsync(DeltaTableOptions.Value.METERING_POINT_MASTER_DATA_V1_VIEW_NAME, SettlementReportMeteringPointMasterDataViewColumns.SchemaDefinition);
         await CreateTableAsync(DeltaTableOptions.Value.ENERGY_RESULTS_TABLE_NAME, EnergyResultsTableSchemaDefinition.SchemaDefinition);
         await CreateTableAsync(DeltaTableOptions.Value.WHOLESALE_RESULTS_TABLE_NAME, WholesaleResultsTableSchemaDefinition.SchemaDefinition);
-        //await CreateTableAsync(DeltaTableOptions.Value.MONTHLY_AMOUNTS_V1_VIEW_NAME, SettlementReportMonthlyAmountViewColumns.SchemaDefinition);
-        //await CreateTableAsync(DeltaTableOptions.Value.CHARGE_PRICES_V1_VIEW_NAME, SettlementReportChargePriceViewColumns.SchemaDefinition);
         await CreateTableAsync(DeltaTableOptions.Value.CALCULATIONS_TABLE_NAME, BasisDataCalculationsTableSchemaDefinition.SchemaDefinition);
 
         await CreateTableAsync(DeltaTableOptions.Value.AMOUNTS_PER_CHARGE_V1_VIEW_NAME, AmountsPerChargeViewSchemaDefinition.SchemaDefinition);
