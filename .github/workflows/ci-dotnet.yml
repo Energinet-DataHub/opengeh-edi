@@ -133,6 +133,12 @@ jobs:
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
+          - name: OutgoingMessages - integration tests
+            paths: \source\OutgoingMessages.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.dll
+            filter: empty # Means skip
+            use_azure_functions_tools: true
+            contentroot_variable_name: empty # Means skip
+
           - name: Edi - integration/unit tests
             paths: \source\Edi.UnitTests\bin\Release\net8.0\Energinet.DataHub.Wholesale.Edi.UnitTests.dll
             filter: empty # Means skip
