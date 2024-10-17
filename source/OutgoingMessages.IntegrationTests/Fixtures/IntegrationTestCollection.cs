@@ -12,19 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using NodaTime;
+using System.Diagnostics.CodeAnalysis;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
+namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 
-public record RejectRequestAggregatedMeasureDataDocumentAssertionInput(
-    BusinessReason BusinessReason,
-    string SenderId,
-    string ReceiverId,
-    Instant Timestamp,
-    // ActorRole ReceiverRole,
-    // ActorRole SenderRole,
-    string ReasonCode,
-    TransactionId OriginalTransactionIdReference,
-    string SeriesReasonCode,
-    string SeriesReasonMessage);
+[CollectionDefinition("IntegrationTest")]
+[SuppressMessage("Naming", "CA1711:Identifiers should not have incorrect suffix", Justification = "Is actually a collection")]
+public class IntegrationTestCollection : ICollectionFixture<IntegrationTestFixture>
+{
+    // This class has no code, and is never created. Its purpose is simply
+    // to be the place to apply [CollectionDefinition] and all the
+    // ICollectionFixture<> interfaces.
+}

@@ -21,8 +21,6 @@ using Dapper;
 using Energinet.DataHub.BuildingBlocks.Tests;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
-using Energinet.DataHub.Core.Outbox.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
@@ -30,25 +28,16 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
-using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
-using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
-using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
-using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
-using Energinet.DataHub.EDI.Outbox.Infrastructure;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
+using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
-using Energinet.DataHub.EDI.Process.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.Process.Application.Transactions.AggregatedMeasureData.Notifications;
 using Energinet.DataHub.EDI.Process.Domain.Commands;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
@@ -64,12 +53,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using NodaTime;
-using Xunit;
 using Xunit.Abstractions;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using ExecutionContext = Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext;
+using SampleData = Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.OutgoingMessages.SampleData;
 
-namespace Energinet.DataHub.EDI.IntegrationTests;
+namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests;
 
 [Collection("IntegrationTest")]
 public class TestBase : IDisposable
@@ -87,8 +76,8 @@ public class TestBase : IDisposable
         Fixture.DatabaseManager.CleanupDatabase();
         Fixture.CleanupFileStorage();
         _serviceBusSenderFactoryStub = new ServiceBusSenderFactoryStub();
-        TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
-        InboxEventNotificationHandler = new TestNotificationHandlerSpy();
+        // TestAggregatedTimeSeriesRequestAcceptedHandlerSpy = new TestAggregatedTimeSeriesRequestAcceptedHandlerSpy();
+        // InboxEventNotificationHandler = new TestNotificationHandlerSpy();
         BuildServices(testOutputHelper);
         _processContext = GetService<ProcessContext>();
         _incomingMessagesContext = GetService<IncomingMessagesContext>();
@@ -104,9 +93,9 @@ public class TestBase : IDisposable
 
     protected ServiceProvider ServiceProvider { get; private set; } = null!;
 
-    private TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
-
-    private TestNotificationHandlerSpy InboxEventNotificationHandler { get; }
+    // private TestAggregatedTimeSeriesRequestAcceptedHandlerSpy TestAggregatedTimeSeriesRequestAcceptedHandlerSpy { get; }
+    //
+    // private TestNotificationHandlerSpy InboxEventNotificationHandler { get; }
 
     public void Dispose()
     {
@@ -319,31 +308,31 @@ public class TestBase : IDisposable
         _services.AddScoped<IConfiguration>(_ => config);
 
         _services.AddTransient<InboxEventsProcessor>()
-            .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>>(
-                _ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy)
-            .AddTransient<INotificationHandler<TestNotification>>(_ => InboxEventNotificationHandler)
-            .AddTransient<IRequestHandler<TestCommand, Unit>, TestCommandHandler>()
-            .AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>,
-                TestCreateOutgoingCommandHandler>()
+            // .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>>(
+            //     _ => TestAggregatedTimeSeriesRequestAcceptedHandlerSpy)
+            // .AddTransient<INotificationHandler<TestNotification>>(_ => InboxEventNotificationHandler)
+            // .AddTransient<IRequestHandler<TestCommand, Unit>, TestCommandHandler>()
+            // .AddTransient<IRequestHandler<TestCreateOutgoingMessageCommand, Unit>,
+            //     TestCreateOutgoingCommandHandler>()
             .AddScopedSqlDbContext<ProcessContext>(config)
-            .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
+            // .AddB2BAuthentication(JwtTokenParserTests.DisableAllTokenValidations)
             .AddJavaScriptEncoder()
             .AddSerializer()
             .AddLogging()
             .AddScoped<IClock>(_ => new ClockStub());
 
         _services.AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
-            .AddIntegrationEventModule(config)
-            .AddOutgoingMessagesModule(config)
-            .AddProcessModule(config)
-            .AddArchivedMessagesModule(config)
-            .AddIncomingMessagesModule(config)
-            .AddMasterDataModule(config)
-            .AddDataAccessUnitOfWorkModule()
-            .AddAuditLog()
-            .AddOutboxContext(config)
-            .AddOutboxClient<OutboxContext>()
-            .AddOutboxProcessor<OutboxContext>();
+            // .AddIntegrationEventModule(config)
+            .AddOutgoingMessagesModule(config);
+            // .AddProcessModule(config)
+            // .AddArchivedMessagesModule(config)
+            // .AddIncomingMessagesModule(config)
+            // .AddMasterDataModule(config)
+            // .AddDataAccessUnitOfWorkModule()
+            // .AddAuditLog()
+            // .AddOutboxContext(config)
+            // .AddOutboxClient<OutboxContext>()
+            // .AddOutboxProcessor<OutboxContext>();
 
         // Replace the services with stub implementations.
         // - Building blocks

@@ -15,15 +15,15 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
+namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 
-public record RejectRequestWholesaleSettlementDocumentAssertionInput(
-    Instant Timestamp,
+public record RejectRequestAggregatedMeasureDataDocumentAssertionInput(
     BusinessReason BusinessReason,
-    string ReceiverId,
-    ActorRole ReceiverRole,
     string SenderId,
-    ActorRole SenderRole,
+    string ReceiverId,
+    Instant Timestamp,
+    // ActorRole ReceiverRole,
+    // ActorRole SenderRole,
     string ReasonCode,
     TransactionId OriginalTransactionIdReference,
     string SeriesReasonCode,
