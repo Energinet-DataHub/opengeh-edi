@@ -69,7 +69,7 @@ public class WholesaleServicesQueriesCsvTests
         }
 
         [Fact]
-        public async Task Given_EnergySupplierWithAmountPerChargeAndWholesaleFixing_Then_CorrespondingDataReturned()
+        public async Task Given_EnergySupplierWithAmountPerChargeAndWholesaleFixing_When_Queried_Then_CorrespondingDataReturned()
         {
             var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
@@ -149,7 +149,7 @@ public class WholesaleServicesQueriesCsvTests
         [InlineData(true)]
         [InlineData(false)]
         public async Task
-            Given_EnergySupplierAndChargeOwnerWithTotalMonthlyAmountAndSecondCorrection_Then_CorrespondingDataReturned(
+            Given_EnergySupplierAndChargeOwnerWithTotalMonthlyAmountAndSecondCorrection_When_Queried_Then_CorrespondingDataReturned(
                 bool isEnergySupplier)
         {
             var totalPeriod = new Period(
@@ -181,7 +181,7 @@ public class WholesaleServicesQueriesCsvTests
         }
 
         [Fact]
-        public async Task Given_EnergySupplierWithTotalMonthlyAmountAndSecondCorrection_Then_CorrespondingDataReturned()
+        public async Task Given_EnergySupplierWithTotalMonthlyAmountAndSecondCorrection_When_Queried_Then_CorrespondingDataReturned()
         {
             var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
@@ -217,7 +217,7 @@ public class WholesaleServicesQueriesCsvTests
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public async Task Given_AllQueryParametersAssignedValuesWithLatestCorrection_Then_LatestCorrectionReturned(
+        public async Task Given_AllQueryParametersAssignedValuesWithLatestCorrection_When_Queried_Then_LatestCorrectionReturned(
             bool isEnergySupplier)
         {
             var totalPeriod = new Period(
@@ -249,7 +249,7 @@ public class WholesaleServicesQueriesCsvTests
         }
 
         [Fact]
-        public async Task Given_SomeArbitraryQueryParameters_Then_AmountAndMonthlyAndTotalHaveCorrectPeriods()
+        public async Task Given_SomeArbitraryQueryParameters_When_Queried_Then_AmountAndMonthlyAndTotalHaveCorrectPeriods()
         {
             var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
@@ -326,7 +326,7 @@ public class WholesaleServicesQueriesCsvTests
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public async Task Given_ChargeOwnerForSpecificGridAreaAndLatestCorrection_Then_LatestCorrectionReturned(
+        public async Task Given_ChargeOwnerForSpecificGridAreaAndLatestCorrection_When_Queried_Then_LatestCorrectionReturned(
             bool isEnergySupplier)
         {
             var totalPeriod = new Period(
@@ -392,7 +392,7 @@ public class WholesaleServicesQueriesCsvTests
         }
 
         [Fact]
-        public async Task Given_ChargeTypeForSpecificCalculationTypeAndGridAreas_Then_CalculationTypeForChargeAndGridAreasReturned()
+        public async Task Given_ChargeTypeForSpecificCalculationTypeAndGridAreas_When_Queried_Then_CalculationTypeForChargeAndGridAreasReturned()
         {
             var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
@@ -429,7 +429,7 @@ public class WholesaleServicesQueriesCsvTests
 
         [Fact]
         public async Task
-            Given_ChargeOwnerRequestsWithoutChargeOwnerOrEnergySupplier_Then_DataReturnedContainsChargeOwnerChargesAndIsTaxCharges()
+            Given_ChargeOwnerRequestsWithoutChargeOwnerOrEnergySupplier_When_Queried_Then_DataReturnedContainsChargeOwnerChargesAndIsTaxCharges()
         {
             var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
@@ -493,7 +493,7 @@ public class WholesaleServicesQueriesCsvTests
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public async Task Given_EnergySupplierOnlyHaveDataForHalfOfThePeriod_Then_DataReturnedWithModifiedPeriod(
+        public async Task Given_EnergySupplierOnlyHaveDataForHalfOfThePeriod_When_Queried_Then_DataReturnedWithModifiedPeriod(
             bool isEnergySupplier)
         {
             /*
@@ -542,7 +542,7 @@ public class WholesaleServicesQueriesCsvTests
         }
 
         [Fact]
-        public async Task Given_EnergySupplierWithAHoleInData_Then_DataReturnedInTwoChunkWithoutAHole()
+        public async Task Given_EnergySupplierWithAHoleInData_When_Queried_Then_DataReturnedInTwoChunkWithoutAHole()
         {
             await ClearAndAddDatabricksDataAsync(_fixture, _testOutputHelper);
             await RemoveDataForEnergySupplierInTimespan(
@@ -624,7 +624,7 @@ public class WholesaleServicesQueriesCsvTests
         }
 
         [Fact]
-        public async Task Given_GridOwnerWithLatestCorrectionButNoCorrectionData_Then_NoDataReturned()
+        public async Task Given_GridOwnerWithLatestCorrectionButNoCorrectionData_When_Queried_Then_NoDataReturned()
         {
             await ClearAndAddDatabricksDataAsync(_fixture, _testOutputHelper);
             await RemoveDataForCorrections(_fixture, _testOutputHelper, []);
@@ -655,7 +655,7 @@ public class WholesaleServicesQueriesCsvTests
         [InlineData(true)]
         [InlineData(false)]
         public async Task
-            Given_EnergySupplierAndChargeOwnerWithLatestCorrectionButOnlyOneGridAreaWithCorrectionData_Then_DataReturnedForGridArea(
+            Given_EnergySupplierAndChargeOwnerWithLatestCorrectionButOnlyOneGridAreaWithCorrectionData_When_Queried_Then_DataReturnedForGridArea(
                 bool isEnergySupplier)
         {
             await ClearAndAddDatabricksDataAsync(_fixture, _testOutputHelper);

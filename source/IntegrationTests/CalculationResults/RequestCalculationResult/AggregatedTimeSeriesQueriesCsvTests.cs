@@ -83,7 +83,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         }
 
         [Fact]
-        public async Task Given_EnergySupplierAcrossGridAreas_Then_RelevantDataFromRelevantGridAreasReturned()
+        public async Task Given_EnergySupplierAcrossGridAreas_When_Queried_Then_RelevantDataFromRelevantGridAreasReturned()
         {
             var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
@@ -141,7 +141,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         }
 
         [Fact]
-        public async Task Given_EnergySupplierAndGridArea_Then_RelevantDataFromSpecifiedGridAreaReturned()
+        public async Task Given_EnergySupplierAndGridArea_When_Queried_Then_RelevantDataFromSpecifiedGridAreaReturned()
         {
             var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
@@ -192,7 +192,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         }
 
         [Fact]
-        public async Task Given_EnergySupplierAndBalanceResponsibleAndGridArea_Then_DataFilteredCorrectlyReturned()
+        public async Task Given_EnergySupplierAndBalanceResponsibleAndGridArea_When_Queried_Then_DataFilteredCorrectlyReturned()
         {
             var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
@@ -237,7 +237,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         }
 
         [Fact]
-        public async Task Given_BalanceResponsibleAndGridArea_Then_RelevantDataFromGridAreaReturned()
+        public async Task Given_BalanceResponsibleAndGridArea_When_Queried_Then_RelevantDataFromGridAreaReturned()
         {
             var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
@@ -284,7 +284,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         }
 
         [Fact]
-        public async Task Given_GridArea_Then_GridOperatorDataForGridAreaReturned()
+        public async Task Given_GridArea_When_Queried_Then_GridOperatorDataForGridAreaReturned()
         {
             var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
@@ -330,7 +330,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         }
 
         [Fact]
-        public async Task Given_FullQueryParametersForAggregation_Then_DataFromNewestVersionsReturned()
+        public async Task Given_FullQueryParametersForAggregation_When_Queried_Then_DataFromNewestVersionsReturned()
         {
             var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
@@ -373,7 +373,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         }
 
         [Fact]
-        public async Task Given_EnergySupplierAndBalanceResponsibleWithLatestCorrection_Then_DataFromNewestCorrectionsReturned()
+        public async Task Given_EnergySupplierAndBalanceResponsibleWithLatestCorrection_When_Queried_Then_DataFromNewestCorrectionsReturned()
         {
             var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
@@ -414,7 +414,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         }
 
         [Fact]
-        public async Task Given_NoEnergySupplierAndBalanceResponsibleAndGridArea_Then_IdenticalToRequestsForEachGridAreaIndividually()
+        public async Task Given_NoEnergySupplierAndBalanceResponsibleAndGridArea_When_Queried_Then_IdenticalToRequestsForEachGridAreaIndividually()
         {
             var totalPeriod = new Period(
                 Instant.FromUtc(2021, 12, 31, 23, 0),
@@ -466,7 +466,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         }
 
         [Fact]
-        public async Task Given_EnergySupplierOnlyHaveDataForHalfOfThePeriod_Then_DataReturnedWithModifiedPeriod()
+        public async Task Given_EnergySupplierOnlyHaveDataForHalfOfThePeriod_When_Queried_Then_DataReturnedWithModifiedPeriod()
         {
             /*
              Business case example:
@@ -520,7 +520,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         }
 
         [Fact]
-        public async Task Given_EnergySupplierWithAHoleInData_Then_DataReturnedInTwoChunkWithoutAHole()
+        public async Task Given_EnergySupplierWithAHoleInData_When_Queried_Then_DataReturnedInTwoChunkWithoutAHole()
         {
             await ClearAndAddDatabricksDataAsync(_fixture.DatabricksSchemaManager, _testOutputHelper);
             await RemoveDataForEnergySupplierInTimespan(
@@ -566,7 +566,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         }
 
         [Fact]
-        public async Task Given_BalanceResponsibleWithLatestCorrectionButNoCorrectionData_Then_NoDataReturned()
+        public async Task Given_BalanceResponsibleWithLatestCorrectionButNoCorrectionData_When_Queried_Then_NoDataReturned()
         {
             await ClearAndAddDatabricksDataAsync(_fixture.DatabricksSchemaManager, _testOutputHelper);
             await RemoveDataForCorrections(_fixture, _testOutputHelper, []);
@@ -591,7 +591,7 @@ public class AggregatedTimeSeriesQueriesCsvTests
         }
 
         [Fact]
-        public async Task Given_EnergySupplierAndBalanceResponsibleWithLatestCorrectionButOnlyOneGridAreaWithCorrectionData_Then_DataReturnedForGridArea()
+        public async Task Given_EnergySupplierAndBalanceResponsibleWithLatestCorrectionButOnlyOneGridAreaWithCorrectionData_When_Queried_Then_DataReturnedForGridArea()
         {
             await ClearAndAddDatabricksDataAsync(_fixture.DatabricksSchemaManager, _testOutputHelper);
             await RemoveDataForCorrections(_fixture, _testOutputHelper, ["804", "543"]);
