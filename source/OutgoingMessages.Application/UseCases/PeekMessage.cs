@@ -137,8 +137,14 @@ public class PeekMessage
         marketDocument = new MarketDocument(peekResult.BundleId, archivedFile);
         _marketDocumentRepository.Add(marketDocument);
 
-        _telemetryClient.GetMetric(
-                outgoingMessageBundle.DocumentType.ToString() + request.DocumentFormat)
+        var documentNameAndFormat = outgoingMessageBundle.DocumentType.ToString();
+
+        // The message is a response to a request if it has a related message id
+        documentNameAndFormat += outgoingMessageBundle.RelatedToMessageId is not null ? "Response" : string.Empty;
+        documentNameAndFormat += request.DocumentFormat;
+
+        _telemetryClient
+            .GetMetric(documentNameAndFormat)
             .TrackValue(1);
 
         return marketDocument;
