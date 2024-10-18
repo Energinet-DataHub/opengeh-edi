@@ -30,5 +30,7 @@ public class MicrosoftFeatureFlagManager : IFeatureFlagManager
 
     public Task<bool> UsePeekMessagesAsync() => IsEnabledAsync(FeatureFlagName.UsePeekMessages);
 
+    public Task<bool> UseRequestForAggregatedMeasuredDataInEdiAsync() => IsEnabledAsync(FeatureFlagName.UseRequestAggregatedMeasureData);
+
     private Task<bool> IsEnabledAsync(FeatureFlagName featureFlagName) => _featureManager.IsEnabledAsync(featureFlagName.ToString());
 }

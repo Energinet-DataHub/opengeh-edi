@@ -13,9 +13,12 @@
 // limitations under the License.
 
 using Energinet.DataHub.Edi.Requests;
+using Energinet.DataHub.Wholesale.Edi.Client;
+using Energinet.DataHub.Wholesale.Edi.Factories;
 using Energinet.DataHub.Wholesale.Edi.Validation;
 using Energinet.DataHub.Wholesale.Edi.Validation.AggregatedTimeSeriesRequest;
 using Energinet.DataHub.Wholesale.Edi.Validation.AggregatedTimeSeriesRequest.Rules;
+using Energinet.DataHub.Wholesale.Edi.Validation.Helpers;
 using Energinet.DataHub.Wholesale.Edi.Validation.WholesaleServicesRequest;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -28,30 +31,30 @@ public static class EdiExtensions
 {
     public static void AddEdiModule(this IServiceCollection services)
     {
-        // services.AddScoped<IWholesaleInboxRequestHandler, AggregatedTimeSeriesRequestHandler>(); TODO: LRN
-        // services.AddScoped<IWholesaleInboxRequestHandler, WholesaleServicesRequestHandler>();
-        // services.AddTransient<WholesaleServicesRequestMapper>();
-        //
-        // services.AddSingleton<IEdiClient, EdiClient>();
-        //
-        // services
-        //     .AddOptions<EdiInboxQueueOptions>()
-        //     .BindConfiguration(EdiInboxQueueOptions.SectionName)
-        //     .ValidateDataAnnotations();
-        //
-        // // Health checks
+        services.AddScoped<IAggregatedTimeSeriesRequestHandler, AggregatedTimeSeriesRequestHandler>();
+        services.AddScoped<IWholesaleServicesRequestHandler, WholesaleServicesRequestHandler>();
+        services.AddTransient<WholesaleServicesRequestMapper>();
+
+        services.AddSingleton<IEdiClient, EdiClient>();
+
+        services
+            .AddOptions<EdiInboxQueueOptions>()
+            .BindConfiguration(EdiInboxQueueOptions.SectionName)
+            .ValidateDataAnnotations();
+
+        // Health checks
         // services.AddHealthChecks()
         //     // Must use a listener connection string
         //     .AddAzureServiceBusQueue(
         //         sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.ConnectionString,
         //         sp => sp.GetRequiredService<IOptions<EdiInboxQueueOptions>>().Value.QueueName,
         //         name: "EdiInboxQueue");
-        //
-        // // Validation helpers
-        // services.AddTransient<PeriodValidationHelper>();
-        // // Validation
-        // services.AddAggregatedTimeSeriesRequestValidation();
-        // services.AddWholesaleServicesRequestValidation();
+
+        // Validation helpers
+        services.AddTransient<PeriodValidationHelper>();
+        // Validation
+        services.AddAggregatedTimeSeriesRequestValidation();
+        services.AddWholesaleServicesRequestValidation();
     }
 
     public static IServiceCollection AddAggregatedTimeSeriesRequestValidation(this IServiceCollection services)

@@ -12,21 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace BuildingBlocks.Application.FeatureFlag;
+using System.ComponentModel.DataAnnotations;
+
+namespace Energinet.DataHub.Wholesale.Edi.Client;
 
 /// <summary>
-/// List of all Feature Flags that exists in the system. A Feature Flag name must
-/// correspond to a value found in the app configuration as "FeatureManagement__NameOfFeatureFlag"
+/// Options related to Edi inbox queue.
 /// </summary>
-public enum FeatureFlagName
+public class EdiInboxQueueOptions
 {
     /// <summary>
-    /// Whether to disable peek messages
+    /// The name of the section in the configuration file where this option should find its information.
     /// </summary>
-    UsePeekMessages,
+    public const string SectionName = "EdiInbox";
 
     /// <summary>
-    /// Whether to send requests for aggregated measured data to Wholesale, or handle it in EDI.
+    /// Queue name for the Edi inbox.
     /// </summary>
-    UseRequestAggregatedMeasureData,
+    [Required]
+    public string QueueName { get; set; } = string.Empty;
 }

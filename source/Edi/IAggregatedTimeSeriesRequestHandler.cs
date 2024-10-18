@@ -12,21 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace BuildingBlocks.Application.FeatureFlag;
+using Azure.Messaging.ServiceBus;
+
+namespace Energinet.DataHub.Wholesale.Edi;
 
 /// <summary>
-/// List of all Feature Flags that exists in the system. A Feature Flag name must
-/// correspond to a value found in the app configuration as "FeatureManagement__NameOfFeatureFlag"
+///     Handler
 /// </summary>
-public enum FeatureFlagName
+public interface IAggregatedTimeSeriesRequestHandler
 {
     /// <summary>
-    /// Whether to disable peek messages
+    /// Handles the process of consuming the request for aggregated time series, then getting the required time series and creating and sending the response.
     /// </summary>
-    UsePeekMessages,
-
-    /// <summary>
-    /// Whether to send requests for aggregated measured data to Wholesale, or handle it in EDI.
-    /// </summary>
-    UseRequestAggregatedMeasureData,
+    Task ProcessAsync(BinaryData receivedMessage, string referenceId, CancellationToken cancellationToken);
 }

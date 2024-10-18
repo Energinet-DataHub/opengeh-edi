@@ -13,12 +13,14 @@
 // limitations under the License.
 
 using Azure.Messaging.ServiceBus;
+using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Domain.Wholesale;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.WholesaleServices;
+using Energinet.DataHub.Wholesale.Edi;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Options;
 
@@ -26,12 +28,21 @@ namespace Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
 
 public class WholesaleInboxClient : IWholesaleInboxClient
 {
+    private readonly IFeatureFlagManager _featureFlagManager;
+    private readonly IWholesaleServicesRequestHandler _wholesaleServicesRequestHandler;
+    private readonly IAggregatedTimeSeriesRequestHandler _aggregatedTimeSeriesRequestHandler;
     private readonly ServiceBusSender _sender;
 
     public WholesaleInboxClient(
         IOptions<WholesaleInboxQueueOptions> options,
-        IAzureClientFactory<ServiceBusSender> senderFactory)
+        IAzureClientFactory<ServiceBusSender> senderFactory,
+        IFeatureFlagManager featureFlagManager,
+        IWholesaleServicesRequestHandler wholesaleServicesRequestHandler,
+        IAggregatedTimeSeriesRequestHandler aggregatedTimeSeriesRequestHandler)
     {
+        _featureFlagManager = featureFlagManager;
+        _wholesaleServicesRequestHandler = wholesaleServicesRequestHandler;
+        _aggregatedTimeSeriesRequestHandler = aggregatedTimeSeriesRequestHandler;
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(senderFactory);
 
@@ -43,8 +54,17 @@ public class WholesaleInboxClient : IWholesaleInboxClient
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(aggregatedMeasureDataProcess);
+
         var serviceBusMessage = AggregatedMeasureDataRequestFactory.CreateServiceBusMessage(aggregatedMeasureDataProcess);
-        await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
+
+        if (await _featureFlagManager.UseRequestForAggregatedMeasuredDataInEdiAsync().ConfigureAwait(false))
+        {
+            await _aggregatedTimeSeriesRequestHandler.ProcessAsync(serviceBusMessage.Body, aggregatedMeasureDataProcess.ProcessId.Id.ToString(), cancellationToken).ConfigureAwait(false);
+        }
+        else
+        {
+            await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
+        }
     }
 
     public async Task SendProcessAsync(
@@ -53,6 +73,13 @@ public class WholesaleInboxClient : IWholesaleInboxClient
     {
         ArgumentNullException.ThrowIfNull(wholesaleServicesProcess);
         var serviceBusMessage = WholesaleServicesRequestFactory.CreateServiceBusMessage(wholesaleServicesProcess);
-        await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
+        if (await _featureFlagManager.UseRequestForAggregatedMeasuredDataInEdiAsync().ConfigureAwait(false))
+        {
+            await _wholesaleServicesRequestHandler.ProcessAsync(serviceBusMessage.Body, wholesaleServicesProcess.ProcessId.Id.ToString(), cancellationToken).ConfigureAwait(false);
+        }
+        else
+        {
+            await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
+        }
     }
 }
