@@ -19,6 +19,7 @@ using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
 using Energinet.DataHub.BuildingBlocks.Tests;
+using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
@@ -190,6 +191,7 @@ public class IncomingMessagesTestBase : IDisposable
                     SignatureValidator = (token, _) => new JsonWebToken(token),
                 })
             .AddJavaScriptEncoder()
+            .AddTestLogger(testOutputHelper)
             .AddSerializer()
             .AddScoped<IClock>(_ => new ClockStub())
             .AddArchivedMessagesModule(config)
@@ -197,7 +199,6 @@ public class IncomingMessagesTestBase : IDisposable
             .AddIncomingMessagesModule(config);
 
         // Replace the services with stub implementations.
-        // - Building blocks
         _services.AddSingleton(_serviceBusSenderFactoryStub);
         _services.AddTransient<IFeatureFlagManager>(_ => FeatureFlagManagerStub);
 
@@ -208,11 +209,6 @@ public class IncomingMessagesTestBase : IDisposable
                 executionContext.SetExecutionType(ExecutionType.Test);
                 return executionContext;
             });
-
-        // Add test logger
-        _services.AddSingleton<ITestOutputHelper>(_ => testOutputHelper);
-        _services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
-        _services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
 
         ServiceProvider = _services.BuildServiceProvider();
     }
