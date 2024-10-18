@@ -97,13 +97,19 @@ jobs:
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
-          - name: Integration tests - Other
+          - name: Integration tests - CalculationResults
             paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
-            filter: (DisplayName!~IntegrationTests.Behaviours)
+            filter: (DisplayName~IntegrationTests.CalculationResults)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
-          - name: Archived messages - integration tests
+          - name: Integration tests - Other
+            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            filter: (DisplayName!~IntegrationTests.Behaviours)&(DisplayName!~IntegrationTests.CalculationResults)
+            use_azure_functions_tools: true
+            contentroot_variable_name: empty # Means skip
+
+          - name: ArchivedMessages - integration tests
             paths: \source\ArchivedMessages.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
@@ -117,6 +123,18 @@ jobs:
 
           - name: MasterData - integration tests
             paths: \source\MasterData.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.MasterData.IntegrationTests.dll
+            filter: empty # Means skip
+            use_azure_functions_tools: true
+            contentroot_variable_name: empty # Means skip
+
+          - name: IncomingMessages - integration tests
+            paths: \source\IncomingMessages.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.dll
+            filter: empty # Means skip
+            use_azure_functions_tools: true
+            contentroot_variable_name: empty # Means skip
+
+          - name: Edi - integration/unit tests
+            paths: \source\Edi.UnitTests\bin\Release\net8.0\Energinet.DataHub.Wholesale.Edi.UnitTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip

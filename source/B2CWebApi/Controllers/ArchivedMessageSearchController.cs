@@ -144,9 +144,9 @@ public class ArchivedMessageSearchController : ControllerBase
             messageCreationPeriod,
             request.SearchCriteria.MessageId,
             request.SearchCriteria.SenderNumber,
-            request.SearchCriteria.SenderRoleCode,
+            ActorRoleMapper.ToActorRoleCode(request.SearchCriteria.SenderRole),
             request.SearchCriteria.ReceiverNumber,
-            request.SearchCriteria.ReceiverRoleCode,
+            ActorRoleMapper.ToActorRoleCode(request.SearchCriteria.ReceiverRole),
             DocumentTypeMapper.FromDocumentTypes(request.SearchCriteria.DocumentTypes),
             request.SearchCriteria.BusinessReasons,
             request.SearchCriteria.IncludeRelatedMessages);
@@ -160,9 +160,9 @@ public class ArchivedMessageSearchController : ControllerBase
                 x.MessageId,
                 DocumentTypeMapper.ToDocumentType(x.DocumentType),
                 x.SenderNumber,
-                ActorRole.FromCode(x.SenderRoleCode),
+                ActorRoleMapper.ToActorRole(x.SenderRoleCode),
                 x.ReceiverNumber,
-                ActorRole.FromCode(x.ReceiverRoleCode),
+                ActorRoleMapper.ToActorRole(x.ReceiverRoleCode),
                 x.CreatedAt.ToDateTimeOffset(),
                 x.BusinessReason));
         return Ok(new ArchivedMessageSearchResponseV3(messages, TotalCount: result.TotalAmountOfMessages));
