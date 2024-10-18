@@ -66,14 +66,11 @@ public class EdiTestBase
             .AddMasterDataModule(configuration)
             .AddDataAccessUnitOfWorkModule()
             .AddSerializer()
+            .AddTestLogger(_testOutputHelper)
             .AddJavaScriptEncoder();
 
         services.AddScoped<IConfiguration>(_ => configuration);
         services.AddTransient<PeriodValidationHelper>();
-        // Add test logger
-        services.AddSingleton(sp => _testOutputHelper);
-        services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
-        services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
 
         Services = services.BuildServiceProvider();
     }
