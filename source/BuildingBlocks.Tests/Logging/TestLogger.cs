@@ -15,17 +15,22 @@
 using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.BuildingBlocks.Tests;
+namespace Energinet.DataHub.BuildingBlocks.Tests.Logging;
 
 public class TestLogger<T> : ILogger<T>
 {
     private readonly ITestOutputHelper _testOutputHelper;
-    private readonly ILogger<T>? _logger;
+    private readonly List<ILogger> _loggers = [];
 
-    public TestLogger(ITestOutputHelper testOutputHelper, Logger<T>? logger)
+    public TestLogger(ITestOutputHelper testOutputHelper, Logger<T>? logger, LoggerSpy? loggerSpy)
     {
         _testOutputHelper = testOutputHelper;
-        _logger = logger;
+
+        if (logger != null)
+            _loggers.Add(logger);
+
+        if (loggerSpy != null)
+            _loggers.Add(loggerSpy);
     }
 
     public IDisposable? BeginScope<TState>(TState state)
@@ -54,6 +59,6 @@ public class TestLogger<T> : ILogger<T>
             }
         }
 
-        _logger?.Log(logLevel, eventId, state, exception, formatter);
+        _loggers.ForEach(l => l.Log(logLevel, eventId, state, exception, formatter));
     }
 }

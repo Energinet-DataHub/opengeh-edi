@@ -54,7 +54,8 @@ public class GridAreaOwnerRetention : IDataRetention
                 activityOrigin: nameof(ADayHasPassed),
                 activityPayload: monthAgo,
                 affectedEntityType: AuditLogEntityType.GridAreaOwner,
-                affectedEntityKey: null)
+                affectedEntityKey: null,
+                cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
         await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

@@ -20,6 +20,7 @@ using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
 using Energinet.DataHub.BuildingBlocks.Tests;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
+using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
@@ -31,12 +32,14 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.DataAccess.UnitOfWork.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.IntegrationTests.DataRetention;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
@@ -206,6 +209,12 @@ public class TestBase : IDisposable
         return ServiceProvider.GetRequiredService<T>();
     }
 
+    protected IEnumerable<T> GetServices<T>()
+        where T : notnull
+    {
+        return ServiceProvider.GetServices<T>();
+    }
+
     protected void ClearDbContextCaches()
     {
         if (_services == null)
@@ -365,9 +374,9 @@ public class TestBase : IDisposable
         });
 
         // Add test logger
-        _services.AddSingleton<ITestOutputHelper>(sp => testOutputHelper);
-        _services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
-        _services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
+        _services.AddTestLogger(testOutputHelper);
+
+        _services.AddTransient<IDataRetention, SleepyDataRetentionJob>();
 
         ServiceProvider = _services.BuildServiceProvider();
     }
