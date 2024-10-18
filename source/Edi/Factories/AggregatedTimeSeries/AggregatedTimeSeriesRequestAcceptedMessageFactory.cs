@@ -20,9 +20,6 @@ using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using NodaTime.Serialization.Protobuf;
 using ATS = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.EnergyResults.AggregatedTimeSeries;
-using Period = Energinet.DataHub.Edi.Responses.Period;
-using QuantityUnit = Energinet.DataHub.Edi.Responses.QuantityUnit;
-using TimeSeriesPoint = Energinet.DataHub.Edi.Responses.TimeSeriesPoint;
 
 namespace Energinet.DataHub.Wholesale.Edi.Factories.AggregatedTimeSeries;
 

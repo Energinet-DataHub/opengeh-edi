@@ -15,13 +15,13 @@
 using AutoFixture.Xunit2;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.TestCommon.AutoFixture.Attributes;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults;
 using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model;
 using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults;
 using Energinet.DataHub.Wholesale.Common.Interfaces.Models;
 using Energinet.DataHub.Wholesale.Edi.Client;
-using Energinet.DataHub.Wholesale.Edi.Contracts;
 using Energinet.DataHub.Wholesale.Edi.Factories;
 using Energinet.DataHub.Wholesale.Edi.UnitTests.Builders;
 using Energinet.DataHub.Wholesale.Edi.UnitTests.Extensions;
@@ -33,7 +33,7 @@ using NodaTime;
 using Xunit;
 using Period = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.Period;
 using QuantityQuality = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.QuantityQuality;
-using QuantityUnit = Energinet.DataHub.Wholesale.Common.Interfaces.Models.QuantityUnit;
+using QuantityUnit = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.QuantityUnit;
 using Resolution = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.Resolution;
 using WholesaleServicesRequest = Energinet.DataHub.Edi.Requests.WholesaleServicesRequest;
 
@@ -79,7 +79,7 @@ public class WholesaleServicesRequestHandlerTests
 
         // Act
         await sut.ProcessAsync(
-            serviceBusReceivedMessage,
+            serviceBusReceivedMessage.Body,
             expectedReferenceId,
             CancellationToken.None);
 
@@ -148,7 +148,7 @@ public class WholesaleServicesRequestHandlerTests
 
         // Act
         await sut.ProcessAsync(
-            serviceBusReceivedMessage,
+            serviceBusReceivedMessage.Body,
             expectedReferenceId,
             CancellationToken.None);
 
@@ -226,7 +226,7 @@ public class WholesaleServicesRequestHandlerTests
 
         // Act
         await sut.ProcessAsync(
-            serviceBusReceivedMessage,
+            serviceBusReceivedMessage.Body,
             expectedReferenceId,
             CancellationToken.None);
 
@@ -286,7 +286,7 @@ public class WholesaleServicesRequestHandlerTests
 
         // Act
         await sut.ProcessAsync(
-            serviceBusReceivedMessage,
+            serviceBusReceivedMessage.Body,
             expectedReferenceId,
             CancellationToken.None);
 
@@ -336,7 +336,7 @@ public class WholesaleServicesRequestHandlerTests
 
         // Act
         await sut.ProcessAsync(
-            serviceBusReceivedMessage,
+            serviceBusReceivedMessage.Body,
             expectedReferenceId,
             CancellationToken.None);
 
@@ -389,7 +389,7 @@ public class WholesaleServicesRequestHandlerTests
 
         // Act
         await sut.ProcessAsync(
-            serviceBusReceivedMessage,
+            serviceBusReceivedMessage.Body,
             expectedReferenceId,
             CancellationToken.None);
 

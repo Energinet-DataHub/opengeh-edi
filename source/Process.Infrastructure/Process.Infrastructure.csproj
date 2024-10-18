@@ -21,9 +21,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AuditLog\AuditLog.csproj" />
+    <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
+    <ProjectReference Include="..\Edi\Edi.csproj" />
     <ProjectReference Include="..\Process.Domain\Process.Domain.csproj" />
     <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
   </ItemGroup>

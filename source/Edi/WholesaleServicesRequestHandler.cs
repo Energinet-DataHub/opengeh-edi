@@ -14,10 +14,10 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults;
 using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults;
 using Energinet.DataHub.Wholesale.Edi.Client;
-using Energinet.DataHub.Wholesale.Edi.Contracts;
 using Energinet.DataHub.Wholesale.Edi.Factories;
 using Energinet.DataHub.Wholesale.Edi.Factories.WholesaleServices;
 using Energinet.DataHub.Wholesale.Edi.Mappers;
@@ -36,7 +36,7 @@ public class WholesaleServicesRequestHandler(
     IValidator<Energinet.DataHub.Edi.Requests.WholesaleServicesRequest> validator,
     IWholesaleServicesQueries wholesaleServicesQueries,
     WholesaleServicesRequestMapper wholesaleServicesRequestMapper,
-    ILogger<WholesaleServicesRequestHandler> logger)
+    ILogger<WholesaleServicesRequestHandler> logger) : IWholesaleServicesRequestHandler
 {
     private static readonly ValidationError _noDataAvailable = new("Ingen data tilgængelig / No data available", "E0H");
     private static readonly ValidationError _noDataForRequestedGridArea = new("Forkert netområde / invalid grid area", "D46");
@@ -49,9 +49,9 @@ public class WholesaleServicesRequestHandler(
 
     public bool CanHandle(string requestSubject) => requestSubject.Equals(Energinet.DataHub.Edi.Requests.WholesaleServicesRequest.Descriptor.Name);
 
-    public async Task ProcessAsync(ServiceBusReceivedMessage receivedMessage, string referenceId, CancellationToken cancellationToken)
+    public async Task ProcessAsync(BinaryData binaryData, string referenceId, CancellationToken cancellationToken)
     {
-        var incomingRequest = Energinet.DataHub.Edi.Requests.WholesaleServicesRequest.Parser.ParseFrom(receivedMessage.Body);
+        var incomingRequest = Energinet.DataHub.Edi.Requests.WholesaleServicesRequest.Parser.ParseFrom(binaryData);
 
         var validationErrors = await _validator.ValidateAsync(incomingRequest).ConfigureAwait(false);
 

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.Wholesale.Edi.Contracts;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.Wholesale.Edi.Validation.AggregatedTimeSeriesRequest.Rules;
 using FluentAssertions;
 using Xunit;
@@ -59,7 +59,7 @@ public sealed class RequestedByActorRoleValidationRuleTest
     public async Task ValidateAsync_WhenRequestingWithDdmActorRole_ReturnsDdmShouldRequestAsMdrErrorAsync()
     {
         // Arrange
-        var request = new DataHub.Edi.Requests.AggregatedTimeSeriesRequest { RequestedForActorRole = "GridOperator" };
+        var request = new DataHub.Edi.Requests.AggregatedTimeSeriesRequest { RequestedForActorRole = "GridAccessProvider" };
         var rule = new RequestedByActorRoleValidationRule();
 
         // Act
