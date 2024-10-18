@@ -14,6 +14,7 @@
 
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.BuildingBlocks.Tests;
+using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
