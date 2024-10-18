@@ -57,7 +57,7 @@ public class WholesaleInboxClient : IWholesaleInboxClient
 
         var serviceBusMessage = AggregatedMeasureDataRequestFactory.CreateServiceBusMessage(aggregatedMeasureDataProcess);
 
-        if (await _featureFlagManager.UseRequestForAggregatedMeasuredDataInEdiAsync().ConfigureAwait(false))
+        if (await _featureFlagManager.RequestStaysInEdiAsync().ConfigureAwait(false))
         {
             await _aggregatedTimeSeriesRequestHandler.ProcessAsync(serviceBusMessage.Body, aggregatedMeasureDataProcess.ProcessId.Id.ToString(), cancellationToken).ConfigureAwait(false);
         }
@@ -73,7 +73,7 @@ public class WholesaleInboxClient : IWholesaleInboxClient
     {
         ArgumentNullException.ThrowIfNull(wholesaleServicesProcess);
         var serviceBusMessage = WholesaleServicesRequestFactory.CreateServiceBusMessage(wholesaleServicesProcess);
-        if (await _featureFlagManager.UseRequestForAggregatedMeasuredDataInEdiAsync().ConfigureAwait(false))
+        if (await _featureFlagManager.RequestStaysInEdiAsync().ConfigureAwait(false))
         {
             await _wholesaleServicesRequestHandler.ProcessAsync(serviceBusMessage.Body, wholesaleServicesProcess.ProcessId.Id.ToString(), cancellationToken).ConfigureAwait(false);
         }

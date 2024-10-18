@@ -25,5 +25,5 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
 {
     public Task<bool> UsePeekMessagesAsync() => Task.FromResult(true);
 
-    public Task<bool> UseRequestForAggregatedMeasuredDataInEdiAsync() => Task.FromResult(false);
+    public Task<bool> RequestStaysInEdiAsync() => Task.FromResult(false);
 }

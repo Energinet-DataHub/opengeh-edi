@@ -28,5 +28,5 @@ public enum FeatureFlagName
     /// <summary>
     /// Whether to send requests for aggregated measured data to Wholesale, or handle it in EDI.
     /// </summary>
-    UseRequestAggregatedMeasureData,
+    RequestStaysInEdi,
 }
