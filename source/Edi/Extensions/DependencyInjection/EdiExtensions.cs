@@ -21,6 +21,7 @@ using Energinet.DataHub.Wholesale.Edi.Validation.AggregatedTimeSeriesRequest.Rul
 using Energinet.DataHub.Wholesale.Edi.Validation.Helpers;
 using Energinet.DataHub.Wholesale.Edi.Validation.WholesaleServicesRequest;
 using Microsoft.Extensions.DependencyInjection;
+using NodaTime;
 
 namespace Energinet.DataHub.Wholesale.Edi.Extensions.DependencyInjection;
 
@@ -34,6 +35,7 @@ public static class EdiExtensions
         services.AddScoped<IAggregatedTimeSeriesRequestHandler, AggregatedTimeSeriesRequestHandler>();
         services.AddScoped<IWholesaleServicesRequestHandler, WholesaleServicesRequestHandler>();
         services.AddTransient<WholesaleServicesRequestMapper>();
+        services.AddTransient<DateTimeZone>(s => DateTimeZoneProviders.Tzdb.GetZoneOrNull("Europe/Copenhagen")!);
 
         services.AddSingleton<IEdiClient, EdiClient>();
 
