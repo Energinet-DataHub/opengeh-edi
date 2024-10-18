@@ -49,9 +49,9 @@ public class WholesaleServicesRequestHandler(
 
     public bool CanHandle(string requestSubject) => requestSubject.Equals(Energinet.DataHub.Edi.Requests.WholesaleServicesRequest.Descriptor.Name);
 
-    public async Task ProcessAsync(BinaryData receivedMessage, string referenceId, CancellationToken cancellationToken)
+    public async Task ProcessAsync(BinaryData binaryData, string referenceId, CancellationToken cancellationToken)
     {
-        var incomingRequest = Energinet.DataHub.Edi.Requests.WholesaleServicesRequest.Parser.ParseFrom(receivedMessage);
+        var incomingRequest = Energinet.DataHub.Edi.Requests.WholesaleServicesRequest.Parser.ParseFrom(binaryData);
 
         var validationErrors = await _validator.ValidateAsync(incomingRequest).ConfigureAwait(false);
 

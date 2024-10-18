@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Azure.Messaging.ServiceBus;
-
 namespace Energinet.DataHub.Wholesale.Edi;
 
 public interface IWholesaleServicesRequestHandler
 {
-    Task ProcessAsync(BinaryData receivedMessage, string referenceId, CancellationToken cancellationToken);
+    Task ProcessAsync(BinaryData binaryData, string referenceId, CancellationToken cancellationToken);
 }

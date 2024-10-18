@@ -56,6 +56,8 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.Extensions.DependencyInjection;
+using Energinet.DataHub.Wholesale.Edi.Extensions.DependencyInjection;
 using Google.Protobuf;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -345,7 +347,9 @@ public class TestBase : IDisposable
             .AddAuditLog()
             .AddOutboxContext(config)
             .AddOutboxClient<OutboxContext>()
-            .AddOutboxProcessor<OutboxContext>();
+            .AddOutboxProcessor<OutboxContext>()
+            .AddCalculationResultsModule(config)
+            .AddEdiModule();
 
         // Replace the services with stub implementations.
         // - Building blocks

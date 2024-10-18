@@ -417,7 +417,7 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         appHostSettings.ProcessEnvironmentVariables.Add(
             "FeatureManagement__RequestStaysInEdi",
-            true.ToString().ToLower());
+            false.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"RevisionLogOptions__{nameof(RevisionLogOptions.ApiAddress)}",
