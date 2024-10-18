@@ -74,6 +74,7 @@ limitations under the License.
       <ProjectReference Include="..\OutgoingMessages.Application\OutgoingMessages.Application.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Domain\OutgoingMessages.Domain.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
+      <ProjectReference Include="..\OutgoingMessages.IntegrationTests\OutgoingMessages.IntegrationTests.csproj" />
       <ProjectReference Include="..\Process.Application\Process.Application.csproj" />
       <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
       <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
