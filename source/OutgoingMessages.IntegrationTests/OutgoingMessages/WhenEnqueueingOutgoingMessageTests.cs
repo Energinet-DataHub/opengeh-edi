@@ -36,7 +36,7 @@ using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime;
 using NodaTime.Extensions;
 using Xunit.Abstractions;
-using RejectedEnergyResultMessageDtoBuilder = Energinet.DataHub.EDI.IntegrationTests.Factories.RejectedEnergyResultMessageDtoBuilder;
+using RejectedEnergyResultMessageDtoBuilder = Energinet.DataHub.EDI.Tests.Factories.RejectedEnergyResultMessageDtoBuilder;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.OutgoingMessages;
 
