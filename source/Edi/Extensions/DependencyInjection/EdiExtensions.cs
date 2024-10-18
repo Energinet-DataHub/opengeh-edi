@@ -29,7 +29,7 @@ namespace Energinet.DataHub.Wholesale.Edi.Extensions.DependencyInjection;
 /// </summary>
 public static class EdiExtensions
 {
-    public static void AddEdiModule(this IServiceCollection services)
+    public static IServiceCollection AddEdiModule(this IServiceCollection services)
     {
         services.AddScoped<IAggregatedTimeSeriesRequestHandler, AggregatedTimeSeriesRequestHandler>();
         services.AddScoped<IWholesaleServicesRequestHandler, WholesaleServicesRequestHandler>();
@@ -42,19 +42,14 @@ public static class EdiExtensions
             .BindConfiguration(EdiInboxQueueOptions.SectionName)
             .ValidateDataAnnotations();
 
-        // Health checks
-        // services.AddHealthChecks()
-        //     // Must use a listener connection string
-        //     .AddAzureServiceBusQueue(
-        //         sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.ConnectionString,
-        //         sp => sp.GetRequiredService<IOptions<EdiInboxQueueOptions>>().Value.QueueName,
-        //         name: "EdiInboxQueue");
-
         // Validation helpers
         services.AddTransient<PeriodValidationHelper>();
+
         // Validation
         services.AddAggregatedTimeSeriesRequestValidation();
         services.AddWholesaleServicesRequestValidation();
+
+        return services;
     }
 
     public static IServiceCollection AddAggregatedTimeSeriesRequestValidation(this IServiceCollection services)
