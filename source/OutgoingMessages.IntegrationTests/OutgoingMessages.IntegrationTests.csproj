@@ -12,7 +12,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Dapper" Version="2.1.35" />
+        <PackageReference Include="Dapper" Version="2.1.35"/>
         <PackageReference Include="FluentAssertions" Version="6.12.1"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1"/>
         <PackageReference Include="xunit" Version="2.9.2"/>
@@ -33,10 +33,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
-      <ProjectReference Include="..\Contracts\Contracts.csproj" />
-      <ProjectReference Include="..\Process.Domain\Process.Domain.csproj" />
-      <ProjectReference Include="..\Tests\Tests.csproj" />
+        <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj"/>
+        <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj"/>
+        <ProjectReference Include="..\Contracts\Contracts.csproj"/>
+        <ProjectReference Include="..\Process.Domain\Process.Domain.csproj"/>
+        <ProjectReference Include="..\Tests\Tests.csproj"/>
     </ItemGroup>
 
 </Project>
