@@ -56,6 +56,7 @@ public static class HostFactory
                     builder.UseWhen<MarketActorAuthenticatorMiddleware>(
                         functionContext => functionContext.IsHttpTriggerAndNotHealthCheck());
                     builder.UseMiddleware<ExecutionContextMiddleware>();
+                    builder.UseMiddleware<SuppressOperationCanceledExceptionMiddleware>();
                 })
             .ConfigureServices(
                 (context, services) =>
