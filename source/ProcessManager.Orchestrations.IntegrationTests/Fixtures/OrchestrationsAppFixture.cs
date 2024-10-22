@@ -64,7 +64,7 @@ public class OrchestrationsAppFixture : IAsyncLifetime
         AzuriteManager.StartAzurite();
 
         // Prepare host settings
-        var port = 8100;
+        var port = 8000;
         var appHostSettings = CreateAppHostSettings("ProcessManager.Orchestrations", ref port);
 
         // Create and start host
