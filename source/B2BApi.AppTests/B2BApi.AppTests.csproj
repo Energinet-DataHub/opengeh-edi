@@ -34,9 +34,11 @@
   <ItemGroup>
     <ProjectReference Include="..\B2BApi\B2BApi.csproj" />
     <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj" />
     <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
     <ProjectReference Include="..\IntegrationEvents.Application\IntegrationEvents.Application.csproj" />
     <ProjectReference Include="..\IntegrationTests\IntegrationTests.csproj" />
+    <ProjectReference Include="..\Outbox.Infrastructure\Outbox.Infrastructure.csproj" />
     <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
     <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
   </ItemGroup>
@@ -55,5 +57,11 @@
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
   </ItemGroup>
+
+  <ItemDefinitionGroup>
+    <ProjectReference>
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
+  </ItemDefinitionGroup>
 
 </Project>

@@ -45,4 +45,10 @@ limitations under the License.
       <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj" />
     </ItemGroup>
 
+    <ItemDefinitionGroup>
+        <ProjectReference>
+            <PrivateAssets>all</PrivateAssets>
+        </ProjectReference>
+    </ItemDefinitionGroup>
+
 </Project>

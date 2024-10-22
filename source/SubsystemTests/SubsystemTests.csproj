@@ -114,6 +114,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\AuditLog\AuditLog.csproj" />
       <ProjectReference Include="..\B2BApi.AppTests\B2BApi.AppTests.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
       <ProjectReference Include="..\Contracts\Contracts.csproj" />
@@ -149,5 +150,11 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
     </ItemGroup>
+
+    <ItemDefinitionGroup>
+        <ProjectReference>
+            <PrivateAssets>all</PrivateAssets>
+        </ProjectReference>
+    </ItemDefinitionGroup>
 
 </Project>

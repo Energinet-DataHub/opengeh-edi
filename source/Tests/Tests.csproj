@@ -132,8 +132,10 @@ limitations under the License.
       </EmbeddedResource>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="DocumentValidation\" />
-    </ItemGroup>
+    <ItemDefinitionGroup>
+        <ProjectReference>
+            <PrivateAssets>all</PrivateAssets>
+        </ProjectReference>
+    </ItemDefinitionGroup>
 
 </Project>

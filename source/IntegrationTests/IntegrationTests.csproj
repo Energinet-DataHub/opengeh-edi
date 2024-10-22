@@ -55,8 +55,10 @@ limitations under the License.
       <ProjectReference Include="..\B2BApi\B2BApi.csproj" />
       <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />
       <ProjectReference Include="..\ArchivedMessages.Interfaces\ArchivedMessages.Interfaces.csproj" />
+      <ProjectReference Include="..\B2CWebApi\B2CWebApi.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
+      <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj" />
       <ProjectReference Include="..\CalculationResults\CalculationResults.Infrastructure\CalculationResults.Infrastructure.csproj" />
       <ProjectReference Include="..\DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj" />
       <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
@@ -178,5 +180,11 @@ limitations under the License.
     <ItemGroup>
         <Folder Include="Application\Process\"/>
     </ItemGroup>
+
+    <ItemDefinitionGroup>
+        <ProjectReference>
+            <PrivateAssets>all</PrivateAssets>
+        </ProjectReference>
+    </ItemDefinitionGroup>
 
 </Project>
