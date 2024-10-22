@@ -14,8 +14,10 @@
 
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Options;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Telemetry;
 using Energinet.DataHub.ProcessManager.Scheduler;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -26,6 +28,13 @@ var host = new HostBuilder()
         // Common
         services.AddApplicationInsightsForIsolatedWorker(TelemetryConstants.SubsystemName);
         services.AddHealthChecksForIsolatedWorker();
+
+        // TODO: Move to ProcessManager.Core
+        services
+            .AddOptions<ProcessManagerOptions>()
+            .BindConfiguration(configSectionPath: string.Empty)
+            .ValidateDataAnnotations();
+        services.AddDurableClientFactory();
 
         // Scheduler
         services.AddScoped<ProcessSchedulerHandler>();

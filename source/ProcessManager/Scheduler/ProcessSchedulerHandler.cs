@@ -12,14 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.DurableTask.Client;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Options;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask.Options;
+using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.ProcessManager.Scheduler;
 
-public class ProcessSchedulerHandler()
+public class ProcessSchedulerHandler(
+    IOptions<ProcessManagerOptions> processManagerOptions,
+    IDurableClientFactory clientFactory)
 {
-    public Task StartScheduledProcessAsync(DurableTaskClient durableTaskClient, CancellationToken cancellationToken)
+    private readonly ProcessManagerOptions _processManagerOptions = processManagerOptions.Value;
+    private readonly IDurableClientFactory _clientFactory = clientFactory;
+
+    public async Task StartScheduledProcessAsync()
     {
-        return Task.CompletedTask;
+        var x = 12 + 2;
+        if (x == 13)
+        {
+            // TODO: Move to ProcessManager.Core
+            var durableClient = _clientFactory.CreateClient(new DurableClientOptions
+            {
+                ConnectionName = nameof(ProcessManagerOptions.ProcessManagerStorageConnectionString),
+                TaskHub = _processManagerOptions.ProcessManagerTaskHubName,
+                IsExternalClient = true,
+            });
+
+            var orchestrationInstanceId = await durableClient
+                .StartNewAsync(
+                    "NotifyAggregatedMeasureDataOrchestration")
+                .ConfigureAwait(false);
+        }
     }
 }
