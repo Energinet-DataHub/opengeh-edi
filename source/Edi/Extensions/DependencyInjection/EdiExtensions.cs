@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Edi.Requests;
 using Energinet.DataHub.Wholesale.Edi.Client;
 using Energinet.DataHub.Wholesale.Edi.Factories;
@@ -20,6 +21,8 @@ using Energinet.DataHub.Wholesale.Edi.Validation.AggregatedTimeSeriesRequest;
 using Energinet.DataHub.Wholesale.Edi.Validation.AggregatedTimeSeriesRequest.Rules;
 using Energinet.DataHub.Wholesale.Edi.Validation.Helpers;
 using Energinet.DataHub.Wholesale.Edi.Validation.WholesaleServicesRequest;
+using Microsoft.Extensions.Azure;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 
@@ -30,19 +33,35 @@ namespace Energinet.DataHub.Wholesale.Edi.Extensions.DependencyInjection;
 /// </summary>
 public static class EdiExtensions
 {
-    public static IServiceCollection AddEdiModule(this IServiceCollection services)
+    public static IServiceCollection AddEdiModule(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IAggregatedTimeSeriesRequestHandler, AggregatedTimeSeriesRequestHandler>();
         services.AddScoped<IWholesaleServicesRequestHandler, WholesaleServicesRequestHandler>();
         services.AddTransient<WholesaleServicesRequestMapper>();
         services.AddTransient<DateTimeZone>(s => DateTimeZoneProviders.Tzdb.GetZoneOrNull("Europe/Copenhagen")!);
 
-        services.AddSingleton<IEdiClient, EdiClient>();
+        services.AddScoped<IEdiClient, EdiClient>();
 
         services
             .AddOptions<EdiInboxQueueOptions>()
             .BindConfiguration(EdiInboxQueueOptions.SectionName)
             .ValidateDataAnnotations();
+
+        var ediInboxQueueOptions =
+            configuration
+                .GetRequiredSection(EdiInboxQueueOptions.SectionName)
+                .Get<EdiInboxQueueOptions>()
+            ?? throw new InvalidOperationException("Missing Wholesale Inbox configuration.");
+
+        services.AddAzureClients(builder =>
+        {
+            builder
+                .AddClient<ServiceBusSender, ServiceBusClientOptions>((_, _, provider) =>
+                    provider
+                        .GetRequiredService<ServiceBusClient>()
+                        .CreateSender(ediInboxQueueOptions.QueueName))
+                .WithName(ediInboxQueueOptions.QueueName);
+        });
 
         // Validation helpers
         services.AddTransient<PeriodValidationHelper>();

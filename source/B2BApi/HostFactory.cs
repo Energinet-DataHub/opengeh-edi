@@ -101,7 +101,7 @@ public static class HostFactory
                         .AddMasterDataModule(context.Configuration)
                         .AddDataAccessUnitOfWorkModule()
                         .AddAuditLog()
-                        .AddEdiModule()
+                        .AddEdiModule(context.Configuration)
                         .AddCalculationResultsModule(context.Configuration)
 
                         // Audit log (outbox publisher)
