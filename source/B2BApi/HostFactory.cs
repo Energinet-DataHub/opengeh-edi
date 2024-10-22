@@ -53,10 +53,10 @@ public static class HostFactory
                     // If the endpoint is omitted from auth, we dont want to intercept exceptions.
                     builder.UseWhen<UnHandledExceptionMiddleware>(
                         functionContext => functionContext.IsHttpTriggerAndNotHealthCheck());
+                    builder.UseMiddleware<SuppressOperationCanceledExceptionMiddleware>();
                     builder.UseWhen<MarketActorAuthenticatorMiddleware>(
                         functionContext => functionContext.IsHttpTriggerAndNotHealthCheck());
                     builder.UseMiddleware<ExecutionContextMiddleware>();
-                    builder.UseMiddleware<SuppressOperationCanceledExceptionMiddleware>();
                 })
             .ConfigureServices(
                 (context, services) =>
