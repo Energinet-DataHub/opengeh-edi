@@ -35,15 +35,13 @@ public interface IAuditLogger
     /// </param>
     /// <param name="affectedEntityType">Primary type of the entity affected. If multiple entities are effected, consider whether it warrants an audit log per entity or not.</param>
     /// <param name="affectedEntityKey">Key (preferably natural key) of the affected entity.</param>
-    /// <param name="cancellationToken"></param>
     Task LogAsync(
         AuditLogId logId,
         AuditLogActivity activity,
         string activityOrigin,
         object? activityPayload,
         AuditLogEntityType? affectedEntityType,
-        string? affectedEntityKey,
-        CancellationToken cancellationToken = default);
+        string? affectedEntityKey);
 
     /// <summary>
     /// Log an audit log entry and commit the transaction immediately.

@@ -41,8 +41,7 @@ public class AuditLogger(
         string activityOrigin,
         object? activityPayload,
         AuditLogEntityType? affectedEntityType,
-        string? affectedEntityKey,
-        CancellationToken cancellationToken)
+        string? affectedEntityKey)
     {
         var currentUser = _auditUserContext.CurrentUser;
         if (activity.AuthenticatedUserRequired && currentUser == null)
@@ -92,8 +91,7 @@ public class AuditLogger(
             activityOrigin,
             activityPayload,
             affectedEntityType,
-            affectedEntityKey,
-            cancellationToken)
+            affectedEntityKey)
             .ConfigureAwait(false);
 
         await _unitOfWork.CommitTransactionAsync(cancellationToken)
