@@ -42,19 +42,9 @@ public class OutboxRetention(
 
         var batchSize = 100;
         var skip = 0;
-        var timeoutInMinutes = 60;
-        var timeoutAfter = _clock.GetCurrentInstant().Plus(Duration.FromMinutes(timeoutInMinutes));
-
         while (true)
         {
-            if (_clock.GetCurrentInstant() > timeoutAfter)
-            {
-                _logger.LogError(
-                    "Outbox retention didn't complete after {timeoutInMinutes} minutes. Deleted {DeletedMessagesCount} messages.",
-                    timeoutInMinutes,
-                    skip);
-                break;
-            }
+            cancellationToken.ThrowIfCancellationRequested();
 
             try
             {
@@ -76,7 +66,8 @@ public class OutboxRetention(
                         activityOrigin: nameof(ADayHasPassed),
                         activityPayload: (OlderThan: oneWeekAgo, DeletedAmount: messagesToDelete.Count),
                         affectedEntityType: AuditLogEntityType.OutboxMessage,
-                        affectedEntityKey: null)
+                        affectedEntityKey: null,
+                        cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
 
                 await _outboxContext.SaveChangesAsync(cancellationToken)

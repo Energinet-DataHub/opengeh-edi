@@ -14,6 +14,7 @@
 
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.BuildingBlocks.Tests;
+using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.Outbox.Extensions.DependencyInjection;
@@ -80,9 +81,7 @@ public class MasterDataTestBase
         services.AddScoped<IConfiguration>(_ => configuration);
 
         // Add test logger
-        services.AddSingleton(sp => _testOutputHelper);
-        services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
-        services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
+        services.AddTestLogger(_testOutputHelper);
 
         Services = services.BuildServiceProvider();
     }

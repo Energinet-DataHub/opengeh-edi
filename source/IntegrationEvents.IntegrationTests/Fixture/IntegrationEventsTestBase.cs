@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.BuildingBlocks.Tests;
+using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.IntegrationEvents.Application.Extensions.DependencyInjection;
@@ -61,9 +62,7 @@ public class IntegrationEventsTestBase : IAsyncLifetime
         services.AddScoped<IConfiguration>(_ => configuration);
 
         // Add test logger
-        services.AddSingleton(sp => _testOutputHelper);
-        services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
-        services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
+        services.AddTestLogger(_testOutputHelper);
 
         Services = services.BuildServiceProvider();
     }
