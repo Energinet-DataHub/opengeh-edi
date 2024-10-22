@@ -18,6 +18,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Options;
 using Xunit.Abstractions;
 
 namespace ProcessManager.Orchestrations.IntegrationTests.Fixtures;
@@ -63,7 +64,7 @@ public class OrchestrationsAppFixture : IAsyncLifetime
         AzuriteManager.StartAzurite();
 
         // Prepare host settings
-        var port = 8000;
+        var port = 8100;
         var appHostSettings = CreateAppHostSettings("ProcessManager.Orchestrations", ref port);
 
         // Create and start host
@@ -149,9 +150,12 @@ public class OrchestrationsAppFixture : IAsyncLifetime
             "APPLICATIONINSIGHTS_CONNECTION_STRING",
             IntegrationTestConfiguration.ApplicationInsightsConnectionString);
 
-        // Durable Functions Task Hub Name
+        // ProcessManager
         appHostSettings.ProcessEnvironmentVariables.Add(
-            "ProcessManagerTaskHubName",
+            nameof(ProcessManagerOptions.ProcessManagerStorageConnectionString),
+            AzuriteManager.FullConnectionString);
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            nameof(ProcessManagerOptions.ProcessManagerTaskHubName),
             TaskHubName);
 
         return appHostSettings;

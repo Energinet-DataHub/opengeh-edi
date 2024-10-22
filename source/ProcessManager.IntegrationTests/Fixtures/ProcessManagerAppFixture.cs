@@ -18,6 +18,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Options;
 using Energinet.DataHub.ProcessManager.Scheduler;
 using Xunit.Abstractions;
 
@@ -150,9 +151,12 @@ public class ProcessManagerAppFixture : IAsyncLifetime
             "APPLICATIONINSIGHTS_CONNECTION_STRING",
             IntegrationTestConfiguration.ApplicationInsightsConnectionString);
 
-        // Durable Functions Task Hub Name
+        // ProcessManager
         appHostSettings.ProcessEnvironmentVariables.Add(
-            "ProcessManagerTaskHubName",
+            nameof(ProcessManagerOptions.ProcessManagerStorageConnectionString),
+            AzuriteManager.FullConnectionString);
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            nameof(ProcessManagerOptions.ProcessManagerTaskHubName),
             TaskHubName);
 
         // Disable timer trigger (should be manually triggered in tests)
