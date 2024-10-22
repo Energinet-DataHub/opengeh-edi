@@ -16,11 +16,19 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Application;
 
+/// <summary>
+/// An encapsulation of <see cref="IDurableClient"/> that allows us to
+/// provide an abstraction using custom domain types to provide a "framework".
+/// </summary>
+/// <param name="durableClient">Must be a Durable Task Client that is connected to the same Task Hub as the Durable Functions host.</param>
 public class OrchestrationManager(
     IDurableClient durableClient)
 {
     private readonly IDurableClient _durableClient = durableClient;
 
+    /// <summary>
+    /// Start a new instance of an orchestration.
+    /// </summary>
     public async Task StartOrchestrationAsync()
     {
         var orchestrationInstanceId = await _durableClient

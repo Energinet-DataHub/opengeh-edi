@@ -23,8 +23,15 @@ using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.DependencyInjection;
 
+/// <summary>
+/// Extension methods for <see cref="IServiceCollection"/>
+/// that allow adding ProcessManager services to an application.
+/// </summary>
 public static class ProcessManagerExtensions
 {
+    /// <summary>
+    /// Register options and services for enabling an application to use the <see cref="OrchestrationManager"/>.
+    /// </summary>
     public static IServiceCollection AddOrchestrationManager(this IServiceCollection services)
     {
         services
