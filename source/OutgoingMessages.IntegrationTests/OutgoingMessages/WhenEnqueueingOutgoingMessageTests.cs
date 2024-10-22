@@ -40,7 +40,7 @@ using RejectedEnergyResultMessageDtoBuilder = Energinet.DataHub.EDI.Tests.Factor
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.OutgoingMessages;
 
-public class WhenEnqueueingOutgoingMessageTests : TestBase
+public class WhenEnqueueingOutgoingMessageTests : OutgoingMessagesTestBase
 {
     private readonly AcceptedEnergyResultMessageDtoBuilder _acceptedEnergyResultMessageDtoBuilder;
     private readonly RejectedEnergyResultMessageDtoBuilder _rejectedEnergyResultMessageDtoBuilder;

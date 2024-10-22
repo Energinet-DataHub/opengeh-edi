@@ -32,7 +32,7 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.OutgoingMessages;
 
-public class WhenAPeekIsRequestedTests : TestBase
+public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
 {
     private readonly EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder;
     private readonly EnergyResultPerGridAreaMessageDtoBuilder _energyResultPerGridAreaMessageDtoBuilder;

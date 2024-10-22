@@ -27,16 +27,19 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.OutgoingMessages;
 
-public class WhenADequeueIsRequestedTests : TestBase
+public class WhenADequeueIsRequestedTests : OutgoingMessagesTestBase
 {
     private readonly EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder;
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly AcceptedEnergyResultMessageDtoBuilder _energyResultPerGridAreaMessageDtoBuilder;
 
-    public WhenADequeueIsRequestedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+    public WhenADequeueIsRequestedTests(
+        IntegrationTestFixture integrationTestFixture,
+        ITestOutputHelper testOutputHelper)
         : base(integrationTestFixture, testOutputHelper)
     {
-        _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
+        _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder =
+            new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
         _energyResultPerGridAreaMessageDtoBuilder = new AcceptedEnergyResultMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();
     }

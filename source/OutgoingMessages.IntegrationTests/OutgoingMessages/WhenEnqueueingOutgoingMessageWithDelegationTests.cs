@@ -30,7 +30,7 @@ using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.OutgoingMessages;
 
-public class WhenEnqueueingOutgoingMessageWithDelegationTests : TestBase
+public class WhenEnqueueingOutgoingMessageWithDelegationTests : OutgoingMessagesTestBase
 {
     private readonly EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder;
     private readonly AcceptedEnergyResultMessageDtoBuilder _acceptedEnergyResultMessageDtoBuilder;

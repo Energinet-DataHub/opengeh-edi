@@ -21,7 +21,7 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.OutgoingMessages.DocumentFactory;
 
 public class DocumentFactoryTests
-    : TestBase
+    : OutgoingMessagesTestBase
 {
     private readonly IEnumerable<IDocumentWriter> _documentWriters;
 
