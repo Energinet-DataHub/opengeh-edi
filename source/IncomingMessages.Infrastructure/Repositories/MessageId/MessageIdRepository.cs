@@ -64,7 +64,7 @@ public class MessageIdRepository : IMessageIdRepository
             .FirstOrDefaultAsync(
                 messageIdForSender => messageIdForSender.MessageId == messageId
                                           && messageIdForSender.SenderId == senderId,
-                cancellationToken: cancellationToken)
+                cancellationToken)
             .ConfigureAwait(false);
     }
 }

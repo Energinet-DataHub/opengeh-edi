@@ -39,13 +39,13 @@ public class ResilientTransaction
     /// committing all changes atomically after action is successfully executed if specified.
     /// If any operation fails, the transaction is rolled back and retried according to the execution strategy.
     /// </summary>
-    public async Task SaveChangesAsync(IReadOnlyCollection<DbContext> dbContexts)
+    public async Task SaveChangesAsync(IReadOnlyCollection<DbContext> dbContexts, CancellationToken cancellationToken = default)
     {
         if (dbContexts.Count == 0)
             throw new InvalidOperationException("Cannot save changes for empty DbContext collection");
 
         var firstDbContext = dbContexts.First();
-        using (var transaction = await firstDbContext.Database.BeginTransactionAsync().ConfigureAwait(false))
+        using (var transaction = await firstDbContext.Database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false))
         {
             using var dbTransaction = transaction.GetDbTransaction();
 
@@ -53,14 +53,14 @@ public class ResilientTransaction
 
             foreach (var dbContext in dbContexts)
             {
-                await dbContext.Database.UseTransactionAsync(dbTransaction).ConfigureAwait(false);
-                await dbContext.SaveChangesAsync().ConfigureAwait(false);
+                await dbContext.Database.UseTransactionAsync(dbTransaction, cancellationToken).ConfigureAwait(false);
+                await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
 
-            await transaction.CommitAsync().ConfigureAwait(false);
+            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             foreach (var dbContext in dbContexts)
             {
-                await dbContext.Database.UseTransactionAsync(null).ConfigureAwait(false);
+                await dbContext.Database.UseTransactionAsync(null, cancellationToken).ConfigureAwait(false);
             }
         }
     }

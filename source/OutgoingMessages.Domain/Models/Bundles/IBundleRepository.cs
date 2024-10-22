@@ -33,7 +33,8 @@ public interface IBundleRepository
     /// </summary>
     /// <param name="olderThan"></param>
     /// <param name="take"></param>
-    Task<IReadOnlyCollection<Bundle>> GetDequeuedBundlesOlderThanAsync(Instant olderThan, int take);
+    /// <param name="cancellationToken"></param>
+    Task<IReadOnlyCollection<Bundle>> GetDequeuedBundlesOlderThanAsync(Instant olderThan, int take, CancellationToken cancellationToken);
 
     /// <summary>
     ///  Delete bundles.
@@ -53,5 +54,6 @@ public interface IBundleRepository
     /// </summary>
     /// <param name="id"></param>
     /// <param name="messageCategory"></param>
-    Task<Bundle?> GetOldestBundleAsync(ActorMessageQueueId id, MessageCategory messageCategory);
+    /// <param name="cancellationToken"></param>
+    Task<Bundle?> GetOldestBundleAsync(ActorMessageQueueId id, MessageCategory messageCategory, CancellationToken cancellationToken);
 }

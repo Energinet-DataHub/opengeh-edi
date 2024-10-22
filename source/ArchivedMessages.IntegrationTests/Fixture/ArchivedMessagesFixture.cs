@@ -16,6 +16,7 @@ using Azure.Storage.Blobs;
 using Dapper;
 using Energinet.DataHub.BuildingBlocks.Tests;
 using Energinet.DataHub.BuildingBlocks.Tests.Database;
+using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
@@ -143,11 +144,7 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
         var configuration = builder.Build();
 
         if (testOutputHelper != null)
-        {
-            services.AddSingleton(sp => testOutputHelper);
-            services.Add(ServiceDescriptor.Singleton(typeof(Logger<>), typeof(Logger<>)));
-            services.Add(ServiceDescriptor.Transient(typeof(ILogger<>), typeof(TestLogger<>)));
-        }
+            services.AddTestLogger(testOutputHelper);
 
         services
             .AddScoped<AuthenticatedActor>()
@@ -216,7 +213,7 @@ public class ArchivedMessagesFixture : IDisposable, IAsyncLifetime
     {
         var blobClient = Services.GetService<IFileStorageClient>()!;
 
-        var fileStorageFile = await blobClient.DownloadAsync(reference).ConfigureAwait(false);
+        var fileStorageFile = await blobClient.DownloadAsync(reference, CancellationToken.None).ConfigureAwait(false);
         return new ArchivedMessageStream(fileStorageFile);
     }
 

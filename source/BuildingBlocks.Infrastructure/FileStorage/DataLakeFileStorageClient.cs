@@ -56,7 +56,7 @@ public class DataLakeFileStorageClient : IFileStorageClient
         await UploadAsync(reference, memoryStream).ConfigureAwait(false);
     }
 
-    public async Task<FileStorageFile> DownloadAsync(FileStorageReference reference)
+    public async Task<FileStorageFile> DownloadAsync(FileStorageReference reference, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(reference);
 
@@ -65,12 +65,12 @@ public class DataLakeFileStorageClient : IFileStorageClient
         var blob = container.GetBlobClient(reference.Path);
 
         // OpenReadAsync() returns a stream for the file, and the file is downloaded the first time the stream is read
-        var downloadStream = await blob.OpenReadAsync().ConfigureAwait(false);
+        var downloadStream = await blob.OpenReadAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
 
         return new FileStorageFile(downloadStream);
     }
 
-    public async Task DeleteIfExistsAsync(IReadOnlyList<FileStorageReference> fileStorageReferences, FileStorageCategory fileStorageCategory)
+    public async Task DeleteIfExistsAsync(IReadOnlyList<FileStorageReference> fileStorageReferences, FileStorageCategory fileStorageCategory, CancellationToken cancellationToken = default)
     {
         var container = _blobServiceClient.GetBlobContainerClient(fileStorageCategory.Value);
         var blobBatchClient = _blobServiceClient.GetBlobBatchClient();
@@ -91,7 +91,7 @@ public class DataLakeFileStorageClient : IFileStorageClient
 
             try
             {
-                await blobBatchClient.DeleteBlobsAsync(batch, DeleteSnapshotsOption.IncludeSnapshots).ConfigureAwait(false);
+                await blobBatchClient.DeleteBlobsAsync(batch, DeleteSnapshotsOption.IncludeSnapshots, cancellationToken).ConfigureAwait(false);
             }
             catch (AggregateException e) when (e.InnerExceptions.Any(x => x is RequestFailedException && x.Message.Contains("BlobNotFound")))
             {

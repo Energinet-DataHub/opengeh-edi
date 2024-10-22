@@ -90,17 +90,17 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         var peekResult = await PeekMessageAsync(MessageCategory.Aggregations, receiverId, ActorRole.EnergySupplier);
         await _outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(peekResult!.MessageId.Value, ActorRole.EnergySupplier, receiverId), CancellationToken.None);
 
-        var outgoingMessageForReceivingActor = await outgoingMessageRepository.GetAsync(Receiver.Create(receiverId, ActorRole.EnergySupplier), message.ExternalId);
+        var outgoingMessageForReceivingActor = await outgoingMessageRepository.GetAsync(Receiver.Create(receiverId, ActorRole.EnergySupplier), message.ExternalId, CancellationToken.None);
 
         // Act
         await sut.CleanupAsync(CancellationToken.None);
 
         // Assert
         ClearDbContextCaches();
-        var actorMessageQueueForEs = await actorMessageQueueRepository.ActorMessageQueueForAsync(receiverId, ActorRole.EnergySupplier);
+        var actorMessageQueueForEs = await actorMessageQueueRepository.ActorMessageQueueForAsync(receiverId, ActorRole.EnergySupplier, CancellationToken.None);
 
         // The bundle should be removed from the queue for the energy supplier, but not for the grid operator.
-        var dequeuedBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(clockStub.GetCurrentInstant(), 100);
+        var dequeuedBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(clockStub.GetCurrentInstant(), 100, CancellationToken.None);
         dequeuedBundles.Should().NotContain(x => x.ActorMessageQueueId == actorMessageQueueForEs!.Id);
 
         // We are still able to peek the message for the grid operator.
@@ -108,7 +108,7 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         peekResultForGo.Should().NotBeNull();
 
         // blob should be cleaned up
-        var downloadBlob = () => fileStorageClient.DownloadAsync(outgoingMessageForReceivingActor!.FileStorageReference);
+        var downloadBlob = () => fileStorageClient.DownloadAsync(outgoingMessageForReceivingActor!.FileStorageReference, CancellationToken.None);
         await downloadBlob.Should().ThrowAsync<RequestFailedException>();
     }
 
@@ -147,20 +147,20 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         var peekResult = await PeekMessageAsync(MessageCategory.Aggregations, receiverId, ActorRole.EnergySupplier);
         await _outgoingMessagesClient.DequeueAndCommitAsync(new DequeueRequestDto(peekResult!.MessageId.Value, ActorRole.EnergySupplier, receiverId), CancellationToken.None);
 
-        var outgoingMessageForReceivingActor = await outgoingMessageRepository.GetAsync(Receiver.Create(receiverId, ActorRole.EnergySupplier), message.ExternalId);
+        var outgoingMessageForReceivingActor = await outgoingMessageRepository.GetAsync(Receiver.Create(receiverId, ActorRole.EnergySupplier), message.ExternalId, CancellationToken.None);
 
         // Delete the blob
-        await fileStorageClient.DeleteIfExistsAsync(new List<FileStorageReference> { outgoingMessageForReceivingActor!.FileStorageReference }, FileStorageCategory.OutgoingMessage());
+        await fileStorageClient.DeleteIfExistsAsync(new List<FileStorageReference> { outgoingMessageForReceivingActor!.FileStorageReference }, FileStorageCategory.OutgoingMessage(), CancellationToken.None);
 
         // Act
         await sut.CleanupAsync(CancellationToken.None);
 
         // Assert
         ClearDbContextCaches();
-        var actorMessageQueueForEs = await actorMessageQueueRepository.ActorMessageQueueForAsync(receiverId, ActorRole.EnergySupplier);
+        var actorMessageQueueForEs = await actorMessageQueueRepository.ActorMessageQueueForAsync(receiverId, ActorRole.EnergySupplier, CancellationToken.None);
 
         // The bundle should be removed from the queue for the energy supplier, but not for the grid operator.
-        var dequeuedBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(clockStub.GetCurrentInstant(), 100);
+        var dequeuedBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(clockStub.GetCurrentInstant(), 100, CancellationToken.None);
         dequeuedBundles.Should().NotContain(x => x.ActorMessageQueueId == actorMessageQueueForEs!.Id);
 
         // We are still able to peek the message for the grid operator.
@@ -211,7 +211,7 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
                 CancellationToken.None);
 
             numberOfMessageToCreate--;
-            var outgoingMessageForReceivingActor = await outgoingMessageRepository.GetAsync(Receiver.Create(receiverId, ActorRole.EnergySupplier), message.ExternalId);
+            var outgoingMessageForReceivingActor = await outgoingMessageRepository.GetAsync(Receiver.Create(receiverId, ActorRole.EnergySupplier), message.ExternalId, CancellationToken.None);
             outgoingMessages.Add(outgoingMessageForReceivingActor!);
         }
 
@@ -220,10 +220,10 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
 
         // Assert
         ClearDbContextCaches();
-        var actorMessageQueueForEs = await actorMessageQueueRepository.ActorMessageQueueForAsync(receiverId, ActorRole.EnergySupplier);
+        var actorMessageQueueForEs = await actorMessageQueueRepository.ActorMessageQueueForAsync(receiverId, ActorRole.EnergySupplier, CancellationToken.None);
 
         // The bundle should be removed from the queue for the energy supplier, but not for the grid operator.
-        var dequeuedBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(clockStub.GetCurrentInstant(), 100);
+        var dequeuedBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(clockStub.GetCurrentInstant(), 100, CancellationToken.None);
         dequeuedBundles.Should().NotContain(x => x.ActorMessageQueueId == actorMessageQueueForEs!.Id);
 
         // We are still able to peek the message for the grid operator.
@@ -233,7 +233,7 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         // blob should be cleaned up
         foreach (var outgoingMessage in outgoingMessages)
         {
-            var downloadBlob = () => fileStorageClient.DownloadAsync(outgoingMessage!.FileStorageReference);
+            var downloadBlob = () => fileStorageClient.DownloadAsync(outgoingMessage!.FileStorageReference, CancellationToken.None);
             await downloadBlob.Should().ThrowAsync<RequestFailedException>();
         }
     }

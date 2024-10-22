@@ -24,7 +24,7 @@ public interface IMarketDocumentRepository
     /// <summary>
     /// Get document by bundle id
     /// </summary>
-    Task<MarketDocument?> GetAsync(BundleId bundleId);
+    Task<MarketDocument?> GetAsync(BundleId bundleId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Add document to repository
@@ -34,5 +34,5 @@ public interface IMarketDocumentRepository
     /// <summary>
     /// Delete market documents if they exists
     /// </summary>
-    Task DeleteMarketDocumentsIfExistsAsync(IReadOnlyCollection<BundleId> bundleMessageIds);
+    Task DeleteMarketDocumentsIfExistsAsync(IReadOnlyCollection<BundleId> bundleMessageIds, CancellationToken cancellationToken);
 }
