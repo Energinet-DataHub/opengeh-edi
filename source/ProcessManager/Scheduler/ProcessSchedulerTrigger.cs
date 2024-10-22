@@ -23,7 +23,7 @@ internal class ProcessSchedulerTrigger(
 
     [Function(nameof(StartScheduledProcess))]
     public Task StartScheduledProcess(
-        [TimerTrigger("*/10 * * * * *")] TimerInfo timerTimerInfo) // Runs every 10 seconds
+        [TimerTrigger("*/10 * * * * *")] TimerInfo timerInfo) // Runs every 10 seconds
     {
         return _handler.StartScheduledProcessAsync();
     }
