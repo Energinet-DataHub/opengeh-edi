@@ -19,8 +19,8 @@ namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Opt
 /// <summary>
 /// Applications that participate in Durable Functions orchestration, either by containing orchestrations
 /// or by managing them (e.g. trigger an orchestration), must use the same Task Hub.
-/// The configuration of the Task Hub is performed in 'host.json', but settings there can be configured to
-/// lookup the values in application settings.
+/// The configuration of the Task Hub is performed in 'host.json' of Durable Functions hosts,
+/// but settings there can be configured to lookup the values in application settings.
 /// Hence, the intention of this class is to help developers configure the expected application settings
 /// so they match how we configure 'host.json'.
 /// Application settings referred from 'host.json' cannot be hierarchical, which is why this options class

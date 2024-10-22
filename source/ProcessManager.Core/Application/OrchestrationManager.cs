@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Application;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 
-namespace Energinet.DataHub.ProcessManager.Scheduler;
+namespace Energinet.DataHub.ProcessManagement.Core.Application;
 
-public class ProcessSchedulerHandler(
-    OrchestrationManager orchestrationManager)
+public class OrchestrationManager(
+    IDurableClient durableClient)
 {
-    private readonly OrchestrationManager _orchestrationManager = orchestrationManager;
+    private readonly IDurableClient _durableClient = durableClient;
 
-    public async Task StartScheduledProcessAsync()
+    public async Task StartOrchestrationAsync()
     {
-        var x = 12 + 2;
-        if (x == 13)
-        {
-            await _orchestrationManager.StartOrchestrationAsync().ConfigureAwait(false);
-        }
+        var orchestrationInstanceId = await _durableClient
+            .StartNewAsync(
+                "NotifyAggregatedMeasureDataOrchestration")
+            .ConfigureAwait(false);
     }
 }
