@@ -14,7 +14,10 @@
 
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
+using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Telemetry;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var host = new HostBuilder()
@@ -24,6 +27,9 @@ var host = new HostBuilder()
         // Common
         services.AddApplicationInsightsForIsolatedWorker(TelemetryConstants.SubsystemName);
         services.AddHealthChecksForIsolatedWorker();
+
+        // ProcessManager
+        services.AddOrchestrationRegister();
     })
     .ConfigureLogging((hostingContext, logging) =>
     {
@@ -31,4 +37,7 @@ var host = new HostBuilder()
     })
     .Build();
 
-host.Run();
+// TODO: Remove, just testing
+var service = host.Services.GetRequiredService<OrchestratorRegister>();
+
+await host.RunAsync().ConfigureAwait(false);

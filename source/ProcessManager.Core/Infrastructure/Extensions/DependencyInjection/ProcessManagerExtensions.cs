@@ -58,4 +58,23 @@ public static class ProcessManagerExtensions
 
         return services;
     }
+
+    /// <summary>
+    /// Register options and services for enabling an application to register Durable Functions Orchestrations
+    /// that can later be e.g. started by using the <see cref="OrchestrationManager"/>.
+    /// </summary>
+    public static IServiceCollection AddOrchestrationRegister(this IServiceCollection services)
+    {
+        // TODO: We want to enforce application settings are configured as expected. We need to use the options somewhere to do that!
+        services
+            .AddOptions<ProcessManagerOptions>()
+            .BindConfiguration(configSectionPath: string.Empty)
+            .ValidateDataAnnotations();
+
+        // TODO: Add OrchestrationRegister (or similar) that can be used to register orchestrations on startup.
+        // TODO: Registration of orchestrations must be performed automatically on startup.
+        services.TryAddSingleton<OrchestratorRegister>(); // TODO: Remove, just testing
+
+        return services;
+    }
 }
