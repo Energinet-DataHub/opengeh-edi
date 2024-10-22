@@ -17,7 +17,8 @@ using Microsoft.DurableTask.Client;
 
 namespace Energinet.DataHub.ProcessManager.Scheduler;
 
-internal class ProcessSchedulerTrigger(ProcessSchedulerHandler handler)
+internal class ProcessSchedulerTrigger(
+    ProcessSchedulerHandler handler)
 {
     private readonly ProcessSchedulerHandler _handler = handler;
 
