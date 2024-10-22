@@ -18,24 +18,24 @@ namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 
 public sealed class TelemetryChannelStub : ITelemetryChannel
 {
-    private readonly List<ITelemetry> _sentTelemtries = new();
+    private readonly List<ITelemetry> _sentTelemetries = new();
 
     private bool _disposed;
 
-    public bool IsFlushed { get; private set; }
-
-    public bool? DeveloperMode { get; set; }
+    public bool? DeveloperMode { get; set; } = true;
 
     public string? EndpointAddress { get; set; }
 
+    public List<ITelemetry> SentTelemetries => _sentTelemetries;
+
     public void Send(ITelemetry item)
     {
-        _sentTelemtries.Add(item);
+        _sentTelemetries.Add(item);
     }
 
     public void Flush()
     {
-        IsFlushed = true;
+        _sentTelemetries.Clear();
     }
 
     public void Dispose()
