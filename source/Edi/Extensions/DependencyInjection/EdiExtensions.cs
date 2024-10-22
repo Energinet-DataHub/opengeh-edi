@@ -51,7 +51,7 @@ public static class EdiExtensions
             configuration
                 .GetRequiredSection(EdiInboxQueueOptions.SectionName)
                 .Get<EdiInboxQueueOptions>()
-            ?? throw new InvalidOperationException("Missing Wholesale Inbox configuration.");
+            ?? throw new InvalidOperationException("Missing EDI Inbox configuration.");
 
         services.AddAzureClients(builder =>
         {

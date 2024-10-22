@@ -468,7 +468,7 @@ public class BehavioursTestBase : IDisposable
             .AddMasterDataModule(config)
             .AddDataAccessUnitOfWorkModule()
             .AddCalculationResultsModule(config)
-            .AddEdiModule();
+            .AddEdiModule(config);
 
         _services.AddTransient<InboxEventsProcessor>()
             .AddTransient<INotificationHandler<AggregatedTimeSeriesRequestWasAccepted>>(

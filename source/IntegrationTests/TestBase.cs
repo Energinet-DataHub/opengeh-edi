@@ -356,7 +356,7 @@ public class TestBase : IDisposable
             .AddOutboxClient<OutboxContext>()
             .AddOutboxProcessor<OutboxContext>()
             .AddCalculationResultsModule(config)
-            .AddEdiModule();
+            .AddEdiModule(config);
 
         // Replace the services with stub implementations.
         // - Building blocks
