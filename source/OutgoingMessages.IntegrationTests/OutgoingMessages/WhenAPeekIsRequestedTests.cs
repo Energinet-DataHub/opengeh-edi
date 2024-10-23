@@ -160,9 +160,9 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         // Assert
         result.Should().NotBeNull();
 
-        var archivedMessageId = await GetArchivedMessageIdFromDatabaseAsync(result!.MessageId.Value);
+        var theIdOfArchivedMessage = await GetIdOfArchivedMessageFromDatabaseAsync(result!.MessageId.Value);
         var fileStorageReference = await GetArchivedMessageFileStorageReferenceFromDatabaseAsync(result.MessageId.Value);
-        fileStorageReference.Should().Be($"{receiverNumber}/{year:0000}/{month:00}/{date:00}/{archivedMessageId:N}");
+        fileStorageReference.Should().Be($"{receiverNumber}/{year:0000}/{month:00}/{date:00}/{theIdOfArchivedMessage:N}");
     }
 
     [Fact]

@@ -129,7 +129,7 @@ public class OutgoingMessagesTestBase : IDisposable
         return fileStorageReference;
     }
 
-    protected async Task<Guid> GetArchivedMessageIdFromDatabaseAsync(string messageId)
+    protected async Task<Guid> GetIdOfArchivedMessageFromDatabaseAsync(string messageId)
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);
         var id = await connection.ExecuteScalarAsync<Guid>($"SELECT Id FROM [dbo].[ArchivedMessages] WHERE MessageId = '{messageId}'");
