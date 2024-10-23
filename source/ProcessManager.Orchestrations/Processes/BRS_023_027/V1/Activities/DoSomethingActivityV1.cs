@@ -16,9 +16,9 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Activities;
 
-internal class DoSomethingActivity()
+internal class DoSomethingActivityV1()
 {
-    [Function(nameof(DoSomethingActivity))]
+    [Function(nameof(DoSomethingActivityV1))]
     public Task<string> Run(
         [ActivityTrigger] string orchestrationId)
     {

@@ -33,7 +33,7 @@ internal class NotifyAggregatedMeasureDataOrchestrationV1
         var defaultRetryOptions = CreateDefaultRetryOptions();
 
         await context.CallActivityAsync(
-            nameof(DoSomethingActivity),
+            nameof(DoSomethingActivityV1),
             context.InstanceId,
             defaultRetryOptions);
 
