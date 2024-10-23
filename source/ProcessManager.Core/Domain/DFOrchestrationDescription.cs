@@ -32,6 +32,8 @@ public class DFOrchestrationDescription : OrchestrationDescription
             canBeScheduled)
     {
         FunctionName = functionName;
+
+        ParameterDefinition = new();
     }
 
     /// <summary>
@@ -43,5 +45,4 @@ public class DFOrchestrationDescription : OrchestrationDescription
     /// Defines the Durable Functions orchestration input parameter type.
     /// </summary>
     public DFOrchestrationParameterDefinition ParameterDefinition { get; }
-        = new();
 }

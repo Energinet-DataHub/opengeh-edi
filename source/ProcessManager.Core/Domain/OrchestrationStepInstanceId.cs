@@ -14,4 +14,4 @@
 
 namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 
-public record OrchestrationStepInstanceId(int Value);
+public record OrchestrationStepInstanceId(Guid Value);

@@ -27,12 +27,15 @@ public abstract class OrchestrationDescription
         int version,
         bool canBeScheduled)
     {
+        Id = new OrchestrationDescriptionId(Guid.NewGuid());
         Name = name;
         Version = version;
         CanBeScheduled = canBeScheduled;
+
+        HostName = string.Empty;
     }
 
-    public OrchestrationDescriptionId? Id { get; private set; }
+    public OrchestrationDescriptionId Id { get;  }
 
     /// <summary>
     /// A name which combined with the <see cref="Version"/> uniquely identifies the orchestration.
@@ -55,7 +58,6 @@ public abstract class OrchestrationDescription
     /// The name of the host where the orchestration is implemented.
     /// </summary>
     public string HostName { get; set; }
-        = string.Empty;
 
     /// <summary>
     /// Specifies if the orchestration is enabled and hence can be started.

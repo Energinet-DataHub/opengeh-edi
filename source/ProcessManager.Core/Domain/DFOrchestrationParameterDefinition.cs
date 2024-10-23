@@ -26,13 +26,13 @@ public class DFOrchestrationParameterDefinition
 {
     internal DFOrchestrationParameterDefinition()
     {
+        SerializedParameterDefinition = string.Empty;
     }
 
     /// <summary>
     /// The JSON schema defining the parameter type.
     /// </summary>
     private string SerializedParameterDefinition { get; set; }
-        = string.Empty;
 
     /// <summary>
     /// Set the parameter definition by specifying its type.
