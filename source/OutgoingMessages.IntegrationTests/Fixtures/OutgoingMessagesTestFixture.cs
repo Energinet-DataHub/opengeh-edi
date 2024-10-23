@@ -35,7 +35,7 @@ public class OutgoingMessagesTestFixture : IDisposable, IAsyncLifetime
         DatabricksSchemaManager = new DatabricksSchemaManager(
             new HttpClientFactory(),
             databricksSettings: IntegrationTestConfiguration.DatabricksSettings,
-            schemaPrefix: "edi_integration_tests");
+            "edi_outgoing_messages_tests");
     }
 
     public EdiDatabaseManager DatabaseManager { get; set; }
