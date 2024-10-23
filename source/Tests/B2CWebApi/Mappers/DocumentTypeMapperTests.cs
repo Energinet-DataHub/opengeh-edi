@@ -63,10 +63,13 @@ public class DocumentTypeMapperTests
                     typeof(IncomingDocumentType).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
                         .Select(f => f.GetValue(null) as IncomingDocumentType)
                         .Where(dt => dt != null)
-                        .Select(dt => dt!.Name))
-                .ToList();
+                        .Select(dt => dt!.Name));
+
+        // TODO - Remove this line when all DocumentTypes are supported in B2C
+        supportedDocumentTypes = supportedDocumentTypes
+            .Where(x => x != IncomingDocumentType.MeteredDataForMeasurementPoint.Name);
 
         // Act & Assert
-        documentTypes.Should().BeEquivalentTo(supportedDocumentTypes);
+        documentTypes.Should().BeEquivalentTo(supportedDocumentTypes.ToList());
     }
 }
