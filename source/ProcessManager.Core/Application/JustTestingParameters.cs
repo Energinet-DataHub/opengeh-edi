@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
+namespace Energinet.DataHub.ProcessManagement.Core.Application;
 
-/// <summary>
-/// An immutable input to start the <see cref="NotifyAggregatedMeasureDataOrchestrationV1"/>.
-/// </summary>
-public sealed record NotifyAggregatedMeasureDataInput();
+// TODO: Remove when done testing
+public sealed record JustTestingParameters(
+    DateTimeOffset StartDate,
+    DateTimeOffset EndDate,
+    DateTimeOffset ScheduledAt,
+    bool IsInternalCalculation);

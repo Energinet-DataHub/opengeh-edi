@@ -26,7 +26,7 @@ internal class NotifyAggregatedMeasureDataOrchestrationV1
     public async Task<string> Run(
         [OrchestrationTrigger] TaskOrchestrationContext context)
     {
-        var input = context.GetInput<NotifyAggregatedMeasureDataInput>();
+        var input = context.GetInput<NotifyAggregatedMeasureDataInputV1>();
         if (input == null)
             return "Error: No input specified.";
 
