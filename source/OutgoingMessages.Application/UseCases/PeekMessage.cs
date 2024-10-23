@@ -15,6 +15,7 @@
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.DocumentWriters;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Domain.Models.ActorMessagesQueues;
@@ -137,14 +138,13 @@ public class PeekMessage
         marketDocument = new MarketDocument(peekResult.BundleId, archivedFile);
         _marketDocumentRepository.Add(marketDocument);
 
-        var documentNameAndFormat = outgoingMessageBundle.DocumentType.ToString();
-
-        // The message is a response to a request if it has a related message id
-        documentNameAndFormat += outgoingMessageBundle.RelatedToMessageId is not null ? "Response" : string.Empty;
-        documentNameAndFormat += request.DocumentFormat;
+        var logName = MetricNameMapper.MessageGenerationMetricName(
+            outgoingMessageBundle.DocumentType,
+            request.DocumentFormat,
+            outgoingMessageBundle.RelatedToMessageId != null);
 
         _telemetryClient
-            .GetMetric(documentNameAndFormat)
+            .GetMetric(logName)
             .TrackValue(1);
 
         return marketDocument;
