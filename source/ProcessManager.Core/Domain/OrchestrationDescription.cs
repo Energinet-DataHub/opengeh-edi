@@ -52,9 +52,10 @@ public abstract class OrchestrationDescription
     public bool CanBeScheduled { get; }
 
     /// <summary>
-    /// Name of the Durable Functions host where the orchestration is implemented.
+    /// The name of the host where the orchestration is implemented.
     /// </summary>
-    public string HostName { get; set; } = string.Empty;
+    public string HostName { get; set; }
+        = string.Empty;
 
     /// <summary>
     /// Specifies if the orchestration is enabled and hence can be started.
@@ -62,7 +63,4 @@ public abstract class OrchestrationDescription
     /// but which we cannot delete in the database because we still need the execution history.
     /// </summary>
     public bool IsEnabled { get; set; }
-
-    public IList<OrchestrationParameterDefinition> Parameters { get; }
-        = [];
 }

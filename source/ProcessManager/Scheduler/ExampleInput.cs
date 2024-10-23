@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application;
+namespace Energinet.DataHub.ProcessManager.Scheduler;
 
-// TODO: Remove when done testing
-public sealed record JustTestingParameters(
+// TODO: Remove when done playing with parameters
+public sealed record ExampleInput(
     DateTimeOffset StartDate,
     DateTimeOffset EndDate,
     DateTimeOffset ScheduledAt,

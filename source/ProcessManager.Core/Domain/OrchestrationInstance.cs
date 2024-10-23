@@ -25,8 +25,11 @@ public class OrchestrationInstance
 {
     public OrchestrationInstanceId? Id { get; set; }
 
-    public IList<OrchestrationParameterValue> ParameterValues { get; }
-        = [];
+    /// <summary>
+    /// The JSON representation of the orchestration input parameter value.
+    /// </summary>
+    public string SerializedParameterValue { get; set; }
+        = string.Empty;
 
     public Instant ScheduledAt { get; set; }
 

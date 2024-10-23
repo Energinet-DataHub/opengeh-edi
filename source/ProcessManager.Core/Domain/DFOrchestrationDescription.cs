@@ -34,5 +34,14 @@ public class DFOrchestrationDescription : OrchestrationDescription
         FunctionName = functionName;
     }
 
+    /// <summary>
+    /// The name of the Durable Functions orchestration implementation.
+    /// </summary>
     public string FunctionName { get; }
+
+    /// <summary>
+    /// Defines the Durable Functions orchestration input parameter type.
+    /// </summary>
+    public DFOrchestrationParameterDefinition ParameterDefinition { get; }
+        = new();
 }
