@@ -25,9 +25,9 @@ namespace Energinet.DataHub.ProcessManagement.Core.Application;
 public class OrchestrationRegister
 {
     // TODO: I think we should just use 'DFOrchestrationDescription' for now
-    private readonly List<OrchestrationDescription> _knownOrchestrationDescriptions = [];
+    private readonly List<DFOrchestrationDescription> _knownOrchestrationDescriptions = [];
 
-    public OrchestrationDescription? GetOrDefault(string name, int version)
+    public DFOrchestrationDescription? GetOrDefault(string name, int version)
     {
         return _knownOrchestrationDescriptions
             .SingleOrDefault(x =>
@@ -42,7 +42,7 @@ public class OrchestrationRegister
     /// <param name="orchestrationDescription"></param>
     /// <exception cref="InvalidOperationException">Thrown if an orchestration description with the
     /// same version and name has been registered before.</exception>
-    public void Register(OrchestrationDescription orchestrationDescription)
+    public void Register(DFOrchestrationDescription orchestrationDescription)
     {
         if (_knownOrchestrationDescriptions
             .Any(x =>
