@@ -38,9 +38,10 @@ var host = new HostBuilder()
     })
     .Build();
 
-var service = host.Services.GetRequiredService<HostStartupRegistrator>();
+// TODO: We should encapsulate and move it away from Program.cs (a method somewhere; perhaps an IHost extension)
+var registrator = host.Services.GetRequiredService<HostStartupRegistrator>();
 var hostName = "ProcessManager.Orchestrations";
-await service.SynchronizeHostOrchestrationsAsync(
+await registrator.SynchronizeHostOrchestrationsAsync(
     hostName,
     [
         new DFOrchestrationDescription(
