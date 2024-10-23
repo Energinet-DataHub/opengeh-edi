@@ -21,7 +21,6 @@ using Dapper;
 using Energinet.DataHub.BuildingBlocks.Tests;
 using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
-using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.Outbox.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
@@ -61,6 +60,8 @@ using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Google.Protobuf;
 using MediatR;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
@@ -366,6 +367,11 @@ public class TestBase : IDisposable
             var executionContext = new ExecutionContext();
             executionContext.SetExecutionType(ExecutionType.Test);
             return executionContext;
+        });
+        _services.AddSingleton<TelemetryClient>(x =>
+        {
+            return new TelemetryClient(
+                new TelemetryConfiguration { TelemetryChannel = new TelemetryChannelStub(), });
         });
 
         // Add test logger
