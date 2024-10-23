@@ -20,11 +20,8 @@ namespace Energinet.DataHub.ProcessManager.Core.IntegrationTests.Domain;
 public class DFOrchestrationParameterDefinitionTests
 {
     [Fact]
-    public void GivenRecordType_WhenSetParameterFromType_CanValidateParameter()
+    public async Task GivenRecordType_WhenSetParameterFromType_CanValidateParameter()
     {
-        // TODO: Look at generating Json Schema => https://www.newtonsoft.com/jsonschema/help/html/GeneratingSchemas.htm
-        // WARNING: Might require a license, so we might have to look for another solution, like: https://docs.json-everything.net/schema/basics/
-
         // Arrange
         var sut = new DFOrchestrationParameterDefinition();
 
@@ -33,7 +30,7 @@ public class DFOrchestrationParameterDefinitionTests
 
         // Assert
         var parameter = new OrchestrationParameterExample(DateTimeOffset.Now, true);
-        var isValid = sut.IsValidParameterValue(parameter);
+        var isValid = await sut.IsValidParameterValueAsync(parameter);
 
         isValid.Should().BeTrue();
     }

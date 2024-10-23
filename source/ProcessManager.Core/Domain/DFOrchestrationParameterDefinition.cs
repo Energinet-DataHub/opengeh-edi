@@ -13,9 +13,8 @@
 // limitations under the License.
 
 using System.Text.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema;
-using Newtonsoft.Json.Schema.Generation;
+using Microsoft.IdentityModel.Tokens;
+using NJsonSchema;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 
@@ -42,34 +41,33 @@ public class DFOrchestrationParameterDefinition
     public void SetFromType<TParameter>()
         where TParameter : class
     {
-        var schemaGenerator = new JSchemaGenerator();
-        var jsonSchema = schemaGenerator.Generate(typeof(TParameter));
+        var jsonSchema = JsonSchema.FromType<TParameter>();
 
-        SerializedParameterDefinition = jsonSchema.ToString();
+        SerializedParameterDefinition = jsonSchema.ToJson();
     }
 
     /// <summary>
     /// Validate <paramref name="parameterValue"/> against the defining JSON schema.
     /// </summary>
-    public bool IsValidParameterValue(object parameterValue)
+    public Task<bool> IsValidParameterValueAsync(object parameterValue)
     {
         ArgumentNullException.ThrowIfNull(parameterValue);
 
         var serializedParameterValue = JsonSerializer.Serialize(parameterValue);
 
-        return IsValidParameterValue(serializedParameterValue);
+        return IsValidParameterValueAsync(serializedParameterValue);
     }
 
     /// <summary>
     /// Validate <paramref name="serializedParameterValue"/> against the defining JSON schema.
     /// </summary>
-    public bool IsValidParameterValue(string serializedParameterValue)
+    public async Task<bool> IsValidParameterValueAsync(string serializedParameterValue)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(serializedParameterValue);
 
-        var jsonSchema = JSchema.Parse(SerializedParameterDefinition);
-        var parameterValue = JObject.Parse(serializedParameterValue);
+        var jsonSchema = await JsonSchema.FromJsonAsync(SerializedParameterDefinition).ConfigureAwait(false);
+        var errors = jsonSchema.Validate(serializedParameterValue);
 
-        return parameterValue.IsValid(jsonSchema);
+        return errors.IsNullOrEmpty();
     }
 }
