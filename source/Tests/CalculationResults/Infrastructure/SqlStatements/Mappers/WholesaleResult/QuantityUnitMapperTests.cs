@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.SqlStatements.Mappers.WholesaleResult;
+using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults;
 using Energinet.DataHub.Wholesale.Common.Interfaces.Models;
 using FluentAssertions;
 using Xunit;

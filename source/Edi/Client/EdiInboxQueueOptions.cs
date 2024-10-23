@@ -12,22 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults;
+using System.ComponentModel.DataAnnotations;
+
+namespace Energinet.DataHub.Wholesale.Edi.Client;
 
 /// <summary>
-/// The unit of measurement for the quantity.
+/// Options related to Edi inbox queue.
 /// </summary>
-public enum QuantityUnit
+public class EdiInboxQueueOptions
 {
     /// <summary>
-    /// The quantity unit is Kilo Watt Hour.
-    /// Code: H87
+    /// The name of the section in the configuration file where this option should find its information.
     /// </summary>
-    Kwh,
+    public const string SectionName = "EdiInbox";
 
     /// <summary>
-    /// The quantity unit is pieces.
-    /// The unit is used for subscriptions and fees that are associated with the metering point.
+    /// Queue name for the Edi inbox.
     /// </summary>
-    Pieces,
+    [Required]
+    public string QueueName { get; set; } = string.Empty;
 }

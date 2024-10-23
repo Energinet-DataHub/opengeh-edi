@@ -15,13 +15,12 @@
 using AutoFixture.Xunit2;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.TestCommon.AutoFixture.Attributes;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.Edi.Responses;
 using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults;
 using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.EnergyResults;
 using Energinet.DataHub.Wholesale.Common.Interfaces.Models;
 using Energinet.DataHub.Wholesale.Edi.Client;
-using Energinet.DataHub.Wholesale.Edi.Contracts;
-using Energinet.DataHub.Wholesale.Edi.Models;
 using Energinet.DataHub.Wholesale.Edi.UnitTests.Builders;
 using Energinet.DataHub.Wholesale.Edi.UnitTests.Extensions;
 using Energinet.DataHub.Wholesale.Edi.Validation;
@@ -78,7 +77,7 @@ public class AggregatedTimeSeriesRequestHandlerTests
 
         // Act
         await sut.ProcessAsync(
-            serviceBusReceivedMessage,
+            serviceBusReceivedMessage.Body,
             expectedReferenceId,
             CancellationToken.None);
 
@@ -128,7 +127,7 @@ public class AggregatedTimeSeriesRequestHandlerTests
 
         // Act
         await sut.ProcessAsync(
-            serviceBusReceivedMessage,
+            serviceBusReceivedMessage.Body,
             expectedReferenceId,
             CancellationToken.None);
 
@@ -170,7 +169,7 @@ public class AggregatedTimeSeriesRequestHandlerTests
 
         // Act
         await sut.ProcessAsync(
-            serviceBusReceivedMessage,
+            serviceBusReceivedMessage.Body,
             expectedReferenceId,
             CancellationToken.None);
 
@@ -223,7 +222,7 @@ public class AggregatedTimeSeriesRequestHandlerTests
 
         // Act
         await sut.ProcessAsync(
-            serviceBusReceivedMessage,
+            serviceBusReceivedMessage.Body,
             expectedReferenceId,
             CancellationToken.None);
 
@@ -267,7 +266,7 @@ public class AggregatedTimeSeriesRequestHandlerTests
 
         // Act
         await sut.ProcessAsync(
-            serviceBusReceivedMessage,
+            serviceBusReceivedMessage.Body,
             expectedReferenceId,
             CancellationToken.None);
 
@@ -311,7 +310,7 @@ public class AggregatedTimeSeriesRequestHandlerTests
 
         // Act
         await sut.ProcessAsync(
-            serviceBusReceivedMessage,
+            serviceBusReceivedMessage.Body,
             expectedReferenceId,
             CancellationToken.None);
 
@@ -359,7 +358,7 @@ public class AggregatedTimeSeriesRequestHandlerTests
 
         // Act
         await sut.ProcessAsync(
-            serviceBusReceivedMessage,
+            serviceBusReceivedMessage.Body,
             expectedReferenceId,
             CancellationToken.None);
 

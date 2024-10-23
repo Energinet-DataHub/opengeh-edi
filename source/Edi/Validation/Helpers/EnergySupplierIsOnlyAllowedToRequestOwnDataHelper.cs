@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.Wholesale.Edi.Contracts;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.Wholesale.Edi.Validation.Helpers;
 
