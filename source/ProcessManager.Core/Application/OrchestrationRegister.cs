@@ -24,15 +24,23 @@ namespace Energinet.DataHub.ProcessManagement.Core.Application;
 /// </summary>
 public class OrchestrationRegister
 {
-    // TODO: I think we should just use 'DFOrchestrationDescription' for now
     private readonly List<DFOrchestrationDescription> _knownOrchestrationDescriptions = [];
 
-    public DFOrchestrationDescription? GetOrDefault(string name, int version)
+    public Task<IReadOnlyCollection<DFOrchestrationDescription>> GetAllByHostNameAsync(string hostName)
     {
-        return _knownOrchestrationDescriptions
+        return Task.FromResult((IReadOnlyCollection<DFOrchestrationDescription>)_knownOrchestrationDescriptions
+            .Where(x =>
+                x.HostName == hostName)
+            .ToList());
+    }
+
+    public Task<DFOrchestrationDescription?> GetOrDefaultAsync(string name, int version, bool isEnabled = true)
+    {
+        return Task.FromResult(_knownOrchestrationDescriptions
             .SingleOrDefault(x =>
                 x.Name == name
-                && x.Version == version);
+                && x.Version == version
+                && x.IsEnabled == isEnabled));
     }
 
     /// <summary>
@@ -42,7 +50,7 @@ public class OrchestrationRegister
     /// <param name="orchestrationDescription"></param>
     /// <exception cref="InvalidOperationException">Thrown if an orchestration description with the
     /// same version and name has been registered before.</exception>
-    public void Register(DFOrchestrationDescription orchestrationDescription)
+    public Task RegisterAsync(DFOrchestrationDescription orchestrationDescription)
     {
         if (_knownOrchestrationDescriptions
             .Any(x =>
@@ -53,9 +61,11 @@ public class OrchestrationRegister
         }
 
         _knownOrchestrationDescriptions.Add(orchestrationDescription);
+
+        return Task.CompletedTask;
     }
 
-    public void Deregister(string name, int version)
+    public Task DeregisterAsync(string name, int version)
     {
         var orchestratorDescription = _knownOrchestrationDescriptions
             .SingleOrDefault(x =>
@@ -67,6 +77,8 @@ public class OrchestrationRegister
             throw new InvalidOperationException("Orchestration description has not been registered.");
         }
 
-        _knownOrchestrationDescriptions.Remove(orchestratorDescription);
+        orchestratorDescription.IsEnabled = false;
+
+        return Task.CompletedTask;
     }
 }

@@ -21,5 +21,22 @@ namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 /// </summary>
 public class DFOrchestrationDescription : OrchestrationDescription
 {
-    public string? FunctionName { get; set; }
+    public DFOrchestrationDescription(
+        string name,
+        int version,
+        bool canBeScheduled,
+        string hostName,
+        bool isEnabled,
+        string functionName)
+        : base(
+            name,
+            version,
+            canBeScheduled,
+            hostName,
+            isEnabled)
+    {
+        FunctionName = functionName;
+    }
+
+    public string FunctionName { get; }
 }

@@ -22,18 +22,49 @@ namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 /// </summary>
 public abstract class OrchestrationDescription
 {
+    public OrchestrationDescription(
+        string name,
+        int version,
+        bool canBeScheduled,
+        string hostName,
+        bool isEnabled)
+    {
+        Name = name;
+        Version = version;
+        HostName = hostName;
+        IsEnabled = isEnabled;
+        CanBeScheduled = canBeScheduled;
+    }
+
     public OrchestrationDescriptionId? Id { get; set; }
 
-    public string? Name { get; set; }
+    public string Name { get; }
 
-    public int Version { get; set; }
+    public int Version { get; }
+
+    /// <summary>
+    /// Name of the Durable Function host in which the orchestration is implemented.
+    /// </summary>
+    public string HostName { get; }
+
+    /// <summary>
+    /// Specifies if the orchestration is enabled and hence can be started.
+    /// Can be used to disable obsolete orchestrations that we have removed from code,
+    /// but which we cannot delete in the database because we still need the execution history.
+    /// </summary>
+    public bool IsEnabled { get; internal set; }
 
     /// <summary>
     /// Flavor text describing an orchestration for end users.
     /// </summary>
     public string? Description { get; set; }
 
-    public bool CanBeScheduled { get; set; }
+    /// <summary>
+    /// Specifies if the orchestration supports scheduling.
+    /// If <see langword="false"/> then the orchestration can only
+    /// be started directly (on-demand) and doesn't support scheduling.
+    /// </summary>
+    public bool CanBeScheduled { get; }
 
     public IList<OrchestrationParameterDefinition> Parameters { get; }
         = [];

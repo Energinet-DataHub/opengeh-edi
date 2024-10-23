@@ -1,0 +1,78 @@
+﻿// Copyright 2020 Energinet DataHub A/S
+//
+// Licensed under the Apache License, Version 2.0 (the "License2");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Domain;
+using Microsoft.Extensions.Logging;
+
+namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Register;
+
+/// <summary>
+/// Responsible for the registration of orchestrations during application startup.
+/// </summary>
+public class HostStartupRegistrator(
+    ILogger<HostStartupRegistrator> logger,
+    OrchestrationRegister register)
+{
+    private readonly ILogger _logger = logger;
+    private readonly OrchestrationRegister _register = register;
+
+    /// <summary>
+    /// Synchronize the orchestration register with the Durable Functions orchestrations for the current host.
+    /// Register any orchestration descriptions that doesn't already exists in the orchestration register.
+    /// Disable any orchestration descriptions that doesn't exists in the host.
+    /// </summary>
+    /// <param name="hostName">Name of the application hosting the Durable Functions orchestrations.</param>
+    /// <param name="hostRegistrations">List of orchestration descriptions that describes Durable Function orchestrations
+    /// known to the current application host.</param>
+    public async Task SynchronizeHostOrchestrationsAsync(
+        string hostName,
+        IReadOnlyCollection<DFOrchestrationDescription> hostRegistrations)
+    {
+        try
+        {
+            var registerDescriptions = await _register.GetAllByHostNameAsync(hostName).ConfigureAwait(false);
+
+            // Deregister orchestrations not known to the host anymore
+            foreach (var registerDescription in registerDescriptions)
+            {
+                var hostDescription = hostRegistrations.SingleOrDefault(x =>
+                    x.Name == registerDescription.Name
+                    && x.Version == registerDescription.Version);
+
+                if (hostDescription == null)
+                {
+                    await _register.DeregisterAsync(registerDescription.Name, registerDescription.Version).ConfigureAwait(false);
+                }
+            }
+
+            // Register orchestrations not known in the register
+            foreach (var hostDescription in hostRegistrations)
+            {
+                var registerDescription = registerDescriptions.SingleOrDefault(x =>
+                    x.Name == hostDescription.Name
+                    && x.Version == hostDescription.Version);
+
+                if (registerDescription == null)
+                {
+                    await _register.RegisterAsync(hostDescription).ConfigureAwait(false);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Could not register orchestrations during startup.");
+        }
+    }
+}

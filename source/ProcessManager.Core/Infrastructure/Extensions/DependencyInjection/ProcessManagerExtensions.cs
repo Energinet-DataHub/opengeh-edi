@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.ProcessManagement.Core.Application;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Options;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Register;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask.Options;
@@ -71,9 +72,9 @@ public static class ProcessManagerExtensions
             .BindConfiguration(configSectionPath: string.Empty)
             .ValidateDataAnnotations();
 
-        // TODO: Add OrchestrationRegister (or similar) that can be used to register orchestrations on startup.
-        // TODO: Registration of orchestrations must be performed automatically on startup.
-        services.TryAddSingleton<OrchestrationRegister>(); // TODO: Remove, just testing
+        // TODO: Not sure what we want the lifetime to be for the following types
+        services.TryAddTransient<OrchestrationRegister>();
+        services.TryAddTransient<HostStartupRegistrator>();
 
         return services;
     }
