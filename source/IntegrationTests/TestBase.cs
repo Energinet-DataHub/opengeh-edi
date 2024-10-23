@@ -18,7 +18,6 @@ using Azure.Storage.Blobs;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
-using Energinet.DataHub.BuildingBlocks.Tests;
 using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
@@ -58,6 +57,8 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.Extensions.DependencyInjection;
+using Energinet.DataHub.Wholesale.Edi.Extensions.DependencyInjection;
 using Google.Protobuf;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -352,7 +353,9 @@ public class TestBase : IDisposable
             .AddAuditLog()
             .AddOutboxContext(config)
             .AddOutboxClient<OutboxContext>()
-            .AddOutboxProcessor<OutboxContext>();
+            .AddOutboxProcessor<OutboxContext>()
+            .AddCalculationResultsModule(config)
+            .AddEdiModule(config);
 
         // Replace the services with stub implementations.
         // - Building blocks
