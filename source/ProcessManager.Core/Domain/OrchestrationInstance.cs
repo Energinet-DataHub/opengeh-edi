@@ -16,11 +16,16 @@ using NodaTime;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 
-public class Orchestration
+/// <summary>
+/// Represents the instance of an orchestration.
+/// It contains state information about the instance, and is linked
+/// to the orchestration description that it is an instance of.
+/// </summary>
+public class OrchestrationInstance
 {
-    public OrchestrationId? Id { get; set; }
+    public OrchestrationInstanceId? Id { get; set; }
 
-    public IList<OrchestrationParameter> Parameters { get; }
+    public IList<OrchestrationParameterValue> ParameterValues { get; }
         = [];
 
     public Instant ScheduledAt { get; set; }
@@ -31,16 +36,20 @@ public class Orchestration
 
     public Instant CompletedAt { get; set; }
 
-    public IList<OrchestrationStep> Steps { get; }
+    /// <summary>
+    /// Workflow steps the orchestration instance is going through.
+    /// </summary>
+    public IList<OrchestrationStepInstance> Steps { get; }
         = [];
 
     /// <summary>
-    /// The overall state of the orchestration.
+    /// The overall state of the orchestration instance.
     /// </summary>
-    public OrchestrationState? State { get; set; }
+    public OrchestrationInstanceState? State { get; set; }
 
     /// <summary>
-    /// The orchestrator which is conducting the orchestration.
+    /// The Durable Function orchestration which describes the workflow that the
+    /// orchestration instance is an instance of.
     /// </summary>
-    public OrchestratorId? OrchestratorId { get; set; }
+    public OrchestrationDescriptionId? OrchestrationDescriptionId { get; set; }
 }

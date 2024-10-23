@@ -14,4 +14,14 @@
 
 namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 
-public record OrchestrationState(string Value);
+/// <summary>
+/// A definition of an orchestration parameter.
+/// It contains the information necessary to validate expected input parameters
+/// before accepting the execution of an orchestration.
+/// </summary>
+public class OrchestrationParameterDefinition
+{
+    public string? Name { get; set; }
+
+    public string? Type { get; set; }
+}

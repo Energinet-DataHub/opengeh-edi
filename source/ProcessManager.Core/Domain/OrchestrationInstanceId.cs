@@ -12,33 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
-
 namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 
-public class OrchestrationStep
-{
-    public OrchestrationStepId? Id { get; set; }
-
-    public string? Description { get; set; }
-
-    public Instant StartedAt { get; set; }
-
-    public Instant ChangedAt { get; set; }
-
-    public Instant CompletedAt { get; set; }
-
-    public OrchestrationStepId? DependsOn { get; set; }
-
-    public int Sequence { get; set; }
-
-    /// <summary>
-    /// The state of the step.
-    /// </summary>
-    public OrchestrationStepState? State { get; set; }
-
-    /// <summary>
-    /// The orchestration which this step is part of.
-    /// </summary>
-    public OrchestratorId? OrchestratorId { get; set; }
-}
+public record OrchestrationInstanceId(Guid Value);

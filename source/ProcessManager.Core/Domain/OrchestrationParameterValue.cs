@@ -14,4 +14,14 @@
 
 namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 
-public record OrchestrationStepState(string Value);
+/// <summary>
+/// Represent the input value given for an orchestration parameter.
+/// </summary>
+public class OrchestrationParameterValue
+{
+    public string? Name { get; set; }
+
+    public string? Type { get; set; }
+
+    public string? Value { get; set; }
+}

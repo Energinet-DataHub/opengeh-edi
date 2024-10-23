@@ -12,15 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManagement.Core.Domain;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using NodaTime;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Application;
 
 /// <summary>
 /// An encapsulation of <see cref="IDurableClient"/> that allows us to
-/// provide an abstraction using custom domain types to provide a "framework".
+/// provide a "framework" for managing orchestrations using custom domain types.
 /// </summary>
-/// <param name="durableClient">Must be a Durable Task Client that is connected to the same Task Hub as the Durable Functions host.</param>
+/// <param name="durableClient">Must be a Durable Task Client that is connected to
+/// the same Task Hub as the Durable Functions host containing orchestrations.</param>
 public class OrchestrationManager(
     IDurableClient durableClient)
 {
@@ -35,5 +38,28 @@ public class OrchestrationManager(
             .StartNewAsync(
                 "NotifyAggregatedMeasureDataOrchestration")
             .ConfigureAwait(false);
+    }
+
+    public OrchestrationInstanceId ScheduleOrchestration(
+        string name,
+        int version,
+        IReadOnlyCollection<OrchestrationParameterValue>? parameters,
+        Instant runAt)
+    {
+        return new OrchestrationInstanceId(Guid.NewGuid());
+    }
+
+    public void CancelScheduledOrchestration(
+        OrchestrationInstanceId id)
+    {
+    }
+
+    public IReadOnlyCollection<OrchestrationInstance> GetOrchestrations(string name, int? version)
+    {
+        return new List<OrchestrationInstance>();
+    }
+
+    public void UpdateOrchestration(OrchestrationInstance orchestration)
+    {
     }
 }

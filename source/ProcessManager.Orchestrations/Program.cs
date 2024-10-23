@@ -38,6 +38,6 @@ var host = new HostBuilder()
     .Build();
 
 // TODO: Remove, just testing
-var service = host.Services.GetRequiredService<OrchestratorRegister>();
+var service = host.Services.GetRequiredService<OrchestrationRegister>();
 
 await host.RunAsync().ConfigureAwait(false);

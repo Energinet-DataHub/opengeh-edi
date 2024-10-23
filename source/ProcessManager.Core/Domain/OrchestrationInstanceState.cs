@@ -14,15 +14,4 @@
 
 namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 
-/// <summary>
-/// Durable Function Orchestrator description contains the information
-/// necessary to locate and execute a Durable Function Orchestration.
-/// </summary>
-public class DFOrchestratorDescription : OrchestratorDescription
-{
-    public string? StorageAccountConnectionStringName { get; set; }
-
-    public string? TaskHubName { get; set; }
-
-    public string? FunctionName { get; set; }
-}
+public record OrchestrationInstanceState(string Value);

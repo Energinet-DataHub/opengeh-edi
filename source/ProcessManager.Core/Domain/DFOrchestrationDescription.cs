@@ -14,4 +14,12 @@
 
 namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 
-public record OrchestrationStepId(int Value);
+/// <summary>
+/// Durable Functions orchestration description.
+/// It contains the information necessary to locate and execute a Durable Functions
+/// orchestration.
+/// </summary>
+public class DFOrchestrationDescription : OrchestrationDescription
+{
+    public string? FunctionName { get; set; }
+}

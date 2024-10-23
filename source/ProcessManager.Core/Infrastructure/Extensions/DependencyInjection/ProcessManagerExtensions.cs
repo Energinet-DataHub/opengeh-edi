@@ -73,7 +73,7 @@ public static class ProcessManagerExtensions
 
         // TODO: Add OrchestrationRegister (or similar) that can be used to register orchestrations on startup.
         // TODO: Registration of orchestrations must be performed automatically on startup.
-        services.TryAddSingleton<OrchestratorRegister>(); // TODO: Remove, just testing
+        services.TryAddSingleton<OrchestrationRegister>(); // TODO: Remove, just testing
 
         return services;
     }

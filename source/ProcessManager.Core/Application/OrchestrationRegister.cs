@@ -13,32 +13,52 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManagement.Core.Domain;
-using NodaTime;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Application;
 
+/// <summary>
+/// Keep a register of known Durable Functions orchestrations.
+/// Each orchestration is registered with information by which
+/// it is possible to communicate with Durable Functions and
+/// start a new orchestration instance.
+/// </summary>
 public class OrchestrationRegister
 {
-    public OrchestrationId ScheduleOrchestration(
-        string name,
-        int version,
-        IReadOnlyCollection<OrchestrationParameter>? parameters,
-        Instant runAt)
+    private readonly List<OrchestrationDescription> _knownOrchestrators = [];
+
+    public OrchestrationDescription? GetOrchestratorDescriptionOrDefault(string name, int version)
     {
-        return new OrchestrationId(Guid.NewGuid());
+        return _knownOrchestrators
+            .SingleOrDefault(x =>
+                x.Name == name
+                && x.Version == version);
     }
 
-    public void CancelScheduledOrchestration(
-        OrchestrationId id)
+    public void Register(OrchestrationDescription orchestrator)
     {
+        if (_knownOrchestrators
+            .Any(x =>
+                x.Name == orchestrator.Name
+                && x.Version == orchestrator.Version))
+        {
+            throw new InvalidOperationException("Orchestrator has been registered before.");
+        }
+
+        _knownOrchestrators.Add(orchestrator);
     }
 
-    public IReadOnlyCollection<Orchestration> GetOrchestrations(string name, int? version)
+    public void Deregister(string name, int version)
     {
-        return new List<Orchestration>();
-    }
+        var orchestratorDescription = _knownOrchestrators
+            .SingleOrDefault(x =>
+                x.Name == name
+                && x.Version == version);
 
-    public void UpdateOrchestration(Orchestration orchestration)
-    {
+        if (orchestratorDescription == null)
+        {
+            throw new InvalidOperationException("Orchestrator has not been registered.");
+        }
+
+        _knownOrchestrators.Remove(orchestratorDescription);
     }
 }
