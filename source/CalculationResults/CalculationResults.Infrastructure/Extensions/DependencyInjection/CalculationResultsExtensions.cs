@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.CalculationResults;
 using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.CalculationResults.Statements;
 using Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults;
@@ -33,8 +34,7 @@ public static class CalculationResultsExtensions
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
-        // services.AddDatabricksSqlStatementForApplication(configuration); TODO: LRN
-        // services.AddDataLakeClientForApplication();
+        services.AddDatabricksSqlStatementExecution(configuration);
 
         // Used by sql statements (queries)
         services.AddOptions<DeltaTableOptions>()

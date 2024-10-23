@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Dapper;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
-using Energinet.DataHub.EDI.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
@@ -58,43 +56,6 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
     }
 
     [Fact]
-    public async Task Aggregated_measure_data_response_is_accepted() // TODO: Shouldn't we have a test with 2 series in the same accepted event, which creates 2 outgoing messages?
-    {
-        // Arrange
-        var expectedEventId = "expected-event-id";
-        await _gridAreaBuilder
-            .WithGridAreaCode(SampleData.GridAreaCode)
-            .StoreAsync(GetService<IMasterDataClient>());
-
-        var process = await BuildProcess(businessReason: BusinessReason.Correction);
-        var acceptedEvent = GetAcceptedEvent(process);
-
-        // Act
-        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id, expectedEventId);
-
-        // Assert
-        var outgoingMessage = await OutgoingMessageAsync(ActorRole.BalanceResponsibleParty, BusinessReason.Correction);
-
-        outgoingMessage
-            .HasProcessId(process.ProcessId)
-            .HasEventId(expectedEventId)
-            .HasBusinessReason(process.BusinessReason)
-            .HasReceiverId(process.RequestedByActor.ActorNumber.Value)
-            .HasReceiverRole(process.RequestedByActor.ActorRole.Code)
-            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
-            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
-            .HasProcessType(ProcessType.RequestEnergyResults)
-            .HasRelationTo(process.InitiatedByMessageId)
-            .HasGridAreaCode(acceptedEvent.Series.Single().GridArea)
-            .HasPointsInCorrectOrder<AcceptedEnergyResultMessageTimeSeries, decimal?>(timeSeries => timeSeries.Point.Select(x => x.Quantity).ToList(), acceptedEvent.Series.SelectMany(x => x.TimeSeriesPoints).OrderBy(x => x.Time).ToList())
-            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSeries => timeSeries.BalanceResponsibleNumber, process.BalanceResponsibleId)
-            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSeries => timeSeries.EnergySupplierNumber, process.EnergySupplierId)
-            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSeries => timeSeries.CalculationResultVersion, 1)
-            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSeries => timeSeries.OriginalTransactionIdReference, process.BusinessTransactionId)
-            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSeries => timeSeries.SettlementVersion, BuildingBlocks.Domain.Models.SettlementVersion.ThirdCorrection.Name);
-    }
-
-    [Fact]
     public async Task Received_2_accepted_events_for_same_aggregated_measure_data_process()
     {
         // Arrange
@@ -108,76 +69,12 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         // Act
         await AddInboxEvent(process, acceptedEvent);
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
-
-        // Assert
-        var outgoingMessage = await OutgoingMessageAsync(ActorRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
-
-        outgoingMessage
-            .HasBusinessReason(process.BusinessReason)
-            .HasReceiverId(process.RequestedByActor.ActorNumber.Value)
-            .HasReceiverRole(process.RequestedByActor.ActorRole.Code)
-            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
-            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
-            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1)
-            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.SettlementVersion, null);
-    }
-
-    [Fact]
-    public async Task Given_AcceptedInboxEventWithTwoSeries_When_ReceivingInboxEvent_Then_EachOutgoingMessageHasAUniqueTransactionId()
-    {
-        // Arrange
-        await _gridAreaBuilder
-            .WithGridAreaCode(SampleData.GridAreaCode)
-            .StoreAsync(GetService<IMasterDataClient>());
-
-        var process = await BuildProcess();
-        var acceptedEvent = GetAcceptedEvent(process);
-        acceptedEvent.Series.Add(acceptedEvent.Series.First());
-
-        // Act
-        await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
-
-        // Assert
-        var outgoingMessages = await AllOutgoingMessageAsync(ActorRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
-        outgoingMessages.Count.Should().Be(2);
-        var firstMessage = outgoingMessages.First();
-        var secondMessage = outgoingMessages.Last();
-
-        var seriesIdOfFirstMessage =
-            firstMessage.GetMessageValue<AcceptedEnergyResultMessageTimeSeries, TransactionId>(
-                series => series.TransactionId);
-        var seriesIdOfSecondMessage =
-            secondMessage.GetMessageValue<AcceptedEnergyResultMessageTimeSeries, TransactionId>(
-                series => series.TransactionId);
-
-        seriesIdOfFirstMessage.Should().NotBe(seriesIdOfSecondMessage);
-    }
-
-    [Fact]
-    public async Task Received_accepted_events_with_multiple_point_ensure_ordering_is_correct()
-    {
-        // Arrange
-        await _gridAreaBuilder
-            .WithGridAreaCode(SampleData.GridAreaCode)
-            .StoreAsync(GetService<IMasterDataClient>());
-
-        var process = await BuildProcess();
-        var acceptedEvent = GetAcceptedEvent(process);
-
-        // Act
         await AddInboxEvent(process, acceptedEvent);
         await HavingReceivedInboxEventAsync(nameof(AggregatedTimeSeriesRequestAccepted), acceptedEvent, process.ProcessId.Id);
 
         // Assert
-        var outgoingMessage = await OutgoingMessageAsync(ActorRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
-
-        outgoingMessage
-            .HasBusinessReason(process.BusinessReason)
-            .HasReceiverId(process.RequestedByActor.ActorNumber.Value)
-            .HasReceiverRole(process.RequestedByActor.ActorRole.Code)
-            .HasSenderRole(ActorRole.MeteredDataAdministrator.Code)
-            .HasSenderId(DataHubDetails.DataHubActorNumber.Value)
-            .HasMessageRecordValue<AcceptedEnergyResultMessageTimeSeries>(timeSerie => timeSerie.CalculationResultVersion, 1);
+        var outgoingMessage = await OutgoingMessagesAsync(ActorRole.BalanceResponsibleParty, BusinessReason.BalanceFixing);
+        outgoingMessage.Should().ContainSingle();
     }
 
     protected override void Dispose(bool disposing)
@@ -256,30 +153,6 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
                 acceptedEvent.ToByteArray());
     }
 
-    private async Task<AssertOutgoingMessage> OutgoingMessageAsync(
-        ActorRole roleOfReceiver,
-        BusinessReason businessReason)
-    {
-        return await AssertOutgoingMessage.OutgoingMessageAsync(
-            DocumentType.NotifyAggregatedMeasureData.Name,
-            businessReason.Name,
-            roleOfReceiver,
-            GetService<IDatabaseConnectionFactory>(),
-            GetService<IFileStorageClient>());
-    }
-
-    private async Task<IList<AssertOutgoingMessage>> AllOutgoingMessageAsync(
-        ActorRole roleOfReceiver,
-        BusinessReason businessReason)
-    {
-        return await AssertOutgoingMessage.AllOutgoingMessagesAsync(
-            DocumentType.NotifyAggregatedMeasureData.Name,
-            businessReason.Name,
-            roleOfReceiver,
-            GetService<IDatabaseConnectionFactory>(),
-            GetService<IFileStorageClient>());
-    }
-
     private async Task<AggregatedMeasureDataProcess> BuildProcess(ActorRole? receiverRole = null, BusinessReason? businessReason = null)
     {
         receiverRole ??= SampleData.BalanceResponsibleParty;
@@ -307,5 +180,24 @@ public class WhenAnAcceptedResultIsAvailableTests : TestBase
         _processContext.AggregatedMeasureDataProcesses.Add(process);
         await _processContext.SaveChangesAsync();
         return process;
+    }
+
+    private async Task<IReadOnlyCollection<dynamic>> OutgoingMessagesAsync(
+        ActorRole receiverRole,
+        BusinessReason businessReason)
+    {
+        ArgumentNullException.ThrowIfNull(businessReason);
+        ArgumentNullException.ThrowIfNull(receiverRole);
+
+        var connectionFactoryFactory = GetService<IDatabaseConnectionFactory>();
+        using var connection = await connectionFactoryFactory.GetConnectionAndOpenAsync(CancellationToken.None).ConfigureAwait(false);
+
+        var messages = await connection.QueryAsync(
+            $"SELECT m.Id, m.RecordId, m.DocumentType, m.DocumentReceiverNumber, m.DocumentReceiverRole, m.ReceiverNumber, m.ProcessId, m.BusinessReason," +
+            $"m.ReceiverRole, m.SenderId, m.SenderRole, m.FileStorageReference, m.RelatedToMessageId " +
+            $" FROM [dbo].[OutgoingMessages] m" +
+            $" WHERE m.DocumentType = '{DocumentType.NotifyAggregatedMeasureData.Name}' AND m.BusinessReason = '{businessReason.Name}' AND m.ReceiverRole = '{receiverRole.Code}'");
+
+        return messages.ToList().AsReadOnly();
     }
 }

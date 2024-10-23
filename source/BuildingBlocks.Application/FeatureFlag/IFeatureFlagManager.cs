@@ -28,4 +28,9 @@ public interface IFeatureFlagManager
     /// Whether to disallow actors to peek messages.
     /// </summary>
     Task<bool> UsePeekMessagesAsync();
+
+    /// <summary>
+    /// Whether to send RequestForAggregatedMeasuredData to Wholesale or handle it in EDI.
+    /// </summary>
+    Task<bool> RequestStaysInEdiAsync();
 }
