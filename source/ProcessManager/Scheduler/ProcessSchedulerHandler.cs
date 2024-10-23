@@ -26,7 +26,10 @@ public class ProcessSchedulerHandler(
         var x = 12 + 2;
         if (x == 13)
         {
-            await _orchestrationManager.StartOrchestrationAsync().ConfigureAwait(false);
+            await _orchestrationManager.StartOrchestrationAsync(
+                name: "NotifyAggregatedMeasureDataOrchestration",
+                version: 1)
+                .ConfigureAwait(false);
         }
     }
 }

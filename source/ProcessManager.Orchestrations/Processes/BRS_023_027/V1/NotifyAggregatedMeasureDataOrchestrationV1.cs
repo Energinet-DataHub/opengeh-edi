@@ -20,9 +20,9 @@ using Microsoft.DurableTask;
 namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1;
 
 // TODO: Implement according to guidelines: https://energinet.atlassian.net/wiki/spaces/D3/pages/824803345/Durable+Functions+Development+Guidelines
-internal class NotifyAggregatedMeasureDataOrchestration
+internal class NotifyAggregatedMeasureDataOrchestrationV1
 {
-    [Function(nameof(NotifyAggregatedMeasureDataOrchestration))]
+    [Function(nameof(NotifyAggregatedMeasureDataOrchestrationV1))]
     public async Task<string> Run(
         [OrchestrationTrigger] TaskOrchestrationContext context)
     {
