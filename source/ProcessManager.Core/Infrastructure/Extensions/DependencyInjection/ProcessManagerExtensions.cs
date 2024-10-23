@@ -82,9 +82,8 @@ public static class ProcessManagerExtensions
             .BindConfiguration(configSectionPath: string.Empty)
             .ValidateDataAnnotations();
 
+        // TODO: Not sure what we want the lifetime to be for the following types; they are only used once during startup
         services.TryAddTransient<IReadOnlyCollection<DFOrchestrationDescription>>(sp => enabledDescriptionsFactory());
-
-        // TODO: Not sure what we want the lifetime to be for the following types
         services.TryAddTransient<OrchestrationRegister>();
         services.TryAddTransient<OrchestrationRegisterSynchronizer>();
 
