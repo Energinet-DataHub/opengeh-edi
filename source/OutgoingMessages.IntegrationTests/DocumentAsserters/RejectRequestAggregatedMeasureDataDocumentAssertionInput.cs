@@ -15,7 +15,7 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
+namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 
 public record RejectRequestAggregatedMeasureDataDocumentAssertionInput(
     BusinessReason BusinessReason,

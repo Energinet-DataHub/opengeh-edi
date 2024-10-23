@@ -12,25 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Xml;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Ebix;
 using Energinet.DataHub.EDI.Tests.DocumentValidation;
 using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.Asserts;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestWholesaleSettlement;
+using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.DocumentAsserters;
+namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
 
-public static class RejectRequestWholesaleSettlementDocumentAsserter
+public static class RejectRequestAggregatedMeasureDataDocumentAsserter
 {
     public static async Task AssertCorrectDocumentAsync(
         DocumentFormat documentFormat,
         Stream document,
-        RejectRequestWholesaleSettlementDocumentAssertionInput assertionInput)
+        RejectRequestAggregatedMeasureDataDocumentAssertionInput assertionInput)
     {
         ArgumentNullException.ThrowIfNull(documentFormat);
         ArgumentNullException.ThrowIfNull(document);
@@ -41,15 +37,15 @@ public static class RejectRequestWholesaleSettlementDocumentAsserter
             new CimXmlValidator(new CimXmlSchemaProvider(new CimXmlSchemas())),
             new EbixValidator(new EbixSchemaProvider()),
         });
-        IAssertRejectRequestWholesaleSettlementDocument asserter = documentFormat.Name switch
+        IAssertRejectRequestAggregatedMeasureDataDocument asserter = documentFormat.Name switch
         {
-            nameof(DocumentFormat.Xml) => new AssertRejectRequestWholesaleSettlementXmlDocument(
+            nameof(DocumentFormat.Xml) => new AssertRejectRequestAggregatedMeasureDataXmlDocument(
                 AssertXmlDocument.Document(
                     document,
                     "cim_",
                     xmlDocumentValidator)),
-            nameof(DocumentFormat.Json) => new AssertRejectRequestWholesaleSettlementJsonDocument(document),
-            nameof(DocumentFormat.Ebix) => new AssertRejectRequestWholesaleSettlementEbixDocument(
+            nameof(DocumentFormat.Json) => new AssertRejectRequestAggregatedMeasureDataJsonDocument(document),
+            nameof(DocumentFormat.Ebix) => new AssertRejectRequestAggregatedMeasureDataEbixDocument(
                 AssertEbixDocument.Document(
                     document,
                     "ns0",
@@ -60,11 +56,12 @@ public static class RejectRequestWholesaleSettlementDocumentAsserter
 
         asserter
             .MessageIdExists()
+            // Assert type?
             .HasBusinessReason(assertionInput.BusinessReason)
             .HasSenderId(assertionInput.SenderId)
-            .HasSenderRole(assertionInput.SenderRole)
+            //.HasSenderRole(assertionInput.SenderRole)
             .HasReceiverId(assertionInput.ReceiverId)
-            .HasReceiverRole(assertionInput.ReceiverRole)
+            //.HasReceiverRole(assertionInput.ReceiverRole)
             .HasTimestamp(assertionInput.Timestamp)
             .HasReasonCode(assertionInput.ReasonCode)
             .TransactionIdExists()

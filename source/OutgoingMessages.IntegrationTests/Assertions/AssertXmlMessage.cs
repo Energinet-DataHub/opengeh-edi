@@ -12,15 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Xml.Linq;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Xunit;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Assertions;
+namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Assertions;
 
 internal sealed class AssertXmlMessage
 {

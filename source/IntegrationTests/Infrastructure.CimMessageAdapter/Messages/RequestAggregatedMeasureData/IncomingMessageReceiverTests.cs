@@ -67,13 +67,13 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
     {
         await CreateActorIfNotExistAsync(
             new CreateActorDto(
-                SampleData.StsAssignedUserId,
-                ActorNumber.Create(SampleData.SenderId)));
+                Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.TestData.SampleData.StsAssignedUserId,
+                ActorNumber.Create(Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.TestData.SampleData.SenderId)));
 
         await CreateActorIfNotExistAsync(
             new CreateActorDto(
-                SampleData.SecondStsAssignedUserId,
-                ActorNumber.Create(SampleData.SecondSenderId)));
+                Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.TestData.SampleData.SecondStsAssignedUserId,
+                ActorNumber.Create(Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.TestData.SampleData.SecondSenderId)));
     }
 
     public Task DisposeAsync()
@@ -159,7 +159,7 @@ public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
     {
         await using var message = BusinessMessageBuilder
             .RequestAggregatedMeasureData()
-            .WithSenderId(SampleData.SenderId)
+            .WithSenderId(Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.TestData.SampleData.SenderId)
             .Message();
 
         var messageParser = await ParseMessageAsync(message);

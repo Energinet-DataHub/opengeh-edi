@@ -21,9 +21,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
-using Xunit;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Assertions;
+namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Assertions;
 
 public class AssertOutgoingMessage
 {
