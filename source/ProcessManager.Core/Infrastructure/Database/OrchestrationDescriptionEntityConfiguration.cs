@@ -36,5 +36,7 @@ public class OrchestrationDescriptionEntityConfiguration : IEntityTypeConfigurat
         builder.Property(o => o.CanBeScheduled);
         builder.Property(o => o.HostName);
         builder.Property(o => o.IsEnabled);
+
+        // TODO: Add parameter definition; sry I had to change it :)
     }
 }

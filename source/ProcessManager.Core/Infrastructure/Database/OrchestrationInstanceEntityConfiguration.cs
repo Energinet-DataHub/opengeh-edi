@@ -31,13 +31,13 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                 id => id.Value,
                 dbValue => new OrchestrationInstanceId(dbValue));
 
-        builder.OwnsMany(o => o.ParameterValues, b => b.ToJson());
-
         builder.Property(o => o.CreatedAt);
         builder.Property(o => o.ScheduledAt);
         builder.Property(o => o.StartedAt);
         builder.Property(o => o.ChangedAt);
         builder.Property(o => o.CompletedAt);
+
+        // TODO: Add parameter value; sry I had to change it :)
 
         builder.OwnsMany(
             o => o.Steps,
