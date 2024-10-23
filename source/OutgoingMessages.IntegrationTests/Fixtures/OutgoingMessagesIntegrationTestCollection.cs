@@ -16,9 +16,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 
-[CollectionDefinition("IntegrationTest")]
+[CollectionDefinition(nameof(OutgoingMessagesIntegrationTestCollection))]
 [SuppressMessage("Naming", "CA1711:Identifiers should not have incorrect suffix", Justification = "Is actually a collection")]
-public class IntegrationTestCollection : ICollectionFixture<IntegrationTestFixture>
+public class OutgoingMessagesIntegrationTestCollection : ICollectionFixture<OutgoingMessagesTestFixture>
 {
     // This class has no code, and is never created. Its purpose is simply
     // to be the place to apply [CollectionDefinition] and all the

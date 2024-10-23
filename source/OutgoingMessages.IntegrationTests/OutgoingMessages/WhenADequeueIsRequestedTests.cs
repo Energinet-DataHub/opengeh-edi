@@ -34,9 +34,9 @@ public class WhenADequeueIsRequestedTests : OutgoingMessagesTestBase
     private readonly AcceptedEnergyResultMessageDtoBuilder _energyResultPerGridAreaMessageDtoBuilder;
 
     public WhenADequeueIsRequestedTests(
-        IntegrationTestFixture integrationTestFixture,
+        OutgoingMessagesTestFixture outgoingMessagesTestFixture,
         ITestOutputHelper testOutputHelper)
-        : base(integrationTestFixture, testOutputHelper)
+        : base(outgoingMessagesTestFixture, testOutputHelper)
     {
         _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder =
             new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();

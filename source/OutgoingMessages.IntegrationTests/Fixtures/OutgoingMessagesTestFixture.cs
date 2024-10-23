@@ -22,11 +22,11 @@ using HttpClientFactory = Energinet.DataHub.Core.FunctionApp.TestCommon.Databric
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 
-public class IntegrationTestFixture : IDisposable, IAsyncLifetime
+public class OutgoingMessagesTestFixture : IDisposable, IAsyncLifetime
 {
     private bool _disposed;
 
-    public IntegrationTestFixture()
+    public OutgoingMessagesTestFixture()
     {
         IntegrationTestConfiguration = new IntegrationTestConfiguration();
 

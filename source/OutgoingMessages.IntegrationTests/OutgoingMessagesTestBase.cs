@@ -48,15 +48,15 @@ using SampleData = Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Outgo
 
 namespace Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests;
 
-[Collection("IntegrationTest")]
+[Collection(nameof(OutgoingMessagesIntegrationTestCollection))]
 public class OutgoingMessagesTestBase : IDisposable
 {
     private ServiceCollection? _services;
     private bool _disposed;
 
-    protected OutgoingMessagesTestBase(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
+    protected OutgoingMessagesTestBase(OutgoingMessagesTestFixture outgoingMessagesTestFixture, ITestOutputHelper testOutputHelper)
     {
-        Fixture = integrationTestFixture;
+        Fixture = outgoingMessagesTestFixture;
 
         Fixture.DatabaseManager.CleanupDatabase();
         Fixture.CleanupFileStorage();
@@ -65,7 +65,7 @@ public class OutgoingMessagesTestBase : IDisposable
         AuthenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create("1234512345888"), restriction: Restriction.None, ActorRole.EnergySupplier));
     }
 
-    protected IntegrationTestFixture Fixture { get; }
+    protected OutgoingMessagesTestFixture Fixture { get; }
 
     protected FeatureFlagManagerStub FeatureFlagManagerStub { get; } = new();
 

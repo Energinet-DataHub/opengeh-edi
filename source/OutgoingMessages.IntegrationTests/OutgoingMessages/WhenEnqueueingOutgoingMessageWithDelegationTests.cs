@@ -42,8 +42,8 @@ public class WhenEnqueueingOutgoingMessageWithDelegationTests : OutgoingMessages
 
     private Actor _delegatedBy = CreateActor(ActorNumber.Create("1234567891234"));
 
-    public WhenEnqueueingOutgoingMessageWithDelegationTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
-        : base(integrationTestFixture, testOutputHelper)
+    public WhenEnqueueingOutgoingMessageWithDelegationTests(OutgoingMessagesTestFixture outgoingMessagesTestFixture, ITestOutputHelper testOutputHelper)
+        : base(outgoingMessagesTestFixture, testOutputHelper)
     {
         _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
         _outgoingMessagesClient = GetService<IOutgoingMessagesClient>();

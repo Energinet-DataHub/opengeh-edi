@@ -39,8 +39,8 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
     private readonly IOutgoingMessagesClient _outgoingMessagesClient;
     private readonly ClockStub _clockStub;
 
-    public WhenAPeekIsRequestedTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
-        : base(integrationTestFixture, testOutputHelper)
+    public WhenAPeekIsRequestedTests(OutgoingMessagesTestFixture outgoingMessagesTestFixture, ITestOutputHelper testOutputHelper)
+        : base(outgoingMessagesTestFixture, testOutputHelper)
     {
         _energyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder = new EnergyResultPerEnergySupplierPerBalanceResponsibleMessageDtoBuilder();
         _energyResultPerGridAreaMessageDtoBuilder = new EnergyResultPerGridAreaMessageDtoBuilder();
