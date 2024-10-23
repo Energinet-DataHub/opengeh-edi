@@ -14,29 +14,26 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessages.Request;
-using Energinet.DataHub.EDI.Tests.Infrastructure.OutgoingMessages.RejectRequestAggregatedMeasureData;
 
 namespace Energinet.DataHub.EDI.Tests.Factories;
 
-public static class RejectedEnergyResultMessageDtoBuilder
+public class RejectedEnergyResultMessageDtoBuilder
 {
-    private static readonly ActorNumber _receiverNumber = ActorNumber.Create("1234567890123");
+    private static readonly EventId _eventId = EventId.From(Guid.NewGuid());
     private static readonly Guid _processId = Guid.NewGuid();
-    private static readonly string _businessReason = BusinessReason.BalanceFixing.Code;
-    private static readonly ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
-    private static readonly MessageId _relatedToMessageId = MessageId.Create(Guid.NewGuid().ToString());
-
+    private static readonly string _businessReason = BusinessReason.BalanceFixing.Name;
     private static readonly RejectedEnergyResultMessageSerie _series = new(
-        SampleData.TransactionId,
-        new List<RejectedEnergyResultMessageRejectReason>
-        {
-            new(SampleData.SerieReasonCode, SampleData.SerieReasonMessage),
-        },
-        SampleData.OriginalTransactionId);
+        TransactionId.From("4E85A732-85FD-4D92-8FF3-72C052802716"),
+        new List<RejectedEnergyResultMessageRejectReason> { new("E18", "Det virker ikke!") },
+        TransactionId.From("4E85A732-85FD-4D92-8FF3-72C052802717"));
 
-    private static readonly EventId _eventId = EventId.From(Guid.NewGuid().ToString());
+    private static MessageId _relatedToMessageId = MessageId.Create(Guid.NewGuid().ToString());
+    private static ActorRole _receiverRole = ActorRole.MeteredDataResponsible;
+    private static ActorNumber _receiverNumber = ActorNumber.Create("1234567890123");
 
-    public static RejectedEnergyResultMessageDto Build()
+#pragma warning disable CA1822
+    public RejectedEnergyResultMessageDto Build()
+#pragma warning restore CA1822
     {
         return new RejectedEnergyResultMessageDto(
             _receiverNumber,
@@ -48,5 +45,23 @@ public static class RejectedEnergyResultMessageDtoBuilder
             _series,
             _receiverNumber,
             _receiverRole);
+    }
+
+    public RejectedEnergyResultMessageDtoBuilder WithRelationTo(MessageId relatedToMessageId)
+    {
+        _relatedToMessageId = relatedToMessageId;
+        return this;
+    }
+
+    public RejectedEnergyResultMessageDtoBuilder WithReceiverNumber(string receiverNumber)
+    {
+        _receiverNumber = ActorNumber.Create(receiverNumber);
+        return this;
+    }
+
+    public RejectedEnergyResultMessageDtoBuilder WithReceiverRole(ActorRole actorRole)
+    {
+        _receiverRole = actorRole;
+        return this;
     }
 }
