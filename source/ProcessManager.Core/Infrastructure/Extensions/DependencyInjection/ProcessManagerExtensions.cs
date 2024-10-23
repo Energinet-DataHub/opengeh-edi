@@ -82,7 +82,7 @@ public static class ProcessManagerExtensions
             .BindConfiguration(configSectionPath: string.Empty)
             .ValidateDataAnnotations();
 
-        services.TryAddSingleton<IReadOnlyCollection<DFOrchestrationDescription>>(sp => enabledDescriptionsFactory());
+        services.TryAddTransient<IReadOnlyCollection<DFOrchestrationDescription>>(sp => enabledDescriptionsFactory());
 
         // TODO: Not sure what we want the lifetime to be for the following types
         services.TryAddTransient<OrchestrationRegister>();
