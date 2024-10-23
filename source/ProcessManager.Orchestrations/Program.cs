@@ -14,11 +14,9 @@
 
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
-using Energinet.DataHub.ProcessManagement.Core.Domain;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.DependencyInjection;
-using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Register;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.OrchestrationsRegistration;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Telemetry;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var host = new HostBuilder()
@@ -38,17 +36,6 @@ var host = new HostBuilder()
     })
     .Build();
 
-// TODO: We should encapsulate and move it away from Program.cs (a method somewhere; perhaps an IHost extension)
-var registrator = host.Services.GetRequiredService<HostStartupRegistrator>();
-await registrator.SynchronizeHostOrchestrationsAsync(
-    hostName: "ProcessManager.Orchestrations",
-    [
-        new DFOrchestrationDescription(
-            name: "BRS_023_027",
-            version: 1,
-            canBeScheduled: true,
-            functionName: "NotifyAggregatedMeasureDataOrchestrationV1")
-    ])
-    .ConfigureAwait(false);
+await host.SynchronizeOrchestrationsAsync().ConfigureAwait(false);
 
 await host.RunAsync().ConfigureAwait(false);
