@@ -35,6 +35,7 @@ using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.RevisionLog.Integration.Options;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using Nito.AsyncEx;
 using Xunit;
 using Xunit.Abstractions;
 using HttpClientFactory = Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks.HttpClientFactory;

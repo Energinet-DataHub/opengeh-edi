@@ -35,7 +35,6 @@ public static class CalculationResultsExtensions
         ArgumentNullException.ThrowIfNull(configuration);
 
         services.AddDatabricksSqlStatementExecution(configuration);
-        // services.AddDataLakeClientForApplication(); TODO: LRN missing?
 
         // Used by sql statements (queries)
         services.AddOptions<DeltaTableOptions>()
