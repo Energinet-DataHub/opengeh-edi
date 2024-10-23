@@ -32,11 +32,11 @@ public class OrchestrationManager(
     /// <summary>
     /// Start a new instance of an orchestration.
     /// </summary>
-    public async Task StartOrchestrationAsync()
+    public async Task StartOrchestrationAsync(string name, int version)
     {
         var orchestrationInstanceId = await _durableClient
             .StartNewAsync(
-                "NotifyAggregatedMeasureDataOrchestration")
+                $"{name}V{version}")
             .ConfigureAwait(false);
     }
 

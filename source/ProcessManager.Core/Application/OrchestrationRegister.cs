@@ -24,41 +24,49 @@ namespace Energinet.DataHub.ProcessManagement.Core.Application;
 /// </summary>
 public class OrchestrationRegister
 {
-    private readonly List<OrchestrationDescription> _knownOrchestrators = [];
+    // TODO: I think we should just use 'DFOrchestrationDescription' for now
+    private readonly List<OrchestrationDescription> _knownOrchestrationDescriptions = [];
 
-    public OrchestrationDescription? GetOrchestratorDescriptionOrDefault(string name, int version)
+    public OrchestrationDescription? GetOrDefault(string name, int version)
     {
-        return _knownOrchestrators
+        return _knownOrchestrationDescriptions
             .SingleOrDefault(x =>
                 x.Name == name
                 && x.Version == version);
     }
 
-    public void Register(OrchestrationDescription orchestrator)
+    /// <summary>
+    /// Durable Functions orchestration host's can use this method to register the orchestrations
+    /// they host.
+    /// </summary>
+    /// <param name="orchestrationDescription"></param>
+    /// <exception cref="InvalidOperationException">Thrown if an orchestration description with the
+    /// same version and name has been registered before.</exception>
+    public void Register(OrchestrationDescription orchestrationDescription)
     {
-        if (_knownOrchestrators
+        if (_knownOrchestrationDescriptions
             .Any(x =>
-                x.Name == orchestrator.Name
-                && x.Version == orchestrator.Version))
+                x.Name == orchestrationDescription.Name
+                && x.Version == orchestrationDescription.Version))
         {
-            throw new InvalidOperationException("Orchestrator has been registered before.");
+            throw new InvalidOperationException("Orchestration description has been registered before.");
         }
 
-        _knownOrchestrators.Add(orchestrator);
+        _knownOrchestrationDescriptions.Add(orchestrationDescription);
     }
 
     public void Deregister(string name, int version)
     {
-        var orchestratorDescription = _knownOrchestrators
+        var orchestratorDescription = _knownOrchestrationDescriptions
             .SingleOrDefault(x =>
                 x.Name == name
                 && x.Version == version);
 
         if (orchestratorDescription == null)
         {
-            throw new InvalidOperationException("Orchestrator has not been registered.");
+            throw new InvalidOperationException("Orchestration description has not been registered.");
         }
 
-        _knownOrchestrators.Remove(orchestratorDescription);
+        _knownOrchestrationDescriptions.Remove(orchestratorDescription);
     }
 }
