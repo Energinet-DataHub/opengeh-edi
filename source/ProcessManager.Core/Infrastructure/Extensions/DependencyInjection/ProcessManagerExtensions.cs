@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.ProcessManagement.Core.Application;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Options;
-using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Register;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.OrchestrationsRegistration;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask.Options;

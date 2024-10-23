@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManagement.Core.Domain;
-using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Register;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.OrchestrationsRegistration;
 
@@ -28,19 +28,43 @@ public static class HostExtensions
     /// <summary>
     /// Register and deregister orchestrations during startup.
     /// </summary>
-    public static Task SynchronizeOrchestrationsAsync(this IHost host)
+    public static async Task SynchronizeOrchestrationsAsync(this IHost host)
     {
-        var brs_023_027 = new DFOrchestrationDescription(
+        var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
+        var logger = loggerFactory.CreateLogger(nameof(SynchronizeOrchestrationsAsync));
+
+        try
+        {
+            var orchestrationDescriptions = BuildOrchestrationDescriptions();
+
+            var registrator = host.Services.GetRequiredService<HostStartupRegistrator>();
+            await registrator
+                .SynchronizeHostOrchestrationsAsync(
+                    hostName: "ProcessManager.Orchestrations",
+                    orchestrationDescriptions)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Could not register orchestrations during startup.");
+        }
+    }
+
+    /// <summary>
+    /// Build descriptions for all Durable Function orchestrations that should be enabled.
+    /// Leave out descriptions for any Durable Function orchestrations that should be disabled.
+    /// </summary>
+    private static IReadOnlyCollection<DFOrchestrationDescription> BuildOrchestrationDescriptions()
+    {
+        var brs_023_027_v1 = new DFOrchestrationDescription(
             name: "BRS_023_027",
             version: 1,
             canBeScheduled: true,
             functionName: "NotifyAggregatedMeasureDataOrchestrationV1");
 
-        var registrator = host.Services.GetRequiredService<HostStartupRegistrator>();
-        return registrator.SynchronizeHostOrchestrationsAsync(
-            hostName: "ProcessManager.Orchestrations",
+        return
             [
-                brs_023_027,
-            ]);
+                brs_023_027_v1
+            ];
     }
 }

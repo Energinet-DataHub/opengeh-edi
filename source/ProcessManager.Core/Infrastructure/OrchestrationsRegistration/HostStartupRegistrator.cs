@@ -14,18 +14,15 @@
 
 using Energinet.DataHub.ProcessManagement.Core.Application;
 using Energinet.DataHub.ProcessManagement.Core.Domain;
-using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Register;
+namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.OrchestrationsRegistration;
 
 /// <summary>
 /// Responsible for the registration of orchestrations during application startup.
 /// </summary>
 public class HostStartupRegistrator(
-    ILogger<HostStartupRegistrator> logger,
     OrchestrationRegister register)
 {
-    private readonly ILogger _logger = logger;
     private readonly OrchestrationRegister _register = register;
 
     /// <summary>
@@ -34,48 +31,39 @@ public class HostStartupRegistrator(
     /// Disable any orchestration descriptions that doesn't exists in the host.
     /// </summary>
     /// <param name="hostName">Name of the application hosting the Durable Functions orchestrations.</param>
-    /// <param name="hostRegistrations">List of orchestration descriptions that describes Durable Function orchestrations
+    /// <param name="hostDescriptions">List of orchestration descriptions that describes Durable Function orchestrations
     /// known to the current application host.</param>
     public async Task SynchronizeHostOrchestrationsAsync(
         string hostName,
-        IReadOnlyCollection<DFOrchestrationDescription> hostRegistrations)
+        IReadOnlyCollection<DFOrchestrationDescription> hostDescriptions)
     {
-        try
+        var registerDescriptions = await _register.GetAllByHostNameAsync(hostName).ConfigureAwait(false);
+
+        // Deregister orchestrations not known to the host anymore
+        foreach (var registerDescription in registerDescriptions)
         {
-            var registerDescriptions = await _register.GetAllByHostNameAsync(hostName).ConfigureAwait(false);
+            var hostDescription = hostDescriptions.SingleOrDefault(x =>
+                x.Name == registerDescription.Name
+                && x.Version == registerDescription.Version);
 
-            // Deregister orchestrations not known to the host anymore
-            foreach (var registerDescription in registerDescriptions)
-            {
-                var hostDescription = hostRegistrations.SingleOrDefault(x =>
-                    x.Name == registerDescription.Name
-                    && x.Version == registerDescription.Version);
-
-                if (hostDescription == null)
-                {
-                    await _register.DeregisterAsync(registerDescription.Name, registerDescription.Version).ConfigureAwait(false);
-                }
-            }
-
-            // Register orchestrations not known in the register
-            foreach (var hostDescription in hostRegistrations)
-            {
-                var registerDescription = registerDescriptions.SingleOrDefault(x =>
-                    x.Name == hostDescription.Name
-                    && x.Version == hostDescription.Version);
-
-                if (registerDescription == null)
-                {
-                    // Enforce certain values
-                    hostDescription.HostName = hostName;
-                    hostDescription.IsEnabled = true;
-                    await _register.RegisterAsync(hostDescription).ConfigureAwait(false);
-                }
-            }
+            if (hostDescription == null)
+                await _register.DeregisterAsync(registerDescription.Name, registerDescription.Version).ConfigureAwait(false);
         }
-        catch (Exception ex)
+
+        // Register orchestrations not known in the register
+        foreach (var hostDescription in hostDescriptions)
         {
-            _logger.LogError(ex, "Could not register orchestrations during startup.");
+            var registerDescription = registerDescriptions.SingleOrDefault(x =>
+                x.Name == hostDescription.Name
+                && x.Version == hostDescription.Version);
+
+            if (registerDescription == null)
+            {
+                // Enforce certain values
+                hostDescription.HostName = hostName;
+                hostDescription.IsEnabled = true;
+                await _register.RegisterAsync(hostDescription).ConfigureAwait(false);
+            }
         }
     }
 }
