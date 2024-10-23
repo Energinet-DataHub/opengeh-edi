@@ -14,7 +14,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Energinet.DataHub.EDI.SubsystemTests.Factories;
-using Energinet.DataHub.EDI.SubsystemTests.Responses.xml;
+using Energinet.DataHub.EDI.SubsystemTests.Responses.Xml;
 using Energinet.DataHub.EDI.SubsystemTests.TestData;
 using Energinet.DataHub.EDI.SubsystemTests.Tests.B2BErrors.Asserters;
 using Xunit.Abstractions;

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using Energinet.DataHub.EDI.SubsystemTests.Responses.xml;
+using Energinet.DataHub.EDI.SubsystemTests.Responses.Xml;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Tests.B2BErrors.Asserters;
 

@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.Client;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV2;
+using Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV3;
 using Nito.AsyncEx;
 using NodaTime;
 using NodaTime.Text;
