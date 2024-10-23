@@ -34,9 +34,11 @@ public class OrchestrationManager(
     /// </summary>
     public async Task StartOrchestrationAsync(string name, int version)
     {
+        // TODO: Lookup description in register and use 'function name' to start the orchestration.
+        var functionName = "NotifyAggregatedMeasureDataOrchestrationV1";
         var orchestrationInstanceId = await _durableClient
             .StartNewAsync(
-                $"{name}V{version}")
+                functionName)
             .ConfigureAwait(false);
     }
 

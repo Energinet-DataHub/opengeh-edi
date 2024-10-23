@@ -13,11 +13,12 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManagement.Core.Domain;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.OrchestrationsRegistration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.OrchestrationsRegistration;
+namespace Energinet.DataHub.ProcessManager.Orchestrations;
 
 /// <summary>
 /// Provides extension methods for the <see cref="IHost"/> to ProcessManager related operations
@@ -35,6 +36,11 @@ public static class HostExtensions
 
         try
         {
+            // TODO:
+            // We could implement and register a "model builder" per orchestration.
+            // Then we could retrieve the list of registered model builders and use the list for the synchronization.
+            // This would allow us to also move current extension into the ProcessManager.Core so other host's
+            // could use the same code.
             var enabledDescriptions = BuildEnabledOrchestrationDescriptions();
 
             var synchronizer = host.Services.GetRequiredService<OrchestrationRegisterSynchronizer>();
