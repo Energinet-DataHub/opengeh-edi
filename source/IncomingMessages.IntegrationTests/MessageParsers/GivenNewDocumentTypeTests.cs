@@ -42,25 +42,34 @@ public class GivenNewIncomingDocumentTypeTests : IncomingMessagesTestBase
     {
     }
 
-    public static IEnumerable<object[]> GetAllIncomingDocumentTypeAndDocumentFormats()
+    public static TheoryData<IncomingDocumentType, DocumentFormat> GetAllIncomingDocumentTypeAndDocumentFormats
     {
-        var incomingDocumentTypes =
-            typeof(IncomingDocumentType).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
-        var documentFormats =
-            typeof(DocumentFormat).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
-
-        foreach (var documentType in incomingDocumentTypes)
+        get
         {
-            foreach (var documentFormat in documentFormats)
+            var data = new TheoryData<IncomingDocumentType, DocumentFormat>();
+
+            var incomingDocumentTypes =
+                typeof(IncomingDocumentType).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+            var documentFormats =
+                typeof(DocumentFormat).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+
+            foreach (var documentType in incomingDocumentTypes)
             {
-                yield return [documentType.GetValue(null)!, documentFormat.GetValue(null)!];
+                foreach (var documentFormat in documentFormats)
+                {
+                    data.Add((IncomingDocumentType)documentType.GetValue(null)!, (DocumentFormat)documentFormat.GetValue(null)!);
+                }
             }
+
+            return data;
         }
     }
 
     [Theory]
     [MemberData(nameof(GetAllIncomingDocumentTypeAndDocumentFormats))]
-    public async Task When_ParsingMessageOfDocumentTypeAndFormat_Then_ExpectedMessageParserFound(IncomingDocumentType incomingDocumentType, DocumentFormat documentFormat)
+    public async Task When_ParsingMessageOfDocumentTypeAndFormat_Then_ExpectedMessageParserFound(
+        IncomingDocumentType incomingDocumentType,
+        DocumentFormat documentFormat)
     {
         // Arrange
         var marketMessageParser = GetService<MarketMessageParser>();
