@@ -34,7 +34,7 @@ public class MarketMessageParser
         var parser = _parsers.FirstOrDefault(parser =>
             parser.HandledFormat.Equals(documentFormat) && parser.DocumentType.Equals(documentType));
         if (parser is null)
-            throw new InvalidOperationException($"No message parser found for message format '{documentFormat}'");
+            throw new InvalidOperationException($"No message parser found for message format '{documentFormat}' and document type '{documentType}'");
         return parser.ParseAsync(marketMessage, cancellationToken);
     }
 }
