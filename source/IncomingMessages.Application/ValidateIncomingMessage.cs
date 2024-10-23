@@ -18,7 +18,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.MessageId;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.TransactionId;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
+namespace Energinet.DataHub.EDI.IncomingMessages.Application;
 
 public class ValidateIncomingMessage
 {

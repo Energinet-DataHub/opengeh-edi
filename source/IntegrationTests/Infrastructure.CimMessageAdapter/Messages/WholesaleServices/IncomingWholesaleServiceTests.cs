@@ -16,6 +16,7 @@ using System.Text;
 using System.Text.Json;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.Application;
 using Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
