@@ -20,26 +20,72 @@ namespace Energinet.DataHub.ProcessManager.Core.IntegrationTests.Domain;
 public class DFOrchestrationParameterDefinitionTests
 {
     [Fact]
-    public async Task GivenRecordType_WhenSetParameterFromType_CanValidateParameter()
+    public async Task GivenSetFromType_WhenValidatingInstanceOfSameType_ThenIsValid()
     {
         // Arrange
         var sut = new DFOrchestrationParameterDefinition();
+        sut.SetFromType<OrchestrationParameterExample01>();
+
+        var instanceOfSameType = new OrchestrationParameterExample01(DateTimeOffset.Now, true);
 
         // Act
-        sut.SetFromType<OrchestrationParameterExample>();
+        var isValid = await sut.IsValidParameterValueAsync(instanceOfSameType);
 
         // Assert
-        var parameter = new OrchestrationParameterExample(DateTimeOffset.Now, true);
-        var isValid = await sut.IsValidParameterValueAsync(parameter);
-
         isValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task GivenSetFromType_WhenValidatingInstanceOfMatchingType_ThenIsValid()
+    {
+        // Arrange
+        var sut = new DFOrchestrationParameterDefinition();
+        sut.SetFromType<OrchestrationParameterExample01>();
+
+        var instanceOfMatchingType = new OrchestrationParameterExample02(DateTimeOffset.Now, true);
+
+        // Act
+        var isValid = await sut.IsValidParameterValueAsync(instanceOfMatchingType);
+
+        // Assert
+        isValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task GivenSetFromType_WhenValidatingInstanceOfAnotherType_ThenIsNotValid()
+    {
+        // Arrange
+        var sut = new DFOrchestrationParameterDefinition();
+        sut.SetFromType<OrchestrationParameterExample01>();
+
+        var instanceOfAnotherType = new OrchestrationParameterExample03(10, true);
+
+        // Act
+        var isValid = await sut.IsValidParameterValueAsync(instanceOfAnotherType);
+
+        // Assert
+        isValid.Should().BeFalse();
     }
 
     /// <summary>
     /// Example orchestration parameter for testing purposes.
     /// DOES NOT work if the parameter use the 'NodaTime.Instant' type.
     /// </summary>
-    public sealed record OrchestrationParameterExample(
+    public sealed record OrchestrationParameterExample01(
         DateTimeOffset ScheduledAt,
+        bool IsInternal);
+
+    /// <summary>
+    /// Example orchestration parameter for testing purposes.
+    /// </summary>
+    public sealed record OrchestrationParameterExample02(
+        DateTimeOffset ScheduledAt,
+        bool IsInternal);
+
+    /// <summary>
+    /// Example orchestration parameter for testing purposes.
+    /// </summary>
+    public sealed record OrchestrationParameterExample03(
+        int Version,
         bool IsInternal);
 }
