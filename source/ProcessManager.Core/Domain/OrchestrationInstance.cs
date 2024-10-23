@@ -23,33 +23,47 @@ namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 /// </summary>
 public class OrchestrationInstance
 {
-    public OrchestrationInstanceId? Id { get; set; }
+    public OrchestrationInstance(
+        OrchestrationDescriptionId orchestrationDescriptionId,
+        IClock clock,
+        IList<OrchestrationParameterValue> parameterValues)
+    {
+        Id = new OrchestrationInstanceId(Guid.NewGuid());
+        CreatedAt = clock.GetCurrentInstant();
+        State = new OrchestrationInstanceState("Created");
+
+        Steps = [];
+        OrchestrationDescriptionId = orchestrationDescriptionId;
+        ParameterValues = parameterValues;
+    }
+
+    public OrchestrationInstanceId Id { get; }
 
     public IList<OrchestrationParameterValue> ParameterValues { get; }
-        = [];
 
-    public Instant ScheduledAt { get; set; }
+    public Instant CreatedAt { get; }
 
-    public Instant StartedAt { get; set; }
+    public Instant? ScheduledAt { get; }
 
-    public Instant ChangedAt { get; set; }
+    public Instant? StartedAt { get; }
 
-    public Instant CompletedAt { get; set; }
+    public Instant? ChangedAt { get; }
+
+    public Instant? CompletedAt { get; }
 
     /// <summary>
     /// Workflow steps the orchestration instance is going through.
     /// </summary>
     public IList<OrchestrationStepInstance> Steps { get; }
-        = [];
 
     /// <summary>
     /// The overall state of the orchestration instance.
     /// </summary>
-    public OrchestrationInstanceState? State { get; set; }
+    public OrchestrationInstanceState State { get; }
 
     /// <summary>
     /// The Durable Function orchestration which describes the workflow that the
     /// orchestration instance is an instance of.
     /// </summary>
-    public OrchestrationDescriptionId? OrchestrationDescriptionId { get; set; }
+    public OrchestrationDescriptionId OrchestrationDescriptionId { get; }
 }

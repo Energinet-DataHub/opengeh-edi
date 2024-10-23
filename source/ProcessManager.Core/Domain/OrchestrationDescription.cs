@@ -27,12 +27,14 @@ public abstract class OrchestrationDescription
         int version,
         bool canBeScheduled)
     {
+        Id = new OrchestrationDescriptionId(Guid.NewGuid());
         Name = name;
         Version = version;
         CanBeScheduled = canBeScheduled;
+        Parameters = [];
     }
 
-    public OrchestrationDescriptionId? Id { get; private set; }
+    public OrchestrationDescriptionId Id { get;  }
 
     /// <summary>
     /// A name which combined with the <see cref="Version"/> uniquely identifies the orchestration.
@@ -64,5 +66,4 @@ public abstract class OrchestrationDescription
     public bool IsEnabled { get; set; }
 
     public IList<OrchestrationParameterDefinition> Parameters { get; }
-        = [];
 }
