@@ -43,7 +43,7 @@ public class OrchestrationInstance
     /// <summary>
     /// The JSON representation of the orchestration input parameter value.
     /// </summary>
-    public string SerializedParameterValue { get; set; }
+    public string SerializedParameterValue { get; set; } // TODO: Can we implement a 'OrchestrationParameterValue' similar to 'DFOrchestrationParameterDefinition' which we can set using a 'instance' which is then serialized into JSON?
 
     public Instant? ScheduledAt { get; }
 
