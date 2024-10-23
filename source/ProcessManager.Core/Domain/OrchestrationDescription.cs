@@ -25,39 +25,24 @@ public abstract class OrchestrationDescription
     public OrchestrationDescription(
         string name,
         int version,
-        bool canBeScheduled,
-        string hostName,
-        bool isEnabled)
+        bool canBeScheduled)
     {
         Name = name;
         Version = version;
-        HostName = hostName;
-        IsEnabled = isEnabled;
         CanBeScheduled = canBeScheduled;
     }
 
-    public OrchestrationDescriptionId? Id { get; set; }
+    public OrchestrationDescriptionId? Id { get; private set; }
 
+    /// <summary>
+    /// A name which combined with the <see cref="Version"/> uniquely identifies the orchestration.
+    /// </summary>
     public string Name { get; }
 
+    /// <summary>
+    /// A version which combined with the <see cref="Name"/> uniquely identifies the orchestration.
+    /// </summary>
     public int Version { get; }
-
-    /// <summary>
-    /// Name of the Durable Function host in which the orchestration is implemented.
-    /// </summary>
-    public string HostName { get; }
-
-    /// <summary>
-    /// Specifies if the orchestration is enabled and hence can be started.
-    /// Can be used to disable obsolete orchestrations that we have removed from code,
-    /// but which we cannot delete in the database because we still need the execution history.
-    /// </summary>
-    public bool IsEnabled { get; internal set; }
-
-    /// <summary>
-    /// Flavor text describing an orchestration for end users.
-    /// </summary>
-    public string? Description { get; set; }
 
     /// <summary>
     /// Specifies if the orchestration supports scheduling.
@@ -65,6 +50,18 @@ public abstract class OrchestrationDescription
     /// be started directly (on-demand) and doesn't support scheduling.
     /// </summary>
     public bool CanBeScheduled { get; }
+
+    /// <summary>
+    /// Name of the Durable Functions host where the orchestration is implemented.
+    /// </summary>
+    public string HostName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Specifies if the orchestration is enabled and hence can be started.
+    /// Can be used to disable obsolete orchestrations that we have removed from code,
+    /// but which we cannot delete in the database because we still need the execution history.
+    /// </summary>
+    public bool IsEnabled { get; set; }
 
     public IList<OrchestrationParameterDefinition> Parameters { get; }
         = [];

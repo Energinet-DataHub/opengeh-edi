@@ -66,6 +66,9 @@ public class HostStartupRegistrator(
 
                 if (registerDescription == null)
                 {
+                    // Enforce certain values
+                    hostDescription.HostName = hostName;
+                    hostDescription.IsEnabled = true;
                     await _register.RegisterAsync(hostDescription).ConfigureAwait(false);
                 }
             }

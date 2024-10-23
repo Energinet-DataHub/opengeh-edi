@@ -25,15 +25,11 @@ public class DFOrchestrationDescription : OrchestrationDescription
         string name,
         int version,
         bool canBeScheduled,
-        string hostName,
-        bool isEnabled,
         string functionName)
         : base(
             name,
             version,
-            canBeScheduled,
-            hostName,
-            isEnabled)
+            canBeScheduled)
     {
         FunctionName = functionName;
     }

@@ -40,17 +40,14 @@ var host = new HostBuilder()
 
 // TODO: We should encapsulate and move it away from Program.cs (a method somewhere; perhaps an IHost extension)
 var registrator = host.Services.GetRequiredService<HostStartupRegistrator>();
-var hostName = "ProcessManager.Orchestrations";
 await registrator.SynchronizeHostOrchestrationsAsync(
-    hostName,
+    hostName: "ProcessManager.Orchestrations",
     [
         new DFOrchestrationDescription(
-            name: "NotifyAggregatedMeasureDataOrchestration",
+            name: "BRS_023_027",
             version: 1,
             canBeScheduled: true,
-            hostName: hostName,
-            isEnabled: true,
-            functionName: "NotifyAggregatedMeasureDataOrchestration")
+            functionName: "NotifyAggregatedMeasureDataOrchestrationV1")
     ])
     .ConfigureAwait(false);
 
