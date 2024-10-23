@@ -74,9 +74,7 @@ public class OrchestrationRegister
                 && x.Version == version);
 
         if (orchestratorDescription == null)
-        {
             throw new InvalidOperationException("Orchestration description has not been registered.");
-        }
 
         orchestratorDescription.IsEnabled = false;
 
