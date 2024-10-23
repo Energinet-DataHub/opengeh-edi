@@ -36,6 +36,6 @@ var host = new HostBuilder()
     })
     .Build();
 
-await host.SynchronizeOrchestrationsAsync().ConfigureAwait(false);
+await host.SynchronizeWithOrchestrationRegisterAsync().ConfigureAwait(false);
 
 await host.RunAsync().ConfigureAwait(false);

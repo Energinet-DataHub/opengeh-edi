@@ -48,19 +48,20 @@ public class OrchestrationRegister
     /// they host.
     /// </summary>
     /// <param name="orchestrationDescription"></param>
-    /// <exception cref="InvalidOperationException">Thrown if an orchestration description with the
-    /// same version and name has been registered before.</exception>
     public Task RegisterAsync(DFOrchestrationDescription orchestrationDescription)
     {
-        if (_knownOrchestrationDescriptions
-            .Any(x =>
-                x.Name == orchestrationDescription.Name
-                && x.Version == orchestrationDescription.Version))
-        {
-            throw new InvalidOperationException("Orchestration description has been registered before.");
-        }
+        var existing = _knownOrchestrationDescriptions.SingleOrDefault(x =>
+            x.Name == orchestrationDescription.Name
+            && x.Version == orchestrationDescription.Version);
 
-        _knownOrchestrationDescriptions.Add(orchestrationDescription);
+        if (existing == null)
+        {
+            _knownOrchestrationDescriptions.Add(orchestrationDescription);
+        }
+        else
+        {
+            existing.IsEnabled = true;
+        }
 
         return Task.CompletedTask;
     }
