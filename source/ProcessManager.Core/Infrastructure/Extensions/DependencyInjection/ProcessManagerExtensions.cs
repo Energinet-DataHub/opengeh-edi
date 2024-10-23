@@ -74,7 +74,7 @@ public static class ProcessManagerExtensions
 
         // TODO: Not sure what we want the lifetime to be for the following types
         services.TryAddTransient<OrchestrationRegister>();
-        services.TryAddTransient<HostStartupRegistrator>();
+        services.TryAddTransient<OrchestrationRegisterSynchronizer>();
 
         return services;
     }

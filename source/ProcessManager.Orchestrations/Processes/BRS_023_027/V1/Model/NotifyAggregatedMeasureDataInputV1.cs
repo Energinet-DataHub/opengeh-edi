@@ -12,24 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Application;
+namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
 
-namespace Energinet.DataHub.ProcessManager.Scheduler;
-
-public class ProcessSchedulerHandler(
-    OrchestrationManager orchestrationManager)
-{
-    private readonly OrchestrationManager _orchestrationManager = orchestrationManager;
-
-    public async Task StartScheduledProcessAsync()
-    {
-        var x = 12 + 2;
-        if (x == 13)
-        {
-            await _orchestrationManager.StartOrchestrationAsync(
-                name: "BRS_023_027",
-                version: 1)
-                .ConfigureAwait(false);
-        }
-    }
-}
+/// <summary>
+/// An immutable input to start the <see cref="NotifyAggregatedMeasureDataOrchestrationV1"/>.
+/// </summary>
+public sealed record NotifyAggregatedMeasureDataInputV1(
+    DateTimeOffset StartDate,
+    DateTimeOffset EndDate,
+    DateTimeOffset ScheduledAt,
+    bool IsInternalCalculation);

@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json;
 using Energinet.DataHub.ProcessManagement.Core.Domain;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Schema;
+using Newtonsoft.Json.Schema.Generation;
 using NodaTime;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Application;
@@ -34,9 +38,35 @@ public class OrchestrationManager(
     /// </summary>
     public async Task StartOrchestrationAsync(string name, int version)
     {
+        // TODO: Look at generating Json Schema => https://www.newtonsoft.com/jsonschema/help/html/GeneratingSchemas.htm
+        // WARNING: Might require a license, so we might have to look for another solution, like: https://docs.json-everything.net/schema/basics/
+
+        var generator = new JSchemaGenerator();
+        var generatedSchema = generator.Generate(typeof(JustTestingParameters));
+
+        // => Schema saved to orchestration register
+        var persistedSchemaJson = generatedSchema.ToString();
+
+        // => Input parameter
+        var parameter = new JustTestingParameters(
+            DateTimeOffset.Now,
+            DateTimeOffset.Now.AddHours(1),
+            DateTimeOffset.Now,
+            true);
+        var serializedParameter = JsonSerializer.Serialize(parameter);
+
+        // => Validate serialized parameter
+        var reloadedSchema = JSchema.Parse(persistedSchemaJson);
+        var reloadedParameter = JObject.Parse(serializedParameter);
+
+        var isValid = reloadedParameter.IsValid(reloadedSchema);
+
+        // TODO: Lookup description in register and use 'function name' to start the orchestration.
+        var functionName = "NotifyAggregatedMeasureDataOrchestrationV1";
         var orchestrationInstanceId = await _durableClient
             .StartNewAsync(
-                $"{name}V{version}")
+                orchestratorFunctionName: functionName,
+                input: parameter)
             .ConfigureAwait(false);
     }
 

@@ -13,11 +13,12 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManagement.Core.Domain;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.OrchestrationsRegistration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.OrchestrationsRegistration;
+namespace Energinet.DataHub.ProcessManager.Orchestrations;
 
 /// <summary>
 /// Provides extension methods for the <see cref="IHost"/> to ProcessManager related operations
@@ -26,22 +27,27 @@ namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestrations
 public static class HostExtensions
 {
     /// <summary>
-    /// Register and deregister orchestrations during startup.
+    /// Register and deregister orchestrations during application startup.
     /// </summary>
-    public static async Task SynchronizeOrchestrationsAsync(this IHost host)
+    public static async Task SynchronizeWithOrchestrationRegisterAsync(this IHost host)
     {
         var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
-        var logger = loggerFactory.CreateLogger(nameof(SynchronizeOrchestrationsAsync));
+        var logger = loggerFactory.CreateLogger(nameof(SynchronizeWithOrchestrationRegisterAsync));
 
         try
         {
-            var orchestrationDescriptions = BuildOrchestrationDescriptions();
+            // TODO:
+            // We could implement and register a "model builder" per orchestration.
+            // Then we could retrieve the list of registered model builders and use the list for the synchronization.
+            // This would allow us to also move current extension into the ProcessManager.Core so other host's
+            // could use the same code.
+            var enabledDescriptions = BuildEnabledOrchestrationDescriptions();
 
-            var registrator = host.Services.GetRequiredService<HostStartupRegistrator>();
-            await registrator
-                .SynchronizeHostOrchestrationsAsync(
+            var synchronizer = host.Services.GetRequiredService<OrchestrationRegisterSynchronizer>();
+            await synchronizer
+                .SynchronizeAsync(
                     hostName: "ProcessManager.Orchestrations",
-                    orchestrationDescriptions)
+                    enabledDescriptions)
                 .ConfigureAwait(false);
         }
         catch (Exception ex)
@@ -54,7 +60,7 @@ public static class HostExtensions
     /// Build descriptions for all Durable Function orchestrations that should be enabled.
     /// Leave out descriptions for any Durable Function orchestrations that should be disabled.
     /// </summary>
-    private static IReadOnlyCollection<DFOrchestrationDescription> BuildOrchestrationDescriptions()
+    private static IReadOnlyCollection<DFOrchestrationDescription> BuildEnabledOrchestrationDescriptions()
     {
         var brs_023_027_v1 = new DFOrchestrationDescription(
             name: "BRS_023_027",

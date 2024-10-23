@@ -18,25 +18,28 @@ using Energinet.DataHub.ProcessManagement.Core.Domain;
 namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.OrchestrationsRegistration;
 
 /// <summary>
-/// Responsible for the registration of orchestrations during application startup.
+/// Register and deregister orchestrations in the orchestration register.
 /// </summary>
-public class HostStartupRegistrator(
+public class OrchestrationRegisterSynchronizer(
     OrchestrationRegister register)
 {
     private readonly OrchestrationRegister _register = register;
 
     /// <summary>
-    /// Synchronize the orchestration register with the Durable Functions orchestrations for the current host.
+    /// Synchronize the orchestration register with the Durable Functions orchestrations for an application host.
     /// Register any orchestration descriptions that doesn't already exists in the orchestration register.
-    /// Disable any orchestration descriptions that doesn't exists in the host.
+    /// Disable any orchestration descriptions that doesn't exists in the application host.
     /// </summary>
     /// <param name="hostName">Name of the application hosting the Durable Functions orchestrations.</param>
     /// <param name="hostDescriptions">List of orchestration descriptions that describes Durable Function orchestrations
-    /// known to the current application host.</param>
-    public async Task SynchronizeHostOrchestrationsAsync(
+    /// known to the application host.</param>
+    public async Task SynchronizeAsync(
         string hostName,
         IReadOnlyCollection<DFOrchestrationDescription> hostDescriptions)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(hostName);
+        ArgumentNullException.ThrowIfNull(hostDescriptions);
+
         var registerDescriptions = await _register.GetAllByHostNameAsync(hostName).ConfigureAwait(false);
 
         // Deregister orchestrations not known to the host anymore
@@ -50,14 +53,14 @@ public class HostStartupRegistrator(
                 await _register.DeregisterAsync(registerDescription.Name, registerDescription.Version).ConfigureAwait(false);
         }
 
-        // Register orchestrations not known in the register
+        // Register orchestrations not known (or previously disabled) in the register
         foreach (var hostDescription in hostDescriptions)
         {
             var registerDescription = registerDescriptions.SingleOrDefault(x =>
                 x.Name == hostDescription.Name
                 && x.Version == hostDescription.Version);
 
-            if (registerDescription == null)
+            if (registerDescription == null || registerDescription.IsEnabled == false)
             {
                 // Enforce certain values
                 hostDescription.HostName = hostName;
