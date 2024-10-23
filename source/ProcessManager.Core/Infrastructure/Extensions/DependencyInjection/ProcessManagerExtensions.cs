@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Domain;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Options;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.OrchestrationsRegistration;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
@@ -64,13 +65,24 @@ public static class ProcessManagerExtensions
     /// Register options and services for enabling an application to register Durable Functions Orchestrations
     /// that can later be e.g. started by using the <see cref="OrchestrationManager"/>.
     /// </summary>
-    public static IServiceCollection AddOrchestrationRegister(this IServiceCollection services)
+    /// <param name="services"></param>
+    /// <param name="enabledDescriptionsFactory">
+    /// Build descriptions for all Durable Function orchestrations that should be enabled.
+    /// Leave out descriptions for any Durable Function orchestrations that should be disabled.
+    /// </param>
+    public static IServiceCollection AddOrchestrationRegister(
+        this IServiceCollection services,
+        Func<IReadOnlyCollection<DFOrchestrationDescription>> enabledDescriptionsFactory)
     {
+        ArgumentNullException.ThrowIfNull(enabledDescriptionsFactory);
+
         // TODO: We want to enforce application settings are configured as expected. We need to use the options somewhere to do that!
         services
             .AddOptions<ProcessManagerOptions>()
             .BindConfiguration(configSectionPath: string.Empty)
             .ValidateDataAnnotations();
+
+        services.TryAddSingleton<IReadOnlyCollection<DFOrchestrationDescription>>(sp => enabledDescriptionsFactory());
 
         // TODO: Not sure what we want the lifetime to be for the following types
         services.TryAddTransient<OrchestrationRegister>();

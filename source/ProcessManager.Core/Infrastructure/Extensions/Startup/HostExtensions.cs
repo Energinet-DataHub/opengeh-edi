@@ -18,7 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.ProcessManager.Orchestrations;
+namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Startup;
 
 /// <summary>
 /// Provides extension methods for the <see cref="IHost"/> to ProcessManager related operations
@@ -36,13 +36,7 @@ public static class HostExtensions
 
         try
         {
-            // TODO:
-            // We could implement and register a "model builder" per orchestration.
-            // Then we could retrieve the list of registered model builders and use the list for the synchronization.
-            // This would allow us to also move current extension into the ProcessManager.Core so other host's
-            // could use the same code.
-            var enabledDescriptions = BuildEnabledOrchestrationDescriptions();
-
+            var enabledDescriptions = host.Services.GetRequiredService<IReadOnlyCollection<DFOrchestrationDescription>>();
             var synchronizer = host.Services.GetRequiredService<OrchestrationRegisterSynchronizer>();
             await synchronizer
                 .SynchronizeAsync(
@@ -54,23 +48,5 @@ public static class HostExtensions
         {
             logger.LogError(ex, "Could not register orchestrations during startup.");
         }
-    }
-
-    /// <summary>
-    /// Build descriptions for all Durable Function orchestrations that should be enabled.
-    /// Leave out descriptions for any Durable Function orchestrations that should be disabled.
-    /// </summary>
-    private static IReadOnlyCollection<DFOrchestrationDescription> BuildEnabledOrchestrationDescriptions()
-    {
-        var brs_023_027_v1 = new DFOrchestrationDescription(
-            name: "BRS_023_027",
-            version: 1,
-            canBeScheduled: true,
-            functionName: "NotifyAggregatedMeasureDataOrchestrationV1");
-
-        return
-            [
-                brs_023_027_v1
-            ];
     }
 }
