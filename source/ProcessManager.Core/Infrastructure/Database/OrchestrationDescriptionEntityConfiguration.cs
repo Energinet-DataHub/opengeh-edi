@@ -36,12 +36,13 @@ public class OrchestrationDescriptionEntityConfiguration : IEntityTypeConfigurat
         builder.Property(o => o.CanBeScheduled);
         builder.Property(o => o.HostName);
         builder.Property(o => o.IsEnabled);
+        builder.Property(o => o.FunctionName);
 
         builder.OwnsOne(
             o => o.ParameterDefinition,
             pd =>
             {
-                pd.Property("SerializedParameterDefinition")
+                pd.Property(OrchestrationParameterDefinition.ParameterDefinitionPropertyName)
                     .HasColumnName("ParameterDefinition");
             });
     }

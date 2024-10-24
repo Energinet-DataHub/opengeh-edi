@@ -49,7 +49,7 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
             o => o.Steps,
             b =>
             {
-                b.ToTable("OrchestrationInstanceStep");
+                b.ToTable("OrchestrationStep");
 
                 b.HasKey(s => s.Id);
                 b.Property(s => s.Id)
@@ -81,6 +81,11 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                         dbValue => new OrchestrationInstanceId(dbValue));
                 b.WithOwner().HasForeignKey(s => s.OrchestrationInstanceId);
             });
+
+        builder.Property(o => o.State)
+            .HasConversion(
+                state => state.Value,
+                dbValue => new OrchestrationInstanceState(dbValue));
 
         builder.Property(o => o.OrchestrationDescriptionId)
             .ValueGeneratedNever()
