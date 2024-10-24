@@ -15,6 +15,7 @@
 using Energinet.DataHub.ProcessManagement.Core.Application;
 using Energinet.DataHub.ProcessManagement.Core.Domain;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Options;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestration;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.OrchestrationsRegistration;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
@@ -59,8 +60,8 @@ public static class ProcessManagerExtensions
             return durableClient;
         });
 
-        services.TryAddScoped<OrchestrationManager>();
         services.TryAddScoped<IOrchestrationRegisterQueries, OrchestrationRegister>();
+        services.TryAddScoped<IOrchestrationManager, OrchestrationManager>();
 
         return services;
     }

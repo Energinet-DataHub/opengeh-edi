@@ -12,33 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManagement.Core.Application;
 using Energinet.DataHub.ProcessManagement.Core.Domain;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using NodaTime;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application;
+namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestration;
 
 /// <summary>
 /// An encapsulation of <see cref="IDurableClient"/> that allows us to
 /// provide a "framework" for managing orchestrations using custom domain types.
 /// </summary>
-/// <param name="clock"></param>
-/// <param name="durableClient">Must be a Durable Task Client that is connected to
-/// the same Task Hub as the Durable Functions host containing orchestrations.</param>
-/// <param name="orchestrationRegister"></param>
-public class OrchestrationManager(
-    IClock clock,
-    IDurableClient durableClient,
-    IOrchestrationRegisterQueries orchestrationRegister)
+public class OrchestrationManager : IOrchestrationManager
 {
-    private readonly IClock _clock = clock;
-    private readonly IDurableClient _durableClient = durableClient;
-    private readonly IOrchestrationRegisterQueries _orchestrationRegister = orchestrationRegister;
+    private readonly IClock _clock;
+    private readonly IDurableClient _durableClient;
+    private readonly IOrchestrationRegisterQueries _orchestrationRegister;
 
     /// <summary>
-    /// Start a new instance of an orchestration.
+    /// Construct manager.
     /// </summary>
-    public async Task StartOrchestrationAsync<TParameter>(string name, int version, TParameter parameter)
+    /// <param name="clock"></param>
+    /// <param name="durableClient">Must be a Durable Task Client that is connected to
+    /// the same Task Hub as the Durable Functions host containing orchestrations.</param>
+    /// <param name="orchestrationRegister"></param>
+    public OrchestrationManager(
+        IClock clock,
+        IDurableClient durableClient,
+        IOrchestrationRegisterQueries orchestrationRegister)
+    {
+        _clock = clock;
+        _durableClient = durableClient;
+        _orchestrationRegister = orchestrationRegister;
+    }
+
+    /// <inheritdoc />
+    public async Task<OrchestrationInstanceId> StartOrchestrationAsync<TParameter>(string name, int version, TParameter parameter)
         where TParameter : class
     {
         var orchestrationDescription = await _orchestrationRegister.GetOrDefaultAsync(name, version).ConfigureAwait(false);
@@ -62,28 +71,30 @@ public class OrchestrationManager(
                 orchestratorFunctionName: functionName,
                 input: instance.ParameterValue.SerializedParameterValue)
             .ConfigureAwait(false);
+
+        return new OrchestrationInstanceId(Guid.Parse(orchestrationInstanceId));
     }
 
-    public OrchestrationInstanceId ScheduleOrchestration<TParameter>(
+    /// <inheritdoc />
+    public Task<OrchestrationInstanceId> ScheduleOrchestrationAsync<TParameter>(
         string name,
         int version,
         TParameter parameter,
         Instant runAt)
+        where TParameter : class
     {
-        return new OrchestrationInstanceId(Guid.NewGuid());
+        return Task.FromResult(new OrchestrationInstanceId(Guid.NewGuid()));
     }
 
-    public void CancelScheduledOrchestration(
-        OrchestrationInstanceId id)
+    /// <inheritdoc />
+    public Task CancelScheduledOrchestrationAsync(OrchestrationInstanceId id)
     {
+        return Task.CompletedTask;
     }
 
-    public IReadOnlyCollection<OrchestrationInstance> GetOrchestrations(string name, int? version)
+    /// <inheritdoc />
+    public Task<IReadOnlyCollection<OrchestrationInstance>> GetOrchestrationInstancesAsync(string name, int? version)
     {
-        return [];
-    }
-
-    public void UpdateOrchestration(OrchestrationInstance orchestration)
-    {
+        return Task.FromResult((IReadOnlyCollection<OrchestrationInstance>)[]);
     }
 }

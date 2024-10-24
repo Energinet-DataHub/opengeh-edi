@@ -17,9 +17,9 @@ using Energinet.DataHub.ProcessManagement.Core.Application;
 namespace Energinet.DataHub.ProcessManager.Scheduler;
 
 public class ProcessSchedulerHandler(
-    OrchestrationManager orchestrationManager)
+    IOrchestrationManager orchestrationManager)
 {
-    private readonly OrchestrationManager _orchestrationManager = orchestrationManager;
+    private readonly IOrchestrationManager _orchestrationManager = orchestrationManager;
 
     public async Task StartScheduledProcessAsync()
     {
