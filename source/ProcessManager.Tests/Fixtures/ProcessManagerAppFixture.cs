@@ -19,6 +19,7 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Options;
+using Energinet.DataHub.ProcessManager.Core.Tests.Fixtures;
 using Energinet.DataHub.ProcessManager.Scheduler;
 using Xunit.Abstractions;
 
@@ -41,11 +42,14 @@ public class ProcessManagerAppFixture : IAsyncLifetime
         IntegrationTestConfiguration = new IntegrationTestConfiguration();
 
         AzuriteManager = new AzuriteManager(useOAuth: true);
+        DatabaseManager = new ProcessManagerDatabaseManager("ProcessManagerTest");
 
         HostConfigurationBuilder = new FunctionAppHostConfigurationBuilder();
     }
 
     public ITestDiagnosticsLogger TestLogger { get; }
+
+    public ProcessManagerDatabaseManager DatabaseManager { get; }
 
     [NotNull]
     public FunctionAppHostManager? AppHostManager { get; private set; }
@@ -56,13 +60,16 @@ public class ProcessManagerAppFixture : IAsyncLifetime
 
     private FunctionAppHostConfigurationBuilder HostConfigurationBuilder { get; }
 
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
         // Clean up old Azurite storage
         CleanupAzuriteStorage();
 
         // Storage emulator
         AzuriteManager.StartAzurite();
+
+        // Database
+        await DatabaseManager.CreateDatabaseAsync();
 
         // Prepare host settings
         var port = 8000;
@@ -71,16 +78,13 @@ public class ProcessManagerAppFixture : IAsyncLifetime
         // Create and start host
         AppHostManager = new FunctionAppHostManager(appHostSettings, TestLogger);
         StartHost(AppHostManager);
-
-        return Task.CompletedTask;
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
         AppHostManager.Dispose();
         AzuriteManager.Dispose();
-
-        return Task.CompletedTask;
+        await DatabaseManager.DeleteDatabaseAsync();
     }
 
     /// <summary>
@@ -152,12 +156,17 @@ public class ProcessManagerAppFixture : IAsyncLifetime
             IntegrationTestConfiguration.ApplicationInsightsConnectionString);
 
         // ProcessManager
+        // => Task Hub
         appHostSettings.ProcessEnvironmentVariables.Add(
             nameof(ProcessManagerTaskHubOptions.ProcessManagerStorageConnectionString),
             AzuriteManager.FullConnectionString);
         appHostSettings.ProcessEnvironmentVariables.Add(
             nameof(ProcessManagerTaskHubOptions.ProcessManagerTaskHubName),
             TaskHubName);
+        // => Database
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"{ProcessManagerOptions.SectionName}__{nameof(ProcessManagerOptions.SqlDatabaseConnectionString)}",
+            DatabaseManager.ConnectionString);
 
         // Disable timer trigger (should be manually triggered in tests)
         appHostSettings.ProcessEnvironmentVariables.Add(
