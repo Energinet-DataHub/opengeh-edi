@@ -10,6 +10,7 @@
       "ProcessManager.IntegrationTests\\ProcessManager.IntegrationTests.csproj",
       "ProcessManager.Orchestrations.IntegrationTests\\ProcessManager.Orchestrations.IntegrationTests.csproj",
       "ProcessManager.Orchestrations\\ProcessManager.Orchestrations.csproj",
+      "ProcessManager.SubsystemTests\\ProcessManager.SubsystemTests.csproj",
       "ProcessManager\\ProcessManager.csproj"
     ]
   }

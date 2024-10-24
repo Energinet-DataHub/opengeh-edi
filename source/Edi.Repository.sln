@@ -176,7 +176,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contracts", "Contracts\Cont
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessManager.Client.IntegrationTests", "ProcessManager.Client.IntegrationTests\ProcessManager.Client.IntegrationTests.csproj", "{2C71465E-05DE-41DE-83E2-5BEC862ECDEF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessManager.Core.IntegrationTests", "ProcessManager.Core.IntegrationTests\ProcessManager.Core.IntegrationTests.csproj", "{997180C2-1E8D-4996-9AB7-0E992EF08EE0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessManager.Core.IntegrationTests", "ProcessManager.Core.IntegrationTests\ProcessManager.Core.IntegrationTests.csproj", "{997180C2-1E8D-4996-9AB7-0E992EF08EE0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{F73E0AE8-0F91-4E9E-B36A-D79FA7AD66E3}"
 	ProjectSection(SolutionItems) = preProject
@@ -188,21 +188,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ReleaseNotes", "ReleaseNote
 		..\docs\ProcessManager.Client\ReleaseNotes\ReleaseNotes.md = ..\docs\ProcessManager.Client\ReleaseNotes\ReleaseNotes.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edi", "Edi\Edi.csproj", "{20FA7A8F-9CBB-4135-85BB-2C23CA2AC650}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Edi", "Edi\Edi.csproj", "{20FA7A8F-9CBB-4135-85BB-2C23CA2AC650}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalculationResults.Interfaces", "CalculationResults\CalculationResults.Interfaces\CalculationResults.Interfaces.csproj", "{D58DB602-43EF-411C-A8E7-912E54CFDFEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalculationResults.Interfaces", "CalculationResults\CalculationResults.Interfaces\CalculationResults.Interfaces.csproj", "{D58DB602-43EF-411C-A8E7-912E54CFDFEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalculationResults.Infrastructure", "CalculationResults\CalculationResults.Infrastructure\CalculationResults.Infrastructure.csproj", "{4C0E9B87-7174-46A9-ADC2-C4E527035355}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalculationResults.Infrastructure", "CalculationResults\CalculationResults.Infrastructure\CalculationResults.Infrastructure.csproj", "{4C0E9B87-7174-46A9-ADC2-C4E527035355}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edi.UnitTests", "Edi.UnitTests\Edi.UnitTests.csproj", "{443978E7-B03D-456B-968F-F7421BA00B1F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Edi.UnitTests", "Edi.UnitTests\Edi.UnitTests.csproj", "{443978E7-B03D-456B-968F-F7421BA00B1F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IncomingMessages.IntegrationTests", "IncomingMessages.IntegrationTests\IncomingMessages.IntegrationTests.csproj", "{89B6C3EC-F8BC-412F-BE6C-772EF32CDCC0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IncomingMessages.IntegrationTests", "IncomingMessages.IntegrationTests\IncomingMessages.IntegrationTests.csproj", "{89B6C3EC-F8BC-412F-BE6C-772EF32CDCC0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{250825EE-BFD4-448C-BC57-EF8EBF2DC504}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{75A9EB8E-EEE3-443B-B497-F624E454DC22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutgoingMessages.IntegrationTests", "OutgoingMessages.IntegrationTests\OutgoingMessages.IntegrationTests.csproj", "{96A9EED1-F2E3-4409-94EC-701BD5E5261F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OutgoingMessages.IntegrationTests", "OutgoingMessages.IntegrationTests\OutgoingMessages.IntegrationTests.csproj", "{96A9EED1-F2E3-4409-94EC-701BD5E5261F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessManager.SubsystemTests", "ProcessManager.SubsystemTests\ProcessManager.SubsystemTests.csproj", "{DCF3843A-3F66-4A4F-B1FA-AF4BE9453D2C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -446,6 +448,10 @@ Global
 		{96A9EED1-F2E3-4409-94EC-701BD5E5261F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96A9EED1-F2E3-4409-94EC-701BD5E5261F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96A9EED1-F2E3-4409-94EC-701BD5E5261F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCF3843A-3F66-4A4F-B1FA-AF4BE9453D2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCF3843A-3F66-4A4F-B1FA-AF4BE9453D2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCF3843A-3F66-4A4F-B1FA-AF4BE9453D2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCF3843A-3F66-4A4F-B1FA-AF4BE9453D2C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -537,10 +543,11 @@ Global
 		{D58DB602-43EF-411C-A8E7-912E54CFDFEA} = {5E56C03C-09BD-4F47-917E-4D5B03E4EE0E}
 		{4C0E9B87-7174-46A9-ADC2-C4E527035355} = {5E56C03C-09BD-4F47-917E-4D5B03E4EE0E}
 		{443978E7-B03D-456B-968F-F7421BA00B1F} = {5E56C03C-09BD-4F47-917E-4D5B03E4EE0E}
-		{250825EE-BFD4-448C-BC57-EF8EBF2DC504} = {631F1E84-DFA2-4B0B-BDB4-1431D9D92652}
 		{89B6C3EC-F8BC-412F-BE6C-772EF32CDCC0} = {250825EE-BFD4-448C-BC57-EF8EBF2DC504}
+		{250825EE-BFD4-448C-BC57-EF8EBF2DC504} = {631F1E84-DFA2-4B0B-BDB4-1431D9D92652}
 		{75A9EB8E-EEE3-443B-B497-F624E454DC22} = {8282F8A9-6B99-459B-8147-5C300169EB41}
 		{96A9EED1-F2E3-4409-94EC-701BD5E5261F} = {75A9EB8E-EEE3-443B-B497-F624E454DC22}
+		{DCF3843A-3F66-4A4F-B1FA-AF4BE9453D2C} = {FC13BF16-B445-41F9-997B-DFA02C35DF32}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C390B97-896A-4AAD-8609-3C20E80966D2}
