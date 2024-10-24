@@ -56,7 +56,7 @@ public class OrchestrationStep
     /// <summary>
     /// The state of the step.
     /// </summary>
-    public OrchestrationStepState? State { get; }
+    public OrchestrationStepState State { get; }
 
     /// <summary>
     /// The orchestration instance which this step is part of.

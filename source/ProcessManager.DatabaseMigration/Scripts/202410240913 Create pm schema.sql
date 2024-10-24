@@ -1,0 +1,4 @@
+﻿IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'pm2')
+BEGIN
+    EXEC('CREATE SCHEMA pm2');
+END
