@@ -28,8 +28,6 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.M
 public class MeteredDateForMeasurementPointEbixMessageParser(EbixSchemaProvider schemaProvider, ILogger<MeteredDateForMeasurementPointEbixMessageParser> logger) : IMarketMessageParser
 {
     private const string RootPayloadElementName = "DK_MeteredDataTimeSeries";
-    private const string HeaderElementName = "HeaderEnergyDocument";
-    private const string EnergyContextElementName = "ProcessEnergyContext";
     private const string SeriesElementName = "PayloadEnergyTimeSeries";
     private readonly EbixSchemaProvider _schemaProvider = schemaProvider;
     private readonly ILogger<MeteredDateForMeasurementPointEbixMessageParser> _logger = logger;
@@ -151,7 +149,7 @@ public class MeteredDateForMeasurementPointEbixMessageParser(EbixSchemaProvider 
         var document = await XDocument.LoadAsync(reader, LoadOptions.None, cancellationToken).ConfigureAwait(false);
         var ns = XNamespace.Get(@namespace);
 
-        var header = MessageHeaderExtractor.Extract(document, ns, HeaderElementName, EnergyContextElementName);
+        var header = MessageHeaderExtractor.Extract(document, ns);
         var listOfSeries = MeteredDataForMeasurementPointSeriesExtractor
             .ParseSeries(document, ns, SeriesElementName, header.SenderId)
             .ToList();

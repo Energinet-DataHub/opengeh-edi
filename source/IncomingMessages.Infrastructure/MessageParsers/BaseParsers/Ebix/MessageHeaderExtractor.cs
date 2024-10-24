@@ -18,6 +18,8 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.B
 
 internal static class MessageHeaderExtractor
 {
+    private const string HeaderElementName = "HeaderEnergyDocument";
+    private const string EnergyContextElementName = "ProcessEnergyContext";
     private const string Identification = "Identification";
     private const string DocumentType = "DocumentType";
     private const string Creation = "Creation";
@@ -29,11 +31,9 @@ internal static class MessageHeaderExtractor
 
     public static MessageHeader Extract(
         XDocument document,
-        XNamespace ns,
-        string headerElementName,
-        string energyContextElementName)
+        XNamespace ns)
     {
-        var headerElement = document.Descendants(ns + headerElementName).FirstOrDefault();
+        var headerElement = document.Descendants(ns + HeaderElementName).FirstOrDefault();
         if (headerElement == null) throw new InvalidOperationException("Header element not found");
 
         var messageId = headerElement.Element(ns + Identification)?.Value ?? string.Empty;
@@ -42,7 +42,7 @@ internal static class MessageHeaderExtractor
         var senderId = headerElement.Element(ns + SenderEnergyParty)?.Element(ns + Identification)?.Value ?? string.Empty;
         var receiverId = headerElement.Element(ns + RecipientEnergyParty)?.Element(ns + Identification)?.Value ?? string.Empty;
 
-        var energyContextElement = document.Descendants(ns + energyContextElementName).FirstOrDefault();
+        var energyContextElement = document.Descendants(ns + EnergyContextElementName).FirstOrDefault();
         if (energyContextElement == null) throw new InvalidOperationException("Energy Context element not found");
 
         var businessReason = energyContextElement.Element(ns + EnergyBusinessProcess)?.Value ?? string.Empty;
