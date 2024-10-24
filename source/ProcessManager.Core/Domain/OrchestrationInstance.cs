@@ -31,7 +31,8 @@ public class OrchestrationInstance
         CreatedAt = clock.GetCurrentInstant();
         State = new OrchestrationInstanceState("Created");
 
-        SerializedParameterValue = string.Empty;
+        ParameterValue = new();
+
         Steps = [];
         OrchestrationDescriptionId = orchestrationDescriptionId;
     }
@@ -41,9 +42,9 @@ public class OrchestrationInstance
     public Instant CreatedAt { get; }
 
     /// <summary>
-    /// The JSON representation of the orchestration input parameter value.
+    /// Defines the Durable Functions orchestration input parameter value.
     /// </summary>
-    public string SerializedParameterValue { get; set; } // TODO: Can we implement a 'OrchestrationParameterValue' similar to 'DFOrchestrationParameterDefinition' which we can set using a 'instance' which is then serialized into JSON?
+    public OrchestrationParameterValue ParameterValue { get; }
 
     public Instant? ScheduledAt { get; }
 
