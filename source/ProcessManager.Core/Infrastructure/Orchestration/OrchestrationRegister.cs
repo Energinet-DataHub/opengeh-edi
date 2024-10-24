@@ -14,6 +14,8 @@
 
 using Energinet.DataHub.ProcessManagement.Core.Application;
 using Energinet.DataHub.ProcessManagement.Core.Domain;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.OrchestrationsRegistration;
 
@@ -24,67 +26,67 @@ namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestrations
 /// </summary>
 public class OrchestrationRegister : IOrchestrationRegister, IOrchestrationRegisterQueries
 {
-    private readonly List<OrchestrationDescription> _knownOrchestrationDescriptions = [];
+    private readonly ProcessManagerContext _context;
+
+    public OrchestrationRegister(ProcessManagerContext context)
+    {
+        _context = context;
+    }
 
     /// <inheritdoc />
     public Task<OrchestrationDescription?> GetOrDefaultAsync(string name, int version, bool isEnabled = true)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
-        return Task.FromResult(_knownOrchestrationDescriptions
-            .SingleOrDefault(x =>
+        return _context.OrchestrationDescriptions
+            .SingleOrDefaultAsync(x =>
                 x.Name == name
                 && x.Version == version
-                && x.IsEnabled == isEnabled));
+                && x.IsEnabled == isEnabled);
     }
 
     /// <inheritdoc />
-    public Task<IReadOnlyCollection<OrchestrationDescription>> GetAllByHostNameAsync(string hostName)
+    public async Task<IReadOnlyCollection<OrchestrationDescription>> GetAllByHostNameAsync(string hostName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(hostName);
 
-        return Task.FromResult((IReadOnlyCollection<OrchestrationDescription>)_knownOrchestrationDescriptions
-            .Where(x =>
-                x.HostName == hostName)
-            .ToList());
+        var query = _context.OrchestrationDescriptions
+            .Where(x
+                => x.HostName == hostName);
+
+        return await query.ToListAsync().ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public Task RegisterAsync(OrchestrationDescription orchestrationDescription)
+    public async Task RegisterAsync(OrchestrationDescription orchestrationDescription)
     {
         ArgumentNullException.ThrowIfNull(orchestrationDescription);
 
-        var existing = _knownOrchestrationDescriptions.SingleOrDefault(x =>
-            x.Name == orchestrationDescription.Name
-            && x.Version == orchestrationDescription.Version);
-
+        var existing = await GetOrDefaultAsync(orchestrationDescription.Name, orchestrationDescription.Version).ConfigureAwait(false);
         if (existing == null)
         {
-            _knownOrchestrationDescriptions.Add(orchestrationDescription);
+            _context.Add(orchestrationDescription);
         }
         else
         {
             existing.IsEnabled = true;
         }
 
-        return Task.CompletedTask;
+        await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public Task DeregisterAsync(string name, int version)
+    public async Task DeregisterAsync(OrchestrationDescription orchestrationDescription)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentNullException.ThrowIfNull(orchestrationDescription);
 
-        var orchestratorDescription = _knownOrchestrationDescriptions
-            .SingleOrDefault(x =>
-                x.Name == name
-                && x.Version == version);
+        var existing = await GetOrDefaultAsync(orchestrationDescription.Name, orchestrationDescription.Version).ConfigureAwait(false);
 
-        if (orchestratorDescription == null)
+        if (existing == null)
             throw new InvalidOperationException("Orchestration description has not been registered.");
 
-        orchestratorDescription.IsEnabled = false;
+        existing.IsEnabled = false;
 
-        return Task.CompletedTask;
+        await _context.SaveChangesAsync().ConfigureAwait(false);
     }
 }

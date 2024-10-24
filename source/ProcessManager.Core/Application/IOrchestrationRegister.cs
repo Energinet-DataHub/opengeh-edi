@@ -27,8 +27,11 @@ public interface IOrchestrationRegister
     /// Durable Functions orchestration host's can use this method to register the orchestrations
     /// they host.
     /// </summary>
-    /// <param name="orchestrationDescription"></param>
     Task RegisterAsync(OrchestrationDescription orchestrationDescription);
 
-    Task DeregisterAsync(string name, int version);
+    /// <summary>
+    /// Durable Functions orchestration host's can use this method to disable orchestrations they don't host anymore
+    /// or want to disable for other reasons.
+    /// </summary>
+    Task DeregisterAsync(OrchestrationDescription orchestrationDescription);
 }

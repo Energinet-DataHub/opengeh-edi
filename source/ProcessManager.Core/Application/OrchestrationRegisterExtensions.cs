@@ -46,7 +46,7 @@ public static class OrchestrationRegisterExtensions
                     && x.Version == registerDescription.Version);
 
             if (hostDescription == null)
-                await register.DeregisterAsync(registerDescription.Name, registerDescription.Version).ConfigureAwait(false);
+                await register.DeregisterAsync(registerDescription).ConfigureAwait(false);
         }
 
         // Register orchestrations not known (or previously disabled) in the register
