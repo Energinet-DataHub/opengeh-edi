@@ -66,8 +66,9 @@ public static class ProcessManagerExtensions
                 return durableClient;
             });
 
-        // ProcessManager components
+        // ProcessManager components using interfaces to restrict access to functionality
         services.TryAddScoped<IOrchestrationRegisterQueries, OrchestrationRegister>();
+        services.TryAddScoped<IOrchestrationInstanceRepository, OrchestrationInstanceRepository>();
         services.TryAddScoped<IOrchestrationManager, OrchestrationManager>();
 
         return services;
@@ -99,8 +100,9 @@ public static class ProcessManagerExtensions
         // Orchestration Descriptions to register
         services.TryAddTransient<IReadOnlyCollection<OrchestrationDescription>>(sp => enabledDescriptionsFactory());
 
-        // ProcessManager components
+        // ProcessManager components using interfaces to restrict access to functionality
         services.TryAddTransient<IOrchestrationRegister, OrchestrationRegister>();
+        services.TryAddScoped<IOrchestrationInstanceProgressRepository, OrchestrationInstanceRepository>();
 
         return services;
     }
@@ -135,6 +137,7 @@ public static class ProcessManagerExtensions
                     providerOptionsBuilder.EnableRetryOnFailure();
                 });
             })
+            .AddScoped<IUnitOfWork, UnitOfWork>()
             .AddHealthChecks()
             .AddDbContextCheck<ProcessManagerContext>(name: "ProcesManagerDatabase");
 

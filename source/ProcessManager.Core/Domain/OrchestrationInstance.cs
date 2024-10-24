@@ -58,7 +58,7 @@ public class OrchestrationInstance
 
     public Instant? ScheduledAt { get; }
 
-    public Instant? StartedAt { get; }
+    public Instant? StartedAt { get; set; }
 
     public Instant? ChangedAt { get; }
 

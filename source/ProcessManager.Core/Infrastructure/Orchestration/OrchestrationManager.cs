@@ -28,6 +28,8 @@ public class OrchestrationManager : IOrchestrationManager
     private readonly IClock _clock;
     private readonly IDurableClient _durableClient;
     private readonly IOrchestrationRegisterQueries _orchestrationRegister;
+    private readonly IOrchestrationInstanceRepository _orchestrationInstanceRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     /// <summary>
     /// Construct manager.
@@ -36,43 +38,57 @@ public class OrchestrationManager : IOrchestrationManager
     /// <param name="durableClient">Must be a Durable Task Client that is connected to
     /// the same Task Hub as the Durable Functions host containing orchestrations.</param>
     /// <param name="orchestrationRegister"></param>
+    /// <param name="orchestrationInstanceRepository"></param>
+    /// <param name="unitOfWork"></param>
     public OrchestrationManager(
         IClock clock,
         IDurableClient durableClient,
-        IOrchestrationRegisterQueries orchestrationRegister)
+        IOrchestrationRegisterQueries orchestrationRegister,
+        IOrchestrationInstanceRepository orchestrationInstanceRepository,
+        IUnitOfWork unitOfWork)
     {
         _clock = clock;
         _durableClient = durableClient;
         _orchestrationRegister = orchestrationRegister;
+        _orchestrationInstanceRepository = orchestrationInstanceRepository;
+        _unitOfWork = unitOfWork;
     }
 
     /// <inheritdoc />
     public async Task<OrchestrationInstanceId> StartOrchestrationAsync<TParameter>(string name, int version, TParameter parameter)
         where TParameter : class
     {
+        // Validate orchestration description is knoww and paramter value is valid
         var orchestrationDescription = await _orchestrationRegister.GetOrDefaultAsync(name, version).ConfigureAwait(false);
-        if (orchestrationDescription != null)
+        if (orchestrationDescription == null)
         {
-            // TODO: Just do it...
+            throw new InvalidOperationException($"No orchestration description matches Name='{name}' and Version='{version}'.");
         }
 
-        // TODO: Lookup description in register and use 'function name' to start the orchestration.
-        var functionName = "NotifyAggregatedMeasureDataOrchestrationV1";
-        // TODO: Lookup description in register and validate input parameter type is valid.
+        var isValidParameterValue = await orchestrationDescription.ParameterDefinition.IsValidParameterValueAsync(parameter).ConfigureAwait(false);
+        if (isValidParameterValue == false)
+        {
+            throw new InvalidOperationException("Paramater value is not valid compared to registered parameter definition.");
+        }
 
-        // TODO: Create instance based on description.
-        var instance = new OrchestrationInstance(
-            new OrchestrationDescriptionId(Guid.NewGuid()),
+        // Create and commit orchestration instance
+        var orchestrationInstance = new OrchestrationInstance(
+            orchestrationDescription.Id,
             _clock);
-        instance.ParameterValue.SetFromInstance(parameter);
+        orchestrationInstance.ParameterValue.SetFromInstance(parameter);
 
-        var orchestrationInstanceId = await _durableClient
+        await _orchestrationInstanceRepository.AddAsync(orchestrationInstance).ConfigureAwait(false);
+        await _unitOfWork.CommitAsync().ConfigureAwait(false);
+
+        // Start orchestration
+        await _durableClient
             .StartNewAsync(
-                orchestratorFunctionName: functionName,
-                input: instance.ParameterValue.SerializedParameterValue)
+                orchestratorFunctionName: orchestrationDescription.FunctionName,
+                orchestrationInstance.Id.ToString(),
+                input: orchestrationInstance.ParameterValue.SerializedParameterValue)
             .ConfigureAwait(false);
 
-        return new OrchestrationInstanceId(Guid.Parse(orchestrationInstanceId));
+        return orchestrationInstance.Id;
     }
 
     /// <inheritdoc />

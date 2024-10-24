@@ -12,16 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Domain;
 using Microsoft.Azure.Functions.Worker;
+using NodaTime;
 
 namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Activities;
 
-internal class DoSomethingActivityV1()
+internal class DoSomethingActivityV1(
+    IClock clock,
+    IOrchestrationInstanceProgressRepository progressRepository,
+    IUnitOfWork unitOfWork)
 {
+    private readonly IClock _clock = clock;
+    private readonly IOrchestrationInstanceProgressRepository _progressRepository = progressRepository;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
     [Function(nameof(DoSomethingActivityV1))]
-    public Task<string> Run(
-        [ActivityTrigger] string orchestrationId)
+    public async Task Run(
+        [ActivityTrigger] string orchestrationInstanceId)
     {
-        return Task.FromResult(orchestrationId);
+        var orchestrationInstance = await _progressRepository
+            .GetAsync(new OrchestrationInstanceId(Guid.Parse(orchestrationInstanceId)))
+            .ConfigureAwait(false);
+
+        orchestrationInstance.StartedAt = _clock.GetCurrentInstant();
+        await _unitOfWork.CommitAsync().ConfigureAwait(false);
     }
 }
