@@ -36,6 +36,7 @@ public class OrchestrationDescriptionEntityConfiguration : IEntityTypeConfigurat
         builder.Property(o => o.CanBeScheduled);
         builder.Property(o => o.HostName);
         builder.Property(o => o.IsEnabled);
-        builder.OwnsMany(o => o.Parameters, b => b.ToJson());
+
+        // TODO: Add parameter definition; sry I had to change it :)
     }
 }

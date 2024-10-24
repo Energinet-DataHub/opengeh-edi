@@ -15,23 +15,27 @@
 namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 
 /// <summary>
-/// A base class for orchestration descriptions.
-/// It contains the information necessary to locate and execute an orchestration.
-/// Technology specific orchestrations can inherit from this class and add
-/// information necessary to execute that technologies orchestrations.
+/// Durable Functions orchestration description.
+/// It contains the information necessary to locate and execute a Durable Functions
+/// orchestration.
 /// </summary>
-public abstract class OrchestrationDescription
+public class OrchestrationDescription
 {
     public OrchestrationDescription(
         string name,
         int version,
-        bool canBeScheduled)
+        bool canBeScheduled,
+        string functionName)
     {
         Id = new OrchestrationDescriptionId(Guid.NewGuid());
         Name = name;
         Version = version;
         CanBeScheduled = canBeScheduled;
-        Parameters = [];
+
+        FunctionName = functionName;
+        ParameterDefinition = new();
+
+        HostName = string.Empty;
     }
 
     public OrchestrationDescriptionId Id { get;  }
@@ -54,9 +58,9 @@ public abstract class OrchestrationDescription
     public bool CanBeScheduled { get; }
 
     /// <summary>
-    /// Name of the Durable Functions host where the orchestration is implemented.
+    /// The name of the host where the orchestration is implemented.
     /// </summary>
-    public string HostName { get; set; } = string.Empty;
+    public string HostName { get; set; }
 
     /// <summary>
     /// Specifies if the orchestration is enabled and hence can be started.
@@ -65,5 +69,13 @@ public abstract class OrchestrationDescription
     /// </summary>
     public bool IsEnabled { get; set; }
 
-    public IList<OrchestrationParameterDefinition> Parameters { get; }
+    /// <summary>
+    /// The name of the Durable Functions orchestration implementation.
+    /// </summary>
+    public string FunctionName { get; }
+
+    /// <summary>
+    /// Defines the Durable Functions orchestration input parameter type.
+    /// </summary>
+    public OrchestrationParameterDefinition ParameterDefinition { get; }
 }

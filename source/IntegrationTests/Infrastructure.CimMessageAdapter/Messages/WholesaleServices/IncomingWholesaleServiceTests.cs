@@ -22,7 +22,6 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.TestData;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using FluentAssertions;
 using Xunit;
@@ -89,13 +88,13 @@ public class IncomingWholesaleServiceTests : TestBase, IAsyncLifetime
     {
         await CreateActorIfNotExistAsync(
             new CreateActorDto(
-                SampleData.StsAssignedUserId,
+                Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.TestData.SampleData.StsAssignedUserId,
                 ActorNumber.Create(SampleData.SenderId)));
 
         await CreateActorIfNotExistAsync(
             new CreateActorDto(
-                SampleData.SecondStsAssignedUserId,
-                ActorNumber.Create(SampleData.SecondSenderId)));
+                Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.TestData.SampleData.SecondStsAssignedUserId,
+                ActorNumber.Create(Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.TestData.SampleData.SecondSenderId)));
     }
 
     public Task DisposeAsync()

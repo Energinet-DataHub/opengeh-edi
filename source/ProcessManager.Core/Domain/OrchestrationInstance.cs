@@ -25,23 +25,26 @@ public class OrchestrationInstance
 {
     public OrchestrationInstance(
         OrchestrationDescriptionId orchestrationDescriptionId,
-        IClock clock,
-        IList<OrchestrationParameterValue> parameterValues)
+        IClock clock)
     {
         Id = new OrchestrationInstanceId(Guid.NewGuid());
         CreatedAt = clock.GetCurrentInstant();
         State = new OrchestrationInstanceState("Created");
 
+        ParameterValue = new();
+
         Steps = [];
         OrchestrationDescriptionId = orchestrationDescriptionId;
-        ParameterValues = parameterValues;
     }
 
     public OrchestrationInstanceId Id { get; }
 
-    public IList<OrchestrationParameterValue> ParameterValues { get; }
-
     public Instant CreatedAt { get; }
+
+    /// <summary>
+    /// Defines the Durable Functions orchestration input parameter value.
+    /// </summary>
+    public OrchestrationParameterValue ParameterValue { get; }
 
     public Instant? ScheduledAt { get; }
 
@@ -54,7 +57,7 @@ public class OrchestrationInstance
     /// <summary>
     /// Workflow steps the orchestration instance is going through.
     /// </summary>
-    public IList<OrchestrationStepInstance> Steps { get; }
+    public IList<OrchestrationStep> Steps { get; }
 
     /// <summary>
     /// The overall state of the orchestration instance.

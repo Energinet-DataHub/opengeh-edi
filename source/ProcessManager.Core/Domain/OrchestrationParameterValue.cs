@@ -12,16 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json;
+
 namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 
 /// <summary>
-/// Represent the input value given for an orchestration parameter.
+/// Store a Durable Functions orchestration input parameter value as JSON.
 /// </summary>
 public class OrchestrationParameterValue
 {
-    public string? Name { get; set; }
+    internal OrchestrationParameterValue()
+    {
+        SerializedParameterValue = string.Empty;
+    }
 
-    public string? Type { get; set; }
+    /// <summary>
+    /// The JSON representation of the orchestration input parameter value.
+    /// </summary>
+    public string SerializedParameterValue { get; private set; }
 
-    public string? Value { get; set; }
+    /// <summary>
+    /// Serialize the parameter value from an instance.
+    /// An input parameter for Durable Functions orchestration must be a <see langword="class"/>
+    /// (which includes <see langword="record"/>), and be serializable to JSON.
+    /// </summary>
+    public void SetFromInstance<TParameter>(TParameter instance)
+        where TParameter : class
+    {
+        ArgumentNullException.ThrowIfNull(instance);
+
+        SerializedParameterValue = JsonSerializer.Serialize(instance);
+    }
 }

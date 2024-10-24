@@ -6,7 +6,7 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <InternalsVisibleTo Include="Energinet.DataHub.ProcessManager.IntegrationTests"/>
+    <InternalsVisibleTo Include="Energinet.DataHub.ProcessManager.Tests"/>
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />

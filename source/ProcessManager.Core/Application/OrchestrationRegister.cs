@@ -24,17 +24,17 @@ namespace Energinet.DataHub.ProcessManagement.Core.Application;
 /// </summary>
 public class OrchestrationRegister
 {
-    private readonly List<DFOrchestrationDescription> _knownOrchestrationDescriptions = [];
+    private readonly List<OrchestrationDescription> _knownOrchestrationDescriptions = [];
 
-    public Task<IReadOnlyCollection<DFOrchestrationDescription>> GetAllByHostNameAsync(string hostName)
+    public Task<IReadOnlyCollection<OrchestrationDescription>> GetAllByHostNameAsync(string hostName)
     {
-        return Task.FromResult((IReadOnlyCollection<DFOrchestrationDescription>)_knownOrchestrationDescriptions
+        return Task.FromResult((IReadOnlyCollection<OrchestrationDescription>)_knownOrchestrationDescriptions
             .Where(x =>
                 x.HostName == hostName)
             .ToList());
     }
 
-    public Task<DFOrchestrationDescription?> GetOrDefaultAsync(string name, int version, bool isEnabled = true)
+    public Task<OrchestrationDescription?> GetOrDefaultAsync(string name, int version, bool isEnabled = true)
     {
         return Task.FromResult(_knownOrchestrationDescriptions
             .SingleOrDefault(x =>
@@ -48,7 +48,7 @@ public class OrchestrationRegister
     /// they host.
     /// </summary>
     /// <param name="orchestrationDescription"></param>
-    public Task RegisterAsync(DFOrchestrationDescription orchestrationDescription)
+    public Task RegisterAsync(OrchestrationDescription orchestrationDescription)
     {
         var existing = _knownOrchestrationDescriptions.SingleOrDefault(x =>
             x.Name == orchestrationDescription.Name

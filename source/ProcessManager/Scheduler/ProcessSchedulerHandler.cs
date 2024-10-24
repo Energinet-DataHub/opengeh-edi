@@ -28,7 +28,12 @@ public class ProcessSchedulerHandler(
         {
             await _orchestrationManager.StartOrchestrationAsync(
                 name: "BRS_023_027",
-                version: 1)
+                version: 1,
+                new ExampleInput(
+                    DateTimeOffset.Now,
+                    DateTimeOffset.Now.AddHours(1),
+                    DateTimeOffset.Now,
+                    true))
                 .ConfigureAwait(false);
         }
     }

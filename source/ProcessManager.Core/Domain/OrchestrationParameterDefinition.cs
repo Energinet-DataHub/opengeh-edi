@@ -12,16 +12,62 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json;
+using Microsoft.IdentityModel.Tokens;
+using NJsonSchema;
+
 namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 
 /// <summary>
-/// A definition of an orchestration parameter.
-/// It contains the information necessary to validate expected input parameters
-/// before accepting the execution of an orchestration.
+/// Defines a Durable Functions orchestration input parameter type using a JSON schema.
 /// </summary>
 public class OrchestrationParameterDefinition
 {
-    public string? Name { get; set; }
+    internal OrchestrationParameterDefinition()
+    {
+        SerializedParameterDefinition = string.Empty;
+    }
 
-    public string? Type { get; set; }
+    /// <summary>
+    /// The JSON schema defining the parameter type.
+    /// </summary>
+    private string SerializedParameterDefinition { get; set; }
+
+    /// <summary>
+    /// Set the parameter definition by specifying its type.
+    /// An input parameter for Durable Functions orchestration must be a <see langword="class"/>
+    /// (which includes <see langword="record"/>), and be serializable to JSON.
+    /// </summary>
+    public void SetFromType<TParameter>()
+        where TParameter : class
+    {
+        var jsonSchema = JsonSchema.FromType<TParameter>();
+
+        SerializedParameterDefinition = jsonSchema.ToJson();
+    }
+
+    /// <summary>
+    /// Validate <paramref name="parameterValue"/> against the defining JSON schema.
+    /// </summary>
+    public Task<bool> IsValidParameterValueAsync(object parameterValue)
+    {
+        ArgumentNullException.ThrowIfNull(parameterValue);
+
+        var serializedParameterValue = JsonSerializer.Serialize(parameterValue);
+
+        return IsValidParameterValueAsync(serializedParameterValue);
+    }
+
+    /// <summary>
+    /// Validate <paramref name="serializedParameterValue"/> against the defining JSON schema.
+    /// </summary>
+    public async Task<bool> IsValidParameterValueAsync(string serializedParameterValue)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(serializedParameterValue);
+
+        var jsonSchema = await JsonSchema.FromJsonAsync(SerializedParameterDefinition).ConfigureAwait(false);
+        var errors = jsonSchema.Validate(serializedParameterValue);
+
+        return errors.IsNullOrEmpty();
+    }
 }

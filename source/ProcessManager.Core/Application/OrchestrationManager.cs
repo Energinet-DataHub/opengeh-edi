@@ -12,12 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
 using Energinet.DataHub.ProcessManagement.Core.Domain;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema;
-using Newtonsoft.Json.Schema.Generation;
 using NodaTime;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Application;
@@ -36,33 +32,12 @@ public class OrchestrationManager(
     /// <summary>
     /// Start a new instance of an orchestration.
     /// </summary>
-    public async Task StartOrchestrationAsync(string name, int version)
+    public async Task StartOrchestrationAsync<TParameter>(string name, int version, TParameter parameter)
+        where TParameter : class
     {
-        // TODO: Look at generating Json Schema => https://www.newtonsoft.com/jsonschema/help/html/GeneratingSchemas.htm
-        // WARNING: Might require a license, so we might have to look for another solution, like: https://docs.json-everything.net/schema/basics/
-
-        var generator = new JSchemaGenerator();
-        var generatedSchema = generator.Generate(typeof(JustTestingParameters));
-
-        // => Schema saved to orchestration register
-        var persistedSchemaJson = generatedSchema.ToString();
-
-        // => Input parameter
-        var parameter = new JustTestingParameters(
-            DateTimeOffset.Now,
-            DateTimeOffset.Now.AddHours(1),
-            DateTimeOffset.Now,
-            true);
-        var serializedParameter = JsonSerializer.Serialize(parameter);
-
-        // => Validate serialized parameter
-        var reloadedSchema = JSchema.Parse(persistedSchemaJson);
-        var reloadedParameter = JObject.Parse(serializedParameter);
-
-        var isValid = reloadedParameter.IsValid(reloadedSchema);
-
         // TODO: Lookup description in register and use 'function name' to start the orchestration.
         var functionName = "NotifyAggregatedMeasureDataOrchestrationV1";
+        // TODO: Lookup description in register and validate input parameter type is valid.
         var orchestrationInstanceId = await _durableClient
             .StartNewAsync(
                 orchestratorFunctionName: functionName,
@@ -70,10 +45,10 @@ public class OrchestrationManager(
             .ConfigureAwait(false);
     }
 
-    public OrchestrationInstanceId ScheduleOrchestration(
+    public OrchestrationInstanceId ScheduleOrchestration<TParameter>(
         string name,
         int version,
-        IReadOnlyCollection<OrchestrationParameterValue>? parameters,
+        TParameter parameter,
         Instant runAt)
     {
         return new OrchestrationInstanceId(Guid.NewGuid());
@@ -86,7 +61,7 @@ public class OrchestrationManager(
 
     public IReadOnlyCollection<OrchestrationInstance> GetOrchestrations(string name, int? version)
     {
-        return new List<OrchestrationInstance>();
+        return [];
     }
 
     public void UpdateOrchestration(OrchestrationInstance orchestration)

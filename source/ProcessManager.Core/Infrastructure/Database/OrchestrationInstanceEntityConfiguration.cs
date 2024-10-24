@@ -31,13 +31,13 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                 id => id.Value,
                 dbValue => new OrchestrationInstanceId(dbValue));
 
-        builder.OwnsMany(o => o.ParameterValues, b => b.ToJson());
-
         builder.Property(o => o.CreatedAt);
         builder.Property(o => o.ScheduledAt);
         builder.Property(o => o.StartedAt);
         builder.Property(o => o.ChangedAt);
         builder.Property(o => o.CompletedAt);
+
+        // TODO: Add parameter value; sry I had to change it :)
 
         builder.OwnsMany(
             o => o.Steps,
@@ -50,7 +50,7 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                     .ValueGeneratedNever()
                     .HasConversion(
                         id => id.Value,
-                        dbValue => new OrchestrationStepInstanceId(dbValue));
+                        dbValue => new OrchestrationStepId(dbValue));
 
                 b.Property(s => s.Description);
 
@@ -62,12 +62,12 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                 b.Property(s => s.DependsOn)
                     .HasConversion(
                         id => id != null ? id.Value : (Guid?)null,
-                        dbValue => dbValue != null ? new OrchestrationStepInstanceId(dbValue.Value) : null);
+                        dbValue => dbValue != null ? new OrchestrationStepId(dbValue.Value) : null);
 
                 b.Property(s => s.State)
                     .HasConversion(
                         state => state.Value,
-                        dbValue => new OrchestrationStepInstanceState(dbValue));
+                        dbValue => new OrchestrationStepState(dbValue));
 
                 b.Property(s => s.OrchestrationInstanceId)
                     .HasConversion(
