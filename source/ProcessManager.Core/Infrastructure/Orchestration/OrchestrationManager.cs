@@ -84,7 +84,7 @@ public class OrchestrationManager : IOrchestrationManager
         await _durableClient
             .StartNewAsync(
                 orchestratorFunctionName: orchestrationDescription.FunctionName,
-                orchestrationInstance.Id.ToString(),
+                orchestrationInstance.Id.Value.ToString(),
                 input: orchestrationInstance.ParameterValue.SerializedParameterValue)
             .ConfigureAwait(false);
 

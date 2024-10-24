@@ -30,10 +30,10 @@ internal class DoSomethingActivityV1(
 
     [Function(nameof(DoSomethingActivityV1))]
     public async Task Run(
-        [ActivityTrigger] string orchestrationInstanceId)
+        [ActivityTrigger] Guid orchestrationInstanceId)
     {
         var orchestrationInstance = await _progressRepository
-            .GetAsync(new OrchestrationInstanceId(Guid.Parse(orchestrationInstanceId)))
+            .GetAsync(new OrchestrationInstanceId(orchestrationInstanceId))
             .ConfigureAwait(false);
 
         orchestrationInstance.StartedAt = _clock.GetCurrentInstant();
