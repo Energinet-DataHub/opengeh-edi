@@ -38,6 +38,16 @@ public class OrchestrationDescription
         HostName = string.Empty;
     }
 
+    /// <summary>
+    /// Used by Entity Framework
+    /// </summary>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    // ReSharper disable once UnusedMember.Local -- Used by Entity Framework
+    private OrchestrationDescription()
+    {
+    }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
     public OrchestrationDescriptionId Id { get;  }
 
     /// <summary>

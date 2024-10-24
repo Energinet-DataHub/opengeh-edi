@@ -15,63 +15,113 @@
 using Energinet.DataHub.ProcessManagement.Core.Domain;
 using Energinet.DataHub.ProcessManager.Core.Tests.Fixtures;
 using FluentAssertions;
+using NodaTime;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.ProcessManager.Core.Tests.Integration;
 
-[Collection(nameof(ProcessManagerCollectionFixture))]
-public class ProcessManagerContextTests : IAsyncLifetime
+[Collection(nameof(ProcessManagerCoreCollection))]
+public class ProcessManagerContextTests
 {
-    private readonly ProcessManagerDatabaseFixture _databaseFixture;
+    private readonly ProcessManagerCoreFixture _fixture;
     private readonly ITestOutputHelper _output;
 
-    public ProcessManagerContextTests(ProcessManagerDatabaseFixture databaseFixture, ITestOutputHelper output)
+    public ProcessManagerContextTests(ProcessManagerCoreFixture fixture, ITestOutputHelper output)
     {
-        _databaseFixture = databaseFixture;
+        _fixture = fixture;
         _output = output;
     }
 
-    public Task InitializeAsync()
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task DisposeAsync()
-    {
-        throw new NotImplementedException();
-    }
-
-    [Fact(Skip = "WIP")]
-    public async Task Given_OrchestrationDescription_WhenAddedToContext_HasCorrectValues()
+    [Fact]
+    public async Task Given_OrchestrationDescriptionAddedToDbContext_WhenRetrievingFromDatabase_HasCorrectValues()
     {
         // Arrange
-        var newOrchestrationDescription = new OrchestrationDescription(
+        var existingOrchestrationDescription = CreateOrchestrationDescription();
+
+        await using (var writeDbContext = _fixture.DatabaseManager.CreateDbContext())
+        {
+            writeDbContext.OrchestrationDescriptions.Add(existingOrchestrationDescription);
+            await writeDbContext.SaveChangesAsync();
+        }
+
+        // Act
+        await using var readDbContext = _fixture.DatabaseManager.CreateDbContext();
+        var orchestrationDescription = await readDbContext.OrchestrationDescriptions.FindAsync(existingOrchestrationDescription.Id);
+
+        // Assert
+        orchestrationDescription.Should()
+            .NotBeNull()
+            .And
+            .BeEquivalentTo(existingOrchestrationDescription);
+    }
+
+    [Fact]
+    public async Task Given_OrchestrationInstanceAddedToDbContext_WhenRetrievingFromDatabase_HasCorrectValues()
+    {
+        // Arrange
+        var existingOrchestrationDescription = CreateOrchestrationDescription();
+        var existingOrchestrationInstance = new OrchestrationInstance(
+            existingOrchestrationDescription.Id,
+            SystemClock.Instance);
+
+        var step1 = new OrchestrationStep(
+            existingOrchestrationInstance.Id,
+            "Test step 1",
+            null,
+            0);
+
+        var step2 = new OrchestrationStep(
+            existingOrchestrationInstance.Id,
+            "Test step 2",
+            step1.Id,
+            1);
+
+        var step3 = new OrchestrationStep(
+            existingOrchestrationInstance.Id,
+            "Test step 3",
+            null,
+            2);
+
+        existingOrchestrationInstance.Steps.Add(step1);
+        existingOrchestrationInstance.Steps.Add(step2);
+        existingOrchestrationInstance.Steps.Add(step3);
+
+        existingOrchestrationInstance.ParameterValue.SetFromInstance(new TestOrchestrationParameter
+        {
+            TestString = "Test string",
+            TestInt = 42,
+        });
+
+        await using (var writeDbContext = _fixture.DatabaseManager.CreateDbContext())
+        {
+            writeDbContext.OrchestrationDescriptions.Add(existingOrchestrationDescription);
+            writeDbContext.OrchestrationInstances.Add(existingOrchestrationInstance);
+            await writeDbContext.SaveChangesAsync();
+        }
+
+        // Act
+        await using var readDbContext = _fixture.DatabaseManager.CreateDbContext();
+        var orchestrationInstance = await readDbContext.OrchestrationInstances.FindAsync(existingOrchestrationInstance.Id);
+
+        // Assert
+        orchestrationInstance.Should()
+            .NotBeNull()
+            .And
+            .BeEquivalentTo(existingOrchestrationInstance);
+    }
+
+    private static OrchestrationDescription CreateOrchestrationDescription()
+    {
+        var existingOrchestrationDescription = new OrchestrationDescription(
             "TestOrchestration",
             4,
             true,
             "TestOrchestrationFunction");
 
-        newOrchestrationDescription
+        existingOrchestrationDescription
             .ParameterDefinition
             .SetFromType<TestOrchestrationParameter>();
-
-        // Act
-        using (var writeDbContext = _databaseFixture.DatabaseManager.CreateDbContext())
-        {
-            writeDbContext.OrchestrationDescriptions.Add(newOrchestrationDescription);
-            await writeDbContext.SaveChangesAsync();
-        }
-
-        // Assert
-        using (var readDbContext = _databaseFixture.DatabaseManager.CreateDbContext())
-        {
-            var orchestrationDescription = await readDbContext.OrchestrationDescriptions.FindAsync(newOrchestrationDescription.Id);
-
-            orchestrationDescription.Should()
-                .NotBeNull()
-                .And
-                .BeEquivalentTo(newOrchestrationDescription);
-        }
+        return existingOrchestrationDescription;
     }
 
     private class TestOrchestrationParameter

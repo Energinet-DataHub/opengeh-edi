@@ -14,11 +14,22 @@
 
 namespace Energinet.DataHub.ProcessManager.Core.Tests.Fixtures;
 
-/// <summary>
-/// A xUnit collection fixture for ensuring tests don't run in parallel.
-///
-/// xUnit documentation of collection fixtures:
-///  * https://xunit.net/docs/shared-context#collection-fixture
-/// </summary>
-[CollectionDefinition(nameof(ProcessManagerCollectionFixture))]
-public class ProcessManagerCollectionFixture : ICollectionFixture<ProcessManagerDatabaseFixture>;
+public class ProcessManagerCoreFixture : IAsyncLifetime
+{
+    public ProcessManagerCoreFixture()
+    {
+        DatabaseManager = new ProcessManagerDatabaseManager("ProcessManager");
+    }
+
+    public ProcessManagerDatabaseManager DatabaseManager { get; }
+
+    public async Task InitializeAsync()
+    {
+        await DatabaseManager.CreateDatabaseAsync();
+    }
+
+    public async Task DisposeAsync()
+    {
+        await DatabaseManager.DeleteDatabaseAsync();
+    }
+}

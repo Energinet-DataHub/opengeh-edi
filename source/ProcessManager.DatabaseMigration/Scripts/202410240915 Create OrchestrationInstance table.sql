@@ -3,7 +3,7 @@
     [Id]                UNIQUEIDENTIFIER NOT NULL,
     [RecordId]          BIGINT IDENTITY (1,1) NOT NULL,
 
-    [ParameterValues]               NVARCHAR(MAX) NOT NULL,
+    [ParameterValue]                NVARCHAR(MAX) NOT NULL,
     [CreatedAt]                     DATETIME2 NOT NULL,
     [ScheduledAt]                   DATETIME2 NULL,
     [StartedAt]                     DATETIME2 NULL,
