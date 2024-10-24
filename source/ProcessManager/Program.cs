@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
-using Energinet.DataHub.ProcessManagement.Core.Telemetry;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.DependencyInjection;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Telemetry;
 using Energinet.DataHub.ProcessManager.Scheduler;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,9 +28,13 @@ var host = new HostBuilder()
         // Common
         services.AddApplicationInsightsForIsolatedWorker(TelemetryConstants.SubsystemName);
         services.AddHealthChecksForIsolatedWorker();
+        services.AddNodaTimeForApplication();
 
         // Scheduler
         services.AddScoped<ProcessSchedulerHandler>();
+
+        // ProcessManager
+        services.AddProcessManagerCore();
     })
     .ConfigureLogging((hostingContext, logging) =>
     {

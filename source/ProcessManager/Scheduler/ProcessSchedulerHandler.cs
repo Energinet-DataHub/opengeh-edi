@@ -12,14 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.DurableTask.Client;
+using Energinet.DataHub.ProcessManagement.Core.Application;
 
 namespace Energinet.DataHub.ProcessManager.Scheduler;
 
-public class ProcessSchedulerHandler()
+public class ProcessSchedulerHandler(
+    IOrchestrationManager orchestrationManager)
 {
-    public Task StartScheduledProcessAsync(DurableTaskClient durableTaskClient, CancellationToken cancellationToken)
+    private readonly IOrchestrationManager _orchestrationManager = orchestrationManager;
+
+    public async Task StartScheduledProcessAsync()
     {
-        return Task.CompletedTask;
+        var x = 12 + 2;
+        if (x == 13)
+        {
+            await _orchestrationManager.StartOrchestrationAsync(
+                name: "BRS_023_027",
+                version: 1,
+                new ExampleInput(
+                    DateTimeOffset.Now,
+                    DateTimeOffset.Now.AddHours(1),
+                    DateTimeOffset.Now,
+                    true))
+                .ConfigureAwait(false);
+        }
     }
 }

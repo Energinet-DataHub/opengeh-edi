@@ -13,20 +13,18 @@
 // limitations under the License.
 
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.DurableTask.Client;
 
 namespace Energinet.DataHub.ProcessManager.Scheduler;
 
-internal class ProcessSchedulerTrigger(ProcessSchedulerHandler handler)
+internal class ProcessSchedulerTrigger(
+    ProcessSchedulerHandler handler)
 {
     private readonly ProcessSchedulerHandler _handler = handler;
 
     [Function(nameof(StartScheduledProcess))]
     public Task StartScheduledProcess(
-        [TimerTrigger("*/10 * * * * *")] TimerInfo timerTimerInfo, // Runs every 10 seconds
-        [DurableClient] DurableTaskClient durableTaskClient,
-        FunctionContext context)
+        [TimerTrigger("*/10 * * * * *")] TimerInfo timerInfo) // Runs every 10 seconds
     {
-        return _handler.StartScheduledProcessAsync(durableTaskClient, context.CancellationToken);
+        return _handler.StartScheduledProcessAsync();
     }
 }

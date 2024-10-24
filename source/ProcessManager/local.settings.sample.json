@@ -1,0 +1,11 @@
+﻿{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    // Process Manager:
+    //  - 'ProcessManager' (host) and 'ProcessManager.Orchestrations' (host) must use the same Task Hub
+    "ProcessManagerStorageConnectionString": "UseDevelopmentStorage=true",
+    "ProcessManagerTaskHubName": "Orchestrations01"
+  }
+}

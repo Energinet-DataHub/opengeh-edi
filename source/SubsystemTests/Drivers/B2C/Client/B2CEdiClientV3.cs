@@ -1,4 +1,4 @@
-// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -249,7 +249,7 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV3
                     var field = System.Reflection.IntrospectionExtensions.GetTypeInfo(value.GetType()).GetDeclaredField(name);
                     if (field != null)
                     {
-                        var attribute = System.Reflection.CustomAttributeExtensions.GetCustomAttribute(field, typeof(System.Runtime.Serialization.EnumMemberAttribute)) 
+                        var attribute = System.Reflection.CustomAttributeExtensions.GetCustomAttribute(field, typeof(System.Runtime.Serialization.EnumMemberAttribute))
                             as System.Runtime.Serialization.EnumMemberAttribute;
                         if (attribute != null)
                         {
@@ -261,7 +261,7 @@ namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.B2C.ClientV3
                     return converted == null ? string.Empty : converted;
                 }
             }
-            else if (value is bool) 
+            else if (value is bool)
             {
                 return System.Convert.ToString((bool)value, cultureInfo).ToLowerInvariant();
             }
