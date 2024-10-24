@@ -22,11 +22,14 @@ namespace Energinet.DataHub.ProcessManagement.Core.Application;
 /// An encapsulation of <see cref="IDurableClient"/> that allows us to
 /// provide a "framework" for managing orchestrations using custom domain types.
 /// </summary>
+/// <param name="clock"></param>
 /// <param name="durableClient">Must be a Durable Task Client that is connected to
 /// the same Task Hub as the Durable Functions host containing orchestrations.</param>
 public class OrchestrationManager(
+    IClock clock,
     IDurableClient durableClient)
 {
+    private readonly IClock _clock = clock;
     private readonly IDurableClient _durableClient = durableClient;
 
     /// <summary>
@@ -38,10 +41,17 @@ public class OrchestrationManager(
         // TODO: Lookup description in register and use 'function name' to start the orchestration.
         var functionName = "NotifyAggregatedMeasureDataOrchestrationV1";
         // TODO: Lookup description in register and validate input parameter type is valid.
+
+        // TODO: Create instance based on description.
+        var instance = new OrchestrationInstance(
+            new OrchestrationDescriptionId(Guid.NewGuid()),
+            _clock);
+        instance.ParameterValue.SetFromInstance(parameter);
+
         var orchestrationInstanceId = await _durableClient
             .StartNewAsync(
                 orchestratorFunctionName: functionName,
-                input: parameter)
+                input: instance.ParameterValue.SerializedParameterValue)
             .ConfigureAwait(false);
     }
 
