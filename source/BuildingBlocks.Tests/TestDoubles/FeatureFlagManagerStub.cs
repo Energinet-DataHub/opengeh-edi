@@ -28,4 +28,6 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
     public Task<bool> RequestStaysInEdiAsync() => Task.FromResult(false);
 
     public Task<bool> ReceiveMeteredDataForMeasurementPointsAsync() => Task.FromResult(true);
+
+    public Task<bool> UseRequestWholesaleServicesProcessOrchestrationAsync() => Task.FromResult(false);
 }
