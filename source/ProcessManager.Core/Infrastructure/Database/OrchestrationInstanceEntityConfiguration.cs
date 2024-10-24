@@ -50,7 +50,7 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                     .ValueGeneratedNever()
                     .HasConversion(
                         id => id.Value,
-                        dbValue => new OrchestrationStepInstanceId(dbValue));
+                        dbValue => new OrchestrationStepId(dbValue));
 
                 b.Property(s => s.Description);
 
@@ -62,12 +62,12 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                 b.Property(s => s.DependsOn)
                     .HasConversion(
                         id => id != null ? id.Value : (Guid?)null,
-                        dbValue => dbValue != null ? new OrchestrationStepInstanceId(dbValue.Value) : null);
+                        dbValue => dbValue != null ? new OrchestrationStepId(dbValue.Value) : null);
 
                 b.Property(s => s.State)
                     .HasConversion(
                         state => state != null ? state.Value : null,
-                        dbValue => dbValue != null ? new OrchestrationStepInstanceState(dbValue) : null);
+                        dbValue => dbValue != null ? new OrchestrationStepState(dbValue) : null);
 
                 b.Property(s => s.OrchestrationInstanceId)
                     .HasConversion(

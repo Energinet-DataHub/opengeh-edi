@@ -21,25 +21,25 @@ namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 /// It contains state information about the step, and is linked
 /// to the orchestration instance that it is part of.
 /// </summary>
-public class OrchestrationStepInstance
+public class OrchestrationStep
 {
-    public OrchestrationStepInstance(
+    public OrchestrationStep(
         OrchestrationInstanceId orchestrationInstanceId,
         string description,
-        OrchestrationStepInstanceId? dependsOn,
+        OrchestrationStepId? dependsOn,
         int sequence)
     {
-        Id = new OrchestrationStepInstanceId(Guid.NewGuid());
+        Id = new OrchestrationStepId(Guid.NewGuid());
         OrchestrationInstanceId = orchestrationInstanceId;
 
         Description = description;
         DependsOn = dependsOn;
         Sequence = sequence;
 
-        State = new OrchestrationStepInstanceState("Created");
+        State = new OrchestrationStepState("Created");
     }
 
-    public OrchestrationStepInstanceId Id { get; }
+    public OrchestrationStepId Id { get; }
 
     public string? Description { get; }
 
@@ -49,14 +49,14 @@ public class OrchestrationStepInstance
 
     public Instant? CompletedAt { get; }
 
-    public OrchestrationStepInstanceId? DependsOn { get; }
+    public OrchestrationStepId? DependsOn { get; }
 
     public int Sequence { get; }
 
     /// <summary>
     /// The state of the step.
     /// </summary>
-    public OrchestrationStepInstanceState? State { get; }
+    public OrchestrationStepState? State { get; }
 
     /// <summary>
     /// The orchestration instance which this step is part of.

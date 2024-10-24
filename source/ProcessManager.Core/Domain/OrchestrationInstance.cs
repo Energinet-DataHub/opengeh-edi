@@ -56,7 +56,7 @@ public class OrchestrationInstance
     /// <summary>
     /// Workflow steps the orchestration instance is going through.
     /// </summary>
-    public IList<OrchestrationStepInstance> Steps { get; }
+    public IList<OrchestrationStep> Steps { get; }
 
     /// <summary>
     /// The overall state of the orchestration instance.
