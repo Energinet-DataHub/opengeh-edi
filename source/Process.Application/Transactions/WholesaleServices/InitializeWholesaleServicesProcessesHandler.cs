@@ -35,20 +35,12 @@ public class InitializeWholesaleServicesProcessesHandler : IRequestHandler<Initi
         _wholesaleServicesProcessRepository = wholesaleServicesProcessRepository;
     }
 
-    public Task<Unit> Handle(InitializeWholesaleServicesProcessesCommand request, CancellationToken cancellationToken)
-    {
-        ArgumentNullException.ThrowIfNull(request);
-        ArgumentNullException.ThrowIfNull(request.InitializeWholesaleServicesProcessDto);
-
-        CreateWholesaleServicesProcess(request.InitializeWholesaleServicesProcessDto);
-
-        return Task.FromResult(Unit.Value);
-    }
-
-    private void CreateWholesaleServicesProcess(InitializeWholesaleServicesProcessDto initializeProcessDto)
+    public static List<WholesaleServicesProcess> CreateWholesaleServicesProcesses(InitializeWholesaleServicesProcessDto initializeProcessDto)
     {
         var businessReason = BusinessReason.FromCodeOrUnused(initializeProcessDto.BusinessReason);
         var messageId = MessageId.Create(initializeProcessDto.MessageId);
+
+        var processes = new List<WholesaleServicesProcess>();
 
         foreach (var series in initializeProcessDto.Series)
         {
@@ -64,7 +56,7 @@ public class InitializeWholesaleServicesProcessesHandler : IRequestHandler<Initi
                         chargeType.Type))
                 .ToList();
 
-            _wholesaleServicesProcessRepository.Add(
+            processes.Add(
                 new WholesaleServicesProcess(
                     processId: ProcessId.New(),
                     series.RequestedByActor,
@@ -82,5 +74,20 @@ public class InitializeWholesaleServicesProcessesHandler : IRequestHandler<Initi
                     chargeTypes: chargeTypes,
                     gridAreas: series.GridAreas));
         }
+
+        return processes;
+    }
+
+    public Task<Unit> Handle(InitializeWholesaleServicesProcessesCommand request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(request.InitializeWholesaleServicesProcessDto);
+
+        var processes = CreateWholesaleServicesProcesses(request.InitializeWholesaleServicesProcessDto);
+
+        foreach (var wholesaleServicesProcess in processes)
+            _wholesaleServicesProcessRepository.Add(wholesaleServicesProcess);
+
+        return Task.FromResult(Unit.Value);
     }
 }

@@ -34,5 +34,8 @@ public class MicrosoftFeatureFlagManager : IFeatureFlagManager
 
     public Task<bool> ReceiveMeteredDataForMeasurementPointsAsync() => IsEnabledAsync(FeatureFlagName.ReceiveMeteredDataForMeasurementPoints);
 
+    public Task<bool> UseRequestWholesaleServicesProcessOrchestrationAsync() =>
+        IsEnabledAsync(FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration);
+
     private Task<bool> IsEnabledAsync(FeatureFlagName featureFlagName) => _featureManager.IsEnabledAsync(featureFlagName.ToString());
 }

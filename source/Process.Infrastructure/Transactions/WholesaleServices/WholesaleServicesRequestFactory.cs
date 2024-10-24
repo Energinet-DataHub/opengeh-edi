@@ -39,9 +39,9 @@ public static class WholesaleServicesRequestFactory
         return message;
     }
 
-    private static WholesaleServicesRequest CreateWholesaleServicesRequest(WholesaleServicesProcess process)
+    public static WholesaleServicesRequest CreateWholesaleServicesRequest(WholesaleServicesProcess process)
     {
-        var request = new WholesaleServicesRequest()
+        var request = new WholesaleServicesRequest
         {
             RequestedForActorNumber = process.OriginalActor.ActorNumber.Value,
             RequestedForActorRole = process.OriginalActor.ActorRole.Name,
