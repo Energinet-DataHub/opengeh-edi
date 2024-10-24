@@ -19,6 +19,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.M
 
 public class MeteredDataForMeasurementPointSeriesExtractor
 {
+    private const string SeriesElementName = "PayloadEnergyTimeSeries";
     private const string Identification = "Identification";
     private const string ResolutionDuration = "ResolutionDuration";
     private const string ObservationTimeSeriesPeriod = "ObservationTimeSeriesPeriod";
@@ -37,10 +38,9 @@ public class MeteredDataForMeasurementPointSeriesExtractor
     protected internal static IEnumerable<MeteredDataForMeasurementPointSeries> ParseSeries(
         XDocument document,
         XNamespace ns,
-        string senderNumber,
-        string seriesElementName)
+        string senderNumber)
     {
-        var seriesElements = document.Descendants(ns + seriesElementName);
+        var seriesElements = document.Descendants(ns + SeriesElementName);
 
         foreach (var seriesElement in seriesElements)
         {
