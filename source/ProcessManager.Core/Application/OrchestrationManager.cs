@@ -25,12 +25,15 @@ namespace Energinet.DataHub.ProcessManagement.Core.Application;
 /// <param name="clock"></param>
 /// <param name="durableClient">Must be a Durable Task Client that is connected to
 /// the same Task Hub as the Durable Functions host containing orchestrations.</param>
+/// <param name="orchestrationRegister"></param>
 public class OrchestrationManager(
     IClock clock,
-    IDurableClient durableClient)
+    IDurableClient durableClient,
+    IOrchestrationRegisterQueries orchestrationRegister)
 {
     private readonly IClock _clock = clock;
     private readonly IDurableClient _durableClient = durableClient;
+    private readonly IOrchestrationRegisterQueries _orchestrationRegister = orchestrationRegister;
 
     /// <summary>
     /// Start a new instance of an orchestration.
@@ -38,6 +41,12 @@ public class OrchestrationManager(
     public async Task StartOrchestrationAsync<TParameter>(string name, int version, TParameter parameter)
         where TParameter : class
     {
+        var orchestrationDescription = await _orchestrationRegister.GetOrDefaultAsync(name, version).ConfigureAwait(false);
+        if (orchestrationDescription != null)
+        {
+            // TODO: Just do it...
+        }
+
         // TODO: Lookup description in register and use 'function name' to start the orchestration.
         var functionName = "NotifyAggregatedMeasureDataOrchestrationV1";
         // TODO: Lookup description in register and validate input parameter type is valid.

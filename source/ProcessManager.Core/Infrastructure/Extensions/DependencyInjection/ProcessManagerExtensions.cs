@@ -32,7 +32,8 @@ namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Dep
 public static class ProcessManagerExtensions
 {
     /// <summary>
-    /// Register options and services for enabling an application to use the <see cref="OrchestrationManager"/>.
+    /// Register options and services for enabling an application to use the <see cref="OrchestrationManager"/>
+    /// and <see cref="IOrchestrationRegisterQueries"/>.
     /// </summary>
     public static IServiceCollection AddOrchestrationManager(this IServiceCollection services)
     {
@@ -44,6 +45,7 @@ public static class ProcessManagerExtensions
         services.AddDurableClientFactory();
         services.TryAddSingleton<IDurableClient>(sp =>
         {
+            // IDurableClientFactory has a singleton lifecycle and caches clients
             var clientFactory = sp.GetRequiredService<IDurableClientFactory>();
             var processManagerOptions = sp.GetRequiredService<IOptions<ProcessManagerOptions>>().Value;
 
@@ -56,7 +58,9 @@ public static class ProcessManagerExtensions
 
             return durableClient;
         });
-        services.TryAddSingleton<OrchestrationManager>();
+
+        services.TryAddScoped<OrchestrationManager>();
+        services.TryAddScoped<IOrchestrationRegisterQueries, OrchestrationRegister>();
 
         return services;
     }
@@ -84,8 +88,7 @@ public static class ProcessManagerExtensions
 
         // TODO: Not sure what we want the lifetime to be for the following types; they are only used once during startup
         services.TryAddTransient<IReadOnlyCollection<OrchestrationDescription>>(sp => enabledDescriptionsFactory());
-        services.TryAddTransient<OrchestrationRegister>();
-        services.TryAddTransient<OrchestrationRegisterSynchronizer>();
+        services.TryAddTransient<IOrchestrationRegister, OrchestrationRegister>();
 
         return services;
     }
