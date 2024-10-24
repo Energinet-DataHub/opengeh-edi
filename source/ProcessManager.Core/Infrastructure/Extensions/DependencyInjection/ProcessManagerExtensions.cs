@@ -35,22 +35,19 @@ namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Dep
 public static class ProcessManagerExtensions
 {
     /// <summary>
-    /// Register options and services for enabling an application to use the <see cref="OrchestrationManager"/>
-    /// and <see cref="IOrchestrationRegisterQueries"/>.
+    /// Register options and services necessary for enabling an application to use the Process Manager
+    /// to manage and monitor orchestrations.
+    /// Should be used from the Process Manager API / Scheduler application.
     /// </summary>
-    public static IServiceCollection AddOrchestrationManager(this IServiceCollection services)
+    public static IServiceCollection AddProcessManagerCore(this IServiceCollection services)
     {
+        // Process Manager Core
         services
-            .AddOptions<ProcessManagerTaskHubOptions>()
-            .BindConfiguration(configSectionPath: string.Empty)
-            .ValidateDataAnnotations();
+            .AddProcessManagerOptions()
+            .AddProcessManagerDatabase();
 
-        services
-            .AddOptions<ProcessManagerOptions>()
-            .BindConfiguration(ProcessManagerOptions.SectionName)
-            .ValidateDataAnnotations();
-
-        // DurableTaskClient
+        // DurableClient connected to Task Hub
+        services.AddTaskHubStorage();
         services
             .AddDurableClientFactory()
             .TryAddSingleton<IDurableClient>(sp =>
@@ -69,20 +66,6 @@ public static class ProcessManagerExtensions
                 return durableClient;
             });
 
-        // TODO: Add health check against Task Hub storage account
-
-        // Database
-        services
-            .AddDbContext<ProcessManagerContext>((sp, dbContextOptions) =>
-            {
-                var processManagerOptions = sp.GetRequiredService<IOptions<ProcessManagerOptions>>().Value;
-                dbContextOptions.UseSqlServer(
-                    processManagerOptions.SqlDatabaseConnectionString,
-                    builder => builder.UseNodaTime());
-            })
-            .AddHealthChecks()
-            .AddDbContextCheck<ProcessManagerContext>(name: "ProcesManagerDatabase");
-
         // ProcessManager components
         services.TryAddScoped<IOrchestrationRegisterQueries, OrchestrationRegister>();
         services.TryAddScoped<IOrchestrationManager, OrchestrationManager>();
@@ -91,48 +74,86 @@ public static class ProcessManagerExtensions
     }
 
     /// <summary>
-    /// Register options and services for enabling an application to register Durable Functions Orchestrations
-    /// that can later be e.g. started by using the <see cref="OrchestrationManager"/>.
+    /// Register options and services necessary for integrating Durable Functions orchestrations with the Process Manager functionality.
+    /// Should be used from host's that contains Durable Functions orchestrations.
     /// </summary>
     /// <param name="services"></param>
     /// <param name="enabledDescriptionsFactory">
     /// Build descriptions for all Durable Function orchestrations that should be enabled.
     /// Leave out descriptions for any Durable Function orchestrations that should be disabled.
     /// </param>
-    public static IServiceCollection AddOrchestrationRegister(
+    public static IServiceCollection AddProcessManagerForOrchestrations(
         this IServiceCollection services,
         Func<IReadOnlyCollection<OrchestrationDescription>> enabledDescriptionsFactory)
     {
         ArgumentNullException.ThrowIfNull(enabledDescriptionsFactory);
 
-        // TODO: Add health check against Task Hub storage account; this will also ensure we have to load settings and thereby validate them
+        // Process Manager Core
+        services
+            .AddProcessManagerOptions()
+            .AddProcessManagerDatabase();
+
+        // Task Hub connected to Durable Functions
+        services.AddTaskHubStorage();
+
+        // Orchestration Descriptions to register
+        services.TryAddTransient<IReadOnlyCollection<OrchestrationDescription>>(sp => enabledDescriptionsFactory());
+
+        // ProcessManager components
+        services.TryAddTransient<IOrchestrationRegister, OrchestrationRegister>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Register hierarchical Process Manager options.
+    /// </summary>
+    private static IServiceCollection AddProcessManagerOptions(this IServiceCollection services)
+    {
+        services
+            .AddOptions<ProcessManagerOptions>()
+            .BindConfiguration(ProcessManagerOptions.SectionName)
+            .ValidateDataAnnotations();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Register Process Manager database and health checks.
+    /// Depends on <see cref="ProcessManagerOptions"/>.
+    /// </summary>
+    private static IServiceCollection AddProcessManagerDatabase(this IServiceCollection services)
+    {
+        services
+            .AddDbContext<ProcessManagerContext>((sp, optionsBuilder) =>
+            {
+                var processManagerOptions = sp.GetRequiredService<IOptions<ProcessManagerOptions>>().Value;
+
+                optionsBuilder.UseSqlServer(processManagerOptions.SqlDatabaseConnectionString, providerOptionsBuilder =>
+                {
+                    providerOptionsBuilder.UseNodaTime();
+                    providerOptionsBuilder.EnableRetryOnFailure();
+                });
+            })
+            .AddHealthChecks()
+            .AddDbContextCheck<ProcessManagerContext>(name: "ProcesManagerDatabase");
+
+        return services;
+    }
+
+    /// <summary>
+    /// Register Task Hub storage options and health checks.
+    /// </summary>
+    private static IServiceCollection AddTaskHubStorage(this IServiceCollection services)
+    {
         services
             .AddOptions<ProcessManagerTaskHubOptions>()
             .BindConfiguration(configSectionPath: string.Empty)
             .ValidateDataAnnotations();
 
         services
-            .AddOptions<ProcessManagerOptions>()
-            .BindConfiguration(ProcessManagerOptions.SectionName)
-            .ValidateDataAnnotations();
-
-        // Database
-        services
-            .AddDbContext<ProcessManagerContext>((sp, dbContextOptions) =>
-            {
-                var processManagerOptions = sp.GetRequiredService<IOptions<ProcessManagerOptions>>().Value;
-                dbContextOptions.UseSqlServer(
-                    processManagerOptions.SqlDatabaseConnectionString,
-                    builder => builder.UseNodaTime());
-            })
-            .AddHealthChecks()
-            .AddDbContextCheck<ProcessManagerContext>(name: "ProcesManagerDatabase");
-
-        // Descriptions
-        services.TryAddTransient<IReadOnlyCollection<OrchestrationDescription>>(sp => enabledDescriptionsFactory());
-
-        // ProcessManager components
-        services.TryAddTransient<IOrchestrationRegister, OrchestrationRegister>();
+            .AddHealthChecks();
+        // TODO: Add health check against Task Hub which means: Blob Containers, Queues and Tables
 
         return services;
     }

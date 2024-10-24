@@ -16,20 +16,17 @@ using Energinet.DataHub.ProcessManagement.Core.Domain;
 using Energinet.DataHub.ProcessManager.Core.Tests.Fixtures;
 using FluentAssertions;
 using NodaTime;
-using Xunit.Abstractions;
 
-namespace Energinet.DataHub.ProcessManager.Core.Tests.Integration;
+namespace Energinet.DataHub.ProcessManager.Core.Tests.Integration.Infrastructure.Database;
 
 [Collection(nameof(ProcessManagerCoreCollection))]
 public class ProcessManagerContextTests
 {
     private readonly ProcessManagerCoreFixture _fixture;
-    private readonly ITestOutputHelper _output;
 
-    public ProcessManagerContextTests(ProcessManagerCoreFixture fixture, ITestOutputHelper output)
+    public ProcessManagerContextTests(ProcessManagerCoreFixture fixture)
     {
         _fixture = fixture;
-        _output = output;
     }
 
     [Fact]

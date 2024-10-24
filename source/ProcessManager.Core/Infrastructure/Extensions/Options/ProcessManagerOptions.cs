@@ -16,6 +16,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Options;
 
+/// <summary>
+/// Contains Process Manager options that we can configure as hierarchical.
+/// </summary>
 public class ProcessManagerOptions
 {
     public const string SectionName = "ProcessManager";

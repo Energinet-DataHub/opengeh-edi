@@ -63,6 +63,7 @@ public class ProcessManagerDatabaseManager(string name)
     protected override bool CreateDatabaseSchema(ProcessManagerContext context)
     {
         var result = DbUpgrader.DatabaseUpgrade(ConnectionString);
-        return !result.Successful ? throw new Exception("Database migration failed", result.Error) : true;
+        return !result.Successful
+            ? throw new Exception("Database migration failed", result.Error) : true;
     }
 }

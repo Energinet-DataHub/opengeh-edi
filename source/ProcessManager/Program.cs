@@ -34,7 +34,7 @@ var host = new HostBuilder()
         services.AddScoped<ProcessSchedulerHandler>();
 
         // ProcessManager
-        services.AddOrchestrationManager();
+        services.AddProcessManagerCore();
     })
     .ConfigureLogging((hostingContext, logging) =>
     {

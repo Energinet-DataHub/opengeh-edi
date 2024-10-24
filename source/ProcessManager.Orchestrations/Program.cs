@@ -31,7 +31,7 @@ var host = new HostBuilder()
         services.AddHealthChecksForIsolatedWorker();
 
         // ProcessManager
-        services.AddOrchestrationRegister(() =>
+        services.AddProcessManagerForOrchestrations(() =>
         {
             // TODO:
             // We could implement an interface for "description building" which could then be implemented besides the orchestration.
