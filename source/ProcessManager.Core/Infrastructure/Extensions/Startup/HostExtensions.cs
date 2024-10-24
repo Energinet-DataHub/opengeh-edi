@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManagement.Core.Application;
 using Energinet.DataHub.ProcessManagement.Core.Domain;
-using Energinet.DataHub.ProcessManagement.Core.Infrastructure.OrchestrationsRegistration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -37,8 +37,8 @@ public static class HostExtensions
         try
         {
             var enabledDescriptions = host.Services.GetRequiredService<IReadOnlyCollection<OrchestrationDescription>>();
-            var synchronizer = host.Services.GetRequiredService<OrchestrationRegisterSynchronizer>();
-            await synchronizer
+            var register = host.Services.GetRequiredService<IOrchestrationRegister>();
+            await register
                 .SynchronizeAsync(
                     hostName: "ProcessManager.Orchestrations",
                     enabledDescriptions)

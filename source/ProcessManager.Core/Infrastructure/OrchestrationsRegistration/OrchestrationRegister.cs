@@ -12,30 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManagement.Core.Application;
 using Energinet.DataHub.ProcessManagement.Core.Domain;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application;
+namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.OrchestrationsRegistration;
 
 /// <summary>
 /// Keep a register of known Durable Functions orchestrations.
-/// Each orchestration is registered with information by which
-/// it is possible to communicate with Durable Functions and
-/// start a new orchestration instance.
+/// Each orchestration is registered with information by which it is possible
+/// to communicate with Durable Functions and start a new orchestration instance.
 /// </summary>
-public class OrchestrationRegister
+public class OrchestrationRegister : IOrchestrationRegister, IOrchestrationRegisterQueries
 {
     private readonly List<OrchestrationDescription> _knownOrchestrationDescriptions = [];
 
-    public Task<IReadOnlyCollection<OrchestrationDescription>> GetAllByHostNameAsync(string hostName)
-    {
-        return Task.FromResult((IReadOnlyCollection<OrchestrationDescription>)_knownOrchestrationDescriptions
-            .Where(x =>
-                x.HostName == hostName)
-            .ToList());
-    }
-
+    /// <inheritdoc />
     public Task<OrchestrationDescription?> GetOrDefaultAsync(string name, int version, bool isEnabled = true)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
         return Task.FromResult(_knownOrchestrationDescriptions
             .SingleOrDefault(x =>
                 x.Name == name
@@ -43,13 +38,22 @@ public class OrchestrationRegister
                 && x.IsEnabled == isEnabled));
     }
 
-    /// <summary>
-    /// Durable Functions orchestration host's can use this method to register the orchestrations
-    /// they host.
-    /// </summary>
-    /// <param name="orchestrationDescription"></param>
+    /// <inheritdoc />
+    public Task<IReadOnlyCollection<OrchestrationDescription>> GetAllByHostNameAsync(string hostName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(hostName);
+
+        return Task.FromResult((IReadOnlyCollection<OrchestrationDescription>)_knownOrchestrationDescriptions
+            .Where(x =>
+                x.HostName == hostName)
+            .ToList());
+    }
+
+    /// <inheritdoc />
     public Task RegisterAsync(OrchestrationDescription orchestrationDescription)
     {
+        ArgumentNullException.ThrowIfNull(orchestrationDescription);
+
         var existing = _knownOrchestrationDescriptions.SingleOrDefault(x =>
             x.Name == orchestrationDescription.Name
             && x.Version == orchestrationDescription.Version);
@@ -66,8 +70,11 @@ public class OrchestrationRegister
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc />
     public Task DeregisterAsync(string name, int version)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
         var orchestratorDescription = _knownOrchestrationDescriptions
             .SingleOrDefault(x =>
                 x.Name == name
