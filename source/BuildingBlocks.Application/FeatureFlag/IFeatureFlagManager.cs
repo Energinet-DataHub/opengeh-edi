@@ -33,4 +33,9 @@ public interface IFeatureFlagManager
     /// Whether to send RequestForAggregatedMeasuredData to Wholesale or handle it in EDI.
     /// </summary>
     Task<bool> RequestStaysInEdiAsync();
+
+    /// <summary>
+    /// Whether to allow receiving metered data for measurement points.
+    /// </summary>
+    Task<bool> ReceiveMeteredDataForMeasurementPointsAsync();
 }
