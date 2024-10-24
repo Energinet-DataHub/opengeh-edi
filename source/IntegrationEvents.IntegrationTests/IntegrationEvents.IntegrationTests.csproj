@@ -32,4 +32,10 @@
         <ProjectReference Include="..\IntegrationEvents.Application\IntegrationEvents.Application.csproj" />
         <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
     </ItemGroup>
+
+    <ItemDefinitionGroup>
+        <ProjectReference>
+            <PrivateAssets>all</PrivateAssets>
+        </ProjectReference>
+    </ItemDefinitionGroup>
 </Project>

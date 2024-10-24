@@ -12,13 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.IO;
-using System.Threading.Tasks;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+namespace Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 
 /// <summary>
 /// A IFileStorageClient that avoids uploading a file to Azurite,

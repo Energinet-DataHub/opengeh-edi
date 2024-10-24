@@ -64,4 +64,10 @@
       </None>
     </ItemGroup>
 
+    <ItemDefinitionGroup>
+        <ProjectReference>
+            <PrivateAssets>all</PrivateAssets>
+        </ProjectReference>
+    </ItemDefinitionGroup>
+
 </Project>

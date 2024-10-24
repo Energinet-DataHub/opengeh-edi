@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Reflection;
-using System.Text.Json.Serialization;
 using Asp.Versioning;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;

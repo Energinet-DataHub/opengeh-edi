@@ -16,6 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Azure.Messaging.ServiceBus;
 using Dapper;
+using Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
@@ -23,7 +24,6 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.DataAc
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
-using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.Azure;

@@ -14,7 +14,6 @@
 
 using System.Collections.Generic;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 
 namespace Energinet.DataHub.EDI.IntegrationTests.Behaviours;
 

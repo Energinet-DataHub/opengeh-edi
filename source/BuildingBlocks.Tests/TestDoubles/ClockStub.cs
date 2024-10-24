@@ -14,7 +14,7 @@
 
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+namespace Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 
 public class ClockStub : IClock
 {

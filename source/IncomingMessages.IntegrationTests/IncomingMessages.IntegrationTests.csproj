@@ -80,4 +80,10 @@ limitations under the License.
       </None>
     </ItemGroup>
 
+    <ItemDefinitionGroup>
+        <ProjectReference>
+            <PrivateAssets>all</PrivateAssets>
+        </ProjectReference>
+    </ItemDefinitionGroup>
+
 </Project>
