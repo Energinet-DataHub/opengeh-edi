@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.DurableTask;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Activities;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
 using Microsoft.Azure.Functions.Worker;
@@ -26,7 +27,7 @@ internal class NotifyAggregatedMeasureDataOrchestrationV1
     public async Task<string> Run(
         [OrchestrationTrigger] TaskOrchestrationContext context)
     {
-        var input = context.GetInput<NotifyAggregatedMeasureDataInputV1>();
+        var input = context.GetOrchestrationParameterValue<NotifyAggregatedMeasureDataInputV1>();
         if (input == null)
             return "Error: No input specified.";
 
