@@ -965,6 +965,22 @@
     <EmbeddedResource Include="Schemas\Cim\Json\Schemas\urn-entsoe-eu-wgedi-codelists.schema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <None Remove="Schemas\Ebix\Schemas\document\DK_MeteredDataTimeSeries\ebIX_AggregatedBusinessInformationEntities-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_MeteredDataTimeSeries\ebIX_AggregatedBusinessInformationEntities-2.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="Schemas\Ebix\Schemas\document\DK_MeteredDataTimeSeries\ebIX_BusinessDataType-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_MeteredDataTimeSeries\ebIX_BusinessDataType-2.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="Schemas\Ebix\Schemas\document\DK_MeteredDataTimeSeries\ebIX_DK_MeteredDataTimeSeries-2.xsd" />
+    <EmbeddedResource Include="Schemas\Ebix\Schemas\document\DK_MeteredDataTimeSeries\ebIX_DK_MeteredDataTimeSeries-2.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Schemas\Ebix\Schemas\document\DK_MeteredDataTimeSeries\" />
   </ItemGroup>
 
 </Project>

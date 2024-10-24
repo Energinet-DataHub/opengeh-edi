@@ -1,0 +1,299 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DK_MeteredDataTimeSeries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="un:unece:260:data:EEM-DK_MeteredDataTimeSeries:v3">
+    <HeaderEnergyDocument>
+        <Identification>111131835</Identification>
+        <DocumentType listAgencyIdentifier="260">E66</DocumentType>
+        <Creation>2024-07-30T07:30:54Z</Creation>
+        <SenderEnergyParty>
+            <Identification schemeAgencyIdentifier="9">5790001330552</Identification>
+        </SenderEnergyParty>
+        <RecipientEnergyParty>
+            <Identification schemeAgencyIdentifier="9">5790000432752</Identification>
+        </RecipientEnergyParty>
+    </HeaderEnergyDocument>
+    <ProcessEnergyContext>
+        <EnergyBusinessProcess listIdentifier="DK" listAgencyIdentifier="260">E23</EnergyBusinessProcess>
+        <EnergyBusinessProcessRole listAgencyIdentifier="260">MDR</EnergyBusinessProcessRole>
+        <EnergyIndustryClassification listAgencyIdentifier="6">23</EnergyIndustryClassification>
+    </ProcessEnergyContext>
+    <PayloadEnergyTimeSeries>
+        <Identification>4413675032_5080574373</Identification>
+        <Function listAgencyIdentifier="6">9</Function>
+        <ObservationTimeSeriesPeriod>
+            <ResolutionDuration>PT1H</ResolutionDuration>
+            <Start>2024-06-28T22:00:00Z</Start>
+            <End>2024-06-29T22:00:00Z</End>
+        </ObservationTimeSeriesPeriod>
+        <IncludedProductCharacteristic>
+            <Identification listAgencyIdentifier="9">8716867000030</Identification>
+            <UnitType listAgencyIdentifier="260">KWH</UnitType>
+        </IncludedProductCharacteristic>
+        <DetailMeasurementMeteringPointCharacteristic>
+            <TypeOfMeteringPoint listAgencyIdentifier="260">E18</TypeOfMeteringPoint>
+            <SettlementMethod listIdentifier="DK" listAgencyIdentifier="260">D01</SettlementMethod>
+        </DetailMeasurementMeteringPointCharacteristic>
+        <MeteringPointDomainLocation>
+            <Identification schemeAgencyIdentifier="9">571313000000002000</Identification>
+        </MeteringPointDomainLocation>
+        <IntervalEnergyObservation>
+            <Position>1</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>2</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>3</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>4</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>5</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>6</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>7</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>8</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>9</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>10</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>11</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>12</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>13</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>14</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>15</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>16</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>17</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>18</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>19</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>20</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>21</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>22</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>23</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>24</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+    </PayloadEnergyTimeSeries>
+    <PayloadEnergyTimeSeries>
+        <Identification>4413675032_5080574374</Identification>
+        <Function listAgencyIdentifier="6">9</Function>
+        <ObservationTimeSeriesPeriod>
+            <ResolutionDuration>PT1H</ResolutionDuration>
+            <Start>2024-06-29T22:00:00Z</Start>
+            <End>2024-06-30T22:00:00Z</End>
+        </ObservationTimeSeriesPeriod>
+        <IncludedProductCharacteristic>
+            <Identification listAgencyIdentifier="9">8716867000030</Identification>
+            <UnitType listAgencyIdentifier="260">KWH</UnitType>
+        </IncludedProductCharacteristic>
+        <DetailMeasurementMeteringPointCharacteristic>
+            <TypeOfMeteringPoint listAgencyIdentifier="260">E18</TypeOfMeteringPoint>
+            <SettlementMethod listIdentifier="DK" listAgencyIdentifier="260">D01</SettlementMethod>
+        </DetailMeasurementMeteringPointCharacteristic>
+        <MeteringPointDomainLocation>
+            <Identification schemeAgencyIdentifier="9">571313000000002000</Identification>
+        </MeteringPointDomainLocation>
+        <IntervalEnergyObservation>
+            <Position>1</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>2</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>3</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>4</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>5</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>6</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>7</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>8</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>9</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>10</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>11</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>12</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>13</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>14</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>15</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>16</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>17</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>18</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>19</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>20</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>21</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>22</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>23</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+        <IntervalEnergyObservation>
+            <Position>24</Position>
+            <EnergyQuantity>0</EnergyQuantity>
+            <QuantityQuality listAgencyIdentifier="6">56</QuantityQuality>
+        </IntervalEnergyObservation>
+    </PayloadEnergyTimeSeries>
+</DK_MeteredDataTimeSeries>
