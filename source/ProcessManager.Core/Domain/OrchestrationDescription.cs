@@ -15,22 +15,25 @@
 namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 
 /// <summary>
-/// A base class for orchestration descriptions.
-/// It contains the information necessary to locate and execute an orchestration.
-/// Technology specific orchestrations can inherit from this class and add
-/// information necessary to execute that technologies orchestrations.
+/// Durable Functions orchestration description.
+/// It contains the information necessary to locate and execute a Durable Functions
+/// orchestration.
 /// </summary>
-public abstract class OrchestrationDescription
+public class OrchestrationDescription
 {
     public OrchestrationDescription(
         string name,
         int version,
-        bool canBeScheduled)
+        bool canBeScheduled,
+        string functionName)
     {
         Id = new OrchestrationDescriptionId(Guid.NewGuid());
         Name = name;
         Version = version;
         CanBeScheduled = canBeScheduled;
+
+        FunctionName = functionName;
+        ParameterDefinition = new();
 
         HostName = string.Empty;
     }
@@ -65,4 +68,14 @@ public abstract class OrchestrationDescription
     /// but which we cannot delete in the database because we still need the execution history.
     /// </summary>
     public bool IsEnabled { get; set; }
+
+    /// <summary>
+    /// The name of the Durable Functions orchestration implementation.
+    /// </summary>
+    public string FunctionName { get; }
+
+    /// <summary>
+    /// Defines the Durable Functions orchestration input parameter type.
+    /// </summary>
+    public OrchestrationParameterDefinition ParameterDefinition { get; }
 }

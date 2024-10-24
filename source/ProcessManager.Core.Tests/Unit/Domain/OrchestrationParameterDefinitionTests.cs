@@ -17,13 +17,13 @@ using FluentAssertions;
 
 namespace Energinet.DataHub.ProcessManager.Core.Tests.Unit.Domain;
 
-public class DFOrchestrationParameterDefinitionTests
+public class OrchestrationParameterDefinitionTests
 {
     [Fact]
     public async Task GivenSetFromType_WhenValidatingInstanceOfSameType_ThenIsValid()
     {
         // Arrange
-        var sut = new DFOrchestrationParameterDefinition();
+        var sut = new OrchestrationParameterDefinition();
         sut.SetFromType<OrchestrationParameterExample01>();
 
         var instanceOfSameType = new OrchestrationParameterExample01(DateTimeOffset.Now, true);
@@ -39,7 +39,7 @@ public class DFOrchestrationParameterDefinitionTests
     public async Task GivenSetFromType_WhenValidatingInstanceOfMatchingType_ThenIsValid()
     {
         // Arrange
-        var sut = new DFOrchestrationParameterDefinition();
+        var sut = new OrchestrationParameterDefinition();
         sut.SetFromType<OrchestrationParameterExample01>();
 
         var instanceOfMatchingType = new OrchestrationParameterExample02(DateTimeOffset.Now, true);
@@ -55,7 +55,7 @@ public class DFOrchestrationParameterDefinitionTests
     public async Task GivenSetFromType_WhenValidatingInstanceOfAnotherType_ThenIsNotValid()
     {
         // Arrange
-        var sut = new DFOrchestrationParameterDefinition();
+        var sut = new OrchestrationParameterDefinition();
         sut.SetFromType<OrchestrationParameterExample01>();
 
         var instanceOfAnotherType = new OrchestrationParameterExample03(10, true);

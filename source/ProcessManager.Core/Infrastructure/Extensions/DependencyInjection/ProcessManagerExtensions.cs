@@ -72,7 +72,7 @@ public static class ProcessManagerExtensions
     /// </param>
     public static IServiceCollection AddOrchestrationRegister(
         this IServiceCollection services,
-        Func<IReadOnlyCollection<DFOrchestrationDescription>> enabledDescriptionsFactory)
+        Func<IReadOnlyCollection<OrchestrationDescription>> enabledDescriptionsFactory)
     {
         ArgumentNullException.ThrowIfNull(enabledDescriptionsFactory);
 
@@ -83,7 +83,7 @@ public static class ProcessManagerExtensions
             .ValidateDataAnnotations();
 
         // TODO: Not sure what we want the lifetime to be for the following types; they are only used once during startup
-        services.TryAddTransient<IReadOnlyCollection<DFOrchestrationDescription>>(sp => enabledDescriptionsFactory());
+        services.TryAddTransient<IReadOnlyCollection<OrchestrationDescription>>(sp => enabledDescriptionsFactory());
         services.TryAddTransient<OrchestrationRegister>();
         services.TryAddTransient<OrchestrationRegisterSynchronizer>();
 

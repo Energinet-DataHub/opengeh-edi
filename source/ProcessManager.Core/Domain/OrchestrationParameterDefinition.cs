@@ -21,9 +21,9 @@ namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 /// <summary>
 /// Defines a Durable Functions orchestration input parameter type using a JSON schema.
 /// </summary>
-public class DFOrchestrationParameterDefinition
+public class OrchestrationParameterDefinition
 {
-    internal DFOrchestrationParameterDefinition()
+    internal OrchestrationParameterDefinition()
     {
         SerializedParameterDefinition = string.Empty;
     }

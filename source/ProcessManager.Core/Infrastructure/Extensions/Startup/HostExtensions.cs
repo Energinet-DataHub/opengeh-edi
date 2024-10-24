@@ -36,7 +36,7 @@ public static class HostExtensions
 
         try
         {
-            var enabledDescriptions = host.Services.GetRequiredService<IReadOnlyCollection<DFOrchestrationDescription>>();
+            var enabledDescriptions = host.Services.GetRequiredService<IReadOnlyCollection<OrchestrationDescription>>();
             var synchronizer = host.Services.GetRequiredService<OrchestrationRegisterSynchronizer>();
             await synchronizer
                 .SynchronizeAsync(

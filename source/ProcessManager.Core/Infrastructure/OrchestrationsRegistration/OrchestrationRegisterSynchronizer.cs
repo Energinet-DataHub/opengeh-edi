@@ -35,7 +35,7 @@ public class OrchestrationRegisterSynchronizer(
     /// known to the application host.</param>
     public async Task SynchronizeAsync(
         string hostName,
-        IReadOnlyCollection<DFOrchestrationDescription> hostDescriptions)
+        IReadOnlyCollection<OrchestrationDescription> hostDescriptions)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(hostName);
         ArgumentNullException.ThrowIfNull(hostDescriptions);

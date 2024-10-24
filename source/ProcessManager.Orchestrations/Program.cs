@@ -37,7 +37,7 @@ var host = new HostBuilder()
             // We could implement an interface for "description building" which could then be implemented besides the orchestration.
             // During DI we could then search for all these interface implementations and register them automatically.
             // This would ensure we didn't have to update Program.cs when we change orchestrations.
-            var brs_023_027_v1 = new DFOrchestrationDescription(
+            var brs_023_027_v1 = new OrchestrationDescription(
                 name: "BRS_023_027",
                 version: 1,
                 canBeScheduled: true,
