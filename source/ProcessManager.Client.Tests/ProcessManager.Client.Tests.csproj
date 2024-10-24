@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyName>Energinet.DataHub.ProcessManager.Client.IntegrationTests</AssemblyName>
-    <RootNamespace>Energinet.DataHub.ProcessManager.Client.IntegrationTests</RootNamespace>
+    <AssemblyName>Energinet.DataHub.ProcessManager.Client.Tests</AssemblyName>
+    <RootNamespace>Energinet.DataHub.ProcessManager.Client.Tests</RootNamespace>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
@@ -20,6 +20,12 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Integration\" />
+    <Folder Include="Fixtures\" />
+    <Folder Include="Unit\" />
   </ItemGroup>
 
 </Project>

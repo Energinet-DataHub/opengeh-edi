@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Energinet.DataHub.ProcessManager.Core.IntegrationTests" />
+    <InternalsVisibleTo Include="Energinet.DataHub.ProcessManager.Core.Tests" />
   </ItemGroup>
 
   <ItemGroup>

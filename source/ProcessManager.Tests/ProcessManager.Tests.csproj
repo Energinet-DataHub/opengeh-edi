@@ -1,9 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyName>Energinet.DataHub.ProcessManager.Orchestrations.IntegrationTests</AssemblyName>
-    <RootNamespace>Energinet.DataHub.ProcessManager.Orchestrations.IntegrationTests</RootNamespace>
-
+    <AssemblyName>Energinet.DataHub.ProcessManager.Tests</AssemblyName>
+    <RootNamespace>Energinet.DataHub.ProcessManager.Tests</RootNamespace>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
@@ -17,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ProcessManager.Orchestrations\ProcessManager.Orchestrations.csproj" />
+    <ProjectReference Include="..\ProcessManager\ProcessManager.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyName>Energinet.DataHub.ProcessManager.Core.IntegrationTests</AssemblyName>
-    <RootNamespace>Energinet.DataHub.ProcessManager.Core.IntegrationTests</RootNamespace>
+    <AssemblyName>Energinet.DataHub.ProcessManager.Core.Tests</AssemblyName>
+    <RootNamespace>Energinet.DataHub.ProcessManager.Core.Tests</RootNamespace>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
