@@ -12,12 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Edi.Requests;
+using Energinet.DataHub.Wholesale.Edi.Client;
+using Energinet.DataHub.Wholesale.Edi.Factories;
 using Energinet.DataHub.Wholesale.Edi.Validation;
 using Energinet.DataHub.Wholesale.Edi.Validation.AggregatedTimeSeriesRequest;
 using Energinet.DataHub.Wholesale.Edi.Validation.AggregatedTimeSeriesRequest.Rules;
+using Energinet.DataHub.Wholesale.Edi.Validation.Helpers;
 using Energinet.DataHub.Wholesale.Edi.Validation.WholesaleServicesRequest;
+using Microsoft.Extensions.Azure;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NodaTime;
 
 namespace Energinet.DataHub.Wholesale.Edi.Extensions.DependencyInjection;
 
@@ -26,32 +33,44 @@ namespace Energinet.DataHub.Wholesale.Edi.Extensions.DependencyInjection;
 /// </summary>
 public static class EdiExtensions
 {
-    public static void AddEdiModule(this IServiceCollection services)
+    public static IServiceCollection AddEdiModule(this IServiceCollection services, IConfiguration configuration)
     {
-        // services.AddScoped<IWholesaleInboxRequestHandler, AggregatedTimeSeriesRequestHandler>(); TODO: LRN
-        // services.AddScoped<IWholesaleInboxRequestHandler, WholesaleServicesRequestHandler>();
-        // services.AddTransient<WholesaleServicesRequestMapper>();
-        //
-        // services.AddSingleton<IEdiClient, EdiClient>();
-        //
-        // services
-        //     .AddOptions<EdiInboxQueueOptions>()
-        //     .BindConfiguration(EdiInboxQueueOptions.SectionName)
-        //     .ValidateDataAnnotations();
-        //
-        // // Health checks
-        // services.AddHealthChecks()
-        //     // Must use a listener connection string
-        //     .AddAzureServiceBusQueue(
-        //         sp => sp.GetRequiredService<IOptions<ServiceBusNamespaceOptions>>().Value.ConnectionString,
-        //         sp => sp.GetRequiredService<IOptions<EdiInboxQueueOptions>>().Value.QueueName,
-        //         name: "EdiInboxQueue");
-        //
-        // // Validation helpers
-        // services.AddTransient<PeriodValidationHelper>();
-        // // Validation
-        // services.AddAggregatedTimeSeriesRequestValidation();
-        // services.AddWholesaleServicesRequestValidation();
+        services.AddScoped<IAggregatedTimeSeriesRequestHandler, AggregatedTimeSeriesRequestHandler>();
+        services.AddScoped<IWholesaleServicesRequestHandler, WholesaleServicesRequestHandler>();
+        services.AddTransient<WholesaleServicesRequestMapper>();
+        services.AddTransient<DateTimeZone>(s => DateTimeZoneProviders.Tzdb.GetZoneOrNull("Europe/Copenhagen")!);
+
+        services.AddScoped<IEdiClient, EdiClient>();
+
+        services
+            .AddOptions<EdiInboxQueueOptions>()
+            .BindConfiguration(EdiInboxQueueOptions.SectionName)
+            .ValidateDataAnnotations();
+
+        var ediInboxQueueOptions =
+            configuration
+                .GetRequiredSection(EdiInboxQueueOptions.SectionName)
+                .Get<EdiInboxQueueOptions>()
+            ?? throw new InvalidOperationException("Missing EDI Inbox configuration.");
+
+        services.AddAzureClients(builder =>
+        {
+            builder
+                .AddClient<ServiceBusSender, ServiceBusClientOptions>((_, _, provider) =>
+                    provider
+                        .GetRequiredService<ServiceBusClient>()
+                        .CreateSender(ediInboxQueueOptions.QueueName))
+                .WithName(ediInboxQueueOptions.QueueName);
+        });
+
+        // Validation helpers
+        services.AddTransient<PeriodValidationHelper>();
+
+        // Validation
+        services.AddAggregatedTimeSeriesRequestValidation();
+        services.AddWholesaleServicesRequestValidation();
+
+        return services;
     }
 
     public static IServiceCollection AddAggregatedTimeSeriesRequestValidation(this IServiceCollection services)
