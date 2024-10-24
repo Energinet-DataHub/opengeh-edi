@@ -46,6 +46,7 @@ public sealed class MessageParserTests
         [
             [DocumentFormat.Ebix, CreateBaseEbixMessage("ValidMeteredDateForMeasurementPoint.xml")],
             [DocumentFormat.Ebix, CreateBaseEbixMessage("ValidMeteredDateForMeasurementPointWithTwoTransactions.xml")],
+            [DocumentFormat.Ebix, CreateBaseEbixMessage("ValidPT1HMeteredDataForMeasurementPoint.xml")],
         ];
     }
 
@@ -77,14 +78,14 @@ public sealed class MessageParserTests
         using var assertionScope = new AssertionScope();
         result.Success.Should().BeTrue();
 
-        var marketMessage = (MeteredDataForMeasurementPoint)result.IncomingMessage!;
+        var marketMessage = (MeteredDataForMeasurementPointMessage)result.IncomingMessage!;
         marketMessage.Should().NotBeNull();
         marketMessage.MessageId.Should().Be("111131835");
         marketMessage.MessageType.Should().Be("E66");
         marketMessage.CreatedAt.Should().Be("2024-07-30T07:30:54Z");
         marketMessage.SenderNumber.Should().Be("5790001330552");
         marketMessage.ReceiverNumber.Should().Be("5790000432752");
-        marketMessage.SenderRoleCode.Should().Be("EZ");
+        marketMessage.SenderRoleCode.Should().Be("MDR");
         marketMessage.BusinessReason.Should().Be("E23");
         marketMessage.ReceiverRoleCode.Should().BeEmpty();
         marketMessage.BusinessType.Should().Be("23");
@@ -94,7 +95,8 @@ public sealed class MessageParserTests
             series.Should().NotBeNull();
             series.TransactionId.Should()
                 .Match(transactionId => transactionId == "4413675032_5080574373" || transactionId == "4413675032_5080574374");
-            series.Resolution.Should().Be("PT15M");
+            series.Resolution.Should()
+                .Match(resolution => resolution == "PT15M" || resolution == "PT1H");
             series.StartDateTime.Should()
                 .Match(startDate => startDate == "2024-06-28T22:00:00Z" || startDate == "2024-06-29T22:00:00Z");
             series.EndDateTime.Should()
@@ -111,7 +113,8 @@ public sealed class MessageParserTests
                 energyObservation.Should().NotBeNull();
                 energyObservation.Position.Should().Be(position.ToString());
                 energyObservation.EnergyQuantity.Should().NotBeEmpty();
-                energyObservation.QuantityQuality.Should().Be("E01");
+                energyObservation.QuantityQuality.Should()
+                    .Match(quality => quality == "E01" || quality == "56");
                 position++;
             }
         }

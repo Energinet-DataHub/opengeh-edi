@@ -13,7 +13,7 @@
     </ns0:HeaderEnergyDocument>
     <ns0:ProcessEnergyContext>
         <ns0:EnergyBusinessProcess listAgencyIdentifier="260">E23</ns0:EnergyBusinessProcess>
-        <ns0:EnergyBusinessProcessRole listAgencyIdentifier="260">EZ</ns0:EnergyBusinessProcessRole>
+        <ns0:EnergyBusinessProcessRole listAgencyIdentifier="260">MDR</ns0:EnergyBusinessProcessRole>
         <ns0:EnergyIndustryClassification listAgencyIdentifier="6">23</ns0:EnergyIndustryClassification>
     </ns0:ProcessEnergyContext>
     <ns0:PayloadEnergyTimeSeries>

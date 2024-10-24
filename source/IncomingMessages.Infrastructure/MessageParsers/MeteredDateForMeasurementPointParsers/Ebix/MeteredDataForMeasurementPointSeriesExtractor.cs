@@ -37,6 +37,7 @@ public class MeteredDataForMeasurementPointSeriesExtractor
     protected internal static IEnumerable<MeteredDataForMeasurementPointSeries> ParseSeries(
         XDocument document,
         XNamespace ns,
+        string senderNumber,
         string seriesElementName)
     {
         var seriesElements = document.Descendants(ns + seriesElementName);
@@ -69,6 +70,7 @@ public class MeteredDataForMeasurementPointSeriesExtractor
                 productUnitType,
                 meteringPointType,
                 meteringPointLocationId,
+                senderNumber,
                 energyObservations);
         }
     }

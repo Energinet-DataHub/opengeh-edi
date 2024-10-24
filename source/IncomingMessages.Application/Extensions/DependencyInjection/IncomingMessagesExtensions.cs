@@ -34,6 +34,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Repositories.Transac
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Json;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Cim.Xml;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
@@ -129,6 +130,7 @@ public static class IncomingMessagesExtensions
             .AddSingleton<CimJsonSchemas>()
             .AddSingleton<CimXmlSchemas>()
             .AddSingleton<CimXmlSchemaProvider>()
+            .AddSingleton<EbixSchemaProvider>()
             .AddSingleton<JsonSchemaProvider>();
         return services;
     }

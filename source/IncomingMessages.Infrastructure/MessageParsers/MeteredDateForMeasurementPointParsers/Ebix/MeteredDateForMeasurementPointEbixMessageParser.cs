@@ -153,10 +153,10 @@ public class MeteredDateForMeasurementPointEbixMessageParser(EbixSchemaProvider 
 
         var header = MessageHeaderExtractor.Extract(document, ns, HeaderElementName, EnergyContextElementName);
         var listOfSeries = MeteredDataForMeasurementPointSeriesExtractor
-            .ParseSeries(document, ns, SeriesElementName)
+            .ParseSeries(document, ns, SeriesElementName, header.SenderId)
             .ToList();
 
-        return new IncomingMarketMessageParserResult(new MeteredDataForMeasurementPoint(
+        return new IncomingMarketMessageParserResult(new MeteredDataForMeasurementPointMessage(
             header.MessageId,
             header.MessageType,
             header.CreatedAt,
