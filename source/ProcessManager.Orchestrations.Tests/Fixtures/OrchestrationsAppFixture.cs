@@ -152,10 +152,10 @@ public class OrchestrationsAppFixture : IAsyncLifetime
 
         // ProcessManager
         appHostSettings.ProcessEnvironmentVariables.Add(
-            nameof(ProcessManagerOptions.ProcessManagerStorageConnectionString),
+            nameof(ProcessManagerTaskHubOptions.ProcessManagerStorageConnectionString),
             AzuriteManager.FullConnectionString);
         appHostSettings.ProcessEnvironmentVariables.Add(
-            nameof(ProcessManagerOptions.ProcessManagerTaskHubName),
+            nameof(ProcessManagerTaskHubOptions.ProcessManagerTaskHubName),
             TaskHubName);
 
         return appHostSettings;

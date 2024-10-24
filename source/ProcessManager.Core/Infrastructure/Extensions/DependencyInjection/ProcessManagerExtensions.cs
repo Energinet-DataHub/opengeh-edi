@@ -14,12 +14,14 @@
 
 using Energinet.DataHub.ProcessManagement.Core.Application;
 using Energinet.DataHub.ProcessManagement.Core.Domain;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Database;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Options;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestration;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.OrchestrationsRegistration;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask.Options;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -39,27 +41,49 @@ public static class ProcessManagerExtensions
     public static IServiceCollection AddOrchestrationManager(this IServiceCollection services)
     {
         services
-            .AddOptions<ProcessManagerOptions>()
+            .AddOptions<ProcessManagerTaskHubOptions>()
             .BindConfiguration(configSectionPath: string.Empty)
             .ValidateDataAnnotations();
 
-        services.AddDurableClientFactory();
-        services.TryAddSingleton<IDurableClient>(sp =>
-        {
-            // IDurableClientFactory has a singleton lifecycle and caches clients
-            var clientFactory = sp.GetRequiredService<IDurableClientFactory>();
-            var processManagerOptions = sp.GetRequiredService<IOptions<ProcessManagerOptions>>().Value;
+        services
+            .AddOptions<ProcessManagerOptions>()
+            .BindConfiguration(ProcessManagerOptions.SectionName)
+            .ValidateDataAnnotations();
 
-            var durableClient = clientFactory.CreateClient(new DurableClientOptions
+        // DurableTaskClient
+        services
+            .AddDurableClientFactory()
+            .TryAddSingleton<IDurableClient>(sp =>
             {
-                ConnectionName = nameof(ProcessManagerOptions.ProcessManagerStorageConnectionString),
-                TaskHub = processManagerOptions.ProcessManagerTaskHubName,
-                IsExternalClient = true,
+                // IDurableClientFactory has a singleton lifecycle and caches clients
+                var clientFactory = sp.GetRequiredService<IDurableClientFactory>();
+                var processManagerOptions = sp.GetRequiredService<IOptions<ProcessManagerTaskHubOptions>>().Value;
+
+                var durableClient = clientFactory.CreateClient(new DurableClientOptions
+                {
+                    ConnectionName = nameof(ProcessManagerTaskHubOptions.ProcessManagerStorageConnectionString),
+                    TaskHub = processManagerOptions.ProcessManagerTaskHubName,
+                    IsExternalClient = true,
+                });
+
+                return durableClient;
             });
 
-            return durableClient;
-        });
+        // TODO: Add health check against Task Hub storage account
 
+        // Database
+        services
+            .AddDbContext<ProcessManagerContext>((sp, dbContextOptions) =>
+            {
+                var processManagerOptions = sp.GetRequiredService<IOptions<ProcessManagerOptions>>().Value;
+                dbContextOptions.UseSqlServer(
+                    processManagerOptions.SqlDatabaseConnectionString,
+                    builder => builder.UseNodaTime());
+            })
+            .AddHealthChecks()
+            .AddDbContextCheck<ProcessManagerContext>(name: "ProcesManagerDatabase");
+
+        // ProcessManager components
         services.TryAddScoped<IOrchestrationRegisterQueries, OrchestrationRegister>();
         services.TryAddScoped<IOrchestrationManager, OrchestrationManager>();
 
@@ -81,14 +105,33 @@ public static class ProcessManagerExtensions
     {
         ArgumentNullException.ThrowIfNull(enabledDescriptionsFactory);
 
-        // TODO: We want to enforce application settings are configured as expected. We need to use the options somewhere to do that!
+        // TODO: Add health check against Task Hub storage account; this will also ensure we have to load settings and thereby validate them
         services
-            .AddOptions<ProcessManagerOptions>()
+            .AddOptions<ProcessManagerTaskHubOptions>()
             .BindConfiguration(configSectionPath: string.Empty)
             .ValidateDataAnnotations();
 
-        // TODO: Not sure what we want the lifetime to be for the following types; they are only used once during startup
+        services
+            .AddOptions<ProcessManagerOptions>()
+            .BindConfiguration(ProcessManagerOptions.SectionName)
+            .ValidateDataAnnotations();
+
+        // Database
+        services
+            .AddDbContext<ProcessManagerContext>((sp, dbContextOptions) =>
+            {
+                var processManagerOptions = sp.GetRequiredService<IOptions<ProcessManagerOptions>>().Value;
+                dbContextOptions.UseSqlServer(
+                    processManagerOptions.SqlDatabaseConnectionString,
+                    builder => builder.UseNodaTime());
+            })
+            .AddHealthChecks()
+            .AddDbContextCheck<ProcessManagerContext>(name: "ProcesManagerDatabase");
+
+        // Descriptions
         services.TryAddTransient<IReadOnlyCollection<OrchestrationDescription>>(sp => enabledDescriptionsFactory());
+
+        // ProcessManager components
         services.TryAddTransient<IOrchestrationRegister, OrchestrationRegister>();
 
         return services;

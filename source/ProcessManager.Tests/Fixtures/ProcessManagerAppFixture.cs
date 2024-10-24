@@ -153,10 +153,10 @@ public class ProcessManagerAppFixture : IAsyncLifetime
 
         // ProcessManager
         appHostSettings.ProcessEnvironmentVariables.Add(
-            nameof(ProcessManagerOptions.ProcessManagerStorageConnectionString),
+            nameof(ProcessManagerTaskHubOptions.ProcessManagerStorageConnectionString),
             AzuriteManager.FullConnectionString);
         appHostSettings.ProcessEnvironmentVariables.Add(
-            nameof(ProcessManagerOptions.ProcessManagerTaskHubName),
+            nameof(ProcessManagerTaskHubOptions.ProcessManagerTaskHubName),
             TaskHubName);
 
         // Disable timer trigger (should be manually triggered in tests)
