@@ -21,7 +21,7 @@ using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Options;
 using Xunit.Abstractions;
 
-namespace ProcessManager.Orchestrations.IntegrationTests.Fixtures;
+namespace Energinet.DataHub.ProcessManager.Orchestrations.Tests.Fixtures;
 
 /// <summary>
 /// Support testing ProcessManager app.

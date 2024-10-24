@@ -15,7 +15,7 @@
 using Energinet.DataHub.ProcessManagement.Core.Domain;
 using FluentAssertions;
 
-namespace Energinet.DataHub.ProcessManager.Core.IntegrationTests.Domain;
+namespace Energinet.DataHub.ProcessManager.Core.Tests.Unit.Domain;
 
 public class DFOrchestrationParameterDefinitionTests
 {

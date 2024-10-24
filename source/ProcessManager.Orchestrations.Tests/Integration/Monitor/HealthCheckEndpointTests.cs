@@ -13,26 +13,26 @@
 // limitations under the License.
 
 using System.Net;
-using Energinet.DataHub.ProcessManager.IntegrationTests.Fixtures;
+using Energinet.DataHub.ProcessManager.Orchestrations.Tests.Fixtures;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.ProcessManager.IntegrationTests.Monitor;
+namespace Energinet.DataHub.ProcessManager.Orchestrations.Tests.Integration.Monitor;
 
 /// <summary>
 /// Tests verifying the configuration and behaviour of Health Checks.
 /// </summary>
-[Collection(nameof(ProcessManagerAppCollectionFixture))]
+[Collection(nameof(OrchestrationsAppCollectionFixture))]
 public class HealthCheckEndpointTests : IAsyncLifetime
 {
-    public HealthCheckEndpointTests(ProcessManagerAppFixture fixture, ITestOutputHelper testOutputHelper)
+    public HealthCheckEndpointTests(OrchestrationsAppFixture fixture, ITestOutputHelper testOutputHelper)
     {
         Fixture = fixture;
         Fixture.SetTestOutputHelper(testOutputHelper);
     }
 
-    private ProcessManagerAppFixture Fixture { get; }
+    private OrchestrationsAppFixture Fixture { get; }
 
     public Task InitializeAsync()
     {

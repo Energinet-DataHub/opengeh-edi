@@ -22,7 +22,7 @@ using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Options
 using Energinet.DataHub.ProcessManager.Scheduler;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.ProcessManager.IntegrationTests.Fixtures;
+namespace Energinet.DataHub.ProcessManager.Tests.Fixtures;
 
 /// <summary>
 /// Support testing ProcessManager app.
