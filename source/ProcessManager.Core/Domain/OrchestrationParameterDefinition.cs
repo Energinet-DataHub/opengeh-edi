@@ -74,6 +74,6 @@ public class OrchestrationParameterDefinition
         var jsonSchema = await JsonSchema.FromJsonAsync(SerializedParameterDefinition).ConfigureAwait(false);
         var errors = jsonSchema.Validate(serializedParameterValue);
 
-        return errors.IsNullOrEmpty();
+        return errors.Count == 0;
     }
 }
