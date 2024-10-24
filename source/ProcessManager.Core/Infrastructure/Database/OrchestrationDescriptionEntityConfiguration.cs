@@ -37,6 +37,12 @@ public class OrchestrationDescriptionEntityConfiguration : IEntityTypeConfigurat
         builder.Property(o => o.HostName);
         builder.Property(o => o.IsEnabled);
 
-        // TODO: Add parameter definition; sry I had to change it :)
+        builder.OwnsOne(
+            o => o.ParameterDefinition,
+            pd =>
+            {
+                pd.Property("SerializedParameterDefinition")
+                    .HasColumnName("ParameterDefinition");
+            });
     }
 }

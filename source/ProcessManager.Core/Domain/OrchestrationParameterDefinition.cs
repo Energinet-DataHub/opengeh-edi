@@ -30,6 +30,10 @@ public class OrchestrationParameterDefinition
 
     /// <summary>
     /// The JSON schema defining the parameter type.
+    /// <remarks>
+    /// Parameter name "SerializedParameterDefinition" needs to be in sync with the Entity Framework configuration
+    /// (since it is private).
+    /// </remarks>
     /// </summary>
     private string SerializedParameterDefinition { get; set; }
 

@@ -37,7 +37,13 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
         builder.Property(o => o.ChangedAt);
         builder.Property(o => o.CompletedAt);
 
-        // TODO: Add parameter value; sry I had to change it :)
+        builder.OwnsOne(
+            o => o.ParameterValue,
+            b =>
+            {
+                b.Property(pv => pv.SerializedParameterValue)
+                    .HasColumnName("ParameterValue");
+            });
 
         builder.OwnsMany(
             o => o.Steps,
