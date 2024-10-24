@@ -56,7 +56,7 @@ public class ProcessManagerContextTests
     }
 
     [Fact]
-    public async Task Given_OrchestrationInstanceAddedToDbContext_WhenRetrievingFromDatabase_HasCorrectValues()
+    public async Task Given_OrchestrationInstanceWithStepsAddedToDbContext_WhenRetrievingFromDatabase_HasCorrectValues()
     {
         // Arrange
         var existingOrchestrationDescription = CreateOrchestrationDescription();
