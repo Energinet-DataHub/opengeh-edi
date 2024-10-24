@@ -66,8 +66,8 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
 
                 b.Property(s => s.State)
                     .HasConversion(
-                        state => state != null ? state.Value : null,
-                        dbValue => dbValue != null ? new OrchestrationStepInstanceState(dbValue) : null);
+                        state => state.Value,
+                        dbValue => new OrchestrationStepInstanceState(dbValue));
 
                 b.Property(s => s.OrchestrationInstanceId)
                     .HasConversion(
