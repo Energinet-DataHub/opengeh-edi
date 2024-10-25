@@ -14,7 +14,7 @@
 
 using Microsoft.ApplicationInsights.Channel;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+namespace Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 
 public sealed class TelemetryChannelStub : ITelemetryChannel
 {
