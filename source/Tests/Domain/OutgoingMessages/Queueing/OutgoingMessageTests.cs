@@ -155,7 +155,7 @@ public class OutgoingMessageTests
     {
         // Arrange
         var serializer = new Serializer();
-        var rejectedEnergyResultMessageDto = RejectedEnergyResultMessageDtoBuilder.Build();
+        var rejectedEnergyResultMessageDto = new RejectedEnergyResultMessageDtoBuilder().Build();
 
         // Act
         var outgoingMessage = OutgoingMessageFactory.CreateMessage(

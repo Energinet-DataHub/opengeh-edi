@@ -29,9 +29,9 @@ public record SearchArchivedMessagesCriteriaV3(
     MessageCreationPeriod? CreatedDuringPeriod,
     string? MessageId,
     string? SenderNumber,
-    string? SenderRoleCode,
+    ActorRole? SenderRole,
     string? ReceiverNumber,
-    string? ReceiverRoleCode,
+    ActorRole? ReceiverRole,
     IReadOnlyCollection<DocumentType>? DocumentTypes,
     IReadOnlyCollection<string>? BusinessReasons,
     bool IncludeRelatedMessages = false);

@@ -37,4 +37,9 @@ public static class ActorRoleMapper
     {
         return ActorRoleMappings[actorRoleCode];
     }
+
+    public static string? ToActorRoleCode(Models.ActorRole? actorRole)
+    {
+        return ActorRoleMappings.FirstOrDefault(x => x.Value == actorRole).Key;
+    }
 }

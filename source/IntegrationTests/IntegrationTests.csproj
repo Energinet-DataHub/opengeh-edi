@@ -57,6 +57,7 @@ limitations under the License.
       <ProjectReference Include="..\ArchivedMessages.Interfaces\ArchivedMessages.Interfaces.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
+      <ProjectReference Include="..\CalculationResults\CalculationResults.Infrastructure\CalculationResults.Infrastructure.csproj" />
       <ProjectReference Include="..\DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj" />
       <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
       <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj" />
@@ -73,6 +74,7 @@ limitations under the License.
       <ProjectReference Include="..\OutgoingMessages.Application\OutgoingMessages.Application.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Domain\OutgoingMessages.Domain.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
+      <ProjectReference Include="..\OutgoingMessages.IntegrationTests\OutgoingMessages.IntegrationTests.csproj" />
       <ProjectReference Include="..\Process.Application\Process.Application.csproj" />
       <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
       <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
@@ -152,6 +154,24 @@ limitations under the License.
       </None>
       <None Update="Behaviours\IntegrationEvents\TestData\balance_fixing_01-11-2022_01-12-2022_ga_543_per_brp_ga_v1_with_invalid_row.csv">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="CalculationResults\TestData\wholesale_calculation_results.amounts_per_charge_v1.csv">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="CalculationResults\TestData\wholesale_calculation_results.energy_per_brp_ga_v1.csv">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="CalculationResults\TestData\wholesale_calculation_results.energy_per_es_brp_ga_v1.csv">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="CalculationResults\TestData\wholesale_calculation_results.energy_per_ga_v1.csv">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="CalculationResults\TestData\wholesale_calculation_results.monthly_amounts_per_charge_v1.csv">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="CalculationResults\TestData\wholesale_calculation_results.total_monthly_amounts_v1.csv">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
 

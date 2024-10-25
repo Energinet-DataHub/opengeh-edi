@@ -97,9 +97,15 @@ jobs:
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
+          - name: Integration tests - CalculationResults
+            paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
+            filter: (DisplayName~IntegrationTests.CalculationResults)
+            use_azure_functions_tools: true
+            contentroot_variable_name: empty # Means skip
+
           - name: Integration tests - Other
             paths: \source\IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IntegrationTests.dll
-            filter: (DisplayName!~IntegrationTests.Behaviours)
+            filter: (DisplayName!~IntegrationTests.Behaviours)&(DisplayName!~IntegrationTests.CalculationResults)
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
@@ -123,6 +129,12 @@ jobs:
 
           - name: IncomingMessages - integration tests
             paths: \source\IncomingMessages.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.dll
+            filter: empty # Means skip
+            use_azure_functions_tools: true
+            contentroot_variable_name: empty # Means skip
+
+          - name: OutgoingMessages - integration tests
+            paths: \source\OutgoingMessages.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip

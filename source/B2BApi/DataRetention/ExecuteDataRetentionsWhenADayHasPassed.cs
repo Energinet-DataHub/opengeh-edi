@@ -15,6 +15,7 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Polly;
 
@@ -24,35 +25,78 @@ public class ExecuteDataRetentionsWhenADayHasPassed : INotificationHandler<ADayH
 {
     private readonly IReadOnlyCollection<IDataRetention> _dataRetentions;
     private readonly ILogger<ExecuteDataRetentionsWhenADayHasPassed> _logger;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly int _jobsExecutionTimeLimitInSeconds;
 
     public ExecuteDataRetentionsWhenADayHasPassed(
         IEnumerable<IDataRetention> dataRetentions,
-        ILogger<ExecuteDataRetentionsWhenADayHasPassed> logger)
+        ILogger<ExecuteDataRetentionsWhenADayHasPassed> logger,
+        IServiceScopeFactory serviceScopeFactory,
+        int executionTimeLimitInSeconds = 25 * 60)
     {
         _dataRetentions = dataRetentions.ToList();
         _logger = logger;
+        _serviceScopeFactory = serviceScopeFactory;
+        _jobsExecutionTimeLimitInSeconds = executionTimeLimitInSeconds;
     }
 
     public async Task Handle(ADayHasPassed notification, CancellationToken cancellationToken)
     {
-        var executionPolicy = Policy
-            .Handle<Exception>()
-            .WaitAndRetryAsync(new[]
-            {
-                TimeSpan.FromSeconds(10),
-                TimeSpan.FromSeconds(15),
-                TimeSpan.FromSeconds(30),
-            });
-
-        foreach (var dataCleaner in _dataRetentions)
+        var taskMap = new Dictionary<Task, IDataRetention>();
+        List<IServiceScope> serviceScopes = [];
+        try
         {
-            var result = await executionPolicy.ExecuteAndCaptureAsync(() =>
-                dataCleaner.CleanupAsync(cancellationToken)).ConfigureAwait(false);
+            // Cancels all retentions after provided seconds
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(_jobsExecutionTimeLimitInSeconds));
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token);
 
-            if (result.Outcome == OutcomeType.Failure)
+            var executionPolicy = Policy
+                .Handle<Exception>(ex => ex is not OperationCanceledException)
+                .WaitAndRetryAsync(
+                    [TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(15), TimeSpan.FromSeconds(30)]);
+
+            foreach (var dataCleaner in _dataRetentions)
             {
-                _logger?.Log(LogLevel.Error, result.FinalException, "Type {DataCleaner} failed to clean up", dataCleaner.GetType().FullName);
+                // Cannot dispose the scope in the foreach loop, as the task may still be running
+                var scope = _serviceScopeFactory.CreateScope();
+                var scopedRetentionJob = scope.ServiceProvider.GetServices<IDataRetention>()
+                    .Single(j => j.GetType() == dataCleaner.GetType());
+
+                var task = executionPolicy.ExecuteAsync(
+                    () => scopedRetentionJob.CleanupAsync(linkedCts.Token));
+
+                taskMap[task] = dataCleaner;
+                serviceScopes.Add(scope);
             }
+
+            var tasks = taskMap.Keys.ToList();
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+        }
+        catch (TaskCanceledException ex)
+        {
+            // This catch block handles task-specific cancellations.
+            // It logs the cancellation of data retention jobs.
+            LogCancelledTasks(taskMap, ex);
+        }
+        finally
+        {
+            foreach (var scope in serviceScopes)
+                scope.Dispose();
+        }
+    }
+
+    private void LogCancelledTasks(Dictionary<Task, IDataRetention> taskMap, TaskCanceledException ex)
+    {
+        var incompleteTasks = taskMap
+            .Where(kvp => kvp.Key.Status != TaskStatus.RanToCompletion)
+            .Select(kvp => kvp.Value);
+        foreach (var dataCleaner in incompleteTasks)
+        {
+            _logger?.LogError(
+                ex,
+                "Data retention job {DataCleaner} was cancelled.",
+                dataCleaner.GetType().FullName);
         }
     }
 }

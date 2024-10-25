@@ -100,7 +100,7 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         var actorMessageQueueForEs = await actorMessageQueueRepository.ActorMessageQueueForAsync(receiverId, ActorRole.EnergySupplier, CancellationToken.None);
 
         // The bundle should be removed from the queue for the energy supplier, but not for the grid operator.
-        var dequeuedBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(clockStub.GetCurrentInstant(), 100);
+        var dequeuedBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(clockStub.GetCurrentInstant(), 100, CancellationToken.None);
         dequeuedBundles.Should().NotContain(x => x.ActorMessageQueueId == actorMessageQueueForEs!.Id);
 
         // We are still able to peek the message for the grid operator.
@@ -150,7 +150,7 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         var outgoingMessageForReceivingActor = await outgoingMessageRepository.GetAsync(Receiver.Create(receiverId, ActorRole.EnergySupplier), message.ExternalId, CancellationToken.None);
 
         // Delete the blob
-        await fileStorageClient.DeleteIfExistsAsync(new List<FileStorageReference> { outgoingMessageForReceivingActor!.FileStorageReference }, FileStorageCategory.OutgoingMessage());
+        await fileStorageClient.DeleteIfExistsAsync(new List<FileStorageReference> { outgoingMessageForReceivingActor!.FileStorageReference }, FileStorageCategory.OutgoingMessage(), CancellationToken.None);
 
         // Act
         await sut.CleanupAsync(CancellationToken.None);
@@ -160,7 +160,7 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         var actorMessageQueueForEs = await actorMessageQueueRepository.ActorMessageQueueForAsync(receiverId, ActorRole.EnergySupplier, CancellationToken.None);
 
         // The bundle should be removed from the queue for the energy supplier, but not for the grid operator.
-        var dequeuedBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(clockStub.GetCurrentInstant(), 100);
+        var dequeuedBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(clockStub.GetCurrentInstant(), 100, CancellationToken.None);
         dequeuedBundles.Should().NotContain(x => x.ActorMessageQueueId == actorMessageQueueForEs!.Id);
 
         // We are still able to peek the message for the grid operator.
@@ -223,7 +223,7 @@ public class RemoveOldDequeuedBundlesWhenADayHasPassedTests : TestBase
         var actorMessageQueueForEs = await actorMessageQueueRepository.ActorMessageQueueForAsync(receiverId, ActorRole.EnergySupplier, CancellationToken.None);
 
         // The bundle should be removed from the queue for the energy supplier, but not for the grid operator.
-        var dequeuedBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(clockStub.GetCurrentInstant(), 100);
+        var dequeuedBundles = await bundleRepository.GetDequeuedBundlesOlderThanAsync(clockStub.GetCurrentInstant(), 100, CancellationToken.None);
         dequeuedBundles.Should().NotContain(x => x.ActorMessageQueueId == actorMessageQueueForEs!.Id);
 
         // We are still able to peek the message for the grid operator.
