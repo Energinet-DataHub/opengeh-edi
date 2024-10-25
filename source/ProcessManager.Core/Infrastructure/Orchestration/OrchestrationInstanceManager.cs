@@ -21,9 +21,9 @@ namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestration;
 
 /// <summary>
 /// An encapsulation of <see cref="IDurableClient"/> that allows us to
-/// provide a "framework" for managing orchestrations using custom domain types.
+/// provide a "framework" for managing Durable Functions orchestration instances using custom domain types.
 /// </summary>
-public class OrchestrationManager : IOrchestrationManager
+public class OrchestrationInstanceManager : IOrchestrationInstanceManager
 {
     private readonly IClock _clock;
     private readonly IDurableClient _durableClient;
@@ -40,7 +40,7 @@ public class OrchestrationManager : IOrchestrationManager
     /// <param name="orchestrationRegister"></param>
     /// <param name="orchestrationInstanceRepository"></param>
     /// <param name="unitOfWork"></param>
-    public OrchestrationManager(
+    public OrchestrationInstanceManager(
         IClock clock,
         IDurableClient durableClient,
         IOrchestrationRegisterQueries orchestrationRegister,
@@ -55,7 +55,7 @@ public class OrchestrationManager : IOrchestrationManager
     }
 
     /// <inheritdoc />
-    public async Task<OrchestrationInstanceId> StartOrchestrationAsync<TParameter>(string name, int version, TParameter parameter)
+    public async Task<OrchestrationInstanceId> StartNewOrchestrationInstanceAsync<TParameter>(string name, int version, TParameter parameter)
         where TParameter : class
     {
         // Validate orchestration description is knoww and paramter value is valid
@@ -92,7 +92,7 @@ public class OrchestrationManager : IOrchestrationManager
     }
 
     /// <inheritdoc />
-    public Task<OrchestrationInstanceId> ScheduleOrchestrationAsync<TParameter>(
+    public Task<OrchestrationInstanceId> ScheduleNewOrchestrationInstanceAsync<TParameter>(
         string name,
         int version,
         TParameter parameter,
@@ -103,7 +103,7 @@ public class OrchestrationManager : IOrchestrationManager
     }
 
     /// <inheritdoc />
-    public Task CancelScheduledOrchestrationAsync(OrchestrationInstanceId id)
+    public Task CancelScheduledOrchestrationInstanceAsync(OrchestrationInstanceId id)
     {
         return Task.CompletedTask;
     }

@@ -17,16 +17,16 @@ using Energinet.DataHub.ProcessManagement.Core.Application;
 namespace Energinet.DataHub.ProcessManager.Scheduler;
 
 public class ProcessSchedulerHandler(
-    IOrchestrationManager orchestrationManager)
+    IOrchestrationInstanceManager orchestrationInstanceManager)
 {
-    private readonly IOrchestrationManager _orchestrationManager = orchestrationManager;
+    private readonly IOrchestrationInstanceManager _orchestrationInstanceManager = orchestrationInstanceManager;
 
     public async Task StartScheduledProcessAsync()
     {
         var x = 12 + 2;
         if (x == 13)
         {
-            await _orchestrationManager.StartOrchestrationAsync(
+            await _orchestrationInstanceManager.StartNewOrchestrationInstanceAsync(
                 name: "BRS_023_027",
                 version: 1,
                 new ExampleInput(

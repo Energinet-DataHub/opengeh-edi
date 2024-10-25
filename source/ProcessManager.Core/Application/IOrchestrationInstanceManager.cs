@@ -17,22 +17,22 @@ using NodaTime;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Application;
 
-public interface IOrchestrationManager
+public interface IOrchestrationInstanceManager
 {
     /// <summary>
     /// Start a new instance of an orchestration.
     /// </summary>
-    Task<OrchestrationInstanceId> StartOrchestrationAsync<TParameter>(string name, int version, TParameter parameter)
+    Task<OrchestrationInstanceId> StartNewOrchestrationInstanceAsync<TParameter>(string name, int version, TParameter parameter)
         where TParameter : class;
 
-    Task<OrchestrationInstanceId> ScheduleOrchestrationAsync<TParameter>(
+    Task<OrchestrationInstanceId> ScheduleNewOrchestrationInstanceAsync<TParameter>(
         string name,
         int version,
         TParameter parameter,
         Instant runAt)
         where TParameter : class;
 
-    Task CancelScheduledOrchestrationAsync(OrchestrationInstanceId id);
+    Task CancelScheduledOrchestrationInstanceAsync(OrchestrationInstanceId id);
 
     Task<IReadOnlyCollection<OrchestrationInstance>> GetOrchestrationInstancesAsync(string name, int? version);
 }
