@@ -41,7 +41,10 @@ public sealed class EbixIncomingMessageReceiver(
         ArgumentNullException.ThrowIfNull(request);
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
 
-        using var seekingStreamFromBody = await request.CreateSeekingStreamFromBodyAsync(cancellationToken).ConfigureAwait(false);
+        using var seekingStreamFromBody = await request
+            .CreateSeekingStreamFromBodyAsync(cancellationToken)
+            .ConfigureAwait(false);
+
         var incomingMarketMessageStream = new IncomingMarketMessageStream(seekingStreamFromBody);
 
         if (!await _featureFlagManager.ReceiveMeteredDataForMeasurementPointsAsync().ConfigureAwait(false))

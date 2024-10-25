@@ -19,7 +19,9 @@ namespace Energinet.DataHub.EDI.B2BApi.Common;
 
 public static class HttpRequestDataExtensions
 {
-    public static async Task<MemoryStream> CreateSeekingStreamFromBodyAsync(this HttpRequestData request, CancellationToken cancellationToken)
+    public static async Task<MemoryStream> CreateSeekingStreamFromBodyAsync(
+        this HttpRequestData request,
+        CancellationToken cancellationToken)
     {
         var memoryStream = new MemoryStream();
         await request.Body.CopyToAsync(memoryStream, cancellationToken).ConfigureAwait(false);
