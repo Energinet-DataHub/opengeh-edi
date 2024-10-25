@@ -127,6 +127,26 @@ limitations under the License.
         <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\EmptyJsonObject.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+        <None Remove="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\BadVersionMeteredDateForMeasurementPoint.xml" />
+        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\BadVersionMeteredDateForMeasurementPoint.xml">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\InvalidMeteredDateForMeasurementPoint.xml" />
+        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\InvalidMeteredDateForMeasurementPoint.xml">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\ValidMeteredDateForMeasurementPoint.xml" />
+        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\ValidMeteredDateForMeasurementPoint.xml">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\ValidMeteredDateForMeasurementPointWithTwoTransactions.xml" />
+        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\ValidMeteredDateForMeasurementPointWithTwoTransactions.xml">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\ValidPT1HMeteredDataForMeasurementPoint.xml" />
+        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\ValidPT1HMeteredDataForMeasurementPoint.xml">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemDefinitionGroup>
