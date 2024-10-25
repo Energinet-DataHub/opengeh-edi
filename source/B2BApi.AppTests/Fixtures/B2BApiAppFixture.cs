@@ -420,6 +420,10 @@ public class B2BApiAppFixture : IAsyncLifetime
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
+            "FeatureManagement__ReceiveMeteredDataForMeasurementPoints",
+            true.ToString().ToLower());
+
+        appHostSettings.ProcessEnvironmentVariables.Add(
             $"RevisionLogOptions__{nameof(RevisionLogOptions.ApiAddress)}",
             AuditLogMockServer.IngestionUrl);
 

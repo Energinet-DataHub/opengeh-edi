@@ -55,8 +55,10 @@ limitations under the License.
       <ProjectReference Include="..\B2BApi\B2BApi.csproj" />
       <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />
       <ProjectReference Include="..\ArchivedMessages.Interfaces\ArchivedMessages.Interfaces.csproj" />
+      <ProjectReference Include="..\B2CWebApi\B2CWebApi.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
       <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj" />
+      <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj" />
       <ProjectReference Include="..\CalculationResults\CalculationResults.Infrastructure\CalculationResults.Infrastructure.csproj" />
       <ProjectReference Include="..\DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj" />
       <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
@@ -65,7 +67,6 @@ limitations under the License.
       <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\IncomingMessages.IntegrationTests\IncomingMessages.IntegrationTests.csproj" />
       <ProjectReference Include="..\IntegrationEvents.Application\IntegrationEvents.Application.csproj" />
-      <ProjectReference Include="..\IntegrationEvents.Infrastructure\IntegrationEvents.Infrastructure.csproj" />
       <ProjectReference Include="..\IntegrationEvents.IntegrationTests\IntegrationEvents.IntegrationTests.csproj" />
       <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
       <ProjectReference Include="..\MasterData.IntegrationTests\MasterData.IntegrationTests.csproj" />
@@ -74,6 +75,7 @@ limitations under the License.
       <ProjectReference Include="..\OutgoingMessages.Application\OutgoingMessages.Application.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Domain\OutgoingMessages.Domain.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
+      <ProjectReference Include="..\OutgoingMessages.IntegrationTests\OutgoingMessages.IntegrationTests.csproj" />
       <ProjectReference Include="..\Process.Application\Process.Application.csproj" />
       <ProjectReference Include="..\Process.Infrastructure\Process.Infrastructure.csproj" />
       <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
@@ -177,5 +179,11 @@ limitations under the License.
     <ItemGroup>
         <Folder Include="Application\Process\"/>
     </ItemGroup>
+
+    <ItemDefinitionGroup>
+        <ProjectReference>
+            <PrivateAssets>all</PrivateAssets>
+        </ProjectReference>
+    </ItemDefinitionGroup>
 
 </Project>

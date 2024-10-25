@@ -19,6 +19,7 @@ using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
 using Energinet.DataHub.BuildingBlocks.Tests.Logging;
+using Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.Outbox.Extensions.DependencyInjection;
@@ -41,7 +42,6 @@ using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Configuration.InternalCommands;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.InboxEvents;
-using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
@@ -72,7 +72,6 @@ using Xunit;
 using Xunit.Abstractions;
 using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using ExecutionContext = Energinet.DataHub.EDI.BuildingBlocks.Domain.ExecutionContext;
-using SampleData = Energinet.DataHub.EDI.IntegrationTests.Application.OutgoingMessages.SampleData;
 
 namespace Energinet.DataHub.EDI.IntegrationTests;
 

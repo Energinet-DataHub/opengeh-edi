@@ -15,7 +15,7 @@
 using System.Diagnostics.CodeAnalysis;
 using BuildingBlocks.Application.FeatureFlag;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+namespace Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 
 /// <summary>
 /// A FeatureFlagManager used to set default values and which allows overriding feature flags during tests
@@ -26,4 +26,6 @@ public class FeatureFlagManagerStub : IFeatureFlagManager
     public Task<bool> UsePeekMessagesAsync() => Task.FromResult(true);
 
     public Task<bool> RequestStaysInEdiAsync() => Task.FromResult(false);
+
+    public Task<bool> ReceiveMeteredDataForMeasurementPointsAsync() => Task.FromResult(true);
 }

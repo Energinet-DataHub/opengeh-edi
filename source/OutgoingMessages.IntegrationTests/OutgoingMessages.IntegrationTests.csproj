@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <AssemblyName>Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests</AssemblyName>
+        <RootNamespace>Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests</RootNamespace>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="coverlet.collector" Version="6.0.2">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Dapper" Version="2.1.35"/>
+        <PackageReference Include="FluentAssertions" Version="6.12.1"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1"/>
+        <PackageReference Include="xunit" Version="2.9.2"/>
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="integrationtest.local.settings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj"/>
+        <ProjectReference Include="..\B2BApi\B2BApi.csproj" />
+        <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj"/>
+        <ProjectReference Include="..\BuildingBlocks.Infrastructure\BuildingBlocks.Infrastructure.csproj"/>
+        <ProjectReference Include="..\Contracts\Contracts.csproj"/>
+        <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
+        <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
+        <ProjectReference Include="..\OutgoingMessages.Application\OutgoingMessages.Application.csproj" />
+        <ProjectReference Include="..\OutgoingMessages.Domain\OutgoingMessages.Domain.csproj" />
+        <ProjectReference Include="..\OutgoingMessages.Infrastructure\OutgoingMessages.Infrastructure.csproj" />
+        <ProjectReference Include="..\Process.Domain\Process.Domain.csproj"/>
+        <ProjectReference Include="..\Tests\Tests.csproj"/>
+    </ItemGroup>
+
+</Project>
