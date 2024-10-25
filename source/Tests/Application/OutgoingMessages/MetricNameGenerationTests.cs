@@ -19,7 +19,7 @@ using Xunit;
 
 namespace Energinet.DataHub.EDI.Tests.Application.OutgoingMessages;
 
-public class ApplicationInsightLoggingTests
+public class MetricNameGenerationTests
 {
     // The following values has to be hardcoded, since they are hardcoded in the terraform defining the dashboard
     private static readonly string[] _formats = ["Json", "Xml", "Ebix" ];
