@@ -25,6 +25,9 @@ public interface IOrchestrationInstanceManager
     Task<OrchestrationInstanceId> StartNewOrchestrationInstanceAsync<TParameter>(string name, int version, TParameter parameter)
         where TParameter : class;
 
+    /// <summary>
+    /// Schedule a new instance of an orchestration.
+    /// </summary>
     Task<OrchestrationInstanceId> ScheduleNewOrchestrationInstanceAsync<TParameter>(
         string name,
         int version,
@@ -32,7 +35,13 @@ public interface IOrchestrationInstanceManager
         Instant runAt)
         where TParameter : class;
 
+    /// <summary>
+    /// Cancel a scheduled orchestration instance.
+    /// </summary>
     Task CancelScheduledOrchestrationInstanceAsync(OrchestrationInstanceId id);
 
+    /// <summary>
+    /// Get all orchestration instances filtered by their related orchestration definition name and version.
+    /// </summary>
     Task<IReadOnlyCollection<OrchestrationInstance>> GetOrchestrationInstancesAsync(string name, int? version);
 }
