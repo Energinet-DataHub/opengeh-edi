@@ -25,15 +25,15 @@ public class OrchestrationInstance
 {
     public OrchestrationInstance(
         OrchestrationDescriptionId orchestrationDescriptionId,
-        IClock clock)
+        IClock clock,
+        Instant? scheduledToRunAt = default)
     {
         Id = new OrchestrationInstanceId(Guid.NewGuid());
-        CreatedAt = clock.GetCurrentInstant();
-        State = new OrchestrationInstanceState("Created");
-
         ParameterValue = new();
+        Lifecycle = new OrchestrationInstanceLifecycleState(clock, scheduledToRunAt);
 
         Steps = [];
+        CustomState = new OrchestrationInstanceCustomState(string.Empty);
         OrchestrationDescriptionId = orchestrationDescriptionId;
     }
 
@@ -49,20 +49,15 @@ public class OrchestrationInstance
 
     public OrchestrationInstanceId Id { get; }
 
-    public Instant CreatedAt { get; }
-
     /// <summary>
     /// Defines the Durable Functions orchestration input parameter value.
     /// </summary>
     public OrchestrationParameterValue ParameterValue { get; }
 
-    public Instant? ScheduledAt { get; }
-
-    public Instant? StartedAt { get; set; }
-
-    public Instant? ChangedAt { get; }
-
-    public Instant? CompletedAt { get; }
+    /// <summary>
+    /// The high-level lifecycle states that all orchestration instances can go through.
+    /// </summary>
+    public OrchestrationInstanceLifecycleState Lifecycle { get; }
 
     /// <summary>
     /// Workflow steps the orchestration instance is going through.
@@ -70,13 +65,13 @@ public class OrchestrationInstance
     public IList<OrchestrationStep> Steps { get; }
 
     /// <summary>
-    /// The overall state of the orchestration instance.
+    /// Any custom state of the orchestration instance.
     /// </summary>
-    public OrchestrationInstanceState State { get; }
+    public OrchestrationInstanceCustomState CustomState { get; }
 
     /// <summary>
-    /// The Durable Function orchestration which describes the workflow that the
-    /// orchestration instance is an instance of.
+    /// The orchestration description for the Durable Functions orchestration which describes
+    /// the workflow that the orchestration instance is an instance of.
     /// </summary>
     public OrchestrationDescriptionId OrchestrationDescriptionId { get; }
 }

@@ -14,4 +14,4 @@
 
 namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 
-public record OrchestrationInstanceState(string Value);
+public record OrchestrationInstanceCustomState(string Value);

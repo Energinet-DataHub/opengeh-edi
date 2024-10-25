@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Text.Json;
-using Microsoft.IdentityModel.Tokens;
 using NJsonSchema;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Domain;

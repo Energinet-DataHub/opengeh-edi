@@ -17,7 +17,7 @@ using Energinet.DataHub.ProcessManagement.Core.Domain;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.OrchestrationsRegistration;
+namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestration;
 
 /// <summary>
 /// Keep a register of known Durable Functions orchestrations.
@@ -34,7 +34,15 @@ public class OrchestrationRegister : IOrchestrationRegister, IOrchestrationRegis
     }
 
     /// <inheritdoc />
-    public Task<OrchestrationDescription?> GetOrDefaultAsync(string name, int version, bool isEnabled = true)
+    public Task<OrchestrationDescription> GetAsync(OrchestrationDescriptionId id)
+    {
+        ArgumentNullException.ThrowIfNull(id);
+
+        return _context.OrchestrationDescriptions.FirstAsync(x => x.Id == id);
+    }
+
+    /// <inheritdoc />
+    public Task<OrchestrationDescription?> GetOrDefaultAsync(string name, int version, bool? isEnabled)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
@@ -42,7 +50,7 @@ public class OrchestrationRegister : IOrchestrationRegister, IOrchestrationRegis
             .SingleOrDefaultAsync(x =>
                 x.Name == name
                 && x.Version == version
-                && x.IsEnabled == isEnabled);
+                && (isEnabled == null || x.IsEnabled == isEnabled));
     }
 
     /// <inheritdoc />
@@ -51,20 +59,23 @@ public class OrchestrationRegister : IOrchestrationRegister, IOrchestrationRegis
         ArgumentException.ThrowIfNullOrWhiteSpace(hostName);
 
         var query = _context.OrchestrationDescriptions
-            .Where(x
-                => x.HostName == hostName);
+            .Where(x => x.HostName == hostName);
 
         return await query.ToListAsync().ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public async Task RegisterAsync(OrchestrationDescription orchestrationDescription)
+    public async Task RegisterAsync(OrchestrationDescription orchestrationDescription, string hostName)
     {
         ArgumentNullException.ThrowIfNull(orchestrationDescription);
+        ArgumentException.ThrowIfNullOrWhiteSpace(hostName);
 
-        var existing = await GetOrDefaultAsync(orchestrationDescription.Name, orchestrationDescription.Version).ConfigureAwait(false);
+        var existing = await GetOrDefaultAsync(orchestrationDescription.Name, orchestrationDescription.Version, isEnabled: null).ConfigureAwait(false);
         if (existing == null)
         {
+            // Enfore certain values
+            orchestrationDescription.HostName = hostName;
+            orchestrationDescription.IsEnabled = true;
             _context.Add(orchestrationDescription);
         }
         else
@@ -80,10 +91,9 @@ public class OrchestrationRegister : IOrchestrationRegister, IOrchestrationRegis
     {
         ArgumentNullException.ThrowIfNull(orchestrationDescription);
 
-        var existing = await GetOrDefaultAsync(orchestrationDescription.Name, orchestrationDescription.Version).ConfigureAwait(false);
-
+        var existing = await GetOrDefaultAsync(orchestrationDescription.Name, orchestrationDescription.Version, isEnabled: true).ConfigureAwait(false);
         if (existing == null)
-            throw new InvalidOperationException("Orchestration description has not been registered.");
+            throw new InvalidOperationException("Orchestration description has not been registered or is not currently enabled.");
 
         existing.IsEnabled = false;
 

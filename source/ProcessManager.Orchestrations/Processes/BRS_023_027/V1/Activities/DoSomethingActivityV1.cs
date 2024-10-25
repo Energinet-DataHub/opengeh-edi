@@ -36,7 +36,7 @@ internal class DoSomethingActivityV1(
             .GetAsync(new OrchestrationInstanceId(orchestrationInstanceId))
             .ConfigureAwait(false);
 
-        orchestrationInstance.StartedAt = _clock.GetCurrentInstant();
+        orchestrationInstance.Lifecycle.TransitionToRunning(_clock);
         await _unitOfWork.CommitAsync().ConfigureAwait(false);
     }
 }

@@ -59,11 +59,7 @@ public static class OrchestrationRegisterExtensions
 
             if (registerDescription == null || registerDescription.IsEnabled == false)
             {
-                // Enforce certain values
-                hostDescription.HostName = hostName;
-                hostDescription.IsEnabled = true;
-
-                await register.RegisterAsync(hostDescription).ConfigureAwait(false);
+                await register.RegisterAsync(hostDescription, hostName).ConfigureAwait(false);
             }
         }
     }

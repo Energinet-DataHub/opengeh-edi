@@ -36,12 +36,12 @@ public interface IOrchestrationInstanceManager
         where TParameter : class;
 
     /// <summary>
+    /// Start a scheduled orchestration instance.
+    /// </summary>
+    Task StartScheduledOrchestrationInstanceAsync(OrchestrationInstanceId id);
+
+    /// <summary>
     /// Cancel a scheduled orchestration instance.
     /// </summary>
     Task CancelScheduledOrchestrationInstanceAsync(OrchestrationInstanceId id);
-
-    /// <summary>
-    /// Get all orchestration instances filtered by their related orchestration definition name and version.
-    /// </summary>
-    Task<IReadOnlyCollection<OrchestrationInstance>> GetOrchestrationInstancesAsync(string name, int? version);
 }

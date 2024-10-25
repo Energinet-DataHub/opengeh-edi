@@ -58,20 +58,83 @@ public class OrchestrationInstanceManager : IOrchestrationInstanceManager
     public async Task<OrchestrationInstanceId> StartNewOrchestrationInstanceAsync<TParameter>(string name, int version, TParameter parameter)
         where TParameter : class
     {
-        // Validate orchestration description is knoww and paramter value is valid
-        var orchestrationDescription = await _orchestrationRegister.GetOrDefaultAsync(name, version).ConfigureAwait(false);
+        var orchestrationDescription = await GuardMatchingOrchestrationDescriptionAsync(name, version, parameter).ConfigureAwait(false);
+
+        var orchestrationInstance = await CreateOrchestrationInstanceAsync(parameter, orchestrationDescription).ConfigureAwait(false);
+        await RequestStartOfOrchestrationInstanceAsync(orchestrationDescription, orchestrationInstance).ConfigureAwait(false);
+
+        return orchestrationInstance.Id;
+    }
+
+    /// <inheritdoc />
+    public async Task<OrchestrationInstanceId> ScheduleNewOrchestrationInstanceAsync<TParameter>(
+        string name,
+        int version,
+        TParameter parameter,
+        Instant runAt)
+        where TParameter : class
+    {
+        var orchestrationDescription = await GuardMatchingOrchestrationDescriptionAsync(name, version, parameter).ConfigureAwait(false);
+        if (orchestrationDescription.CanBeScheduled == false)
+            throw new InvalidOperationException("Orchestration description cannot be scheduled.");
+
+        var orchestrationInstance = await CreateScheduledOrchestrationInstanceAsync(parameter, runAt, orchestrationDescription).ConfigureAwait(false);
+
+        return orchestrationInstance.Id;
+    }
+
+    /// <inheritdoc />
+    public async Task StartScheduledOrchestrationInstanceAsync(OrchestrationInstanceId id)
+    {
+        var orchestrationInstance = await _orchestrationInstanceRepository.GetAsync(id).ConfigureAwait(false);
+        if (!orchestrationInstance.Lifecycle.IsPendingForScheduledStart())
+            throw new InvalidOperationException("Orchestration instance cannot be started.");
+
+        var orchestrationDescription = await _orchestrationRegister.GetAsync(orchestrationInstance.OrchestrationDescriptionId).ConfigureAwait(false);
+        if (!orchestrationDescription.IsEnabled)
+            throw new InvalidOperationException("Orchestration instance is based on a disabled orchestration definition.");
+
+        await RequestStartOfOrchestrationInstanceAsync(orchestrationDescription, orchestrationInstance).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public async Task CancelScheduledOrchestrationInstanceAsync(OrchestrationInstanceId id)
+    {
+        var orchestrationInstance = await _orchestrationInstanceRepository.GetAsync(id).ConfigureAwait(false);
+        if (!orchestrationInstance.Lifecycle.IsPendingForScheduledStart())
+            throw new InvalidOperationException("Orchestration instance cannot be canceled.");
+
+        // Transition lifecycle
+        orchestrationInstance.Lifecycle.TransitionToTerminated(_clock, OrchestrationInstanceTerminationStates.UserCanceled);
+        await _unitOfWork.CommitAsync().ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Validate orchestration description is known and that paramter value is valid according to its parameter definition.
+    /// </summary>
+    private async Task<OrchestrationDescription> GuardMatchingOrchestrationDescriptionAsync<TParameter>(
+        string name,
+        int version,
+        TParameter parameter)
+        where TParameter : class
+    {
+        var orchestrationDescription = await _orchestrationRegister.GetOrDefaultAsync(name, version, isEnabled: true).ConfigureAwait(false);
         if (orchestrationDescription == null)
         {
-            throw new InvalidOperationException($"No orchestration description matches Name='{name}' and Version='{version}'.");
+            throw new InvalidOperationException($"No enabled orchestration description matches Name='{name}' and Version='{version}'.");
         }
 
         var isValidParameterValue = await orchestrationDescription.ParameterDefinition.IsValidParameterValueAsync(parameter).ConfigureAwait(false);
-        if (isValidParameterValue == false)
-        {
-            throw new InvalidOperationException("Paramater value is not valid compared to registered parameter definition.");
-        }
+        return isValidParameterValue == false
+            ? throw new InvalidOperationException("Paramater value is not valid compared to registered parameter definition.")
+            : orchestrationDescription;
+    }
 
-        // Create and commit orchestration instance
+    private async Task<OrchestrationInstance> CreateOrchestrationInstanceAsync<TParameter>(
+        TParameter parameter,
+        OrchestrationDescription orchestrationDescription)
+        where TParameter : class
+    {
         var orchestrationInstance = new OrchestrationInstance(
             orchestrationDescription.Id,
             _clock);
@@ -80,7 +143,29 @@ public class OrchestrationInstanceManager : IOrchestrationInstanceManager
         await _orchestrationInstanceRepository.AddAsync(orchestrationInstance).ConfigureAwait(false);
         await _unitOfWork.CommitAsync().ConfigureAwait(false);
 
-        // Start orchestration
+        return orchestrationInstance;
+    }
+
+    private async Task<OrchestrationInstance> CreateScheduledOrchestrationInstanceAsync<TParameter>(
+        TParameter parameter,
+        Instant runAt,
+        OrchestrationDescription orchestrationDescription)
+        where TParameter : class
+    {
+        var orchestrationInstance = new OrchestrationInstance(
+            orchestrationDescription.Id,
+            _clock,
+            runAt);
+        orchestrationInstance.ParameterValue.SetFromInstance(parameter);
+
+        await _orchestrationInstanceRepository.AddAsync(orchestrationInstance).ConfigureAwait(false);
+        await _unitOfWork.CommitAsync().ConfigureAwait(false);
+
+        return orchestrationInstance;
+    }
+
+    private async Task RequestStartOfOrchestrationInstanceAsync(OrchestrationDescription orchestrationDescription, OrchestrationInstance orchestrationInstance)
+    {
         await _durableClient
             .StartNewAsync(
                 orchestratorFunctionName: orchestrationDescription.FunctionName,
@@ -88,29 +173,7 @@ public class OrchestrationInstanceManager : IOrchestrationInstanceManager
                 input: orchestrationInstance.ParameterValue.SerializedParameterValue)
             .ConfigureAwait(false);
 
-        return orchestrationInstance.Id;
-    }
-
-    /// <inheritdoc />
-    public Task<OrchestrationInstanceId> ScheduleNewOrchestrationInstanceAsync<TParameter>(
-        string name,
-        int version,
-        TParameter parameter,
-        Instant runAt)
-        where TParameter : class
-    {
-        return Task.FromResult(new OrchestrationInstanceId(Guid.NewGuid()));
-    }
-
-    /// <inheritdoc />
-    public Task CancelScheduledOrchestrationInstanceAsync(OrchestrationInstanceId id)
-    {
-        return Task.CompletedTask;
-    }
-
-    /// <inheritdoc />
-    public Task<IReadOnlyCollection<OrchestrationInstance>> GetOrchestrationInstancesAsync(string name, int? version)
-    {
-        return Task.FromResult((IReadOnlyCollection<OrchestrationInstance>)[]);
+        orchestrationInstance.Lifecycle.TransitionToStartRequested(_clock);
+        await _unitOfWork.CommitAsync().ConfigureAwait(false);
     }
 }

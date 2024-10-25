@@ -21,5 +21,7 @@ namespace Energinet.DataHub.ProcessManagement.Core.Application;
 /// </summary>
 public interface IOrchestrationRegisterQueries
 {
-    Task<OrchestrationDescription?> GetOrDefaultAsync(string name, int version, bool isEnabled = true);
+    Task<OrchestrationDescription> GetAsync(OrchestrationDescriptionId id);
+
+    Task<OrchestrationDescription?> GetOrDefaultAsync(string name, int version, bool? isEnabled);
 }

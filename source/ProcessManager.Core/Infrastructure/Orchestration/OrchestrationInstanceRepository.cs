@@ -16,6 +16,7 @@ using Energinet.DataHub.ProcessManagement.Core.Application;
 using Energinet.DataHub.ProcessManagement.Core.Domain;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestration;
 
@@ -29,14 +30,52 @@ public class OrchestrationInstanceRepository : IOrchestrationInstanceRepository
     }
 
     /// <inheritdoc />
+    public Task<OrchestrationInstance> GetAsync(OrchestrationInstanceId id)
+    {
+        ArgumentNullException.ThrowIfNull(id);
+
+        return _context.OrchestrationInstances.FirstAsync(x => x.Id == id);
+    }
+
+    /// <inheritdoc />
     public async Task AddAsync(OrchestrationInstance orchestrationInstance)
     {
+        ArgumentNullException.ThrowIfNull(orchestrationInstance);
+
         await _context.OrchestrationInstances.AddAsync(orchestrationInstance).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public async Task<OrchestrationInstance> GetAsync(OrchestrationInstanceId id)
+    public async Task<IReadOnlyCollection<OrchestrationInstance>> GetScheduledByInstantAsync(Instant scheduledToRunBefore)
     {
-        return await _context.OrchestrationInstances.FirstAsync(x => x.Id == id).ConfigureAwait(false);
+        var query = _context.OrchestrationInstances
+            .Where(x => x.Lifecycle.State == OrchestrationInstanceLifecycleStates.Pending)
+            .Where(x => x.Lifecycle.ScheduledToRunAt != null && x.Lifecycle.ScheduledToRunAt.Value <= scheduledToRunBefore);
+
+        return await query.ToListAsync().ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyCollection<OrchestrationInstance>> SearchAsync(
+        string name,
+        int? version,
+        OrchestrationInstanceLifecycleStates? lifecycleState,
+        OrchestrationInstanceTerminationStates? terminationState)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
+        var query = _context
+            .OrchestrationDescriptions
+                .Where(x => x.Name == name)
+                .Where(x => version == null || x.Version == version)
+            .Join(
+                _context.OrchestrationInstances,
+                description => description.Id,
+                instance => instance.OrchestrationDescriptionId,
+                (_, instance) => instance)
+            .Where(x => lifecycleState == null || x.Lifecycle.State == lifecycleState)
+            .Where(x => terminationState == null || x.Lifecycle.TerminationState == terminationState);
+
+        return await query.ToListAsync().ConfigureAwait(false);
     }
 }

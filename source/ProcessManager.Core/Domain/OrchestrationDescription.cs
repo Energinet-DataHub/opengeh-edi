@@ -70,14 +70,14 @@ public class OrchestrationDescription
     /// <summary>
     /// The name of the host where the orchestration is implemented.
     /// </summary>
-    public string HostName { get; set; }
+    public string HostName { get; internal set; }
 
     /// <summary>
     /// Specifies if the orchestration is enabled and hence can be started.
     /// Can be used to disable obsolete orchestrations that we have removed from code,
     /// but which we cannot delete in the database because we still need the execution history.
     /// </summary>
-    public bool IsEnabled { get; set; }
+    public bool IsEnabled { get; internal set; }
 
     /// <summary>
     /// The name of the Durable Functions orchestration implementation.

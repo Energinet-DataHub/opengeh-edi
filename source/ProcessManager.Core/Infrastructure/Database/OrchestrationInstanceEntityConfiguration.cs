@@ -31,11 +31,12 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                 id => id.Value,
                 dbValue => new OrchestrationInstanceId(dbValue));
 
-        builder.Property(o => o.CreatedAt);
-        builder.Property(o => o.ScheduledAt);
-        builder.Property(o => o.StartedAt);
-        builder.Property(o => o.ChangedAt);
-        builder.Property(o => o.CompletedAt);
+        // TODO: Refactor to new model :)
+        ////builder.Property(o => o.CreatedAt);
+        ////builder.Property(o => o.ScheduledToRunAt);
+        ////builder.Property(o => o.StartedAt);
+        ////builder.Property(o => o.ChangedAt);
+        ////builder.Property(o => o.TerminatedAt);
 
         builder.OwnsOne(
             o => o.ParameterValue,
@@ -82,10 +83,10 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                 b.WithOwner().HasForeignKey(s => s.OrchestrationInstanceId);
             });
 
-        builder.Property(o => o.State)
+        builder.Property(o => o.CustomState)
             .HasConversion(
                 state => state.Value,
-                dbValue => new OrchestrationInstanceState(dbValue));
+                dbValue => new OrchestrationInstanceCustomState(dbValue));
 
         builder.Property(o => o.OrchestrationDescriptionId)
             .ValueGeneratedNever()
