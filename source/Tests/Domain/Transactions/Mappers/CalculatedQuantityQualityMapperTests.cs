@@ -17,6 +17,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 using Energinet.DataHub.Edi.Responses;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Xunit;
 
 #pragma warning disable CS8604 // Possible null reference argument.
@@ -226,10 +227,57 @@ public sealed class CalculatedQuantityQualityMapperTests
 
     public sealed class WholesaleTests
     {
+        [Fact]
+        public void Given_WholesaleQuantityQualityTestCases_When_Unpacked_Then_ContainAllValuesAtLeastOnce()
+        {
+            var wholesaleQuantityQualityTestCases = new WholesaleQuantityQualityTestCases();
+
+            using var assertionScope = new AssertionScope();
+
+            // Quantity qualities
+            foreach (var quantityQuality in Enum.GetValues<QuantityQuality>())
+            {
+                wholesaleQuantityQualityTestCases
+                    .Select(testCase => testCase[0])
+                    .Should()
+                    .Contain(qqs => ((ICollection<QuantityQuality>)qqs).Contains(quantityQuality));
+            }
+
+            // Resolutions
+            foreach (var resolution in Enum.GetValues<WholesaleServicesRequestSeries.Types.Resolution>())
+            {
+                wholesaleQuantityQualityTestCases
+                    .Select(testCase => testCase[1])
+                    .Distinct()
+                    .Should()
+                    .Contain(resolution);
+            }
+
+            // Has price
+            foreach (var hasPrice in new[] { true, false })
+            {
+                wholesaleQuantityQualityTestCases
+                    .Select(testCase => testCase[2])
+                    .Distinct()
+                    .Should()
+                    .Contain(hasPrice);
+            }
+
+            // Charge types
+            foreach (var chargeType in Enum.GetValues<WholesaleServicesRequestSeries.Types.ChargeType>())
+            {
+                wholesaleQuantityQualityTestCases
+                    .Select(testCase => testCase[3])
+                    .Distinct()
+                    .Should()
+                    .Contain(chargeType);
+            }
+        }
+
         [Theory]
         [ClassData(typeof(WholesaleQuantityQualityResolutionHasPriceChargeTypeInputTestCases))]
         public void
-            Given_WholesaleQuantityQualityResolutionHasPriceChargeTypeInput_When_MappedToEdiQuantityQuality_Then_CanMapAllWithoutError(
+            Given_WholesaleQuantityQualityResolutionHasPriceChargeTypeInput_When_MappedToEdiQuantityQuality_Then_CanMapWithoutError(
                 ICollection<QuantityQuality> qualitySetFromWholesale,
                 WholesaleServicesRequestSeries.Types.Resolution resolution,
                 bool hasPrice,
@@ -348,7 +396,7 @@ public sealed class CalculatedQuantityQualityMapperTests
 
                 Add(
                     [QuantityQuality.Measured],
-                    WholesaleServicesRequestSeries.Types.Resolution.Day,
+                    WholesaleServicesRequestSeries.Types.Resolution.Hour,
                     true,
                     WholesaleServicesRequestSeries.Types.ChargeType.Tariff,
                     CalculatedQuantityQuality.Calculated);
@@ -376,7 +424,7 @@ public sealed class CalculatedQuantityQualityMapperTests
 
                 Add(
                     [QuantityQuality.Missing, QuantityQuality.Calculated],
-                    WholesaleServicesRequestSeries.Types.Resolution.Day,
+                    WholesaleServicesRequestSeries.Types.Resolution.Hour,
                     true,
                     WholesaleServicesRequestSeries.Types.ChargeType.Tariff,
                     CalculatedQuantityQuality.Incomplete);
@@ -397,7 +445,7 @@ public sealed class CalculatedQuantityQualityMapperTests
 
                 Add(
                     [QuantityQuality.Estimated, QuantityQuality.Calculated],
-                    WholesaleServicesRequestSeries.Types.Resolution.Day,
+                    WholesaleServicesRequestSeries.Types.Resolution.Hour,
                     true,
                     WholesaleServicesRequestSeries.Types.ChargeType.Tariff,
                     CalculatedQuantityQuality.Calculated);
@@ -427,7 +475,7 @@ public sealed class CalculatedQuantityQualityMapperTests
                 // The empty set is undefined.
                 Add(
                     [],
-                    WholesaleServicesRequestSeries.Types.Resolution.Day,
+                    WholesaleServicesRequestSeries.Types.Resolution.Hour,
                     true,
                     WholesaleServicesRequestSeries.Types.ChargeType.Tariff,
                     CalculatedQuantityQuality.NotAvailable);
@@ -472,7 +520,7 @@ public sealed class CalculatedQuantityQualityMapperTests
                 // Unspecified quantity quality is ignored
                 Add(
                     [QuantityQuality.Missing, QuantityQuality.Unspecified],
-                    WholesaleServicesRequestSeries.Types.Resolution.Day,
+                    WholesaleServicesRequestSeries.Types.Resolution.Hour,
                     true,
                     WholesaleServicesRequestSeries.Types.ChargeType.Tariff,
                     CalculatedQuantityQuality.Missing);
