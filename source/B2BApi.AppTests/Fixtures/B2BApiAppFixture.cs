@@ -417,7 +417,7 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         appHostSettings.ProcessEnvironmentVariables.Add(
             "FeatureManagement__RequestStaysInEdi",
-            false.ToString().ToLower());
+            true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"RevisionLogOptions__{nameof(RevisionLogOptions.ApiAddress)}",
@@ -425,7 +425,7 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"AzureWebJobs.TenSecondsHasPassed.Disabled",
-            "true");
+            "false");
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"AzureWebJobs.ADayHasPassed.Disabled",
             "true");

@@ -106,14 +106,14 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
         var messageCategory = "aggregations";
 
         // The actor must exist in the database
-        var actorNumber = ActorNumber.Create("1234567890123");
+        var actorNumber = ActorNumber.Create("5790000392551");
         var externalId = Guid.NewGuid().ToString();
         await Fixture.DatabaseManager.AddActorAsync(actorNumber, externalId);
 
         // The bearer token must contain:
         //  * the actor role matching any valid/known role in the ClaimsMap
         //  * the external id matching the actor in the database
-        var actorRole = ActorRole.MeteredDataResponsible;
+        var actorRole = ActorRole.EnergySupplier;
         var b2bToken = new JwtBuilder()
             .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
             .WithClaim(ClaimsMap.ActorId, externalId)
