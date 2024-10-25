@@ -212,7 +212,6 @@ public class OutgoingMessagesTestBase : IDisposable
             .AddSerializer()
             .AddTestLogger(testOutputHelper)
             .AddScoped<IClock>(_ => new ClockStub())
-            .AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
             .AddOutgoingMessagesModule(config)
             .AddArchivedMessagesModule(config)
             .AddMasterDataModule(config);
