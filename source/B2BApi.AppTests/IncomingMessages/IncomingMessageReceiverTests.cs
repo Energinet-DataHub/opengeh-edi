@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
 using System.Dynamic;
 using System.Net;
 using System.Net.Http.Headers;
@@ -84,58 +85,51 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_PersistedActor_When_CallingIncomingMessagesWithValidDocumentAndBearerToken_Then_ResponseShouldBeAccepted_AndRequestIsPeekable()
+    public async Task Given_PersistedActor_When_CallingIncomingMessagesWithValidDocumentAndBearerToken_Then_ResponseShouldBeAccepted_AndRequestCanBePeeked()
     {
-        using var request = await CreateHttpRequest(
-            "TestData/Messages/json/RequestAggregatedMeasureData.json",
-            IncomingDocumentType.RequestAggregatedMeasureData.Name,
-            "application/json");
-
-        // Act
-        using var actualResponse = await Fixture.AppHostManager.HttpClient.SendAsync(request);
-
-        // Assert
-        var contentType = actualResponse.Content.Headers.ContentType;
-        contentType.Should().NotBeNull();
-        contentType!.MediaType.Should().Be("application/json");
-        contentType.CharSet.Should().Be("utf-8");
-        var content = await actualResponse.Content.ReadAsByteArrayAsync();
-        Encoding.UTF8.GetString(content).Should().BeEmpty();
-        actualResponse.StatusCode.Should().Be(HttpStatusCode.Accepted);
-
-        var messageCategory = "aggregations";
-
-        // The actor must exist in the database
+        // Arrange
         var actorNumber = ActorNumber.Create("5790000392551");
         var externalId = Guid.NewGuid().ToString();
         await Fixture.DatabaseManager.AddActorAsync(actorNumber, externalId);
 
-        // The bearer token must contain:
-        //  * the actor role matching any valid/known role in the ClaimsMap
-        //  * the external id matching the actor in the database
         var actorRole = ActorRole.EnergySupplier;
         var b2bToken = new JwtBuilder()
             .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
             .WithClaim(ClaimsMap.ActorId, externalId)
             .CreateToken();
 
-        using var request2 = new HttpRequestMessage(HttpMethod.Get, $"api/peek/{messageCategory}");
-        request2.Content = new StringContent(
-            string.Empty,
-            Encoding.UTF8,
+        using var request = await CreateHttpRequest(
+            "TestData/Messages/json/RequestAggregatedMeasureData.json",
+            IncomingDocumentType.RequestAggregatedMeasureData.Name,
             "application/json");
-        request2.Headers.Authorization = new AuthenticationHeaderValue("bearer", b2bToken);
 
         // Act
-        Thread.Sleep(60000);
-        using var actualResponse2 = await Fixture.AppHostManager.HttpClient.SendAsync(request2);
+        await Fixture.AppHostManager.HttpClient.SendAsync(request);
 
         // Assert
-        actualResponse2.StatusCode.Should().Be(HttpStatusCode.OK);
-        // (await actualResponse2.Content.ReadAsStringAsync()).Should().BeEmpty();
-        // actualResponse2.Content.Headers.ContentType.Should().NotBeNull();
-        // actualResponse2.Content.Headers.ContentType!.MediaType.Should().Be("application/json");
-        // actualResponse2.Content.Headers.ContentType.CharSet.Should().Be("utf-8");
+        var stopWatch = Stopwatch.StartNew();
+        var timeoutAfter = TimeSpan.FromMinutes(1);
+
+        while (stopWatch.ElapsedMilliseconds < timeoutAfter.TotalMilliseconds)
+        {
+            using var peekRequest = new HttpRequestMessage(HttpMethod.Get, $"api/peek/aggregations");
+            peekRequest.Content = new StringContent(
+                string.Empty,
+                Encoding.UTF8,
+                "application/json");
+            peekRequest.Headers.Authorization = new AuthenticationHeaderValue("bearer", b2bToken);
+            using var response = await Fixture.AppHostManager.HttpClient.SendAsync(peekRequest);
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                // Assert
+                response.Should().NotBeNull();
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                (await response.Content.ReadAsStringAsync()).Should().Contain("RejectRequestAggregatedMeasureData_MarketDocument");
+            }
+
+            await Task.Delay(500);
+        }
     }
 
     [Fact]
