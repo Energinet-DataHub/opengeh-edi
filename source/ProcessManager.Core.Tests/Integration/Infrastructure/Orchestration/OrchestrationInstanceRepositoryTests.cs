@@ -13,9 +13,12 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManagement.Core.Domain;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Database;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestration;
 using Energinet.DataHub.ProcessManager.Core.Tests.Fixtures;
 using FluentAssertions;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using NodaTime;
 
 namespace Energinet.DataHub.ProcessManager.Core.Tests.Integration.Infrastructure.Orchestration;
@@ -25,15 +28,18 @@ public class OrchestrationInstanceRepositoryTests
 {
     private readonly ProcessManagerCoreFixture _fixture;
     private readonly OrchestrationInstanceRepository _sut;
+    private readonly UnitOfWork _unitOfWork;
 
     public OrchestrationInstanceRepositoryTests(ProcessManagerCoreFixture fixture)
     {
         _fixture = fixture;
-        _sut = new OrchestrationInstanceRepository(_fixture.DatabaseManager.CreateDbContext());
+        var dbContext = _fixture.DatabaseManager.CreateDbContext();
+        _sut = new OrchestrationInstanceRepository(dbContext);
+        _unitOfWork = new UnitOfWork(dbContext);
     }
 
     [Fact]
-    public async Task GivenIdNotInDatabase_WhenGetById_ThenThrowsException()
+    public async Task GivenOrchestrationInstanceIdNotInDatabase_WhenGetById_ThenThrowsException()
     {
         // Arrange
         var id = new OrchestrationInstanceId(Guid.NewGuid());
@@ -48,7 +54,7 @@ public class OrchestrationInstanceRepositoryTests
     }
 
     [Fact]
-    public async Task GivenIdInDatabase_WhenGetById_ThenExpectedOrchestrationInstanceIsRetrieved()
+    public async Task GivenOrchestrationInstanceIdInDatabase_WhenGetById_ThenExpectedOrchestrationInstanceIsRetrieved()
     {
         // Arrange
         var existingOrchestrationDescription = CreateOrchestrationDescription();
@@ -69,6 +75,76 @@ public class OrchestrationInstanceRepositoryTests
             .BeEquivalentTo(existingOrchestrationInstance);
     }
 
+    [Fact]
+    public async Task GivenOrchestrationDescriptionNotInDatabase_WhenAddOrchestrationInstance_ThenThrowsException()
+    {
+        // Arrange
+        var newOrchestrationDescription = CreateOrchestrationDescription();
+        var newOrchestrationInstance = CreateOrchestrationInstance(newOrchestrationDescription);
+
+        // Act
+        await _sut.AddAsync(newOrchestrationInstance);
+        var act = () => _unitOfWork.CommitAsync();
+
+        // Assert
+        await act.Should()
+            .ThrowAsync<DbUpdateException>()
+            .WithInnerException<DbUpdateException, SqlException>()
+            .WithMessage("*FOREIGN KEY constraint \"FK_OrchestrationInstance_OrchestrationDescription\"*");
+    }
+
+    [Fact]
+    public async Task GivenOrchestrationDescriptionInDatabase_WhenAddOrchestrationInstance_ThenOrchestrationInstanceIsAdded()
+    {
+        // Arrange
+        var existingOrchestrationDescription = CreateOrchestrationDescription();
+        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescription);
+
+        var newOrchestrationInstance = CreateOrchestrationInstance(existingOrchestrationDescription);
+
+        // Act
+        await _sut.AddAsync(newOrchestrationInstance);
+        await _unitOfWork.CommitAsync();
+
+        // Assert
+        var actual = await _sut.GetAsync(newOrchestrationInstance.Id);
+        actual.Should()
+            .BeEquivalentTo(newOrchestrationInstance);
+    }
+
+    [Fact]
+    public async Task GivenScheduledOrchestrationInstancesInDatabase_WhenGetScheduledByInstant_ThenExpectedOrchestrationInstancesAreRetrieved()
+    {
+        // Arrange
+        var existingOrchestrationDescription = CreateOrchestrationDescription();
+        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescription);
+
+        var notScheduled = CreateOrchestrationInstance(existingOrchestrationDescription);
+        await _sut.AddAsync(notScheduled);
+
+        var scheduledToRun = CreateOrchestrationInstance(
+            existingOrchestrationDescription,
+            scheduledToRunAt: SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromMinutes(1)));
+        await _sut.AddAsync(scheduledToRun);
+
+        var scheduledIntoTheFarFuture = CreateOrchestrationInstance(
+            existingOrchestrationDescription,
+            scheduledToRunAt: SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(1)));
+        await _sut.AddAsync(scheduledIntoTheFarFuture);
+
+        await _unitOfWork.CommitAsync();
+
+        // Act
+        var actual = await _sut.GetScheduledByInstantAsync(
+            SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromMinutes(5)));
+
+        // Assert
+        actual.Should()
+            .ContainEquivalentOf(scheduledToRun)
+            .And
+            .HaveCount(1);
+    }
+
     private static OrchestrationDescription CreateOrchestrationDescription()
     {
         var existingOrchestrationDescription = new OrchestrationDescription(
@@ -83,11 +159,12 @@ public class OrchestrationInstanceRepositoryTests
         return existingOrchestrationDescription;
     }
 
-    private static OrchestrationInstance CreateOrchestrationInstance(OrchestrationDescription existingOrchestrationDescription)
+    private static OrchestrationInstance CreateOrchestrationInstance(OrchestrationDescription existingOrchestrationDescription, Instant? scheduledToRunAt = default)
     {
         var existingOrchestrationInstance = new OrchestrationInstance(
             existingOrchestrationDescription.Id,
-            SystemClock.Instance);
+            SystemClock.Instance,
+            scheduledToRunAt);
 
         var step1 = new OrchestrationStep(
             existingOrchestrationInstance.Id,
@@ -120,6 +197,15 @@ public class OrchestrationInstanceRepositoryTests
         });
 
         return existingOrchestrationInstance;
+    }
+
+    private async Task SeedDatabaseWithOrchestrationDescriptionAsync(OrchestrationDescription existingOrchestrationDescription)
+    {
+        await using (var writeDbContext = _fixture.DatabaseManager.CreateDbContext())
+        {
+            writeDbContext.OrchestrationDescriptions.Add(existingOrchestrationDescription);
+            await writeDbContext.SaveChangesAsync();
+        }
     }
 
     private class TestOrchestrationParameter
