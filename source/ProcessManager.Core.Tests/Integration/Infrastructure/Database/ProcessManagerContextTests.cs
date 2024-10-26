@@ -15,6 +15,7 @@
 using Energinet.DataHub.ProcessManagement.Core.Domain;
 using Energinet.DataHub.ProcessManager.Core.Tests.Fixtures;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using NodaTime;
 
 namespace Energinet.DataHub.ProcessManager.Core.Tests.Integration.Infrastructure.Database;
@@ -57,6 +58,42 @@ public class ProcessManagerContextTests
     {
         // Arrange
         var existingOrchestrationDescription = CreateOrchestrationDescription();
+        var existingOrchestrationInstance = CreateOrchestrationInstance(existingOrchestrationDescription);
+
+        await using (var writeDbContext = _fixture.DatabaseManager.CreateDbContext())
+        {
+            writeDbContext.OrchestrationDescriptions.Add(existingOrchestrationDescription);
+            writeDbContext.OrchestrationInstances.Add(existingOrchestrationInstance);
+            await writeDbContext.SaveChangesAsync();
+        }
+
+        // Act
+        await using var readDbContext = _fixture.DatabaseManager.CreateDbContext();
+        var orchestrationInstance = await readDbContext.OrchestrationInstances.FindAsync(existingOrchestrationInstance.Id);
+
+        // Assert
+        orchestrationInstance.Should()
+            .NotBeNull()
+            .And
+            .BeEquivalentTo(existingOrchestrationInstance);
+    }
+
+    private static OrchestrationDescription CreateOrchestrationDescription()
+    {
+        var existingOrchestrationDescription = new OrchestrationDescription(
+            "TestOrchestration",
+            4,
+            true,
+            "TestOrchestrationFunction");
+
+        existingOrchestrationDescription
+            .ParameterDefinition
+            .SetFromType<TestOrchestrationParameter>();
+        return existingOrchestrationDescription;
+    }
+
+    private static OrchestrationInstance CreateOrchestrationInstance(OrchestrationDescription existingOrchestrationDescription)
+    {
         var existingOrchestrationInstance = new OrchestrationInstance(
             existingOrchestrationDescription.Id,
             SystemClock.Instance);
@@ -91,36 +128,7 @@ public class ProcessManagerContextTests
             TestInt = 42,
         });
 
-        await using (var writeDbContext = _fixture.DatabaseManager.CreateDbContext())
-        {
-            writeDbContext.OrchestrationDescriptions.Add(existingOrchestrationDescription);
-            writeDbContext.OrchestrationInstances.Add(existingOrchestrationInstance);
-            await writeDbContext.SaveChangesAsync();
-        }
-
-        // Act
-        await using var readDbContext = _fixture.DatabaseManager.CreateDbContext();
-        var orchestrationInstance = await readDbContext.OrchestrationInstances.FindAsync(existingOrchestrationInstance.Id);
-
-        // Assert
-        orchestrationInstance.Should()
-            .NotBeNull()
-            .And
-            .BeEquivalentTo(existingOrchestrationInstance);
-    }
-
-    private static OrchestrationDescription CreateOrchestrationDescription()
-    {
-        var existingOrchestrationDescription = new OrchestrationDescription(
-            "TestOrchestration",
-            4,
-            true,
-            "TestOrchestrationFunction");
-
-        existingOrchestrationDescription
-            .ParameterDefinition
-            .SetFromType<TestOrchestrationParameter>();
-        return existingOrchestrationDescription;
+        return existingOrchestrationInstance;
     }
 
     private class TestOrchestrationParameter

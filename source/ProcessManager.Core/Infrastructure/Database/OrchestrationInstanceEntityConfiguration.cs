@@ -81,13 +81,14 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                 b.Property(s => s.Description);
 
                 b.Property(s => s.Sequence);
+                // Relation to another previous step
+                // TODO: Do we miss foreign key here?
                 b.Property(s => s.DependsOn)
                     .HasConversion(
                         id => id != null ? id.Value : (Guid?)null,
                         dbValue => dbValue == null
                             ? null
                             : new OrchestrationStepId(dbValue.Value));
-                // TODO: Do we miss foreign key here?
 
                 b.Property(s => s.CustomState)
                     .HasConversion(
@@ -108,11 +109,11 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                 dbValue => new OrchestrationInstanceCustomState(dbValue));
 
         // Relation to description
+        // TODO: Do we miss foreign key here?
         builder.Property(o => o.OrchestrationDescriptionId)
             .ValueGeneratedNever()
             .HasConversion(
                 id => id.Value,
                 dbValue => new OrchestrationDescriptionId(dbValue));
-        // TODO: Do we miss foreign key here?
     }
 }

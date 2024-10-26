@@ -30,13 +30,14 @@ public class OrchestrationStep
         int sequence,
         OrchestrationStepId? dependsOn = default)
     {
-        OrchestrationInstanceId = orchestrationInstanceId;
         Id = new OrchestrationStepId(Guid.NewGuid());
         Lifecycle = new OrchestrationStepLifecycleState(clock);
         Description = description;
         Sequence = sequence;
         DependsOn = dependsOn;
         CustomState = new OrchestrationStepCustomState(string.Empty);
+
+        OrchestrationInstanceId = orchestrationInstanceId;
     }
 
     /// <summary>

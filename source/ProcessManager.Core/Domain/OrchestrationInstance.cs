@@ -28,12 +28,13 @@ public class OrchestrationInstance
         IClock clock,
         Instant? scheduledToRunAt = default)
     {
-        OrchestrationDescriptionId = orchestrationDescriptionId;
         Id = new OrchestrationInstanceId(Guid.NewGuid());
         Lifecycle = new OrchestrationInstanceLifecycleState(clock, scheduledToRunAt);
         ParameterValue = new();
         Steps = [];
         CustomState = new OrchestrationInstanceCustomState(string.Empty);
+
+        OrchestrationDescriptionId = orchestrationDescriptionId;
     }
 
     /// <summary>
@@ -72,5 +73,5 @@ public class OrchestrationInstance
     /// The orchestration description for the Durable Functions orchestration which describes
     /// the workflow that the orchestration instance is an instance of.
     /// </summary>
-    public OrchestrationDescriptionId OrchestrationDescriptionId { get; }
+    internal OrchestrationDescriptionId OrchestrationDescriptionId { get; }
 }
