@@ -63,21 +63,23 @@ public class ProcessManagerContextTests
 
         var step1 = new OrchestrationStep(
             existingOrchestrationInstance.Id,
+            SystemClock.Instance,
             "Test step 1",
-            null,
             0);
 
         var step2 = new OrchestrationStep(
             existingOrchestrationInstance.Id,
+            SystemClock.Instance,
             "Test step 2",
-            step1.Id,
-            1);
+            1,
+            step1.Id);
 
         var step3 = new OrchestrationStep(
             existingOrchestrationInstance.Id,
+            SystemClock.Instance,
             "Test step 3",
-            null,
-            2);
+            2,
+            step2.Id);
 
         existingOrchestrationInstance.Steps.Add(step1);
         existingOrchestrationInstance.Steps.Add(step2);

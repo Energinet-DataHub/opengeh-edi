@@ -3,8 +3,6 @@
     [Id]                            UNIQUEIDENTIFIER NOT NULL,
     [RecordId]                      BIGINT IDENTITY (1,1) NOT NULL,
 
-    [ParameterValue]                NVARCHAR(MAX) NOT NULL,
-
     [Lifecycle_State]               INT NOT NULL,
     [Lifecycle_TerminationState]    INT NULL,
     [Lifecycle_CreatedAt]           DATETIME2 NOT NULL,
@@ -13,6 +11,7 @@
     [Lifecycle_StartedAt]           DATETIME2 NULL,
     [Lifecycle_TerminatedAt]        DATETIME2 NULL,
 
+    [ParameterValue]                NVARCHAR(MAX) NOT NULL,
     [CustomState]                   NVARCHAR(255) NOT NULL,
     [OrchestrationDescriptionId]    UNIQUEIDENTIFIER NOT NULL,
 

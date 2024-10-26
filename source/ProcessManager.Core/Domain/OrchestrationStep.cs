@@ -25,41 +25,50 @@ public class OrchestrationStep
 {
     public OrchestrationStep(
         OrchestrationInstanceId orchestrationInstanceId,
+        IClock clock,
         string description,
-        OrchestrationStepId? dependsOn,
-        int sequence)
+        int sequence,
+        OrchestrationStepId? dependsOn = default)
     {
-        Id = new OrchestrationStepId(Guid.NewGuid());
         OrchestrationInstanceId = orchestrationInstanceId;
-
+        Id = new OrchestrationStepId(Guid.NewGuid());
+        Lifecycle = new OrchestrationStepLifecycleState(clock);
         Description = description;
-        DependsOn = dependsOn;
         Sequence = sequence;
-
-        State = new OrchestrationStepState("Created");
+        DependsOn = dependsOn;
+        CustomState = new OrchestrationStepCustomState(string.Empty);
     }
+
+    /// <summary>
+    /// Used by Entity Framework
+    /// </summary>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    // ReSharper disable once UnusedMember.Local -- Used by Entity Framework
+    private OrchestrationStep()
+    {
+    }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
+    /// <summary>
+    /// The orchestration instance which this step is part of.
+    /// </summary>
+    public OrchestrationInstanceId OrchestrationInstanceId { get; }
 
     public OrchestrationStepId Id { get; }
 
+    /// <summary>
+    /// The high-level lifecycle states that all orchestration steps can go through.
+    /// </summary>
+    public OrchestrationStepLifecycleState Lifecycle { get; }
+
     public string? Description { get; }
-
-    public Instant? StartedAt { get; }
-
-    public Instant? ChangedAt { get; }
-
-    public Instant? CompletedAt { get; }
 
     public int Sequence { get; }
 
     public OrchestrationStepId? DependsOn { get; }
 
     /// <summary>
-    /// The state of the step.
+    /// Any custom state of the step.
     /// </summary>
-    public OrchestrationStepState State { get; }
-
-    /// <summary>
-    /// The orchestration instance which this step is part of.
-    /// </summary>
-    public OrchestrationInstanceId OrchestrationInstanceId { get; }
+    public OrchestrationStepCustomState CustomState { get; }
 }

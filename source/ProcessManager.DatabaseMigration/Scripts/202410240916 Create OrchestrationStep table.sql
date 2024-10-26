@@ -1,19 +1,21 @@
 ﻿CREATE TABLE [pm].[OrchestrationStep]
 (
-    [Id]                        UNIQUEIDENTIFIER NOT NULL,
-    [RecordId]                  BIGINT IDENTITY (1,1) NOT NULL,
+    [Id]                            UNIQUEIDENTIFIER NOT NULL,
+    [RecordId]                      BIGINT IDENTITY (1,1) NOT NULL,
 
-    [Description]               NVARCHAR(1000) NULL,
+    [Lifecycle_State]               INT NOT NULL,
+    [Lifecycle_TerminationState]    INT NULL,
+    [Lifecycle_CreatedAt]           DATETIME2 NOT NULL,
+    [Lifecycle_StartedAt]           DATETIME2 NULL,
+    [Lifecycle_TerminatedAt]        DATETIME2 NULL,
 
-    [StartedAt]                 DATETIME2 NULL,
-    [ChangedAt]                 DATETIME2 NULL,
-    [CompletedAt]               DATETIME2 NULL,
+    [Description]                   NVARCHAR(1000) NULL,
 
-    [Sequence]                  INT NOT NULL,
-    [DependsOn]                 UNIQUEIDENTIFIER NULL,
+    [Sequence]                      INT NOT NULL,
+    [DependsOn]                     UNIQUEIDENTIFIER NULL,
 
-    [State]                     NVARCHAR(255) NOT NULL,
-    [OrchestrationInstanceId]   UNIQUEIDENTIFIER NOT NULL,
+    [CustomState]                   NVARCHAR(255) NOT NULL,
+    [OrchestrationInstanceId]       UNIQUEIDENTIFIER NOT NULL,
 
     -- A UNIQUE CLUSTERED constraint on an INT IDENTITY column optimizes the performance of the table
     -- by ordering indexes by the sequential RecordId column instead of the UNIQUEIDENTIFIER primary key (which is random).

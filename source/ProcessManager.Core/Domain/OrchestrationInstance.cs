@@ -28,13 +28,12 @@ public class OrchestrationInstance
         IClock clock,
         Instant? scheduledToRunAt = default)
     {
+        OrchestrationDescriptionId = orchestrationDescriptionId;
         Id = new OrchestrationInstanceId(Guid.NewGuid());
-        ParameterValue = new();
         Lifecycle = new OrchestrationInstanceLifecycleState(clock, scheduledToRunAt);
-
+        ParameterValue = new();
         Steps = [];
         CustomState = new OrchestrationInstanceCustomState(string.Empty);
-        OrchestrationDescriptionId = orchestrationDescriptionId;
     }
 
     /// <summary>
@@ -47,17 +46,23 @@ public class OrchestrationInstance
     }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-    public OrchestrationInstanceId Id { get; }
-
     /// <summary>
-    /// Defines the Durable Functions orchestration input parameter value.
+    /// The orchestration description for the Durable Functions orchestration which describes
+    /// the workflow that the orchestration instance is an instance of.
     /// </summary>
-    public OrchestrationParameterValue ParameterValue { get; }
+    public OrchestrationDescriptionId OrchestrationDescriptionId { get; }
+
+    public OrchestrationInstanceId Id { get; }
 
     /// <summary>
     /// The high-level lifecycle states that all orchestration instances can go through.
     /// </summary>
     public OrchestrationInstanceLifecycleState Lifecycle { get; }
+
+    /// <summary>
+    /// Defines the Durable Functions orchestration input parameter value.
+    /// </summary>
+    public OrchestrationParameterValue ParameterValue { get; }
 
     /// <summary>
     /// Workflow steps the orchestration instance is going through.
@@ -68,10 +73,4 @@ public class OrchestrationInstance
     /// Any custom state of the orchestration instance.
     /// </summary>
     public OrchestrationInstanceCustomState CustomState { get; }
-
-    /// <summary>
-    /// The orchestration description for the Durable Functions orchestration which describes
-    /// the workflow that the orchestration instance is an instance of.
-    /// </summary>
-    public OrchestrationDescriptionId OrchestrationDescriptionId { get; }
 }

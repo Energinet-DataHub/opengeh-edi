@@ -24,20 +24,18 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
     {
         builder.ToTable("OrchestrationInstance");
 
+        builder.Property(o => o.OrchestrationDescriptionId)
+            .ValueGeneratedNever()
+            .HasConversion(
+                id => id.Value,
+                dbValue => new OrchestrationDescriptionId(dbValue));
+
         builder.HasKey(o => o.Id);
         builder.Property(o => o.Id)
             .ValueGeneratedNever()
             .HasConversion(
                 id => id.Value,
                 dbValue => new OrchestrationInstanceId(dbValue));
-
-        builder.OwnsOne(
-            o => o.ParameterValue,
-            b =>
-            {
-                b.Property(pv => pv.SerializedParameterValue)
-                    .HasColumnName("ParameterValue");
-            });
 
         builder.OwnsOne(
             o => o.Lifecycle,
@@ -53,11 +51,25 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                 b.Property(pv => pv.TerminatedAt);
             });
 
+        builder.OwnsOne(
+            o => o.ParameterValue,
+            b =>
+            {
+                b.Property(pv => pv.SerializedParameterValue)
+                    .HasColumnName("ParameterValue");
+            });
+
         builder.OwnsMany(
             o => o.Steps,
             b =>
             {
                 b.ToTable("OrchestrationStep");
+
+                b.Property(s => s.OrchestrationInstanceId)
+                    .HasConversion(
+                        id => id.Value,
+                        dbValue => new OrchestrationInstanceId(dbValue));
+                b.WithOwner().HasForeignKey(s => s.OrchestrationInstanceId);
 
                 b.HasKey(s => s.Id);
                 b.Property(s => s.Id)
@@ -66,11 +78,19 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                         id => id.Value,
                         dbValue => new OrchestrationStepId(dbValue));
 
-                b.Property(s => s.Description);
+                b.OwnsOne(
+                    o => o.Lifecycle,
+                    b =>
+                    {
+                        b.Property(pv => pv.State);
+                        b.Property(pv => pv.TerminationState);
 
-                b.Property(s => s.StartedAt);
-                b.Property(s => s.ChangedAt);
-                b.Property(s => s.CompletedAt);
+                        b.Property(pv => pv.CreatedAt);
+                        b.Property(pv => pv.StartedAt);
+                        b.Property(pv => pv.TerminatedAt);
+                    });
+
+                b.Property(s => s.Description);
 
                 b.Property(s => s.Sequence);
                 b.Property(s => s.DependsOn)
@@ -80,27 +100,15 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                             ? null
                             : new OrchestrationStepId(dbValue.Value));
 
-                b.Property(s => s.State)
+                b.Property(s => s.CustomState)
                     .HasConversion(
                         state => state.Value,
-                        dbValue => new OrchestrationStepState(dbValue));
-
-                b.Property(s => s.OrchestrationInstanceId)
-                    .HasConversion(
-                        id => id.Value,
-                        dbValue => new OrchestrationInstanceId(dbValue));
-                b.WithOwner().HasForeignKey(s => s.OrchestrationInstanceId);
+                        dbValue => new OrchestrationStepCustomState(dbValue));
             });
 
         builder.Property(o => o.CustomState)
             .HasConversion(
                 state => state.Value,
                 dbValue => new OrchestrationInstanceCustomState(dbValue));
-
-        builder.Property(o => o.OrchestrationDescriptionId)
-            .ValueGeneratedNever()
-            .HasConversion(
-                id => id.Value,
-                dbValue => new OrchestrationDescriptionId(dbValue));
     }
 }
