@@ -13,47 +13,42 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManagement.Core.Domain;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestration;
 using Energinet.DataHub.ProcessManager.Core.Tests.Fixtures;
 using FluentAssertions;
 using NodaTime;
 
-namespace Energinet.DataHub.ProcessManager.Core.Tests.Integration.Infrastructure.Database;
+namespace Energinet.DataHub.ProcessManager.Core.Tests.Integration.Infrastructure.Orchestration;
 
 [Collection(nameof(ProcessManagerCoreCollection))]
-public class ProcessManagerContextTests
+public class OrchestrationInstanceRepositoryTests
 {
     private readonly ProcessManagerCoreFixture _fixture;
+    private readonly OrchestrationInstanceRepository _sut;
 
-    public ProcessManagerContextTests(ProcessManagerCoreFixture fixture)
+    public OrchestrationInstanceRepositoryTests(ProcessManagerCoreFixture fixture)
     {
         _fixture = fixture;
+        _sut = new OrchestrationInstanceRepository(_fixture.DatabaseManager.CreateDbContext());
     }
 
     [Fact]
-    public async Task Given_OrchestrationDescriptionAddedToDbContext_WhenRetrievingFromDatabase_HasCorrectValues()
+    public async Task GivenIdNotInDatabase_WhenGetById_ThenThrowsException()
     {
         // Arrange
-        var existingOrchestrationDescription = CreateOrchestrationDescription();
-
-        await using (var writeDbContext = _fixture.DatabaseManager.CreateDbContext())
-        {
-            writeDbContext.OrchestrationDescriptions.Add(existingOrchestrationDescription);
-            await writeDbContext.SaveChangesAsync();
-        }
+        var id = new OrchestrationInstanceId(Guid.NewGuid());
 
         // Act
-        await using var readDbContext = _fixture.DatabaseManager.CreateDbContext();
-        var orchestrationDescription = await readDbContext.OrchestrationDescriptions.FindAsync(existingOrchestrationDescription.Id);
+        var act = () => _sut.GetAsync(id);
 
         // Assert
-        orchestrationDescription.Should()
-            .NotBeNull()
-            .And
-            .BeEquivalentTo(existingOrchestrationDescription);
+        await act.Should()
+            .ThrowAsync<InvalidOperationException>()
+            .WithMessage("Sequence contains no elements.");
     }
 
     [Fact]
-    public async Task Given_OrchestrationInstanceWithStepsAddedToDbContext_WhenRetrievingFromDatabase_HasCorrectValues()
+    public async Task GivenIdInDatabase_WhenGetById_ThenExpectedOrchestrationInstanceIsRetrieved()
     {
         // Arrange
         var existingOrchestrationDescription = CreateOrchestrationDescription();
@@ -67,13 +62,10 @@ public class ProcessManagerContextTests
         }
 
         // Act
-        await using var readDbContext = _fixture.DatabaseManager.CreateDbContext();
-        var orchestrationInstance = await readDbContext.OrchestrationInstances.FindAsync(existingOrchestrationInstance.Id);
+        var actual = await _sut.GetAsync(existingOrchestrationInstance.Id);
 
         // Assert
-        orchestrationInstance.Should()
-            .NotBeNull()
-            .And
+        actual.Should()
             .BeEquivalentTo(existingOrchestrationInstance);
     }
 
