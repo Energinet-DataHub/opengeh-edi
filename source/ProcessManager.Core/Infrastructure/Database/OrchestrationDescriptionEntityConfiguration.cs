@@ -34,8 +34,6 @@ public class OrchestrationDescriptionEntityConfiguration : IEntityTypeConfigurat
         builder.Property(o => o.Name);
         builder.Property(o => o.Version);
         builder.Property(o => o.CanBeScheduled);
-        builder.Property(o => o.HostName);
-        builder.Property(o => o.IsEnabled);
         builder.Property(o => o.FunctionName);
 
         builder.OwnsOne(
@@ -45,5 +43,8 @@ public class OrchestrationDescriptionEntityConfiguration : IEntityTypeConfigurat
                 pd.Property(OrchestrationParameterDefinition.ParameterDefinitionPropertyName)
                     .HasColumnName("ParameterDefinition");
             });
+
+        builder.Property(o => o.HostName);
+        builder.Property(o => o.IsEnabled);
     }
 }

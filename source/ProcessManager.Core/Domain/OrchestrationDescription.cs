@@ -31,11 +31,10 @@ public class OrchestrationDescription
         Name = name;
         Version = version;
         CanBeScheduled = canBeScheduled;
-
         FunctionName = functionName;
         ParameterDefinition = new();
-
         HostName = string.Empty;
+        IsEnabled = true;
     }
 
     /// <summary>
@@ -68,18 +67,6 @@ public class OrchestrationDescription
     public bool CanBeScheduled { get; }
 
     /// <summary>
-    /// The name of the host where the orchestration is implemented.
-    /// </summary>
-    public string HostName { get; internal set; }
-
-    /// <summary>
-    /// Specifies if the orchestration is enabled and hence can be started.
-    /// Can be used to disable obsolete orchestrations that we have removed from code,
-    /// but which we cannot delete in the database because we still need the execution history.
-    /// </summary>
-    public bool IsEnabled { get; internal set; }
-
-    /// <summary>
     /// The name of the Durable Functions orchestration implementation.
     /// </summary>
     public string FunctionName { get; }
@@ -88,4 +75,18 @@ public class OrchestrationDescription
     /// Defines the Durable Functions orchestration input parameter type.
     /// </summary>
     public OrchestrationParameterDefinition ParameterDefinition { get; }
+
+    /// <summary>
+    /// This is set by the framework when synchronizing with the orchestration register during startup.
+    /// The name of the host where the orchestration is implemented.
+    /// </summary>
+    public string HostName { get; internal set; }
+
+    /// <summary>
+    /// This is set by the framework when synchronizing with the orchestration register during startup.
+    /// Specifies if the orchestration is enabled and hence can be started.
+    /// Can be used to disable obsolete orchestrations that we have removed from code,
+    /// but which we cannot delete in the database because we still need the execution history.
+    /// </summary>
+    public bool IsEnabled { get; internal set; }
 }
