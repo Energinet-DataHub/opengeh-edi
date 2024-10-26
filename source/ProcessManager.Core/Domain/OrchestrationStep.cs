@@ -49,9 +49,9 @@ public class OrchestrationStep
 
     public Instant? CompletedAt { get; }
 
-    public OrchestrationStepId? DependsOn { get; }
-
     public int Sequence { get; }
+
+    public OrchestrationStepId? DependsOn { get; }
 
     /// <summary>
     /// The state of the step.

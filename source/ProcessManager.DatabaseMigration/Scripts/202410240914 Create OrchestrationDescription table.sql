@@ -1,7 +1,7 @@
 ﻿CREATE TABLE [pm].[OrchestrationDescription]
 (
-    [Id]                UNIQUEIDENTIFIER NOT NULL,
-    [RecordId]          BIGINT IDENTITY (1,1) NOT NULL,
+    [Id]                    UNIQUEIDENTIFIER NOT NULL,
+    [RecordId]              BIGINT IDENTITY (1,1) NOT NULL,
 
     [Name]                  NVARCHAR(255) NOT NULL,
     [Version]               INT NOT NULL,

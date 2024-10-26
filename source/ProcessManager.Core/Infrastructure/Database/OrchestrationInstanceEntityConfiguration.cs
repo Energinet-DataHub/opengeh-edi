@@ -31,19 +31,26 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                 id => id.Value,
                 dbValue => new OrchestrationInstanceId(dbValue));
 
-        // TODO: Refactor to new model :)
-        ////builder.Property(o => o.CreatedAt);
-        ////builder.Property(o => o.ScheduledToRunAt);
-        ////builder.Property(o => o.StartedAt);
-        ////builder.Property(o => o.ChangedAt);
-        ////builder.Property(o => o.TerminatedAt);
-
         builder.OwnsOne(
             o => o.ParameterValue,
             b =>
             {
                 b.Property(pv => pv.SerializedParameterValue)
                     .HasColumnName("ParameterValue");
+            });
+
+        builder.OwnsOne(
+            o => o.Lifecycle,
+            b =>
+            {
+                b.Property(pv => pv.State);
+                b.Property(pv => pv.TerminationState);
+
+                b.Property(pv => pv.CreatedAt);
+                b.Property(pv => pv.ScheduledToRunAt);
+                b.Property(pv => pv.StartRequestedAt);
+                b.Property(pv => pv.StartedAt);
+                b.Property(pv => pv.TerminatedAt);
             });
 
         builder.OwnsMany(
@@ -64,12 +71,14 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                 b.Property(s => s.StartedAt);
                 b.Property(s => s.ChangedAt);
                 b.Property(s => s.CompletedAt);
-                b.Property(s => s.Sequence);
 
+                b.Property(s => s.Sequence);
                 b.Property(s => s.DependsOn)
                     .HasConversion(
                         id => id != null ? id.Value : (Guid?)null,
-                        dbValue => dbValue != null ? new OrchestrationStepId(dbValue.Value) : null);
+                        dbValue => dbValue == null
+                            ? null
+                            : new OrchestrationStepId(dbValue.Value));
 
                 b.Property(s => s.State)
                     .HasConversion(

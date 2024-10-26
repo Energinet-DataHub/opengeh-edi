@@ -1,14 +1,17 @@
 ﻿CREATE TABLE [pm].[OrchestrationStep]
 (
-    [Id]                UNIQUEIDENTIFIER NOT NULL,
-    [RecordId]          BIGINT IDENTITY (1,1) NOT NULL,
+    [Id]                        UNIQUEIDENTIFIER NOT NULL,
+    [RecordId]                  BIGINT IDENTITY (1,1) NOT NULL,
 
     [Description]               NVARCHAR(1000) NULL,
+
     [StartedAt]                 DATETIME2 NULL,
     [ChangedAt]                 DATETIME2 NULL,
     [CompletedAt]               DATETIME2 NULL,
-    [DependsOn]                 UNIQUEIDENTIFIER NULL,
+
     [Sequence]                  INT NOT NULL,
+    [DependsOn]                 UNIQUEIDENTIFIER NULL,
+
     [State]                     NVARCHAR(255) NOT NULL,
     [OrchestrationInstanceId]   UNIQUEIDENTIFIER NOT NULL,
 
