@@ -24,12 +24,6 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
     {
         builder.ToTable("OrchestrationInstance");
 
-        builder.Property(o => o.OrchestrationDescriptionId)
-            .ValueGeneratedNever()
-            .HasConversion(
-                id => id.Value,
-                dbValue => new OrchestrationDescriptionId(dbValue));
-
         builder.HasKey(o => o.Id);
         builder.Property(o => o.Id)
             .ValueGeneratedNever()
@@ -65,12 +59,6 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
             {
                 b.ToTable("OrchestrationStep");
 
-                b.Property(s => s.OrchestrationInstanceId)
-                    .HasConversion(
-                        id => id.Value,
-                        dbValue => new OrchestrationInstanceId(dbValue));
-                b.WithOwner().HasForeignKey(s => s.OrchestrationInstanceId);
-
                 b.HasKey(s => s.Id);
                 b.Property(s => s.Id)
                     .ValueGeneratedNever()
@@ -99,16 +87,32 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                         dbValue => dbValue == null
                             ? null
                             : new OrchestrationStepId(dbValue.Value));
+                // TODO: Do we miss foreign key here?
 
                 b.Property(s => s.CustomState)
                     .HasConversion(
                         state => state.Value,
                         dbValue => new OrchestrationStepCustomState(dbValue));
+
+                // Relation to parent
+                b.Property(s => s.OrchestrationInstanceId)
+                    .HasConversion(
+                        id => id.Value,
+                        dbValue => new OrchestrationInstanceId(dbValue));
+                b.WithOwner().HasForeignKey(s => s.OrchestrationInstanceId);
             });
 
         builder.Property(o => o.CustomState)
             .HasConversion(
                 state => state.Value,
                 dbValue => new OrchestrationInstanceCustomState(dbValue));
+
+        // Relation to description
+        builder.Property(o => o.OrchestrationDescriptionId)
+            .ValueGeneratedNever()
+            .HasConversion(
+                id => id.Value,
+                dbValue => new OrchestrationDescriptionId(dbValue));
+        // TODO: Do we miss foreign key here?
     }
 }

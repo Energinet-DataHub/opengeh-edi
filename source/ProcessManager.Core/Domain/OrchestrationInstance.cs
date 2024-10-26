@@ -46,12 +46,6 @@ public class OrchestrationInstance
     }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-    /// <summary>
-    /// The orchestration description for the Durable Functions orchestration which describes
-    /// the workflow that the orchestration instance is an instance of.
-    /// </summary>
-    public OrchestrationDescriptionId OrchestrationDescriptionId { get; }
-
     public OrchestrationInstanceId Id { get; }
 
     /// <summary>
@@ -73,4 +67,10 @@ public class OrchestrationInstance
     /// Any custom state of the orchestration instance.
     /// </summary>
     public OrchestrationInstanceCustomState CustomState { get; }
+
+    /// <summary>
+    /// The orchestration description for the Durable Functions orchestration which describes
+    /// the workflow that the orchestration instance is an instance of.
+    /// </summary>
+    public OrchestrationDescriptionId OrchestrationDescriptionId { get; }
 }

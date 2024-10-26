@@ -49,11 +49,6 @@ public class OrchestrationStep
     }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-    /// <summary>
-    /// The orchestration instance which this step is part of.
-    /// </summary>
-    public OrchestrationInstanceId OrchestrationInstanceId { get; }
-
     public OrchestrationStepId Id { get; }
 
     /// <summary>
@@ -71,4 +66,9 @@ public class OrchestrationStep
     /// Any custom state of the step.
     /// </summary>
     public OrchestrationStepCustomState CustomState { get; }
+
+    /// <summary>
+    /// The orchestration instance which this step is part of.
+    /// </summary>
+    public OrchestrationInstanceId OrchestrationInstanceId { get; }
 }
