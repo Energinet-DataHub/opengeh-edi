@@ -35,7 +35,7 @@ var host = new HostBuilder()
         // ProcessManager
         services.AddProcessManagerForOrchestrations(() =>
         {
-            // TODO:
+            // TODO: For demo purposes; remove when done.
             // We could implement an interface for "description building" which could then be implemented besides the orchestration.
             // During DI we could then search for all these interface implementations and register them automatically.
             // This would ensure we didn't have to update Program.cs when we change orchestrations.

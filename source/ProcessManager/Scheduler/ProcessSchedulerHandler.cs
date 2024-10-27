@@ -13,28 +13,46 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManagement.Core.Application;
+using Microsoft.Extensions.Logging;
+using NodaTime;
 
 namespace Energinet.DataHub.ProcessManager.Scheduler;
 
 public class ProcessSchedulerHandler(
+    ILogger<ProcessSchedulerHandler> logger,
+    IClock clock,
+    IOrchestrationInstanceRepository repository,
     IOrchestrationInstanceManager orchestrationInstanceManager)
 {
+    private readonly ILogger _logger = logger;
+    private readonly IClock _clock = clock;
+    private readonly IOrchestrationInstanceRepository _repository = repository;
     private readonly IOrchestrationInstanceManager _orchestrationInstanceManager = orchestrationInstanceManager;
 
     public async Task StartScheduledProcessAsync()
     {
-        var x = 12 + 2;
-        if (x == 13)
+        var now = _clock.GetCurrentInstant();
+        var scheduledOrchestrationInstances = await _repository
+            .GetScheduledByInstantAsync(scheduledToRunBefore: now)
+            .ConfigureAwait(false);
+
+        foreach (var orchestrationInstance in scheduledOrchestrationInstances)
         {
-            await _orchestrationInstanceManager.StartNewOrchestrationInstanceAsync(
-                name: "BRS_023_027",
-                version: 1,
-                new ExampleInput(
-                    DateTimeOffset.Now,
-                    DateTimeOffset.Now.AddHours(1),
-                    DateTimeOffset.Now,
-                    true))
-                .ConfigureAwait(false);
+            try
+            {
+                await _orchestrationInstanceManager
+                    .StartScheduledOrchestrationInstanceAsync(orchestrationInstance.Id)
+                    .ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                // Log error if orchestration instance did not start successfully.
+                // Does not throw exception since we want to continue processing the next scheduled orchestration instance.
+                _logger.LogError(
+                    ex,
+                    "Failed to start orchestration instance with id = {OrchestrationInstanceId}",
+                    orchestrationInstance.Id.Value);
+            }
         }
     }
 }

@@ -19,6 +19,7 @@ using Energinet.DataHub.ProcessManager.Core.Tests.Fixtures;
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using NodaTime;
 
 namespace Energinet.DataHub.ProcessManager.Core.Tests.Integration.Infrastructure.Orchestration;
@@ -124,12 +125,12 @@ public class OrchestrationInstanceRepositoryTests
 
         var scheduledToRun = CreateOrchestrationInstance(
             existingOrchestrationDescription,
-            scheduledToRunAt: SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromMinutes(1)));
+            scheduledToRunAt: SystemClock.Instance.GetCurrentInstant().PlusMinutes(1));
         await _sut.AddAsync(scheduledToRun);
 
         var scheduledIntoTheFarFuture = CreateOrchestrationInstance(
             existingOrchestrationDescription,
-            scheduledToRunAt: SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(1)));
+            scheduledToRunAt: SystemClock.Instance.GetCurrentInstant().PlusDays(5));
         await _sut.AddAsync(scheduledIntoTheFarFuture);
 
         await _unitOfWork.CommitAsync();
