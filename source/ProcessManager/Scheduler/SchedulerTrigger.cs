@@ -16,15 +16,15 @@ using Microsoft.Azure.Functions.Worker;
 
 namespace Energinet.DataHub.ProcessManager.Scheduler;
 
-internal class ProcessSchedulerTrigger(
-    ProcessSchedulerHandler handler)
+internal class SchedulerTrigger(
+    SchedulerHandler handler)
 {
-    private readonly ProcessSchedulerHandler _handler = handler;
+    private readonly SchedulerHandler _handler = handler;
 
-    [Function(nameof(StartScheduledProcess))]
-    public Task StartScheduledProcess(
+    [Function(nameof(StartScheduledOrchestrationInstances))]
+    public Task StartScheduledOrchestrationInstances(
         [TimerTrigger("*/10 * * * * *")] TimerInfo timerInfo) // Runs every 10 seconds
     {
-        return _handler.StartScheduledProcessAsync();
+        return _handler.StartScheduledOrchestrationInstancesAsync();
     }
 }

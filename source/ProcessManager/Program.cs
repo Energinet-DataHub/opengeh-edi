@@ -35,7 +35,7 @@ var host = new HostBuilder()
         services.AddNodaTimeForApplication();
 
         // Scheduler
-        services.AddScoped<ProcessSchedulerHandler>();
+        services.AddScoped<SchedulerHandler>();
 
         // ProcessManager
         services.AddProcessManagerCore();

@@ -13,24 +13,14 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManagement.Core.Domain;
+using NodaTime;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Application;
 
-public interface IOrchestrationInstanceRepository : IOrchestrationInstanceProgressRepository
+public interface IQueryScheduledOrchestrationInstancesByInstant
 {
     /// <summary>
-    /// Add the orchestration instance.
-    /// To commit changes use <see cref="IUnitOfWork.CommitAsync"/>.
+    /// Find scheduled orchestration instances that should be started when comparing to given <paramref name="scheduledToRunBefore"/>.
     /// </summary>
-    Task AddAsync(OrchestrationInstance orchestrationInstance);
-
-    /// <summary>
-    /// Get all orchestration instances filtered by their related orchestration definition name and version,
-    /// and their lifecycle / termination states.
-    /// </summary>
-    Task<IReadOnlyCollection<OrchestrationInstance>> SearchAsync(
-        string name,
-        int? version,
-        OrchestrationInstanceLifecycleStates? lifecycleState,
-        OrchestrationInstanceTerminationStates? terminationState);
+    Task<IReadOnlyCollection<OrchestrationInstance>> FindAsync(Instant scheduledToRunBefore);
 }

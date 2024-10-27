@@ -18,22 +18,22 @@ using NodaTime;
 
 namespace Energinet.DataHub.ProcessManager.Scheduler;
 
-public class ProcessSchedulerHandler(
-    ILogger<ProcessSchedulerHandler> logger,
+public class SchedulerHandler(
+    ILogger<SchedulerHandler> logger,
     IClock clock,
-    IOrchestrationInstanceRepository repository,
+    IQueryScheduledOrchestrationInstancesByInstant query,
     IOrchestrationInstanceManager orchestrationInstanceManager)
 {
     private readonly ILogger _logger = logger;
     private readonly IClock _clock = clock;
-    private readonly IOrchestrationInstanceRepository _repository = repository;
+    private readonly IQueryScheduledOrchestrationInstancesByInstant _query = query;
     private readonly IOrchestrationInstanceManager _orchestrationInstanceManager = orchestrationInstanceManager;
 
-    public async Task StartScheduledProcessAsync()
+    public async Task StartScheduledOrchestrationInstancesAsync()
     {
         var now = _clock.GetCurrentInstant();
-        var scheduledOrchestrationInstances = await _repository
-            .GetScheduledByInstantAsync(scheduledToRunBefore: now)
+        var scheduledOrchestrationInstances = await _query
+            .FindAsync(scheduledToRunBefore: now)
             .ConfigureAwait(false);
 
         foreach (var orchestrationInstance in scheduledOrchestrationInstances)

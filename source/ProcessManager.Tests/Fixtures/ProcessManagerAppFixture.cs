@@ -170,7 +170,7 @@ public class ProcessManagerAppFixture : IAsyncLifetime
 
         // Disable timer trigger (should be manually triggered in tests)
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"AzureWebJobs.{nameof(ProcessSchedulerTrigger.StartScheduledProcess)}.Disabled",
+            $"AzureWebJobs.{nameof(SchedulerTrigger.StartScheduledOrchestrationInstances)}.Disabled",
             "true");
 
         return appHostSettings;

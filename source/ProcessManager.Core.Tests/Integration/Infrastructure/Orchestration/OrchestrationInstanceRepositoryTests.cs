@@ -136,7 +136,7 @@ public class OrchestrationInstanceRepositoryTests
         await _unitOfWork.CommitAsync();
 
         // Act
-        var actual = await _sut.GetScheduledByInstantAsync(
+        var actual = await _sut.FindAsync(
             SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromMinutes(5)));
 
         // Assert

@@ -68,6 +68,7 @@ public static class ProcessManagerExtensions
         // ProcessManager components using interfaces to restrict access to functionality
         services.TryAddScoped<IOrchestrationRegisterQueries, OrchestrationRegister>();
         services.TryAddScoped<IOrchestrationInstanceRepository, OrchestrationInstanceRepository>();
+        services.TryAddScoped<IQueryScheduledOrchestrationInstancesByInstant, OrchestrationInstanceRepository>();
         services.TryAddScoped<IOrchestrationInstanceManager, OrchestrationInstanceManager>();
 
         return services;

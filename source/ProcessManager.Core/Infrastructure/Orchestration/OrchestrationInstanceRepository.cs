@@ -20,7 +20,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestration;
 
-public class OrchestrationInstanceRepository : IOrchestrationInstanceRepository
+public class OrchestrationInstanceRepository : IOrchestrationInstanceRepository, IQueryScheduledOrchestrationInstancesByInstant
 {
     private readonly ProcessManagerContext _context;
 
@@ -45,8 +45,8 @@ public class OrchestrationInstanceRepository : IOrchestrationInstanceRepository
         await _context.OrchestrationInstances.AddAsync(orchestrationInstance).ConfigureAwait(false);
     }
 
-    /// <inheritdoc />
-    public async Task<IReadOnlyCollection<OrchestrationInstance>> GetScheduledByInstantAsync(Instant scheduledToRunBefore)
+    /// <inheritdoc cref="IQueryScheduledOrchestrationInstancesByInstant.FindAsync(Instant)"/>
+    public async Task<IReadOnlyCollection<OrchestrationInstance>> FindAsync(Instant scheduledToRunBefore)
     {
         var query = _context.OrchestrationInstances
             .Where(x => x.Lifecycle.State == OrchestrationInstanceLifecycleStates.Pending)
