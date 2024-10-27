@@ -151,21 +151,21 @@ public class OrchestrationInstanceRepositoryTests
     {
         // Arrange
         var uniqueName = Guid.NewGuid().ToString();
-        var existingOrchestrationDescription = CreateOrchestrationDescription(uniqueName, version: 1);
-        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescription);
+        var existingOrchestrationDescriptionV1 = CreateOrchestrationDescription(uniqueName, version: 1);
+        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescriptionV1);
 
-        var notScheduledV1 = CreateOrchestrationInstance(existingOrchestrationDescription);
+        var notScheduledV1 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
         await _sut.AddAsync(notScheduledV1);
 
         var scheduledToRunV1 = CreateOrchestrationInstance(
-            existingOrchestrationDescription,
+            existingOrchestrationDescriptionV1,
             scheduledToRunAt: SystemClock.Instance.GetCurrentInstant().PlusMinutes(1));
         await _sut.AddAsync(scheduledToRunV1);
 
         await _unitOfWork.CommitAsync();
 
         // Act
-        var actual = await _sut.SearchAsync(existingOrchestrationDescription.Name);
+        var actual = await _sut.SearchAsync(existingOrchestrationDescriptionV1.Name);
 
         // Assert
         actual.Should()
@@ -197,6 +197,85 @@ public class OrchestrationInstanceRepositoryTests
         // Assert
         actual.Should()
             .BeEquivalentTo(new[] { basedOnV1 });
+    }
+
+    [Fact]
+    public async Task GivenOrchestrationInstancesInDatabase_WhenSearchByNameAndLifecycleState_ThenExpectedOrchestrationInstancesAreRetrieved()
+    {
+        // Arrange
+        var uniqueName = Guid.NewGuid().ToString();
+        var existingOrchestrationDescriptionV1 = CreateOrchestrationDescription(uniqueName, version: 1);
+        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescriptionV1);
+
+        var existingOrchestrationDescriptionV2 = CreateOrchestrationDescription(uniqueName, version: 2);
+        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescriptionV2);
+
+        var isPendingV1 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
+        await _sut.AddAsync(isPendingV1);
+
+        var isRunningV1 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
+        isRunningV1.Lifecycle.TransitionToStartRequested(SystemClock.Instance);
+        isRunningV1.Lifecycle.TransitionToRunning(SystemClock.Instance);
+        await _sut.AddAsync(isRunningV1);
+
+        var isPendingV2 = CreateOrchestrationInstance(existingOrchestrationDescriptionV2);
+        await _sut.AddAsync(isPendingV2);
+
+        var isRunningV2 = CreateOrchestrationInstance(existingOrchestrationDescriptionV2);
+        isRunningV2.Lifecycle.TransitionToStartRequested(SystemClock.Instance);
+        isRunningV2.Lifecycle.TransitionToRunning(SystemClock.Instance);
+        await _sut.AddAsync(isRunningV2);
+
+        await _unitOfWork.CommitAsync();
+
+        // Act
+        var actual = await _sut.SearchAsync(existingOrchestrationDescriptionV1.Name, lifecycleState: OrchestrationInstanceLifecycleStates.Running);
+
+        // Assert
+        actual.Should()
+            .BeEquivalentTo(new[] { isRunningV1, isRunningV2 });
+    }
+
+    [Fact]
+    public async Task GivenOrchestrationInstancesInDatabase_WhenSearchByNameAndTerminationState_ThenExpectedOrchestrationInstancesAreRetrieved()
+    {
+        // Arrange
+        var uniqueName = Guid.NewGuid().ToString();
+        var existingOrchestrationDescriptionV1 = CreateOrchestrationDescription(uniqueName, version: 1);
+        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescriptionV1);
+
+        var existingOrchestrationDescriptionV2 = CreateOrchestrationDescription(uniqueName, version: 2);
+        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescriptionV2);
+
+        var isPendingV1 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
+        await _sut.AddAsync(isPendingV1);
+
+        var isTerminatedAsSucceededV1 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
+        isTerminatedAsSucceededV1.Lifecycle.TransitionToStartRequested(SystemClock.Instance);
+        isTerminatedAsSucceededV1.Lifecycle.TransitionToRunning(SystemClock.Instance);
+        isTerminatedAsSucceededV1.Lifecycle.TransitionToTerminated(SystemClock.Instance, OrchestrationInstanceTerminationStates.Succeeded);
+        await _sut.AddAsync(isTerminatedAsSucceededV1);
+
+        var isPendingV2 = CreateOrchestrationInstance(existingOrchestrationDescriptionV2);
+        await _sut.AddAsync(isPendingV2);
+
+        var isTerminatedAsFailedV2 = CreateOrchestrationInstance(existingOrchestrationDescriptionV2);
+        isTerminatedAsFailedV2.Lifecycle.TransitionToStartRequested(SystemClock.Instance);
+        isTerminatedAsFailedV2.Lifecycle.TransitionToRunning(SystemClock.Instance);
+        isTerminatedAsFailedV2.Lifecycle.TransitionToTerminated(SystemClock.Instance, OrchestrationInstanceTerminationStates.Failed);
+        await _sut.AddAsync(isTerminatedAsFailedV2);
+
+        await _unitOfWork.CommitAsync();
+
+        // Act
+        var actual = await _sut.SearchAsync(
+            existingOrchestrationDescriptionV1.Name,
+            lifecycleState: OrchestrationInstanceLifecycleStates.Terminated,
+            terminationState: OrchestrationInstanceTerminationStates.Succeeded);
+
+        // Assert
+        actual.Should()
+            .BeEquivalentTo(new[] { isTerminatedAsSucceededV1 });
     }
 
     private static OrchestrationDescription CreateOrchestrationDescription(string? name = default, int? version = default)
