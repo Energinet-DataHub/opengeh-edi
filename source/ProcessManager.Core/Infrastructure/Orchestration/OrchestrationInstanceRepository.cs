@@ -58,9 +58,9 @@ public class OrchestrationInstanceRepository : IOrchestrationInstanceRepository,
     /// <inheritdoc />
     public async Task<IReadOnlyCollection<OrchestrationInstance>> SearchAsync(
         string name,
-        int? version,
-        OrchestrationInstanceLifecycleStates? lifecycleState,
-        OrchestrationInstanceTerminationStates? terminationState)
+        int? version = default,
+        OrchestrationInstanceLifecycleStates? lifecycleState = default,
+        OrchestrationInstanceTerminationStates? terminationState = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
