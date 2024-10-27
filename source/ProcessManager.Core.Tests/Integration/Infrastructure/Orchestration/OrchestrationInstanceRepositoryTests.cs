@@ -85,7 +85,7 @@ public class OrchestrationInstanceRepositoryTests
 
         // Act
         await _sut.AddAsync(newOrchestrationInstance);
-        var act = () => _unitOfWork.CommitAsync();
+        var act = _unitOfWork.CommitAsync;
 
         // Assert
         await act.Should()
@@ -146,13 +146,66 @@ public class OrchestrationInstanceRepositoryTests
             .HaveCount(1);
     }
 
-    private static OrchestrationDescription CreateOrchestrationDescription()
+    [Fact]
+    public async Task GivenOrchestrationInstancesInDatabase_WhenSearchByName_ThenExpectedOrchestrationInstancesAreRetrieved()
+    {
+        // Arrange
+        var uniqueName = Guid.NewGuid().ToString();
+        var existingOrchestrationDescription = CreateOrchestrationDescription(uniqueName, version: 1);
+        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescription);
+
+        var notScheduledV1 = CreateOrchestrationInstance(existingOrchestrationDescription);
+        await _sut.AddAsync(notScheduledV1);
+
+        var scheduledToRunV1 = CreateOrchestrationInstance(
+            existingOrchestrationDescription,
+            scheduledToRunAt: SystemClock.Instance.GetCurrentInstant().PlusMinutes(1));
+        await _sut.AddAsync(scheduledToRunV1);
+
+        await _unitOfWork.CommitAsync();
+
+        // Act
+        var actual = await _sut.SearchAsync(existingOrchestrationDescription.Name);
+
+        // Assert
+        actual.Should()
+            .BeEquivalentTo(new[] { notScheduledV1, scheduledToRunV1 });
+    }
+
+    [Fact]
+    public async Task GivenOrchestrationInstancesInDatabase_WhenSearchByNameAndVersion_ThenExpectedOrchestrationInstancesAreRetrieved()
+    {
+        // Arrange
+        var uniqueName = Guid.NewGuid().ToString();
+        var existingOrchestrationDescriptionV1 = CreateOrchestrationDescription(uniqueName, version: 1);
+        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescriptionV1);
+
+        var existingOrchestrationDescriptionV2 = CreateOrchestrationDescription(uniqueName, version: 2);
+        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescriptionV2);
+
+        var basedOnV1 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
+        await _sut.AddAsync(basedOnV1);
+
+        var basedOnV2 = CreateOrchestrationInstance(existingOrchestrationDescriptionV2);
+        await _sut.AddAsync(basedOnV2);
+
+        await _unitOfWork.CommitAsync();
+
+        // Act
+        var actual = await _sut.SearchAsync(existingOrchestrationDescriptionV1.Name, existingOrchestrationDescriptionV1.Version);
+
+        // Assert
+        actual.Should()
+            .BeEquivalentTo(new[] { basedOnV1 });
+    }
+
+    private static OrchestrationDescription CreateOrchestrationDescription(string? name = default, int? version = default)
     {
         var existingOrchestrationDescription = new OrchestrationDescription(
-            "TestOrchestration",
-            4,
-            true,
-            "TestOrchestrationFunction");
+            name: name ?? "TestOrchestration",
+            version: version ?? 4,
+            canBeScheduled: true,
+            functionName: "TestOrchestrationFunction");
 
         existingOrchestrationDescription
             .ParameterDefinition
