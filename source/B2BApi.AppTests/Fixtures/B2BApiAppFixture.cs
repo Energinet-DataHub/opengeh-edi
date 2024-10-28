@@ -429,7 +429,7 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"AzureWebJobs.TenSecondsHasPassed.Disabled",
-            "false");
+            "true");
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"AzureWebJobs.ADayHasPassed.Disabled",
             "true");

@@ -17,6 +17,7 @@ using System.Dynamic;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.AuditLog.AuditLogOutbox;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
@@ -41,6 +42,10 @@ namespace Energinet.DataHub.EDI.B2BApi.AppTests.IncomingMessages;
 [Collection(nameof(B2BApiAppCollectionFixture))]
 public class IncomingMessageReceiverTests : IAsyncLifetime
 {
+    private readonly ActorNumber _actorNumber = ActorNumber.Create("5790000392551");
+    private readonly ActorRole _actorRole = ActorRole.EnergySupplier;
+    private readonly string _externalId = Guid.NewGuid().ToString();
+
     public IncomingMessageReceiverTests(B2BApiAppFixture fixture, ITestOutputHelper testOutputHelper)
     {
         Fixture = fixture;
@@ -54,6 +59,7 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
         Fixture.AppHostManager.ClearHostLog();
         await using var context = Fixture.DatabaseManager.CreateDbContext<OutboxContext>();
         await context.Outbox.ExecuteDeleteAsync();
+        await Fixture.DatabaseManager.AddActorAsync(_actorNumber, _externalId);
     }
 
     public Task DisposeAsync()
@@ -88,14 +94,9 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
     public async Task Given_PersistedActor_When_CallingIncomingMessagesWithValidDocumentAndBearerToken_Then_ResponseShouldBeAccepted_AndRequestCanBePeeked()
     {
         // Arrange
-        var actorNumber = ActorNumber.Create("5790000392551");
-        var externalId = Guid.NewGuid().ToString();
-        await Fixture.DatabaseManager.AddActorAsync(actorNumber, externalId);
-
-        var actorRole = ActorRole.EnergySupplier;
-        var b2bToken = new JwtBuilder()
-            .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
-            .WithClaim(ClaimsMap.ActorId, externalId)
+        var b2BToken = new JwtBuilder()
+            .WithRole(ClaimsMap.RoleFrom(_actorRole).Value)
+            .WithClaim(ClaimsMap.ActorId, _externalId)
             .CreateToken();
 
         using var request = await CreateHttpRequest(
@@ -107,6 +108,8 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
         await Fixture.AppHostManager.HttpClient.SendAsync(request);
 
         // Assert
+        await Fixture.AppHostManager.TriggerFunctionAsync("TenSecondsHasPassed");
+
         var stopWatch = Stopwatch.StartNew();
         var timeoutAfter = TimeSpan.FromMinutes(1);
 
@@ -117,12 +120,13 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
                 string.Empty,
                 Encoding.UTF8,
                 "application/json");
-            peekRequest.Headers.Authorization = new AuthenticationHeaderValue("bearer", b2bToken);
+            peekRequest.Headers.Authorization = new AuthenticationHeaderValue("bearer", b2BToken);
             using var response = await Fixture.AppHostManager.HttpClient.SendAsync(peekRequest);
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 // Assert
+                using var assertionScope = new AssertionScope();
                 response.Should().NotBeNull();
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
                 (await response.Content.ReadAsStringAsync()).Should().Contain("RejectRequestAggregatedMeasureData_MarketDocument");
@@ -218,24 +222,15 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
         HttpRequestMessage? request = null;
         try
         {
-            // The following must match with the JSON/XML document content
-            var actorNumber = ActorNumber.Create("5790000392551");
-            var actorRole = ActorRole.EnergySupplier;
+            // Add new Ids to ensure the request is accepted.
             var document = await File.ReadAllTextAsync(filePath);
             document = document
                 .Replace("{MessageId}", Guid.NewGuid().ToString())
                 .Replace("{TransactionId}", Guid.NewGuid().ToString());
 
-            // The actor must exist in the database
-            var externalId = Guid.NewGuid().ToString();
-            await Fixture.DatabaseManager.AddActorAsync(actorNumber, externalId);
-
-            // The bearer token must contain:
-            //  * the actor role matching the document content
-            //  * the external id matching the actor in the database
             var b2bToken = new JwtBuilder()
-                .WithRole(ClaimsMap.RoleFrom(actorRole).Value)
-                .WithClaim(ClaimsMap.ActorId, externalId)
+                .WithRole(ClaimsMap.RoleFrom(_actorRole).Value)
+                .WithClaim(ClaimsMap.ActorId, _externalId)
                 .CreateToken();
 
             request = new HttpRequestMessage(HttpMethod.Post, $"api/incomingMessages/{documentType}")
