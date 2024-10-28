@@ -26,6 +26,8 @@ public static class DbUpgrader
     {
         EnsureDatabase.For.SqlDatabase(connectionString);
 
+        // We create the schema in code to ensure we can create the 'SchemaVersions'
+        // table within the schema.
         var schemaName = "pm";
         CreateSchema(connectionString, schemaName);
 
