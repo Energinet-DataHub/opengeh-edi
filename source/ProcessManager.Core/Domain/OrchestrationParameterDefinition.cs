@@ -56,8 +56,6 @@ public class OrchestrationParameterDefinition
     /// </summary>
     public Task<bool> IsValidParameterValueAsync(object parameterValue)
     {
-        ArgumentNullException.ThrowIfNull(parameterValue);
-
         var serializedParameterValue = JsonSerializer.Serialize(parameterValue);
 
         return IsValidParameterValueAsync(serializedParameterValue);

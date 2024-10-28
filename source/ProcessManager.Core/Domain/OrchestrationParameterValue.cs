@@ -39,8 +39,6 @@ public class OrchestrationParameterValue
     public void SetFromInstance<TParameter>(TParameter instance)
         where TParameter : class
     {
-        ArgumentNullException.ThrowIfNull(instance);
-
         SerializedParameterValue = JsonSerializer.Serialize(instance);
     }
 }
