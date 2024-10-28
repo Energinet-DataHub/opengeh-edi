@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.ProcessManagement.Core.Domain;
+namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 
 /// <summary>
 /// Durable Functions orchestration description.
@@ -47,7 +47,7 @@ public class OrchestrationDescription
     }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-    public OrchestrationDescriptionId Id { get;  }
+    public OrchestrationDescriptionId Id { get; }
 
     /// <summary>
     /// A name which combined with the <see cref="Version"/> uniquely identifies the orchestration.

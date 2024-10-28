@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 using NodaTime;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Domain;
+namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 
 /// <summary>
 /// Represents the instance of an orchestration.
@@ -57,7 +58,7 @@ public class OrchestrationInstance
     /// <summary>
     /// Defines the Durable Functions orchestration input parameter value.
     /// </summary>
-    public OrchestrationParameterValue ParameterValue { get; }
+    public OrchestrationInstanceParameterValue ParameterValue { get; }
 
     /// <summary>
     /// Workflow steps the orchestration instance is going through.

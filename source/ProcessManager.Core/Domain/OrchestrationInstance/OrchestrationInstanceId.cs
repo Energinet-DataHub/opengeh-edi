@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.ProcessManagement.Core.Domain;
+namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 
-public record OrchestrationInstanceCustomState(string Value);
+public record OrchestrationInstanceId(Guid Value);

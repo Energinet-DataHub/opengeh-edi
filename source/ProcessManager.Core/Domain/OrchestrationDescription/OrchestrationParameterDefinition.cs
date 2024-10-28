@@ -15,7 +15,7 @@
 using System.Text.Json;
 using NJsonSchema;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Domain;
+namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 
 /// <summary>
 /// Defines a Durable Functions orchestration input parameter type using a JSON schema.

@@ -14,14 +14,14 @@
 
 using System.Text.Json;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Domain;
+namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 
 /// <summary>
 /// Store a Durable Functions orchestration input parameter value as JSON.
 /// </summary>
-public class OrchestrationParameterValue
+public class OrchestrationInstanceParameterValue
 {
-    internal OrchestrationParameterValue()
+    internal OrchestrationInstanceParameterValue()
     {
         SerializedParameterValue = string.Empty;
     }

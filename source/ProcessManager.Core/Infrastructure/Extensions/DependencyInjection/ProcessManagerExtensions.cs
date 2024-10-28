@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManagement.Core.Application;
-using Energinet.DataHub.ProcessManagement.Core.Domain;
+using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Database;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Options;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestration;

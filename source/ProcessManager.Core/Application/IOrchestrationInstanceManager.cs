@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Domain;
+using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using NodaTime;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Application;

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManagement.Core.Application;
-using Energinet.DataHub.ProcessManagement.Core.Domain;
+using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;

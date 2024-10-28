@@ -14,7 +14,7 @@
 
 using NodaTime;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Domain;
+namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 
 public class OrchestrationInstanceLifecycleState
 {
