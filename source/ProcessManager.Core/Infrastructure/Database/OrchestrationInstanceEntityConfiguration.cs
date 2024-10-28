@@ -49,7 +49,7 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
             b =>
             {
                 b.Property(pv => pv.SerializedParameterValue)
-                    .HasColumnName("ParameterValue");
+                    .HasColumnName(nameof(OrchestrationInstance.ParameterValue.SerializedParameterValue));
             });
 
         builder.OwnsMany(

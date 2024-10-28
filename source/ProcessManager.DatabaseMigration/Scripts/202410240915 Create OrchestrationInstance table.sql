@@ -11,7 +11,7 @@
     [Lifecycle_StartedAt]           DATETIME2 NULL,
     [Lifecycle_TerminatedAt]        DATETIME2 NULL,
 
-    [ParameterValue]                NVARCHAR(MAX) NOT NULL,
+    [SerializedParameterValue]      NVARCHAR(MAX) NOT NULL,
     [CustomState]                   NVARCHAR(255) NOT NULL,
     [OrchestrationDescriptionId]    UNIQUEIDENTIFIER NOT NULL,
 

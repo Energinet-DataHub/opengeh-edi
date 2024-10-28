@@ -40,8 +40,8 @@ public class OrchestrationDescriptionEntityConfiguration : IEntityTypeConfigurat
             o => o.ParameterDefinition,
             pd =>
             {
-                pd.Property(OrchestrationParameterDefinition.ParameterDefinitionPropertyName)
-                    .HasColumnName("ParameterDefinition");
+                pd.Property(OrchestrationParameterDefinition.SerializedParameterDefinitionPropertyName)
+                    .HasColumnName(OrchestrationParameterDefinition.SerializedParameterDefinitionPropertyName);
             });
 
         builder.Property(o => o.HostName);

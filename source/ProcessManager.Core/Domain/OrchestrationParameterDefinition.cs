@@ -22,7 +22,7 @@ namespace Energinet.DataHub.ProcessManagement.Core.Domain;
 /// </summary>
 public class OrchestrationParameterDefinition
 {
-    internal const string ParameterDefinitionPropertyName = nameof(SerializedParameterDefinition);
+    internal const string SerializedParameterDefinitionPropertyName = nameof(SerializedParameterDefinition);
 
     internal OrchestrationParameterDefinition()
     {
