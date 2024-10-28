@@ -24,5 +24,3 @@
         REFERENCES [pm].[OrchestrationDescription]([Id])
 )
 GO
-
--- TODO: Indexes needs to be created for the OrchestrationInstance table based on how the instances will be queried

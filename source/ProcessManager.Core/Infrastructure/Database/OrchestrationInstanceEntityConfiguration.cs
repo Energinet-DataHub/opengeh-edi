@@ -1,5 +1,4 @@
-﻿// Copyright 2020 Energinet DataHub A/S
-//
+﻿//
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -82,7 +81,6 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
 
                 b.Property(s => s.Sequence);
                 // Relation to another previous step
-                // TODO: Do we miss foreign key here?
                 b.Property(s => s.DependsOn)
                     .HasConversion(
                         id => id != null ? id.Value : (Guid?)null,
@@ -100,6 +98,7 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                     .HasConversion(
                         id => id.Value,
                         dbValue => new OrchestrationInstanceId(dbValue));
+
                 b.WithOwner().HasForeignKey(s => s.OrchestrationInstanceId);
             });
 
@@ -109,7 +108,6 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                 dbValue => new OrchestrationInstanceCustomState(dbValue));
 
         // Relation to description
-        // TODO: Do we miss foreign key here?
         builder.Property(o => o.OrchestrationDescriptionId)
             .ValueGeneratedNever()
             .HasConversion(
