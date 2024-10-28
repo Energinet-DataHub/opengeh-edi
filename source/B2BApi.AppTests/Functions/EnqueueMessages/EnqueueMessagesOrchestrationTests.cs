@@ -83,8 +83,6 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventForBalanceFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
-        EnableEnqueueMessagesOrchestration();
-
         var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
         var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
         var perBrpAndEsGridAreaDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
@@ -180,8 +178,6 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventForWholesaleFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
-        EnableEnqueueMessagesOrchestration();
-
         var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
         var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
         var perBrpAndEsGridAreaDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
@@ -281,8 +277,6 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_DatabricksHasNoData_When_CalculationCompletedEventIsHandled_Then_OrchestrationIsStartedButActivitiesWillFailAndBeRetriedForever()
     {
         // Arrange
-        EnableEnqueueMessagesOrchestration();
-
         var calculationId = Guid.NewGuid().ToString();
         var calculationOrchestrationId = Guid.NewGuid().ToString();
         var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
@@ -346,8 +340,6 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_WholesaleResultsContainsAnInvalidRow_When_CalculationCompletedEventForWholesaleFixing_Then_EnqueueAllValidMessages()
     {
         // Arrange
-        EnableEnqueueMessagesOrchestration();
-
         var forAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
         var forMonthlyAmountPerChargeDescription = new WholesaleResultForMonthlyAmountPerChargeDescription();
         var forTotalAmountDescription = new WholesaleResultForTotalAmountDescription();
@@ -412,8 +404,6 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_EnergyResultsContainsAnInvalidRow_When_CalculationCompletedEventForBalanceFixing_Then_EnqueueAllValidMessages()
     {
         // Arrange
-        EnableEnqueueMessagesOrchestration();
-
         var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
         var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
         var perBrpAndEsGridAreaDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
@@ -612,10 +602,5 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     private async Task AddGridAreaOwner(ActorNumber actorNumber, string gridAreaCode)
     {
         await Fixture.DatabaseManager.AddGridAreaOwnerAsync(actorNumber, gridAreaCode);
-    }
-
-    private void EnableEnqueueMessagesOrchestration()
-    {
-        Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: true);
     }
 }

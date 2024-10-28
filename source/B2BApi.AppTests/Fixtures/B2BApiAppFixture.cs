@@ -15,6 +15,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Azure.Storage.Blobs;
+using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
@@ -66,7 +67,7 @@ public class B2BApiAppFixture : IAsyncLifetime
         IntegrationTestConfiguration = new IntegrationTestConfiguration();
         LogStopwatch(stopwatch, nameof(IntegrationTestConfiguration));
 
-        AzuriteManager = new AzuriteManager(useOAuth: true);
+        AzuriteManager = new AzuriteManager();
         LogStopwatch(stopwatch, nameof(AzuriteManager));
 
         CleanupAzuriteStorage();
@@ -143,6 +144,9 @@ public class B2BApiAppFixture : IAsyncLifetime
     {
         var initializeStopwatch = new Stopwatch();
         var stopwatch = new Stopwatch();
+
+        initializeStopwatch.Start();
+        stopwatch.Start();
 
         // Storage emulator
         AzuriteManager.StartAzurite();
@@ -236,11 +240,11 @@ public class B2BApiAppFixture : IAsyncLifetime
     }
 
     public void EnsureAppHostUsesFeatureFlagValue(
-        bool enableCalculationCompletedEvent)
+        bool useRequestWholesaleServicesOrchestration = false)
     {
         AppHostManager.RestartHostIfChanges(new Dictionary<string, string>
         {
-            { "FeatureManagement__UseCalculationCompletedEvent", enableCalculationCompletedEvent.ToString().ToLower() },
+            { $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration.ToString()}", useRequestWholesaleServicesOrchestration.ToString().ToLower() },
         });
     }
 
@@ -408,19 +412,19 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // Feature Flags: Default values
         appHostSettings.ProcessEnvironmentVariables.Add(
-            "FeatureManagement__UseCalculationCompletedEvent",
+            $"FeatureManagement__{FeatureFlagName.UsePeekMessages.ToString()}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            "FeatureManagement__UsePeekMessages",
-            true.ToString().ToLower());
-
-        appHostSettings.ProcessEnvironmentVariables.Add(
-            "FeatureManagement__RequestStaysInEdi",
+            $"FeatureManagement__{FeatureFlagName.RequestStaysInEdi.ToString()}",
             false.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            "FeatureManagement__ReceiveMeteredDataForMeasurementPoints",
+            $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration.ToString()}",
+            false.ToString().ToLower());
+
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"FeatureManagement__{FeatureFlagName.ReceiveMeteredDataForMeasurementPoints.ToString()}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
