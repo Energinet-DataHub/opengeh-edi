@@ -5,8 +5,8 @@
     <cim:type>D21</cim:type>
     <cim:process.processType>D05</cim:process.processType>
     <cim:businessSector.type>23</cim:businessSector.type>
-    <cim:sender_MarketParticipant.mRID codingScheme="A10">5790000392551</cim:sender_MarketParticipant.mRID>
-    <cim:sender_MarketParticipant.marketRole.type>DDQ</cim:sender_MarketParticipant.marketRole.type>
+    <cim:sender_MarketParticipant.mRID codingScheme="A10">{ActorNumber}</cim:sender_MarketParticipant.mRID>
+    <cim:sender_MarketParticipant.marketRole.type>{ActorRole}</cim:sender_MarketParticipant.marketRole.type>
     <cim:receiver_MarketParticipant.mRID codingScheme="A10">5790001330552</cim:receiver_MarketParticipant.mRID>
     <cim:receiver_MarketParticipant.marketRole.type>DGL</cim:receiver_MarketParticipant.marketRole.type>
     <cim:createdDateTime>2022-12-17T09:30:47Z</cim:createdDateTime>

@@ -46,6 +46,8 @@ public static class HttpRequestExtensions
         {
             var document = await File.ReadAllTextAsync(filePath);
             document = document
+                .Replace("{ActorNumber}", actor.ActorNumber.Value)
+                .Replace("{ActorRole}", actor.ActorRole.Code)
                 .Replace("{MessageId}", Guid.NewGuid().ToString())
                 .Replace("{TransactionId}", Guid.NewGuid().ToString());
 
