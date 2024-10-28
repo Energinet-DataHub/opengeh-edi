@@ -33,7 +33,6 @@ limitations under the License.
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Nito.AsyncEx.Coordination" Version="5.1.2" />
         <PackageReference Include="xunit" Version="2.9.0" />
         <PackageReference Include="xunit.categories" Version="2.0.8" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
@@ -49,10 +48,8 @@ limitations under the License.
     <ItemGroup>
       <ProjectReference Include="..\B2BApi\B2BApi.csproj" />
       <ProjectReference Include="..\CalculationResults\CalculationResults.Infrastructure\CalculationResults.Infrastructure.csproj" />
-      <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj" />
       <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj" />
-      <ProjectReference Include="..\IntegrationEvents.Infrastructure\IntegrationEvents.Infrastructure.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Application\OutgoingMessages.Application.csproj" />
       <ProjectReference Include="..\OutgoingMessages.Domain\OutgoingMessages.Domain.csproj" />
       <ProjectReference Include="..\B2CWebApi\B2CWebApi.csproj" />
@@ -130,10 +127,32 @@ limitations under the License.
         <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\EmptyJsonObject.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+        <None Remove="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\BadVersionMeteredDateForMeasurementPoint.xml" />
+        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\BadVersionMeteredDateForMeasurementPoint.xml">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\InvalidMeteredDateForMeasurementPoint.xml" />
+        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\InvalidMeteredDateForMeasurementPoint.xml">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\ValidMeteredDateForMeasurementPoint.xml" />
+        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\ValidMeteredDateForMeasurementPoint.xml">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\ValidMeteredDateForMeasurementPointWithTwoTransactions.xml" />
+        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\ValidMeteredDateForMeasurementPointWithTwoTransactions.xml">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <None Remove="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\ValidPT1HMeteredDataForMeasurementPoint.xml" />
+        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\ValidPT1HMeteredDataForMeasurementPoint.xml">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="DocumentValidation\" />
-    </ItemGroup>
+    <ItemDefinitionGroup>
+        <ProjectReference>
+            <PrivateAssets>all</PrivateAssets>
+        </ProjectReference>
+    </ItemDefinitionGroup>
 
 </Project>

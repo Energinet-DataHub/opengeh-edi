@@ -97,6 +97,17 @@ public class SenderAuthorizer : ISenderAuthorizer
                 }
 
                 break;
+            case MeteredDataForMeasurementPointMessage mdfmpm:
+                switch (mdfmpm.SenderRoleCode)
+                {
+                    case var sc1 when sc1.Equals(ActorRole.MeteredDataResponsible.Code, StringComparison.OrdinalIgnoreCase):
+                        break;
+                    default:
+                        _validationErrors.Add(new SenderRoleTypeIsNotAuthorized());
+                        break;
+                }
+
+                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(message));
         }

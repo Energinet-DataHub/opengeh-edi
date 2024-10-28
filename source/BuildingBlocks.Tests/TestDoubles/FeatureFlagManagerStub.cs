@@ -15,7 +15,7 @@
 using System.Diagnostics.CodeAnalysis;
 using BuildingBlocks.Application.FeatureFlag;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
+namespace Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 
 /// <summary>
 /// A FeatureFlagManager used to set default values and which allows overriding feature flags during tests
