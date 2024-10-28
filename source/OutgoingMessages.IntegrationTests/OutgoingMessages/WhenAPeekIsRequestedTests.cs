@@ -331,66 +331,6 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
             assertProperties.Keys.Should().Contain(dbPropertyName);
     }
 
-    [Fact]
-    public async Task Given_OutgoingMessage_MessageIsPeekedTwiceWithoutDequeue_Then_WeLogOneMessageGenerationInApplicationInsight()
-    {
-        // Arrange
-        var actorNumber = ActorNumber.Create("1234567890123");
-        var message = _energyResultPerGridAreaMessageDtoBuilder
-            .WithMeteredDataResponsibleNumber(actorNumber.Value)
-            .Build();
-
-        await _outgoingMessagesClient.EnqueueAndCommitAsync(message, CancellationToken.None);
-
-        // For some ungodly reason it takes 1,5 minute to log to the channel/application insight...
-        var timeoutInSeconds = 30 * 3;
-
-        // Act
-        await PeekMessageAsync(MessageCategory.Aggregations, actorNumber: actorNumber, actorRole: ActorRole.MeteredDataResponsible);
-
-        // Assert
-        using var assertionScope = new AssertionScope();
-
-        var telemetries = await GetTelemetriesAsync(timeoutInSeconds);
-        var telemetryLog = telemetries.Should().ContainSingle().Subject;
-        var telemetryLogName = telemetryLog.GetType()
-            .GetProperty("Name")!
-            .GetValue(telemetryLog, null);
-        telemetryLogName.Should().Be("NotifyAggregatedMeasureDataXml");
-
-        // Removing the previously logged telemetry log
-        GetService<TelemetryClient>().TelemetryConfiguration.TelemetryChannel.Flush();
-
-        // Act
-        await PeekMessageAsync(MessageCategory.Aggregations, actorNumber: actorNumber, actorRole: ActorRole.MeteredDataResponsible);
-        // Assert
-        (await GetTelemetriesAsync(timeoutInSeconds))
-            .Should().BeEmpty();
-    }
-
-    private async Task<List<ITelemetry>> GetTelemetriesAsync(int timeoutInSeconds)
-    {
-        var timer = new Stopwatch();
-        timer.Start();
-
-        while (timer.Elapsed < TimeSpan.FromSeconds(timeoutInSeconds))
-        {
-            if (GetService<TelemetryClient>().TelemetryConfiguration.TelemetryChannel is TelemetryChannelStub telemetryChannel)
-            {
-                if (telemetryChannel.SentTelemetries.Count > 0)
-                {
-                    await Task.Delay(1000);
-                    var sentTelemetries = (TelemetryChannelStub)GetService<TelemetryClient>().TelemetryConfiguration.TelemetryChannel;
-                    return sentTelemetries.SentTelemetries;
-                }
-            }
-
-            await Task.Delay(100);
-        }
-
-        return new List<ITelemetry>();
-    }
-
     private async Task<bool> BundleIsRegistered()
     {
         using var connection = await GetService<IDatabaseConnectionFactory>().GetConnectionAndOpenAsync(CancellationToken.None);

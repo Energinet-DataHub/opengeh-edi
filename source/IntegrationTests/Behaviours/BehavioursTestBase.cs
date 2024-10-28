@@ -13,11 +13,9 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using AutoFixture;
 using Azure.Messaging.ServiceBus;
 using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.FeatureFlag;
-using Energinet.DataHub.BuildingBlocks.Tests;
 using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
@@ -56,8 +54,6 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.Extensions.DependencyInjection;
-using Energinet.DataHub.Wholesale.Common.Infrastructure.Options;
-using Energinet.DataHub.Wholesale.Edi.Client;
 using Energinet.DataHub.Wholesale.Edi.Extensions.DependencyInjection;
 using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
@@ -70,9 +66,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
