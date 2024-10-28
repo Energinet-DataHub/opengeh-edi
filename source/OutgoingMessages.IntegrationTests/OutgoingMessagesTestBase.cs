@@ -18,6 +18,7 @@ using BuildingBlocks.Application.Extensions.DependencyInjection;
 using BuildingBlocks.Application.FeatureFlag;
 using Dapper;
 using Energinet.DataHub.BuildingBlocks.Tests.Logging;
+using Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2BApi.DataRetention;
@@ -36,6 +37,8 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using MediatR;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -230,6 +233,12 @@ public class OutgoingMessagesTestBase : IDisposable
             var executionContext = new ExecutionContext();
             executionContext.SetExecutionType(ExecutionType.Test);
             return executionContext;
+        });
+
+        _services.AddSingleton<TelemetryClient>(x =>
+        {
+            return new TelemetryClient(
+                new TelemetryConfiguration { TelemetryChannel = new TelemetryChannelStub(), });
         });
 
         ServiceProvider = _services.BuildServiceProvider();
