@@ -55,15 +55,6 @@ public static class DurableClientExtensions
         var isAvailable = await Awaiter.TryWaitUntilConditionAsync(
             async () =>
             {
-                var queryFilter2 = new OrchestrationStatusQueryCondition
-                {
-                    CreatedTimeFrom = DateTime.UtcNow.AddDays(-1),
-                };
-                var runningOrchestrations = await client
-                    .ListInstancesAsync(
-                        queryFilter2,
-                        CancellationToken.None);
-
                 var queryResult = await client.ListInstancesAsync(filter, CancellationToken.None);
 
                 if (queryResult == null)
