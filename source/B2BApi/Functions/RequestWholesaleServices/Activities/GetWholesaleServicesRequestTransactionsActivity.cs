@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.B2BApi.Functions.RequestWholesaleServices.Models;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
@@ -27,25 +27,42 @@ public class GetWholesaleServicesRequestTransactionsActivity
     /// <remarks>The <paramref name="input"/> type and return type must be that same as the <see cref="Run"/> method</remarks>
     /// <remarks>Changing the <paramref name="input"/> or return type might break the Durable Function's deserialization</remarks>
     /// </summary>
-    public static Task<IReadOnlyCollection<WholesaleServicesProcess>> StartActivityAsync(
+    public static Task<IReadOnlyCollection<RequestWholesaleServicesTransaction>> StartActivityAsync(
         InitializeWholesaleServicesProcessDto input,
         TaskOrchestrationContext context,
         TaskOptions? options)
     {
-        return context.CallActivityAsync<IReadOnlyCollection<WholesaleServicesProcess>>(
+        return context.CallActivityAsync<IReadOnlyCollection<RequestWholesaleServicesTransaction>>(
             nameof(GetWholesaleServicesRequestTransactionsActivity),
             input,
             options: options);
     }
 
     [Function(nameof(GetWholesaleServicesRequestTransactionsActivity))]
-    public Task<IReadOnlyCollection<WholesaleServicesProcess>> Run([ActivityTrigger] InitializeWholesaleServicesProcessDto input)
+    public Task<IReadOnlyCollection<RequestWholesaleServicesTransaction>> Run([ActivityTrigger] InitializeWholesaleServicesProcessDto input)
     {
         ArgumentNullException.ThrowIfNull(input);
 
-        var processes = InitializeWholesaleServicesProcessesHandler
-            .CreateWholesaleServicesProcesses(input);
+        var transactions = InitializeWholesaleServicesProcessesHandler
+            .CreateWholesaleServicesProcesses(input)
+            .Select(p => new RequestWholesaleServicesTransaction(
+                p.ProcessId,
+                p.RequestedByActor,
+                p.OriginalActor,
+                p.BusinessTransactionId,
+                p.InitiatedByMessageId,
+                p.BusinessReason,
+                p.StartOfPeriod,
+                p.EndOfPeriod,
+                p.RequestedGridArea,
+                p.EnergySupplierId,
+                p.SettlementVersion,
+                p.Resolution,
+                p.ChargeOwner,
+                p.ChargeTypes,
+                p.GridAreas))
+            .ToArray();
 
-        return Task.FromResult<IReadOnlyCollection<WholesaleServicesProcess>>(processes);
+        return Task.FromResult<IReadOnlyCollection<RequestWholesaleServicesTransaction>>(transactions);
     }
 }

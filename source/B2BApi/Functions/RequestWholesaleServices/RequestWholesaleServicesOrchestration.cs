@@ -13,32 +13,33 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.B2BApi.Functions.RequestWholesaleServices.Activities;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
+using Energinet.DataHub.EDI.B2BApi.Functions.RequestWholesaleServices.Models;
+using Energinet.DataHub.EDI.Process.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.RequestWholesaleServices;
 
-internal class RequestWholesaleServicesOrchestration
+public class RequestWholesaleServicesOrchestration
 {
     [Function(nameof(RequestWholesaleServicesOrchestration))]
     public async Task<string> Run(
         [OrchestrationTrigger] TaskOrchestrationContext context,
         FunctionContext executionContext)
     {
-        var input = context.GetInput<RequestWholesaleServicesOrchestrationInput>();
+        var input = context.GetInput<InitializeWholesaleServicesProcessDto>();
         if (input == null)
             return "Error: No input given.";
 
         // Split request in multiple transactions
         var transactions = await GetWholesaleServicesRequestTransactionsActivity
             .StartActivityAsync(
-                input.InitializeWholesaleServicesProcessDto,
+                input,
                 context,
                 null);
 
         // TODO: Maybe use sub orchestrations instead of fan-out?
-        var transactionTasks = new Task<EnqueueMessagesForWholesaleServicesRequestActivity.EnqueueMessagesResult>[transactions.Count];
+        var transactionTasks = new Task<EnqueueMessagesForRequestWholesaleServicesActivity.EnqueueMessagesResult>[transactions.Count];
         for (var i = 0; i < transactions.Count; i++)
         {
             transactionTasks[i] = HandleRequestWholesaleServicesTransaction(
@@ -53,8 +54,8 @@ internal class RequestWholesaleServicesOrchestration
                $"RejectedMessagesCount={enqueueMessagesResults.Sum(r => r.RejectedMessagesCount)}";
     }
 
-    private async Task<EnqueueMessagesForWholesaleServicesRequestActivity.EnqueueMessagesResult> HandleRequestWholesaleServicesTransaction(
-        WholesaleServicesProcess transaction,
+    private async Task<EnqueueMessagesForRequestWholesaleServicesActivity.EnqueueMessagesResult> HandleRequestWholesaleServicesTransaction(
+        RequestWholesaleServicesTransaction transaction,
         TaskOrchestrationContext context)
     {
         // Perform "Wholesale" part from WholesaleServicesRequestHandler
@@ -71,7 +72,7 @@ internal class RequestWholesaleServicesOrchestration
         // 2. Perform wholesale services query and enqueue messages
         //      2b) Enqueue reject message (and terminate) if no data
         //      2c) Enqueue accept message if data exists
-        return await EnqueueMessagesForWholesaleServicesRequestActivity.StartActivityAsync(
+        return await EnqueueMessagesForRequestWholesaleServicesActivity.StartActivityAsync(
             transaction,
             context,
             null);

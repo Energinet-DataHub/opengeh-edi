@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
+using Energinet.DataHub.EDI.B2BApi.Functions.RequestWholesaleServices.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
-using Energinet.DataHub.EDI.Process.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.RequestWholesaleServices.Activities;
 
-public class EnqueueMessagesForWholesaleServicesRequestActivity
+public class EnqueueMessagesForRequestWholesaleServicesActivity
 {
     /// <summary>
     /// Start an ValidateWholesaleServicesRequestActivity activity.
@@ -28,18 +27,18 @@ public class EnqueueMessagesForWholesaleServicesRequestActivity
     /// <remarks>Changing the <paramref name="input"/> or return type might break the Durable Function's deserialization</remarks>
     /// </summary>
     public static Task<EnqueueMessagesResult> StartActivityAsync(
-        WholesaleServicesProcess input,
+        RequestWholesaleServicesTransaction input,
         TaskOrchestrationContext context,
         TaskOptions? options)
     {
         return context.CallActivityAsync<EnqueueMessagesResult>(
-            nameof(EnqueueMessagesForWholesaleServicesRequestActivity),
+            nameof(EnqueueMessagesForRequestWholesaleServicesActivity),
             input,
             options: options);
     }
 
-    [Function(nameof(EnqueueMessagesForWholesaleServicesRequestActivity))]
-    public Task<EnqueueMessagesResult> Run([ActivityTrigger] WholesaleServicesProcess input)
+    [Function(nameof(EnqueueMessagesForRequestWholesaleServicesActivity))]
+    public Task<EnqueueMessagesResult> Run([ActivityTrigger] RequestWholesaleServicesTransaction input)
     {
         return Task.FromResult(new EnqueueMessagesResult(0, 0));
     }

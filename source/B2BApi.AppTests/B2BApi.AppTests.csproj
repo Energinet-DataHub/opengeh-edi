@@ -54,6 +54,9 @@
       <None Update="TestData\Messages\xml\RequestWholesaleSettlement.xml">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="TestData\Messages\xml\InvalidRequestWholesaleSettlement.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
   </ItemGroup>
 
 </Project>
