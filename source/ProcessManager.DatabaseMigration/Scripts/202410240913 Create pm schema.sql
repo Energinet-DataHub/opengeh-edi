@@ -1,4 +1,4 @@
-﻿IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'pm2')
+﻿IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'pm')
 BEGIN
-    EXEC('CREATE SCHEMA pm2');
+    EXEC('CREATE SCHEMA pm');
 END
