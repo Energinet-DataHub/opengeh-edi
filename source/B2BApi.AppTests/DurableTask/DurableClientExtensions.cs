@@ -47,6 +47,7 @@ public static class DurableClientExtensions
                 OrchestrationRuntimeStatus.Pending,
                 OrchestrationRuntimeStatus.Running,
                 OrchestrationRuntimeStatus.Completed,
+                OrchestrationRuntimeStatus.Failed,
             ],
         };
 
@@ -54,6 +55,15 @@ public static class DurableClientExtensions
         var isAvailable = await Awaiter.TryWaitUntilConditionAsync(
             async () =>
             {
+                var queryFilter2 = new OrchestrationStatusQueryCondition
+                {
+                    CreatedTimeFrom = DateTime.UtcNow.AddDays(-1),
+                };
+                var runningOrchestrations = await client
+                    .ListInstancesAsync(
+                        queryFilter2,
+                        CancellationToken.None);
+
                 var queryResult = await client.ListInstancesAsync(filter, CancellationToken.None);
 
                 if (queryResult == null)
@@ -91,6 +101,10 @@ public static class DurableClientExtensions
             {
                 // Do not retrieve history here as it could be expensive
                 var completeOrchestrationStatus = await client.GetStatusAsync(instanceId);
+
+                if (completeOrchestrationStatus.RuntimeStatus == OrchestrationRuntimeStatus.Failed)
+                    throw new Exception($"Orchestration instance '{instanceId}' failed.");
+
                 return completeOrchestrationStatus.RuntimeStatus == OrchestrationRuntimeStatus.Completed;
             },
             waitTimeLimit ?? TimeSpan.FromSeconds(30),

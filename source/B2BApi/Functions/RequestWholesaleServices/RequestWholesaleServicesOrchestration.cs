@@ -67,7 +67,7 @@ public class RequestWholesaleServicesOrchestration
             null);
 
         if (validationErrors.Any())
-            throw new Exception("Validation failed");
+            throw new Exception("Validation failed: " + string.Join("; ", validationErrors.Select(v => v.Message)));
 
         // 2. Perform wholesale services query and enqueue messages
         //      2b) Enqueue reject message (and terminate) if no data

@@ -20,7 +20,7 @@
         <cim:chargeTypeOwner_MarketParticipant.mRID codingScheme="A10">5790000432752</cim:chargeTypeOwner_MarketParticipant.mRID>
         <cim:ChargeType>
             <cim:type>D03</cim:type>
-            <cim:mRID>456456456456456456456456456</cim:mRID>
+            <cim:mRID>456</cim:mRID>
         </cim:ChargeType>
     </cim:Series>
 </cim:RequestWholesaleSettlement_MarketDocument>

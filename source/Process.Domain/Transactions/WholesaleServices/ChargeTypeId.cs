@@ -13,11 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 
 public record ChargeTypeId
 {
+    [JsonConstructor]
     private ChargeTypeId(Guid id)
     {
         Id = id;

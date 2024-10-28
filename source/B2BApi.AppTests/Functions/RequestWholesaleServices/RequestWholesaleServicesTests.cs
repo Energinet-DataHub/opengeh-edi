@@ -12,30 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
-using Energinet.DataHub.Core.FunctionApp.TestCommon.ServiceBus.ListenerMock;
-using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
 using Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures.Extensions;
 using Energinet.DataHub.EDI.B2BApi.Functions.RequestWholesaleServices;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
-using Energinet.DataHub.EnergySupplying.RequestResponse.IntegrationEvents;
-using Energinet.DataHub.Wholesale.Contracts.IntegrationEvents;
-using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using Google.Protobuf;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
@@ -60,8 +51,6 @@ public class RequestWholesaleServicesTests : IAsyncLifetime
         Fixture.AppHostManager.ClearHostLog();
 
         // Clear mappings etc. before each test
-        // Fixture.ServiceBusListenerMock.ResetMessageHandlersAndReceivedMessages();
-
         await AddGridAreaOwner(ActorNumber.Create("5790001662233"), "804");
     }
 
@@ -97,7 +86,7 @@ public class RequestWholesaleServicesTests : IAsyncLifetime
 
         // Test steps:
         // => HTTP POST: RequestWholesaleServices
-        var beforeOrchestrationCreated = SystemClock.Instance.GetCurrentInstant();
+        var beforeOrchestrationCreated = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromSeconds(30));
         var httpRequest = await Fixture.CreateRequestWholesaleServicesHttpRequestAsync(actor);
         var httpResponse = await Fixture.AppHostManager.HttpClient.SendAsync(httpRequest);
         await httpResponse.EnsureSuccessStatusCodeWithLogAsync(Fixture.TestLogger);
@@ -117,8 +106,10 @@ public class RequestWholesaleServicesTests : IAsyncLifetime
         // => Assert activities
         // => Assert enqueued messages (database or peek?)
         using var assertionScope = new AssertionScope();
-        completedOrchestrationStatus.Output.Should().Contain("Enqueueing finished. AcceptedMessagesCount=1");
-        completedOrchestrationStatus.Output.Should().Contain("RejectedMessagesCount==0");
+        completedOrchestrationStatus.RuntimeStatus.Should().Be(OrchestrationRuntimeStatus.Completed);
+        completedOrchestrationStatus.Output.ToString()
+            .Should().Contain("AcceptedMessagesCount=1")
+            .And.Contain("RejectedMessagesCount=0");
     }
 
     /// <summary>
