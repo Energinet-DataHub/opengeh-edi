@@ -41,8 +41,8 @@ public class EbixResponseFactoryTests
         var response = CreateResponse(result);
 
         Assert.True(response.IsErrorResponse);
-        AssertHasValue(response, "faultcode", duplicateMessageIdError.Code);
-        AssertHasValue(response, "faultstring", duplicateMessageIdError.Message);
+        AssertHasValue(response, "faultcode", "SOAP-ENV:Client");
+        AssertHasValue(response, "faultstring", $"{duplicateMessageIdError.Code}:{duplicateMessageIdError.Message}");
     }
 
     [Fact]
@@ -55,10 +55,9 @@ public class EbixResponseFactoryTests
         var response = CreateResponse(result);
 
         Assert.True(response.IsErrorResponse);
-        AssertHasValue(response, "faultcode", "BadRequest");
-        AssertHasValue(response, "faultstring", "Multiple errors in message");
-        AssertContainsError(response, duplicateMessageIdError);
-        AssertContainsError(response, duplicateTransactionIdError);
+        AssertHasValue(response, "faultcode", "SOAP-ENV:Client");
+        AssertHasValue(response, "faultstring", $"{duplicateMessageIdError.Code}:{duplicateMessageIdError.Message}");
+        AssertHasNotValue(response, "faultstring", $"{duplicateTransactionIdError.Code}:{duplicateTransactionIdError.Message}");
     }
 
     private static void AssertHasValue(ResponseMessage responseMessage, string elementName, string expectedValue)
@@ -67,13 +66,10 @@ public class EbixResponseFactoryTests
         Assert.Equal(expectedValue, document?.Element("Error")?.Element(elementName)?.Value);
     }
 
-    private static void AssertContainsError(ResponseMessage responseMessage, ValidationError validationError)
+    private static void AssertHasNotValue(ResponseMessage responseMessage, string elementName, string expectedValue)
     {
         var document = XDocument.Parse(responseMessage.MessageBody);
-        var errors = document.Element("Error")?.Elements("detail")?.ToList();
-
-        Assert.Contains(errors!, error => error.Element("fault")?.Element("ErrorCode")?.Value == validationError.Code);
-        Assert.Contains(errors!, error => error.Element("fault")?.Element("ErrorText")?.Value == validationError.Message);
+        Assert.NotEqual(expectedValue, document?.Element("Error")?.Element(elementName)?.Value);
     }
 
     private ResponseMessage CreateResponse(Result result)

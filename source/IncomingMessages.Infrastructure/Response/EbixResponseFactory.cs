@@ -40,20 +40,14 @@ public class EbixResponseFactory : IResponseFactory
 
         using var writer = XmlWriter.Create(messageBody, settings);
         writer.WriteStartElement("Error");
-        writer.WriteElementString("faultcode", result.Errors.Count == 1 ? result.Errors.First().Code : "BadRequest");
-        writer.WriteElementString("faultstring", result.Errors.Count == 1 ? result.Errors.First().Message : "Multiple errors in message");
-        if (result.Errors.Count > 1)
-        {
-            foreach (var validationError in result.Errors)
-            {
-                writer.WriteStartElement("detail");
-                writer.WriteStartElement("fault");
-                writer.WriteElementString("ErrorCode", validationError.Code);
-                writer.WriteElementString("ErrorText", validationError.Message);
-                writer.WriteEndElement();
-                writer.WriteEndElement();
-            }
-        }
+        writer.WriteElementString("faultcode", "SOAP-ENV:Client");
+        writer.WriteElementString("faultstring", $"{result.Errors.First().Code}:{result.Errors.First().Message}");
+        writer.WriteStartElement("detail");
+        writer.WriteStartElement("fault");
+        writer.WriteElementString("ErrorCode", result.Errors.First().Code);
+        writer.WriteElementString("ErrorText", result.Errors.First().Message);
+        writer.WriteEndElement();
+        writer.WriteEndElement();
 
         writer.WriteEndElement();
         writer.Close();
