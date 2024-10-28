@@ -91,7 +91,7 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Given_PersistedActor_When_CallingIncomingMessagesWithValidDocumentAndBearerToken_Then_ResponseShouldBeAccepted_AndRequestCanBePeeked()
+    public async Task Given_PersistedActor_When_SendingRequestForAggregatedMeasuredData_Then_ResponseShouldBeAccepted_AndRequestCanBePeeked()
     {
         // Arrange
         var b2BToken = new JwtBuilder()
