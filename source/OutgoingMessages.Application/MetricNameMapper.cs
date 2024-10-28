@@ -22,7 +22,6 @@ public static class MetricNameMapper
     {
         var documentNameAndFormat = type.Name;
 
-        // The message is a response to a request if it has a related message id
         documentNameAndFormat += isResponse ? "Response" : string.Empty;
         documentNameAndFormat += format.Name;
 
