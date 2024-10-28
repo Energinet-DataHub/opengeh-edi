@@ -27,15 +27,11 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.TimeEvents;
-using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.MasterData.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.Application.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
-using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using MediatR;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -206,8 +202,6 @@ public class OutgoingMessagesTestBase : IDisposable
         _services = [];
         _services
             .AddScoped<IConfiguration>(_ => config)
-            .AddTransient<InboxEventsProcessor>()
-            .AddScopedSqlDbContext<ProcessContext>(config)
             .AddB2BAuthentication(
                 new TokenValidationParameters
                 {
@@ -220,7 +214,6 @@ public class OutgoingMessagesTestBase : IDisposable
             .AddSerializer()
             .AddTestLogger(testOutputHelper)
             .AddScoped<IClock>(_ => new ClockStub())
-            .AddTransient<INotificationHandler<ADayHasPassed>, ExecuteDataRetentionsWhenADayHasPassed>()
             .AddOutgoingMessagesModule(config)
             .AddArchivedMessagesModule(config)
             .AddMasterDataModule(config);
