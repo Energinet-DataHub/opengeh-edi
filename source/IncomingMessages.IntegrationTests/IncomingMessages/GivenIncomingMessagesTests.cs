@@ -62,19 +62,16 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         _clockStub = (ClockStub)GetService<IClock>();
     }
 
-    public static IEnumerable<object[]> ValidIncomingRequestMessages()
+    public static TheoryData<DocumentFormat, IncomingDocumentType, ActorRole, IncomingMarketMessageStream> ValidIncomingRequestMessages()
     {
-        return
-        [
-            [
-                DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData,
-                ReadJsonFile(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json"),
-            ],
-            [
-                DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement,
-                ReadJsonFile(@"IncomingMessages\RequestWholesaleSettlement.json"),
-            ],
-        ];
+        var data = new TheoryData<DocumentFormat, IncomingDocumentType, ActorRole, IncomingMarketMessageStream>
+        {
+            { DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData, ActorRole.BalanceResponsibleParty, ReadJsonFile(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json") },
+            { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ActorRole.EnergySupplier, ReadJsonFile(@"IncomingMessages\RequestWholesaleSettlement.json") },
+            { DocumentFormat.Ebix, IncomingDocumentType.MeteredDataForMeasurementPoint, ActorRole.MeteredDataResponsible, ReadJsonFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml") },
+        };
+
+        return data;
     }
 
     public static IEnumerable<object[]> InvalidIncomingRequestMessages()
@@ -105,6 +102,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
     public async Task When_MessageIsReceived_Then_BodyAndTransactionAndMessageIdArePresentOnTheInternalRepresentation(
         DocumentFormat format,
         IncomingDocumentType incomingDocumentType,
+        ActorRole actorRole,
         IncomingMarketMessageStream incomingMarketMessageStream)
     {
         // Assert
@@ -114,9 +112,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
             new ActorIdentity(
                 senderActorNumber,
                 Restriction.Owned,
-                incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData
-                    ? ActorRole.BalanceResponsibleParty
-                    : ActorRole.EnergySupplier));
+                actorRole));
 
         // Act
         var registerAndSendAsync = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
@@ -172,6 +168,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
     public async Task AndGiven_ServiceBusFails_When_MessageIsReceived_Then_TransactionAndMessageIdsAreNotSaved(
         DocumentFormat format,
         IncomingDocumentType incomingDocumentType,
+        ActorRole actorRole,
         IncomingMarketMessageStream incomingMarketMessageStream)
     {
         // Assert
@@ -181,9 +178,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
             new ActorIdentity(
                 senderActorNumber,
                 Restriction.Owned,
-                incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData
-                    ? ActorRole.BalanceResponsibleParty
-                    : ActorRole.EnergySupplier));
+                actorRole));
 
         _senderSpy.ShouldFail = true;
 
@@ -213,6 +208,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
     public async Task AndGiven_MultipleRequestsWithSameTransactionAndMessageId_When_MessageIsReceived_Then_OnlyOneRequestPrTransactionIdAndMessageIdIsAccepted(
         DocumentFormat format,
         IncomingDocumentType incomingDocumentType,
+        ActorRole actorRole,
         IncomingMarketMessageStream incomingMarketMessageStream)
     {
         // Arrange
@@ -222,9 +218,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
             new ActorIdentity(
                 senderActorNumber,
                 Restriction.Owned,
-                incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData
-                    ? ActorRole.BalanceResponsibleParty
-                    : ActorRole.EnergySupplier));
+                actorRole));
 
         // new scope to simulate a race condition.
         var sessionProvider = GetService<IServiceProvider>();
@@ -269,6 +263,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
     public async Task AndGiven_ASecondRequestWithSameTransactionIdAndMessageId_When_MessageIsReceived_Then_ItIsRejected(
         DocumentFormat format,
         IncomingDocumentType incomingDocumentType,
+        ActorRole actorRole,
         IncomingMarketMessageStream incomingMarketMessageStream)
     {
         // Arrange
@@ -277,9 +272,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
 
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");
-        var authenticatedActorRole = incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData
-            ? ActorRole.BalanceResponsibleParty
-            : ActorRole.EnergySupplier;
+        var authenticatedActorRole = actorRole;
 
         authenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(
