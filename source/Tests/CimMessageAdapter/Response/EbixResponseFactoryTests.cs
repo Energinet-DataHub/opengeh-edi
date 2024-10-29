@@ -63,7 +63,7 @@ public sealed class EbixResponseFactoryTests
                     </fault>
                   </detail>
                 </Error>
-                """);
+                """.ReplaceLineEndings());
     }
 
     [Fact]

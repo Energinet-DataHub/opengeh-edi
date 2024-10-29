@@ -87,7 +87,7 @@ public sealed class XmlResponseFactoryTests
                     </Error>
                   </Details>
                 </Error>
-                """);
+                """.ReplaceLineEndings());
     }
 
     private static void AssertHasValue(ResponseMessage responseMessage, string elementName, string expectedValue)

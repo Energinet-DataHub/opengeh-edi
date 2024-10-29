@@ -104,7 +104,7 @@ public sealed class JsonResponseFactoryTests
                     }
                   }
                 }
-                """);
+                """.ReplaceLineEndings());
     }
 
     private static void AssertHasValue(ResponseMessage response, string path, string expectedValue)
