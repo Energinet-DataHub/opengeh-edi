@@ -19,7 +19,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Activities;
 
-internal class DoSomethingActivityV1(
+internal class Brs023StartCalculationActivityV1(
     IClock clock,
     IOrchestrationInstanceProgressRepository progressRepository,
     IUnitOfWork unitOfWork)
@@ -28,7 +28,7 @@ internal class DoSomethingActivityV1(
     private readonly IOrchestrationInstanceProgressRepository _progressRepository = progressRepository;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    [Function(nameof(DoSomethingActivityV1))]
+    [Function(nameof(Brs023StartCalculationActivityV1))]
     public async Task Run(
         [ActivityTrigger] Guid orchestrationInstanceId)
     {
@@ -36,7 +36,11 @@ internal class DoSomethingActivityV1(
             .GetAsync(new OrchestrationInstanceId(orchestrationInstanceId))
             .ConfigureAwait(false);
 
-        orchestrationInstance.Lifecycle.TransitionToRunning(_clock);
+        var step = orchestrationInstance.Steps[NotifyAggregatedMeasureDataOrchestrationV1.CalculationStepIndex];
+        step.Lifecycle.TransitionToRunning(_clock);
         await _unitOfWork.CommitAsync().ConfigureAwait(false);
+
+        // TODO: For demo purposes; remove when done
+        await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
     }
 }

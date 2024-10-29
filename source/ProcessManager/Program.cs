@@ -19,6 +19,7 @@ using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.ProcessManagement.Core.Application;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Telemetry;
+using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
 using Energinet.DataHub.ProcessManager.Scheduler;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.Extensions.DependencyInjection;
@@ -56,6 +57,8 @@ if (runDemo)
 
     // Must match the parameter definition registered, with regards to properties
     dynamic parameter = new ExpandoObject();
+    parameter.CalculationType = CalculationTypes.BalanceFixing;
+    parameter.GridAreaCodes = new[] { "543" };
     parameter.StartDate = DateTimeOffset.Now;
     parameter.EndDate = DateTimeOffset.Now.AddHours(1);
     parameter.ScheduledAt = DateTimeOffset.Now;
