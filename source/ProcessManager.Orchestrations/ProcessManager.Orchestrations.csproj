@@ -28,7 +28,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Processes\BRS_021\" />
-    <Folder Include="Processes\BRS_023_027\V1\Model\" />
     <Folder Include="Processes\BRS_026_028\" />
   </ItemGroup>
   <ItemGroup>
