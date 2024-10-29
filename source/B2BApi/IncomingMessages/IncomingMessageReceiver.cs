@@ -53,7 +53,7 @@ public class IncomingMessageReceiver
         ArgumentNullException.ThrowIfNull(request);
         var cancellationToken = request.GetCancellationToken(hostCancellationToken);
 
-        using var seekingStreamFromBody = await request.CreateSeekingStreamFromBodyAsync().ConfigureAwait(false);
+        using var seekingStreamFromBody = await request.CreateSeekingStreamFromBodyAsync(cancellationToken).ConfigureAwait(false);
         var incomingMarketMessageStream = new IncomingMarketMessageStream(seekingStreamFromBody);
         await AuditLogAsync(request, incomingDocumentTypeName, incomingMarketMessageStream, cancellationToken).ConfigureAwait(false);
 

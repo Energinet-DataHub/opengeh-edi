@@ -15,10 +15,10 @@
 using System.Reflection;
 using System.Xml.Linq;
 using Dapper;
+using Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
-using Energinet.DataHub.EDI.IntegrationTests.TestDoubles;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Assertions;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;

@@ -40,29 +40,27 @@ public sealed class MessageParserTests
         new MeteredDateForMeasurementPointEbixMessageParser(new EbixSchemaProvider(), new Logger<MeteredDateForMeasurementPointEbixMessageParser>(new LoggerFactory())),
     ]);
 
-    public static IEnumerable<object[]> CreateMessagesWithSingleAndMultipleTransactions()
+    public static TheoryData<DocumentFormat, Stream> CreateMessagesWithSingleAndMultipleTransactions()
     {
-        return
-        [
-            [DocumentFormat.Ebix, CreateBaseEbixMessage("ValidMeteredDateForMeasurementPoint.xml")],
-            [DocumentFormat.Ebix, CreateBaseEbixMessage("ValidMeteredDateForMeasurementPointWithTwoTransactions.xml")],
-            [DocumentFormat.Ebix, CreateBaseEbixMessage("ValidPT1HMeteredDataForMeasurementPoint.xml")],
-        ];
+        var data = new TheoryData<DocumentFormat, Stream>
+        {
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidMeteredDateForMeasurementPoint.xml") },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidMeteredDateForMeasurementPointWithTwoTransactions.xml") },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidPT1HMeteredDataForMeasurementPoint.xml") },
+        };
+
+        return data;
     }
 
-    public static IEnumerable<object[]> CreateBadMessages()
+    public static TheoryData<DocumentFormat, Stream, string> CreateBadMessages()
     {
-        return
-        [
-            [
-                DocumentFormat.Ebix, CreateBaseEbixMessage("BadVersionMeteredDateForMeasurementPoint.xml"),
-                nameof(InvalidBusinessReasonOrVersion),
-            ],
-            [
-                DocumentFormat.Ebix, CreateBaseEbixMessage("InvalidMeteredDateForMeasurementPoint.xml"),
-                nameof(InvalidMessageStructure),
-            ],
-        ];
+        var data = new TheoryData<DocumentFormat, Stream, string>
+        {
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("BadVersionMeteredDateForMeasurementPoint.xml"), nameof(InvalidBusinessReasonOrVersion) },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("InvalidMeteredDateForMeasurementPoint.xml"), nameof(InvalidMessageStructure) },
+        };
+
+        return data;
     }
 
     [Theory]

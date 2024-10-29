@@ -83,6 +83,60 @@ public class SenderAuthorizerTests
         result.Errors.Should().ContainSingle().Which.Should().BeAssignableTo(typeof(SenderRoleTypeIsNotAuthorized));
     }
 
+    [Fact]
+    public async Task
+        Given_ActorIsNotMeteredDataResponsible_When_MeteredDataForMeasurementPoint_Then_SenderRoleTypeIsNotAuthorizedError()
+    {
+        var senderRole = ActorRole.BalanceResponsibleParty;
+        var authenticatedActor = CreateAuthenticatedActor(
+            ActorNumber.Create("1213141516178"),
+            senderRole);
+        var sut = CreateSut(authenticatedActor);
+
+        var incomingMessage = new MeteredDataForMeasurementPointMessage(
+            "MessageId",
+            "MessageType",
+            "CreatedAt",
+            "1213141516178",
+            DataHubDetails.DataHubActorNumber.Value,
+            senderRole.Code,
+            "BusinessReason",
+            string.Empty,
+            "BusinessType",
+            new List<IIncomingMessageSeries>());
+
+        var result = await sut.AuthorizeAsync(incomingMessage, false);
+
+        result.Errors.Should().ContainSingle().Which.Should().BeAssignableTo(typeof(SenderRoleTypeIsNotAuthorized));
+    }
+
+    [Fact]
+    public async Task
+        Given_ActorIsMeteredDataResponsible_When_MeteredDataForMeasurementPoint_Then_SenderIsAuthorized()
+    {
+        var senderRole = ActorRole.MeteredDataResponsible;
+        var authenticatedActor = CreateAuthenticatedActor(
+            ActorNumber.Create("1213141516178"),
+            senderRole);
+        var sut = CreateSut(authenticatedActor);
+
+        var incomingMessage = new MeteredDataForMeasurementPointMessage(
+            "MessageId",
+            "MessageType",
+            "CreatedAt",
+            "1213141516178",
+            DataHubDetails.DataHubActorNumber.Value,
+            senderRole.Code,
+            "BusinessReason",
+            string.Empty,
+            "BusinessType",
+            new List<IIncomingMessageSeries>());
+
+        var result = await sut.AuthorizeAsync(incomingMessage, false);
+        result.Success.Should().BeTrue();
+        result.Errors.Should().BeEmpty();
+    }
+
     private AuthenticatedActor CreateAuthenticatedActor(ActorNumber actorNumber, ActorRole actorRole)
     {
         var actorIdentity = new ActorIdentity(actorNumber, Restriction.Owned, actorRole);

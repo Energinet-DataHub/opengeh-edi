@@ -17,7 +17,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.Ebix;
 
-public class MeteredDataForMeasurementPointSeriesExtractor
+public static class MeteredDataForMeasurementPointSeriesExtractor
 {
     private const string SeriesElementName = "PayloadEnergyTimeSeries";
     private const string Identification = "Identification";
@@ -35,7 +35,7 @@ public class MeteredDataForMeasurementPointSeriesExtractor
     private const string QuantityQuality = "QuantityQuality";
     private const string IntervalEnergyObservation = "IntervalEnergyObservation";
 
-    protected internal static IEnumerable<MeteredDataForMeasurementPointSeries> ParseSeries(
+    internal static IEnumerable<MeteredDataForMeasurementPointSeries> ParseSeries(
         XDocument document,
         XNamespace ns,
         string senderNumber)
