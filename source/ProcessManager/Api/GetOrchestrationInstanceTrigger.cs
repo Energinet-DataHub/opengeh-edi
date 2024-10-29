@@ -35,6 +35,7 @@ internal class GetOrchestrationInstanceTrigger(
         Guid id,
         FunctionContext executionContext)
     {
+        // TODO: We currently do not return "NodaTime.Instant" correctly
         var orchestrationInstance = await _repository.GetAsync(new OrchestrationInstanceId(id)).ConfigureAwait(false);
 
         return new OkObjectResult(orchestrationInstance);
