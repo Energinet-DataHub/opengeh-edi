@@ -36,26 +36,35 @@ public class XmlResponseFactory : IResponseFactory
     {
         ArgumentNullException.ThrowIfNull(result);
         var messageBody = new StringBuilder();
-        var settings = new XmlWriterSettings() { OmitXmlDeclaration = true, };
+        var settings = new XmlWriterSettings { OmitXmlDeclaration = true, Indent = true };
 
         using var writer = XmlWriter.Create(messageBody, settings);
         writer.WriteStartElement("Error");
-        writer.WriteElementString("Code", result.Errors.Count == 1 ? result.Errors.First().Code : "BadRequest");
-        writer.WriteElementString("Message", result.Errors.Count == 1 ? result.Errors.First().Message : "Multiple errors in message");
-        writer.WriteElementString("Target", result.Errors.Count == 1 ? result.Errors.First().Target : string.Empty);
-        if (result.Errors.Count > 1)
         {
-            writer.WriteStartElement("Details");
-            foreach (var validationError in result.Errors)
+            writer.WriteElementString("Code", result.Errors.Count == 1 ? result.Errors.First().Code : "BadRequest");
+            writer.WriteElementString(
+                "Message",
+                result.Errors.Count == 1 ? result.Errors.First().Message : "Multiple errors in message");
+            writer.WriteElementString("Target", result.Errors.Count == 1 ? result.Errors.First().Target : string.Empty);
+            if (result.Errors.Count > 1)
             {
-                writer.WriteStartElement("Error");
-                writer.WriteElementString("Code", validationError.Code);
-                writer.WriteElementString("Message", validationError.Message);
-                writer.WriteElementString("Target", validationError.Target);
+                writer.WriteStartElement("Details");
+                {
+                    foreach (var validationError in result.Errors)
+                    {
+                        writer.WriteStartElement("Error");
+                        {
+                            writer.WriteElementString("Code", validationError.Code);
+                            writer.WriteElementString("Message", validationError.Message);
+                            writer.WriteElementString("Target", validationError.Target);
+                        }
+
+                        writer.WriteEndElement();
+                    }
+                }
+
                 writer.WriteEndElement();
             }
-
-            writer.WriteEndElement();
         }
 
         writer.WriteEndElement();
