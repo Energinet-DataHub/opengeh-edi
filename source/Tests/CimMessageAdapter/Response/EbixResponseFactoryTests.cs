@@ -17,36 +17,57 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+using FluentAssertions;
 using Xunit;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Response;
 
 [UnitTest]
-public class EbixResponseFactoryTests
+public sealed class EbixResponseFactoryTests
 {
-    private readonly EbixResponseFactory _responseFactory;
-
-    public EbixResponseFactoryTests()
-    {
-        _responseFactory = new EbixResponseFactory();
-    }
+    private readonly EbixResponseFactory _responseFactory = new();
 
     [Fact]
-    public void Generates_single_error_response()
+    public void Given_FailureResultWithOneError_When_ResponseCreated_Then_ResponseContainsError()
     {
         var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
         var result = Result.Failure(duplicateMessageIdError);
 
         var response = CreateResponse(result);
 
-        Assert.True(response.IsErrorResponse);
+        response.IsErrorResponse.Should().BeTrue();
         AssertHasValue(response, "faultcode", "SOAP-ENV:Client");
         AssertHasValue(response, "faultstring", $"{duplicateMessageIdError.Code}:{duplicateMessageIdError.Message}");
     }
 
     [Fact]
-    public void Generates_multiple_errors_response()
+    public void Given_FailureResult_When_ResponseCreated_Then_ResponseLooksLikeAnEbixResponse()
+    {
+        var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
+        var result = Result.Failure(duplicateMessageIdError);
+
+        var response = CreateResponse(result);
+
+        response.IsErrorResponse.Should().BeTrue();
+        response.MessageBody.Should()
+            .BeEquivalentTo(
+                """
+                <Error>
+                  <faultcode>SOAP-ENV:Client</faultcode>
+                  <faultstring>00101:Message id 'Duplicate message id' is not unique</faultstring>
+                  <detail>
+                    <fault>
+                      <ErrorCode>00101</ErrorCode>
+                      <ErrorText>Message id 'Duplicate message id' is not unique</ErrorText>
+                    </fault>
+                  </detail>
+                </Error>
+                """.ReplaceLineEndings());
+    }
+
+    [Fact]
+    public void Given_FailureResultWithMultipleErrors_When_ResponseCreated_Then_ResponseContainsOnlyTheFirstError()
     {
         var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
         var duplicateTransactionIdError = new DuplicateTransactionIdDetected("Fake transaction id");
@@ -54,7 +75,7 @@ public class EbixResponseFactoryTests
 
         var response = CreateResponse(result);
 
-        Assert.True(response.IsErrorResponse);
+        response.IsErrorResponse.Should().BeTrue();
         AssertHasValue(response, "faultcode", "SOAP-ENV:Client");
         AssertHasValue(response, "faultstring", $"{duplicateMessageIdError.Code}:{duplicateMessageIdError.Message}");
         AssertHasNotValue(response, "faultstring", $"{duplicateTransactionIdError.Code}:{duplicateTransactionIdError.Message}");
@@ -63,13 +84,13 @@ public class EbixResponseFactoryTests
     private static void AssertHasValue(ResponseMessage responseMessage, string elementName, string expectedValue)
     {
         var document = XDocument.Parse(responseMessage.MessageBody);
-        Assert.Equal(expectedValue, document?.Element("Error")?.Element(elementName)?.Value);
+        (document.Element("Error")?.Element(elementName)?.Value).Should().Be(expectedValue);
     }
 
     private static void AssertHasNotValue(ResponseMessage responseMessage, string elementName, string expectedValue)
     {
         var document = XDocument.Parse(responseMessage.MessageBody);
-        Assert.NotEqual(expectedValue, document?.Element("Error")?.Element(elementName)?.Value);
+        (document.Element("Error")?.Element(elementName)?.Value).Should().NotBe(expectedValue);
     }
 
     private ResponseMessage CreateResponse(Result result)

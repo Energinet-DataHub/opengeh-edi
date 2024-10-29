@@ -23,6 +23,8 @@ public sealed class BusinessReason : DataHubTypeWithUnused<BusinessReason>
     public static readonly BusinessReason PreliminaryAggregation = new(DataHubNames.BusinessReason.PreliminaryAggregation, "D03");
     public static readonly BusinessReason WholesaleFixing = new(DataHubNames.BusinessReason.WholesaleFixing, "D05"); // Engrosfiksering
     public static readonly BusinessReason Correction = new(DataHubNames.BusinessReason.Correction, "D32");
+    public static readonly BusinessReason PeriodicMetering = new(DataHubNames.BusinessReason.PeriodicMetering, "E23");
+    public static readonly BusinessReason PeriodicFlexMetering = new(DataHubNames.BusinessReason.PeriodicFlexMetering, "D42");
 
     private BusinessReason(string name, string code, bool isUnused = false)
      : base(name, code, isUnused) { }

@@ -18,26 +18,18 @@ using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 
-public class ResponseFactory
+public class ResponseFactory(IEnumerable<IResponseFactory> factories)
 {
-    private readonly IEnumerable<IResponseFactory> _factories;
-
-    public ResponseFactory(IEnumerable<IResponseFactory> factories)
-    {
-        _factories = factories;
-    }
+    private readonly IEnumerable<IResponseFactory> _factories = factories;
 
     public ResponseMessage From(Result result, DocumentFormat format)
     {
         ArgumentNullException.ThrowIfNull(result);
         ArgumentNullException.ThrowIfNull(format);
 
-        var factory = _factories.FirstOrDefault(factory => factory.HandledFormat.Equals(format));
-
-        if (factory is null)
-        {
-            throw new InvalidOperationException($"Could not generate response message in format {format.Name}");
-        }
+        var factory = _factories.FirstOrDefault(factory => factory.HandledFormat.Equals(format))
+                      ?? throw new InvalidOperationException(
+                          $"Could not generate response message in format {format.Name}");
 
         return factory.From(result);
     }

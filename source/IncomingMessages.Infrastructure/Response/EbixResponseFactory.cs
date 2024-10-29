@@ -36,18 +36,26 @@ public class EbixResponseFactory : IResponseFactory
     {
         ArgumentNullException.ThrowIfNull(result);
         var messageBody = new StringBuilder();
-        var settings = new XmlWriterSettings() { OmitXmlDeclaration = true, };
+        var settings = new XmlWriterSettings { OmitXmlDeclaration = true, Indent = true };
 
         using var writer = XmlWriter.Create(messageBody, settings);
         writer.WriteStartElement("Error");
-        writer.WriteElementString("faultcode", "SOAP-ENV:Client");
-        writer.WriteElementString("faultstring", $"{result.Errors.First().Code}:{result.Errors.First().Message}");
-        writer.WriteStartElement("detail");
-        writer.WriteStartElement("fault");
-        writer.WriteElementString("ErrorCode", result.Errors.First().Code);
-        writer.WriteElementString("ErrorText", result.Errors.First().Message);
-        writer.WriteEndElement();
-        writer.WriteEndElement();
+        {
+            writer.WriteElementString("faultcode", "SOAP-ENV:Client");
+            writer.WriteElementString("faultstring", $"{result.Errors.First().Code}:{result.Errors.First().Message}");
+            writer.WriteStartElement("detail");
+            {
+                writer.WriteStartElement("fault");
+                {
+                    writer.WriteElementString("ErrorCode", result.Errors.First().Code);
+                    writer.WriteElementString("ErrorText", result.Errors.First().Message);
+                }
+
+                writer.WriteEndElement();
+            }
+
+            writer.WriteEndElement();
+        }
 
         writer.WriteEndElement();
         writer.Close();
