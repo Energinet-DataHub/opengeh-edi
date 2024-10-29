@@ -26,18 +26,29 @@ using NodaTime;
 namespace Energinet.DataHub.ProcessManager.Core.Tests.Integration.Infrastructure.Orchestration;
 
 [Collection(nameof(ProcessManagerCoreCollection))]
-public class OrchestrationInstanceRepositoryTests
+public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
 {
     private readonly ProcessManagerCoreFixture _fixture;
+    private readonly ProcessManagerContext _dbContext;
     private readonly OrchestrationInstanceRepository _sut;
     private readonly UnitOfWork _unitOfWork;
 
     public OrchestrationInstanceRepositoryTests(ProcessManagerCoreFixture fixture)
     {
         _fixture = fixture;
-        var dbContext = _fixture.DatabaseManager.CreateDbContext();
-        _sut = new OrchestrationInstanceRepository(dbContext);
-        _unitOfWork = new UnitOfWork(dbContext);
+        _dbContext = _fixture.DatabaseManager.CreateDbContext();
+        _sut = new OrchestrationInstanceRepository(_dbContext);
+        _unitOfWork = new UnitOfWork(_dbContext);
+    }
+
+    public Task InitializeAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    public async Task DisposeAsync()
+    {
+        await _dbContext.DisposeAsync();
     }
 
     [Fact]
