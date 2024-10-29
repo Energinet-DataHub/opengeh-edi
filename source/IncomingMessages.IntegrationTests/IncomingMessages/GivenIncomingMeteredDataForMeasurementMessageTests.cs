@@ -378,7 +378,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     }
 
     [Fact]
-    public async Task When_MessageIdIs35Characters_ThenValidationSucceed()
+    public async Task When_MessageIdIs35Characters_Then_ValidationSucceed()
     {
         var validMessageId = "12356478912356478912356478912356478";
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
@@ -400,7 +400,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     }
 
     [Fact]
-    public async Task When_MessageIdExceed35Characters_ThenExpectedValidationError()
+    public async Task When_MessageIdExceed35Characters_Then_ExpectedValidationError()
     {
         var invalidMessageId = "123564789123564789123564789123564789_123564789123564789123564789123564789";
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
@@ -420,31 +420,8 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
         messageParser.ParserResult.Success.Should().BeFalse();
     }
 
-    //TODO: this test should be moved into process.integrationTests or b2b integration tests
-    // [Fact]
-    // public async Task When_MessageContainsMultipleTransactions_ThenMultipleProcessesIsInitialized()
-    // {
-    //     var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
-    //         DocumentFormat.Ebix,
-    //         _actorIdentity.ActorNumber,
-    //         [
-    //             ("123564789",
-    //                 Instant.FromUtc(2024, 1, 1, 0, 0), Instant.FromUtc(2024, 1, 2, 0, 0), Resolution.QuarterHourly),
-    //             ("235647891",
-    //                 Instant.FromUtc(2024, 1, 02, 0, 0), Instant.FromUtc(2024, 1, 3, 0, 0), Resolution.QuarterHourly),
-    //         ]);
-    //
-    //     var messageParser = await ParseMessageAsync(message.Stream);
-    //     var marketMessage = CreateMarketMessageWithAuthentication(messageParser.IncomingMessage!, _actorIdentity.ActorNumber.Value, _actorIdentity.ActorRole.Code);
-    //     await InvokeCommandAsync(new InitializeAggregatedMeasureDataProcessesCommand(marketMessage));
-    //
-    //     var processes = _processContext.AggregatedMeasureDataProcesses.ToList();
-    //     Assert.NotNull(processes);
-    //     Assert.Equal(2, processes.Count);
-    // }
-
     [Fact]
-    public async Task When_TransactionIdIsLessThen35Characters_ThenValidationSucceed()
+    public async Task When_TransactionIdIsLessThen35Characters_Then_ValidationSucceed()
     {
         var validTransactionId = "1235647891235647891235647891";
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
@@ -466,7 +443,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     }
 
     [Fact]
-    public async Task When_TransactionIdIs35Characters_ThenValidationSucceed()
+    public async Task When_TransactionIdIs35Characters_Then_ValidationSucceed()
     {
         var validTransactionId = "12356478912356478912356478912356478";
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
@@ -487,7 +464,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     }
 
     [Fact]
-    public async Task When_TransactionIdExceed35Characters_ThenExpectedValidationError()
+    public async Task When_TransactionIdExceed35Characters_Then_ExpectedValidationError()
     {
         var invalidTransactionId = "123564789123564789123564789123564789_123564789123564789123564789123564789";
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
@@ -507,7 +484,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     }
 
     [Fact]
-    public async Task When_BusinessTypeIsAllowed_ThenValidationSucceed()
+    public async Task When_BusinessTypeIsAllowed_Then_ValidationSucceed()
     {
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             DocumentFormat.Ebix,
@@ -528,7 +505,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     }
 
     [Fact]
-    public async Task When_BusinessTypeIsNotAllowed_ThenExpectedValidationError()
+    public async Task When_BusinessTypeIsNotAllowed_Then_ExpectedValidationError()
     {
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             DocumentFormat.Ebix,
@@ -542,51 +519,6 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
         var messageParser = await ParseMessageAsync(message.Stream);
         messageParser.ParserResult.Errors.Should().Contain(error => error is InvalidMessageStructure);
         messageParser.ParserResult.Success.Should().BeFalse();
-    }
-
-    private InitializeMeteredDataForMeasurementPointMessageProcessDto CreateMarketMessageWithAuthentication(MeteredDataForMeasurementPointMessage message, string knownSenderId, string knownSenderRole)
-    {
-        var authenticatedActor = GetService<AuthenticatedActor>();
-        authenticatedActor.SetAuthenticatedActor(new ActorIdentity(ActorNumber.Create(knownSenderId), restriction: Restriction.None,  ActorRole.FromCode(knownSenderRole)));
-
-        var series = message.Series
-            .Cast<MeteredDataForMeasurementPointSeries>()
-            .Select(
-                series =>
-                {
-                    var energyObservations = series.EnergyObservations
-                        .Select(
-                            energyObservation => new InitializeEnergyObservation(
-                                energyObservation.Position,
-                                energyObservation.EnergyQuantity,
-                                energyObservation.QuantityQuality))
-                        .ToList()
-                        .AsReadOnly();
-                    var requestedByActor = RequestedByActor.From(
-                        ActorNumber.Create(message.SenderNumber),
-                        ActorRole.FromCode(message.SenderRoleCode));
-
-                    return new InitializeMeteredDataForMeasurementPointMessageSeries(
-                        series.TransactionId,
-                        series.Resolution,
-                        series.StartDateTime,
-                        series.EndDateTime,
-                        series.ProductNumber,
-                        series.ProductUnitType,
-                        series.MeteringPointType,
-                        series.MeteringPointLocationId,
-                        requestedByActor,
-                        OriginalActor.From(requestedByActor),
-                        energyObservations);
-                }).ToList().AsReadOnly();
-
-        return new InitializeMeteredDataForMeasurementPointMessageProcessDto(
-            message.MessageId,
-            message.MessageType,
-            message.CreatedAt,
-            message.BusinessReason,
-            message.BusinessType,
-            series);
     }
 
     private async Task<(MeteredDataForMeasurementPointMessage? IncomingMessage, IncomingMarketMessageParserResult ParserResult)> ParseMessageAsync(
