@@ -58,11 +58,15 @@ internal class NotifyAggregatedMeasureDataOrchestrationV1
             context.InstanceId,
             defaultRetryOptions);
         await context.CallActivityAsync(
-            nameof(Brs023CalculationStepTerminateActivityV1),
+            nameof(Brs023EnqueueMessagesStepTerminateActivityV1),
             context.InstanceId,
             defaultRetryOptions);
 
         // Terminate
+        await context.CallActivityAsync(
+            nameof(Brs023OrchestrationTerminateActivityV1),
+            context.InstanceId,
+            defaultRetryOptions);
 
         return "Success";
     }

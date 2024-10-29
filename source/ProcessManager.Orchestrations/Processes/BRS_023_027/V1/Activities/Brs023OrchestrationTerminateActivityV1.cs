@@ -32,7 +32,7 @@ internal class Brs023OrchestrationTerminateActivityV1(
         progressRepository,
         unitOfWork)
 {
-    [Function(nameof(Brs023OrchestrationInitializeActivityV1))]
+    [Function(nameof(Brs023OrchestrationTerminateActivityV1))]
     public async Task Run(
         [ActivityTrigger] Guid orchestrationInstanceId)
     {
