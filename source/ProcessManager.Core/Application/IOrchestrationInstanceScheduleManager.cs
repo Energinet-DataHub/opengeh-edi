@@ -13,30 +13,13 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
-using NodaTime;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Application;
 
-public interface IOrchestrationInstanceManager
+public interface IOrchestrationInstanceScheduleManager
 {
     /// <summary>
-    /// Start a new instance of an orchestration.
+    /// Start a scheduled orchestration instance.
     /// </summary>
-    Task<OrchestrationInstanceId> StartNewOrchestrationInstanceAsync<TParameter>(string name, int version, TParameter parameter)
-        where TParameter : class;
-
-    /// <summary>
-    /// Schedule a new instance of an orchestration.
-    /// </summary>
-    Task<OrchestrationInstanceId> ScheduleNewOrchestrationInstanceAsync<TParameter>(
-        string name,
-        int version,
-        TParameter parameter,
-        Instant runAt)
-        where TParameter : class;
-
-    /// <summary>
-    /// Cancel a scheduled orchestration instance.
-    /// </summary>
-    Task CancelScheduledOrchestrationInstanceAsync(OrchestrationInstanceId id);
+    Task StartScheduledOrchestrationInstanceAsync(OrchestrationInstanceId id);
 }

@@ -24,7 +24,7 @@ namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestration;
 /// An encapsulation of <see cref="IDurableClient"/> that allows us to
 /// provide a "framework" for managing Durable Functions orchestration instances using custom domain types.
 /// </summary>
-public class OrchestrationInstanceManager : IOrchestrationInstanceManager
+public class OrchestrationInstanceManager : IOrchestrationInstanceManager, IOrchestrationInstanceScheduleManager
 {
     private readonly IClock _clock;
     private readonly IDurableClient _durableClient;
