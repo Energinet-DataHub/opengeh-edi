@@ -53,7 +53,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
     [Fact]
     public async Task When_ReceiverIdIsDatahub_Then_ValidationSucceed()
     {
-        var invalidDataHubReceiverId = "5790001330552";
+        var validDataHubReceiverId = "5790001330552";
         var message = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
             DocumentFormat.Ebix,
             _actorIdentity.ActorNumber,
@@ -63,7 +63,7 @@ public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessag
                     Instant.FromUtc(2024, 1, 2, 0, 0),
                     Resolution.QuarterHourly),
             ],
-            receiverNumber: invalidDataHubReceiverId);
+            receiverNumber: validDataHubReceiverId);
 
         var (incomingMessage, _) = await ParseMessageAsync(message.Stream);
         var result = await _validateIncomingMessage.ValidateAsync(
