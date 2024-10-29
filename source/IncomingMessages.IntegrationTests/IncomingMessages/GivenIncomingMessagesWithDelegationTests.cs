@@ -17,8 +17,8 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Builders;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.RequestBuilders;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
@@ -346,6 +346,66 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             series.BalanceResponsibleNumber.Should().Be(balanceResponsibleParty?.Value);
             series.RequestedGridAreaCode.Should().BeNull();
             series.GridAreas.Should().Equal(expectedGridAreaCode);
+        }
+    }
+
+    [Fact]
+    public async Task AndGiven_MessageIsMeteredDataForMeasurementPoint_When_SenderIsDDM_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
+    {
+        // Arrange
+        const string gridAreaCode = "512";
+        var delegatedToAsGridAccessProvider = new Actor(ActorNumber.Create("2222222222222"), ActorRole.GridAccessProvider);
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
+        _clockStub.SetCurrentInstant(now);
+
+        var documentFormat = DocumentFormat.Ebix;
+
+        _authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(delegatedToAsGridAccessProvider.ActorNumber, Restriction.Owned, delegatedToAsGridAccessProvider.ActorRole));
+
+        var messageStream = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+            documentFormat,
+            delegatedToAsGridAccessProvider.ActorNumber,
+            [
+                ("555555555", Instant.FromUtc(2024, 01, 01, 0, 0), Instant.FromUtc(2024, 01, 31, 0, 0), Resolution.QuarterHourly),
+            ]);
+
+        await AddDelegationAsync(
+            _originalActor,
+            delegatedToAsGridAccessProvider,
+            gridAreaCode,
+            ProcessType.IncomingMeteredDataForMeasurementPoint,
+            now,
+            now.Plus(Duration.FromSeconds(1)));
+
+        // Act
+        var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+            messageStream,
+            documentFormat,
+            IncomingDocumentType.MeteredDataForMeasurementPoint,
+            documentFormat,
+            CancellationToken.None);
+
+        // Assert
+        using (new AssertionScope())
+        {
+            response.IsErrorResponse.Should().BeFalse();
+            response.MessageBody.Should().BeNullOrEmpty();
+
+            _senderSpy.LatestMessage.Should().NotBeNull();
+        }
+
+        using (new AssertionScope())
+        {
+            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeAggregatedMeasureDataProcessDto>();
+            var series = message.Series.Should().ContainSingle().Subject;
+            series.RequestedByActor.ActorRole.Should().Be(_delegatedTo.ActorRole);
+            series.RequestedByActor.ActorNumber.Should().Be(_delegatedTo.ActorNumber);
+            series.OriginalActor.ActorRole.Should().Be(_originalActor.ActorRole);
+            series.OriginalActor.ActorNumber.Should().Be(_originalActor.ActorNumber);
+            series.EnergySupplierNumber.Should().Be(_originalActor.ActorNumber.Value);
+            series.RequestedGridAreaCode.Should().Be(gridAreaCode);
+            series.GridAreas.Should().Equal(gridAreaCode);
         }
     }
 

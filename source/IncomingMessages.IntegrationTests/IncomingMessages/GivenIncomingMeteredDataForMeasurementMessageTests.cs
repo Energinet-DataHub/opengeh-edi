@@ -21,46 +21,33 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Builders;
+using Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
-using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using FluentAssertions;
 using NodaTime;
-using Xunit;
 using Xunit.Abstractions;
 
-namespace Energinet.DataHub.EDI.IntegrationTests.Infrastructure.CimMessageAdapter.Messages.MeteredDataForMeasurementPoint;
+namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.IncomingMessages;
 
-public class IncomingMessageReceiverTests : TestBase, IAsyncLifetime
+public class GivenIncomingMeteredDataForMeasurementMessageTests : IncomingMessagesTestBase
 {
     private readonly MarketMessageParser _marketMessageParser;
-    private readonly ProcessContext _processContext;
     private readonly ValidateIncomingMessage _validateIncomingMessage;
     private readonly ActorIdentity _actorIdentity;
 
-    public IncomingMessageReceiverTests(IntegrationTestFixture integrationTestFixture, ITestOutputHelper testOutputHelper)
-        : base(integrationTestFixture, testOutputHelper)
+    public GivenIncomingMeteredDataForMeasurementMessageTests(
+        IncomingMessagesTestFixture incomingMessagesTestFixture,
+        ITestOutputHelper testOutputHelper)
+        : base(incomingMessagesTestFixture, testOutputHelper)
     {
         _marketMessageParser = GetService<MarketMessageParser>();
-        _processContext = GetService<ProcessContext>();
 
         var authenticatedActor = GetService<AuthenticatedActor>();
         _actorIdentity = new ActorIdentity(ActorNumber.Create("1234567890123"), restriction: Restriction.None,  ActorRole.FromCode("DDM"));
         authenticatedActor.SetAuthenticatedActor(_actorIdentity);
 
         _validateIncomingMessage = GetService<ValidateIncomingMessage>();
-    }
-
-    public Task InitializeAsync()
-    {
-        return Task.CompletedTask;
-    }
-
-    public Task DisposeAsync()
-    {
-        _processContext.Dispose();
-        return Task.CompletedTask;
     }
 
     [Fact]
