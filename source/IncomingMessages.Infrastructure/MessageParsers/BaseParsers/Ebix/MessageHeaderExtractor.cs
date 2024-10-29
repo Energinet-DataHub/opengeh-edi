@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Xml.Linq;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.BaseParsers.Ebix;
 
@@ -57,7 +58,7 @@ internal static class MessageHeaderExtractor
             senderRole,
             receiverId,
             // ReceiverRole is not specified in incoming Ebix documents
-            string.Empty,
+            ActorRole.MeteredDataAdministrator.Code,
             createdAt,
             businessType);
     }
