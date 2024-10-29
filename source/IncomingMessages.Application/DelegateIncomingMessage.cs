@@ -78,7 +78,6 @@ public class DelegateIncomingMessage
         foreach (var series in message.Series)
         {
             if ((originalActorRole == ActorRole.GridAccessProvider || originalActorRole == ActorRole.MeteredDataResponsible)
-                && processType != ProcessType.IncomingMeteredDataForMeasurementPoint
                 && series.GridArea == null)
             {
                 continue;
