@@ -12,15 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
+using Energinet.DataHub.ProcessManagement.Core.Application;
+using NodaTime;
 
-/// <summary>
-/// An immutable input to start the <see cref="NotifyAggregatedMeasureDataOrchestrationV1"/>.
-/// </summary>
-public sealed record NotifyAggregatedMeasureDataInputV1(
-    CalculationTypes CalculationType,
-    IReadOnlyCollection<string> GridAreaCodes,
-    DateTimeOffset StartDate,
-    DateTimeOffset EndDate,
-    DateTimeOffset ScheduledAt,
-    bool IsInternalCalculation);
+namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Activities;
+
+internal abstract class ProgressActivityBase(
+    IClock clock,
+    IOrchestrationInstanceProgressRepository progressRepository,
+    IUnitOfWork unitOfWork)
+{
+    protected IClock Clock { get; } = clock;
+
+    protected IOrchestrationInstanceProgressRepository ProgressRepository { get; } = progressRepository;
+
+    protected IUnitOfWork UnitOfWork { get; } = unitOfWork;
+}

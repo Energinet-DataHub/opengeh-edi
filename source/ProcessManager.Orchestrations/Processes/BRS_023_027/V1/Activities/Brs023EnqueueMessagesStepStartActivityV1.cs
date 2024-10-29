@@ -19,24 +19,28 @@ using NodaTime;
 
 namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Activities;
 
-internal class DoSomethingActivityV1(
+internal class Brs023EnqueueMessagesStepStartActivityV1(
     IClock clock,
     IOrchestrationInstanceProgressRepository progressRepository,
     IUnitOfWork unitOfWork)
+    : ProgressActivityBase(
+        clock,
+        progressRepository,
+        unitOfWork)
 {
-    private readonly IClock _clock = clock;
-    private readonly IOrchestrationInstanceProgressRepository _progressRepository = progressRepository;
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
-    [Function(nameof(DoSomethingActivityV1))]
+    [Function(nameof(Brs023EnqueueMessagesStepStartActivityV1))]
     public async Task Run(
         [ActivityTrigger] Guid orchestrationInstanceId)
     {
-        var orchestrationInstance = await _progressRepository
+        var orchestrationInstance = await ProgressRepository
             .GetAsync(new OrchestrationInstanceId(orchestrationInstanceId))
             .ConfigureAwait(false);
 
-        orchestrationInstance.Lifecycle.TransitionToRunning(_clock);
-        await _unitOfWork.CommitAsync().ConfigureAwait(false);
+        var step = orchestrationInstance.Steps.First(x => x.Sequence == NotifyAggregatedMeasureDataOrchestrationV1.EnqueueMessagesStepIndex);
+        step.Lifecycle.TransitionToRunning(Clock);
+        await UnitOfWork.CommitAsync().ConfigureAwait(false);
+
+        // TODO: For demo purposes; remove when done
+        await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
     }
 }

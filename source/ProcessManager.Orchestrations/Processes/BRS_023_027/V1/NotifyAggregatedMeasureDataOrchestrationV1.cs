@@ -23,6 +23,9 @@ namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.
 // TODO: Implement according to guidelines: https://energinet.atlassian.net/wiki/spaces/D3/pages/824803345/Durable+Functions+Development+Guidelines
 internal class NotifyAggregatedMeasureDataOrchestrationV1
 {
+    internal const int CalculationStepIndex = 0;
+    internal const int EnqueueMessagesStepIndex = 1;
+
     [Function(nameof(NotifyAggregatedMeasureDataOrchestrationV1))]
     public async Task<string> Run(
         [OrchestrationTrigger] TaskOrchestrationContext context)
@@ -33,8 +36,35 @@ internal class NotifyAggregatedMeasureDataOrchestrationV1
 
         var defaultRetryOptions = CreateDefaultRetryOptions();
 
+        // Initialize
         await context.CallActivityAsync(
-            nameof(DoSomethingActivityV1),
+            nameof(Brs023OrchestrationInitializeActivityV1),
+            context.InstanceId,
+            defaultRetryOptions);
+
+        // Step: Calculation
+        await context.CallActivityAsync(
+            nameof(Brs023CalculationStepStartActivityV1),
+            context.InstanceId,
+            defaultRetryOptions);
+        await context.CallActivityAsync(
+            nameof(Brs023CalculationStepTerminateActivityV1),
+            context.InstanceId,
+            defaultRetryOptions);
+
+        // Step: Enqueue messages
+        await context.CallActivityAsync(
+            nameof(Brs023EnqueueMessagesStepStartActivityV1),
+            context.InstanceId,
+            defaultRetryOptions);
+        await context.CallActivityAsync(
+            nameof(Brs023EnqueueMessagesStepTerminateActivityV1),
+            context.InstanceId,
+            defaultRetryOptions);
+
+        // Terminate
+        await context.CallActivityAsync(
+            nameof(Brs023OrchestrationTerminateActivityV1),
             context.InstanceId,
             defaultRetryOptions);
 
