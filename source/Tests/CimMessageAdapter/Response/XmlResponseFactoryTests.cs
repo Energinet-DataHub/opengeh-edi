@@ -17,36 +17,32 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+using FluentAssertions;
 using Xunit;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Response;
 
 [UnitTest]
-public class XmlResponseFactoryTests
+public sealed class XmlResponseFactoryTests
 {
-    private readonly XmlResponseFactory _responseFactory;
-
-    public XmlResponseFactoryTests()
-    {
-        _responseFactory = new XmlResponseFactory();
-    }
+    private readonly XmlResponseFactory _responseFactory = new();
 
     [Fact]
-    public void Generates_single_error_response()
+    public void Given_FailureResultWithSingleError_When_ResponseCreated_Then_ResponseContainsError()
     {
         var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
         var result = Result.Failure(duplicateMessageIdError);
 
         var response = CreateResponse(result);
 
-        Assert.True(response.IsErrorResponse);
+        response.IsErrorResponse.Should().BeTrue();
         AssertHasValue(response, "Code", duplicateMessageIdError.Code);
         AssertHasValue(response, "Message", duplicateMessageIdError.Message);
     }
 
     [Fact]
-    public void Generates_multiple_errors_response()
+    public void Given_FailureResultWithMultipleErrors_When_ResponseCreated_Then_ResponseContainsAllErrors()
     {
         var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
         var duplicateTransactionIdError = new DuplicateTransactionIdDetected("Fake transaction id");
@@ -54,17 +50,50 @@ public class XmlResponseFactoryTests
 
         var response = CreateResponse(result);
 
-        Assert.True(response.IsErrorResponse);
+        response.IsErrorResponse.Should().BeTrue();
         AssertHasValue(response, "Code", "BadRequest");
         AssertHasValue(response, "Message", "Multiple errors in message");
         AssertContainsError(response, duplicateMessageIdError);
         AssertContainsError(response, duplicateTransactionIdError);
     }
 
+    [Fact]
+    public void Given_FailureResultWithMultipleErrors_When_ResponseCreated_Then_ResponseLooksLikeAXmlResponse()
+    {
+        var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
+        var duplicateTransactionIdError = new DuplicateTransactionIdDetected("Fake transaction id");
+        var result = Result.Failure(duplicateMessageIdError, duplicateTransactionIdError);
+
+        var response = CreateResponse(result);
+
+        response.IsErrorResponse.Should().BeTrue();
+        response.MessageBody.Should()
+            .BeEquivalentTo(
+                """
+                <Error>
+                  <Code>BadRequest</Code>
+                  <Message>Multiple errors in message</Message>
+                  <Target />
+                  <Details>
+                    <Error>
+                      <Code>00101</Code>
+                      <Message>Message id 'Duplicate message id' is not unique</Message>
+                      <Target>MessageId</Target>
+                    </Error>
+                    <Error>
+                      <Code>00102</Code>
+                      <Message>Transaction id 'Fake transaction id' is not unique and will not be processed.</Message>
+                      <Target>TransactionId</Target>
+                    </Error>
+                  </Details>
+                </Error>
+                """);
+    }
+
     private static void AssertHasValue(ResponseMessage responseMessage, string elementName, string expectedValue)
     {
         var document = XDocument.Parse(responseMessage.MessageBody);
-        Assert.Equal(expectedValue, document?.Element("Error")?.Element(elementName)?.Value);
+        (document.Element("Error")?.Element(elementName)?.Value).Should().Be(expectedValue);
     }
 
     private static void AssertContainsError(ResponseMessage responseMessage, ValidationError validationError)
