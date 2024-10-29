@@ -15,32 +15,34 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
+using FluentAssertions;
 using Xunit;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Response;
 
 [UnitTest]
-public class ResponseFactoryTests
+public sealed class ResponseFactoryTests
 {
     [Fact]
-    public void Generate_empty_response_when_no_validation_errors_has_occurred()
+    public void Given_SucceededResult_When_ResponseCreated_Then_ResponseIsEmpty()
     {
-        var responseFactory = new ResponseFactory(new[] { new XmlResponseFactory() });
+        var responseFactory = new ResponseFactory([new XmlResponseFactory()]);
         var result = Result.Succeeded();
 
         var response = responseFactory.From(result, DocumentFormat.Xml);
 
-        Assert.False(response.IsErrorResponse);
-        Assert.Empty(response.MessageBody);
+        response.IsErrorResponse.Should().BeFalse();
+        response.MessageBody.Should().BeEmpty();
     }
 
     [Fact]
-    public void Throw_if_requested_format_can_not_be_parsed()
+    public void Given_AResponseFactory_When_InvokedWithUnknownDocumentType_Then_ThrowError()
     {
-        var responseFactory = new ResponseFactory(new List<IResponseFactory>());
+        var responseFactory = new ResponseFactory([]);
         var result = Result.Succeeded();
 
-        Assert.Throws<InvalidOperationException>(() => responseFactory.From(result, DocumentFormat.Json));
+        var act = () => responseFactory.From(result, DocumentFormat.Json);
+        act.Should().ThrowExactly<InvalidOperationException>();
     }
 }
