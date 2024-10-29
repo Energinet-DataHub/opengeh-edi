@@ -19,26 +19,26 @@ using NodaTime;
 
 namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Activities;
 
-internal class Brs023TerminateCalculationActivityV1(
+internal class Brs023CalculationStepTerminateActivityV1(
     IClock clock,
     IOrchestrationInstanceProgressRepository progressRepository,
     IUnitOfWork unitOfWork)
+    : ProgressActivityBase(
+        clock,
+        progressRepository,
+        unitOfWork)
 {
-    private readonly IClock _clock = clock;
-    private readonly IOrchestrationInstanceProgressRepository _progressRepository = progressRepository;
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
-    [Function(nameof(Brs023TerminateCalculationActivityV1))]
+    [Function(nameof(Brs023CalculationStepTerminateActivityV1))]
     public async Task Run(
         [ActivityTrigger] Guid orchestrationInstanceId)
     {
-        var orchestrationInstance = await _progressRepository
+        var orchestrationInstance = await ProgressRepository
             .GetAsync(new OrchestrationInstanceId(orchestrationInstanceId))
             .ConfigureAwait(false);
 
         var step = orchestrationInstance.Steps[NotifyAggregatedMeasureDataOrchestrationV1.CalculationStepIndex];
-        step.Lifecycle.TransitionToTerminated(_clock, OrchestrationStepTerminationStates.Succeeded);
-        await _unitOfWork.CommitAsync().ConfigureAwait(false);
+        step.Lifecycle.TransitionToTerminated(Clock, OrchestrationStepTerminationStates.Succeeded);
+        await UnitOfWork.CommitAsync().ConfigureAwait(false);
 
         // TODO: For demo purposes; remove when done
         await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
