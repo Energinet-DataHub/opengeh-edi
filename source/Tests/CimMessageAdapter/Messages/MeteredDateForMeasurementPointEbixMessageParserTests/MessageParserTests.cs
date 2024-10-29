@@ -85,7 +85,7 @@ public sealed class MessageParserTests
         marketMessage.ReceiverNumber.Should().Be("5790000432752");
         marketMessage.SenderRoleCode.Should().Be("MDR");
         marketMessage.BusinessReason.Should().Be("E23");
-        marketMessage.ReceiverRoleCode.Should().BeEmpty();
+        marketMessage.ReceiverRoleCode.Should().Be("DGL");
         marketMessage.BusinessType.Should().Be("23");
 
         foreach (var series in marketMessage.Series.Cast<MeteredDataForMeasurementPointSeries>())
