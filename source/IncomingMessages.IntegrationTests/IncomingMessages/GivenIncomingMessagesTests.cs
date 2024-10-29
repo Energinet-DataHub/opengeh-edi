@@ -68,7 +68,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         {
             { DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData, ActorRole.BalanceResponsibleParty, ReadJsonFile(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json") },
             { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ActorRole.EnergySupplier, ReadJsonFile(@"IncomingMessages\RequestWholesaleSettlement.json") },
-            // TODO: enable we validation rules has been impl.
+            // TODO: enable when delegation has been impl.
             //{ DocumentFormat.Ebix, IncomingDocumentType.MeteredDataForMeasurementPoint, ActorRole.MeteredDataResponsible, ReadJsonFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml") },
         };
 

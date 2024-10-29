@@ -19,7 +19,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.RequestBuilders;
+namespace Energinet.DataHub.EDI.IncomingMessages.IntegrationTests.Builders;
 
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Used only in tests")]
 public static class RequestWholesaleServicesRequestBuilder
