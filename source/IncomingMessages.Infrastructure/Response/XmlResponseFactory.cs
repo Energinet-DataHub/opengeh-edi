@@ -20,7 +20,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 
-public sealed class XmlResponseFactory : IResponseFactory
+public class XmlResponseFactory : IResponseFactory
 {
 #pragma warning disable CA1822
     public DocumentFormat HandledFormat => DocumentFormat.Xml;

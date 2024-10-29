@@ -101,8 +101,16 @@ public sealed class XmlResponseFactoryTests
         var document = XDocument.Parse(responseMessage.MessageBody);
         var errors = document.Element("Error")?.Element("Details")?.Elements().ToList();
 
-        Assert.Contains(errors!, error => error.Element("Code")?.Value == validationError.Code);
-        Assert.Contains(errors!, error => error.Element("Message")?.Value == validationError.Message);
+        errors.Should().NotBeNull();
+        errors!
+            .Select(e => e.Element("Code")!.Value)
+            .Should()
+            .Contain(validationError.Code);
+
+        errors!
+            .Select(e => e.Element("Message")!.Value)
+            .Should()
+            .Contain(validationError.Message);
     }
 
     private ResponseMessage CreateResponse(Result result)
