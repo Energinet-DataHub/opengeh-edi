@@ -22,18 +22,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.ProcessManager.Api;
 
-internal class CancelScheduledOrchestrationInstanceTrigger
+internal class CancelScheduledOrchestrationInstanceTrigger(
+    ILogger<NotifyAggregatedMeasureDataOrchestrationTriggerV1> logger,
+    IOrchestrationInstanceManager manager)
 {
-    private readonly ILogger _logger;
-    private readonly IOrchestrationInstanceManager _manager;
-
-    public CancelScheduledOrchestrationInstanceTrigger(
-        ILogger<NotifyAggregatedMeasureDataOrchestrationTriggerV1> logger,
-        IOrchestrationInstanceManager manager)
-    {
-        _logger = logger;
-        _manager = manager;
-    }
+    private readonly ILogger _logger = logger;
+    private readonly IOrchestrationInstanceManager _manager = manager;
 
     [Function(nameof(CancelScheduledOrchestrationInstanceTrigger))]
     public async Task<IActionResult> Run(

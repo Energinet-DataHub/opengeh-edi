@@ -24,18 +24,12 @@ using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribut
 
 namespace Energinet.DataHub.ProcessManager.Api.Processes.BRS_023_027.V1;
 
-internal class NotifyAggregatedMeasureDataOrchestrationTriggerV1
+internal class NotifyAggregatedMeasureDataOrchestrationTriggerV1(
+    ILogger<NotifyAggregatedMeasureDataOrchestrationTriggerV1> logger,
+    IOrchestrationInstanceManager manager)
 {
-    private readonly ILogger _logger;
-    private readonly IOrchestrationInstanceManager _manager;
-
-    public NotifyAggregatedMeasureDataOrchestrationTriggerV1(
-        ILogger<NotifyAggregatedMeasureDataOrchestrationTriggerV1> logger,
-        IOrchestrationInstanceManager manager)
-    {
-        _logger = logger;
-        _manager = manager;
-    }
+    private readonly ILogger _logger = logger;
+    private readonly IOrchestrationInstanceManager _manager = manager;
 
     [Function(nameof(NotifyAggregatedMeasureDataOrchestrationTriggerV1))]
     public async Task<IActionResult> Run(
