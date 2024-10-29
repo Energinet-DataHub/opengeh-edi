@@ -12,12 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Dynamic;
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
-using Energinet.DataHub.ProcessManagement.Core.Telemetry;
+using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.DependencyInjection;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Telemetry;
 using Energinet.DataHub.ProcessManager.Scheduler;
+using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NodaTime;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
@@ -26,14 +32,43 @@ var host = new HostBuilder()
         // Common
         services.AddApplicationInsightsForIsolatedWorker(TelemetryConstants.SubsystemName);
         services.AddHealthChecksForIsolatedWorker();
+        services.AddNodaTimeForApplication();
 
         // Scheduler
-        services.AddScoped<ProcessSchedulerHandler>();
+        services.AddScoped<SchedulerHandler>();
+
+        // ProcessManager
+        services.AddProcessManagerCore();
     })
     .ConfigureLogging((hostingContext, logging) =>
     {
         logging.AddLoggingConfigurationForIsolatedWorker(hostingContext);
     })
     .Build();
+
+// TODO: For demo purposes; remove when done
+var runDemo = false;
+if (runDemo)
+{
+    // Wait to allow orchestartion description to be registered.
+    // This is only necessary if the database is empty and hence the orchestration description was not registered previously.
+    await Task.Delay(TimeSpan.FromSeconds(30)).ConfigureAwait(false);
+
+    // Must match the parameter definition registered, with regards to properties
+    dynamic parameter = new ExpandoObject();
+    parameter.StartDate = DateTimeOffset.Now;
+    parameter.EndDate = DateTimeOffset.Now.AddHours(1);
+    parameter.ScheduledAt = DateTimeOffset.Now;
+    parameter.IsInternalCalculation = true;
+
+    var manager = host.Services.GetRequiredService<IOrchestrationInstanceManager>();
+    var clock = host.Services.GetRequiredService<IClock>();
+    await manager.ScheduleNewOrchestrationInstanceAsync(
+        name: "BRS_023_027",
+        version: 1,
+        parameter: parameter,
+        runAt: clock.GetCurrentInstant().PlusSeconds(20))
+        .ConfigureAwait(false);
+}
 
 host.Run();
