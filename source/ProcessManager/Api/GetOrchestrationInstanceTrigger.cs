@@ -21,22 +21,22 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.ProcessManager.Api;
 
-internal class CancelScheduledOrchestrationInstanceTrigger(
-    ILogger<CancelScheduledOrchestrationInstanceTrigger> logger,
-    IOrchestrationInstanceManager manager)
+internal class GetOrchestrationInstanceTrigger(
+    ILogger<GetOrchestrationInstanceTrigger> logger,
+    IOrchestrationInstanceRepository repository)
 {
     private readonly ILogger _logger = logger;
-    private readonly IOrchestrationInstanceManager _manager = manager;
+    private readonly IOrchestrationInstanceRepository _repository = repository;
 
-    [Function(nameof(CancelScheduledOrchestrationInstanceTrigger))]
+    [Function(nameof(GetOrchestrationInstanceTrigger))]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "processmanager/orchestrationinstance/{id}")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "processmanager/orchestrationinstance/{id}")]
         HttpRequest httpRequest,
         Guid id,
         FunctionContext executionContext)
     {
-        await _manager.CancelScheduledOrchestrationInstanceAsync(new OrchestrationInstanceId(id)).ConfigureAwait(false);
+        var orchestrationInstance = await _repository.GetAsync(new OrchestrationInstanceId(id)).ConfigureAwait(false);
 
-        return new OkResult();
+        return new OkObjectResult(orchestrationInstance);
     }
 }
