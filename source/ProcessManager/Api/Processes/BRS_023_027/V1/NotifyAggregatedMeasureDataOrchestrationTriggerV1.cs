@@ -39,7 +39,7 @@ internal class NotifyAggregatedMeasureDataOrchestrationTriggerV1
 
     [Function(nameof(NotifyAggregatedMeasureDataOrchestrationTriggerV1))]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest httpRequest,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", "processmanager/schedulenew/brs_023_027/v1")] HttpRequest httpRequest,
         [FromBody] ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> dto,
         FunctionContext executionContext)
     {
