@@ -74,7 +74,6 @@ public class DelegateIncomingMessage
         }
 
         // Delegation is setup for grid areas, so we need to set delegated for each series since they contain the grid area
-        // Except for MeteredDataForMeasurementPoint, where the grid area is not set
         foreach (var series in message.Series)
         {
             if ((originalActorRole == ActorRole.GridAccessProvider || originalActorRole == ActorRole.MeteredDataResponsible)
