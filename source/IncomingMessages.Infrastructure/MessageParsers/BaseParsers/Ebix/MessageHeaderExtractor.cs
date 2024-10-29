@@ -33,7 +33,7 @@ internal static class MessageHeaderExtractor
         XDocument document,
         XNamespace ns)
     {
-        var headerElement = document.Descendants(ns + HeaderElementName).FirstOrDefault();
+        var headerElement = document.Descendants(ns + HeaderElementName).SingleOrDefault();
         if (headerElement == null) throw new InvalidOperationException("Header element not found");
 
         var messageId = headerElement.Element(ns + Identification)?.Value ?? string.Empty;
