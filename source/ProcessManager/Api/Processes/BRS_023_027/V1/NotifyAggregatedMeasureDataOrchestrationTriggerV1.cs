@@ -39,8 +39,10 @@ internal class NotifyAggregatedMeasureDataOrchestrationTriggerV1
 
     [Function(nameof(NotifyAggregatedMeasureDataOrchestrationTriggerV1))]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", "processmanager/schedulenew/brs_023_027/v1")] HttpRequest httpRequest,
-        [FromBody] ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> dto,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "processmanager/schedulenew/brs_023_027/v1")]
+        HttpRequest httpRequest,
+        [FromBody]
+        ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> dto,
         FunctionContext executionContext)
     {
         // TODO: Server-side validation => Validate "period" is midnight values when given "timezone"
