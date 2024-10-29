@@ -47,4 +47,14 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Model\" />
+    <Folder Include="Processes\BRS_023_027\V1\Model\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Shared\ProcessManager\Api\Model\ScheduleOrchestrationInstanceDto.cs" Link="Model\ScheduleOrchestrationInstanceDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Orchestrations\Processes\BRS_023_027\V1\Model\CalculationTypes.cs" Link="Processes\BRS_023_027\V1\Model\CalculationTypes.cs" />
+    <Compile Include="..\Shared\ProcessManager\Orchestrations\Processes\BRS_023_027\V1\Model\NotifyAggregatedMeasureDataInputV1.cs" Link="Processes\BRS_023_027\V1\Model\NotifyAggregatedMeasureDataInputV1.cs" />
+  </ItemGroup>
+
 </Project>

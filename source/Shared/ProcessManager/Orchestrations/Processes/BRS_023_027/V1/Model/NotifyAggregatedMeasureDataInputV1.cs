@@ -15,7 +15,7 @@
 namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
 
 /// <summary>
-/// An immutable input to start the <see cref="NotifyAggregatedMeasureDataOrchestrationV1"/>.
+/// An immutable input to start the orchestration instance for "BRS_023_027" V1.
 /// </summary>
 public sealed record NotifyAggregatedMeasureDataInputV1(
     CalculationTypes CalculationType,

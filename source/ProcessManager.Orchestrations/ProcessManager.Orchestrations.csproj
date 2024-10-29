@@ -28,7 +28,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Processes\BRS_021\" />
-    <Folder Include="Processes\BRS_026_028\V1\Activities\" />
-    <Folder Include="Processes\BRS_026_028\V1\Model\" />
+    <Folder Include="Processes\BRS_023_027\V1\Model\" />
+    <Folder Include="Processes\BRS_026_028\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Shared\ProcessManager\Orchestrations\Processes\BRS_023_027\V1\Model\CalculationTypes.cs" Link="Processes\BRS_023_027\V1\Model\CalculationTypes.cs" />
+    <Compile Include="..\Shared\ProcessManager\Orchestrations\Processes\BRS_023_027\V1\Model\NotifyAggregatedMeasureDataInputV1.cs" Link="Processes\BRS_023_027\V1\Model\NotifyAggregatedMeasureDataInputV1.cs" />
   </ItemGroup>
 </Project>

@@ -29,4 +29,13 @@
   <ItemGroup>
     <ProjectReference Include="..\ProcessManager.Core\ProcessManager.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Api\Model\" />
+    <Folder Include="Api\Processes\BRS_023_027\V1\Model\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Shared\ProcessManager\Api\Model\ScheduleOrchestrationInstanceDto.cs" Link="Api\Model\ScheduleOrchestrationInstanceDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Orchestrations\Processes\BRS_023_027\V1\Model\CalculationTypes.cs" Link="Api\Processes\BRS_023_027\V1\Model\CalculationTypes.cs" />
+    <Compile Include="..\Shared\ProcessManager\Orchestrations\Processes\BRS_023_027\V1\Model\NotifyAggregatedMeasureDataInputV1.cs" Link="Api\Processes\BRS_023_027\V1\Model\NotifyAggregatedMeasureDataInputV1.cs" />
+  </ItemGroup>
 </Project>

@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.ProcessManagement.Core.Application;
 using Energinet.DataHub.ProcessManager.Api.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -21,35 +22,35 @@ using Microsoft.Extensions.Logging;
 using NodaTime.Extensions;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 
-namespace Energinet.DataHub.ProcessManager.Api;
+namespace Energinet.DataHub.ProcessManager.Api.Processes.BRS_023_027.V1;
 
-internal class ScheduleNewOrchestrationInstanceTrigger
+internal class NotifyAggregatedMeasureDataOrchestrationTriggerV1
 {
     private readonly ILogger _logger;
     private readonly IOrchestrationInstanceManager _manager;
 
-    public ScheduleNewOrchestrationInstanceTrigger(
-        ILogger<ScheduleNewOrchestrationInstanceTrigger> logger,
+    public NotifyAggregatedMeasureDataOrchestrationTriggerV1(
+        ILogger<NotifyAggregatedMeasureDataOrchestrationTriggerV1> logger,
         IOrchestrationInstanceManager manager)
     {
         _logger = logger;
         _manager = manager;
     }
 
-    ////[Function(nameof(ScheduleNewOrchestrationInstanceTrigger))]
-    ////public async Task<IActionResult> Run(
-    ////    [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest httpRequest,
-    ////    [FromBody] ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> dto,
-    ////    FunctionContext executionContext)
-    ////{
-    ////    // TODO: Server-side validation => Validate "period" is midnight values when given "timezone"
-    ////    var orchestrationInstanceId = await _manager.ScheduleNewOrchestrationInstanceAsync(
-    ////        name: "BRS_023_027",
-    ////        version: 1,
-    ////        parameter: dto.Parameter,
-    ////        runAt: dto.ScheduledAt.ToInstant())
-    ////        .ConfigureAwait(false);
+    [Function(nameof(NotifyAggregatedMeasureDataOrchestrationTriggerV1))]
+    public async Task<IActionResult> Run(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest httpRequest,
+        [FromBody] ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> dto,
+        FunctionContext executionContext)
+    {
+        // TODO: Server-side validation => Validate "period" is midnight values when given "timezone"
+        var orchestrationInstanceId = await _manager.ScheduleNewOrchestrationInstanceAsync(
+            name: "BRS_023_027",
+            version: 1,
+            parameter: dto.Parameter,
+            runAt: dto.ScheduledAt.ToInstant())
+            .ConfigureAwait(false);
 
-    ////    return new OkObjectResult(orchestrationInstanceId.Value);
-    ////}
+        return new OkObjectResult(orchestrationInstanceId.Value);
+    }
 }
