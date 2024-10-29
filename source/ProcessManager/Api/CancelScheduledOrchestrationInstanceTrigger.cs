@@ -13,23 +13,21 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManagement.Core.Application;
-using Energinet.DataHub.ProcessManager.Api.Model;
-using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
+using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
+using Energinet.DataHub.ProcessManager.Api.Processes.BRS_023_027.V1;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using NodaTime.Extensions;
-using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 
-namespace Energinet.DataHub.ProcessManager.Api.Processes.BRS_023_027.V1;
+namespace Energinet.DataHub.ProcessManager.Api;
 
-internal class NotifyAggregatedMeasureDataOrchestrationTriggerV1
+internal class CancelScheduledOrchestrationInstanceTrigger
 {
     private readonly ILogger _logger;
     private readonly IOrchestrationInstanceManager _manager;
 
-    public NotifyAggregatedMeasureDataOrchestrationTriggerV1(
+    public CancelScheduledOrchestrationInstanceTrigger(
         ILogger<NotifyAggregatedMeasureDataOrchestrationTriggerV1> logger,
         IOrchestrationInstanceManager manager)
     {
@@ -37,22 +35,16 @@ internal class NotifyAggregatedMeasureDataOrchestrationTriggerV1
         _manager = manager;
     }
 
-    [Function(nameof(NotifyAggregatedMeasureDataOrchestrationTriggerV1))]
+    [Function(nameof(CancelScheduledOrchestrationInstanceTrigger))]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "processmanager/orchestrationinstance/brs_023_027/v1")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "processmanager/orchestrationinstance/{id}")]
         HttpRequest httpRequest,
         [FromBody]
-        ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> dto,
+        Guid id,
         FunctionContext executionContext)
     {
-        // TODO: Server-side validation => Validate "period" is midnight values when given "timezone"
-        var orchestrationInstanceId = await _manager.ScheduleNewOrchestrationInstanceAsync(
-            name: "BRS_023_027",
-            version: 1,
-            parameter: dto.Parameter,
-            runAt: dto.ScheduledAt.ToInstant())
-            .ConfigureAwait(false);
+        await _manager.CancelScheduledOrchestrationInstanceAsync(new OrchestrationInstanceId(id)).ConfigureAwait(false);
 
-        return new OkObjectResult(orchestrationInstanceId.Value);
+        return new OkResult();
     }
 }
