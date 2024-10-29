@@ -30,7 +30,7 @@ internal class CancelScheduledOrchestrationInstanceTrigger(
 
     [Function(nameof(CancelScheduledOrchestrationInstanceTrigger))]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "processmanager/orchestrationinstance/{id}")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "processmanager/orchestrationinstance/{id:guid}")]
         HttpRequest httpRequest,
         Guid id,
         FunctionContext executionContext)

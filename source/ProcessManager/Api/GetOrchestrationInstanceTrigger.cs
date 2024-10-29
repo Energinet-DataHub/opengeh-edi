@@ -30,7 +30,7 @@ internal class GetOrchestrationInstanceTrigger(
 
     [Function(nameof(GetOrchestrationInstanceTrigger))]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "processmanager/orchestrationinstance/{id}")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "processmanager/orchestrationinstance/{id:guid}")]
         HttpRequest httpRequest,
         Guid id,
         FunctionContext executionContext)
