@@ -21,23 +21,46 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.ProcessManager.Api;
 
-internal class GetOrchestrationInstanceTrigger(
-    ILogger<GetOrchestrationInstanceTrigger> logger,
+internal class SearchOrchestrationInstancesTrigger(
+    ILogger<SearchOrchestrationInstancesTrigger> logger,
     IOrchestrationInstanceRepository repository)
 {
     private readonly ILogger _logger = logger;
     private readonly IOrchestrationInstanceRepository _repository = repository;
 
-    [Function(nameof(GetOrchestrationInstanceTrigger))]
+    [Function(nameof(SearchOrchestrationInstancesTrigger))]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "processmanager/orchestrationinstance/{id:guid}")]
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "get",
+            Route = "processmanager/orchestrationinstances/{name}/{version:int?}")]
         HttpRequest httpRequest,
-        Guid id,
+        string name,
+        int? version,
         FunctionContext executionContext)
     {
-        var orchestrationInstance = await _repository.GetAsync(new OrchestrationInstanceId(id)).ConfigureAwait(false);
+        var lifecycleState = TryParseEnum<OrchestrationInstanceLifecycleStates>(httpRequest.Query["lifecycleState"]);
+        var terminationState = TryParseEnum<OrchestrationInstanceTerminationStates>(httpRequest.Query["terminationState"]);
+
+        var orchestrationInstances = await _repository.SearchAsync(
+            name,
+            version,
+            lifecycleState,
+            terminationState)
+                .ConfigureAwait(false);
 
         // TODO: We currently do not return "NodaTime.Instant" correctly
-        return new OkObjectResult(orchestrationInstance);
+        return new OkObjectResult(orchestrationInstances);
+    }
+
+    private static TEnum? TryParseEnum<TEnum>(string? value)
+        where TEnum : struct
+    {
+        if (Enum.TryParse<TEnum>(value, ignoreCase: true, out var result))
+        {
+            return result;
+        }
+
+        return null;
     }
 }
