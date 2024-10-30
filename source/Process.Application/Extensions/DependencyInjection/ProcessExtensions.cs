@@ -82,6 +82,7 @@ public static class ProcessExtensions
         // ProcessInitialization handlers Configuration
         services.AddTransient<IProcessInitializationHandler, InitializeAggregatedMeasureDataHandler>();
         services.AddTransient<IProcessInitializationHandler, InitializeWholesaleServicesProcessHandler>();
+        services.AddTransient<IProcessInitializationHandler, InitializeMeteredDataForMeasurementPointHandler>();
 
         // ProcessInitializationClient Configuration
         services.AddTransient<IProcessClient, ProcessClient>();

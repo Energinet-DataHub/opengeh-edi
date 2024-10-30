@@ -14,6 +14,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
+using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
@@ -82,7 +83,7 @@ public class SubsystemTestFixture : IAsyncLifetime
         var dbConnectionString = BuildDbConnectionString(sqlServer, databaseName);
         ConnectionString = dbConnectionString;
 
-        var serviceBusConnectionString = GetConfigurationValue<string>(root, "sb-domain-relay-manage-connection-string");
+        var serviceBusFullyQualifiedNamespace = $"{GetConfigurationValue<string>(root, "sb-domain-relay-namespace-name")}.servicebus.windows.net";
         var topicName = GetConfigurationValue<string>(root, "sbt-shres-integrationevent-received-name");
         var ediInboxQueueName = GetConfigurationValue<string>(root, "sbq-edi-inbox-messagequeue-name");
 
@@ -159,14 +160,8 @@ public class SubsystemTestFixture : IAsyncLifetime
                 b2cPassword,
                 GetConfigurationValue<Guid>(root, "B2C_ENERGY_SUPPLIER_ACTOR_ID"))));
 
-        ServiceBusClient = new ServiceBusClient(
-            serviceBusConnectionString,
-            new ServiceBusClientOptions()
-            {
-                TransportType =
-                    ServiceBusTransportType
-                        .AmqpWebSockets, // Firewall is not open for AMQP and Therefore, needs to go over WebSockets.
-            });
+        var credential = new DefaultAzureCredential();
+        ServiceBusClient = new ServiceBusClient(serviceBusFullyQualifiedNamespace, credential);
         EventPublisher = new IntegrationEventPublisher(ServiceBusClient, topicName, dbConnectionString);
         EdiInboxClient = new EdiInboxClient(ServiceBusClient, ediInboxQueueName);
 
