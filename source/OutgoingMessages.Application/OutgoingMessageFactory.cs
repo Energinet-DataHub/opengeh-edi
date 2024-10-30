@@ -27,7 +27,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Application;
 
 public static class OutgoingMessageFactory
 {
-       /// <summary>
+    /// <summary>
     /// This method create a single outgoing message, for the receiver, based on the accepted energyResultMessage.
     /// </summary>
     public static OutgoingMessage CreateMessage(

@@ -33,6 +33,8 @@ using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.Peek;
 using MediatR;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -224,6 +226,12 @@ public class OutgoingMessagesTestBase : IDisposable
             var executionContext = new ExecutionContext();
             executionContext.SetExecutionType(ExecutionType.Test);
             return executionContext;
+        });
+
+        _services.AddSingleton<TelemetryClient>(x =>
+        {
+            return new TelemetryClient(
+                new TelemetryConfiguration { TelemetryChannel = new TelemetryChannelStub(), });
         });
 
         ServiceProvider = _services.BuildServiceProvider();
