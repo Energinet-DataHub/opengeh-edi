@@ -60,6 +60,6 @@ public record MeteredDataForMeasurementPointSeries(
 }
 
 public record EnergyObservation(
-    string? Position, //PayloadEnergyTimeSeries.IntervalEnergyObservation.Position
-    string? EnergyQuantity, //PayloadEnergyTimeSeries.IntervalEnergyObservation.EnergyQuantity
-    string? QuantityQuality); //PayloadEnergyTimeSeries.IntervalEnergyObservation.QuantityQuality
+    string? Position,
+    string? EnergyQuantity,
+    string? QuantityQuality);

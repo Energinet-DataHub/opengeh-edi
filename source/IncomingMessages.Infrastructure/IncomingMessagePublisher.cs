@@ -54,6 +54,9 @@ public class IncomingMessagePublisher
             case RequestWholesaleServicesMessage wholesaleSettlementMessage:
                 await SendInitializeWholesaleServicesProcessAsync(InitializeWholesaleServicesProcessDtoFactory.Create(wholesaleSettlementMessage), cancellationToken).ConfigureAwait(false);
                 break;
+            case MeteredDataForMeasurementPointMessage meteredDataForMeasurementPointMessage:
+                await SendInitializeMeteredDataForMeasurementPointMessageProcessAsync(InitializeMeteredDataForMeasurementPointProcessDtoFactory.Create(meteredDataForMeasurementPointMessage), cancellationToken).ConfigureAwait(false);
+                break;
             default:
                 throw new InvalidOperationException($"Unknown message type {incomingMessage.GetType().Name}");
         }
@@ -82,6 +85,20 @@ public class IncomingMessagePublisher
                 _serializer.Serialize(initializeWholesaleServicesProcessDto))
             {
                 Subject = nameof(InitializeWholesaleServicesProcessDto),
+            };
+
+        await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task SendInitializeMeteredDataForMeasurementPointMessageProcessAsync(InitializeMeteredDataForMeasurementPointMessageProcessDto initializeMeteredDataForMeasurementPointMessageProcessDto, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(initializeMeteredDataForMeasurementPointMessageProcessDto);
+
+        var serviceBusMessage =
+            new ServiceBusMessage(
+                _serializer.Serialize(initializeMeteredDataForMeasurementPointMessageProcessDto))
+            {
+                Subject = nameof(InitializeMeteredDataForMeasurementPointMessageProcessDto),
             };
 
         await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
