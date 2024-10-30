@@ -29,7 +29,7 @@ public class XmlResponseFactory : IResponseFactory
     public ResponseMessage From(Result result)
     {
         ArgumentNullException.ThrowIfNull(result);
-        return result.Success ? new ResponseMessage() : new ResponseMessage(CreateMessageBodyFrom(result));
+        return result.Success ? ResponseMessage.Success() : ResponseMessage.Error(CreateMessageBodyFrom(result));
     }
 
     private static string CreateMessageBodyFrom(Result result)

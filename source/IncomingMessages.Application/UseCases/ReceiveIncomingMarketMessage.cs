@@ -120,7 +120,7 @@ public class ReceiveIncomingMarketMessage
 
         if (result.Success)
         {
-            return new ResponseMessage();
+            return _responseFactory.From(result, responseDocumentFormat);
         }
 
         _logger.LogInformation(
