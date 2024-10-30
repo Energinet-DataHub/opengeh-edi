@@ -13,12 +13,14 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Api.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using NodaTime.Extensions;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 
@@ -26,9 +28,15 @@ namespace Energinet.DataHub.ProcessManager.Api.Processes.BRS_023_027.V1;
 
 internal class NotifyAggregatedMeasureDataOrchestrationTriggerV1(
     ILogger<NotifyAggregatedMeasureDataOrchestrationTriggerV1> logger,
+    IClock clock,
+    IOrchestrationInstanceRepository repository,
+    IUnitOfWork unitOfWork,
     IOrchestrationInstanceManager manager)
 {
     private readonly ILogger _logger = logger;
+    private readonly IClock _clock = clock;
+    private readonly IOrchestrationInstanceRepository _repository = repository;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IOrchestrationInstanceManager _manager = manager;
 
     [Function(nameof(NotifyAggregatedMeasureDataOrchestrationTriggerV1))]
@@ -46,6 +54,21 @@ internal class NotifyAggregatedMeasureDataOrchestrationTriggerV1(
             parameter: dto.Parameter,
             runAt: dto.ScheduledAt.ToInstant())
             .ConfigureAwait(false);
+
+        // TODO:
+        // For demo purposes we create the steps here.
+        // Will be refactored to describing the steps as part of the orchestration description
+        var orchestrationInstance = await _repository.GetAsync(orchestrationInstanceId);
+        orchestrationInstance.Steps.Add(new OrchestrationStep(
+            orchestrationInstance.Id,
+            _clock,
+            "Beregning",
+            sequence: 0));
+        orchestrationInstance.Steps.Add(new OrchestrationStep(
+            orchestrationInstance.Id,
+            _clock,
+            "Besked dannelse",
+            sequence: 1));
 
         return new OkObjectResult(orchestrationInstanceId.Value);
     }
