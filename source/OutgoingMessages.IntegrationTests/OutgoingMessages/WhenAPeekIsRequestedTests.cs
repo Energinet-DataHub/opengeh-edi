@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
 using System.Reflection;
 using System.Xml.Linq;
 using Dapper;
@@ -26,6 +27,8 @@ using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.EnergyResultMessa
 using Energinet.DataHub.EDI.Tests.Factories;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Channel;
 using NodaTime;
 using NodaTime.Extensions;
 using Xunit.Abstractions;
