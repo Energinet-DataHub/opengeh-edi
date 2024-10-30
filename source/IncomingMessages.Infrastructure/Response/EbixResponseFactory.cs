@@ -32,7 +32,7 @@ public class EbixResponseFactory : IResponseFactory
         return result.Success ? ResponseMessage.Success(CreateSuccessMessageBody(result.MessageId)) : ResponseMessage.Error(CreateErrorMessageBodyFrom(result));
     }
 
-    private static string CreateSuccessMessageBody(MessageId? messageId)
+    private static string CreateSuccessMessageBody(string? messageId)
     {
         if (messageId == null)
         {
@@ -42,7 +42,7 @@ public class EbixResponseFactory : IResponseFactory
         var messageBody = new StringBuilder();
         var settings = new XmlWriterSettings { OmitXmlDeclaration = true, Indent = true };
         using var writer = XmlWriter.Create(messageBody, settings);
-        writer.WriteElementString("MessageId", messageId.Value.ToString());
+        writer.WriteElementString("MessageId", messageId);
         writer.Close();
 
         return messageBody.ToString();

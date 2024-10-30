@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 
 public class Result
 {
-    private Result(MessageId? messageId)
+    private Result(string? messageId)
     {
         MessageId = messageId;
     }
@@ -29,7 +28,7 @@ public class Result
         Errors = errors;
     }
 
-    public MessageId? MessageId { get; }
+    public string? MessageId { get; }
 
     public bool Success => Errors.Count == 0;
 
@@ -40,7 +39,7 @@ public class Result
         return new Result(errors);
     }
 
-    public static Result Succeeded(MessageId? messageId = null)
+    public static Result Succeeded(string? messageId = null)
     {
         return new Result(messageId);
     }
