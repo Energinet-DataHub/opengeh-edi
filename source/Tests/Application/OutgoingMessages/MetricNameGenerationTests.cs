@@ -54,8 +54,8 @@ public class MetricNameGenerationTests
 
     private static List<string> AllMessageGenerationsMetricsNames()
     {
-        var documentTypes = EnumerationType.GetAll<DocumentType>();
-        var documentFormats = EnumerationType.GetAll<DocumentFormat>();
+        var documentTypes = EnumerationType.GetAll<DocumentType>().ToList();
+        var documentFormats = EnumerationType.GetAll<DocumentFormat>().ToList();
         var names = new List<string>();
 
         foreach (var documentFormat in documentFormats)
