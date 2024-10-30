@@ -49,7 +49,7 @@ public class MetricNameGenerationTests
         allMetricNamesUsedWhenGeneratingMessages.Should()
             .BeEquivalentTo(
                 currentlyAddedMetric,
-                "All documentTypes + documentFormats should have a corresponding visualization in the dashboard, remember to add them to the dashboard");
+                "All documentTypes + documentFormats should have a corresponding visualization in the dashboard, remember to add or remove them to/from the dashboard");
     }
 
     private static List<string> AllMessageGenerationsMetricsNames()
