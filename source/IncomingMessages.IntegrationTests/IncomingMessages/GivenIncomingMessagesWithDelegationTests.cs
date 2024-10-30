@@ -540,8 +540,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         {
             var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>();
             var series = message.Series.Should().ContainSingle().Subject;
-            // Should this be the authenticated actor role or the one in message
-            series.RequestedByActor.ActorRole.Should().Be(ActorRole.MeteredDataResponsible);
+            series.RequestedByActor.ActorRole.Should().Be(_authenticatedActor.CurrentActorIdentity.ActorRole);
             series.RequestedByActor.ActorNumber.Should().Be(_authenticatedActor.CurrentActorIdentity.ActorNumber);
             series.DelegatedGridAreaCodes.Should().BeEmpty();
         }

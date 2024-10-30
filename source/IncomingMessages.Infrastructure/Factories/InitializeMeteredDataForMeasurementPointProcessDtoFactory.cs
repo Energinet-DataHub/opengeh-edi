@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
 using Energinet.DataHub.EDI.Process.Interfaces;
 
@@ -20,12 +20,9 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Factories;
 
 public static class InitializeMeteredDataForMeasurementPointProcessDtoFactory
 {
-    public static InitializeMeteredDataForMeasurementPointMessageProcessDto Create(MeteredDataForMeasurementPointMessage meteredDataForMeasurementPointMessage)
+    public static InitializeMeteredDataForMeasurementPointMessageProcessDto Create(MeteredDataForMeasurementPointMessage meteredDataForMeasurementPointMessage, AuthenticatedActor authenticatedActor)
     {
         ArgumentNullException.ThrowIfNull(meteredDataForMeasurementPointMessage);
-
-        var senderActorNumber = ActorNumber.Create(meteredDataForMeasurementPointMessage.SenderNumber);
-        var senderRoleCode = ActorRole.FromCode(meteredDataForMeasurementPointMessage.SenderRoleCode);
 
         var series = meteredDataForMeasurementPointMessage.Series
             .Cast<MeteredDataForMeasurementPointSeries>()
@@ -43,8 +40,8 @@ public static class InitializeMeteredDataForMeasurementPointProcessDtoFactory
                         MeteringPointLocationId: series.MeteringPointLocationId,
                         DelegatedGridAreaCodes: series.DelegatedGridAreas,
                         RequestedByActor: RequestedByActor.From(
-                            senderActorNumber,
-                            series.RequestedByActorRole ?? senderRoleCode),
+                            authenticatedActor.CurrentActorIdentity.ActorNumber,
+                            series.RequestedByActorRole ?? authenticatedActor.CurrentActorIdentity.ActorRole),
                         EnergyObservations: series.EnergyObservations
                             .Select(
                                 energyObservation => new InitializeEnergyObservation(

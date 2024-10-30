@@ -74,7 +74,7 @@ public class DelegateIncomingMessage
         }
 
         // Delegation is setup for grid areas, so we need to set delegated for each series since they contain the grid area
-        // Except for incoming metered data for measurement point, since this doesn't have a grid area
+        // Except for incoming metered data for measurement point, which this doesn't have a grid area
         foreach (var series in message.Series)
         {
             if ((originalActorRole == ActorRole.GridAccessProvider || originalActorRole == ActorRole.MeteredDataResponsible)
@@ -92,7 +92,6 @@ public class DelegateIncomingMessage
                     cancellationToken)
                 .ConfigureAwait(false);
 
-            // TODO: Metered mes type should find delegation when role is del only and ignore gridarea.
             if (delegations.Count != 0)
             {
                 GridAreaOwnerDto? gridAreaOwner = null;
