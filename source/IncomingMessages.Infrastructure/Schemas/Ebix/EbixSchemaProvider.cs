@@ -47,7 +47,7 @@ public class EbixSchemaProvider : SchemaProvider, ISchemaProvider<XmlSchema>
     {
         var schemaName = _schema.GetSchemaLocation(businessProcessType, version);
 
-        if (schemaName == null)
+        if (string.IsNullOrEmpty(schemaName))
         {
             return Task.FromResult(default(T));
         }

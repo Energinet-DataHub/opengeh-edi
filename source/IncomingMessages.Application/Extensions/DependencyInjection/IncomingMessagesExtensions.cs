@@ -76,6 +76,7 @@ public static class IncomingMessagesExtensions
             .AddScoped<IIncomingMessageReceiver, IncomingMessageReceiver>()
             .AddSingleton<IResponseFactory, JsonResponseFactory>()
             .AddSingleton<IResponseFactory, XmlResponseFactory>()
+            .AddSingleton<IResponseFactory, EbixResponseFactory>()
             .AddSingleton<ResponseFactory>();
 
         /*

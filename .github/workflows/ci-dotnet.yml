@@ -49,14 +49,26 @@ jobs:
       fail-fast: false
       matrix:
         tests_filter_expression:
-          - name: ProcessManager IntegrationTests
-            paths: \source\ProcessManager.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.IntegrationTests.dll
+          - name: ProcessManager Tests
+            paths: \source\ProcessManager.Tests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.Tests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
-          - name: ProcessManager Orchestrations IntegrationTests
-            paths: \source\ProcessManager.Orchestrations.IntegrationTests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.Orchestrations.IntegrationTests.dll
+          - name: ProcessManager Orchestrations Tests
+            paths: \source\ProcessManager.Orchestrations.Tests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.Orchestrations.Tests.dll
+            filter: empty # Means skip
+            use_azure_functions_tools: true
+            contentroot_variable_name: empty # Means skip
+
+          - name: ProcessManager Core Tests
+            paths: \source\ProcessManager.Core.Tests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.Core.Tests.dll
+            filter: empty # Means skip
+            use_azure_functions_tools: true
+            contentroot_variable_name: empty # Means skip
+
+          - name: ProcessManager Subsystem Tests
+            paths: \source\ProcessManager.SubsystemTests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.SubsystemTests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
