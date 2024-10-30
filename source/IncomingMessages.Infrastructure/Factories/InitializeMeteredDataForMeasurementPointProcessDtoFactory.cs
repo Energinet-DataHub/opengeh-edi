@@ -25,7 +25,7 @@ public static class InitializeMeteredDataForMeasurementPointProcessDtoFactory
         ArgumentNullException.ThrowIfNull(meteredDataForMeasurementPointMessage);
 
         var senderActorNumber = ActorNumber.Create(meteredDataForMeasurementPointMessage.SenderNumber);
-        var senderActorRole = ActorRole.FromCode(meteredDataForMeasurementPointMessage.SenderRoleCode);
+        var senderRoleCode = ActorRole.FromCode(meteredDataForMeasurementPointMessage.SenderRoleCode);
 
         var series = meteredDataForMeasurementPointMessage.Series
             .Cast<MeteredDataForMeasurementPointSeries>()
@@ -41,12 +41,10 @@ public static class InitializeMeteredDataForMeasurementPointProcessDtoFactory
                         ProductUnitType: series.ProductUnitType,
                         MeteringPointType: series.MeteringPointType,
                         MeteringPointLocationId: series.MeteringPointLocationId,
+                        DelegatedGridAreaCodes: series.DelegatedGridAreas,
                         RequestedByActor: RequestedByActor.From(
                             senderActorNumber,
-                            series.RequestedByActorRole ?? senderActorRole),
-                        OriginalActor: OriginalActor.From(
-                            series.OriginalActorNumber ?? senderActorNumber,
-                            senderActorRole),
+                            series.RequestedByActorRole ?? senderRoleCode),
                         EnergyObservations: series.EnergyObservations
                             .Select(
                                 energyObservation => new InitializeEnergyObservation(

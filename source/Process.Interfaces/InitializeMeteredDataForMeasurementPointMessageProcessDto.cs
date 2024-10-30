@@ -31,8 +31,9 @@ public record InitializeMeteredDataForMeasurementPointMessageSeries(
     string? ProductUnitType,
     string? MeteringPointType,
     string? MeteringPointLocationId,
+    // DelegatedGridAreaCodes is a list of grid area codes that the requester is allowed to submit measurements for
+    IReadOnlyCollection<string>? DelegatedGridAreaCodes,
     RequestedByActor RequestedByActor,
-    OriginalActor OriginalActor,
     IReadOnlyCollection<InitializeEnergyObservation> EnergyObservations);
 
 public record InitializeEnergyObservation(

@@ -74,10 +74,12 @@ public class DelegateIncomingMessage
         }
 
         // Delegation is setup for grid areas, so we need to set delegated for each series since they contain the grid area
+        // Except for incoming metered data for measurement point, since this doesn't have a grid area
         foreach (var series in message.Series)
         {
             if ((originalActorRole == ActorRole.GridAccessProvider || originalActorRole == ActorRole.MeteredDataResponsible)
-                && series.GridArea == null)
+                && series.GridArea == null
+                && processType != ProcessType.IncomingMeteredDataForMeasurementPoint)
             {
                 continue;
             }
@@ -90,6 +92,7 @@ public class DelegateIncomingMessage
                     cancellationToken)
                 .ConfigureAwait(false);
 
+            // TODO: Metered mes type should find delegation when role is del only and ignore gridarea.
             if (delegations.Count != 0)
             {
                 GridAreaOwnerDto? gridAreaOwner = null;
@@ -101,6 +104,13 @@ public class DelegateIncomingMessage
                             series.GridArea,
                             cancellationToken)
                         .ConfigureAwait(false);
+                }
+
+                if (processType == ProcessType.IncomingMeteredDataForMeasurementPoint)
+                {
+                    // For incoming metered data for measurement point, we do not know the owner of the metering point yet (original actor). Therefore, all delegated grid ares are parsed on.
+                    // Then in the async validation we will check that the metering point belongs to any of the grid areas.
+                    series.DelegateSeries(null, requestedByActorRole, delegations.Select(d => d.GridAreaCode).ToArray());
                 }
 
                 var originalActorNumber = series.GetActorNumberForRole(originalActorRole, gridAreaOwner?.ActorNumber);
@@ -151,6 +161,11 @@ public class DelegateIncomingMessage
             || incomingDocumentType == IncomingDocumentType.B2CRequestWholesaleSettlement)
         {
             return ProcessType.RequestWholesaleResults;
+        }
+
+        if (incomingDocumentType == IncomingDocumentType.MeteredDataForMeasurementPoint)
+        {
+            return ProcessType.IncomingMeteredDataForMeasurementPoint;
         }
 
         throw new ArgumentOutOfRangeException(nameof(incomingDocumentType), incomingDocumentType, $"Cannot map {nameof(IncomingDocumentType)} to {nameof(ProcessType)}");
