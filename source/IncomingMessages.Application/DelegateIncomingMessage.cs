@@ -150,21 +150,18 @@ public class DelegateIncomingMessage
 
     private ProcessType MapToProcessType(IncomingDocumentType incomingDocumentType)
     {
-        if (incomingDocumentType == IncomingDocumentType.RequestAggregatedMeasureData
-            || incomingDocumentType == IncomingDocumentType.B2CRequestAggregatedMeasureData)
+        var documentTypeToProcessTypeMap = new Dictionary<IncomingDocumentType, ProcessType>
         {
-            return ProcessType.RequestEnergyResults;
-        }
+            { IncomingDocumentType.RequestAggregatedMeasureData, ProcessType.RequestEnergyResults },
+            { IncomingDocumentType.B2CRequestAggregatedMeasureData, ProcessType.RequestEnergyResults },
+            { IncomingDocumentType.RequestWholesaleSettlement, ProcessType.RequestWholesaleResults },
+            { IncomingDocumentType.B2CRequestWholesaleSettlement, ProcessType.RequestWholesaleResults },
+            { IncomingDocumentType.MeteredDataForMeasurementPoint, ProcessType.IncomingMeteredDataForMeasurementPoint },
+        };
 
-        if (incomingDocumentType == IncomingDocumentType.RequestWholesaleSettlement
-            || incomingDocumentType == IncomingDocumentType.B2CRequestWholesaleSettlement)
+        if (documentTypeToProcessTypeMap.TryGetValue(incomingDocumentType, out var processType))
         {
-            return ProcessType.RequestWholesaleResults;
-        }
-
-        if (incomingDocumentType == IncomingDocumentType.MeteredDataForMeasurementPoint)
-        {
-            return ProcessType.IncomingMeteredDataForMeasurementPoint;
+            return processType;
         }
 
         throw new ArgumentOutOfRangeException(nameof(incomingDocumentType), incomingDocumentType, $"Cannot map {nameof(IncomingDocumentType)} to {nameof(ProcessType)}");
