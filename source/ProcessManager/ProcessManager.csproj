@@ -6,7 +6,7 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <InternalsVisibleTo Include="Energinet.DataHub.ProcessManager.Tests"/>
+    <InternalsVisibleTo Include="Energinet.DataHub.ProcessManager.Tests" />
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
@@ -27,9 +27,12 @@
     <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Api\" />
+    <Folder Include="Api\Processes\BRS_023_027\Model\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ProcessManager.Core\ProcessManager.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\ProcessManager.Orchestrations\Processes\BRS_023_027\V1\Model\CalculationTypes.cs" Link="Api\Processes\BRS_023_027\Model\CalculationTypes.cs" />
   </ItemGroup>
 </Project>
