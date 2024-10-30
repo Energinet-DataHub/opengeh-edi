@@ -61,12 +61,13 @@ using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.Extensions.D
 using Energinet.DataHub.Wholesale.Edi.Extensions.DependencyInjection;
 using Google.Protobuf;
 using MediatR;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 using NodaTime;
 using Xunit;
 using Xunit.Abstractions;
@@ -367,6 +368,11 @@ public class TestBase : IDisposable
             var executionContext = new ExecutionContext();
             executionContext.SetExecutionType(ExecutionType.Test);
             return executionContext;
+        });
+        _services.AddSingleton<TelemetryClient>(x =>
+        {
+            return new TelemetryClient(
+                new TelemetryConfiguration { TelemetryChannel = new TelemetryChannelStub(), });
         });
 
         // Add test logger
