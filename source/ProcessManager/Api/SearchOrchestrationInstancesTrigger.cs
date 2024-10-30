@@ -39,8 +39,14 @@ internal class SearchOrchestrationInstancesTrigger(
         int? version,
         FunctionContext executionContext)
     {
-        var lifecycleState = TryParseEnum<OrchestrationInstanceLifecycleStates>(httpRequest.Query["lifecycleState"]);
-        var terminationState = TryParseEnum<OrchestrationInstanceTerminationStates>(httpRequest.Query["terminationState"]);
+        var lifecycleState =
+            Enum.TryParse<OrchestrationInstanceLifecycleStates>(httpRequest.Query["lifecycleState"], ignoreCase: true, out var lifecycleStateResult)
+            ? lifecycleStateResult
+            : (OrchestrationInstanceLifecycleStates?)null;
+        var terminationState =
+            Enum.TryParse<OrchestrationInstanceTerminationStates>(httpRequest.Query["terminationState"], ignoreCase: true, out var terminationStateResult)
+            ? terminationStateResult
+            : (OrchestrationInstanceTerminationStates?)null;
 
         var orchestrationInstances = await _repository.SearchAsync(
             name,
@@ -51,16 +57,5 @@ internal class SearchOrchestrationInstancesTrigger(
 
         // TODO: We currently do not return "NodaTime.Instant" correctly
         return new OkObjectResult(orchestrationInstances);
-    }
-
-    private static TEnum? TryParseEnum<TEnum>(string? value)
-        where TEnum : struct
-    {
-        if (Enum.TryParse<TEnum>(value, ignoreCase: true, out var result))
-        {
-            return result;
-        }
-
-        return null;
     }
 }
