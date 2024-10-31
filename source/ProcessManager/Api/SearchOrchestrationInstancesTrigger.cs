@@ -52,6 +52,7 @@ internal class SearchOrchestrationInstancesTrigger(
             .SearchAsync(name, version, lifecycleState, terminationState)
             .ConfigureAwait(false);
 
+        // TODO: Map to DTO's
         return new OkObjectResult(orchestrationInstances);
     }
 }

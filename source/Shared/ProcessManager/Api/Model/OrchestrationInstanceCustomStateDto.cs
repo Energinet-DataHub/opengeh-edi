@@ -14,6 +14,4 @@
 
 namespace Energinet.DataHub.ProcessManager.Client.Model.OrchestrationInstance;
 
-public class OrchestrationInstanceDto
-{
-}
+public record OrchestrationInstanceCustomStateDto(string Value);
