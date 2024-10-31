@@ -28,14 +28,22 @@ internal class CancelScheduledOrchestrationInstanceTrigger(
     private readonly ILogger _logger = logger;
     private readonly IOrchestrationInstanceManager _manager = manager;
 
+    /// <summary>
+    /// Cancel a scheduled orchestration instance.
+    /// </summary>
     [Function(nameof(CancelScheduledOrchestrationInstanceTrigger))]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "processmanager/orchestrationinstance/{id:guid}")]
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "delete",
+            Route = "processmanager/orchestrationinstance/{id:guid}")]
         HttpRequest httpRequest,
         Guid id,
         FunctionContext executionContext)
     {
-        await _manager.CancelScheduledOrchestrationInstanceAsync(new OrchestrationInstanceId(id)).ConfigureAwait(false);
+        await _manager
+            .CancelScheduledOrchestrationInstanceAsync(new OrchestrationInstanceId(id))
+            .ConfigureAwait(false);
 
         return new OkResult();
     }

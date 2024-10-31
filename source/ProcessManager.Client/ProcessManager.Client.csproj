@@ -48,7 +48,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Model\" />
     <Folder Include="Processes\BRS_023_027\V1\Model\" />
   </ItemGroup>
   <ItemGroup>

@@ -28,16 +28,23 @@ internal class GetOrchestrationInstanceTrigger(
     private readonly ILogger _logger = logger;
     private readonly IOrchestrationInstanceRepository _repository = repository;
 
+    /// <summary>
+    /// Get orchestration instance.
+    /// </summary>
     [Function(nameof(GetOrchestrationInstanceTrigger))]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "processmanager/orchestrationinstance/{id:guid}")]
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "get",
+            Route = "processmanager/orchestrationinstance/{id:guid}")]
         HttpRequest httpRequest,
         Guid id,
         FunctionContext executionContext)
     {
-        var orchestrationInstance = await _repository.GetAsync(new OrchestrationInstanceId(id)).ConfigureAwait(false);
+        var orchestrationInstance = await _repository
+            .GetAsync(new OrchestrationInstanceId(id))
+            .ConfigureAwait(false);
 
-        // TODO: We currently do not return "NodaTime.Instant" correctly
         return new OkObjectResult(orchestrationInstance);
     }
 }

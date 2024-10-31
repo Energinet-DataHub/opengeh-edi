@@ -48,14 +48,10 @@ internal class SearchOrchestrationInstancesTrigger(
             ? terminationStateResult
             : (OrchestrationInstanceTerminationStates?)null;
 
-        var orchestrationInstances = await _repository.SearchAsync(
-            name,
-            version,
-            lifecycleState,
-            terminationState)
-                .ConfigureAwait(false);
+        var orchestrationInstances = await _repository
+            .SearchAsync(name, version, lifecycleState, terminationState)
+            .ConfigureAwait(false);
 
-        // TODO: We currently do not return "NodaTime.Instant" correctly
         return new OkObjectResult(orchestrationInstances);
     }
 }

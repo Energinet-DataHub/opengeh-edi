@@ -39,20 +39,27 @@ internal class NotifyAggregatedMeasureDataOrchestrationTriggerV1(
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IOrchestrationInstanceManager _manager = manager;
 
+    /// <summary>
+    /// Schedule a BRS-023 or BRS-027 calculation and return its id.
+    /// </summary>
     [Function(nameof(NotifyAggregatedMeasureDataOrchestrationTriggerV1))]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "processmanager/orchestrationinstance/brs_023_027/v1")]
+        [HttpTrigger(
+            AuthorizationLevel.Anonymous,
+            "post",
+            Route = "processmanager/orchestrationinstance/brs_023_027/v1")]
         HttpRequest httpRequest,
         [FromBody]
         ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> dto,
         FunctionContext executionContext)
     {
         // TODO: Server-side validation => Validate "period" is midnight values when given "timezone"
-        var orchestrationInstanceId = await _manager.ScheduleNewOrchestrationInstanceAsync(
-            name: "BRS_023_027",
-            version: 1,
-            parameter: dto.Parameter,
-            runAt: dto.ScheduledAt.ToInstant())
+        var orchestrationInstanceId = await _manager
+            .ScheduleNewOrchestrationInstanceAsync(
+                name: "BRS_023_027",
+                version: 1,
+                parameter: dto.Parameter,
+                runAt: dto.ScheduledAt.ToInstant())
             .ConfigureAwait(false);
 
         // TODO:

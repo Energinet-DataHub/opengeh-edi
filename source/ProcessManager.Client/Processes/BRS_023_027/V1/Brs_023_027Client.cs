@@ -43,16 +43,22 @@ internal class Brs_023_027Client : IBrs_023_027Client
         ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> requestDto,
         CancellationToken cancellationToken)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Post, "api/processmanager/orchestrationinstance/brs_023_027/v1");
+        using var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            "api/processmanager/orchestrationinstance/brs_023_027/v1");
         request.Content = new StringContent(
             JsonSerializer.Serialize(requestDto),
             Encoding.UTF8,
             "application/json");
 
-        using var actualResponse = await HttpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        using var actualResponse = await HttpClient
+            .SendAsync(request, cancellationToken)
+            .ConfigureAwait(false);
         actualResponse.EnsureSuccessStatusCode();
 
-        var calculationId = await actualResponse.Content.ReadFromJsonAsync<Guid>(cancellationToken).ConfigureAwait(false);
+        var calculationId = await actualResponse.Content
+            .ReadFromJsonAsync<Guid>(cancellationToken)
+            .ConfigureAwait(false);
 
         return calculationId;
     }

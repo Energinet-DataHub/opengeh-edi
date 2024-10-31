@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net.Http.Json;
+using Energinet.DataHub.ProcessManager.Client.Model.OrchestrationInstance;
+
 namespace Energinet.DataHub.ProcessManager.Client;
 
 /// <inheritdoc/>
@@ -37,9 +40,33 @@ internal class ProcessManagerClient : IProcessManagerClient
         Guid id,
         CancellationToken cancellationToken)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/processmanager/orchestrationinstance/{id}");
+        using var request = new HttpRequestMessage(
+            HttpMethod.Delete,
+            $"api/processmanager/orchestrationinstance/{id}");
 
-        using var actualResponse = await HttpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        using var actualResponse = await HttpClient
+            .SendAsync(request, cancellationToken)
+            .ConfigureAwait(false);
         actualResponse.EnsureSuccessStatusCode();
+    }
+
+    public async Task<OrchestrationInstanceDto> GetOrchestrationInstanceAsync(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        using var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"api/processmanager/orchestrationinstance/{id}");
+
+        using var actualResponse = await HttpClient
+            .SendAsync(request, cancellationToken)
+            .ConfigureAwait(false);
+        actualResponse.EnsureSuccessStatusCode();
+
+        var orchestrationInstance = await actualResponse.Content
+            .ReadFromJsonAsync<OrchestrationInstanceDto>(cancellationToken)
+            .ConfigureAwait(false);
+
+        return orchestrationInstance!;
     }
 }
