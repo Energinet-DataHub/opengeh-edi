@@ -34,15 +34,15 @@
     <Folder Include="Api\Processes\BRS_023_027\V1\Model\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstanceCustomStateDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceCustomStateDto.cs" />
-    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstanceDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceDto.cs" />
-    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstanceLifecycleStates.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStates.cs" />
-    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstanceLifecycleStatesDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStatesDto.cs" />
-    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstanceParameterValueDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceParameterValueDto.cs" />
-    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationStepCustomStateDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationStepCustomStateDto.cs" />
-    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationStepDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationStepDto.cs" />
-    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationStepLifecycleStateDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationStepLifecycleStateDto.cs" />
-    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationStepLifecycleStates.cs" Link="Api\Model\OrchestrationInstance\OrchestrationStepLifecycleStates.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceCustomStateDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceCustomStateDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStates.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStates.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStatesDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStatesDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceParameterValueDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceParameterValueDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationStepCustomStateDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationStepCustomStateDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationStepDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationStepDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationStepLifecycleStateDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationStepLifecycleStateDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationStepLifecycleStates.cs" Link="Api\Model\OrchestrationInstance\OrchestrationStepLifecycleStates.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\ScheduleOrchestrationInstanceDto.cs" Link="Api\Model\ScheduleOrchestrationInstanceDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Orchestrations\Processes\BRS_023_027\V1\Model\CalculationTypes.cs" Link="Api\Processes\BRS_023_027\V1\Model\CalculationTypes.cs" />
     <Compile Include="..\Shared\ProcessManager\Orchestrations\Processes\BRS_023_027\V1\Model\NotifyAggregatedMeasureDataInputV1.cs" Link="Api\Processes\BRS_023_027\V1\Model\NotifyAggregatedMeasureDataInputV1.cs" />
