@@ -25,7 +25,7 @@ using FluentAssertions.Execution;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.MeteredDateForMeasurementPointEbixMessageParserTests;
+namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.MeteredDataForMeasurementPointEbixMessageParserTests;
 
 public sealed class MessageParserTests
 {
@@ -33,19 +33,19 @@ public sealed class MessageParserTests
         $"cimmessageadapter{Path.DirectorySeparatorChar}messages{Path.DirectorySeparatorChar}";
 
     private static readonly string SubPath =
-        $"{Path.DirectorySeparatorChar}MeteredDateForMeasurementPoint{Path.DirectorySeparatorChar}";
+        $"{Path.DirectorySeparatorChar}MeteredDataForMeasurementPoint{Path.DirectorySeparatorChar}";
 
     private readonly MarketMessageParser _marketMessageParser = new(
     [
-        new MeteredDateForMeasurementPointEbixMessageParser(new EbixSchemaProvider(), new Logger<MeteredDateForMeasurementPointEbixMessageParser>(new LoggerFactory())),
+        new MeteredDataForMeasurementPointEbixMessageParser(new EbixSchemaProvider(), new Logger<MeteredDataForMeasurementPointEbixMessageParser>(new LoggerFactory())),
     ]);
 
     public static TheoryData<DocumentFormat, Stream> CreateMessagesWithSingleAndMultipleTransactions()
     {
         var data = new TheoryData<DocumentFormat, Stream>
         {
-            { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidMeteredDateForMeasurementPoint.xml") },
-            { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidMeteredDateForMeasurementPointWithTwoTransactions.xml") },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidMeteredDataForMeasurementPoint.xml") },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidMeteredDataForMeasurementPointWithTwoTransactions.xml") },
             { DocumentFormat.Ebix, CreateBaseEbixMessage("ValidPT1HMeteredDataForMeasurementPoint.xml") },
         };
 
@@ -56,8 +56,8 @@ public sealed class MessageParserTests
     {
         var data = new TheoryData<DocumentFormat, Stream, string>
         {
-            { DocumentFormat.Ebix, CreateBaseEbixMessage("BadVersionMeteredDateForMeasurementPoint.xml"), nameof(InvalidBusinessReasonOrVersion) },
-            { DocumentFormat.Ebix, CreateBaseEbixMessage("InvalidMeteredDateForMeasurementPoint.xml"), nameof(InvalidMessageStructure) },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("BadVersionMeteredDataForMeasurementPoint.xml"), nameof(InvalidBusinessReasonOrVersion) },
+            { DocumentFormat.Ebix, CreateBaseEbixMessage("InvalidMeteredDataForMeasurementPoint.xml"), nameof(InvalidMessageStructure) },
         };
 
         return data;
