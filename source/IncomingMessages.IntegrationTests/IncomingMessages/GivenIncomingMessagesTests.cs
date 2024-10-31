@@ -414,7 +414,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         // Assert
         var archivedMessage = await GetArchivedMessageFromDatabaseAsync(messageIdFromFile);
 
-        archivedMessage!.Should().BeNull();
+        archivedMessage?.Should().BeNull();
     }
 
     [Theory]
