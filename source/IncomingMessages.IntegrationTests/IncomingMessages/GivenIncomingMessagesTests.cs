@@ -390,6 +390,33 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         archivedMessageFileContent.Should().Be(incomingMessageContent);
     }
 
+    [Fact]
+    public async Task When_MeteredDataForMeasurementPointMessageIsReceived_Then_IncomingMessageIsNotArchived()
+    {
+        // Assert
+        const string messageIdFromFile = "111131835";
+
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        var senderActorNumber = ActorNumber.Create("5790001330552");
+        authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.MeteredDataResponsible));
+
+        var messageStream = ReadJsonFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml");
+
+        // Act
+        await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+            messageStream,
+            DocumentFormat.Ebix,
+            IncomingDocumentType.MeteredDataForMeasurementPoint,
+            DocumentFormat.Ebix,
+            CancellationToken.None);
+
+        // Assert
+        var archivedMessage = await GetArchivedMessageFromDatabaseAsync(messageIdFromFile);
+
+        archivedMessage?.Should().BeNull();
+    }
+
     [Theory]
     [InlineData(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json", "RequestAggregatedMeasureData")]
     [InlineData(@"IncomingMessages\RequestWholesaleSettlement.json", "RequestWholesaleSettlement")]
