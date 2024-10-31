@@ -20,30 +20,11 @@ using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Telemetry;
 using Energinet.DataHub.ProcessManager.Scheduler;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using NodaTime;
-using NodaTime.Serialization.SystemTextJson;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
     .ConfigureServices((context, services) =>
     {
-        // HttpTrigger serializtion
-        //
-        // Based on input from the following:
-        //  - https://github.com/Azure/azure-functions-dotnet-worker/issues/2131
-        //  - https://learn.microsoft.com/en-us/azure/azure-functions/dotnet-isolated-process-guide?tabs=hostbuilder%2Cwindows#json-serialization-with-aspnet-core-integration
-        //
-        // TODO:
-        // If this works then perhaps we should implement an extension for easy use with
-        // Azure Functions applications using ASP.NET Core integration.
-        services
-            .AddMvc()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.Converters.Add(NodaConverters.InstantConverter);
-                options.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
-            });
-
         // Common
         services.AddApplicationInsightsForIsolatedWorker(TelemetryConstants.SubsystemName);
         services.AddHealthChecksForIsolatedWorker();

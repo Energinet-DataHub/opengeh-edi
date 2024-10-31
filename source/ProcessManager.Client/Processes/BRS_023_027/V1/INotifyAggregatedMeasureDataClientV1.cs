@@ -20,7 +20,7 @@ namespace Energinet.DataHub.ProcessManager.Client.Processes.BRS_023_027.V1;
 /// <summary>
 /// Client for using the BRS-023/BRS_027 Process Manager API.
 /// </summary>
-public interface IBrs_023_027Client
+public interface INotifyAggregatedMeasureDataClientV1
 {
     /// <summary>
     /// Schedule a BRS-023 or BRS-027 calculation and return its id.

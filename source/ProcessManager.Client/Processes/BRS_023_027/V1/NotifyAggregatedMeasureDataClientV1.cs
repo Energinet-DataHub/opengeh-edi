@@ -21,9 +21,9 @@ using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.M
 namespace Energinet.DataHub.ProcessManager.Client.Processes.BRS_023_027.V1;
 
 /// <inheritdoc/>
-internal class Brs_023_027Client : IBrs_023_027Client
+internal class NotifyAggregatedMeasureDataClientV1 : INotifyAggregatedMeasureDataClientV1
 {
-    public Brs_023_027Client(string baseUrl, HttpClient httpClient)
+    public NotifyAggregatedMeasureDataClientV1(string baseUrl, HttpClient httpClient)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(baseUrl);
         ArgumentNullException.ThrowIfNull(httpClient);
