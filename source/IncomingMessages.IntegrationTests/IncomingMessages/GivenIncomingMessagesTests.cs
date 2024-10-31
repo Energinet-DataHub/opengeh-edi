@@ -68,7 +68,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         {
             { DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData, ActorRole.BalanceResponsibleParty, ReadJsonFile(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json") },
             { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ActorRole.EnergySupplier, ReadJsonFile(@"IncomingMessages\RequestWholesaleSettlement.json") },
-            { DocumentFormat.Ebix, IncomingDocumentType.MeteredDataForMeasurementPoint, ActorRole.MeteredDataResponsible, ReadJsonFile(@"IncomingMessages\EbixMeteredDateForMeasurementPoint.xml") },
+            { DocumentFormat.Ebix, IncomingDocumentType.MeteredDataForMeasurementPoint, ActorRole.MeteredDataResponsible, ReadJsonFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml") },
         };
 
         return data;
@@ -401,7 +401,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         authenticatedActor.SetAuthenticatedActor(
             new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.MeteredDataResponsible));
 
-        var messageStream = ReadJsonFile(@"IncomingMessages\EbixMeteredDateForMeasurementPoint.xml");
+        var messageStream = ReadJsonFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml");
 
         // Act
         await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(

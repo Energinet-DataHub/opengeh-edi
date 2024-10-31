@@ -25,11 +25,11 @@ using MessageHeaderExtractor = Energinet.DataHub.EDI.IncomingMessages.Infrastruc
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.Ebix;
 
-public class MeteredDateForMeasurementPointEbixMessageParser(EbixSchemaProvider schemaProvider, ILogger<MeteredDateForMeasurementPointEbixMessageParser> logger) : IMarketMessageParser
+public class MeteredDataForMeasurementPointEbixMessageParser(EbixSchemaProvider schemaProvider, ILogger<MeteredDataForMeasurementPointEbixMessageParser> logger) : IMarketMessageParser
 {
     private const string RootPayloadElementName = "DK_MeteredDataTimeSeries";
     private readonly EbixSchemaProvider _schemaProvider = schemaProvider;
-    private readonly ILogger<MeteredDateForMeasurementPointEbixMessageParser> _logger = logger;
+    private readonly ILogger<MeteredDataForMeasurementPointEbixMessageParser> _logger = logger;
 
     public DocumentFormat HandledFormat => DocumentFormat.Ebix;
 
