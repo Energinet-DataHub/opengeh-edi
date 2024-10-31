@@ -34,4 +34,15 @@ public interface IProcessManagerClient
     public Task<OrchestrationInstanceDto> GetOrchestrationInstanceAsync(
         Guid id,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Get all orchestration instances filtered by their related orchestration definition name and version,
+    /// and their lifecycle / termination states.
+    /// </summary>
+    public Task<IReadOnlyCollection<OrchestrationInstanceDto>> SearchOrchestrationsInstanceAsync(
+        string name,
+        int? version,
+        OrchestrationInstanceLifecycleStates? lifecycleState,
+        OrchestrationInstanceTerminationStates? terminationState,
+        CancellationToken cancellationToken);
 }

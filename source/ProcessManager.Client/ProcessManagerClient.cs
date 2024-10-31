@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Net.Http.Json;
+using System.Text;
 using Energinet.DataHub.ProcessManager.Client.Model.OrchestrationInstance;
 
 namespace Energinet.DataHub.ProcessManager.Client;
@@ -50,6 +51,7 @@ internal class ProcessManagerClient : IProcessManagerClient
         actualResponse.EnsureSuccessStatusCode();
     }
 
+    /// <inheritdoc/>
     public async Task<OrchestrationInstanceDto> GetOrchestrationInstanceAsync(
         Guid id,
         CancellationToken cancellationToken)
@@ -68,5 +70,51 @@ internal class ProcessManagerClient : IProcessManagerClient
             .ConfigureAwait(false);
 
         return orchestrationInstance!;
+    }
+
+    /// <inheritdoc/>
+    public async Task<IReadOnlyCollection<OrchestrationInstanceDto>> SearchOrchestrationsInstanceAsync(
+        string name,
+        int? version,
+        OrchestrationInstanceLifecycleStates? lifecycleState,
+        OrchestrationInstanceTerminationStates? terminationState,
+        CancellationToken cancellationToken)
+    {
+        var url = BuildRequestUrl(name, version, lifecycleState, terminationState);
+        using var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            url);
+
+        using var actualResponse = await HttpClient
+            .SendAsync(request, cancellationToken)
+            .ConfigureAwait(false);
+        actualResponse.EnsureSuccessStatusCode();
+
+        var orchestrationInstances = await actualResponse.Content
+            .ReadFromJsonAsync<IReadOnlyCollection<OrchestrationInstanceDto>>(cancellationToken)
+            .ConfigureAwait(false);
+
+        return orchestrationInstances!;
+    }
+
+    private static string BuildRequestUrl(string name, int? version, OrchestrationInstanceLifecycleStates? lifecycleState, OrchestrationInstanceTerminationStates? terminationState)
+    {
+        var urlBuilder = new StringBuilder($"processmanager/orchestrationinstances/{name}");
+
+        if (version.HasValue)
+            urlBuilder.Append($"/{version}");
+
+        if (lifecycleState.HasValue || terminationState.HasValue)
+        {
+            urlBuilder.Append("?");
+
+            if (lifecycleState.HasValue)
+                urlBuilder.Append($"lifecycleState={lifecycleState.ToString()}&");
+
+            if (terminationState.HasValue)
+                urlBuilder.Append($"terminationState={terminationState.ToString()}&");
+        }
+
+        return urlBuilder.ToString();
     }
 }
