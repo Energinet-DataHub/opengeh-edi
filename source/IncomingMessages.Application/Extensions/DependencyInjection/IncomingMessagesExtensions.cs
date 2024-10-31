@@ -65,7 +65,7 @@ public static class IncomingMessagesExtensions
             .AddScoped<IMarketMessageParser, WholesaleSettlementJsonMessageParser>()
             .AddScoped<IMarketMessageParser, WholesaleSettlementXmlMessageParser>()
             .AddScoped<IMarketMessageParser, WholesaleSettlementB2CJsonMessageParser>()
-            .AddScoped<IMarketMessageParser, MeteredDateForMeasurementPointEbixMessageParser>()
+            .AddScoped<IMarketMessageParser, MeteredDataForMeasurementPointEbixMessageParser>()
             .AddScoped<MarketMessageParser>()
             .AddScoped<ISenderAuthorizer, SenderAuthorizer>()
             .AddScoped<ValidateIncomingMessage>()

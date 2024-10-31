@@ -18,14 +18,17 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 
 public class Result
 {
-    private Result()
+    private Result(string? messageId)
     {
+        MessageId = messageId;
     }
 
     private Result(IReadOnlyCollection<ValidationError> errors)
     {
         Errors = errors;
     }
+
+    public string? MessageId { get; }
 
     public bool Success => Errors.Count == 0;
 
@@ -36,8 +39,8 @@ public class Result
         return new Result(errors);
     }
 
-    public static Result Succeeded()
+    public static Result Succeeded(string? messageId = null)
     {
-        return new Result();
+        return new Result(messageId);
     }
 }

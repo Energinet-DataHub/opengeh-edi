@@ -47,5 +47,5 @@ public interface IDelegatedIncomingMessageSeries
     /// <summary>
     /// Sets the incoming message series as delegated
     /// </summary>
-    public void DelegateSeries(ActorNumber originalActorNumber, ActorRole requestedByActorRole, IReadOnlyCollection<string> delegatedGridAreas);
+    public void DelegateSeries(ActorNumber? originalActorNumber, ActorRole requestedByActorRole, IReadOnlyCollection<string> delegatedGridAreas);
 }

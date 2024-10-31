@@ -349,6 +349,209 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         }
     }
 
+    [Fact]
+    public async Task AndGiven_MessageIsMeteredDataForMeasurementPoint_When_SenderIsDelegatedAndDelegationExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
+    {
+        // Arrange
+        const string expectedMessageId = "123456";
+        const string expectedGridAreaCode = "512";
+        var delegatedToAsDelegated = new Actor(ActorNumber.Create("2222222222222"), ActorRole.Delegated);
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
+        _clockStub.SetCurrentInstant(now);
+
+        var documentFormat = DocumentFormat.Ebix;
+
+        _authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(delegatedToAsDelegated.ActorNumber, Restriction.Owned, delegatedToAsDelegated.ActorRole));
+
+        var messageStream = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+                documentFormat,
+                delegatedToAsDelegated.ActorNumber,
+                [
+                ("555555555", Instant.FromUtc(2024, 01, 01, 0, 0), Instant.FromUtc(2024, 01, 31, 0, 0), Resolution.QuarterHourly),
+                ],
+                messageId: expectedMessageId);
+
+        await AddDelegationAsync(
+            _originalActor,
+            delegatedToAsDelegated,
+            expectedGridAreaCode,
+            ProcessType.IncomingMeteredDataForMeasurementPoint,
+            now,
+            now.Plus(Duration.FromSeconds(1)));
+
+        // Act
+        var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+            messageStream,
+            documentFormat,
+            IncomingDocumentType.MeteredDataForMeasurementPoint,
+            documentFormat,
+            CancellationToken.None);
+
+        // Assert
+        using (new AssertionScope())
+        {
+            response.IsErrorResponse.Should().BeFalse();
+            response.MessageBody.Should().Contain(expectedMessageId);
+
+            _senderSpy.LatestMessage.Should().NotBeNull();
+        }
+
+        using (new AssertionScope())
+        {
+            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>();
+            var series = message.Series.Should().ContainSingle().Subject;
+            series.RequestedByActor.ActorRole.Should().Be(delegatedToAsDelegated.ActorRole);
+            series.RequestedByActor.ActorNumber.Should().Be(delegatedToAsDelegated.ActorNumber);
+            series.DelegatedGridAreaCodes.Should().Contain(expectedGridAreaCode);
+        }
+    }
+
+    [Fact]
+    public async Task AndGiven_MessageIsMeteredDataForMeasurementPoint_When_SenderIsDelegatedAndDelegationDoesNotExists_Then_ReturnsErrorMessage()
+    {
+        // Arrange
+        var delegatedToAsDelegated = new Actor(ActorNumber.Create("2222222222222"), ActorRole.Delegated);
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
+        _clockStub.SetCurrentInstant(now);
+
+        var documentFormat = DocumentFormat.Ebix;
+
+        _authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(delegatedToAsDelegated.ActorNumber, Restriction.Owned, delegatedToAsDelegated.ActorRole));
+
+        var messageStream = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+            documentFormat,
+            delegatedToAsDelegated.ActorNumber,
+            [
+                ("555555555", Instant.FromUtc(2024, 01, 01, 0, 0), Instant.FromUtc(2024, 01, 31, 0, 0), Resolution.QuarterHourly),
+            ]);
+
+        // Act
+        var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+            messageStream,
+            documentFormat,
+            IncomingDocumentType.MeteredDataForMeasurementPoint,
+            documentFormat,
+            CancellationToken.None);
+
+        // Assert
+        using (new AssertionScope())
+        {
+            response.IsErrorResponse.Should().BeTrue();
+            response.MessageBody.Should().Contain("The authenticated user does not hold the required role");
+
+            _senderSpy.LatestMessage.Should().BeNull();
+        }
+    }
+
+    [Fact]
+    public async Task AndGiven_MessageIsMeteredDataForMeasurementPoint_When_SenderIsGridAccessProviderAndDelegationExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
+    {
+        // Arrange
+        const string expectedMessageId = "123456";
+        const string expectedGridAreaCode = "512";
+        var delegatedToAsGridAccessProvider = new Actor(ActorNumber.Create("2222222222222"), ActorRole.GridAccessProvider);
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
+        _clockStub.SetCurrentInstant(now);
+
+        var documentFormat = DocumentFormat.Ebix;
+
+        _authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(delegatedToAsGridAccessProvider.ActorNumber, Restriction.Owned, delegatedToAsGridAccessProvider.ActorRole));
+
+        var messageStream = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+            documentFormat,
+            delegatedToAsGridAccessProvider.ActorNumber,
+            [
+                ("555555555", Instant.FromUtc(2024, 01, 01, 0, 0), Instant.FromUtc(2024, 01, 31, 0, 0), Resolution.QuarterHourly),
+            ],
+            messageId: expectedMessageId);
+
+        await AddDelegationAsync(
+            _originalActor,
+            delegatedToAsGridAccessProvider,
+            expectedGridAreaCode,
+            ProcessType.IncomingMeteredDataForMeasurementPoint,
+            now,
+            now.Plus(Duration.FromSeconds(1)));
+
+        // Act
+        var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+            messageStream,
+            documentFormat,
+            IncomingDocumentType.MeteredDataForMeasurementPoint,
+            documentFormat,
+            CancellationToken.None);
+
+        // Assert
+        using (new AssertionScope())
+        {
+            response.IsErrorResponse.Should().BeFalse();
+            response.MessageBody.Should().Contain(expectedMessageId);
+
+            _senderSpy.LatestMessage.Should().NotBeNull();
+        }
+
+        using (new AssertionScope())
+        {
+            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>();
+            var series = message.Series.Should().ContainSingle().Subject;
+            series.RequestedByActor.ActorRole.Should().Be(delegatedToAsGridAccessProvider.ActorRole);
+            series.RequestedByActor.ActorNumber.Should().Be(delegatedToAsGridAccessProvider.ActorNumber);
+            series.DelegatedGridAreaCodes.Should().Contain(expectedGridAreaCode);
+        }
+    }
+
+    [Fact]
+    public async Task AndGiven_MessageIsMeteredDataForMeasurementPoint_When_SenderIsGridAccessProviderAndDelegationDoesNotExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
+    {
+        // Arrange
+        const string expectedMessageId = "123456";
+        var delegatedToAsGridAccessProvider = new Actor(ActorNumber.Create("2222222222222"), ActorRole.GridAccessProvider);
+
+        var now = Instant.FromUtc(2024, 05, 07, 13, 37);
+        _clockStub.SetCurrentInstant(now);
+
+        _authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(delegatedToAsGridAccessProvider.ActorNumber, Restriction.Owned, delegatedToAsGridAccessProvider.ActorRole));
+        var documentFormat = DocumentFormat.Ebix;
+
+        var messageStream = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
+            documentFormat,
+            _authenticatedActor.CurrentActorIdentity.ActorNumber,
+            [
+                ("555555555", Instant.FromUtc(2024, 01, 01, 0, 0), Instant.FromUtc(2024, 01, 31, 0, 0), Resolution.QuarterHourly),
+            ],
+            messageId: expectedMessageId);
+
+        // Act
+        var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+            messageStream,
+            documentFormat,
+            IncomingDocumentType.MeteredDataForMeasurementPoint,
+            documentFormat,
+            CancellationToken.None);
+
+        // Assert
+        using (new AssertionScope())
+        {
+            response.IsErrorResponse.Should().BeFalse();
+            response.MessageBody.Should().Contain(expectedMessageId);
+
+            _senderSpy.LatestMessage.Should().NotBeNull();
+        }
+
+        using (new AssertionScope())
+        {
+            var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>();
+            var series = message.Series.Should().ContainSingle().Subject;
+            series.RequestedByActor.ActorRole.Should().Be(_authenticatedActor.CurrentActorIdentity.ActorRole);
+            series.RequestedByActor.ActorNumber.Should().Be(_authenticatedActor.CurrentActorIdentity.ActorNumber);
+            series.DelegatedGridAreaCodes.Should().BeEmpty();
+        }
+    }
+
     private async Task AddDelegationAsync(
         Actor delegatedBy,
         Actor delegatedTo,

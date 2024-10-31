@@ -26,7 +26,7 @@ public abstract record BaseDelegatedSeries : IDelegatedIncomingMessageSeries
 
     public IReadOnlyCollection<string> DelegatedGridAreas { get; private set; } = Array.Empty<string>();
 
-    public void DelegateSeries(ActorNumber originalActorNumber, ActorRole requestedByActorRole, IReadOnlyCollection<string> delegatedGridAreas)
+    public void DelegateSeries(ActorNumber? originalActorNumber, ActorRole requestedByActorRole, IReadOnlyCollection<string> delegatedGridAreas)
     {
         IsDelegated = true;
         OriginalActorNumber = originalActorNumber;

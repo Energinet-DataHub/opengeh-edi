@@ -68,8 +68,7 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         {
             { DocumentFormat.Json, IncomingDocumentType.RequestAggregatedMeasureData, ActorRole.BalanceResponsibleParty, ReadJsonFile(@"IncomingMessages\RequestAggregatedMeasureDataAsDdk.json") },
             { DocumentFormat.Json, IncomingDocumentType.RequestWholesaleSettlement, ActorRole.EnergySupplier, ReadJsonFile(@"IncomingMessages\RequestWholesaleSettlement.json") },
-            // TODO: enable when delegation has been impl.
-            //{ DocumentFormat.Ebix, IncomingDocumentType.MeteredDataForMeasurementPoint, ActorRole.MeteredDataResponsible, ReadJsonFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml") },
+            { DocumentFormat.Ebix, IncomingDocumentType.MeteredDataForMeasurementPoint, ActorRole.MeteredDataResponsible, ReadJsonFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml") },
         };
 
         return data;
@@ -389,6 +388,33 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
             archivedMessageFileStorageReference!);
 
         archivedMessageFileContent.Should().Be(incomingMessageContent);
+    }
+
+    [Fact]
+    public async Task When_MeteredDataForMeasurementPointMessageIsReceived_Then_IncomingMessageIsNotArchived()
+    {
+        // Assert
+        const string messageIdFromFile = "111131835";
+
+        var authenticatedActor = GetService<AuthenticatedActor>();
+        var senderActorNumber = ActorNumber.Create("5790001330552");
+        authenticatedActor.SetAuthenticatedActor(
+            new ActorIdentity(senderActorNumber, Restriction.Owned, ActorRole.MeteredDataResponsible));
+
+        var messageStream = ReadJsonFile(@"IncomingMessages\EbixMeteredDataForMeasurementPoint.xml");
+
+        // Act
+        await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
+            messageStream,
+            DocumentFormat.Ebix,
+            IncomingDocumentType.MeteredDataForMeasurementPoint,
+            DocumentFormat.Ebix,
+            CancellationToken.None);
+
+        // Assert
+        var archivedMessage = await GetArchivedMessageFromDatabaseAsync(messageIdFromFile);
+
+        archivedMessage?.Should().BeNull();
     }
 
     [Theory]
