@@ -76,6 +76,7 @@ internal class NotifyAggregatedMeasureDataOrchestrationTriggerV1(
             _clock,
             "Besked dannelse",
             sequence: 1));
+        await _unitOfWork.CommitAsync();
 
         return new OkObjectResult(orchestrationInstanceId.Value);
     }
