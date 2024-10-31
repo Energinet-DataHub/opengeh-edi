@@ -90,7 +90,7 @@ public class MeteredDateForMeasurementPointEbixMessageParser(EbixSchemaProvider 
         var split = SplitNamespace(@namespace);
         if (split.Length < 5)
         {
-            throw new ArgumentException("Invalid namespace format", nameof(@namespace));
+            throw new XmlException($"Invalid namespace format");
         }
 
         var businessReason = split[4];
@@ -104,7 +104,7 @@ public class MeteredDateForMeasurementPointEbixMessageParser(EbixSchemaProvider 
         var split = SplitNamespace(@namespace);
         if (split.Length < 6)
         {
-            throw new ArgumentException("Invalid namespace format", nameof(@namespace));
+            throw new XmlException($"Invalid namespace format");
         }
 
         var version = split[5];

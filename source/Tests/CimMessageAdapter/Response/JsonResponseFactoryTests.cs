@@ -18,6 +18,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Response;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
+using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -26,7 +27,7 @@ using Xunit.Categories;
 namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Response;
 
 [UnitTest]
-public class JsonResponseFactoryTests
+public sealed class JsonResponseFactoryTests
 {
     private readonly JsonResponseFactory _responseFactory;
 
@@ -41,20 +42,20 @@ public class JsonResponseFactoryTests
     }
 
     [Fact]
-    public void Generates_single_error_response()
+    public void Given_FailureResultWithSingleError_When_ResponseCreated_Then_ResponseContainsError()
     {
         var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
         var result = Result.Failure(duplicateMessageIdError);
 
         var response = CreateResponse(result);
 
-        Assert.True(response.IsErrorResponse);
+        response.IsErrorResponse.Should().BeTrue();
         AssertHasValue(response, "Error.Code", duplicateMessageIdError.Code);
         AssertHasValue(response, "Error.Message", duplicateMessageIdError.Message);
     }
 
     [Fact]
-    public void Generates_multiple_errors_response()
+    public void Given_FailureResultWithMultipleErrors_When_ResponseCreated_Then_ResponseContainsAllErrors()
     {
         var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
         var duplicateTransactionIdError = new DuplicateTransactionIdDetected("Fake transaction id");
@@ -62,18 +63,55 @@ public class JsonResponseFactoryTests
 
         var response = CreateResponse(result);
 
-        Assert.True(response.IsErrorResponse);
+        response.IsErrorResponse.Should().BeTrue();
         AssertHasValue(response, "Error.Code", "BadRequest");
         AssertHasValue(response, "Error.Message", "Multiple errors in message");
         AssertContainsError(response, duplicateMessageIdError, "Error.Details.Errors[0].");
         AssertContainsError(response, duplicateTransactionIdError, "Error.Details.Errors[1].");
     }
 
+    [Fact]
+    public void Given_FailureResultWithMultipleErrors_When_ResponseCreated_Then_ResponseLooksLikeAJsonResponse()
+    {
+        var duplicateMessageIdError = new DuplicateMessageIdDetected("Duplicate message id");
+        var duplicateTransactionIdError = new DuplicateTransactionIdDetected("Fake transaction id");
+        var result = Result.Failure(duplicateMessageIdError, duplicateTransactionIdError);
+
+        var response = CreateResponse(result);
+
+        response.IsErrorResponse.Should().BeTrue();
+        response.MessageBody.Should()
+            .BeEquivalentTo(
+                """
+                {
+                  "Error": {
+                    "Code": "BadRequest",
+                    "Message": "Multiple errors in message",
+                    "Target": "",
+                    "Details": {
+                      "Errors": [
+                        {
+                          "Code": "00101",
+                          "Message": "Message id \u0027Duplicate message id\u0027 is not unique",
+                          "Target": "MessageId"
+                        },
+                        {
+                          "Code": "00102",
+                          "Message": "Transaction id \u0027Fake transaction id\u0027 is not unique and will not be processed.",
+                          "Target": "TransactionId"
+                        }
+                      ]
+                    }
+                  }
+                }
+                """.ReplaceLineEndings());
+    }
+
     private static void AssertHasValue(ResponseMessage response, string path, string expectedValue)
     {
         var jsonObject = JObject.Parse(response.MessageBody);
         var value = (string)jsonObject.SelectToken(path)!;
-        Assert.Equal(expectedValue, value);
+        value.Should().Be(expectedValue);
     }
 
     private static void AssertContainsError(ResponseMessage response, ValidationError validationError, string path)
@@ -82,8 +120,8 @@ public class JsonResponseFactoryTests
         var code = (string)jsonObject.SelectToken(path + "Code")!;
         var message = (string)jsonObject.SelectToken(path + "Message")!;
 
-        Assert.Equal(validationError.Code, code);
-        Assert.Equal(validationError.Message, message);
+        code.Should().Be(validationError.Code);
+        message.Should().Be(validationError.Message);
     }
 
     private ResponseMessage CreateResponse(Result result)
