@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.ProcessManager.Client.Model.OrchestrationInstance;
+namespace Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 
 /// <summary>
 /// High-level lifecycle states that all orchestration instances can go through.
