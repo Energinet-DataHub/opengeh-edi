@@ -353,6 +353,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     public async Task AndGiven_MessageIsMeteredDataForMeasurementPoint_When_SenderIsDelegatedAndDelegationExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
+        const string expectedMessageId = "123456";
         const string expectedGridAreaCode = "512";
         var delegatedToAsDelegated = new Actor(ActorNumber.Create("2222222222222"), ActorRole.Delegated);
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
@@ -364,11 +365,12 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             new ActorIdentity(delegatedToAsDelegated.ActorNumber, Restriction.Owned, delegatedToAsDelegated.ActorRole));
 
         var messageStream = MeteredDataForMeasurementPointBuilder.CreateIncomingMessage(
-            documentFormat,
-            delegatedToAsDelegated.ActorNumber,
-            [
+                documentFormat,
+                delegatedToAsDelegated.ActorNumber,
+                [
                 ("555555555", Instant.FromUtc(2024, 01, 01, 0, 0), Instant.FromUtc(2024, 01, 31, 0, 0), Resolution.QuarterHourly),
-            ]);
+                ],
+                messageId: expectedMessageId);
 
         await AddDelegationAsync(
             _originalActor,
@@ -390,7 +392,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         using (new AssertionScope())
         {
             response.IsErrorResponse.Should().BeFalse();
-            response.MessageBody.Should().BeNullOrEmpty();
+            response.MessageBody.Should().Contain(expectedMessageId);
 
             _senderSpy.LatestMessage.Should().NotBeNull();
         }
@@ -447,6 +449,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     public async Task AndGiven_MessageIsMeteredDataForMeasurementPoint_When_SenderIsGridAccessProviderAndDelegationExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
+        const string expectedMessageId = "123456";
         const string expectedGridAreaCode = "512";
         var delegatedToAsGridAccessProvider = new Actor(ActorNumber.Create("2222222222222"), ActorRole.GridAccessProvider);
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
@@ -462,7 +465,8 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             delegatedToAsGridAccessProvider.ActorNumber,
             [
                 ("555555555", Instant.FromUtc(2024, 01, 01, 0, 0), Instant.FromUtc(2024, 01, 31, 0, 0), Resolution.QuarterHourly),
-            ]);
+            ],
+            messageId: expectedMessageId);
 
         await AddDelegationAsync(
             _originalActor,
@@ -484,7 +488,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         using (new AssertionScope())
         {
             response.IsErrorResponse.Should().BeFalse();
-            response.MessageBody.Should().BeNullOrEmpty();
+            response.MessageBody.Should().Contain(expectedMessageId);
 
             _senderSpy.LatestMessage.Should().NotBeNull();
         }
@@ -503,6 +507,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
     public async Task AndGiven_MessageIsMeteredDataForMeasurementPoint_When_SenderIsGridAccessProviderAndDelegationDoesNotExists_Then_ActorPropertiesOnInternalRepresentationAreCorrect()
     {
         // Arrange
+        const string expectedMessageId = "123456";
         var delegatedToAsGridAccessProvider = new Actor(ActorNumber.Create("2222222222222"), ActorRole.GridAccessProvider);
 
         var now = Instant.FromUtc(2024, 05, 07, 13, 37);
@@ -517,7 +522,8 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
             _authenticatedActor.CurrentActorIdentity.ActorNumber,
             [
                 ("555555555", Instant.FromUtc(2024, 01, 01, 0, 0), Instant.FromUtc(2024, 01, 31, 0, 0), Resolution.QuarterHourly),
-            ]);
+            ],
+            messageId: expectedMessageId);
 
         // Act
         var response = await _incomingMessagesRequest.ReceiveIncomingMarketMessageAsync(
@@ -531,7 +537,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         using (new AssertionScope())
         {
             response.IsErrorResponse.Should().BeFalse();
-            response.MessageBody.Should().BeNullOrEmpty();
+            response.MessageBody.Should().Contain(expectedMessageId);
 
             _senderSpy.LatestMessage.Should().NotBeNull();
         }

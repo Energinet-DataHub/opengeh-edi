@@ -88,7 +88,7 @@ public class IncomingMessageReceiver : IIncomingMessageReceiver
             return Result.Failure(new DuplicateMessageIdDetected(incomingMessage.MessageId));
         }
 
-        return Result.Succeeded();
+        return Result.Succeeded(incomingMessage.MessageId);
     }
 
     private async Task AddMessageIdAndTransactionIdAsync(

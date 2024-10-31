@@ -30,7 +30,7 @@ public sealed class JsonResponseFactory(JavaScriptEncoder javaScriptEncoder) : I
     public ResponseMessage From(Result result)
     {
         ArgumentNullException.ThrowIfNull(result);
-        return result.Success ? new ResponseMessage() : new ResponseMessage(CreateMessageBodyFrom(result));
+        return result.Success ? ResponseMessage.Success() : ResponseMessage.Error(CreateMessageBodyFrom(result));
     }
 
     private string CreateMessageBodyFrom(Result result)
