@@ -16,7 +16,7 @@ namespace Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 
 public class OrchestrationInstanceLifecycleStatesDto
 {
-    public OrchestrationInstanceLifecycleStates State { get; set; }
+    public OrchestrationInstanceLifecycleStates? State { get; set; }
 
     public OrchestrationInstanceTerminationStates? TerminationState { get; set; }
 

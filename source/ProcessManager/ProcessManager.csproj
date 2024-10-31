@@ -30,16 +30,12 @@
     <ProjectReference Include="..\ProcessManager.Core\ProcessManager.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Api\Model\OrchestrationInstance\" />
     <Folder Include="Api\Processes\BRS_023_027\V1\Model\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceCustomStateDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceCustomStateDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStates.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStates.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStatesDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStatesDto.cs" />
-    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceParameterValueDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceParameterValueDto.cs" />
-    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationStepCustomStateDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationStepCustomStateDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationStepDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationStepDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationStepLifecycleStateDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationStepLifecycleStateDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationStepLifecycleStates.cs" Link="Api\Model\OrchestrationInstance\OrchestrationStepLifecycleStates.cs" />

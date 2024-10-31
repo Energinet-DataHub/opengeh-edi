@@ -45,7 +45,7 @@ internal class GetOrchestrationInstanceTrigger(
             .GetAsync(new OrchestrationInstanceId(id))
             .ConfigureAwait(false);
 
-        // TODO: Map to DTO's
-        return new OkObjectResult(orchestrationInstance);
+        var dto = orchestrationInstance.MapToDto();
+        return new OkObjectResult(dto);
     }
 }

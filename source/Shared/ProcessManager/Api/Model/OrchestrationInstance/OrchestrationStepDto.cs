@@ -37,5 +37,5 @@ public class OrchestrationStepDto
     /// <summary>
     /// Any custom state of the step.
     /// </summary>
-    public OrchestrationStepCustomStateDto? CustomState { get; set; }
+    public string? CustomState { get; set; }
 }

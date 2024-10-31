@@ -16,13 +16,13 @@ namespace Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 
 public class OrchestrationStepLifecycleStateDto
 {
-    public OrchestrationStepLifecycleStates State { get; private set; }
+    public OrchestrationStepLifecycleStates? State { get; set; }
 
-    public OrchestrationStepTerminationStates? TerminationState { get; private set; }
+    public OrchestrationStepTerminationStates? TerminationState { get; set; }
 
-    public DateTimeOffset? CreatedAt { get; }
+    public DateTimeOffset? CreatedAt { get; set; }
 
-    public DateTimeOffset? StartedAt { get; private set; }
+    public DateTimeOffset? StartedAt { get; set; }
 
-    public DateTimeOffset? TerminatedAt { get; private set; }
+    public DateTimeOffset? TerminatedAt { get; set; }
 }

@@ -26,7 +26,7 @@ public class OrchestrationInstanceDto
     /// <summary>
     /// Defines the Durable Functions orchestration input parameter value.
     /// </summary>
-    public OrchestrationInstanceParameterValueDto? ParameterValue { get; set; }
+    public string? ParameterValue { get; set; }
 
     /// <summary>
     /// Workflow steps the orchestration instance is going through.
@@ -36,5 +36,5 @@ public class OrchestrationInstanceDto
     /// <summary>
     /// Any custom state of the orchestration instance.
     /// </summary>
-    public OrchestrationInstanceCustomStateDto? CustomState { get; set; }
+    public string? CustomState { get; set; }
 }
