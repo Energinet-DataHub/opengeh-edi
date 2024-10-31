@@ -12,20 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManager.Api.Model;
-using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
-
-namespace Energinet.DataHub.ProcessManager.Client.Processes.BRS_023_027.V1;
+namespace Energinet.DataHub.ProcessManager.Client;
 
 /// <summary>
-/// Client for using the BRS-023/BRS_027 Process Manager API.
+/// Client for using the generic Process Manager API.
 /// </summary>
-public interface IBrs_023_027Client
+public interface IProcessManagerClient
 {
     /// <summary>
-    /// Schedule a BRS-023 or BRS-027 calculation and return its id.
+    /// Cancel a scheduled orchestration instance.
     /// </summary>
-    public Task<Guid> ScheduleNewCalculationOrchestationInstanceAsync(
-        ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> requestDto,
+    public Task CancelScheduledOrchestrationInstanceAsync(
+        Guid id,
         CancellationToken cancellationToken);
 }

@@ -12,18 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Net.Http.Json;
-using System.Text;
-using System.Text.Json;
-using Energinet.DataHub.ProcessManager.Api.Model;
-using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
-
-namespace Energinet.DataHub.ProcessManager.Client.Processes.BRS_023_027.V1;
+namespace Energinet.DataHub.ProcessManager.Client;
 
 /// <inheritdoc/>
-internal class Brs_023_027Client : IBrs_023_027Client
+internal class ProcessManagerClient : IProcessManagerClient
 {
-    public Brs_023_027Client(string baseUrl, HttpClient httpClient)
+    public ProcessManagerClient(string baseUrl, HttpClient httpClient)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(baseUrl);
         ArgumentNullException.ThrowIfNull(httpClient);
@@ -39,21 +33,13 @@ internal class Brs_023_027Client : IBrs_023_027Client
     protected HttpClient HttpClient { get; }
 
     /// <inheritdoc/>
-    public async Task<Guid> ScheduleNewCalculationOrchestationInstanceAsync(
-        ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> requestDto,
+    public async Task CancelScheduledOrchestrationInstanceAsync(
+        Guid id,
         CancellationToken cancellationToken)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Post, "api/processmanager/orchestrationinstance/brs_023_027/v1");
-        request.Content = new StringContent(
-            JsonSerializer.Serialize(requestDto),
-            Encoding.UTF8,
-            "application/json");
+        using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/processmanager/orchestrationinstance/{id}");
 
         using var actualResponse = await HttpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         actualResponse.EnsureSuccessStatusCode();
-
-        var calculationId = await actualResponse.Content.ReadFromJsonAsync<Guid>(cancellationToken).ConfigureAwait(false);
-
-        return calculationId;
     }
 }
