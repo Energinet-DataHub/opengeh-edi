@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Globalization;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -144,16 +145,16 @@ internal class NotifyAggregatedMeasureDataClientV1 : INotifyAggregatedMeasureDat
         urlBuilder.Append("?");
 
         if (lifecycleState.HasValue)
-            urlBuilder.Append($"lifecycleState={lifecycleState.ToString()}&");
+            urlBuilder.Append($"lifecycleState={Uri.EscapeDataString(lifecycleState.ToString() ?? string.Empty)}&");
 
         if (terminationState.HasValue)
-            urlBuilder.Append($"terminationState={terminationState.ToString()}&");
+            urlBuilder.Append($"terminationState={Uri.EscapeDataString(terminationState.ToString() ?? string.Empty)}&");
 
         if (startedAtOrLater.HasValue)
-            urlBuilder.Append($"startedAtOrLater={startedAtOrLater.ToString()}&");
+            urlBuilder.Append($"startedAtOrLater={Uri.EscapeDataString(startedAtOrLater?.ToString("o", CultureInfo.InvariantCulture) ?? string.Empty)}&");
 
         if (terminatedAtOrEarlier.HasValue)
-            urlBuilder.Append($"terminatedAtOrEarlier={terminatedAtOrEarlier.ToString()}&");
+            urlBuilder.Append($"terminatedAtOrEarlier={Uri.EscapeDataString(terminatedAtOrEarlier?.ToString("o", CultureInfo.InvariantCulture) ?? string.Empty)}&");
 
         return urlBuilder.ToString();
     }

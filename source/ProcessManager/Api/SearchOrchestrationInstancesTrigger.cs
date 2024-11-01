@@ -51,6 +51,8 @@ internal class SearchOrchestrationInstancesTrigger(
             ? terminationStateResult
             : (OrchestrationInstanceTerminationStates?)null;
 
+        // DateTimeOffset values must be in "round-trip" ("o"/"O") format to be parsed correctly
+        // See https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings#the-round-trip-o-o-format-specifier
         var startedAtOrLater =
             DateTimeOffset.TryParse(httpRequest.Query["startedAtOrLater"], CultureInfo.InvariantCulture, out var startedAtOrLaterResult)
             ? Instant.FromDateTimeOffset(startedAtOrLaterResult)
