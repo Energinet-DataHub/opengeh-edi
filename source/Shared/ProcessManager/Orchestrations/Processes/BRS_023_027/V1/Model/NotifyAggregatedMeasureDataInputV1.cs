@@ -20,7 +20,6 @@ namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.
 public sealed record NotifyAggregatedMeasureDataInputV1(
     CalculationTypes CalculationType,
     IReadOnlyCollection<string> GridAreaCodes,
-    DateTimeOffset StartDate,
-    DateTimeOffset EndDate,
-    DateTimeOffset ScheduledAt,
+    DateTimeOffset PeriodStartDate,
+    DateTimeOffset PeriodEndDate,
     bool IsInternalCalculation);

@@ -27,10 +27,10 @@ public class OrchestrationInstance
     public OrchestrationInstance(
         OrchestrationDescriptionId orchestrationDescriptionId,
         IClock clock,
-        Instant? scheduledToRunAt = default)
+        Instant? runAt = default)
     {
         Id = new OrchestrationInstanceId(Guid.NewGuid());
-        Lifecycle = new OrchestrationInstanceLifecycleState(clock, scheduledToRunAt);
+        Lifecycle = new OrchestrationInstanceLifecycleState(clock, runAt);
         ParameterValue = new();
         Steps = [];
         CustomState = new OrchestrationInstanceCustomState(string.Empty);

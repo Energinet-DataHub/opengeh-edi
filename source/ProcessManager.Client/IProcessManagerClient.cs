@@ -39,7 +39,7 @@ public interface IProcessManagerClient
     /// Get all orchestration instances filtered by their related orchestration definition name and version,
     /// and their lifecycle / termination states.
     /// </summary>
-    public Task<IReadOnlyCollection<OrchestrationInstanceDto>> SearchOrchestrationsInstanceAsync(
+    public Task<IReadOnlyCollection<OrchestrationInstanceDto>> SearchOrchestrationInstancesAsync(
         string name,
         int? version,
         OrchestrationInstanceLifecycleStates? lifecycleState,

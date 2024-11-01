@@ -73,7 +73,7 @@ internal class ProcessManagerClient : IProcessManagerClient
     }
 
     /// <inheritdoc/>
-    public async Task<IReadOnlyCollection<OrchestrationInstanceDto>> SearchOrchestrationsInstanceAsync(
+    public async Task<IReadOnlyCollection<OrchestrationInstanceDto>> SearchOrchestrationInstancesAsync(
         string name,
         int? version,
         OrchestrationInstanceLifecycleStates? lifecycleState,

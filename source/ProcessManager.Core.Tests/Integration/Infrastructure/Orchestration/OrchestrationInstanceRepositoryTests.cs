@@ -137,12 +137,12 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
 
         var scheduledToRun = CreateOrchestrationInstance(
             existingOrchestrationDescription,
-            scheduledToRunAt: SystemClock.Instance.GetCurrentInstant().PlusMinutes(1));
+            runAt: SystemClock.Instance.GetCurrentInstant().PlusMinutes(1));
         await _sut.AddAsync(scheduledToRun);
 
         var scheduledIntoTheFarFuture = CreateOrchestrationInstance(
             existingOrchestrationDescription,
-            scheduledToRunAt: SystemClock.Instance.GetCurrentInstant().PlusDays(5));
+            runAt: SystemClock.Instance.GetCurrentInstant().PlusDays(5));
         await _sut.AddAsync(scheduledIntoTheFarFuture);
 
         await _unitOfWork.CommitAsync();
@@ -171,7 +171,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
 
         var scheduledToRunV1 = CreateOrchestrationInstance(
             existingOrchestrationDescriptionV1,
-            scheduledToRunAt: SystemClock.Instance.GetCurrentInstant().PlusMinutes(1));
+            runAt: SystemClock.Instance.GetCurrentInstant().PlusMinutes(1));
         await _sut.AddAsync(scheduledToRunV1);
 
         await _unitOfWork.CommitAsync();
@@ -304,12 +304,12 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         return existingOrchestrationDescription;
     }
 
-    private static OrchestrationInstance CreateOrchestrationInstance(OrchestrationDescription existingOrchestrationDescription, Instant? scheduledToRunAt = default)
+    private static OrchestrationInstance CreateOrchestrationInstance(OrchestrationDescription existingOrchestrationDescription, Instant? runAt = default)
     {
         var existingOrchestrationInstance = new OrchestrationInstance(
             existingOrchestrationDescription.Id,
             SystemClock.Instance,
-            scheduledToRunAt);
+            runAt);
 
         var step1 = new OrchestrationStep(
             existingOrchestrationInstance.Id,

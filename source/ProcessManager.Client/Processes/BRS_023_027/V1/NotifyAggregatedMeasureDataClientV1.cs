@@ -16,6 +16,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using Energinet.DataHub.ProcessManager.Api.Model;
+using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
 
 namespace Energinet.DataHub.ProcessManager.Client.Processes.BRS_023_027.V1;
@@ -61,5 +62,29 @@ internal class NotifyAggregatedMeasureDataClientV1 : INotifyAggregatedMeasureDat
             .ConfigureAwait(false);
 
         return calculationId;
+    }
+
+    /// <inheritdoc/>
+    public Task<NotifyAggregatedMeasureDataDtoV1> GetCalculationOrchestrationInstanceAsync(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc/>
+    public Task<IReadOnlyCollection<NotifyAggregatedMeasureDataDtoV1>> SearchCalculationOrchestrationInstancesAsync(
+        OrchestrationInstanceLifecycleStates? lifecycleState,
+        OrchestrationInstanceTerminationStates? terminationState,
+        IReadOnlyCollection<CalculationTypes>? calculationTypes,
+        IReadOnlyCollection<string>? gridAreaCodes,
+        DateTimeOffset? startedAtOrLater,
+        DateTimeOffset? terminatedAtOrEarlier,
+        DateTimeOffset? periodStartDate,
+        DateTimeOffset? periodEndDate,
+        bool? isInternalCalculation,
+        CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 }

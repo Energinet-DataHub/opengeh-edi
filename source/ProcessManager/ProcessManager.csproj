@@ -40,6 +40,7 @@
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationStepLifecycleStateDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationStepLifecycleStateDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationStepLifecycleStates.cs" Link="Api\Model\OrchestrationInstance\OrchestrationStepLifecycleStates.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\ScheduleOrchestrationInstanceDto.cs" Link="Api\Model\ScheduleOrchestrationInstanceDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Processes\BRS_023_027\V1\Model\NotifyAggregatedMeasureDataDtoV1.cs" Link="Api\Processes\BRS_023_027\V1\Model\NotifyAggregatedMeasureDataDtoV1.cs" />
     <Compile Include="..\Shared\ProcessManager\Orchestrations\Processes\BRS_023_027\V1\Model\CalculationTypes.cs" Link="Api\Processes\BRS_023_027\V1\Model\CalculationTypes.cs" />
     <Compile Include="..\Shared\ProcessManager\Orchestrations\Processes\BRS_023_027\V1\Model\NotifyAggregatedMeasureDataInputV1.cs" Link="Api\Processes\BRS_023_027\V1\Model\NotifyAggregatedMeasureDataInputV1.cs" />
   </ItemGroup>

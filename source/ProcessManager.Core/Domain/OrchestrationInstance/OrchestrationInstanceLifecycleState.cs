@@ -18,10 +18,10 @@ namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 
 public class OrchestrationInstanceLifecycleState
 {
-    internal OrchestrationInstanceLifecycleState(IClock clock, Instant? scheduledToRunAt)
+    internal OrchestrationInstanceLifecycleState(IClock clock, Instant? runAt)
     {
         CreatedAt = clock.GetCurrentInstant();
-        ScheduledToRunAt = scheduledToRunAt;
+        ScheduledToRunAt = runAt;
 
         State = OrchestrationInstanceLifecycleStates.Pending;
     }

@@ -59,7 +59,7 @@ internal class NotifyAggregatedMeasureDataOrchestrationTriggerV1(
                 name: "BRS_023_027",
                 version: 1,
                 parameter: dto.Parameter,
-                runAt: dto.ScheduledAt.ToInstant())
+                runAt: dto.RunAt.ToInstant())
             .ConfigureAwait(false);
 
         // TODO:

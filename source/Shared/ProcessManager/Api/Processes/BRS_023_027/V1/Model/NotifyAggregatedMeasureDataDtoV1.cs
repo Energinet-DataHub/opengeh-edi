@@ -12,9 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.ProcessManager.Api.Model;
+namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
 
-public sealed record ScheduleOrchestrationInstanceDto<TParameter>(
-    DateTimeOffset RunAt,
-    TParameter Parameter)
-        where TParameter : class;
+/// <summary>
+/// Information for a BRS-023 or BRS-027 calculation orchestration instance.
+/// </summary>
+public sealed record NotifyAggregatedMeasureDataDtoV1(
+    CalculationTypes CalculationType,
+    IReadOnlyCollection<string> GridAreaCodes,
+    DateTimeOffset PeriodStartDate,
+    DateTimeOffset PeriodEndDate,
+    bool IsInternalCalculation);

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManager.Api.Model;
+using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
 
 namespace Energinet.DataHub.ProcessManager.Client.Processes.BRS_023_027.V1;
@@ -23,9 +24,31 @@ namespace Energinet.DataHub.ProcessManager.Client.Processes.BRS_023_027.V1;
 public interface INotifyAggregatedMeasureDataClientV1
 {
     /// <summary>
-    /// Schedule a BRS-023 or BRS-027 calculation and return its id.
+    /// Schedule a BRS-023 or BRS-027 calculation orchestration instance and return its id.
     /// </summary>
     public Task<Guid> ScheduleNewCalculationOrchestationInstanceAsync(
         ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> requestDto,
+        CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Get information for BRS-023 or BRS-027 calculation orchestration instance.
+    /// </summary>
+    public Task<NotifyAggregatedMeasureDataDtoV1> GetCalculationOrchestrationInstanceAsync(
+        Guid id,
+        CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Get all BRS-023 or BRS-027 calculation orchestration instances filtered by given parameters.
+    /// </summary>
+    public Task<IReadOnlyCollection<NotifyAggregatedMeasureDataDtoV1>> SearchCalculationOrchestrationInstancesAsync(
+        OrchestrationInstanceLifecycleStates? lifecycleState,
+        OrchestrationInstanceTerminationStates? terminationState,
+        IReadOnlyCollection<CalculationTypes>? calculationTypes,
+        IReadOnlyCollection<string>? gridAreaCodes,
+        DateTimeOffset? startedAtOrLater,
+        DateTimeOffset? terminatedAtOrEarlier,
+        DateTimeOffset? periodStartDate,
+        DateTimeOffset? periodEndDate,
+        bool? isInternalCalculation,
         CancellationToken cancellationToken);
 }
