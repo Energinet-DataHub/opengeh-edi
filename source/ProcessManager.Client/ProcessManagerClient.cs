@@ -12,30 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Globalization;
 using System.Net.Http.Json;
-using System.Text;
 using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 
 namespace Energinet.DataHub.ProcessManager.Client;
 
 /// <inheritdoc/>
-internal class ProcessManagerClient : IProcessManagerClient
+internal class ProcessManagerClient : ProcessManagerClientBase, IProcessManagerClient
 {
     public ProcessManagerClient(string baseUrl, HttpClient httpClient)
+        : base(baseUrl, httpClient)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(baseUrl);
-        ArgumentNullException.ThrowIfNull(httpClient);
-
-        BaseUrl = baseUrl;
-        HttpClient = httpClient;
-
-        HttpClient.BaseAddress = new Uri(BaseUrl);
     }
-
-    public string BaseUrl { get; }
-
-    protected HttpClient HttpClient { get; }
 
     /// <inheritdoc/>
     public async Task CancelScheduledOrchestrationInstanceAsync(
@@ -83,7 +71,7 @@ internal class ProcessManagerClient : IProcessManagerClient
         DateTimeOffset? terminatedAtOrEarlier,
         CancellationToken cancellationToken)
     {
-        var url = BuildRequestUrl(name, version, lifecycleState, terminationState, startedAtOrLater, terminatedAtOrEarlier);
+        var url = BuildSearchRequestUrl(name, version, lifecycleState, terminationState, startedAtOrLater, terminatedAtOrEarlier);
         using var request = new HttpRequestMessage(
             HttpMethod.Get,
             url);
@@ -98,35 +86,5 @@ internal class ProcessManagerClient : IProcessManagerClient
             .ConfigureAwait(false);
 
         return orchestrationInstances!;
-    }
-
-    private static string BuildRequestUrl(
-        string name,
-        int? version,
-        OrchestrationInstanceLifecycleStates? lifecycleState,
-        OrchestrationInstanceTerminationStates? terminationState,
-        DateTimeOffset? startedAtOrLater,
-        DateTimeOffset? terminatedAtOrEarlier)
-    {
-        var urlBuilder = new StringBuilder($"processmanager/orchestrationinstances/{name}");
-
-        if (version.HasValue)
-            urlBuilder.Append($"/{version}");
-
-        urlBuilder.Append("?");
-
-        if (lifecycleState.HasValue)
-            urlBuilder.Append($"lifecycleState={Uri.EscapeDataString(lifecycleState.ToString() ?? string.Empty)}&");
-
-        if (terminationState.HasValue)
-            urlBuilder.Append($"terminationState={Uri.EscapeDataString(terminationState.ToString() ?? string.Empty)}&");
-
-        if (startedAtOrLater.HasValue)
-            urlBuilder.Append($"startedAtOrLater={Uri.EscapeDataString(startedAtOrLater?.ToString("o", CultureInfo.InvariantCulture) ?? string.Empty)}&");
-
-        if (terminatedAtOrEarlier.HasValue)
-            urlBuilder.Append($"terminatedAtOrEarlier={Uri.EscapeDataString(terminatedAtOrEarlier?.ToString("o", CultureInfo.InvariantCulture) ?? string.Empty)}&");
-
-        return urlBuilder.ToString();
     }
 }
