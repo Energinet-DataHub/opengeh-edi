@@ -25,12 +25,20 @@ namespace Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection
 public static class ClientExtensions
 {
     // TODO: Add description
+    // TODO: Consider allowing the consumer to specify "configSectionPath" if it makes it easier to consume it from the BFF: https://learn.microsoft.com/en-us/dotnet/core/extensions/options-library-authors#configuration-section-path-parameter
     public static IServiceCollection AddProcessManagerClients(this IServiceCollection services)
     {
         services
             .AddOptions<ProcessManagerClientOptions>()
             .BindConfiguration(ProcessManagerClientOptions.SectionName)
             .ValidateDataAnnotations();
+
+        // Challenge:
+        // In the BFF, the http clients used by api clients are created using the "AuthorizedHttpClientFactory"
+        // to ensure the authorization header is re-applied to any requests.
+        // We want to implement extensions that allows any consumer to use our clients, so we need a way to
+        // allow the consumer to either create the http client OR let us do it. In both scenarious they should
+        // respect our ProcessManagerClientOptions.
 
         // TODO: Consider using `AddHttpClient` => https://learn.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests
         services.AddScoped<IProcessManagerClient, ProcessManagerClient>();

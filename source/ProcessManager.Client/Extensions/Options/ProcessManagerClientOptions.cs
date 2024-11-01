@@ -17,12 +17,12 @@ using System.ComponentModel.DataAnnotations;
 namespace Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 
 /// <summary>
-/// Options for the configuration of Process Manager clients.
+/// Options for the configuration of Process Manager clients using the Process Manager API.
 /// </summary>
 public class ProcessManagerClientOptions
 {
     public const string SectionName = "ProcessManager";
 
     [Required]
-    public string BaseUrl { get; set; } = string.Empty;
+    public string ApiBaseUrl { get; set; } = string.Empty;
 }
