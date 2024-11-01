@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Globalization;
 using Energinet.DataHub.ProcessManagement.Core.Application;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
+using Energinet.DataHub.ProcessManager.Api.Mappers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 
 namespace Energinet.DataHub.ProcessManager.Api;
 
@@ -48,8 +51,17 @@ internal class SearchOrchestrationInstancesTrigger(
             ? terminationStateResult
             : (OrchestrationInstanceTerminationStates?)null;
 
+        var startedAtOrLater =
+            DateTimeOffset.TryParse(httpRequest.Query["startedAtOrLater"], CultureInfo.InvariantCulture, out var startedAtOrLaterResult)
+            ? Instant.FromDateTimeOffset(startedAtOrLaterResult)
+            : (Instant?)null;
+        var terminatedAtOrEarlier =
+            DateTimeOffset.TryParse(httpRequest.Query["terminatedAtOrEarlier"], CultureInfo.InvariantCulture, out var terminatedAtOrEarlierResult)
+            ? Instant.FromDateTimeOffset(terminatedAtOrEarlierResult)
+            : (Instant?)null;
+
         var orchestrationInstances = await _repository
-            .SearchAsync(name, version, lifecycleState, terminationState)
+            .SearchAsync(name, version, lifecycleState, terminationState, startedAtOrLater, terminatedAtOrEarlier)
             .ConfigureAwait(false);
 
         var dto = orchestrationInstances.MapToDto();

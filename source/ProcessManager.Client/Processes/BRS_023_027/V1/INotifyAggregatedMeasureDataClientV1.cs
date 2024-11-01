@@ -43,10 +43,10 @@ public interface INotifyAggregatedMeasureDataClientV1
     public Task<IReadOnlyCollection<OrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>>> SearchCalculationOrchestrationInstancesAsync(
         OrchestrationInstanceLifecycleStates? lifecycleState,
         OrchestrationInstanceTerminationStates? terminationState,
-        IReadOnlyCollection<CalculationTypes>? calculationTypes,
-        IReadOnlyCollection<string>? gridAreaCodes,
         DateTimeOffset? startedAtOrLater,
         DateTimeOffset? terminatedAtOrEarlier,
+        IReadOnlyCollection<CalculationTypes>? calculationTypes,
+        IReadOnlyCollection<string>? gridAreaCodes,
         DateTimeOffset? periodStartDate,
         DateTimeOffset? periodEndDate,
         bool? isInternalCalculation,

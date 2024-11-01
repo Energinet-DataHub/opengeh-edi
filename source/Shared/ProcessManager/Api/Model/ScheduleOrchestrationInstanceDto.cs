@@ -16,5 +16,5 @@ namespace Energinet.DataHub.ProcessManager.Api.Model;
 
 public sealed record ScheduleOrchestrationInstanceDto<TParameter>(
     DateTimeOffset RunAt,
-    TParameter Parameter)
+    TParameter InputParameter)
         where TParameter : class;

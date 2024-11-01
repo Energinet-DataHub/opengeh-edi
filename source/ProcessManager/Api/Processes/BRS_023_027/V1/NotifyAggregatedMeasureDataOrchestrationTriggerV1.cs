@@ -47,7 +47,7 @@ internal class NotifyAggregatedMeasureDataOrchestrationTriggerV1(
         [HttpTrigger(
             AuthorizationLevel.Anonymous,
             "post",
-            Route = "processmanager/orchestrationinstance/brs_023_027/v1")]
+            Route = "processmanager/orchestrationinstance/brs_023_027/1")]
         HttpRequest httpRequest,
         [FromBody]
         ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> dto,
@@ -58,7 +58,7 @@ internal class NotifyAggregatedMeasureDataOrchestrationTriggerV1(
             .ScheduleNewOrchestrationInstanceAsync(
                 name: "BRS_023_027",
                 version: 1,
-                parameter: dto.Parameter,
+                inputParameter: dto.InputParameter,
                 runAt: dto.RunAt.ToInstant())
             .ConfigureAwait(false);
 

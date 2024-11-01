@@ -78,9 +78,11 @@ internal class ProcessManagerClient : IProcessManagerClient
         int? version,
         OrchestrationInstanceLifecycleStates? lifecycleState,
         OrchestrationInstanceTerminationStates? terminationState,
+        DateTimeOffset? startedAtOrLater,
+        DateTimeOffset? terminatedAtOrEarlier,
         CancellationToken cancellationToken)
     {
-        var url = BuildRequestUrl(name, version, lifecycleState, terminationState);
+        var url = BuildRequestUrl(name, version, lifecycleState, terminationState, startedAtOrLater, terminatedAtOrEarlier);
         using var request = new HttpRequestMessage(
             HttpMethod.Get,
             url);
@@ -101,23 +103,28 @@ internal class ProcessManagerClient : IProcessManagerClient
         string name,
         int? version,
         OrchestrationInstanceLifecycleStates? lifecycleState,
-        OrchestrationInstanceTerminationStates? terminationState)
+        OrchestrationInstanceTerminationStates? terminationState,
+        DateTimeOffset? startedAtOrLater,
+        DateTimeOffset? terminatedAtOrEarlier)
     {
         var urlBuilder = new StringBuilder($"processmanager/orchestrationinstances/{name}");
 
         if (version.HasValue)
             urlBuilder.Append($"/{version}");
 
-        if (lifecycleState.HasValue || terminationState.HasValue)
-        {
-            urlBuilder.Append("?");
+        urlBuilder.Append("?");
 
-            if (lifecycleState.HasValue)
-                urlBuilder.Append($"lifecycleState={lifecycleState.ToString()}&");
+        if (lifecycleState.HasValue)
+            urlBuilder.Append($"lifecycleState={lifecycleState.ToString()}&");
 
-            if (terminationState.HasValue)
-                urlBuilder.Append($"terminationState={terminationState.ToString()}&");
-        }
+        if (terminationState.HasValue)
+            urlBuilder.Append($"terminationState={terminationState.ToString()}&");
+
+        if (startedAtOrLater.HasValue)
+            urlBuilder.Append($"startedAtOrLater={startedAtOrLater.ToString()}&");
+
+        if (terminatedAtOrEarlier.HasValue)
+            urlBuilder.Append($"terminatedAtOrEarlier={terminatedAtOrEarlier.ToString()}&");
 
         return urlBuilder.ToString();
     }

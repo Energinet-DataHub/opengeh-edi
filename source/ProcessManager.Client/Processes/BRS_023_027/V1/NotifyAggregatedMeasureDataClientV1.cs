@@ -44,9 +44,12 @@ internal class NotifyAggregatedMeasureDataClientV1 : INotifyAggregatedMeasureDat
         ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> requestDto,
         CancellationToken cancellationToken)
     {
+        // TODO:
+        // Same base functionality as the generic code; should be possible to just reuse the generic code
+        // (but currently we have implemented the endpoint strongly typed).
         using var request = new HttpRequestMessage(
             HttpMethod.Post,
-            "api/processmanager/orchestrationinstance/brs_023_027/v1");
+            "api/processmanager/orchestrationinstance/brs_023_027/1");
         request.Content = new StringContent(
             JsonSerializer.Serialize(requestDto),
             Encoding.UTF8,
@@ -65,26 +68,93 @@ internal class NotifyAggregatedMeasureDataClientV1 : INotifyAggregatedMeasureDat
     }
 
     /// <inheritdoc/>
-    public Task<OrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>> GetCalculationOrchestrationInstanceAsync(
+    public async Task<OrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>> GetCalculationOrchestrationInstanceAsync(
         Guid id,
         CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        // TODO:
+        // Same base functionality as the generic code; should be possible to just reuse
+        // the "request" generic code and only have specific parsing.
+        using var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"api/processmanager/orchestrationinstance/{id}");
+
+        using var actualResponse = await HttpClient
+            .SendAsync(request, cancellationToken)
+            .ConfigureAwait(false);
+        actualResponse.EnsureSuccessStatusCode();
+
+        var calculationOrechestrationInstance = await actualResponse.Content
+            .ReadFromJsonAsync<OrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>>(cancellationToken)
+            .ConfigureAwait(false);
+
+        return calculationOrechestrationInstance!;
     }
 
     /// <inheritdoc/>
-    public Task<IReadOnlyCollection<OrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>>> SearchCalculationOrchestrationInstancesAsync(
+    public async Task<IReadOnlyCollection<OrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>>> SearchCalculationOrchestrationInstancesAsync(
         OrchestrationInstanceLifecycleStates? lifecycleState,
         OrchestrationInstanceTerminationStates? terminationState,
-        IReadOnlyCollection<CalculationTypes>? calculationTypes,
-        IReadOnlyCollection<string>? gridAreaCodes,
         DateTimeOffset? startedAtOrLater,
         DateTimeOffset? terminatedAtOrEarlier,
+        IReadOnlyCollection<CalculationTypes>? calculationTypes,
+        IReadOnlyCollection<string>? gridAreaCodes,
         DateTimeOffset? periodStartDate,
         DateTimeOffset? periodEndDate,
         bool? isInternalCalculation,
         CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        // TODO: Same base functionality as the generic code, but we perform an
+        // additional in-memory filtering of specific inputs.
+        var url = BuildRequestUrl("brs_023_027", 1, lifecycleState, terminationState, startedAtOrLater, terminatedAtOrEarlier);
+        using var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            url);
+
+        using var actualResponse = await HttpClient
+            .SendAsync(request, cancellationToken)
+            .ConfigureAwait(false);
+        actualResponse.EnsureSuccessStatusCode();
+
+        var orchestrationInstances = await actualResponse.Content
+            .ReadFromJsonAsync<IReadOnlyCollection<OrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>>>(cancellationToken)
+            .ConfigureAwait(false);
+
+        if (orchestrationInstances == null)
+            return [];
+
+        // TODO: Filter in-memory
+
+        return orchestrationInstances;
+    }
+
+    private static string BuildRequestUrl(
+        string name,
+        int? version,
+        OrchestrationInstanceLifecycleStates? lifecycleState,
+        OrchestrationInstanceTerminationStates? terminationState,
+        DateTimeOffset? startedAtOrLater,
+        DateTimeOffset? terminatedAtOrEarlier)
+    {
+        var urlBuilder = new StringBuilder($"processmanager/orchestrationinstances/{name}");
+
+        if (version.HasValue)
+            urlBuilder.Append($"/{version}");
+
+        urlBuilder.Append("?");
+
+        if (lifecycleState.HasValue)
+            urlBuilder.Append($"lifecycleState={lifecycleState.ToString()}&");
+
+        if (terminationState.HasValue)
+            urlBuilder.Append($"terminationState={terminationState.ToString()}&");
+
+        if (startedAtOrLater.HasValue)
+            urlBuilder.Append($"startedAtOrLater={startedAtOrLater.ToString()}&");
+
+        if (terminatedAtOrEarlier.HasValue)
+            urlBuilder.Append($"terminatedAtOrEarlier={terminatedAtOrEarlier.ToString()}&");
+
+        return urlBuilder.ToString();
     }
 }

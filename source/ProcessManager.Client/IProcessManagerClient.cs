@@ -44,5 +44,7 @@ public interface IProcessManagerClient
         int? version,
         OrchestrationInstanceLifecycleStates? lifecycleState,
         OrchestrationInstanceTerminationStates? terminationState,
+        DateTimeOffset? startedAtOrLater,
+        DateTimeOffset? terminatedAtOrEarlier,
         CancellationToken cancellationToken);
 }
