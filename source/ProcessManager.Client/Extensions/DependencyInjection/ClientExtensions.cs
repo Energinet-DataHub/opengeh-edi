@@ -14,7 +14,9 @@
 
 using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 using Energinet.DataHub.ProcessManager.Client.Processes.BRS_023_027.V1;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
 
@@ -24,8 +26,11 @@ namespace Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection
 /// </summary>
 public static class ClientExtensions
 {
-    // TODO: Add description
-    // TODO: Consider allowing the consumer to specify "configSectionPath" if it makes it easier to consume it from the BFF: https://learn.microsoft.com/en-us/dotnet/core/extensions/options-library-authors#configuration-section-path-parameter
+    /// <summary>
+    /// Register Process Manager clients for use in applications.
+    /// If <see cref="IHttpContextAccessor"/> is registered we try to retrieve the "Authorization"
+    /// header value and forward it to the Process Manager API for authentication/authorization.
+    /// </summary>
     public static IServiceCollection AddProcessManagerClients(this IServiceCollection services)
     {
         services
@@ -33,19 +38,24 @@ public static class ClientExtensions
             .BindConfiguration(ProcessManagerClientOptions.SectionName)
             .ValidateDataAnnotations();
 
-        // Challenge:
-        // In the BFF, the http clients used by api clients are created using the "AuthorizedHttpClientFactory"
-        // to ensure the authorization header is re-applied to any requests.
-        // We want to implement extensions that allows any consumer to use our clients, so we need a way to
-        // allow the consumer to either create the http client OR let us do it. In both scenarious they should
-        // respect our ProcessManagerClientOptions.
+        services.AddHttpClient<IProcessManagerClient, ProcessManagerClient>(ConfigureHttpClient);
+        services.AddHttpClient<INotifyAggregatedMeasureDataClientV1, NotifyAggregatedMeasureDataClientV1>(ConfigureHttpClient);
 
-        // TODO: Consider using `AddHttpClient` => https://learn.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests
-        services.AddScoped<IProcessManagerClient, ProcessManagerClient>();
-        // TODO: Consider using `AddHttpClient` => https://learn.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests
-        services.AddScoped<INotifyAggregatedMeasureDataClientV1, NotifyAggregatedMeasureDataClientV1>();
-
-        // TODO: Do we want to automatically add "live" health check against Process Manager API? I think not, but lets talk.
         return services;
+    }
+
+    /// <summary>
+    /// Configure http client base address; and if available then apply
+    /// the authorization header from the current HTTP context.
+    /// </summary>
+    private static void ConfigureHttpClient(IServiceProvider sp, HttpClient httpClient)
+    {
+        var options = sp.GetRequiredService<IOptions<ProcessManagerClientOptions>>().Value;
+        httpClient.BaseAddress = new Uri(options.ApiBaseAddress);
+
+        var httpContextAccessor = sp.GetService<IHttpContextAccessor>();
+        var authorizationHeaderValue = (string?)httpContextAccessor?.HttpContext.Request.Headers["Authorization"];
+        if (!string.IsNullOrWhiteSpace(authorizationHeaderValue))
+            httpClient.DefaultRequestHeaders.Add("Authorization", authorizationHeaderValue);
     }
 }

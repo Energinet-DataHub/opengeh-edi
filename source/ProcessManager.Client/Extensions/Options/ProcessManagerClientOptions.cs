@@ -21,8 +21,8 @@ namespace Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 /// </summary>
 public class ProcessManagerClientOptions
 {
-    public const string SectionName = "ProcessManager";
+    public const string SectionName = "ProcessManagerClient";
 
     [Required]
-    public string ApiBaseUrl { get; set; } = string.Empty;
+    public string ApiBaseAddress { get; set; } = string.Empty;
 }
