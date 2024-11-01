@@ -24,7 +24,7 @@ public class OrchestrationInstanceLifecycleStatesDto
 
     public DateTimeOffset? ScheduledToRunAt { get; set; }
 
-    public DateTimeOffset? StartRequestedAt { get; set; }
+    public DateTimeOffset? QueuedAt { get; set; }
 
     public DateTimeOffset? StartedAt { get; set; }
 

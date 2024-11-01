@@ -51,7 +51,7 @@ internal static class OrchestrationInstanceMapper
                 : null,
             CreatedAt = entity.CreatedAt.ToDateTimeOffset(),
             ScheduledToRunAt = entity.ScheduledToRunAt?.ToDateTimeOffset(),
-            StartRequestedAt = entity.StartRequestedAt?.ToDateTimeOffset(),
+            QueuedAt = entity.QueuedAt?.ToDateTimeOffset(),
             StartedAt = entity.StartedAt?.ToDateTimeOffset(),
             TerminatedAt = entity.TerminatedAt?.ToDateTimeOffset(),
         };

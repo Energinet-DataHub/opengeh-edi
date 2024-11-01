@@ -27,7 +27,7 @@ public enum OrchestrationInstanceLifecycleStates
     /// <summary>
     /// The Process Manager has requested the Task Hub to start the Durable Functions orchestration instance.
     /// </summary>
-    StartRequested = 2,
+    Queued = 2,
 
     /// <summary>
     /// A Durable Functions activity has transitioned the orchestration instance into running.

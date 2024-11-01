@@ -174,7 +174,7 @@ public class OrchestrationInstanceManager : IOrchestrationInstanceManager, IOrch
                 input: orchestrationInstance.ParameterValue.SerializedParameterValue)
             .ConfigureAwait(false);
 
-        orchestrationInstance.Lifecycle.TransitionToStartRequested(_clock);
+        orchestrationInstance.Lifecycle.TransitionToQueued(_clock);
         await _unitOfWork.CommitAsync().ConfigureAwait(false);
     }
 }

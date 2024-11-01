@@ -226,7 +226,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         await _sut.AddAsync(isPendingV1);
 
         var isRunningV1 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
-        isRunningV1.Lifecycle.TransitionToStartRequested(SystemClock.Instance);
+        isRunningV1.Lifecycle.TransitionToQueued(SystemClock.Instance);
         isRunningV1.Lifecycle.TransitionToRunning(SystemClock.Instance);
         await _sut.AddAsync(isRunningV1);
 
@@ -234,7 +234,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         await _sut.AddAsync(isPendingV2);
 
         var isRunningV2 = CreateOrchestrationInstance(existingOrchestrationDescriptionV2);
-        isRunningV2.Lifecycle.TransitionToStartRequested(SystemClock.Instance);
+        isRunningV2.Lifecycle.TransitionToQueued(SystemClock.Instance);
         isRunningV2.Lifecycle.TransitionToRunning(SystemClock.Instance);
         await _sut.AddAsync(isRunningV2);
 
@@ -263,7 +263,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         await _sut.AddAsync(isPendingV1);
 
         var isTerminatedAsSucceededV1 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
-        isTerminatedAsSucceededV1.Lifecycle.TransitionToStartRequested(SystemClock.Instance);
+        isTerminatedAsSucceededV1.Lifecycle.TransitionToQueued(SystemClock.Instance);
         isTerminatedAsSucceededV1.Lifecycle.TransitionToRunning(SystemClock.Instance);
         isTerminatedAsSucceededV1.Lifecycle.TransitionToTerminated(SystemClock.Instance, OrchestrationInstanceTerminationStates.Succeeded);
         await _sut.AddAsync(isTerminatedAsSucceededV1);
@@ -272,7 +272,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         await _sut.AddAsync(isPendingV2);
 
         var isTerminatedAsFailedV2 = CreateOrchestrationInstance(existingOrchestrationDescriptionV2);
-        isTerminatedAsFailedV2.Lifecycle.TransitionToStartRequested(SystemClock.Instance);
+        isTerminatedAsFailedV2.Lifecycle.TransitionToQueued(SystemClock.Instance);
         isTerminatedAsFailedV2.Lifecycle.TransitionToRunning(SystemClock.Instance);
         isTerminatedAsFailedV2.Lifecycle.TransitionToTerminated(SystemClock.Instance, OrchestrationInstanceTerminationStates.Failed);
         await _sut.AddAsync(isTerminatedAsFailedV2);

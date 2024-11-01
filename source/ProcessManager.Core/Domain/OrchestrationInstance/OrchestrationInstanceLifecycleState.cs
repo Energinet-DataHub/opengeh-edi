@@ -44,7 +44,7 @@ public class OrchestrationInstanceLifecycleState
 
     public Instant? ScheduledToRunAt { get; }
 
-    public Instant? StartRequestedAt { get; private set; }
+    public Instant? QueuedAt { get; private set; }
 
     public Instant? StartedAt { get; private set; }
 
@@ -57,18 +57,18 @@ public class OrchestrationInstanceLifecycleState
             && ScheduledToRunAt.HasValue;
     }
 
-    public void TransitionToStartRequested(IClock clock)
+    public void TransitionToQueued(IClock clock)
     {
         if (State is not OrchestrationInstanceLifecycleStates.Pending)
-            ThrowInvalidStateTransitionException(State, OrchestrationInstanceLifecycleStates.StartRequested);
+            ThrowInvalidStateTransitionException(State, OrchestrationInstanceLifecycleStates.Queued);
 
-        State = OrchestrationInstanceLifecycleStates.StartRequested;
-        StartRequestedAt = clock.GetCurrentInstant();
+        State = OrchestrationInstanceLifecycleStates.Queued;
+        QueuedAt = clock.GetCurrentInstant();
     }
 
     public void TransitionToRunning(IClock clock)
     {
-        if (State is not OrchestrationInstanceLifecycleStates.StartRequested)
+        if (State is not OrchestrationInstanceLifecycleStates.Queued)
             ThrowInvalidStateTransitionException(State, OrchestrationInstanceLifecycleStates.Running);
 
         State = OrchestrationInstanceLifecycleStates.Running;
