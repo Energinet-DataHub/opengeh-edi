@@ -15,7 +15,9 @@
 using ApiModel = Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 using DomainModel = Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 
-internal static class OrchestrationInstanceMapper
+namespace Energinet.DataHub.ProcessManager.Api.Mappers;
+
+internal static class OrchestrationInstanceMapperExtensions
 {
     public static ApiModel.OrchestrationInstanceDto MapToDto(
         this DomainModel.OrchestrationInstance entity)
