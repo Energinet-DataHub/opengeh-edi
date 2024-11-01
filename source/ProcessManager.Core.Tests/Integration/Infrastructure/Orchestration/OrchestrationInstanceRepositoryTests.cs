@@ -21,6 +21,7 @@ using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
+using Moq;
 using NodaTime;
 
 namespace Energinet.DataHub.ProcessManager.Core.Tests.Integration.Infrastructure.Orchestration;
@@ -162,26 +163,28 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
     public async Task GivenOrchestrationInstancesInDatabase_WhenSearchByName_ThenExpectedOrchestrationInstancesAreRetrieved()
     {
         // Arrange
-        var uniqueName = Guid.NewGuid().ToString();
-        var existingOrchestrationDescriptionV1 = CreateOrchestrationDescription(uniqueName, version: 1);
-        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescriptionV1);
+        var uniqueName1 = Guid.NewGuid().ToString();
+        var existingOrchestrationDescription01 = CreateOrchestrationDescription(uniqueName1, version: 1);
+        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescription01);
 
-        var notScheduledV1 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
-        await _sut.AddAsync(notScheduledV1);
+        var uniqueName2 = Guid.NewGuid().ToString();
+        var existingOrchestrationDescription02 = CreateOrchestrationDescription(uniqueName2, version: 1);
+        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescription02);
 
-        var scheduledToRunV1 = CreateOrchestrationInstance(
-            existingOrchestrationDescriptionV1,
-            runAt: SystemClock.Instance.GetCurrentInstant().PlusMinutes(1));
-        await _sut.AddAsync(scheduledToRunV1);
+        var basedOn01 = CreateOrchestrationInstance(existingOrchestrationDescription01);
+        await _sut.AddAsync(basedOn01);
+
+        var basedOn02 = CreateOrchestrationInstance(existingOrchestrationDescription02);
+        await _sut.AddAsync(basedOn02);
 
         await _unitOfWork.CommitAsync();
 
         // Act
-        var actual = await _sut.SearchAsync(existingOrchestrationDescriptionV1.Name);
+        var actual = await _sut.SearchAsync(existingOrchestrationDescription01.Name);
 
         // Assert
         actual.Should()
-            .BeEquivalentTo(new[] { notScheduledV1, scheduledToRunV1 });
+            .BeEquivalentTo(new[] { basedOn01 });
     }
 
     [Fact]
@@ -288,6 +291,89 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         // Assert
         actual.Should()
             .BeEquivalentTo(new[] { isTerminatedAsSucceededV1 });
+    }
+
+    [Fact]
+    public async Task GivenOrchestrationInstancesInDatabase_WhenSearchByNameAndStartedAt_ThenExpectedOrchestrationInstancesAreRetrieved()
+    {
+        // Arrange
+        var startedAt01 = SystemClock.Instance.GetCurrentInstant().PlusDays(1);
+        var startedAtClockMock01 = new Mock<IClock>();
+        startedAtClockMock01.Setup(m => m.GetCurrentInstant())
+            .Returns(startedAt01);
+
+        var uniqueName = Guid.NewGuid().ToString();
+        var existingOrchestrationDescriptionV1 = CreateOrchestrationDescription(uniqueName, version: 1);
+        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescriptionV1);
+
+        var isPending = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
+        await _sut.AddAsync(isPending);
+
+        var isRunning01 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
+        isRunning01.Lifecycle.TransitionToQueued(SystemClock.Instance);
+        isRunning01.Lifecycle.TransitionToRunning(startedAtClockMock01.Object);
+        await _sut.AddAsync(isRunning01);
+
+        var isRunning02 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
+        isRunning02.Lifecycle.TransitionToQueued(SystemClock.Instance);
+        isRunning02.Lifecycle.TransitionToRunning(SystemClock.Instance);
+        await _sut.AddAsync(isRunning02);
+
+        await _unitOfWork.CommitAsync();
+
+        // Act
+        var actual = await _sut.SearchAsync(
+            existingOrchestrationDescriptionV1.Name,
+            startedAtOrLater: startedAt01);
+
+        // Assert
+        actual.Should()
+            .BeEquivalentTo(new[] { isRunning01 });
+    }
+
+    [Fact]
+    public async Task GivenOrchestrationInstancesInDatabase_WhenSearchByNameAndTerminatedAt_ThenExpectedOrchestrationInstancesAreRetrieved()
+    {
+        // Arrange
+        var terminatedAt01 = SystemClock.Instance.GetCurrentInstant().PlusDays(-1);
+        var terminatedAtClockMock01 = new Mock<IClock>();
+        terminatedAtClockMock01.Setup(m => m.GetCurrentInstant())
+            .Returns(terminatedAt01);
+
+        var uniqueName = Guid.NewGuid().ToString();
+        var existingOrchestrationDescriptionV1 = CreateOrchestrationDescription(uniqueName, version: 1);
+        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescriptionV1);
+
+        var isPending = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
+        await _sut.AddAsync(isPending);
+
+        var isRunning = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
+        isRunning.Lifecycle.TransitionToQueued(SystemClock.Instance);
+        isRunning.Lifecycle.TransitionToRunning(SystemClock.Instance);
+        await _sut.AddAsync(isRunning);
+
+        var isTerminated01 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
+        isTerminated01.Lifecycle.TransitionToQueued(SystemClock.Instance);
+        isTerminated01.Lifecycle.TransitionToRunning(SystemClock.Instance);
+        isTerminated01.Lifecycle.TransitionToTerminated(terminatedAtClockMock01.Object, OrchestrationInstanceTerminationStates.Succeeded);
+        await _sut.AddAsync(isTerminated01);
+
+        var isTerminated02 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
+        isTerminated02.Lifecycle.TransitionToQueued(SystemClock.Instance);
+        isTerminated02.Lifecycle.TransitionToRunning(SystemClock.Instance);
+        isTerminated02.Lifecycle.TransitionToTerminated(SystemClock.Instance, OrchestrationInstanceTerminationStates.Succeeded);
+        await _sut.AddAsync(isTerminated02);
+
+        await _unitOfWork.CommitAsync();
+
+        // Act
+        var actual = await _sut.SearchAsync(
+            existingOrchestrationDescriptionV1.Name,
+            terminatedAtOrEarlier: terminatedAt01);
+
+        // Assert
+        actual.Should()
+            .BeEquivalentTo(new[] { isTerminated01 });
     }
 
     private static OrchestrationDescription CreateOrchestrationDescription(string? name = default, int? version = default)
