@@ -65,7 +65,7 @@ internal class NotifyAggregatedMeasureDataClientV1 : INotifyAggregatedMeasureDat
     }
 
     /// <inheritdoc/>
-    public Task<NotifyAggregatedMeasureDataDtoV1> GetCalculationOrchestrationInstanceAsync(
+    public Task<OrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>> GetCalculationOrchestrationInstanceAsync(
         Guid id,
         CancellationToken cancellationToken)
     {
@@ -73,7 +73,7 @@ internal class NotifyAggregatedMeasureDataClientV1 : INotifyAggregatedMeasureDat
     }
 
     /// <inheritdoc/>
-    public Task<IReadOnlyCollection<NotifyAggregatedMeasureDataDtoV1>> SearchCalculationOrchestrationInstancesAsync(
+    public Task<IReadOnlyCollection<OrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>>> SearchCalculationOrchestrationInstancesAsync(
         OrchestrationInstanceLifecycleStates? lifecycleState,
         OrchestrationInstanceTerminationStates? terminationState,
         IReadOnlyCollection<CalculationTypes>? calculationTypes,

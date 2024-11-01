@@ -12,9 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
+using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 
-public class OrchestrationInstanceDto
+namespace Energinet.DataHub.ProcessManager.Api.Model;
+
+/// <summary>
+/// Contains information about an orchestration instance including
+/// specific input parameter values.
+/// </summary>
+/// <typeparam name="TParameterDto">Must be a JSON serializable type.</typeparam>
+public class OrchestrationInstanceDto<TParameterDto>
+    where TParameterDto : class
 {
     public Guid Id { get; set; }
 
@@ -26,7 +34,7 @@ public class OrchestrationInstanceDto
     /// <summary>
     /// Contains the Durable Functions orchestration input parameter value.
     /// </summary>
-    public string? ParameterValue { get; set; }
+    public TParameterDto? ParameterValue { get; set; }
 
     /// <summary>
     /// Workflow steps the orchestration instance is going through.

@@ -56,7 +56,7 @@ public class OrchestrationInstance
     public OrchestrationInstanceLifecycleState Lifecycle { get; }
 
     /// <summary>
-    /// Defines the Durable Functions orchestration input parameter value.
+    /// Contains the Durable Functions orchestration input parameter value.
     /// </summary>
     public OrchestrationInstanceParameterValue ParameterValue { get; }
 

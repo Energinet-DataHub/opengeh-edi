@@ -97,7 +97,11 @@ internal class ProcessManagerClient : IProcessManagerClient
         return orchestrationInstances!;
     }
 
-    private static string BuildRequestUrl(string name, int? version, OrchestrationInstanceLifecycleStates? lifecycleState, OrchestrationInstanceTerminationStates? terminationState)
+    private static string BuildRequestUrl(
+        string name,
+        int? version,
+        OrchestrationInstanceLifecycleStates? lifecycleState,
+        OrchestrationInstanceTerminationStates? terminationState)
     {
         var urlBuilder = new StringBuilder($"processmanager/orchestrationinstances/{name}");
 
