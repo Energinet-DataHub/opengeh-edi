@@ -9,7 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="Energinet.DataHub.Core.App.WebApp" Version="13.2.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.10"/>
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0"/>
         <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="2.13.6"/>
         <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0"/>
