@@ -26,7 +26,7 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.ProcessManager.Tests.Fixtures;
 
 /// <summary>
-/// Support testing ProcessManager app.
+/// Support testing Process Manager app.
 /// </summary>
 public class ProcessManagerAppFixture : IAsyncLifetime
 {
