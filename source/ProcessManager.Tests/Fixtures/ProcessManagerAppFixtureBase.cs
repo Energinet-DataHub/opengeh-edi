@@ -31,8 +31,6 @@ namespace Energinet.DataHub.ProcessManager.Tests.Fixtures;
 /// </summary>
 public abstract class ProcessManagerAppFixtureBase : IAsyncLifetime
 {
-    private int _port;
-
     public ProcessManagerAppFixtureBase(
         ProcessManagerDatabaseManager databaseManager,
         string taskHubName,
@@ -43,7 +41,7 @@ public abstract class ProcessManagerAppFixtureBase : IAsyncLifetime
         TaskHubName = string.IsNullOrWhiteSpace(taskHubName)
             ? throw new ArgumentException("Cannot be null or whitespace.", nameof(taskHubName))
             : taskHubName;
-        _port = port;
+        Port = port;
 
         TestLogger = new TestDiagnosticsLogger();
         IntegrationTestConfiguration = new IntegrationTestConfiguration();
@@ -66,6 +64,8 @@ public abstract class ProcessManagerAppFixtureBase : IAsyncLifetime
     /// </summary>
     private string TaskHubName { get; }
 
+    private int Port { get; }
+
     private IntegrationTestConfiguration IntegrationTestConfiguration { get; }
 
     private AzuriteManager AzuriteManager { get; }
@@ -84,7 +84,7 @@ public abstract class ProcessManagerAppFixtureBase : IAsyncLifetime
         await DatabaseManager.CreateDatabaseAsync();
 
         // Prepare host settings
-        var appHostSettings = CreateAppHostSettings("ProcessManager", ref _port);
+        var appHostSettings = CreateAppHostSettings("ProcessManager");
 
         // Create and start host
         AppHostManager = new FunctionAppHostManager(appHostSettings, TestLogger);
@@ -145,13 +145,13 @@ public abstract class ProcessManagerAppFixtureBase : IAsyncLifetime
 #endif
     }
 
-    private FunctionAppHostSettings CreateAppHostSettings(string csprojName, ref int port)
+    private FunctionAppHostSettings CreateAppHostSettings(string csprojName)
     {
         var buildConfiguration = GetBuildConfiguration();
 
         var appHostSettings = HostConfigurationBuilder.CreateFunctionAppHostSettings();
         appHostSettings.FunctionApplicationPath = $"..\\..\\..\\..\\{csprojName}\\bin\\{buildConfiguration}\\net8.0";
-        appHostSettings.Port = ++port;
+        appHostSettings.Port = Port;
 
         // It seems the host + worker is not ready if we use the default startup log message, so we override it here
         appHostSettings.HostStartedEvent = "Host lock lease acquired";
