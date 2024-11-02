@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Dynamic;
+
 namespace Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 
 public class OrchestrationInstanceDto
@@ -26,7 +28,7 @@ public class OrchestrationInstanceDto
     /// <summary>
     /// Contains the Durable Functions orchestration input parameter value.
     /// </summary>
-    public string? ParameterValue { get; set; }
+    public ExpandoObject? ParameterValue { get; set; }
 
     /// <summary>
     /// Workflow steps the orchestration instance is going through.

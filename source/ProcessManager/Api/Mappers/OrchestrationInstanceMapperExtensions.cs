@@ -26,7 +26,7 @@ internal static class OrchestrationInstanceMapperExtensions
         {
             Id = entity.Id.Value,
             Lifecycle = entity.Lifecycle.MapToDto(),
-            ParameterValue = entity.ParameterValue.SerializedParameterValue,
+            ParameterValue = entity.ParameterValue.AsExpandoObject(),
             Steps = entity.Steps.Select(step => step.MapToDto()).ToList(),
             CustomState = entity.CustomState.Value,
         };
