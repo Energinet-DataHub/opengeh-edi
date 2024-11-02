@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using AutoFixture;
 using Energinet.DataHub.ProcessManager.Client.Tests.Fixtures;
-using Energinet.DataHub.ProcessManager.Tests.Fixtures;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.ProcessManager.Client.Tests.Integration;
