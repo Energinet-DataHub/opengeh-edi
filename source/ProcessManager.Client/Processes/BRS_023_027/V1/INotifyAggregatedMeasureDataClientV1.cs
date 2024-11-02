@@ -33,14 +33,14 @@ public interface INotifyAggregatedMeasureDataClientV1
     /// <summary>
     /// Get information for BRS-023 or BRS-027 calculation orchestration instance.
     /// </summary>
-    public Task<OrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>> GetCalculationOrchestrationInstanceAsync(
+    public Task<OrchestrationInstanceTypedDto<NotifyAggregatedMeasureDataInputV1>> GetCalculationOrchestrationInstanceAsync(
         Guid id,
         CancellationToken cancellationToken);
 
     /// <summary>
     /// Get all BRS-023 or BRS-027 calculation orchestration instances filtered by given parameters.
     /// </summary>
-    public Task<IReadOnlyCollection<OrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>>> SearchCalculationOrchestrationInstancesAsync(
+    public Task<IReadOnlyCollection<OrchestrationInstanceTypedDto<NotifyAggregatedMeasureDataInputV1>>> SearchCalculationOrchestrationInstancesAsync(
         OrchestrationInstanceLifecycleStates? lifecycleState,
         OrchestrationInstanceTerminationStates? terminationState,
         DateTimeOffset? startedAtOrLater,

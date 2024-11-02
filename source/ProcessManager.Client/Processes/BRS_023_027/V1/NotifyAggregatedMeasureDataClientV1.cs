@@ -58,7 +58,7 @@ internal class NotifyAggregatedMeasureDataClientV1 : ProcessManagerClientBase, I
     }
 
     /// <inheritdoc/>
-    public async Task<OrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>> GetCalculationOrchestrationInstanceAsync(
+    public async Task<OrchestrationInstanceTypedDto<NotifyAggregatedMeasureDataInputV1>> GetCalculationOrchestrationInstanceAsync(
         Guid id,
         CancellationToken cancellationToken)
     {
@@ -75,14 +75,14 @@ internal class NotifyAggregatedMeasureDataClientV1 : ProcessManagerClientBase, I
         actualResponse.EnsureSuccessStatusCode();
 
         var calculationOrechestrationInstance = await actualResponse.Content
-            .ReadFromJsonAsync<OrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>>(cancellationToken)
+            .ReadFromJsonAsync<OrchestrationInstanceTypedDto<NotifyAggregatedMeasureDataInputV1>>(cancellationToken)
             .ConfigureAwait(false);
 
         return calculationOrechestrationInstance!;
     }
 
     /// <inheritdoc/>
-    public async Task<IReadOnlyCollection<OrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>>> SearchCalculationOrchestrationInstancesAsync(
+    public async Task<IReadOnlyCollection<OrchestrationInstanceTypedDto<NotifyAggregatedMeasureDataInputV1>>> SearchCalculationOrchestrationInstancesAsync(
         OrchestrationInstanceLifecycleStates? lifecycleState,
         OrchestrationInstanceTerminationStates? terminationState,
         DateTimeOffset? startedAtOrLater,
@@ -107,7 +107,7 @@ internal class NotifyAggregatedMeasureDataClientV1 : ProcessManagerClientBase, I
         actualResponse.EnsureSuccessStatusCode();
 
         var orchestrationInstances = await actualResponse.Content
-            .ReadFromJsonAsync<IReadOnlyCollection<OrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>>>(cancellationToken)
+            .ReadFromJsonAsync<IReadOnlyCollection<OrchestrationInstanceTypedDto<NotifyAggregatedMeasureDataInputV1>>>(cancellationToken)
             .ConfigureAwait(false);
 
         if (orchestrationInstances == null)

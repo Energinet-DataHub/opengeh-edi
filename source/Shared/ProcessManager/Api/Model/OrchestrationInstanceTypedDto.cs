@@ -21,7 +21,7 @@ namespace Energinet.DataHub.ProcessManager.Api.Model;
 /// specific input parameter values.
 /// </summary>
 /// <typeparam name="TParameterDto">Must be a JSON serializable type.</typeparam>
-public class OrchestrationInstanceDto<TParameterDto>
+public class OrchestrationInstanceTypedDto<TParameterDto>
     where TParameterDto : class
 {
     public Guid Id { get; set; }
