@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManager.Core.Tests.Fixtures;
+
 namespace Energinet.DataHub.ProcessManager.Orchestrations.Tests.Fixtures;
 
 /// <summary>
@@ -22,6 +24,7 @@ public class OrchestrationsAppFixture
 {
     public OrchestrationsAppFixture()
         : base(
+            databaseManager: new ProcessManagerDatabaseManager("OrchestrationsTest"),
             taskHubName: "OrchestrationsTest01",
             port: 8000)
     {

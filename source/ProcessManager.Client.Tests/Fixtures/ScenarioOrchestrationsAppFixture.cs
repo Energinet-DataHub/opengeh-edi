@@ -25,17 +25,13 @@ public class ScenarioOrchestrationsAppFixture
     : OrchestrationsAppFixtureBase
 {
     /// <summary>
-    /// For the Process Manager clients scenario tests the two applications must:
-    /// - Use the same Task Hub
-    /// - Use the same Database
-    /// - Run on different ports
-    ///
-    /// Settings must be coordinated with <see cref="ScenarioProcessManagerAppFixture"/>.
+    /// See details at <see cref="ScenarioAppFixturesConfiguration"/>.
     /// </summary>
     public ScenarioOrchestrationsAppFixture()
         : base(
-            taskHubName: "ClientsTest01",
-            port: 8101)
+            ScenarioAppFixturesConfiguration.Instance.DatabaseManager,
+            ScenarioAppFixturesConfiguration.Instance.TaskHubName,
+            ScenarioAppFixturesConfiguration.Instance.OrchestrationsAppPort)
     {
     }
 }

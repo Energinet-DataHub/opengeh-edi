@@ -33,17 +33,21 @@ public abstract class OrchestrationsAppFixtureBase : IAsyncLifetime
     private int _port;
 
     public OrchestrationsAppFixtureBase(
+        ProcessManagerDatabaseManager databaseManager,
         string taskHubName,
         int port)
     {
-        TaskHubName = taskHubName;
+        DatabaseManager = databaseManager
+            ?? throw new ArgumentNullException(nameof(databaseManager));
+        TaskHubName = string.IsNullOrWhiteSpace(taskHubName)
+            ? throw new ArgumentException("Cannot be null or whitespace.", nameof(taskHubName))
+            : taskHubName;
         _port = port;
 
         TestLogger = new TestDiagnosticsLogger();
         IntegrationTestConfiguration = new IntegrationTestConfiguration();
 
         AzuriteManager = new AzuriteManager(useOAuth: true);
-        DatabaseManager = new ProcessManagerDatabaseManager("OrchestrationsTest");
 
         HostConfigurationBuilder = new FunctionAppHostConfigurationBuilder();
     }
