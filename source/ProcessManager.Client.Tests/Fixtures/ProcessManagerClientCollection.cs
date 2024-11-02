@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.ProcessManager.Tests.Fixtures;
+using Energinet.DataHub.ProcessManager.Tests.Fixtures;
+
+namespace Energinet.DataHub.ProcessManager.Client.Tests.Fixtures;
 
 /// <summary>
-/// Support testing Process Manager Orchestrations app using default fixture configuration.
+/// A xUnit collection fixture for ensuring tests don't run in parallel.
+///
+/// xUnit documentation of collection fixtures:
+///  * https://xunit.net/docs/shared-context#collection-fixture
 /// </summary>
-public class ProcessManagerAppFixture
-    : ProcessManagerAppFixtureBase
+[CollectionDefinition(nameof(ProcessManagerClientCollection))]
+public class ProcessManagerClientCollection :
+    ICollectionFixture<ScenarioProcessManagerAppFixture>,
+    ICollectionFixture<ScenarioOrchestrationsAppFixture>
 {
-    public ProcessManagerAppFixture()
-        : base(
-            taskHubName: "ProcessManagerTest01",
-            port: 8000)
-    {
-    }
 }

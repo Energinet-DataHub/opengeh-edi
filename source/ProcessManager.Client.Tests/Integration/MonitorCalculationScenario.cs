@@ -12,12 +12,55 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using AutoFixture;
+using Energinet.DataHub.ProcessManager.Client.Tests.Fixtures;
+using Energinet.DataHub.ProcessManager.Tests.Fixtures;
+using Xunit.Abstractions;
+
 namespace Energinet.DataHub.ProcessManager.Client.Tests.Integration;
 
 /// <summary>
 /// Test case where we verify the Process Manager clients can be used to start a
 /// calculation orchestration and monitor its status during its lifetime.
 /// </summary>
-public class MonitorCalculationScenario
+[Collection(nameof(ProcessManagerClientCollection))]
+public class MonitorCalculationScenario : IAsyncLifetime
 {
+    public MonitorCalculationScenario(
+        ScenarioProcessManagerAppFixture processManagerAppFixture,
+        ScenarioOrchestrationsAppFixture orchestrationsAppFixture,
+        ITestOutputHelper testOutputHelper)
+    {
+        ProcessManagerAppFixture = processManagerAppFixture;
+        ProcessManagerAppFixture.SetTestOutputHelper(testOutputHelper);
+
+        OrchestrationsAppFixture = orchestrationsAppFixture;
+        OrchestrationsAppFixture.SetTestOutputHelper(testOutputHelper);
+    }
+
+    private ScenarioProcessManagerAppFixture ProcessManagerAppFixture { get; }
+
+    private ScenarioOrchestrationsAppFixture OrchestrationsAppFixture { get; }
+
+    public Task InitializeAsync()
+    {
+        ProcessManagerAppFixture.AppHostManager.ClearHostLog();
+        OrchestrationsAppFixture.AppHostManager.ClearHostLog();
+
+        return Task.CompletedTask;
+    }
+
+    public Task DisposeAsync()
+    {
+        ProcessManagerAppFixture.SetTestOutputHelper(null!);
+        OrchestrationsAppFixture.SetTestOutputHelper(null!);
+
+        return Task.CompletedTask;
+    }
+
+    [Fact]
+    public async Task CalculationBrs023_WhenScheduledUsingClient_CanMonitorLifecycle()
+    {
+        await Task.Delay(TimeSpan.FromSeconds(5));
+    }
 }
