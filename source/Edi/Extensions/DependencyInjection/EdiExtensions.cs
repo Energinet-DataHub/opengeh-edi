@@ -73,7 +73,6 @@ public static class EdiExtensions
         services.AddAggregatedTimeSeriesRequestValidation();
         services.AddWholesaleServicesRequestValidation();
 
-
         return services;
     }
 
