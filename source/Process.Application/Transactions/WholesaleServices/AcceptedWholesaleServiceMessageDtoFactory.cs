@@ -16,6 +16,8 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Mappers;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
+using Energinet.DataHub.Wholesale.Edi.Models;
+using Period = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Period;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
 
@@ -44,29 +46,85 @@ public static class AcceptedWholesaleServiceMessageDtoFactory
             relatedToMessageId: process.InitiatedByMessageId);
     }
 
+    public static AcceptedWholesaleServicesMessageDto Create(
+        EventId eventId,
+        RequestWholesaleServicesTransaction transaction,
+        Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.WholesaleServices wholesaleServices)
+    {
+        ArgumentNullException.ThrowIfNull(transaction);
+        ArgumentNullException.ThrowIfNull(wholesaleServices);
+
+        var acceptedWholesaleServicesSeriesDto = WholesaleServicesResultMapper.MapToAcceptedWholesaleServicesSerieDto(wholesaleServices);
+
+        var message = CreateWholesaleResultSeries(transaction, acceptedWholesaleServicesSeriesDto);
+
+        var chargeOwnerId = wholesaleServices.ChargeOwnerId != null
+                ? ActorNumber.Create(wholesaleServices.ChargeOwnerId)
+                : null;
+
+        return AcceptedWholesaleServicesMessageDto.Create(
+            receiverNumber: transaction.RequestedByActor.ActorNumber,
+            receiverRole: transaction.RequestedByActor.ActorRole,
+            documentReceiverNumber: transaction.OriginalActor.ActorNumber,
+            documentReceiverRole: transaction.OriginalActor.ActorRole,
+            chargeOwnerId: chargeOwnerId,
+            processId: transaction.ProcessId.Id,
+            eventId: eventId,
+            businessReason: transaction.BusinessReason.Name,
+            wholesaleSeries: message,
+            relatedToMessageId: transaction.InitiatedByMessageId);
+    }
+
     private static AcceptedWholesaleServicesSeries CreateWholesaleResultSeries(
         WholesaleServicesProcess process,
-        AcceptedWholesaleServicesSerieDto acceptedWholesaleServices)
+        AcceptedWholesaleServicesSerieDto wholesaleServices)
     {
         var acceptedWholesaleCalculationSeries = new AcceptedWholesaleServicesSeries(
             TransactionId: TransactionId.New(),
-            CalculationVersion: acceptedWholesaleServices.CalculationResultVersion,
-            GridAreaCode: acceptedWholesaleServices.GridArea,
-            ChargeCode: acceptedWholesaleServices.ChargeCode,
+            CalculationVersion: wholesaleServices.CalculationResultVersion,
+            GridAreaCode: wholesaleServices.GridArea,
+            ChargeCode: wholesaleServices.ChargeCode,
             IsTax: false,
-            Points: PointsMapper.Map(acceptedWholesaleServices.Points),
-            EnergySupplier: acceptedWholesaleServices.EnergySupplierId,
-            ChargeOwner: acceptedWholesaleServices.ChargeOwnerId,
-            Period: new Period(acceptedWholesaleServices.StartOfPeriod, acceptedWholesaleServices.EndOfPeriod),
-            acceptedWholesaleServices.SettlementVersion,
-            acceptedWholesaleServices.MeasurementUnit,
-            PriceMeasureUnit: IsTotalSum(acceptedWholesaleServices) ? null : MeasurementUnit.TryFromChargeType(acceptedWholesaleServices.ChargeType),
-            acceptedWholesaleServices.Currency,
-            acceptedWholesaleServices.ChargeType,
-            acceptedWholesaleServices.Resolution,
-            acceptedWholesaleServices.MeteringPointType,
-            acceptedWholesaleServices.SettlementMethod,
+            Points: PointsMapper.Map(wholesaleServices.Points),
+            EnergySupplier: wholesaleServices.EnergySupplierId,
+            ChargeOwner: wholesaleServices.ChargeOwnerId,
+            Period: new Period(wholesaleServices.StartOfPeriod, wholesaleServices.EndOfPeriod),
+            wholesaleServices.SettlementVersion,
+            wholesaleServices.MeasurementUnit,
+            PriceMeasureUnit: IsTotalSum(wholesaleServices) ? null : MeasurementUnit.TryFromChargeType(wholesaleServices.ChargeType),
+            wholesaleServices.Currency,
+            wholesaleServices.ChargeType,
+            wholesaleServices.Resolution,
+            wholesaleServices.MeteringPointType,
+            wholesaleServices.SettlementMethod,
             OriginalTransactionIdReference: process.BusinessTransactionId);
+
+        return acceptedWholesaleCalculationSeries;
+    }
+
+    private static AcceptedWholesaleServicesSeries CreateWholesaleResultSeries(
+        RequestWholesaleServicesTransaction transaction,
+        AcceptedWholesaleServicesSerieDto wholesaleServices)
+    {
+        var acceptedWholesaleCalculationSeries = new AcceptedWholesaleServicesSeries(
+            TransactionId: TransactionId.New(),
+            CalculationVersion: wholesaleServices.CalculationResultVersion,
+            GridAreaCode: wholesaleServices.GridArea,
+            ChargeCode: wholesaleServices.ChargeCode,
+            IsTax: false,
+            Points: PointsMapper.Map(wholesaleServices.Points),
+            EnergySupplier: wholesaleServices.EnergySupplierId,
+            ChargeOwner: wholesaleServices.ChargeOwnerId,
+            Period: new Period(wholesaleServices.StartOfPeriod, wholesaleServices.EndOfPeriod),
+            wholesaleServices.SettlementVersion,
+            wholesaleServices.MeasurementUnit,
+            PriceMeasureUnit: IsTotalSum(wholesaleServices) ? null : MeasurementUnit.TryFromChargeType(wholesaleServices.ChargeType),
+            wholesaleServices.Currency,
+            wholesaleServices.ChargeType,
+            wholesaleServices.Resolution,
+            wholesaleServices.MeteringPointType,
+            wholesaleServices.SettlementMethod,
+            OriginalTransactionIdReference: transaction.BusinessTransactionId);
 
         return acceptedWholesaleCalculationSeries;
     }

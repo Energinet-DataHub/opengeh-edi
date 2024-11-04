@@ -70,6 +70,9 @@ public static class EdiExtensions
         services.AddAggregatedTimeSeriesRequestValidation();
         services.AddWholesaleServicesRequestValidation();
 
+        // New
+        services.AddTransient<RequestWholesaleServicesQueryHandler>();
+
         return services;
     }
 

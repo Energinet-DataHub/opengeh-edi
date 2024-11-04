@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.B2BApi.Functions.RequestWholesaleServices.Activities;
-using Energinet.DataHub.EDI.B2BApi.Functions.RequestWholesaleServices.Models;
 using Energinet.DataHub.EDI.Process.Interfaces;
+using Energinet.DataHub.Wholesale.Edi.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 

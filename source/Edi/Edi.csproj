@@ -23,6 +23,8 @@
     <ProjectReference Include="..\CalculationResults\CalculationResults.Interfaces\CalculationResults.Interfaces.csproj" />
     <ProjectReference Include="..\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
+    <ProjectReference Include="..\Process.Domain\Process.Domain.csproj" />
+    <ProjectReference Include="..\Process.Interfaces\Process.Interfaces.csproj" />
   </ItemGroup>
 
 </Project>

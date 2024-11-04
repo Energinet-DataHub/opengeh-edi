@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.B2BApi.Functions.RequestWholesaleServices.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.Edi.Requests;
+using Energinet.DataHub.Wholesale.Edi.Models;
 using Energinet.DataHub.Wholesale.Edi.Validation;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.DurableTask;
 using ChargeType = Energinet.DataHub.Edi.Requests.ChargeType;
+using WholesaleServicesRequest = Energinet.DataHub.Edi.Requests.WholesaleServicesRequest;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.RequestWholesaleServices.Activities;
 

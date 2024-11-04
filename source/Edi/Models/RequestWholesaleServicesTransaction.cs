@@ -15,9 +15,8 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Interfaces;
-using ChargeType = Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ChargeType;
 
-namespace Energinet.DataHub.EDI.B2BApi.Functions.RequestWholesaleServices.Models;
+namespace Energinet.DataHub.Wholesale.Edi.Models;
 
 public record RequestWholesaleServicesTransaction(
     ProcessId ProcessId,
@@ -33,5 +32,5 @@ public record RequestWholesaleServicesTransaction(
     SettlementVersion? SettlementVersion,
     string? Resolution,
     string? ChargeOwner,
-    IReadOnlyCollection<ChargeType> ChargeTypes,
+    IReadOnlyCollection<Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.ChargeType> ChargeTypes,
     IReadOnlyCollection<string> GridAreas);

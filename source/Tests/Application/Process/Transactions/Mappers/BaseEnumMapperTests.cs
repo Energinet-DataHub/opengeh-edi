@@ -57,6 +57,30 @@ public abstract class BaseEnumMapperTests
         }
     }
 
+    protected static void EnsureCanMapOrThrows<TEnum>(
+        Action performMapping,
+        TEnum value,
+        params TEnum[] invalidValues)
+        where TEnum : Enum
+    {
+        // Act
+        var act = performMapping;
+
+        // Assert
+        if (ValueIsValid(value, invalidValues))
+        {
+            act.Should().NotThrow();
+        }
+        else if (invalidValues.Contains(value))
+        {
+            act.Should().Throw<InvalidOperationException>();
+        }
+        else
+        {
+            act.Should().Throw<ArgumentOutOfRangeException>();
+        }
+    }
+
     protected static void EnsureCanMapOrReturnsNull<TEnumInput, TEnumResult>(
         Func<TEnumResult?> performMapping,
         TEnumInput value,
