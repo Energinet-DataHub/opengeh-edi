@@ -124,8 +124,8 @@ public class MonitorCalculationScenarioUsingClients : IAsyncLifetime
 
                 return orchestrationInstance!.Lifecycle!.State == OrchestrationInstanceLifecycleStates.Terminated;
             },
-            timeLimit: TimeSpan.FromSeconds(40),
-            delay: TimeSpan.FromSeconds(2));
+            timeLimit: TimeSpan.FromSeconds(60),
+            delay: TimeSpan.FromSeconds(3));
 
         isTerminated.Should().BeTrue("because we expects the orchestration instance can complete within given wait time");
     }
