@@ -12,18 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Globalization;
 using System.Net.Http.Json;
+using System.Text;
 using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
+using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.ProcessManager.Client;
 
 /// <inheritdoc/>
-internal class ProcessManagerClient : ProcessManagerClientBase, IProcessManagerClient
+internal class ProcessManagerClient : IProcessManagerClient
 {
-    public ProcessManagerClient(
-        HttpClient httpClient)
-            : base(httpClient)
+    private readonly HttpClient _httpClient;
+
+    public ProcessManagerClient(IHttpClientFactory httpClientFactory)
     {
+        _httpClient = httpClientFactory.CreateClient(HttpClientNames.GeneralApi);
     }
 
     /// <inheritdoc/>
@@ -35,7 +39,7 @@ internal class ProcessManagerClient : ProcessManagerClientBase, IProcessManagerC
             HttpMethod.Delete,
             $"api/processmanager/orchestrationinstance/{id}");
 
-        using var actualResponse = await HttpClient
+        using var actualResponse = await _httpClient
             .SendAsync(request, cancellationToken)
             .ConfigureAwait(false);
         actualResponse.EnsureSuccessStatusCode();
@@ -50,7 +54,7 @@ internal class ProcessManagerClient : ProcessManagerClientBase, IProcessManagerC
             HttpMethod.Get,
             $"api/processmanager/orchestrationinstance/{id}");
 
-        using var actualResponse = await HttpClient
+        using var actualResponse = await _httpClient
             .SendAsync(request, cancellationToken)
             .ConfigureAwait(false);
         actualResponse.EnsureSuccessStatusCode();
@@ -77,7 +81,7 @@ internal class ProcessManagerClient : ProcessManagerClientBase, IProcessManagerC
             HttpMethod.Get,
             url);
 
-        using var actualResponse = await HttpClient
+        using var actualResponse = await _httpClient
             .SendAsync(request, cancellationToken)
             .ConfigureAwait(false);
         actualResponse.EnsureSuccessStatusCode();
@@ -87,5 +91,36 @@ internal class ProcessManagerClient : ProcessManagerClientBase, IProcessManagerC
             .ConfigureAwait(false);
 
         return orchestrationInstances!;
+    }
+
+    // TODO: Perhaps share with other clients
+    private static string BuildSearchRequestUrl(
+        string name,
+        int? version,
+        OrchestrationInstanceLifecycleStates? lifecycleState,
+        OrchestrationInstanceTerminationStates? terminationState,
+        DateTimeOffset? startedAtOrLater,
+        DateTimeOffset? terminatedAtOrEarlier)
+    {
+        var urlBuilder = new StringBuilder($"processmanager/orchestrationinstances/{name}");
+
+        if (version.HasValue)
+            urlBuilder.Append($"/{version}");
+
+        urlBuilder.Append("?");
+
+        if (lifecycleState.HasValue)
+            urlBuilder.Append($"lifecycleState={Uri.EscapeDataString(lifecycleState.ToString() ?? string.Empty)}&");
+
+        if (terminationState.HasValue)
+            urlBuilder.Append($"terminationState={Uri.EscapeDataString(terminationState.ToString() ?? string.Empty)}&");
+
+        if (startedAtOrLater.HasValue)
+            urlBuilder.Append($"startedAtOrLater={Uri.EscapeDataString(startedAtOrLater?.ToString("o", CultureInfo.InvariantCulture) ?? string.Empty)}&");
+
+        if (terminatedAtOrEarlier.HasValue)
+            urlBuilder.Append($"terminatedAtOrEarlier={Uri.EscapeDataString(terminatedAtOrEarlier?.ToString("o", CultureInfo.InvariantCulture) ?? string.Empty)}&");
+
+        return urlBuilder.ToString();
     }
 }

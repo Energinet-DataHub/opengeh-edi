@@ -92,7 +92,7 @@ public class MonitorCalculationScenarioUsingApi : IAsyncLifetime
             "application/json");
 
         // Step 1: Schedule new calculation orchestration instance
-        using var scheduleResponse = await ProcessManagerAppFixture.AppHostManager
+        using var scheduleResponse = await OrchestrationsAppFixture.AppHostManager
             .HttpClient
             .SendAsync(scheduleRequest);
         scheduleResponse.EnsureSuccessStatusCode();

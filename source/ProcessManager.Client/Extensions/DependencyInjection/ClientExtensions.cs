@@ -38,8 +38,19 @@ public static class ClientExtensions
             .BindConfiguration(ProcessManagerClientOptions.SectionName)
             .ValidateDataAnnotations();
 
-        services.AddHttpClient<IProcessManagerClient, ProcessManagerClient>(ConfigureHttpClient);
-        services.AddHttpClient<INotifyAggregatedMeasureDataClientV1, NotifyAggregatedMeasureDataClientV1>(ConfigureHttpClient);
+        services.AddHttpClient(HttpClientNames.GeneralApi, (sp, httpClient) =>
+        {
+            var options = sp.GetRequiredService<IOptions<ProcessManagerClientOptions>>().Value;
+            ConfigureHttpClient(sp, httpClient, options.GeneralApiBaseAddress);
+        });
+        services.AddHttpClient(HttpClientNames.OrchestrationsApi, (sp, httpClient) =>
+        {
+            var options = sp.GetRequiredService<IOptions<ProcessManagerClientOptions>>().Value;
+            ConfigureHttpClient(sp, httpClient, options.OrchestrationsApiBaseAddress);
+        });
+
+        services.AddScoped<IProcessManagerClient, ProcessManagerClient>();
+        services.AddScoped<INotifyAggregatedMeasureDataClientV1, NotifyAggregatedMeasureDataClientV1>();
 
         return services;
     }
@@ -48,10 +59,9 @@ public static class ClientExtensions
     /// Configure http client base address; and if available then apply
     /// the authorization header from the current HTTP context.
     /// </summary>
-    private static void ConfigureHttpClient(IServiceProvider sp, HttpClient httpClient)
+    private static void ConfigureHttpClient(IServiceProvider sp, HttpClient httpClient, string baseAddress)
     {
-        var options = sp.GetRequiredService<IOptions<ProcessManagerClientOptions>>().Value;
-        httpClient.BaseAddress = new Uri(options.ApiBaseAddress);
+        httpClient.BaseAddress = new Uri(baseAddress);
 
         var httpContextAccessor = sp.GetService<IHttpContextAccessor>();
         var authorizationHeaderValue = (string?)httpContextAccessor?.HttpContext.Request.Headers["Authorization"];

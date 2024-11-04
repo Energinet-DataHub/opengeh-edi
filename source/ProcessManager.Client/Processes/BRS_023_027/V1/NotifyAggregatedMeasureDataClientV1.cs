@@ -12,22 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Globalization;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using Energinet.DataHub.ProcessManager.Api.Model;
 using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
+using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
 
 namespace Energinet.DataHub.ProcessManager.Client.Processes.BRS_023_027.V1;
 
 /// <inheritdoc/>
-internal class NotifyAggregatedMeasureDataClientV1 : ProcessManagerClientBase, INotifyAggregatedMeasureDataClientV1
+internal class NotifyAggregatedMeasureDataClientV1 : INotifyAggregatedMeasureDataClientV1
 {
-    public NotifyAggregatedMeasureDataClientV1(
-        HttpClient httpClient)
-            : base(httpClient)
+    private readonly HttpClient _generalApiHttpClient;
+    private readonly HttpClient _orchestrationsApiHttpClient;
+
+    public NotifyAggregatedMeasureDataClientV1(IHttpClientFactory httpClientFactory)
     {
+        _generalApiHttpClient = httpClientFactory.CreateClient(HttpClientNames.GeneralApi);
+        _orchestrationsApiHttpClient = httpClientFactory.CreateClient(HttpClientNames.OrchestrationsApi);
     }
 
     /// <inheritdoc/>
@@ -46,7 +51,7 @@ internal class NotifyAggregatedMeasureDataClientV1 : ProcessManagerClientBase, I
             Encoding.UTF8,
             "application/json");
 
-        using var actualResponse = await HttpClient
+        using var actualResponse = await _orchestrationsApiHttpClient
             .SendAsync(request, cancellationToken)
             .ConfigureAwait(false);
         actualResponse.EnsureSuccessStatusCode();
@@ -70,7 +75,7 @@ internal class NotifyAggregatedMeasureDataClientV1 : ProcessManagerClientBase, I
             HttpMethod.Get,
             $"api/processmanager/orchestrationinstance/{id}");
 
-        using var actualResponse = await HttpClient
+        using var actualResponse = await _generalApiHttpClient
             .SendAsync(request, cancellationToken)
             .ConfigureAwait(false);
         actualResponse.EnsureSuccessStatusCode();
@@ -102,7 +107,7 @@ internal class NotifyAggregatedMeasureDataClientV1 : ProcessManagerClientBase, I
             HttpMethod.Get,
             url);
 
-        using var actualResponse = await HttpClient
+        using var actualResponse = await _generalApiHttpClient
             .SendAsync(request, cancellationToken)
             .ConfigureAwait(false);
         actualResponse.EnsureSuccessStatusCode();
@@ -117,5 +122,36 @@ internal class NotifyAggregatedMeasureDataClientV1 : ProcessManagerClientBase, I
         // TODO: Filter in-memory
 
         return orchestrationInstances;
+    }
+
+    // TODO: Perhaps share with other clients
+    private static string BuildSearchRequestUrl(
+        string name,
+        int? version,
+        OrchestrationInstanceLifecycleStates? lifecycleState,
+        OrchestrationInstanceTerminationStates? terminationState,
+        DateTimeOffset? startedAtOrLater,
+        DateTimeOffset? terminatedAtOrEarlier)
+    {
+        var urlBuilder = new StringBuilder($"processmanager/orchestrationinstances/{name}");
+
+        if (version.HasValue)
+            urlBuilder.Append($"/{version}");
+
+        urlBuilder.Append("?");
+
+        if (lifecycleState.HasValue)
+            urlBuilder.Append($"lifecycleState={Uri.EscapeDataString(lifecycleState.ToString() ?? string.Empty)}&");
+
+        if (terminationState.HasValue)
+            urlBuilder.Append($"terminationState={Uri.EscapeDataString(terminationState.ToString() ?? string.Empty)}&");
+
+        if (startedAtOrLater.HasValue)
+            urlBuilder.Append($"startedAtOrLater={Uri.EscapeDataString(startedAtOrLater?.ToString("o", CultureInfo.InvariantCulture) ?? string.Empty)}&");
+
+        if (terminatedAtOrEarlier.HasValue)
+            urlBuilder.Append($"terminatedAtOrEarlier={Uri.EscapeDataString(terminatedAtOrEarlier?.ToString("o", CultureInfo.InvariantCulture) ?? string.Empty)}&");
+
+        return urlBuilder.ToString();
     }
 }

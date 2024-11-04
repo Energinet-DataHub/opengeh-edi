@@ -78,7 +78,8 @@ public static class ProcessManagerExtensions
     }
 
     /// <summary>
-    /// Register options and services necessary for integrating Durable Functions orchestrations with the Process Manager functionality.
+    /// Register options and services necessary for integrating Durable Functions orchestrations with the
+    /// Process Manager functionality.
     /// Should be used from host's that contains Durable Functions orchestrations.
     /// </summary>
     /// <param name="services"></param>
@@ -99,13 +100,34 @@ public static class ProcessManagerExtensions
 
         // Task Hub connected to Durable Functions
         services.AddTaskHubStorage();
+        services
+            .AddDurableClientFactory()
+            .TryAddSingleton<IDurableClient>(sp =>
+            {
+                // IDurableClientFactory has a singleton lifecycle and caches clients
+                var clientFactory = sp.GetRequiredService<IDurableClientFactory>();
+                var processManagerOptions = sp.GetRequiredService<IOptions<ProcessManagerTaskHubOptions>>().Value;
 
-        // Orchestration Descriptions to register
-        services.TryAddTransient<IReadOnlyCollection<OrchestrationDescription>>(sp => enabledDescriptionsFactory());
+                var durableClient = clientFactory.CreateClient(new DurableClientOptions
+                {
+                    ConnectionName = nameof(ProcessManagerTaskHubOptions.ProcessManagerStorageConnectionString),
+                    TaskHub = processManagerOptions.ProcessManagerTaskHubName,
+                    IsExternalClient = true,
+                });
+
+                return durableClient;
+            });
 
         // ProcessManager components using interfaces to restrict access to functionality
+        // => Orchestration Descriptions registration during startup
+        services.TryAddTransient<IReadOnlyCollection<OrchestrationDescription>>(sp => enabledDescriptionsFactory());
         services.TryAddTransient<IOrchestrationRegister, OrchestrationRegister>();
+        // => Orchestration instances progress
         services.TryAddScoped<IOrchestrationInstanceProgressRepository, OrchestrationInstanceRepository>();
+        // => Manager
+        services.TryAddScoped<IOrchestrationRegisterQueries, OrchestrationRegister>();
+        services.TryAddScoped<IOrchestrationInstanceRepository, OrchestrationInstanceRepository>();
+        services.TryAddScoped<IOrchestrationInstanceManager, OrchestrationInstanceManager>();
 
         return services;
     }

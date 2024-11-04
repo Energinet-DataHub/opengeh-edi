@@ -12,26 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.ComponentModel.DataAnnotations;
-
-namespace Energinet.DataHub.ProcessManager.Client.Extensions.Options;
+namespace Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
 
 /// <summary>
-/// Options for the configuration of Process Manager clients using the Process Manager API.
+/// Constants used for naming <see cref="HttpClient"/> instances.
 /// </summary>
-public class ProcessManagerClientOptions
+internal static class HttpClientNames
 {
-    public const string SectionName = "ProcessManagerClient";
+    /// <summary>
+    /// Http client for the general Api hosted in Process Manager
+    /// </summary>
+    public const string GeneralApi = "General";
 
     /// <summary>
-    /// Address to the general Api hosted in Process Manager.
+    /// Http client for the specific Api hosted in Process Manager Orchestrations.
     /// </summary>
-    [Required]
-    public string GeneralApiBaseAddress { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Address to the specific Api hosted in Process Manager Orchestrations.
-    /// </summary>
-    [Required]
-    public string OrchestrationsApiBaseAddress { get; set; } = string.Empty;
+    public const string OrchestrationsApi = "Orchestrations";
 }

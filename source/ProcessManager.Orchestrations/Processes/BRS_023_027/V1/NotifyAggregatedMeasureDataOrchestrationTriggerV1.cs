@@ -24,7 +24,7 @@ using NodaTime;
 using NodaTime.Extensions;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 
-namespace Energinet.DataHub.ProcessManager.Api.Processes.BRS_023_027.V1;
+namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1;
 
 internal class NotifyAggregatedMeasureDataOrchestrationTriggerV1(
     ILogger<NotifyAggregatedMeasureDataOrchestrationTriggerV1> logger,

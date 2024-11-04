@@ -12,26 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// IMPORTANT:
 // Since we use shared types (linked files) and the test project needs a reference
 // to multiple projects where files are linked, we need to specify which assembly
 // we want to use the type from.
 // See also https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/cs0433?f1url=%3FappId%3Droslyn%26k%3Dk(CS0433)
+extern alias ClientTypes;
 
-using System.Dynamic;
-using System.Net.Http.Json;
-using System.Text;
-using System.Text.Json;
+using ClientTypes.Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
+using ClientTypes.Energinet.DataHub.ProcessManager.Client.Extensions.Options;
+using ClientTypes.Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.TestCommon;
-using Energinet.DataHub.ProcessManager.Api.Model;
-using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
-using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
-using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
-using Energinet.DataHub.ProcessManager.Client.Processes.BRS_023_027.V1;
 using Energinet.DataHub.ProcessManager.Client.Tests.Fixtures;
-using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
 using FluentAssertions;
-using FluentAssertions.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit.Abstractions;
@@ -59,8 +53,10 @@ public class MonitorCalculationScenarioUsingClients : IAsyncLifetime
         var services = new ServiceCollection();
         services.AddScoped<IConfiguration>(_ => CreateInMemoryConfigurations(new Dictionary<string, string?>()
         {
-            [$"{ProcessManagerClientOptions.SectionName}:{nameof(ProcessManagerClientOptions.ApiBaseAddress)}"]
+            [$"{ProcessManagerClientOptions.SectionName}:{nameof(ProcessManagerClientOptions.GeneralApiBaseAddress)}"]
                 = ProcessManagerAppFixture.AppHostManager.HttpClient.BaseAddress!.ToString(),
+            [$"{ProcessManagerClientOptions.SectionName}:{nameof(ProcessManagerClientOptions.OrchestrationsApiBaseAddress)}"]
+                = OrchestrationsAppFixture.AppHostManager.HttpClient.BaseAddress!.ToString(),
         }));
         services.AddProcessManagerClients();
         ServiceProvider = services.BuildServiceProvider();
@@ -97,12 +93,12 @@ public class MonitorCalculationScenarioUsingClients : IAsyncLifetime
     [Fact]
     public async Task CalculationBrs023_WhenScheduledUsingClient_CanMonitorLifecycle()
     {
-        var calculationClient = ServiceProvider.GetRequiredService<INotifyAggregatedMeasureDataClientV1>();
+        var calculationClient = ServiceProvider.GetRequiredService<ClientTypes.Energinet.DataHub.ProcessManager.Client.Processes.BRS_023_027.V1.INotifyAggregatedMeasureDataClientV1>();
 
         // Step 1: Schedule new calculation orchestration instance
         var orchestrationInstanceId = await calculationClient
             .ScheduleNewCalculationOrchestationInstanceAsync(
-                new ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>(
+                new ClientTypes.Energinet.DataHub.ProcessManager.Api.Model.ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>(
                     RunAt: DateTimeOffset.Parse("2024-11-01T06:19:10.0209567+01:00"),
                     InputParameter: new NotifyAggregatedMeasureDataInputV1(
                         CalculationTypes.BalanceFixing,
@@ -122,7 +118,7 @@ public class MonitorCalculationScenarioUsingClients : IAsyncLifetime
             {
                 var orchestrationInstance = await calculationClient.GetCalculationOrchestrationInstanceAsync(orchestrationInstanceId, CancellationToken.None);
 
-                return orchestrationInstance!.Lifecycle!.State == OrchestrationInstanceLifecycleStates.Terminated;
+                return orchestrationInstance!.Lifecycle!.State == ClientTypes.Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance.OrchestrationInstanceLifecycleStates.Terminated;
             },
             timeLimit: TimeSpan.FromSeconds(60),
             delay: TimeSpan.FromSeconds(3));

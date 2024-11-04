@@ -17,7 +17,6 @@ using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Api.Mappers;
 using Energinet.DataHub.ProcessManager.Api.Model;
-using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
 using FluentAssertions;
 using NodaTime;
 
@@ -35,11 +34,13 @@ public class OrchestrationInstanceMapperExtensionsTests
         var orchestrationInstance = CreateOrchestrationInstance();
 
         // Act
-        var actualOrchestrationInstanceDto = orchestrationInstance.MapToDto();
+        var actualDto = orchestrationInstance.MapToDto();
+        var dtoAsJson = JsonSerializer.Serialize(actualDto);
 
-        var dtoAsJson = JsonSerializer.Serialize(actualOrchestrationInstanceDto);
-        var typedOrchestrationInstanceDto = JsonSerializer.Deserialize<OrchestrationInstanceTypedDto<NotifyAggregatedMeasureDataInputV1>>(dtoAsJson);
-        typedOrchestrationInstanceDto!.ParameterValue.Should().NotBeNull();
+        // Assert
+        var typedDto = JsonSerializer.Deserialize<OrchestrationInstanceTypedDto<TestOrchestrationParameter>>(dtoAsJson);
+        typedDto!.ParameterValue!.TestString.Should().NotBeNull();
+        typedDto!.ParameterValue!.TestInt.Should().NotBeNull();
     }
 
     private static OrchestrationInstance CreateOrchestrationInstance()
