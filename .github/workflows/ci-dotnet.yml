@@ -36,10 +36,8 @@ jobs:
           dotnet affected --solution-path ${{github.workspace}}/source/Edi.Repository.sln -p ${{github.workspace}} --from ${{steps.set_shas.outputs.base}} --to ${{steps.set_shas.outputs.head}}
           
           cat affected.proj
-          
-          if ($LASTEXITCODE -eq 1) {
-            exit 0
-          }
+
+          dotnet build affected.proj
 
       # - name: Install dependencies
       #   if: success() && steps.dotnet_affected.outputs.affected != ''
