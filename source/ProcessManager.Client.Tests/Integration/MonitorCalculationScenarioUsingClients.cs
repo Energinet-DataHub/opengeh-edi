@@ -16,7 +16,6 @@
 // to multiple projects where files are linked, we need to specify which assembly
 // we want to use the type from.
 // See also https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/cs0433?f1url=%3FappId%3Droslyn%26k%3Dk(CS0433)
-extern alias SharedTypes;
 
 using System.Dynamic;
 using System.Net.Http.Json;
@@ -25,9 +24,10 @@ using System.Text.Json;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.TestCommon;
 using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
+using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
 using Energinet.DataHub.ProcessManager.Client.Tests.Fixtures;
-using Energinet.DataHub.ProcessManager.Scheduler;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.ProcessManager.Client.Tests.Integration;
@@ -37,9 +37,9 @@ namespace Energinet.DataHub.ProcessManager.Client.Tests.Integration;
 /// calculation orchestration and monitor its status during its lifetime.
 /// </summary>
 [Collection(nameof(ProcessManagerClientCollection))]
-public class MonitorCalculationScenario : IAsyncLifetime
+public class MonitorCalculationScenarioUsingClients : IAsyncLifetime
 {
-    public MonitorCalculationScenario(
+    public MonitorCalculationScenarioUsingClients(
         ScenarioProcessManagerAppFixture processManagerAppFixture,
         ScenarioOrchestrationsAppFixture orchestrationsAppFixture,
         ITestOutputHelper testOutputHelper)
@@ -49,11 +49,17 @@ public class MonitorCalculationScenario : IAsyncLifetime
 
         OrchestrationsAppFixture = orchestrationsAppFixture;
         OrchestrationsAppFixture.SetTestOutputHelper(testOutputHelper);
+
+        var services = new ServiceCollection();
+        services.AddProcessManagerClients();
+        ServiceProvider = services.BuildServiceProvider();
     }
 
     private ScenarioProcessManagerAppFixture ProcessManagerAppFixture { get; }
 
     private ScenarioOrchestrationsAppFixture OrchestrationsAppFixture { get; }
+
+    private ServiceProvider ServiceProvider { get; }
 
     public Task InitializeAsync()
     {
@@ -63,18 +69,23 @@ public class MonitorCalculationScenario : IAsyncLifetime
         return Task.CompletedTask;
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
         ProcessManagerAppFixture.SetTestOutputHelper(null!);
         OrchestrationsAppFixture.SetTestOutputHelper(null!);
 
-        return Task.CompletedTask;
+        await ServiceProvider.DisposeAsync();
     }
 
+    /// <summary>
+    /// TODO: Change when we don't share types.
+    /// At the moment we have no project references to the applications that we start.
+    /// It means they are not automatically builded when changed, so we must ensure to build them
+    /// before running tests.
+    /// </summary>
     [Fact]
     public async Task CalculationBrs023_WhenScheduledUsingClient_CanMonitorLifecycle()
     {
-        // TODO: Move to API test project AND then implement the same but with the client
         dynamic scheduleRequestDto = new ExpandoObject();
         scheduleRequestDto.RunAt = "2024-11-01T06:19:10.0209567+01:00";
         scheduleRequestDto.InputParameter = new ExpandoObject();
@@ -103,7 +114,7 @@ public class MonitorCalculationScenario : IAsyncLifetime
 
         // Step 2: Trigger the scheduler to queue the calculation orchestration instance
         await ProcessManagerAppFixture.AppHostManager
-            .TriggerFunctionAsync(nameof(SchedulerTrigger.StartScheduledOrchestrationInstances));
+            .TriggerFunctionAsync("StartScheduledOrchestrationInstances");
 
         // Step 3: Query until terminated with succeeded
         var isTerminated = await Awaiter.TryWaitUntilConditionAsync(

@@ -20,7 +20,6 @@ using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Options;
 using Energinet.DataHub.ProcessManager.Core.Tests.Fixtures;
-using Energinet.DataHub.ProcessManager.Scheduler;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.ProcessManager.Tests.Fixtures;
@@ -181,7 +180,7 @@ public abstract class ProcessManagerAppFixtureBase : IAsyncLifetime
 
         // Disable timer trigger (should be manually triggered in tests)
         appHostSettings.ProcessEnvironmentVariables.Add(
-            $"AzureWebJobs.{nameof(SchedulerTrigger.StartScheduledOrchestrationInstances)}.Disabled",
+            $"AzureWebJobs.StartScheduledOrchestrationInstances.Disabled",
             "true");
 
         return appHostSettings;
