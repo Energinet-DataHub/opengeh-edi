@@ -33,6 +33,15 @@ on:
 env:
   # Conditions
   PUSH_PACKAGES: ${{ github.event_name != 'pull_request' }}
+  # Necessary to manage Azure resources from automated tests
+  AZURE_KEYVAULT_URL: ${{ vars.integration_test_azure_keyvault_url }}
+  # Set value used by 'AzuriteManager'
+  #  Use 'AzuriteBlobFolderPath' for TestCommon version 4.2.0 and lower
+  AzuriteBlobFolderPath: ${{ github.workspace }}\node_modules\.bin\
+  #  Use 'AzuriteFolderPath' for TestCommon version 4.3.0 and higher
+  AzuriteFolderPath: ${{ github.workspace }}\node_modules\.bin\
+  # Overrides settings in 'functionhost.settings.json'
+  FunctionAppHostPath: ${{ github.workspace }}\node_modules\azure-functions-core-tools\bin\func.dll
 
 jobs:
   build_and_publish:
@@ -53,11 +62,17 @@ jobs:
 
       - name: Setup dotnet and tools
         uses: Energinet-DataHub/.github/.github/actions/dotnet-setup-and-tools@v13
+        with:
+          use_azure_functions_tools: "true"
+          azure_functions_core_tools_version: 4.0.5455
 
       - name: Build and test solution
         uses: Energinet-DataHub/.github/.github/actions/dotnet-solution-build-and-test@v13
         with:
           solution_file_path: ./source/ProcessManager.Client.Filtered.slnf
+          azure_tenant_id: ${{ vars.integration_test_azure_tenant_id }}
+          azure_subscription_id: ${{ vars.integration_test_azure_subscription_id }}
+          azure_spn_id: ${{ vars.integration_test_azure_spn_id_oidc }}
           publish_test_report: "true"
 
       - name: Pack ProcessManager.Client project
