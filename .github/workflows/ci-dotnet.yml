@@ -35,9 +35,9 @@ jobs:
           from: ${{ steps.set_shas.outputs.base }}
           to: ${{ steps.set_shas.outputs.head }}
 
-      # - name: Install dependencies
-      #   if: success() && steps.dotnet_affected.outputs.affected != ''
-      #   run: dotnet restore affected.proj
+      - name: Install dependencies
+        if: success() && steps.dotnet_affected.outputs.affected != ''
+        run: dotnet restore affected.proj
       # - name: Build
       #   if: success() && steps.dotnet_affected.outputs.affected != ''
       #   run: dotnet build --configuration Release --no-restore affected.proj
