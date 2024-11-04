@@ -66,7 +66,7 @@ public class RequestWholesaleServicesOrchestration
             context,
             null);
 
-        if (validationErrors.Any())
+        if (validationErrors.Any()) // TODO: Enqueue reject message
             throw new Exception("Validation failed: " + string.Join("; ", validationErrors.Select(v => v.Message)));
 
         // 2. Perform wholesale services query and enqueue messages

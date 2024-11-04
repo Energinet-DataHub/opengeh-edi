@@ -27,15 +27,13 @@ using Period = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.Calcula
 namespace Energinet.DataHub.Wholesale.Edi;
 
 /// <summary>
-/// Handles WholesaleServicesRequest messages (typically received from the EDI subsystem through the WholesaleInbox service bus queue)
+/// Handles retrieving WholesaleServicesRequest messages based on a incoming request
 /// </summary>
 public class RequestWholesaleServicesQueryHandler(
-    IValidator<Energinet.DataHub.Edi.Requests.WholesaleServicesRequest> validator,
     IWholesaleServicesQueries wholesaleServicesQueries,
     WholesaleServicesRequestMapper wholesaleServicesRequestMapper,
     ILogger<WholesaleServicesRequestHandler> logger)
 {
-    private readonly IValidator<Energinet.DataHub.Edi.Requests.WholesaleServicesRequest> _validator = validator;
     private readonly ILogger<WholesaleServicesRequestHandler> _logger = logger;
     private readonly IWholesaleServicesQueries _wholesaleServicesQueries = wholesaleServicesQueries;
     private readonly WholesaleServicesRequestMapper _wholesaleServicesRequestMapper = wholesaleServicesRequestMapper;

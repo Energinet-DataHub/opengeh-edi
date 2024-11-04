@@ -81,6 +81,7 @@ public class EnqueueMessagesForRequestWholesaleServicesActivity(
             }
             else if (calculationResult.Result == RequestWholesaleServicesQueryResultEnum.NoDataForGridArea)
             {
+                // TODO: Enqueue rejected message
                 // var rejectedWholesaleServicesMessage = RejectedWholesaleServiceMessageDtoFactory.Create();
                 // var messageId = await _outgoingMessagesClient.EnqueueAsync(rejectedWholesaleServicesMessage, cancellationToken)
                 //     .ConfigureAwait(false);

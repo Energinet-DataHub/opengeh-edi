@@ -40,6 +40,9 @@ public static class EdiExtensions
         services.AddTransient<WholesaleServicesRequestMapper>();
         services.AddTransient<DateTimeZone>(s => DateTimeZoneProviders.Tzdb.GetZoneOrNull("Europe/Copenhagen")!);
 
+        // New (temporary) request wholesale services query handler
+        services.AddScoped<RequestWholesaleServicesQueryHandler>();
+
         services.AddScoped<IEdiClient, EdiClient>();
 
         services
@@ -70,8 +73,6 @@ public static class EdiExtensions
         services.AddAggregatedTimeSeriesRequestValidation();
         services.AddWholesaleServicesRequestValidation();
 
-        // New
-        services.AddTransient<RequestWholesaleServicesQueryHandler>();
 
         return services;
     }
