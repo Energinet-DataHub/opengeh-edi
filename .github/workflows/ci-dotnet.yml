@@ -29,6 +29,11 @@ jobs:
       - uses: nrwl/nx-set-shas@v4
         id: set_shas
 
+      - name: Setup .NET Core SDK 
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
       - uses: leonardochaia/dotnet-affected-action@v1
         id: dotnet_affected
         with:
