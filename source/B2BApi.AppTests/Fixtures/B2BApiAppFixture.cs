@@ -28,24 +28,18 @@ using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.Functions;
-using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
-using Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.RevisionLog.Integration.Options;
 using Energinet.DataHub.Wholesale.Common.Infrastructure.Options;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
-using Microsoft.Extensions.Logging;
 using Xunit;
 using Xunit.Abstractions;
 using AmountsPerChargeViewSchemaDefinition = Energinet.DataHub.EDI.B2BApi.AppTests.TestData.CalculationResults.AmountsPerChargeViewSchemaDefinition;
-using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using HttpClientFactory = Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks.HttpClientFactory;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
@@ -67,11 +61,8 @@ public class B2BApiAppFixture : IAsyncLifetime
 
     public B2BApiAppFixture()
     {
-        var constructorStopwatch = new Stopwatch();
-        var stopwatch = new Stopwatch();
-
-        constructorStopwatch.Start();
-        stopwatch.Start();
+        var constructorStopwatch = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
 
         TestLogger = new TestDiagnosticsLogger();
         LogStopwatch(stopwatch, nameof(TestLogger));
@@ -114,16 +105,16 @@ public class B2BApiAppFixture : IAsyncLifetime
             "B2BApi_tests_edi");
         LogStopwatch(stopwatch, nameof(EdiDatabricksSchemaManager));
 
-        WholesaleDatabricksSchemaManager = new DatabricksSchemaManager(
+        CalculationResultsDatabricksSchemaManager = new DatabricksSchemaManager(
             new HttpClientFactory(),
             IntegrationTestConfiguration.DatabricksSettings,
-            "B2BApi_tests_wholesale");
-        LogStopwatch(stopwatch, nameof(WholesaleDatabricksSchemaManager));
+            "B2BApi_tests_calculation_results");
+        LogStopwatch(stopwatch, nameof(CalculationResultsDatabricksSchemaManager));
 
         _calculationResultsDatabricksOptions = new DeltaTableOptions
         {
             DatabricksCatalogName = DatabricksCatalogName,
-            WholesaleCalculationResultsSchemaName = WholesaleDatabricksSchemaManager.SchemaName,
+            WholesaleCalculationResultsSchemaName = CalculationResultsDatabricksSchemaManager.SchemaName,
         };
 
         AuditLogMockServer = new AuditLogMockServer();
@@ -152,7 +143,7 @@ public class B2BApiAppFixture : IAsyncLifetime
 
     public DatabricksSchemaManager EdiDatabricksSchemaManager { get; }
 
-    public DatabricksSchemaManager WholesaleDatabricksSchemaManager { get; }
+    public DatabricksSchemaManager CalculationResultsDatabricksSchemaManager { get; }
 
     public EdiDatabaseManager DatabaseManager { get; }
 
@@ -168,11 +159,8 @@ public class B2BApiAppFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        var initializeStopwatch = new Stopwatch();
-        var stopwatch = new Stopwatch();
-
-        initializeStopwatch.Start();
-        stopwatch.Start();
+        var initializeStopwatch = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
 
         // Storage emulator
         AzuriteManager.StartAzurite();
@@ -240,10 +228,10 @@ public class B2BApiAppFixture : IAsyncLifetime
         DurableClient = DurableTaskManager.CreateClient(taskHubName: TaskHubName);
         LogStopwatch(stopwatch, nameof(DurableTaskManager.CreateClient));
 
-        await WholesaleDatabricksSchemaManager.CreateSchemaAsync();
+        await CalculationResultsDatabricksSchemaManager.CreateSchemaAsync();
         LogStopwatch(
             stopwatch,
-            $"{nameof(WholesaleDatabricksSchemaManager)}.{nameof(WholesaleDatabricksSchemaManager.CreateSchemaAsync)}");
+            $"{nameof(CalculationResultsDatabricksSchemaManager)}.{nameof(CalculationResultsDatabricksSchemaManager.CreateSchemaAsync)}");
 
         await CreateCalculationResultDatabricksDataAsync();
         LogStopwatch(stopwatch, nameof(CreateCalculationResultDatabricksDataAsync));
@@ -487,13 +475,13 @@ public class B2BApiAppFixture : IAsyncLifetime
 
     private async Task CreateCalculationResultDatabricksDataAsync()
     {
-        await WholesaleDatabricksSchemaManager.CreateTableAsync(
+        await CalculationResultsDatabricksSchemaManager.CreateTableAsync(
             _calculationResultsDatabricksOptions.AMOUNTS_PER_CHARGE_V1_VIEW_NAME,
             AmountsPerChargeViewSchemaDefinition.SchemaDefinition);
 
         const string amountsPerChargeFileName = "wholesale_calculation_results.amounts_per_charge_v1.csv";
         var amountsPerChargeFilePath = Path.Combine("TestData", "CalculationResults", amountsPerChargeFileName);
-        await WholesaleDatabricksSchemaManager.InsertFromCsvFileAsync(
+        await CalculationResultsDatabricksSchemaManager.InsertFromCsvFileAsync(
             _calculationResultsDatabricksOptions.AMOUNTS_PER_CHARGE_V1_VIEW_NAME,
             AmountsPerChargeViewSchemaDefinition.SchemaDefinition,
             amountsPerChargeFilePath);
