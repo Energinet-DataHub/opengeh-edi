@@ -39,7 +39,7 @@ jobs:
         with:
           from: ${{ steps.set_shas.outputs.base }}
           to: ${{ steps.set_shas.outputs.head }}
-          solution-path: source/Edi.Repository.sln
+          solution-path: ${{github.workspace}}/source/Edi.Repository.sln
 
       # - name: Install dependencies
       #   if: success() && steps.dotnet_affected.outputs.affected != ''
