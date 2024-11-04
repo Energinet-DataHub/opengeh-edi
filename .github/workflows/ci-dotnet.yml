@@ -30,8 +30,8 @@ jobs:
       - uses: leonardochaia/dotnet-affected-action@v1
         id: dotnet_affected
         with:
-          from: ${{ steps.set_shas.outputs.base }}
-          to: ${{ steps.set_shas.outputs.head }}
+          from: kerbou/play-with-dotnet-affected
+          to: main
           solution-path: ${{github.workspace}}/source/Edi.Repository.sln --repository-path ${{github.workspace}}
 
       # - name: Install dependencies
