@@ -27,12 +27,11 @@ jobs:
       - uses: nrwl/nx-set-shas@v4
         id: set_shas
 
-      - uses: leonardochaia/dotnet-affected-action@v1
-        id: dotnet_affected
-        with:
-          from: kerbou/play-with-dotnet-affected
-          to: main
-          solution-path: ${{github.workspace}}/source/Edi.Repository.sln --repository-path ${{github.workspace}}
+      - name: Run dotnet-affected
+        shell: pwsh
+        run: |
+          dotnet tool install dotnet-affected --global
+          dotnet affected --solution-path ${{github.workspace}}/source/Edi.Repository.sln --repository-path --repository-path ${{github.workspace}}
 
       # - name: Install dependencies
       #   if: success() && steps.dotnet_affected.outputs.affected != ''
