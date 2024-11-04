@@ -31,7 +31,7 @@ jobs:
         shell: pwsh
         run: |
           dotnet tool install dotnet-affected --global
-          dotnet affected --solution-path ${{github.workspace}}/source/Edi.Repository.sln --repository-path --repository-path ${{github.workspace}}
+          dotnet affected --solution-path ${{github.workspace}}/source/Edi.Repository.sln --repository-path ${{github.workspace}}
 
       # - name: Install dependencies
       #   if: success() && steps.dotnet_affected.outputs.affected != ''
