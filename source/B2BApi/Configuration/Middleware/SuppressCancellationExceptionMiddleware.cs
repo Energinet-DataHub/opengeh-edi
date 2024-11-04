@@ -37,10 +37,7 @@ public sealed class SuppressOperationCanceledExceptionMiddleware(ILogger<UnHandl
             // E.g. if a task is cancelled it throws a TaskCanceledException which is a OperationCanceledException.
             // E.g. if cancellationToken.ThrowIfCancellationRequested() it throws an task OperationCanceledException.
             // It logs a warning message indicating that the request was cancelled.
-            _logger.LogWarning(
-                operationCanceledException,
-                "Request was cancelled: {Ex}",
-                operationCanceledException.Message);
+            _logger.LogWarning(operationCanceledException, "Request was cancelled: {Ex}", operationCanceledException.Message);
         }
     }
 }
