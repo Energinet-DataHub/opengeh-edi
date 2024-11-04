@@ -35,7 +35,11 @@ jobs:
           dotnet tool install dotnet-affected --global
           dotnet affected --solution-path ${{github.workspace}}/source/Edi.Repository.sln -p ${{github.workspace}} --from ${{steps.set_shas.outputs.base}} --to ${{steps.set_shas.outputs.head}}
           
-          dotnet affected describe
+          cat affected.proj
+          
+          if ($LASTEXITCODE -eq 1) {
+            exit 0
+          }
 
       # - name: Install dependencies
       #   if: success() && steps.dotnet_affected.outputs.affected != ''
