@@ -20,8 +20,9 @@ namespace Energinet.DataHub.ProcessManager.Client;
 /// <inheritdoc/>
 internal class ProcessManagerClient : ProcessManagerClientBase, IProcessManagerClient
 {
-    public ProcessManagerClient(string baseUrl, HttpClient httpClient)
-        : base(baseUrl, httpClient)
+    public ProcessManagerClient(
+        HttpClient httpClient)
+            : base(httpClient)
     {
     }
 

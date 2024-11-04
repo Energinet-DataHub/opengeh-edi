@@ -24,8 +24,9 @@ namespace Energinet.DataHub.ProcessManager.Client.Processes.BRS_023_027.V1;
 /// <inheritdoc/>
 internal class NotifyAggregatedMeasureDataClientV1 : ProcessManagerClientBase, INotifyAggregatedMeasureDataClientV1
 {
-    public NotifyAggregatedMeasureDataClientV1(string baseUrl, HttpClient httpClient)
-        : base(baseUrl, httpClient)
+    public NotifyAggregatedMeasureDataClientV1(
+        HttpClient httpClient)
+            : base(httpClient)
     {
     }
 

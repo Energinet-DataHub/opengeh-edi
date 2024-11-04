@@ -20,18 +20,12 @@ namespace Energinet.DataHub.ProcessManager.Client;
 
 internal abstract class ProcessManagerClientBase
 {
-    protected ProcessManagerClientBase(string baseUrl, HttpClient httpClient)
+    protected ProcessManagerClientBase(HttpClient httpClient)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(baseUrl);
         ArgumentNullException.ThrowIfNull(httpClient);
 
-        BaseUrl = baseUrl;
         HttpClient = httpClient;
-
-        HttpClient.BaseAddress = new Uri(BaseUrl);
     }
-
-    public string BaseUrl { get; }
 
     protected HttpClient HttpClient { get; }
 

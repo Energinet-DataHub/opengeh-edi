@@ -23,10 +23,16 @@ using System.Text;
 using System.Text.Json;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.FunctionAppHost;
 using Energinet.DataHub.Core.TestCommon;
+using Energinet.DataHub.ProcessManager.Api.Model;
 using Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection;
+using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
+using Energinet.DataHub.ProcessManager.Client.Processes.BRS_023_027.V1;
 using Energinet.DataHub.ProcessManager.Client.Tests.Fixtures;
+using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
 using FluentAssertions;
+using FluentAssertions.Common;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit.Abstractions;
 
@@ -51,6 +57,11 @@ public class MonitorCalculationScenarioUsingClients : IAsyncLifetime
         OrchestrationsAppFixture.SetTestOutputHelper(testOutputHelper);
 
         var services = new ServiceCollection();
+        services.AddScoped<IConfiguration>(_ => CreateInMemoryConfigurations(new Dictionary<string, string?>()
+        {
+            [$"{ProcessManagerClientOptions.SectionName}:{nameof(ProcessManagerClientOptions.ApiBaseAddress)}"]
+                = ProcessManagerAppFixture.AppHostManager.HttpClient.BaseAddress!.ToString(),
+        }));
         services.AddProcessManagerClients();
         ServiceProvider = services.BuildServiceProvider();
     }
@@ -86,31 +97,20 @@ public class MonitorCalculationScenarioUsingClients : IAsyncLifetime
     [Fact]
     public async Task CalculationBrs023_WhenScheduledUsingClient_CanMonitorLifecycle()
     {
-        dynamic scheduleRequestDto = new ExpandoObject();
-        scheduleRequestDto.RunAt = "2024-11-01T06:19:10.0209567+01:00";
-        scheduleRequestDto.InputParameter = new ExpandoObject();
-        scheduleRequestDto.InputParameter.CalculationType = 0;
-        scheduleRequestDto.InputParameter.GridAreaCodes = new[] { "543" };
-        scheduleRequestDto.InputParameter.PeriodStartDate = "2024-10-29T15:19:10.0151351+01:00";
-        scheduleRequestDto.InputParameter.PeriodEndDate = "2024-10-29T16:19:10.0193962+01:00";
-        scheduleRequestDto.InputParameter.IsInternalCalculation = true;
-
-        using var scheduleRequest = new HttpRequestMessage(
-            HttpMethod.Post,
-            "api/processmanager/orchestrationinstance/brs_023_027/1");
-        scheduleRequest.Content = new StringContent(
-            JsonSerializer.Serialize(scheduleRequestDto),
-            Encoding.UTF8,
-            "application/json");
+        var calculationClient = ServiceProvider.GetRequiredService<INotifyAggregatedMeasureDataClientV1>();
 
         // Step 1: Schedule new calculation orchestration instance
-        using var scheduleResponse = await ProcessManagerAppFixture.AppHostManager
-            .HttpClient
-            .SendAsync(scheduleRequest);
-        scheduleResponse.EnsureSuccessStatusCode();
-
-        var calculationId = await scheduleResponse.Content
-            .ReadFromJsonAsync<Guid>();
+        var orchestrationInstanceId = await calculationClient
+            .ScheduleNewCalculationOrchestationInstanceAsync(
+                new ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>(
+                    RunAt: DateTimeOffset.Parse("2024-11-01T06:19:10.0209567+01:00"),
+                    InputParameter: new NotifyAggregatedMeasureDataInputV1(
+                        CalculationTypes.BalanceFixing,
+                        GridAreaCodes: new[] { "543" },
+                        PeriodStartDate: DateTimeOffset.Parse("2024-10-29T15:19:10.0151351+01:00"),
+                        PeriodEndDate: DateTimeOffset.Parse("2024-10-29T16:19:10.0193962+01:00"),
+                        IsInternalCalculation: true)),
+                CancellationToken.None);
 
         // Step 2: Trigger the scheduler to queue the calculation orchestration instance
         await ProcessManagerAppFixture.AppHostManager
@@ -120,17 +120,7 @@ public class MonitorCalculationScenarioUsingClients : IAsyncLifetime
         var isTerminated = await Awaiter.TryWaitUntilConditionAsync(
             async () =>
             {
-                using var queryRequest = new HttpRequestMessage(
-                    HttpMethod.Get,
-                    $"api/processmanager/orchestrationinstance/{calculationId}");
-
-                using var queryResponse = await ProcessManagerAppFixture.AppHostManager
-                    .HttpClient
-                    .SendAsync(queryRequest);
-                queryResponse.EnsureSuccessStatusCode();
-
-                var orchestrationInstance = await queryResponse.Content
-                    .ReadFromJsonAsync<OrchestrationInstanceDto>();
+                var orchestrationInstance = await calculationClient.GetCalculationOrchestrationInstanceAsync(orchestrationInstanceId, CancellationToken.None);
 
                 return orchestrationInstance!.Lifecycle!.State == OrchestrationInstanceLifecycleStates.Terminated;
             },
@@ -138,5 +128,12 @@ public class MonitorCalculationScenarioUsingClients : IAsyncLifetime
             delay: TimeSpan.FromSeconds(2));
 
         isTerminated.Should().BeTrue("because we expects the orchestration instance can complete within given wait time");
+    }
+
+    private IConfiguration CreateInMemoryConfigurations(Dictionary<string, string?> configurations)
+    {
+        return new ConfigurationBuilder()
+            .AddInMemoryCollection(configurations)
+            .Build();
     }
 }
