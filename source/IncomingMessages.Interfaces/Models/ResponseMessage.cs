@@ -16,18 +16,23 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
 
 public class ResponseMessage
 {
-    public ResponseMessage(string messageBody)
+    private ResponseMessage(bool isErrorResponse, string? messageBody)
     {
-        IsErrorResponse = true;
-        MessageBody = messageBody;
+        IsErrorResponse = isErrorResponse;
+        MessageBody = messageBody ?? string.Empty;
     }
 
-    public ResponseMessage()
-    {
-        IsErrorResponse = false;
-    }
-
-    public string MessageBody { get; } = string.Empty;
+    public string MessageBody { get; }
 
     public bool IsErrorResponse { get; }
+
+    public static ResponseMessage Error(string messageBody)
+    {
+        return new ResponseMessage(true, messageBody);
+    }
+
+    public static ResponseMessage Success(string? messageBody = null)
+    {
+        return new ResponseMessage(false, messageBody);
+    }
 }

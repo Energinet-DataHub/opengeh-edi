@@ -47,6 +47,8 @@ public class BusinessReasonTests
             (BusinessReason.MoveIn, "MoveIn", "E65"),
             (BusinessReason.PreliminaryAggregation, "PreliminaryAggregation", "D03"),
             (BusinessReason.WholesaleFixing, "WholesaleFixing", "D05"),
+            (BusinessReason.PeriodicMetering, "PeriodicMetering", "E23"),
+            (BusinessReason.PeriodicFlexMetering, "PeriodicFlexMetering", "D42"),
         };
 
         using var scope = new AssertionScope();

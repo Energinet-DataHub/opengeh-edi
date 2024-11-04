@@ -30,7 +30,7 @@ public sealed class JsonResponseFactory(JavaScriptEncoder javaScriptEncoder) : I
     public ResponseMessage From(Result result)
     {
         ArgumentNullException.ThrowIfNull(result);
-        return result.Success ? new ResponseMessage() : new ResponseMessage(CreateMessageBodyFrom(result));
+        return result.Success ? ResponseMessage.Success() : ResponseMessage.Error(CreateMessageBodyFrom(result));
     }
 
     private string CreateMessageBodyFrom(Result result)
@@ -41,38 +41,50 @@ public sealed class JsonResponseFactory(JavaScriptEncoder javaScriptEncoder) : I
         using var writer = new Utf8JsonWriter(messageBody, _writerOptions);
 
         writer.WriteStartObject();
-        writer.WritePropertyName("Error");
-        writer.WriteStartObject();
-        writer.WritePropertyName("Code");
-        writer.WriteStringValue(result.Errors.Count == 1 ? result.Errors.First().Code : "BadRequest");
-        writer.WritePropertyName("Message");
-        writer.WriteStringValue(result.Errors.Count == 1 ? result.Errors.First().Message : "Multiple errors in message");
-        writer.WritePropertyName("Target");
-        writer.WriteStringValue(result.Errors.Count == 1 ? result.Errors.First().Target : string.Empty);
-
-        if (result.Errors.Count > 1)
         {
-            writer.WritePropertyName("Details");
+            writer.WritePropertyName("Error");
             writer.WriteStartObject();
-            writer.WritePropertyName("Errors");
-            writer.WriteStartArray();
-            foreach (var validationError in result.Errors)
             {
-                writer.WriteStartObject();
                 writer.WritePropertyName("Code");
-                writer.WriteStringValue(validationError.Code);
+                writer.WriteStringValue(result.Errors.Count == 1 ? result.Errors.First().Code : "BadRequest");
                 writer.WritePropertyName("Message");
-                writer.WriteStringValue(validationError.Message);
+                writer.WriteStringValue(
+                    result.Errors.Count == 1 ? result.Errors.First().Message : "Multiple errors in message");
                 writer.WritePropertyName("Target");
-                writer.WriteStringValue(validationError.Target);
-                writer.WriteEndObject();
+                writer.WriteStringValue(result.Errors.Count == 1 ? result.Errors.First().Target : string.Empty);
+
+                if (result.Errors.Count > 1)
+                {
+                    writer.WritePropertyName("Details");
+                    writer.WriteStartObject();
+                    {
+                        writer.WritePropertyName("Errors");
+                        writer.WriteStartArray();
+                        foreach (var validationError in result.Errors)
+                        {
+                            writer.WriteStartObject();
+                            {
+                                writer.WritePropertyName("Code");
+                                writer.WriteStringValue(validationError.Code);
+                                writer.WritePropertyName("Message");
+                                writer.WriteStringValue(validationError.Message);
+                                writer.WritePropertyName("Target");
+                                writer.WriteStringValue(validationError.Target);
+                            }
+
+                            writer.WriteEndObject();
+                        }
+
+                        writer.WriteEndArray();
+                    }
+
+                    writer.WriteEndObject();
+                }
             }
 
-            writer.WriteEndArray();
             writer.WriteEndObject();
         }
 
-        writer.WriteEndObject();
         writer.WriteEndObject();
         writer.Flush();
 

@@ -36,6 +36,13 @@ public class ProcessTypeValidator : IProcessTypeValidator
             BusinessReason.Correction.Code,
         };
 
+    private static readonly IReadOnlyCollection<string> _meteredDataForMeasurementPointWhiteList =
+        new[]
+        {
+            BusinessReason.PeriodicMetering.Code,
+            BusinessReason.PeriodicFlexMetering.Code, // Flex metering is only supported for Ebix and should be rejected when used for CIM
+        };
+
     public async Task<Result> ValidateAsync(IIncomingMessage message, CancellationToken cancellationToken)
     {
         return await Task.FromResult(
@@ -49,6 +56,10 @@ public class ProcessTypeValidator : IProcessTypeValidator
                         _wholesaleServicesWhitelist.Contains(rwsm.BusinessReason)
                             ? Result.Succeeded()
                             : Result.Failure(new NotSupportedProcessType(rwsm.BusinessReason)),
+                    MeteredDataForMeasurementPointMessage mdfmpm =>
+                        _meteredDataForMeasurementPointWhiteList.Contains(mdfmpm.BusinessReason)
+                            ? Result.Succeeded()
+                            : Result.Failure(new NotSupportedProcessType(mdfmpm.BusinessReason)),
                     _ => throw new InvalidOperationException($"The baw's on the slates! {message.GetType().Name}"),
                 })
             .ConfigureAwait(false);

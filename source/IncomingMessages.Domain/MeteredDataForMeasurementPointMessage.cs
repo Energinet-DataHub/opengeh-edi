@@ -52,14 +52,14 @@ public record MeteredDataForMeasurementPointSeries(
     {
         return actorRole.Name switch
         {
-            // MeteredDataResponsible is the only role that can make this incoming message.
-            DataHubNames.ActorRole.MeteredDataResponsible => ActorNumber.TryCreate(SenderNumber),
+            DataHubNames.ActorRole.GridAccessProvider => ActorNumber.TryCreate(SenderNumber),
+            DataHubNames.ActorRole.Delegated => ActorNumber.TryCreate(SenderNumber),
             _ => null,
         };
     }
 }
 
 public record EnergyObservation(
-    string? Position, //PayloadEnergyTimeSeries.IntervalEnergyObservation.Position
-    string? EnergyQuantity, //PayloadEnergyTimeSeries.IntervalEnergyObservation.EnergyQuantity
-    string? QuantityQuality); //PayloadEnergyTimeSeries.IntervalEnergyObservation.QuantityQuality
+    string? Position,
+    string? EnergyQuantity,
+    string? QuantityQuality);

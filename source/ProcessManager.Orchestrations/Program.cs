@@ -12,9 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
-using Energinet.DataHub.ProcessManagement.Core.Telemetry;
+using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.DependencyInjection;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Startup;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Telemetry;
+using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1;
+using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
 using Microsoft.Extensions.Hosting;
 
 var host = new HostBuilder()
@@ -24,6 +30,25 @@ var host = new HostBuilder()
         // Common
         services.AddApplicationInsightsForIsolatedWorker(TelemetryConstants.SubsystemName);
         services.AddHealthChecksForIsolatedWorker();
+        services.AddNodaTimeForApplication();
+
+        // ProcessManager
+        services.AddProcessManagerForOrchestrations(() =>
+        {
+            // TODO: For demo purposes; remove when done.
+            // We could implement an interface for "description building" which could then be implemented besides the orchestration.
+            // During DI we could then search for all these interface implementations and register them automatically.
+            // This would ensure we didn't have to update Program.cs when we change orchestrations.
+            var brs_023_027_v1 = new OrchestrationDescription(
+                name: "BRS_023_027",
+                version: 1,
+                canBeScheduled: true,
+                functionName: nameof(NotifyAggregatedMeasureDataOrchestrationV1));
+
+            brs_023_027_v1.ParameterDefinition.SetFromType<NotifyAggregatedMeasureDataInputV1>();
+
+            return [brs_023_027_v1];
+        });
     })
     .ConfigureLogging((hostingContext, logging) =>
     {
@@ -31,4 +56,5 @@ var host = new HostBuilder()
     })
     .Build();
 
-host.Run();
+await host.SynchronizeWithOrchestrationRegisterAsync().ConfigureAwait(false);
+await host.RunAsync().ConfigureAwait(false);

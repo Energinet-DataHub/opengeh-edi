@@ -23,7 +23,7 @@ limitations under the License.
 
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="6.12.1" />
-        <PackageReference Include="FluentAssertions.Analyzers" Version="0.33.0">
+        <PackageReference Include="FluentAssertions.Analyzers" Version="0.34.1">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -127,25 +127,20 @@ limitations under the License.
         <EmbeddedResource Include="CimMessageAdapter\Messages\json\AggregatedMeasure\EmptyJsonObject.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
-        <None Remove="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\BadVersionMeteredDateForMeasurementPoint.xml" />
-        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\BadVersionMeteredDateForMeasurementPoint.xml">
+        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDataForMeasurementPoint\ValidPT1HMeteredDataForMeasurementPoint.xml">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </EmbeddedResource>
-        <None Remove="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\InvalidMeteredDateForMeasurementPoint.xml" />
-        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\InvalidMeteredDateForMeasurementPoint.xml">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDataForMeasurementPoint\BadVersionMeteredDataForMeasurementPoint.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
-        <None Remove="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\ValidMeteredDateForMeasurementPoint.xml" />
-        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\ValidMeteredDateForMeasurementPoint.xml">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDataForMeasurementPoint\InvalidMeteredDataForMeasurementPoint.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
-        <None Remove="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\ValidMeteredDateForMeasurementPointWithTwoTransactions.xml" />
-        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\ValidMeteredDateForMeasurementPointWithTwoTransactions.xml">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDataForMeasurementPoint\ValidMeteredDataForMeasurementPoint.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
-        <None Remove="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\ValidPT1HMeteredDataForMeasurementPoint.xml" />
-        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDateForMeasurementPoint\ValidPT1HMeteredDataForMeasurementPoint.xml">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <EmbeddedResource Include="CimMessageAdapter\Messages\ebix\MeteredDataForMeasurementPoint\ValidMeteredDataForMeasurementPointWithTwoTransactions.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
     </ItemGroup>
 

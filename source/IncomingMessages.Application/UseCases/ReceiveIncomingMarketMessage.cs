@@ -88,12 +88,15 @@ public class ReceiveIncomingMarketMessage
             return _responseFactory.From(res, responseDocumentFormat);
         }
 
-        await ArchiveIncomingMessageAsync(
-                incomingMarketMessageStream,
-                incomingMarketMessageParserResult.IncomingMessage,
-                documentType,
-                cancellationToken)
-            .ConfigureAwait(false);
+        if (ShouldArchive(documentType))
+        {
+            await ArchiveIncomingMessageAsync(
+                    incomingMarketMessageStream,
+                    incomingMarketMessageParserResult.IncomingMessage,
+                    documentType,
+                    cancellationToken)
+                .ConfigureAwait(false);
+        }
 
         await _delegateIncomingMessage
                 .DelegateAsync(incomingMarketMessageParserResult.IncomingMessage, documentType, cancellationToken)
@@ -120,7 +123,7 @@ public class ReceiveIncomingMarketMessage
 
         if (result.Success)
         {
-            return new ResponseMessage();
+            return _responseFactory.From(result, responseDocumentFormat);
         }
 
         _logger.LogInformation(
@@ -128,6 +131,11 @@ public class ReceiveIncomingMarketMessage
             incomingMarketMessageParserResult.IncomingMessage!.MessageId,
             string.Join(',', incomingMarketMessageParserResult.Errors.Select(e => e.ToString())));
         return _responseFactory.From(result, responseDocumentFormat);
+    }
+
+    private static bool ShouldArchive(IncomingDocumentType documentType)
+    {
+        return documentType != IncomingDocumentType.MeteredDataForMeasurementPoint;
     }
 
     private async Task ArchiveIncomingMessageAsync(

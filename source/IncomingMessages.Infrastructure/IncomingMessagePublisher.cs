@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
@@ -26,16 +27,19 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure;
 
 public class IncomingMessagePublisher
 {
+    private readonly AuthenticatedActor _authenticatedActor;
     private readonly ISerializer _serializer;
     private readonly ServiceBusSender _sender;
 
     public IncomingMessagePublisher(
+        AuthenticatedActor authenticatedActor,
         IOptions<IncomingMessagesQueueOptions> options,
         IAzureClientFactory<ServiceBusSender> senderFactory,
         ISerializer serializer)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(senderFactory);
+        _authenticatedActor = authenticatedActor;
         _serializer = serializer;
 
         _sender = senderFactory.CreateClient(options.Value.QueueName);
@@ -53,6 +57,9 @@ public class IncomingMessagePublisher
                 break;
             case RequestWholesaleServicesMessage wholesaleSettlementMessage:
                 await SendInitializeWholesaleServicesProcessAsync(InitializeWholesaleServicesProcessDtoFactory.Create(wholesaleSettlementMessage), cancellationToken).ConfigureAwait(false);
+                break;
+            case MeteredDataForMeasurementPointMessage meteredDataForMeasurementPointMessage:
+                await SendInitializeMeteredDataForMeasurementPointMessageProcessAsync(InitializeMeteredDataForMeasurementPointProcessDtoFactory.Create(meteredDataForMeasurementPointMessage, _authenticatedActor), cancellationToken).ConfigureAwait(false);
                 break;
             default:
                 throw new InvalidOperationException($"Unknown message type {incomingMessage.GetType().Name}");
@@ -82,6 +89,20 @@ public class IncomingMessagePublisher
                 _serializer.Serialize(initializeWholesaleServicesProcessDto))
             {
                 Subject = nameof(InitializeWholesaleServicesProcessDto),
+            };
+
+        await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task SendInitializeMeteredDataForMeasurementPointMessageProcessAsync(InitializeMeteredDataForMeasurementPointMessageProcessDto initializeMeteredDataForMeasurementPointMessageProcessDto, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(initializeMeteredDataForMeasurementPointMessageProcessDto);
+
+        var serviceBusMessage =
+            new ServiceBusMessage(
+                _serializer.Serialize(initializeMeteredDataForMeasurementPointMessageProcessDto))
+            {
+                Subject = nameof(InitializeMeteredDataForMeasurementPointMessageProcessDto),
             };
 
         await _sender.SendMessageAsync(serviceBusMessage, cancellationToken).ConfigureAwait(false);
