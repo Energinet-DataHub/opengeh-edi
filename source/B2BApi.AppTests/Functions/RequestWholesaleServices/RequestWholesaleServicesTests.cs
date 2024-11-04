@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
+using System.Net;
 using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
@@ -56,29 +58,27 @@ public class RequestWholesaleServicesTests : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        if (Fixture.DatabricksSchemaManager.SchemaExists)
-            await Fixture.DatabricksSchemaManager.DropSchemaAsync();
+        if (Fixture.EdiDatabricksSchemaManager.SchemaExists)
+            await Fixture.EdiDatabricksSchemaManager.DropSchemaAsync();
 
         Fixture.SetTestOutputHelper(null!);
     }
 
     /// <summary>
     /// Verifies that:
-    ///  - The orchestration can complete a full run.
-    ///  - Every activity is executed once. We cannot be sure in which order, because we use fan-out/fan-in.
-    ///  - A service bus message is sent as expected.
+    ///  - The RequestWholesaleServicesOrchestration can complete successfully.
+    /// - The correct number of messages are enqueued.
+    /// - The enqueued messages can all be peeked and dequeued.
+    /// - The peeked messages all have the correct document type.
     /// </summary>
-    /// <remarks>
-    /// Feature flags are enabled for all calculation types to ensure activities are executed.
-    /// </remarks>
     [Fact]
-    public async Task When_RequestWholesaleServicesDocumentReceived_Then_OrchestrationCompletesWithExpectedMessagesEnqueued()
+    public async Task Given_RequestWholesaleServices_When_RequestWholesaleServicesOrchestrationIsCompleted_Then_EnqueuedMessagesCanBePeeked()
     {
         // Arrange
         EnableRequestWholesaleServicesOrchestrationFeature();
         // The following must match with the JSON/XML document content
-        var actor = new Actor(
-            ActorNumber.Create("5790000392551"),
+        var energySupplier = new Actor(
+            ActorNumber.Create("5790000701278"),
             ActorRole.EnergySupplier);
 
         var amountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
@@ -87,8 +87,8 @@ public class RequestWholesaleServicesTests : IAsyncLifetime
         // Test steps:
         // => HTTP POST: RequestWholesaleServices
         var beforeOrchestrationCreated = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromSeconds(30));
-        var httpRequest = await Fixture.CreateRequestWholesaleServicesHttpRequestAsync(actor);
-        var httpResponse = await Fixture.AppHostManager.HttpClient.SendAsync(httpRequest);
+        using var httpRequest = await Fixture.CreateRequestWholesaleServicesHttpRequestAsync(energySupplier);
+        using var httpResponse = await Fixture.AppHostManager.HttpClient.SendAsync(httpRequest);
         await httpResponse.EnsureSuccessStatusCodeWithLogAsync(Fixture.TestLogger);
 
         // => Wait for orchestration to start
@@ -103,13 +103,74 @@ public class RequestWholesaleServicesTests : IAsyncLifetime
             TimeSpan.FromMinutes(5));
         completedOrchestrationStatus.Should().NotBeNull();
 
-        // => Assert activities
-        // => Assert enqueued messages (database or peek?)
+        // Assert activities
+        // => Assert enqueued messages in orchestrator
+        using (new AssertionScope())
+        {
+            completedOrchestrationStatus.RuntimeStatus.Should().Be(OrchestrationRuntimeStatus.Completed);
+            completedOrchestrationStatus.Output.ToString()
+                .Should().Contain("AcceptedMessagesCount=33")
+                .And.Contain("RejectedMessagesCount=0");
+        }
+
+         // => HTTP GET: Peek messages
+        var peekedDocuments = await PeekAllMessages(energySupplier);
+
         using var assertionScope = new AssertionScope();
-        completedOrchestrationStatus.RuntimeStatus.Should().Be(OrchestrationRuntimeStatus.Completed);
-        completedOrchestrationStatus.Output.ToString()
-            .Should().Contain("AcceptedMessagesCount=1")
-            .And.Contain("RejectedMessagesCount=0");
+        peekedDocuments.Should()
+            .HaveCount(33)
+            .And.AllSatisfy(
+                peekedDocument => peekedDocument.Should().Contain("NotifyWholesaleServices_MarketDocument"));
+    }
+
+    private async Task<IReadOnlyCollection<string>> PeekAllMessages(Actor actor)
+    {
+        List<string> peekResponses = [];
+
+        var timeout = TimeSpan.FromSeconds(60);
+        var stopwatch = Stopwatch.StartNew();
+        while (stopwatch.Elapsed < timeout)
+        {
+            using var peekResponse = await PeekNextMessage(actor);
+
+            if (peekResponse.StatusCode == HttpStatusCode.NoContent)
+                break;
+
+            var peekedDocument = await peekResponse.Content.ReadAsStringAsync();
+            peekResponses.Add(peekedDocument);
+
+            var messageId = peekResponse.Headers.GetValues("MessageId").Single();
+            await DequeueMessage(actor, messageId);
+        }
+
+        return peekResponses;
+    }
+
+    private async Task<HttpResponseMessage> PeekNextMessage(Actor actor)
+    {
+        HttpResponseMessage? peekResponse = null;
+        try
+        {
+            using var peekRequest = await Fixture.CreatePeekHttpRequestAsync(actor);
+            peekResponse = await Fixture.AppHostManager.HttpClient.SendAsync(peekRequest);
+            await peekResponse.EnsureSuccessStatusCodeWithLogAsync(Fixture.TestLogger);
+            return peekResponse;
+        }
+        catch
+        {
+            peekResponse?.Dispose();
+            throw;
+        }
+    }
+
+    private async Task DequeueMessage(Actor actor, string messageId)
+    {
+        using var dequeueRequest = await Fixture.CreateDequeueHttpRequestAsync(
+            actor,
+            messageId);
+
+        using var dequeueResponse = await Fixture.AppHostManager.HttpClient.SendAsync(dequeueRequest);
+        await dequeueResponse.EnsureSuccessStatusCodeWithLogAsync(Fixture.TestLogger);
     }
 
     /// <summary>
@@ -121,7 +182,7 @@ public class RequestWholesaleServicesTests : IAsyncLifetime
     {
         // Ensure that databricks does not contain data, unless the test explicit adds it
         await ResetDatabricks();
-        var ediDatabricksOptions = Options.Create(new EdiDatabricksOptions { DatabaseName = Fixture.DatabricksSchemaManager.SchemaName });
+        var ediDatabricksOptions = Options.Create(new EdiDatabricksOptions { DatabaseName = Fixture.EdiDatabricksSchemaManager.SchemaName });
 
         var amountPerChargeQuery = new WholesaleAmountPerChargeQuery(null!, ediDatabricksOptions.Value, null!, null!, amountPerChargeDescription.CalculationId, null);
         await SeedDatabricksWithDataAsync(amountPerChargeDescription.TestFilePath, amountPerChargeQuery);
@@ -131,16 +192,16 @@ public class RequestWholesaleServicesTests : IAsyncLifetime
 
     private async Task ResetDatabricks()
     {
-        if (Fixture.DatabricksSchemaManager.SchemaExists)
-            await Fixture.DatabricksSchemaManager.DropSchemaAsync();
+        if (Fixture.EdiDatabricksSchemaManager.SchemaExists)
+            await Fixture.EdiDatabricksSchemaManager.DropSchemaAsync();
 
-        await Fixture.DatabricksSchemaManager.CreateSchemaAsync();
+        await Fixture.EdiDatabricksSchemaManager.CreateSchemaAsync();
     }
 
     private async Task SeedDatabricksWithDataAsync(string testFilePath, IDeltaTableSchemaDescription schemaInformation)
     {
-        await Fixture.DatabricksSchemaManager.CreateTableAsync(schemaInformation.DataObjectName, schemaInformation.SchemaDefinition);
-        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(schemaInformation.DataObjectName, schemaInformation.SchemaDefinition, testFilePath);
+        await Fixture.EdiDatabricksSchemaManager.CreateTableAsync(schemaInformation.DataObjectName, schemaInformation.SchemaDefinition);
+        await Fixture.EdiDatabricksSchemaManager.InsertFromCsvFileAsync(schemaInformation.DataObjectName, schemaInformation.SchemaDefinition, testFilePath);
     }
 
     private async Task AddGridAreaOwner(ActorNumber actorNumber, string gridAreaCode)

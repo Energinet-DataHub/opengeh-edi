@@ -94,7 +94,7 @@ public static class DurableClientExtensions
                 var completeOrchestrationStatus = await client.GetStatusAsync(instanceId);
 
                 if (completeOrchestrationStatus.RuntimeStatus == OrchestrationRuntimeStatus.Failed)
-                    throw new Exception($"Orchestration instance '{instanceId}' failed.");
+                    throw new Exception($"Orchestration instance '{instanceId}' was status 'failed'.");
 
                 return completeOrchestrationStatus.RuntimeStatus == OrchestrationRuntimeStatus.Completed;
             },

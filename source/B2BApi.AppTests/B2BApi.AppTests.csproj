@@ -36,6 +36,7 @@
   <ItemGroup>
     <ProjectReference Include="..\B2BApi\B2BApi.csproj" />
     <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj" />
+    <ProjectReference Include="..\CalculationResults\CalculationResults.Infrastructure\CalculationResults.Infrastructure.csproj" />
     <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
     <ProjectReference Include="..\IntegrationTests\IntegrationTests.csproj" />
     <ProjectReference Include="..\Outbox.Infrastructure\Outbox.Infrastructure.csproj" />
@@ -53,10 +54,16 @@
     <None Update="TestData\Messages\json\RequestAggregatedMeasureData.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-      <None Update="TestData\Messages\xml\RequestWholesaleSettlement.xml">
+      <None Update="TestData\Messages\xml\RequestWholesaleSettlementForEnergySupplier.xml">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="TestData\Messages\xml\InvalidRequestWholesaleSettlement.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\Databricks\wholesale_calculation_results.amounts_per_charge_v1.csv">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\CalculationResults\wholesale_calculation_results.amounts_per_charge_v1.csv">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
   </ItemGroup>

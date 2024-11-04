@@ -15,6 +15,7 @@
 using System.Net.Http.Headers;
 using System.Text;
 using Energinet.DataHub.EDI.B2BApi.Authentication;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Infrastructure.Authentication.MarketActors;
 
@@ -26,15 +27,45 @@ public static class HttpRequestExtensions
         this B2BApiAppFixture fixture,
         Actor actor)
     {
-        return CreateHttpRequestAsync(
+        var documentPath = actor.ActorRole.Name switch
+        {
+            DataHubNames.ActorRole.EnergySupplier => "TestData/Messages/xml/RequestWholesaleSettlementForEnergySupplier.xml",
+            _ => throw new ArgumentOutOfRangeException(actor.ActorRole.Name),
+        };
+
+        return CreateIncomingMessageHttpRequestAsync(
             fixture,
-            "TestData/Messages/xml/RequestWholesaleSettlement.xml",
+            documentPath,
             IncomingDocumentType.RequestWholesaleSettlement.Name,
             "application/xml",
             actor);
     }
 
-    private static async Task<HttpRequestMessage> CreateHttpRequestAsync(
+    public static Task<HttpRequestMessage> CreatePeekHttpRequestAsync(
+        this B2BApiAppFixture fixture,
+        Actor actor)
+    {
+        return CreateHttpRequestAsync(
+            fixture,
+            actor,
+            HttpMethod.Get,
+            $"api/peek/Aggregations",
+            new StringContent(string.Empty, new MediaTypeHeaderValue("application/json")));
+    }
+
+    public static Task<HttpRequestMessage> CreateDequeueHttpRequestAsync(
+        this B2BApiAppFixture fixture,
+        Actor actor,
+        string messageId)
+    {
+        return CreateHttpRequestAsync(
+            fixture,
+            actor,
+            HttpMethod.Delete,
+            $"api/dequeue/{messageId}");
+    }
+
+    private static async Task<HttpRequestMessage> CreateIncomingMessageHttpRequestAsync(
         B2BApiAppFixture fixture,
         string filePath,
         string documentType,
@@ -51,27 +82,15 @@ public static class HttpRequestExtensions
                 .Replace("{MessageId}", Guid.NewGuid().ToString())
                 .Replace("{TransactionId}", Guid.NewGuid().ToString());
 
-            // The actor must exist in the database
-            var externalId = Guid.NewGuid().ToString();
-            await fixture.DatabaseManager.AddActorAsync(actor.ActorNumber, externalId);
-
-            // The bearer token must contain:
-            //  * the actor role matching the document content
-            //  * the external id matching the actor in the database
-            var b2bToken = new JwtBuilder()
-                .WithRole(ClaimsMap.RoleFrom(actor.ActorRole).Value)
-                .WithClaim(ClaimsMap.ActorId, externalId)
-                .CreateToken();
-
-            request = new HttpRequestMessage(HttpMethod.Post, $"api/incomingMessages/{documentType}")
-            {
-                Content = new StringContent(
+            request = await CreateHttpRequestAsync(
+                fixture,
+                actor,
+                HttpMethod.Post,
+                $"api/incomingMessages/{documentType}",
+                new StringContent(
                     document,
                     Encoding.UTF8,
-                    contentType),
-            };
-
-            request.Headers.Authorization = new AuthenticationHeaderValue("bearer", b2bToken);
+                    contentType));
 
             return request;
         }
@@ -80,5 +99,33 @@ public static class HttpRequestExtensions
             request?.Dispose();
             throw;
         }
+    }
+
+    private static async Task<HttpRequestMessage> CreateHttpRequestAsync(
+        B2BApiAppFixture fixture,
+        Actor actor,
+        HttpMethod method,
+        string url,
+        HttpContent? content = null)
+    {
+        // The actor must exist in the database
+        var externalId = Guid.NewGuid().ToString();
+        await fixture.DatabaseManager.AddActorAsync(actor.ActorNumber, externalId);
+
+        // The bearer token must contain:
+        //  * the actor role matching the document content
+        //  * the external id matching the actor in the database
+        var b2bToken = new JwtBuilder()
+            .WithRole(ClaimsMap.RoleFrom(actor.ActorRole).Value)
+            .WithClaim(ClaimsMap.ActorId, externalId)
+            .CreateToken();
+
+        var request = new HttpRequestMessage(method, url)
+        {
+            Content = content,
+        };
+
+        request.Headers.Authorization = new AuthenticationHeaderValue("bearer", b2bToken);
+        return request;
     }
 }

@@ -28,16 +28,24 @@ using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
 using Energinet.DataHub.Core.TestCommon.Diagnostics;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.B2BApi.Functions;
+using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
+using Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
+using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.RevisionLog.Integration.Options;
+using Energinet.DataHub.Wholesale.Common.Infrastructure.Options;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using Microsoft.Extensions.Logging;
 using Xunit;
 using Xunit.Abstractions;
+using AmountsPerChargeViewSchemaDefinition = Energinet.DataHub.EDI.B2BApi.AppTests.TestData.CalculationResults.AmountsPerChargeViewSchemaDefinition;
+using EventId = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.EventId;
 using HttpClientFactory = Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks.HttpClientFactory;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
@@ -52,6 +60,10 @@ public class B2BApiAppFixture : IAsyncLifetime
     /// See naming constraints: https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-task-hubs?tabs=csharp#task-hub-names
     /// </summary>
     private const string TaskHubName = "EdiTest01";
+
+    private const string DatabricksCatalogName = "hive_metastore";
+
+    private readonly DeltaTableOptions _calculationResultsDatabricksOptions;
 
     public B2BApiAppFixture()
     {
@@ -96,11 +108,23 @@ public class B2BApiAppFixture : IAsyncLifetime
         HostConfigurationBuilder = new FunctionAppHostConfigurationBuilder();
         LogStopwatch(stopwatch, nameof(HostConfigurationBuilder));
 
-        DatabricksSchemaManager = new DatabricksSchemaManager(
+        EdiDatabricksSchemaManager = new DatabricksSchemaManager(
             new HttpClientFactory(),
             IntegrationTestConfiguration.DatabricksSettings,
-            "edi_B2BApi_tests");
-        LogStopwatch(stopwatch, nameof(DatabricksSchemaManager));
+            "B2BApi_tests_edi");
+        LogStopwatch(stopwatch, nameof(EdiDatabricksSchemaManager));
+
+        WholesaleDatabricksSchemaManager = new DatabricksSchemaManager(
+            new HttpClientFactory(),
+            IntegrationTestConfiguration.DatabricksSettings,
+            "B2BApi_tests_wholesale");
+        LogStopwatch(stopwatch, nameof(WholesaleDatabricksSchemaManager));
+
+        _calculationResultsDatabricksOptions = new DeltaTableOptions
+        {
+            DatabricksCatalogName = DatabricksCatalogName,
+            WholesaleCalculationResultsSchemaName = WholesaleDatabricksSchemaManager.SchemaName,
+        };
 
         AuditLogMockServer = new AuditLogMockServer();
         LogStopwatch(stopwatch, nameof(AuditLogMockServer));
@@ -126,7 +150,9 @@ public class B2BApiAppFixture : IAsyncLifetime
 
     public ServiceBusListenerMock ServiceBusListenerMock { get; }
 
-    public DatabricksSchemaManager DatabricksSchemaManager { get; }
+    public DatabricksSchemaManager EdiDatabricksSchemaManager { get; }
+
+    public DatabricksSchemaManager WholesaleDatabricksSchemaManager { get; }
 
     public EdiDatabaseManager DatabaseManager { get; }
 
@@ -213,6 +239,14 @@ public class B2BApiAppFixture : IAsyncLifetime
         // Create durable client when TaskHub has been created
         DurableClient = DurableTaskManager.CreateClient(taskHubName: TaskHubName);
         LogStopwatch(stopwatch, nameof(DurableTaskManager.CreateClient));
+
+        await WholesaleDatabricksSchemaManager.CreateSchemaAsync();
+        LogStopwatch(
+            stopwatch,
+            $"{nameof(WholesaleDatabricksSchemaManager)}.{nameof(WholesaleDatabricksSchemaManager.CreateSchemaAsync)}");
+
+        await CreateCalculationResultDatabricksDataAsync();
+        LogStopwatch(stopwatch, nameof(CreateCalculationResultDatabricksDataAsync));
 
         LogStopwatch(initializeStopwatch, nameof(InitializeAsync));
     }
@@ -400,10 +434,17 @@ public class B2BApiAppFixture : IAsyncLifetime
             IntegrationTestConfiguration.DatabricksSettings.WarehouseId);
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.DatabaseName)}",
-            DatabricksSchemaManager.SchemaName);
+            EdiDatabricksSchemaManager.SchemaName);
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.CatalogName)}",
-            "hive_metastore");
+            DatabricksCatalogName);
+
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"{nameof(DeltaTableOptions.WholesaleCalculationResultsSchemaName)}",
+            _calculationResultsDatabricksOptions.WholesaleCalculationResultsSchemaName);
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"{nameof(DeltaTableOptions.DatabricksCatalogName)}",
+            _calculationResultsDatabricksOptions.DatabricksCatalogName);
 
         // ServiceBus connection strings
         appHostSettings.ProcessEnvironmentVariables.Add(
@@ -442,6 +483,20 @@ public class B2BApiAppFixture : IAsyncLifetime
             "true");
 
         return appHostSettings;
+    }
+
+    private async Task CreateCalculationResultDatabricksDataAsync()
+    {
+        await WholesaleDatabricksSchemaManager.CreateTableAsync(
+            _calculationResultsDatabricksOptions.AMOUNTS_PER_CHARGE_V1_VIEW_NAME,
+            AmountsPerChargeViewSchemaDefinition.SchemaDefinition);
+
+        const string amountsPerChargeFileName = "wholesale_calculation_results.amounts_per_charge_v1.csv";
+        var amountsPerChargeFilePath = Path.Combine("TestData", "CalculationResults", amountsPerChargeFileName);
+        await WholesaleDatabricksSchemaManager.InsertFromCsvFileAsync(
+            _calculationResultsDatabricksOptions.AMOUNTS_PER_CHARGE_V1_VIEW_NAME,
+            AmountsPerChargeViewSchemaDefinition.SchemaDefinition,
+            amountsPerChargeFilePath);
     }
 
     private void LogStopwatch(Stopwatch stopwatch, string tag)
