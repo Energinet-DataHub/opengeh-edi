@@ -48,6 +48,8 @@ jobs:
     runs-on: windows-2022
     name: Publish bundle to NuGet.org
 
+    environment: AzureAuth
+
     # We need to have permissions here to be able to support manually triggering this workflow for releasing a pre-release.
     permissions:
       id-token: write # Needed by 'dotnet-solution-build-and-test' to login to Azure
