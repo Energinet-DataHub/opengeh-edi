@@ -31,7 +31,7 @@ jobs:
         shell: pwsh
         run: |
           dotnet tool install dotnet-affected --global
-          dotnet affected --solution-path ${{github.workspace}}/source/Edi.Repository.sln -p ${{github.workspace}} --from origin/main --to $CURRENT_COMMIT_HASH
+          dotnet affected --solution-path ${{github.workspace}}/source/Edi.Repository.sln -p ${{github.workspace}} --from $env:GITHUB_SHA --to $env:GITHUB_BASE_REF
           
           dotnet affected describe
 
