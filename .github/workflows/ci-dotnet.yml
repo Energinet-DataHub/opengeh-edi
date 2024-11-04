@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Fetch all history so that we can determine the base commit
 
       - uses: nrwl/nx-set-shas@v4
         id: set_shas
