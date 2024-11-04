@@ -73,7 +73,7 @@ public class MonitorCalculationScenarioUsingApi : IAsyncLifetime
     [Fact]
     public async Task CalculationBrs023_WhenScheduledUsingClient_CanMonitorLifecycle()
     {
-        // TODO: Move to API test project AND then implement the same but with the client
+        // TODO: Move to API test project
         dynamic scheduleRequestDto = new ExpandoObject();
         scheduleRequestDto.RunAt = "2024-11-01T06:19:10.0209567+01:00";
         scheduleRequestDto.InputParameter = new ExpandoObject();
