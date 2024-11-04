@@ -42,13 +42,5 @@ public sealed class SuppressOperationCanceledExceptionMiddleware(ILogger<UnHandl
                 "Request was cancelled: {Ex}",
                 operationCanceledException.Message);
         }
-        catch (ObjectDisposedException e)
-        {
-            // TODO: Move to own branch
-            var objectName = e.ObjectName;
-
-            if (objectName != "test")
-                throw;
-        }
     }
 }
