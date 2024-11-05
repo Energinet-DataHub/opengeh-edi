@@ -29,23 +29,7 @@ public class EbixResponseFactory : IResponseFactory
     public ResponseMessage From(Result result)
     {
         ArgumentNullException.ThrowIfNull(result);
-        return result.Success ? ResponseMessage.Success(CreateSuccessMessageBody(result.MessageId)) : ResponseMessage.Error(CreateErrorMessageBodyFrom(result));
-    }
-
-    private static string CreateSuccessMessageBody(string? messageId)
-    {
-        if (messageId == null)
-        {
-            throw new ArgumentNullException(nameof(messageId));
-        }
-
-        var messageBody = new StringBuilder();
-        var settings = new XmlWriterSettings { OmitXmlDeclaration = true, Indent = true };
-        using var writer = XmlWriter.Create(messageBody, settings);
-        writer.WriteElementString("MessageId", messageId);
-        writer.Close();
-
-        return messageBody.ToString();
+        return result.Success ? ResponseMessage.Success(result.MessageId) : ResponseMessage.Error(CreateErrorMessageBodyFrom(result));
     }
 
     private static string CreateErrorMessageBodyFrom(Result result)
@@ -57,7 +41,7 @@ public class EbixResponseFactory : IResponseFactory
         using var writer = XmlWriter.Create(messageBody, settings);
         writer.WriteStartElement("Error");
         {
-            writer.WriteElementString("faultcode", "SOAP-ENV:Client");
+            writer.WriteElementString("faultcode", "soapenv:Client");
             writer.WriteElementString("faultstring", $"{result.Errors.First().Code}:{result.Errors.First().Message}");
             writer.WriteStartElement("detail");
             {
