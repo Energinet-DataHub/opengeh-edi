@@ -81,3 +81,25 @@ runs:
           --no-restore \
           --configuration Release \
           --output '${{ inputs.output_path }}\b2cwebapi'
+
+    - name: Publish ProcessManager API
+      shell: bash
+      run: |
+        dotnet publish \
+          'source/ProcessManager/ProcessManager.csproj' \
+          --no-build \
+          --no-restore \
+          --configuration Release \
+          --output '${{ inputs.output_path }}\functions\ProcessManager.Api'
+
+    - name: Publish ProcessManager Orchestrations
+      shell: bash
+      run: |
+        dotnet publish \
+          'source/ProcessManager.Orchestrations/ProcessManager.Orchestrations.csproj' \
+          --no-build \
+          --no-restore \
+          --configuration Release \
+          --output '${{ inputs.output_path }}\functions\ProcessManager.Orchestrations'
+
+
