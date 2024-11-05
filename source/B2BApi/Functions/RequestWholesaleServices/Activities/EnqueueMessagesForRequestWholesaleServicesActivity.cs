@@ -55,16 +55,14 @@ public class EnqueueMessagesForRequestWholesaleServicesActivity(
     public async Task<EnqueueMessagesResult> Run([ActivityTrigger] RequestWholesaleServicesTransaction transaction, CancellationToken cancellationToken)
     {
         var request = WholesaleServicesRequestFactory.CreateWholesaleServicesRequest(transaction);
-        var calculationResults = await _requestWholesaleServicesQueryHandler.GetAsync(
+        var calculationResultsAsyncEnumerable = _requestWholesaleServicesQueryHandler.GetAsync(
             request,
             transaction.BusinessTransactionId.Value,
-            cancellationToken)
-            .ToListAsync(cancellationToken)
-            .ConfigureAwait(false);
+            cancellationToken);
 
         List<Guid> acceptedMessagesIds = [];
         List<Guid> rejectedMessageIds = [];
-        foreach (var calculationResult in calculationResults)
+        await foreach (var calculationResult in calculationResultsAsyncEnumerable)
         {
             if (calculationResult.Result == RequestWholesaleServicesQueryResultEnum.Success)
             {
