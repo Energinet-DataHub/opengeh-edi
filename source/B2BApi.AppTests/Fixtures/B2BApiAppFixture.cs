@@ -242,8 +242,9 @@ public class B2BApiAppFixture : IAsyncLifetime
     public async Task DisposeAsync()
     {
         AppHostManager.Dispose();
-        DurableTaskManager.Dispose();
         AzuriteManager.Dispose();
+        await CalculationResultsDatabricksSchemaManager.DropSchemaAsync();
+        await DurableTaskManager.DisposeAsync();
         await ServiceBusResourceProvider.DisposeAsync();
         await DatabaseManager.DeleteDatabaseAsync();
     }

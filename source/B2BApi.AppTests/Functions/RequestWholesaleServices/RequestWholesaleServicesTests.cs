@@ -51,17 +51,13 @@ public class RequestWholesaleServicesTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         Fixture.AppHostManager.ClearHostLog();
-
-        // Clear mappings etc. before each test
-        await AddGridAreaOwner(ActorNumber.Create("5790001662233"), "804");
+        await Task.CompletedTask;
     }
 
     public async Task DisposeAsync()
     {
-        if (Fixture.EdiDatabricksSchemaManager.SchemaExists)
-            await Fixture.EdiDatabricksSchemaManager.DropSchemaAsync();
-
         Fixture.SetTestOutputHelper(null!);
+        await Task.CompletedTask;
     }
 
     /// <summary>
