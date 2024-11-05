@@ -9,7 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="6.1.0" />
-        <PackageReference Include="FluentAssertions.Analyzers" Version="0.34.1">
+        <PackageReference Include="FluentAssertions.Analyzers" Version="0.33.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
