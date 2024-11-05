@@ -60,6 +60,7 @@ public static class MeteringPointTypeMapper
             Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.ElectricalHeating => MeteringPointType.ElectricalHeating,
             Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.NetConsumption => MeteringPointType.NetConsumption,
             Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.EffectSettlement => MeteringPointType.EffectSettlement,
+            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.Exchange => MeteringPointType.Exchange,
             _ => throw new ArgumentOutOfRangeException(nameof(meteringPointType), meteringPointType, "Unknown metering point type"),
         };
     }
