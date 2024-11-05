@@ -70,7 +70,7 @@ public class B2BApiAppFixture : IAsyncLifetime
         IntegrationTestConfiguration = new IntegrationTestConfiguration();
         LogStopwatch(stopwatch, nameof(IntegrationTestConfiguration));
 
-        AzuriteManager = new AzuriteManager();
+        AzuriteManager = new AzuriteManager(useOAuth: true);
         LogStopwatch(stopwatch, nameof(AzuriteManager));
 
         CleanupAzuriteStorage();
