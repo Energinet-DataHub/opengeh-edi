@@ -70,8 +70,6 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
             _serviceBusClient,
             GetConfigurationValue<string>(configuration, "sbq-edi-inbox-messagequeue-name"));
 
-        // Durable Task Hub connection string name/value is set implicitly from terraform as an application setting in Azure,
-        // and added to the keyvault as "func-edi-api-taskhub-storage-connection-string"
         _durableTaskManager = new DurableTaskManager(
             "OrchestrationsStorageConnectionString",
             GetConfigurationValue<string>(configuration, "func-edi-api-taskhub-storage-connection-string"));

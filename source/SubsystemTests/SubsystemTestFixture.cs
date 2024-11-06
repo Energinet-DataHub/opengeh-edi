@@ -170,8 +170,6 @@ public class SubsystemTestFixture : IAsyncLifetime
         EventPublisher = new IntegrationEventPublisher(ServiceBusClient, topicName, dbConnectionString);
         EdiInboxClient = new EdiInboxClient(ServiceBusClient, ediInboxQueueName);
 
-        // Durable Task Hub connection string name/value is set implicitly from terraform as an application setting in Azure,
-        // and added to the keyvault as "func-edi-api-taskhub-storage-connection-string"
         DurableTaskManager = new DurableTaskManager(
             "OrchestrationsStorageConnectionString",
             GetConfigurationValue<string>(root, "func-edi-api-taskhub-storage-connection-string"));
