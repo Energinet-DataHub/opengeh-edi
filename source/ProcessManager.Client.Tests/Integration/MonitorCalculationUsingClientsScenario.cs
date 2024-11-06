@@ -97,7 +97,7 @@ public class MonitorCalculationUsingClientsScenario : IAsyncLifetime
 
         // Step 1: Schedule new calculation orchestration instance
         var orchestrationInstanceId = await calculationClient
-            .ScheduleNewCalculationOrchestationInstanceAsync(
+            .ScheduleNewCalculationAsync(
                 new ClientTypes.Energinet.DataHub.ProcessManager.Api.Model.ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1>(
                     RunAt: DateTimeOffset.Parse("2024-11-01T06:19:10.0209567+01:00"),
                     InputParameter: new NotifyAggregatedMeasureDataInputV1(
@@ -116,7 +116,7 @@ public class MonitorCalculationUsingClientsScenario : IAsyncLifetime
         var isTerminated = await Awaiter.TryWaitUntilConditionAsync(
             async () =>
             {
-                var orchestrationInstance = await calculationClient.GetCalculationOrchestrationInstanceAsync(orchestrationInstanceId, CancellationToken.None);
+                var orchestrationInstance = await calculationClient.GetCalculationAsync(orchestrationInstanceId, CancellationToken.None);
 
                 return orchestrationInstance!.Lifecycle!.State == ClientTypes.Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance.OrchestrationInstanceLifecycleStates.Terminated;
             },
