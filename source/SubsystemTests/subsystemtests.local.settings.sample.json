@@ -2,6 +2,7 @@
   "SHARED_KEYVAULT_NAME": "<SHARED_KEYVAULT_NAME>",
   "EBIX_CERTIFICATE_PASSWORD_MDR": "<certificate password for performing an ebix peek in api management for the meter data responsible>",
   "EBIX_CERTIFICATE_PASSWORD_ES": "<certificate password for performing an ebix peek in api management for the energysupplier>",
+  "EBIX_CERTIFICATE_PASSWORD_DDM": "<certificate password for performing an ebix send metered data in api management for the grid operator>",
 
   "AZURE_B2C_TENANT_URL": "<optional: azure b2c tenant (ROPC) url>",
   "AZURE_ENTRA_FRONTEND_APP_ID": "<optional: frontend app id in b2c tenant>",

@@ -127,7 +127,7 @@ internal sealed class EdiDatabaseDriver
             UPDATE [WholesaleServicesProcesses] SET State = 'Rejected' WHERE InitiatedByMessageId = @InitiatedByMessageId;
             SELECT ProcessId FROM [WholesaleServicesProcesses] WHERE InitiatedByMessageId = @InitiatedByMessageId";
         command.Parameters.AddWithValue("@InitiatedByMessageId", initiatedByMessageId.ToString());
-        return await GetWholesaleServiceProcessIdAsync(command, cancellationToken);
+        return await GetProcessIdAsync(command, cancellationToken);
     }
 
     internal async Task<Guid?> GetWholesaleServiceProcessIdAsync(Instant createdAfter, string requestedByActorNumber, CancellationToken cancellationToken)
@@ -140,7 +140,7 @@ internal sealed class EdiDatabaseDriver
             SELECT ProcessId FROM [WholesaleServicesProcesses] WHERE CreatedAt >= @CreatedAfter AND RequestedByActorNumber = @RequestedByActorNumber";
         command.Parameters.AddWithValue("@CreatedAfter", InstantPattern.General.Format(createdAfter));
         command.Parameters.AddWithValue("@RequestedByActorNumber", requestedByActorNumber);
-        return await GetWholesaleServiceProcessIdAsync(command, cancellationToken);
+        return await GetProcessIdAsync(command, cancellationToken);
     }
 
     internal async Task<Guid?> GetAggregatedMeasureDataProcessIdAsync(
@@ -155,7 +155,7 @@ internal sealed class EdiDatabaseDriver
             SELECT ProcessId FROM [AggregatedMeasureDataProcesses] WHERE InitiatedByMessageId = @InitiatedByMessageId";
         command.Parameters.AddWithValue("@InitiatedByMessageId", initiatedByMessageId.ToString());
 
-        return await GetAggregatedMeasureDataProcessIdAsync(command, cancellationToken);
+        return await GetProcessIdAsync(command, cancellationToken);
     }
 
     internal async Task<Guid?> GetAggregatedMeasureDataProcessIdAsync(
@@ -172,7 +172,19 @@ internal sealed class EdiDatabaseDriver
         command.Parameters.AddWithValue("@CreatedAfter", InstantPattern.General.Format(createdAfter));
         command.Parameters.AddWithValue("@RequestedByActorNumber", requestedByActorNumber);
 
-        return await GetAggregatedMeasureDataProcessIdAsync(command, cancellationToken);
+        return await GetProcessIdAsync(command, cancellationToken);
+    }
+
+    internal async Task<string?> GetMeteredDataForMeasurementPointProcessIdAsync(string initiatedByMessageId, CancellationToken cancellationToken)
+    {
+        await using var command = new SqlCommand();
+
+        // TODO: This is a workaround to see if we have handled the request, since we currently don't create a process for the request.
+        command.CommandText = @"
+            SELECT [MessageId] FROM [MessageRegistry] WHERE [MessageId] = @InitiatedByMessageId";
+        command.Parameters.AddWithValue("@InitiatedByMessageId", initiatedByMessageId);
+
+        return await GetMessageIdAsync(command, cancellationToken);
     }
 
     /// <summary>
@@ -262,7 +274,7 @@ internal sealed class EdiDatabaseDriver
         return dequeuedMessagesCount;
     }
 
-    private async Task<Guid?> GetAggregatedMeasureDataProcessIdAsync(SqlCommand command, CancellationToken cancellationToken)
+    private async Task<Guid?> GetProcessIdAsync(SqlCommand command, CancellationToken cancellationToken)
     {
         await using var connection = new SqlConnection(_connectionString);
 
@@ -282,7 +294,7 @@ internal sealed class EdiDatabaseDriver
         return null;
     }
 
-    private async Task<Guid?> GetWholesaleServiceProcessIdAsync(SqlCommand command, CancellationToken cancellationToken)
+    private async Task<string?> GetMessageIdAsync(SqlCommand command, CancellationToken cancellationToken)
     {
         await using var connection = new SqlConnection(_connectionString);
 
@@ -293,8 +305,8 @@ internal sealed class EdiDatabaseDriver
         while (stopWatch.Elapsed < TimeSpan.FromSeconds(30))
         {
             await command.Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-            if (await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false) is Guid processId)
-                return processId;
+            if (await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false) is string messageId)
+                return messageId;
             await command.Connection.CloseAsync().ConfigureAwait(false);
             await Task.Delay(500, cancellationToken).ConfigureAwait(false);
         }
