@@ -26,7 +26,7 @@ public interface INotifyAggregatedMeasureDataClientV1
     /// <summary>
     /// Schedule a BRS-023 or BRS-027 calculation orchestration instance and return its id.
     /// </summary>
-    public Task<Guid> ScheduleNewCalculationOrchestationInstanceAsync(
+    public Task<Guid> ScheduleNewCalculationAsync(
         ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> requestDto,
         CancellationToken cancellationToken);
 
