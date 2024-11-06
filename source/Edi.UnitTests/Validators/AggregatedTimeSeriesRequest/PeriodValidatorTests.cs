@@ -271,10 +271,12 @@ public class PeriodValidatorTests
             .InZoneStrictly(_dateTimeZone!)
             .ToInstant();
 
+        // Using a start date 2 years, 8 months, 14 days, 13 hours, 25 minutes and 37 seconds back in time
         var start = new LocalDateTime(2022, 4, 1, 0, 0, 0)
             .InZoneStrictly(_dateTimeZone!)
             .ToInstant();
 
+        // Using an end date 2 years, 7 months, 14 days, 13 hours, 25 minutes and 37 seconds back in time
         var end = new LocalDateTime(2022, 5, 1, 0, 0, 0)
             .InZoneStrictly(_dateTimeZone!)
             .ToInstant();
@@ -297,15 +299,17 @@ public class PeriodValidatorTests
         Validate_WhenPeriodStartIsMoreThan3And6MonthsBackInTimeButPartOfCutOffMonth_ReturnsNoValidationError()
     {
         // Arrange
+        _now = new LocalDateTime(2024, 12, 15, 13, 25, 37)
+            .InZoneStrictly(_dateTimeZone!)
+            .ToInstant();
+
+        // Using a start date 3 years, 6 months, 14 days, 13 hours, 25 minutes and 37 seconds back in time
         var periodStartDate = new LocalDateTime(2021, 6, 1, 0, 0, 0)
             .InZoneStrictly(_dateTimeZone!)
             .ToInstant();
 
+        // Using an end date 3 years, 5 months, 14 days, 13 hours, 25 minutes and 37 seconds back in time
         var periodEndDate = new LocalDateTime(2021, 7, 1, 0, 0, 0)
-            .InZoneStrictly(_dateTimeZone!)
-            .ToInstant();
-
-        _now = new LocalDateTime(2024, 12, 15, 13, 25, 37)
             .InZoneStrictly(_dateTimeZone!)
             .ToInstant();
 
