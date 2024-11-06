@@ -64,12 +64,6 @@ public class MonitorCalculationUsingApiScenario : IAsyncLifetime
         return Task.CompletedTask;
     }
 
-    /// <summary>
-    /// TODO: Change when we don't share types.
-    /// At the moment we have no project references to the applications that we start.
-    /// It means they are not automatically builded when changed, so we must ensure to build them
-    /// before running tests.
-    /// </summary>
     [Fact]
     public async Task CalculationBrs023_WhenScheduledUsingClient_CanMonitorLifecycle()
     {
