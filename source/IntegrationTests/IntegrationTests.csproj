@@ -23,7 +23,7 @@ limitations under the License.
 
     <ItemGroup>
         <PackageReference Include="CsvHelper" Version="33.0.1" />
-        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.0.0" />
+        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.0.1" />
         <PackageReference Include="FluentAssertions" Version="6.12.1" />
         <PackageReference Include="FluentAssertions.Analyzers" Version="0.33.0">
           <PrivateAssets>all</PrivateAssets>
@@ -177,7 +177,7 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Application\Process\"/>
+        <Folder Include="Application\Process\" />
     </ItemGroup>
 
     <ItemDefinitionGroup>
