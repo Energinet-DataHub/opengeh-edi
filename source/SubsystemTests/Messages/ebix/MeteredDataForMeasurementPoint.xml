@@ -1,0 +1,517 @@
+﻿<ns0:DK_MeteredDataTimeSeries xmlns:ns0="un:unece:260:data:EEM-DK_MeteredDataTimeSeries:v3">
+    <ns0:HeaderEnergyDocument>
+        <ns0:Identification>{MessageId}</ns0:Identification>
+        <ns0:DocumentType listAgencyIdentifier="260">E66</ns0:DocumentType>
+        <ns0:Creation>2024-07-30T07:30:54Z</ns0:Creation>
+        <ns0:SenderEnergyParty>
+            <ns0:Identification schemeAgencyIdentifier="9">0266518730406</ns0:Identification>
+        </ns0:SenderEnergyParty>
+        <ns0:RecipientEnergyParty>
+            <ns0:Identification schemeAgencyIdentifier="9">5790001330552</ns0:Identification>
+        </ns0:RecipientEnergyParty>
+    </ns0:HeaderEnergyDocument>
+    <ns0:ProcessEnergyContext>
+        <ns0:EnergyBusinessProcess listAgencyIdentifier="260">E23</ns0:EnergyBusinessProcess>
+        <ns0:EnergyBusinessProcessRole listAgencyIdentifier="260">MDR</ns0:EnergyBusinessProcessRole>
+        <ns0:EnergyIndustryClassification listAgencyIdentifier="6">23</ns0:EnergyIndustryClassification>
+    </ns0:ProcessEnergyContext>
+    <ns0:PayloadEnergyTimeSeries>
+        <ns0:Identification>{TransactionId}</ns0:Identification>
+        <ns0:Function listAgencyIdentifier="6">9</ns0:Function>
+        <ns0:ObservationTimeSeriesPeriod>
+            <ns0:ResolutionDuration>PT15M</ns0:ResolutionDuration>
+            <ns0:Start>2024-06-29T22:00:00Z</ns0:Start>
+            <ns0:End>2024-06-30T22:00:00Z</ns0:End>
+        </ns0:ObservationTimeSeriesPeriod>
+        <ns0:IncludedProductCharacteristic>
+            <ns0:Identification listAgencyIdentifier="9">8716867000030</ns0:Identification>
+            <ns0:UnitType listAgencyIdentifier="260">KWH</ns0:UnitType>
+        </ns0:IncludedProductCharacteristic>
+        <ns0:DetailMeasurementMeteringPointCharacteristic>
+            <ns0:TypeOfMeteringPoint listAgencyIdentifier="260">E18</ns0:TypeOfMeteringPoint>
+        </ns0:DetailMeasurementMeteringPointCharacteristic>
+        <ns0:MeteringPointDomainLocation>
+            <ns0:Identification schemeAgencyIdentifier="9">571313000000002000</ns0:Identification>
+        </ns0:MeteringPointDomainLocation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>1</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>2</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>3</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>4</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>5</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>6</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>7</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>8</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>9</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>10</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>11</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>12</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>13</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>14</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>15</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>16</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>17</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>18</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>19</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>20</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>21</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>22</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>23</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>24</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>25</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>26</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>27</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>28</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>29</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>30</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>31</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>32</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>33</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>34</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>35</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>36</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>37</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>38</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>39</ns0:Position>
+            <ns0:EnergyQuantity>0.007</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>40</ns0:Position>
+            <ns0:EnergyQuantity>0.082</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>41</ns0:Position>
+            <ns0:EnergyQuantity>0.078</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>42</ns0:Position>
+            <ns0:EnergyQuantity>0.042</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>43</ns0:Position>
+            <ns0:EnergyQuantity>0.014</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>44</ns0:Position>
+            <ns0:EnergyQuantity>0.057</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>45</ns0:Position>
+            <ns0:EnergyQuantity>0.271</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>46</ns0:Position>
+            <ns0:EnergyQuantity>0.236</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>47</ns0:Position>
+            <ns0:EnergyQuantity>0.052</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>48</ns0:Position>
+            <ns0:EnergyQuantity>0.112</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>49</ns0:Position>
+            <ns0:EnergyQuantity>0.173</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>50</ns0:Position>
+            <ns0:EnergyQuantity>0.107</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>51</ns0:Position>
+            <ns0:EnergyQuantity>0.124</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>52</ns0:Position>
+            <ns0:EnergyQuantity>0.081</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>53</ns0:Position>
+            <ns0:EnergyQuantity>0.039</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>54</ns0:Position>
+            <ns0:EnergyQuantity>0.236</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>55</ns0:Position>
+            <ns0:EnergyQuantity>0.046</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>56</ns0:Position>
+            <ns0:EnergyQuantity>0.044</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>57</ns0:Position>
+            <ns0:EnergyQuantity>0.147</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>58</ns0:Position>
+            <ns0:EnergyQuantity>0.188</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>59</ns0:Position>
+            <ns0:EnergyQuantity>0.087</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>60</ns0:Position>
+            <ns0:EnergyQuantity>0.001</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>61</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>62</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>63</ns0:Position>
+            <ns0:EnergyQuantity>0.005</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>64</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>65</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>66</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>67</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>68</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>69</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>70</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>71</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>72</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>73</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>74</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>75</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>76</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>77</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>78</ns0:Position>
+            <ns0:EnergyQuantity>0.015</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>79</ns0:Position>
+            <ns0:EnergyQuantity>0.001</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>80</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>81</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>82</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>83</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>84</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>85</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>86</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>87</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>88</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>89</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>90</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>91</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>92</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>93</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>94</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>95</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+        <ns0:IntervalEnergyObservation>
+            <ns0:Position>96</ns0:Position>
+            <ns0:EnergyQuantity>0</ns0:EnergyQuantity>
+            <ns0:QuantityQuality listAgencyIdentifier="260">E01</ns0:QuantityQuality>
+        </ns0:IntervalEnergyObservation>
+    </ns0:PayloadEnergyTimeSeries>
+</ns0:DK_MeteredDataTimeSeries>
