@@ -18,6 +18,7 @@ using Energinet.DataHub.Wholesale.Edi.Validation.AggregatedTimeSeriesRequest.Rul
 using Energinet.DataHub.Wholesale.Edi.Validation.Helpers;
 using FluentAssertions;
 using NodaTime;
+using NodaTime.Extensions;
 using Xunit;
 
 namespace Energinet.DataHub.Wholesale.Edi.UnitTests.Validators.AggregatedTimeSeriesRequest;
@@ -27,11 +28,24 @@ public class PeriodValidatorTests
     private static readonly ValidationError _invalidDateFormat = new("Forkert dato format for {PropertyName}, skal være YYYY-MM-DDT22:00:00Z eller YYYY-MM-DDT23:00:00Z / Wrong date format for {PropertyName}, must be YYYY-MM-DDT22:00:00Z or YYYY-MM-DDT23:00:00Z", "D66");
     private static readonly ValidationError _invalidWinterMidnightFormat = new("Forkert dato format for {PropertyName}, skal være YYYY-MM-DDT23:00:00Z / Wrong date format for {PropertyName}, must be YYYY-MM-DDT23:00:00Z", "D66");
     private static readonly ValidationError _invalidSummerMidnightFormat = new("Forkert dato format for {PropertyName}, skal være YYYY-MM-DDT22:00:00Z / Wrong date format for {PropertyName}, must be YYYY-MM-DDT22:00:00Z", "D66");
-    private static readonly ValidationError _startDateMustBeLessThen3Years = new("Dato må max være 3 år tilbage i tid / Can maximum be 3 years back in time", "E17");
+
+    private static readonly ValidationError _startDateMustBeLessThen3Years = new(
+        "Dato må max være 3 år og 6 måneder tilbage i tid / Can maximum be 3 years and 6 months back in time",
+        "E17");
+
     private static readonly ValidationError _periodIsGreaterThenAllowedPeriodSize = new("Dato må kun være for 1 måned af gangen / Can maximum be for a 1 month period", "E17");
     private static readonly ValidationError _missingStartOrAndEndDate = new("Start og slut dato skal udfyldes / Start and end date must be present in request", "E50");
 
-    private readonly PeriodValidationRule _sut = new(new PeriodValidationHelper(DateTimeZoneProviders.Tzdb.GetZoneOrNull("Europe/Copenhagen")!, SystemClock.Instance));
+    private readonly PeriodValidationRule _sut;
+    private readonly DateTimeZone? _dateTimeZone = DateTimeZoneProviders.Tzdb.GetZoneOrNull("Europe/Copenhagen");
+
+    private Instant _now;
+
+    public PeriodValidatorTests()
+    {
+        _now = Instant.FromUtc(2024, 5, 31, 22, 0, 0);
+        _sut = new PeriodValidationRule(new PeriodValidationHelper(_dateTimeZone!, new MockClock(() => _now)));
+    }
 
     [Fact]
     public async Task Validate_WhenRequestIsValid_ReturnsNoValidationErrors()
@@ -71,8 +85,8 @@ public class PeriodValidatorTests
     public async Task Validate_WhenStartHourIsWrong_ReturnsExpectedValidationError()
     {
         // Arrange
-        var now = SystemClock.Instance.GetCurrentInstant();
-        var notWinterTimeMidnight = Instant.FromUtc(now.InUtc().Year, 1, 1, 22, 0, 0).ToString();
+        var notWinterTimeMidnight = Instant.FromUtc(_now.InUtc().Year, 1, 1, 22, 0, 0).ToString();
+
         var message = AggregatedTimeSeriesRequestBuilder
             .AggregatedTimeSeriesRequest()
             .WithStartDate(notWinterTimeMidnight)
@@ -92,12 +106,11 @@ public class PeriodValidatorTests
     public async Task Validate_WhenEndHourIsWrong_ReturnsExpectedValidationError()
     {
         // Arrange
-        var now = SystemClock.Instance.GetCurrentInstant();
-        var notSummerTimeMidnight = Instant.FromUtc(now.InUtc().Year, 7, 1, 23, 0, 0).ToString();
+        var notSummerTimeMidnight = Instant.FromUtc(_now.InUtc().Year, 7, 1, 23, 0, 0).ToString();
         var message = AggregatedTimeSeriesRequestBuilder
             .AggregatedTimeSeriesRequest()
             .WithEndDate(notSummerTimeMidnight)
-            .WithStartDate(Instant.FromUtc(now.InUtc().Year, 7, 2, 22, 0, 0).ToString())
+            .WithStartDate(Instant.FromUtc(_now.InUtc().Year, 7, 2, 22, 0, 0).ToString())
             .Build();
 
         // Act
@@ -154,8 +167,8 @@ public class PeriodValidatorTests
     public async Task Validate_WhenPeriodSizeIsGreaterThenAllowed_ReturnsExpectedValidationError()
     {
         // Arrange
-        var now = SystemClock.Instance.GetCurrentInstant();
-        var winterTimeMidnight = Instant.FromUtc(now.InUtc().Year, 1, 1, 23, 0, 0);
+        var winterTimeMidnight = Instant.FromUtc(_now.InUtc().Year, 1, 1, 23, 0, 0);
+
         var message = AggregatedTimeSeriesRequestBuilder
             .AggregatedTimeSeriesRequest()
             .WithStartDate(winterTimeMidnight.ToString())
@@ -215,9 +228,8 @@ public class PeriodValidatorTests
     public async Task Validate_WhenPeriodOverlapWinterDaylightSavingTime_ReturnsNoValidationErrors()
     {
         // Arrange
-        var now = SystemClock.Instance.GetCurrentInstant();
-        var summerTime = Instant.FromUtc(now.InUtc().Year, 9, 29, 22, 0, 0).ToString();
-        var winterTime = Instant.FromUtc(now.InUtc().Year, 10, 29, 23, 0, 0).ToString();
+        var summerTime = Instant.FromUtc(_now.InUtc().Year, 9, 29, 22, 0, 0).ToString();
+        var winterTime = Instant.FromUtc(_now.InUtc().Year, 10, 29, 23, 0, 0).ToString();
         var message = AggregatedTimeSeriesRequestBuilder
             .AggregatedTimeSeriesRequest()
             .WithStartDate(summerTime)
@@ -229,5 +241,91 @@ public class PeriodValidatorTests
 
         // Assert
         errors.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task
+        Validate_WhenPeriodStartIsMoreThan3YearsAnd6MonthsOldAndPeriodNotPartOfCutOffMonth_ReturnsExpectedValidationError()
+    {
+        // Arrange
+        var dateTimeOffset = _now.ToDateTimeOffset().AddYears(-5);
+
+        var message = AggregatedTimeSeriesRequestBuilder
+            .AggregatedTimeSeriesRequest()
+            .WithStartDate(dateTimeOffset.ToInstant().ToString())
+            .WithEndDate(dateTimeOffset.AddMonths(1).ToInstant().ToString())
+            .Build();
+
+        // Act
+        var errors = await _sut.ValidateAsync(message);
+
+        // Assert
+        errors.Should().ContainSingle().Subject.Should().Be(_startDateMustBeLessThen3Years);
+    }
+
+    [Fact]
+    public async Task Validate_WhenPeriodStartIsLessThan3YearsAnd6MonthsOld_ReturnNoValidationError()
+    {
+        // Arrange
+        _now = new LocalDateTime(2024, 6, 1, 0, 0, 0)
+            .InZoneStrictly(_dateTimeZone!)
+            .ToInstant();
+
+        var start = new LocalDateTime(2022, 4, 1, 0, 0, 0)
+            .InZoneStrictly(_dateTimeZone!)
+            .ToInstant();
+
+        var end = new LocalDateTime(2022, 5, 1, 0, 0, 0)
+            .InZoneStrictly(_dateTimeZone!)
+            .ToInstant();
+
+        var message = AggregatedTimeSeriesRequestBuilder
+            .AggregatedTimeSeriesRequest()
+            .WithStartDate(start.ToString())
+            .WithEndDate(end.ToString())
+            .Build();
+
+        // Act
+        var errors = await _sut.ValidateAsync(message);
+
+        // Assert
+        errors.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task
+        Validate_WhenPeriodStartIsMoreThan3And6MonthsBackInTimeButPartOfCutOffMonth_ReturnsNoValidationError()
+    {
+        // Arrange
+        var periodStartDate = new LocalDateTime(2021, 6, 1, 0, 0, 0)
+            .InZoneStrictly(_dateTimeZone!)
+            .ToInstant();
+
+        var periodEndDate = new LocalDateTime(2021, 7, 1, 0, 0, 0)
+            .InZoneStrictly(_dateTimeZone!)
+            .ToInstant();
+
+        _now = new LocalDateTime(2024, 12, 15, 13, 25, 37)
+            .InZoneStrictly(_dateTimeZone!)
+            .ToInstant();
+
+        var message = AggregatedTimeSeriesRequestBuilder
+            .AggregatedTimeSeriesRequest()
+            .WithStartDate(periodStartDate.ToString())
+            .WithEndDate(periodEndDate.ToString())
+            .Build();
+
+        // Act
+        var errors = await _sut.ValidateAsync(message);
+
+        // Assert
+        errors.Should().BeEmpty();
+    }
+
+    private sealed class MockClock(Func<Instant> getInstant) : IClock
+    {
+        private readonly Func<Instant> _getInstant = getInstant;
+
+        public Instant GetCurrentInstant() => _getInstant.Invoke();
     }
 }
