@@ -6,30 +6,30 @@
     "B2C_TENANT_ID": "<Azure B2C tenant id>",
     "BACKEND_SERVICE_APP_ID": "<Backend service application id>",
     "DB_CONNECTION_STRING": "<SQL database connection string>",
-    "AZURE_STORAGE_ACCOUNT_CONNECTION_STRING":  "<Azure storage account connection string>",
-    "AZURE_STORAGE_ACCOUNT_URL":                "<Azure storage account url>",
+    "AZURE_STORAGE_ACCOUNT_CONNECTION_STRING": "<Azure storage account connection string>",
+    "AZURE_STORAGE_ACCOUNT_URL": "<Azure storage account url>",
 
     "ServiceBus__ManageConnectionString": "<service bus connection string for shared service bus with manage permissions>",
     "ServiceBus__ListenConnectionString": "<service bus connection string for shared service bus with listener permissions>",
-    "ServiceBus__SendConnectionString":   "<connection string for shared service bus with sender permissions>",
+    "ServiceBus__SendConnectionString": "<connection string for shared service bus with sender permissions>",
 
-    "EdiInbox__QueueName":          "<Name of queue where incoming messages to EDI from other subsystems are placed>",
-    "WholesaleInbox__QueueName":    "<Name of queue where EDI place messages to wholesale>",
-    "IncomingMessages__QueueName":  "<Name of queue where incoming messages to EDI from EDI are placed>",
+    "EdiInbox__QueueName": "<Name of queue where incoming messages to EDI from other subsystems are placed>",
+    "WholesaleInbox__QueueName": "<Name of queue where EDI place messages to wholesale>",
+    "IncomingMessages__QueueName": "<Name of queue where incoming messages to EDI from EDI are placed>",
 
-    "IntegrationEvents__TopicName":         "<Name of topic where integration events are received>",
-    "IntegrationEvents__SubscriptionName":  "<Name of the service bus topic subscription for aggregation result notifications>",
+    "IntegrationEvents__TopicName": "<Name of topic where integration events are received>",
+    "IntegrationEvents__SubscriptionName": "<Name of the service bus topic subscription for aggregation result notifications>",
 
-    "FeatureManagement__UseMonthlyAmountPerChargeResultProduced":         "<Boolean to enable or disable feature>",
-    "FeatureManagement__UseAmountPerChargeResultProduced":                "<Boolean to enable or disable feature>",
-    "FeatureManagement__UseRequestWholesaleSettlementReceiver":           "<Boolean to enable or disable feature>",
-    "FeatureManagement__UseMessageDelegation":                            "<Boolean to enable or disable feature>",
-    "FeatureManagement__UsePeekMessages":                                 "<Boolean to enable or disable feature>",
-    "FeatureManagement__UseRequestMessages":                              "<Boolean to enable or disable feature>",
-    "FeatureManagement__UseEnergyResultProduced":                         "<Boolean to enable or disable feature>",
-    "FeatureManagement__UseCalculationCompletedEvent":                    "<Boolean to enable or disable feature>",
-    "FeatureManagement__UseCalculationCompletedEventForBalanceFixing":    "<Boolean to enable or disable feature>",
-    "FeatureManagement__UseCalculationCompletedEventForWholesaleFixing":  "<Boolean to enable or disable feature>",
+    "FeatureManagement__UseMonthlyAmountPerChargeResultProduced": "<Boolean to enable or disable feature>",
+    "FeatureManagement__UseAmountPerChargeResultProduced": "<Boolean to enable or disable feature>",
+    "FeatureManagement__UseRequestWholesaleSettlementReceiver": "<Boolean to enable or disable feature>",
+    "FeatureManagement__UseMessageDelegation": "<Boolean to enable or disable feature>",
+    "FeatureManagement__UsePeekMessages": "<Boolean to enable or disable feature>",
+    "FeatureManagement__UseRequestMessages": "<Boolean to enable or disable feature>",
+    "FeatureManagement__UseEnergyResultProduced": "<Boolean to enable or disable feature>",
+    "FeatureManagement__UseCalculationCompletedEvent": "<Boolean to enable or disable feature>",
+    "FeatureManagement__UseCalculationCompletedEventForBalanceFixing": "<Boolean to enable or disable feature>",
+    "FeatureManagement__UseCalculationCompletedEventForWholesaleFixing": "<Boolean to enable or disable feature>",
 
     // Databricks
     "WorkspaceToken": "<Databricks workspace token>",
@@ -37,8 +37,11 @@
     "WarehouseId": "<Databricks warehouse id>",
     "EdiDatabricks__CatalogName": "<Databricks unity catalog name>",
 
-    // Durable Functions Task Hub Name
+    // Durable Functions
+    // => Task Hub Name
     // See naming constraints: https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-task-hubs?tabs=csharp#task-hub-names
-    "OrchestrationsTaskHubName": "Edi01"
+    "OrchestrationsTaskHubName": "Edi01",
+    // => Task Hub Storage account connection string
+    "OrchestrationsStorageConnectionString": "UseDevelopmentStorage=true"
   }
 }

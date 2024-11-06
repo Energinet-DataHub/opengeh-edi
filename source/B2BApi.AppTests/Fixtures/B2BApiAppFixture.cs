@@ -73,7 +73,7 @@ public class B2BApiAppFixture : IAsyncLifetime
         LogStopwatch(stopwatch, nameof(CleanupAzuriteStorage));
 
         DurableTaskManager = new DurableTaskManager(
-            "AzureWebJobsStorage",
+            "OrchestrationsStorageConnectionString",
             AzuriteManager.FullConnectionString);
         LogStopwatch(stopwatch, nameof(DurableTaskManager));
 

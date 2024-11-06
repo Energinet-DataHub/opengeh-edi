@@ -170,11 +170,11 @@ public class SubsystemTestFixture : IAsyncLifetime
         EventPublisher = new IntegrationEventPublisher(ServiceBusClient, topicName, dbConnectionString);
         EdiInboxClient = new EdiInboxClient(ServiceBusClient, ediInboxQueueName);
 
-        // AzureWebJobsStorage connection string name/value is set implicitly from terraform as an application setting in Azure,
-        // and added to the keyvault as "func-edi-api-web-jobs-storage-connection-string"
+        // Durable Task Hub connection string name/value is set implicitly from terraform as an application setting in Azure,
+        // and added to the keyvault as "func-edi-api-taskhub-storage-connection-string"
         DurableTaskManager = new DurableTaskManager(
-            "AzureWebJobsStorage",
-            GetConfigurationValue<string>(root, "func-edi-api-web-jobs-storage-connection-string"));
+            "OrchestrationsStorageConnectionString",
+            GetConfigurationValue<string>(root, "func-edi-api-taskhub-storage-connection-string"));
     }
 
     internal B2BClients B2BClients { get; }
