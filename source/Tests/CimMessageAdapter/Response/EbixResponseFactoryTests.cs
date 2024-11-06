@@ -37,7 +37,7 @@ public sealed class EbixResponseFactoryTests
         var response = CreateResponse(result);
 
         response.IsErrorResponse.Should().BeTrue();
-        AssertHasValue(response, "faultcode", "SOAP-ENV:Client");
+        AssertHasValue(response, "faultcode", "soapenv:Client");
         AssertHasValue(response, "faultstring", $"{duplicateMessageIdError.Code}:{duplicateMessageIdError.Message}");
     }
 
@@ -54,7 +54,7 @@ public sealed class EbixResponseFactoryTests
             .BeEquivalentTo(
                 """
                 <Error>
-                  <faultcode>SOAP-ENV:Client</faultcode>
+                  <faultcode>soapenv:Client</faultcode>
                   <faultstring>00101:Message id 'Duplicate message id' is not unique</faultstring>
                   <detail>
                     <fault>
@@ -76,7 +76,7 @@ public sealed class EbixResponseFactoryTests
         var response = CreateResponse(result);
 
         response.IsErrorResponse.Should().BeTrue();
-        AssertHasValue(response, "faultcode", "SOAP-ENV:Client");
+        AssertHasValue(response, "faultcode", "soapenv:Client");
         AssertHasValue(response, "faultstring", $"{duplicateMessageIdError.Code}:{duplicateMessageIdError.Message}");
         AssertHasNotValue(response, "faultstring", $"{duplicateTransactionIdError.Code}:{duplicateTransactionIdError.Message}");
     }
