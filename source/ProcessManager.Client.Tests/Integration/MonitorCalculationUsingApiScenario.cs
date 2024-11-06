@@ -79,7 +79,7 @@ public class MonitorCalculationUsingApiScenario : IAsyncLifetime
 
         using var scheduleRequest = new HttpRequestMessage(
             HttpMethod.Post,
-            "api/processmanager/orchestrationinstance/brs_023_027/1");
+            "/api/processmanager/orchestrationinstance/brs_023_027/1");
         scheduleRequest.Content = new StringContent(
             JsonSerializer.Serialize(scheduleRequestDto),
             Encoding.UTF8,
@@ -104,7 +104,7 @@ public class MonitorCalculationUsingApiScenario : IAsyncLifetime
             {
                 using var queryRequest = new HttpRequestMessage(
                     HttpMethod.Get,
-                    $"api/processmanager/orchestrationinstance/{calculationId}");
+                    $"/api/processmanager/orchestrationinstance/{calculationId}");
 
                 using var queryResponse = await ProcessManagerAppFixture.AppHostManager
                     .HttpClient

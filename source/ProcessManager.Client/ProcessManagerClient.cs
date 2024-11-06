@@ -37,7 +37,7 @@ internal class ProcessManagerClient : IProcessManagerClient
     {
         using var request = new HttpRequestMessage(
             HttpMethod.Delete,
-            $"api/processmanager/orchestrationinstance/{id}");
+            $"/api/processmanager/orchestrationinstance/{id}");
 
         using var actualResponse = await _httpClient
             .SendAsync(request, cancellationToken)
@@ -52,7 +52,7 @@ internal class ProcessManagerClient : IProcessManagerClient
     {
         using var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"api/processmanager/orchestrationinstance/{id}");
+            $"/api/processmanager/orchestrationinstance/{id}");
 
         using var actualResponse = await _httpClient
             .SendAsync(request, cancellationToken)

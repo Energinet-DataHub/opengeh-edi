@@ -45,7 +45,7 @@ internal class NotifyAggregatedMeasureDataClientV1 : INotifyAggregatedMeasureDat
         // (but currently we have implemented the endpoint strongly typed).
         using var request = new HttpRequestMessage(
             HttpMethod.Post,
-            "api/processmanager/orchestrationinstance/brs_023_027/1");
+            "/api/processmanager/orchestrationinstance/brs_023_027/1");
         request.Content = new StringContent(
             JsonSerializer.Serialize(requestDto),
             Encoding.UTF8,
@@ -73,7 +73,7 @@ internal class NotifyAggregatedMeasureDataClientV1 : INotifyAggregatedMeasureDat
         // the "request" generic code and only have specific parsing.
         using var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"api/processmanager/orchestrationinstance/{id}");
+            $"/api/processmanager/orchestrationinstance/{id}");
 
         using var actualResponse = await _generalApiHttpClient
             .SendAsync(request, cancellationToken)
