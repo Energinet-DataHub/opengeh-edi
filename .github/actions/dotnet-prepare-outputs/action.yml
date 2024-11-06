@@ -101,5 +101,3 @@ runs:
           --no-restore \
           --configuration Release \
           --output '${{ inputs.output_path }}\functions\ProcessManager.Orchestrations'
-
-
