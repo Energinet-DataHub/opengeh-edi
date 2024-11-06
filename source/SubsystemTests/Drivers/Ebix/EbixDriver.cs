@@ -17,8 +17,8 @@ using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Security;
+using System.Text;
 using System.Xml;
-using Energinet.DataHub.EDI.SubsystemTests.Drivers.Ebix;
 using Xunit.Abstractions;
 
 namespace Energinet.DataHub.EDI.SubsystemTests.Drivers.Ebix;
@@ -161,6 +161,59 @@ internal sealed class EbixDriver : IDisposable
         return await _unauthorizedHttpClient.SendAsync(request).ConfigureAwait(false);
     }
 
+    public async Task<string> SendMeteredDataForMeasurementPointAsync(CancellationToken cancellationToken)
+    {
+        if (_ebixServiceClient.State != CommunicationState.Opened)
+            _ebixServiceClient.Open();
+
+        using var operationScope = new OperationContextScope(_ebixServiceClient.InnerChannel);
+
+        var messageId = Guid.NewGuid().ToString("N");
+        var requestContent = await GetMeteredDataForMeasurementPointRequestContentAsync(messageId, cancellationToken).ConfigureAwait(false);
+        var requestXml = new XmlDocument();
+        requestXml.LoadXml(requestContent);
+        var message = new MessageContainer_Type
+        {
+            MessageReference = messageId,
+            DocumentType = "MeteredDataTimeSeries",
+            MessageType = MessageType_Type.XML,
+            Payload = requestXml.DocumentElement,
+        };
+        var response = await _ebixServiceClient.sendMessageAsync(message);
+
+        return response.MessageId;
+    }
+
+    public async Task<string> SendMeteredDataForMeasurementPointInEbixWithAlreadyUsedMessageIdAsync(CancellationToken cancellationToken)
+    {
+        if (_ebixServiceClient.State != CommunicationState.Opened)
+            _ebixServiceClient.Open();
+
+        using var operationScope = new OperationContextScope(_ebixServiceClient.InnerChannel);
+
+        var existingMessageId = "fe8eaac060c8418fae510402c6c60376";
+        var requestContent = await GetMeteredDataForMeasurementPointRequestContentAsync(existingMessageId, cancellationToken).ConfigureAwait(false);
+        var requestXml = new XmlDocument();
+        requestXml.LoadXml(requestContent);
+        var message = new MessageContainer_Type
+        {
+            MessageReference = existingMessageId,
+            DocumentType = "MeteredDataTimeSeries",
+            MessageType = MessageType_Type.XML,
+            Payload = requestXml.DocumentElement,
+        };
+
+        try
+        {
+            var response = await _ebixServiceClient.sendMessageAsync(message);
+            return response.MessageId;
+        }
+        catch (FaultException e)
+        {
+            return e.Message;
+        }
+    }
+
     public void Dispose()
     {
         if (_ebixServiceClient.State != CommunicationState.Closed)
@@ -216,5 +269,16 @@ internal sealed class EbixDriver : IDisposable
     private async Task<peekMessageResponse?> PeekAsync()
     {
         return await _ebixServiceClient.peekMessageAsync().ConfigureAwait(false);
+    }
+
+    private async Task<string> GetMeteredDataForMeasurementPointRequestContentAsync(string messageId, CancellationToken cancellationToken)
+    {
+        var content = await File.ReadAllTextAsync("Messages/ebix/MeteredDataForMeasurementPoint.xml", cancellationToken)
+            .ConfigureAwait(false);
+
+        content = content.Replace("{MessageId}", messageId, StringComparison.InvariantCulture);
+        content = content.Replace("{TransactionId}", Guid.NewGuid().ToString("N"), StringComparison.InvariantCulture);
+
+        return content;
     }
 }
