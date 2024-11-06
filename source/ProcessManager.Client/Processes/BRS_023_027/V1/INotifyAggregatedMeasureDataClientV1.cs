@@ -40,7 +40,7 @@ public interface INotifyAggregatedMeasureDataClientV1
     /// <summary>
     /// Get all BRS-023 or BRS-027 calculation orchestration instances filtered by given parameters.
     /// </summary>
-    public Task<IReadOnlyCollection<OrchestrationInstanceTypedDto<NotifyAggregatedMeasureDataInputV1>>> SearchCalculationOrchestrationInstancesAsync(
+    public Task<IReadOnlyCollection<OrchestrationInstanceTypedDto<NotifyAggregatedMeasureDataInputV1>>> SearchCalculationsAsync(
         OrchestrationInstanceLifecycleStates? lifecycleState,
         OrchestrationInstanceTerminationStates? terminationState,
         DateTimeOffset? startedAtOrLater,
