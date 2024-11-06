@@ -30,9 +30,9 @@ namespace Energinet.DataHub.ProcessManager.Client.Tests.Integration;
 /// calculation orchestration and monitor its status during its lifetime.
 /// </summary>
 [Collection(nameof(ProcessManagerClientCollection))]
-public class MonitorCalculationScenarioUsingApi : IAsyncLifetime
+public class MonitorCalculationUsingApiScenario : IAsyncLifetime
 {
-    public MonitorCalculationScenarioUsingApi(
+    public MonitorCalculationUsingApiScenario(
         ScenarioProcessManagerAppFixture processManagerAppFixture,
         ScenarioOrchestrationsAppFixture orchestrationsAppFixture,
         ITestOutputHelper testOutputHelper)
