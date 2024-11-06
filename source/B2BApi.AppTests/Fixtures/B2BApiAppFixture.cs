@@ -352,10 +352,15 @@ public class B2BApiAppFixture : IAsyncLifetime
             "APPLICATIONINSIGHTS_CONNECTION_STRING",
             IntegrationTestConfiguration.ApplicationInsightsConnectionString);
 
-        // Durable Functions Task Hub Name
+        // Durable Functions
+        // => Task Hub Name
         appHostSettings.ProcessEnvironmentVariables.Add(
             "OrchestrationsTaskHubName",
             TaskHubName);
+        // => Task Hub Storage account connection string
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            "OrchestrationsStorageConnectionString",
+            AzuriteManager.FullConnectionString);
 
         // Make Orchestrator poll for updates every second (default is every 30 seconds) by overriding maxQueuePollingInterval
         // (ref: https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-bindings?tabs=python-v2%2Cisolated-process%2C2x-durable-functions&pivots=programming-language-csharp#hostjson-settings)
