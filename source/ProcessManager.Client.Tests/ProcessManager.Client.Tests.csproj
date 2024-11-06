@@ -18,11 +18,11 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
-    <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.0.0" />
+    <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ProcessManager.Client\ProcessManager.Client.csproj" >
+    <ProjectReference Include="..\ProcessManager.Client\ProcessManager.Client.csproj">
       <Aliases>ClientTypes</Aliases>
     </ProjectReference>
     <ProjectReference Include="..\ProcessManager.DatabaseMigration\ProcessManager.DatabaseMigration.csproj" />
