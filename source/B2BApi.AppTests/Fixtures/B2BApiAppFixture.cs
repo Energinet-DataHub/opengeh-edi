@@ -339,9 +339,6 @@ public class B2BApiAppFixture : IAsyncLifetime
         appHostSettings.FunctionApplicationPath = $"..\\..\\..\\..\\{csprojName}\\bin\\{buildConfiguration}\\net8.0";
         appHostSettings.Port = ++port;
 
-        // It seems the host + worker is not ready if we use the default startup log message, so we override it here
-        appHostSettings.HostStartedEvent = "Host lock lease acquired";
-
         appHostSettings.ProcessEnvironmentVariables.Add(
             "FUNCTIONS_WORKER_RUNTIME",
             "dotnet-isolated");
