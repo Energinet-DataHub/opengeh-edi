@@ -26,11 +26,11 @@ limitations under the License.
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.0.0"/>
-        <PackageReference Include="Energinet.DataHub.Core.TestCommon" Version="7.0.0"/>
-        <PackageReference Include="FluentAssertions" Version="6.12.1"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1"/>
-        <PackageReference Include="xunit" Version="2.9.2"/>
+        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.0.1" />
+        <PackageReference Include="Energinet.DataHub.Core.TestCommon" Version="7.0.1" />
+        <PackageReference Include="FluentAssertions" Version="6.12.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+        <PackageReference Include="xunit" Version="2.9.2" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -38,7 +38,7 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-        <Using Include="Xunit"/>
+        <Using Include="Xunit" />
     </ItemGroup>
 
     <ItemGroup>
@@ -68,11 +68,11 @@ limitations under the License.
     <ItemGroup>
         <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />
         <ProjectReference Include="..\B2BApi\B2BApi.csproj" />
-        <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj"/>
-        <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj"/>
-        <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj"/>
-        <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj"/>
-        <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj"/>
+        <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+        <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj" />
+        <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj" />
+        <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
+        <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj" />
         <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
         <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
     </ItemGroup>
