@@ -64,6 +64,9 @@
       <None Update="subsystemtests.dev002.settings.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="Drivers\Ebix\DH3-test-Mosaic-GridAccessProvider.pfx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
@@ -126,6 +129,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <EmbeddedResource Include="Messages\ebix\MeteredDataForMeasurementPoint.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
       <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataBalanceResponsibleWithBadPeriod.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
