@@ -38,4 +38,9 @@ public interface IFeatureFlagManager
     /// Whether to allow receiving metered data for measurement points.
     /// </summary>
     Task<bool> ReceiveMeteredDataForMeasurementPointsAsync();
+
+    /// <summary>
+    /// Whether to use the new incoming message parser.
+    /// </summary>
+    Task<bool> UseNewIncomingMessageParserAsync();
 }
