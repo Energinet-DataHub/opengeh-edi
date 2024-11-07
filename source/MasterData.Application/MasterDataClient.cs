@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Domain.ActorCertificates;
 using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
 using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
-using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Microsoft.Extensions.Logging;
@@ -25,12 +25,12 @@ using Actor = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Actor;
 
 namespace Energinet.DataHub.EDI.MasterData.Application;
 
-internal sealed class MasterDataClient : IMasterDataClient
+public sealed class MasterDataClient : IMasterDataClient
 {
     private readonly IActorRepository _actorRepository;
     private readonly IGridAreaRepository _gridAreaRepository;
     private readonly IActorCertificateRepository _actorCertificateRepository;
-    private readonly MasterDataContext _masterDataContext;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<IMasterDataClient> _logger;
     private readonly IProcessDelegationRepository _processDelegationRepository;
 
@@ -38,14 +38,14 @@ internal sealed class MasterDataClient : IMasterDataClient
         IActorRepository actorRepository,
         IGridAreaRepository gridAreaRepository,
         IActorCertificateRepository actorCertificateRepository,
-        MasterDataContext masterDataContext,
+        IUnitOfWork unitOfWork,
         ILogger<IMasterDataClient> logger,
         IProcessDelegationRepository processDelegationRepository)
     {
         _actorRepository = actorRepository;
         _gridAreaRepository = gridAreaRepository;
         _actorCertificateRepository = actorCertificateRepository;
-        _masterDataContext = masterDataContext;
+        _unitOfWork = unitOfWork;
         _logger = logger;
         _processDelegationRepository = processDelegationRepository;
     }
@@ -60,7 +60,7 @@ internal sealed class MasterDataClient : IMasterDataClient
                 cancellationToken)
             .ConfigureAwait(false);
 
-        await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public Task<ActorNumber?> GetActorNumberByExternalIdAsync(
@@ -84,7 +84,7 @@ internal sealed class MasterDataClient : IMasterDataClient
                 cancellationToken)
             .ConfigureAwait(false);
 
-        await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<GridAreaOwnerDto> GetGridOwnerForGridAreaCodeAsync(string gridAreaCode, CancellationToken cancellationToken)
@@ -131,7 +131,7 @@ internal sealed class MasterDataClient : IMasterDataClient
                 request.SequenceNumber);
         }
 
-        await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<Actor?> GetActorFromThumbprintAsync(
@@ -158,7 +158,7 @@ internal sealed class MasterDataClient : IMasterDataClient
                 cancellationToken)
             .ConfigureAwait(false);
 
-        await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task CreateProcessDelegationAsync(
@@ -178,7 +178,7 @@ internal sealed class MasterDataClient : IMasterDataClient
                 processDelegationDto.DelegatedTo.ActorRole),
             cancellationToken);
 
-        await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<ProcessDelegationDto?> GetProcessDelegatedByAsync(

@@ -15,10 +15,10 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
-using Energinet.DataHub.EDI.MasterData.Infrastructure.ActorCertificate;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.ActorCertificates;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.Actors;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.GridAreas;
-using Energinet.DataHub.EDI.MasterData.Infrastructure.ProcessDelegation;
+using Energinet.DataHub.EDI.MasterData.Infrastructure.ProcessDelegations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
