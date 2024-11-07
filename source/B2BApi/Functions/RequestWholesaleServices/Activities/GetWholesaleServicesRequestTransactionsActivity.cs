@@ -20,10 +20,13 @@ using Microsoft.DurableTask;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.RequestWholesaleServices.Activities;
 
+/// <summary>
+/// Split a request for wholesale services into separate transactions.
+/// </summary>
 public class GetWholesaleServicesRequestTransactionsActivity
 {
     /// <summary>
-    /// Start an ValidateWholesaleServicesRequestActivity activity.
+    /// Start an <see cref="GetWholesaleServicesRequestTransactionsActivity"/> activity.
     /// <remarks>The <paramref name="input"/> type and return type must be that same as the <see cref="Run"/> method</remarks>
     /// <remarks>Changing the <paramref name="input"/> or return type might break the Durable Function's deserialization</remarks>
     /// </summary>

@@ -36,9 +36,9 @@ using Xunit.Abstractions;
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Functions.RequestWholesaleServices;
 
 [Collection(nameof(B2BApiAppCollectionFixture))]
-public class RequestWholesaleServicesTests : IAsyncLifetime
+public class RequestWholesaleServicesOrchestrationTests : IAsyncLifetime
 {
-    public RequestWholesaleServicesTests(
+    public RequestWholesaleServicesOrchestrationTests(
         B2BApiAppFixture fixture,
         ITestOutputHelper testOutputHelper)
     {

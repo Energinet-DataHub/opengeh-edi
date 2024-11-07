@@ -32,6 +32,7 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
+using Energinet.DataHub.EDI.IntegrationTests.CalculationResults.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.RevisionLog.Integration.Options;

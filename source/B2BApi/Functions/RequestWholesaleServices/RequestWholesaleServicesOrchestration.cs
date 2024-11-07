@@ -38,7 +38,6 @@ public class RequestWholesaleServicesOrchestration
                 context,
                 null);
 
-        // TODO: Maybe use sub orchestrations instead of fan-out?
         var transactionTasks = new Task<EnqueueMessagesForRequestWholesaleServicesActivity.EnqueueMessagesResult>[transactions.Count];
         for (var i = 0; i < transactions.Count; i++)
         {

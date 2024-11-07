@@ -15,9 +15,7 @@
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces;
-using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models.WholesaleResultMessages.Request;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices;
-using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.WholesaleServices;
 using Energinet.DataHub.Wholesale.Edi;
 using Energinet.DataHub.Wholesale.Edi.Models;
@@ -26,6 +24,10 @@ using Microsoft.DurableTask;
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.RequestWholesaleServices.Activities;
 
+/// <summary>
+/// Enqueue messages for a Wholesale services request transaction.
+/// Queries the requested data from databricks and enqueues a message for each result.
+/// </summary>
 public class EnqueueMessagesForRequestWholesaleServicesActivity(
     RequestWholesaleServicesQueryHandler requestWholesaleServicesQueryHandler,
     IOutgoingMessagesClient outgoingMessagesClient,
@@ -36,7 +38,7 @@ public class EnqueueMessagesForRequestWholesaleServicesActivity(
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     /// <summary>
-    /// Start an ValidateWholesaleServicesRequestActivity activity.
+    /// Start a <see cref="EnqueueMessagesForRequestWholesaleServicesActivity"/> activity.
     /// <remarks>The <paramref name="input"/> type and return type must be that same as the <see cref="Run"/> method</remarks>
     /// <remarks>Changing the <paramref name="input"/> or return type might break the Durable Function's deserialization</remarks>
     /// </summary>
@@ -64,30 +66,36 @@ public class EnqueueMessagesForRequestWholesaleServicesActivity(
         List<Guid> rejectedMessageIds = [];
         await foreach (var calculationResult in calculationResultsAsyncEnumerable)
         {
-            if (calculationResult.Result == RequestWholesaleServicesQueryResultEnum.Success)
+            switch (calculationResult.Result)
             {
-                ArgumentNullException.ThrowIfNull(calculationResult.WholesaleServices);
-                var acceptedWholesaleServicesMessage =
-                    AcceptedWholesaleServiceMessageDtoFactory.Create(
-                        EventId.From("deprecated-event-id"),
-                        transaction,
-                        calculationResult.WholesaleServices);
-                var messageId = await _outgoingMessagesClient.EnqueueAsync(acceptedWholesaleServicesMessage, cancellationToken)
-                    .ConfigureAwait(false);
+                case RequestWholesaleServicesQueryResultEnum.Success:
+                    {
+                        ArgumentNullException.ThrowIfNull(calculationResult.WholesaleServices);
+                        var acceptedWholesaleServicesMessage =
+                            AcceptedWholesaleServiceMessageDtoFactory.Create(
+                                EventId.From("deprecated-event-id"),
+                                transaction,
+                                calculationResult.WholesaleServices);
+                        var messageId = await _outgoingMessagesClient.EnqueueAsync(acceptedWholesaleServicesMessage, cancellationToken)
+                            .ConfigureAwait(false);
 
-                acceptedMessagesIds.Add(messageId);
-            }
-            else if (calculationResult.Result == RequestWholesaleServicesQueryResultEnum.NoDataForGridArea)
-            {
-                // TODO: Enqueue rejected message
-                // var rejectedWholesaleServicesMessage = RejectedWholesaleServiceMessageDtoFactory.Create();
-                // var messageId = await _outgoingMessagesClient.EnqueueAsync(rejectedWholesaleServicesMessage, cancellationToken)
-                //     .ConfigureAwait(false);
-                rejectedMessageIds.Add(Guid.Empty);
+                        acceptedMessagesIds.Add(messageId);
+                        break;
+                    }
+                case RequestWholesaleServicesQueryResultEnum.NoDataForGridArea:
+                    // TODO: Enqueue rejected message
+                case RequestWholesaleServicesQueryResultEnum.NoDataAvailable:
+                    // TODO: Enqueue rejected message
+                    // var rejectedWholesaleServicesMessage = RejectedWholesaleServiceMessageDtoFactory.Create();
+                    // var messageId = await _outgoingMessagesClient.EnqueueAsync(rejectedWholesaleServicesMessage, cancellationToken)
+                    //     .ConfigureAwait(false);
+                    rejectedMessageIds.Add(Guid.Empty);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(calculationResult.Result), calculationResult.Result, "Unknown calculation result state when enqueueing messages");
             }
         }
 
-        // TODO: Should this save per transaction (as it works today) or is it better to save once when all messages are enqueued?
         await _unitOfWork.CommitTransactionAsync(cancellationToken)
             .ConfigureAwait(false);
 

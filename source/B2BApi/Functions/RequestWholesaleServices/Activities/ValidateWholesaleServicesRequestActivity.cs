@@ -22,13 +22,17 @@ using WholesaleServicesRequest = Energinet.DataHub.Edi.Requests.WholesaleService
 
 namespace Energinet.DataHub.EDI.B2BApi.Functions.RequestWholesaleServices.Activities;
 
+/// <summary>
+/// Perform business validation of a wholesale services request.
+/// </summary>
+/// <param name="validator"></param>
 public class ValidateWholesaleServicesRequestActivity(
-    IValidator<Energinet.DataHub.Edi.Requests.WholesaleServicesRequest> validator)
+    IValidator<WholesaleServicesRequest> validator)
 {
     private readonly IValidator<WholesaleServicesRequest> _validator = validator;
 
     /// <summary>
-    /// Start an ValidateWholesaleServicesRequestActivity activity.
+    /// Start a <see cref="ValidateWholesaleServicesRequestActivity"/> activity.
     /// <remarks>The <paramref name="input"/> type and return type must be that same as the <see cref="Run"/> method</remarks>
     /// <remarks>Changing the <paramref name="input"/> or return type might break the Durable Function's deserialization</remarks>
     /// </summary>

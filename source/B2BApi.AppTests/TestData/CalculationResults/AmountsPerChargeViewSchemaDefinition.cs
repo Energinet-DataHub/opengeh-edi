@@ -40,7 +40,7 @@ public class AmountsPerChargeViewSchemaDefinition
         { AmountsPerChargeViewColumnNames.Currency, ("string", false) },
         { AmountsPerChargeViewColumnNames.Time, ("timestamp", false) },
         { AmountsPerChargeViewColumnNames.Quantity, ("decimal(18,3)", false) },
-        { AmountsPerChargeViewColumnNames.QuantityQualities, ("string", true) },
+        { AmountsPerChargeViewColumnNames.QuantityQualities, ("string", true) }, // TODO: Why does this fail if it is type array<string>?
         { AmountsPerChargeViewColumnNames.Price, ("decimal(18,6)", false) },
         { AmountsPerChargeViewColumnNames.Amount, ("decimal(18,6)", false) },
     };
