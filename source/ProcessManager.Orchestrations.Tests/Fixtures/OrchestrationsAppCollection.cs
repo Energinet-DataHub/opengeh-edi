@@ -20,7 +20,7 @@ namespace Energinet.DataHub.ProcessManager.Orchestrations.Tests.Fixtures;
 /// xUnit documentation of collection fixtures:
 ///  * https://xunit.net/docs/shared-context#collection-fixture
 /// </summary>
-[CollectionDefinition(nameof(OrchestrationsAppCollectionFixture))]
-public class OrchestrationsAppCollectionFixture : ICollectionFixture<OrchestrationsAppFixture>
+[CollectionDefinition(nameof(OrchestrationsAppCollection))]
+public class OrchestrationsAppCollection : ICollectionFixture<OrchestrationsAppFixture>
 {
 }

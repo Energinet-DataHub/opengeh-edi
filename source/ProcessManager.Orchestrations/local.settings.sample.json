@@ -7,6 +7,7 @@
     //  - Settings names must match configuration in 'host.json'
     //  - 'ProcessManager' (host) and 'ProcessManager.Orchestrations' (host) must use the same Task Hub
     "ProcessManagerStorageConnectionString": "UseDevelopmentStorage=true",
-    "ProcessManagerTaskHubName": "Orchestrations01"
+    "ProcessManagerTaskHubName": "Orchestrations01",
+    "ProcessManager__SqlDatabaseConnectionString": "<database connection string>"
   }
 }

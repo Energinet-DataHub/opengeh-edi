@@ -22,12 +22,12 @@ public class SchedulerHandler(
     ILogger<SchedulerHandler> logger,
     IClock clock,
     IQueryScheduledOrchestrationInstancesByInstant query,
-    IOrchestrationInstanceManager orchestrationInstanceManager)
+    IOrchestrationInstanceScheduleManager manager)
 {
     private readonly ILogger _logger = logger;
     private readonly IClock _clock = clock;
     private readonly IQueryScheduledOrchestrationInstancesByInstant _query = query;
-    private readonly IOrchestrationInstanceManager _orchestrationInstanceManager = orchestrationInstanceManager;
+    private readonly IOrchestrationInstanceScheduleManager _manager = manager;
 
     public async Task StartScheduledOrchestrationInstancesAsync()
     {
@@ -40,7 +40,7 @@ public class SchedulerHandler(
         {
             try
             {
-                await _orchestrationInstanceManager
+                await _manager
                     .StartScheduledOrchestrationInstanceAsync(orchestrationInstance.Id)
                     .ConfigureAwait(false);
             }
