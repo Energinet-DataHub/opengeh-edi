@@ -14,6 +14,7 @@
 
 using System.Text;
 using System.Xml.Linq;
+using Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -54,7 +55,9 @@ public sealed class MessageParserTests
             new WholesaleSettlementXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
                 new WholesaleSettlementJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
                 new WholesaleSettlementB2CJsonMessageParser(_serializer),
-        ]);
+        ],
+        new Dictionary<IncomingDocumentType, IMessageParser>(),
+        new FeatureFlagManagerStub());
     }
 
     public static IEnumerable<object[]> CreateMessagesWithTwoChargeTypes()

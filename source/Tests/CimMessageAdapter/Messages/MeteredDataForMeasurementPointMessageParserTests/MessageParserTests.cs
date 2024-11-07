@@ -13,10 +13,12 @@
 // limitations under the License.
 
 using System.Xml.Linq;
+using Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
 using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Ebix;
 using Energinet.DataHub.EDI.IncomingMessages.Interfaces.Models;
@@ -25,7 +27,7 @@ using FluentAssertions.Execution;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
-namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.MeteredDataForMeasurementPointEbixMessageParserTests;
+namespace Energinet.DataHub.EDI.Tests.CimMessageAdapter.Messages.MeteredDataForMeasurementPointMessageParserTests;
 
 public sealed class MessageParserTests
 {
@@ -36,9 +38,14 @@ public sealed class MessageParserTests
         $"{Path.DirectorySeparatorChar}MeteredDataForMeasurementPoint{Path.DirectorySeparatorChar}";
 
     private readonly MarketMessageParser _marketMessageParser = new(
-    [
-        new MeteredDataForMeasurementPointEbixMessageParser(new EbixSchemaProvider(), new Logger<MeteredDataForMeasurementPointEbixMessageParser>(new LoggerFactory())),
-    ]);
+    new List<IMarketMessageParser>(),
+    new Dictionary<IncomingDocumentType, IMessageParser>()
+    {
+        {
+            IncomingDocumentType.MeteredDataForMeasurementPoint, new MeteredDataForMeasurementPointMessageParser(new EbixSchemaProvider(), new Logger<MeteredDataForMeasurementPointEbixMessageParser>(new LoggerFactory()))
+        },
+    },
+    new FeatureFlagManagerStub());
 
     public static TheoryData<DocumentFormat, Stream> CreateMessagesWithSingleAndMultipleTransactions()
     {

@@ -24,11 +24,11 @@ public partial class MeteredDataForMeasurementPointMessageParser : IMessageParse
 
     public Task<IncomingMarketMessageParserResult> ParseXmlAsync(IIncomingMarketMessageStream incomingMarketMessageStream, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public Task<IncomingMarketMessageParserResult> ParseJsonAsync(IIncomingMarketMessageStream incomingMarketMessageStream, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 }
