@@ -17,7 +17,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErr
 public class InvalidMessageStructure : ValidationError
 {
     private InvalidMessageStructure(string message)
-        : base(message, "00302")
+        : base(message, "00302", "Syntax validation failed for Business Message in Payload", "B2B-005")
     {
     }
 

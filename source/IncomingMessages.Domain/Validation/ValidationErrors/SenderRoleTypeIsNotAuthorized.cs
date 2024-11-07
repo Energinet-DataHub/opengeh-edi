@@ -17,7 +17,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErr
 public class SenderRoleTypeIsNotAuthorized : ValidationError
 {
     public SenderRoleTypeIsNotAuthorized()
-        : base("Sender role type is not authorized to use this type of message", "00003", "SenderRole")
+        : base("Sender role type is not authorized to use this type of message", "00003", "Sender Role and/or Recipient Role not provided (see [RSM] dependency matrices)", "B2B-010", "SenderRole")
     {
     }
 }

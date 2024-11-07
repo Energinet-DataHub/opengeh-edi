@@ -439,7 +439,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         using (new AssertionScope())
         {
             response.IsErrorResponse.Should().BeTrue();
-            response.MessageBody.Should().Contain("The authenticated user does not hold the required role");
+            response.MessageBody.Should().Contain("The user of the SendMessage operation is not allowed to send this type of message (DocumentType) for its role");
 
             _senderSpy.LatestMessage.Should().BeNull();
         }

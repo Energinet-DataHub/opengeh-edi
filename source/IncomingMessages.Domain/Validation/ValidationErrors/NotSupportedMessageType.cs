@@ -17,7 +17,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErr
 public class NotSupportedMessageType : ValidationError
 {
     public NotSupportedMessageType(string type)
-        : base($"The type {type} is not supported", "00401", "Type")
+        : base($"The type {type} is not supported", "00401", "MessageType does not match the Business Message in Payload", "B2B-006", "Type")
     {
     }
 }
