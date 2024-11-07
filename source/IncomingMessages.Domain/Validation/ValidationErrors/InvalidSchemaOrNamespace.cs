@@ -17,7 +17,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErr
 public class InvalidSchemaOrNamespace : ValidationError
 {
     public InvalidSchemaOrNamespace()
-        : base($"Schema or namespace could not be resolved", "00301")
+        : base($"Schema or namespace could not be resolved", "00301",  "Internal transformation failed", "B2B-007")
     {
     }
 }

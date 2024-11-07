@@ -17,7 +17,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErr
 public class DuplicateMessageIdDetected : ValidationError
 {
     public DuplicateMessageIdDetected(string messageId)
-        : base($"Message id '{messageId}' is not unique", "00101", "MessageId")
+        : base($"Message id '{messageId}' is not unique", "00101", "The provided Ids are not unique and have been used before", "B2B-003", target: "MessageId")
     {
     }
 }
