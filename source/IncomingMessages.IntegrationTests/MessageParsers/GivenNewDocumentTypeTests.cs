@@ -88,7 +88,7 @@ public class GivenNewIncomingDocumentTypeTests : IncomingMessagesTestBase
         }
         else
         {
-            await act.Should().NotThrowAsync<InvalidOperationException>("because this combination is valid, but no parser was found");
+            await act.Should().NotThrowAsync<NotSupportedException>("because this combination is valid, but no parser was found");
         }
     }
 }
