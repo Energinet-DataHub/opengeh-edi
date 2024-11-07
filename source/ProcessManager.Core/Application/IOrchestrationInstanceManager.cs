@@ -22,8 +22,11 @@ public interface IOrchestrationInstanceManager
     /// <summary>
     /// Start a new instance of an orchestration.
     /// </summary>
-    Task<OrchestrationInstanceId> StartNewOrchestrationInstanceAsync<TParameter>(string name, int version, TParameter parameter)
-        where TParameter : class;
+    Task<OrchestrationInstanceId> StartNewOrchestrationInstanceAsync<TParameter>(
+        string name,
+        int version,
+        TParameter inputParameter)
+            where TParameter : class;
 
     /// <summary>
     /// Schedule a new instance of an orchestration.
@@ -31,14 +34,9 @@ public interface IOrchestrationInstanceManager
     Task<OrchestrationInstanceId> ScheduleNewOrchestrationInstanceAsync<TParameter>(
         string name,
         int version,
-        TParameter parameter,
+        TParameter inputParameter,
         Instant runAt)
-        where TParameter : class;
-
-    /// <summary>
-    /// Start a scheduled orchestration instance.
-    /// </summary>
-    Task StartScheduledOrchestrationInstanceAsync(OrchestrationInstanceId id);
+            where TParameter : class;
 
     /// <summary>
     /// Cancel a scheduled orchestration instance.

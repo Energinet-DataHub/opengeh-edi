@@ -60,7 +60,9 @@ public class OrchestrationInstanceRepository : IOrchestrationInstanceRepository,
         string name,
         int? version = default,
         OrchestrationInstanceLifecycleStates? lifecycleState = default,
-        OrchestrationInstanceTerminationStates? terminationState = default)
+        OrchestrationInstanceTerminationStates? terminationState = default,
+        Instant? startedAtOrLater = default,
+        Instant? terminatedAtOrEarlier = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
@@ -74,7 +76,9 @@ public class OrchestrationInstanceRepository : IOrchestrationInstanceRepository,
                 instance => instance.OrchestrationDescriptionId,
                 (_, instance) => instance)
             .Where(x => lifecycleState == null || x.Lifecycle.State == lifecycleState)
-            .Where(x => terminationState == null || x.Lifecycle.TerminationState == terminationState);
+            .Where(x => terminationState == null || x.Lifecycle.TerminationState == terminationState)
+            .Where(x => startedAtOrLater == null || x.Lifecycle.StartedAt >= startedAtOrLater)
+            .Where(x => terminatedAtOrEarlier == null || x.Lifecycle.TerminatedAt <= terminatedAtOrEarlier);
 
         return await query.ToListAsync().ConfigureAwait(false);
     }

@@ -41,7 +41,7 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
 
                 b.Property(pv => pv.CreatedAt);
                 b.Property(pv => pv.ScheduledToRunAt);
-                b.Property(pv => pv.StartRequestedAt);
+                b.Property(pv => pv.QueuedAt);
                 b.Property(pv => pv.StartedAt);
                 b.Property(pv => pv.TerminatedAt);
             });

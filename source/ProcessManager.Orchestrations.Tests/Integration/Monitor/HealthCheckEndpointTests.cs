@@ -23,7 +23,7 @@ namespace Energinet.DataHub.ProcessManager.Orchestrations.Tests.Integration.Moni
 /// <summary>
 /// Tests verifying the configuration and behaviour of Health Checks.
 /// </summary>
-[Collection(nameof(OrchestrationsAppCollectionFixture))]
+[Collection(nameof(OrchestrationsAppCollection))]
 public class HealthCheckEndpointTests : IAsyncLifetime
 {
     public HealthCheckEndpointTests(OrchestrationsAppFixture fixture, ITestOutputHelper testOutputHelper)
