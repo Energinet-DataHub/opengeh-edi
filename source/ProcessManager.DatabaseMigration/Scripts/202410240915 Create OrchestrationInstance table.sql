@@ -7,7 +7,7 @@
     [Lifecycle_TerminationState]    INT NULL,
     [Lifecycle_CreatedAt]           DATETIME2 NOT NULL,
     [Lifecycle_ScheduledToRunAt]    DATETIME2 NULL,
-    [Lifecycle_StartRequestedAt]    DATETIME2 NULL,
+    [Lifecycle_QueuedAt]            DATETIME2 NULL,
     [Lifecycle_StartedAt]           DATETIME2 NULL,
     [Lifecycle_TerminatedAt]        DATETIME2 NULL,
 
