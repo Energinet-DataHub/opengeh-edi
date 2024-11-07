@@ -44,6 +44,6 @@ internal class Brs023OrchestrationTerminateActivityV1(
         await UnitOfWork.CommitAsync().ConfigureAwait(false);
 
         // TODO: For demo purposes; remove when done
-        await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+        await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
     }
 }

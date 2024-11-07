@@ -12,15 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
+namespace Energinet.DataHub.ProcessManager.Api.Model;
 
-/// <summary>
-/// An immutable input to start the <see cref="NotifyAggregatedMeasureDataOrchestrationV1"/>.
-/// </summary>
-public sealed record NotifyAggregatedMeasureDataInputV1(
-    CalculationTypes CalculationType,
-    IReadOnlyCollection<string> GridAreaCodes,
-    DateTimeOffset StartDate,
-    DateTimeOffset EndDate,
-    DateTimeOffset ScheduledAt,
-    bool IsInternalCalculation);
+public sealed record ScheduleOrchestrationInstanceDto<TParameter>(
+    DateTimeOffset RunAt,
+    TParameter InputParameter)
+        where TParameter : class;

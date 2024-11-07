@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
+using NodaTime;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Application;
 
@@ -32,5 +33,7 @@ public interface IOrchestrationInstanceRepository : IOrchestrationInstanceProgre
         string name,
         int? version,
         OrchestrationInstanceLifecycleStates? lifecycleState,
-        OrchestrationInstanceTerminationStates? terminationState);
+        OrchestrationInstanceTerminationStates? terminationState,
+        Instant? startedAtOrLater,
+        Instant? terminatedAtOrEarlier);
 }
