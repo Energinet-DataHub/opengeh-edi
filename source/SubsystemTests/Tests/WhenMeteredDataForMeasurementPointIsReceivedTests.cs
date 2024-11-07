@@ -54,7 +54,7 @@ public class WhenMeteredDataForMeasurementPointIsReceivedTests : BaseTestClass
         var faultMessage = await _meteredDataForMeasurementPointGridAccessProvider
             .SendMeteredDataForMeasurementPointInEbixWithAlreadyUsedMessageIdAsync(CancellationToken.None);
 
-        var expectedErrorMessage = "The provided Ids are not unique and have been used before";
+        var expectedErrorMessage = "B2B-003:The provided Ids are not unique and have been used before";
 
         _meteredDataForMeasurementPointGridAccessProvider.ConfirmResponseContainsValidationError(
             faultMessage,
