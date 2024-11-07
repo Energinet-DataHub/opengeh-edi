@@ -14,10 +14,10 @@
 
 using Asp.Versioning;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2CWebApi.Mappers;
 using Energinet.DataHub.EDI.B2CWebApi.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime.Extensions;
@@ -57,7 +57,7 @@ public class ArchivedMessageSearchController : ControllerBase
                 affectedEntityKey: null)
             .ConfigureAwait(false);
         var messageCreationPeriod = request.SearchCriteria.CreatedDuringPeriod is not null
-            ? new ArchivedMessages.Interfaces.MessageCreationPeriod(
+            ? new ArchivedMessages.Interfaces.Models.MessageCreationPeriod(
                 request.SearchCriteria.CreatedDuringPeriod.Start.ToInstant(),
                 request.SearchCriteria.CreatedDuringPeriod.End.ToInstant())
             : null;
@@ -121,7 +121,7 @@ public class ArchivedMessageSearchController : ControllerBase
             .ConfigureAwait(false);
 
         var messageCreationPeriod = request.SearchCriteria.CreatedDuringPeriod is not null
-            ? new ArchivedMessages.Interfaces.MessageCreationPeriod(
+            ? new ArchivedMessages.Interfaces.Models.MessageCreationPeriod(
                 request.SearchCriteria.CreatedDuringPeriod.Start.ToInstant(),
                 request.SearchCriteria.CreatedDuringPeriod.End.ToInstant())
             : null;

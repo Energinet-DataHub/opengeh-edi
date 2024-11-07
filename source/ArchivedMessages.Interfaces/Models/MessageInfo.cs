@@ -12,9 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using NodaTime;
 
-public record ArchivedMessageId(Guid Value)
-{
-    public static ArchivedMessageId Create() => new(Guid.NewGuid());
-}
+namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
+
+public record MessageInfo(
+    long RecordId,
+    Guid Id,
+    string? MessageId,
+    string DocumentType,
+    string SenderNumber,
+    string SenderRoleCode,
+    string ReceiverNumber,
+    string ReceiverRoleCode,
+    Instant CreatedAt,
+    string? BusinessReason);

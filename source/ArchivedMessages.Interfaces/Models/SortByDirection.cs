@@ -12,10 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 
-public enum ArchivedMessageType
+public readonly struct DirectionToSortBy
 {
-    IncomingMessage,
-    OutgoingMessage,
+    public static readonly DirectionToSortBy Ascending = new("ASC");
+    public static readonly DirectionToSortBy Descending = new("DESC");
+
+    private DirectionToSortBy(string identifier)
+    {
+        Identifier = identifier;
+    }
+
+    public string Identifier { get; }
 }

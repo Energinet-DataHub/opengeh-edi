@@ -20,7 +20,7 @@ using Dapper;
 using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.Core.Messaging.Communication.Extensions.Options;
-using Energinet.DataHub.EDI.ArchivedMessages.Application.Extensions.DependencyInjection;
+using Energinet.DataHub.EDI.ArchivedMessages.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.B2BApi.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Authentication;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;

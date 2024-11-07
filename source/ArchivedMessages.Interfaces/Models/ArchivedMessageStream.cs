@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 
 #pragma warning disable CA1711 // Is a "Stream" value type
 public sealed record ArchivedMessageStream : StreamValueObject, IArchivedMessageStream

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 
 /// <summary>
 /// The SortedCursorBasedPagination is navigating forward or backwards through a dataset

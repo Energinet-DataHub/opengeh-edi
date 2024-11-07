@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
-
-public record MessageSearchResult(ReadOnlyCollection<MessageInfo> Messages, int TotalAmountOfMessages);
+public enum ArchivedMessageType
+{
+    IncomingMessage,
+    OutgoingMessage,
+}
