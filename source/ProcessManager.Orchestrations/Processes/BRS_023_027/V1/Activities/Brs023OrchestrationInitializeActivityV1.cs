@@ -40,24 +40,10 @@ internal class Brs023OrchestrationInitializeActivityV1(
             .GetAsync(new OrchestrationInstanceId(orchestrationInstanceId))
             .ConfigureAwait(false);
 
-        // TODO: For demo purposes we create the steps here; will be refactored to either:
-        //  - describing the steps as part of the orchestration description
-        //  - describing the steps in the specific BRS handler located in the API
-        orchestrationInstance.Steps.Add(new OrchestrationStep(
-            orchestrationInstance.Id,
-            Clock,
-            "Beregning",
-            NotifyAggregatedMeasureDataOrchestrationV1.CalculationStepIndex));
-        orchestrationInstance.Steps.Add(new OrchestrationStep(
-            orchestrationInstance.Id,
-            Clock,
-            "Besked dannelse",
-            NotifyAggregatedMeasureDataOrchestrationV1.EnqueueMessagesStepIndex));
-
         orchestrationInstance.Lifecycle.TransitionToRunning(Clock);
         await UnitOfWork.CommitAsync().ConfigureAwait(false);
 
         // TODO: For demo purposes; remove when done
-        await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+        await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
     }
 }

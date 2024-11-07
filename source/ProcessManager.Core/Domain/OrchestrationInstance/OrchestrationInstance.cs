@@ -27,10 +27,10 @@ public class OrchestrationInstance
     public OrchestrationInstance(
         OrchestrationDescriptionId orchestrationDescriptionId,
         IClock clock,
-        Instant? scheduledToRunAt = default)
+        Instant? runAt = default)
     {
         Id = new OrchestrationInstanceId(Guid.NewGuid());
-        Lifecycle = new OrchestrationInstanceLifecycleState(clock, scheduledToRunAt);
+        Lifecycle = new OrchestrationInstanceLifecycleState(clock, runAt);
         ParameterValue = new();
         Steps = [];
         CustomState = new OrchestrationInstanceCustomState(string.Empty);
@@ -56,7 +56,7 @@ public class OrchestrationInstance
     public OrchestrationInstanceLifecycleState Lifecycle { get; }
 
     /// <summary>
-    /// Defines the Durable Functions orchestration input parameter value.
+    /// Contains the Durable Functions orchestration input parameter value.
     /// </summary>
     public OrchestrationInstanceParameterValue ParameterValue { get; }
 
