@@ -17,7 +17,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErr
 public class AuthenticatedUserDoesNotHoldRequiredRoleType : ValidationError
 {
     public AuthenticatedUserDoesNotHoldRequiredRoleType()
-        : base("The authenticated user does not hold the required role", "00001")
+        : base("The authenticated user does not hold the required role", "00001", "Sender Identification in the Business Message is not authorised or user of the SendMessage operation has no relation with the organisation (i.e. Sender Identification)", "B2B-008")
     {
     }
 }

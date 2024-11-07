@@ -17,7 +17,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErr
 public class EmptyTransactionId : ValidationError
 {
     public EmptyTransactionId()
-        : base($"Transaction id cannot be empty", "00202", "TransactionId")
+        : base($"Transaction id cannot be empty", "00202", "The provided Ids are not unique in the Business Message (e.g. same TransactionId or TimeseriesId used in the same message), or duplicate Ids in requests when calling the SendMessage operation in parallel.", "B2B-009", "TransactionId")
     {
     }
 }

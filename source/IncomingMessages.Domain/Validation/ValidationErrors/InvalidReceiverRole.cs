@@ -16,8 +16,12 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErr
 
 public class InvalidReceiverRole : ValidationError
 {
+    /// <summary>
+    /// Represents the error when the receiver role is invalid
+    /// </summary>
+    /// <remarks>Ebix messages doesn't contain ReceiverRole</remarks>
     public InvalidReceiverRole()
-        : base("Invalid receiver role", "00304", "marketRole.type")
+        : base("Invalid receiver role", "00304", "Invalid receiver role", "00000", "marketRole.type")
     {
     }
 }
