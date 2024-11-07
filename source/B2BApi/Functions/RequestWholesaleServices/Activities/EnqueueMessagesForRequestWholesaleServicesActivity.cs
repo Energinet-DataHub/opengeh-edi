@@ -69,19 +69,17 @@ public class EnqueueMessagesForRequestWholesaleServicesActivity(
             switch (calculationResult.Result)
             {
                 case RequestWholesaleServicesQueryResultEnum.Success:
-                    {
-                        ArgumentNullException.ThrowIfNull(calculationResult.WholesaleServices);
-                        var acceptedWholesaleServicesMessage =
-                            AcceptedWholesaleServiceMessageDtoFactory.Create(
-                                EventId.From("deprecated-event-id"),
-                                transaction,
-                                calculationResult.WholesaleServices);
-                        var messageId = await _outgoingMessagesClient.EnqueueAsync(acceptedWholesaleServicesMessage, cancellationToken)
-                            .ConfigureAwait(false);
+                    ArgumentNullException.ThrowIfNull(calculationResult.WholesaleServices);
+                    var acceptedWholesaleServicesMessage =
+                        AcceptedWholesaleServiceMessageDtoFactory.Create(
+                            EventId.From("deprecated-event-id"),
+                            transaction,
+                            calculationResult.WholesaleServices);
+                    var messageId = await _outgoingMessagesClient.EnqueueAsync(acceptedWholesaleServicesMessage, cancellationToken)
+                        .ConfigureAwait(false);
 
-                        acceptedMessagesIds.Add(messageId);
-                        break;
-                    }
+                    acceptedMessagesIds.Add(messageId);
+                    break;
                 case RequestWholesaleServicesQueryResultEnum.NoDataForGridArea:
                     // TODO: Enqueue rejected message
                 case RequestWholesaleServicesQueryResultEnum.NoDataAvailable:
