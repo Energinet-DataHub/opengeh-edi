@@ -17,7 +17,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErr
 public class InvalidBusinessReasonOrVersion : ValidationError
 {
     public InvalidBusinessReasonOrVersion(string businessReason, string version)
-        : base($"Schema version {version} for business process type {businessReason} does not exist", "00301")
+        : base($"Schema version {version} for business process type {businessReason} does not exist", "00301", "Internal transformation failed", "B2B-007")
     {
     }
 }

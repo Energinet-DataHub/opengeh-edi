@@ -17,7 +17,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErr
 public class AuthenticatedUserDoesNotMatchSenderId : ValidationError
 {
     public AuthenticatedUserDoesNotMatchSenderId()
-        : base("Sender id does not match id of current authenticated user", "00002", "SenderId")
+        : base("Sender id does not match id of current authenticated user", "00002", "Sender Identification in the Business Message is not authorised or user of the SendMessage operation has no relation with the organisation (i.e. Sender Identification)", "B2B-008", "SenderId")
     {
     }
 }
