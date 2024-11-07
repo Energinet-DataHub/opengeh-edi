@@ -17,7 +17,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErr
 public class InvalidReceiverId : ValidationError
 {
     public InvalidReceiverId(string receiverId)
-        : base($"Receiver id {receiverId} is not a valid receiver", "00303",  "Sender Identification in the Business Message is not authorised or user of the SendMessage operation has no relation with the organisation (i.e. Sender Identification)", "B2B-008", "ReceiverId")
+        : base($"Receiver id {receiverId} is not a valid receiver", "00303",  "Invalid recipient", "B2B-011", "ReceiverId")
     {
     }
 }
