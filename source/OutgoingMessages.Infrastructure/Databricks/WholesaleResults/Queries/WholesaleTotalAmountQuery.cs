@@ -115,9 +115,9 @@ public class WholesaleTotalAmountQuery(
 
         if (chargeOwnerNumber is not null)
         {
-            if (chargeOwnerNumber != DataHubDetails.SystemOperatorActorNumber && gridAreaOwnerDictionary is not null)
+            if (chargeOwnerNumber != DataHubDetails.SystemOperatorActorNumber)
             {
-                var gridAreaOwner = gridAreaOwnerDictionary[gridAreaCode];
+                var gridAreaOwner = gridAreaOwnerDictionary![gridAreaCode];
                 return (gridAreaOwner, GetChargeOwnerRole(gridAreaOwner));
             }
 

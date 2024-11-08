@@ -32,7 +32,6 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Whole
 public class WholesaleAmountPerChargeQuery(
     ILogger logger,
     EdiDatabricksOptions ediDatabricksOptions,
-    IMasterDataClient masterDataClient,
     EventId eventId,
     Guid calculationId,
     string? energySupplier)
@@ -42,7 +41,6 @@ public class WholesaleAmountPerChargeQuery(
         calculationId,
         energySupplier)
 {
-    private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly EventId _eventId = eventId;
     private readonly ILogger _logger = logger;
 
@@ -74,7 +72,7 @@ public class WholesaleAmountPerChargeQuery(
 
     protected override string ActorColumnName => WholesaleResultColumnNames.EnergySupplierId;
 
-    protected override async Task<WholesaleAmountPerChargeMessageDto> CreateWholesaleResultAsync(
+    protected override Task<WholesaleAmountPerChargeMessageDto> CreateWholesaleResultAsync(
         DatabricksSqlRow databricksSqlRow,
         IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints,
         ImmutableDictionary<string, ActorNumber>? gridAreaOwnerDictionary)
@@ -88,12 +86,7 @@ public class WholesaleAmountPerChargeQuery(
 
         if (isTax)
         {
-            var gridAreaOwner = gridAreaOwnerDictionary != null
-                ? gridAreaOwnerDictionary[gridAreaCode]
-                : (await _masterDataClient
-                .GetGridOwnerForGridAreaCodeAsync(gridAreaCode, CancellationToken.None)
-                .ConfigureAwait(false))
-                .ActorNumber;
+            var gridAreaOwner = gridAreaOwnerDictionary![gridAreaCode];
 
             chargeOwnerReceiverId = gridAreaOwner;
             _logger.LogInformation("Message created from CalculationResultId: {CalculationResultId}, was tax. ChargeOwnerReceiver was changed from {ChargeOwnerReceiverId} to {NewChargeOwnerReceiverId}", calculationResultId, originalChargeOwnerReceiverId, chargeOwnerReceiverId);
@@ -102,12 +95,7 @@ public class WholesaleAmountPerChargeQuery(
         {
             if (chargeOwnerId != DataHubDetails.SystemOperatorActorNumber)
             {
-                var gridAreaOwner = gridAreaOwnerDictionary != null
-                    ? gridAreaOwnerDictionary[gridAreaCode]
-                    : (await _masterDataClient
-                        .GetGridOwnerForGridAreaCodeAsync(gridAreaCode, CancellationToken.None)
-                        .ConfigureAwait(false))
-                    .ActorNumber;
+                var gridAreaOwner = gridAreaOwnerDictionary![gridAreaCode];
 
                 chargeOwnerReceiverId = gridAreaOwner;
                 _logger.LogInformation(
@@ -125,7 +113,8 @@ public class WholesaleAmountPerChargeQuery(
                 databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.Resolution));
 
         var chargeType = ChargeTypeMapper.FromDeltaTableValue(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.ChargeType));
-        return new WholesaleAmountPerChargeMessageDto(
+        return Task.FromResult(
+            new WholesaleAmountPerChargeMessageDto(
             eventId: _eventId,
             calculationId: databricksSqlRow.ToGuid(WholesaleResultColumnNames.CalculationId),
             calculationResultId: calculationResultId,
@@ -155,6 +144,6 @@ public class WholesaleAmountPerChargeQuery(
                         p.Amount,
                         QuantityQualitiesFactor.CreateQuantityQuality(p.Price, p.Qualities, chargeType)))
                 .ToList()
-                .AsReadOnly());
+                .AsReadOnly()));
     }
 }
