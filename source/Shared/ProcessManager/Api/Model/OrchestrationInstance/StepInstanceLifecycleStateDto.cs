@@ -14,31 +14,25 @@
 
 namespace Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 
-/// <summary>
-/// High-level lifecycle states that all orchestration steps can go through.
-/// </summary>
-public enum OrchestrationStepLifecycleStates
+public record StepInstanceLifecycleStateDto(
+    StepInstanceLifecycleStates State,
+    OrchestrationStepTerminationStates? TerminationState,
+    DateTimeOffset? StartedAt,
+    DateTimeOffset? TerminatedAt)
 {
-    /// <summary>
-    /// Created and waiting to be started.
-    /// </summary>
-    Pending = 1,
+    public StepInstanceLifecycleStates State { get; } = State;
+
+    public OrchestrationStepTerminationStates? TerminationState { get; } = TerminationState;
 
     /// <summary>
-    /// A Durable Functions activity has transitioned the orchestration step into running.
+    /// The time when the Process Manager was used from Durable Functions to
+    /// transition the state to Running.
     /// </summary>
-    Running = 2,
+    public DateTimeOffset? StartedAt { get; } = StartedAt;
 
     /// <summary>
-    /// A Durable Functions activity has transitioned the orchestration step into terminated.
-    /// See <see cref="OrchestrationStepTerminationStates"/> for details.
+    /// The time when the Process Manager was used from Durable Functions to
+    /// transition the state to Terminated.
     /// </summary>
-    Terminated = 3,
-}
-
-public enum OrchestrationStepTerminationStates
-{
-    Succeeded = 1,
-
-    Failed = 2,
+    public DateTimeOffset? TerminatedAt { get; } = TerminatedAt;
 }

@@ -56,10 +56,10 @@ internal static class OrchestrationInstanceMapperExtensions
             TerminatedAt: entity.TerminatedAt?.ToDateTimeOffset());
     }
 
-    public static ApiModel.OrchestrationStepDto MapToDto(
+    public static ApiModel.StepInstanceDto MapToDto(
         this DomainModel.StepInstance entity)
     {
-        return new ApiModel.OrchestrationStepDto(
+        return new ApiModel.StepInstanceDto(
             Id: entity.Id.Value,
             Lifecycle: entity.Lifecycle.MapToDto(),
             Description: entity.Description,
@@ -67,12 +67,12 @@ internal static class OrchestrationInstanceMapperExtensions
             CustomState: entity.CustomState.Value);
     }
 
-    public static ApiModel.OrchestrationStepLifecycleStateDto MapToDto(
+    public static ApiModel.StepInstanceLifecycleStateDto MapToDto(
         this DomainModel.StepInstanceLifecycleState entity)
     {
-        return new ApiModel.OrchestrationStepLifecycleStateDto(
+        return new ApiModel.StepInstanceLifecycleStateDto(
             State: Enum
-                .TryParse<ApiModel.OrchestrationStepLifecycleStates>(
+                .TryParse<ApiModel.StepInstanceLifecycleStates>(
                     entity.State.ToString(),
                     ignoreCase: true,
                     out var lifecycleStateResult)
