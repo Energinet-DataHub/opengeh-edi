@@ -15,6 +15,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Azure.Storage.Blobs;
+using BuildingBlocks.Application.FeatureFlag;
 using Energinet.DataHub.BuildingBlocks.Tests.Database;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Azurite;
@@ -31,12 +32,15 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.IntegrationTests.AuditLog.Fixture;
+using Energinet.DataHub.EDI.IntegrationTests.CalculationResults.Fixtures;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.RevisionLog.Integration.Options;
+using Energinet.DataHub.Wholesale.Common.Infrastructure.Options;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Xunit;
 using Xunit.Abstractions;
+using AmountsPerChargeViewSchemaDefinition = Energinet.DataHub.EDI.B2BApi.AppTests.TestData.CalculationResults.AmountsPerChargeViewSchemaDefinition;
 using HttpClientFactory = Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks.HttpClientFactory;
 
 namespace Energinet.DataHub.EDI.B2BApi.AppTests.Fixtures;
@@ -52,13 +56,14 @@ public class B2BApiAppFixture : IAsyncLifetime
     /// </summary>
     private const string TaskHubName = "EdiTest01";
 
+    private const string DatabricksCatalogName = "hive_metastore";
+
+    private readonly DeltaTableOptions _calculationResultsDatabricksOptions;
+
     public B2BApiAppFixture()
     {
-        var constructorStopwatch = new Stopwatch();
-        var stopwatch = new Stopwatch();
-
-        constructorStopwatch.Start();
-        stopwatch.Start();
+        var constructorStopwatch = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
 
         TestLogger = new TestDiagnosticsLogger();
         LogStopwatch(stopwatch, nameof(TestLogger));
@@ -95,11 +100,23 @@ public class B2BApiAppFixture : IAsyncLifetime
         HostConfigurationBuilder = new FunctionAppHostConfigurationBuilder();
         LogStopwatch(stopwatch, nameof(HostConfigurationBuilder));
 
-        DatabricksSchemaManager = new DatabricksSchemaManager(
+        EdiDatabricksSchemaManager = new DatabricksSchemaManager(
             new HttpClientFactory(),
             IntegrationTestConfiguration.DatabricksSettings,
-            "edi_B2BApi_tests");
-        LogStopwatch(stopwatch, nameof(DatabricksSchemaManager));
+            "B2BApi_tests_edi");
+        LogStopwatch(stopwatch, nameof(EdiDatabricksSchemaManager));
+
+        CalculationResultsDatabricksSchemaManager = new DatabricksSchemaManager(
+            new HttpClientFactory(),
+            IntegrationTestConfiguration.DatabricksSettings,
+            "B2BApi_tests_calculation_results");
+        LogStopwatch(stopwatch, nameof(CalculationResultsDatabricksSchemaManager));
+
+        _calculationResultsDatabricksOptions = new DeltaTableOptions
+        {
+            DatabricksCatalogName = DatabricksCatalogName,
+            WholesaleCalculationResultsSchemaName = CalculationResultsDatabricksSchemaManager.SchemaName,
+        };
 
         AuditLogMockServer = new AuditLogMockServer();
         LogStopwatch(stopwatch, nameof(AuditLogMockServer));
@@ -125,7 +142,9 @@ public class B2BApiAppFixture : IAsyncLifetime
 
     public ServiceBusListenerMock ServiceBusListenerMock { get; }
 
-    public DatabricksSchemaManager DatabricksSchemaManager { get; }
+    public DatabricksSchemaManager EdiDatabricksSchemaManager { get; }
+
+    public DatabricksSchemaManager CalculationResultsDatabricksSchemaManager { get; }
 
     public EdiDatabaseManager DatabaseManager { get; }
 
@@ -141,8 +160,8 @@ public class B2BApiAppFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        var initializeStopwatch = new Stopwatch();
-        var stopwatch = new Stopwatch();
+        var initializeStopwatch = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
 
         // Storage emulator
         AzuriteManager.StartAzurite();
@@ -210,14 +229,23 @@ public class B2BApiAppFixture : IAsyncLifetime
         DurableClient = DurableTaskManager.CreateClient(taskHubName: TaskHubName);
         LogStopwatch(stopwatch, nameof(DurableTaskManager.CreateClient));
 
+        await CalculationResultsDatabricksSchemaManager.CreateSchemaAsync();
+        LogStopwatch(
+            stopwatch,
+            $"{nameof(CalculationResultsDatabricksSchemaManager)}.{nameof(CalculationResultsDatabricksSchemaManager.CreateSchemaAsync)}");
+
+        await CreateCalculationResultDatabricksDataAsync();
+        LogStopwatch(stopwatch, nameof(CreateCalculationResultDatabricksDataAsync));
+
         LogStopwatch(initializeStopwatch, nameof(InitializeAsync));
     }
 
     public async Task DisposeAsync()
     {
         AppHostManager.Dispose();
-        DurableTaskManager.Dispose();
         AzuriteManager.Dispose();
+        await CalculationResultsDatabricksSchemaManager.DropSchemaAsync();
+        await DurableTaskManager.DisposeAsync();
         await ServiceBusResourceProvider.DisposeAsync();
         await DatabaseManager.DeleteDatabaseAsync();
     }
@@ -236,11 +264,11 @@ public class B2BApiAppFixture : IAsyncLifetime
     }
 
     public void EnsureAppHostUsesFeatureFlagValue(
-        bool enableCalculationCompletedEvent)
+        bool useRequestWholesaleServicesOrchestration = false)
     {
         AppHostManager.RestartHostIfChanges(new Dictionary<string, string>
         {
-            { "FeatureManagement__UseCalculationCompletedEvent", enableCalculationCompletedEvent.ToString().ToLower() },
+            { $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration.ToString()}", useRequestWholesaleServicesOrchestration.ToString().ToLower() },
         });
     }
 
@@ -396,10 +424,17 @@ public class B2BApiAppFixture : IAsyncLifetime
             IntegrationTestConfiguration.DatabricksSettings.WarehouseId);
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.DatabaseName)}",
-            DatabricksSchemaManager.SchemaName);
+            EdiDatabricksSchemaManager.SchemaName);
         appHostSettings.ProcessEnvironmentVariables.Add(
             $"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.CatalogName)}",
-            "hive_metastore");
+            DatabricksCatalogName);
+
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"{nameof(DeltaTableOptions.WholesaleCalculationResultsSchemaName)}",
+            _calculationResultsDatabricksOptions.WholesaleCalculationResultsSchemaName);
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"{nameof(DeltaTableOptions.DatabricksCatalogName)}",
+            _calculationResultsDatabricksOptions.DatabricksCatalogName);
 
         // ServiceBus connection strings
         appHostSettings.ProcessEnvironmentVariables.Add(
@@ -408,19 +443,19 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         // Feature Flags: Default values
         appHostSettings.ProcessEnvironmentVariables.Add(
-            "FeatureManagement__UseCalculationCompletedEvent",
+            $"FeatureManagement__{FeatureFlagName.UsePeekMessages.ToString()}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            "FeatureManagement__UsePeekMessages",
-            true.ToString().ToLower());
-
-        appHostSettings.ProcessEnvironmentVariables.Add(
-            "FeatureManagement__RequestStaysInEdi",
+            $"FeatureManagement__{FeatureFlagName.RequestStaysInEdi.ToString()}",
             false.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
-            "FeatureManagement__ReceiveMeteredDataForMeasurementPoints",
+            $"FeatureManagement__{FeatureFlagName.UseRequestWholesaleServicesProcessOrchestration.ToString()}",
+            false.ToString().ToLower());
+
+        appHostSettings.ProcessEnvironmentVariables.Add(
+            $"FeatureManagement__{FeatureFlagName.ReceiveMeteredDataForMeasurementPoints.ToString()}",
             true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
@@ -438,6 +473,20 @@ public class B2BApiAppFixture : IAsyncLifetime
             "true");
 
         return appHostSettings;
+    }
+
+    private async Task CreateCalculationResultDatabricksDataAsync()
+    {
+        await CalculationResultsDatabricksSchemaManager.CreateTableAsync(
+            _calculationResultsDatabricksOptions.AMOUNTS_PER_CHARGE_V1_VIEW_NAME,
+            AmountsPerChargeViewSchemaDefinition.SchemaDefinition);
+
+        const string amountsPerChargeFileName = "wholesale_calculation_results.amounts_per_charge_v1.csv";
+        var amountsPerChargeFilePath = Path.Combine("TestData", "CalculationResults", amountsPerChargeFileName);
+        await CalculationResultsDatabricksSchemaManager.InsertFromCsvFileAsync(
+            _calculationResultsDatabricksOptions.AMOUNTS_PER_CHARGE_V1_VIEW_NAME,
+            AmountsPerChargeViewSchemaDefinition.SchemaDefinition,
+            amountsPerChargeFilePath);
     }
 
     private void LogStopwatch(Stopwatch stopwatch, string tag)

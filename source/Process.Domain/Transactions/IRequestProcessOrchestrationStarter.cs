@@ -12,28 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
+using Energinet.DataHub.EDI.Process.Interfaces;
 
-namespace Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
+namespace Energinet.DataHub.EDI.Process.Domain.Transactions;
 
-public record ChargeTypeId
+public interface IRequestProcessOrchestrationStarter
 {
-    [JsonConstructor]
-    private ChargeTypeId(Guid id)
-    {
-        Id = id;
-    }
-
-    public Guid Id { get; }
-
-    public static ChargeTypeId New()
-    {
-        return new ChargeTypeId(Guid.NewGuid());
-    }
-
-    public static ChargeTypeId Create(Guid id)
-    {
-        return new ChargeTypeId(id);
-    }
+    Task StartRequestWholesaleServicesOrchestrationAsync(InitializeWholesaleServicesProcessDto initializeProcessDto);
 }

@@ -47,6 +47,7 @@ limitations under the License.
     <ItemGroup>
       <ProjectReference Include="..\B2BApi\B2BApi.csproj" />
       <ProjectReference Include="..\B2CWebApi\B2CWebApi.csproj" />
+      <ProjectReference Include="..\CalculationResults\CalculationResults.Infrastructure\CalculationResults.Infrastructure.csproj" />
       <ProjectReference Include="..\DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj" />
       <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
       <ProjectReference Include="..\MasterData.Infrastructure\MasterData.Infrastructure.csproj" />
