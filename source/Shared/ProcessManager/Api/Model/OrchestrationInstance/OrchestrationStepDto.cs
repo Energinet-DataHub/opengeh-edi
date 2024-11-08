@@ -22,9 +22,8 @@ namespace Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 public record OrchestrationStepDto(
     Guid Id,
     OrchestrationStepLifecycleStateDto Lifecycle,
-    string? Description,
+    string Description,
     int Sequence,
-    Guid? DependsOn,
     string CustomState)
 {
     public Guid Id { get; } = Id;
@@ -34,11 +33,9 @@ public record OrchestrationStepDto(
     /// </summary>
     public OrchestrationStepLifecycleStateDto Lifecycle { get; } = Lifecycle;
 
-    public string? Description { get; } = Description;
+    public string Description { get; } = Description;
 
     public int Sequence { get; } = Sequence;
-
-    public Guid? DependsOn { get; } = DependsOn;
 
     /// <summary>
     /// Any custom state of the step.

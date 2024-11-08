@@ -80,55 +80,34 @@ public class ProcessManagerContextTests
 
     private static OrchestrationDescription CreateOrchestrationDescription()
     {
-        var existingOrchestrationDescription = new OrchestrationDescription(
-            "TestOrchestration",
-            4,
-            true,
-            "TestOrchestrationFunction");
+        var orchestrationDescription = new OrchestrationDescription(
+            name: "TestOrchestration",
+            version: 4,
+            canBeScheduled: true,
+            functionName: "TestOrchestrationFunction");
 
-        existingOrchestrationDescription
-            .ParameterDefinition
-            .SetFromType<TestOrchestrationParameter>();
-        return existingOrchestrationDescription;
+        orchestrationDescription.ParameterDefinition.SetFromType<TestOrchestrationParameter>();
+
+        orchestrationDescription.AppendStepDescription("Test step 1");
+        orchestrationDescription.AppendStepDescription("Test step 2");
+        orchestrationDescription.AppendStepDescription("Test step 3");
+
+        return orchestrationDescription;
     }
 
-    private static OrchestrationInstance CreateOrchestrationInstance(OrchestrationDescription existingOrchestrationDescription)
+    private static OrchestrationInstance CreateOrchestrationInstance(OrchestrationDescription orchestrationDescription)
     {
-        var existingOrchestrationInstance = new OrchestrationInstance(
-            existingOrchestrationDescription.Id,
-            SystemClock.Instance);
+        var orchestrationInstance = OrchestrationInstance.CreateFromDescription(
+            description: orchestrationDescription,
+            clock: SystemClock.Instance);
 
-        var step1 = new OrchestrationStep(
-            existingOrchestrationInstance.Id,
-            SystemClock.Instance,
-            "Test step 1",
-            0);
-
-        var step2 = new OrchestrationStep(
-            existingOrchestrationInstance.Id,
-            SystemClock.Instance,
-            "Test step 2",
-            1,
-            step1.Id);
-
-        var step3 = new OrchestrationStep(
-            existingOrchestrationInstance.Id,
-            SystemClock.Instance,
-            "Test step 3",
-            2,
-            step2.Id);
-
-        existingOrchestrationInstance.Steps.Add(step1);
-        existingOrchestrationInstance.Steps.Add(step2);
-        existingOrchestrationInstance.Steps.Add(step3);
-
-        existingOrchestrationInstance.ParameterValue.SetFromInstance(new TestOrchestrationParameter
+        orchestrationInstance.ParameterValue.SetFromInstance(new TestOrchestrationParameter
         {
             TestString = "Test string",
             TestInt = 42,
         });
 
-        return existingOrchestrationInstance;
+        return orchestrationInstance;
     }
 
     private class TestOrchestrationParameter

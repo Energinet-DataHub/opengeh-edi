@@ -36,7 +36,7 @@ internal class Brs023EnqueueMessagesStepStartActivityV1(
             .GetAsync(new OrchestrationInstanceId(orchestrationInstanceId))
             .ConfigureAwait(false);
 
-        var step = orchestrationInstance.Steps.First(x => x.Sequence == NotifyAggregatedMeasureDataOrchestrationV1.EnqueueMessagesStepIndex);
+        var step = orchestrationInstance.Steps.First(x => x.Sequence == NotifyAggregatedMeasureDataOrchestrationV1.EnqueueMessagesStepSequence);
         step.Lifecycle.TransitionToRunning(Clock);
         await UnitOfWork.CommitAsync().ConfigureAwait(false);
 

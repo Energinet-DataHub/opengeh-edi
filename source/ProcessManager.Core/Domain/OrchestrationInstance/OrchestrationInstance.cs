@@ -24,7 +24,9 @@ namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 /// </summary>
 public class OrchestrationInstance
 {
-    public OrchestrationInstance(
+    private readonly List<StepInstance> _steps;
+
+    private OrchestrationInstance(
         OrchestrationDescriptionId orchestrationDescriptionId,
         IClock clock,
         Instant? runAt = default)
@@ -32,8 +34,10 @@ public class OrchestrationInstance
         Id = new OrchestrationInstanceId(Guid.NewGuid());
         Lifecycle = new OrchestrationInstanceLifecycleState(clock, runAt);
         ParameterValue = new();
-        Steps = [];
         CustomState = new OrchestrationInstanceCustomState(string.Empty);
+
+        _steps = [];
+        Steps = _steps.AsReadOnly();
 
         OrchestrationDescriptionId = orchestrationDescriptionId;
     }
@@ -58,12 +62,13 @@ public class OrchestrationInstance
     /// <summary>
     /// Contains the Durable Functions orchestration input parameter value.
     /// </summary>
-    public OrchestrationInstanceParameterValue ParameterValue { get; }
+    public ParameterValue ParameterValue { get; }
 
     /// <summary>
-    /// Workflow steps the orchestration instance is going through.
+    /// Steps the orchestration instance is going through, and which should be
+    /// visible to the users (e.g. shown in the UI).
     /// </summary>
-    public IList<OrchestrationStep> Steps { get; }
+    public IReadOnlyCollection<StepInstance> Steps { get; }
 
     /// <summary>
     /// Any custom state of the orchestration instance.
@@ -75,4 +80,25 @@ public class OrchestrationInstance
     /// the workflow that the orchestration instance is an instance of.
     /// </summary>
     internal OrchestrationDescriptionId OrchestrationDescriptionId { get; }
+
+    internal static OrchestrationInstance CreateFromDescription(
+        OrchestrationDescription.OrchestrationDescription description,
+        IClock clock,
+        Instant? runAt = default)
+    {
+        var instance = new OrchestrationInstance(
+            description.Id,
+            clock,
+            runAt);
+
+        foreach (var stepDefinition in description.Steps)
+        {
+            instance._steps.Add(new StepInstance(
+                instance.Id,
+                stepDefinition.Description,
+                stepDefinition.Sequence));
+        }
+
+        return instance;
+    }
 }

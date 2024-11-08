@@ -139,8 +139,8 @@ public class OrchestrationInstanceManager : IOrchestrationInstanceManager, IOrch
         OrchestrationDescription orchestrationDescription)
             where TParameter : class
     {
-        var orchestrationInstance = new OrchestrationInstance(
-            orchestrationDescription.Id,
+        var orchestrationInstance = OrchestrationInstance.CreateFromDescription(
+            orchestrationDescription,
             _clock);
         orchestrationInstance.ParameterValue.SetFromInstance(inputParameter);
 
@@ -156,8 +156,8 @@ public class OrchestrationInstanceManager : IOrchestrationInstanceManager, IOrch
         OrchestrationDescription orchestrationDescription)
             where TParameter : class
     {
-        var orchestrationInstance = new OrchestrationInstance(
-            orchestrationDescription.Id,
+        var orchestrationInstance = OrchestrationInstance.CreateFromDescription(
+            orchestrationDescription,
             _clock,
             runAt);
         orchestrationInstance.ParameterValue.SetFromInstance(inputParameter);

@@ -47,6 +47,9 @@ var host = new HostBuilder()
 
             brs_023_027_v1.ParameterDefinition.SetFromType<NotifyAggregatedMeasureDataInputV1>();
 
+            brs_023_027_v1.AppendStepDescription("Beregning");
+            brs_023_027_v1.AppendStepDescription("Besked dannelse");
+
             return [brs_023_027_v1];
         });
     })

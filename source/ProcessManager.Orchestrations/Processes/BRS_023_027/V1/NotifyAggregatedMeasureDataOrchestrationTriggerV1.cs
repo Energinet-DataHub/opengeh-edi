@@ -62,22 +62,6 @@ internal class NotifyAggregatedMeasureDataOrchestrationTriggerV1(
                 runAt: dto.RunAt.ToInstant())
             .ConfigureAwait(false);
 
-        // TODO:
-        // For demo purposes we create the steps here.
-        // Will be refactored to describing the steps as part of the orchestration description
-        var orchestrationInstance = await _repository.GetAsync(orchestrationInstanceId);
-        orchestrationInstance.Steps.Add(new OrchestrationStep(
-            orchestrationInstance.Id,
-            _clock,
-            "Beregning",
-            sequence: 0));
-        orchestrationInstance.Steps.Add(new OrchestrationStep(
-            orchestrationInstance.Id,
-            _clock,
-            "Besked dannelse",
-            sequence: 1));
-        await _unitOfWork.CommitAsync();
-
         return new OkObjectResult(orchestrationInstanceId.Value);
     }
 }

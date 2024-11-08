@@ -40,11 +40,36 @@ public class OrchestrationDescriptionEntityConfiguration : IEntityTypeConfigurat
             o => o.ParameterDefinition,
             pd =>
             {
-                pd.Property(OrchestrationParameterDefinition.SerializedParameterDefinitionPropertyName)
-                    .HasColumnName(OrchestrationParameterDefinition.SerializedParameterDefinitionPropertyName);
+                pd.Property(ParameterDefinition.SerializedParameterDefinitionPropertyName)
+                    .HasColumnName(ParameterDefinition.SerializedParameterDefinitionPropertyName);
             });
 
         builder.Property(o => o.HostName);
         builder.Property(o => o.IsEnabled);
+
+        builder.OwnsMany(
+            o => o.Steps,
+            b =>
+            {
+                b.ToTable("StepDescription");
+
+                b.HasKey(s => s.Id);
+                b.Property(s => s.Id)
+                    .ValueGeneratedNever()
+                    .HasConversion(
+                        id => id.Value,
+                        dbValue => new StepDescriptionId(dbValue));
+
+                b.Property(s => s.Description);
+                b.Property(s => s.Sequence);
+
+                // Relation to parent
+                b.Property(s => s.OrchestrationDescriptionId)
+                    .HasConversion(
+                        id => id.Value,
+                        dbValue => new OrchestrationDescriptionId(dbValue));
+
+                b.WithOwner().HasForeignKey(s => s.OrchestrationDescriptionId);
+            });
     }
 }

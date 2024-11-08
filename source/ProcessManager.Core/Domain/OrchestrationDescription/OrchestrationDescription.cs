@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Microsoft.Extensions.Hosting;
+
 namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 
 /// <summary>
@@ -21,6 +23,8 @@ namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescripti
 /// </summary>
 public class OrchestrationDescription
 {
+    private readonly List<StepDescription> _steps;
+
     public OrchestrationDescription(
         string name,
         int version,
@@ -35,6 +39,9 @@ public class OrchestrationDescription
         ParameterDefinition = new();
         HostName = string.Empty;
         IsEnabled = true;
+
+        _steps = [];
+        Steps = _steps.AsReadOnly();
     }
 
     /// <summary>
@@ -74,7 +81,13 @@ public class OrchestrationDescription
     /// <summary>
     /// Defines the Durable Functions orchestration input parameter type.
     /// </summary>
-    public OrchestrationParameterDefinition ParameterDefinition { get; }
+    public ParameterDefinition ParameterDefinition { get; }
+
+    /// <summary>
+    /// Defines the steps the orchestration is going through, and which should be
+    /// visible to the users (e.g. shown in the UI).
+    /// </summary>
+    public IReadOnlyCollection<StepDescription> Steps { get; }
 
     /// <summary>
     /// This is set by the framework when synchronizing with the orchestration register during startup.
@@ -89,4 +102,17 @@ public class OrchestrationDescription
     /// but which we cannot delete in the database because we still need the execution history.
     /// </summary>
     public bool IsEnabled { get; internal set; }
+
+    /// <summary>
+    /// Append the step description to the end of the current list of steps.
+    /// </summary>
+    public void AppendStepDescription(string description)
+    {
+        var step = new StepDescription(
+            Id,
+            description,
+            sequence: _steps.Count + 1);
+
+        _steps.Add(step);
+    }
 }

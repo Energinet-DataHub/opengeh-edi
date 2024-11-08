@@ -21,21 +21,18 @@ namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 /// It contains state information about the step, and is linked
 /// to the orchestration instance that it is part of.
 /// </summary>
-public class OrchestrationStep
+public class StepInstance
 {
-    public OrchestrationStep(
+    internal StepInstance(
         OrchestrationInstanceId orchestrationInstanceId,
-        IClock clock,
         string description,
-        int sequence,
-        OrchestrationStepId? dependsOn = default)
+        int sequence)
     {
-        Id = new OrchestrationStepId(Guid.NewGuid());
-        Lifecycle = new OrchestrationStepLifecycleState(clock);
+        Id = new StepInstanceId(Guid.NewGuid());
+        Lifecycle = new StepInstanceLifecycleState();
         Description = description;
         Sequence = sequence;
-        DependsOn = dependsOn;
-        CustomState = new OrchestrationStepCustomState(string.Empty);
+        CustomState = new StepInstanceCustomState(string.Empty);
 
         OrchestrationInstanceId = orchestrationInstanceId;
     }
@@ -45,31 +42,33 @@ public class OrchestrationStep
     /// </summary>
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     // ReSharper disable once UnusedMember.Local -- Used by Entity Framework
-    private OrchestrationStep()
+    private StepInstance()
     {
     }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-    public OrchestrationStepId Id { get; }
+    public StepInstanceId Id { get; }
 
     /// <summary>
     /// The high-level lifecycle states that all orchestration steps can go through.
     /// </summary>
-    public OrchestrationStepLifecycleState Lifecycle { get; }
+    public StepInstanceLifecycleState Lifecycle { get; }
 
-    public string? Description { get; }
+    public string Description { get; }
 
+    /// <summary>
+    /// The steps number in the list of steps.
+    /// The sequence of the first step in the list is 1.
+    /// </summary>
     public int Sequence { get; }
-
-    public OrchestrationStepId? DependsOn { get; }
 
     /// <summary>
     /// Any custom state of the step.
     /// </summary>
-    public OrchestrationStepCustomState CustomState { get; }
+    public StepInstanceCustomState CustomState { get; }
 
     /// <summary>
     /// The orchestration instance which this step is part of.
     /// </summary>
-    public OrchestrationInstanceId OrchestrationInstanceId { get; }
+    internal OrchestrationInstanceId OrchestrationInstanceId { get; }
 }

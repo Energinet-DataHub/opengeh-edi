@@ -58,14 +58,14 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
             o => o.Steps,
             b =>
             {
-                b.ToTable("OrchestrationStep");
+                b.ToTable("StepInstance");
 
                 b.HasKey(s => s.Id);
                 b.Property(s => s.Id)
                     .ValueGeneratedNever()
                     .HasConversion(
                         id => id.Value,
-                        dbValue => new OrchestrationStepId(dbValue));
+                        dbValue => new StepInstanceId(dbValue));
 
                 b.OwnsOne(
                     o => o.Lifecycle,
@@ -74,26 +74,17 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
                         b.Property(pv => pv.State);
                         b.Property(pv => pv.TerminationState);
 
-                        b.Property(pv => pv.CreatedAt);
                         b.Property(pv => pv.StartedAt);
                         b.Property(pv => pv.TerminatedAt);
                     });
 
                 b.Property(s => s.Description);
-
                 b.Property(s => s.Sequence);
-                // Relation to another previous step
-                b.Property(s => s.DependsOn)
-                    .HasConversion(
-                        id => id != null ? id.Value : (Guid?)null,
-                        dbValue => dbValue == null
-                            ? null
-                            : new OrchestrationStepId(dbValue.Value));
 
                 b.Property(s => s.CustomState)
                     .HasConversion(
                         state => state.Value,
-                        dbValue => new OrchestrationStepCustomState(dbValue));
+                        dbValue => new StepInstanceCustomState(dbValue));
 
                 // Relation to parent
                 b.Property(s => s.OrchestrationInstanceId)
