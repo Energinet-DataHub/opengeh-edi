@@ -50,7 +50,7 @@ public class WholesaleResultEnumerator(
         var resultCount = 0;
 
         await foreach (var wholesaleResult in query
-                           .GetAsync(_databricksSqlWarehouseQueryExecutor, null)
+                           .GetAsync(_databricksSqlWarehouseQueryExecutor, gridAreaOwnerDictionary)
                            .ConfigureAwait(false))
         {
             yield return wholesaleResult;
