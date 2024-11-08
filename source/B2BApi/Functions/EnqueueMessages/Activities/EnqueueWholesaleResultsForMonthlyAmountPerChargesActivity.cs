@@ -55,7 +55,6 @@ public class EnqueueWholesaleResultsForMonthlyAmountPerChargesActivity(
         var query = new WholesaleMonthlyAmountPerChargeQuery(
             _logger,
             _wholesaleResultEnumerator.EdiDatabricksOptions,
-            _masterDataClient,
             EventId.From(input.EventId),
             input.CalculationId,
             input.Actor);

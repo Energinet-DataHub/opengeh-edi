@@ -565,7 +565,6 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         var query = new WholesaleAmountPerChargeQuery(
             GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity>>(),
             _ediDatabricksOptions.Value,
-            GetService<IMasterDataClient>(),
             EventId.From(Guid.NewGuid()),
             Guid.NewGuid(),
             null);
@@ -610,7 +609,6 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         var wholesaleAmountPerChargeQuery = new WholesaleAmountPerChargeQuery(
             GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity>>(),
             _ediDatabricksOptions.Value,
-            GetService<IMasterDataClient>(),
             EventId.From(Guid.NewGuid()),
             wholesaleResultForAmountPerChargeDescription.CalculationId,
             null);
@@ -626,7 +624,6 @@ public class GivenCalculationCompletedV1ReceivedForWholesaleFixingTests : Wholes
         var wholesaleMonthlyAmountPerChargeQuery = new WholesaleMonthlyAmountPerChargeQuery(
             GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity>>(),
             _ediDatabricksOptions.Value,
-            GetService<IMasterDataClient>(),
             EventId.From(Guid.NewGuid()),
             wholesaleResultForMonthlyAmountPerChargeDescription.CalculationId,
             null);
