@@ -16,12 +16,16 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 
-public class MarketMessageParser(
-    IEnumerable<IMarketMessageParser> parsers)
+public class MarketMessageParser
 {
-    private readonly IEnumerable<IMarketMessageParser> _parsers = parsers;
+    private readonly IEnumerable<IMarketMessageParser> _parsers;
 
-    public async Task<IncomingMarketMessageParserResult> ParseAsync(
+    public MarketMessageParser(IEnumerable<IMarketMessageParser> parsers)
+    {
+        _parsers = parsers;
+    }
+
+    public Task<IncomingMarketMessageParserResult> ParseAsync(
         IIncomingMarketMessageStream marketMessage,
         DocumentFormat documentFormat,
         IncomingDocumentType documentType,
@@ -31,6 +35,6 @@ public class MarketMessageParser(
             parser.HandledFormat.Equals(documentFormat) && parser.DocumentType.Equals(documentType));
         if (parser is null)
             throw new NotSupportedException($"No message parser found for message format '{documentFormat}' and document type '{documentType}'");
-        return await parser.ParseAsync(marketMessage, cancellationToken).ConfigureAwait(false);
+        return parser.ParseAsync(marketMessage, cancellationToken);
     }
 }

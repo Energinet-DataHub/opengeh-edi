@@ -14,7 +14,6 @@
 
 using System.Text;
 using System.Xml.Linq;
-using Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.EDI.B2CWebApi.Factories;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -45,11 +44,11 @@ public sealed class MessageParserTests
         $"{Path.DirectorySeparatorChar}aggregatedmeasure{Path.DirectorySeparatorChar}";
 
     private readonly MarketMessageParser _marketMessageParser = new(
-        [
-            new AggregatedMeasureDataXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
-            new AggregatedMeasureDataJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
-            new AggregatedMeasureDataB2CJsonMessageParser(new Serializer()),
-        ]);
+    [
+        new AggregatedMeasureDataXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
+        new AggregatedMeasureDataJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
+        new AggregatedMeasureDataB2CJsonMessageParser(new Serializer()),
+    ]);
 
     public static IEnumerable<object[]> CreateMessagesWithSingleAndMultipleTransactions()
     {

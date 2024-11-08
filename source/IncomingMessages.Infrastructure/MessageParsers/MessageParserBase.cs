@@ -24,8 +24,6 @@ public abstract class MessageParserBase<TSchema>(ISchemaProvider schemaProvider)
 {
     private readonly ISchemaProvider _schemaProvider = schemaProvider;
 
-    protected abstract string RootPayloadElementName { get; }
-
     protected Collection<ValidationError> Errors { get; } = [];
 
     public async Task<IncomingMarketMessageParserResult> ParseAsync(

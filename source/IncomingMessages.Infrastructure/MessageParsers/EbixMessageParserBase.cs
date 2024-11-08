@@ -36,6 +36,8 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
     private const string EnergyBusinessProcessRole = "EnergyBusinessProcessRole";
     private const string EnergyIndustryClassification = "EnergyIndustryClassification";
 
+    protected abstract string RootPayloadElementName { get; }
+
     protected override async Task<IncomingMarketMessageParserResult> ParseMessageAsync(
         IIncomingMarketMessageStream marketMessage,
         XmlSchema schemaResult,
