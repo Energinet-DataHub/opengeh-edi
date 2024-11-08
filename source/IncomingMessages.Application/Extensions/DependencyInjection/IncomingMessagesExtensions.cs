@@ -137,11 +137,11 @@ public static class IncomingMessagesExtensions
             .AddSingleton<JsonSchemaProvider>();
 
         services
-            .AddSingleton<MeteredDataForMeasurementPointMessageParser>();
+            .AddTransient<Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.EbixMessageParser>();
 
-        services.AddSingleton<IDictionary<IncomingDocumentType, MessageParser>>(provider => new Dictionary<IncomingDocumentType, MessageParser>
+        services.AddTransient<IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser>>(provider => new Dictionary<(IncomingDocumentType, DocumentFormat), IMessageParser>
         {
-            { IncomingDocumentType.MeteredDataForMeasurementPoint, provider.GetRequiredService<MeteredDataForMeasurementPointMessageParser>() },
+            { (IncomingDocumentType.MeteredDataForMeasurementPoint, DocumentFormat.Ebix), provider.GetRequiredService<Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.EbixMessageParser>() },
         });
 
         return services;

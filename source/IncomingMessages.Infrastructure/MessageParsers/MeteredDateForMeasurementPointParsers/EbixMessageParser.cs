@@ -12,140 +12,75 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Xml;
 using System.Xml.Linq;
-using System.Xml.Schema;
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IncomingMessages.Domain;
-using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.BaseParsers.Ebix;
-using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.Ebix;
+using Energinet.DataHub.EDI.IncomingMessages.Domain.Abstractions;
+using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.BaseParsers;
 using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Ebix;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers;
 
-public partial class MeteredDataForMeasurementPointMessageParser
-    (EbixSchemaProvider schemaProvider, ILogger<MeteredDataForMeasurementPointEbixMessageParser> logger)
+public class EbixMessageParser(EbixSchemaProvider schemaProvider) : EbixMessageParserBase(schemaProvider)
 {
-    private const string RootPayloadElementName = "DK_MeteredDataTimeSeries";
-    private readonly EbixSchemaProvider _schemaProvider = schemaProvider;
-    private readonly ILogger<MeteredDataForMeasurementPointEbixMessageParser> _logger = logger;
+    private const string SeriesElementName = "PayloadEnergyTimeSeries";
+    private const string Identification = "Identification";
+    private const string ResolutionDuration = "ResolutionDuration";
+    private const string ObservationTimeSeriesPeriod = "ObservationTimeSeriesPeriod";
+    private const string Start = "Start";
+    private const string End = "End";
+    private const string IncludedProductCharacteristic = "IncludedProductCharacteristic";
+    private const string UnitType = "UnitType";
+    private const string DetailMeasurementMeteringPointCharacteristic = "DetailMeasurementMeteringPointCharacteristic";
+    private const string TypeOfMeteringPoint = "TypeOfMeteringPoint";
+    private const string MeteringPointDomainLocation = "MeteringPointDomainLocation";
+    private const string Position = "Position";
+    private const string EnergyQuantity = "EnergyQuantity";
+    private const string QuantityQuality = "QuantityQuality";
+    private const string IntervalEnergyObservation = "IntervalEnergyObservation";
 
-    protected override async Task<IncomingMarketMessageParserResult> ParseEbixXmlAsync(IIncomingMarketMessageStream incomingMarketMessageStream, CancellationToken cancellationToken)
+    protected override string RootPayloadElementName => "DK_MeteredDataTimeSeries";
+
+    protected override IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(XDocument document, XNamespace ns, string senderNumber)
     {
-        var xmlSchemaResult = await GetSchemaAsync(incomingMarketMessageStream, cancellationToken).ConfigureAwait(false);
-        if (xmlSchemaResult.Schema == null || xmlSchemaResult.Namespace == null)
+        var seriesElements = document.Descendants(ns + SeriesElementName);
+        var result = new List<MeteredDataForMeasurementPointSeries>();
+        foreach (var seriesElement in seriesElements)
         {
-            return xmlSchemaResult.ParserResult ?? new IncomingMarketMessageParserResult(new InvalidSchemaOrNamespace());
+            var id = seriesElement.Element(ns + Identification)?.Value ?? string.Empty;
+            var resolution = seriesElement.Element(ns + ObservationTimeSeriesPeriod)?.Element(ns + ResolutionDuration)?.Value;
+            var startDateAndOrTimeDateTime = seriesElement.Element(ns + ObservationTimeSeriesPeriod)?.Element(ns + Start)?.Value ?? string.Empty;
+            var endDateAndOrTimeDateTime = seriesElement.Element(ns + ObservationTimeSeriesPeriod)?.Element(ns + End)?.Value;
+            var productNumber = seriesElement.Element(ns + IncludedProductCharacteristic)?.Element(ns + Identification)?.Value;
+            var productUnitType = seriesElement.Element(ns + IncludedProductCharacteristic)?.Element(ns + UnitType)?.Value;
+            var meteringPointType = seriesElement.Element(ns + DetailMeasurementMeteringPointCharacteristic)?.Element(ns + TypeOfMeteringPoint)?.Value;
+            var meteringPointLocationId = seriesElement.Element(ns + MeteringPointDomainLocation)?.Element(ns + Identification)?.Value;
+
+            var energyObservations = seriesElement
+                .Descendants(ns + IntervalEnergyObservation)
+                .Select(e => new EnergyObservation(
+                    e.Element(ns + Position)?.Value,
+                    e.Element(ns + EnergyQuantity)?.Value,
+                    e.Element(ns + QuantityQuality)?.Value))
+                .ToList();
+
+            result.Add(new MeteredDataForMeasurementPointSeries(
+                id,
+                resolution,
+                startDateAndOrTimeDateTime,
+                endDateAndOrTimeDateTime,
+                productNumber,
+                productUnitType,
+                meteringPointType,
+                meteringPointLocationId,
+                senderNumber,
+                energyObservations));
         }
 
-        using var reader = XmlReader.Create(incomingMarketMessageStream.Stream, CreateXmlReaderSettings(xmlSchemaResult.Schema));
-        if (Errors.Count > 0)
-        {
-            return new IncomingMarketMessageParserResult(Errors.ToArray());
-        }
-
-        try
-        {
-            var parsedXmlData = await ParseXmlDataAsync(reader, xmlSchemaResult.Namespace, cancellationToken).ConfigureAwait(false);
-
-            if (Errors.Count != 0)
-            {
-                _logger.LogError("Errors found after parsing XML data: {Errors}", Errors);
-                return new IncomingMarketMessageParserResult(Errors.ToArray());
-            }
-
-            return parsedXmlData;
-        }
-        catch (XmlException exception)
-        {
-            _logger.LogError(exception, "Ebix parsing error during data extraction");
-            return InvalidEbixFailure(exception);
-        }
-        catch (ObjectDisposedException objectDisposedException)
-        {
-            _logger.LogError(objectDisposedException, "Stream was disposed during data extraction");
-            return InvalidEbixFailure(objectDisposedException);
-        }
+        return result.AsReadOnly();
     }
 
-    private static IncomingMarketMessageParserResult InvalidEbixFailure(
-        Exception exception)
+    protected override IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions)
     {
-        return new IncomingMarketMessageParserResult(
-            InvalidMessageStructure.From(exception));
-    }
-
-    private static string BusinessProcessType(string @namespace)
-    {
-        ArgumentNullException.ThrowIfNull(@namespace);
-        var split = SplitNamespace(@namespace);
-        if (split.Length < 5)
-        {
-            throw new XmlException($"Invalid namespace format");
-        }
-
-        var businessReason = split[4];
-        var parts = businessReason.Split('-');
-        return parts.Last();
-    }
-
-    private static string GetVersion(string @namespace)
-    {
-        ArgumentNullException.ThrowIfNull(@namespace);
-        var split = SplitNamespace(@namespace);
-        if (split.Length < 6)
-        {
-            throw new XmlException($"Invalid namespace format");
-        }
-
-        var version = split[5];
-        return version.StartsWith('v') ? version[1..] : version;
-    }
-
-    private static string[] SplitNamespace(string @namespace)
-    {
-        ArgumentNullException.ThrowIfNull(@namespace);
-        return @namespace.Split(':');
-    }
-
-    private static string GetNamespace(IIncomingMarketMessageStream marketMessage)
-    {
-        ArgumentNullException.ThrowIfNull(marketMessage);
-
-        var settings = new XmlReaderSettings
-        {
-            Async = true,
-            IgnoreWhitespace = true,
-            IgnoreComments = true,
-        };
-
-        using var reader = XmlReader.Create(marketMessage.Stream, settings);
-        while (reader.Read())
-        {
-            if (reader.NodeType == XmlNodeType.Element && reader.Name.Contains(RootPayloadElementName))
-            {
-                return reader.NamespaceURI;
-            }
-        }
-
-        throw new XmlException($"Namespace for element '{RootPayloadElementName}' not found.");
-    }
-
-    private async Task<IncomingMarketMessageParserResult> ParseXmlDataAsync(
-        XmlReader reader,
-        string @namespace,
-        CancellationToken cancellationToken)
-    {
-        var document = await XDocument.LoadAsync(reader, LoadOptions.None, cancellationToken).ConfigureAwait(false);
-        var ns = XNamespace.Get(@namespace);
-
-        var header = MessageHeaderExtractor.Extract(document, ns);
-        var listOfSeries = MeteredDataForMeasurementPointSeriesExtractor
-            .ParseSeries(document, ns, header.SenderId)
-            .ToList();
-
         return new IncomingMarketMessageParserResult(new MeteredDataForMeasurementPointMessage(
             header.MessageId,
             header.MessageType,
@@ -156,69 +91,6 @@ public partial class MeteredDataForMeasurementPointMessageParser
             header.BusinessReason,
             header.ReceiverRole,
             header.BusinessType,
-            listOfSeries.AsReadOnly()));
-    }
-
-    private async Task<(XmlSchema? Schema, string? Namespace, IncomingMarketMessageParserResult? ParserResult)> GetSchemaAsync(
-        IIncomingMarketMessageStream incomingMarketMessageStream,
-        CancellationToken cancellationToken)
-    {
-        string? @namespace = null;
-        IncomingMarketMessageParserResult? parserResult = null;
-        XmlSchema? xmlSchema = null;
-        try
-        {
-            @namespace = GetNamespace(incomingMarketMessageStream);
-            var version = GetVersion(@namespace);
-            var businessProcessType = BusinessProcessType(@namespace);
-            xmlSchema = await _schemaProvider.GetSchemaAsync<XmlSchema>(businessProcessType, version, cancellationToken)
-                .ConfigureAwait(true);
-
-            if (xmlSchema is null)
-            {
-                _logger.LogError("Schema not found for business process type {BusinessProcessType} and version {Version}", businessProcessType, version);
-                parserResult = new IncomingMarketMessageParserResult(
-                    new InvalidBusinessReasonOrVersion(businessProcessType, version));
-            }
-        }
-        catch (XmlException exception)
-        {
-            _logger.LogWarning(exception, "Ebix parsing error");
-            parserResult = InvalidEbixFailure(exception);
-        }
-        catch (ObjectDisposedException objectDisposedException)
-        {
-            _logger.LogWarning(objectDisposedException, "Stream was disposed");
-            parserResult = InvalidEbixFailure(objectDisposedException);
-        }
-        catch (IndexOutOfRangeException indexOutOfRangeException)
-        {
-            _logger.LogWarning(indexOutOfRangeException, "Namespace format is invalid");
-            parserResult = InvalidEbixFailure(indexOutOfRangeException);
-        }
-
-        return (xmlSchema, @namespace, parserResult);
-    }
-
-    private XmlReaderSettings CreateXmlReaderSettings(XmlSchema xmlSchema)
-    {
-        var settings = new XmlReaderSettings
-        {
-            Async = true,
-            ValidationType = ValidationType.Schema,
-            ValidationFlags = XmlSchemaValidationFlags.ProcessInlineSchema |
-                              XmlSchemaValidationFlags.ReportValidationWarnings,
-        };
-
-        settings.Schemas.Add(xmlSchema);
-        settings.ValidationEventHandler += OnValidationError;
-        return settings;
-    }
-
-    private void OnValidationError(object? sender, ValidationEventArgs arguments)
-    {
-        var message =
-            $"XML schema validation error at line {arguments.Exception.LineNumber}, position {arguments.Exception.LinePosition}: {arguments.Message}.";
-        Errors.Add(InvalidMessageStructure.From(message));
+            transactions));
     }
 }

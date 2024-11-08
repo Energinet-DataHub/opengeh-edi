@@ -31,7 +31,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Application.UseCases;
 public class ReceiveIncomingMarketMessage
 {
     private readonly MarketMessageParser _marketMessageParser;
-    private readonly IDictionary<IncomingDocumentType, MessageParser> _messageParsers;
+    private readonly IDictionary<(IncomingDocumentType, DocumentFormat), IMessageParser> _messageParsers;
     private readonly IFeatureFlagManager _featureFlagManager;
     private readonly ValidateIncomingMessage _validateIncomingMessage;
     private readonly ResponseFactory _responseFactory;
@@ -44,7 +44,7 @@ public class ReceiveIncomingMarketMessage
 
     public ReceiveIncomingMarketMessage(
         MarketMessageParser marketMessageParser,
-        IDictionary<IncomingDocumentType, MessageParser> messageParsers,
+        IDictionary<(IncomingDocumentType DocumentType, DocumentFormat DocumentFormat), IMessageParser> messageParsers,
         IFeatureFlagManager featureFlagManager,
         ValidateIncomingMessage validateIncomingMessage,
         ResponseFactory responseFactory,
@@ -148,19 +148,19 @@ public class ReceiveIncomingMarketMessage
 
     private async Task<IncomingMarketMessageParserResult> ParseIncomingMessageAsync(
         IIncomingMarketMessageStream incomingMarketMessageStream,
-        DocumentFormat incomingDocumentFormat,
+        DocumentFormat documentFormat,
         IncomingDocumentType documentType,
         CancellationToken cancellationToken)
     {
         if (await _featureFlagManager.UseNewIncomingMessageParserAsync().ConfigureAwait(false))
         {
-            if (_messageParsers.TryGetValue(documentType, out var messageParser))
+            if (_messageParsers.TryGetValue((documentType, documentFormat), out var messageParser))
             {
-                return await messageParser.ParseAsync(incomingMarketMessageStream, incomingDocumentFormat, cancellationToken).ConfigureAwait(false);
+                return await messageParser.ParseAsync(incomingMarketMessageStream, cancellationToken).ConfigureAwait(false);
             }
         }
 
-        return await _marketMessageParser.ParseAsync(incomingMarketMessageStream, incomingDocumentFormat, documentType, cancellationToken)
+        return await _marketMessageParser.ParseAsync(incomingMarketMessageStream, documentFormat, documentType, cancellationToken)
             .ConfigureAwait(false);
     }
 

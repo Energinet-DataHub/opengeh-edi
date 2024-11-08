@@ -16,9 +16,9 @@ using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers.Ebix;
 
-public class MeteredDataForMeasurementPointEbixMessageParser(MeteredDataForMeasurementPointMessageParser messageParser) : IMarketMessageParser
+public class MeteredDataForMeasurementPointEbixMessageParser(EbixMessageParser messageParser) : IMarketMessageParser
 {
-    private readonly MeteredDataForMeasurementPointMessageParser _messageParser = messageParser;
+    private readonly EbixMessageParser _messageParser = messageParser;
 
     public DocumentFormat HandledFormat => DocumentFormat.Ebix;
 
@@ -28,6 +28,6 @@ public class MeteredDataForMeasurementPointEbixMessageParser(MeteredDataForMeasu
         IIncomingMarketMessageStream incomingMarketMessageStream,
         CancellationToken cancellationToken)
     {
-        return await _messageParser.ParseAsync(incomingMarketMessageStream, DocumentFormat.Ebix, cancellationToken).ConfigureAwait(false);
+        return await _messageParser.ParseAsync(incomingMarketMessageStream, cancellationToken).ConfigureAwait(false);
     }
 }
