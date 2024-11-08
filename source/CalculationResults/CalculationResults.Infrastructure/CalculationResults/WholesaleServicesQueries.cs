@@ -32,7 +32,7 @@ public class WholesaleServicesQueries(
     : RequestQueriesBase(databricksSqlWarehouseQueryExecutor), IWholesaleServicesQueries
 {
     private readonly DatabricksSqlWarehouseQueryExecutor _databricksSqlWarehouseQueryExecutor = databricksSqlWarehouseQueryExecutor;
-    private readonly DeltaTableOptions _deltaTableOptions = deltaTableOptions.Value;
+    private readonly IOptions<DeltaTableOptions> _deltaTableOptions = deltaTableOptions;
     private readonly WholesaleServicesQuerySnippetProviderFactory _querySnippetProviderFactory = querySnippetProviderFactory;
 
     public async IAsyncEnumerable<WholesaleServices> GetAsync(WholesaleServicesQueryParameters queryParameters)
@@ -43,7 +43,7 @@ public class WholesaleServicesQueries(
             await GetCalculationTypeForGridAreasAsync(
                     querySnippetsProvider.DatabricksContract.GetGridAreaCodeColumnName(),
                     querySnippetsProvider.DatabricksContract.GetCalculationTypeColumnName(),
-                    new WholesaleServicesCalculationTypeForGridAreasQueryStatement(_deltaTableOptions, querySnippetsProvider),
+                    new WholesaleServicesCalculationTypeForGridAreasQueryStatement(_deltaTableOptions.Value, querySnippetsProvider),
                     queryParameters.CalculationType)
                 .ConfigureAwait(false);
 
@@ -51,7 +51,7 @@ public class WholesaleServicesQueries(
             WholesaleServicesQueryStatement.StatementType.Select,
             calculationTypePerGridAreas,
             querySnippetsProvider,
-            _deltaTableOptions);
+            _deltaTableOptions.Value);
 
         var calculationIdColumn = querySnippetsProvider.DatabricksContract.GetCalculationIdColumnName();
 
@@ -78,7 +78,7 @@ public class WholesaleServicesQueries(
             await GetCalculationTypeForGridAreasAsync(
                     querySnippetsProvider.DatabricksContract.GetGridAreaCodeColumnName(),
                     querySnippetsProvider.DatabricksContract.GetCalculationTypeColumnName(),
-                    new WholesaleServicesCalculationTypeForGridAreasQueryStatement(_deltaTableOptions, querySnippetsProvider),
+                    new WholesaleServicesCalculationTypeForGridAreasQueryStatement(_deltaTableOptions.Value, querySnippetsProvider),
                     queryParameters.CalculationType)
                 .ConfigureAwait(false);
 
@@ -86,7 +86,7 @@ public class WholesaleServicesQueries(
             WholesaleServicesQueryStatement.StatementType.Exists,
             calculationTypePerGridAreas,
             _querySnippetProviderFactory.Create(queryParameters),
-            _deltaTableOptions);
+            _deltaTableOptions.Value);
 
         return await _databricksSqlWarehouseQueryExecutor
             .ExecuteStatementAsync(sqlStatement)
