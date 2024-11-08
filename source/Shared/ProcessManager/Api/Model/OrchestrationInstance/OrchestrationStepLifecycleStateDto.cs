@@ -14,15 +14,31 @@
 
 namespace Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 
-public class OrchestrationStepLifecycleStateDto
+public record OrchestrationStepLifecycleStateDto(
+    OrchestrationStepLifecycleStates State,
+    OrchestrationStepTerminationStates? TerminationState,
+    DateTimeOffset CreatedAt,
+    DateTimeOffset? StartedAt,
+    DateTimeOffset? TerminatedAt)
 {
-    public OrchestrationStepLifecycleStates? State { get; set; }
+    public OrchestrationStepLifecycleStates State { get; } = State;
 
-    public OrchestrationStepTerminationStates? TerminationState { get; set; }
+    public OrchestrationStepTerminationStates? TerminationState { get; } = TerminationState;
 
-    public DateTimeOffset? CreatedAt { get; set; }
+    /// <summary>
+    /// The time when the orchestration step was created (State => Pending).
+    /// </summary>
+    public DateTimeOffset CreatedAt { get; } = CreatedAt;
 
-    public DateTimeOffset? StartedAt { get; set; }
+    /// <summary>
+    /// The time when the Process Manager was used from Durable Functions to
+    /// transition the state to Running.
+    /// </summary>
+    public DateTimeOffset? StartedAt { get; } = StartedAt;
 
-    public DateTimeOffset? TerminatedAt { get; set; }
+    /// <summary>
+    /// The time when the Process Manager was used from Durable Functions to
+    /// transition the state to Terminated.
+    /// </summary>
+    public DateTimeOffset? TerminatedAt { get; } = TerminatedAt;
 }

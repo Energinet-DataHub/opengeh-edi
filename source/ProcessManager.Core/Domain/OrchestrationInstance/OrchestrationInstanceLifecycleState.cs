@@ -40,14 +40,32 @@ public class OrchestrationInstanceLifecycleState
 
     public OrchestrationInstanceTerminationStates? TerminationState { get; private set; }
 
+    /// <summary>
+    /// The time when the orchestration instance was created (State => Pending).
+    /// </summary>
     public Instant CreatedAt { get; }
 
+    /// <summary>
+    /// The time when the orchestration instance should be executed by the Scheduler.
+    /// </summary>
     public Instant? ScheduledToRunAt { get; }
 
+    /// <summary>
+    /// The time when the Process Manager has queued the orchestration instance
+    /// for execution by Durable Functions (State => Queued).
+    /// </summary>
     public Instant? QueuedAt { get; private set; }
 
+    /// <summary>
+    /// The time when the Process Manager was used from Durable Functions to
+    /// transition the state to Running.
+    /// </summary>
     public Instant? StartedAt { get; private set; }
 
+    /// <summary>
+    /// The time when the Process Manager was used from Durable Functions to
+    /// transition the state to Terminated.
+    /// </summary>
     public Instant? TerminatedAt { get; private set; }
 
     public bool IsPendingForScheduledStart()
