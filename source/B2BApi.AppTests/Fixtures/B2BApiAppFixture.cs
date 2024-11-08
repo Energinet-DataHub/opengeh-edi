@@ -417,7 +417,7 @@ public class B2BApiAppFixture : IAsyncLifetime
 
         appHostSettings.ProcessEnvironmentVariables.Add(
             "FeatureManagement__RequestStaysInEdi",
-            false.ToString().ToLower());
+            true.ToString().ToLower());
 
         appHostSettings.ProcessEnvironmentVariables.Add(
             "FeatureManagement__ReceiveMeteredDataForMeasurementPoints",
