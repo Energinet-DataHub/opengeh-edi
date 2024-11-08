@@ -32,7 +32,7 @@ public partial class MeteredDataForMeasurementPointMessageParser
     private readonly EbixSchemaProvider _schemaProvider = schemaProvider;
     private readonly ILogger<MeteredDataForMeasurementPointEbixMessageParser> _logger = logger;
 
-    public async Task<IncomingMarketMessageParserResult> ParseEbixXmlAsync(IIncomingMarketMessageStream incomingMarketMessageStream, CancellationToken cancellationToken)
+    protected override async Task<IncomingMarketMessageParserResult> ParseEbixXmlAsync(IIncomingMarketMessageStream incomingMarketMessageStream, CancellationToken cancellationToken)
     {
         var xmlSchemaResult = await GetSchemaAsync(incomingMarketMessageStream, cancellationToken).ConfigureAwait(false);
         if (xmlSchemaResult.Schema == null || xmlSchemaResult.Namespace == null)

@@ -18,16 +18,16 @@ using Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErrors;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers.MeteredDateForMeasurementPointParsers;
 
-public partial class MeteredDataForMeasurementPointMessageParser : IMessageParser
+public partial class MeteredDataForMeasurementPointMessageParser : MessageParser
 {
     private Collection<ValidationError> Errors { get; } = [];
 
-    public Task<IncomingMarketMessageParserResult> ParseXmlAsync(IIncomingMarketMessageStream incomingMarketMessageStream, CancellationToken cancellationToken)
+    protected override Task<IncomingMarketMessageParserResult> ParseXmlAsync(IIncomingMarketMessageStream incomingMarketMessageStream, CancellationToken cancellationToken)
     {
         throw new NotSupportedException();
     }
 
-    public Task<IncomingMarketMessageParserResult> ParseJsonAsync(IIncomingMarketMessageStream incomingMarketMessageStream, CancellationToken cancellationToken)
+    protected override Task<IncomingMarketMessageParserResult> ParseJsonAsync(IIncomingMarketMessageStream incomingMarketMessageStream, CancellationToken cancellationToken)
     {
         throw new NotSupportedException();
     }

@@ -139,7 +139,7 @@ public static class IncomingMessagesExtensions
         services
             .AddSingleton<MeteredDataForMeasurementPointMessageParser>();
 
-        services.AddSingleton<IDictionary<IncomingDocumentType, IMessageParser>>(provider => new Dictionary<IncomingDocumentType, IMessageParser>
+        services.AddSingleton<IDictionary<IncomingDocumentType, MessageParser>>(provider => new Dictionary<IncomingDocumentType, MessageParser>
         {
             { IncomingDocumentType.MeteredDataForMeasurementPoint, provider.GetRequiredService<MeteredDataForMeasurementPointMessageParser>() },
         });

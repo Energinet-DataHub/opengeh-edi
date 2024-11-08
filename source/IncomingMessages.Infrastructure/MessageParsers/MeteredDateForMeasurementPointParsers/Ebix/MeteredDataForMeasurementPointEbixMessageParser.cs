@@ -28,6 +28,6 @@ public class MeteredDataForMeasurementPointEbixMessageParser(MeteredDataForMeasu
         IIncomingMarketMessageStream incomingMarketMessageStream,
         CancellationToken cancellationToken)
     {
-        return await _messageParser.ParseEbixXmlAsync(incomingMarketMessageStream, cancellationToken).ConfigureAwait(false);
+        return await _messageParser.ParseAsync(incomingMarketMessageStream, DocumentFormat.Ebix, cancellationToken).ConfigureAwait(false);
     }
 }

@@ -49,9 +49,7 @@ public sealed class MessageParserTests
             new AggregatedMeasureDataXmlMessageParser(new CimXmlSchemaProvider(new CimXmlSchemas())),
             new AggregatedMeasureDataJsonMessageParser(new JsonSchemaProvider(new CimJsonSchemas())),
             new AggregatedMeasureDataB2CJsonMessageParser(new Serializer()),
-        ],
-        new Dictionary<IncomingDocumentType, IMessageParser>(),
-        new FeatureFlagManagerStub());
+        ]);
 
     public static IEnumerable<object[]> CreateMessagesWithSingleAndMultipleTransactions()
     {

@@ -38,14 +38,9 @@ public sealed class MessageParserTests
         $"{Path.DirectorySeparatorChar}MeteredDataForMeasurementPoint{Path.DirectorySeparatorChar}";
 
     private readonly MarketMessageParser _marketMessageParser = new(
-    new List<IMarketMessageParser>(),
-    new Dictionary<IncomingDocumentType, IMessageParser>()
-    {
-        {
-            IncomingDocumentType.MeteredDataForMeasurementPoint, new MeteredDataForMeasurementPointMessageParser(new EbixSchemaProvider(), new Logger<MeteredDataForMeasurementPointEbixMessageParser>(new LoggerFactory()))
-        },
-    },
-    new FeatureFlagManagerStub());
+    [
+        new MeteredDataForMeasurementPointEbixMessageParser(new MeteredDataForMeasurementPointMessageParser(new EbixSchemaProvider(), new Logger<MeteredDataForMeasurementPointEbixMessageParser>(new LoggerFactory()))),
+    ]);
 
     public static TheoryData<DocumentFormat, Stream> CreateMessagesWithSingleAndMultipleTransactions()
     {
