@@ -31,13 +31,10 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 public class EnqueueWholesaleResultsForAmountPerChargesActivity(
     ILogger<EnqueueWholesaleResultsForAmountPerChargesActivity> logger,
     IServiceScopeFactory serviceScopeFactory,
-    IMasterDataClient masterDataClient,
     WholesaleResultEnumerator wholesaleResultEnumerator)
     : EnqueueWholesaleResultsBaseActivity(logger, serviceScopeFactory, wholesaleResultEnumerator)
 {
     private readonly ILogger<EnqueueWholesaleResultsForAmountPerChargesActivity> _logger = logger;
-    private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
-    private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly WholesaleResultEnumerator _wholesaleResultEnumerator = wholesaleResultEnumerator;
 
     /// <summary>
@@ -59,6 +56,7 @@ public class EnqueueWholesaleResultsForAmountPerChargesActivity(
         var query = new WholesaleAmountPerChargeQuery(
             _logger,
             _wholesaleResultEnumerator.EdiDatabricksOptions,
+            input.GridAreaOwners,
             EventId.From(input.EventId),
             input.CalculationId,
             input.Actor);

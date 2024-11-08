@@ -60,8 +60,7 @@ public abstract class WholesaleResultQueryBase<TResult>(
 
     protected abstract Task<TResult> CreateWholesaleResultAsync(
         DatabricksSqlRow databricksSqlRow,
-        IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints,
-        ImmutableDictionary<string, ActorNumber>? gridAreaOwnerDictionary);
+        IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints);
 
     protected override async Task<QueryResult<TResult>> CreateResultAsync(
         List<DatabricksSqlRow> currentResultSet,
@@ -80,7 +79,7 @@ public abstract class WholesaleResultQueryBase<TResult>(
                 timeSeriesPoints.Add(timeSeriesPoint);
             }
 
-            var result = await CreateWholesaleResultAsync(firstRow, timeSeriesPoints, gridAreaOwnerDictionary)
+            var result = await CreateWholesaleResultAsync(firstRow, timeSeriesPoints)
                 .ConfigureAwait(false);
             return QueryResult<TResult>.Success(result);
         }

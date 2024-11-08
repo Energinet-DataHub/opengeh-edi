@@ -32,6 +32,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Whole
 public class WholesaleAmountPerChargeQuery(
     ILogger logger,
     EdiDatabricksOptions ediDatabricksOptions,
+    ImmutableDictionary<string, ActorNumber> gridAreaOwners,
     EventId eventId,
     Guid calculationId,
     string? energySupplier)
@@ -43,6 +44,7 @@ public class WholesaleAmountPerChargeQuery(
 {
     private readonly EventId _eventId = eventId;
     private readonly ILogger _logger = logger;
+    private readonly ImmutableDictionary<string, ActorNumber> _gridAreaOwners = gridAreaOwners;
 
     public override string DataObjectName => "amounts_per_charge_v1";
 
@@ -74,8 +76,7 @@ public class WholesaleAmountPerChargeQuery(
 
     protected override Task<WholesaleAmountPerChargeMessageDto> CreateWholesaleResultAsync(
         DatabricksSqlRow databricksSqlRow,
-        IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints,
-        ImmutableDictionary<string, ActorNumber>? gridAreaOwnerDictionary)
+        IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
         var calculationResultId = databricksSqlRow.ToGuid(WholesaleResultColumnNames.ResultId);
         var gridAreaCode = databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.GridAreaCode);
@@ -86,7 +87,7 @@ public class WholesaleAmountPerChargeQuery(
 
         if (isTax)
         {
-            var gridAreaOwner = gridAreaOwnerDictionary![gridAreaCode];
+            var gridAreaOwner = _gridAreaOwners[gridAreaCode];
 
             chargeOwnerReceiverId = gridAreaOwner;
             _logger.LogInformation("Message created from CalculationResultId: {CalculationResultId}, was tax. ChargeOwnerReceiver was changed from {ChargeOwnerReceiverId} to {NewChargeOwnerReceiverId}", calculationResultId, originalChargeOwnerReceiverId, chargeOwnerReceiverId);
@@ -95,7 +96,7 @@ public class WholesaleAmountPerChargeQuery(
         {
             if (chargeOwnerId != DataHubDetails.SystemOperatorActorNumber)
             {
-                var gridAreaOwner = gridAreaOwnerDictionary![gridAreaCode];
+                var gridAreaOwner = _gridAreaOwners[gridAreaCode];
 
                 chargeOwnerReceiverId = gridAreaOwner;
                 _logger.LogInformation(

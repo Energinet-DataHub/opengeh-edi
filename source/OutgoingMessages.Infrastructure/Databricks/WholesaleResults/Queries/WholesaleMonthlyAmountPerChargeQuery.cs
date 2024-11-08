@@ -15,7 +15,6 @@
 using System.Collections.Immutable;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
@@ -31,6 +30,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Whole
 public class WholesaleMonthlyAmountPerChargeQuery(
     ILogger logger,
     EdiDatabricksOptions ediDatabricksOptions,
+    ImmutableDictionary<string, ActorNumber> gridAreaOwners,
     EventId eventId,
     Guid calculationId,
     string? energySupplier)
@@ -42,6 +42,7 @@ public class WholesaleMonthlyAmountPerChargeQuery(
 {
     private readonly EventId _eventId = eventId;
     private readonly ILogger _logger = logger;
+    private readonly ImmutableDictionary<string, ActorNumber> _gridAreaOwners = gridAreaOwners;
 
     public override string DataObjectName => "monthly_amounts_per_charge_v1";
 
@@ -67,8 +68,7 @@ public class WholesaleMonthlyAmountPerChargeQuery(
 
     protected override Task<WholesaleMonthlyAmountPerChargeMessageDto> CreateWholesaleResultAsync(
         DatabricksSqlRow databricksSqlRow,
-        IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints,
-        ImmutableDictionary<string, ActorNumber>? gridAreaOwnerDictionary)
+        IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
         var gridAreaCode = databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.GridAreaCode);
         var chargeOwnerId = ActorNumber.Create(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.ChargeOwnerId));
@@ -79,7 +79,7 @@ public class WholesaleMonthlyAmountPerChargeQuery(
 
         if (isTax)
         {
-            var gridAreaOwner = gridAreaOwnerDictionary![gridAreaCode];
+            var gridAreaOwner = _gridAreaOwners[gridAreaCode];
 
             chargeOwnerReceiverId = gridAreaOwner;
             _logger.LogInformation("Message created from CalculationResultId: {CalculationResultId}, was tax. ChargeOwnerReceiver was changed from {ChargeOwnerReceiverId} to {NewChargeOwnerReceiverId}", calculationResultId, originalChargeOwnerReceiverId, chargeOwnerReceiverId);
@@ -88,7 +88,7 @@ public class WholesaleMonthlyAmountPerChargeQuery(
         {
             if (chargeOwnerId != DataHubDetails.SystemOperatorActorNumber)
             {
-                var gridAreaOwner = gridAreaOwnerDictionary![gridAreaCode];
+                var gridAreaOwner = _gridAreaOwners[gridAreaCode];
 
                 chargeOwnerReceiverId = gridAreaOwner;
                 _logger.LogInformation(

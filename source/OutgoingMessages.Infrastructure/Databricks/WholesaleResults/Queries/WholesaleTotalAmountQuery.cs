@@ -30,6 +30,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Whole
 public class WholesaleTotalAmountQuery(
     ILogger logger,
     EdiDatabricksOptions ediDatabricksOptions,
+    ImmutableDictionary<string, ActorNumber> gridAreaOwners,
     EventId eventId,
     Guid calculationId,
     string? energySupplier)
@@ -39,6 +40,7 @@ public class WholesaleTotalAmountQuery(
         calculationId,
         energySupplier)
 {
+    private readonly ImmutableDictionary<string, ActorNumber> _gridAreaOwners = gridAreaOwners;
     private readonly EventId _eventId = eventId;
 
     public override string DataObjectName => "total_monthly_amounts_v1";
@@ -61,10 +63,9 @@ public class WholesaleTotalAmountQuery(
 
     protected override Task<WholesaleTotalAmountMessageDto> CreateWholesaleResultAsync(
         DatabricksSqlRow databricksSqlRow,
-        IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints,
-        ImmutableDictionary<string, ActorNumber>? gridAreaOwnerDictionary)
+        IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
-        var receiver = GetReceiver(databricksSqlRow, gridAreaOwnerDictionary);
+        var receiver = GetReceiver(databricksSqlRow, _gridAreaOwners);
         var (businessReason, settlementVersion) = BusinessReasonAndSettlementVersionMapper.FromDeltaTableValue(
             databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.CalculationType));
 
@@ -106,7 +107,7 @@ public class WholesaleTotalAmountQuery(
 
     private static (ActorNumber ActorNumber, ActorRole ActorRole) GetReceiver(
         DatabricksSqlRow databricksSqlRow,
-        ImmutableDictionary<string, ActorNumber>? gridAreaOwnerDictionary)
+        ImmutableDictionary<string, ActorNumber> gridAreaOwnerDictionary)
     {
         var chargeOwnerNumber = GetChargeOwnerNumber(databricksSqlRow);
         var gridAreaCode = databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.GridAreaCode);
@@ -117,7 +118,7 @@ public class WholesaleTotalAmountQuery(
         {
             if (chargeOwnerNumber != DataHubDetails.SystemOperatorActorNumber)
             {
-                var gridAreaOwner = gridAreaOwnerDictionary![gridAreaCode];
+                var gridAreaOwner = gridAreaOwnerDictionary[gridAreaCode];
                 return (gridAreaOwner, GetChargeOwnerRole(gridAreaOwner));
             }
 

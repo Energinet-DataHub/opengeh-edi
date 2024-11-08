@@ -53,6 +53,7 @@ public class GetActorsForWholesaleResultsForMonthlyAmountPerChargesActivity(
         var query = new WholesaleMonthlyAmountPerChargeQuery(
             _logger,
             _wholesaleResultActorsEnumerator.EdiDatabricksOptions,
+            input.GridAreaOwners,
             EventId.From(input.EventId),
             input.CalculationId,
             null);
