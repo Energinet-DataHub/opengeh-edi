@@ -30,11 +30,13 @@ public static class DurableClientExtensions
     /// </summary>
     /// <param name="client"></param>
     /// <param name="createdTimeFrom"></param>
+    /// <param name="name"></param>
     /// <param name="waitTimeLimit">Max time to wait for orchestration. If not specified it defaults to 30 seconds.</param>
     /// <returns>If started within given <paramref name="waitTimeLimit"/> it returns the orchestration status; otherwise it throws an exception.</returns>
     public static async Task<DurableOrchestrationStatus> WaitForOrchestrationStatusAsync(
         this IDurableClient client,
         DateTime createdTimeFrom,
+        string? name = null,
         TimeSpan? waitTimeLimit = null)
     {
         var filter = new OrchestrationStatusQueryCondition()
@@ -45,6 +47,7 @@ public static class DurableClientExtensions
                 OrchestrationRuntimeStatus.Pending,
                 OrchestrationRuntimeStatus.Running,
                 OrchestrationRuntimeStatus.Completed,
+                OrchestrationRuntimeStatus.Failed,
             ],
         };
 
@@ -53,8 +56,14 @@ public static class DurableClientExtensions
             async () =>
             {
                 var queryResult = await client.ListInstancesAsync(filter, CancellationToken.None);
-                durableOrchestrationState = queryResult.DurableOrchestrationState;
-                return durableOrchestrationState != null && durableOrchestrationState.Any();
+
+                if (queryResult == null)
+                    return false;
+
+                durableOrchestrationState = queryResult.DurableOrchestrationState
+                    .Where(o => name == null || o.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+                return durableOrchestrationState.Any();
             },
             waitTimeLimit ?? TimeSpan.FromSeconds(60),
             delay: TimeSpan.FromSeconds(5));
@@ -83,6 +92,10 @@ public static class DurableClientExtensions
             {
                 // Do not retrieve history here as it could be expensive
                 var completeOrchestrationStatus = await client.GetStatusAsync(instanceId);
+
+                if (completeOrchestrationStatus.RuntimeStatus == OrchestrationRuntimeStatus.Failed)
+                    throw new Exception($"Orchestration instance '{instanceId}' was status 'failed'.");
+
                 return completeOrchestrationStatus.RuntimeStatus == OrchestrationRuntimeStatus.Completed;
             },
             waitTimeLimit ?? TimeSpan.FromSeconds(30),
