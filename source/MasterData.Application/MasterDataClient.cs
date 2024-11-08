@@ -113,8 +113,16 @@ internal sealed class MasterDataClient : IMasterDataClient
     public async IAsyncEnumerable<GridAreaOwnerDto> GetAllGridAreaOwnersAsync(
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        await Task.Delay(1, cancellationToken).ConfigureAwait(false);
-        yield break;
+        await foreach (var gridAreaOwner in _gridAreaRepository
+                           .GetAllGridAreaOwnersAsync(cancellationToken)
+                           .ConfigureAwait(false))
+        {
+            yield return new GridAreaOwnerDto(
+                gridAreaOwner.GridAreaCode,
+                gridAreaOwner.ValidFrom,
+                gridAreaOwner.GridAreaOwnerActorNumber,
+                gridAreaOwner.SequenceNumber);
+        }
     }
 
     public async Task CreateOrUpdateActorCertificateAsync(
