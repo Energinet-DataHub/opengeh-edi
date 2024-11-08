@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Immutable;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -47,7 +49,9 @@ public abstract class CalculationResultQueryBase<TResult>(
 
     public Guid CalculationId { get; } = calculationId;
 
-    internal async IAsyncEnumerable<QueryResult<TResult>> GetAsync(DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor)
+    internal async IAsyncEnumerable<QueryResult<TResult>> GetAsync(
+        DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor,
+        ImmutableDictionary<string, ActorNumber>? gridAreaOwnerDictionary)
     {
         ArgumentNullException.ThrowIfNull(databricksSqlWarehouseQueryExecutor);
 
@@ -67,7 +71,7 @@ public abstract class CalculationResultQueryBase<TResult>(
                 continue;
             }
 
-            yield return await CreateResultAsync(currentResultSet).ConfigureAwait(false);
+            yield return await CreateResultAsync(currentResultSet, gridAreaOwnerDictionary).ConfigureAwait(false);
 
             // Next result serie
             currentResultSet =
@@ -80,11 +84,13 @@ public abstract class CalculationResultQueryBase<TResult>(
         // Last result (if any)
         if (currentResultSet.Count != 0)
         {
-            yield return await CreateResultAsync(currentResultSet).ConfigureAwait(false);
+            yield return await CreateResultAsync(currentResultSet, gridAreaOwnerDictionary).ConfigureAwait(false);
         }
     }
 
-    protected abstract Task<QueryResult<TResult>> CreateResultAsync(List<DatabricksSqlRow> currentResultSet);
+    protected abstract Task<QueryResult<TResult>> CreateResultAsync(
+        List<DatabricksSqlRow> currentResultSet,
+        ImmutableDictionary<string, ActorNumber>? gridAreaOwnerDictionary);
 
     protected abstract bool BelongsToSameResultSet(DatabricksSqlRow currentResult, DatabricksSqlRow previousResult);
 

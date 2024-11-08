@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Immutable;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
@@ -60,9 +61,10 @@ public class WholesaleTotalAmountQuery(
 
     protected override Task<WholesaleTotalAmountMessageDto> CreateWholesaleResultAsync(
         DatabricksSqlRow databricksSqlRow,
-        IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
+        IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints,
+        ImmutableDictionary<string, ActorNumber>? gridAreaOwnerDictionary)
     {
-        var receiver = GetReceiver(databricksSqlRow);
+        var receiver = GetReceiver(databricksSqlRow, gridAreaOwnerDictionary);
         var (businessReason, settlementVersion) = BusinessReasonAndSettlementVersionMapper.FromDeltaTableValue(
             databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.CalculationType));
 
@@ -103,17 +105,24 @@ public class WholesaleTotalAmountQuery(
     }
 
     private static (ActorNumber ActorNumber, ActorRole ActorRole) GetReceiver(
-        DatabricksSqlRow databricksSqlRow)
+        DatabricksSqlRow databricksSqlRow,
+        ImmutableDictionary<string, ActorNumber>? gridAreaOwnerDictionary)
     {
         var chargeOwnerNumber = GetChargeOwnerNumber(databricksSqlRow);
+        var gridAreaCode = databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.GridAreaCode);
         var energySupplierNumber =
             ActorNumber.Create(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.EnergySupplierId));
+
         if (chargeOwnerNumber is not null)
         {
+            if (chargeOwnerNumber != DataHubDetails.SystemOperatorActorNumber && gridAreaOwnerDictionary is not null)
+            {
+                var gridAreaOwner = gridAreaOwnerDictionary[gridAreaCode];
+                return (gridAreaOwner, GetChargeOwnerRole(gridAreaOwner));
+            }
+
             // ChargeOwner can either be grid operator or system operator.
-            return (
-                chargeOwnerNumber,
-                GetChargeOwnerRole(chargeOwnerNumber));
+            return (chargeOwnerNumber, GetChargeOwnerRole(chargeOwnerNumber));
         }
 
         return (energySupplierNumber, ActorRole.EnergySupplier);

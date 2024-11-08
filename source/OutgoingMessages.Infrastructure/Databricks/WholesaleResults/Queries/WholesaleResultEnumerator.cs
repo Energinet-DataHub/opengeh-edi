@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Immutable;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
+using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
 using Microsoft.Extensions.Logging;
@@ -23,19 +26,32 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Whole
 public class WholesaleResultEnumerator(
     DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor,
     IOptions<EdiDatabricksOptions> ediDatabricksOptions,
-    ILogger<WholesaleResultEnumerator> logger)
+    ILogger<WholesaleResultEnumerator> logger,
+    IMasterDataClient masterDataClient)
 {
     private readonly DatabricksSqlWarehouseQueryExecutor _databricksSqlWarehouseQueryExecutor = databricksSqlWarehouseQueryExecutor;
     private readonly ILogger<WholesaleResultEnumerator> _logger = logger;
+    private readonly IMasterDataClient _masterDataClient = masterDataClient;
 
     public EdiDatabricksOptions EdiDatabricksOptions { get; } = ediDatabricksOptions.Value;
 
     public async IAsyncEnumerable<QueryResult<TResult>> GetAsync<TResult>(WholesaleResultQueryBase<TResult> query)
         where TResult : OutgoingMessageDto
     {
+        var builder = ImmutableDictionary.CreateBuilder<string, ActorNumber>();
+        await foreach (var (gridAreaCode, _, actorNumber, _) in _masterDataClient.GetAllGridAreaOwnersAsync(
+                           CancellationToken.None))
+        {
+            builder.TryAdd(gridAreaCode, actorNumber);
+        }
+
+        var gridAreaOwnerDictionary = builder.ToImmutable();
+
         var resultCount = 0;
 
-        await foreach (var wholesaleResult in query.GetAsync(_databricksSqlWarehouseQueryExecutor).ConfigureAwait(false))
+        await foreach (var wholesaleResult in query
+                           .GetAsync(_databricksSqlWarehouseQueryExecutor, gridAreaOwnerDictionary)
+                           .ConfigureAwait(false))
         {
             yield return wholesaleResult;
             resultCount++;

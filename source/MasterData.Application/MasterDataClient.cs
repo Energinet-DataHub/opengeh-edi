@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Runtime.CompilerServices;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Domain.ActorCertificates;
 using Energinet.DataHub.EDI.MasterData.Domain.Actors;
@@ -107,6 +108,13 @@ internal sealed class MasterDataClient : IMasterDataClient
             return null;
 
         return new GridAreaOwnerDto(gridAreaOwner.GridAreaCode, gridAreaOwner.ValidFrom, gridAreaOwner.GridAreaOwnerActorNumber, gridAreaOwner.SequenceNumber);
+    }
+
+    public async IAsyncEnumerable<GridAreaOwnerDto> GetAllGridAreaOwnersAsync(
+        [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        await Task.Delay(1, cancellationToken).ConfigureAwait(false);
+        yield break;
     }
 
     public async Task CreateOrUpdateActorCertificateAsync(

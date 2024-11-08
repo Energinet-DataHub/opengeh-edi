@@ -50,6 +50,11 @@ public interface IMasterDataClient
     Task<GridAreaOwnerDto?> TryGetGridOwnerForGridAreaCodeAsync(string gridAreaCode, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Get all grid area owners.
+    /// </summary>
+    IAsyncEnumerable<GridAreaOwnerDto> GetAllGridAreaOwnersAsync(CancellationToken cancellationToken);
+
+    /// <summary>
     ///     Create or update the actor certificate for a given actor.
     /// </summary>
     Task CreateOrUpdateActorCertificateAsync(

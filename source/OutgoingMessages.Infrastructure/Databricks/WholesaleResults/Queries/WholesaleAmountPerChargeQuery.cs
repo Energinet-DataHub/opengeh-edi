@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Immutable;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
@@ -74,7 +76,8 @@ public class WholesaleAmountPerChargeQuery(
 
     protected override async Task<WholesaleAmountPerChargeMessageDto> CreateWholesaleResultAsync(
         DatabricksSqlRow databricksSqlRow,
-        IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
+        IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints,
+        ImmutableDictionary<string, ActorNumber>? gridAreaOwnerDictionary)
     {
         var calculationResultId = databricksSqlRow.ToGuid(WholesaleResultColumnNames.ResultId);
         var gridAreaCode = databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.GridAreaCode);
@@ -85,12 +88,34 @@ public class WholesaleAmountPerChargeQuery(
 
         if (isTax)
         {
-            var gridAreaOwner = await _masterDataClient
+            var gridAreaOwner = gridAreaOwnerDictionary != null
+                ? gridAreaOwnerDictionary[gridAreaCode]
+                : (await _masterDataClient
                 .GetGridOwnerForGridAreaCodeAsync(gridAreaCode, CancellationToken.None)
-                .ConfigureAwait(false);
+                .ConfigureAwait(false))
+                .ActorNumber;
 
-            chargeOwnerReceiverId = gridAreaOwner.ActorNumber;
+            chargeOwnerReceiverId = gridAreaOwner;
             _logger.LogInformation("Message created from CalculationResultId: {CalculationResultId}, was tax. ChargeOwnerReceiver was changed from {ChargeOwnerReceiverId} to {NewChargeOwnerReceiverId}", calculationResultId, originalChargeOwnerReceiverId, chargeOwnerReceiverId);
+        }
+        else
+        {
+            if (chargeOwnerId != DataHubDetails.SystemOperatorActorNumber)
+            {
+                var gridAreaOwner = gridAreaOwnerDictionary != null
+                    ? gridAreaOwnerDictionary[gridAreaCode]
+                    : (await _masterDataClient
+                        .GetGridOwnerForGridAreaCodeAsync(gridAreaCode, CancellationToken.None)
+                        .ConfigureAwait(false))
+                    .ActorNumber;
+
+                chargeOwnerReceiverId = gridAreaOwner;
+                _logger.LogInformation(
+                    "Message created from CalculationResultId: {CalculationResultId} had old charge owner. ChargeOwnerReceiver was changed from {ChargeOwnerReceiverId} to {NewChargeOwnerReceiverId}",
+                    calculationResultId,
+                    originalChargeOwnerReceiverId,
+                    chargeOwnerReceiverId);
+            }
         }
 
         var (businessReason, settlementVersion) = BusinessReasonAndSettlementVersionMapper.FromDeltaTableValue(
