@@ -44,7 +44,7 @@ public class NotifyAggregatedMeasureDataHandler(
 
         // Here we show how its possible, based on input, to decide certain steps should be skipped by the orchestration.
         IReadOnlyCollection<int> skipStepsBySequence = dto.InputParameter.IsInternalCalculation
-            ? [2] // TODO: Use some kind of const or enum linked to the "definition" to avoid magic numbers
+            ? [NotifyAggregatedMeasureDataOrchestrationV1.EnqueueMessagesStepSequence]
             : [];
 
         var orchestrationInstanceId = await _manager
