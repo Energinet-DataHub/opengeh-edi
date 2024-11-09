@@ -35,6 +35,10 @@ public record StepInstanceDto(
 
     public string Description { get; } = Description;
 
+    /// <summary>
+    /// The steps number in the list of steps.
+    /// The sequence of the first step in the list is 1.
+    /// </summary>
     public int Sequence { get; } = Sequence;
 
     /// <summary>
