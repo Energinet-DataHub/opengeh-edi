@@ -36,7 +36,7 @@ internal class Brs023EnqueueMessagesStepTerminateActivityV1(
             .GetAsync(new OrchestrationInstanceId(orchestrationInstanceId))
             .ConfigureAwait(false);
 
-        var step = orchestrationInstance.Steps.First(x => x.Sequence == NotifyAggregatedMeasureDataOrchestrationV1.EnqueueMessagesStepSequence);
+        var step = orchestrationInstance.CurrentStep();
         step.Lifecycle.TransitionToTerminated(Clock, OrchestrationStepTerminationStates.Succeeded);
         await UnitOfWork.CommitAsync().ConfigureAwait(false);
 

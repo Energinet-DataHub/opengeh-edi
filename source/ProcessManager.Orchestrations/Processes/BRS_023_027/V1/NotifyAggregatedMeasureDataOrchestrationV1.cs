@@ -23,9 +23,6 @@ namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.
 // TODO: Implement according to guidelines: https://energinet.atlassian.net/wiki/spaces/D3/pages/824803345/Durable+Functions+Development+Guidelines
 internal class NotifyAggregatedMeasureDataOrchestrationV1
 {
-    internal const int CalculationStepSequence = 1;
-    internal const int EnqueueMessagesStepSequence = 2;
-
     [Function(nameof(NotifyAggregatedMeasureDataOrchestrationV1))]
     public async Task<string> Run(
         [OrchestrationTrigger] TaskOrchestrationContext context)

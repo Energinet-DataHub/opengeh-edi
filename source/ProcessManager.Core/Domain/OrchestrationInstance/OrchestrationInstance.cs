@@ -81,6 +81,26 @@ public class OrchestrationInstance
     /// </summary>
     internal OrchestrationDescriptionId OrchestrationDescriptionId { get; }
 
+    /// <summary>
+    /// The next step we would start.
+    /// </summary>
+    public StepInstance NextStep()
+    {
+        return Steps
+            .OrderBy(step => step.Sequence)
+            .First(step => step.Lifecycle.State == StepInstanceLifecycleStates.Pending);
+    }
+
+    /// <summary>
+    /// The current active step, which is running.
+    /// </summary>
+    public StepInstance CurrentStep()
+    {
+        return Steps
+            .OrderBy(step => step.Sequence)
+            .First(step => step.Lifecycle.State == StepInstanceLifecycleStates.Running);
+    }
+
     internal static OrchestrationInstance CreateFromDescription(
         OrchestrationDescription.OrchestrationDescription description,
         IClock clock,
