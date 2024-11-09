@@ -21,6 +21,7 @@ using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Startup
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Telemetry;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var host = new HostBuilder()
@@ -33,6 +34,7 @@ var host = new HostBuilder()
         services.AddNodaTimeForApplication();
 
         // ProcessManager
+        // => Orchestration Descriptions
         services.AddProcessManagerForOrchestrations(() =>
         {
             // TODO: For demo purposes; remove when done.
@@ -52,6 +54,8 @@ var host = new HostBuilder()
 
             return [brs_023_027_v1];
         });
+        // => Handlers
+        services.AddScoped<NotifyAggregatedMeasureDataHandler>();
     })
     .ConfigureLogging((hostingContext, logging) =>
     {
