@@ -109,8 +109,14 @@ public class OrchestrationDescription
         var step = new StepDescription(
             Id,
             description,
-            sequence: _steps.Count + 1);
+            sequence: GetNextSequence());
 
         _steps.Add(step);
     }
+
+    /// <summary>
+    /// Generate next sequence number for a new step.
+    /// </summary>
+    private int GetNextSequence()
+        => _steps.Count + 1;
 }
