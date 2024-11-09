@@ -59,12 +59,13 @@ public class OrchestrationInstanceManager : IOrchestrationInstanceManager, IOrch
     public async Task<OrchestrationInstanceId> StartNewOrchestrationInstanceAsync<TParameter>(
         string name,
         int version,
-        TParameter inputParameter)
+        TParameter inputParameter,
+        IReadOnlyCollection<int> skipStepsBySequence)
             where TParameter : class
     {
-        var orchestrationDescription = await GuardMatchingOrchestrationDescriptionAsync(name, version, inputParameter).ConfigureAwait(false);
+        var orchestrationDescription = await GuardMatchingOrchestrationDescriptionAsync(name, version, inputParameter, skipStepsBySequence).ConfigureAwait(false);
 
-        var orchestrationInstance = await CreateOrchestrationInstanceAsync(inputParameter, orchestrationDescription).ConfigureAwait(false);
+        var orchestrationInstance = await CreateOrchestrationInstanceAsync(inputParameter, orchestrationDescription, skipStepsBySequence).ConfigureAwait(false);
         await RequestStartOfOrchestrationInstanceAsync(orchestrationDescription, orchestrationInstance).ConfigureAwait(false);
 
         return orchestrationInstance.Id;
@@ -75,14 +76,15 @@ public class OrchestrationInstanceManager : IOrchestrationInstanceManager, IOrch
         string name,
         int version,
         TParameter inputParameter,
-        Instant runAt)
+        Instant runAt,
+        IReadOnlyCollection<int> skipStepsBySequence)
             where TParameter : class
     {
-        var orchestrationDescription = await GuardMatchingOrchestrationDescriptionAsync(name, version, inputParameter).ConfigureAwait(false);
+        var orchestrationDescription = await GuardMatchingOrchestrationDescriptionAsync(name, version, inputParameter, skipStepsBySequence).ConfigureAwait(false);
         if (orchestrationDescription.CanBeScheduled == false)
             throw new InvalidOperationException("Orchestration description cannot be scheduled.");
 
-        var orchestrationInstance = await CreateScheduledOrchestrationInstanceAsync(inputParameter, runAt, orchestrationDescription).ConfigureAwait(false);
+        var orchestrationInstance = await CreateOrchestrationInstanceAsync(inputParameter, orchestrationDescription, skipStepsBySequence, runAt).ConfigureAwait(false);
 
         return orchestrationInstance.Id;
     }
@@ -119,45 +121,41 @@ public class OrchestrationInstanceManager : IOrchestrationInstanceManager, IOrch
     private async Task<OrchestrationDescription> GuardMatchingOrchestrationDescriptionAsync<TParameter>(
         string name,
         int version,
-        TParameter inputParameter)
+        TParameter inputParameter,
+        IReadOnlyCollection<int> skipStepsBySequence)
             where TParameter : class
     {
         var orchestrationDescription = await _orchestrationRegister.GetOrDefaultAsync(name, version, isEnabled: true).ConfigureAwait(false);
         if (orchestrationDescription == null)
-        {
             throw new InvalidOperationException($"No enabled orchestration description matches Name='{name}' and Version='{version}'.");
-        }
 
         var isValidParameterValue = await orchestrationDescription.ParameterDefinition.IsValidParameterValueAsync(inputParameter).ConfigureAwait(false);
-        return isValidParameterValue == false
-            ? throw new InvalidOperationException("Paramater value is not valid compared to registered parameter definition.")
-            : orchestrationDescription;
+        if (isValidParameterValue == false)
+            throw new InvalidOperationException("Paramater value is not valid compared to registered parameter definition.");
+
+        foreach (var stepSequence in skipStepsBySequence)
+        {
+            var stepOrDefault = orchestrationDescription.Steps.FirstOrDefault(step => step.Sequence == stepSequence);
+            if (stepOrDefault == null)
+                throw new InvalidOperationException($"No step description matches the sequence '{stepSequence}'.");
+
+            if (stepOrDefault.CanBeSkipped == false)
+                throw new InvalidOperationException($"Step description with sequence '{stepSequence}' cannot be skipped.");
+        }
+
+        return orchestrationDescription;
     }
 
     private async Task<OrchestrationInstance> CreateOrchestrationInstanceAsync<TParameter>(
         TParameter inputParameter,
-        OrchestrationDescription orchestrationDescription)
+        OrchestrationDescription orchestrationDescription,
+        IReadOnlyCollection<int> skipStepsBySequence,
+        Instant? runAt = default)
             where TParameter : class
     {
         var orchestrationInstance = OrchestrationInstance.CreateFromDescription(
             orchestrationDescription,
-            _clock);
-        orchestrationInstance.ParameterValue.SetFromInstance(inputParameter);
-
-        await _orchestrationInstanceRepository.AddAsync(orchestrationInstance).ConfigureAwait(false);
-        await _unitOfWork.CommitAsync().ConfigureAwait(false);
-
-        return orchestrationInstance;
-    }
-
-    private async Task<OrchestrationInstance> CreateScheduledOrchestrationInstanceAsync<TParameter>(
-        TParameter inputParameter,
-        Instant runAt,
-        OrchestrationDescription orchestrationDescription)
-            where TParameter : class
-    {
-        var orchestrationInstance = OrchestrationInstance.CreateFromDescription(
-            orchestrationDescription,
+            skipStepsBySequence,
             _clock,
             runAt);
         orchestrationInstance.ParameterValue.SetFromInstance(inputParameter);

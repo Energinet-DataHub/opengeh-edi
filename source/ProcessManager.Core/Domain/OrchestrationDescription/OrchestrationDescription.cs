@@ -102,14 +102,20 @@ public class OrchestrationDescription
     public bool IsEnabled { get; internal set; }
 
     /// <summary>
-    /// Append the step description to the end of the current list of steps.
+    /// Factory method that ensures domain rules are obeyed when creating and adding a new
+    /// step description.
     /// </summary>
-    public void AppendStepDescription(string description)
+    public void AppendStepDescription(string description, bool canBeSkipped = false, string skipReason = "")
     {
+        if (canBeSkipped && string.IsNullOrWhiteSpace(skipReason))
+            ArgumentException.ThrowIfNullOrWhiteSpace(skipReason);
+
         var step = new StepDescription(
             Id,
             description,
-            sequence: GetNextSequence());
+            sequence: GetNextSequence(),
+            canBeSkipped,
+            skipReason);
 
         _steps.Add(step);
     }

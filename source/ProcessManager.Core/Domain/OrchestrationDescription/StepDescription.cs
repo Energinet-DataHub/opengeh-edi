@@ -24,11 +24,16 @@ public class StepDescription
     internal StepDescription(
         OrchestrationDescriptionId orchestrationDescriptionId,
         string description,
-        int sequence)
+        int sequence,
+        bool canBeSkipped,
+        string skipReason)
     {
         Id = new StepDescriptionId(Guid.NewGuid());
         Description = description;
         Sequence = sequence;
+
+        CanBeSkipped = canBeSkipped;
+        SkipReason = skipReason;
 
         OrchestrationDescriptionId = orchestrationDescriptionId;
     }
@@ -52,6 +57,18 @@ public class StepDescription
     /// The sequence of the first step in the list is 1.
     /// </summary>
     public int Sequence { get; }
+
+    /// <summary>
+    /// Specifies if the step supports beeing skipped.
+    /// If <see langword="false"/> then the step cannot be transitioned
+    /// to the Skipped state.
+    /// </summary>
+    public bool CanBeSkipped { get; }
+
+    /// <summary>
+    /// A development note allowing developers to describe possible reasons for skipping this step.
+    /// </summary>
+    public string SkipReason { get; }
 
     /// <summary>
     /// The orchestration description which this step is part of.

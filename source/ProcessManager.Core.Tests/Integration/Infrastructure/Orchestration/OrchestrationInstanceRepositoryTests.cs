@@ -399,6 +399,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
     {
         var orchestrationInstance = OrchestrationInstance.CreateFromDescription(
             description: orchestrationDescription,
+            skipStepsBySequence: [],
             clock: SystemClock.Instance,
             runAt: runAt);
 

@@ -63,6 +63,9 @@ public class OrchestrationDescriptionEntityConfiguration : IEntityTypeConfigurat
                 b.Property(s => s.Description);
                 b.Property(s => s.Sequence);
 
+                b.Property(s => s.CanBeSkipped);
+                b.Property(s => s.SkipReason);
+
                 // Relation to parent
                 b.Property(s => s.OrchestrationDescriptionId)
                     .HasConversion(

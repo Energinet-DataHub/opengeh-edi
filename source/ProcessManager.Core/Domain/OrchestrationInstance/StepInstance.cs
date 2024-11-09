@@ -26,10 +26,11 @@ public class StepInstance
     internal StepInstance(
         OrchestrationInstanceId orchestrationInstanceId,
         string description,
-        int sequence)
+        int sequence,
+        bool canBeSkipped)
     {
         Id = new StepInstanceId(Guid.NewGuid());
-        Lifecycle = new StepInstanceLifecycleState();
+        Lifecycle = new StepInstanceLifecycleState(canBeSkipped);
         Description = description;
         Sequence = sequence;
         CustomState = new StepInstanceCustomState(string.Empty);
@@ -71,4 +72,9 @@ public class StepInstance
     /// The orchestration instance which this step is part of.
     /// </summary>
     internal OrchestrationInstanceId OrchestrationInstanceId { get; }
+
+    public bool IsSkipped()
+    {
+        return Lifecycle.TerminationState == OrchestrationStepTerminationStates.Skipped;
+    }
 }

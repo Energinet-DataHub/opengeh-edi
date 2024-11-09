@@ -6,6 +6,9 @@
     [Description]                   NVARCHAR(255) NOT NULL,
     [Sequence]                      INT NOT NULL,
 
+    [CanBeSkipped]                  BIT NOT NULL,
+    [SkipReason]                    NVARCHAR(255) NOT NULL,
+
     [OrchestrationDescriptionId]    UNIQUEIDENTIFIER NOT NULL,
 
     -- A UNIQUE CLUSTERED constraint on an INT IDENTITY column optimizes the performance of the table

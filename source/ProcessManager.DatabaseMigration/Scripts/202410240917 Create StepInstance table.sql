@@ -7,11 +7,12 @@
     [Lifecycle_TerminationState]    INT NULL,
     [Lifecycle_StartedAt]           DATETIME2 NULL,
     [Lifecycle_TerminatedAt]        DATETIME2 NULL,
+    [Lifecycle_CanBeSkipped]        BIT NOT NULL,
 
     [Description]                   NVARCHAR(255) NOT NULL,
     [Sequence]                      INT NOT NULL,
 
-    [CustomState]                   NVARCHAR(255) NOT NULL,
+    [CustomState]                   NVARCHAR(MAX) NOT NULL,
     [OrchestrationInstanceId]       UNIQUEIDENTIFIER NOT NULL,
 
     -- A UNIQUE CLUSTERED constraint on an INT IDENTITY column optimizes the performance of the table

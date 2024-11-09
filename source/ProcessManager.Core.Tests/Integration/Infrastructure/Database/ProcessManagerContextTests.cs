@@ -90,7 +90,7 @@ public class ProcessManagerContextTests
 
         orchestrationDescription.AppendStepDescription("Test step 1");
         orchestrationDescription.AppendStepDescription("Test step 2");
-        orchestrationDescription.AppendStepDescription("Test step 3");
+        orchestrationDescription.AppendStepDescription("Test step 3", canBeSkipped: true, skipReason: "Because we are testing");
 
         return orchestrationDescription;
     }
@@ -99,6 +99,7 @@ public class ProcessManagerContextTests
     {
         var orchestrationInstance = OrchestrationInstance.CreateFromDescription(
             description: orchestrationDescription,
+            skipStepsBySequence: [3],
             clock: SystemClock.Instance);
 
         orchestrationInstance.ParameterValue.SetFromInstance(new TestOrchestrationParameter

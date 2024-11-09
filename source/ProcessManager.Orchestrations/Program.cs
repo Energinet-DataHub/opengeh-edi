@@ -50,7 +50,10 @@ var host = new HostBuilder()
             brs_023_027_v1.ParameterDefinition.SetFromType<NotifyAggregatedMeasureDataInputV1>();
 
             brs_023_027_v1.AppendStepDescription("Beregning");
-            brs_023_027_v1.AppendStepDescription("Besked dannelse");
+            brs_023_027_v1.AppendStepDescription(
+                "Besked dannelse",
+                canBeSkipped: true,
+                skipReason: "Do not perform this step for an internal calculation.");
 
             return [brs_023_027_v1];
         });

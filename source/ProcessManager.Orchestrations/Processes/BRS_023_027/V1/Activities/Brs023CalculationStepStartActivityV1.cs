@@ -36,7 +36,7 @@ internal class Brs023CalculationStepStartActivityV1(
             .GetAsync(new OrchestrationInstanceId(orchestrationInstanceId))
             .ConfigureAwait(false);
 
-        var step = orchestrationInstance.NextStep();
+        var step = orchestrationInstance.Steps.Single(x => x.Sequence == NotifyAggregatedMeasureDataOrchestrationV1.CalculationStepSequence);
         step.Lifecycle.TransitionToRunning(Clock);
         await UnitOfWork.CommitAsync().ConfigureAwait(false);
 

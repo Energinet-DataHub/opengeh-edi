@@ -36,7 +36,7 @@ internal class Brs023CalculationStepTerminateActivityV1(
             .GetAsync(new OrchestrationInstanceId(orchestrationInstanceId))
             .ConfigureAwait(false);
 
-        var step = orchestrationInstance.CurrentStep();
+        var step = orchestrationInstance.Steps.Single(x => x.Sequence == NotifyAggregatedMeasureDataOrchestrationV1.CalculationStepSequence);
         step.Lifecycle.TransitionToTerminated(Clock, OrchestrationStepTerminationStates.Succeeded);
         await UnitOfWork.CommitAsync().ConfigureAwait(false);
 

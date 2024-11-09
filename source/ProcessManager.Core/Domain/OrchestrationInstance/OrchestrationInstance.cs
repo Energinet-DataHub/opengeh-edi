@@ -82,43 +82,49 @@ public class OrchestrationInstance
     internal OrchestrationDescriptionId OrchestrationDescriptionId { get; }
 
     /// <summary>
-    /// The next step we would start.
+    /// Factory method that ensures domain rules are obeyed when creating a new
+    /// orchestration instance.
     /// </summary>
-    public StepInstance NextStep()
-    {
-        return Steps
-            .OrderBy(step => step.Sequence)
-            .First(step => step.Lifecycle.State == StepInstanceLifecycleStates.Pending);
-    }
-
-    /// <summary>
-    /// The current active step, which is running.
-    /// </summary>
-    public StepInstance CurrentStep()
-    {
-        return Steps
-            .OrderBy(step => step.Sequence)
-            .First(step => step.Lifecycle.State == StepInstanceLifecycleStates.Running);
-    }
-
     internal static OrchestrationInstance CreateFromDescription(
         OrchestrationDescription.OrchestrationDescription description,
+        IReadOnlyCollection<int> skipStepsBySequence,
         IClock clock,
         Instant? runAt = default)
     {
-        var instance = new OrchestrationInstance(
+        foreach (var stepSequence in skipStepsBySequence)
+        {
+            var stepOrDefault = description.Steps.FirstOrDefault(step => step.Sequence == stepSequence);
+            if (stepOrDefault == null)
+                throw new InvalidOperationException($"No step description matches the sequence '{stepSequence}'.");
+
+            if (stepOrDefault.CanBeSkipped == false)
+                throw new InvalidOperationException($"Step description with sequence '{stepSequence}' cannot be skipped.");
+        }
+
+        if (runAt.HasValue && description.CanBeScheduled == false)
+            throw new InvalidOperationException("Orchestration description cannot be scheduled.");
+
+        var orchestrationInstance = new OrchestrationInstance(
             description.Id,
             clock,
             runAt);
 
         foreach (var stepDefinition in description.Steps)
         {
-            instance._steps.Add(new StepInstance(
-                instance.Id,
+            var stepInstance = new StepInstance(
+                orchestrationInstance.Id,
                 stepDefinition.Description,
-                stepDefinition.Sequence));
+                stepDefinition.Sequence,
+                stepDefinition.CanBeSkipped);
+
+            if (skipStepsBySequence.Contains(stepInstance.Sequence))
+            {
+                stepInstance.Lifecycle.TransitionToTerminated(clock, OrchestrationStepTerminationStates.Skipped);
+            }
+
+            orchestrationInstance._steps.Add(stepInstance);
         }
 
-        return instance;
+        return orchestrationInstance;
     }
 }

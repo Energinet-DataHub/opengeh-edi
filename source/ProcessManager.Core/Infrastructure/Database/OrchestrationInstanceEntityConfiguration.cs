@@ -76,6 +76,8 @@ public class OrchestrationInstanceEntityConfiguration : IEntityTypeConfiguration
 
                         b.Property(pv => pv.StartedAt);
                         b.Property(pv => pv.TerminatedAt);
+
+                        b.Property(pv => pv.CanBeSkipped);
                     });
 
                 b.Property(s => s.Description);

@@ -18,9 +18,11 @@ namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 
 public class StepInstanceLifecycleState
 {
-    internal StepInstanceLifecycleState()
+    internal StepInstanceLifecycleState(
+        bool canBeSkipped)
     {
         State = StepInstanceLifecycleStates.Pending;
+        CanBeSkipped = canBeSkipped;
     }
 
     public StepInstanceLifecycleStates State { get; private set; }
@@ -38,6 +40,13 @@ public class StepInstanceLifecycleState
     /// transition the state to Terminated.
     /// </summary>
     public Instant? TerminatedAt { get; private set; }
+
+    /// <summary>
+    /// Specifies if the step supports beeing skipped.
+    /// If <see langword="false"/> then the step cannot be transitioned
+    /// to the Skipped state.
+    /// </summary>
+    public bool CanBeSkipped { get; }
 
     public void TransitionToRunning(IClock clock)
     {
@@ -57,6 +66,14 @@ public class StepInstanceLifecycleState
                 if (State is not StepInstanceLifecycleStates.Running)
                     throw new InvalidOperationException($"Cannot change termination state to '{terminationState}' when '{State}'.");
                 break;
+
+            case OrchestrationStepTerminationStates.Skipped:
+                if (State is not StepInstanceLifecycleStates.Pending)
+                    throw new InvalidOperationException($"Cannot change termination state to '{terminationState}' when '{State}'.");
+                if (CanBeSkipped == false)
+                    throw new InvalidOperationException($"Step cannot be skipped.");
+                break;
+
             default:
                 throw new InvalidOperationException($"Unsupported termination state '{terminationState}'.");
         }

@@ -59,6 +59,7 @@ public class OrchestrationInstanceMapperExtensionsTests
 
         var orchestrationInstance = OrchestrationInstance.CreateFromDescription(
             orchestrationDescription,
+            skipStepsBySequence: [],
             SystemClock.Instance);
 
         orchestrationInstance.ParameterValue.SetFromInstance(new TestOrchestrationParameter

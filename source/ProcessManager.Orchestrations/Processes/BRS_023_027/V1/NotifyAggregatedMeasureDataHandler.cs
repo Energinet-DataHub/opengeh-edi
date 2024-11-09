@@ -35,22 +35,26 @@ public class NotifyAggregatedMeasureDataHandler(
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IOrchestrationInstanceManager _manager = manager;
 
-    public async Task<OrchestrationInstanceId> ScheduleNewCalculationAsync(ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> dto)
+    public async Task<OrchestrationInstanceId> ScheduleNewCalculationAsync(
+        ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> dto)
     {
-        // TODO: Server-side validation => Validate "period" is midnight values when given "timezone"
+        // TODO:
+        // Server-side validation => Validate "period" is midnight values when given "timezone" etc.
+        // See class Calculation and method IsValid in Wholesale.
+
+        // Here we show how its possible, based on input, to decide certain steps should be skipped by the orchestration.
+        IReadOnlyCollection<int> skipStepsBySequence = dto.InputParameter.IsInternalCalculation
+            ? [2] // TODO: Use some kind of const or enum linked to the "definition" to avoid magic numbers
+            : [];
+
         var orchestrationInstanceId = await _manager
             .ScheduleNewOrchestrationInstanceAsync(
                 name: "BRS_023_027",
                 version: 1,
                 inputParameter: dto.InputParameter,
-                runAt: dto.RunAt.ToInstant())
+                runAt: dto.RunAt.ToInstant(),
+                skipStepsBySequence: skipStepsBySequence)
             .ConfigureAwait(false);
-
-        // TODO:
-        // If we want to be able to "skip" steps based on input, we should be able to do it here.
-        // If we want the UI to have the correct information immediately, then we must be able to first
-        // create the orchestration instance, make any modification (e.g. mark step 2 as skip)
-        // and THEN call Start or Schedule.
 
         return orchestrationInstanceId;
     }
