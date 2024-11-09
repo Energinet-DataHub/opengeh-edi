@@ -62,6 +62,12 @@ internal class NotifyAggregatedMeasureDataOrchestrationTriggerV1(
                 runAt: dto.RunAt.ToInstant())
             .ConfigureAwait(false);
 
+        // TODO:
+        // If we want to be able to "skip" steps based on input, we should be able to do it here.
+        // If we want the UI to have the correct information immediately, then we must be able to first
+        // create the orchestration instance, make any modification (e.g. mark step 2 as skip)
+        // and THEN call Start or Schedule.
+
         return new OkObjectResult(orchestrationInstanceId.Value);
     }
 }
