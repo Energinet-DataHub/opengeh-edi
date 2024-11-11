@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Immutable;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Databricks;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 using Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Model;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Behaviours.IntegrationEvents.TestData;
 using Energinet.DataHub.EDI.IntegrationTests.Fixtures;
-using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.IntegrationTests.DocumentAsserters;
@@ -74,7 +74,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         var meteredDataResponsible = new Actor(ActorNumber.Create("1111111111111"), ActorRole.MeteredDataResponsible);
 
         await GivenGridAreaOwnershipAsync(testDataDescription.GridAreaCode, meteredDataResponsible.ActorNumber);
-        await GivenEnqueueEnergyResultsPerGridAreaAsync(testDataDescription.CalculationId);
+        await GivenEnqueueEnergyResultsPerGridAreaAsync(testDataDescription.CalculationId, testDataDescription.GridAreaOwners);
 
         // When (act)
         var peekResultsForMeteredDataResponsible = await WhenActorPeeksAllMessages(
@@ -127,7 +127,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
             testDataDescription.ExampleBalanceResponsible.ActorNumber,
             ActorRole.BalanceResponsibleParty);
 
-        await GivenEnqueueEnergyResultsPerBalanceResponsible(testDataDescription.CalculationId);
+        await GivenEnqueueEnergyResultsPerBalanceResponsible(testDataDescription.CalculationId, new Dictionary<string, ActorNumber>() { { "543", ActorNumber.Create("8500000000502") } });
 
         // When (act)
         var peekResultsForBalanceResponsible = await WhenActorPeeksAllMessages(
@@ -180,7 +180,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         var energySupplier = new Actor(testDataDescription.ExampleEnergySupplier.ActorNumber, ActorRole.EnergySupplier);
         var balanceResponsible = new Actor(testDataDescription.ExampleBalanceResponsible.ActorNumber, ActorRole.BalanceResponsibleParty);
 
-        await GivenEnqueueEnergyResultsPerEnergySuppliersPerBalanceResponsible(testDataDescription.CalculationId);
+        await GivenEnqueueEnergyResultsPerEnergySuppliersPerBalanceResponsible(testDataDescription.CalculationId, new Dictionary<string, ActorNumber>() { { "543", ActorNumber.Create("8500000000502") } });
 
         // When (act)
         var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(
@@ -281,7 +281,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
                 ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'balance_fixing'", "'2023-02-01 23:00:00.000000'", "'2023-02-12 23:00:00.000000'", "'111'", "'10e4e982-91dc-4e1c-9079-514ed45a64a7'", "'543'", "'5790001662233'", "'7080000729821'", "'production'", "NULL", "'PT1H'", "'2023-02-02 05:00:00.000000'", "'39473.336'", "'kWh'", "Array('measured')"],
             ]);
 
-        await GivenEnqueueEnergyResultsPerEnergySuppliersPerBalanceResponsible(calculationId);
+        await GivenEnqueueEnergyResultsPerEnergySuppliersPerBalanceResponsible(calculationId, new Dictionary<string, ActorNumber>() { { "543", ActorNumber.Create("8500000000502") } });
 
         // When (act)
         var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(
@@ -337,7 +337,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
                 ["'61d60f89-bbc5-4f7a-be98-6139aab1c1b2'", "'balance_fixing'", "'2023-02-01 23:00:00.000000'", "'2023-02-12 23:00:00.000000'", "'111'", "'10e4e982-91dc-4e1c-9079-514ed45a64a7'", "'543'", "'5790001662233'", "'7080000729821'", "'production'", "NULL", "'PT1H'", "'2023-02-02 05:00:00.000000'", "'39473.336'", "'kWh'", "Array('measured')"],
             ]);
 
-        await GivenEnqueueEnergyResultsPerEnergySuppliersPerBalanceResponsible(calculationId);
+        await GivenEnqueueEnergyResultsPerEnergySuppliersPerBalanceResponsible(calculationId, new Dictionary<string, ActorNumber>() { { "543", ActorNumber.Create("8500000000502") } });
 
         // When (act)
         var peekResultsForEnergySupplier = await WhenActorPeeksAllMessages(
@@ -392,35 +392,34 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         return new(query.DataObjectName, query.SchemaDefinition);
     }
 
-    private Task GivenEnqueueEnergyResultsPerGridAreaAsync(Guid calculationId)
+    private Task GivenEnqueueEnergyResultsPerGridAreaAsync(Guid calculationId, IDictionary<string, ActorNumber> gridAreaOwners)
     {
         var activity = new EnqueueEnergyResultsForGridAreaOwnersActivity(
             GetService<ILogger<EnqueueEnergyResultsForGridAreaOwnersActivity>>(),
             GetService<IServiceScopeFactory>(),
-            GetService<IMasterDataClient>(),
             GetService<EnergyResultEnumerator>());
 
-        return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
+        return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid(), gridAreaOwners.ToImmutableDictionary()));
     }
 
-    private Task GivenEnqueueEnergyResultsPerBalanceResponsible(Guid calculationId)
+    private Task GivenEnqueueEnergyResultsPerBalanceResponsible(Guid calculationId, IDictionary<string, ActorNumber> gridAreaOwners)
     {
         var activity = new EnqueueEnergyResultsForBalanceResponsiblesActivity(
             GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesActivity>>(),
             GetService<IServiceScopeFactory>(),
             GetService<EnergyResultEnumerator>());
 
-        return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
+        return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid(), gridAreaOwners.ToImmutableDictionary()));
     }
 
-    private Task GivenEnqueueEnergyResultsPerEnergySuppliersPerBalanceResponsible(Guid calculationId)
+    private Task GivenEnqueueEnergyResultsPerEnergySuppliersPerBalanceResponsible(Guid calculationId, IDictionary<string, ActorNumber> gridAreaOwners)
     {
         var activity = new EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity(
             GetService<ILogger<EnqueueEnergyResultsForBalanceResponsiblesAndEnergySuppliersActivity>>(),
             GetService<IServiceScopeFactory>(),
             GetService<EnergyResultEnumerator>());
 
-        return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid()));
+        return activity.Run(new EnqueueMessagesInput(calculationId, Guid.NewGuid(), gridAreaOwners.ToImmutableDictionary()));
     }
 
     private async Task<EnergyResultPerGridAreaDescription> GivenDatabricksResultDataForEnergyResultPerGridArea()
@@ -429,7 +428,7 @@ public class GivenCalculationCompletedV1ReceivedForBalanceFixingTests : Aggregat
         var energyResultPerGridAreaQuery = new EnergyResultPerGridAreaQuery(
             GetService<ILogger<EnqueueEnergyResultsForGridAreaOwnersActivity>>(),
             _ediDatabricksOptions.Value,
-            GetService<IMasterDataClient>(),
+            energyResultPerGridAreaTestDataDescription.GridAreaOwners,
             EventId.From(Guid.NewGuid()),
             energyResultPerGridAreaTestDataDescription.CalculationId);
 
