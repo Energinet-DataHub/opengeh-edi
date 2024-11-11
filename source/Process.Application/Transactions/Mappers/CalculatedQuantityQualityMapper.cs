@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.ObjectModel;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.Edi.Responses;
+using ChargeType = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.ChargeType;
+using Resolution = Energinet.DataHub.Wholesale.CalculationResults.Interfaces.CalculationResults.Model.WholesaleResults.Resolution;
 
 namespace Energinet.DataHub.EDI.Process.Application.Transactions.Mappers;
 
@@ -171,6 +174,40 @@ public static class CalculatedQuantityQualityMapper
                 estimated: quantityQualities.Contains(QuantityQuality.Estimated),
                 measured: quantityQualities.Contains(QuantityQuality.Measured),
                 calculated: quantityQualities.Contains(QuantityQuality.Calculated)) switch
+            {
+                (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality
+                    .Missing,
+                (missing: true, _, _, _) => CalculatedQuantityQuality.Incomplete,
+                (_, estimated: true, _, _) => CalculatedQuantityQuality.Calculated,
+                (_, _, measured: true, _) => CalculatedQuantityQuality.Calculated,
+                (_, _, _, calculated: true) => CalculatedQuantityQuality.Calculated,
+                _ => CalculatedQuantityQuality.NotAvailable,
+            };
+    }
+
+    public static CalculatedQuantityQuality? MapForWholesaleServices(ReadOnlyCollection<Wholesale.CalculationResults.Interfaces.CalculationResults.Model.QuantityQuality>? quantityQualities, Resolution resolution, bool hasPrice, ChargeType? chargeType)
+    {
+        ArgumentNullException.ThrowIfNull(quantityQualities);
+
+        if (resolution == Resolution.Month)
+        {
+            return null;
+        }
+
+        if (!hasPrice)
+        {
+            return CalculatedQuantityQuality.Missing;
+        }
+
+        if (chargeType is ChargeType.Subscription or ChargeType.Fee)
+        {
+            return CalculatedQuantityQuality.Calculated;
+        }
+
+        return (missing: quantityQualities.Contains(Wholesale.CalculationResults.Interfaces.CalculationResults.Model.QuantityQuality.Missing),
+                estimated: quantityQualities.Contains(Wholesale.CalculationResults.Interfaces.CalculationResults.Model.QuantityQuality.Estimated),
+                measured: quantityQualities.Contains(Wholesale.CalculationResults.Interfaces.CalculationResults.Model.QuantityQuality.Measured),
+                calculated: quantityQualities.Contains(Wholesale.CalculationResults.Interfaces.CalculationResults.Model.QuantityQuality.Calculated)) switch
             {
                 (missing: true, estimated: false, measured: false, calculated: false) => CalculatedQuantityQuality
                     .Missing,

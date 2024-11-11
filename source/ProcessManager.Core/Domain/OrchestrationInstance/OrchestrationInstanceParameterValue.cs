@@ -43,8 +43,8 @@ public class OrchestrationInstanceParameterValue
         SerializedParameterValue = JsonSerializer.Serialize(instance);
     }
 
-    public ExpandoObject? AsExpandoObject()
+    public ExpandoObject AsExpandoObject()
     {
-        return JsonSerializer.Deserialize<ExpandoObject>(SerializedParameterValue);
+        return JsonSerializer.Deserialize<ExpandoObject>(SerializedParameterValue) ?? new ExpandoObject();
     }
 }

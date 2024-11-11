@@ -15,9 +15,10 @@
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
-using Energinet.DataHub.Edi.Requests;
+using Energinet.DataHub.Wholesale.Edi.Models;
 using Google.Protobuf;
 using ChargeType = Energinet.DataHub.Edi.Requests.ChargeType;
+using WholesaleServicesRequest = Energinet.DataHub.Edi.Requests.WholesaleServicesRequest;
 
 namespace Energinet.DataHub.EDI.Process.Infrastructure.Transactions.WholesaleServices;
 
@@ -39,9 +40,53 @@ public static class WholesaleServicesRequestFactory
         return message;
     }
 
-    private static WholesaleServicesRequest CreateWholesaleServicesRequest(WholesaleServicesProcess process)
+    public static WholesaleServicesRequest CreateWholesaleServicesRequest(WholesaleServicesProcess process)
     {
-        var request = new WholesaleServicesRequest()
+        var request = new WholesaleServicesRequest
+        {
+            RequestedForActorNumber = process.OriginalActor.ActorNumber.Value,
+            RequestedForActorRole = process.OriginalActor.ActorRole.Name,
+            BusinessReason = process.BusinessReason.Name,
+            PeriodStart = process.StartOfPeriod,
+        };
+
+        if (process.EndOfPeriod != null)
+            request.PeriodEnd = process.EndOfPeriod;
+
+        if (process.Resolution != null)
+            request.Resolution = Resolution.TryGetNameFromCode(process.Resolution, fallbackValue: process.Resolution);
+
+        if (process.EnergySupplierId != null)
+            request.EnergySupplierId = process.EnergySupplierId;
+
+        if (process.ChargeOwner != null)
+            request.ChargeOwnerId = process.ChargeOwner;
+
+        if (process.GridAreas.Count > 0)
+            request.GridAreaCodes.AddRange(process.GridAreas);
+
+        if (process.SettlementVersion != null)
+            request.SettlementVersion = process.SettlementVersion.Name;
+
+        foreach (var chargeType in process.ChargeTypes)
+        {
+            var ct = new ChargeType();
+
+            if (chargeType.Id != null)
+                ct.ChargeCode = chargeType.Id;
+
+            if (chargeType.Type != null)
+                ct.ChargeType_ = MapChargeType(chargeType.Type);
+
+            request.ChargeTypes.Add(ct);
+        }
+
+        return request;
+    }
+
+    public static WholesaleServicesRequest CreateWholesaleServicesRequest(RequestWholesaleServicesTransaction process)
+    {
+        var request = new WholesaleServicesRequest
         {
             RequestedForActorNumber = process.OriginalActor.ActorNumber.Value,
             RequestedForActorRole = process.OriginalActor.ActorRole.Name,

@@ -16,27 +16,36 @@ using System.Dynamic;
 
 namespace Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 
-public class OrchestrationInstanceDto
+/// <summary>
+/// Represents the instance of an orchestration.
+/// It contains state information about the instance.
+/// </summary>
+public record OrchestrationInstanceDto(
+    Guid Id,
+    OrchestrationInstanceLifecycleStatesDto Lifecycle,
+    ExpandoObject ParameterValue,
+    IReadOnlyCollection<OrchestrationStepDto> Steps,
+    string CustomState)
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; } = Id;
 
     /// <summary>
     /// The high-level lifecycle states that all orchestration instances can go through.
     /// </summary>
-    public OrchestrationInstanceLifecycleStatesDto? Lifecycle { get; set; }
+    public OrchestrationInstanceLifecycleStatesDto Lifecycle { get; } = Lifecycle;
 
     /// <summary>
     /// Contains the Durable Functions orchestration input parameter value.
     /// </summary>
-    public ExpandoObject? ParameterValue { get; set; }
+    public ExpandoObject ParameterValue { get; } = ParameterValue;
 
     /// <summary>
     /// Workflow steps the orchestration instance is going through.
     /// </summary>
-    public IReadOnlyCollection<OrchestrationStepDto>? Steps { get; set; }
+    public IReadOnlyCollection<OrchestrationStepDto> Steps { get; } = Steps;
 
     /// <summary>
     /// Any custom state of the orchestration instance.
     /// </summary>
-    public string? CustomState { get; set; }
+    public string CustomState { get; } = CustomState;
 }

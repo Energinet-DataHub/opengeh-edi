@@ -38,10 +38,21 @@ public class OrchestrationStepLifecycleState
 
     public OrchestrationStepTerminationStates? TerminationState { get; private set; }
 
+    /// <summary>
+    /// The time when the orchestration step was created (State => Pending).
+    /// </summary>
     public Instant CreatedAt { get; }
 
+    /// <summary>
+    /// The time when the Process Manager was used from Durable Functions to
+    /// transition the state to Running.
+    /// </summary>
     public Instant? StartedAt { get; private set; }
 
+    /// <summary>
+    /// The time when the Process Manager was used from Durable Functions to
+    /// transition the state to Terminated.
+    /// </summary>
     public Instant? TerminatedAt { get; private set; }
 
     public void TransitionToRunning(IClock clock)

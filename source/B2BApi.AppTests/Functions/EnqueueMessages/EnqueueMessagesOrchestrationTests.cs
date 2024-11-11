@@ -64,8 +64,8 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        if (Fixture.DatabricksSchemaManager.SchemaExists)
-            await Fixture.DatabricksSchemaManager.DropSchemaAsync();
+        if (Fixture.EdiDatabricksSchemaManager.SchemaExists)
+            await Fixture.EdiDatabricksSchemaManager.DropSchemaAsync();
 
         Fixture.SetTestOutputHelper(null!);
     }
@@ -83,8 +83,6 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventForBalanceFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
-        EnableEnqueueMessagesOrchestration();
-
         var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
         var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
         var perBrpAndEsGridAreaDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
@@ -180,8 +178,6 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_CalculationOrchestrationId_When_CalculationCompletedEventForWholesaleFixingIsHandled_Then_OrchestrationCompletesWithExpectedServiceBusMessage()
     {
         // Arrange
-        EnableEnqueueMessagesOrchestration();
-
         var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
         var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
         var perBrpAndEsGridAreaDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
@@ -281,8 +277,6 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_DatabricksHasNoData_When_CalculationCompletedEventIsHandled_Then_OrchestrationIsStartedButActivitiesWillFailAndBeRetriedForever()
     {
         // Arrange
-        EnableEnqueueMessagesOrchestration();
-
         var calculationId = Guid.NewGuid().ToString();
         var calculationOrchestrationId = Guid.NewGuid().ToString();
         var calculationCompletedEventMessage = CreateCalculationCompletedEventMessage(
@@ -346,8 +340,6 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_WholesaleResultsContainsAnInvalidRow_When_CalculationCompletedEventForWholesaleFixing_Then_EnqueueAllValidMessages()
     {
         // Arrange
-        EnableEnqueueMessagesOrchestration();
-
         var forAmountPerChargeDescription = new WholesaleResultForAmountPerChargeDescription();
         var forMonthlyAmountPerChargeDescription = new WholesaleResultForMonthlyAmountPerChargeDescription();
         var forTotalAmountDescription = new WholesaleResultForTotalAmountDescription();
@@ -412,8 +404,6 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     public async Task Given_EnergyResultsContainsAnInvalidRow_When_CalculationCompletedEventForBalanceFixing_Then_EnqueueAllValidMessages()
     {
         // Arrange
-        EnableEnqueueMessagesOrchestration();
-
         var perGridAreaDataDescription = new EnergyResultPerGridAreaDescription();
         var perBrpGridAreaDataDescription = new EnergyResultPerBrpGridAreaDescription();
         var perBrpAndEsGridAreaDataDescription = new EnergyResultPerEnergySupplierBrpGridAreaDescription();
@@ -513,7 +503,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
         params TestDataDescription[] testDataDescriptions)
     {
         await ResetDatabricks();
-        var ediDatabricksOptions = Options.Create(new EdiDatabricksOptions { DatabaseName = Fixture.DatabricksSchemaManager.SchemaName });
+        var ediDatabricksOptions = Options.Create(new EdiDatabricksOptions { DatabaseName = Fixture.EdiDatabricksSchemaManager.SchemaName });
 
         var tasks = new List<Task>();
         foreach (var testDataDescription in testDataDescriptions)
@@ -569,7 +559,7 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
     {
         // Ensure that databricks does not contain data, unless the test explicit adds it
         await ResetDatabricks();
-        var ediDatabricksOptions = Options.Create(new EdiDatabricksOptions { DatabaseName = Fixture.DatabricksSchemaManager.SchemaName });
+        var ediDatabricksOptions = Options.Create(new EdiDatabricksOptions { DatabaseName = Fixture.EdiDatabricksSchemaManager.SchemaName });
 
         // TODO: Separate schema information from query
         var perGridAreaQuery = new EnergyResultPerGridAreaQuery(null!, ediDatabricksOptions.Value, null!, null!, perGridAreaDataDescription.CalculationId);
@@ -597,25 +587,20 @@ public class EnqueueMessagesOrchestrationTests : IAsyncLifetime
 
     private async Task ResetDatabricks()
     {
-        if (Fixture.DatabricksSchemaManager.SchemaExists)
-            await Fixture.DatabricksSchemaManager.DropSchemaAsync();
+        if (Fixture.EdiDatabricksSchemaManager.SchemaExists)
+            await Fixture.EdiDatabricksSchemaManager.DropSchemaAsync();
 
-        await Fixture.DatabricksSchemaManager.CreateSchemaAsync();
+        await Fixture.EdiDatabricksSchemaManager.CreateSchemaAsync();
     }
 
     private async Task SeedDatabricksWithDataAsync(string testFilePath, IDeltaTableSchemaDescription schemaInformation)
     {
-        await Fixture.DatabricksSchemaManager.CreateTableAsync(schemaInformation.DataObjectName, schemaInformation.SchemaDefinition);
-        await Fixture.DatabricksSchemaManager.InsertFromCsvFileAsync(schemaInformation.DataObjectName, schemaInformation.SchemaDefinition, testFilePath);
+        await Fixture.EdiDatabricksSchemaManager.CreateTableAsync(schemaInformation.DataObjectName, schemaInformation.SchemaDefinition);
+        await Fixture.EdiDatabricksSchemaManager.InsertFromCsvFileAsync(schemaInformation.DataObjectName, schemaInformation.SchemaDefinition, testFilePath);
     }
 
     private async Task AddGridAreaOwner(ActorNumber actorNumber, string gridAreaCode)
     {
         await Fixture.DatabaseManager.AddGridAreaOwnerAsync(actorNumber, gridAreaCode);
-    }
-
-    private void EnableEnqueueMessagesOrchestration()
-    {
-        Fixture.EnsureAppHostUsesFeatureFlagValue(enableCalculationCompletedEvent: true);
     }
 }
