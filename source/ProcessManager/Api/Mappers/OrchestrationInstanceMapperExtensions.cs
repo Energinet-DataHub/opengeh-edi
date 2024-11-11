@@ -41,7 +41,7 @@ internal static class OrchestrationInstanceMapperExtensions
                     ignoreCase: true,
                     out var lifecycleStateResult)
                 ? lifecycleStateResult
-                : throw new InvalidOperationException($"Invalid state '{entity.State}'; cannot be mapped."),
+                : throw new InvalidOperationException($"Invalid State '{entity.State}'; cannot be mapped."),
             TerminationState: Enum
                 .TryParse<ApiModel.OrchestrationInstanceTerminationStates>(
                     entity.TerminationState.ToString(),
@@ -56,29 +56,28 @@ internal static class OrchestrationInstanceMapperExtensions
             TerminatedAt: entity.TerminatedAt?.ToDateTimeOffset());
     }
 
-    public static ApiModel.OrchestrationStepDto MapToDto(
-        this DomainModel.OrchestrationStep entity)
+    public static ApiModel.StepInstanceDto MapToDto(
+        this DomainModel.StepInstance entity)
     {
-        return new ApiModel.OrchestrationStepDto(
+        return new ApiModel.StepInstanceDto(
             Id: entity.Id.Value,
             Lifecycle: entity.Lifecycle.MapToDto(),
             Description: entity.Description,
             Sequence: entity.Sequence,
-            DependsOn: entity.DependsOn?.Value,
             CustomState: entity.CustomState.Value);
     }
 
-    public static ApiModel.OrchestrationStepLifecycleStateDto MapToDto(
-        this DomainModel.OrchestrationStepLifecycleState entity)
+    public static ApiModel.StepInstanceLifecycleStateDto MapToDto(
+        this DomainModel.StepInstanceLifecycleState entity)
     {
-        return new ApiModel.OrchestrationStepLifecycleStateDto(
+        return new ApiModel.StepInstanceLifecycleStateDto(
             State: Enum
-                .TryParse<ApiModel.OrchestrationStepLifecycleStates>(
+                .TryParse<ApiModel.StepInstanceLifecycleStates>(
                     entity.State.ToString(),
                     ignoreCase: true,
                     out var lifecycleStateResult)
                 ? lifecycleStateResult
-                : throw new InvalidOperationException($"Invalid state '{entity.State}'; cannot be mapped."),
+                : throw new InvalidOperationException($"Invalid State '{entity.State}'; cannot be mapped."),
             TerminationState: Enum
                 .TryParse<ApiModel.OrchestrationStepTerminationStates>(
                     entity.TerminationState.ToString(),
@@ -86,7 +85,6 @@ internal static class OrchestrationInstanceMapperExtensions
                     out var terminationStateResult)
                 ? terminationStateResult
                 : null,
-            CreatedAt: entity.CreatedAt.ToDateTimeOffset(),
             StartedAt: entity.StartedAt?.ToDateTimeOffset(),
             TerminatedAt: entity.TerminatedAt?.ToDateTimeOffset());
     }

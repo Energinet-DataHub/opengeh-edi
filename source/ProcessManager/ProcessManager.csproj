@@ -35,9 +35,9 @@
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceDto.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStates.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStates.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStatesDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationInstanceLifecycleStatesDto.cs" />
-    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationStepDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationStepDto.cs" />
-    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationStepLifecycleStateDto.cs" Link="Api\Model\OrchestrationInstance\OrchestrationStepLifecycleStateDto.cs" />
-    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\OrchestrationStepLifecycleStates.cs" Link="Api\Model\OrchestrationInstance\OrchestrationStepLifecycleStates.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\StepInstanceDto.cs" Link="Api\Model\OrchestrationInstance\StepInstanceDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\StepInstanceLifecycleStateDto.cs" Link="Api\Model\OrchestrationInstance\StepInstanceLifecycleStateDto.cs" />
+    <Compile Include="..\Shared\ProcessManager\Api\Model\OrchestrationInstance\StepInstanceLifecycleStates.cs" Link="Api\Model\OrchestrationInstance\StepInstanceLifecycleStates.cs" />
     <Compile Include="..\Shared\ProcessManager\Api\Model\ScheduleOrchestrationInstanceDto.cs" Link="Api\Model\ScheduleOrchestrationInstanceDto.cs" />
   </ItemGroup>
 </Project>

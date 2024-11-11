@@ -24,7 +24,9 @@ namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 /// </summary>
 public class OrchestrationInstance
 {
-    public OrchestrationInstance(
+    private readonly List<StepInstance> _steps;
+
+    private OrchestrationInstance(
         OrchestrationDescriptionId orchestrationDescriptionId,
         IClock clock,
         Instant? runAt = default)
@@ -32,8 +34,10 @@ public class OrchestrationInstance
         Id = new OrchestrationInstanceId(Guid.NewGuid());
         Lifecycle = new OrchestrationInstanceLifecycleState(clock, runAt);
         ParameterValue = new();
-        Steps = [];
         CustomState = new OrchestrationInstanceCustomState(string.Empty);
+
+        _steps = [];
+        Steps = _steps.AsReadOnly();
 
         OrchestrationDescriptionId = orchestrationDescriptionId;
     }
@@ -58,12 +62,13 @@ public class OrchestrationInstance
     /// <summary>
     /// Contains the Durable Functions orchestration input parameter value.
     /// </summary>
-    public OrchestrationInstanceParameterValue ParameterValue { get; }
+    public ParameterValue ParameterValue { get; }
 
     /// <summary>
-    /// Workflow steps the orchestration instance is going through.
+    /// Steps the orchestration instance is going through, and which should be
+    /// visible to the users (e.g. shown in the UI).
     /// </summary>
-    public IList<OrchestrationStep> Steps { get; }
+    public IReadOnlyCollection<StepInstance> Steps { get; }
 
     /// <summary>
     /// Any custom state of the orchestration instance.
@@ -75,4 +80,51 @@ public class OrchestrationInstance
     /// the workflow that the orchestration instance is an instance of.
     /// </summary>
     internal OrchestrationDescriptionId OrchestrationDescriptionId { get; }
+
+    /// <summary>
+    /// Factory method that ensures domain rules are obeyed when creating a new
+    /// orchestration instance.
+    /// </summary>
+    internal static OrchestrationInstance CreateFromDescription(
+        OrchestrationDescription.OrchestrationDescription description,
+        IReadOnlyCollection<int> skipStepsBySequence,
+        IClock clock,
+        Instant? runAt = default)
+    {
+        foreach (var stepSequence in skipStepsBySequence)
+        {
+            var stepOrDefault = description.Steps.FirstOrDefault(step => step.Sequence == stepSequence);
+            if (stepOrDefault == null)
+                throw new InvalidOperationException($"No step description matches the sequence '{stepSequence}'.");
+
+            if (stepOrDefault.CanBeSkipped == false)
+                throw new InvalidOperationException($"Step description with sequence '{stepSequence}' cannot be skipped.");
+        }
+
+        if (runAt.HasValue && description.CanBeScheduled == false)
+            throw new InvalidOperationException("Orchestration description cannot be scheduled.");
+
+        var orchestrationInstance = new OrchestrationInstance(
+            description.Id,
+            clock,
+            runAt);
+
+        foreach (var stepDefinition in description.Steps)
+        {
+            var stepInstance = new StepInstance(
+                orchestrationInstance.Id,
+                stepDefinition.Description,
+                stepDefinition.Sequence,
+                stepDefinition.CanBeSkipped);
+
+            if (skipStepsBySequence.Contains(stepInstance.Sequence))
+            {
+                stepInstance.Lifecycle.TransitionToTerminated(clock, OrchestrationStepTerminationStates.Skipped);
+            }
+
+            orchestrationInstance._steps.Add(stepInstance);
+        }
+
+        return orchestrationInstance;
+    }
 }

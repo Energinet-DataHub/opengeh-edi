@@ -25,7 +25,8 @@ public interface IOrchestrationInstanceManager
     Task<OrchestrationInstanceId> StartNewOrchestrationInstanceAsync<TParameter>(
         string name,
         int version,
-        TParameter inputParameter)
+        TParameter inputParameter,
+        IReadOnlyCollection<int> skipStepsBySequence)
             where TParameter : class;
 
     /// <summary>
@@ -35,7 +36,8 @@ public interface IOrchestrationInstanceManager
         string name,
         int version,
         TParameter inputParameter,
-        Instant runAt)
+        Instant runAt,
+        IReadOnlyCollection<int> skipStepsBySequence)
             where TParameter : class;
 
     /// <summary>

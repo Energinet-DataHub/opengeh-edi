@@ -12,32 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using NodaTime;
-
-namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
+namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 
 /// <summary>
-/// Represents the instance of a workflow (orchestration) step.
-/// It contains state information about the step, and is linked
-/// to the orchestration instance that it is part of.
+/// Describes an orchestration step that should be visible to the user
+/// (e.g. shown in the UI).
+/// It is linked to the orchestration description that it is part of.
 /// </summary>
-public class OrchestrationStep
+public class StepDescription
 {
-    public OrchestrationStep(
-        OrchestrationInstanceId orchestrationInstanceId,
-        IClock clock,
+    internal StepDescription(
+        OrchestrationDescriptionId orchestrationDescriptionId,
         string description,
         int sequence,
-        OrchestrationStepId? dependsOn = default)
+        bool canBeSkipped,
+        string skipReason)
     {
-        Id = new OrchestrationStepId(Guid.NewGuid());
-        Lifecycle = new OrchestrationStepLifecycleState(clock);
+        Id = new StepDescriptionId(Guid.NewGuid());
         Description = description;
         Sequence = sequence;
-        DependsOn = dependsOn;
-        CustomState = new OrchestrationStepCustomState(string.Empty);
 
-        OrchestrationInstanceId = orchestrationInstanceId;
+        CanBeSkipped = canBeSkipped;
+        SkipReason = skipReason;
+
+        OrchestrationDescriptionId = orchestrationDescriptionId;
     }
 
     /// <summary>
@@ -45,31 +43,35 @@ public class OrchestrationStep
     /// </summary>
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     // ReSharper disable once UnusedMember.Local -- Used by Entity Framework
-    private OrchestrationStep()
+    private StepDescription()
     {
     }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-    public OrchestrationStepId Id { get; }
+    public StepDescriptionId Id { get; }
+
+    public string Description { get; }
 
     /// <summary>
-    /// The high-level lifecycle states that all orchestration steps can go through.
+    /// The steps number in the list of steps.
+    /// The sequence of the first step in the list is 1.
     /// </summary>
-    public OrchestrationStepLifecycleState Lifecycle { get; }
-
-    public string? Description { get; }
-
     public int Sequence { get; }
 
-    public OrchestrationStepId? DependsOn { get; }
+    /// <summary>
+    /// Specifies if the step supports beeing skipped.
+    /// If <see langword="false"/> then the step cannot be transitioned
+    /// to the Skipped state.
+    /// </summary>
+    public bool CanBeSkipped { get; }
 
     /// <summary>
-    /// Any custom state of the step.
+    /// A development note allowing developers to describe possible reasons for skipping this step.
     /// </summary>
-    public OrchestrationStepCustomState CustomState { get; }
+    public string SkipReason { get; }
 
     /// <summary>
-    /// The orchestration instance which this step is part of.
+    /// The orchestration description which this step is part of.
     /// </summary>
-    public OrchestrationInstanceId OrchestrationInstanceId { get; }
+    internal OrchestrationDescriptionId OrchestrationDescriptionId { get; }
 }
