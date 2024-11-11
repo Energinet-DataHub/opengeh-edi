@@ -17,7 +17,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErr
 public class NotSupportedBusinessType : ValidationError
 {
     public NotSupportedBusinessType(string? businessType)
-        : base($"The business type {businessType ?? "null"} is not supported", "00403", "BusinessType")
+        : base($"The business type {businessType ?? "null"} is not supported", "00403", "BusinessType does not match the Business Message in Payload", "B2B-006", "BusinessType")
     {
     }
 }

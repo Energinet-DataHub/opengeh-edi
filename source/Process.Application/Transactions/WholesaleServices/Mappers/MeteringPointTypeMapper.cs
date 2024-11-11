@@ -41,4 +41,27 @@ public static class MeteringPointTypeMapper
             _ => throw new ArgumentOutOfRangeException(nameof(meteringPointType), meteringPointType, "Unknown metering point type"),
         };
     }
+
+    public static MeteringPointType Map(Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType meteringPointType)
+    {
+        return meteringPointType switch
+        {
+            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.Production => MeteringPointType.Production,
+            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.Consumption => MeteringPointType.Consumption,
+            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.VeProduction => MeteringPointType.VeProduction,
+            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.NetProduction => MeteringPointType.NetProduction,
+            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.SupplyToGrid => MeteringPointType.SupplyToGrid,
+            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.ConsumptionFromGrid => MeteringPointType.ConsumptionFromGrid,
+            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.WholesaleServicesInformation => MeteringPointType.WholesaleServicesInformation,
+            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.OwnProduction => MeteringPointType.OwnProduction,
+            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.NetFromGrid => MeteringPointType.NetFromGrid,
+            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.NetToGrid => MeteringPointType.NetToGrid,
+            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.TotalConsumption => MeteringPointType.TotalConsumption,
+            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.ElectricalHeating => MeteringPointType.ElectricalHeating,
+            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.NetConsumption => MeteringPointType.NetConsumption,
+            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.EffectSettlement => MeteringPointType.EffectSettlement,
+            Wholesale.CalculationResults.Interfaces.CalculationResults.Model.MeteringPointType.Exchange => MeteringPointType.Exchange,
+            _ => throw new ArgumentOutOfRangeException(nameof(meteringPointType), meteringPointType, "Unknown metering point type"),
+        };
+    }
 }

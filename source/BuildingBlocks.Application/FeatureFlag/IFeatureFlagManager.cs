@@ -40,6 +40,11 @@ public interface IFeatureFlagManager
     Task<bool> ReceiveMeteredDataForMeasurementPointsAsync();
 
     /// <summary>
+    /// Whether to use the RequestWholesaleServices process orchestration.
+    /// </summary>
+    Task<bool> UseRequestWholesaleServicesProcessOrchestrationAsync();
+
+    /// <summary>
     /// Whether to use the new incoming message parser.
     /// </summary>
     Task<bool> UseNewIncomingMessageParserAsync();

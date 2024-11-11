@@ -57,10 +57,107 @@ public abstract class BaseEnumMapperTests
         }
     }
 
+    protected static void EnsureCanMapOrThrows<TEnum>(
+        Action performMapping,
+        TEnum value,
+        params TEnum[] invalidValues)
+        where TEnum : Enum
+    {
+        // Act
+        var act = performMapping;
+
+        // Assert
+        if (ValueIsValid(value, invalidValues))
+        {
+            act.Should().NotThrow();
+        }
+        else if (invalidValues.Contains(value))
+        {
+            act.Should().Throw<InvalidOperationException>();
+        }
+        else
+        {
+            act.Should().Throw<ArgumentOutOfRangeException>();
+        }
+    }
+
+    protected static void EnsureCanMapOrReturnsNull<TEnumInput, TEnumResult>(
+        Func<TEnumResult?> performMapping,
+        TEnumInput value,
+        TEnumInput unspecifiedValue,
+        TEnumInput? notSupportedValue = default,
+        params TEnumInput[] invalidValues)
+        where TEnumInput : Enum
+    {
+        ArgumentNullException.ThrowIfNull(performMapping);
+
+        // Act
+        var act = performMapping;
+
+        // Assert
+        if (ValueIsValid(value, unspecifiedValue, notSupportedValue, invalidValues))
+        {
+            var result = act.Should().NotThrow().Subject;
+            result.Should().NotBeNull();
+        }
+        else if (invalidValues.Contains(value))
+        {
+            var result = act();
+            result.Should().BeNull();
+        }
+        else if (value.Equals(unspecifiedValue))
+        {
+            act.Should().Throw<InvalidOperationException>();
+        }
+        else if (notSupportedValue is not null && value.Equals(notSupportedValue))
+        {
+            act.Should().Throw<NotSupportedException>();
+        }
+        else
+        {
+            act.Should().Throw<ArgumentOutOfRangeException>();
+        }
+    }
+
+    protected static void EnsureCanMapOrReturnsNull<TEnumInput, TEnumResult>(
+        Func<TEnumResult?> performMapping,
+        TEnumInput value,
+        params TEnumInput[] invalidValues)
+        where TEnumInput : Enum
+    {
+        ArgumentNullException.ThrowIfNull(performMapping);
+
+        // Act
+        var act = performMapping;
+
+        // Assert
+        if (ValueIsValid(value, invalidValues))
+        {
+            act.Should().NotThrow();
+        }
+        else if (invalidValues.Contains(value))
+        {
+            var result = act();
+            result.Should().BeNull();
+        }
+        else
+        {
+            act.Should().Throw<ArgumentOutOfRangeException>();
+        }
+    }
+
     private static bool ValueIsValid<TEnum>(TEnum value, TEnum? unspecifiedValue, TEnum? notSupportedValue, params TEnum[] invalidValues)
         where TEnum : Enum
     {
         var valid = (int)(object)value != InvalidEnumNumber && !value.Equals(unspecifiedValue) && !value.Equals(notSupportedValue) && !invalidValues.Contains(value);
+
+        return valid;
+    }
+
+    private static bool ValueIsValid<TEnum>(TEnum value, params TEnum[] invalidValues)
+        where TEnum : Enum
+    {
+        var valid = (int)(object)value != InvalidEnumNumber && !invalidValues.Contains(value);
 
         return valid;
     }

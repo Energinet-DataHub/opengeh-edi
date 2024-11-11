@@ -16,16 +16,22 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErr
 
 public abstract class ValidationError
 {
-    protected ValidationError(string message, string code, string? target = null)
+    protected ValidationError(string message, string code, string ebixMessage, string ebixCode, string? target = null)
     {
         Message = message;
         Code = code;
+        EbixMessage = ebixMessage;
+        EbixCode = ebixCode;
         Target = target;
     }
 
     public string Message { get; }
 
     public string Code { get; }
+
+    public string EbixMessage { get; }
+
+    public string EbixCode { get; }
 
     public string? Target { get; }
 

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json.Serialization;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 
 namespace Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
@@ -26,6 +27,7 @@ public sealed class BusinessReason : DataHubTypeWithUnused<BusinessReason>
     public static readonly BusinessReason PeriodicMetering = new(DataHubNames.BusinessReason.PeriodicMetering, "E23");
     public static readonly BusinessReason PeriodicFlexMetering = new(DataHubNames.BusinessReason.PeriodicFlexMetering, "D42");
 
+    [JsonConstructor]
     private BusinessReason(string name, string code, bool isUnused = false)
      : base(name, code, isUnused) { }
 }

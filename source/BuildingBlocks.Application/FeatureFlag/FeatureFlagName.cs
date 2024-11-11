@@ -36,6 +36,11 @@ public enum FeatureFlagName
     ReceiveMeteredDataForMeasurementPoints,
 
     /// <summary>
+    /// Whether to use orchestration for handling RequestWholesaleServices processes.
+    /// </summary>
+    UseRequestWholesaleServicesProcessOrchestration,
+
+    /// <summary>
     /// Whether to use the new incoming message parser.
     /// </summary>
     UseNewIncomingMessageParser,

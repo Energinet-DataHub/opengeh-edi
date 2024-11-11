@@ -14,19 +14,44 @@
 
 namespace Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 
-public class OrchestrationInstanceLifecycleStatesDto
+public record OrchestrationInstanceLifecycleStatesDto(
+    OrchestrationInstanceLifecycleStates State,
+    OrchestrationInstanceTerminationStates? TerminationState,
+    DateTimeOffset CreatedAt,
+    DateTimeOffset? ScheduledToRunAt,
+    DateTimeOffset? QueuedAt,
+    DateTimeOffset? StartedAt,
+    DateTimeOffset? TerminatedAt)
 {
-    public OrchestrationInstanceLifecycleStates? State { get; set; }
+    public OrchestrationInstanceLifecycleStates State { get; } = State;
 
-    public OrchestrationInstanceTerminationStates? TerminationState { get; set; }
+    public OrchestrationInstanceTerminationStates? TerminationState { get; } = TerminationState;
 
-    public DateTimeOffset CreatedAt { get; set; }
+    /// <summary>
+    /// The time when the orchestration instance was created (State => Pending).
+    /// </summary>
+    public DateTimeOffset CreatedAt { get; } = CreatedAt;
 
-    public DateTimeOffset? ScheduledToRunAt { get; set; }
+    /// <summary>
+    /// The time when the orchestration instance should be executed by the Scheduler.
+    /// </summary>
+    public DateTimeOffset? ScheduledToRunAt { get; } = ScheduledToRunAt;
 
-    public DateTimeOffset? QueuedAt { get; set; }
+    /// <summary>
+    /// The time when the Process Manager has queued the orchestration instance
+    /// for execution by Durable Functions (State => Queued).
+    /// </summary>
+    public DateTimeOffset? QueuedAt { get; } = QueuedAt;
 
-    public DateTimeOffset? StartedAt { get; set; }
+    /// <summary>
+    /// The time when the Process Manager was used from Durable Functions to
+    /// transition the state to Running.
+    /// </summary>
+    public DateTimeOffset? StartedAt { get; } = StartedAt;
 
-    public DateTimeOffset? TerminatedAt { get; set; }
+    /// <summary>
+    /// The time when the Process Manager was used from Durable Functions to
+    /// transition the state to Terminated.
+    /// </summary>
+    public DateTimeOffset? TerminatedAt { get; } = TerminatedAt;
 }

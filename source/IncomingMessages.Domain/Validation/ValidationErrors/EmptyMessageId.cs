@@ -17,7 +17,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErr
 public class EmptyMessageId : ValidationError
 {
     public EmptyMessageId()
-        : base($"The id of the message cannot be empty", "00201", "MessageId")
+        : base($"The id of the message cannot be empty", "00201", "The provided Ids are not unique and have been used before", "B2B-003", "MessageId")
     {
     }
 }
