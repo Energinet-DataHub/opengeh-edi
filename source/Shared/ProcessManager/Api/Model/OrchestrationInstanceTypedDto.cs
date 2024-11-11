@@ -25,7 +25,7 @@ public record OrchestrationInstanceTypedDto<TParameterDto>(
     Guid Id,
     OrchestrationInstanceLifecycleStatesDto Lifecycle,
     TParameterDto ParameterValue,
-    IReadOnlyCollection<OrchestrationStepDto> Steps,
+    IReadOnlyCollection<StepInstanceDto> Steps,
     string CustomState)
         where TParameterDto : class
 {
@@ -44,7 +44,7 @@ public record OrchestrationInstanceTypedDto<TParameterDto>(
     /// <summary>
     /// Workflow steps the orchestration instance is going through.
     /// </summary>
-    public IReadOnlyCollection<OrchestrationStepDto> Steps { get; } = Steps;
+    public IReadOnlyCollection<StepInstanceDto> Steps { get; } = Steps;
 
     /// <summary>
     /// Any custom state of the orchestration instance.

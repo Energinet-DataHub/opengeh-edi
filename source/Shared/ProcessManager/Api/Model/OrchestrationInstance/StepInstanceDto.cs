@@ -19,12 +19,11 @@ namespace Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 /// It contains state information about the step, and is linked
 /// to the orchestration instance that it is part of.
 /// </summary>
-public record OrchestrationStepDto(
+public record StepInstanceDto(
     Guid Id,
-    OrchestrationStepLifecycleStateDto Lifecycle,
-    string? Description,
+    StepInstanceLifecycleStateDto Lifecycle,
+    string Description,
     int Sequence,
-    Guid? DependsOn,
     string CustomState)
 {
     public Guid Id { get; } = Id;
@@ -32,13 +31,15 @@ public record OrchestrationStepDto(
     /// <summary>
     /// The high-level lifecycle states that all orchestration steps can go through.
     /// </summary>
-    public OrchestrationStepLifecycleStateDto Lifecycle { get; } = Lifecycle;
+    public StepInstanceLifecycleStateDto Lifecycle { get; } = Lifecycle;
 
-    public string? Description { get; } = Description;
+    public string Description { get; } = Description;
 
+    /// <summary>
+    /// The steps number in the list of steps.
+    /// The sequence of the first step in the list is 1.
+    /// </summary>
     public int Sequence { get; } = Sequence;
-
-    public Guid? DependsOn { get; } = DependsOn;
 
     /// <summary>
     /// Any custom state of the step.

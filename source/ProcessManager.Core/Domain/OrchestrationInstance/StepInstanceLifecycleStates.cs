@@ -17,7 +17,7 @@ namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 /// <summary>
 /// High-level lifecycle states that all orchestration steps can go through.
 /// </summary>
-public enum OrchestrationStepLifecycleStates
+public enum StepInstanceLifecycleStates
 {
     /// <summary>
     /// Created and waiting to be started.
@@ -41,4 +41,6 @@ public enum OrchestrationStepTerminationStates
     Succeeded = 1,
 
     Failed = 2,
+
+    Skipped = 3,
 }
