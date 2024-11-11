@@ -72,14 +72,14 @@ public class OrchestrationParameterDefinitionTests
     /// DOES NOT work if the parameter use the 'NodaTime.Instant' type.
     /// </summary>
     public sealed record OrchestrationParameterExample01(
-        DateTimeOffset ScheduledAt,
+        DateTimeOffset RunAt,
         bool IsInternal);
 
     /// <summary>
     /// Example orchestration parameter for testing purposes.
     /// </summary>
     public sealed record OrchestrationParameterExample02(
-        DateTimeOffset ScheduledAt,
+        DateTimeOffset RunAt,
         bool IsInternal);
 
     /// <summary>

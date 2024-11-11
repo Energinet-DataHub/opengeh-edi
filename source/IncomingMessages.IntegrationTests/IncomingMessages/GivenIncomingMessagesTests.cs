@@ -267,8 +267,8 @@ public sealed class GivenIncomingMessagesTests : IncomingMessagesTestBase
         IncomingMarketMessageStream incomingMarketMessageStream)
     {
         // Arrange
-        const string exceptedDuplicateTransactionIdDetectedErrorCode = "00102";
-        const string exceptedDuplicateMessageIdDetectedErrorCode = "00101";
+        var exceptedDuplicateTransactionIdDetectedErrorCode = format == DocumentFormat.Ebix ? "B2B-009" : "00102";
+        var exceptedDuplicateMessageIdDetectedErrorCode = format == DocumentFormat.Ebix ? "B2B-003" : "00101";
 
         var authenticatedActor = GetService<AuthenticatedActor>();
         var senderActorNumber = ActorNumber.Create("5799999933318");

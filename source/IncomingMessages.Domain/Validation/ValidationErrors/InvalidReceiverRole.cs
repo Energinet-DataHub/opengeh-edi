@@ -17,7 +17,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErr
 public class InvalidReceiverRole : ValidationError
 {
     public InvalidReceiverRole()
-        : base("Invalid receiver role", "00304", "marketRole.type")
+        : base("Invalid receiver role", "00304", "Invalid recipient", "B2B-011", "marketRole.type")
     {
     }
 }

@@ -12,15 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.ProcessManager.Tests.Fixtures;
+namespace Energinet.DataHub.ProcessManager.Api.Model;
 
-/// <summary>
-/// A xUnit collection fixture for ensuring tests don't run in parallel.
-///
-/// xUnit documentation of collection fixtures:
-///  * https://xunit.net/docs/shared-context#collection-fixture
-/// </summary>
-[CollectionDefinition(nameof(ProcessManagerAppCollectionFixture))]
-public class ProcessManagerAppCollectionFixture : ICollectionFixture<ProcessManagerAppFixture>
-{
-}
+public sealed record ScheduleOrchestrationInstanceDto<TParameter>(
+    DateTimeOffset RunAt,
+    TParameter InputParameter)
+        where TParameter : class;

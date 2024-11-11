@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Dynamic;
 using System.Text.Json;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
@@ -40,5 +41,10 @@ public class OrchestrationInstanceParameterValue
         where TParameter : class
     {
         SerializedParameterValue = JsonSerializer.Serialize(instance);
+    }
+
+    public ExpandoObject AsExpandoObject()
+    {
+        return JsonSerializer.Deserialize<ExpandoObject>(SerializedParameterValue) ?? new ExpandoObject();
     }
 }

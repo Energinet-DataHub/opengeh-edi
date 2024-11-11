@@ -17,7 +17,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErr
 public class InvalidTransactionIdSize : ValidationError
 {
     public InvalidTransactionIdSize(string transactionId)
-        : base($"Transaction id {transactionId} is invalid. Must contain at most 36 characters.", "00205", "transactionId")
+        : base($"Transaction id {transactionId} is invalid. Must contain at most 36 characters.", "00205", "The provided Ids are not unique in the Business Message (e.g. same TransactionId or TimeseriesId used in the same message), or duplicate Ids in requests when calling the SendMessage operation in parallel.", "B2B-009", "transactionId")
     {
     }
 }

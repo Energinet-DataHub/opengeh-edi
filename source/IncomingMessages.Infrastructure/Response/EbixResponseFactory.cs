@@ -42,13 +42,13 @@ public class EbixResponseFactory : IResponseFactory
         writer.WriteStartElement("Error");
         {
             writer.WriteElementString("faultcode", "soapenv:Client");
-            writer.WriteElementString("faultstring", $"{result.Errors.First().Code}:{result.Errors.First().Message}");
+            writer.WriteElementString("faultstring", $"{result.Errors.First().EbixCode}:{result.Errors.First().EbixMessage}");
             writer.WriteStartElement("detail");
             {
                 writer.WriteStartElement("fault");
                 {
-                    writer.WriteElementString("ErrorCode", result.Errors.First().Code);
-                    writer.WriteElementString("ErrorText", result.Errors.First().Message);
+                    writer.WriteElementString("ErrorCode", result.Errors.First().EbixCode);
+                    writer.WriteElementString("ErrorText", result.Errors.First().EbixMessage);
                 }
 
                 writer.WriteEndElement();

@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
+namespace Energinet.DataHub.ProcessManager.Orchestrations.Tests.Fixtures;
 
 /// <summary>
-/// An immutable input to start the <see cref="NotifyAggregatedMeasureDataOrchestrationV1"/>.
+/// A xUnit collection fixture for ensuring tests don't run in parallel.
+///
+/// xUnit documentation of collection fixtures:
+///  * https://xunit.net/docs/shared-context#collection-fixture
 /// </summary>
-public sealed record NotifyAggregatedMeasureDataInputV1(
-    CalculationTypes CalculationType,
-    IReadOnlyCollection<string> GridAreaCodes,
-    DateTimeOffset StartDate,
-    DateTimeOffset EndDate,
-    DateTimeOffset ScheduledAt,
-    bool IsInternalCalculation);
+[CollectionDefinition(nameof(OrchestrationsAppCollection))]
+public class OrchestrationsAppCollection : ICollectionFixture<OrchestrationsAppFixture>
+{
+}

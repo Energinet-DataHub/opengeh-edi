@@ -12,15 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.ProcessManager.Orchestrations.Tests.Fixtures;
+using Energinet.DataHub.EDI.Process.Interfaces;
 
-/// <summary>
-/// A xUnit collection fixture for ensuring tests don't run in parallel.
-///
-/// xUnit documentation of collection fixtures:
-///  * https://xunit.net/docs/shared-context#collection-fixture
-/// </summary>
-[CollectionDefinition(nameof(OrchestrationsAppCollectionFixture))]
-public class OrchestrationsAppCollectionFixture : ICollectionFixture<OrchestrationsAppFixture>
+namespace Energinet.DataHub.EDI.Process.Domain.Transactions;
+
+public interface IRequestProcessOrchestrationStarter
 {
+    Task StartRequestWholesaleServicesOrchestrationAsync(InitializeWholesaleServicesProcessDto initializeProcessDto);
 }

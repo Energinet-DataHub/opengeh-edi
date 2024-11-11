@@ -17,7 +17,7 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErr
 public class NotSupportedProcessType : ValidationError
 {
     public NotSupportedProcessType(string processType)
-        : base($"The process type {processType} is not support", "00402", "ProcessType")
+        : base($"The process type {processType} is not support", "00402", "The user of the SendMessage operation is not allowed to send this type of message (ProcessType) for its role", "B2B-002", "ProcessType")
     {
     }
 }
