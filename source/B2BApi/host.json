@@ -3,6 +3,9 @@
   "extensions": {
     "durableTask": {
       "hubName": "%OrchestrationsTaskHubName%",
+      "storageProvider": {
+        "connectionStringName": "OrchestrationsStorageConnectionString"
+      },
       "tracing": {
         "traceInputsAndOutputs": true
       },
