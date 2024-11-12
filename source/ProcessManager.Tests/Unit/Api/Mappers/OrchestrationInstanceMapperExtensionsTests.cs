@@ -39,49 +39,36 @@ public class OrchestrationInstanceMapperExtensionsTests
 
         // Assert
         var typedDto = JsonSerializer.Deserialize<OrchestrationInstanceTypedDto<TestOrchestrationParameter>>(dtoAsJson);
-        typedDto!.ParameterValue!.TestString.Should().NotBeNull();
-        typedDto!.ParameterValue!.TestInt.Should().NotBeNull();
+        typedDto!.ParameterValue.TestString.Should().NotBeNull();
+        typedDto!.ParameterValue.TestInt.Should().NotBeNull();
     }
 
     private static OrchestrationInstance CreateOrchestrationInstance()
     {
-        var orchestrationDescriptionId = new OrchestrationDescriptionId(Guid.NewGuid());
+        var orchestrationDescription = new OrchestrationDescription(
+            name: "name",
+            version: 1,
+            canBeScheduled: false,
+            functionName: "functionName");
 
-        var existingOrchestrationInstance = new OrchestrationInstance(
-            orchestrationDescriptionId,
+        orchestrationDescription.ParameterDefinition.SetFromType<TestOrchestrationParameter>();
+
+        orchestrationDescription.AppendStepDescription("Test step 1");
+        orchestrationDescription.AppendStepDescription("Test step 2");
+        orchestrationDescription.AppendStepDescription("Test step 3");
+
+        var orchestrationInstance = OrchestrationInstance.CreateFromDescription(
+            orchestrationDescription,
+            skipStepsBySequence: [],
             SystemClock.Instance);
 
-        var step1 = new OrchestrationStep(
-            existingOrchestrationInstance.Id,
-            SystemClock.Instance,
-            "Test step 1",
-            0);
-
-        var step2 = new OrchestrationStep(
-            existingOrchestrationInstance.Id,
-            SystemClock.Instance,
-            "Test step 2",
-            1,
-            step1.Id);
-
-        var step3 = new OrchestrationStep(
-            existingOrchestrationInstance.Id,
-            SystemClock.Instance,
-            "Test step 3",
-            2,
-            step2.Id);
-
-        existingOrchestrationInstance.Steps.Add(step1);
-        existingOrchestrationInstance.Steps.Add(step2);
-        existingOrchestrationInstance.Steps.Add(step3);
-
-        existingOrchestrationInstance.ParameterValue.SetFromInstance(new TestOrchestrationParameter
+        orchestrationInstance.ParameterValue.SetFromInstance(new TestOrchestrationParameter
         {
             TestString = "Test string",
             TestInt = 42,
         });
 
-        return existingOrchestrationInstance;
+        return orchestrationInstance;
     }
 
     private class TestOrchestrationParameter

@@ -1,5 +1,9 @@
 # ProcessManager.Client Release Notes
 
+## Version 0.9.2
+
+- Updated DTO types.
+
 ## Version 0.9.1
 
 - Add documentation to several domain and DTO types.
