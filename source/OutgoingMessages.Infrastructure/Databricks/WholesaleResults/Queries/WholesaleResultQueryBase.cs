@@ -63,8 +63,7 @@ public abstract class WholesaleResultQueryBase<TResult>(
         IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints);
 
     protected override async Task<QueryResult<TResult>> CreateResultAsync(
-        List<DatabricksSqlRow> currentResultSet,
-        ImmutableDictionary<string, ActorNumber>? gridAreaOwnerDictionary)
+        List<DatabricksSqlRow> currentResultSet)
     {
         var firstRow = currentResultSet.First();
         var resultId = firstRow.ToGuid(WholesaleResultColumnNames.ResultId);

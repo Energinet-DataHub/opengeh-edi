@@ -40,8 +40,7 @@ public abstract class EnergyResultQueryBase<TResult>(
         IReadOnlyCollection<EnergyTimeSeriesPoint> timeSeriesPoints);
 
     protected override async Task<QueryResult<TResult>> CreateResultAsync(
-        List<DatabricksSqlRow> currentResultSet,
-        ImmutableDictionary<string, ActorNumber>? gridAreaOwnerDictionary)
+        List<DatabricksSqlRow> currentResultSet)
     {
         var firstRow = currentResultSet.First();
         var resultId = firstRow.ToGuid(EnergyResultColumnNames.ResultId);

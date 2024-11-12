@@ -71,7 +71,7 @@ public abstract class CalculationResultQueryBase<TResult>(
                 continue;
             }
 
-            yield return await CreateResultAsync(currentResultSet, gridAreaOwnerDictionary).ConfigureAwait(false);
+            yield return await CreateResultAsync(currentResultSet).ConfigureAwait(false);
 
             // Next result serie
             currentResultSet =
@@ -84,13 +84,12 @@ public abstract class CalculationResultQueryBase<TResult>(
         // Last result (if any)
         if (currentResultSet.Count != 0)
         {
-            yield return await CreateResultAsync(currentResultSet, gridAreaOwnerDictionary).ConfigureAwait(false);
+            yield return await CreateResultAsync(currentResultSet).ConfigureAwait(false);
         }
     }
 
     protected abstract Task<QueryResult<TResult>> CreateResultAsync(
-        List<DatabricksSqlRow> currentResultSet,
-        ImmutableDictionary<string, ActorNumber>? gridAreaOwnerDictionary);
+        List<DatabricksSqlRow> currentResultSet);
 
     protected abstract bool BelongsToSameResultSet(DatabricksSqlRow currentResult, DatabricksSqlRow previousResult);
 

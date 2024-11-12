@@ -25,7 +25,7 @@ public class GetGridAreaOwnersActivity(IMasterDataClient masterDataClient)
     private readonly IMasterDataClient _masterDataClient = masterDataClient;
 
     /// <summary>
-    /// Start a GetGridAreaOwnersActivity activity.
+    /// Start a GetGridAreaOwners activity.
     /// <remarks>The <paramref name="input"/> type and return type must be that same as the <see cref="Run"/> method</remarks>
     /// <remarks>Changing the <paramref name="input"/> or return type might break the Durable Function's deserialization</remarks>
     /// </summary>
