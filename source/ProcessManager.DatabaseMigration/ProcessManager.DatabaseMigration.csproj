@@ -7,14 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Scripts\202410240915 Create StepDescription table.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="dbup-sqlserver" Version="5.0.41" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Scripts\202410240913 Create pm schema.sql" />
-    <EmbeddedResource Include="Scripts\202410240916 Create OrchestrationStep table.sql" />
+    <EmbeddedResource Include="Scripts\202410240915 Create StepDescription table.sql" />
+    <EmbeddedResource Include="Scripts\202410240917 Create StepInstance table.sql" />
     <EmbeddedResource Include="Scripts\202410240914 Create OrchestrationDescription table.sql" />
-    <EmbeddedResource Include="Scripts\202410240915 Create OrchestrationInstance table.sql" />
+    <EmbeddedResource Include="Scripts\202410240916 Create OrchestrationInstance table.sql" />
   </ItemGroup>
 
 </Project>

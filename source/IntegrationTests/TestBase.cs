@@ -58,6 +58,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.Extensions.DependencyInjection;
+using Energinet.DataHub.Wholesale.Common.Infrastructure.Options;
 using Energinet.DataHub.Wholesale.Edi.Extensions.DependencyInjection;
 using Google.Protobuf;
 using MediatR;
@@ -323,6 +324,8 @@ public class TestBase : IDisposable
                     // => EDI views
                     [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.DatabaseName)}"] = Fixture.DatabricksSchemaManager.SchemaName,
                     [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.CatalogName)}"] = "hive_metastore",
+                    // => Calculation Result views
+                    [$"{nameof(DeltaTableOptions.DatabricksCatalogName)}"] = "hive_metastore",
                 })
             .Build();
 

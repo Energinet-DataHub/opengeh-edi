@@ -21,6 +21,7 @@ using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Startup
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Telemetry;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var host = new HostBuilder()
@@ -33,6 +34,7 @@ var host = new HostBuilder()
         services.AddNodaTimeForApplication();
 
         // ProcessManager
+        // => Orchestration Descriptions
         services.AddProcessManagerForOrchestrations(() =>
         {
             // TODO: For demo purposes; remove when done.
@@ -47,8 +49,16 @@ var host = new HostBuilder()
 
             brs_023_027_v1.ParameterDefinition.SetFromType<NotifyAggregatedMeasureDataInputV1>();
 
+            brs_023_027_v1.AppendStepDescription("Beregning");
+            brs_023_027_v1.AppendStepDescription(
+                "Besked dannelse",
+                canBeSkipped: true,
+                skipReason: "Do not perform this step for an internal calculation.");
+
             return [brs_023_027_v1];
         });
+        // => Handlers
+        services.AddScoped<NotifyAggregatedMeasureDataHandler>();
     })
     .ConfigureLogging((hostingContext, logging) =>
     {

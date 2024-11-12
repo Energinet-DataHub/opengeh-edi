@@ -26,6 +26,7 @@ using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.C
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Commands.Handlers;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications;
 using Energinet.DataHub.EDI.Process.Application.Transactions.WholesaleServices.Notifications.Handlers;
+using Energinet.DataHub.EDI.Process.Domain.Transactions;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.AggregatedMeasureData.ProcessEvents;
 using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices;
@@ -33,11 +34,13 @@ using Energinet.DataHub.EDI.Process.Domain.Transactions.WholesaleServices.Proces
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.DataAccess;
 using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.Processing;
+using Energinet.DataHub.EDI.Process.Infrastructure.Transactions;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.AggregatedMeasureData;
 using Energinet.DataHub.EDI.Process.Infrastructure.Transactions.WholesaleServices;
 using Energinet.DataHub.EDI.Process.Infrastructure.Wholesale;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using MediatR;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -86,6 +89,15 @@ public static class ProcessExtensions
 
         // ProcessInitializationClient Configuration
         services.AddTransient<IProcessClient, ProcessClient>();
+
+        // DurableClientFactory and RequestProcessOrchestrationStarter
+        services.AddTransient<IRequestProcessOrchestrationStarter, RequestProcessOrchestrationStarter>();
+        services.AddDurableClientFactory(options =>
+        {
+            options.ConnectionName = "OrchestrationsStorageConnectionString";
+            options.TaskHub = configuration["OrchestrationsTaskHubName"]!;
+            options.IsExternalClient = true;
+        });
 
         // RequestedAggregatedMeasureDataConfiguration
         services

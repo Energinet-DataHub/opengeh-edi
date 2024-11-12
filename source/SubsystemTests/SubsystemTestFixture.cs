@@ -119,6 +119,11 @@ public class SubsystemTestFixture : IAsyncLifetime
             certificateName: "DH3-test-mosaik-1-private-and-public.pfx",
             certificatePassword: GetConfigurationValue<string>(root, "EBIX_CERTIFICATE_PASSWORD_MDR"));
 
+        // The actor 0266518730406 as Grid Access Provider (owns area 757)
+        EbixGridAccessProviderCredentials = new EbixCredentials(
+            certificateName: "DH3-test-Mosaic-GridAccessProvider.pfx",
+            certificatePassword: GetConfigurationValue<string>(root, "EBIX_CERTIFICATE_PASSWORD_DDM"));
+
         // The actor 5790000610976 as Energy Supplier
         EbixEnergySupplierCredentials = new EbixCredentials(
             certificateName: "DH3-test-mosaik-energysupplier-private-and-public.pfx",
@@ -165,11 +170,9 @@ public class SubsystemTestFixture : IAsyncLifetime
         EventPublisher = new IntegrationEventPublisher(ServiceBusClient, topicName, dbConnectionString);
         EdiInboxClient = new EdiInboxClient(ServiceBusClient, ediInboxQueueName);
 
-        // AzureWebJobsStorage connection string name/value is set implicitly from terraform as an application setting in Azure,
-        // and added to the keyvault as "func-edi-api-web-jobs-storage-connection-string"
         DurableTaskManager = new DurableTaskManager(
-            "AzureWebJobsStorage",
-            GetConfigurationValue<string>(root, "func-edi-api-web-jobs-storage-connection-string"));
+            "OrchestrationsStorageConnectionString",
+            GetConfigurationValue<string>(root, "func-edi-api-taskhub-storage-connection-string"));
     }
 
     internal B2BClients B2BClients { get; }
@@ -179,6 +182,8 @@ public class SubsystemTestFixture : IAsyncLifetime
     internal EbixCredentials EbixEnergySupplierCredentials { get; }
 
     internal EbixCredentials EbixMeteredDataResponsibleCredentials { get; }
+
+    internal EbixCredentials EbixGridAccessProviderCredentials { get; }
 
     internal string EbixMeteredDataResponsibleCertificateThumbprint { get; }
 

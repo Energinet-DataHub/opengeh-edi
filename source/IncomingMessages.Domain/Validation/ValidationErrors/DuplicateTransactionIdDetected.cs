@@ -17,12 +17,12 @@ namespace Energinet.DataHub.EDI.IncomingMessages.Domain.Validation.ValidationErr
 public class DuplicateTransactionIdDetected : ValidationError
 {
     public DuplicateTransactionIdDetected(string transactionId)
-        : base($"Transaction id '{transactionId}' is not unique and will not be processed.", "00102", "TransactionId")
+        : base($"Transaction id '{transactionId}' is not unique and will not be processed.", "00102", "The provided Ids are not unique in the Business Message (e.g. same TransactionId or TimeseriesId used in the same message), or duplicate Ids in requests when calling the SendMessage operation in parallel.", "B2B-009", "TransactionId")
     {
     }
 
     public DuplicateTransactionIdDetected()
-        : base("Duplicated transaction id found", "00102", "TransactionId")
+        : base("Duplicated transaction id found", "00102", "The provided Ids are not unique in the Business Message (e.g. same TransactionId or TimeseriesId used in the same message), or duplicate Ids in requests when calling the SendMessage operation in parallel.", "B2B-009", "TransactionId")
     {
     }
 }

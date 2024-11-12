@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
+using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
@@ -48,13 +49,8 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
             GetConfigurationValue<string>(configuration, "mssql-edi-database-name"));
 
         _serviceBusClient = new ServiceBusClient(
-            GetConfigurationValue<string>(configuration, "sb-domain-relay-manage-connection-string"),
-            new ServiceBusClientOptions()
-            {
-                TransportType =
-                    ServiceBusTransportType
-                        .AmqpWebSockets, // Firewall is not open for AMQP and Therefore, needs to go over WebSockets.
-            });
+            $"{GetConfigurationValue<string>(configuration, "sb-domain-relay-namespace-name")}.servicebus.windows.net",
+            new DefaultAzureCredential());
 
         IntegrationEventPublisher = new IntegrationEventPublisher(
             _serviceBusClient,
@@ -74,13 +70,9 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
             _serviceBusClient,
             GetConfigurationValue<string>(configuration, "sbq-edi-inbox-messagequeue-name"));
 
-        // AzureWebJobsStorage connection string name/value is set implicitly from terraform as an application setting in Azure,
-        // and added to the keyvault as "func-edi-api-web-jobs-storage-connection-string"
         _durableTaskManager = new DurableTaskManager(
-            "AzureWebJobsStorage",
-            GetConfigurationValue<string>(
-                configuration,
-                "func-edi-api-web-jobs-storage-connection-string"));
+            "OrchestrationsStorageConnectionString",
+            GetConfigurationValue<string>(configuration, "func-edi-api-taskhub-storage-connection-string"));
     }
 
     internal EdiInboxClient EdiInboxClient { get; }

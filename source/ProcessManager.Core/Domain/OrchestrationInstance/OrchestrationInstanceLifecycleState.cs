@@ -18,10 +18,10 @@ namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 
 public class OrchestrationInstanceLifecycleState
 {
-    internal OrchestrationInstanceLifecycleState(IClock clock, Instant? scheduledToRunAt)
+    internal OrchestrationInstanceLifecycleState(IClock clock, Instant? runAt)
     {
         CreatedAt = clock.GetCurrentInstant();
-        ScheduledToRunAt = scheduledToRunAt;
+        ScheduledToRunAt = runAt;
 
         State = OrchestrationInstanceLifecycleStates.Pending;
     }
@@ -40,14 +40,32 @@ public class OrchestrationInstanceLifecycleState
 
     public OrchestrationInstanceTerminationStates? TerminationState { get; private set; }
 
+    /// <summary>
+    /// The time when the orchestration instance was created (State => Pending).
+    /// </summary>
     public Instant CreatedAt { get; }
 
+    /// <summary>
+    /// The time when the orchestration instance should be executed by the Scheduler.
+    /// </summary>
     public Instant? ScheduledToRunAt { get; }
 
-    public Instant? StartRequestedAt { get; private set; }
+    /// <summary>
+    /// The time when the Process Manager has queued the orchestration instance
+    /// for execution by Durable Functions (State => Queued).
+    /// </summary>
+    public Instant? QueuedAt { get; private set; }
 
+    /// <summary>
+    /// The time when the Process Manager was used from Durable Functions to
+    /// transition the state to Running.
+    /// </summary>
     public Instant? StartedAt { get; private set; }
 
+    /// <summary>
+    /// The time when the Process Manager was used from Durable Functions to
+    /// transition the state to Terminated.
+    /// </summary>
     public Instant? TerminatedAt { get; private set; }
 
     public bool IsPendingForScheduledStart()
@@ -57,18 +75,18 @@ public class OrchestrationInstanceLifecycleState
             && ScheduledToRunAt.HasValue;
     }
 
-    public void TransitionToStartRequested(IClock clock)
+    public void TransitionToQueued(IClock clock)
     {
         if (State is not OrchestrationInstanceLifecycleStates.Pending)
-            ThrowInvalidStateTransitionException(State, OrchestrationInstanceLifecycleStates.StartRequested);
+            ThrowInvalidStateTransitionException(State, OrchestrationInstanceLifecycleStates.Queued);
 
-        State = OrchestrationInstanceLifecycleStates.StartRequested;
-        StartRequestedAt = clock.GetCurrentInstant();
+        State = OrchestrationInstanceLifecycleStates.Queued;
+        QueuedAt = clock.GetCurrentInstant();
     }
 
     public void TransitionToRunning(IClock clock)
     {
-        if (State is not OrchestrationInstanceLifecycleStates.StartRequested)
+        if (State is not OrchestrationInstanceLifecycleStates.Queued)
             ThrowInvalidStateTransitionException(State, OrchestrationInstanceLifecycleStates.Running);
 
         State = OrchestrationInstanceLifecycleStates.Running;

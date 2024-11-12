@@ -23,7 +23,7 @@ namespace Energinet.DataHub.ProcessManager.Tests.Integration.Monitor;
 /// <summary>
 /// Tests verifying the configuration and behaviour of Health Checks.
 /// </summary>
-[Collection(nameof(ProcessManagerAppCollectionFixture))]
+[Collection(nameof(ProcessManagerAppCollection))]
 public class HealthCheckEndpointTests : IAsyncLifetime
 {
     public HealthCheckEndpointTests(ProcessManagerAppFixture fixture, ITestOutputHelper testOutputHelper)

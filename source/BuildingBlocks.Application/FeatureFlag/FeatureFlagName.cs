@@ -34,4 +34,9 @@ public enum FeatureFlagName
     /// Whether to allow receiving metered data for measurement points.
     /// </summary>
     ReceiveMeteredDataForMeasurementPoints,
+
+    /// <summary>
+    /// Whether to use orchestration for handling RequestWholesaleServices processes.
+    /// </summary>
+    UseRequestWholesaleServicesProcessOrchestration,
 }

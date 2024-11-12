@@ -23,7 +23,7 @@ public class OrchestrationParameterDefinitionTests
     public async Task GivenSetFromType_WhenValidatingInstanceOfSameType_ThenIsValid()
     {
         // Arrange
-        var sut = new OrchestrationParameterDefinition();
+        var sut = new ParameterDefinition();
         sut.SetFromType<OrchestrationParameterExample01>();
 
         var instanceOfSameType = new OrchestrationParameterExample01(DateTimeOffset.Now, true);
@@ -39,7 +39,7 @@ public class OrchestrationParameterDefinitionTests
     public async Task GivenSetFromType_WhenValidatingInstanceOfMatchingType_ThenIsValid()
     {
         // Arrange
-        var sut = new OrchestrationParameterDefinition();
+        var sut = new ParameterDefinition();
         sut.SetFromType<OrchestrationParameterExample01>();
 
         var instanceOfMatchingType = new OrchestrationParameterExample02(DateTimeOffset.Now, true);
@@ -55,7 +55,7 @@ public class OrchestrationParameterDefinitionTests
     public async Task GivenSetFromType_WhenValidatingInstanceOfAnotherType_ThenIsNotValid()
     {
         // Arrange
-        var sut = new OrchestrationParameterDefinition();
+        var sut = new ParameterDefinition();
         sut.SetFromType<OrchestrationParameterExample01>();
 
         var instanceOfAnotherType = new OrchestrationParameterExample03(10, true);
@@ -72,14 +72,14 @@ public class OrchestrationParameterDefinitionTests
     /// DOES NOT work if the parameter use the 'NodaTime.Instant' type.
     /// </summary>
     public sealed record OrchestrationParameterExample01(
-        DateTimeOffset ScheduledAt,
+        DateTimeOffset RunAt,
         bool IsInternal);
 
     /// <summary>
     /// Example orchestration parameter for testing purposes.
     /// </summary>
     public sealed record OrchestrationParameterExample02(
-        DateTimeOffset ScheduledAt,
+        DateTimeOffset RunAt,
         bool IsInternal);
 
     /// <summary>

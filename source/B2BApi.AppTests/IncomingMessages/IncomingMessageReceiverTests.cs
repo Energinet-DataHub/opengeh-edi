@@ -88,7 +88,7 @@ public class IncomingMessageReceiverTests : IAsyncLifetime
         Given_PersistedActor_When_CallingIncomingMessagesWithInvalidDocumentAndBearerToken_Then_ResponseShouldBeBadRequest()
     {
         using var request = await CreateHttpRequest(
-            "TestData/Messages/xml/RequestWholesaleSettlement.xml",
+            "TestData/Messages/xml/InvalidRequestWholesaleSettlement.xml",
             IncomingDocumentType.RequestWholesaleSettlement.Name,
             "application/xml");
 

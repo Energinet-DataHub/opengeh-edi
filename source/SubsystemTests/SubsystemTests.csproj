@@ -64,12 +64,15 @@
       <None Update="subsystemtests.dev002.settings.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="Drivers\Ebix\DH3-test-Mosaic-GridAccessProvider.pfx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.1" />
         <PackageReference Include="Dapper" Version="2.1.35" />
-        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.0.0" />
+        <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="7.0.1" />
         <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="10.0.0" />
         <PackageReference Include="FluentAssertions" Version="6.12.1" />
         <PackageReference Include="FluentAssertions.Analyzers" Version="0.33.0">
@@ -126,6 +129,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <EmbeddedResource Include="Messages\ebix\MeteredDataForMeasurementPoint.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
       <EmbeddedResource Include="Messages\json\RequestAggregatedMeasureDataBalanceResponsibleWithBadPeriod.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>

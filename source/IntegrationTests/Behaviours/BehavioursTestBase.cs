@@ -53,6 +53,7 @@ using Energinet.DataHub.EDI.Process.Infrastructure.Configuration.Options;
 using Energinet.DataHub.EDI.Process.Infrastructure.InboxEvents;
 using Energinet.DataHub.EDI.Process.Interfaces;
 using Energinet.DataHub.Wholesale.CalculationResults.Infrastructure.Extensions.DependencyInjection;
+using Energinet.DataHub.Wholesale.Common.Infrastructure.Options;
 using Energinet.DataHub.Wholesale.Edi.Extensions.DependencyInjection;
 using Energinet.DataHub.Wholesale.Events.Infrastructure.IntegrationEvents;
 using FluentAssertions;
@@ -448,6 +449,8 @@ public class BehavioursTestBase : IDisposable
                     // => EDI views
                     [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.DatabaseName)}"] = _integrationTestFixture.DatabricksSchemaManager.SchemaName,
                     [$"{EdiDatabricksOptions.SectionName}:{nameof(EdiDatabricksOptions.CatalogName)}"] = "hive_metastore",
+                    // => Calculation Result views
+                    [$"{nameof(DeltaTableOptions.DatabricksCatalogName)}"] = "hive_metastore",
                 })
             .Build();
 

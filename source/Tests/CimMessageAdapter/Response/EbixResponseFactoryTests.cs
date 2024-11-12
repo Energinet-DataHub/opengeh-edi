@@ -37,8 +37,8 @@ public sealed class EbixResponseFactoryTests
         var response = CreateResponse(result);
 
         response.IsErrorResponse.Should().BeTrue();
-        AssertHasValue(response, "faultcode", "SOAP-ENV:Client");
-        AssertHasValue(response, "faultstring", $"{duplicateMessageIdError.Code}:{duplicateMessageIdError.Message}");
+        AssertHasValue(response, "faultcode", "soapenv:Client");
+        AssertHasValue(response, "faultstring", $"{duplicateMessageIdError.EbixCode}:{duplicateMessageIdError.EbixMessage}");
     }
 
     [Fact]
@@ -54,12 +54,12 @@ public sealed class EbixResponseFactoryTests
             .BeEquivalentTo(
                 """
                 <Error>
-                  <faultcode>SOAP-ENV:Client</faultcode>
-                  <faultstring>00101:Message id 'Duplicate message id' is not unique</faultstring>
+                  <faultcode>soapenv:Client</faultcode>
+                  <faultstring>B2B-003:The provided Ids are not unique and have been used before</faultstring>
                   <detail>
                     <fault>
-                      <ErrorCode>00101</ErrorCode>
-                      <ErrorText>Message id 'Duplicate message id' is not unique</ErrorText>
+                      <ErrorCode>B2B-003</ErrorCode>
+                      <ErrorText>The provided Ids are not unique and have been used before</ErrorText>
                     </fault>
                   </detail>
                 </Error>
@@ -76,9 +76,9 @@ public sealed class EbixResponseFactoryTests
         var response = CreateResponse(result);
 
         response.IsErrorResponse.Should().BeTrue();
-        AssertHasValue(response, "faultcode", "SOAP-ENV:Client");
-        AssertHasValue(response, "faultstring", $"{duplicateMessageIdError.Code}:{duplicateMessageIdError.Message}");
-        AssertHasNotValue(response, "faultstring", $"{duplicateTransactionIdError.Code}:{duplicateTransactionIdError.Message}");
+        AssertHasValue(response, "faultcode", "soapenv:Client");
+        AssertHasValue(response, "faultstring", $"{duplicateMessageIdError.EbixCode}:{duplicateMessageIdError.EbixMessage}");
+        AssertHasNotValue(response, "faultstring", $"{duplicateTransactionIdError.EbixCode}:{duplicateTransactionIdError.EbixMessage}");
     }
 
     private static void AssertHasValue(ResponseMessage responseMessage, string elementName, string expectedValue)

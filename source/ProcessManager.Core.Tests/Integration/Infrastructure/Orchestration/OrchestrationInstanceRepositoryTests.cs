@@ -21,6 +21,7 @@ using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer.NodaTime.Extensions;
+using Moq;
 using NodaTime;
 
 namespace Energinet.DataHub.ProcessManager.Core.Tests.Integration.Infrastructure.Orchestration;
@@ -137,12 +138,12 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
 
         var scheduledToRun = CreateOrchestrationInstance(
             existingOrchestrationDescription,
-            scheduledToRunAt: SystemClock.Instance.GetCurrentInstant().PlusMinutes(1));
+            runAt: SystemClock.Instance.GetCurrentInstant().PlusMinutes(1));
         await _sut.AddAsync(scheduledToRun);
 
         var scheduledIntoTheFarFuture = CreateOrchestrationInstance(
             existingOrchestrationDescription,
-            scheduledToRunAt: SystemClock.Instance.GetCurrentInstant().PlusDays(5));
+            runAt: SystemClock.Instance.GetCurrentInstant().PlusDays(5));
         await _sut.AddAsync(scheduledIntoTheFarFuture);
 
         await _unitOfWork.CommitAsync();
@@ -162,26 +163,28 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
     public async Task GivenOrchestrationInstancesInDatabase_WhenSearchByName_ThenExpectedOrchestrationInstancesAreRetrieved()
     {
         // Arrange
-        var uniqueName = Guid.NewGuid().ToString();
-        var existingOrchestrationDescriptionV1 = CreateOrchestrationDescription(uniqueName, version: 1);
-        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescriptionV1);
+        var uniqueName1 = Guid.NewGuid().ToString();
+        var existingOrchestrationDescription01 = CreateOrchestrationDescription(uniqueName1, version: 1);
+        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescription01);
 
-        var notScheduledV1 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
-        await _sut.AddAsync(notScheduledV1);
+        var uniqueName2 = Guid.NewGuid().ToString();
+        var existingOrchestrationDescription02 = CreateOrchestrationDescription(uniqueName2, version: 1);
+        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescription02);
 
-        var scheduledToRunV1 = CreateOrchestrationInstance(
-            existingOrchestrationDescriptionV1,
-            scheduledToRunAt: SystemClock.Instance.GetCurrentInstant().PlusMinutes(1));
-        await _sut.AddAsync(scheduledToRunV1);
+        var basedOn01 = CreateOrchestrationInstance(existingOrchestrationDescription01);
+        await _sut.AddAsync(basedOn01);
+
+        var basedOn02 = CreateOrchestrationInstance(existingOrchestrationDescription02);
+        await _sut.AddAsync(basedOn02);
 
         await _unitOfWork.CommitAsync();
 
         // Act
-        var actual = await _sut.SearchAsync(existingOrchestrationDescriptionV1.Name);
+        var actual = await _sut.SearchAsync(existingOrchestrationDescription01.Name);
 
         // Assert
         actual.Should()
-            .BeEquivalentTo(new[] { notScheduledV1, scheduledToRunV1 });
+            .BeEquivalentTo(new[] { basedOn01 });
     }
 
     [Fact]
@@ -226,7 +229,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         await _sut.AddAsync(isPendingV1);
 
         var isRunningV1 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
-        isRunningV1.Lifecycle.TransitionToStartRequested(SystemClock.Instance);
+        isRunningV1.Lifecycle.TransitionToQueued(SystemClock.Instance);
         isRunningV1.Lifecycle.TransitionToRunning(SystemClock.Instance);
         await _sut.AddAsync(isRunningV1);
 
@@ -234,7 +237,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         await _sut.AddAsync(isPendingV2);
 
         var isRunningV2 = CreateOrchestrationInstance(existingOrchestrationDescriptionV2);
-        isRunningV2.Lifecycle.TransitionToStartRequested(SystemClock.Instance);
+        isRunningV2.Lifecycle.TransitionToQueued(SystemClock.Instance);
         isRunningV2.Lifecycle.TransitionToRunning(SystemClock.Instance);
         await _sut.AddAsync(isRunningV2);
 
@@ -263,7 +266,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         await _sut.AddAsync(isPendingV1);
 
         var isTerminatedAsSucceededV1 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
-        isTerminatedAsSucceededV1.Lifecycle.TransitionToStartRequested(SystemClock.Instance);
+        isTerminatedAsSucceededV1.Lifecycle.TransitionToQueued(SystemClock.Instance);
         isTerminatedAsSucceededV1.Lifecycle.TransitionToRunning(SystemClock.Instance);
         isTerminatedAsSucceededV1.Lifecycle.TransitionToTerminated(SystemClock.Instance, OrchestrationInstanceTerminationStates.Succeeded);
         await _sut.AddAsync(isTerminatedAsSucceededV1);
@@ -272,7 +275,7 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
         await _sut.AddAsync(isPendingV2);
 
         var isTerminatedAsFailedV2 = CreateOrchestrationInstance(existingOrchestrationDescriptionV2);
-        isTerminatedAsFailedV2.Lifecycle.TransitionToStartRequested(SystemClock.Instance);
+        isTerminatedAsFailedV2.Lifecycle.TransitionToQueued(SystemClock.Instance);
         isTerminatedAsFailedV2.Lifecycle.TransitionToRunning(SystemClock.Instance);
         isTerminatedAsFailedV2.Lifecycle.TransitionToTerminated(SystemClock.Instance, OrchestrationInstanceTerminationStates.Failed);
         await _sut.AddAsync(isTerminatedAsFailedV2);
@@ -290,58 +293,123 @@ public class OrchestrationInstanceRepositoryTests : IAsyncLifetime
             .BeEquivalentTo(new[] { isTerminatedAsSucceededV1 });
     }
 
+    [Fact]
+    public async Task GivenOrchestrationInstancesInDatabase_WhenSearchByNameAndStartedAt_ThenExpectedOrchestrationInstancesAreRetrieved()
+    {
+        // Arrange
+        var startedAt01 = SystemClock.Instance.GetCurrentInstant().PlusDays(1);
+        var startedAtClockMock01 = new Mock<IClock>();
+        startedAtClockMock01.Setup(m => m.GetCurrentInstant())
+            .Returns(startedAt01);
+
+        var uniqueName = Guid.NewGuid().ToString();
+        var existingOrchestrationDescriptionV1 = CreateOrchestrationDescription(uniqueName, version: 1);
+        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescriptionV1);
+
+        var isPending = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
+        await _sut.AddAsync(isPending);
+
+        var isRunning01 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
+        isRunning01.Lifecycle.TransitionToQueued(SystemClock.Instance);
+        isRunning01.Lifecycle.TransitionToRunning(startedAtClockMock01.Object);
+        await _sut.AddAsync(isRunning01);
+
+        var isRunning02 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
+        isRunning02.Lifecycle.TransitionToQueued(SystemClock.Instance);
+        isRunning02.Lifecycle.TransitionToRunning(SystemClock.Instance);
+        await _sut.AddAsync(isRunning02);
+
+        await _unitOfWork.CommitAsync();
+
+        // Act
+        var actual = await _sut.SearchAsync(
+            existingOrchestrationDescriptionV1.Name,
+            startedAtOrLater: startedAt01);
+
+        // Assert
+        actual.Should()
+            .BeEquivalentTo(new[] { isRunning01 });
+    }
+
+    [Fact]
+    public async Task GivenOrchestrationInstancesInDatabase_WhenSearchByNameAndTerminatedAt_ThenExpectedOrchestrationInstancesAreRetrieved()
+    {
+        // Arrange
+        var terminatedAt01 = SystemClock.Instance.GetCurrentInstant().PlusDays(-1);
+        var terminatedAtClockMock01 = new Mock<IClock>();
+        terminatedAtClockMock01.Setup(m => m.GetCurrentInstant())
+            .Returns(terminatedAt01);
+
+        var uniqueName = Guid.NewGuid().ToString();
+        var existingOrchestrationDescriptionV1 = CreateOrchestrationDescription(uniqueName, version: 1);
+        await SeedDatabaseWithOrchestrationDescriptionAsync(existingOrchestrationDescriptionV1);
+
+        var isPending = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
+        await _sut.AddAsync(isPending);
+
+        var isRunning = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
+        isRunning.Lifecycle.TransitionToQueued(SystemClock.Instance);
+        isRunning.Lifecycle.TransitionToRunning(SystemClock.Instance);
+        await _sut.AddAsync(isRunning);
+
+        var isTerminated01 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
+        isTerminated01.Lifecycle.TransitionToQueued(SystemClock.Instance);
+        isTerminated01.Lifecycle.TransitionToRunning(SystemClock.Instance);
+        isTerminated01.Lifecycle.TransitionToTerminated(terminatedAtClockMock01.Object, OrchestrationInstanceTerminationStates.Succeeded);
+        await _sut.AddAsync(isTerminated01);
+
+        var isTerminated02 = CreateOrchestrationInstance(existingOrchestrationDescriptionV1);
+        isTerminated02.Lifecycle.TransitionToQueued(SystemClock.Instance);
+        isTerminated02.Lifecycle.TransitionToRunning(SystemClock.Instance);
+        isTerminated02.Lifecycle.TransitionToTerminated(SystemClock.Instance, OrchestrationInstanceTerminationStates.Succeeded);
+        await _sut.AddAsync(isTerminated02);
+
+        await _unitOfWork.CommitAsync();
+
+        // Act
+        var actual = await _sut.SearchAsync(
+            existingOrchestrationDescriptionV1.Name,
+            terminatedAtOrEarlier: terminatedAt01);
+
+        // Assert
+        actual.Should()
+            .BeEquivalentTo(new[] { isTerminated01 });
+    }
+
     private static OrchestrationDescription CreateOrchestrationDescription(string? name = default, int? version = default)
     {
-        var existingOrchestrationDescription = new OrchestrationDescription(
+        var orchestrationDescription = new OrchestrationDescription(
             name: name ?? "TestOrchestration",
             version: version ?? 4,
             canBeScheduled: true,
             functionName: "TestOrchestrationFunction");
 
-        existingOrchestrationDescription
-            .ParameterDefinition
-            .SetFromType<TestOrchestrationParameter>();
-        return existingOrchestrationDescription;
+        orchestrationDescription.ParameterDefinition.SetFromType<TestOrchestrationParameter>();
+
+        orchestrationDescription.AppendStepDescription("Test step 1");
+        orchestrationDescription.AppendStepDescription("Test step 2");
+        orchestrationDescription.AppendStepDescription("Test step 3");
+
+        return orchestrationDescription;
     }
 
-    private static OrchestrationInstance CreateOrchestrationInstance(OrchestrationDescription existingOrchestrationDescription, Instant? scheduledToRunAt = default)
+    private static OrchestrationInstance CreateOrchestrationInstance(
+        OrchestrationDescription orchestrationDescription,
+        Instant? runAt = default)
     {
-        var existingOrchestrationInstance = new OrchestrationInstance(
-            existingOrchestrationDescription.Id,
-            SystemClock.Instance,
-            scheduledToRunAt);
+        var orchestrationInstance = OrchestrationInstance.CreateFromDescription(
+            description: orchestrationDescription,
+            skipStepsBySequence: [],
+            clock: SystemClock.Instance,
+            runAt: runAt);
 
-        var step1 = new OrchestrationStep(
-            existingOrchestrationInstance.Id,
-            SystemClock.Instance,
-            "Test step 1",
-            0);
-
-        var step2 = new OrchestrationStep(
-            existingOrchestrationInstance.Id,
-            SystemClock.Instance,
-            "Test step 2",
-            1,
-            step1.Id);
-
-        var step3 = new OrchestrationStep(
-            existingOrchestrationInstance.Id,
-            SystemClock.Instance,
-            "Test step 3",
-            2,
-            step2.Id);
-
-        existingOrchestrationInstance.Steps.Add(step1);
-        existingOrchestrationInstance.Steps.Add(step2);
-        existingOrchestrationInstance.Steps.Add(step3);
-
-        existingOrchestrationInstance.ParameterValue.SetFromInstance(new TestOrchestrationParameter
+        orchestrationInstance.ParameterValue.SetFromInstance(new TestOrchestrationParameter
         {
             TestString = "Test string",
             TestInt = 42,
         });
 
-        return existingOrchestrationInstance;
+        return orchestrationInstance;
     }
 
     private async Task SeedDatabaseWithOrchestrationDescriptionAsync(OrchestrationDescription existingOrchestrationDescription)
