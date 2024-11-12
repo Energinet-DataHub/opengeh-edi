@@ -12,7 +12,7 @@
     [Lifecycle_TerminatedAt]        DATETIME2 NULL,
 
     [SerializedParameterValue]      NVARCHAR(MAX) NOT NULL,
-    [CustomState]                   NVARCHAR(255) NOT NULL,
+    [CustomState]                   NVARCHAR(MAX) NOT NULL,
     [OrchestrationDescriptionId]    UNIQUEIDENTIFIER NOT NULL,
 
     -- A UNIQUE CLUSTERED constraint on an INT IDENTITY column optimizes the performance of the table

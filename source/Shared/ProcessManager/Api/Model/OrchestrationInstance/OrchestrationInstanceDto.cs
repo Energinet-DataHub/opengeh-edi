@@ -24,7 +24,7 @@ public record OrchestrationInstanceDto(
     Guid Id,
     OrchestrationInstanceLifecycleStatesDto Lifecycle,
     ExpandoObject ParameterValue,
-    IReadOnlyCollection<OrchestrationStepDto> Steps,
+    IReadOnlyCollection<StepInstanceDto> Steps,
     string CustomState)
 {
     public Guid Id { get; } = Id;
@@ -42,7 +42,7 @@ public record OrchestrationInstanceDto(
     /// <summary>
     /// Workflow steps the orchestration instance is going through.
     /// </summary>
-    public IReadOnlyCollection<OrchestrationStepDto> Steps { get; } = Steps;
+    public IReadOnlyCollection<StepInstanceDto> Steps { get; } = Steps;
 
     /// <summary>
     /// Any custom state of the orchestration instance.
