@@ -14,28 +14,25 @@
 
 namespace Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
 
-/// <summary>
-/// Represents the instance of a workflow (orchestration) step.
-/// It contains state information about the step, and is linked
-/// to the orchestration instance that it is part of.
-/// </summary>
-public class OrchestrationStepDto
+public record StepInstanceLifecycleStateDto(
+    StepInstanceLifecycleStates State,
+    OrchestrationStepTerminationStates? TerminationState,
+    DateTimeOffset? StartedAt,
+    DateTimeOffset? TerminatedAt)
 {
-    public Guid Id { get; set; }
+    public StepInstanceLifecycleStates State { get; } = State;
+
+    public OrchestrationStepTerminationStates? TerminationState { get; } = TerminationState;
 
     /// <summary>
-    /// The high-level lifecycle states that all orchestration steps can go through.
+    /// The time when the Process Manager was used from Durable Functions to
+    /// transition the state to Running.
     /// </summary>
-    public OrchestrationStepLifecycleStateDto? Lifecycle { get; set; }
-
-    public string? Description { get; set; }
-
-    public int Sequence { get; set; }
-
-    public Guid? DependsOn { get; set; }
+    public DateTimeOffset? StartedAt { get; } = StartedAt;
 
     /// <summary>
-    /// Any custom state of the step.
+    /// The time when the Process Manager was used from Durable Functions to
+    /// transition the state to Terminated.
     /// </summary>
-    public string? CustomState { get; set; }
+    public DateTimeOffset? TerminatedAt { get; } = TerminatedAt;
 }
