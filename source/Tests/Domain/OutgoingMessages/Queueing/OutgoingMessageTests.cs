@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Text.Encodings.Web;
-using BuildingBlocks.Application.Extensions.DependencyInjection;
+using BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Serialization;
 using Energinet.DataHub.EDI.OutgoingMessages.Application;

@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using BuildingBlocks.Application.FeatureFlag;
+using BuildingBlocks.Infrastructure.FeatureFlag;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.FeatureManagement;
 
-namespace BuildingBlocks.Application.Extensions.DependencyInjection;
+namespace BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 
 public static class FeatureFlagExtensions
 {

@@ -14,7 +14,7 @@
 
 using Microsoft.FeatureManagement;
 
-namespace BuildingBlocks.Application.FeatureFlag;
+namespace BuildingBlocks.Infrastructure.FeatureFlag;
 
 /// <summary>
 /// A <see cref="IFeatureFlagManager"/> implementation using the Microsoft.FeatureManagement package

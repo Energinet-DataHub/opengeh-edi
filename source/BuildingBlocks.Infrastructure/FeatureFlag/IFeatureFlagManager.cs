@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace BuildingBlocks.Application.FeatureFlag;
+namespace BuildingBlocks.Infrastructure.FeatureFlag;
 
 /// <summary>
 /// Manage feature flags in the application. If using <see cref="MicrosoftFeatureFlagManager"/>

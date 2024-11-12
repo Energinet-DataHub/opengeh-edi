@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Diagnostics.CodeAnalysis;
-using BuildingBlocks.Application.FeatureFlag;
+using BuildingBlocks.Infrastructure.FeatureFlag;
 
 namespace Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace BuildingBlocks.Application.FeatureFlag;
+namespace BuildingBlocks.Infrastructure.FeatureFlag;
 
 /// <summary>
 /// List of all Feature Flags that exists in the system. A Feature Flag name must

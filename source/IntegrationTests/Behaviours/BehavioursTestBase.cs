@@ -14,8 +14,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Azure.Messaging.ServiceBus;
-using BuildingBlocks.Application.Extensions.DependencyInjection;
-using BuildingBlocks.Application.FeatureFlag;
+using BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
+using BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;

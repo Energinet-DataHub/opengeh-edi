@@ -14,8 +14,8 @@
 
 using System.Text;
 using Azure.Storage.Blobs;
-using BuildingBlocks.Application.Extensions.DependencyInjection;
-using BuildingBlocks.Application.FeatureFlag;
+using BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
+using BuildingBlocks.Infrastructure.FeatureFlag;
 using Dapper;
 using Energinet.DataHub.BuildingBlocks.Tests.Logging;
 using Energinet.DataHub.BuildingBlocks.Tests.TestDoubles;

@@ -16,7 +16,7 @@ using Energinet.DataHub.Core.Messaging.Communication.Extensions.DependencyInject
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BuildingBlocks.Application.Extensions.DependencyInjection;
+namespace BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 
 public static class BuildingBlockExtensions
 {

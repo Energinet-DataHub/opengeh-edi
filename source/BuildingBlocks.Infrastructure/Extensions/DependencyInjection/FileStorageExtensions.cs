@@ -14,13 +14,14 @@
 
 using Azure.Identity;
 using Azure.Storage.Blobs;
+using Energinet.DataHub.EDI.BuildingBlocks.Application.FileStorage;
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.Configuration.Options;
-using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
+using Energinet.DataHub.EDI.BuildingBlocks.Interfaces.FileStorage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace BuildingBlocks.Application.Extensions.DependencyInjection;
+namespace BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 
 public static class FileStorageExtensions
 {

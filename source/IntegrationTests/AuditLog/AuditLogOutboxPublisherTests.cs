@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Net;
-using BuildingBlocks.Application.Extensions.DependencyInjection;
+using BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.Outbox.Abstractions;
 using Energinet.DataHub.EDI.AuditLog;
 using Energinet.DataHub.EDI.AuditLog.AuditLogClient;

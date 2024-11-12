@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Net;
-using BuildingBlocks.Application.FeatureFlag;
+using BuildingBlocks.Infrastructure.FeatureFlag;
 using Energinet.DataHub.EDI.AuditLog.AuditLogger;
 using Energinet.DataHub.EDI.B2BApi.Common;
 using Energinet.DataHub.EDI.B2BApi.Extensions;

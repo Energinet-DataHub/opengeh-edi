@@ -15,7 +15,7 @@
 using Azure;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.FileStorage;
+namespace Energinet.DataHub.EDI.BuildingBlocks.Interfaces.FileStorage;
 
 /// <summary>
 /// Used to upload/download files (primarily used for market documents)

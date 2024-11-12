@@ -14,7 +14,7 @@
 
 using System.Reflection;
 using Asp.Versioning;
-using BuildingBlocks.Application.Extensions.DependencyInjection;
+using BuildingBlocks.Infrastructure.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.Common.Extensions.DependencyInjection;
 using Energinet.DataHub.Core.App.WebApp.Extensions.Builder;
 using Energinet.DataHub.Core.App.WebApp.Extensions.DependencyInjection;
