@@ -58,7 +58,8 @@ public class ProcessDelegationConfiguredEventProcessor : IIntegrationEventProces
             DelegatedProcess.ProcessRequestEnergyResults => ProcessType.RequestEnergyResults,
             DelegatedProcess.ProcessRequestWholesaleResults => ProcessType.RequestWholesaleResults,
             DelegatedProcess.ProcessReceiveWholesaleResults => ProcessType.ReceiveWholesaleResults,
-            // TODO: DelegatedProcess.IncomingMeteredDataForMeasurementPoint => ProcessType.IncomingMeteredDataForMeasurementPoint,
+            DelegatedProcess.ProcessRequestMeteringpointData => ProcessType.IncomingMeteredDataForMeasurementPoint,
+            DelegatedProcess.ProcessReceiveMeteringpointData => ProcessType.OutgoingMeteredDataForMeasurementPoint,
             _ => throw new ArgumentOutOfRangeException(nameof(delegatedProcess), delegatedProcess, null),
         };
     }
