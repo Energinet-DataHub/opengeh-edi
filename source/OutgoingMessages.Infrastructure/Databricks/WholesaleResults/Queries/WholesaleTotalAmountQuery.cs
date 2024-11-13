@@ -114,25 +114,16 @@ public class WholesaleTotalAmountQuery(
         var energySupplierNumber =
             ActorNumber.Create(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.EnergySupplierId));
 
-        if (chargeOwnerNumber is not null)
+        if (chargeOwnerNumber is null)
         {
-            if (chargeOwnerNumber != DataHubDetails.SystemOperatorActorNumber)
-            {
-                var gridAreaOwner = gridAreaOwnerDictionary[gridAreaCode];
-                return (gridAreaOwner, GetChargeOwnerRole(gridAreaOwner));
-            }
-
-            // ChargeOwner can either be grid operator or system operator.
-            return (chargeOwnerNumber, GetChargeOwnerRole(chargeOwnerNumber));
+            return (energySupplierNumber, ActorRole.EnergySupplier);
         }
 
-        return (energySupplierNumber, ActorRole.EnergySupplier);
-    }
+        if (chargeOwnerNumber == DataHubDetails.SystemOperatorActorNumber)
+        {
+            return (chargeOwnerNumber, ActorRole.SystemOperator);
+        }
 
-    private static ActorRole GetChargeOwnerRole(ActorNumber chargeOwnerId)
-    {
-        return chargeOwnerId == DataHubDetails.SystemOperatorActorNumber
-            ? ActorRole.SystemOperator
-            : ActorRole.GridAccessProvider;
+        return (gridAreaOwnerDictionary[gridAreaCode], ActorRole.GridAccessProvider);
     }
 }

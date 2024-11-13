@@ -77,26 +77,15 @@ public class WholesaleMonthlyAmountPerChargeQuery(
         var chargeOwnerReceiverId = originalChargeOwnerReceiverId;
         var isTax = databricksSqlRow.ToBool(WholesaleResultColumnNames.IsTax);
 
-        if (isTax)
+        if (isTax || chargeOwnerId != DataHubDetails.SystemOperatorActorNumber)
         {
-            var gridAreaOwner = _gridAreaOwners[gridAreaCode];
+            chargeOwnerReceiverId = _gridAreaOwners[gridAreaCode];
 
-            chargeOwnerReceiverId = gridAreaOwner;
-            _logger.LogInformation("Message created from CalculationResultId: {CalculationResultId}, was tax. ChargeOwnerReceiver was changed from {ChargeOwnerReceiverId} to {NewChargeOwnerReceiverId}", calculationResultId, originalChargeOwnerReceiverId, chargeOwnerReceiverId);
-        }
-        else
-        {
-            if (chargeOwnerId != DataHubDetails.SystemOperatorActorNumber)
-            {
-                var gridAreaOwner = _gridAreaOwners[gridAreaCode];
-
-                chargeOwnerReceiverId = gridAreaOwner;
-                _logger.LogInformation(
-                    "Message created from CalculationResultId: {CalculationResultId} had old charge owner. ChargeOwnerReceiver was changed from {ChargeOwnerReceiverId} to {NewChargeOwnerReceiverId}",
-                    calculationResultId,
-                    originalChargeOwnerReceiverId,
-                    chargeOwnerReceiverId);
-            }
+            _logger.LogInformation(
+                "Message created from CalculationResultId: {CalculationResultId}, was tax. ChargeOwnerReceiver was changed from {ChargeOwnerReceiverId} to {NewChargeOwnerReceiverId}",
+                calculationResultId,
+                originalChargeOwnerReceiverId,
+                chargeOwnerReceiverId);
         }
 
         var (businessReason, settlementVersion) = BusinessReasonAndSettlementVersionMapper.FromDeltaTableValue(
