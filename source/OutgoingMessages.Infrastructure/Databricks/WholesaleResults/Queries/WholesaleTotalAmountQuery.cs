@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Immutable;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.DataHub;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableConstants;
@@ -29,6 +30,7 @@ namespace Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Whole
 public class WholesaleTotalAmountQuery(
     ILogger logger,
     EdiDatabricksOptions ediDatabricksOptions,
+    ImmutableDictionary<string, ActorNumber> gridAreaOwners,
     EventId eventId,
     Guid calculationId,
     string? energySupplier)
@@ -38,6 +40,7 @@ public class WholesaleTotalAmountQuery(
         calculationId,
         energySupplier)
 {
+    private readonly ImmutableDictionary<string, ActorNumber> _gridAreaOwners = gridAreaOwners;
     private readonly EventId _eventId = eventId;
 
     public override string DataObjectName => "total_monthly_amounts_v1";
@@ -62,7 +65,7 @@ public class WholesaleTotalAmountQuery(
         DatabricksSqlRow databricksSqlRow,
         IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints)
     {
-        var receiver = GetReceiver(databricksSqlRow);
+        var receiver = GetReceiver(databricksSqlRow, _gridAreaOwners);
         var (businessReason, settlementVersion) = BusinessReasonAndSettlementVersionMapper.FromDeltaTableValue(
             databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.CalculationType));
 
@@ -103,26 +106,24 @@ public class WholesaleTotalAmountQuery(
     }
 
     private static (ActorNumber ActorNumber, ActorRole ActorRole) GetReceiver(
-        DatabricksSqlRow databricksSqlRow)
+        DatabricksSqlRow databricksSqlRow,
+        ImmutableDictionary<string, ActorNumber> gridAreaOwnerDictionary)
     {
         var chargeOwnerNumber = GetChargeOwnerNumber(databricksSqlRow);
+        var gridAreaCode = databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.GridAreaCode);
         var energySupplierNumber =
             ActorNumber.Create(databricksSqlRow.ToNonEmptyString(WholesaleResultColumnNames.EnergySupplierId));
-        if (chargeOwnerNumber is not null)
+
+        if (chargeOwnerNumber is null)
         {
-            // ChargeOwner can either be grid operator or system operator.
-            return (
-                chargeOwnerNumber,
-                GetChargeOwnerRole(chargeOwnerNumber));
+            return (energySupplierNumber, ActorRole.EnergySupplier);
         }
 
-        return (energySupplierNumber, ActorRole.EnergySupplier);
-    }
+        if (chargeOwnerNumber == DataHubDetails.SystemOperatorActorNumber)
+        {
+            return (chargeOwnerNumber, ActorRole.SystemOperator);
+        }
 
-    private static ActorRole GetChargeOwnerRole(ActorNumber chargeOwnerId)
-    {
-        return chargeOwnerId == DataHubDetails.SystemOperatorActorNumber
-            ? ActorRole.SystemOperator
-            : ActorRole.GridAccessProvider;
+        return (gridAreaOwnerDictionary[gridAreaCode], ActorRole.GridAccessProvider);
     }
 }
