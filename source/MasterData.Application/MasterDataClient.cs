@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Domain.ActorCertificates;
@@ -110,19 +111,17 @@ internal sealed class MasterDataClient : IMasterDataClient
         return new GridAreaOwnerDto(gridAreaOwner.GridAreaCode, gridAreaOwner.ValidFrom, gridAreaOwner.GridAreaOwnerActorNumber, gridAreaOwner.SequenceNumber);
     }
 
-    public async IAsyncEnumerable<GridAreaOwnerDto> GetAllGridAreaOwnersAsync(
-        [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async Task<ImmutableDictionary<string, ActorNumber>> GetAllGridAreaOwnersAsync(
+        CancellationToken cancellationToken)
     {
-        await foreach (var gridAreaOwner in _gridAreaRepository
-                           .GetAllGridAreaOwnersAsync(cancellationToken)
-                           .ConfigureAwait(false))
+        var builder = ImmutableDictionary.CreateBuilder<string, ActorNumber>();
+        await foreach (var gridAreaOwner in _gridAreaRepository.GetAllGridAreaOwnersAsync(cancellationToken))
         {
-            yield return new GridAreaOwnerDto(
-                gridAreaOwner.GridAreaCode,
-                gridAreaOwner.ValidFrom,
-                gridAreaOwner.GridAreaOwnerActorNumber,
-                gridAreaOwner.SequenceNumber);
+            // TODO (MWO): This should in principle always add, and always successfully add, but we should consider what to do if it fails.
+            builder.TryAdd(gridAreaOwner.GridAreaCode, gridAreaOwner.GridAreaOwnerActorNumber);
         }
+
+        return builder.ToImmutable();
     }
 
     public async Task CreateOrUpdateActorCertificateAsync(

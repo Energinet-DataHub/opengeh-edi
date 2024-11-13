@@ -40,15 +40,8 @@ public class GetGridAreaOwnersActivity(IMasterDataClient masterDataClient)
     }
 
     [Function(nameof(GetGridAreaOwnersActivity))]
-    public async Task<ImmutableDictionary<string, ActorNumber>> Run([ActivityTrigger] object? input)
+    public Task<ImmutableDictionary<string, ActorNumber>> Run([ActivityTrigger] object? input)
     {
-        var builder = ImmutableDictionary.CreateBuilder<string, ActorNumber>();
-        await foreach (var (gridAreaCode, _, actorNumber, _) in _masterDataClient.GetAllGridAreaOwnersAsync(
-                           CancellationToken.None))
-        {
-            builder.TryAdd(gridAreaCode, actorNumber);
-        }
-
-        return builder.ToImmutable();
+        return _masterDataClient.GetAllGridAreaOwnersAsync(CancellationToken.None);
     }
 }

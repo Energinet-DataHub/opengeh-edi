@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Immutable;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 
@@ -52,7 +53,7 @@ public interface IMasterDataClient
     /// <summary>
     /// Get all grid area owners.
     /// </summary>
-    IAsyncEnumerable<GridAreaOwnerDto> GetAllGridAreaOwnersAsync(CancellationToken cancellationToken);
+    Task<ImmutableDictionary<string, ActorNumber>> GetAllGridAreaOwnersAsync(CancellationToken cancellationToken);
 
     /// <summary>
     ///     Create or update the actor certificate for a given actor.
