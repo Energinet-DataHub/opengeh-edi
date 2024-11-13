@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;

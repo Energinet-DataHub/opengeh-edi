@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.DataAccess.Extensions.DependencyInjection;
-using Energinet.DataHub.EDI.DataAccess.UnitOfWork;
 using Energinet.DataHub.EDI.MasterData.Application;
 using Energinet.DataHub.EDI.MasterData.Domain.ActorCertificates;
 using Energinet.DataHub.EDI.MasterData.Domain.Actors;
@@ -28,7 +27,6 @@ using Energinet.DataHub.EDI.MasterData.Infrastructure.ProcessDelegation;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Energinet.DataHub.EDI.MasterData.Infrastructure.Extensions.DependencyInjection;
 
@@ -39,8 +37,10 @@ public static class MasterDataExtensions
         services.AddScopedSqlDbContext<MasterDataContext>(configuration);
 
         // Data access
-        services
-            .TryAddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IMasterDataContext, MasterDataContext>(sp =>
+        {
+            return sp.GetRequiredService<MasterDataContext>();
+        });
 
         // Grid area
         services
