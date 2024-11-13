@@ -12,17 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.ProcessManager.Api.Model.OrchestrationInstance;
+namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 
-public class OrchestrationStepLifecycleStateDto
-{
-    public OrchestrationStepLifecycleStates? State { get; set; }
-
-    public OrchestrationStepTerminationStates? TerminationState { get; set; }
-
-    public DateTimeOffset? CreatedAt { get; set; }
-
-    public DateTimeOffset? StartedAt { get; set; }
-
-    public DateTimeOffset? TerminatedAt { get; set; }
-}
+public record StepInstanceId(Guid Value);

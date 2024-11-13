@@ -17,85 +17,76 @@ using DomainModel = Energinet.DataHub.ProcessManagement.Core.Domain.Orchestratio
 
 namespace Energinet.DataHub.ProcessManager.Api.Mappers;
 
+#pragma warning disable SA1118 // Parameter should not span multiple lines
 internal static class OrchestrationInstanceMapperExtensions
 {
     public static ApiModel.OrchestrationInstanceDto MapToDto(
         this DomainModel.OrchestrationInstance entity)
     {
-        return new ApiModel.OrchestrationInstanceDto
-        {
-            Id = entity.Id.Value,
-            Lifecycle = entity.Lifecycle.MapToDto(),
-            ParameterValue = entity.ParameterValue.AsExpandoObject(),
-            Steps = entity.Steps.Select(step => step.MapToDto()).ToList(),
-            CustomState = entity.CustomState.Value,
-        };
+        return new ApiModel.OrchestrationInstanceDto(
+            Id: entity.Id.Value,
+            Lifecycle: entity.Lifecycle.MapToDto(),
+            ParameterValue: entity.ParameterValue.AsExpandoObject(),
+            Steps: entity.Steps.Select(step => step.MapToDto()).ToList(),
+            CustomState: entity.CustomState.Value);
     }
 
     public static ApiModel.OrchestrationInstanceLifecycleStatesDto MapToDto(
         this DomainModel.OrchestrationInstanceLifecycleState entity)
     {
-        return new ApiModel.OrchestrationInstanceLifecycleStatesDto
-        {
-            State = Enum
+        return new ApiModel.OrchestrationInstanceLifecycleStatesDto(
+            State: Enum
                 .TryParse<ApiModel.OrchestrationInstanceLifecycleStates>(
                     entity.State.ToString(),
                     ignoreCase: true,
                     out var lifecycleStateResult)
                 ? lifecycleStateResult
-                : null,
-            TerminationState = Enum
+                : throw new InvalidOperationException($"Invalid State '{entity.State}'; cannot be mapped."),
+            TerminationState: Enum
                 .TryParse<ApiModel.OrchestrationInstanceTerminationStates>(
                     entity.TerminationState.ToString(),
                     ignoreCase: true,
                     out var terminationStateResult)
                 ? terminationStateResult
                 : null,
-            CreatedAt = entity.CreatedAt.ToDateTimeOffset(),
-            ScheduledToRunAt = entity.ScheduledToRunAt?.ToDateTimeOffset(),
-            QueuedAt = entity.QueuedAt?.ToDateTimeOffset(),
-            StartedAt = entity.StartedAt?.ToDateTimeOffset(),
-            TerminatedAt = entity.TerminatedAt?.ToDateTimeOffset(),
-        };
+            CreatedAt: entity.CreatedAt.ToDateTimeOffset(),
+            ScheduledToRunAt: entity.ScheduledToRunAt?.ToDateTimeOffset(),
+            QueuedAt: entity.QueuedAt?.ToDateTimeOffset(),
+            StartedAt: entity.StartedAt?.ToDateTimeOffset(),
+            TerminatedAt: entity.TerminatedAt?.ToDateTimeOffset());
     }
 
-    public static ApiModel.OrchestrationStepDto MapToDto(
-        this DomainModel.OrchestrationStep entity)
+    public static ApiModel.StepInstanceDto MapToDto(
+        this DomainModel.StepInstance entity)
     {
-        return new ApiModel.OrchestrationStepDto
-        {
-            Id = entity.Id.Value,
-            Lifecycle = entity.Lifecycle.MapToDto(),
-            Description = entity.Description,
-            Sequence = entity.Sequence,
-            DependsOn = entity.DependsOn?.Value,
-            CustomState = entity.CustomState.Value,
-        };
+        return new ApiModel.StepInstanceDto(
+            Id: entity.Id.Value,
+            Lifecycle: entity.Lifecycle.MapToDto(),
+            Description: entity.Description,
+            Sequence: entity.Sequence,
+            CustomState: entity.CustomState.Value);
     }
 
-    public static ApiModel.OrchestrationStepLifecycleStateDto MapToDto(
-        this DomainModel.OrchestrationStepLifecycleState entity)
+    public static ApiModel.StepInstanceLifecycleStateDto MapToDto(
+        this DomainModel.StepInstanceLifecycleState entity)
     {
-        return new ApiModel.OrchestrationStepLifecycleStateDto
-        {
-            State = Enum
-                .TryParse<ApiModel.OrchestrationStepLifecycleStates>(
+        return new ApiModel.StepInstanceLifecycleStateDto(
+            State: Enum
+                .TryParse<ApiModel.StepInstanceLifecycleStates>(
                     entity.State.ToString(),
                     ignoreCase: true,
                     out var lifecycleStateResult)
                 ? lifecycleStateResult
-                : null,
-            TerminationState = Enum
+                : throw new InvalidOperationException($"Invalid State '{entity.State}'; cannot be mapped."),
+            TerminationState: Enum
                 .TryParse<ApiModel.OrchestrationStepTerminationStates>(
                     entity.TerminationState.ToString(),
                     ignoreCase: true,
                     out var terminationStateResult)
                 ? terminationStateResult
                 : null,
-            CreatedAt = entity.CreatedAt.ToDateTimeOffset(),
-            StartedAt = entity.StartedAt?.ToDateTimeOffset(),
-            TerminatedAt = entity.TerminatedAt?.ToDateTimeOffset(),
-        };
+            StartedAt: entity.StartedAt?.ToDateTimeOffset(),
+            TerminatedAt: entity.TerminatedAt?.ToDateTimeOffset());
     }
 
     public static IReadOnlyCollection<ApiModel.OrchestrationInstanceDto> MapToDto(
@@ -106,3 +97,4 @@ internal static class OrchestrationInstanceMapperExtensions
             .ToList();
     }
 }
+#pragma warning restore SA1118 // Parameter should not span multiple lines
