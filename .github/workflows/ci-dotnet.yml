@@ -157,7 +157,7 @@ jobs:
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@madu/upgrade-azurite-to-3.33.0
     with:
       download_attempt_limit: 20
       azure_integrationtest_tenant_id: ${{ vars.integration_test_azure_tenant_id }}
