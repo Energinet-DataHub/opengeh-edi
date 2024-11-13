@@ -110,4 +110,4 @@ runs:
           --no-build \
           --no-restore \
           --configuration Release \
-          --output '${{ inputs.output_path }}\migration\ProcessManager.DatabaseMigration'
+          --output '${{ inputs.output_path }}\migration\ProcessManager.DatabaseMigration12313'
