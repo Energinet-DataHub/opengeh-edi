@@ -85,7 +85,7 @@ public static class IntegrationEventExtensions
         // Durable Task
         services.AddDurableClientFactory(options =>
         {
-            options.ConnectionName = "AzureWebJobsStorage";
+            options.ConnectionName = "OrchestrationsStorageConnectionString";
             options.TaskHub = configuration["OrchestrationsTaskHubName"]!;
             options.IsExternalClient = true;
         });

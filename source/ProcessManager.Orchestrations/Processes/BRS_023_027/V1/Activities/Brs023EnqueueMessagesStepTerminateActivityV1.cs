@@ -36,11 +36,14 @@ internal class Brs023EnqueueMessagesStepTerminateActivityV1(
             .GetAsync(new OrchestrationInstanceId(orchestrationInstanceId))
             .ConfigureAwait(false);
 
-        var step = orchestrationInstance.Steps.First(x => x.Sequence == NotifyAggregatedMeasureDataOrchestrationV1.EnqueueMessagesStepIndex);
-        step.Lifecycle.TransitionToTerminated(Clock, OrchestrationStepTerminationStates.Succeeded);
-        await UnitOfWork.CommitAsync().ConfigureAwait(false);
+        var step = orchestrationInstance.Steps.Single(x => x.Sequence == NotifyAggregatedMeasureDataOrchestrationV1.EnqueueMessagesStepSequence);
+        if (!step.IsSkipped())
+        {
+            step.Lifecycle.TransitionToTerminated(Clock, OrchestrationStepTerminationStates.Succeeded);
+            await UnitOfWork.CommitAsync().ConfigureAwait(false);
 
-        // TODO: For demo purposes; remove when done
-        await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+            // TODO: For demo purposes; remove when done
+            await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+        }
     }
 }

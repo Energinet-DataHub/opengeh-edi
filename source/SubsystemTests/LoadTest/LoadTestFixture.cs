@@ -70,13 +70,9 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
             _serviceBusClient,
             GetConfigurationValue<string>(configuration, "sbq-edi-inbox-messagequeue-name"));
 
-        // AzureWebJobsStorage connection string name/value is set implicitly from terraform as an application setting in Azure,
-        // and added to the keyvault as "func-edi-api-web-jobs-storage-connection-string"
         _durableTaskManager = new DurableTaskManager(
-            "AzureWebJobsStorage",
-            GetConfigurationValue<string>(
-                configuration,
-                "func-edi-api-web-jobs-storage-connection-string"));
+            "OrchestrationsStorageConnectionString",
+            GetConfigurationValue<string>(configuration, "func-edi-api-taskhub-storage-connection-string"));
     }
 
     internal EdiInboxClient EdiInboxClient { get; }

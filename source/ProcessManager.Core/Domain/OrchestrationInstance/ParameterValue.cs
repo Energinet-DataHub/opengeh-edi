@@ -20,9 +20,9 @@ namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 /// <summary>
 /// Store a Durable Functions orchestration input parameter value as JSON.
 /// </summary>
-public class OrchestrationInstanceParameterValue
+public class ParameterValue
 {
-    internal OrchestrationInstanceParameterValue()
+    internal ParameterValue()
     {
         SerializedParameterValue = string.Empty;
     }
@@ -43,8 +43,8 @@ public class OrchestrationInstanceParameterValue
         SerializedParameterValue = JsonSerializer.Serialize(instance);
     }
 
-    public ExpandoObject? AsExpandoObject()
+    public ExpandoObject AsExpandoObject()
     {
-        return JsonSerializer.Deserialize<ExpandoObject>(SerializedParameterValue);
+        return JsonSerializer.Deserialize<ExpandoObject>(SerializedParameterValue) ?? new ExpandoObject();
     }
 }

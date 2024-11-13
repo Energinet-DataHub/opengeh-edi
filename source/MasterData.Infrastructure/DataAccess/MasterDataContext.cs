@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Infrastructure.DataAccess;
+using Energinet.DataHub.EDI.MasterData.Application;
 using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
 using Energinet.DataHub.EDI.MasterData.Infrastructure.ActorCertificates;
@@ -23,7 +24,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 
-public class MasterDataContext : DbContext, IEdiDbContext
+public class MasterDataContext : DbContext, IEdiDbContext, IMasterDataContext
 {
 #nullable disable
     public MasterDataContext(DbContextOptions<MasterDataContext> options)

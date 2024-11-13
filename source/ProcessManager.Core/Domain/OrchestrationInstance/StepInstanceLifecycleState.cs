@@ -16,40 +16,44 @@ using NodaTime;
 
 namespace Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 
-public class OrchestrationStepLifecycleState
+public class StepInstanceLifecycleState
 {
-    internal OrchestrationStepLifecycleState(IClock clock)
+    internal StepInstanceLifecycleState(
+        bool canBeSkipped)
     {
-        CreatedAt = clock.GetCurrentInstant();
-        State = OrchestrationStepLifecycleStates.Pending;
+        State = StepInstanceLifecycleStates.Pending;
+        CanBeSkipped = canBeSkipped;
     }
 
-    /// <summary>
-    /// Used by Entity Framework
-    /// </summary>
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-    // ReSharper disable once UnusedMember.Local -- Used by Entity Framework
-    private OrchestrationStepLifecycleState()
-    {
-    }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-
-    public OrchestrationStepLifecycleStates State { get; private set; }
+    public StepInstanceLifecycleStates State { get; private set; }
 
     public OrchestrationStepTerminationStates? TerminationState { get; private set; }
 
-    public Instant CreatedAt { get; }
-
+    /// <summary>
+    /// The time when the Process Manager was used from Durable Functions to
+    /// transition the state to Running.
+    /// </summary>
     public Instant? StartedAt { get; private set; }
 
+    /// <summary>
+    /// The time when the Process Manager was used from Durable Functions to
+    /// transition the state to Terminated.
+    /// </summary>
     public Instant? TerminatedAt { get; private set; }
+
+    /// <summary>
+    /// Specifies if the step supports beeing skipped.
+    /// If <see langword="false"/> then the step cannot be transitioned
+    /// to the Skipped state.
+    /// </summary>
+    public bool CanBeSkipped { get; }
 
     public void TransitionToRunning(IClock clock)
     {
-        if (State is not OrchestrationStepLifecycleStates.Pending)
-            throw new InvalidOperationException($"Cannot change state from '{State}' to '{OrchestrationStepLifecycleStates.Running}'.");
+        if (State is not StepInstanceLifecycleStates.Pending)
+            throw new InvalidOperationException($"Cannot change state from '{State}' to '{StepInstanceLifecycleStates.Running}'.");
 
-        State = OrchestrationStepLifecycleStates.Running;
+        State = StepInstanceLifecycleStates.Running;
         StartedAt = clock.GetCurrentInstant();
     }
 
@@ -59,14 +63,22 @@ public class OrchestrationStepLifecycleState
         {
             case OrchestrationStepTerminationStates.Succeeded:
             case OrchestrationStepTerminationStates.Failed:
-                if (State is not OrchestrationStepLifecycleStates.Running)
+                if (State is not StepInstanceLifecycleStates.Running)
                     throw new InvalidOperationException($"Cannot change termination state to '{terminationState}' when '{State}'.");
                 break;
+
+            case OrchestrationStepTerminationStates.Skipped:
+                if (State is not StepInstanceLifecycleStates.Pending)
+                    throw new InvalidOperationException($"Cannot change termination state to '{terminationState}' when '{State}'.");
+                if (CanBeSkipped == false)
+                    throw new InvalidOperationException($"Step cannot be skipped.");
+                break;
+
             default:
                 throw new InvalidOperationException($"Unsupported termination state '{terminationState}'.");
         }
 
-        State = OrchestrationStepLifecycleStates.Terminated;
+        State = StepInstanceLifecycleStates.Terminated;
         TerminationState = terminationState;
         TerminatedAt = clock.GetCurrentInstant();
     }

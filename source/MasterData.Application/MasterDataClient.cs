@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-using Energinet.DataHub.EDI.BuildingBlocks.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Domain.ActorCertificates;
 using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
@@ -30,7 +29,7 @@ public sealed class MasterDataClient : IMasterDataClient
     private readonly IActorRepository _actorRepository;
     private readonly IGridAreaRepository _gridAreaRepository;
     private readonly IActorCertificateRepository _actorCertificateRepository;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMasterDataContext _masterDataContext;
     private readonly ILogger<IMasterDataClient> _logger;
     private readonly IProcessDelegationRepository _processDelegationRepository;
 
@@ -38,14 +37,14 @@ public sealed class MasterDataClient : IMasterDataClient
         IActorRepository actorRepository,
         IGridAreaRepository gridAreaRepository,
         IActorCertificateRepository actorCertificateRepository,
-        IUnitOfWork unitOfWork,
+        IMasterDataContext masterDataContext,
         ILogger<IMasterDataClient> logger,
         IProcessDelegationRepository processDelegationRepository)
     {
         _actorRepository = actorRepository;
         _gridAreaRepository = gridAreaRepository;
         _actorCertificateRepository = actorCertificateRepository;
-        _unitOfWork = unitOfWork;
+        _masterDataContext = masterDataContext;
         _logger = logger;
         _processDelegationRepository = processDelegationRepository;
     }
@@ -60,7 +59,7 @@ public sealed class MasterDataClient : IMasterDataClient
                 cancellationToken)
             .ConfigureAwait(false);
 
-        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
+        await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public Task<ActorNumber?> GetActorNumberByExternalIdAsync(
@@ -84,7 +83,7 @@ public sealed class MasterDataClient : IMasterDataClient
                 cancellationToken)
             .ConfigureAwait(false);
 
-        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
+        await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<GridAreaOwnerDto> GetGridOwnerForGridAreaCodeAsync(string gridAreaCode, CancellationToken cancellationToken)
@@ -131,7 +130,7 @@ public sealed class MasterDataClient : IMasterDataClient
                 request.SequenceNumber);
         }
 
-        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
+        await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<Actor?> GetActorFromThumbprintAsync(
@@ -158,7 +157,7 @@ public sealed class MasterDataClient : IMasterDataClient
                 cancellationToken)
             .ConfigureAwait(false);
 
-        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
+        await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task CreateProcessDelegationAsync(
@@ -178,7 +177,7 @@ public sealed class MasterDataClient : IMasterDataClient
                 processDelegationDto.DelegatedTo.ActorRole),
             cancellationToken);
 
-        await _unitOfWork.CommitTransactionAsync(cancellationToken).ConfigureAwait(false);
+        await _masterDataContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<ProcessDelegationDto?> GetProcessDelegatedByAsync(

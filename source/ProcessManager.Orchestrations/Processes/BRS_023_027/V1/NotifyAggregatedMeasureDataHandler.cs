@@ -16,18 +16,14 @@ using Energinet.DataHub.ProcessManagement.Core.Application;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using Energinet.DataHub.ProcessManager.Api.Model;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using NodaTime.Extensions;
-using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 
 namespace Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1;
 
-internal class NotifyAggregatedMeasureDataOrchestrationTriggerV1(
-    ILogger<NotifyAggregatedMeasureDataOrchestrationTriggerV1> logger,
+public class NotifyAggregatedMeasureDataHandler(
+    ILogger<NotifyAggregatedMeasureDataHandler> logger,
     IClock clock,
     IOrchestrationInstanceRepository repository,
     IUnitOfWork unitOfWork,
@@ -39,45 +35,27 @@ internal class NotifyAggregatedMeasureDataOrchestrationTriggerV1(
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IOrchestrationInstanceManager _manager = manager;
 
-    /// <summary>
-    /// Schedule a BRS-023 or BRS-027 calculation and return its id.
-    /// </summary>
-    [Function(nameof(NotifyAggregatedMeasureDataOrchestrationTriggerV1))]
-    public async Task<IActionResult> Run(
-        [HttpTrigger(
-            AuthorizationLevel.Anonymous,
-            "post",
-            Route = "processmanager/orchestrationinstance/brs_023_027/1")]
-        HttpRequest httpRequest,
-        [FromBody]
-        ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> dto,
-        FunctionContext executionContext)
+    public async Task<OrchestrationInstanceId> ScheduleNewCalculationAsync(
+        ScheduleOrchestrationInstanceDto<NotifyAggregatedMeasureDataInputV1> dto)
     {
-        // TODO: Server-side validation => Validate "period" is midnight values when given "timezone"
+        // TODO:
+        // Server-side validation => Validate "period" is midnight values when given "timezone" etc.
+        // See class Calculation and method IsValid in Wholesale.
+
+        // Here we show how its possible, based on input, to decide certain steps should be skipped by the orchestration.
+        IReadOnlyCollection<int> skipStepsBySequence = dto.InputParameter.IsInternalCalculation
+            ? [NotifyAggregatedMeasureDataOrchestrationV1.EnqueueMessagesStepSequence]
+            : [];
+
         var orchestrationInstanceId = await _manager
             .ScheduleNewOrchestrationInstanceAsync(
                 name: "BRS_023_027",
                 version: 1,
                 inputParameter: dto.InputParameter,
-                runAt: dto.RunAt.ToInstant())
+                runAt: dto.RunAt.ToInstant(),
+                skipStepsBySequence: skipStepsBySequence)
             .ConfigureAwait(false);
 
-        // TODO:
-        // For demo purposes we create the steps here.
-        // Will be refactored to describing the steps as part of the orchestration description
-        var orchestrationInstance = await _repository.GetAsync(orchestrationInstanceId);
-        orchestrationInstance.Steps.Add(new OrchestrationStep(
-            orchestrationInstance.Id,
-            _clock,
-            "Beregning",
-            sequence: 0));
-        orchestrationInstance.Steps.Add(new OrchestrationStep(
-            orchestrationInstance.Id,
-            _clock,
-            "Besked dannelse",
-            sequence: 1));
-        await _unitOfWork.CommitAsync();
-
-        return new OkObjectResult(orchestrationInstanceId.Value);
+        return orchestrationInstanceId;
     }
 }
