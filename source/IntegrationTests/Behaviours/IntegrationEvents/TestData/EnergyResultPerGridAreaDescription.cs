@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Immutable;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.EnergyResults.Queries;
@@ -58,4 +59,8 @@ public class EnergyResultPerGridAreaDescription
             Period.Start,
             1928898.153m,
             CalculatedQuantityQuality.Incomplete));
+
+    public ImmutableDictionary<string, ActorNumber> GridAreaOwners =>
+        ImmutableDictionary<string, ActorNumber>.Empty
+            .Add(GridAreaCode, ActorNumber.Create("1111111111111"));
 }

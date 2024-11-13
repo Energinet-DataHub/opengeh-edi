@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Immutable;
+using System.Runtime.CompilerServices;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Domain.ActorCertificates;
 using Energinet.DataHub.EDI.MasterData.Domain.Actors;
@@ -107,6 +109,23 @@ internal sealed class MasterDataClient : IMasterDataClient
             return null;
 
         return new GridAreaOwnerDto(gridAreaOwner.GridAreaCode, gridAreaOwner.ValidFrom, gridAreaOwner.GridAreaOwnerActorNumber, gridAreaOwner.SequenceNumber);
+    }
+
+    public async Task<ImmutableList<GridAreaOwnerDto>> GetAllGridAreaOwnersAsync(
+        CancellationToken cancellationToken)
+    {
+        var builder = ImmutableList.CreateBuilder<GridAreaOwnerDto>();
+        await foreach (var gridAreaOwner in _gridAreaRepository.GetAllGridAreaOwnersAsync(cancellationToken))
+        {
+            builder.Add(
+                new GridAreaOwnerDto(
+                    gridAreaOwner.GridAreaCode,
+                    gridAreaOwner.ValidFrom,
+                    gridAreaOwner.GridAreaOwnerActorNumber,
+                    gridAreaOwner.SequenceNumber));
+        }
+
+        return builder.ToImmutable();
     }
 
     public async Task CreateOrUpdateActorCertificateAsync(
