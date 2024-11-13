@@ -34,4 +34,10 @@ public class ProcessManagerClientOptions
     /// </summary>
     [Required]
     public string OrchestrationsApiBaseAddress { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Name of the topic which the Process Manager receives service bus messages on
+    /// </summary>
+    [Required]
+    public string ProcessManagerTopic { get; set; } = string.Empty;
 }

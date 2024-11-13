@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 using Energinet.DataHub.ProcessManager.Client.Processes.BRS_023_027.V1;
+using Energinet.DataHub.ProcessManager.Client.Processes.BRS_026_028.V1;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -51,6 +54,19 @@ public static class ClientExtensions
 
         services.AddScoped<IProcessManagerClient, ProcessManagerClient>();
         services.AddScoped<INotifyAggregatedMeasureDataClientV1, NotifyAggregatedMeasureDataClientV1>();
+
+        services.AddAzureClients(
+            builder =>
+            {
+                builder.AddClient<ServiceBusSender, ServiceBusClientOptions>(
+                        (_, _, provider) =>
+                            provider
+                                .GetRequiredService<ServiceBusClient>()
+                                .CreateSender(nameof(ProcessManagerClientOptions.ProcessManagerTopic)))
+                    .WithName(nameof(ProcessManagerClientOptions.ProcessManagerTopic));
+            });
+
+        services.AddScoped<IRequestCalculatedDataClientV1, RequestCalculatedDataClientV1>();
 
         return services;
     }
