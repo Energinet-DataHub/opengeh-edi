@@ -9,7 +9,7 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.17.4" />
     <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="13.2.0" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.DurableTask" Version="1.1.5" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.DurableTask" Version="1.1.7" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ProcessManager.Core\ProcessManager.Core.csproj" />
