@@ -38,8 +38,15 @@ public class WholesaleResultEnumerator(
     public async IAsyncEnumerable<QueryResult<TResult>> GetAsync<TResult>(WholesaleResultQueryBase<TResult> query)
         where TResult : OutgoingMessageDto
     {
-        var gridAreaOwnerDictionary =
-            await _masterDataClient.GetAllGridAreaOwnersAsync(CancellationToken.None).ConfigureAwait(false);
+        var builder = ImmutableDictionary.CreateBuilder<string, ActorNumber>();
+        foreach (var gridAreaOwner in await _masterDataClient
+                     .GetAllGridAreaOwnersAsync(CancellationToken.None)
+                     .ConfigureAwait(false))
+        {
+            builder.Add(gridAreaOwner.GridAreaCode, gridAreaOwner.ActorNumber);
+        }
+
+        var gridAreaOwnerDictionary = builder.ToImmutable();
 
         var resultCount = 0;
 

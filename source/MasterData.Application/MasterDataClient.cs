@@ -111,14 +111,18 @@ internal sealed class MasterDataClient : IMasterDataClient
         return new GridAreaOwnerDto(gridAreaOwner.GridAreaCode, gridAreaOwner.ValidFrom, gridAreaOwner.GridAreaOwnerActorNumber, gridAreaOwner.SequenceNumber);
     }
 
-    public async Task<ImmutableDictionary<string, ActorNumber>> GetAllGridAreaOwnersAsync(
+    public async Task<ImmutableList<GridAreaOwnerDto>> GetAllGridAreaOwnersAsync(
         CancellationToken cancellationToken)
     {
-        var builder = ImmutableDictionary.CreateBuilder<string, ActorNumber>();
+        var builder = ImmutableList.CreateBuilder<GridAreaOwnerDto>();
         await foreach (var gridAreaOwner in _gridAreaRepository.GetAllGridAreaOwnersAsync(cancellationToken))
         {
-            // TODO (MWO): This should in principle always add, and always successfully add, but we should consider what to do if it fails.
-            builder.TryAdd(gridAreaOwner.GridAreaCode, gridAreaOwner.GridAreaOwnerActorNumber);
+            builder.Add(
+                new GridAreaOwnerDto(
+                    gridAreaOwner.GridAreaCode,
+                    gridAreaOwner.ValidFrom,
+                    gridAreaOwner.GridAreaOwnerActorNumber,
+                    gridAreaOwner.SequenceNumber));
         }
 
         return builder.ToImmutable();

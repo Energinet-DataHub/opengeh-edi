@@ -53,7 +53,7 @@ public interface IMasterDataClient
     /// <summary>
     /// Get all grid area owners.
     /// </summary>
-    Task<ImmutableDictionary<string, ActorNumber>> GetAllGridAreaOwnersAsync(CancellationToken cancellationToken);
+    Task<ImmutableList<GridAreaOwnerDto>> GetAllGridAreaOwnersAsync(CancellationToken cancellationToken);
 
     /// <summary>
     ///     Create or update the actor certificate for a given actor.
