@@ -36,4 +36,9 @@ public interface IGridAreaRepository
     /// Responsible for getting the grid area owner for a given grid area code.
     /// </summary>
     Task<GridAreaOwner?> GetGridAreaOwnerAsync(string gridAreaCode, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Responsible for getting all current grid area owners.
+    /// </summary>
+    IAsyncEnumerable<GridAreaOwner> GetAllGridAreaOwnersAsync(CancellationToken cancellationToken);
 }

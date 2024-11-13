@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Immutable;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.IntegrationTests.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.WholesaleResults.Queries;
@@ -92,4 +93,8 @@ public class WholesaleResultForMonthlyAmountPerChargeDescription
         65,
         Points: TimeSeriesPointsFactory
             .CreatePointsForPeriod(Period, Resolution.Monthly, null, null, 19.514m, null));
+
+    public ImmutableDictionary<string, ActorNumber> GridAreaOwners =>
+        ImmutableDictionary<string, ActorNumber>.Empty
+            .Add(GridAreaCode, ActorNumber.Create("8500000000502"));
 }
