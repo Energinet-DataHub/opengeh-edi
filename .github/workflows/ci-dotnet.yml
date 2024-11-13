@@ -35,7 +35,7 @@ jobs:
             paths: \source\ArchitectureTests\bin\Release\net8.0\Energinet.DataHub.EDI.ArchitectureTests.dll
           - name: Tests
             paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.Tests.dll
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@madu/upgrade-azurite-to-3.33.0
     with:
       download_attempt_limit: 30
       # Matrix parameters
