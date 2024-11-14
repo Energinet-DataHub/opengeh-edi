@@ -30,31 +30,40 @@ namespace Energinet.DataHub.ProcessManager.Client.Extensions.DependencyInjection
 public static class ClientExtensions
 {
     /// <summary>
-    /// Register Process Manager clients for use in applications.
+    /// Register Process Manager HTTP clients for use in applications.
     /// If <see cref="IHttpContextAccessor"/> is registered we try to retrieve the "Authorization"
     /// header value and forward it to the Process Manager API for authentication/authorization.
     /// </summary>
-    public static IServiceCollection AddProcessManagerClients(this IServiceCollection services)
+    public static IServiceCollection AddProcessManagerHttpClients(this IServiceCollection services)
     {
         services
-            .AddOptions<ProcessManagerClientOptions>()
-            .BindConfiguration(ProcessManagerClientOptions.SectionName)
+            .AddOptions<ProcessManagerHttpClientsOptions>()
+            .BindConfiguration(ProcessManagerHttpClientsOptions.SectionName)
             .ValidateDataAnnotations();
 
         services.AddHttpClient(HttpClientNames.GeneralApi, (sp, httpClient) =>
         {
-            var options = sp.GetRequiredService<IOptions<ProcessManagerClientOptions>>().Value;
+            var options = sp.GetRequiredService<IOptions<ProcessManagerHttpClientsOptions>>().Value;
             ConfigureHttpClient(sp, httpClient, options.GeneralApiBaseAddress);
         });
         services.AddHttpClient(HttpClientNames.OrchestrationsApi, (sp, httpClient) =>
         {
-            var options = sp.GetRequiredService<IOptions<ProcessManagerClientOptions>>().Value;
+            var options = sp.GetRequiredService<IOptions<ProcessManagerHttpClientsOptions>>().Value;
             ConfigureHttpClient(sp, httpClient, options.OrchestrationsApiBaseAddress);
         });
 
         services.AddScoped<IProcessManagerClient, ProcessManagerClient>();
         services.AddScoped<INotifyAggregatedMeasureDataClientV1, NotifyAggregatedMeasureDataClientV1>();
 
+        return services;
+    }
+
+    /// <summary>
+    /// Register Process Manager Service Bus clients for use in applications.
+    /// <remarks>The application must register the <see cref="ServiceBusClient"/> by calling </remarks>
+    /// </summary>
+    public static IServiceCollection AddProcessManagerServiceBusClients(this IServiceCollection services)
+    {
         services.AddAzureClients(
             builder =>
             {
@@ -62,8 +71,8 @@ public static class ClientExtensions
                         (_, _, provider) =>
                             provider
                                 .GetRequiredService<ServiceBusClient>()
-                                .CreateSender(nameof(ProcessManagerClientOptions.ProcessManagerTopic)))
-                    .WithName(nameof(ProcessManagerClientOptions.ProcessManagerTopic));
+                                .CreateSender(nameof(ProcessManagerServiceBusClientsOptions.ProcessManagerTopic)))
+                    .WithName(nameof(ProcessManagerServiceBusClientsOptions.ProcessManagerTopic));
             });
 
         services.AddScoped<IRequestCalculatedDataClientV1, RequestCalculatedDataClientV1>();

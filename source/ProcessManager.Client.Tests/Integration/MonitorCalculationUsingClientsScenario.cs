@@ -53,12 +53,12 @@ public class MonitorCalculationUsingClientsScenario : IAsyncLifetime
         var services = new ServiceCollection();
         services.AddScoped<IConfiguration>(_ => CreateInMemoryConfigurations(new Dictionary<string, string?>()
         {
-            [$"{ProcessManagerClientOptions.SectionName}:{nameof(ProcessManagerClientOptions.GeneralApiBaseAddress)}"]
+            [$"{ProcessManagerHttpClientsOptions.SectionName}:{nameof(ProcessManagerHttpClientsOptions.GeneralApiBaseAddress)}"]
                 = ProcessManagerAppFixture.AppHostManager.HttpClient.BaseAddress!.ToString(),
-            [$"{ProcessManagerClientOptions.SectionName}:{nameof(ProcessManagerClientOptions.OrchestrationsApiBaseAddress)}"]
+            [$"{ProcessManagerHttpClientsOptions.SectionName}:{nameof(ProcessManagerHttpClientsOptions.OrchestrationsApiBaseAddress)}"]
                 = OrchestrationsAppFixture.AppHostManager.HttpClient.BaseAddress!.ToString(),
         }));
-        services.AddProcessManagerClients();
+        services.AddProcessManagerHttpClients();
         ServiceProvider = services.BuildServiceProvider();
     }
 

@@ -17,11 +17,11 @@ using System.ComponentModel.DataAnnotations;
 namespace Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 
 /// <summary>
-/// Options for the configuration of Process Manager clients using the Process Manager API.
+/// Options for the configuration of Process Manager HTTP clients using the Process Manager API.
 /// </summary>
-public class ProcessManagerClientOptions
+public class ProcessManagerHttpClientsOptions
 {
-    public const string SectionName = "ProcessManagerClient";
+    public const string SectionName = "ProcessManagerHttpClients";
 
     /// <summary>
     /// Address to the general Api hosted in Process Manager.
@@ -34,10 +34,4 @@ public class ProcessManagerClientOptions
     /// </summary>
     [Required]
     public string OrchestrationsApiBaseAddress { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Name of the topic which the Process Manager receives service bus messages on
-    /// </summary>
-    [Required]
-    public string ProcessManagerTopic { get; set; } = string.Empty;
 }
