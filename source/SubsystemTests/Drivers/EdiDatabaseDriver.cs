@@ -274,6 +274,21 @@ internal sealed class EdiDatabaseDriver
         return dequeuedMessagesCount;
     }
 
+    internal async Task<int> CountEnqueuedMessagesForCalculationAsync(Guid calculationId)
+    {
+        await using var connection = new SqlConnection(_connectionString);
+
+        await connection.OpenAsync();
+
+        var dequeuedMessagesCount = await connection.ExecuteScalarAsync<int>(
+            sql: @"SELECT COUNT(B.[Id]) FROM [Bundles] B
+                        INNER JOIN [OutgoingMessages] OM ON B.[Id] = OM.[AssignedBundleId]
+                        WHERE OM.[CalculationId] = @CalculationId",
+            param: new { CalculationId = calculationId, });
+
+        return dequeuedMessagesCount;
+    }
+
     private async Task<Guid?> GetProcessIdAsync(SqlCommand command, CancellationToken cancellationToken)
     {
         await using var connection = new SqlConnection(_connectionString);

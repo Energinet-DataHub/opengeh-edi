@@ -18,6 +18,8 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.EDI.B2BApi.AppTests.DurableTask;
 using Energinet.DataHub.EDI.SubsystemTests.Drivers;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Extensions.Configuration;
 
@@ -61,6 +63,11 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
             configuration,
             "LOAD_TEST_CALCULATION_ID");
 
+        MinimumEnqueuedMessagesCount = GetConfigurationValue<int>(
+            configuration,
+            "MINIMUM_ENQUEUED_MESSAGES_COUNT",
+            defaultValue: 0);
+
         MinimumDequeuedMessagesCount = GetConfigurationValue<int>(
             configuration,
             "MINIMUM_DEQUEUED_MESSAGES_COUNT",
@@ -73,17 +80,26 @@ public sealed class LoadTestFixture : IAsyncLifetime, IAsyncDisposable
         _durableTaskManager = new DurableTaskManager(
             "OrchestrationsStorageConnectionString",
             GetConfigurationValue<string>(configuration, "func-edi-api-taskhub-storage-connection-string"));
+
+        var credential = new DefaultAzureCredential();
+        var telemetryConfiguration = TelemetryConfiguration.CreateDefault();
+        telemetryConfiguration.SetAzureTokenCredential(credential);
+        TelemetryClient = new TelemetryClient(telemetryConfiguration);
     }
 
     internal EdiInboxClient EdiInboxClient { get; }
 
     internal Guid LoadTestCalculationId { get; }
 
+    internal int MinimumEnqueuedMessagesCount { get; }
+
     internal int MinimumDequeuedMessagesCount { get; }
 
     internal IntegrationEventPublisher IntegrationEventPublisher { get; }
 
     internal string DatabaseConnectionString { get; }
+
+    internal TelemetryClient TelemetryClient { get; }
 
     [NotNull]
     internal IDurableClient? DurableClient { get; private set; }
