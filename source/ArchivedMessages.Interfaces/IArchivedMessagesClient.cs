@@ -27,7 +27,7 @@ public interface IArchivedMessagesClient
     /// </summary>
     /// <param name="message"></param>
     /// <param name="cancellationToken"></param>
-    Task<IArchivedFile> CreateAsync(ArchivedMessage message, CancellationToken cancellationToken);
+    Task<IArchivedFile> CreateAsync(ArchivedMessageDto message, CancellationToken cancellationToken);
 
     /// <summary>
     /// Get a document from the database
@@ -35,7 +35,7 @@ public interface IArchivedMessagesClient
     /// <param name="id"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-    Task<ArchivedMessageStream?> GetAsync(ArchivedMessageId id, CancellationToken cancellationToken);
+    Task<ArchivedMessageStreamDto?> GetAsync(ArchivedMessageIdDto id, CancellationToken cancellationToken);
 
     /// <summary>
     /// Search for messages in the database
@@ -43,5 +43,5 @@ public interface IArchivedMessagesClient
     /// <param name="queryInput"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-    Task<MessageSearchResult> SearchAsync(GetMessagesQuery queryInput, CancellationToken cancellationToken);
+    Task<MessageSearchResultDto> SearchAsync(GetMessagesQueryDto queryInput, CancellationToken cancellationToken);
 }

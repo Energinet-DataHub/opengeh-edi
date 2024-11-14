@@ -57,21 +57,21 @@ public class ArchivedMessageSearchController : ControllerBase
                 affectedEntityKey: null)
             .ConfigureAwait(false);
         var messageCreationPeriod = request.SearchCriteria.CreatedDuringPeriod is not null
-            ? new ArchivedMessages.Interfaces.Models.MessageCreationPeriod(
+            ? new ArchivedMessages.Interfaces.Models.MessageCreationPeriodDto(
                 request.SearchCriteria.CreatedDuringPeriod.Start.ToInstant(),
                 request.SearchCriteria.CreatedDuringPeriod.End.ToInstant())
             : null;
 
         var cursor = request.Pagination.Cursor != null
-            ? new SortingCursor(request.Pagination.Cursor.FieldToSortByValue, request.Pagination.Cursor.RecordId)
+            ? new SortingCursorDto(request.Pagination.Cursor.FieldToSortByValue, request.Pagination.Cursor.RecordId)
             : null;
         var pageSize = request.Pagination.PageSize;
         var navigationForward = request.Pagination.NavigationForward;
         var fieldToSortBy = FieldToSortByMapper.MapToFieldToSortBy(request.Pagination.SortBy);
         var directionToSortBy = DirectionToSortByMapper.MapToDirectionToSortBy(request.Pagination.DirectionToSortBy);
 
-        var query = new GetMessagesQuery(
-            new SortedCursorBasedPagination(
+        var query = new GetMessagesQueryDto(
+            new SortedCursorBasedPaginationDto(
                 cursor,
                 pageSize,
                 navigationForward,
@@ -121,21 +121,21 @@ public class ArchivedMessageSearchController : ControllerBase
             .ConfigureAwait(false);
 
         var messageCreationPeriod = request.SearchCriteria.CreatedDuringPeriod is not null
-            ? new ArchivedMessages.Interfaces.Models.MessageCreationPeriod(
+            ? new ArchivedMessages.Interfaces.Models.MessageCreationPeriodDto(
                 request.SearchCriteria.CreatedDuringPeriod.Start.ToInstant(),
                 request.SearchCriteria.CreatedDuringPeriod.End.ToInstant())
             : null;
 
         var cursor = request.Pagination.Cursor != null
-            ? new SortingCursor(request.Pagination.Cursor.FieldToSortByValue, request.Pagination.Cursor.RecordId)
+            ? new SortingCursorDto(request.Pagination.Cursor.FieldToSortByValue, request.Pagination.Cursor.RecordId)
             : null;
         var pageSize = request.Pagination.PageSize;
         var navigationForward = request.Pagination.NavigationForward;
         var fieldToSortBy = FieldToSortByMapper.MapToFieldToSortBy(request.Pagination.SortBy);
         var directionToSortBy = DirectionToSortByMapper.MapToDirectionToSortBy(request.Pagination.DirectionToSortBy);
 
-        var query = new GetMessagesQuery(
-            new SortedCursorBasedPagination(
+        var query = new GetMessagesQueryDto(
+            new SortedCursorBasedPaginationDto(
                 cursor,
                 pageSize,
                 navigationForward,

@@ -14,7 +14,7 @@
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 
-public record ArchivedMessageId(Guid Value)
+public sealed record ArchivedMessageIdDto(Guid Value)
 {
-    public static ArchivedMessageId Create() => new(Guid.NewGuid());
+    public static ArchivedMessageIdDto Create() => new(Guid.NewGuid());
 }

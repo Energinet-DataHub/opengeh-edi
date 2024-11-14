@@ -119,7 +119,7 @@ public class PeekMessage
         var marketDocumentStream = await _documentFactory.CreateFromAsync(outgoingMessageBundle, request.DocumentFormat, timestamp, cancellationToken).ConfigureAwait(false);
 
         var authenticatedActor = _actorAuthenticator.CurrentActorIdentity;
-        var archivedMessageToCreate = new ArchivedMessage(
+        var archivedMessageToCreate = new ArchivedMessageDto(
             outgoingMessageBundle.MessageId.Value,
             outgoingMessageBundle.OutgoingMessages.Select(om => om.EventId).ToArray(),
             outgoingMessageBundle.DocumentType.ToString(),
@@ -130,7 +130,7 @@ public class PeekMessage
             authenticatedActor.ActorRole,
             timestamp,
             outgoingMessageBundle.BusinessReason,
-            ArchivedMessageType.OutgoingMessage,
+            ArchivedMessageTypeDto.OutgoingMessage,
             marketDocumentStream,
             outgoingMessageBundle.RelatedToMessageId);
 

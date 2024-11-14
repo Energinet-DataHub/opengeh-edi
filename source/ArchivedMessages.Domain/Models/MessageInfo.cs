@@ -14,7 +14,7 @@
 
 using NodaTime;
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 
 public record MessageInfo(
     long RecordId,

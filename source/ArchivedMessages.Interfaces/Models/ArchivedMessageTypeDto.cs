@@ -12,20 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 
-namespace Energinet.DataHub.EDI.B2CWebApi.Mappers;
-
-public static class DirectionToSortByMapper
+public enum ArchivedMessageTypeDto
 {
-    public static DirectionToSortByDto? MapToDirectionToSortBy(
-        Energinet.DataHub.EDI.B2CWebApi.Models.DirectionToSortBy? directionToSortBy)
-    {
-        return directionToSortBy switch
-        {
-            Models.DirectionToSortBy.Ascending => DirectionToSortByDto.Ascending,
-            Models.DirectionToSortBy.Descending => DirectionToSortByDto.Descending,
-            _ => null,
-        };
-    }
+    IncomingMessage,
+    OutgoingMessage,
 }
