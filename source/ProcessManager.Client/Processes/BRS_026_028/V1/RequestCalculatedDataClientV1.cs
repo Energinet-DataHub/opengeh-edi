@@ -16,6 +16,10 @@ using System.Dynamic;
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.ProcessManager.Client.Extensions.Options;
+using Energinet.DataHub.ProcessManager.Client.Processes.BRS_026_028.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Contracts;
+using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_026.V1.Models;
+using Google.Protobuf;
 using Microsoft.Extensions.Azure;
 
 namespace Energinet.DataHub.ProcessManager.Client.Processes.BRS_026_028.V1;
@@ -23,24 +27,59 @@ namespace Energinet.DataHub.ProcessManager.Client.Processes.BRS_026_028.V1;
 public class RequestCalculatedDataClientV1(
     IAzureClientFactory<ServiceBusSender> serviceBusFactory) : IRequestCalculatedDataClientV1
 {
-    private readonly ServiceBusSender _serviceBusSender = serviceBusFactory.CreateClient(nameof(ProcessManagerClientOptions.ProcessManagerTopic));
+    private readonly ServiceBusSender _serviceBusSender = serviceBusFactory.CreateClient(nameof(ProcessManagerServiceBusOptions.ProcessManagerTopic));
 
-    public async Task RequestCalculatedEnergyTimeSeriesAsync(ExpandoObject input, CancellationToken cancellationToken)
+    public async Task RequestCalculatedEnergyTimeSeriesAsync(RequestCalculatedDataInputV1<RequestCalculatedEnergyTimeSeriesInputV1> input, CancellationToken cancellationToken)
     {
-        // TODO: Should input be generic or specific to the process?
-        // TODO: Create and send "Start orchestration DTO" protobuf messages
-        var jsonMessage = JsonSerializer.Serialize(input);
-        ServiceBusMessage serviceBusMessage = new(jsonMessage);
-        await _serviceBusSender.SendMessageAsync(serviceBusMessage, cancellationToken)
+        var serviceBusMessage = CreateServiceBusMessage(
+            "BRS_026",
+            1,
+            input);
+
+        await SendServiceBusMessage(
+                serviceBusMessage,
+                cancellationToken)
             .ConfigureAwait(false);
     }
 
-    public async Task RequestCalculatedWholesaleServicesAsync(ExpandoObject input, CancellationToken cancellationToken)
+    public async Task RequestCalculatedWholesaleServicesAsync(RequestCalculatedDataInputV1<object> input, CancellationToken cancellationToken)
     {
-        // TODO: Should input be generic or specific to the process?
-        // TODO: Create and send "Start orchestration DTO" protobuf messages
-        var jsonMessage = JsonSerializer.Serialize(input);
-        ServiceBusMessage serviceBusMessage = new(jsonMessage);
+        var serviceBusMessage = CreateServiceBusMessage(
+            "BRS_028",
+            1,
+            input);
+
+        await SendServiceBusMessage(serviceBusMessage, cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    private ServiceBusMessage CreateServiceBusMessage<TInput>(
+        string orchestrationName,
+        int orchestrationVersion,
+        RequestCalculatedDataInputV1<TInput> input)
+    where TInput : class
+    {
+        var message = new StartOrchestrationDto
+        {
+            OrchestrationName = orchestrationName,
+            OrchestrationVersion = orchestrationVersion,
+            JsonInput = JsonSerializer.Serialize(input.Input),
+        };
+
+        ServiceBusMessage serviceBusMessage = new(JsonFormatter.Default.Format(message))
+        {
+            Subject = orchestrationName,
+            MessageId = input.MessageId,
+            ContentType = "application/json",
+        };
+
+        return serviceBusMessage;
+    }
+
+    private async Task SendServiceBusMessage(
+        ServiceBusMessage serviceBusMessage,
+        CancellationToken cancellationToken)
+    {
         await _serviceBusSender.SendMessageAsync(serviceBusMessage, cancellationToken)
             .ConfigureAwait(false);
     }

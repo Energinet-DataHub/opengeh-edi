@@ -21,6 +21,8 @@ using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Startup
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Telemetry;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1;
 using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_023_027.V1.Model;
+using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_026.V1;
+using Energinet.DataHub.ProcessManager.Orchestrations.Processes.BRS_026.V1.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -54,6 +56,16 @@ var host = new HostBuilder()
                 "Besked dannelse",
                 canBeSkipped: true,
                 skipReason: "Do not perform this step for an internal calculation.");
+
+            var brs_026_v1 = new OrchestrationDescription(
+                name: "BRS_026",
+                version: 1,
+                canBeScheduled: false,
+                functionName: nameof(RequestCalculatedEnergyTimeSeriesOrchestrationV1));
+            brs_026_v1.ParameterDefinition.SetFromType<RequestCalculatedEnergyTimeSeriesInputV1>();
+            brs_026_v1.AppendStepDescription("Asynkron validering");
+            brs_026_v1.AppendStepDescription("Hent anmodningsdata");
+            brs_026_v1.AppendStepDescription("Udsend beskeder");
 
             return [brs_023_027_v1];
         });
