@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Immutable;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.DeltaTableMappers;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.Factories;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
@@ -60,7 +62,8 @@ public abstract class WholesaleResultQueryBase<TResult>(
         DatabricksSqlRow databricksSqlRow,
         IReadOnlyCollection<WholesaleTimeSeriesPoint> timeSeriesPoints);
 
-    protected override async Task<QueryResult<TResult>> CreateResultAsync(List<DatabricksSqlRow> currentResultSet)
+    protected override async Task<QueryResult<TResult>> CreateResultAsync(
+        List<DatabricksSqlRow> currentResultSet)
     {
         var firstRow = currentResultSet.First();
         var resultId = firstRow.ToGuid(WholesaleResultColumnNames.ResultId);
@@ -75,7 +78,8 @@ public abstract class WholesaleResultQueryBase<TResult>(
                 timeSeriesPoints.Add(timeSeriesPoint);
             }
 
-            var result = await CreateWholesaleResultAsync(firstRow, timeSeriesPoints).ConfigureAwait(false);
+            var result = await CreateWholesaleResultAsync(firstRow, timeSeriesPoints)
+                .ConfigureAwait(false);
             return QueryResult<TResult>.Success(result);
         }
         catch (Exception ex)

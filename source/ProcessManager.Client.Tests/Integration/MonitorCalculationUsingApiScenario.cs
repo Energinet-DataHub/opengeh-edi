@@ -76,6 +76,7 @@ public class MonitorCalculationUsingApiScenario : IAsyncLifetime
         scheduleRequestDto.InputParameter.PeriodStartDate = "2024-10-29T15:19:10.0151351+01:00";
         scheduleRequestDto.InputParameter.PeriodEndDate = "2024-10-29T16:19:10.0193962+01:00";
         scheduleRequestDto.InputParameter.IsInternalCalculation = true;
+        scheduleRequestDto.InputParameter.UserId = Guid.NewGuid();
 
         using var scheduleRequest = new HttpRequestMessage(
             HttpMethod.Post,
