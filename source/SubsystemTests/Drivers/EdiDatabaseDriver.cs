@@ -280,13 +280,13 @@ internal sealed class EdiDatabaseDriver
 
         await connection.OpenAsync();
 
-        var dequeuedMessagesCount = await connection.ExecuteScalarAsync<int>(
+        var enqueuedMessagesCount = await connection.ExecuteScalarAsync<int>(
             sql: @"SELECT COUNT(B.[Id]) FROM [Bundles] B
                         INNER JOIN [OutgoingMessages] OM ON B.[Id] = OM.[AssignedBundleId]
                         WHERE OM.[CalculationId] = @CalculationId",
             param: new { CalculationId = calculationId, });
 
-        return dequeuedMessagesCount;
+        return enqueuedMessagesCount;
     }
 
     private async Task<Guid?> GetProcessIdAsync(SqlCommand command, CancellationToken cancellationToken)
