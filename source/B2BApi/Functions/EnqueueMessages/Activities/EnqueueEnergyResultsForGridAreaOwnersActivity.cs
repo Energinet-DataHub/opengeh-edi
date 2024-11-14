@@ -30,12 +30,10 @@ namespace Energinet.DataHub.EDI.B2BApi.Functions.EnqueueMessages.Activities;
 public class EnqueueEnergyResultsForGridAreaOwnersActivity(
     ILogger<EnqueueEnergyResultsForGridAreaOwnersActivity> logger,
     IServiceScopeFactory serviceScopeFactory,
-    IMasterDataClient masterDataClient,
     EnergyResultEnumerator energyResultEnumerator)
     : EnqueueEnergyResultsBaseActivity(logger, serviceScopeFactory, energyResultEnumerator)
 {
     private readonly ILogger<EnqueueEnergyResultsForGridAreaOwnersActivity> _logger = logger;
-    private readonly IMasterDataClient _masterDataClient = masterDataClient;
     private readonly EnergyResultEnumerator _energyResultEnumerator = energyResultEnumerator;
 
     [Function(nameof(EnqueueEnergyResultsForGridAreaOwnersActivity))]
@@ -45,7 +43,7 @@ public class EnqueueEnergyResultsForGridAreaOwnersActivity(
         var query = new EnergyResultPerGridAreaQuery(
             _logger,
             _energyResultEnumerator.EdiDatabricksOptions,
-            _masterDataClient,
+            input.GridAreaOwners,
             EventId.From(input.EventId),
             input.CalculationId);
 

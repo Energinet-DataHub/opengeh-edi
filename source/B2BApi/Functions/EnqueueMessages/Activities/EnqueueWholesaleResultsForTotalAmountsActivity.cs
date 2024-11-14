@@ -31,7 +31,6 @@ public class EnqueueWholesaleResultsForTotalAmountsActivity(
     : EnqueueWholesaleResultsBaseActivity(logger, serviceScopeFactory, wholesaleResultEnumerator)
 {
     private readonly ILogger<EnqueueWholesaleResultsForTotalAmountsActivity> _logger = logger;
-    private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
     private readonly WholesaleResultEnumerator _wholesaleResultEnumerator = wholesaleResultEnumerator;
 
     /// <summary>
@@ -53,6 +52,7 @@ public class EnqueueWholesaleResultsForTotalAmountsActivity(
         var query = new WholesaleTotalAmountQuery(
             _logger,
             _wholesaleResultEnumerator.EdiDatabricksOptions,
+            input.GridAreaOwners,
             EventId.From(input.EventId),
             input.CalculationId,
             input.Actor);
