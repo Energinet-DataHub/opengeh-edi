@@ -18,6 +18,7 @@ using Energinet.DataHub.ProcessManager.Client.Processes.BRS_023_027.V1;
 using Energinet.DataHub.ProcessManager.Client.Processes.BRS_026_028.V1;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Azure;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -59,20 +60,27 @@ public static class ClientExtensions
     }
 
     /// <summary>
-    /// Register Process Manager Service Bus clients for use in applications.
+    /// Register Process Manager RequestCalculatedData client for use in applications.
     /// <remarks>The application must register the <see cref="ServiceBusClient"/> by calling </remarks>
     /// </summary>
-    public static IServiceCollection AddProcessManagerServiceBusClients(this IServiceCollection services)
+    public static IServiceCollection AddProcessManagerRequestCalculatedDataClient(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddProcessManagerServiceBusOptions();
+
         services.AddAzureClients(
             builder =>
             {
                 builder.AddClient<ServiceBusSender, ServiceBusClientOptions>(
-                        (_, _, provider) =>
-                            provider
-                                .GetRequiredService<ServiceBusClient>()
-                                .CreateSender(nameof(ProcessManagerServiceBusClientsOptions.ProcessManagerTopic)))
-                    .WithName(nameof(ProcessManagerServiceBusClientsOptions.ProcessManagerTopic));
+                    (_, _, provider) =>
+                    {
+                        var serviceBusOptions = provider.GetRequiredProcessManagerServiceBusOptions();
+                        var serviceBusSender = provider
+                            .GetRequiredService<ServiceBusClient>()
+                            .CreateSender(serviceBusOptions.ProcessManagerTopic);
+
+                        return serviceBusSender;
+                    })
+                    .WithName(nameof(ProcessManagerServiceBusOptions.ProcessManagerTopic));
             });
 
         services.AddScoped<IRequestCalculatedDataClientV1, RequestCalculatedDataClientV1>();

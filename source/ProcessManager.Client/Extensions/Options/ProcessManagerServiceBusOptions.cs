@@ -13,15 +13,16 @@
 // limitations under the License.
 
 using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Configuration;
 
 namespace Energinet.DataHub.ProcessManager.Client.Extensions.Options;
 
 /// <summary>
-/// Options for the configuration of Process Manager Service Bus clients using the Process Manager.
+/// Options for configuration of Process Manager Service Bus clients using the Process Manager.
 /// </summary>
-public class ProcessManagerServiceBusClientsOptions
+public class ProcessManagerServiceBusOptions
 {
-    public const string SectionName = "ProcessManagerServiceBusClients";
+    public const string SectionName = "ProcessManagerServiceBus";
 
     /// <summary>
     /// Name of the topic which the Process Manager receives service bus messages on
