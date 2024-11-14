@@ -170,7 +170,9 @@ public class OutgoingMessagesTestBase : IDisposable
             .Select(s => (DbContext)ServiceProvider.GetService(s.ServiceType)!);
 
         foreach (var dbContext in dbContextServices)
+        {
             dbContext.ChangeTracker.Clear();
+        }
     }
 
     protected virtual void Dispose(bool disposing)
