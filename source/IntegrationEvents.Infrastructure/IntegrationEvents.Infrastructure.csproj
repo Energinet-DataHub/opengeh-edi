@@ -18,7 +18,7 @@
         <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="6.1.0" />
       <PackageReference Include="Energinet.DataHub.Wholesale.Contracts" Version="10.0.0" />
       <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
-      <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
+      <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.12.19">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>

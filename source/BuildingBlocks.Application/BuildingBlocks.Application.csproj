@@ -11,7 +11,7 @@
       <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="8.0.2" />
       <PackageReference Include="AspNetCore.HealthChecks.AzureStorage" Version="7.0.0" />
       <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.1" />
-      <PackageReference Include="Energinet.DataHub.Core.App.Common" Version="13.2.0" />
+      <PackageReference Include="Energinet.DataHub.Core.App.Common" Version="13.3.0" />
       <PackageReference Include="Energinet.DataHub.Core.Messaging" Version="6.1.0" />
       <PackageReference Include="Google.Protobuf" Version="3.28.2" />
       <PackageReference Include="Microsoft.ApplicationInsights" Version="2.22.0" />
@@ -20,7 +20,7 @@
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
       <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
       <PackageReference Include="Microsoft.FeatureManagement" Version="3.5.0" />
-      <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
+      <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.12.19">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
