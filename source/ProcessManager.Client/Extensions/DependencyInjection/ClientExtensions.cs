@@ -63,7 +63,7 @@ public static class ClientExtensions
     /// Register Process Manager RequestCalculatedData client for use in applications.
     /// <remarks>The application must register the <see cref="ServiceBusClient"/> by calling </remarks>
     /// </summary>
-    public static IServiceCollection AddProcessManagerRequestCalculatedDataClient(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddProcessManagerRequestCalculatedDataClient(this IServiceCollection services)
     {
         services.AddProcessManagerServiceBusOptions();
 
