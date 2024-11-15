@@ -72,10 +72,6 @@ public sealed class LoadTestHelper : IClassFixture<LoadTestFixture>
     [Fact]
     public async Task After_load_test()
     {
-        await _ediDriver.StopOrchestrationForCalculationAsync(
-            calculationId: _fixture.LoadTestCalculationId,
-            createdAfter: SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromHours(1)));
-
         var enqueuedMessagesCount = await _ediDatabaseDriver.CountEnqueuedMessagesForCalculationAsync(_fixture.LoadTestCalculationId);
         _logger.WriteLine($"Enqueued messages count: {enqueuedMessagesCount} (CalculationId={_fixture.LoadTestCalculationId})");
 
