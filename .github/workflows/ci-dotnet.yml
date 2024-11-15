@@ -28,7 +28,7 @@ jobs:
     steps:
       - name: Print context
         run: |
-          echo "Job context: ${{ github.event.inputs.job_context }}"
+          echo "Job context: ${{ inputs.job_context }}"
 
   # Build DB migrations artifact
   dotnet_ci_build_auditlog_project:
