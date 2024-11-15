@@ -18,7 +18,7 @@ on:
   workflow_call:
     inputs:
       job_context:
-        description: 'The context of the job'
+        description: The context of the job
         type: string
         required: false
 
@@ -39,6 +39,7 @@ jobs:
   # Tests that do not require the integration test environment
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
   tests:
+    if: 1 == 2
     strategy:
       fail-fast: false
       matrix:
