@@ -34,8 +34,7 @@ jobs:
   # Build DB migrations artifact
   dotnet_auditlog_ci:
     if: fromJson(inputs.job_context).auditlog == 'true'
-    name: Build AuditLog project
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v14
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@kerbou/2524-build-brs-pipeline
     with:
       solution_file_path: source/AuditLog/AuditLog.csproj
       prepare_dotnet_tests: false
@@ -43,8 +42,7 @@ jobs:
   # Build DB migrations artifact
   dotnet_ci_build_db_migrations_project:
     if: fromJson(inputs.job_context).db_migrations == 'true'
-    name: Build DBMigrations project
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v14
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@kerbou/2524-build-brs-pipeline
     with:
       solution_file_path: source/ApplyDBMigrationsApp/ApplyDBMigrationsApp.csproj
       prepare_dotnet_tests: false
