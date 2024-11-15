@@ -43,12 +43,12 @@ jobs:
       matrix:
         artifact:
           - name: B2B API
-            should_build: ${{ fromJson(needs.print_context.outputs.job_context).b2bapi == 'true' }}
+            should_build: ${{ fromJson(inputs.job_context).b2bapi == 'true' }}
             project_name: b2bapi
             path: source/B2BApi/B2BApi.csproj
             outputpath: ${{ github.workspace }}/output/functions/b2bapi
           - name: B2C WebAPI
-            should_build: ${{ fromJson(needs.print_context.outputs.job_context).b2capi == 'true' }}
+            should_build: ${{ fromJson(inputs.job_context).b2capi == 'true' }}
             project_name: b2capi
             path: source/B2CWebApi/B2CWebApi.csproj
             outputpath: ${{ github.workspace }}/output/functions/b2capi
