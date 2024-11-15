@@ -1,5 +1,9 @@
 # ProcessManager.Client Release Notes
 
+## Version 0.10.0
+
+- Added 'RequestCalculatedDataClientV1'
+
 ## Version 0.9.3
 
 - Updated 'NotifyAggregatedMeasureDataInputV1' with new required 'UserId' parameter/property.
