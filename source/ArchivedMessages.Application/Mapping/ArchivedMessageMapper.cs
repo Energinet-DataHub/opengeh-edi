@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.EDI.ArchivedMessages.Domain.Exceptions;
 using Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Validation;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.Application.Mapping;
 
@@ -21,7 +23,9 @@ internal static class ArchivedMessageMapper
 {
     internal static ArchivedMessage Map(ArchivedMessageDto dto)
     {
-        return new ArchivedMessage(
+        return !EnumCompatibilityChecker.AreEnumsCompatible<ArchivedMessageType, ArchivedMessageTypeDto>()
+            ? throw new InvalidEnumMappingException($"Enum of type {nameof(ArchivedMessageType)} cannot be mapped to type {nameof(ArchivedMessageTypeDto)}.")
+            : new ArchivedMessage(
             id: new ArchivedMessageId(dto.Id.Value),
             messageId: dto.MessageId,
             eventIds: dto.EventIds,

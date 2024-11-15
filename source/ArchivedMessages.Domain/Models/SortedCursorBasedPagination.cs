@@ -23,7 +23,7 @@ public class SortedCursorBasedPagination(
     int pageSize = 100,
     bool navigationForward = true,
     FieldToSortBy? fieldToSortBy = null,
-    DirectionToSortBy? sortByDirection = null)
+    DirectionToSortBy? directionToSortBy = null)
 {
     /// <summary>
     ///  The current position in the dataset.
@@ -43,12 +43,12 @@ public class SortedCursorBasedPagination(
     /// <summary>
     ///  The field to sort by.
     /// </summary>
-    public FieldToSortBy SortBy { get; } = fieldToSortBy ?? FieldToSortBy.CreatedAt;
+    public FieldToSortBy FieldToSortBy { get; } = fieldToSortBy ?? FieldToSortBy.CreatedAt;
 
     /// <summary>
     /// The direction to sort by.
     /// </summary>
-    public DirectionToSortBy SortByDirection { get; } = sortByDirection ?? DirectionToSortBy.Descending;
+    public DirectionToSortBy DirectionToSortBy { get; } = directionToSortBy ?? DirectionToSortBy.Descending;
 }
 
 /// <summary>

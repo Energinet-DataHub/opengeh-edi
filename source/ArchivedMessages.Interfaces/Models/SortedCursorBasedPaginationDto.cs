@@ -39,12 +39,12 @@ public sealed record SortedCursorBasedPaginationDto(
     /// <summary>
     ///  The field to sort by.
     /// </summary>
-    public FieldToSortByDto SortBy { get; } = FieldToSortBy ?? FieldToSortByDto.CreatedAt;
+    public FieldToSortByDto SortField { get; } = FieldToSortBy ?? FieldToSortByDto.CreatedAt;
 
     /// <summary>
     /// The direction to sort by.
     /// </summary>
-    public DirectionToSortByDto SortByDirection { get; } = DirectionToSortBy ?? DirectionToSortByDto.Descending;
+    public DirectionToSortByDto SortDirection { get; } = DirectionToSortBy ?? DirectionToSortByDto.Descending;
 }
 
 public sealed record SortingCursorDto(string? SortedFieldValue = null, long RecordId = 0);

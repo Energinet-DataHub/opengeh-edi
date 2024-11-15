@@ -41,7 +41,7 @@ internal static class GetMessagesQueryMapper
                 pageSize: dto.PageSize,
                 navigationForward: dto.NavigationForward,
                 fieldToSortBy: SetFieldToSortBy(dto.FieldToSortBy),
-                sortByDirection: SetDirectionToSortBy(dto.DirectionToSortBy));
+                directionToSortBy: SetDirectionToSortBy(dto.DirectionToSortBy));
     }
 
     private static MessageCreationPeriod? SetMessageCreationPeriod(MessageCreationPeriodDto? messageCreationPeriod)

@@ -122,7 +122,7 @@ internal sealed class QueryBuilder
         return new QueryInput(BuildStatement(query), BuildTotalCountStatement(query), _queryParameters);
     }
 
-    private static string WherePaginationPosition(FieldToSortBy fieldToSortBy, DirectionToSortBy sortByDirection, SortingCursor cursor, bool isForward)
+    private static string WherePaginationPosition(FieldToSortBy fieldToSortBy, DirectionToSortBy directionToSortBy, SortingCursor cursor, bool isForward)
     {
         if (cursor.SortedFieldValue is null)
         {
@@ -131,8 +131,8 @@ internal sealed class QueryBuilder
         }
 
         // Toggle the sort direction if navigating backwards, because sql use top to limit the result
-        var sortingDirection = isForward ? sortByDirection.Identifier == DirectionToSortBy.Descending.Identifier ? "<" : ">"
-                : sortByDirection.Identifier == DirectionToSortBy.Descending.Identifier ? ">" : "<";
+        var sortingDirection = isForward ? directionToSortBy.Identifier == DirectionToSortBy.Descending.Identifier ? "<" : ">"
+                : directionToSortBy.Identifier == DirectionToSortBy.Descending.Identifier ? ">" : "<";
         return isForward
             ? $"""
                   (({fieldToSortBy.Identifier} = '{cursor.SortedFieldValue}' AND (RecordId < {cursor.RecordId} OR {cursor.RecordId} = 0)) 
@@ -156,7 +156,7 @@ internal sealed class QueryBuilder
     {
         var whereClause = " WHERE ";
         whereClause += _statement.Count > 0 ? $"{string.Join(" AND ", _statement)} AND " : string.Empty;
-        whereClause += WherePaginationPosition(query.Pagination.SortBy, query.Pagination.SortByDirection, query.Pagination.Cursor, query.Pagination.NavigationForward);
+        whereClause += WherePaginationPosition(query.Pagination.FieldToSortBy, query.Pagination.DirectionToSortBy, query.Pagination.Cursor, query.Pagination.NavigationForward);
         string sqlStatement;
 
         if (query.IncludeRelatedMessages == true && query.MessageId is not null)
@@ -183,7 +183,7 @@ internal sealed class QueryBuilder
             sqlStatement = selectStatement + whereClause;
         }
 
-        sqlStatement += OrderBy(query.Pagination.SortBy, query.Pagination.SortByDirection, query.Pagination.NavigationForward);
+        sqlStatement += OrderBy(query.Pagination.FieldToSortBy, query.Pagination.DirectionToSortBy, query.Pagination.NavigationForward);
         return sqlStatement;
     }
 
