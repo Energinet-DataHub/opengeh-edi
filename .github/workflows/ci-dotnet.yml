@@ -78,7 +78,7 @@ jobs:
           repo_token: ${{ github.token }}
           automatic_release_tag: ${{ env.RELEASE_VERSION }}_${{ matrix.artifact.project_name}}
           prerelease: true
-          title: ${{ env.RELEASE_VERSION }}
+          title: ${{ env.RELEASE_VERSION }}_${{ matrix.artifact.project_name}}
           files: |
             ${{ env.RELEASE_FOLDER_PATH }}/${{ env.RELEASE_ZIP_FILENAME }}
 
