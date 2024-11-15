@@ -122,7 +122,9 @@ public class MigrationsFreeDatabricksSchemaManager
         {
             var row = new string[csvReader.HeaderRecord!.Length];
             for (var columnIndex = 0; columnIndex < csvReader.ColumnCount; columnIndex++)
+            {
                 row[columnIndex] = ParseColumnValue(schemaInformation, csvReader, columnIndex);
+            }
 
             rows.Add(row);
         }

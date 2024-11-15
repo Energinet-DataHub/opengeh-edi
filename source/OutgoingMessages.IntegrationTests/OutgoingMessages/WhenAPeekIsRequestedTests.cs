@@ -322,12 +322,16 @@ public class WhenAPeekIsRequestedTests : OutgoingMessagesTestBase
         var archivedMessageAsDictionary = (IDictionary<string, object>)archivedMessage;
 
         foreach (var assertProperty in assertProperties)
+        {
             assertProperty.Value(archivedMessageAsDictionary[assertProperty.Key]);
+        }
 
         assertProperties.Should().HaveSameCount(archivedMessageAsDictionary, "because all archived message properties should be asserted");
 
         foreach (var dbPropertyName in archivedMessageAsDictionary.Keys)
+        {
             assertProperties.Keys.Should().Contain(dbPropertyName);
+        }
     }
 
     private async Task<bool> BundleIsRegistered()
