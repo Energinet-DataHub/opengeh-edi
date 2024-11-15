@@ -15,9 +15,21 @@
 name: CI dotnet
 
 on:
-  workflow_call: {}
+  workflow_call:
+    inputs:
+      job_context:
+        description: 'The context of the job'
+        type: string
+        required: false
 
 jobs:
+  print_context:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print context
+        run: |
+          echo "Job context: ${{ github.event.inputs.job_context }}"
+
   # Build all projects within solution
   dotnet_ci_build:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v14

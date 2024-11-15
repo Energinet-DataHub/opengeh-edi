@@ -35,8 +35,9 @@ jobs:
 
   ci_dotnet:
     needs: changes
-    if: ${{ needs.changes.outputs.dotnet == 'true' || needs.changes.outputs.db_migrations == 'true' }}
     uses: ./.github/workflows/ci-dotnet.yml
+    with:
+      job_context: ${{ toJSON(needs.changes.outputs) }}
 
   ci_processmanager_client:
     needs: changes
