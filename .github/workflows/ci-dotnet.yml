@@ -138,7 +138,7 @@ jobs:
     needs: build_testsuite
     name: Merge test artifacts
     steps:
-      - name: Merge Artifacts
+      - name: Merge artifacts
         uses: actions/upload-artifact/merge@v4
         with:
           name: dotnet-tests-outputs
