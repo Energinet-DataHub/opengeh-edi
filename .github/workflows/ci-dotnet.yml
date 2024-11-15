@@ -82,9 +82,54 @@ jobs:
           files: |
             ${{ env.RELEASE_FOLDER_PATH }}/${{ env.RELEASE_ZIP_FILENAME }}
 
+  build_testsuite:
+    name: Build tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        testdll:
+        - name: IntegrationTests
+          path: .\source\IntegrationTests\IntegrationTests.csproj
+          outputpath: .\source\IntegrationTests\bin\Release\net8.0
+        - name: ArchitectureTests
+          path: .\source\ArchitectureTests\ArchitectureTests.csproj
+          outputpath: .\source\ArchitectureTests\bin\Release\net8.0
+        - name: Tests
+          path: .\source\Tests\Tests.csproj
+          outputpath: .\source\Tests\bin\Release\net8.0
+        - name: B2BApi AppTests
+          path: .\source\B2BApi.AppTests\B2BApi.AppTests.csproj
+          outputpath: .\source\Tests\bin\Release\net8.0
+        - name: B2CWebApi AppTests
+          path: .\source\B2CWebApi.AppTests\B2CWebApi.AppTests.csproj
+          outputpath: .\source\Tests\bin\Release\net8.0
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build ${{ matrix.testdll.name }}
+        run: |
+          dotnet publish \
+            '${{ matrix.testdll.path }}' \
+            --configuration Release \
+            --output '${{ matrix.testdll.outputpath }}'
+
+      - name: Copy all bin folders
+        shell: bash
+        run: |
+          # Create base directory
+          mkdir -p '${{ inputs.output_path }}/source' ';'
+          # Copy everything from source to the new directory
+          cp -a source/. '${{ inputs.output_path }}/source'
+          # Remove obj-directories from artifact
+          find ${{ inputs.output_path }}/ -type d -name 'obj' -exec rm -rf {} +            
+
+        
+
   # Tests that do not require the integration test environment
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
   unit_tests:
+    needs: build_testsuite
     strategy:
       fail-fast: false
       matrix:
@@ -103,7 +148,7 @@ jobs:
   # Tests that require the integration test environment
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
   integration_tests:
-    if: 1 == 2
+    needs: build_testsuite
     strategy:
       fail-fast: false
       matrix:
