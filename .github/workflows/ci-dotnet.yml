@@ -36,7 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build_artifact:
+        artifact:
           - name: B2BAPI
             path: source/B2BApi/B2BApi.csproj
             outputpath: ${{ inputs.output_path }}\functions\b2bapi
@@ -65,12 +65,12 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v4
 
-            - name: Build ${{ matrix.build_artifact.name }}
+            - name: Build ${{ matrix.artifact.name }}
               run: |
                 dotnet publish \
-                  '${{ matrix.build_artifact.path }}' \
+                  '${{ matrix.artifact.path }}' \
                   --configuration Release \
-                  --output '${{ matrix.build_artifact.outputpath }}'
+                  --output '${{ matrix.artifact.outputpath }}'
 
   # Tests that do not require the integration test environment
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
