@@ -57,11 +57,11 @@ jobs:
         run: echo ${{matrix.artifact.should_build}}
 
       - name: Checkout repository
-        if: ${{ matrix.artifact.should_build == 'true' }} 
+        if: ${{ matrix.artifact.should_build == true }} 
         uses: actions/checkout@v4
 
       - name: Build ${{ matrix.artifact.name }}
-        if: ${{ matrix.artifact.should_build == 'true' }}
+        if: ${{ matrix.artifact.should_build == true }}
         run: |
           dotnet publish \
             '${{ matrix.artifact.path }}' \
