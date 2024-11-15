@@ -51,4 +51,15 @@ public class GridAreaRepository : IGridAreaRepository
             .OrderByDescending(gridArea => gridArea.SequenceNumber)
             .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
+
+    public IAsyncEnumerable<GridAreaOwner> GetAllGridAreaOwnersAsync(CancellationToken cancellationToken)
+    {
+        var now = _clock.GetCurrentInstant();
+
+        return _masterDataContext.GridAreaOwners
+            .Where(gridArea => gridArea.ValidFrom <= now)
+            .GroupBy(gridArea => gridArea.GridAreaCode)
+            .Select(group => group.OrderByDescending(gridArea => gridArea.SequenceNumber).First())
+            .AsAsyncEnumerable();
+    }
 }
