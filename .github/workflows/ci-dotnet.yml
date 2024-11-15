@@ -29,6 +29,7 @@ jobs:
       - name: Print context
         run: |
           echo "Job context: ${{ inputs.job_context }}"
+          echo "Job context using fromJSON: ${{ fromJson(inputs.job_context).dotnet }}"
 
   # Build DB migrations artifact
   dotnet_ci_build_auditlog_project:
