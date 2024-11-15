@@ -147,7 +147,7 @@ public class ReceiveIncomingMarketMessage
     {
         var authenticatedActor = _actorAuthenticator.CurrentActorIdentity;
         await _archivedMessagesClient.CreateAsync(
-            new ArchivedMessage(
+            new ArchivedMessageDto(
                 incomingMessage.MessageId,
                 incomingDocumentType.Name,
                 authenticatedActor.ActorNumber,
@@ -158,7 +158,7 @@ public class ReceiveIncomingMarketMessage
                 ActorRole.MeteredDataAdministrator,
                 _clock.GetCurrentInstant(),
                 incomingMessage.BusinessReason,
-                ArchivedMessageType.IncomingMessage,
+                ArchivedMessageTypeDto.IncomingMessage,
                 incomingMarketMessageStream),
             cancellationToken).ConfigureAwait(false);
     }

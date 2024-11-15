@@ -155,7 +155,7 @@ public sealed class CalculationCompletedDsl
         var notifyWholesaleServicesDocuments = responseDocuments
             .Where(document => document.Contains("NotifyWholesaleServices_MarketDocument"))
             .ToList();
-        notifyWholesaleServicesDocuments.Should().HaveCount(28, $"because there should be 28 wholesale results for actor 5790000392551 as MDR in the calculation {_wholesaleFixingCalculationId}");
+        notifyWholesaleServicesDocuments.Should().HaveCount(225, $"because there should be 225 wholesale results for actor 5790000392551 as MDR in the calculation {_wholesaleFixingCalculationId}");
 
         var notifyAggregatedMeasureDataDocuments = responseDocuments
             .Where(document => document.Contains("NotifyAggregatedMeasureData_MarketDocument"))

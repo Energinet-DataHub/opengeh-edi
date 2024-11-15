@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />
+    <ProjectReference Include="..\ArchivedMessages.Domain\ArchivedMessages.Domain.csproj" />
     <ProjectReference Include="..\ArchivedMessages.Interfaces\ArchivedMessages.Interfaces.csproj" />
     <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />

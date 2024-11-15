@@ -12,17 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 
-public readonly struct FieldToSortBy
+public readonly struct DirectionToSortBy
 {
-    public static readonly FieldToSortBy MessageId = new("MessageId");
-    public static readonly FieldToSortBy DocumentType = new("DocumentType");
-    public static readonly FieldToSortBy SenderNumber = new("SenderNumber");
-    public static readonly FieldToSortBy ReceiverNumber = new("ReceiverNumber");
-    public static readonly FieldToSortBy CreatedAt = new("CreatedAt");
+    public static readonly DirectionToSortBy Ascending = new("ASC");
+    public static readonly DirectionToSortBy Descending = new("DESC");
 
-    private FieldToSortBy(string identifier)
+    public DirectionToSortBy(string identifier)
     {
         Identifier = identifier;
     }

@@ -120,7 +120,7 @@ public class ArchivedMessagesWithOwnedRestrictionTests : IAsyncLifetime
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQuery(new SortedCursorBasedPagination()),
+            new GetMessagesQueryDto(new SortedCursorBasedPaginationDto()),
             CancellationToken.None);
 
         // Assert
@@ -142,19 +142,19 @@ public class ArchivedMessagesWithOwnedRestrictionTests : IAsyncLifetime
         var expectedMessageId = Guid.NewGuid().ToString();
         await _fixture.CreateArchivedMessageAsync(
             messageId: expectedMessageId,
-            archivedMessageType: ArchivedMessageType.IncomingMessage,
+            archivedMessageType: ArchivedMessageTypeDto.IncomingMessage,
             receiverNumber: _authenticatedActor.ActorNumber.Value,
             receiverRole: _authenticatedActor.ActorRole);
         await _fixture.CreateArchivedMessageAsync(
             relatedToMessageId: MessageId.Create(expectedMessageId),
-            archivedMessageType: ArchivedMessageType.OutgoingMessage,
+            archivedMessageType: ArchivedMessageTypeDto.OutgoingMessage,
             receiverNumber: _authenticatedActor.ActorNumber.Value,
             receiverRole: _authenticatedActor.ActorRole);
 
         // Act
         var result = await _sut.SearchAsync(
-            new GetMessagesQuery(
-                new SortedCursorBasedPagination(),
+            new GetMessagesQueryDto(
+                new SortedCursorBasedPaginationDto(),
                 MessageId: expectedMessageId,
                 IncludeRelatedMessages: false),
             CancellationToken.None);
@@ -174,17 +174,17 @@ public class ArchivedMessagesWithOwnedRestrictionTests : IAsyncLifetime
         // Arrange
         var messageWithoutRelation = await _fixture.CreateArchivedMessageAsync(
             relatedToMessageId: null,
-            archivedMessageType: ArchivedMessageType.IncomingMessage,
+            archivedMessageType: ArchivedMessageTypeDto.IncomingMessage,
             receiverNumber: _authenticatedActor.ActorNumber.Value,
             receiverRole: _authenticatedActor.ActorRole);
         var messageWithRelation = await _fixture.CreateArchivedMessageAsync(
             relatedToMessageId: MessageId.Create(messageWithoutRelation.MessageId!),
-            archivedMessageType: ArchivedMessageType.OutgoingMessage,
+            archivedMessageType: ArchivedMessageTypeDto.OutgoingMessage,
             receiverNumber: _authenticatedActor.ActorNumber.Value,
             receiverRole: _authenticatedActor.ActorRole);
         var messageWithRelation2 = await _fixture.CreateArchivedMessageAsync(
             relatedToMessageId: MessageId.Create(messageWithoutRelation.MessageId!),
-            archivedMessageType: ArchivedMessageType.OutgoingMessage,
+            archivedMessageType: ArchivedMessageTypeDto.OutgoingMessage,
             receiverNumber: _authenticatedActor.ActorNumber.Value,
             receiverRole: _authenticatedActor.ActorRole);
         var unexpectedMessage = await _fixture.CreateArchivedMessageAsync();
@@ -192,16 +192,16 @@ public class ArchivedMessagesWithOwnedRestrictionTests : IAsyncLifetime
         // Act
         // This could simulate a search for a message, where the message is a request with two responses
         var searchForRequest = await _sut.SearchAsync(
-            new GetMessagesQuery(
-                new SortedCursorBasedPagination(),
+            new GetMessagesQueryDto(
+                new SortedCursorBasedPaginationDto(),
                 MessageId: messageWithoutRelation.MessageId,
                 IncludeRelatedMessages: true),
             CancellationToken.None);
 
         // This could simulate a search for a message, where the message is a response to a request with two responses
         var searchForResponse = await _sut.SearchAsync(
-            new GetMessagesQuery(
-                new SortedCursorBasedPagination(),
+            new GetMessagesQueryDto(
+                new SortedCursorBasedPaginationDto(),
                 MessageId: messageWithRelation.MessageId,
                 IncludeRelatedMessages: true),
             CancellationToken.None);

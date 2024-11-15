@@ -12,8 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.ObjectModel;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
+namespace Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
 
-public record MessageSearchResult(ReadOnlyCollection<MessageInfo> Messages, int TotalAmountOfMessages);
+#pragma warning disable CA1711 // Is a "Stream" value type
+public sealed record ArchivedMessageStream : StreamValueObject, IArchivedMessageStream
+{
+    public ArchivedMessageStream(FileStorageFile fileStorageFile)
+        : base(fileStorageFile?.Stream) { }
+
+    /// <summary>
+    /// This is only intended for testing and mapping purposes
+    /// </summary>
+    public ArchivedMessageStream(Stream stream)
+        : base(stream) { }
+}

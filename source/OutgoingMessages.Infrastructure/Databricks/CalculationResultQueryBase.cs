@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Immutable;
 using Energinet.DataHub.Core.Databricks.SqlStatementExecution;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Databricks.SqlStatements;
 using Energinet.DataHub.EDI.OutgoingMessages.Infrastructure.Extensions.Options;
 using Energinet.DataHub.EDI.OutgoingMessages.Interfaces.Models;
@@ -47,7 +49,9 @@ public abstract class CalculationResultQueryBase<TResult>(
 
     public Guid CalculationId { get; } = calculationId;
 
-    internal async IAsyncEnumerable<QueryResult<TResult>> GetAsync(DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor)
+    internal async IAsyncEnumerable<QueryResult<TResult>> GetAsync(
+        DatabricksSqlWarehouseQueryExecutor databricksSqlWarehouseQueryExecutor,
+        ImmutableDictionary<string, ActorNumber>? gridAreaOwnerDictionary)
     {
         ArgumentNullException.ThrowIfNull(databricksSqlWarehouseQueryExecutor);
 
@@ -84,7 +88,8 @@ public abstract class CalculationResultQueryBase<TResult>(
         }
     }
 
-    protected abstract Task<QueryResult<TResult>> CreateResultAsync(List<DatabricksSqlRow> currentResultSet);
+    protected abstract Task<QueryResult<TResult>> CreateResultAsync(
+        List<DatabricksSqlRow> currentResultSet);
 
     protected abstract bool BelongsToSameResultSet(DatabricksSqlRow currentResult, DatabricksSqlRow previousResult);
 

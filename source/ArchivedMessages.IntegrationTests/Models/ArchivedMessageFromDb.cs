@@ -35,7 +35,7 @@ public record ArchivedMessageFromDb(
     string? EventIds,
     string ReceiverRoleCode,
     string SenderRoleCode)
-    : MessageInfo(
+    : MessageInfoDto(
         RecordId,
         Id,
         MessageId,

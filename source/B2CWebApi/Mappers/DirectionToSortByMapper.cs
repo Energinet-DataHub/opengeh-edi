@@ -18,13 +18,13 @@ namespace Energinet.DataHub.EDI.B2CWebApi.Mappers;
 
 public static class DirectionToSortByMapper
 {
-    public static DirectionToSortBy? MapToDirectionToSortBy(
+    public static DirectionToSortByDto? MapToDirectionToSortBy(
         Energinet.DataHub.EDI.B2CWebApi.Models.DirectionToSortBy? directionToSortBy)
     {
         return directionToSortBy switch
         {
-            Models.DirectionToSortBy.Ascending => DirectionToSortBy.Ascending,
-            Models.DirectionToSortBy.Descending => DirectionToSortBy.Descending,
+            Models.DirectionToSortBy.Ascending => DirectionToSortByDto.Ascending,
+            Models.DirectionToSortBy.Descending => DirectionToSortByDto.Descending,
             _ => null,
         };
     }

@@ -49,7 +49,7 @@ public class ArchivedMessageGetDocumentController : ControllerBase
                 id.ToString())
             .ConfigureAwait(false);
 
-        var archivedMessageId = new ArchivedMessageId(id);
+        var archivedMessageId = new ArchivedMessageIdDto(id);
         var archivedMessageStream = await _archivedMessagesClient.GetAsync(archivedMessageId, cancellationToken).ConfigureAwait(false);
 
         return archivedMessageStream is null ? NoContent() : Ok(archivedMessageStream.Stream);

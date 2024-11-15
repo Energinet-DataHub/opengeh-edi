@@ -22,4 +22,5 @@ public sealed record NotifyAggregatedMeasureDataInputV1(
     IReadOnlyCollection<string> GridAreaCodes,
     DateTimeOffset PeriodStartDate,
     DateTimeOffset PeriodEndDate,
-    bool IsInternalCalculation);
+    bool IsInternalCalculation,
+    Guid UserId);
