@@ -113,7 +113,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         using (new AssertionScope())
         {
             var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeAggregatedMeasureDataProcessDto>();
-            var series = message.Series.Should().ContainSingle().Subject;
+            var series = message!.Series.Should().ContainSingle().Subject;
             series.RequestedByActor.ActorRole.Should().Be(_delegatedTo.ActorRole);
             series.RequestedByActor.ActorNumber.Should().Be(_delegatedTo.ActorNumber);
             series.OriginalActor.ActorRole.Should().Be(_originalActor.ActorRole);
@@ -337,7 +337,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         using (new AssertionScope())
         {
             var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeAggregatedMeasureDataProcessDto>();
-            var series = message.Series.Should().ContainSingle().Subject;
+            var series = message!.Series.Should().ContainSingle().Subject;
             series.RequestedByActor.ActorRole.Should().Be(_delegatedTo.ActorRole);
             series.RequestedByActor.ActorNumber.Should().Be(_delegatedTo.ActorNumber);
             series.OriginalActor.ActorRole.Should().Be(originalActorRole);
@@ -400,7 +400,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         using (new AssertionScope())
         {
             var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>();
-            var series = message.Series.Should().ContainSingle().Subject;
+            var series = message!.Series.Should().ContainSingle().Subject;
             series.RequestedByActor.ActorRole.Should().Be(delegatedToAsDelegated.ActorRole);
             series.RequestedByActor.ActorNumber.Should().Be(delegatedToAsDelegated.ActorNumber);
             series.DelegatedGridAreaCodes.Should().Contain(expectedGridAreaCode);
@@ -496,7 +496,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         using (new AssertionScope())
         {
             var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>();
-            var series = message.Series.Should().ContainSingle().Subject;
+            var series = message!.Series.Should().ContainSingle().Subject;
             series.RequestedByActor.ActorRole.Should().Be(delegatedToAsGridAccessProvider.ActorRole);
             series.RequestedByActor.ActorNumber.Should().Be(delegatedToAsGridAccessProvider.ActorNumber);
             series.DelegatedGridAreaCodes.Should().Contain(expectedGridAreaCode);
@@ -545,7 +545,7 @@ public sealed class GivenIncomingMessagesWithDelegationTests : IncomingMessagesT
         using (new AssertionScope())
         {
             var message = _senderSpy.LatestMessage!.Body.ToObjectFromJson<InitializeMeteredDataForMeasurementPointMessageProcessDto>();
-            var series = message.Series.Should().ContainSingle().Subject;
+            var series = message!.Series.Should().ContainSingle().Subject;
             series.RequestedByActor.ActorRole.Should().Be(_authenticatedActor.CurrentActorIdentity.ActorRole);
             series.RequestedByActor.ActorNumber.Should().Be(_authenticatedActor.CurrentActorIdentity.ActorNumber);
             series.DelegatedGridAreaCodes.Should().BeEmpty();

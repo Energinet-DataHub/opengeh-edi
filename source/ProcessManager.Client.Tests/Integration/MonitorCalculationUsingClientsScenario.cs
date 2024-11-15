@@ -99,7 +99,8 @@ public class MonitorCalculationUsingClientsScenario : IAsyncLifetime
                         GridAreaCodes: new[] { "543" },
                         PeriodStartDate: DateTimeOffset.Parse("2024-10-29T15:19:10.0151351+01:00"),
                         PeriodEndDate: DateTimeOffset.Parse("2024-10-29T16:19:10.0193962+01:00"),
-                        IsInternalCalculation: true)),
+                        IsInternalCalculation: true,
+                        UserId: Guid.NewGuid())),
                 CancellationToken.None);
 
         // Step 2: Trigger the scheduler to queue the calculation orchestration instance
