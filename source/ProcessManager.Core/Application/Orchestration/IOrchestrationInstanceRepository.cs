@@ -15,9 +15,9 @@
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using NodaTime;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application;
+namespace Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
 
-public interface IOrchestrationInstanceRepository
+internal interface IOrchestrationInstanceRepository
 {
     /// <summary>
     /// Use <see cref="IUnitOfWork.CommitAsync"/> to save changes.

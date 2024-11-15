@@ -13,23 +13,26 @@
 // limitations under the License.
 
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
+using NodaTime;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application;
+namespace Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
 
-/// <summary>
-/// Use this from Durable Functions activities to get the orchestration instance and then
-/// update its progress, before commiting changes back by using <see cref="UnitOfWork"/>.
-/// </summary>
-public interface IOrchestrationInstanceProgressRepository
+public interface IOrchestrationInstanceQueries
 {
     /// <summary>
-    /// Use <see cref="IUnitOfWork.CommitAsync"/> to save changes.
-    /// </summary>
-    public IUnitOfWork UnitOfWork { get; }
-
-    /// <summary>
     /// Get existing orchestration instance.
-    /// To commit changes use <see cref="UnitOfWork"/>.
     /// </summary>
     Task<OrchestrationInstance> GetAsync(OrchestrationInstanceId id);
+
+    /// <summary>
+    /// Get all orchestration instances filtered by their related orchestration definition name and version,
+    /// and their lifecycle / termination states.
+    /// </summary>
+    Task<IReadOnlyCollection<OrchestrationInstance>> SearchAsync(
+        string name,
+        int? version,
+        OrchestrationInstanceLifecycleStates? lifecycleState,
+        OrchestrationInstanceTerminationStates? terminationState,
+        Instant? startedAtOrLater,
+        Instant? terminatedAtOrEarlier);
 }

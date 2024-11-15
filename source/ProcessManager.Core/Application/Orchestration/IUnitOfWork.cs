@@ -12,16 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
+namespace Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application;
-
-/// <summary>
-/// Readonly access to the orchestration register.
-/// </summary>
-public interface IOrchestrationRegisterQueries
+public interface IUnitOfWork
 {
-    Task<OrchestrationDescription> GetAsync(OrchestrationDescriptionId id);
-
-    Task<OrchestrationDescription?> GetOrDefaultAsync(string name, int version, bool? isEnabled);
+    Task CommitAsync(CancellationToken cancellationToken = default);
 }

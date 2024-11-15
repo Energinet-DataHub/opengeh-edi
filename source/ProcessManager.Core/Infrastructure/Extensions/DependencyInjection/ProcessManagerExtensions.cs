@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
+using Energinet.DataHub.ProcessManagement.Core.Application.Registration;
+using Energinet.DataHub.ProcessManagement.Core.Application.Scheduling;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Database;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Extensions.Options;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestration;
+using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Registration;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask.ContextImplementations;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask.Options;
@@ -66,14 +69,18 @@ public static class ProcessManagerExtensions
             });
 
         // ProcessManager components using interfaces to restrict access to functionality
-        // => Scheduler
-        services.TryAddScoped<IQueryScheduledOrchestrationInstancesByInstant, OrchestrationInstanceRepository>();
-        services.TryAddScoped<IOrchestrationInstanceScheduleManager, OrchestrationInstanceManager>();
-        // => Manager
+        // => Scheduling
+        services.TryAddScoped<IScheduledOrchestrationInstancesByInstantQuery, OrchestrationInstanceRepository>();
+        services.TryAddScoped<IStartScheduledOrchestrationInstanceCommand, OrchestrationInstanceManager>();
+        // => Cancellation (manager)
+        services.TryAddScoped<ICancelScheduledOrchestrationInstanceCommand, OrchestrationInstanceManager>();
+        // => Start instance (manager)
         services.TryAddScoped<IOrchestrationInstanceExecutor, DurableOrchestrationInstanceExecutor>();
         services.TryAddScoped<IOrchestrationRegisterQueries, OrchestrationRegister>();
         services.TryAddScoped<IOrchestrationInstanceRepository, OrchestrationInstanceRepository>();
-        services.TryAddScoped<IOrchestrationInstanceManager, OrchestrationInstanceManager>();
+        services.TryAddScoped<IStartOrchestrationInstanceCommands, OrchestrationInstanceManager>();
+        // => Public queries
+        services.TryAddScoped<IOrchestrationInstanceQueries, OrchestrationInstanceRepository>();
 
         return services;
     }
@@ -123,13 +130,13 @@ public static class ProcessManagerExtensions
         // => Orchestration Descriptions registration during startup
         services.TryAddTransient<IReadOnlyCollection<OrchestrationDescription>>(sp => enabledDescriptionsFactory());
         services.TryAddTransient<IOrchestrationRegister, OrchestrationRegister>();
-        // => Orchestration instances progress
-        services.TryAddScoped<IOrchestrationInstanceProgressRepository, OrchestrationInstanceRepository>();
-        // => Manager
+        // => Start instance (manager)
         services.TryAddScoped<IOrchestrationInstanceExecutor, DurableOrchestrationInstanceExecutor>();
         services.TryAddScoped<IOrchestrationRegisterQueries, OrchestrationRegister>();
         services.TryAddScoped<IOrchestrationInstanceRepository, OrchestrationInstanceRepository>();
-        services.TryAddScoped<IOrchestrationInstanceManager, OrchestrationInstanceManager>();
+        services.TryAddScoped<IStartOrchestrationInstanceCommands, OrchestrationInstanceManager>();
+        // => Public progress repository
+        services.TryAddScoped<IOrchestrationInstanceProgressRepository, OrchestrationInstanceRepository>();
 
         return services;
     }

@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
-using NodaTime;
+using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application;
+namespace Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
 
-public interface IQueryScheduledOrchestrationInstancesByInstant
+/// <summary>
+/// Readonly access to the orchestration register.
+/// </summary>
+internal interface IOrchestrationRegisterQueries
 {
-    /// <summary>
-    /// Find scheduled orchestration instances that should be started when comparing to given <paramref name="scheduledToRunBefore"/>.
-    /// </summary>
-    Task<IReadOnlyCollection<OrchestrationInstance>> FindAsync(Instant scheduledToRunBefore);
+    Task<OrchestrationDescription> GetAsync(OrchestrationDescriptionId id);
+
+    Task<OrchestrationDescription?> GetOrDefaultAsync(string name, int version, bool? isEnabled);
 }

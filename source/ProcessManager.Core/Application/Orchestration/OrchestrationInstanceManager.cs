@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.ProcessManagement.Core.Application.Scheduling;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using NodaTime;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Application;
+namespace Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
 
 /// <summary>
 /// An manager that allows us to provide a framework for managing orchestration instances
@@ -27,8 +28,9 @@ internal class OrchestrationInstanceManager(
     IOrchestrationInstanceExecutor executor,
     IOrchestrationRegisterQueries orchestrationRegister,
     IOrchestrationInstanceRepository repository) :
-        IOrchestrationInstanceManager,
-        IOrchestrationInstanceScheduleManager
+        IStartOrchestrationInstanceCommands,
+        IStartScheduledOrchestrationInstanceCommand,
+        ICancelScheduledOrchestrationInstanceCommand
 {
     private readonly IClock _clock = clock;
     private readonly IOrchestrationInstanceExecutor _executor = executor;

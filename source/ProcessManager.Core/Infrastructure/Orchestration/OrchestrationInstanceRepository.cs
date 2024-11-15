@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Application;
+using Energinet.DataHub.ProcessManagement.Core.Application.Orchestration;
+using Energinet.DataHub.ProcessManagement.Core.Application.Scheduling;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using Energinet.DataHub.ProcessManagement.Core.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +28,8 @@ internal class OrchestrationInstanceRepository(
     ProcessManagerContext context) :
         IOrchestrationInstanceRepository,
         IOrchestrationInstanceProgressRepository,
-        IQueryScheduledOrchestrationInstancesByInstant
+        IOrchestrationInstanceQueries,
+        IScheduledOrchestrationInstancesByInstantQuery
 {
     private readonly ProcessManagerContext _context = context;
 
@@ -50,7 +52,7 @@ internal class OrchestrationInstanceRepository(
         await _context.OrchestrationInstances.AddAsync(orchestrationInstance).ConfigureAwait(false);
     }
 
-    /// <inheritdoc cref="IQueryScheduledOrchestrationInstancesByInstant.FindAsync(Instant)"/>
+    /// <inheritdoc cref="IScheduledOrchestrationInstancesByInstantQuery.FindAsync(Instant)"/>
     public async Task<IReadOnlyCollection<OrchestrationInstance>> FindAsync(Instant scheduledToRunBefore)
     {
         var query = _context.OrchestrationInstances
