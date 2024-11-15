@@ -20,10 +20,8 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 
-public abstract class MessageParserBase<TSchema>(ISchemaProvider schemaProvider) : IMessageParser
+public abstract class MessageParserBase<TSchema>() : IMessageParser
 {
-    private readonly ISchemaProvider _schemaProvider = schemaProvider;
-
     protected Collection<ValidationError> Errors { get; } = [];
 
     public async Task<IncomingMarketMessageParserResult> ParseAsync(
@@ -40,57 +38,19 @@ public abstract class MessageParserBase<TSchema>(ISchemaProvider schemaProvider)
             .ConfigureAwait(false);
     }
 
-    protected abstract string BusinessProcessType(string ns);
-
-    protected abstract string GetVersion(string ns);
-
-    protected abstract string GetNamespace(IIncomingMarketMessageStream marketMessage);
-
-    protected abstract Task<IncomingMarketMessageParserResult> ParseMessageAsync(
-        IIncomingMarketMessageStream marketMessage,
-        TSchema schemaResult,
-        string @namespace,
-        CancellationToken cancellationToken);
-
-    private static IncomingMarketMessageParserResult Invalid(
+    protected static IncomingMarketMessageParserResult Invalid(
         Exception exception)
     {
         return new IncomingMarketMessageParserResult(
             InvalidMessageStructure.From(exception));
     }
 
-    private async Task<(TSchema? Schema, string? Namespace, IncomingMarketMessageParserResult? Result)> GetSchemaAsync(IIncomingMarketMessageStream marketMessage, CancellationToken cancellationToken)
-    {
-        string? @namespace = null;
-        IncomingMarketMessageParserResult? parserResult = null;
-        TSchema? xmlSchema = default;
-        try
-        {
-            @namespace = GetNamespace(marketMessage);
-            var version = GetVersion(@namespace);
-            var businessProcessType = BusinessProcessType(@namespace);
-            xmlSchema = await _schemaProvider.GetSchemaAsync<TSchema>(businessProcessType, version, cancellationToken)
-                .ConfigureAwait(true);
+    protected abstract Task<(TSchema? Schema, string? Namespace, IncomingMarketMessageParserResult? Result)>
+        GetSchemaAsync(IIncomingMarketMessageStream marketMessage, CancellationToken cancellationToken);
 
-            if (xmlSchema is null)
-            {
-                parserResult = new IncomingMarketMessageParserResult(
-                    new InvalidBusinessReasonOrVersion(businessProcessType, version));
-            }
-        }
-        catch (XmlException exception)
-        {
-            parserResult = Invalid(exception);
-        }
-        catch (ObjectDisposedException objectDisposedException)
-        {
-            parserResult = Invalid(objectDisposedException);
-        }
-        catch (IndexOutOfRangeException indexOutOfRangeException)
-        {
-            parserResult = Invalid(indexOutOfRangeException);
-        }
-
-        return (xmlSchema, @namespace, parserResult);
-    }
+    protected abstract Task<IncomingMarketMessageParserResult> ParseMessageAsync(
+        IIncomingMarketMessageStream marketMessage,
+        TSchema schemaResult,
+        string @namespace,
+        CancellationToken cancellationToken);
 }

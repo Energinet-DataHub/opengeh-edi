@@ -23,7 +23,7 @@ using Energinet.DataHub.EDI.IncomingMessages.Infrastructure.Schemas.Ebix;
 
 namespace Energinet.DataHub.EDI.IncomingMessages.Infrastructure.MessageParsers;
 
-public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) : MessageParserBase<XmlSchema>(schemaProvider)
+public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) : MessageParserBase<XmlSchema>()
 {
     private const string HeaderElementName = "HeaderEnergyDocument";
     private const string EnergyContextElementName = "ProcessEnergyContext";
@@ -35,6 +35,7 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
     private const string EnergyBusinessProcess = "EnergyBusinessProcess";
     private const string EnergyBusinessProcessRole = "EnergyBusinessProcessRole";
     private const string EnergyIndustryClassification = "EnergyIndustryClassification";
+    private readonly EbixSchemaProvider _schemaProvider = schemaProvider;
 
     protected abstract string RootPayloadElementName { get; }
 
@@ -64,11 +65,52 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
         return CreateResult(header, transactions);
     }
 
+    protected override async Task<(XmlSchema? Schema, string? Namespace, IncomingMarketMessageParserResult? Result)> GetSchemaAsync(IIncomingMarketMessageStream marketMessage, CancellationToken cancellationToken)
+    {
+        string? @namespace = null;
+        IncomingMarketMessageParserResult? parserResult = null;
+        XmlSchema? xmlSchema = default;
+        try
+        {
+            @namespace = GetNamespace(marketMessage);
+            var version = GetVersion(@namespace);
+            var businessProcessType = BusinessProcessType(@namespace);
+            xmlSchema = await _schemaProvider.GetSchemaAsync<XmlSchema>(businessProcessType, version, cancellationToken)
+                .ConfigureAwait(true);
+
+            if (xmlSchema is null)
+            {
+                parserResult = new IncomingMarketMessageParserResult(
+                    new InvalidBusinessReasonOrVersion(businessProcessType, version));
+            }
+        }
+        catch (XmlException exception)
+        {
+            parserResult = Invalid(exception);
+        }
+        catch (ObjectDisposedException objectDisposedException)
+        {
+            parserResult = Invalid(objectDisposedException);
+        }
+        catch (IndexOutOfRangeException indexOutOfRangeException)
+        {
+            parserResult = Invalid(indexOutOfRangeException);
+        }
+
+        return (xmlSchema, @namespace, parserResult);
+    }
+
     protected abstract IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(XDocument document, XNamespace ns, string senderNumber);
 
     protected abstract IncomingMarketMessageParserResult CreateResult(MessageHeader header, IReadOnlyCollection<IIncomingMessageSeries> transactions);
 
-    protected override string GetNamespace(IIncomingMarketMessageStream marketMessage)
+    private static string[] SplitNamespace(string @namespace)
+    {
+        ArgumentNullException.ThrowIfNull(@namespace);
+        return @namespace.Split(':');
+    }
+
+    private string GetNamespace(IIncomingMarketMessageStream marketMessage)
     {
         ArgumentNullException.ThrowIfNull(marketMessage);
 
@@ -91,7 +133,7 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
         throw new XmlException($"Namespace for element '{RootPayloadElementName}' not found.");
     }
 
-    protected override string BusinessProcessType(string @namespace)
+    private string BusinessProcessType(string @namespace)
     {
         ArgumentNullException.ThrowIfNull(@namespace);
         var split = SplitNamespace(@namespace);
@@ -105,7 +147,7 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
         return parts.Last();
     }
 
-    protected override string GetVersion(string @namespace)
+    private string GetVersion(string @namespace)
     {
         ArgumentNullException.ThrowIfNull(@namespace);
         var split = SplitNamespace(@namespace);
@@ -116,12 +158,6 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
 
         var version = split[5];
         return version.StartsWith('v') ? version[1..] : version;
-    }
-
-    private static string[] SplitNamespace(string @namespace)
-    {
-        ArgumentNullException.ThrowIfNull(@namespace);
-        return @namespace.Split(':');
     }
 
     private MessageHeader ParseHeader(XDocument document, XNamespace ns)
