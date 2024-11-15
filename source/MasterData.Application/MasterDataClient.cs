@@ -19,7 +19,6 @@ using Energinet.DataHub.EDI.MasterData.Domain.ActorCertificates;
 using Energinet.DataHub.EDI.MasterData.Domain.Actors;
 using Energinet.DataHub.EDI.MasterData.Domain.GridAreaOwners;
 using Energinet.DataHub.EDI.MasterData.Domain.ProcessDelegations;
-using Energinet.DataHub.EDI.MasterData.Infrastructure.DataAccess;
 using Energinet.DataHub.EDI.MasterData.Interfaces;
 using Energinet.DataHub.EDI.MasterData.Interfaces.Models;
 using Microsoft.Extensions.Logging;
@@ -27,12 +26,12 @@ using Actor = Energinet.DataHub.EDI.BuildingBlocks.Domain.Models.Actor;
 
 namespace Energinet.DataHub.EDI.MasterData.Application;
 
-internal sealed class MasterDataClient : IMasterDataClient
+public sealed class MasterDataClient : IMasterDataClient
 {
     private readonly IActorRepository _actorRepository;
     private readonly IGridAreaRepository _gridAreaRepository;
     private readonly IActorCertificateRepository _actorCertificateRepository;
-    private readonly MasterDataContext _masterDataContext;
+    private readonly IMasterDataContext _masterDataContext;
     private readonly ILogger<IMasterDataClient> _logger;
     private readonly IProcessDelegationRepository _processDelegationRepository;
 
@@ -40,7 +39,7 @@ internal sealed class MasterDataClient : IMasterDataClient
         IActorRepository actorRepository,
         IGridAreaRepository gridAreaRepository,
         IActorCertificateRepository actorCertificateRepository,
-        MasterDataContext masterDataContext,
+        IMasterDataContext masterDataContext,
         ILogger<IMasterDataClient> logger,
         IProcessDelegationRepository processDelegationRepository)
     {

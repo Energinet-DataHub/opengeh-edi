@@ -12,22 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
-
-namespace Energinet.DataHub.EDI.MasterData.Domain.Actors;
+namespace Energinet.DataHub.EDI.MasterData.Application;
 
 /// <summary>
-/// Service for looking up actor details
+/// Wrapper for the module context.
 /// </summary>
-public interface IActorRepository
+public interface IMasterDataContext
 {
     /// <summary>
-    /// Get actor number by id
+    /// Saves all changes on the wrapped context async.
     /// </summary>
-    Task<ActorNumber?> GetActorNumberByExternalIdAsync(string externalId, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Creates a new actor
-    /// </summary>
-    Task CreateIfNotExistAsync(ActorNumber actorNumber, string externalId, CancellationToken cancellationToken);
+    /// <param name="cancellationToken"></param>
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
