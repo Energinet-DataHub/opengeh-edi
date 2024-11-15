@@ -31,21 +31,46 @@ jobs:
           echo "Job context: ${{ inputs.job_context }}"
           echo "Job context auditlog: ${{ fromJson(inputs.job_context).auditlog }}"
 
-  # Build DB migrations artifact
-  dotnet_auditlog_ci:
-    if: fromJson(inputs.job_context).auditlog == 'true'
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@kerbou/2524-build-brs-pipeline
-    with:
-      solution_file_path: source/AuditLog/AuditLog.csproj
-      prepare_dotnet_tests: false
+  build_artifact:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build_artifact:
+          - name: B2BAPI
+            path: source/B2BApi/B2BApi.csproj
+            outputpath: ${{ inputs.output_path }}\functions\b2bapi
+          - name: Databasemigration
+            path: source/ApplyDBMigrationsApp/ApplyDBMigrationsApp.csproj
+            outputpath: ${{ inputs.output_path }}\migration\databasemigration
+          - name: SubsystemTests
+            path: 'source/SubsystemTests/SubsystemTests.csproj'
+            outputpath: '${{ inputs.output_path }}\SubsystemTests'
+          - name: SystemTests
+            path: 'source/SystemTests/SystemTests.csproj'
+            outputpath: '${{ inputs.output_path }}\SystemTests'
+          - name: B2CWebApi'
+            path: 'source/B2CWebApi/B2CWebApi.csproj'
+            outputpath: '${{ inputs.output_path }}\b2cwebapi'
+          - name: ProcessManager API
+            path: 'source/ProcessManager/ProcessManager.csproj'
+            outputpath: '${{ inputs.output_path }}\functions\ProcessManager.Api'
+          - name: ProcessManager Orchestrations
+            path: 'source/ProcessManager.Orchestrations/ProcessManager.Orchestrations.csproj'
+            outputpath: '${{ inputs.output_path }}\functions\ProcessManager.Orchestrations'
+          - name: ProcessManager Migration
+            path: 'source/ProcessManager.DatabaseMigration/ProcessManager.DatabaseMigration.csproj'
+            outputpath: '${{ inputs.output_path }}\migration\ProcessManager.DatabaseMigration'
+          steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
-  # Build DB migrations artifact
-  dotnet_ci_build_db_migrations_project:
-    if: fromJson(inputs.job_context).db_migrations == 'true'
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@kerbou/2524-build-brs-pipeline
-    with:
-      solution_file_path: source/ApplyDBMigrationsApp/ApplyDBMigrationsApp.csproj
-      prepare_dotnet_tests: false
+            - name: Build ${{ matrix.build_artifact.name }}
+              run: |
+                dotnet publish \
+                  '${{ matrix.build_artifact.path }}' \
+                  --configuration Release \
+                  --output '${{ matrix.build_artifact.outputpath }}'
 
   # Tests that do not require the integration test environment
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
