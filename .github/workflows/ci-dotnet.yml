@@ -299,7 +299,7 @@ jobs:
       run_integration_tests: true
       # Matrix parameters
       job_name: ${{ matrix.tests_filter_expression.name }}
-      tests_dll_file_path: ${{ matrix.tests_filter_expression.paths }}
+      tests_dll_file_path: /${{ matrix.tests_filter_expression.paths }}
       tests_filter_expression: ${{ matrix.tests_filter_expression.filter }}
       use_azure_functions_tools: ${{ matrix.tests_filter_expression.use_azure_functions_tools }}
       aspnetcore_test_contentroot_variable_name: ${{ matrix.tests_filter_expression.contentroot_variable_name }}
