@@ -84,17 +84,17 @@ jobs:
           files: |
             ${{ env.RELEASE_FOLDER_PATH }}/dotnet_${{ github.event.pull_request.number }}_${{matrix.artifact.project_name}}.zip
   build_testsuite:
-    name: Build ${{ matrix.testdll.name }}
+    name: Build ${{ matrix.testproject.name }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        testdll:
+        testproject:
         - name: IntegrationTests
           path: .\source\IntegrationTests\IntegrationTests.csproj
-          outputpath: .\source\IntegrationTests\bin\Release\net8.0
+          outputpath: .\source\Tests\bin\Release\net8.0
         - name: ArchitectureTests
           path: .\source\ArchitectureTests\ArchitectureTests.csproj
-          outputpath: .\source\ArchitectureTests\bin\Release\net8.0
+          outputpath: .\source\Tests\bin\Release\net8.0
         - name: Tests
           path: .\source\Tests\Tests.csproj
           outputpath: .\source\Tests\bin\Release\net8.0
@@ -108,12 +108,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build ${{ matrix.testdll.name }}
+      - name: Build ${{ matrix.testproject.name }}
         run: |
           dotnet publish \
-            '${{ matrix.testdll.path }}' \
+            '${{ matrix.testproject.path }}' \
             --configuration Release \
-            --output '${{ matrix.testdll.outputpath }}'
+            --output '${{ matrix.testproject.outputpath }}'
+      
+      - uses: actions/upload-artifact@v4
+        with:
+          name: edi-tests-${{ matrix.testproject.name }}
+          path: ./source/Tests/bin/Release/net8.0/*.dll
 
       # - name: Copy all bin folders
       #   shell: bash
@@ -126,34 +131,19 @@ jobs:
       #     find ${{ inputs.output_path }}/ -type d -name 'obj' -exec rm -rf {} +
 
 
-
-  # Tests that do not require the integration test environment
+  # Tests that require the integration test environment
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
-  unit_tests:
-    needs: build_testsuite
+  testsuite:
     strategy:
       fail-fast: false
       matrix:
         tests_filter_expression:
           - name: Architecture Tests
             paths: \source\ArchitectureTests\bin\Release\net8.0\Energinet.DataHub.EDI.ArchitectureTests.dll
+            
           - name: Tests
             paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.Tests.dll
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v14
-    with:
-      download_attempt_limit: 30
-      # Matrix parameters
-      job_name: ${{ matrix.tests_filter_expression.name }}
-      tests_dll_file_path: ${{ matrix.tests_filter_expression.paths }}
 
-  # Tests that require the integration test environment
-  # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
-  integration_tests:
-    needs: build_testsuite
-    strategy:
-      fail-fast: false
-      matrix:
-        tests_filter_expression:
           - name: ProcessManager Tests
             paths: \source\ProcessManager.Tests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.Tests.dll
             filter: empty # Means skip
