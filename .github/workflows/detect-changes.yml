@@ -32,16 +32,12 @@ jobs:
     runs-on: ubuntu-latest
     # Set job outputs to values from filter step
     outputs:
-      job_context: "{ 'auditlog': '${{ steps.filter.outputs.auditlog }}',
+      job_context: "{ 
+        'architecture_tests': '${{ steps.filter.outputs.architecture_tests }}',
         'db_migrations': '${{ steps.filter.outputs.db_migrations }}',
         'processmanager_client': '${{ steps.filter.outputs.processmanager_client }}',
         'render_c4model_views': '${{ steps.filter.outputs.render_c4model_views }}'
         }"
-      # job_context: ${{ toJson(steps.filter.outputs.changes) }}  // Returns "[\"dotnet\"]" --> useless
-      # dotnet: ${{ steps.filter.outputs.dotnet }}
-      # db_migrations: ${{ steps.filter.outputs.db_migrations }}
-      # processmanager_client: ${{ steps.filter.outputs.processmanager_client }}
-      # render_c4model_views: ${{ steps.filter.outputs.render_c4model_views }}
     steps:
       # For pull requests it's not necessary to checkout the code because GitHub REST API is used to determine changes
       - name: Checkout repository
@@ -53,14 +49,8 @@ jobs:
         id: filter
         with:
           filters: |
-            auditlog:
-              - 'source/AuditLog/**'
-            db_migrations:
-              - 'source/ApplyDBMigrationsApp/**'
-            processmanager_client:
-              - 'docs/ProcessManager.Client/**'
-              - 'source/ProcessManager.Client*/**'
-              - '.github/workflows/processmanager-client-bundle-publish.yml'
+            architecture_tests:
+              - 'source/ArchitectureTests/**'
             render_c4model_views:
               - 'docs/diagrams/c4-model/views.dsl'
               - 'docs/diagrams/c4-model/views.json'
