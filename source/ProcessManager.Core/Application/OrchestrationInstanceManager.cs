@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.ProcessManagement.Core.Application;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationDescription;
 using Energinet.DataHub.ProcessManagement.Core.Domain.OrchestrationInstance;
 using NodaTime;
 
-namespace Energinet.DataHub.ProcessManagement.Core.Infrastructure.Orchestration;
+namespace Energinet.DataHub.ProcessManagement.Core.Application;
 
 /// <summary>
 /// An manager that allows us to provide a framework for managing orchestration instances
