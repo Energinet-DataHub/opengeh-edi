@@ -165,7 +165,7 @@ jobs:
       download_attempt_limit: 30
       # Matrix parameters
       job_name: ${{ matrix.tests_filter_expression.name }}
-      tests_dll_file_path: ${{ matrix.tests_filter_expression.paths }}
+      tests_dll_file_path: /${{ matrix.tests_filter_expression.paths }}
 
   # Tests that require the integration test environment
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
