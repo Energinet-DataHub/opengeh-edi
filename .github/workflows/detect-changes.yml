@@ -49,9 +49,9 @@ jobs:
         with:
           filters: |
             b2bapi:
-              - 'src/B2BApi/**/*'
+              - 'source/B2BApi/**/*'
             b2capi:
-              - 'src/B2CWebApi/**/*'           
+              - 'source/B2CWebApi/**/*'           
             render_c4model_views:
               - 'docs/diagrams/c4-model/views.dsl'
               - 'docs/diagrams/c4-model/views.json'
