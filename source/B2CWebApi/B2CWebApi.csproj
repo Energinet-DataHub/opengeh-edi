@@ -8,33 +8,33 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Energinet.DataHub.Core.App.WebApp" Version="13.2.0"/>
+        <PackageReference Include="Energinet.DataHub.Core.App.WebApp" Version="13.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.11" />
-        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0"/>
-        <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="2.13.6"/>
-        <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0"/>
-        <PackageReference Include="Microsoft.OpenApi" Version="1.6.22"/>
+        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
+        <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.DurableTask" Version="2.13.6" />
+        <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
+        <PackageReference Include="Microsoft.OpenApi" Version="1.6.22" />
         <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.3"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.3" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj"/>
-        <ProjectReference Include="..\ArchivedMessages.Interfaces\ArchivedMessages.Interfaces.csproj"/>
-        <ProjectReference Include="..\AuditLog\AuditLog.csproj"/>
-        <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj"/>
-        <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj"/>
-        <ProjectReference Include="..\DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj"/>
-        <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj"/>
-        <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj"/>
+        <ProjectReference Include="..\ArchivedMessages.Infrastructure\ArchivedMessages.Infrastructure.csproj" />
+        <ProjectReference Include="..\ArchivedMessages.Interfaces\ArchivedMessages.Interfaces.csproj" />
+        <ProjectReference Include="..\AuditLog\AuditLog.csproj" />
+        <ProjectReference Include="..\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+        <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+        <ProjectReference Include="..\DataAccess.UnitOfWork\DataAccess.UnitOfWork.csproj" />
+        <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj" />
+        <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj" />
         <!--PLEASE DO NOT REMOVE THE REFERENCE TO INCOMINGMESSAGES.INFRASTRUCTURE! DOING SO WILL BREAK THE SCHEMA LOOKUP!-->
-        <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj"/>
+        <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
         <!--READ THE COMMENT ABOVE-->
-        <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj"/>
-        <ProjectReference Include="..\Outbox.Infrastructure\Outbox.Infrastructure.csproj"/>
+        <ProjectReference Include="..\MasterData.Infrastructure\MasterData.Infrastructure.csproj" />
+        <ProjectReference Include="..\Outbox.Infrastructure\Outbox.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemDefinitionGroup>

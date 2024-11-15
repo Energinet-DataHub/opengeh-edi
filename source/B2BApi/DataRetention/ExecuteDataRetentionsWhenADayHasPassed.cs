@@ -82,7 +82,9 @@ public class ExecuteDataRetentionsWhenADayHasPassed : INotificationHandler<ADayH
         finally
         {
             foreach (var scope in serviceScopes)
+            {
                 scope.Dispose();
+            }
         }
     }
 

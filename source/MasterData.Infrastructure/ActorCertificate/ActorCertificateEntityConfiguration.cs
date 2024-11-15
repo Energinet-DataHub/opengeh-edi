@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 using Energinet.DataHub.EDI.MasterData.Domain.ActorCertificates;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.EDI.MasterData.Infrastructure.ActorCertificate;
+namespace Energinet.DataHub.EDI.MasterData.Infrastructure.ActorCertificates;
 
 public class ActorCertificateEntityConfiguration : IEntityTypeConfiguration<Domain.ActorCertificates.ActorCertificate>
 {
