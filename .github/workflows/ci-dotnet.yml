@@ -157,9 +157,9 @@ jobs:
       matrix:
         tests_filter_expression:
           - name: ArchitectureTests
-            paths: \source\ArchitectureTests\bin\Release\net8.0\Energinet.DataHub.EDI.ArchitectureTests.dll
+            paths: Energinet.DataHub.EDI.ArchitectureTests.dll
           - name: Tests
-            paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.Tests.dll
+            paths: Energinet.DataHub.EDI.Tests.dll
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@kerbou/2524-build-brs-pipeline
     with:
       download_artifact_name: dotnet-tests-outputs
@@ -180,19 +180,19 @@ jobs:
       matrix:
         tests_filter_expression:
           - name: ProcessManager Tests
-            paths: \source\ProcessManager.Tests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.Tests.dll
+            paths: Energinet.DataHub.ProcessManager.Tests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: ProcessManager Orchestrations Tests
-            paths: \source\ProcessManager.Orchestrations.Tests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.Orchestrations.Tests.dll
+            paths: Energinet.DataHub.ProcessManager.Orchestrations.Tests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
 
           - name: ProcessManager Core Tests
-            paths: \source\ProcessManager.Core.Tests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.Core.Tests.dll
+            paths: Energinet.DataHub.ProcessManager.Core.Tests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
             contentroot_variable_name: empty # Means skip
