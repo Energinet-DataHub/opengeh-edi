@@ -37,8 +37,6 @@ runs:
       run: |
         dotnet publish \
           'source/ApplyDBMigrationsApp/ApplyDBMigrationsApp.csproj' \
-          --no-build \
-          --no-restore \
           --configuration Release \
           --output '${{ inputs.output_path }}\migration\databasemigration'
 
@@ -47,8 +45,6 @@ runs:
       run: |
         dotnet publish \
           'source/B2BApi/B2BApi.csproj' \
-          --no-build \
-          --no-restore \
           --configuration Release \
           --output '${{ inputs.output_path }}\functions\b2bapi'
 
@@ -57,8 +53,6 @@ runs:
       run: |
         dotnet publish \
           'source/SubsystemTests/SubsystemTests.csproj' \
-          --no-build \
-          --no-restore \
           --configuration Release \
           --output '${{ inputs.output_path }}\SubsystemTests'
 
@@ -67,8 +61,6 @@ runs:
       run: |
         dotnet publish \
           'source/SystemTests/SystemTests.csproj' \
-          --no-build \
-          --no-restore \
           --configuration Release \
           --output '${{ inputs.output_path }}\SystemTests'
 
@@ -77,8 +69,6 @@ runs:
       run: |
         dotnet publish \
           'source/B2CWebApi/B2CWebApi.csproj' \
-          --no-build \
-          --no-restore \
           --configuration Release \
           --output '${{ inputs.output_path }}\b2cwebapi'
 
@@ -87,8 +77,6 @@ runs:
       run: |
         dotnet publish \
           'source/ProcessManager/ProcessManager.csproj' \
-          --no-build \
-          --no-restore \
           --configuration Release \
           --output '${{ inputs.output_path }}\functions\ProcessManager.Api'
 
@@ -97,8 +85,6 @@ runs:
       run: |
         dotnet publish \
           'source/ProcessManager.Orchestrations/ProcessManager.Orchestrations.csproj' \
-          --no-build \
-          --no-restore \
           --configuration Release \
           --output '${{ inputs.output_path }}\functions\ProcessManager.Orchestrations'
 
@@ -107,7 +93,5 @@ runs:
       run: |
         dotnet publish \
           'source/ProcessManager.DatabaseMigration/ProcessManager.DatabaseMigration.csproj' \
-          --no-build \
-          --no-restore \
           --configuration Release \
           --output '${{ inputs.output_path }}\migration\ProcessManager.DatabaseMigration'
