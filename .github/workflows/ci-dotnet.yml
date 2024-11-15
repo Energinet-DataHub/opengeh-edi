@@ -36,7 +36,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RELEASE_FOLDER_PATH: ${{ github.workspace }}/output
-      #RELEASE_ZIP_FILENAME: dotnet_${{ github.event.pull_request.number }}.zip
       RELEASE_VERSION: dotnet_${{ github.event.pull_request.number }}
     strategy:
       fail-fast: false
