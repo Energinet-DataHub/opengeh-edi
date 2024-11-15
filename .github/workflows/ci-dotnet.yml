@@ -30,11 +30,17 @@ jobs:
         run: |
           echo "Job context: ${{ github.event.inputs.job_context }}"
 
-  # Build all projects within solution
-  dotnet_ci_build:
+  # Build DB migrations artifact
+  dotnet_ci_build_auditlog_project:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v14
     with:
-      solution_file_path: source/Edi.Repository.sln
+      solution_file_path: source/AuditLog/AuditLog.csproj
+
+  # Build DB migrations artifact
+  dotnet_ci_build_db_migrations_project:
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v14
+    with:
+      solution_file_path: source/ApplyDBMigrationsApp/ApplyDBMigrationsApp.csproj
 
   # Tests that do not require the integration test environment
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
