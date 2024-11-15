@@ -1,5 +1,9 @@
 # ProcessManager.Client Release Notes
 
+## Version 0.9.3
+
+- Updated 'NotifyAggregatedMeasureDataInputV1' with new required 'UserId' parameter/property.
+
 ## Version 0.9.2
 
 - Updated DTO types.
