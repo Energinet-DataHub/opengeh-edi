@@ -42,7 +42,6 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
     protected override async Task<IncomingMarketMessageParserResult> ParseMessageAsync(
         IIncomingMarketMessageStream marketMessage,
         XmlSchema schemaResult,
-        string @namespace,
         CancellationToken cancellationToken)
     {
         using var reader = XmlReader.Create(marketMessage.Stream, CreateXmlReaderSettings(schemaResult));
@@ -52,6 +51,7 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
         }
 
         var document = await XDocument.LoadAsync(reader, LoadOptions.None, cancellationToken).ConfigureAwait(false);
+        var @namespace = GetNamespace(marketMessage);
         var ns = XNamespace.Get(@namespace);
 
         var header = ParseHeader(document, ns);
@@ -65,7 +65,7 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
         return CreateResult(header, transactions);
     }
 
-    protected override async Task<(XmlSchema? Schema, string? Namespace, IncomingMarketMessageParserResult? Result)> GetSchemaAsync(IIncomingMarketMessageStream marketMessage, CancellationToken cancellationToken)
+    protected override async Task<(XmlSchema? Schema, IncomingMarketMessageParserResult? Result)> GetSchemaAsync(IIncomingMarketMessageStream marketMessage, CancellationToken cancellationToken)
     {
         string? @namespace = null;
         IncomingMarketMessageParserResult? parserResult = null;
@@ -97,7 +97,7 @@ public abstract class EbixMessageParserBase(EbixSchemaProvider schemaProvider) :
             parserResult = Invalid(indexOutOfRangeException);
         }
 
-        return (xmlSchema, @namespace, parserResult);
+        return (xmlSchema, parserResult);
     }
 
     protected abstract IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(XDocument document, XNamespace ns, string senderNumber);
