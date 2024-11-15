@@ -32,8 +32,8 @@ jobs:
           echo "Job context: ${{ inputs.job_context }}"
 
   build_artifact:
-    name: Artifact - ${{ matrix.artifact.name }}    
-    runs-on: ubuntu-latest   
+    name: Artifact - ${{ matrix.artifact.name }}   
+    runs-on: ubuntu-latest
     env:
       RELEASE_FOLDER_PATH: ${{ github.workspace }}/output
       RELEASE_ZIP_FILENAME: dotnet_${{ github.event.pull_request.number }}.zip
@@ -61,8 +61,8 @@ jobs:
           dotnet publish \
             '${{ matrix.artifact.path }}' \
             --configuration Release \
-            --output '${{ matrix.artifact.outputpath }}'  
-            
+            --output '${{ matrix.artifact.outputpath }}' 
+
       - name: Zip files for prerelease
         if: github.event_name == 'pull_request'
         uses: thedoctor0/zip-release@0.6.2
@@ -80,11 +80,11 @@ jobs:
           prerelease: true
           title: ${{ env.RELEASE_VERSION }}
           files: |
-            ${{ env.RELEASE_FOLDER_PATH }}/${{ env.RELEASE_ZIP_FILENAME }}            
+            ${{ env.RELEASE_FOLDER_PATH }}/${{ env.RELEASE_ZIP_FILENAME }}
 
   # Tests that do not require the integration test environment
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
-  unit_tests:    
+  unit_tests:
     strategy:
       fail-fast: false
       matrix:
@@ -111,7 +111,7 @@ jobs:
             paths: \source\ProcessManager.Tests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.Tests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
-            contentroot_variable_name: empty # Means skip            
+            contentroot_variable_name: empty # Means skip      
 
           - name: ProcessManager Orchestrations Tests
             paths: \source\ProcessManager.Orchestrations.Tests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.Orchestrations.Tests.dll

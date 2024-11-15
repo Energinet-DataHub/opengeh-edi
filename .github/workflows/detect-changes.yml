@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     # Set job outputs to values from filter step
     outputs:
-      job_context: "{ 
+      job_context: "{
         'b2bapi': '${{ steps.filter.outputs.b2bapi }}',
         'b2capi': '${{ steps.filter.outputs.b2capi }}',
         'render_c4model_views': '${{ steps.filter.outputs.render_c4model_views }}'
@@ -51,7 +51,7 @@ jobs:
             b2bapi:
               - 'src/B2BApi/**/*'
             b2capi:
-              - 'src/B2CWebApi/**/*'              
+              - 'src/B2CWebApi/**/*'           
             render_c4model_views:
               - 'docs/diagrams/c4-model/views.dsl'
               - 'docs/diagrams/c4-model/views.json'
