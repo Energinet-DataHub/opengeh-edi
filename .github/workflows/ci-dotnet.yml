@@ -117,6 +117,8 @@ jobs:
             --configuration Release \
             --output '${{ matrix.testproject.outputpath }}'
 
+          ls ${{ matrix.testproject.outputpath }}
+
       - uses: actions/upload-artifact@v4
         with:
           name: edi-tests-${{ matrix.testproject.name }}
