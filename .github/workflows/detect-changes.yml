@@ -25,14 +25,6 @@ on:
     outputs:
       job_context:
         value: ${{ jobs.changes.outputs.job_context }}
-      # dotnet:
-      #   value: ${{ jobs.changes.outputs.dotnet }}
-      # db_migrations:
-      #   value: ${{ jobs.changes.outputs.db_migrations }}
-      # processmanager_client:
-      #   value: ${{ jobs.changes.outputs.processmanager_client }}
-      # render_c4model_views:
-      #   value: ${{ jobs.changes.outputs.render_c4model_views }}
 
 jobs:
   changes:
@@ -40,11 +32,11 @@ jobs:
     runs-on: ubuntu-latest
     # Set job outputs to values from filter step
     outputs:
-      job_context: ${{ steps.filter.outputs.changes }}
-      dotnet: ${{ steps.filter.outputs.dotnet }}
-      db_migrations: ${{ steps.filter.outputs.db_migrations }}
-      processmanager_client: ${{ steps.filter.outputs.processmanager_client }}
-      render_c4model_views: ${{ steps.filter.outputs.render_c4model_views }}
+      job_context: ${{ toJson(steps.filter.outputs.changes) }}
+      # dotnet: ${{ steps.filter.outputs.dotnet }}
+      # db_migrations: ${{ steps.filter.outputs.db_migrations }}
+      # processmanager_client: ${{ steps.filter.outputs.processmanager_client }}
+      # render_c4model_views: ${{ steps.filter.outputs.render_c4model_views }}
     steps:
       # For pull requests it's not necessary to checkout the code because GitHub REST API is used to determine changes
       - name: Checkout repository

@@ -41,13 +41,13 @@ jobs:
 
   ci_processmanager_client:
     needs: changes
-    if: ${{ needs.changes.outputs.processmanager_client == 'true' }}
+    if: ${{ fromJson(needs.changes.outputs.job_context).processmanager_client == 'true' }}
     uses: ./.github/workflows/processmanager-client-bundle-publish.yml
     secrets: inherit
 
   render_c4model_views:
     needs: changes
-    if: ${{ needs.changes.outputs.render_c4model_views == 'true' }}
+    if: ${{ fromJson(needs.changes.outputs.job_context).render_c4model_views == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/structurizr-render-diagrams.yml@v13
     with:
       structurizr_workspace_filename: views
