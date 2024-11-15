@@ -31,7 +31,7 @@ public class EbixMessageParser(EbixSchemaProvider schemaProvider) : EbixMessageP
     private const string IncludedProductCharacteristic = "IncludedProductCharacteristic";
     private const string UnitType = "UnitType";
     private const string DetailMeasurementMeteringPointCharacteristic = "DetailMeasurementMeteringPointCharacteristic";
-    private const string TypeOfMeteringPoint = "TypeOfMeteringPoint";
+    private const string MeteringPointType = "TypeOfMeteringPoint";
     private const string MeteringPointDomainLocation = "MeteringPointDomainLocation";
     private const string Position = "Position";
     private const string EnergyQuantity = "EnergyQuantity";
@@ -42,20 +42,20 @@ public class EbixMessageParser(EbixSchemaProvider schemaProvider) : EbixMessageP
 
     protected override IReadOnlyCollection<IIncomingMessageSeries> ParseTransactions(XDocument document, XNamespace ns, string senderNumber)
     {
-        var seriesElements = document.Descendants(ns + SeriesElementName);
+        var transactionElements = document.Descendants(ns + SeriesElementName);
         var result = new List<MeteredDataForMeasurementPointSeries>();
-        foreach (var seriesElement in seriesElements)
+        foreach (var transactionElement in transactionElements)
         {
-            var id = seriesElement.Element(ns + Identification)?.Value ?? string.Empty;
-            var resolution = seriesElement.Element(ns + ObservationTimeSeriesPeriod)?.Element(ns + ResolutionDuration)?.Value;
-            var startDateAndOrTimeDateTime = seriesElement.Element(ns + ObservationTimeSeriesPeriod)?.Element(ns + Start)?.Value ?? string.Empty;
-            var endDateAndOrTimeDateTime = seriesElement.Element(ns + ObservationTimeSeriesPeriod)?.Element(ns + End)?.Value;
-            var productNumber = seriesElement.Element(ns + IncludedProductCharacteristic)?.Element(ns + Identification)?.Value;
-            var productUnitType = seriesElement.Element(ns + IncludedProductCharacteristic)?.Element(ns + UnitType)?.Value;
-            var meteringPointType = seriesElement.Element(ns + DetailMeasurementMeteringPointCharacteristic)?.Element(ns + TypeOfMeteringPoint)?.Value;
-            var meteringPointLocationId = seriesElement.Element(ns + MeteringPointDomainLocation)?.Element(ns + Identification)?.Value;
+            var id = transactionElement.Element(ns + Identification)?.Value ?? string.Empty;
+            var resolution = transactionElement.Element(ns + ObservationTimeSeriesPeriod)?.Element(ns + ResolutionDuration)?.Value;
+            var startDateAndOrTimeDateTime = transactionElement.Element(ns + ObservationTimeSeriesPeriod)?.Element(ns + Start)?.Value ?? string.Empty;
+            var endDateAndOrTimeDateTime = transactionElement.Element(ns + ObservationTimeSeriesPeriod)?.Element(ns + End)?.Value;
+            var productNumber = transactionElement.Element(ns + IncludedProductCharacteristic)?.Element(ns + Identification)?.Value;
+            var productUnitType = transactionElement.Element(ns + IncludedProductCharacteristic)?.Element(ns + UnitType)?.Value;
+            var meteringPointType = transactionElement.Element(ns + DetailMeasurementMeteringPointCharacteristic)?.Element(ns + MeteringPointType)?.Value;
+            var meteringPointLocationId = transactionElement.Element(ns + MeteringPointDomainLocation)?.Element(ns + Identification)?.Value;
 
-            var energyObservations = seriesElement
+            var energyObservations = transactionElement
                 .Descendants(ns + IntervalEnergyObservation)
                 .Select(e => new EnergyObservation(
                     e.Element(ns + Position)?.Value,
