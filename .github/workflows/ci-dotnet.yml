@@ -32,12 +32,14 @@ jobs:
 
   # Build DB migrations artifact
   dotnet_ci_build_auditlog_project:
+    name: Build AuditLog project
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v14
     with:
       solution_file_path: source/AuditLog/AuditLog.csproj
 
   # Build DB migrations artifact
   dotnet_ci_build_db_migrations_project:
+    name: Build DBMigrations project
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v14
     with:
       solution_file_path: source/ApplyDBMigrationsApp/ApplyDBMigrationsApp.csproj
