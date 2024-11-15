@@ -57,7 +57,7 @@ jobs:
         run: echo ${{matrix.artifact.should_build}}
 
       - name: Checkout repository
-        if: ${{ matrix.artifact.should_build == true }} 
+        if: ${{ matrix.artifact.should_build == true }}
         uses: actions/checkout@v4
 
       - name: Build ${{ matrix.artifact.name }}
@@ -117,13 +117,13 @@ jobs:
             '${{ matrix.testproject.path }}' \
             --configuration Release \
             --output '${{ matrix.testproject.outputpath }}'
-      
+
       - uses: actions/upload-artifact@v4
         with:
           name: edi-tests-${{ matrix.testproject.name }}
           path: ./source/Tests/bin/Release/net8.0/*.dll
 
-      # - name: Copy all bin folders 
+      # - name: Copy all bin folders
       #   shell: bash
       #   run: |
       #     # Create base directory
@@ -149,7 +149,7 @@ jobs:
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
   unit_tests:
     needs: [
-      merge, 
+      merge,
       build_testsuite
     ]
     strategy:
@@ -172,7 +172,7 @@ jobs:
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
   integration_tests:
     needs: [
-      merge, 
+      merge,
       build_testsuite
     ]
     strategy:
