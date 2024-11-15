@@ -31,7 +31,7 @@ jobs:
           echo "Job context: ${{ inputs.job_context }}"
           echo "Job context auditlog: ${{ fromJson(inputs.job_context).auditlog }}"
 
-  build_artifact:
+  build_artifact:    
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -39,38 +39,38 @@ jobs:
         artifact:
           - name: B2BAPI
             path: source/B2BApi/B2BApi.csproj
-            outputpath: ${{ inputs.output_path }}\functions\b2bapi
+            outputpath:  ${{ github.workspace }}\output\functions\b2bapi
           - name: Databasemigration
             path: source/ApplyDBMigrationsApp/ApplyDBMigrationsApp.csproj
-            outputpath: ${{ inputs.output_path }}\migration\databasemigration
+            outputpath: ${{ github.workspace }}\output\migration\databasemigration
           - name: SubsystemTests
-            path: 'source/SubsystemTests/SubsystemTests.csproj'
-            outputpath: '${{ inputs.output_path }}\SubsystemTests'
+            path: source/SubsystemTests/SubsystemTests.csproj
+            outputpath: ${{ github.workspace }}\output\SubsystemTests
           - name: SystemTests
-            path: 'source/SystemTests/SystemTests.csproj'
-            outputpath: '${{ inputs.output_path }}\SystemTests'
+            path: source/SystemTests/SystemTests.csproj
+            outputpath: ${{ github.workspace }}\output\SystemTests
           - name: B2CWebApi'
-            path: 'source/B2CWebApi/B2CWebApi.csproj'
-            outputpath: '${{ inputs.output_path }}\b2cwebapi'
+            path: source/B2CWebApi/B2CWebApi.csproj
+            outputpath: ${{ github.workspace }}\output\b2cwebapi
           - name: ProcessManager API
-            path: 'source/ProcessManager/ProcessManager.csproj'
-            outputpath: '${{ inputs.output_path }}\functions\ProcessManager.Api'
+            path: source/ProcessManager/ProcessManager.csproj'
+            outputpath: ${{ github.workspace }}\output\functions\ProcessManager.Api
           - name: ProcessManager Orchestrations
-            path: 'source/ProcessManager.Orchestrations/ProcessManager.Orchestrations.csproj'
-            outputpath: '${{ inputs.output_path }}\functions\ProcessManager.Orchestrations'
+            path: source/ProcessManager.Orchestrations/ProcessManager.Orchestrations.csproj
+            outputpath: ${{ github.workspace }}\output\functions\ProcessManager.Orchestrations
           - name: ProcessManager Migration
-            path: 'source/ProcessManager.DatabaseMigration/ProcessManager.DatabaseMigration.csproj'
-            outputpath: '${{ inputs.output_path }}\migration\ProcessManager.DatabaseMigration'
-          steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+            path: source/ProcessManager.DatabaseMigration/ProcessManager.DatabaseMigration.csproj
+            outputpath: ${{ github.workspace }}\output\migration\ProcessManager.DatabaseMigration
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-            - name: Build ${{ matrix.artifact.name }}
-              run: |
-                dotnet publish \
-                  '${{ matrix.artifact.path }}' \
-                  --configuration Release \
-                  --output '${{ matrix.artifact.outputpath }}'
+      - name: Build ${{ matrix.artifact.name }}
+        run: |
+          dotnet publish \
+            '${{ matrix.artifact.path }}' \
+            --configuration Release \
+            --output '${{ matrix.artifact.outputpath }}'
 
   # Tests that do not require the integration test environment
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
