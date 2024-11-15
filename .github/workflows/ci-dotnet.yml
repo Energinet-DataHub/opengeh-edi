@@ -53,7 +53,7 @@ jobs:
             path: source/B2CWebApi/B2CWebApi.csproj
             outputpath: ${{ github.workspace }}\output\b2cwebapi
           - name: ProcessManager API
-            path: source/ProcessManager/ProcessManager.csproj'
+            path: source/ProcessManager/ProcessManager.csproj
             outputpath: ${{ github.workspace }}\output\functions\ProcessManager.Api
           - name: ProcessManager Orchestrations
             path: source/ProcessManager.Orchestrations/ProcessManager.Orchestrations.csproj
