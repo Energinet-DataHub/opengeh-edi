@@ -32,7 +32,7 @@ jobs:
           echo "Job context: ${{ inputs.job_context }}"
 
   build_artifact:
-    name: Artifact - ${{ matrix.artifact.name }}   
+    name: Artifact - ${{ matrix.artifact.name }}
     runs-on: ubuntu-latest
     env:
       RELEASE_FOLDER_PATH: ${{ github.workspace }}/output
@@ -61,7 +61,7 @@ jobs:
           dotnet publish \
             '${{ matrix.artifact.path }}' \
             --configuration Release \
-            --output '${{ env.RELEASE_FOLDER_PATH }}/${{ matrix.artifact.outputpath }}' 
+            --output '${{ env.RELEASE_FOLDER_PATH }}/${{ matrix.artifact.outputpath }}'
 
       - name: Zip files for prerelease
         if: github.event_name == 'pull_request'
@@ -122,9 +122,9 @@ jobs:
           # Copy everything from source to the new directory
           cp -a source/. '${{ inputs.output_path }}/source'
           # Remove obj-directories from artifact
-          find ${{ inputs.output_path }}/ -type d -name 'obj' -exec rm -rf {} +            
+          find ${{ inputs.output_path }}/ -type d -name 'obj' -exec rm -rf {} +
 
-        
+
 
   # Tests that do not require the integration test environment
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
@@ -157,7 +157,7 @@ jobs:
             paths: \source\ProcessManager.Tests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.Tests.dll
             filter: empty # Means skip
             use_azure_functions_tools: true
-            contentroot_variable_name: empty # Means skip      
+            contentroot_variable_name: empty # Means skip
 
           - name: ProcessManager Orchestrations Tests
             paths: \source\ProcessManager.Orchestrations.Tests\bin\Release\net8.0\Energinet.DataHub.ProcessManager.Orchestrations.Tests.dll
