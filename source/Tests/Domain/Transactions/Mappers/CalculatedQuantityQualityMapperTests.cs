@@ -48,7 +48,10 @@ public sealed class CalculatedQuantityQualityMapperTests
                 var source = powerSet[j];
                 var destination = powerSet[count + j] = new T[source.Length + 1];
                 for (var q = 0; q < source.Length; q++)
+                {
                     destination[q] = source[q];
+                }
+
                 destination[source.Length] = cur;
             }
         }
