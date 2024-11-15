@@ -37,7 +37,7 @@ jobs:
     needs: changes
     uses: ./.github/workflows/ci-dotnet.yml
     with:
-      job_context: ${{ toJSON(needs.changes.outputs) }}
+      job_context: ${{ needs.changes.outputs.job_context }}
 
   ci_processmanager_client:
     needs: changes

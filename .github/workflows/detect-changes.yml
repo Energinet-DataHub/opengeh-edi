@@ -23,14 +23,16 @@ name: Detect changes
 on:
   workflow_call:
     outputs:
-      dotnet:
-        value: ${{ jobs.changes.outputs.dotnet }}
-      db_migrations:
-        value: ${{ jobs.changes.outputs.db_migrations }}
-      processmanager_client:
-        value: ${{ jobs.changes.outputs.processmanager_client }}
-      render_c4model_views:
-        value: ${{ jobs.changes.outputs.render_c4model_views }}
+      job_context: 
+        value: ${{ jobs.changes.outputs }}
+      #dotnet:
+      #  value: ${{ jobs.changes.outputs.dotnet }}
+      # db_migrations:
+      #   value: ${{ jobs.changes.outputs.db_migrations }}
+      # processmanager_client:
+      #   value: ${{ jobs.changes.outputs.processmanager_client }}
+      # render_c4model_views:
+      #   value: ${{ jobs.changes.outputs.render_c4model_views }}
 
 jobs:
   changes:
