@@ -32,7 +32,7 @@ jobs:
           echo "Job context auditlog: ${{ fromJson(inputs.job_context).auditlog }}"
 
   build_artifact:
-    name: Build ${{ matrix.artifact.name }}    
+    name: Artifact - ${{ matrix.artifact.name }}    
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -75,8 +75,9 @@ jobs:
 
   # Tests that do not require the integration test environment
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
-  tests:
+  tests:    
     if: ${{ fromJson(inputs.job_context).architecture_tests == 'true' }}
+    name: Test - ${{ matrix.tests_filter_expression.name}}
     strategy:
       fail-fast: false
       matrix:
@@ -95,6 +96,7 @@ jobs:
   # Tests that require the integration test environment
   # DO NOT add ProcessManager.Client tests, they must be executed as part of the "publish" workflow"
   integration_tests:
+    name: Test - ${{ matrix.tests_filter_expression.name}}
     strategy:
       fail-fast: false
       matrix:
