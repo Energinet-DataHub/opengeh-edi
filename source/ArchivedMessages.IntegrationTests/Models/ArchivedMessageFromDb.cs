@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.ArchivedMessages.Interfaces.Models;
 using NodaTime;
 
 namespace Energinet.DataHub.EDI.ArchivedMessages.IntegrationTests.Models;
@@ -35,7 +35,7 @@ public record ArchivedMessageFromDb(
     string? EventIds,
     string ReceiverRoleCode,
     string SenderRoleCode)
-    : MessageInfo(
+    : MessageInfoDto(
         RecordId,
         Id,
         MessageId,

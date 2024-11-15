@@ -12,9 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.EDI.ArchivedMessages.Interfaces;
+using Energinet.DataHub.EDI.BuildingBlocks.Domain.Models;
 
-public record ArchivedMessageId(Guid Value)
+namespace Energinet.DataHub.EDI.ArchivedMessages.Domain.Models;
+
+#pragma warning disable CA1711 // Is a "Stream" value type
+public sealed record ArchivedMessageStream : StreamValueObject, IArchivedMessageStream
 {
-    public static ArchivedMessageId Create() => new(Guid.NewGuid());
+    public ArchivedMessageStream(FileStorageFile fileStorageFile)
+        : base(fileStorageFile?.Stream) { }
+
+    /// <summary>
+    /// This is only intended for testing and mapping purposes
+    /// </summary>
+    public ArchivedMessageStream(Stream stream)
+        : base(stream) { }
 }

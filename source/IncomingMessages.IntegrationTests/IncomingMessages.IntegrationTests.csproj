@@ -1,4 +1,4 @@
-<!--
+﻿<!--
 Copyright 2020 Energinet DataHub A/S
 
 Licensed under the Apache License, Version 2.0 (the "License2");
@@ -66,14 +66,14 @@ limitations under the License.
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ArchivedMessages.Application\ArchivedMessages.Application.csproj" />
+        <ProjectReference Include="..\ArchivedMessages.Infrastructure\ArchivedMessages.Infrastructure.csproj" />
         <ProjectReference Include="..\B2BApi\B2BApi.csproj" />
         <ProjectReference Include="..\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
         <ProjectReference Include="..\BuildingBlocks.Tests\BuildingBlocks.Tests.csproj" />
         <ProjectReference Include="..\IncomingMessages.Application\IncomingMessages.Application.csproj" />
         <ProjectReference Include="..\IncomingMessages.Infrastructure\IncomingMessages.Infrastructure.csproj" />
         <ProjectReference Include="..\IncomingMessages.Interfaces\IncomingMessages.Interfaces.csproj" />
-        <ProjectReference Include="..\MasterData.Application\MasterData.Application.csproj" />
+        <ProjectReference Include="..\MasterData.Infrastructure\MasterData.Infrastructure.csproj" />
         <ProjectReference Include="..\MasterData.Interfaces\MasterData.Interfaces.csproj" />
     </ItemGroup>
 
