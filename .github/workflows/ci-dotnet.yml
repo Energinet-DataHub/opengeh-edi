@@ -55,7 +55,7 @@ jobs:
     steps:
       - name: Echo ${{matrix.artifact.should_build}}
         run: echo ${{matrix.artifact.should_build}}
-        
+
       - name: Checkout repository
         if: ${{ matrix.artifact.should_build == 'true' }} 
         uses: actions/checkout@v4
@@ -162,7 +162,7 @@ jobs:
             paths: \source\Tests\bin\Release\net8.0\Energinet.DataHub.EDI.Tests.dll
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@kerbou/2524-build-brs-pipeline
     with:
-      download_artifact_name: dotnet-tests-outputs
+      download_artifact_name: dotnet-tests-outputs.zip
       download_attempt_limit: 30
       # Matrix parameters
       job_name: ${{ matrix.tests_filter_expression.name }}
@@ -289,7 +289,7 @@ jobs:
 
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@kerbou/2524-build-brs-pipeline
     with:
-      download_artifact_name: dotnet-tests-outputs
+      download_artifact_name: dotnet-tests-outputs.zip
       download_attempt_limit: 20
       azure_integrationtest_tenant_id: ${{ vars.integration_test_azure_tenant_id }}
       azure_integrationtest_subscription_id: ${{ vars.integration_test_azure_subscription_id }}
