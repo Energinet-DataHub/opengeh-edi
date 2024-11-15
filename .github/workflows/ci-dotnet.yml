@@ -46,12 +46,12 @@ jobs:
             should_build: ${{ fromJson(inputs.job_context).b2bapi == 'true' }}
             project_name: b2bapi
             path: source/B2BApi/B2BApi.csproj
-            outputpath: ${{ github.workspace }}/output/functions/b2bapi
+            outputpath: functions/b2bapi
           - name: B2C WebAPI
             should_build: ${{ fromJson(inputs.job_context).b2capi == 'true' }}
             project_name: b2capi
             path: source/B2CWebApi/B2CWebApi.csproj
-            outputpath: ${{ github.workspace }}/output/functions/b2capi
+            outputpath: functions/b2capi
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -61,7 +61,7 @@ jobs:
           dotnet publish \
             '${{ matrix.artifact.path }}' \
             --configuration Release \
-            --output '${{ matrix.artifact.outputpath }}' 
+            --output '${{ env.RELEASE_FOLDER_PATH }}/${{ matrix.artifact.outputpath }}' 
 
       - name: Zip files for prerelease
         if: github.event_name == 'pull_request'
